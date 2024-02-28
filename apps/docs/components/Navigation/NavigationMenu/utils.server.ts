@@ -10,19 +10,18 @@
  * Nav utilities that can be used on the client go in a separate file.
  */
 
-/**
- * Makes it obvious if we accidentally use this code in the browser.
- */
-import assert from 'node:assert'
-assert.ok('Running in Node')
-
 import { compact, flow } from 'lodash'
 
 import { type RefMenuCategory, type RefMenuItem, UNTITLED } from './NavigationMenuRefListItems'
 
-import commonClientLibSections from '~/spec/common-client-libs-sections.json' assert { type: 'json' }
+import type cliCommonSections from '~/spec/common-cli-sections.json'
+import type commonClientLibSections from '~/spec/common-client-libs-sections.json'
 
-type CommonClientLibSections = typeof commonClientLibSections
+type CommonRefSections = typeof commonClientLibSections | typeof cliCommonSections
+type IncludeList = {
+  tag: string
+  list: Array<string>
+}
 
 /**
  * Creates a string ID with weak guarantees on uniqueness.
@@ -35,27 +34,28 @@ const weakUniqId = () => Math.random().toString(36).slice(2)
 /**
  * Items are excluded if:
  * - They are explicitly excluded by defining an `excludes` array.
- * - They are implicitly excluded because the function is not defined within
- *   the current client library.
+ * - They are implicitly excluded because they aren't defined in the specific
+ *   spec.
  */
 const isExcluded = <T extends { id: string; type: string }>(
-  excludedName: string,
-  includedFunctions: Array<string>,
+  includeList: IncludeList,
+  excludedName: string | undefined,
   section: T
 ) =>
-  ('excludes' in section &&
+  (excludedName &&
+    'excludes' in section &&
     Array.isArray(section.excludes) &&
     !!section.excludes?.includes(excludedName)) ||
-  (section.type === 'function' && !includedFunctions.includes(section.id as string))
+  (section.type === includeList.tag && !includeList.list.includes(section.id as string))
 
 /**
  * Marks excluded items from the commont client lib spec as null.
  */
 const markExcluded =
-  (excludedName: string, includedFunctions: Array<string>) =>
+  (includeList: IncludeList, excludedName: string | undefined) =>
   <Elem extends { id: string; type: string }, T extends Array<Elem>>(libSections: T) =>
     libSections.map((section) => {
-      if (isExcluded(excludedName, includedFunctions, section)) return null
+      if (isExcluded(includeList, excludedName, section)) return null
       if (!('items' in section)) return section
       if (!Array.isArray(section.items)) {
         const { items, ...rest } = section
@@ -63,7 +63,7 @@ const markExcluded =
       }
       return {
         ...section,
-        items: removeExcluded(excludedName, includedFunctions)(section.items),
+        items: removeExcluded(includeList, excludedName)(section.items),
       }
     })
 
@@ -72,12 +72,12 @@ const markExcluded =
  * functions that are not relevant to the current client library.
  *
  * @param { string } excludedName - A name in the exclusions list of the common client library spec
- * @param { string[] } includedFunctions - Functions included in the spec of  the current client library
+ * @param { string[] } includeList - Functions included in the spec of  the current client library
  */
 const removeExcluded =
-  (excludedName: string, includedFunctions: Array<string>) =>
+  (includeList: IncludeList, excludedName: string | undefined) =>
   <Elem extends { id: string; type: string }, T extends Array<Elem>>(libSections: T) =>
-    compact(markExcluded(excludedName, includedFunctions)(libSections))
+    compact(markExcluded(includeList, excludedName)(libSections))
 
 const createUntitledCategory = () =>
   ({
@@ -110,7 +110,7 @@ const reformat =
 /**
  * Creates a function that organizes the common client lib spec by category.
  */
-const collectCategories = (sectionPath: `/${string}`) => (libSections: CommonClientLibSections) =>
+const collectCategories = (sectionPath: `/${string}`) => (libSections: CommonRefSections) =>
   libSections.reduce((allSections, currentSection) => {
     if (currentSection.type !== 'category') {
       // Current section is a category member
@@ -130,8 +130,9 @@ const collectCategories = (sectionPath: `/${string}`) => (libSections: CommonCli
   }, [] as Array<RefMenuCategory>)
 
 type ToClientLibraryMenuParams = {
-  excludedName: string
-  includedFunctions: Array<string>
+  sections: CommonRefSections
+  excludedName?: string
+  includeList: IncludeList
   sectionPath: `/${string}`
 }
 
@@ -140,14 +141,14 @@ type ToClientLibraryMenuParams = {
  * produce a nav menu.
  */
 const toClientLibraryMenu = ({
+  sections,
   excludedName,
-  includedFunctions,
+  includeList,
   sectionPath,
 }: ToClientLibraryMenuParams) =>
-  flow([removeExcluded(excludedName, includedFunctions), collectCategories(sectionPath)])(
-    commonClientLibSections
-  ) as unknown as (
-    params: ToClientLibraryMenuParams
-  ) => ReturnType<ReturnType<typeof collectCategories>> // cast to return type of last function in flow
+  flow([removeExcluded(includeList, excludedName), collectCategories(sectionPath)])(
+    sections
+  ) as unknown as ReturnType<ReturnType<typeof collectCategories>> // cast to return type of last function in flow
 
+export type { CommonRefSections, IncludeList }
 export { toClientLibraryMenu }

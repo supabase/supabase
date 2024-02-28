@@ -1,5 +1,4 @@
 import NavigationMenuRefListItems, { type RefMenuCategory } from './NavigationMenuRefListItems'
-import { ActiveElemContext, useActiveElemController } from './utils'
 
 interface NavigationMenuRefListProps {
   id: string
@@ -7,17 +6,10 @@ interface NavigationMenuRefListProps {
 }
 
 const NavigationMenuRefList = ({ id, menuData }: NavigationMenuRefListProps) => {
-  const { ref, value } = useActiveElemController()
-
   return (
-    <ActiveElemContext.Provider value={value}>
-      <div
-        ref={ref}
-        className="transition-all duration-150 ease-out opacity-100 ml-0 delay-150 h-auto"
-      >
-        <NavigationMenuRefListItems id={id} menuData={menuData} />
-      </div>
-    </ActiveElemContext.Provider>
+    <div className="transition-all duration-150 ease-out opacity-100 ml-0 delay-150 h-auto">
+      <NavigationMenuRefListItems id={id} menuData={menuData} />
+    </div>
   )
 }
 

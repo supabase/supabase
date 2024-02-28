@@ -1,4 +1,11 @@
-import { type MouseEventHandler, createContext, useContext, useEffect, useRef } from 'react'
+import {
+  type MouseEventHandler,
+  type PropsWithChildren,
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+} from 'react'
 
 import { useConstant } from 'common'
 
@@ -39,7 +46,7 @@ const createAriaCurrentController = () => {
       _afHandle = requestAnimationFrame(() => {
         if (!elementInViewport(_ariaCurrent)) {
           _ariaCurrent.scrollIntoView({
-            behavior: prefersReducedMotion() ? 'instant' : 'smooth',
+            behavior: prefersReducedMotion() ? 'smooth' : 'instant',
             block: 'center',
           })
         }
@@ -225,11 +232,11 @@ const createNavController = () => {
   }
 }
 
-const ActiveElemContext = createContext<ReturnType<typeof createNavController> | undefined>(
+const ActivePageContext = createContext<ReturnType<typeof createNavController> | undefined>(
   undefined
 )
 
-const useActiveElemController = () => {
+const useActivePageController = () => {
   const navController = useConstant(createNavController)
   const ref = useRef<HTMLDivElement>(null)
 
@@ -238,27 +245,39 @@ const useActiveElemController = () => {
   return { ref, value: navController }
 }
 
-const useActiveElemContext = () => {
-  const context = useContext(ActiveElemContext)
+const useActivePageContext = () => {
+  const context = useContext(ActivePageContext)
   if (!context) throw Error('`useFirePageChange` must be used within an `ActiveElemContext`')
   return context
 }
 
 const useGetInitialCollapsibleProps = () => {
-  const { propGetters } = useActiveElemContext()
+  const { propGetters } = useActivePageContext()
   return {
     ...propGetters,
   }
 }
 
 const useFirePageChange = () => {
-  const { firePageChange } = useActiveElemContext()
+  const { firePageChange } = useActivePageContext()
   return firePageChange
 }
 
+const ActivePageProvider = ({ children, className }: PropsWithChildren<{ className: string }>) => {
+  const { ref, value } = useActivePageController()
+
+  return (
+    <ActivePageContext.Provider value={value}>
+      <div ref={ref} className={className}>
+        {children}
+      </div>
+    </ActivePageContext.Provider>
+  )
+}
+
 export {
-  ActiveElemContext,
-  useActiveElemController,
+  ActivePageProvider,
+  useActivePageController,
   useFirePageChange,
   useGetInitialCollapsibleProps,
 }

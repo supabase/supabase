@@ -2,24 +2,24 @@ import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { MDXRemote } from 'next-mdx-remote'
 import components from '~/components'
 
-const RefEducationSection = (props) => {
+const RefEducationSection = ({ item, markdownContent, ...rest }) => {
   // gracefully reject pages we can't render
-  if (!props.markdownContent) {
+  if (!markdownContent) {
     //console.log(props.item.id)
     return <div></div>
   }
 
   return (
     <RefSubLayout.EducationSection
-      key={props.item.id}
-      title={props.item.title}
-      hideTitle={props.markdownContent.meta.hideTitle}
-      id={props.item.id}
-      slug={props.item.id}
-      scrollSpyHeader={true}
-      icon={props.markdownContent.meta.icon}
+      key={item.id}
+      title={item.title}
+      hideTitle={markdownContent.meta.hideTitle}
+      id={item.id}
+      slug={item.id}
+      icon={markdownContent.meta.icon}
+      {...rest}
     >
-      <MDXRemote {...props.markdownContent.content} components={components} />
+      <MDXRemote {...markdownContent.content} components={components} />
     </RefSubLayout.EducationSection>
   )
 }

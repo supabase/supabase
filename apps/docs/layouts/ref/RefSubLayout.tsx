@@ -1,10 +1,7 @@
-import { useInView } from 'react-intersection-observer'
-import { FC, PropsWithChildren } from 'react'
-import { highlightSelectedNavItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
+import { FC, MutableRefObject, PropsWithChildren } from 'react'
 import { useRouter } from 'next/router'
-import { useNavigationMenuContext } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
-import { menuState } from '~/hooks/useMenuState'
 import Image from 'next/legacy/image'
+import { useObserveIntersection } from '~/components/reference/RefSectionHandler'
 
 interface ISectionContainer {
   id: string
@@ -84,27 +81,11 @@ const Section: FC<PropsWithChildren<ISectionContainer>> = (props) => {
 const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
   const router = useRouter()
 
-  const { setActiveRefItem } = useNavigationMenuContext()
-
   // we're serving search bots a different file (/crawlers/[...slug])
   // and need to modify content to suit that
   const isCrawlerPage = router.route.includes('/crawlers/[...slug]')
 
-  const { ref } = useInView({
-    threshold: 1,
-    rootMargin: '30% 0% -35% 0px',
-    onChange: (inView, entry) => {
-      if (inView && window) highlightSelectedNavItem(entry.target.attributes['data-ref-id'].value)
-      if (inView && props.scrollSpyHeader) {
-        window.history.replaceState(null, '', entry.target.id)
-        // if (setActiveRefItem) setActiveRefItem(entry.target.attributes['data-ref-id'].value)
-        menuState.setMenuActiveRefId(entry.target.attributes['data-ref-id'].value)
-        // router.push(`/reference/javascript/${entry.target.attributes['data-ref-id'].value}`, null, {
-        //   shallow: true,
-        // })
-      }
-    },
-  })
+  const { ref } = useObserveIntersection()
 
   return (
     <div className={['flex items-center gap-3 not-prose', icon && 'mb-8'].join(' ')}>
@@ -117,7 +98,7 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
         <h1>{props.title}</h1>
       ) : (
         <h2
-          ref={ref}
+          ref={ref as MutableRefObject<HTMLHeadingElement>}
           id={props.slug}
           data-ref-id={props.id}
           className={[
@@ -153,6 +134,18 @@ const EducationRow: FC<PropsWithChildren<IEducationRow>> = (props) => {
   )
 }
 
+/**
+ * Highlight heading in nav bar even if not displayed
+ */
+const HiddenTitle = ({ slug, title }: { slug: string; title: string }) => {
+  const { ref } = useObserveIntersection()
+  return (
+    <h2 id={slug} className="sr-only" ref={ref as MutableRefObject<HTMLHeadingElement>}>
+      {title}
+    </h2>
+  )
+}
+
 const EducationSection: FC<PropsWithChildren<IEducationSection>> = ({
   icon,
   hideTitle = false,
@@ -162,8 +155,13 @@ const EducationSection: FC<PropsWithChildren<IEducationSection>> = ({
     <article
       key={props.id + 'education'}
       className={'prose max-w-none py-16 lg:py-32 first:pt-8 last:pb-8'}
+      {...props}
     >
-      {!hideTitle && <StickyHeader {...props} icon={icon} />}
+      {hideTitle ? (
+        <HiddenTitle slug={props.slug} title={props.title} />
+      ) : (
+        <StickyHeader {...props} icon={icon} />
+      )}
       {props.children}
     </article>
   )

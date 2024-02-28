@@ -12,4 +12,22 @@ const elementInViewport = (elem: Element) => {
 
 const prefersReducedMotion = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-export { elementInViewport, prefersReducedMotion }
+const scrollParentOrigin = (elem: Element | null | undefined) => {
+  if (!elem) return
+
+  const getScrollParent = (node: Element) => {
+    const parent = node.parentElement
+    if (!parent) return null
+
+    if (parent.scrollHeight > parent.clientHeight) {
+      return parent
+    } else {
+      return getScrollParent(parent)
+    }
+  }
+
+  const scrollParent = getScrollParent(elem)
+  if (scrollParent) scrollParent.scrollTo(0, 0)
+}
+
+export { elementInViewport, prefersReducedMotion, scrollParentOrigin }

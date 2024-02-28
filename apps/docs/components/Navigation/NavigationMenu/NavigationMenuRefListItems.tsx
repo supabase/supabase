@@ -7,6 +7,7 @@ import RevVersionDropdown from '~/components/RefVersionDropdown'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
 import * as NavItems from './NavigationMenu.constants'
 import { useFirePageChange, useGetInitialCollapsibleProps } from './utils'
+import { scrollParentOrigin } from '~/lib/uiUtils'
 
 const UNTITLED = '__UNTITLED_NAV_CATEGORY__'
 
@@ -38,10 +39,16 @@ const HeaderLink = React.memo(function HeaderLink(props: any) {
 
 interface InnerLinkProps {
   item: RefMenuItem
+  firstItem: boolean
   className?: string
 }
 
-const InnerLink = React.memo(function InnerLink({ item, className, ...rest }: InnerLinkProps) {
+const InnerLink = React.memo(function InnerLink({
+  item,
+  firstItem,
+  className,
+  ...rest
+}: InnerLinkProps) {
   const router = useRouter()
   const firePageChange = useFirePageChange()
 
@@ -62,7 +69,11 @@ const InnerLink = React.memo(function InnerLink({ item, className, ...rest }: In
          * links are all subsections on the same page.
          */
         history.pushState({}, '', `${router.basePath}/reference${item.href}`)
-        document.getElementById(item.slug)?.scrollIntoView()
+        if (firstItem) {
+          scrollParentOrigin(document.getElementById(item.slug))
+        } else {
+          document.getElementById(item.slug)?.scrollIntoView()
+        }
         firePageChange(e.target)
         // Last so the link still woorks if something above errors
         e.preventDefault()
@@ -75,9 +86,10 @@ const InnerLink = React.memo(function InnerLink({ item, className, ...rest }: In
 
 export interface RenderLinkProps {
   item: RefMenuItem
+  firstItem: boolean
 }
 
-const RenderLink = React.memo(function RenderLink({ item }: RenderLinkProps) {
+const RenderLink = React.memo(function RenderLink({ item, firstItem }: RenderLinkProps) {
   const { getRootProps, getTriggerProps, getControlledProps } = useGetInitialCollapsibleProps()
 
   const compoundItem = hasChildren(item) && item.items.length > 0
@@ -85,7 +97,7 @@ const RenderLink = React.memo(function RenderLink({ item }: RenderLinkProps) {
   return compoundItem ? (
     <div {...getRootProps(item)}>
       <div className="flex items-center justify-between">
-        <InnerLink item={item} className="peer" />
+        <InnerLink item={item} firstItem={firstItem} className="peer" />
         <button
           className={cn('group', 'peer-aria-[current]:text-brand')}
           {...getTriggerProps(item)}
@@ -99,13 +111,13 @@ const RenderLink = React.memo(function RenderLink({ item }: RenderLinkProps) {
       <ul {...getControlledProps(item)}>
         {item.items.map((child) => (
           <li key={child.id}>
-            <RenderLink item={child} />
+            <RenderLink item={child} firstItem={firstItem} />
           </li>
         ))}
       </ul>
     </div>
   ) : (
-    <InnerLink item={item} />
+    <InnerLink item={item} firstItem={firstItem} />
   )
 })
 
@@ -128,7 +140,6 @@ interface NavigationMenuRefListItemsProps {
 
 const NavigationMenuRefListItems = ({ id, menuData }: NavigationMenuRefListItemsProps) => {
   const menu = NavItems[id]
-  console.log(menuData)
 
   return (
     <div className={'w-full flex flex-col gap-0 sticky top-8'}>
@@ -152,20 +163,26 @@ const NavigationMenuRefListItems = ({ id, menuData }: NavigationMenuRefListItems
         <RevVersionDropdown />
       </div>
       <ul className="function-link-list flex flex-col gap-2 pb-5">
-        {menuData.map((section) => {
+        {menuData.map((section, sectionIdx) => {
           return (
             section.items.length > 0 && (
               <Fragment key={section.id}>
                 {section.name === UNTITLED ? (
-                  section.items.map((item) => <RenderLink key={item.id} item={item} />)
+                  section.items.map((item, itemIdx) => (
+                    <RenderLink
+                      key={item.id}
+                      item={item}
+                      firstItem={sectionIdx === 0 && itemIdx === 0}
+                    />
+                  ))
                 ) : (
                   <>
                     <Divider />
                     <SideMenuTitle title={section.name} />
                     <ul>
-                      {section.items.map((item) => (
+                      {section.items.map((item, itemIdx) => (
                         <li key={item.id}>
-                          <RenderLink item={item} />
+                          <RenderLink item={item} firstItem={sectionIdx === 0 && itemIdx === 0} />
                         </li>
                       ))}
                     </ul>

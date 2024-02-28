@@ -2,7 +2,7 @@ import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
-import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
+import { handleRefStaticProps } from '~/lib/mdx/handleRefStaticProps'
 
 import spec from '~/spec/cli_v1_commands.yaml' assert { type: 'yml' }
 import cliCommonSections from '~/spec/common-cli-sections.json' assert { type: 'json' }
@@ -14,7 +14,8 @@ export default function CliRef(props) {
   return (
     <RefSectionHandler
       menuId={MenuId.RefCli}
-      sections={sections}
+      menuData={props.menuData}
+      sections={props.sections}
       spec={spec}
       pageProps={props}
       type="cli"
@@ -23,9 +24,16 @@ export default function CliRef(props) {
 }
 
 export async function getStaticProps() {
-  return handleRefStaticProps(sections, libraryPath)
+  const includeList = { tag: 'command', list: spec.commands.map((command) => command.id) }
+
+  return handleRefStaticProps({
+    sections,
+    spec,
+    libraryPath,
+    includeList,
+  })
 }
 
 export async function getStaticPaths() {
-  return handleRefGetStaticPaths(sections)
+  return handleRefGetStaticPaths()
 }

@@ -1,40 +1,39 @@
+import { type InferGetStaticPropsType, type GetStaticPaths, type GetStaticProps } from 'next'
+
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
-import { flattenSections } from '~/lib/helpers'
-import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
-import { handleRefStaticProps } from '~/lib/mdx/handleRefStaticProps'
-
-import clientLibsCommonSections from '~/spec/common-client-libs-sections.json' assert { type: 'json' }
-import typeSpec from '~/spec/enrichments/tsdoc_v1/combined.json' assert { type: 'json' }
+import {
+  getClientRefStaticPaths,
+  getClientRefStaticProps,
+} from '~/lib/mdx/refUtils.clientLibrary.server'
 import spec from '~/spec/supabase_js_v1.yml' assert { type: 'yml' }
 
-const sections = flattenSections(clientLibsCommonSections)
 const libraryPath = '/javascript/v1'
 
-export default function JSReference(props) {
+const JavaScriptReferencePage = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
   return (
     <RefSectionHandler
       menuId={MenuId.RefJavaScriptV1}
       menuData={props.menuData}
-      sections={sections}
+      sections={props.flatSections}
       spec={spec}
-      typeSpec={typeSpec}
       pageProps={props}
       type="client-lib"
-      isOldVersion
     />
   )
 }
 
-export async function getStaticProps() {
-  return handleRefStaticProps({
-    sections,
+const getStaticProps = (async () => {
+  return getClientRefStaticProps({
     spec,
     libraryPath,
-    excludedName: 'reference_javascript_v1',
+    excludedName: 'reference_js_v1',
   })
-}
+}) satisfies GetStaticProps
 
-export async function getStaticPaths() {
-  return handleRefGetStaticPaths(sections)
-}
+const getStaticPaths = (async () => {
+  return getClientRefStaticPaths()
+}) satisfies GetStaticPaths
+
+export default JavaScriptReferencePage
+export { getStaticProps, getStaticPaths }

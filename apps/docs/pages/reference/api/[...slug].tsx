@@ -17,7 +17,7 @@ export default function Config(props) {
   return (
     <RefSectionHandler
       menuId={MenuId.RefApi}
-      sections={sections}
+      sections={props.sections}
       spec={generatedSpec}
       pageProps={props}
       type="api"
@@ -30,5 +30,5 @@ export async function getStaticProps() {
 }
 
 export async function getStaticPaths() {
-  return handleRefGetStaticPaths(sections)
+  return handleRefGetStaticPaths()
 }
