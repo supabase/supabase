@@ -71,8 +71,9 @@ Supavisor
 [Ss]upersets?
 Terraform
 [Tt]odos?
-[Uu]psert
-[Uu]pvot(es|ed|ing)?
+[Uu]npaus(e|es|ed|ing)
+[Uu]psert(s|ed|ing)?
+[Uu]pvot(es|ed|ing)
 Vercel
 Vite
 VSCode
