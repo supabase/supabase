@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { components } from 'data/api'
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { branchKeys } from './keys'
 
@@ -22,7 +22,7 @@ export async function getBranches({ projectRef }: BranchesVariables, signal?: Ab
     if ((error as ResponseError).message === 'Preview branching is not enabled for this project.') {
       return []
     } else {
-      throw error
+      throw handleError(error)
     }
   }
   return data
