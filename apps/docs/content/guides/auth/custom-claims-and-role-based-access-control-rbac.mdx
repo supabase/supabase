@@ -17,13 +17,13 @@ Custom Claims are special attributes attached to a user that you can use to cont
 }
 ```
 
-While there are many ways to implement `custom claims` we recommend utilizing the [custom access token auth hook](/guides/auth/auth-hooks#hook-custom-access-token), which runs before a token is issued and allows you to add additional claims to the user's JWT.
+To implement Role-Based Access Control (RBAC) with `custom claims`, use a [Custom Access Token Auth Hook](/guides/auth/auth-hooks#hook-custom-access-token). This hook runs before a token is issued. You can use it to add additional claims to the user's JWT.
 
 This guide uses the [Slack Clone example](https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone) to demonstrate how to add a `user_role` claim and use it in your [Row Level Security (RLS) policies](/guides/auth/row-level-security).
 
 ## Create a table to track user roles and permissions
 
-In this example we're implementing two user roles with specific permissions:
+In this example, you will implement two user roles with specific permissions:
 
 - `moderator`: A moderator can delete all messages but not channels.
 - `admin`: An admin can delete all messages and channels.
@@ -54,11 +54,11 @@ comment on table public.role_permissions is 'Application permissions for each ro
 
 <Admonition type="note">
   
-  For the [full schema](https://github.com/supabase/supabase/blob/master/examples/slack-clone/nextjs-slack-clone/README.md) please refer to the example application on [Github](https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone).
+  For the [full schema](https://github.com/supabase/supabase/blob/master/examples/slack-clone/nextjs-slack-clone/README.md), see the example application on [GitHub](https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone).
 
 </Admonition>
 
-You can now manage your roles and permissions in SQL, e.g. to add the mentioned roles and permissions from aboove you can say:
+You can now manage your roles and permissions in SQL. For example, to add the mentioned roles and permissions from above, run:
 
 ```sql supabase/seed.sql
 insert into public.role_permissions (role, permission)
@@ -68,9 +68,9 @@ values
   ('moderator', 'messages.delete');
 ```
 
-## Create auth hook to apply user role
+## Create Auth Hook to apply user role
 
-The [custom access token auth hook](/guides/auth/auth-hooks#hook-custom-access-token) runs before a token is issued allowing you to add additional claims to the user's JWT. You should add the custom claim to the user's `app_metadata` to make sure that the logged in user can't modify this value themselves!
+The [Custom Access Token Auth Hook](/guides/auth/auth-hooks#hook-custom-access-token) runs before a token is issued. You can use it edit the JWT. You should add your custom claim to the user's `app_metadata` to make sure that the logged-in user can't modify this value themselves!
 
 <Tabs
   scrollable
@@ -208,13 +208,13 @@ using (true)
 
 <Admonition type="note">
   
-To learn more about auth hooks, head over the the [Auth Hooks docs](/guides/auth/auth-hooks).
+To learn more about Auth Hooks, see the [Auth Hooks docs](/guides/auth/auth-hooks).
 
 </Admonition>
 
 ## Using roles in RLS policies
 
-To utilize role-based access control (RBAC) in Row Level Security (RLS) policies, you can create an `authorize` methods that reads the user's role from their JWT and check's the role's permissions:
+To utilize Role-Based Access Control (RBAC) in Row Level Security (RLS) policies, create an `authorize` method that reads the user's role from their JWT and checks the role's permissions:
 
 ```sql supabase/migrations/init.sql
 create function public.authorize(
@@ -249,7 +249,7 @@ create policy "Allow authorized delete access" on public.channels for delete usi
 create policy "Allow authorized delete access" on public.messages for delete using ( authorize('messages.delete', auth.uid()) );
 ```
 
-That's it, now you have a robust system in place to manage user roles and permissions within your database that automatically propagate to Supabase Auth.
+You now have a robust system in place to manage user roles and permissions within your database that automatically propagates to Supabase Auth.
 
 ## More resources
 
