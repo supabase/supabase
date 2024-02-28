@@ -9,6 +9,7 @@ import { Database } from './replicas-query'
 export type ReadReplicaRemoveVariables = {
   projectRef: string
   identifier: string
+  skipInvalidateOnSuccess?: boolean
 }
 
 export async function removeReadReplica({ projectRef, identifier }: ReadReplicaRemoveVariables) {
@@ -39,17 +40,19 @@ export const useReadReplicaRemoveMutation = ({
     (vars) => removeReadReplica(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef, identifier } = variables
+        const { projectRef, identifier, skipInvalidateOnSuccess } = variables
 
-        // [Joshen] Just FYI, will remove this once API changes to remove the need for optimistic rendering
-        queryClient.setQueriesData<any>(replicaKeys.list(projectRef), (old: any) => {
-          return old.filter((db: Database) => db.identifier !== identifier)
-        })
+        if (!!skipInvalidateOnSuccess) {
+          // [Joshen] Just FYI, will remove this once API changes to remove the need for optimistic rendering
+          queryClient.setQueriesData<any>(replicaKeys.list(projectRef), (old: any) => {
+            return old.filter((db: Database) => db.identifier !== identifier)
+          })
 
-        setTimeout(async () => {
-          await queryClient.invalidateQueries(replicaKeys.list(projectRef))
-          await queryClient.invalidateQueries(replicaKeys.loadBalancers(projectRef))
-        }, 5000)
+          setTimeout(async () => {
+            await queryClient.invalidateQueries(replicaKeys.list(projectRef))
+            await queryClient.invalidateQueries(replicaKeys.loadBalancers(projectRef))
+          }, 5000)
+        }
 
         await onSuccess?.(data, variables, context)
       },
