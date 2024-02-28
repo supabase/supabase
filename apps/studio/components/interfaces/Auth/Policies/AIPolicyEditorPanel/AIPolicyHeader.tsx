@@ -1,9 +1,7 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
-import styles from '@ui/layout/ai-icon-animation/ai-icon-animation-style.module.css'
 import clsx from 'clsx'
 import { PanelLeftClose, PanelRightClose, X } from 'lucide-react'
 import {
-  Button,
   SheetClose_Shadcn_,
   SheetHeader_Shadcn_,
   SheetTitle_Shadcn_,
