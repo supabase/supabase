@@ -237,7 +237,7 @@ const PolicyEditorModal = ({
           />
         ) : view === POLICY_MODAL_VIEWS.TEMPLATES ? (
           <PolicyTemplates
-            templates={getGeneralPolicyTemplates(schema, table)}
+            templates={getGeneralPolicyTemplates(schema, table).filter((policy) => !policy.preview)}
             templatesNote="* References a specific column in the table"
             onUseTemplate={onUseTemplate}
           />

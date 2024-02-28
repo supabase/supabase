@@ -25,14 +25,16 @@ import Message from './Message'
 
 interface AIPolicyChatProps {
   messages: MessageWithDebug[]
+  selectedMessage?: string
   loading: boolean
   onSubmit: (s: string) => void
-  onDiff: (s: string) => void
+  onDiff: (message: { id: string; content: string }) => void
   onChange: (value: boolean) => void
 }
 
 export const AIPolicyChat = ({
   messages,
+  selectedMessage,
   loading,
   onSubmit,
   onDiff,
@@ -78,13 +80,13 @@ export const AIPolicyChat = ({
 
   return (
     <div id={'ai-chat-assistant'} className="flex flex-col h-full max-w-full">
-      <div className="overflow-auto flex-1">
+      <div className="overflow-auto flex-1 divide-y divide-border">
         <Message
           key="zero"
           role="assistant"
           content={`Hi${
             name ? ' ' + name : ''
-          }, how can I help you? I'm powered by AI, so surprises and mistakes are possible.
+          }, I can help you to write RLS policies. I'm powered by AI, so surprises and mistakes are possible.
         Make sure to verify any generated code or suggestions, and share feedback so that we can
         learn and improve.`}
         >
@@ -107,7 +109,8 @@ export const AIPolicyChat = ({
             content={m.content}
             createdAt={new Date(m.createdAt || new Date()).getTime()}
             isDebug={m.isDebug}
-            onDiff={onDiff}
+            isSelected={m.id === selectedMessage}
+            onDiff={(content) => onDiff({ id: m.id, content })}
           />
         ))}
 

@@ -3,6 +3,17 @@
   -webkit-text-size-adjust: 100%;
 }
 
+.monaco-editor,
+.monaco-diff-editor {
+  --vscode-editor-background: hsl(var(--background-surface-200)) !important;
+  --vscode-editorGutter-background: hsl(var(--background-surface-200)) !important;
+}
+
+.gutter {
+  @apply bg-border-control;
+  cursor: row-resize;
+}
+
 .grid-monaco-editor,
 .monaco-editor p,
 label,
