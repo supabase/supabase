@@ -15,12 +15,12 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
     const snap = useAppStateSnapshot()
 
     const iconClasses = [
-      'absolute left-0 top-0 flex rounded items-center h-10 w-10 items-center justify-center', // Layout
+      'absolute left-0 top-0 flex rounded items-center h-9 w-10 items-center justify-center', // Layout
     ]
 
     const classes = [
       'relative',
-      'h-10 w-10 group-data-[state=expanded]:h-10 group-data-[state=expanded]:w-full',
+      'h-9 w-10 group-data-[state=expanded]:w-full',
       'transition-all duration-200',
       'flex items-center rounded',
       'group-data-[state=collapsed]:justify-center',

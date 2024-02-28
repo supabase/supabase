@@ -19,7 +19,7 @@ export const NavigationIconButton = forwardRef<
       size="tiny"
       {...props}
       className={cn(
-        'h-10 [&>span]:relative [&>span]:items-center [&>span]:gap-3 [&>span]:flex [&>span]:w-full [&>span]:h-full p-0',
+        'h-9 [&>span]:relative [&>span]:items-center [&>span]:gap-3 [&>span]:flex [&>span]:w-full [&>span]:h-full p-0',
         props.className
       )}
     >

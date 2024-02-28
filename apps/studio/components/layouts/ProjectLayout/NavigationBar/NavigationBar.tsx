@@ -97,7 +97,7 @@ const NavigationBar = () => {
           if (!userDropdownOpen) snap.setNavigationPanelOpen(false)
         }}
       >
-        <ul className="flex flex-col gap-0 justify-start px-2">
+        <ul className="flex flex-col gap-y-1 justify-start px-2">
           {(!navLayoutV2 || !IS_PLATFORM) && (
             <Link
               href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
@@ -159,7 +159,7 @@ const NavigationBar = () => {
           })}
         </ul>
 
-        <ul className="flex flex-col px-2">
+        <ul className="flex flex-col px-2 gap-y-1">
           {settingsRoutes.map((route) => (
             <NavigationIconLink
               key={route.key}
@@ -178,13 +178,10 @@ const NavigationBar = () => {
                 <div
                   className={cn(
                     'flex items-center gap-1',
-                    'h-6',
-                    'py-1.5 px-2',
-                    'bg-surface-100',
-                    'text-foreground-lighter',
+                    'h-6 py-1.5 px-2 leading-none',
+                    'bg-surface-100 text-foreground-lighter',
                     'border border-default rounded-md',
-                    'shadow-xs shadow-background-surface-100',
-                    'leading-none'
+                    'shadow-xs shadow-background-surface-100'
                   )}
                 >
                   {os === 'macos' || true ? ( // todo: issue with `os` and hydration fail
@@ -203,11 +200,8 @@ const NavigationBar = () => {
           <DropdownMenu
             open={userDropdownOpen}
             onOpenChange={(open: boolean) => {
-              console.log('open', open)
               setUserDropdownOpenState(open)
-              if (open === false) {
-                snap.setNavigationPanelOpen(false)
-              }
+              if (open === false) snap.setNavigationPanelOpen(false)
             }}
           >
             <DropdownMenuTrigger asChild>
@@ -215,8 +209,7 @@ const NavigationBar = () => {
                 type="text"
                 size="tiny"
                 className={cn(
-                  'mt-3',
-                  'h-10 [&>span]:relative [&>span]:flex [&>span]:w-full [&>span]:h-full p-0'
+                  'mt-3 h-10 [&>span]:relative [&>span]:flex [&>span]:w-full [&>span]:h-full p-0'
                 )}
                 block
               >
