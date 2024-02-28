@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
+import { Heart, Plus, Pointer } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -15,8 +16,18 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
-  cn,
 } from 'ui'
+import {
+  InnerSideBarEmptyPanel,
+  InnerSideBarFilterSearchInput,
+  InnerSideBarFilters,
+  InnerSideBarShimmeringLoaders,
+  InnerSideMenuCollapsible,
+  InnerSideMenuCollapsibleContent,
+  InnerSideMenuCollapsibleTrigger,
+  InnerSideMenuItem,
+  InnerSideMenuSeparator,
+} from 'ui-patterns/InnerSideMenu'
 
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
@@ -30,18 +41,6 @@ import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import QueryItem from './QueryItem'
 import { selectItemsInRange } from './SQLEditorLayout.utils'
-import { Heart, Plus, Pointer } from 'lucide-react'
-import {
-  InnerSideBarEmptyPanel,
-  InnerSideBarFilterSearchInput,
-  InnerSideBarFilters,
-  InnerSideBarShimmeringLoaders,
-  InnerSideMenuCollapsible,
-  InnerSideMenuCollapsibleContent,
-  InnerSideMenuCollapsibleTrigger,
-  InnerSideMenuItem,
-  InnerSideMenuSeparator,
-} from 'ui-patterns/InnerSideMenu'
 
 const SideBarContent = observer(() => {
   const { ui } = useStore()
@@ -223,7 +222,7 @@ const SideBarContent = observer(() => {
         {isLoading ? (
           <InnerSideBarShimmeringLoaders />
         ) : isSuccess ? (
-          <div className="">
+          <div>
             <div className="flex flex-col">
               <div className="px-4 flex flex-col">
                 <Button
@@ -253,61 +252,59 @@ const SideBarContent = observer(() => {
                   </InnerSideMenuItem>
                 </div>
               )}
-              {searchText.length > 0 &&
-                filteredFavoriteSnippets.length === 0 &&
-                filteredProjectSnippets.length === 0 &&
-                personalSnippets.length === 0 && (
-                  <div className="h-32 border border-dashed flex flex-col gap-y-3 items-center justify-center rounded px-3">
-                    <div className="flex flex-col gap-y-1 items-center justify-center">
-                      <p className="text-xs text-foreground">No queries found</p>
-                      <p className="text-xs text-foreground-light text-center">
-                        Your search for "{searchText}" did not return any results
-                      </p>
-                    </div>
-                    <Button type="default" onClick={() => handleNewQuery()}>
-                      New query
-                    </Button>
-                  </div>
-                )}
+
               <InnerSideMenuSeparator />
-              <InnerSideMenuCollapsible className="editor-product-menu" defaultOpen>
+
+              <InnerSideMenuCollapsible className="editor-product-menu">
                 <InnerSideMenuCollapsibleTrigger title="Project queries" />
                 <InnerSideMenuCollapsibleContent>
-                  <InnerSideBarFilters>
-                    <InnerSideBarFilterSearchInput
-                      name="search-queries"
-                      placeholder="Search project queries..."
-                      onChange={(e) => setSearchTextProjectState(e.target.value.trim())}
-                      value={searchTextProject}
-                      aria-labelledby="Search queries"
-                    ></InnerSideBarFilterSearchInput>
-                  </InnerSideBarFilters>
-                  <div className="">
-                    {filteredProjectSnippets.length > 0 &&
-                      filteredProjectSnippets.map((tabInfo) => {
-                        const { id } = tabInfo || {}
-                        return (
-                          <QueryItem
-                            key={id}
-                            tabInfo={tabInfo}
-                            hasQueriesSelected={selectedQueries.length > 0}
-                          />
-                        )
-                      })}
-                    {searchTextProject.length > 0 && filteredProjectSnippets.length === 0 && (
-                      <InnerSideBarEmptyPanel
-                        title="No project queries found"
-                        description="Click the New query button to create a new query"
-                        actions={
-                          <Button type="default" onClick={() => handleNewQuery()}>
-                            New query
-                          </Button>
-                        }
-                      />
-                    )}
-                  </div>
+                  {projectSnippets.length > 0 ? (
+                    <>
+                      <InnerSideBarFilters>
+                        <InnerSideBarFilterSearchInput
+                          name="search-queries"
+                          placeholder="Search project queries..."
+                          onChange={(e) => setSearchTextProjectState(e.target.value.trim())}
+                          value={searchTextProject}
+                          aria-labelledby="Search queries"
+                        />
+                      </InnerSideBarFilters>
+                      {filteredProjectSnippets.map((tabInfo) => (
+                        <QueryItem
+                          key={tabInfo.id}
+                          tabInfo={tabInfo}
+                          hasQueriesSelected={selectedQueries.length > 0}
+                        />
+                      ))}
+                      {searchTextProject.length > 0 && filteredProjectSnippets.length === 0 && (
+                        <InnerSideBarEmptyPanel
+                          title="No project queries found"
+                          description="Click the New query button to create a new query"
+                          actions={
+                            <Button type="default" onClick={() => handleNewQuery()}>
+                              New query
+                            </Button>
+                          }
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <InnerSideBarEmptyPanel
+                      title="No project queries found"
+                      description="Some description here"
+                      illustration={
+                        <div className="flex -space-x-2 items-center">
+                          <div className="bg-surface-300 p-1 rounded-md border border-strong">
+                            <Heart size={12} className="text-light" />
+                          </div>
+                          <Pointer size={16} className="z-10 mt-4" strokeWidth={1.5} />
+                        </div>
+                      }
+                    />
+                  )}
                 </InnerSideMenuCollapsibleContent>
               </InnerSideMenuCollapsible>
+
               {selectedQueries.length > 0 && (
                 <>
                   <Separator />
@@ -319,8 +316,7 @@ const SideBarContent = observer(() => {
                     <Tooltip_Shadcn_ delayDuration={100}>
                       <TooltipTrigger_Shadcn_ asChild>
                         <Button type="default" onClick={() => setSelectedQueries([])}>
-                          {' '}
-                          Cancel{' '}
+                          Cancel
                         </Button>
                       </TooltipTrigger_Shadcn_>
                       <TooltipContent_Shadcn_ side="bottom">Clear selection</TooltipContent_Shadcn_>
@@ -331,10 +327,10 @@ const SideBarContent = observer(() => {
 
               <InnerSideMenuSeparator />
 
-              <InnerSideMenuCollapsible className="editor-product-menu" defaultOpen>
+              <InnerSideMenuCollapsible className="editor-product-menu">
                 <InnerSideMenuCollapsibleTrigger title="Favorites" />
                 <InnerSideMenuCollapsibleContent>
-                  {filteredFavoriteSnippets.length > 0 ? (
+                  {favoriteSnippets.length > 0 ? (
                     <>
                       <InnerSideBarFilters>
                         <InnerSideBarFilterSearchInput
@@ -343,23 +339,19 @@ const SideBarContent = observer(() => {
                           onChange={(e) => setSearchTextFavoriteState(e.target.value.trim())}
                           value={searchTextFavorite}
                           aria-labelledby="Search queries"
-                        ></InnerSideBarFilterSearchInput>
+                        />
                       </InnerSideBarFilters>
 
-                      {filteredFavoriteSnippets.length > 0 &&
-                        filteredFavoriteSnippets.map((tabInfo) => {
-                          const { id } = tabInfo || {}
-                          return (
-                            <QueryItem
-                              key={id}
-                              tabInfo={tabInfo}
-                              isSelected={selectedQueries.includes(id as string)}
-                              hasQueriesSelected={selectedQueries.length > 0}
-                              onSelectQuery={(isShiftHeld) => onSelectQuery(id, isShiftHeld)}
-                              onDeleteQuery={postDeleteCleanup}
-                            />
-                          )
-                        })}
+                      {filteredFavoriteSnippets.map((tabInfo) => (
+                        <QueryItem
+                          key={tabInfo.id}
+                          tabInfo={tabInfo}
+                          isSelected={selectedQueries.includes(tabInfo.id as string)}
+                          hasQueriesSelected={selectedQueries.length > 0}
+                          onSelectQuery={(isShiftHeld) => onSelectQuery(tabInfo.id, isShiftHeld)}
+                          onDeleteQuery={postDeleteCleanup}
+                        />
+                      ))}
                       {searchTextFavorite.length > 0 && filteredFavoriteSnippets.length === 0 && (
                         <InnerSideBarEmptyPanel
                           title="No favorite queries found"
@@ -388,54 +380,65 @@ const SideBarContent = observer(() => {
                   )}
                 </InnerSideMenuCollapsibleContent>
               </InnerSideMenuCollapsible>
+
               <InnerSideMenuSeparator />
+
               <InnerSideMenuCollapsible className="editor-product-menu" defaultOpen>
                 <InnerSideMenuCollapsibleTrigger title="Your queries" />
                 <InnerSideMenuCollapsibleContent className="editor-product-menu">
-                  <InnerSideBarFilters>
-                    <InnerSideBarFilterSearchInput
-                      name="search-queries"
-                      placeholder="Search your queries..."
-                      onChange={(e) => setSearchTextPersonalState(e.target.value.trim())}
-                      value={searchTextPersonal}
-                      aria-labelledby="Search queries"
-                    ></InnerSideBarFilterSearchInput>
-                  </InnerSideBarFilters>
-                  <div className="">
-                    {personalSnippets.length > 0 &&
-                      personalSnippets.map((tabInfo) => {
-                        const { id } = tabInfo || {}
-                        return (
+                  {personalSnippets.length > 0 ? (
+                    <>
+                      <InnerSideBarFilters>
+                        <InnerSideBarFilterSearchInput
+                          name="search-queries"
+                          placeholder="Search your queries..."
+                          onChange={(e) => setSearchTextPersonalState(e.target.value.trim())}
+                          value={searchTextPersonal}
+                          aria-labelledby="Search queries"
+                        />
+                      </InnerSideBarFilters>
+                      <div className="space-y-0.5">
+                        {personalSnippets.map((tabInfo) => (
                           <QueryItem
-                            key={id}
+                            key={tabInfo.id}
                             tabInfo={tabInfo}
-                            isSelected={selectedQueries.includes(id as string)}
+                            isSelected={selectedQueries.includes(tabInfo.id as string)}
                             hasQueriesSelected={selectedQueries.length > 0}
-                            onSelectQuery={(isShiftHeld) => onSelectQuery(id, isShiftHeld)}
+                            onSelectQuery={(isShiftHeld) => onSelectQuery(tabInfo.id, isShiftHeld)}
                             onDeleteQuery={postDeleteCleanup}
                           />
-                        )
-                      })}
-                    {searchTextFavorite.length > 0 && filteredFavoriteSnippets.length === 0 && (
-                      <InnerSideBarEmptyPanel
-                        title="No personal queries found"
-                        description="Click the New query button to create a new query"
-                        actions={
-                          <Button type="default" onClick={() => handleNewQuery()}>
-                            New query
-                          </Button>
-                        }
-                      />
-                    )}
-                  </div>
+                        ))}
+                      </div>
+                      {searchTextPersonal.length > 0 && personalSnippets.length === 0 && (
+                        <InnerSideBarEmptyPanel
+                          title="No personal queries found"
+                          description="Click the New query button to create a new query"
+                          actions={
+                            <Button type="default" onClick={() => handleNewQuery()}>
+                              New query
+                            </Button>
+                          }
+                        />
+                      )}
+                    </>
+                  ) : (
+                    <InnerSideBarEmptyPanel
+                      title="No personal queries found"
+                      description="Click the New query button to create a new query"
+                      actions={
+                        <Button type="default" onClick={() => handleNewQuery()}>
+                          New query
+                        </Button>
+                      }
+                    />
+                  )}
                 </InnerSideMenuCollapsibleContent>
               </InnerSideMenuCollapsible>
             </div>
           </div>
-        ) : (
-          <></>
-        )}
+        ) : null}
       </div>
+
       <ConfirmationModal
         header="Confirm to delete query"
         buttonLabel={`Delete ${selectedQueries.length.toLocaleString()} quer${selectedQueries.length > 1 ? 'ies' : 'y'}`}

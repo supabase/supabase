@@ -199,9 +199,7 @@ const InnerSideBarEmptyPanel = forwardRef<
         {illustration}
         {title && <p className="text-xs text-foreground-light">{title}</p>}
         {description && (
-          <p className="text-xs text-foreground-lighter text-center">
-            Click the heart icon to favorite any of your queries
-          </p>
+          <p className="text-xs text-foreground-lighter text-center">{description}</p>
         )}
         {actions && <div className="mt-2">{actions}</div>}
       </div>
