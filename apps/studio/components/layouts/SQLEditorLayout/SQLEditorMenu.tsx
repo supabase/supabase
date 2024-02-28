@@ -255,7 +255,7 @@ const SideBarContent = observer(() => {
 
               <InnerSideMenuSeparator />
 
-              <InnerSideMenuCollapsible className="editor-product-menu">
+              <InnerSideMenuCollapsible className="editor-product-menu" defaultOpen>
                 <InnerSideMenuCollapsibleTrigger title="Project queries" />
                 <InnerSideMenuCollapsibleContent>
                   {projectSnippets.length > 0 ? (
@@ -327,7 +327,7 @@ const SideBarContent = observer(() => {
 
               <InnerSideMenuSeparator />
 
-              <InnerSideMenuCollapsible className="editor-product-menu">
+              <InnerSideMenuCollapsible className="editor-product-menu" defaultOpen>
                 <InnerSideMenuCollapsibleTrigger title="Favorites" />
                 <InnerSideMenuCollapsibleContent>
                   {favoriteSnippets.length > 0 ? (
