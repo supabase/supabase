@@ -1,11 +1,11 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
-import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft } from 'ui'
+import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft, Toggle_Shadcn, cn } from 'ui'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { useSelectedProject } from 'hooks'
+import { useLocalStorageQuery, useSelectedProject } from 'hooks'
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
 
@@ -29,13 +29,33 @@ const UtilityActions = ({
   const os = detectOS()
   const project = useSelectedProject()
   const showReadReplicasUI = project?.is_read_replicas_enabled
+  const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
+    'supabase_sql-editor-intellisense-enabled',
+    true
+  )
 
   return (
     <>
       <SavingIndicator id={id} />
 
+      <Toggle_Shadcn
+        aria-label="Toggle Intellisense"
+        size="sm"
+        pressed={intellisenseEnabled}
+        className="text-xs font-normal h-auto group"
+        onPressedChange={() => setIntellisenseEnabled(!intellisenseEnabled)}
+      >
+        <div className="flex items-center gap-2">
+          <span
+            className={cn(
+              'w-2 h-2 flex  rounded-full transition-colors ',
+              intellisenseEnabled ? 'bg-green-900' : 'bg-surface-400 group-hover:bg-green-600'
+            )}
+          ></span>
+          Intellisense
+        </div>
+      </Toggle_Shadcn>
       {IS_PLATFORM && <FavoriteButton id={id} />}
-
       <Tooltip.Root delayDuration={0}>
         <Tooltip.Trigger asChild>
           <Button
@@ -58,16 +78,13 @@ const UtilityActions = ({
           </Tooltip.Content>
         </Tooltip.Portal>
       </Tooltip.Root>
-
       <div className="flex items-center justify-between gap-x-2 mx-2">
         <div className="flex items-center">
           {showReadReplicasUI && <DatabaseSelector variant="connected-on-right" />}
-
           <RoleImpersonationPopover
             serviceRoleLabel="postgres"
             variant={showReadReplicasUI ? 'connected-on-both' : 'connected-on-right'}
           />
-
           <Button
             onClick={() => executeQuery()}
             disabled={isDisabled || isExecuting}
