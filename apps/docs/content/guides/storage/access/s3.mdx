@@ -1,0 +1,42 @@
+---
+id: 'storage-s3-compatibility'
+title: 'S3 Compatibility'
+description: 'Learn how to access Supabase Storage using S3-compatible tools.'
+sidebar_label: 'S3'
+---
+
+<Admonition type="caution">
+
+S3 API compatibility is in alpha and is not intended for production use cases yet.
+
+</Admonition>
+
+Supabase Storage has initial support for the S3 API, allowing you to use S3-compatible tools directly with Supabase Storage.
+
+### AWS S3 CLI 
+
+Add the following profile to your `~/.aws/credentials`:
+
+```
+[supabase-storage]
+aws_access_key_id = TENANT_REF
+aws_secret_access_key = SERVICE_KEY
+region=ap-southeast-1
+endpoint_url= https://TENANT_REF.supabase.co/storage/v1/s3/
+```
+
+When using the S3 CLI, you can specify the profile like this:
+
+`AWS_PROFILE=supabase-storage aws s3 ls`
+
+This will list all of the buckets in your project.
+
+
+### Support for Other Tools 
+
+There are a number of popular S3 compatible tools available and, while we would love to support them all, the early stage of this feature means that we are focusing on a core set of tools first.
+
+Primarily, the `AWS S3` CLI and our `S3` [Foreign Data Wrapper](https://supabase.com/docs/guides/database/extensions/wrappers/s3) are the focus.
+
+If you find tools working, or not working, please report them in the [Github Discussion](Link TBC) and we will ensure it stays up to date.
+
