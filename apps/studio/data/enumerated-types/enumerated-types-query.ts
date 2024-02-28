@@ -4,7 +4,6 @@ import { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { enumeratedTypesKeys } from './keys'
-import { PostgresType } from '@supabase/postgres-meta'
 
 export type EnumeratedTypesVariables = {
   projectRef?: string
@@ -34,7 +33,7 @@ export async function getEnumeratedTypes(
 
   if (error) handleError(error)
   const enumeratedTypes = data.filter((type) => type.enums.length > 0)
-  return enumeratedTypes as PostgresType[]
+  return enumeratedTypes
 }
 
 export type EnumeratedTypesData = Awaited<ReturnType<typeof getEnumeratedTypes>>
