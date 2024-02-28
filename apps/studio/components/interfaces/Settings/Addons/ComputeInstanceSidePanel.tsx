@@ -35,6 +35,8 @@ import {
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { WarningIcon } from 'components/ui/Icons'
 
 const ComputeInstanceSidePanel = () => {
   const queryClient = useQueryClient()
@@ -61,6 +63,7 @@ const ComputeInstanceSidePanel = () => {
     snap.setPanelKey(undefined)
   }
 
+  const { data: databases } = useReadReplicasQuery({ projectRef })
   const { data: addons, isLoading } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
@@ -105,7 +108,6 @@ const ComputeInstanceSidePanel = () => {
   const [selectedOption, setSelectedOption] = useState<string>('')
 
   const isSubmitting = isUpdating || isRemoving
-
   const projectId = selectedProject?.id
   const cpuArchitecture = getCloudProviderArchitecture(selectedProject?.cloud_provider)
   const selectedAddons = addons?.selected_addons ?? []
@@ -162,9 +164,12 @@ const ComputeInstanceSidePanel = () => {
   const selectedCompute = availableOptions.find((option) => option.identifier === selectedOption)
   const hasChanges =
     selectedOption !== (subscriptionCompute?.variant.identifier ?? defaultInstanceSize)
+  const hasReadReplicas = (databases ?? []).length > 1
 
   const blockDowngradeDueToPitr =
     pitrAddon !== undefined && ['ci_micro', 'ci_nano'].includes(selectedOption) && hasChanges
+  const blockDowngradeDueToReadReplicas =
+    hasChanges && hasReadReplicas && ['ci_micro', 'ci_nano'].includes(selectedOption)
 
   useEffect(() => {
     if (visible) {
@@ -217,7 +222,12 @@ const ComputeInstanceSidePanel = () => {
         onConfirm={() => setShowConfirmationModal(true)}
         loading={isLoading}
         disabled={
-          isFreePlan || isLoading || !hasChanges || blockDowngradeDueToPitr || !canUpdateCompute
+          isFreePlan ||
+          isLoading ||
+          !hasChanges ||
+          blockDowngradeDueToPitr ||
+          blockDowngradeDueToReadReplicas ||
+          !canUpdateCompute
         }
         tooltip={
           isFreePlan
@@ -382,38 +392,66 @@ const ComputeInstanceSidePanel = () => {
               </p>
             )}
 
-            {hasChanges && !blockDowngradeDueToPitr && (
-              <Alert
-                withIcon
-                variant="info"
-                title="Your project will need to be restarted when changing it's compute size"
-              >
-                Your project will be unavailable for up to 2 minutes while the changes take place.
-              </Alert>
+            {hasChanges && !blockDowngradeDueToPitr && !blockDowngradeDueToReadReplicas && (
+              <Alert_Shadcn_>
+                <WarningIcon />
+                <AlertTitle_Shadcn_>
+                  Your project will need to be restarted when changing it's compute size
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  Your project will be unavailable for up to 2 minutes while the changes take place.
+                </AlertDescription_Shadcn_>
+                {hasReadReplicas && (
+                  <AlertDescription_Shadcn_>
+                    The compute sizes for <span className="text-foreground">all read replicas</span>{' '}
+                    on your project will also be changed to the {selectedCompute?.name} size as
+                    well.
+                  </AlertDescription_Shadcn_>
+                )}
+              </Alert_Shadcn_>
             )}
 
-            {blockDowngradeDueToPitr && (
-              <Alert
-                withIcon
-                variant="info"
-                className="mb-4"
-                title="Disable PITR before downgrading"
-                actions={
+            {blockDowngradeDueToReadReplicas ? (
+              <Alert_Shadcn_>
+                <WarningIcon />
+                <AlertTitle_Shadcn_>
+                  Unable to downgrade as project has active read replicas
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  The minimum compute instance size for using read replicas is the Small Compute.
+                  You need to remove all read replicas before downgrading Compute as it requires at
+                  least a Small compute instance.
+                </AlertDescription_Shadcn_>
+                <AlertDescription_Shadcn_ className="mt-2">
+                  <Button asChild type="default">
+                    <Link
+                      href={`/project/${projectRef}/settings/infrastructure`}
+                      onClick={() => snap.setPanelKey(undefined)}
+                    >
+                      Manage read replicas
+                    </Link>
+                  </Button>
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            ) : blockDowngradeDueToPitr ? (
+              <Alert_Shadcn_>
+                <WarningIcon />
+                <AlertTitle_Shadcn_>Disable PITR before downgrading</AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  You currently have PITR enabled. The minimum compute instance size for using PITR
+                  is the Small Compute.
+                </AlertDescription_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  You need to disable PITR before downgrading Compute as it requires at least a
+                  Small compute instance.
+                </AlertDescription_Shadcn_>
+                <AlertDescription_Shadcn_ className="mt-2">
                   <Button type="default" onClick={() => snap.setPanelKey('pitr')}>
                     Change PITR
                   </Button>
-                }
-              >
-                <p>
-                  You currently have PITR enabled. The minimum compute instance size for using PITR
-                  is the Small Compute.
-                </p>
-                <p>
-                  You need to disable PITR before downgrading Compute as it requires at least a
-                  Small compute instance.
-                </p>
-              </Alert>
-            )}
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            ) : null}
 
             {hasChanges &&
               subscription?.billing_via_partner &&
