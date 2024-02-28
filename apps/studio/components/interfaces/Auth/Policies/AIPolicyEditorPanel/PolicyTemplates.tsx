@@ -65,7 +65,20 @@ export const PolicyTemplates = ({ selectedTemplate, onSelectTemplate }: PolicyTe
                   fixedHeight={false}
                   icon={
                     <div className="min-w-16">
-                      <Badge className="!rounded font-mono" color="scale">
+                      <Badge
+                        className="!rounded font-mono"
+                        color={
+                          template.command === 'ALL'
+                            ? 'scale'
+                            : template.command === 'SELECT'
+                              ? 'green'
+                              : template.command === 'UPDATE'
+                                ? 'blue'
+                                : template.command === 'DELETE'
+                                  ? 'tomato'
+                                  : 'yellow'
+                        }
+                      >
                         {template.command}
                       </Badge>
                     </div>

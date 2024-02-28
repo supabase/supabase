@@ -436,7 +436,7 @@ export const AIPolicyEditorPanel = memo(function ({
                     value="templates"
                     className="px-0 data-[state=active]:bg-transparent"
                   >
-                    RLS Templates
+                    Templates
                   </TabsTrigger_Shadcn_>
                   {!hasHipaaAddon && (
                     <TabsTrigger_Shadcn_

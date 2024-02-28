@@ -86,7 +86,7 @@ export const AIPolicyChat = ({
           role="assistant"
           content={`Hi${
             name ? ' ' + name : ''
-          }, how can I help you? I'm powered by AI, so surprises and mistakes are possible.
+          }, I can help you to write RLS policies. I'm powered by AI, so surprises and mistakes are possible.
         Make sure to verify any generated code or suggestions, and share feedback so that we can
         learn and improve.`}
         >
