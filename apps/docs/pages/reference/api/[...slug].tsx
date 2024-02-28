@@ -1,23 +1,24 @@
+import { type InferGetStaticPropsType, type GetStaticPaths, type GetStaticProps } from 'next'
+
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
-import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
-import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
+import { getGenericRefStaticPaths, getGenericRefStaticProps } from '~/lib/mdx/refUtils.server'
 import { gen_v3 } from '~/lib/refGenerator/helpers'
-
 import apiCommonSections from '~/spec/common-api-sections.json' assert { type: 'json' }
 import specFile from '~/spec/transforms/api_v0_openapi_deparsed.json' assert { type: 'json' }
 
 // @ts-ignore
 const generatedSpec = gen_v3(specFile, 'wat', { apiUrl: 'apiv0' })
-const sections = flattenSections(apiCommonSections)
+const flatSections = flattenSections(apiCommonSections)
 const libraryPath = '/api'
 
-export default function Config(props) {
+const ManagementApiReference = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
   return (
     <RefSectionHandler
       menuId={MenuId.RefApi}
-      sections={props.sections}
+      menuData={props.menuData}
+      sections={props.flatSections}
       spec={generatedSpec}
       pageProps={props}
       type="api"
@@ -25,10 +26,20 @@ export default function Config(props) {
   )
 }
 
-export async function getStaticProps() {
-  return handleRefStaticProps(sections, libraryPath)
-}
+const getStaticProps = (() => {
+  const definedOperations = generatedSpec.operations.map((operation) => operation.operationId)
 
-export async function getStaticPaths() {
-  return handleRefGetStaticPaths()
-}
+  return getGenericRefStaticProps({
+    sections: apiCommonSections,
+    flatSections,
+    libraryPath,
+    includeList: { tag: 'operation', list: definedOperations },
+  })
+}) satisfies GetStaticProps
+
+const getStaticPaths = (() => {
+  return getGenericRefStaticPaths({ flatSections })
+}) satisfies GetStaticPaths
+
+export default ManagementApiReference
+export { getStaticProps, getStaticPaths }

@@ -27,7 +27,7 @@ const getStaticProps = (async () => {
   return getClientRefStaticProps({
     spec,
     libraryPath,
-    excludedName: 'reference_js_v1',
+    excludedName: 'reference_javascript_v1',
   })
 }) satisfies GetStaticProps
 

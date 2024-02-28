@@ -1,29 +1,38 @@
+import { type InferGetStaticPropsType, type GetStaticPaths, type GetStaticProps } from 'next'
+
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
-import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
-import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
-
+import { getGenericRefStaticPaths, getGenericRefStaticProps } from '~/lib/mdx/refUtils.server'
 import selfHostingRealtimeCommonSections from '~/spec/common-self-hosting-realtime-sections.json' assert { type: 'json' }
 
-const sections = flattenSections(selfHostingRealtimeCommonSections)
+// @ts-ignore
+const flatSections = flattenSections(selfHostingRealtimeCommonSections)
 const libraryPath = '/self-hosting-realtime'
 
-export default function SelfHostRealtimeReference(props) {
+const SelfHostRealtimeReference = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
   return (
     <RefSectionHandler
       menuId={MenuId.SelfHostingRealtime}
-      sections={sections}
+      menuData={props.menuData}
+      sections={props.flatSections}
       pageProps={props}
       type="api"
     />
   )
 }
 
-export async function getStaticProps() {
-  return handleRefStaticProps(sections, libraryPath)
-}
+const getStaticProps = (() => {
+  return getGenericRefStaticProps({
+    sections: selfHostingRealtimeCommonSections,
+    flatSections,
+    libraryPath,
+  })
+}) satisfies GetStaticProps
 
-export async function getStaticPaths() {
-  return handleRefGetStaticPaths(sections)
-}
+const getStaticPaths = (() => {
+  return getGenericRefStaticPaths({ flatSections })
+}) satisfies GetStaticPaths
+
+export default SelfHostRealtimeReference
+export { getStaticProps, getStaticPaths }

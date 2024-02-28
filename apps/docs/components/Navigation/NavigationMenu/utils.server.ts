@@ -140,7 +140,7 @@ type ToClientLibraryMenuParams = {
  * Reformats the common client lib spec into a minimal array of data needed to
  * produce a nav menu.
  */
-const toClientLibraryMenu = ({
+const toRefNavMenu = ({
   sections,
   excludedName,
   includeList,
@@ -151,4 +151,4 @@ const toClientLibraryMenu = ({
   ) as unknown as ReturnType<ReturnType<typeof collectCategories>> // cast to return type of last function in flow
 
 export type { CommonRefSections, IncludeList }
-export { toClientLibraryMenu }
+export { toRefNavMenu }

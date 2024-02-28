@@ -8,7 +8,7 @@ import {
   getClientRefStaticPaths,
   getClientRefStaticProps,
 } from '~/lib/mdx/refUtils.clientLibrary.server'
-import spec from '~/spec/supabase_javascript_v2.yml' assert { type: 'yml' }
+import spec from '~/spec/supabase_js_v2.yml' assert { type: 'yml' }
 
 const libraryPath = '/javascript'
 

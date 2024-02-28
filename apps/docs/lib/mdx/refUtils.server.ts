@@ -3,7 +3,7 @@ import { compact } from 'lodash'
 import {
   type CommonRefSections,
   type IncludeList,
-  toClientLibraryMenu,
+  toRefNavMenu,
 } from '~/components/Navigation/NavigationMenu/utils.server'
 import { type ICommonMarkdown, type ICommonSection } from '~/components/reference/Reference.types'
 import generateRefMarkdown from '~/lib/mdx/generateRefMarkdown'
@@ -21,7 +21,7 @@ const getGenericRefStaticProps = async ({
 }: {
   sections: CommonRefSections
   flatSections: Array<ICommonSection>
-  spec: any
+  spec?: any
   libraryPath: `/${string}`
   excludedName?: string
   includeList?: IncludeList
@@ -30,10 +30,10 @@ const getGenericRefStaticProps = async ({
   const includeList = _includeList ?? {
     tag: 'function',
     list: compact(
-      (spec.functions ?? []).map(<T extends object>(fn: T) => ('id' in fn ? fn.id : null))
+      (spec?.functions ?? []).map(<T extends object>(fn: T) => ('id' in fn ? fn.id : null))
     ),
   }
-  const menuData = toClientLibraryMenu({
+  const menuData = toRefNavMenu({
     sections,
     excludedName,
     sectionPath: libraryPath,
@@ -44,9 +44,7 @@ const getGenericRefStaticProps = async ({
   const markdownSections = flatSections.filter(
     (section): section is ICommonMarkdown => section.type === 'markdown'
   )
-  console.log('markdown sections:', markdownSections)
   const markdownContent = await generateRefMarkdown(markdownSections, libraryPath)
-  console.log('markdown content:', markdownContent)
 
   return {
     props: {

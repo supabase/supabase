@@ -34,7 +34,7 @@ const useScrollTo = () => {
 
   useEffect(() => {
     const elem = document.getElementById(slug)
-    const isFirstItem = elem.dataset.navIndex === '0'
+    const isFirstItem = elem?.dataset.navIndex === '0'
     if (isFirstItem) {
       scrollParentOrigin(elem)
     } else {
@@ -46,7 +46,7 @@ const useScrollTo = () => {
     const handler = () => {
       const [slug] = window.location.pathname.split('/').slice(-1)
       const elem = document.getElementById(slug)
-      const isFirstItem = elem.dataset.navIndex === '0'
+      const isFirstItem = elem?.dataset.navIndex === '0'
       if (isFirstItem) {
         scrollParentOrigin(elem)
       } else {
