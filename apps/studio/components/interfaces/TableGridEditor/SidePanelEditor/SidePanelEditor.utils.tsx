@@ -33,6 +33,7 @@ import { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import { ImportContent } from './TableEditor/TableEditor.types'
+import { Constraint } from 'data/database/constraints-query'
 
 const BATCH_SIZE = 1000
 const CHUNK_SIZE = 1024 * 1024 * 0.1 // 0.1MB
@@ -112,18 +113,19 @@ export const addPrimaryKey = async (
   })
 }
 
-export const removePrimaryKey = async (
+export const dropConstraint = async (
   projectRef: string,
   connectionString: string | undefined,
   schema: string,
-  table: string
+  table: string,
+  name: string
 ) => {
-  const query = `ALTER TABLE "${schema}"."${table}" DROP CONSTRAINT "${table}_pkey"`
+  const query = `ALTER TABLE "${schema}"."${table}" DROP CONSTRAINT "${name}"`
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
     sql: query,
-    queryKey: ['primary-keys'],
+    queryKey: ['drop-constraint'],
   })
 }
 
@@ -266,11 +268,13 @@ export const createColumn = async ({
   connectionString,
   payload,
   selectedTable,
+  primaryKey,
 }: {
   projectRef: string
   connectionString: string | undefined
   payload: CreateColumnPayload
   selectedTable: PostgresTable
+  primaryKey?: Constraint
 }) => {
   const toastId = toast.loading(`Creating column "${payload.name}"...`)
   try {
@@ -288,8 +292,14 @@ export const createColumn = async ({
       // Same logic in createTable: Remove any primary key constraints first (we'll add it back later)
       const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
 
-      if (existingPrimaryKeys.length > 0) {
-        await removePrimaryKey(projectRef, connectionString, column.schema, column.table)
+      if (existingPrimaryKeys.length > 0 && primaryKey !== undefined) {
+        await dropConstraint(
+          projectRef,
+          connectionString,
+          column.schema,
+          column.table,
+          primaryKey.name
+        )
       }
 
       const primaryKeyColumns = existingPrimaryKeys.concat([column.name])
@@ -314,6 +324,7 @@ export const updateColumn = async ({
   id,
   payload,
   selectedTable,
+  primaryKey,
   skipPKCreation,
   skipSuccessMessage = false,
 }: {
@@ -322,6 +333,7 @@ export const updateColumn = async ({
   id: string
   payload: UpdateColumnPayload
   selectedTable: PostgresTable
+  primaryKey?: Constraint
   skipPKCreation?: boolean
   skipSuccessMessage?: boolean
 }) => {
@@ -338,8 +350,14 @@ export const updateColumn = async ({
       const existingPrimaryKeys = selectedTable.primary_keys.map((x) => x.name)
 
       // Primary key is getting updated for the column
-      if (existingPrimaryKeys.length > 0) {
-        await removePrimaryKey(projectRef, connectionString, column.schema, column.table)
+      if (existingPrimaryKeys.length > 0 && primaryKey !== undefined) {
+        await dropConstraint(
+          projectRef,
+          connectionString,
+          column.schema,
+          column.table,
+          primaryKey.name
+        )
       }
 
       const primaryKeyColumns = isPrimaryKey
@@ -632,6 +650,7 @@ export const updateTable = async ({
   columns,
   foreignKeyRelations,
   existingForeignKeyRelations,
+  primaryKey,
 }: {
   projectRef: string
   connectionString: string | undefined
@@ -641,6 +660,7 @@ export const updateTable = async ({
   columns: ColumnField[]
   foreignKeyRelations: ForeignKey[]
   existingForeignKeyRelations: ForeignKeyConstraint[]
+  primaryKey?: Constraint
 }) => {
   // Prepare a check to see if primary keys to the tables were updated or not
   const primaryKeyColumns = columns
@@ -655,8 +675,8 @@ export const updateTable = async ({
     // If we do it later, and if the user deleted a PK column, we'd need to do
     // an additional check when removing PK if the column in the PK was removed
     // So doing this one step earlier, lets us skip that additional check.
-    if (table.primary_keys.length > 0) {
-      await removePrimaryKey(projectRef, connectionString, table.schema, table.name)
+    if (primaryKey !== undefined) {
+      await dropConstraint(projectRef, connectionString, table.schema, table.name, primaryKey.name)
     }
   }
 

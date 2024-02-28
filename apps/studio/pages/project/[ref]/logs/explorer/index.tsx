@@ -1,20 +1,28 @@
+import { useParams } from 'common/hooks'
 import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, Form, Input, Modal } from 'ui'
-import Split from 'react-split'
-import { useParams } from 'common/hooks'
+import {
+  Button,
+  Form,
+  Input,
+  Modal,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from 'ui'
+
 import {
   DatePickerToFrom,
-  LogsQueryPanel,
-  LogsTableName,
-  LogsWarning,
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
   LogTable,
   LogTemplate,
-  maybeShowUpgradePrompt,
+  LogsQueryPanel,
+  LogsTableName,
+  LogsWarning,
   TEMPLATES,
+  maybeShowUpgradePrompt,
   useEditorHints,
 } from 'components/interfaces/Settings/Logs'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
@@ -23,12 +31,13 @@ import CodeEditor from 'components/ui/CodeEditor'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useContentInsertMutation } from 'data/content/content-insert-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useLocalStorage, useSelectedOrganization, useStore } from 'hooks'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { LogSqlSnippets, NextPageWithLayout } from 'types'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
@@ -187,17 +196,12 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
   return (
     <div className="w-full h-full mx-auto">
-      <Split
-        className="w-full"
-        style={{ height: '100%' }}
+      <ResizablePanelGroup
+        className="w-full h-full"
         direction="vertical"
-        gutterSize={2}
-        sizes={[50, 50]}
-        minSize={44}
-        snapOffset={50}
-        expandToMin={true}
+        autoSaveId={LOCAL_STORAGE_KEYS.LOG_EXPLORER_SPLIT_SIZE}
       >
-        <div className="flex-grow overflow-y-auto border-b">
+        <ResizablePanel collapsible minSize={5}>
           <LogsQueryPanel
             defaultFrom={params.iso_timestamp_start || ''}
             defaultTo={params.iso_timestamp_end || ''}
@@ -220,8 +224,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             onInputChange={(v) => setEditorValue(v || '')}
             onInputRun={handleRun}
           />
-        </div>
-        <div className="flex flex-col flex-grow">
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel collapsible minSize={5} className="flex flex-col flex-grow">
           <LoadingOpacity active={isLoading}>
             <div className="flex flex-grow">
               <LogTable
@@ -238,8 +243,8 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
           <div className="flex flex-row justify-end mt-2">
             <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
           </div>
-        </div>
-      </Split>
+        </ResizablePanel>
+      </ResizablePanelGroup>
 
       <Modal
         size="medium"

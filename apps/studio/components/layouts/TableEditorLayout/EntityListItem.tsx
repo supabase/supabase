@@ -129,13 +129,13 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         'py-1 px-2',
         'text-light',
         'rounded-md',
-        isActive ? 'text-foreground bg-selection' : 'hover:bg-surface-200 focus:bg-surface-200',
+        isActive ? 'bg-selection' : 'hover:bg-surface-200 focus:bg-surface-200',
         'group',
         'transition'
       )}
     >
       <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
-        <Tooltip.Trigger className="flex items-center" asChild>
+        <Tooltip.Trigger className="min-w-4" asChild>
           {entity.type === ENTITY_TYPE.TABLE ? (
             <Table2 size={15} strokeWidth={1.5} className="text-foreground-lighter" />
           ) : entity.type === ENTITY_TYPE.VIEW ? (
@@ -173,20 +173,25 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
       <div
         className={cn(
           'truncate',
-          'max-w-[175px] overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-2 relative w-full',
+          'overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-2 relative w-full',
           isActive && 'text-foreground'
         )}
       >
-        {/* only show tooltips if required, to reduce noise */}
-        <span className="truncate text-sm text-foreground-light group-hover:text-foreground transition">
+        <span
+          className={cn(
+            isActive ? 'text-foreground' : 'text-foreground-light group-hover:text-foreground',
+            'text-sm',
+            'transition',
+            'truncate'
+          )}
+        >
           {entity.name}
         </span>
-
         {entity.type === ENTITY_TYPE.TABLE && !entity.rls_enabled && (
           <Unlock
             size={14}
             strokeWidth={2}
-            className={cn(isActive ? 'text-warning-600' : 'text-warning-500')}
+            className={cn('min-w-4', isActive ? 'text-warning-600' : 'text-warning-500')}
           />
         )}
       </div>
