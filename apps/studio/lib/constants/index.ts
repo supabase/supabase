@@ -29,11 +29,14 @@ export const USAGE_APPROACHING_THRESHOLD = 0.75
 export const LOCAL_STORAGE_KEYS = {
   RECENTLY_VISITED_ORGANIZATION: 'supabase-organization',
   TELEMETRY_CONSENT: 'supabase-consent',
+
   UI_PREVIEW_NAVIGATION_LAYOUT: 'supabase-ui-preview-nav-layout',
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_RLS_AI_ASSISTANT: 'supabase-ui-rls-ai-assistant',
-  DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
   UI_PREVIEW_CLS: 'supabase-ui-cls',
+  UI_PREVIEW_SQL_EDITOR_AI_ASSISTANT: 'supabase-ui-sql-editor-ai-assistant',
+
+  DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
 
   SQL_EDITOR_SPLIT_SIZE: 'supabase_sql-editor-split-size',
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',

@@ -46,6 +46,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useIsSQLEditorAiAssistantEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import { DiffActionBar } from './DiffActionBar'
@@ -98,7 +99,9 @@ const SQLEditor = () => {
   const snap = useSqlEditorStateSnapshot()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
 
-  const isAIConversational = useFlag('sqlEditorConversationalAi')
+  const aiAssistantFlag = useFlag('sqlEditorConversationalAi')
+  const aiAssistantFeaturePreview = useIsSQLEditorAiAssistantEnabled()
+  const isAiAssistantOn = aiAssistantFlag && aiAssistantFeaturePreview
 
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSql, isLoading: isGenerateSqlLoading } = useSqlGenerateMutation()
