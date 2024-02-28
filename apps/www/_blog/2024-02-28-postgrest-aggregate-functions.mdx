@@ -14,7 +14,7 @@ toc_depth: 2
 
 [PostgREST v12 has been released,](https://github.com/PostgREST/postgrest/releases/tag/v12.0.0) and with it comes the release of a much-requested feature: **aggregate functions**.
 
-As a bit of background, aggregate functions are a database feature that allow you to summarize your data by performing calculations across groups of rows. Previously, you could only use aggregate functions *indirectly* with PostgREST, for instance, by using them in a view, but with the latest release, you can now use aggregate functions on the fly, dynamically slicing-and-dicing data directly through the PostgREST API.
+As a bit of background, aggregate functions are a database feature that allow you to summarize your data by performing calculations across groups of rows. Previously, you could only use aggregate functions _indirectly_ with PostgREST, for instance, by using them in a view, but with the latest release, you can now use aggregate functions on the fly, dynamically slicing-and-dicing data directly through the PostgREST API.
 
 In this post, we’ll go through a few examples of some of the neat things you can do with this new feature. We’ll also discuss the importance of ensuring you have the appropriate safeguards in place to prevent potential performance issues that may arise when using aggregate functions.
 
@@ -26,18 +26,21 @@ PostgREST supports a handful of the most-common aggregate functions from Postgre
 
 Let’s take a look at an example. Imagine we have a table called `movies` that has the following columns: `name`, `release_year`, `genre`, and `box_office_earnings`. Let’s say that we want to grab the max and min of the `release_year` column across all of the movies in our dataset. That’s pretty simple to achieve:
 
+{/* prettier-ignore */}
 ```bash
 $ curl 'http://postgrest/movies?select=release_year.max(),release_year.min()'
 ```
 
 or, using supabase-js:
 
+{/* prettier-ignore */}
 ```jsx
 const { data, error } = await supabase
   .from('movies')
   .select('release_year.max(), release_year.min()')
 ```
 
+{/* prettier-ignore */}
 ```json
 [
   {
@@ -49,20 +52,23 @@ const { data, error } = await supabase
 
 As you can see, to use an aggregate function, we just place the function after the column in the `select` parameter. Easy.
 
-Now, what if we want to get a little fancier and get the max and min of the `release_year` for every `genre` in our dataset? If you’re familiar with aggregate functions in SQL, then your mind will probably go right away to `GROUP BY`. In PostgREST, there is no need to *explicitly* specify a `GROUP BY`; instead, you can just add your grouping columns right to the `select` parameter. Any column without an aggregate function in the `select` list will be used as a grouping column:
+Now, what if we want to get a little fancier and get the max and min of the `release_year` for every `genre` in our dataset? If you’re familiar with aggregate functions in SQL, then your mind will probably go right away to `GROUP BY`. In PostgREST, there is no need to _explicitly_ specify a `GROUP BY`; instead, you can just add your grouping columns right to the `select` parameter. Any column without an aggregate function in the `select` list will be used as a grouping column:
 
+{/* prettier-ignore */}
 ```bash
 $ curl 'http://postgrest/movies?select=genre,release_year.max(),release_year.min()'
 ```
 
 supabase-js:
 
+{/* prettier-ignore */}
 ```jsx
 const { data, error } = await supabase
   .from('movies')
   .select('genre, release_year.max(), release_year.min()')
 ```
 
+{/* prettier-ignore */}
 ```json
 [
   {
@@ -98,10 +104,12 @@ Building on the previous examples, let’s say that we have a table called `dire
 
 Let’s say for every director, we want to get the `release_year` of their oldest and newest movies. We can do that without too much trouble:
 
+{/* prettier-ignore */}
 ```bash
 $ curl 'http://postgrest/directors?select=name,movies(newest_movie_year:release_year.max(),oldest_movie_year:release_year.min())'
 ```
 
+{/* prettier-ignore */}
 ```jsx
 const { data, error } = await supabase
   .from('directors')
@@ -112,6 +120,7 @@ const { data, error } = await supabase
 		)`)
 ```
 
+{/* prettier-ignore */}
 ```json
 [
   {
@@ -144,20 +153,22 @@ const { data, error } = await supabase
 ]
 ```
 
-As shown above, you can use aggregate functions *within* the context of an embedded resource: For each set of movies that belongs to a particular director, we apply the given aggregate functions, in this case applying the `min()` and `max()` functions to the `release_year`.
+As shown above, you can use aggregate functions _within_ the context of an embedded resource: For each set of movies that belongs to a particular director, we apply the given aggregate functions, in this case applying the `min()` and `max()` functions to the `release_year`.
 
 You can also see that we made use of a column renaming — as was briefly described earlier — to make the results a little easier to understand.
 
-Note that we didn’t use grouping columns here, but we could use them to drill-down even further: For instance, we could grab the earliest and latest values of the `release_year` column for each director *by* `genre` by adding `genre` as a grouping column.
+Note that we didn’t use grouping columns here, but we could use them to drill-down even further: For instance, we could grab the earliest and latest values of the `release_year` column for each director _by_ `genre` by adding `genre` as a grouping column.
 
 Let’s look at another example, but this time going the opposite way: We’ll use `movies` as our **top-level resource** and embed `directors` through a **one-to-one** relationship.
 
 Now, we want to get the average `box_office_earnings` for our movies, grouped by the `country` of the director. To do that, we can use the following API call:
 
+{/* prettier-ignore */}
 ```bash
 $ curl 'http://postgrest/movies?select=avg_earnings:box_office_earnings.avg(),...directors(country)'
 ```
 
+{/* prettier-ignore */}
 ```jsx
 const { data, error } = await supabase
   .from('movies')
@@ -167,6 +178,7 @@ const { data, error } = await supabase
 	`)
 ```
 
+{/* prettier-ignore */}
 ```json
 [
   {
@@ -190,8 +202,9 @@ Because spreading columns brings them to the top-level, they are treated as colu
 
 ## Staying Safe with Aggregate Functions
 
-Now that we’ve gone through a few examples of how to use aggregate functions, it’s important to discuss how to *safely* use aggregate functions in your application. Because of the potential performance risks with aggregate functions, we have **[disabled** aggregate functions by default](https://postgrest.org/en/stable/references/configuration.html#db-aggregates-enabled). Only after reviewing the risks and ensuring appropriate safeguards are in place should you enable this feature. On Supabase, you can enable it by modifying the PostgREST connection role and then reloading the server configuration, like so:
+Now that we’ve gone through a few examples of how to use aggregate functions, it’s important to discuss how to _safely_ use aggregate functions in your application. Because of the potential performance risks with aggregate functions, we have **[disabled** aggregate functions by default](https://postgrest.org/en/stable/references/configuration.html#db-aggregates-enabled). Only after reviewing the risks and ensuring appropriate safeguards are in place should you enable this feature. On Supabase, you can enable it by modifying the PostgREST connection role and then reloading the server configuration, like so:
 
+{/* prettier-ignore */}
 ```sql
 ALTER ROLE authenticator SET pgrst.db_aggregates_enabled = 'true';
 NOTIFY pgrst, 'reload config';
@@ -199,23 +212,23 @@ NOTIFY pgrst, 'reload config';
 
 Now you may be thinking, “what’s the big deal?” Aggregate functions may not seem any more likely to pose performance problems than other parts of PostgREST, but there is one key difference: Aggregate functions can operate across an effectively limitless number of rows, whereas other parts of PostgREST — thanks to pagination — can be limited to operate only across a certain number of rows.
 
-For example, imagine our `movies` table from before has twenty million rows. If we wanted to get the max of the `release_year` for all movies and there is no index on the `release_year` column, it’s going to take a *looooong* time.
+For example, imagine our `movies` table from before has twenty million rows. If we wanted to get the max of the `release_year` for all movies and there is no index on the `release_year` column, it’s going to take a _looooong_ time.
 
 Even worse, imagine that someone with bad intentions wants to do bad things to your innocent server: It could be relatively simple for the attacker to bombard your server with expensive aggregation queries, preventing your server from having the capacity to deal with legitimate traffic, a form of denial-of-service attack.
 
-One strategy for preventing potential performance issues is using the `[pg_plan_filter_module](https://github.com/pgexperts/pg_plan_filter)` . Using this extension, you can set an upper limit on the *cost* of queries that PostgREST will run.
+One strategy for preventing potential performance issues is using the `[pg_plan_filter_module](https://github.com/pgexperts/pg_plan_filter)` . Using this extension, you can set an upper limit on the _cost_ of queries that PostgREST will run.
 
+{/* prettier-ignore */}
 ```sql
-
 ALTER USER authenticator SET plan_filter.statement_cost_limit = 1e7;
 ```
 
-Before PostgreSQL executes a query, it first comes up with a plan on how it will execute it, and as part of that plan, it comes up with a cost. As you might imagine, higher costs are associated with slower queries, and therefore setting an upper bound can limit your exposure to performance problems or even denial-of-service attacks. `pg_plan_filter_module`  enables you to easily set this upper bound using PostgreSQL configuration.
+Before PostgreSQL executes a query, it first comes up with a plan on how it will execute it, and as part of that plan, it comes up with a cost. As you might imagine, higher costs are associated with slower queries, and therefore setting an upper bound can limit your exposure to performance problems or even denial-of-service attacks. `pg_plan_filter_module` enables you to easily set this upper bound using PostgreSQL configuration.
 
 You can even change this limit on a per-role basis, allowing more privileged roles free rein in the queries they run, while less-privileged roles — perhaps external users of your public API, for instance — could have tighter limits.
 
+{/* prettier-ignore */}
 ```sql
-
 -- anonymous users can only run cheap queries
 ALTER
   USER anon
@@ -227,7 +240,6 @@ ALTER
   USER authenticated
 SET
   plan_filter.statement_cost_limit = 1e6;
-
 ```
 
 You can take a look at an example of using per-role configuration with PostgREST [in the documentation](https://postgrest.org/en/stable/references/transactions.html#impersonated-role-settings).
@@ -236,4 +248,4 @@ You can take a look at an example of using per-role configuration with PostgREST
 
 PostgREST v12 now has aggregate functions, giving you a lot more flexibility in how you work with your data. Even better, it’s deeply integrated with other PostgREST features you already know, providing you with a powerful new abstraction that fits in frictionlessly with existing features.
 
-While we are excited to bring aggregate functions to PostgREST, it’s important for administrators and users to understand the risks that come with them, hence why this feature comes as opt-in only. Make sure to have a strategy in place — like using `pg_plan_filter_module`  — before enabling aggregate functions to ensure maximum protection.
+While we are excited to bring aggregate functions to PostgREST, it’s important for administrators and users to understand the risks that come with them, hence why this feature comes as opt-in only. Make sure to have a strategy in place — like using `pg_plan_filter_module` — before enabling aggregate functions to ensure maximum protection.
