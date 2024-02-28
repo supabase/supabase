@@ -22,7 +22,7 @@ export const getGeneralPolicyTemplates = (schema: string, table: string): Policy
     description:
       'This policy gives read access to your table for all users via the SELECT operation.',
     statement: `
-create policy "policy_name"
+create policy "Enable read access for all users"
 on ${schema}.${table}
 for select using (true);`.trim(),
     name: 'Enable read access for all users',
@@ -37,7 +37,7 @@ for select using (true);`.trim(),
     templateName: 'Enable insert access for authenticated users only',
     description: 'This policy gives insert access to your table for all authenticated users only.',
     statement: `
-create policy "policy_name"
+create policy "Enable insert for authenticated users only"
 on ${schema}.${table}
 for insert to authenticated 
 with check (true);`.trim(),
@@ -54,7 +54,7 @@ with check (true);`.trim(),
     description:
       'This policy assumes that your table has a column "email", and allows users to update rows which the "email" column matches their email.',
     statement: `
-create policy "policy_name"
+create policy "Enable update for users based on email"
 on ${schema}.${table}
 for update using (
   auth.jwt() ->> 'email' = email
@@ -74,7 +74,7 @@ for update using (
     description:
       'This policy assumes that your table has a column "user_id", and allows users to delete rows which the "user_id" column matches their ID',
     statement: `
-create policy "policy_name"
+create policy "Enable delete for users based on user_id"
 on ${schema}.${table}
 for delete using (
   auth.uid() = user_id
@@ -92,7 +92,7 @@ for delete using (
     description:
       'This policy assumes that your table has a column "user_id", and allows users to insert rows which the "user_id" column matches their ID',
     statement: `
-create policy "policy_name"
+create policy "Enable insert for users based on user_id"
 on ${schema}.${table}
 for insert using (
   auth.uid() = user_id
