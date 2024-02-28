@@ -38,6 +38,8 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
   const { data: gitHubAuthorization, isLoading: isLoadingGitHubAuthorization } =
     useGitHubAuthorizationQuery()
 
+  console.log({ gitHubAuthorization })
+
   // [Alaister]: temp override with <any> until the typegen is fixed
   const { data: githubReposData, isLoading: isLoadingGitHubRepos } =
     useGitHubRepositoriesQuery<any[]>()
@@ -111,35 +113,36 @@ Check the details below before proceeding
           />
 
           {gitHubAuthorization === null ? (
-            <div className="my-8">
-              Write something nice about authorization and that user need to authorize the app
-              before they can create connections
+            <div className="flex flex-col items-center justify-center mt-8 relative border rounded-lg p-12 bg shadow px-20s">
+              <p className="text-sm text-center">
+                Connect your Supabase projects with your GitHub repositories
+              </p>
+              <p className="text-sm text-center text-foreground-light">
+                Authorize with GitHub to retrieve your GitHub repositories
+              </p>
               <Button
-                size="small"
+                className="w-min mt-3"
                 onClick={() => {
                   openInstallGitHubIntegrationWindow('authorize')
                 }}
               >
-                Authorize
+                Authorize GitHub
               </Button>
             </div>
           ) : (
-            ''
+            <ProjectLinker
+              defaultSupabaseProjectRef={projectRef}
+              foreignProjects={githubRepos}
+              supabaseProjects={supabaseProjects}
+              onCreateConnections={createGithubConnection}
+              isLoading={isCreatingConnection}
+              loadingForeignProjects={isLoadingGitHubRepos}
+              loadingSupabaseProjects={isLoadingSupabaseProjects}
+              integrationIcon={GITHUB_ICON}
+              choosePrompt="Choose GitHub Repo"
+              showNoEntitiesState={false}
+            />
           )}
-        </SidePanel.Content>
-        <SidePanel.Content className="flex flex-col gap-2">
-          <ProjectLinker
-            defaultSupabaseProjectRef={projectRef}
-            foreignProjects={githubRepos}
-            supabaseProjects={supabaseProjects}
-            onCreateConnections={createGithubConnection}
-            isLoading={isCreatingConnection}
-            loadingForeignProjects={isLoadingGitHubRepos}
-            loadingSupabaseProjects={isLoadingSupabaseProjects}
-            integrationIcon={GITHUB_ICON}
-            choosePrompt="Choose GitHub Repo"
-            showNoEntitiesState={false}
-          />
         </SidePanel.Content>
       </div>
     </SidePanel>

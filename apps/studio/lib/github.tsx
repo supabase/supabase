@@ -10,7 +10,7 @@ const GITHUB_INTEGRATION_CLIENT_ID =
     ? `Iv1.b91a6d8eaa272168`
     : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
       ? `Iv1.2681ab9a0360d8ad`
-      : `Iv1.5022a3b44d150fbf`
+      : `Iv1.004a02b0dc6caab0`
 
 const GITHUB_INTEGRATION_AUTHORIZATION_URL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_INTEGRATION_CLIENT_ID}`
 
