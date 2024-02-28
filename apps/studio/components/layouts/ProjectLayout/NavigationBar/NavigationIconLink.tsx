@@ -20,7 +20,7 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
 
     const classes = [
       'relative',
-      'h-10 w-10 group-data-[state=expanded]:h-10 group-data-[state=expanded]:w-full',
+      'h-10 w-10 group-data-[state=expanded]:w-full',
       'transition-all duration-200',
       'flex items-center rounded',
       'group-data-[state=collapsed]:justify-center',
