@@ -82,7 +82,7 @@ const GithubRepositorySelection = ({
                       Configure connection
                     </Button>
                   }
-                  orientation="vertical"
+                  orientation="horizontal"
                 />
               </ul>
 

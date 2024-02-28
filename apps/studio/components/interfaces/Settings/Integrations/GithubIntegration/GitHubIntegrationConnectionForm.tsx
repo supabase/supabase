@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { GitBranch, RotateCcw, Shield } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -37,7 +38,6 @@ import { useGitHubBranchesQuery } from 'data/integrations/github-branches-query'
 import { useGitHubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutation'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import toast from 'react-hot-toast'
 
 interface GitHubIntegrationConnectionFormProps {
   connection: IntegrationProjectConnection
@@ -55,12 +55,12 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
 
   const { mutate: updateConnection, isLoading: isUpdatingConnection } =
     useGitHubConnectionUpdateMutation({
-      onSuccess: () => toast.success('Successfully updated directory'),
+      onSuccess: () => toast.success('Successfully updated connection settings'),
     })
 
   const { mutate: updateBranch, isLoading: isUpdatingProdBranch } = useBranchUpdateMutation({
     onSuccess: (data) => {
-      toast.success(`Changed Production Branch to ${data.git_branch}`)
+      toast.success(`Successfully updated production branch to ${data.git_branch}`)
       setOpen(false)
     },
   })
@@ -110,14 +110,14 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
   }
 
   return (
-    <div className="flex flex-col gap-6 px-8 py-8">
+    <div className="flex flex-col gap-6 px-6 py-4">
       <div>
         <Label_Shadcn_ className="text-foreground">Production branch</Label_Shadcn_>
         <p className="text-xs text-foreground-light mb-3">
           All other branches will be treated as Preview branches
         </p>
 
-        <Alert_Shadcn_ className="mb-4 w-96">
+        <Alert_Shadcn_ className="mb-4">
           <AlertTitle_Shadcn_ className="text-sm">
             Changing Git branch for Production Branch coming soon
           </AlertTitle_Shadcn_>
@@ -136,7 +136,7 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
               size="medium"
               ref={comboBoxRef}
               className={cn(
-                'justify-start w-64',
+                'justify-start w-80',
                 productionPreviewBranch?.git_branch === undefined ? 'text-foreground-light' : 'text'
               )}
               icon={
@@ -208,10 +208,11 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
                   Path in your repository where <code>supabase</code> directory for this connection
                   lives.
                 </FormDescription_Shadcn_>
-                <FormControl_Shadcn_ className="xl:w-96 flex gap-3">
+                <FormControl_Shadcn_ className="flex gap-3">
                   <div className="relative">
                     <Input_Shadcn_
                       {...field}
+                      className="w-80"
                       onKeyPress={(event) => {
                         if (event.key === 'Escape') form.reset()
                       }}
@@ -254,16 +255,10 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
             control={form.control}
             name="supabaseChangesOnly"
             render={({ field }) => (
-              <FormItem_Shadcn_ className="flex gap-x-4 justify-between">
-                <div>
-                  <FormLabel_Shadcn_ className="!text">Supabase changes only</FormLabel_Shadcn_>
-                  <FormDescription_Shadcn_ className="text-xs text-foreground-lighter !mt-0 !mb-1">
-                    Trigger branch creation only when there were changes to <code>supabase</code>{' '}
-                    directory.
-                  </FormDescription_Shadcn_>
-                </div>
+              <FormItem_Shadcn_ className="space-y-0 flex gap-x-4 justify-between">
                 <FormControl_Shadcn_>
                   <Switch
+                    className="mt-1"
                     checked={field.value}
                     onCheckedChange={(e) => {
                       field.onChange(e)
@@ -271,6 +266,13 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
                     }}
                   />
                 </FormControl_Shadcn_>
+                <div>
+                  <FormLabel_Shadcn_ className="!text">Supabase changes only</FormLabel_Shadcn_>
+                  <FormDescription_Shadcn_ className="text-xs text-foreground-lighter">
+                    Trigger branch creation only when there were changes to <code>supabase</code>{' '}
+                    directory.
+                  </FormDescription_Shadcn_>
+                </div>
               </FormItem_Shadcn_>
             )}
           />

@@ -1,20 +1,18 @@
 import { useMemo } from 'react'
+import toast from 'react-hot-toast'
+import { Button, SidePanel } from 'ui'
 
 import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
+import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
 import { useGitHubConnectionCreateMutation } from 'data/integrations/github-connection-create-mutation'
 import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
-import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { IntegrationConnectionsCreateVariables } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
+import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { EMPTY_ARR } from 'lib/void'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { Button, SidePanel } from 'ui'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import toast from 'react-hot-toast'
-import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
-import { openInstallGitHubIntegrationWindow } from 'lib/github'
 
 const GITHUB_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" className="w-6">
@@ -38,15 +36,9 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
   const { data: gitHubAuthorization, isLoading: isLoadingGitHubAuthorization } =
     useGitHubAuthorizationQuery()
 
-  console.log({ gitHubAuthorization })
-
   // [Alaister]: temp override with <any> until the typegen is fixed
   const { data: githubReposData, isLoading: isLoadingGitHubRepos } =
     useGitHubRepositoriesQuery<any[]>()
-
-  const { data: connections } = useGitHubConnectionsQuery({
-    organizationId: selectedOrganization?.id,
-  })
 
   /**
    * Supabase projects available
