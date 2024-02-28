@@ -24,6 +24,7 @@ swap:
   'Next(?:js)?': Next.js (if referring to the framework)
   'tap (?:&|and) hold': touch & hold
   'un(?:check|select)': clear
+  'utili[sz](e[ds]|ing)': use, used, uses, etc.
   above: preceding
   account name: username
   action bar: app bar
