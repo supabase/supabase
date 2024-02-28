@@ -3,14 +3,15 @@ export default {
     title: 'Branching',
     badge: 'New',
     features: [
-      'Branch your Supabase project along with your git branches',
-      'Every Preview can be managed from the Dashboard',
+      'Branch your Supabase project',
+      'Sync with your git branches',
+      'Manage every Preview from the Dashboard',
       'Support for Vercel Previews',
     ],
     ctas: [
       {
         label: 'Get Early Access',
-        href: '/',
+        href: 'https://forms.supabase.com/enterprise',
         target: '_blank',
         type: 'primary',
       },
@@ -21,6 +22,10 @@ export default {
         type: 'default',
       },
     ],
+    image: {
+      dark: '/images/product/database/branching.svg',
+      light: '/images/product/database/branching-light.svg',
+    },
   },
   readReplicas: {
     title: 'Read Replicas',
@@ -34,16 +39,20 @@ export default {
     ctas: [
       {
         label: 'Get Early Access',
-        href: '/',
+        href: 'https://forms.supabase.com/enterprise',
         target: '_blank',
         type: 'primary',
       },
       {
         label: 'Learn more',
-        href: '/',
+        href: 'https://supabase.com/docs/reference/cli/supabase-branches',
         target: '_blank',
         type: 'default',
       },
     ],
+    image: {
+      dark: '/images/product/database/read-replicas.svg',
+      light: '/images/product/database/read-replicas-light.svg',
+    },
   },
 }
