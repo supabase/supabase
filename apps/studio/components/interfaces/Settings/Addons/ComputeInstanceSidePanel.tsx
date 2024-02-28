@@ -12,7 +12,7 @@ import { setProjectStatus } from 'data/projects/projects-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { INSTANCE_MICRO_SPECS, PROJECT_STATUS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'
@@ -37,6 +37,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { WarningIcon } from 'components/ui/Icons'
+import toast from 'react-hot-toast'
 
 const ComputeInstanceSidePanel = () => {
   const queryClient = useQueryClient()
@@ -46,6 +47,7 @@ const ComputeInstanceSidePanel = () => {
   const { project: selectedProject } = useProjectContext()
   const organization = useSelectedOrganization()
 
+  const computeSizeChangesDisabled = useFlag('disableComputeSizeChanges')
   const [showConfirmationModal, setShowConfirmationModal] = useState(false)
 
   const canUpdateCompute = useCheckPermissions(
@@ -196,6 +198,10 @@ const ComputeInstanceSidePanel = () => {
   const onConfirmUpdateComputeInstance = async () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!projectId) return console.error('Project ID is required')
+    if (computeSizeChangesDisabled)
+      toast.error(
+        'Compute size changes are currently disabled - our engineers are working on a fix.'
+      )
 
     // Temporary backwards compatibility fix
     if (
