@@ -3,14 +3,14 @@ const GITHUB_INTEGRATION_INSTALLATION_URL =
     ? `https://github.com/apps/supabase/installations/new`
     : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
       ? `https://github.com/apps/supabase-staging/installations/new`
-      : `https://github.com/apps/joshen-supabase/installations/new`
+      : `https://github.com/apps/supabase-github-v2-migration-test/installations/new`
 
 const GITHUB_INTEGRATION_CLIENT_ID =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
     ? `Iv1.b91a6d8eaa272168`
     : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
       ? `Iv1.2681ab9a0360d8ad`
-      : `Iv1.004a02b0dc6caab0`
+      : `Iv1.5022a3b44d150fbf`
 
 const GITHUB_INTEGRATION_AUTHORIZATION_URL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_INTEGRATION_CLIENT_ID}`
 
