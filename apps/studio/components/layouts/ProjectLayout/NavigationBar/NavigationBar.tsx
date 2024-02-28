@@ -221,7 +221,7 @@ const NavigationBar = () => {
                 block
               >
                 <div className="relative w-full h-full flex items-center justify-center">
-                  <figure className="absolute left-1 min-h-7 min-w-7 bg-foreground rounded-full flex items-center justify-center">
+                  <figure className="absolute left-1.5 min-h-6 min-w-6 bg-foreground rounded-full flex items-center justify-center">
                     <User
                       size={ICON_SIZE - 2}
                       strokeWidth={ICON_STROKE_WIDTH}
@@ -230,15 +230,22 @@ const NavigationBar = () => {
                   </figure>
                   <span
                     className={cn(
-                      'absolute left-10 w-[8rem] flex flex-col items-start text-sm truncate',
+                      'w-[8rem] flex flex-col items-start text-sm truncate',
+                      'absolute left-7 group-data-[state=expanded]:left-10',
                       'group-data-[state=collapsed]:opacity-0 group-data-[state=expanded]:opacity-100',
-                      'transition-all duration-200 delay-100'
+                      'transition-all'
                     )}
                   >
-                    <span className="w-full text-left text-foreground truncate">
+                    <span
+                      title={profile?.username}
+                      className="w-full text-left text-foreground truncate"
+                    >
                       {profile?.username}
                     </span>
-                    <span className="w-full text-left text-foreground-light text-xs truncate">
+                    <span
+                      title={profile?.primary_email}
+                      className="w-full text-left text-foreground-light text-xs truncate"
+                    >
                       {profile?.primary_email}
                     </span>
                   </span>

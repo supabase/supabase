@@ -29,7 +29,7 @@ export const NavigationIconButton = forwardRef<
           'absolute left-7 group-data-[state=expanded]:left-10',
           'opacity-0 group-data-[state=expanded]:opacity-100',
           'w-[10rem] text-sm flex flex-col items-center',
-          'transition-all delay-100'
+          'transition-all'
         )}
       >
         <span className="w-full text-left text-foreground-light truncate">{props.children}</span>

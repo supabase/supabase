@@ -51,7 +51,7 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
             'group-aria-current/item:text-foreground',
             'absolute left-7 group-data-[state=expanded]:left-12',
             'opacity-0 group-data-[state=expanded]:opacity-100',
-            'transition-all delay-100'
+            'transition-all'
           )}
         >
           {route.label}
