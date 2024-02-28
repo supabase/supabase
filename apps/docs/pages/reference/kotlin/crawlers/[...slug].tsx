@@ -31,7 +31,6 @@ const KotlinReferencePage = (props: InferGetStaticPropsType<typeof getStaticProp
         sections={filteredSection}
         docs={props.docs}
         spec={spec}
-        typeSpec={props.typeSpec}
         type="client-lib"
       />
     </>

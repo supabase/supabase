@@ -31,7 +31,6 @@ const DartReferencePage = (props: InferGetStaticPropsType<typeof getStaticProps>
         sections={filteredSection}
         docs={props.docs}
         spec={spec}
-        typeSpec={props.typeSpec}
         type="client-lib"
       />
     </>
