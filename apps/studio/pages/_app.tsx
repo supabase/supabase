@@ -183,7 +183,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   </TooltipProvider>
                 </PageTelemetry>
 
-                <SpeedInsights />
+                <SpeedInsights sampleRate={0.05} />
                 <HCaptchaLoadedStore />
                 <Toaster />
                 <PortalToast />
