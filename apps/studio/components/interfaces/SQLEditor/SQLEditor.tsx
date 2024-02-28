@@ -50,6 +50,7 @@ import {
   IconSettings,
   IconX,
   Input_Shadcn_,
+  Loading,
   cn,
 } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
@@ -600,7 +601,7 @@ const SQLEditor = () => {
               }}
               initial={isFirstRender ? 'visible' : 'hidden'}
               animate="visible"
-              className="w-full flex justify-center z-10 h-[60px] bg-brand-300 border-b border-brand-400 px-5"
+              className="w-full flex justify-center z-10 min-h-[60px] bg-brand-300 border-b border-brand-400 px-5"
             >
               <div
                 className={cn(
@@ -898,7 +899,11 @@ const SQLEditor = () => {
             )}
 
             {isLoading ? (
-              <div className="flex h-full w-full items-center justify-center">Loading...</div>
+              <div className="flex h-full w-full items-center justify-center">
+                <Loading active={true}>
+                  <></>
+                </Loading>
+              </div>
             ) : (
               <>
                 {isDiffOpen && (
@@ -1009,7 +1014,11 @@ const SQLEditor = () => {
           </div>
           <div className="flex flex-col">
             {isLoading ? (
-              <div className="flex h-full w-full items-center justify-center">Loading...</div>
+              <div className="flex h-full w-full items-center justify-center">
+                <Loading active={true}>
+                  <></>
+                </Loading>
+              </div>
             ) : (
               <UtilityPanel
                 id={id}

@@ -16,6 +16,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   customDateFormat?: string
   displayDateInUtc?: boolean
   onBarClick?: (datum: Datum, tooltipData?: CategoricalChartState) => void
+  emptyStateMessage?: string
 }
 
 const BarChart = ({
@@ -32,12 +33,14 @@ const BarChart = ({
   valuePrecision,
   className = '',
   size = 'normal',
+  emptyStateMessage,
   onBarClick,
 }: BarChartProps) => {
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
-  if (data.length === 0) return <ChartNoData size={size} className={className} />
+  if (data.length === 0)
+    return <ChartNoData message={emptyStateMessage} size={size} className={className} />
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
   const resolvedHighlightedLabel =

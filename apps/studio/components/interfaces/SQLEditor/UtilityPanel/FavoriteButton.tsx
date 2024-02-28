@@ -78,6 +78,7 @@ const FavoriteButton = ({ id }: FavoriteButtonProps) => {
     <>
       {isFavorite ? (
         <Button
+          title="Remove from favorites"
           type="text"
           size="tiny"
           onClick={removeFavorite}
@@ -85,6 +86,7 @@ const FavoriteButton = ({ id }: FavoriteButtonProps) => {
         />
       ) : (
         <Button
+          title="Add to favorites"
           type="text"
           size="tiny"
           onClick={addFavorite}
