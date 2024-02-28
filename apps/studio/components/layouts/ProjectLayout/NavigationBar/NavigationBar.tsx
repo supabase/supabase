@@ -1,17 +1,12 @@
 import { useParams } from 'common'
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { Home, User } from 'icons'
-import { IS_PLATFORM } from 'lib/constants'
-import { detectOS } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
 import { isUndefined } from 'lodash'
 import { Command, FileText, FlaskConical, Search, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { useAppStateSnapshot } from 'state/app-state'
 import {
   Button,
   DropdownMenu,
@@ -30,6 +25,12 @@ import {
   themes,
   useCommandMenu,
 } from 'ui'
+
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { IS_PLATFORM } from 'lib/constants'
+import { detectOS } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { useAppStateSnapshot } from 'state/app-state'
 import { useProjectContext } from '../ProjectContext'
 import {
   generateOtherRoutes,
@@ -46,18 +47,16 @@ export const ICON_STROKE_WIDTH = 1.5
 const NavigationBar = () => {
   const os = detectOS()
   const router = useRouter()
-  const snap = useAppStateSnapshot()
+  const { profile } = useProfile()
+  const { project } = useProjectContext()
   const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
   const { setIsOpen } = useCommandMenu()
+  const snap = useAppStateSnapshot()
 
-  const { profile } = useProfile()
-
-  const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
-
-  const { project } = useProjectContext()
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
 
   const {
     projectAuthAll: authEnabled,
@@ -87,21 +86,13 @@ const NavigationBar = () => {
     <div className="w-14 h-full flex flex-col">
       <nav
         data-state={snap.navigationPanelOpen ? 'expanded' : 'collapsed'}
-        className={[
-          'z-10',
-          'bg-studio',
-          'data-[state=expanded]:shadow-xl',
-          'h-full',
+        className={cn(
+          'group py-2 z-10 h-full w-14 data-[state=expanded]:w-[13rem]',
+          'border-r bg-studio border-default data-[state=expanded]:shadow-xl',
           'transition-width duration-200',
-          'w-14 data-[state=expanded]:w-[13rem]',
-          'py-2',
-          'hide-scrollbar flex flex-col justify-between overflow-y-auto',
-          'border-r bg-studio border-default',
-          'group',
-        ].join(' ')}
-        onMouseEnter={() => {
-          snap.setNavigationPanelOpen(true)
-        }}
+          'hide-scrollbar flex flex-col justify-between overflow-y-auto'
+        )}
+        onMouseEnter={() => snap.setNavigationPanelOpen(true)}
         onMouseLeave={() => {
           if (!userDropdownOpen) snap.setNavigationPanelOpen(false)
         }}
@@ -113,8 +104,8 @@ const NavigationBar = () => {
               className="mx-2 flex items-center h-[40px]"
             >
               <img
-                src={`${router.basePath}/img/supabase-logo.svg`}
                 alt="Supabase"
+                src={`${router.basePath}/img/supabase-logo.svg`}
                 className="absolute h-[40px] w-6 cursor-pointer rounded"
               />
             </Link>
@@ -238,25 +229,11 @@ const NavigationBar = () => {
                     />
                   </figure>
                   <span
-                    className=" 
-                    left-10
-                    w-[8rem]
-                    absolute
-                    
-                    flex flex-col 
-                    items-start
-                    text-sm 
-
-                    
-                    group-data-[state=collapsed]:opacity-0 
-                    group-data-[state=expanded]:opacity-100 
-
-                    transition-all 
-                    duration-200 
-                    delay-100                   
-
-                    truncate
-                  "
+                    className={cn(
+                      'absolute left-10 w-[8rem] flex flex-col items-start text-sm truncate',
+                      'group-data-[state=collapsed]:opacity-0 group-data-[state=expanded]:opacity-100',
+                      'transition-all duration-200 delay-100'
+                    )}
                   >
                     <span className="w-full text-left text-foreground truncate">
                       {profile?.username}

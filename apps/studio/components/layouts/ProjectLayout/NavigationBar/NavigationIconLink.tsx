@@ -1,11 +1,11 @@
 import Link from 'next/link'
-import React, { forwardRef } from 'react'
+import { AnchorHTMLAttributes, forwardRef } from 'react'
+import { cn } from 'ui'
 
 import { Route } from 'components/ui/ui.types'
-import { cn } from 'ui'
 import { useAppStateSnapshot } from 'state/app-state'
 
-interface NavigationIconButtonProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
+interface NavigationIconButtonProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   route: Route
   isActive?: boolean
 }
@@ -30,6 +30,7 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
       `${isActive ? '!bg-selection !text-foreground shadow-sm' : ''}`,
       'group/item',
     ]
+
     return route.link !== undefined ? (
       <Link
         role="button"
@@ -63,5 +64,4 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
 )
 
 NavigationIconLink.displayName = 'NavigationIconLink'
-
 export default NavigationIconLink

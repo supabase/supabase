@@ -1,15 +1,15 @@
 import { Button, cn } from 'ui'
-import React, { forwardRef } from 'react'
+import { ComponentProps, ReactNode, forwardRef } from 'react'
 
-const NavigationIconButton = forwardRef<
+export const NavigationIconButton = forwardRef<
   HTMLButtonElement,
   Omit<
-    React.ComponentProps<typeof Button>,
+    ComponentProps<typeof Button>,
     // omit other icon props to avoid confusion
     // using `icon` instead as there is only 1 use case for this component
     'iconRight' | 'iconLeft'
   > & {
-    rightText?: React.ReactNode
+    rightText?: ReactNode
   }
 >(({ icon, rightText, ...props }, ref) => {
   return (
@@ -50,5 +50,3 @@ const NavigationIconButton = forwardRef<
 })
 
 NavigationIconButton.displayName = 'NavigationIconButton'
-
-export { NavigationIconButton }
