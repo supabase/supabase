@@ -17,7 +17,7 @@ export default {
       },
       {
         label: 'Learn more',
-        href: '/',
+        href: 'https://supabase.com/docs/reference/cli/supabase-branches',
         target: '_blank',
         type: 'default',
       },
@@ -45,7 +45,7 @@ export default {
       },
       {
         label: 'Learn more',
-        href: 'https://supabase.com/docs/reference/cli/supabase-branches',
+        href: 'https://supabase.com/docs/guides/platform/read-replicas',
         target: '_blank',
         type: 'default',
       },
