@@ -19,8 +19,8 @@ const ManagementApiReference = (props: InferGetStaticPropsType<typeof getStaticP
       menuId={MenuId.RefApi}
       menuData={props.menuData}
       sections={props.flatSections}
+      docs={props.docs}
       spec={generatedSpec}
-      pageProps={props}
       type="api"
     />
   )

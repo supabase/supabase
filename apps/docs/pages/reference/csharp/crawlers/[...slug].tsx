@@ -29,9 +29,9 @@ const CSharpReferencePage = (props: InferGetStaticPropsType<typeof getStaticProp
         menuId={MenuId.RefCSharpV0}
         menuData={props.menuData}
         sections={filteredSection}
+        docs={props.docs}
         spec={spec}
         typeSpec={props.typeSpec}
-        pageProps={props}
         type="client-lib"
       />
     </>

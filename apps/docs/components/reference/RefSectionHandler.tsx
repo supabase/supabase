@@ -140,7 +140,7 @@ interface RefSectionHandlerProps {
   sections: ICommonSection[]
   spec?: ISpec | IAPISpec
   typeSpec?: TypeSpec
-  pageProps: { docs: IRefStaticDoc[] }
+  docs: IRefStaticDoc[]
   type: 'client-lib' | 'cli' | 'api'
   isOldVersion?: boolean
   menuId: MenuId
@@ -192,7 +192,7 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
               const sectionType = section.type
               switch (sectionType) {
                 case 'markdown':
-                  const markdownData = props.pageProps.docs.find((doc) => doc.id === section.id)
+                  const markdownData = props.docs.find((doc) => doc.id === section.id)
 
                   return (
                     <RefEducationSection

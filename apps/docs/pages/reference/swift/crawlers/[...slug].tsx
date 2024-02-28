@@ -29,9 +29,9 @@ const SwiftReferencePage = (props: InferGetStaticPropsType<typeof getStaticProps
         menuId={MenuId.RefSwiftV2}
         menuData={props.menuData}
         sections={filteredSection}
+        docs={props.docs}
         spec={spec}
         typeSpec={props.typeSpec}
-        pageProps={props}
         type="client-lib"
       />
     </>

@@ -16,7 +16,7 @@ const SelfHostRealtimeReference = (props: InferGetStaticPropsType<typeof getStat
       menuId={MenuId.SelfHostingRealtime}
       menuData={props.menuData}
       sections={props.flatSections}
-      pageProps={props}
+      docs={props.docs}
       type="api"
     />
   )

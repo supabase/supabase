@@ -19,8 +19,8 @@ const SelfHostStorageReference = (props: InferGetStaticPropsType<typeof getStati
       menuId={MenuId.SelfHostingStorage}
       menuData={props.menuData}
       sections={props.flatSections}
+      docs={props.docs}
       spec={spec}
-      pageProps={props}
       type="api"
     />
   )

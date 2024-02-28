@@ -29,9 +29,9 @@ const KotlinReferencePage = (props: InferGetStaticPropsType<typeof getStaticProp
         menuId={MenuId.RefKotlinV1}
         menuData={props.menuData}
         sections={filteredSection}
+        docs={props.docs}
         spec={spec}
         typeSpec={props.typeSpec}
-        pageProps={props}
         type="client-lib"
       />
     </>

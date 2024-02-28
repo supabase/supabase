@@ -16,8 +16,8 @@ const CliRef = (props: InferGetStaticPropsType<typeof getStaticProps>) => {
       menuId={MenuId.RefCli}
       menuData={props.menuData}
       sections={props.flatSections}
+      docs={props.docs}
       spec={spec}
-      pageProps={props}
       type="cli"
     />
   )

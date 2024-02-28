@@ -19,8 +19,8 @@ const SelfHostFunctionsReference = (props: InferGetStaticPropsType<typeof getSta
       menuId={MenuId.SelfHostingFunctions}
       menuData={props.menuData}
       sections={props.flatSections}
+      docs={props.docs}
       spec={spec}
-      pageProps={props}
       type="api"
     />
   )

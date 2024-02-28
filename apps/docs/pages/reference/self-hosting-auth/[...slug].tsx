@@ -19,8 +19,8 @@ const SelfHostAuthReference = (props: InferGetStaticPropsType<typeof getStaticPr
       menuId={MenuId.SelfHostingAuth}
       menuData={props.menuData}
       sections={props.flatSections}
+      docs={props.docs}
       spec={spec}
-      pageProps={props}
       type="api"
     />
   )

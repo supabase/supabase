@@ -16,8 +16,8 @@ const DartReferencePage = (props: InferGetStaticPropsType<typeof getStaticProps>
       menuId={MenuId.RefDartV1}
       menuData={props.menuData}
       sections={props.flatSections}
+      docs={props.docs}
       spec={spec}
-      pageProps={props}
       type="client-lib"
     />
   )

@@ -29,9 +29,9 @@ const PythonReferencePage = (props: InferGetStaticPropsType<typeof getStaticProp
         menuId={MenuId.RefPythonV2}
         menuData={props.menuData}
         sections={filteredSection}
+        docs={props.docs}
         spec={spec}
         typeSpec={props.typeSpec}
-        pageProps={props}
         type="client-lib"
       />
     </>

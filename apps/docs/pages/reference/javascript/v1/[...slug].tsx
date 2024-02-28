@@ -16,8 +16,8 @@ const JavaScriptReferencePage = (props: InferGetStaticPropsType<typeof getStatic
       menuId={MenuId.RefJavaScriptV1}
       menuData={props.menuData}
       sections={props.flatSections}
+      docs={props.docs}
       spec={spec}
-      pageProps={props}
       type="client-lib"
     />
   )
