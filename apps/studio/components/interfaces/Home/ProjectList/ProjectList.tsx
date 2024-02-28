@@ -43,6 +43,7 @@ const ProjectList = ({ search, rewriteHref }: ProjectListProps) => {
   const projectsByOrg = groupBy(allProjects, 'organization_id')
   const isLoadingPermissions = IS_PLATFORM ? _isLoadingPermissions : false
   const noResults =
+    search.length > 0 &&
     allProjects !== undefined &&
     allProjects.filter((project) => {
       return (

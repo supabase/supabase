@@ -1,12 +1,14 @@
+import { useParams, useTelemetryProps } from 'common'
 import { isEqual } from 'lodash'
 import { Loader2, MegaphoneIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Key, useEffect, useState } from 'react'
 import DataGrid, { RenderRowProps, Row } from 'react-data-grid'
-
-import { useParams } from 'common'
-import ShimmerLine from 'components/ui/ShimmerLine'
 import { Button, IconBroadcast, IconDatabaseChanges, IconExternalLink, IconPresence, cn } from 'ui'
+
+import ShimmerLine from 'components/ui/ShimmerLine'
+import Telemetry from 'lib/telemetry'
+import { useRouter } from 'next/router'
 import MessageSelection from './MessageSelection'
 import { LogData } from './Messages.types'
 import NoChannelEmptyState from './NoChannelEmptyState'
@@ -118,6 +120,8 @@ const MessagesTable = ({
 }: MessagesTableProps) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const stringData = JSON.stringify(data)
+  const telemetryProps = useTelemetryProps()
+  const router = useRouter()
 
   useEffect(() => {
     if (!data) return
@@ -164,6 +168,16 @@ const MessagesTable = ({
               rowHeight={40}
               headerRowHeight={0}
               onSelectedCellChange={({ rowIdx }) => {
+                Telemetry.sendEvent(
+                  {
+                    category: 'realtime_inspector',
+                    action: 'focused-specific-message',
+                    label: 'realtime_inspector_results',
+                  },
+                  telemetryProps,
+                  router
+                )
+
                 setFocusedLog(data[rowIdx])
               }}
               selectedRows={new Set([])}

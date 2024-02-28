@@ -15,17 +15,17 @@ import {
   maybeShowUpgradePrompt,
 } from 'components/interfaces/Settings/Logs'
 import PreviewFilterPanel from 'components/interfaces/Settings/Logs/PreviewFilterPanel'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks'
 import useLogsPreview from 'hooks/analytics/useLogsPreview'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { LOGS_TABLES } from './Logs.constants'
 import UpgradePrompt from './UpgradePrompt'
-import { useFlag, useSelectedOrganization } from 'hooks'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 /**
  * Acts as a container component for the entire log display
@@ -58,7 +58,7 @@ export const LogsPreviewer = ({
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
-  const readReplicasEnabled = useFlag('readReplicas') && project?.is_read_replicas_enabled
+  const readReplicasEnabled = project?.is_read_replicas_enabled
 
   const { data: databases, isSuccess } = useReadReplicasQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })

@@ -170,6 +170,43 @@ const Policies = ({
     })
   }
 
+  if (tables.length === 0) {
+    return (
+      <div className="flex-grow flex items-center justify-center">
+        <ProductEmptyState
+          size="large"
+          title="Row-Level Security (RLS) Policies"
+          ctaButtonLabel="Create a table"
+          infoButtonLabel="What is RLS?"
+          infoButtonUrl="https://supabase.com/docs/guides/auth/row-level-security"
+          onClickCta={() => router.push(`/project/${ref}/editor`)}
+        >
+          <div className="space-y-4">
+            <InformationBox
+              title="What are policies?"
+              icon={<IconHelpCircle strokeWidth={2} />}
+              description={
+                <div className="space-y-2">
+                  <p className="text-sm">
+                    Policies restrict, on a per-user basis, which rows can be returned by normal
+                    queries, or inserted, updated, or deleted by data modification commands.
+                  </p>
+                  <p className="text-sm">
+                    This is also known as Row-Level Security (RLS). Each policy is attached to a
+                    table, and the policy is executed each time its accessed.
+                  </p>
+                </div>
+              }
+            />
+            <p className="text-sm text-foreground-light">
+              Create a table in this schema first before creating a policy.
+            </p>
+          </div>
+        </ProductEmptyState>
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="flex flex-col gap-y-4 pb-4">
@@ -189,40 +226,7 @@ const Policies = ({
           ))
         ) : hasTables ? (
           <NoSearchResults />
-        ) : (
-          <div className="flex-grow">
-            <ProductEmptyState
-              size="large"
-              title="Row-Level Security (RLS) Policies"
-              ctaButtonLabel="Create a table"
-              infoButtonLabel="What is RLS?"
-              infoButtonUrl="https://supabase.com/docs/guides/auth/row-level-security"
-              onClickCta={() => router.push(`/project/${ref}/editor`)}
-            >
-              <div className="space-y-4">
-                <InformationBox
-                  title="What are policies?"
-                  icon={<IconHelpCircle strokeWidth={2} />}
-                  description={
-                    <div className="space-y-2">
-                      <p className="text-sm">
-                        Policies restrict, on a per-user basis, which rows can be returned by normal
-                        queries, or inserted, updated, or deleted by data modification commands.
-                      </p>
-                      <p className="text-sm">
-                        This is also known as Row-Level Security (RLS). Each policy is attached to a
-                        table, and the policy is executed each time its accessed.
-                      </p>
-                    </div>
-                  }
-                />
-                <p className="text-sm text-foreground-light">
-                  Create a table in this schema first before creating a policy.
-                </p>
-              </div>
-            </ProductEmptyState>
-          </div>
-        )}
+        ) : null}
       </div>
 
       <PolicyEditorModal
