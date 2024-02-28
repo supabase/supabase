@@ -58,6 +58,11 @@ export const appState = proxy({
   setShowAiSettingsModal: (value: boolean) => {
     appState.showAiSettingsModal = value
   },
+
+  navigationPanelOpen: false,
+  setNavigationPanelOpen: (value: boolean) => {
+    appState.navigationPanelOpen = value
+  },
 })
 
 export const getAppStateSnapshot = () => snapshot(appState)

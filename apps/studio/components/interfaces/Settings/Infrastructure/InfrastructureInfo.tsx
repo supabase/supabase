@@ -23,7 +23,7 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useFlag, useIsFeatureEnabled } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks'
 import { AWS_REGIONS, FLY_REGIONS } from 'lib/constants'
 import ProjectUpgradeAlert from '../General/Infrastructure/ProjectUpgradeAlert'
 import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
@@ -54,8 +54,7 @@ const InfrastructureInfo = () => {
   const currentPgVersion = (current_app_version ?? '').split('supabase-postgres-')[1]
   const latestPgVersion = (latest_app_version ?? '').split('supabase-postgres-')[1]
 
-  const readReplicasEnabled = useFlag('readReplicas')
-  const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
+  const showReadReplicasUI = project?.is_read_replicas_enabled
   const hasReadReplicas = (databases ?? []).length > 1
   const subject = 'Request%20for%20Postgres%20upgrade%20for%20project'
   const message = `Upgrade information:%0A• Manual intervention reason: ${requires_manual_intervention}`

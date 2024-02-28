@@ -5,7 +5,7 @@ import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft } from 'ui'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { useFlag, useSelectedProject } from 'hooks'
+import { useSelectedProject } from 'hooks'
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
 
@@ -28,9 +28,7 @@ const UtilityActions = ({
 }: UtilityActionsProps) => {
   const os = detectOS()
   const project = useSelectedProject()
-  const readReplicasEnabled = useFlag('readReplicas')
-
-  const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
+  const showReadReplicasUI = project?.is_read_replicas_enabled
 
   return (
     <>

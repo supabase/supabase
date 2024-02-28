@@ -1,50 +1,52 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
-import Link from 'next/link'
+import { Button, cn } from 'ui'
+import { ComponentProps, ReactNode, forwardRef } from 'react'
 
-import ConditionalWrap from 'components/ui/ConditionalWrap'
-import { Route } from 'components/ui/ui.types'
-
-interface NavigationIconButtonProps {
-  route: Route
-  isActive?: boolean
-}
-
-const NavigationIconButton = ({ route, isActive = false }: NavigationIconButtonProps) => {
+export const NavigationIconButton = forwardRef<
+  HTMLButtonElement,
+  Omit<
+    ComponentProps<typeof Button>,
+    // omit other icon props to avoid confusion
+    // using `icon` instead as there is only 1 use case for this component
+    'iconRight' | 'iconLeft'
+  > & {
+    rightText?: ReactNode
+  }
+>(({ icon, rightText, ...props }, ref) => {
   return (
-    <Tooltip.Root delayDuration={0}>
-      <Tooltip.Trigger>
-        <ConditionalWrap
-          condition={route.link !== undefined}
-          wrap={(children) => <Link href={route.link!}>{children}</Link>}
+    <Button
+      ref={ref}
+      type="text"
+      size="tiny"
+      {...props}
+      className={cn(
+        'h-10 [&>span]:relative [&>span]:items-center [&>span]:gap-3 [&>span]:flex [&>span]:w-full [&>span]:h-full p-0',
+        props.className
+      )}
+    >
+      <div className="absolute left-2 text-foreground-lighter">{icon}</div>
+      <span
+        className={cn(
+          'absolute left-7 group-data-[state=expanded]:left-10',
+          'opacity-0 group-data-[state=expanded]:opacity-100',
+          'w-[10rem] text-sm flex flex-col items-center',
+          'transition-all'
+        )}
+      >
+        <span className="w-full text-left text-foreground-light truncate">{props.children}</span>
+      </span>
+      {rightText && (
+        <div
+          className={cn(
+            'absolute right-2 flex items-center',
+            'opacity-0 transition-all',
+            'group-data-[state=expanded]:opacity-100 '
+          )}
         >
-          <span
-            className={[
-              'transition-colors duration-200',
-              'flex items-center justify-center h-10 w-10 rounded', // Layout
-              'text-foreground-lighter hover:text-foreground ', // Dark mode
-              'bg-studio hover:bg-surface-200', // Light mode
-              `${isActive ? '!bg-surface-300 !text-foreground shadow-sm' : ''}`,
-            ].join(' ')}
-          >
-            {route.icon}
-          </span>
-        </ConditionalWrap>
-      </Tooltip.Trigger>
-      <Tooltip.Portal>
-        <Tooltip.Content side="right" sideOffset={5}>
-          <Tooltip.Arrow className="radix-tooltip-arrow" />
-          <div
-            className={[
-              'bg-alternative shadow-lg shadow-background-surface-100	py-1.5 px-3 rounded leading-none', // background
-              'border border-default', //border
-            ].join(' ')}
-          >
-            <span className="text-foreground text-xs">{route.label}</span>
-          </div>
-        </Tooltip.Content>
-      </Tooltip.Portal>
-    </Tooltip.Root>
+          {rightText}
+        </div>
+      )}
+    </Button>
   )
-}
+})
 
-export default NavigationIconButton
+NavigationIconButton.displayName = 'NavigationIconButton'

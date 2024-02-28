@@ -16,7 +16,7 @@ There are three general ways to use Sign in with Google, depending on the applic
 - Sign in on the web or in web-based apps
   - Using an OAuth flow initiated by Supabase Auth using [Google Identity Authorization with OAuth 2.0 for Web Server Applications](https://developers.google.com/identity/protocols/oauth2/web-server).
   - Using a [personalized sign-in button](https://developers.google.com/identity/gsi/web/guides/personalized-button) or [One Tap](https://developers.google.com/identity/gsi/web/guides/display-google-one-tap) and [automatic sign-in](https://developers.google.com/identity/gsi/web/guides/automatic-sign-in-sign-out) for users already logged in to their Google account.
-- Sign in in native Android apps and Chrome extensions
+- Sign in in native Android apps and Chrome extensions.
 
 In some cases you're able to use the OAuth flow within web-based native apps such as with React Native, Expo or other similar frameworks. It is best practice to use native Sign in with Google capabilities whenever possible.
 
@@ -232,7 +232,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
   <TabPanel id="flutter" label="Flutter">
 
-    ## Using native sign in with Google in Flutter
+    ## Using native sign-in with Google on Flutter
 
     Native Google sign in with Supabase is done through the [google_sign_in](https://pub.dev/packages/google_sign_in) package for iOS and Android. Follow the instructions on the [google_sign_in](https://pub.dev/packages/google_sign_in) package for plugin specific settings.
 
@@ -301,11 +301,114 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
   <TabPanel id="android" label="Android (Kotlin)">
 
-    Unlike the OAuth flow which requires the use of a web browser, the native Sign in with Google flow on Android uses the [operating system's built-in functionalities](https://developers.google.com/android/reference/com/google/android/gms/auth/api/identity/package-summary) to prompt the user for consent. Note that native sign-in has been rebranded as _One Tap sign-in on Android_ by Google, which you should not confuse with _One Tap sign in for web_, as mentioned below.
+    ## Using Google sign-in on Android
+
+    The Sign in with Google flow on Android uses the [operating system's built-in functionalities](https://developer.android.com/training/sign-in/credential-manager) to prompt the user for consent.
 
     When the user provides consent, Google issues an identity token (commonly abbreviated as ID token) that is then sent to your project's Supabase Auth server. When valid, a new user session is started by issuing an access and refresh token from Supabase Auth.
 
-    When using [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/), you can use the [compose-auth](https://supabase.com/docs/reference/kotlin/installing) plugin. On Android it uses Google OneTap (or Credential Manager on Android 14+) automatically and on other platforms it uses `auth.signInWith(Google)`.
+    **Note:** You have to create OAuth client IDs for both a Web and Android application. The Web client ID is the one used in your Android app.
+
+    Add the following dependencies to your app. You can find the latest version of `credentials` [here](https://developer.android.com/jetpack/androidx/releases/credentials) and `googleid` [here](https://developers.google.com/identity/android-credential-manager/releases).
+
+    ```kotlin
+    implementation("androidx.credentials:credentials:<latest version>")
+    implementation ("com.google.android.libraries.identity.googleid:googleid:<latest version>")
+
+    // optional - needed for credentials support from play services, for devices running
+    // Android 13 and below.
+    implementation("androidx.credentials:credentials-play-services-auth:<latest version>")
+    ```
+
+    Add the following proguard rules to your `proguard-rules.pro` file:
+
+    ```proguard
+    -if class androidx.credentials.CredentialManager
+    -keep class androidx.credentials.playservices.** {
+      *;
+    }
+    ```
+
+    Follow the code sample below to implement native Google sign-in with Supabase using Credential Manager in your Android app.
+
+    ```kotlin
+    @Composable
+    fun GoogleSignInButton() {
+        val coroutineScope = rememberCoroutineScope()
+        val context = LocalContext.current
+
+        val onClick: () -> Unit = {
+            val credentialManager = CredentialManager.create(context)
+
+            // Generate a nonce and hash it with sha-256
+            // Providing a nonce is optional but recommended
+            val rawNonce = UUID.randomUUID().toString() // Generate a random String. UUID should be sufficient, but can also be any other random string.
+            val bytes = rawNonce.toString().toByteArray()
+            val md = MessageDigest.getInstance("SHA-256")
+            val digest = md.digest(bytes)
+            val hashedNonce = digest.fold("") { str, it -> str + "%02x".format(it) } // Hashed nonce to be passed to Google sign-in
+
+
+            val googleIdOption: GetGoogleIdOption = GetGoogleIdOption.Builder()
+                .setFilterByAuthorizedAccounts(false)
+                .setServerClientId("WEB_GOOGLE_CLIENT_ID")
+                .setNonce(hashedNonce) // Provide the nonce if you have one
+                .build()
+
+            val request: GetCredentialRequest = GetCredentialRequest.Builder()
+                .addCredentialOption(googleIdOption)
+                .build()
+
+            coroutineScope.launch {
+                try {
+                    val result = credentialManager.getCredential(
+                        request = request,
+                        context = context,
+                    )
+
+                    val googleIdTokenCredential = GoogleIdTokenCredential
+                        .createFrom(result.credential.data)
+
+                    val googleIdToken = googleIdTokenCredential.idToken
+
+                    supabase.auth.signInWith(IDToken) {
+                        idToken = googleIdToken
+                        provider = Google
+                        nonce = rawNonce
+                    }
+
+                    // Handle successful sign-in
+                } catch (e: GetCredentialException) {
+                    // Handle GetCredentialException thrown by `credentialManager.getCredential()`
+                } catch (e: GoogleIdTokenParsingException) {
+                    // Handle GoogleIdTokenParsingException thrown by `GoogleIdTokenCredential.createFrom()`
+                } catch (e: RestException) {
+                    // Handle RestException thrown by Supabase
+                } catch (e: Exception) {
+                    // Handle unknown exceptions
+                }
+            }
+        }
+
+        Button(
+            onClick = onClick,
+        ) {
+            Text("Sign in with Google")
+        }
+    }
+    ```
+
+    ### Configuration [#android-configuration]
+
+    1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. You need two client IDs, a web client ID and Android client ID. When creating a new Android OAuth client ID, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
+    2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
+    3. Finally, add the web client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
+
+    Note that you do not have to configure the OAuth flow in the Supabase Dashboard in order to use native sign in.
+
+    ## Using Google sign-in with Kotlin Multiplatform
+
+    When using [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/), you can use the [compose-auth](https://supabase.com/docs/reference/kotlin/installing) plugin. On Android it uses Google OneTap (or Credential Manager on Android 14+) automatically and on other platforms it uses `auth.signInWith(Google)`.
     Alternatively, you can have a look at [Google One Tap](https://developers.google.com/identity/one-tap/android/overview), just login with the IdToken after you receive it.
 
     **Initialize the Supabase Client**
@@ -343,7 +446,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
     }
     ```
 
-    ### Configuration [#kotlin-configuration-native-app]
+    ### Configuration [#kotlin-multiplatform-configuration]
 
     1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for.
 
@@ -352,8 +455,6 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
     2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
     3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
-
-    Note that you do not have to configure the OAuth flow in the Supabase Dashboard in order to use native sign in.
 
   </TabPanel>
 
