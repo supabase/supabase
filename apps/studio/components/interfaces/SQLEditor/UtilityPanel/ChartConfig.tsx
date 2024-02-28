@@ -86,7 +86,7 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
           </div>
         </ResizablePanel_Shadcn_>
         <ResizableHandle_Shadcn_ />
-        <ResizablePanel_Shadcn_ defaultSize={15} minSize={15} className="px-3 py-2 space-y-4">
+        <ResizablePanel_Shadcn_ defaultSize={15} minSize={15} className="px-3 py-3 space-y-4">
           <>
             <div className="flex justify-between items-center h-5">
               <h2 className="text-sm text-foreground-lighter">Chart options</h2>
