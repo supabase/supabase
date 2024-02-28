@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import UserContext from 'lib/UserContext'
 import { supabase } from 'lib/Store'
+import { jwtDecode } from 'jwt-decode'
 
 export default function SupabaseSlackClone({ Component, pageProps }) {
   const [userLoaded, setUserLoaded] = useState(false)
@@ -17,6 +18,10 @@ export default function SupabaseSlackClone({ Component, pageProps }) {
     ) {
       setSession(session)
       const currentUser = session?.user
+      if (session) {
+        const jwt = jwtDecode(session.access_token)
+        currentUser.appRole = jwt.user_role
+      }
       setUser(currentUser ?? null)
       setUserLoaded(!!currentUser)
       if (currentUser) {

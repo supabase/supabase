@@ -19,17 +19,11 @@ as $$
 
     claims := event->'claims';
 
-    -- Check if 'app_metadata' exists in claims
-    if jsonb_typeof(claims->'app_metadata') is null then
-      -- If 'app_metadata' does not exist, create an empty object
-      claims := jsonb_set(claims, '{app_metadata}', '{}');
-    end if;
-
     if user_role is not null then
       -- Set the claim
-      claims := jsonb_set(claims, '{app_metadata, user_role}', to_jsonb(user_role));
+      claims := jsonb_set(claims, '{user_role}', to_jsonb(user_role));
     else 
-      claims := jsonb_set(claims, '{app_metadata, user_role}', 'null');
+      claims := jsonb_set(claims, '{user_role}', 'null');
     end if;
 
     -- Update the 'claims' object in the original event

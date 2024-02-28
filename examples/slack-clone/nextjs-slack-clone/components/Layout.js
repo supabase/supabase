@@ -78,12 +78,11 @@ const SidebarItem = ({ channel, isActiveChannel, user }) => (
       <Link href="/channels/[id]" as={`/channels/${channel.id}`}>
         <a className={isActiveChannel ? 'font-bold' : ''}>{channel.slug}</a>
       </Link>
-      {channel.id !== 1 &&
-        (channel.created_by === user?.id || user?.app_metadata.user_role === 'admin') && (
-          <button onClick={() => deleteChannel(channel.id)}>
-            <TrashIcon />
-          </button>
-        )}
+      {channel.id !== 1 && (channel.created_by === user?.id || user?.appRole === 'admin') && (
+        <button onClick={() => deleteChannel(channel.id)}>
+          <TrashIcon />
+        </button>
+      )}
     </li>
   </>
 )

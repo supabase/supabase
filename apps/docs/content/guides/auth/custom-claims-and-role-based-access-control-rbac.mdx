@@ -7,13 +7,13 @@ description: 'Use Auth Hooks to add custom claims for managing role-based access
 Custom Claims are special attributes attached to a user that you can use to control access to portions of your application. For example:
 
 ```json
-"app_metadata": {
+{
   "plan": "TRIAL",
   "user_level": 100,
   "group_name": "Super Guild!",
   "joined_on": "2022-05-20T14:28:18.217Z",
   "group_manager": false,
-  "items": ["toothpick", "string", "ring"],
+  "items": ["toothpick", "string", "ring"]
 }
 ```
 
@@ -70,7 +70,7 @@ values
 
 ## Create Auth Hook to apply user role
 
-The [Custom Access Token Auth Hook](/guides/auth/auth-hooks#hook-custom-access-token) runs before a token is issued. You can use it edit the JWT. You should add your custom claim to the user's `app_metadata` to make sure that the logged-in user can't modify this value themselves!
+The [Custom Access Token Auth Hook](/guides/auth/auth-hooks#hook-custom-access-token) runs before a token is issued. You can use it edit the JWT.
 
 <Tabs
   scrollable
@@ -97,17 +97,11 @@ as $$
 
     claims := event->'claims';
 
-    -- Check if 'app_metadata' exists in claims
-    if jsonb_typeof(claims->'app_metadata') is null then
-      -- If 'app_metadata' does not exist, create an empty object
-      claims := jsonb_set(claims, '{app_metadata}', '{}');
-    end if;
-
     if user_role is not null then
       -- Set the claim
-      claims := jsonb_set(claims, '{app_metadata, user_role}', to_jsonb(user_role));
+      claims := jsonb_set(claims, '{user_role}', to_jsonb(user_role));
     else
-      claims := jsonb_set(claims, '{app_metadata, user_role}', 'null');
+      claims := jsonb_set(claims, '{user_role}', 'null');
     end if;
 
     -- Update the 'claims' object in the original event
@@ -169,12 +163,9 @@ as $$
   if (!event.claims) {
     event.claims = {};
   }
-  if (!event.claims.app_metadata) {
-    event.claims.app_metadata = {};
-  }
 
   // Update the level in the claims
-  event.claims.app_metadata.user_role = user_role;
+  event.claims.user_role = user_role;
 
   return event;
 $$;
@@ -228,7 +219,7 @@ begin
   select count(*)
   from public.role_permissions
   where role_permissions.permission = authorize.requested_permission
-    and role_permissions.role = (auth.jwt() -> 'app_metadata' ->> 'user_role')::public.app_role
+    and role_permissions.role = (auth.jwt() ->> 'user_role')::public.app_role
   into bind_permissions;
 
   return bind_permissions > 0;

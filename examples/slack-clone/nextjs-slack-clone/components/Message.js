@@ -9,8 +9,7 @@ const Message = ({ message }) => {
   return (
     <div className="py-1 flex items-center space-x-2">
       <div className="text-gray-100 w-4">
-        {(user?.id === message.user_id ||
-          ['admin', 'moderator'].includes(user?.app_metadata.user_role)) && (
+        {(user?.id === message.user_id || ['admin', 'moderator'].includes(user?.appRole)) && (
           <button onClick={() => deleteMessage(message.id)}>
             <TrashIcon />
           </button>

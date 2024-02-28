@@ -65,7 +65,7 @@ begin
   select count(*)
   from public.role_permissions
   where role_permissions.permission = authorize.requested_permission
-    and role_permissions.role = (auth.jwt() -> 'app_metadata' ->> 'user_role')::public.app_role
+    and role_permissions.role = (auth.jwt() ->> 'user_role')::public.app_role
   into bind_permissions;
   
   return bind_permissions > 0;
@@ -161,17 +161,11 @@ as $$
 
     claims := event->'claims';
 
-    -- Check if 'app_metadata' exists in claims
-    if jsonb_typeof(claims->'app_metadata') is null then
-      -- If 'app_metadata' does not exist, create an empty object
-      claims := jsonb_set(claims, '{app_metadata}', '{}');
-    end if;
-
     if user_role is not null then
       -- Set the claim
-      claims := jsonb_set(claims, '{app_metadata, user_role}', to_jsonb(user_role));
+      claims := jsonb_set(claims, '{user_role}', to_jsonb(user_role));
     else 
-      claims := jsonb_set(claims, '{app_metadata, user_role}', 'null');
+      claims := jsonb_set(claims, '{user_role}', 'null');
     end if;
 
     -- Update the 'claims' object in the original event
