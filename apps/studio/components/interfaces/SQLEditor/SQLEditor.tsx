@@ -718,6 +718,7 @@ const SQLEditor = () => {
                                       original: currentSql ?? '',
                                       modified: formattedSql,
                                     })
+                                    setSelectedDiffType(DiffType.Modification)
 
                                     if (title) {
                                       setPendingTitle(title)
@@ -861,7 +862,7 @@ const SQLEditor = () => {
                           diffEditorRef.current = editor
 
                           // This logic deducts whether the diff should be addition or replacement on initial diffing.
-                          // With the AI assistant is not neccessary because it has separate buttons for addition and
+                          // With the AI assistant is not necessary because it has separate buttons for addition and
                           // replacement. Using this logic with the AI assistant would probably annoy the users.
                           if (isAiAssistantOn) {
                             return
