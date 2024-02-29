@@ -8,7 +8,7 @@ import {
   Modal,
 } from 'ui'
 
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'
 import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useQueryClient } from '@tanstack/react-query'

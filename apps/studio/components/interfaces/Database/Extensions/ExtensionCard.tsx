@@ -7,7 +7,7 @@ import { extensions } from 'shared-data'
 import { Badge, IconExternalLink, IconLoader, Modal, Toggle } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useDatabaseExtensionDisableMutation } from 'data/database-extensions/database-extension-disable-mutation'
 import { useCheckPermissions } from 'hooks'
 import EnableExtensionModal from './EnableExtensionModal'
@@ -86,12 +86,12 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
                     .find((item: any) => item.name === extension.name)
                     ?.link.startsWith('/guides')
                     ? siteUrl === 'http://localhost:8082'
-                      ? `http://localhost:3001/docs${
-                          extensions.find((item: any) => item.name === extension.name)?.link
-                        }`
-                      : `https://supabase.com/docs${
-                          extensions.find((item: any) => item.name === extension.name)?.link
-                        }`
+                      ? `http://localhost:3001/docs${extensions.find(
+                          (item: any) => item.name === extension.name
+                        )?.link}`
+                      : `https://supabase.com/docs${extensions.find(
+                          (item: any) => item.name === extension.name
+                        )?.link}`
                     : extensions.find((item: any) => item.name === extension.name)?.link ?? ''
                 }
                 className="max-w-[85%] cursor-default zans"

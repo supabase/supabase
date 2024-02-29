@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { Alert, Badge, Button, Checkbox, IconBookOpen, Input, Modal, SidePanel } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import {
   CONSTRAINT_TYPE,

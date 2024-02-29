@@ -6,7 +6,7 @@ import { IconLoader } from 'ui'
 
 import { PolicyEditorModal } from 'components/interfaces/Auth/Policies'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
