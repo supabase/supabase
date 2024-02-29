@@ -1,5 +1,6 @@
 import BarChart from 'components/ui/Charts/BarChart'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
+import dayjs from 'dayjs'
 import { ArrowUpDown } from 'lucide-react'
 import { useMemo } from 'react'
 import {
@@ -39,6 +40,7 @@ const getCumulativeResults = (results: Results, config: ChartConfig) => {
   }, [])
   return cumulativeResults
 }
+const VALID_RESULT_KEY_TYPES = ['number', 'string', 'date']
 
 type ChartConfigProps = {
   results: Results
@@ -46,10 +48,13 @@ type ChartConfigProps = {
   onConfigChange: (config: ChartConfig) => void
 }
 export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: ChartConfigProps) {
-  const resultKeys = useMemo(
-    () => (results?.rows?.length ? Object.keys(results.rows[0]) : []),
-    [results]
-  )
+  // If a result key is not valid, it will be filtered out
+  const resultKeys = useMemo(() => {
+    return Object.keys(results.rows[0] || {}).filter((key) => {
+      const type = typeof results.rows[0][key]
+      return VALID_RESULT_KEY_TYPES.includes(type)
+    })
+  }, [results])
 
   // Compute cumulative results only if necessary
   const cumulativeResults = useMemo(() => getCumulativeResults(results, config), [results, config])
@@ -69,6 +74,15 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
     )
   }
 
+  const getDateFormat = (key: any) => {
+    const value = resultToRender[0][key]
+    if (typeof value === 'number') return 'number'
+    if (dayjs(value).isValid()) return 'date'
+    return 'string'
+  }
+
+  const xKeyDateFormat = getDateFormat(config.xKey)
+
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-grow h-full">
       <>
@@ -76,7 +90,9 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
           <div className="h-full">
             {config.type === 'bar' && (
               <BarChart
+                showLegend
                 size="normal"
+                xAxisIsDate={xKeyDateFormat === 'date'}
                 data={resultToRender as any}
                 xAxisKey={config.xKey}
                 yAxisKey={config.yKey}
