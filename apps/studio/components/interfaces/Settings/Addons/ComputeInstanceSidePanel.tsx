@@ -1,22 +1,11 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import clsx from 'clsx'
+import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
-
-import { useParams } from 'common'
-import { useTheme } from 'next-themes'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { setProjectStatus } from 'data/projects/projects-query'
-import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
-import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
-import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { INSTANCE_MICRO_SPECS, PROJECT_STATUS } from 'lib/constants'
-import Telemetry from 'lib/telemetry'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
+import toast from 'react-hot-toast'
 import {
   Alert,
   AlertDescription_Shadcn_,
@@ -32,12 +21,20 @@ import {
   SidePanel,
 } from 'ui'
 
-import * as Tooltip from '@radix-ui/react-tooltip'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { WarningIcon } from 'components/ui/Icons'
-import toast from 'react-hot-toast'
+import { setProjectStatus } from 'data/projects/projects-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
+import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
+import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
+import { INSTANCE_MICRO_SPECS, PROJECT_STATUS } from 'lib/constants'
+import Telemetry from 'lib/telemetry'
+import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 
 const ComputeInstanceSidePanel = () => {
   const queryClient = useQueryClient()
