@@ -45,130 +45,186 @@ function hasDereferenced(param) {
   return !!param.type?.dereferenced
 }
 
-function parseArrayType(param, sig, fnRef) {
+function parseArrayType(param, parent, fnRef) {
+  console.log('parse array')
   return {
     type: 'array',
     elementType: parseParamDetails2(
       param.type.elementType.type,
       param.type.elementType,
-      sig,
+      param,
       fnRef
     ),
   }
 }
 
-function parseInterface(_param, dereferenced, sig, fnRef) {
+function parseInterface(dereferenced, parent, fnRef) {
   if (!dereferenced.children) return undefined
-  return {
+  console.log('parse interface:', dereferenced)
+  const result = {
     type: 'interface',
+    name: dereferenced.name,
     properties: dereferenced.children.map((child) => ({
-      name: child.name,
-      type: parseParamDetails2(child.type.type, child, sig, fnRef),
+      ...parseParamDetails2(child.type.type, child, dereferenced, fnRef),
+      optional: child.flags?.isOptional,
     })),
   }
+  console.log('interface parsed:', result)
+  return result
 }
 
-function parseTypeParameter(param, typeParams, sig, fnRef) {
-  const typeParam = typeParams.find((some) => some.name === param.name)
+function parseTypeParameter(param, parent, fnRef) {
+  console.log('parse type parameter')
+  const typeParam = parent.typeParameter.find((some) => some.name === param.name)
   if (!typeParam) return undefined
 
-  console.log('typeParam:', typeParam)
   return undefined
 }
 
-function parseDereferenced(param, dereferenced, sig, fnRef) {
+function parseDereferenced(dereferenced, parent, fnRef) {
   try {
-    if (!dereferenced.name === param.type.name) return undefined
+    console.log('parse dereferenced:', dereferenced, parent)
+    if (!dereferenced.name === parent.type?.name) return undefined
 
     return (
       (!!dereferenced.type?.type &&
-        parseParamDetails2(dereferenced.type.type, dereferenced, sig, fnRef)) ||
-      (dereferenced.kindString === 'Interface' &&
-        parseInterface(param, dereferenced, sig, fnRef)) ||
+        parseParamDetails2(dereferenced.type.type, dereferenced, parent, fnRef)) ||
+      (dereferenced.kindString === 'Interface' && parseInterface(dereferenced, parent, fnRef)) ||
       console.log('unknown dereferenced type:', JSON.stringify(dereferenced, null, 2))
     )
   } catch (err) {
     console.error(err)
-    console.log(param)
+    console.log(parent)
   }
 }
 
-function parseReferenceType(param, sig, fnRef) {
-  console.log(fnRef)
-  // console.log(JSON.stringify(sig, null, 2))
-
+function parseReferenceType(param, parent, fnRef) {
+  console.log('parse reference type:', param)
   return (
-    (hasTypeParameter(sig) && parseTypeParameter(param, sig.typeParameter, sig, fnRef)) ||
-    (hasDereferenced(param) && parseDereferenced(param, param.type.dereferenced, sig, fnRef)) ||
+    (hasTypeParameter(parent) && parseTypeParameter(param, parent, fnRef)) ||
+    (hasDereferenced(param) && parseDereferenced(param.type.dereference, param, fnRef)) ||
     undefined
   )
 }
 
-function parseParamDetails2(type, param, sig, fnRef) {
-  switch (type) {
-    case 'array':
-      return parseArrayType(param, sig, fnRef)
-    case 'reference':
-      return parseReferenceType(param, sig, fnRef)
-    default:
-    // not implemented
+function parseIndexSignature(declaration, parent, fnRef) {
+  if (!declaration.indexSignature) return undefined
+  console.log('parse index signature:', declaration)
+
+  return {
+    type: 'indexed object',
+    indexes: declaration.indexSignature.parameters.map((param) => ({
+      type: parseParamDetails2(param.type.type, param, declaration, fnRef),
+    })),
+    value: parseParamDetails2(
+      declaration.indexSignature.type.type,
+      declaration.indexSignature,
+      declaration,
+      fnRef
+    ),
   }
 }
 
-// Param type is param.type in the original, there seems to be layer missing in the nested
-const parseParamDetails = (paramType, param, sig, logRef) => {
-  try {
-    switch (paramType.type) {
-      case 'array':
-        return {
-          type: 'array',
-          elementType: parseParamDetails(paramType.elementType, paramType, sig, logRef),
-        }
-      case 'indexedAccess':
-        console.log('indexed access:', logRef)
-        break
-      case 'intrinsic':
-        return {
-          type: paramType.name,
-        }
-      case 'intersection':
-        break
-      case 'literal':
-        return {
-          type: 'literal',
-          value: paramType.value,
-        }
-      case 'reference':
-        const reference = sig.typeParameter?.find((typeParam) => typeParam.name === paramType.name)
-        const dereferenced = paramType.dereferenced
-        if (!(reference || dereferenced)) {
-          console.error(
-            'Could not reference for type parameter:',
-            paramType.name,
-            JSON.stringify(sig, null, 2)
-          )
-          return null
-        }
+function parseCallSignature(declaration, parent, fnRef) {
+  console.log('parse call signature:', declaration)
+  if (declaration.signatures?.kindString !== 'Call signature') return undefined
 
-        return {
-          type: 'reference',
-          underlyingType: reference
-            ? parseParamDetails(reference.type, reference, sig, logRef)
-            : undefined, // TODO
-        }
-      case 'reflection':
-        // console.log(param.type.declaration)
-        break
-      case 'typeOperator':
-        break
-      case 'union':
-        break
-      default:
-        console.error('missing:', paramType)
-    }
-  } catch (err) {
-    console.log(err, paramType, param, sig, logRef)
+  console.log('parsing')
+
+  return {
+    name: declaration.name,
+    optional: declaration.flags?.isOptional,
+    signatures: declaration.signatures.map((sig) => ({
+      params: sig.parameters?.map((param) =>
+        parseParamDetails2(param.type.type, param, sig, fnRef)
+      ),
+      returns: parseParamDetails2(sig.type.type, sig, declaration, fnRef),
+    })),
   }
+}
+
+function parseReflectionType(param, parent, fnRef) {
+  console.log('parseReflectionType', param)
+  if (param.type.declaration.kindString === 'Type literal') {
+    return {
+      name: param.name,
+      comment: param.comment,
+      type:
+        parseInterface(param.type.declaration, param, fnRef) ||
+        parseIndexSignature(param.type.declaration, param, fnRef) ||
+        parseCallSignature(param.type.declaration, param, fnRef),
+    }
+  }
+  return undefined
+}
+
+function parseIntrinsicType(param, parent, fnRef) {
+  console.log('parse intrinsic type')
+  return {
+    name: param.name,
+    type: param.type.name,
+    comment: param.comment,
+  }
+}
+
+function parseLiteralType(param, parent, fnRef) {
+  console.log('parse literal type')
+  return {
+    name: param.name,
+    type: 'literal',
+    value: param.type.value,
+    comment: param.comment,
+  }
+}
+
+function parseUnionType(param, parent, fnRef) {
+  console.log('parse union type:', param)
+  return {
+    name: param.name,
+    type: 'union',
+    comment: param.comment,
+    types: param.type.types.map((type) => parseParamDetails2(type.type, { type }, param, fnRef)),
+  }
+}
+
+function parseParamDetails2(type, param, parent, fnRef) {
+  console.log(fnRef)
+  let result
+  switch (type) {
+    case 'array':
+      result = parseArrayType(param, parent, fnRef)
+      break
+    case 'indexedAccess':
+      break
+    case 'intersection':
+      break
+    case 'intrinsic':
+      result = parseIntrinsicType(param, parent, fnRef)
+      break
+    case 'literal':
+      result = parseLiteralType(param, parent, fnRef)
+      break
+    case 'reference':
+      result = parseReferenceType(param, parent, fnRef)
+      break
+    case 'reflection':
+      result = parseReflectionType(param, parent, fnRef)
+      break
+    case 'typeOperator':
+      break
+    case 'union':
+      result = parseUnionType(param, parent, fnRef)
+      break
+    default:
+      // not implemented
+      return undefined
+  }
+  if (result) {
+    console.log('successfully parsed:', JSON.stringify(result, null, 2))
+    return result
+  }
+
+  return undefined
 }
 
 const getTypes = (fn, version: 'v1' | 'v2') => {
@@ -209,13 +265,13 @@ const getTypes = (fn, version: 'v1' | 'v2') => {
 
         return {
           name: param.name,
-          comment: param.comment?.shortText,
+          comment: param.comment,
           ...paramDetails,
         }
       })
 
       return {
-        comment: sig.comment?.shortText,
+        comment: sig.comment,
         params,
       }
     })
