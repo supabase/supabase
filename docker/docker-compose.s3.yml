@@ -3,7 +3,7 @@ version: "3.8"
 services:
 
   minio:
-    image: minio/minio
+    image: minio/minio:RELEASE.2024-02-24T17-11-14Z
     ports:
       - '9000:9000'
       - '9001:9001'
@@ -20,7 +20,7 @@ services:
       - ./volumes/storage:/data:z
 
   minio-createbucket:
-    image: minio/mc
+    image: minio/mc:RELEASE.2024-02-24T01-33-20Z
     depends_on:
       minio:
         condition: service_healthy
