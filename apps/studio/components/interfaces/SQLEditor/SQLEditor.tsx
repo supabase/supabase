@@ -576,6 +576,7 @@ const SQLEditor = () => {
         setSqlDiff: setSourceSqlDiff,
         debugSolution,
         setDebugSolution,
+        setSelectedDiffType,
       }}
     >
       <ConfirmModal
@@ -628,7 +629,7 @@ const SQLEditor = () => {
 
                       <AnimatePresence initial={false} mode="wait">
                         {debugSolution && (
-                          <div className="h-full w-full flex flex-row items-center overflow-y-hidden text-sm text-white">
+                          <div className="h-full w-full flex flex-row items-center overflow-y-hidden text-sm text-brand-600">
                             {debugSolution}
                           </div>
                         )}
@@ -812,6 +813,11 @@ const SQLEditor = () => {
                       'bg-brand-200 border-b border-brand-400  !shadow-none'
                     )}
                   >
+                    {debugSolution && (
+                      <div className="h-full w-full flex flex-row items-center overflow-y-hidden text-sm text-brand-600">
+                        {debugSolution}
+                      </div>
+                    )}
                     <DiffActionBar
                       loading={isAcceptDiffLoading}
                       selectedDiffType={selectedDiffType || DiffType.Modification}
