@@ -1,5 +1,4 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import type { PostgresType } from '@supabase/postgres-meta'
 import { isEmpty, noop, partition } from 'lodash'
 import {
   DragDropContext,
@@ -11,6 +10,7 @@ import {
 import { Alert, Button, IconEdit, IconExternalLink, IconHelpCircle, IconKey, IconTrash } from 'ui'
 
 import InformationBox from 'components/ui/InformationBox'
+import { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { generateColumnField } from '../ColumnEditor/ColumnEditor.utils'
 import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
@@ -21,7 +21,7 @@ import { ImportContent } from './TableEditor.types'
 interface ColumnManagementProps {
   columns?: ColumnField[]
   relations: ForeignKey[]
-  enumTypes: PostgresType[]
+  enumTypes: EnumeratedType[]
   importContent?: ImportContent
   isNewRecord: boolean
   onColumnsUpdated: (columns: ColumnField[]) => void
