@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Message as MessageType } from 'ai'
 import { useTelemetryProps } from 'common'
 import Telemetry from 'lib/telemetry'
 import { compact, last } from 'lodash'
@@ -22,7 +23,8 @@ import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import { DiffType } from '../SQLEditor.types'
 import Message from './Message'
-import { MessageWithDebug } from './utils'
+
+export type MessageWithDebug = MessageType & { isDebug: boolean }
 
 interface AISQLEditorPolicyChatProps {
   messages: MessageWithDebug[]
