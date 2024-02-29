@@ -50,7 +50,7 @@ const UtilityPanel = ({
               <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
                 Results{' '}
                 {!isExecuting &&
-                  result.rows.length > 0 &&
+                  (result?.rows ?? []).length > 0 &&
                   `(${result.rows.length.toLocaleString()})`}
               </TabsTrigger_Shadcn_>
               {showCharts && (
