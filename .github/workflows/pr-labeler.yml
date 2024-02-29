@@ -1,0 +1,37 @@
+name: Auto Label PRs
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  check-external:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Install deps
+      run: |
+        sudo apt update && sudo apt install -y jq
+    - name: Get org members
+      id: fetch-members
+      run: |
+        members=$(gh api \
+          -H "Accept: application/vnd.github+json" \
+          /orgs/supabase/members | jq -r '.[].login' | tr '\n' ' ')
+        echo "::set-output name=members::$members"
+    - name: Check if external contribution
+      run: |
+        PR_OPENER="${{ github.event.pull_request.user.login }}"
+        MEMBERS="${{ steps.fetch-members.outputs.members }}"
+        if [[ $MEMBERS =~ (^|[[:space:]])"$PR_OPENER"($|[[:space:]]) ]]; then
+          echo "PR opener is a member of the organization."
+          exit 1
+        fi
+        exit 0
+  label-pr:
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+    - uses: actions/checkout@v2
+    - name: Label PR
+      uses: actions/labeler@v3
+      with:
+        repo-token: "${{ secrets.GITHUB_TOKEN }}"
+        configuration-path: .github/labeler.yml

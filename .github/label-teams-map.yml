@@ -1,0 +1,8 @@
+teams/docs:
+  - apps/docs/**/*
+
+teams/frontend:
+  - apps/studio/**/*
+
+teams/devrel:
+  - apps/www/**/*
