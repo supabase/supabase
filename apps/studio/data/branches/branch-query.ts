@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
+import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { branchKeys } from './keys'
 
@@ -16,7 +16,7 @@ export async function getBranch({ id }: BranchVariables, signal?: AbortSignal) {
     params: { path: { branch_id: id } },
     signal,
   })
-  if (error) throw error
+  if (error) handleError(error)
 
   return data
 }
