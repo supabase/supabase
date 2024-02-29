@@ -8,10 +8,15 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import {
+  CONSTRAINT_TYPE,
+  Constraint,
+  useTableConstraintsQuery,
+} from 'data/database/constraints-query'
+import {
   ForeignKeyConstraint,
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
-import { usePostgresTypesQuery } from 'data/database/types-query'
+import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useIsFeatureEnabled, useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
@@ -32,11 +37,6 @@ import {
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
-import {
-  CONSTRAINT_TYPE,
-  Constraint,
-  useTableConstraintsQuery,
-} from 'data/database/constraints-query'
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -80,7 +80,7 @@ const TableEditor = ({
   const isNewRecord = isUndefined(table)
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
 
-  const { data: types } = usePostgresTypesQuery({
+  const { data: types } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })

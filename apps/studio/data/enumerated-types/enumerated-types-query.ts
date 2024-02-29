@@ -1,10 +1,9 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { useCallback } from 'react'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'data/fetchers'
+import { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
 import { ResponseError } from 'types'
 import { enumeratedTypesKeys } from './keys'
-import { components } from 'data/api'
 
 export type EnumeratedTypesVariables = {
   projectRef?: string
@@ -32,7 +31,7 @@ export async function getEnumeratedTypes(
     signal,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   const enumeratedTypes = data.filter((type) => type.enums.length > 0)
   return enumeratedTypes
 }
