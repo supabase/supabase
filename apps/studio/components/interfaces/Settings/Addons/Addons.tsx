@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
+import { capitalize } from 'lodash'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -12,7 +13,6 @@ import {
   Alert_Shadcn_,
   Button,
   IconAlertCircle,
-  IconAlertTriangle,
   IconChevronRight,
   IconExternalLink,
   IconInfo,
@@ -48,15 +48,13 @@ import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
-import PITRSidePanel from './PITRSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
-import { capitalize } from 'lodash'
+import PITRSidePanel from './PITRSidePanel'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef, panel } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
-  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { project: selectedProject, isLoading: isLoadingProject } = useProjectContext()
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef })
   const selectedOrg = useSelectedOrganization()
@@ -69,6 +67,9 @@ const Addons = () => {
   if (panel && typeof panel === 'string' && allowedPanelValues.includes(panel)) {
     snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
   }
+
+  const computeSizeChangesDisabled = useFlag('disableComputeSizeChanges')
+  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
@@ -249,14 +250,20 @@ const Addons = () => {
                       </p>
                     )}
                     <ProjectUpdateDisabledTooltip
-                      projectUpdateDisabled={projectUpdateDisabled}
+                      projectUpdateDisabled={projectUpdateDisabled || computeSizeChangesDisabled}
                       projectNotActive={!isProjectActive}
+                      tooltip="Compute size changes are currently disabled. Our engineers are working on a fix."
                     >
                       <Button
                         type="default"
                         className="mt-2 pointer-events-auto"
                         onClick={() => snap.setPanelKey('computeInstance')}
-                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
+                        disabled={
+                          isBranch ||
+                          !isProjectActive ||
+                          projectUpdateDisabled ||
+                          computeSizeChangesDisabled
+                        }
                       >
                         Change compute size
                       </Button>

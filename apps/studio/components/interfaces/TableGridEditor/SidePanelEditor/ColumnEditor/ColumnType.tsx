@@ -1,5 +1,4 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import type { PostgresType } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
 import Link from 'next/link'
 import { ReactNode } from 'react'
@@ -23,10 +22,11 @@ import {
 } from '../SidePanelEditor.constants'
 import { PostgresDataTypeOption } from '../SidePanelEditor.types'
 import { ListPlus } from 'lucide-react'
+import { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 
 interface ColumnTypeProps {
   value: string
-  enumTypes: PostgresType[]
+  enumTypes: EnumeratedType[]
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
   layout?: 'vertical' | 'horizontal'
   className?: string

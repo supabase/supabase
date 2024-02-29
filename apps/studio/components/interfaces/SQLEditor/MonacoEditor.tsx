@@ -2,16 +2,17 @@ import Editor, { Monaco, OnMount } from '@monaco-editor/react'
 import { useParams } from 'common'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
-import { MutableRefObject, useEffect, useRef } from 'react'
+import { MutableRefObject, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 
 import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useSelectedProject } from 'hooks'
+import { useLocalStorageQuery, useSelectedProject } from 'hooks'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { untitledSnippetTitle } from './SQLEditor.constants'
 import { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeleton } from './SQLEditor.utils'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export type MonacoEditorProps = {
   id: string
@@ -36,6 +37,11 @@ const MonacoEditor = ({
   const router = useRouter()
   const { profile } = useProfile()
   const project = useSelectedProject()
+
+  const [intellisenseEnabled] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
+    typeof window !== 'undefined' ? false : true
+  )
 
   const snap = useSqlEditorStateSnapshot({ sync: true })
   const snippet = snap.snippets[id]
@@ -138,6 +144,36 @@ const MonacoEditor = ({
         // - https://github.com/microsoft/monaco-editor/issues/2229
         // - https://github.com/microsoft/monaco-editor/issues/2503
         // fixedOverflowWidgets: true,
+        suggest: {
+          showMethods: intellisenseEnabled,
+          showFunctions: intellisenseEnabled,
+          showConstructors: intellisenseEnabled,
+          showDeprecated: intellisenseEnabled,
+          showFields: intellisenseEnabled,
+          showVariables: intellisenseEnabled,
+          showClasses: intellisenseEnabled,
+          showStructs: intellisenseEnabled,
+          showInterfaces: intellisenseEnabled,
+          showModules: intellisenseEnabled,
+          showProperties: intellisenseEnabled,
+          showEvents: intellisenseEnabled,
+          showOperators: intellisenseEnabled,
+          showUnits: intellisenseEnabled,
+          showValues: intellisenseEnabled,
+          showConstants: intellisenseEnabled,
+          showEnums: intellisenseEnabled,
+          showEnumMembers: intellisenseEnabled,
+          showKeywords: intellisenseEnabled,
+          showWords: intellisenseEnabled,
+          showColors: intellisenseEnabled,
+          showFiles: intellisenseEnabled,
+          showReferences: intellisenseEnabled,
+          showFolders: intellisenseEnabled,
+          showTypeParameters: intellisenseEnabled,
+          showIssues: intellisenseEnabled,
+          showUsers: intellisenseEnabled,
+          showSnippets: intellisenseEnabled,
+        },
       }}
     />
   )
