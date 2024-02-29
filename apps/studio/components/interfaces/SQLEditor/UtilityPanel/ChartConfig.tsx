@@ -5,9 +5,9 @@ import { useMemo } from 'react'
 import {
   Button,
   Checkbox,
-  ResizableHandle_Shadcn_,
-  ResizablePanelGroup_Shadcn_,
-  ResizablePanel_Shadcn_,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
@@ -70,9 +70,9 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
   }
 
   return (
-    <ResizablePanelGroup_Shadcn_ direction="horizontal" className="flex-grow h-full">
+    <ResizablePanelGroup direction="horizontal" className="flex-grow h-full">
       <>
-        <ResizablePanel_Shadcn_ className="p-4" defaultSize={85}>
+        <ResizablePanel className="p-4" defaultSize={85}>
           <div className="h-full">
             {config.type === 'bar' && (
               <BarChart
@@ -84,9 +84,9 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
               />
             )}
           </div>
-        </ResizablePanel_Shadcn_>
-        <ResizableHandle_Shadcn_ />
-        <ResizablePanel_Shadcn_ defaultSize={15} minSize={15} className="px-3 py-3 space-y-4">
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel defaultSize={15} minSize={15} className="px-3 py-3 space-y-4">
           <>
             <div className="flex justify-between items-center h-5">
               <h2 className="text-sm text-foreground-lighter">Chart options</h2>
@@ -153,8 +153,8 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
               }}
             />
           </>
-        </ResizablePanel_Shadcn_>
+        </ResizablePanel>
       </>
-    </ResizablePanelGroup_Shadcn_>
+    </ResizablePanelGroup>
   )
 }

@@ -98,12 +98,6 @@ export {
 } from './src/components/shadcn/ui/command'
 
 export {
-  ResizablePanelGroup as ResizablePanelGroup_Shadcn_,
-  ResizablePanel as ResizablePanel_Shadcn_,
-  ResizableHandle as ResizableHandle_Shadcn_,
-} from './src/components/shadcn/ui/resizable'
-
-export {
   Dialog as Dialog_Shadcn_,
   DialogTrigger as DialogTrigger_Shadcn_,
   DialogContent as DialogContent_Shadcn_,
