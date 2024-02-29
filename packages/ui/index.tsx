@@ -172,6 +172,8 @@ export * from './src/components/shadcn/ui/switch'
 
 export { Checkbox as Checkbox_Shadcn_ } from './src/components/shadcn/ui/checkbox'
 
+export { Toggle as Toggle_Shadcn_ } from './src/components/shadcn/ui/toggle'
+
 export * from './src/components/shadcn/ui/scroll-area'
 
 export * from './src/components/shadcn/ui/hover-card'
