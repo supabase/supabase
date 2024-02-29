@@ -1,8 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
 import { post } from 'data/fetchers'
 import { ResponseError } from 'types'
+import { databaseKeys } from './keys'
 
 export type HooksEnableVariables = {
   ref: string
@@ -26,11 +27,14 @@ export const useHooksEnableMutation = ({
   UseMutationOptions<HooksEnableData, ResponseError, HooksEnableVariables>,
   'mutationFn'
 > = {}) => {
+  const queryClient = useQueryClient()
   return useMutation<HooksEnableData, ResponseError, HooksEnableVariables>(
     (vars) => enableDatabaseWebhooks(vars),
     {
       async onSuccess(data, variables, context) {
+        const { ref } = variables
         await onSuccess?.(data, variables, context)
+        await queryClient.invalidateQueries(databaseKeys.schemaList(ref))
       },
       async onError(data, variables, context) {
         if (onError === undefined) {

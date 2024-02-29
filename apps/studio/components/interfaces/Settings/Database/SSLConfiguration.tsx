@@ -159,8 +159,8 @@ const SSLConfiguration = () => {
                             {!canUpdateSSLEnforcement
                               ? 'You need additional permissions to update SSL enforcement for your project'
                               : !hasAccessToSSLEnforcement
-                              ? 'Your project does not have access to SSL enforcement'
-                              : ''}
+                                ? 'Your project does not have access to SSL enforcement'
+                                : ''}
                           </span>
                         </div>
                       </Tooltip.Content>

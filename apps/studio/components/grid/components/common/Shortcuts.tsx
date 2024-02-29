@@ -18,8 +18,8 @@ export function Shortcuts({ gridRef }: ShortcutsProps) {
       return navigator?.appVersion.indexOf('Win') !== -1
         ? 'windows'
         : navigator?.appVersion.indexOf('Mac') !== -1
-        ? 'macos'
-        : 'unknown'
+          ? 'macos'
+          : 'unknown'
     }
     const metakey = getClientOS() === 'windows' ? 'Control' : 'Command'
     setMetaKey(metakey)

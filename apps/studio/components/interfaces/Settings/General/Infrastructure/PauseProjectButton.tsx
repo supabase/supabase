@@ -84,12 +84,12 @@ const PauseProjectButton = () => {
                   {isPaused
                     ? 'Your project is already paused'
                     : !canPauseProject
-                    ? 'You need additional permissions to pause this project'
-                    : !isProjectActive
-                    ? 'Unable to pause project as project is not active'
-                    : !isFreePlan
-                    ? 'Projects on a paid plan will always be running'
-                    : ''}
+                      ? 'You need additional permissions to pause this project'
+                      : !isProjectActive
+                        ? 'Unable to pause project as project is not active'
+                        : !isFreePlan
+                          ? 'Projects on a paid plan will always be running'
+                          : ''}
                 </span>
               </div>
             </Tooltip.Content>

@@ -18,7 +18,9 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useTheme } from 'next-themes'
 import 'reactflow/dist/style.css'
-import { IconLoader, TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNode } from 'ui'
+import { IconLoader } from 'ui'
+import { TABLE_NODE_ROW_HEIGHT, TABLE_NODE_WIDTH, TableNode } from 'ui-patterns/SchemaTableNode'
+import SchemaGraphLegend from './SchemaGraphLegend'
 
 type TableNodeData = {
   name: string
@@ -258,6 +260,7 @@ const TablesGraph = ({ tables }: { tables: PostgresTable[] }) => {
             maskColor={miniMapMaskColor}
             className="border rounded-md shadow-sm"
           />
+          <SchemaGraphLegend />
         </ReactFlow>
       </div>
     </>

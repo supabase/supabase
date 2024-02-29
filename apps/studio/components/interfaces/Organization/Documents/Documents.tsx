@@ -1,5 +1,6 @@
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldSection } from 'components/layouts/Scaffold'
 import DPA from './DPA'
+import TIA from './TIA'
 import SecurityQuestionnaire from './SecurityQuestionnaire'
 import SOC2 from './SOC2'
 import HIPAA from './HIPAA'
@@ -14,8 +15,8 @@ const Documents = () => {
 
       <ScaffoldDivider />
 
-      <ScaffoldContainer id="security-questionnaire">
-        <SecurityQuestionnaire />
+      <ScaffoldContainer id="tia">
+        <TIA />
       </ScaffoldContainer>
 
       <ScaffoldDivider />
@@ -28,6 +29,12 @@ const Documents = () => {
 
       <ScaffoldContainer id="hipaa">
         <HIPAA />
+      </ScaffoldContainer>
+
+      <ScaffoldDivider />
+
+      <ScaffoldContainer id="security-questionnaire">
+        <SecurityQuestionnaire />
       </ScaffoldContainer>
 
       <ScaffoldDivider />

@@ -21,7 +21,7 @@ type CustomAuthMFAGetAuthenticatorAssuranceLevelError = NonNullable<
 >
 
 export const useAuthenticatorAssuranceLevelQuery = <
-  TData = CustomAuthMFAGetAuthenticatorAssuranceLevelData
+  TData = CustomAuthMFAGetAuthenticatorAssuranceLevelData,
 >({
   enabled = true,
   ...options

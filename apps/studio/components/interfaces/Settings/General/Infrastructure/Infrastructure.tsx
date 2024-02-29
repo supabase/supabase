@@ -1,9 +1,9 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { Alert, Badge, Button, IconPackage, Input } from 'ui'
 
-import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   FormHeader,
@@ -13,11 +13,11 @@ import {
   FormSectionLabel,
 } from 'components/ui/Forms'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
-import { useFlag, useSelectedOrganization } from 'hooks'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useSelectedOrganization } from 'hooks'
 import PauseProjectButton from './PauseProjectButton'
 import ProjectUpgradeAlert from './ProjectUpgradeAlert'
 import RestartServerButton from './RestartServerButton'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 interface InfrastructureProps {}
 
@@ -41,7 +41,6 @@ const Infrastructure = ({}: InfrastructureProps) => {
   const currentPgVersion = (current_app_version ?? '').split('supabase-postgres-')[1]
   const latestPgVersion = (latest_app_version ?? '').split('supabase-postgres-')[1]
 
-  const showDbUpgrades = useFlag('databaseUpgrades')
   const subject = 'Request%20for%20Postgres%20upgrade%20for%20project'
   const message = `Upgrade information:%0A• Manual intervention reason: ${requires_manual_intervention}`
 
@@ -125,8 +124,8 @@ const Infrastructure = ({}: InfrastructureProps) => {
                 ),
               ]}
             />
-            {showDbUpgrades && data?.eligible && <ProjectUpgradeAlert />}
-            {showDbUpgrades && !data?.eligible && data?.requires_manual_intervention && (
+            {data?.eligible && <ProjectUpgradeAlert />}
+            {!data?.eligible && data?.requires_manual_intervention && (
               <Alert
                 icon={<IconPackage className="text-foreground-light" strokeWidth={1.5} />}
                 variant="neutral"

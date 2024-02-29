@@ -85,8 +85,8 @@ const ConfirmModal = ({
                     {buttonLoadingLabel && loading
                       ? buttonLoadingLabel
                       : buttonLabel
-                      ? buttonLabel
-                      : 'Confirm'}
+                        ? buttonLabel
+                        : 'Confirm'}
                   </Button>
                 </div>
               </Modal.Content>

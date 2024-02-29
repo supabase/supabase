@@ -19,7 +19,6 @@ export async function getProjectAddons(
   })
 
   if (error) throw error
-
   return data
 }
 

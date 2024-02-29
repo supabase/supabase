@@ -1,12 +1,10 @@
 'use client'
 
-import * as React from 'react'
 import * as SheetPrimitive from '@radix-ui/react-dialog'
 import { cva, type VariantProps } from 'class-variance-authority'
-import { X } from 'lucide-react'
+import * as React from 'react'
 
-import { cn } from '@ui/lib/utils'
-import { DialogCloseProps } from '@radix-ui/react-alert-dialog'
+import { cn } from '../../../lib/utils/cn'
 
 const Sheet = SheetPrimitive.Root
 
@@ -210,11 +208,11 @@ SheetDescription.displayName = SheetPrimitive.Description.displayName
 
 export {
   Sheet,
-  SheetTrigger,
   SheetClose,
   SheetContent,
-  SheetHeader,
-  SheetFooter,
-  SheetTitle,
   SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
 }

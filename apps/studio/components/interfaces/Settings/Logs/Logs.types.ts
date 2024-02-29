@@ -86,7 +86,6 @@ export type QueryType =
   | 'realtime'
   | 'storage'
   | 'supavisor'
-  | 'pgbouncer'
   | 'postgrest'
 
 export type Mode = 'simple' | 'custom'

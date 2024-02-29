@@ -111,6 +111,28 @@
       ]
     },
     {
+      "label": "Reports",
+      "url": "/project/_/reports",
+      "subItems": [
+        {
+          "label": "API reports",
+          "url": "/project/_/reports/api-overview"
+        },
+        {
+          "label": "Storage reports",
+          "url": "/project/_/reports/storage"
+        },
+        {
+          "label": "Database reports",
+          "url": "/project/_/reports/database"
+        },
+        {
+          "label": "Query performance reports",
+          "url": "/project/_/reports/query-performance"
+        }
+      ]
+    },
+    {
       "label": "API Docs",
       "url": "/project/_/api",
       "subItems": [

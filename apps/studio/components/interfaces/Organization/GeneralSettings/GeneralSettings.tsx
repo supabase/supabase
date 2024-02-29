@@ -55,8 +55,8 @@ const GeneralSettings = () => {
       values.isOptedIntoAi && !existingOptInTags.includes(OPT_IN_TAGS.AI_SQL)
         ? existingOptInTags.concat([OPT_IN_TAGS.AI_SQL])
         : !values.isOptedIntoAi && existingOptInTags.includes(OPT_IN_TAGS.AI_SQL)
-        ? existingOptInTags.filter((x) => x !== OPT_IN_TAGS.AI_SQL)
-        : existingOptInTags
+          ? existingOptInTags.filter((x) => x !== OPT_IN_TAGS.AI_SQL)
+          : existingOptInTags
 
     updateOrganization(
       { slug, name: values.name, opt_in_tags: updatedOptInTags },

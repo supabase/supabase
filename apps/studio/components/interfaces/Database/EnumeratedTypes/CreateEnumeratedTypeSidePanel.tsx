@@ -1,6 +1,6 @@
-import Link from 'next/link'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useEffect, useRef } from 'react'
+import Link from 'next/link'
+import { useRef } from 'react'
 import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useFieldArray, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -40,12 +40,13 @@ const CreateEnumeratedTypeSidePanel = ({
   onClose,
   schema,
 }: CreateEnumeratedTypeSidePanelProps) => {
+  const initialValues = { name: '', description: '', values: [{ value: '' }] }
   const submitRef = useRef<HTMLButtonElement>(null)
   const { project } = useProjectContext()
   const { mutate: createEnumeratedType, isLoading: isCreating } = useEnumeratedTypeCreateMutation({
     onSuccess: (res, vars) => {
       toast.success(`Successfully created type "${vars.name}"`)
-      onClose()
+      closePanel()
     },
   })
 
@@ -60,7 +61,7 @@ const CreateEnumeratedTypeSidePanel = ({
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
-    defaultValues: { name: '', description: '', values: [{ value: '' }] },
+    defaultValues: initialValues,
   })
 
   const { fields, append, remove, move } = useFieldArray({
@@ -89,15 +90,16 @@ const CreateEnumeratedTypeSidePanel = ({
     })
   }
 
-  useEffect(() => {
-    if (visible) form.reset()
-  }, [visible])
+  const closePanel = () => {
+    form.reset(initialValues)
+    onClose()
+  }
 
   return (
     <SidePanel
       loading={isCreating}
       visible={visible}
-      onCancel={onClose}
+      onCancel={closePanel}
       header="Create a new enumerated type"
       confirmText="Create type"
       onConfirm={() => {

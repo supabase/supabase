@@ -109,7 +109,7 @@ const NetworkRestrictions = () => {
   const restrictedIps = ipv4Restrictions.concat(ipv6Restrictions)
   const restrictionStatus = data?.status ?? ''
 
-  const hasApplyError = restrictedIps.length === 0 && restrictionStatus === 'stored'
+  const hasApplyError = restrictionStatus === 'stored'
   const isUninitialized = restrictedIps.length === 0 && restrictionStatus.length === 0
   const isAllowedAll = restrictedIps.includes('0.0.0.0/0') && restrictedIps.includes('::/0')
   const isDisallowedAll =

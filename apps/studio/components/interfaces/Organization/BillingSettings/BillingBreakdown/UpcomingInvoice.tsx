@@ -134,8 +134,8 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       {item.unit_price === 0
                         ? 'FREE'
                         : item.unit_price
-                        ? formatCurrency(item.unit_price)
-                        : null}
+                          ? formatCurrency(item.unit_price)
+                          : null}
                     </td>
                   )}
                   <td className="py-2 text-sm text-right">{formatCurrency(item.amount)}</td>
@@ -195,15 +195,15 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                           {fee.usage_original
                             ? `${formatUsage(fee.usage_metric!, fee.usage_original)}`
                             : fee.quantity
-                            ? fee.quantity
-                            : null}
+                              ? fee.quantity
+                              : null}
                         </td>
                         <td className="py-2 text-sm">
                           {fee.unit_price_desc
                             ? `${fee.unit_price_desc}`
                             : fee.unit_price
-                            ? formatCurrency(fee.unit_price)
-                            : null}
+                              ? formatCurrency(fee.unit_price)
+                              : null}
                         </td>
                         <td className="py-2 text-sm text-right max-w-[70px]">
                           {formatCurrency(fee.amount) ?? formatCurrency(0)}
@@ -241,7 +241,7 @@ const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                   <td className="py-2 text-sm max-w-[200px]">
                     <span className="mr-2">{computeCredits.description}</span>
                     <InvoiceTooltip
-                      text="Paid plans come with $10 in Compute Credits to cover one Starter instance or parts of any other instance. Compute Credits are given to you every month and do not stack up while you are on a paid plan."
+                      text="Paid plans come with $10 in Compute Credits to cover one Micro instance or parts of any other instance. Compute Credits are given to you every month and do not stack up while you are on a paid plan."
                       linkRef="https://supabase.com/docs/guides/platform/org-based-billing#compute-credits"
                     />
                   </td>

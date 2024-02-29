@@ -1,35 +1,43 @@
+import { useParams } from 'common/hooks'
 import dayjs from 'dayjs'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, Form, Input, Modal } from 'ui'
+import {
+  Button,
+  Form,
+  Input,
+  Modal,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from 'ui'
 
-import { useParams } from 'common/hooks'
 import {
   DatePickerToFrom,
-  LogsQueryPanel,
-  LogsTableName,
-  LogsWarning,
   LOGS_LARGE_DATE_RANGE_DAYS_THRESHOLD,
   LogTable,
   LogTemplate,
-  maybeShowUpgradePrompt,
+  LogsQueryPanel,
+  LogsTableName,
+  LogsWarning,
   TEMPLATES,
+  maybeShowUpgradePrompt,
   useEditorHints,
 } from 'components/interfaces/Settings/Logs'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import { LogsLayout } from 'components/layouts'
 import CodeEditor from 'components/ui/CodeEditor'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
-import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useContentInsertMutation } from 'data/content/content-insert-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useLocalStorage, useSelectedOrganization, useStore } from 'hooks'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { LogSqlSnippets, NextPageWithLayout } from 'types'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
@@ -136,7 +144,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   }
 
   const handleInsertSource = (source: LogsTableName) => {
-    setEditorValue((prev) => prev + source)
+    setEditorValue((prev) => {
+      const index = prev.indexOf('from')
+      if (index === -1) return `${prev}${source}`
+      return `${prev.substring(0, index + 4)} ${source} ${prev.substring(index + 5)}`
+    })
     setEditorId(uuidv4())
   }
 
@@ -183,18 +195,19 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
   })
 
   return (
-    <div className="w-full h-full px-5 py-6 mx-auto">
-      <LogsExplorerHeader />
-
-      <div className="flex flex-col flex-grow h-full gap-4">
-        <div className="border rounded">
+    <div className="w-full h-full mx-auto">
+      <ResizablePanelGroup
+        className="w-full h-full"
+        direction="vertical"
+        autoSaveId={LOCAL_STORAGE_KEYS.LOG_EXPLORER_SPLIT_SIZE}
+      >
+        <ResizablePanel collapsible minSize={5}>
           <LogsQueryPanel
             defaultFrom={params.iso_timestamp_start || ''}
             defaultTo={params.iso_timestamp_end || ''}
             onDateChange={handleDateChange}
             onSelectSource={handleInsertSource}
             onClear={handleClear}
-            onRun={handleRun}
             hasEditorValue={Boolean(editorValue)}
             templates={TEMPLATES.filter((template) => template.mode === 'custom')}
             onSelectTemplate={onSelectTemplate}
@@ -202,21 +215,24 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
             isLoading={isLoading}
             warnings={warnings}
           />
-          <div className="h-48 min-h-[7rem]">
-            <ShimmerLine active={isLoading} />
-            <CodeEditor
-              id={editorId}
-              language="pgsql"
-              defaultValue={editorValue}
-              onInputChange={(v) => setEditorValue(v || '')}
-              onInputRun={handleRun}
-            />
-          </div>
-        </div>
-        <div className="relative flex flex-col flex-grow">
+
+          <ShimmerLine active={isLoading} />
+          <CodeEditor
+            id={editorId}
+            language="pgsql"
+            defaultValue={editorValue}
+            onInputChange={(v) => setEditorValue(v || '')}
+            onInputRun={handleRun}
+          />
+        </ResizablePanel>
+        <ResizableHandle withHandle />
+        <ResizablePanel collapsible minSize={5} className="flex flex-col flex-grow">
           <LoadingOpacity active={isLoading}>
-            <div className="flex flex-grow h-full">
+            <div className="flex flex-grow">
               <LogTable
+                onRun={handleRun}
+                onSave={handleOnSave}
+                hasEditorValue={Boolean(editorValue)}
                 params={params}
                 data={logData}
                 error={error}
@@ -227,8 +243,9 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
           <div className="flex flex-row justify-end mt-2">
             <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
           </div>
-        </div>
-      </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
+
       <Modal
         size="medium"
         onCancel={() => setSaveModalOpen(!saveModalOpen)}

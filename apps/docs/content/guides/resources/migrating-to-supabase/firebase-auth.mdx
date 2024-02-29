@@ -1,0 +1,87 @@
+---
+id: 'firebase-auth'
+title: 'Firebase Auth Migration'
+description: 'Migrate Firebase auth users to a Supabase project.'
+sidebar_label: 'Firebase Auth'
+---
+
+Supabase provides several [tools](https://github.com/supabase-community/firebase-to-supabase/tree/main/auth) to help migrate auth users from a Firebase project to a Supabase project. There are two parts to the migration process:
+
+- `firestoreusers2json` ([TypeScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/firestoreusers2json.ts), [JavaScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/firestoreusers2json.js)) exports users from an existing Firebase project to a `.json` file on your local system.
+- `import_users` ([TypeScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/import_users.ts), [JavaScript](https://github.com/supabase-community/firebase-to-supabase/blob/main/auth/import_users.js)) imports users from a saved `.json` file into your Supabase project (inserting those users into the `auth.users` table of your `PostgreSQL` database instance).
+
+## Set up the migration tool [#set-up-migration-tool]
+
+1. Clone the [firebase-to-supabase](https://github.com/supabase-community/firebase-to-supabase) repository:
+
+```bash
+git clone https://github.com/supabase-community/firebase-to-supabase.git
+```
+
+1. In the `/auth` directory, create a file named `supabase-service.json` with the following contents:
+
+```json
+{
+  "host": "database.server.com",
+  "password": "secretpassword",
+  "user": "postgres",
+  "database": "postgres",
+  "port": 5432
+}
+```
+
+1. Go to the [Database settings](https://supabase.com/dashboard/project/_/settings/database) for your project in the Supabase Dashboard.
+1. Under `Connection parameters`, enable `Use connection pooling` and set the mode to `Session`. Replace the `Host` and `User` fields with the values shown.
+1. Enter the password you used when you created your Supabase project in the `password` entry in the `supabase-service.json` file.
+
+## Generate a Firebase private key [#generate-firebase-private-key]
+
+1. Log in to your [Firebase Console](https://console.firebase.google.com/project) and open your project.
+1. Click the gear icon next to **Project Overview** in the sidebar and select **Project Settings**.
+1. Click **Service Accounts** and select **Firebase Admin SDK**.
+1. Click **Generate new private key**.
+1. Rename the downloaded file to `firebase-service.json`.
+
+## Save your Firebase password hash parameters [#save-firebase-hash-parameters]
+
+1. Log in to your [Firebase Console](https://console.firebase.google.com/project) and open your project.
+1. Select **Authentication** (Build section) in the sidebar.
+1. Select **Users** in the top menu.
+1. At the top right of the users list, open the menu (3 dots) and click **Password hash parameters**.
+1. Copy and save the parameters for `base64_signer_key`, `base64_salt_separator`, `rounds`, and `mem_cost`.
+
+```text Sample
+hash_config {
+  algorithm: SCRYPT,
+  base64_signer_key: XXXX/XXX+XXXXXXXXXXXXXXXXX+XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX==,
+  base64_salt_separator: Aa==,
+  rounds: 8,
+  mem_cost: 14,
+}
+```
+
+## Command line options
+
+### Dump Firestore users to a JSON file [#dump-firestore-users]
+
+`node firestoreusers2json.js [<filename.json>] [<batch_size>]`
+
+- `filename.json`: (optional) output filename (defaults to `./users.json`)
+- `batchSize`: (optional) number of users to fetch in each batch (defaults to 100)
+
+### Import JSON users file to Supabase Auth (PostgreSQL: auth.users) [#import-json-users-file]
+
+`node import_users.js <path_to_json_file> [<batch_size>]`
+
+- `path_to_json_file`: full local path and filename of .json input file (of users)
+- `batch_size`: (optional) number of users to process in a batch (defaults to 100)
+
+## Notes
+
+For more advanced migrations, including the use of a middleware server component for verifying a user's existing Firebase password and updating that password in your Supabase project the first time a user logs in, see the [firebase-to-supabase repo](https://github.com/supabase-community/firebase-to-supabase/tree/main/auth).
+
+## Resources
+
+- [Supabase vs Firebase](https://supabase.com/alternatives/supabase-vs-firebase)
+- [Firestore Data Migration](/docs/guides/migrations/firestore-data)
+- [Firestore Storage Migration](/docs/guides/migrations/firebase-storage)

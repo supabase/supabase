@@ -1,0 +1,115 @@
+---
+title: 'Use Supabase with Ruby on Rails'
+subtitle: 'Learn how to create a Rails project and connect it to your Supabase Postgres database.'
+breadcrumb: 'Framework Quickstarts'
+hideToc: true
+---
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Create a Rails Project">
+
+    Make sure your Ruby and Rails versions are up to date, then use `rails new` to scaffold a new Rails project. Use the `-d=postgresql` flag to set it up for Postgres.
+
+    Go to the [Rails docs](https://guides.rubyonrails.org/getting_started.html) for more details.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ```bash Terminal
+     rails new blog -d=postgresql
+     ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Set up the Postgres connection details">
+
+    Go to [database.new](https://database.new) and create a new Supabase project. Save your database password securely.
+
+    When your project is up and running, navigate to the [database settings](https://supabase.com/dashboard/project/_/settings/database) to find the URI connection string. Make sure **Use connection pooling** is checked and **Session mode** is selected. Then copy the URI. Replace the password placeholder with your saved database password.
+
+    <Admonition type="tip">
+
+    If your network supports IPv6 connections, you can also use the direct connection string. Uncheck **Use connection pooling** and copy the new URI.
+
+    </Admonition>
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```bash Terminal
+    export DATABASE_URL=postgres://postgres.xxxx:password@xxxx.pooler.supabase.com:5432/postgres
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Create and run a database migration">
+
+    Rails includes Active Record as the ORM as well as database migration tooling which generates the SQL migration files for you.
+
+    Create an example `Article` model and generate the migration files.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+    ```bash Terminal
+    bin/rails generate model Article title:string body:text
+    bin/rails db:migrate
+    ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Use the Model to interact with the database">
+
+    You can use the included Rails console to interact with the database. For example, you can create new entries or list all entries in a Model's table.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      bin/rails console
+      ```
+
+      ```rb irb
+      article = Article.new(title: "Hello Rails", body: "I am on Rails!")
+      article.save # Saves the entry to the database
+
+      Article.all
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Start the app">
+
+    Run the development server. Go to http://127.0.0.1:3000 in a browser to see your application running.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      bin/rails server
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+</StepHikeCompact>

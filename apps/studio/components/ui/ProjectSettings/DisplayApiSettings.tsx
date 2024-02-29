@@ -107,10 +107,10 @@ const DisplayApiSettings = () => {
                 !canReadAPIKeys
                   ? 'You need additional permissions to view API keys'
                   : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
-                  ? 'JWT secret update failed, new API key may have issues'
-                  : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
-                  ? 'Updating JWT secret...'
-                  : x.api_key
+                    ? 'JWT secret update failed, new API key may have issues'
+                    : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
+                      ? 'Updating JWT secret...'
+                      : x.api_key
               }
               onChange={() => {}}
               descriptionText={

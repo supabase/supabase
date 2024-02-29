@@ -69,7 +69,7 @@ const Compute = ({ orgSlug, projectRef, startDate, endDate }: ComputeProps) => {
         section={{
           name: 'Compute Hours',
           description:
-            'Amount of hours your projects were active. Each project is a dedicated server and database.\nPaid plans come with $10 in Compute Credits to cover one project running on Starter Compute or parts of any compute add-on.\nBilling is based on the sum of Compute Hours used. Paused projects do not count towards usage.',
+            'Amount of hours your projects were active. Each project is a dedicated server and database.\nPaid plans come with $10 in Compute Credits to cover one project running on Micro Compute or parts of any compute add-on.\nBilling is based on the sum of Compute Hours used. Paused projects do not count towards usage.',
           links: [
             {
               name: 'Compute Add-ons',

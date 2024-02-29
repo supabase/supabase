@@ -100,13 +100,13 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
       className={[
         'relative flex h-full flex-grow flex-col border border-l',
         'border-overlay',
-        'overflow-y-scroll bg-background',
+        'overflow-y-scroll bg-studio',
       ].join(' ')}
     >
       <div
         className={
           `absolute flex
-          h-full w-full flex-col items-center justify-center gap-2 overflow-y-scroll bg-background text-center opacity-0 transition-all ` +
+          h-full w-full flex-col items-center justify-center gap-2 overflow-y-scroll bg-studio text-center opacity-0 transition-all ` +
           (partialLog ? 'z-0 opacity-0' : 'z-10 opacity-100')
         }
       >

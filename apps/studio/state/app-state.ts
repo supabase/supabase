@@ -50,9 +50,18 @@ export const appState = proxy({
   setShowFeaturePreviewModal: (value: boolean) => {
     appState.showFeaturePreviewModal = value
   },
+  selectedFeaturePreview: '',
+  setSelectedFeaturePreview: (value: string) => {
+    appState.selectedFeaturePreview = value
+  },
   showAiSettingsModal: false,
   setShowAiSettingsModal: (value: boolean) => {
     appState.showAiSettingsModal = value
+  },
+
+  navigationPanelOpen: false,
+  setNavigationPanelOpen: (value: boolean) => {
+    appState.navigationPanelOpen = value
   },
 })
 

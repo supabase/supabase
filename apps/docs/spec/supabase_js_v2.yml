@@ -234,20 +234,46 @@ functions:
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
       - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
-          - If **Confirm email** is enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
-          - If **Confirm email** is disabled, the error message, `User already registered` is returned.
+        - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
+        - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/javascript/auth-getuser).
     examples:
       - id: sign-up
-        name: Sign up
+        name: Sign up with an email and password
         isSpotlight: true
-        description: |
-          If the password is larger than 72 chars, it will be truncated to the first 72 chars.
         code: |
           ```js
           const { data, error } = await supabase.auth.signUp({
             email: 'example@email.com',
             password: 'example-password',
+          })
+          ```
+      - id: sign-up-phone
+        name: Sign up with a phone number and password (SMS)
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.signUp({
+            phone: '123456789',
+            password: 'example-password',
+            options: {
+              channel: 'sms'
+            }
+          })
+          ```
+      - id: sign-up-phone-whatsapp
+        name: Sign up with a phone number and password (whatsapp)
+        isSpotlight: true
+        description: |
+          The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.signUp({
+            phone: '123456789',
+            password: 'example-password',
+            options: {
+              channel: 'whatsapp'
+            }
           })
           ```
       - id: sign-up-with-additional-user-metadata
@@ -338,7 +364,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-          const subscription = supabase.auth.onAuthStateChange((event, session) => {
+          const { data } = supabase.auth.onAuthStateChange((event, session) => {
             console.log(event, session)
 
             if (event === 'INITIAL_SESSION') {
@@ -357,7 +383,7 @@ functions:
           })
 
           // call unsubscribe to remove the callback
-          subscription.unsubscribe()
+          data.subscription.unsubscribe()
           ```
       - id: listen-to-sign-out
         name: Listen to sign out
@@ -504,12 +530,6 @@ functions:
           const { data, error } = await supabase.auth.signInWithPassword({
             phone: '+13334445555',
             password: 'some-password',
-          })
-
-          // After receiving a SMS with a OTP.
-          const { data, error } = await supabase.auth.verifyOtp({
-            phone: '+13334445555',
-            token: '123456',
           })
           ```
   - id: sign-in-with-otp
@@ -749,13 +769,63 @@ functions:
           ```js
           const { data, error } = await supabase.auth.getSession()
           ```
+  - id: start-auto-refresh
+    title: 'startAutoRefresh()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.startAutoRefresh'
+    notes: |
+      - Only useful in non-browser environments such as React Native or Electron.
+      - The Supabase Auth library automatically starts and stops proactively refreshing the session when a tab is focused or not.
+      - On non-browser platforms, such as mobile or desktop apps built with web technologies, the library is not able to effectively determine whether the application is _focused_ or not.
+      - To give this hint to the application, you should be calling this method when the app is in focus and calling `supabase.auth.stopAutoRefresh()` when it's out of focus.
+    examples:
+      - id: start-stop-auto-refresh-react-native
+        name: Start and stop auto refresh in React Native
+        isSpotlight: true
+        code: |
+          ```js
+          import { AppState } from 'react-native'
+
+          // make sure you register this only once!
+          AppState.addEventListener('change', (state) => {
+            if (state === 'active') {
+              supabase.auth.startAutoRefresh()
+            } else {
+              supabase.auth.stopAutoRefresh()
+            }
+          })
+          ```
+  - id: stop-auto-refresh
+    title: 'stopAutoRefresh()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.stopAutoRefresh'
+    notes: |
+      - Only useful in non-browser environments such as React Native or Electron.
+      - The Supabase Auth library automatically starts and stops proactively refreshing the session when a tab is focused or not.
+      - On non-browser platforms, such as mobile or desktop apps built with web technologies, the library is not able to effectively determine whether the application is _focused_ or not.
+      - When your application goes in the background or out of focus, call this method to stop the proactive refreshing of the session.
+    examples:
+      - id: start-stop-auto-refresh-react-native
+        name: Start and stop auto refresh in React Native
+        isSpotlight: true
+        code: |
+          ```js
+          import { AppState } from 'react-native'
+
+          // make sure you register this only once!
+          AppState.addEventListener('change', (state) => {
+            if (state === 'active') {
+              supabase.auth.startAutoRefresh()
+            } else {
+              supabase.auth.stopAutoRefresh()
+            }
+          })
+          ```
   - id: get-user
     title: 'getUser()'
     $ref: '@supabase/gotrue-js.GoTrueClient.getUser'
     notes: |
       - This method fetches the user object from the database instead of local session.
       - This method is useful for checking if the user is authorized because it validates the user's access token JWT on the server.
-      - Should be used only when you require the most current user data. For faster results, `getSession().session.user` is recommended.
+      - Should always be used when checking for user authorization on the server. On the client, you can instead use `getSession().session.user` for faster results. `getSession` is insecure on the server.
     examples:
       - id: get-the-logged-in-user-with-the-current-existing-session
         name: Get the logged in user with the current existing session
@@ -786,16 +856,28 @@ functions:
         isSpotlight: false
         code: |
           ```js
-          const { data, error } = await supabase.auth.updateUser({email: 'new@email.com'})
+          const { data, error } = await supabase.auth.updateUser({
+            email: 'new@email.com'
+          })
+          ```
+      - id: update-the-phone-for-an-authenticated-user
+        name: Update the phone number for an authenticated user
+        description: Sends a one-time password (OTP) to the new phone number.
+        isSpotlight: false
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.updateUser({
+            phone: '123456789'
+          })
           ```
       - id: update-the-password-for-an-authenticated-user
         name: Update the password for an authenticated user
         isSpotlight: false
-        description: |
-          If the password is larger than 72 chars, it will be truncated to the first 72 chars.
         code: |
           ```js
-          const { data, error } = await supabase.auth.updateUser({password: 'new password'})
+          const { data, error } = await supabase.auth.updateUser({
+            password: 'new password'
+          })
           ```
       - id: update-the-users-metadata
         name: Update the user's metadata
@@ -894,7 +976,7 @@ functions:
     notes: |
       - Resends a signup confirmation, email change or phone change email to the user.
       - Passwordless sign-ins can be resent by calling the `signInWithOtp()` method again.
-      - Password recovery emails can be resent by calling the `resetPassswordForEmail()` method again.
+      - Password recovery emails can be resent by calling the `resetPasswordForEmail()` method again.
       - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
       - You can specify a redirect url when you resend an email link using the `emailRedirectTo` option.
     examples:
@@ -957,7 +1039,7 @@ functions:
         isSpotlight: true
         code: |
           ```js
-            const { data, error } = supabase.auth.setSession({
+            const { data, error } = await supabase.auth.setSession({
               access_token,
               refresh_token
             })
@@ -1186,8 +1268,6 @@ functions:
       - id: create-a-new-user-with-custom-user-metadata
         name: With custom user metadata
         isSpotlight: true
-        description: |
-          If the password is larger than 72 chars, it will be truncated to the first 72 chars.
         code: |
           ```js
           const { data, error } = await supabase.auth.admin.createUser({
@@ -1711,6 +1791,16 @@ functions:
               content,
               from:sender_id(name),
               to:receiver_id(name)
+            `)
+          
+          // To infer types, use the name of the table (in this case `users`) and
+          // the name of the foreign key constraint.
+          const { data, error } = await supabase
+            .from('messages')
+            .select(`
+              content,
+              from:users!messages_sender_id_fkey(name),
+              to:users!messages_receiver_id_fkey(name)
             `)
           ```
         data:
@@ -2537,9 +2627,7 @@ functions:
           }
           ```
         description: |
-          Postgres functions that return tables can also be combined with
-          [Filters](/docs/reference/javascript/using-filters) and
-          [Modifiers](/docs/reference/javascript/using-modifiers).
+          Postgres functions that return tables can also be combined with [Filters](/docs/reference/javascript/using-filters) and [Modifiers](/docs/reference/javascript/using-modifiers).
         hideCodeBlock: true
 
   - id: using-filters
@@ -4005,7 +4093,7 @@ functions:
                 name
               )
             `)
-            .or('country_id.eq.1,name.eq.Beijing', { referenceTable: 'cities' })
+            .or('country_id.eq.1,name.eq.Beijing', { referencedTable: 'cities' })
           ```
         data:
           sql: |

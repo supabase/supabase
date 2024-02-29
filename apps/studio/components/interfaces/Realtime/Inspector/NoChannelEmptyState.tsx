@@ -2,7 +2,7 @@ import { Button, IconExternalLink } from 'ui'
 
 const NoChannelEmptyState = () => {
   return (
-    <div className="border bg-background border-border rounded-md justify-start items-center flex flex-col w-10/12 relative">
+    <div className="border bg-studio border-border rounded-md justify-start items-center flex flex-col w-10/12 relative">
       <div className="w-full px-5 py-4 items-center gap-4 inline-flex border-b rounded-t-md">
         <div className="grow flex-col flex gap-y-1">
           <p className="text-foreground">Join a channel to start listening to messages</p>

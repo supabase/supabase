@@ -1,5 +1,5 @@
 import { Meta } from '@storybook/react'
-import { Separator } from '@ui/components/shadcn/ui/separator'
+import { Separator } from '../ui/separator'
 
 const meta: Meta = {
   title: 'shadcn/Separator',

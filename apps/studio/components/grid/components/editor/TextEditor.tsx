@@ -1,6 +1,7 @@
-import { RenderEditCellProps } from 'react-data-grid'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { useCallback, useState } from 'react'
-import { Button, Popover } from 'ui'
+import { RenderEditCellProps } from 'react-data-grid'
+import { Button, IconMaximize, Popover } from 'ui'
 import { useTrackedState } from '../../store'
 import { BlockKeys, EmptyValue, MonacoEditor, NullValue } from '../common'
 
@@ -10,7 +11,12 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
   isNullable,
   isEditable,
   onRowChange,
-}: RenderEditCellProps<TRow, TSummaryRow> & { isNullable?: boolean; isEditable?: boolean }) => {
+  onExpandEditor,
+}: RenderEditCellProps<TRow, TSummaryRow> & {
+  isNullable?: boolean
+  isEditable?: boolean
+  onExpandEditor: (column: string, row: TRow) => void
+}) => {
   const state = useTrackedState()
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const gridColumn = state.gridColumns.find((x) => x.name == column.key)
@@ -26,6 +32,14 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
     if (isEditable) onRowChange({ ...row, [column.key]: newValue }, true)
     setIsPopoverOpen(false)
   }, [])
+
+  const onSelectExpand = () => {
+    cancelChanges()
+    onExpandEditor(column.key, {
+      ...row,
+      [column.key]: value || (row as any)[column.key],
+    })
+  }
 
   function onChange(_value: string | undefined) {
     if (!isEditable) return
@@ -65,7 +79,32 @@ export const TextEditor = <TRow, TSummaryRow = unknown>({
                   <p className="text-xs text-foreground-light">Cancel changes</p>
                 </div>
               </div>
-              <div className="space-y-1">
+              <div className="flex flex-col items-end gap-y-1">
+                <div>
+                  <Tooltip.Root delayDuration={0}>
+                    <Tooltip.Trigger asChild>
+                      <Button
+                        type="default"
+                        className="px-1"
+                        onClick={() => onSelectExpand()}
+                        icon={<IconMaximize size={12} strokeWidth={2} />}
+                      />
+                    </Tooltip.Trigger>
+                    <Tooltip.Portal>
+                      <Tooltip.Content side="bottom">
+                        <Tooltip.Arrow className="radix-tooltip-arrow" />
+                        <div
+                          className={[
+                            'rounded bg-alternative py-1 px-2 leading-none shadow',
+                            'border border-background',
+                          ].join(' ')}
+                        >
+                          <span className="text-xs text-foreground">Expand editor</span>
+                        </div>
+                      </Tooltip.Content>
+                    </Tooltip.Portal>
+                  </Tooltip.Root>
+                </div>
                 {isNullable && (
                   <Button
                     asChild

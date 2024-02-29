@@ -1,13 +1,28 @@
 import { PostgresPolicy } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useChat } from 'ai/react'
-import { useParams } from 'common'
+import { useParams, useTelemetryProps } from 'common'
 import { uniqBy } from 'lodash'
 import { FileDiff } from 'lucide-react'
 import dynamic from 'next/dynamic'
+import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, Modal, SheetContent_Shadcn_, SheetFooter_Shadcn_, Sheet_Shadcn_, cn } from 'ui'
+import {
+  Button,
+  IconEdit,
+  IconGrid,
+  Modal,
+  ScrollArea,
+  SheetContent_Shadcn_,
+  SheetFooter_Shadcn_,
+  Sheet_Shadcn_,
+  TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  cn,
+} from 'ui'
 
 import {
   IStandaloneCodeEditor,
@@ -19,8 +34,10 @@ import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { BASE_PATH, OPT_IN_TAGS } from 'lib/constants'
+import { BASE_PATH, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
+import Telemetry from 'lib/telemetry'
+import { useAppStateSnapshot } from 'state/app-state'
 import { AIPolicyChat } from './AIPolicyChat'
 import {
   MessageWithDebug,
@@ -32,9 +49,10 @@ import { AIPolicyHeader } from './AIPolicyHeader'
 import PolicyDetails from './PolicyDetails'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
-import Telemetry from 'lib/telemetry'
-import { useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
+import { PolicyTemplates } from './PolicyTemplates'
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import CardButton from 'components/ui/CardButton'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -60,25 +78,32 @@ export const AIPolicyEditorPanel = memo(function ({
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
   const router = useRouter()
+  const snap = useAppStateSnapshot()
   const telemetryProps = useTelemetryProps()
 
   // use chat id because useChat doesn't have a reset function to clear all messages
   const [chatId, setChatId] = useState(uuidv4())
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
+  const isTogglingPreviewRef = useRef<boolean>(false)
   const placeholder = generatePlaceholder(selectedPolicy)
   const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
 
   const [error, setError] = useState<QueryResponseError>()
-  const [errorPanelOpen, setErrorPanelOpen] = useState(true)
-  const [showDetails, setShowDetails] = useState(false)
+  const [errorPanelOpen, setErrorPanelOpen] = useState<boolean>(true)
+  const [showDetails, setShowDetails] = useState<boolean>(false)
+  const [selectedDiff, setSelectedDiff] = useState<string>()
   // [Joshen] Separate state here as there's a delay between submitting and the API updating the loading status
   const [debugThread, setDebugThread] = useState<MessageWithDebug[]>([])
-  const [assistantVisible, setAssistantPanel] = useState(false)
-  const [isAssistantChatInputEmpty, setIsAssistantChatInputEmpty] = useState(true)
+  const [assistantVisible, setAssistantPanel] = useState<boolean>(false)
+  const [isAssistantChatInputEmpty, setIsAssistantChatInputEmpty] = useState<boolean>(true)
   const [incomingChange, setIncomingChange] = useState<string | undefined>(undefined)
   // used for confirmation when closing the panel with unsaved changes
-  const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState(false)
+  const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState<boolean>(false)
+
+  // Customers on HIPAA plans should not have access to Supabase AI
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
+  const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
   const { data: entities } = useEntityDefinitionsQuery(
     {
@@ -128,9 +153,6 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
 
-  const errorLines =
-    error?.formattedError.split('\n').filter((x: string) => x.length > 0).length ?? 0
-
   const onExecuteSQL = useCallback(() => {
     // clean up the sql before sending
     const policy = editorRef.current?.getValue().replaceAll('  ', ' ')
@@ -175,14 +197,23 @@ export const AIPolicyEditorPanel = memo(function ({
     setIncomingChange(undefined)
   }, [incomingChange])
 
-  const onClosingPanel = useCallback(() => {
+  const toggleFeaturePreviewModal = () => {
+    isTogglingPreviewRef.current = true
+    onClosingPanel()
+  }
+
+  const onClosingPanel = () => {
     const policy = editorRef.current?.getValue()
     if (policy || messages.length > 0 || !isAssistantChatInputEmpty) {
       setIsClosingPolicyEditorPanel(true)
     } else {
+      if (isTogglingPreviewRef.current) {
+        snap.setSelectedFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT)
+        snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
+      }
       onSelectCancel()
     }
-  }, [onSelectCancel, messages, isAssistantChatInputEmpty])
+  }
 
   const onSelectDebug = async () => {
     const policy = editorRef.current?.getValue().replaceAll('\n', ' ').replaceAll('  ', ' ')
@@ -214,6 +245,24 @@ export const AIPolicyEditorPanel = memo(function ({
     setDebugThread(cleanedMessages)
   }
 
+  const updateEditorWithCheckForDiff = (value: { id: string; content: string }) => {
+    const editorModel = editorRef.current?.getModel()
+    if (!editorModel) return
+
+    const existingValue = editorRef.current?.getValue() ?? ''
+    if (existingValue.length === 0) {
+      editorRef.current?.executeEdits('apply-template', [
+        {
+          text: value.content,
+          range: editorModel.getFullModelRange(),
+        },
+      ])
+    } else {
+      setSelectedDiff(value.id)
+      setIncomingChange(value.content)
+    }
+  }
+
   // when the panel is closed, reset all values
   useEffect(() => {
     if (!visible) {
@@ -225,6 +274,9 @@ export const AIPolicyEditorPanel = memo(function ({
       setDebugThread([])
       setChatId(uuidv4())
       setShowDetails(false)
+      setSelectedDiff(undefined)
+    } else {
+      setAssistantPanel(true)
     }
   }, [visible])
 
@@ -243,8 +295,9 @@ export const AIPolicyEditorPanel = memo(function ({
         <SheetContent_Shadcn_
           size={assistantVisible ? 'lg' : 'default'}
           className={cn(
+            'bg-surface-200',
             'p-0 flex flex-row gap-0',
-            assistantVisible ? '!min-w-[1024px]' : '!min-w-[600px]'
+            assistantVisible ? '!min-w-[1200px]' : '!min-w-[600px]'
           )}
         >
           <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
@@ -253,16 +306,14 @@ export const AIPolicyEditorPanel = memo(function ({
               assistantVisible={assistantVisible}
               setAssistantVisible={setAssistantPanel}
             />
-
             <PolicyDetails
               policy={selectedPolicy}
               showDetails={showDetails}
               toggleShowDetails={() => setShowDetails(!showDetails)}
             />
-
             <div className="flex flex-col h-full w-full justify-between">
               {incomingChange ? (
-                <div className="px-5 py-3 flex justify-between gap-3 bg-muted">
+                <div className="px-5 py-3 flex justify-between gap-3 bg-surface-75">
                   <div className="flex gap-2 items-center text-foreground-light">
                     <FileDiff className="h-4 w-4" />
                     <span className="text-sm">Accept changes from assistant</span>
@@ -272,6 +323,7 @@ export const AIPolicyEditorPanel = memo(function ({
                       type="default"
                       onClick={() => {
                         setIncomingChange(undefined)
+                        setSelectedDiff(undefined)
                         Telemetry.sendEvent(
                           {
                             category: 'rls_editor',
@@ -289,6 +341,7 @@ export const AIPolicyEditorPanel = memo(function ({
                       type="primary"
                       onClick={() => {
                         acceptChange()
+                        setSelectedDiff(undefined)
                         Telemetry.sendEvent(
                           {
                             category: 'rls_editor',
@@ -347,8 +400,11 @@ export const AIPolicyEditorPanel = memo(function ({
                     setOpen={setErrorPanelOpen}
                   />
                 )}
-                <SheetFooter_Shadcn_ className="flex flex-col gap-12 px-5 py-4 w-full">
-                  <div className="flex justify-end gap-x-2">
+                <SheetFooter_Shadcn_ className="flex items-center !justify-between px-5 py-4 w-full">
+                  <Button type="text" onClick={toggleFeaturePreviewModal}>
+                    Toggle feature preview
+                  </Button>
+                  <div className="flex items-center gap-x-2">
                     <Button type="default" disabled={isExecuting} onClick={() => onSelectCancel()}>
                       Cancel
                     </Button>
@@ -366,20 +422,66 @@ export const AIPolicyEditorPanel = memo(function ({
             </div>
           </div>
           {assistantVisible && (
-            <div className={cn('flex border-l grow w-full', assistantVisible && 'w-[40%]')}>
-              <AIPolicyChat
-                messages={messages}
-                onSubmit={(message) =>
-                  append({
-                    content: message,
-                    role: 'user',
-                    createdAt: new Date(),
-                  })
-                }
-                onDiff={setIncomingChange}
-                onChange={setIsAssistantChatInputEmpty}
-                loading={isLoading || isDebugSqlLoading}
-              />
+            <div
+              className={cn(
+                'border-l shadow-[rgba(0,0,0,0.13)_-4px_0px_6px_0px] z-10',
+                assistantVisible && 'w-[50%]',
+                'bg-studio'
+              )}
+            >
+              <Tabs_Shadcn_ defaultValue="templates" className="flex flex-col h-full w-full">
+                <TabsList_Shadcn_ className="flex gap-4 px-content pt-2">
+                  <TabsTrigger_Shadcn_
+                    key="templates"
+                    value="templates"
+                    className="px-0 data-[state=active]:bg-transparent"
+                  >
+                    Templates
+                  </TabsTrigger_Shadcn_>
+                  {!hasHipaaAddon && (
+                    <TabsTrigger_Shadcn_
+                      key="conversation"
+                      value="conversation"
+                      className="px-0 data-[state=active]:bg-transparent"
+                    >
+                      Assistant
+                    </TabsTrigger_Shadcn_>
+                  )}
+                </TabsList_Shadcn_>
+                <TabsContent_Shadcn_
+                  value="templates"
+                  className={cn(
+                    '!mt-0 overflow-y-auto',
+                    'data-[state=active]:flex data-[state=active]:grow'
+                  )}
+                >
+                  <ScrollArea className="h-full w-full">
+                    <PolicyTemplates
+                      selectedTemplate={selectedDiff}
+                      onSelectTemplate={updateEditorWithCheckForDiff}
+                    />
+                  </ScrollArea>
+                </TabsContent_Shadcn_>
+                <TabsContent_Shadcn_
+                  value="conversation"
+                  className="flex grow !mt-0 overflow-y-auto"
+                >
+                  <AIPolicyChat
+                    messages={messages}
+                    selectedMessage={selectedDiff}
+                    onSubmit={(message) =>
+                      append({
+                        content: message,
+                        role: 'user',
+                        createdAt: new Date(),
+                      })
+                    }
+                    onDiff={updateEditorWithCheckForDiff}
+                    onChange={setIsAssistantChatInputEmpty}
+                    loading={isLoading || isDebugSqlLoading}
+                  />
+                </TabsContent_Shadcn_>
+              </Tabs_Shadcn_>
             </div>
           )}
 
@@ -387,9 +489,17 @@ export const AIPolicyEditorPanel = memo(function ({
             visible={isClosingPolicyEditorPanel}
             header="Discard changes"
             buttonLabel="Discard"
-            onSelectCancel={() => setIsClosingPolicyEditorPanel(false)}
+            onSelectCancel={() => {
+              isTogglingPreviewRef.current = false
+              setIsClosingPolicyEditorPanel(false)
+            }}
             onSelectConfirm={() => {
+              if (isTogglingPreviewRef.current) {
+                snap.setSelectedFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT)
+                snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
+              }
               onSelectCancel()
+              isTogglingPreviewRef.current = false
               setIsClosingPolicyEditorPanel(false)
             }}
           >

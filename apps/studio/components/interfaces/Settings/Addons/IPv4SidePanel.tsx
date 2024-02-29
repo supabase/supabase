@@ -5,15 +5,16 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { AddonVariantId } from 'data/subscriptions/types'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { formatCurrency } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { AddonVariantId } from 'data/subscriptions/types'
 
 const IPv4SidePanel = () => {
   const { ui } = useStore()
@@ -124,19 +125,19 @@ const IPv4SidePanel = () => {
         isFreePlan
           ? 'Unable to enable IPv4 on a free plan'
           : !canUpdateIPv4
-          ? 'You do not have permission to update IPv4'
-          : undefined
+            ? 'You do not have permission to update IPv4'
+            : undefined
       }
       header={
         <div className="flex items-center justify-between">
-          <h4>IPv4 address</h4>
+          <h4>Dedicated IPv4 address</h4>
           <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
             <Link
-              href="https://github.com/orgs/supabase/discussions/17817"
+              href="https://supabase.com/docs/guides/platform/ipv4-address"
               target="_blank"
               rel="noreferrer"
             >
-              About IPv4 deprecation
+              About dedicated IPv4 addresses
             </Link>
           </Button>
         </div>
@@ -146,10 +147,12 @@ const IPv4SidePanel = () => {
         <div className="py-6 space-y-4">
           <p className="text-sm">
             Direct connections to the database only work if your client is able to resolve IPv6
-            addresses from January 26th. Enabling the IPv4 add-on allows you to directly connect to
-            your database via a IPv4 address. If you are connecting via our connection pooler, you
-            do not need this add-on as our pooler resolves to IPv4 addresses. You can check your
-            connection info in your{' '}
+            addresses. Enabling the dedicated IPv4 add-on allows you to directly connect to your
+            database via a IPv4 address.
+          </p>
+          <p className="text-sm">
+            If you are connecting via our connection pooler, you do not need this add-on as our
+            pooler resolves to IPv4 addresses. You can check your connection info in your{' '}
             <Link href={`/project/${projectRef}/settings/database`} className="text-brand">
               project database settings
             </Link>
@@ -212,14 +215,14 @@ const IPv4SidePanel = () => {
                 >
                   <div className="w-full group">
                     <div className="border-b border-default px-4 py-2 group-hover:border-control">
-                      <p className="text-sm">IPv4 address</p>
+                      <p className="text-sm">Dedicated IPv4 address</p>
                     </div>
                     <div className="px-4 py-2">
                       <p className="text-foreground-light">
                         Allow direct database connections via IPv4 address
                       </p>
                       <div className="flex items-center space-x-1 mt-2">
-                        <p className="text-foreground text-sm">${option.price}</p>
+                        <p className="text-foreground text-sm">{formatCurrency(option.price)}</p>
                         <p className="text-foreground-light translate-y-[1px]"> / month</p>
                       </div>
                     </div>
@@ -238,11 +241,18 @@ const IPv4SidePanel = () => {
                   the future.
                 </p>
               ) : (
-                <p className="text-sm text-foreground-light">
-                  Upon clicking confirm, the amount of{' '}
-                  <span className="text-foreground">${selectedIPv4?.price.toLocaleString()}</span>{' '}
-                  will be added to your monthly invoice.
-                </p>
+                <>
+                  <Alert withIcon variant="info" title="Potential downtime">
+                    There might be some downtime when enabling the add-on since some DNS clients
+                    might have cached the old DNS entry. Generally, this should be less than a
+                    minute.
+                  </Alert>
+                  <p className="text-sm text-foreground-light">
+                    Upon clicking confirm, the amount of{' '}
+                    <span className="text-foreground">{formatCurrency(selectedIPv4?.price)}</span>{' '}
+                    will be added to your monthly invoice.
+                  </p>
+                </>
               )}
             </>
           )}
