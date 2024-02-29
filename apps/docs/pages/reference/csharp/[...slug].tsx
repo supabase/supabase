@@ -2,8 +2,8 @@ import { type InferGetStaticPropsType, type GetStaticPaths, type GetStaticProps 
 
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import type { ICommonSection } from '~/components/reference/Reference.types'
-import flatSections from '~/features/Navigation/refNavigation/generated/commonClientLibFlat.json' assert { type: 'json' }
-import menuData from '~/features/Navigation/refNavigation/generated/reference_csharp_v0.json' assert { type: 'json' }
+import flatSections from '~/features/Reference/navigation/generated/commonClientLibFlat.json' assert { type: 'json' }
+import menuData from '~/features/Reference/navigation/generated/reference_csharp_v0.json' assert { type: 'json' }
 import { MenuId } from '~/features/Navigation/NavigationMenu/menus'
 import { RefMainSkeleton } from '~/layouts/MainSkeleton'
 import spec from '~/spec/supabase_csharp_v0.yml' assert { type: 'yml' }

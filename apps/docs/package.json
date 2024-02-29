@@ -38,6 +38,7 @@
     "github-slugger": "^2.0.0",
     "gray-matter": "^4.0.3",
     "hast-util-has-property": "^2.0.1",
+    "icons": "*",
     "isbot": "^3.6.5",
     "jsrsasign": "^11.0.0",
     "lodash": "^4.17.21",
@@ -68,7 +69,6 @@
     "remark-gfm": "^3.0.1",
     "shared-data": "*",
     "ui": "*",
-    "icons": "*",
     "ui-patterns": "*",
     "unist-builder": "^3.0.1",
     "unist-util-filter": "^4.0.1",
@@ -94,6 +94,7 @@
     "openapi-typescript": "^6.7.4",
     "tsconfig": "*",
     "tsx": "^4.6.2",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "yaml": "^2.4.0"
   }
 }

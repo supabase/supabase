@@ -1,6 +1,6 @@
 import { type InferGetStaticPropsType, type GetStaticPaths, type GetStaticProps } from 'next'
 
-import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { MenuId } from '~/features/Navigation/NavigationMenu/NavigationMenu'
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import type { TypeSpec } from '~/components/reference/Reference.types'
 import {

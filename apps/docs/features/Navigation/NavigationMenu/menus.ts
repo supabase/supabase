@@ -1,3 +1,25 @@
+interface BaseMenu {
+  id: MenuId
+  type: string
+}
+
+interface HomeMenu extends BaseMenu {
+  type: 'home'
+}
+
+interface GuideMenu extends BaseMenu {
+  type: 'guide'
+}
+
+interface ReferenceMenu extends BaseMenu {
+  type: 'reference'
+  path: string
+  commonSectionsFile: string
+  specFile?: string
+}
+
+type Menu = HomeMenu | GuideMenu | ReferenceMenu
+
 enum MenuId {
   Home = 'home',
   GettingStarted = 'gettingstarted',
@@ -208,4 +230,5 @@ const menus: Menu[] = [
   },
 ]
 
+export type { Menu }
 export { MenuId, menus }
