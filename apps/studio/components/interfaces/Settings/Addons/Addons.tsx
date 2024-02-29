@@ -250,7 +250,7 @@ const Addons = () => {
                       </p>
                     )}
                     <ProjectUpdateDisabledTooltip
-                      projectUpdateDisabled={computeSizeChangesDisabled}
+                      projectUpdateDisabled={projectUpdateDisabled || computeSizeChangesDisabled}
                       projectNotActive={!isProjectActive}
                       tooltip="Compute size changes are currently disabled. Our engineers are working on a fix."
                     >
@@ -258,7 +258,12 @@ const Addons = () => {
                         type="default"
                         className="mt-2 pointer-events-auto"
                         onClick={() => snap.setPanelKey('computeInstance')}
-                        disabled={isBranch || !isProjectActive || computeSizeChangesDisabled}
+                        disabled={
+                          isBranch ||
+                          !isProjectActive ||
+                          projectUpdateDisabled ||
+                          computeSizeChangesDisabled
+                        }
                       >
                         Change compute size
                       </Button>
