@@ -43,7 +43,7 @@ const HighlightCard = (props: any) => (
           <Badge className="border-strong !bg-alternative-200 text-foreground">{props.badge}</Badge>
         )}
       </div>
-      <div className="flex flex-col w-full xl:w-2/3 2xl:w-1/2 flex-grow mb-4 sm:mb-10 lg:mb-8 2xl:xl:mb-32">
+      <div className="flex flex-col w-full xl:w-2/3 flex-grow mb-4 sm:mb-10 lg:mb-8 2xl:xl:mb-32">
         <ul className="flex flex-col text-foreground-lighter text-sm gap-1">
           {props.features.map((feature: any) => (
             <li key={feature} className="flex items-start gap-2">

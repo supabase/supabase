@@ -10,14 +10,8 @@ export default {
     ],
     ctas: [
       {
-        label: 'Get Early Access',
-        href: 'https://forms.supabase.com/enterprise',
-        target: '_blank',
-        type: 'primary',
-      },
-      {
         label: 'Learn more',
-        href: 'https://supabase.com/docs/reference/cli/supabase-branches',
+        href: 'https://supabase.com/docs/guides/platform/branching',
         target: '_blank',
         type: 'default',
       },
