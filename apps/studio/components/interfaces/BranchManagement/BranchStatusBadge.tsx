@@ -1,5 +1,6 @@
+import { WarningIcon } from 'components/ui/Icons'
 import { BranchData } from 'data/branches/branch-query'
-import { AlertTriangleIcon, ClockIcon } from 'lucide-react'
+import { ClockIcon } from 'lucide-react'
 import { Badge } from 'ui'
 
 type Status = BranchData['status']
@@ -35,7 +36,7 @@ const BranchStatusBadge = ({ status }: BranchStatusBadgeProps) => {
 
   return (
     <Badge color={isUnhealthy ? 'red' : 'slate'} className="flex items-center gap-1.5">
-      {isUnhealthy && <AlertTriangleIcon size={12} />}
+      {isUnhealthy && <WarningIcon className="w-3 h-3" />}
       {isWaiting && <ClockIcon size={12} />}
       <span>{STATUS_TO_LABEL[status]}</span>
     </Badge>
