@@ -6,13 +6,10 @@ import Header from '@/components/Header/Header'
 import { ThemeProvider } from '@/components/providers'
 import type { Metadata } from 'next'
 import { LoadingLine } from './LoadingLine'
-
-const defaultUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : 'http://localhost:3000'
+import { SITE_URL } from '@ui/lib/constants'
 
 export const metadata: Metadata = {
-  metadataBase: new URL(defaultUrl),
+  metadataBase: new URL(SITE_URL),
   title: 'database.design',
   description: 'Generate schemas from your ideas',
 }

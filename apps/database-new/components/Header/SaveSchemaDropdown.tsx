@@ -1,7 +1,10 @@
 'use client'
 
 import { getAppStateSnapshot } from '@/lib/state'
+import { SITE_URL } from '@ui/lib/constants'
+import { Share } from 'lucide-react'
 import Image from 'next/image'
+import { useParams } from 'next/navigation'
 import {
   Button,
   DropdownMenu,
@@ -14,11 +17,27 @@ import {
 } from 'ui'
 
 const SaveSchemaDropdown = () => {
+  const params = useParams()
+
+  const thread_id = params.thread_id as string
+
   const copyToClipboard = () => {
     const snap = getAppStateSnapshot()
     const focused = window.document.hasFocus()
     if (focused) {
       window.navigator?.clipboard?.writeText(snap.selectedCode)
+    } else {
+      console.warn('Unable to copy to clipboard')
+    }
+  }
+
+  const shareSchema = () => {
+    console.log({ params })
+    const shareUrl = SITE_URL + '/' + thread_id.substring(0, 8)
+    const snap = getAppStateSnapshot()
+    const focused = window.document.hasFocus()
+    if (focused) {
+      window.navigator?.clipboard?.writeText(shareUrl)
     } else {
       console.warn('Unable to copy to clipboard')
     }
@@ -59,6 +78,10 @@ const SaveSchemaDropdown = () => {
         <DropdownMenuItem className="space-x-2" onClick={() => downloadSQL()}>
           <IconDownload size={14} strokeWidth={1.5} className="text-lighter" />
           <p>Download SQL</p>
+        </DropdownMenuItem>
+        <DropdownMenuItem className="space-x-2" onClick={() => shareSchema()}>
+          <Share size={14} strokeWidth={1.5} className="text-lighter" />
+          <p>Share Schema</p>
         </DropdownMenuItem>
         <DropdownMenuItem className="space-x-2" onClick={() => loadSQLInSupabase()}>
           <Image alt="supabase" src="/supabase.png" width={14} height={14} />
