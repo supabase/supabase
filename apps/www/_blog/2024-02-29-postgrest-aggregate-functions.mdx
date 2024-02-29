@@ -1,12 +1,12 @@
 ---
 title: 'PostgREST Aggregate Functions'
-description: Usage of Aggregate functions on PostgREST 12
+description: 'Usage of Aggregate functions on PostgREST 12'
 author: timabdulla
 categories:
   - postgrest
 tags:
   - postgrest
-date: '2024-02-28'
+date: '2024-02-29'
 toc_depth: 2
 ---
 
@@ -24,20 +24,19 @@ PostgREST supports a handful of the most-common aggregate functions from Postgre
 
 Let’s take a look at an example. Imagine we have a table called `movies` that has the following columns: `name`, `release_year`, `genre`, and `box_office_earnings`. Let’s say that we want to grab the max and min of the `release_year` column across all of the movies in our dataset. That’s pretty simple to achieve:
 
-<CH.Code>
-
+{/* prettier-ignore */}
 ```bash cURL
 $ curl 'http://postgrest/movies?select=release_year.max(),release_year.min()'
 ```
 
+{/* prettier-ignore */}
 ```js supabase-js
 const { data, error } = await supabase
   .from('movies')
   .select('release_year.max(), release_year.min()')
 ```
 
-</CH.Code>
-
+{/* prettier-ignore */}
 ```json
 [
   {
@@ -51,20 +50,19 @@ As you can see, to use an aggregate function, we just place the function after t
 
 Now, what if we want to get a little fancier and get the max and min of the `release_year` for every `genre` in our dataset? If you’re familiar with aggregate functions in SQL, then your mind will probably go right away to `GROUP BY`. In PostgREST, there is no need to _explicitly_ specify a `GROUP BY`; instead, you can just add your grouping columns right to the `select` parameter. Any column without an aggregate function in the `select` list will be used as a grouping column:
 
-<CH.Code>
-
+{/* prettier-ignore */}
 ```bash cURL
 $ curl 'http://postgrest/movies?select=genre,release_year.max(),release_year.min()'
 ```
 
+{/* prettier-ignore */}
 ```js supabase-js
 const { data, error } = await supabase
   .from('movies')
   .select('genre, release_year.max(), release_year.min()')
 ```
 
-</CH.Code>
-
+{/* prettier-ignore */}
 ```json
 [
   {
@@ -100,12 +98,12 @@ Building on the previous examples, let’s say that we have a table called `dire
 
 Let’s say for every director, we want to get the `release_year` of their oldest and newest movies. We can do that without too much trouble:
 
-<CH.Code>
-
+{/* prettier-ignore */}
 ```bash cURL
 $ curl 'http://postgrest/directors?select=name,movies(newest_movie_year:release_year.max(),oldest_movie_year:release_year.min())'
 ```
 
+{/* prettier-ignore */}
 ```js supabase-js
 const { data, error } = await supabase.from('directors').select(`name,
 		movies(
@@ -114,8 +112,7 @@ const { data, error } = await supabase.from('directors').select(`name,
 		)`)
 ```
 
-</CH.Code>
-
+{/* prettier-ignore */}
 ```json
 [
   {
@@ -158,12 +155,12 @@ Let’s look at another example, but this time going the opposite way: We’ll u
 
 Now, we want to get the average `box_office_earnings` for our movies, grouped by the `country` of the director. To do that, we can use the following API call:
 
-<CH.Code>
-
+{/* prettier-ignore */}
 ```bash cURL
 $ curl 'http://postgrest/movies?select=avg_earnings:box_office_earnings.avg(),...directors(country)'
 ```
 
+{/* prettier-ignore */}
 ```js supabase-js
 const { data, error } = await supabase.from('movies').select(`
 		avg_earnings:box_office_earnings.avg(),
@@ -171,8 +168,7 @@ const { data, error } = await supabase.from('movies').select(`
 	`)
 ```
 
-</CH.Code>
-
+{/* prettier-ignore */}
 ```json
 [
   {
@@ -192,12 +188,13 @@ const { data, error } = await supabase.from('movies').select(`
 
 In this case, we have used [the ability to spread the columns from an embedded resource](https://postgrest.org/en/stable/references/api/resource_embedding.html#spread-embedded-resource) to use the director’s `country` as a grouping column, even though the aggregate function `avg()` is being applied to a column of `movies`, not `directors`.
 
-Because spreading columns brings them to the top-level, they are treated as columns of the top-level for purposes of aggregation and grouping. That means any aggregate functions applied to the columns of a spreaded resource are applied within the context of the top-level, too.
+Because spreading columns brings them to the top-level, they are treated as columns of the top-level for purposes of aggregation and grouping. That means any aggregate functions applied to the columns of a spread resource are applied within the context of the top-level, too.
 
 ## Staying Safe with Aggregate Functions
 
 Now that we’ve gone through a few examples of how to use aggregate functions, it’s important to discuss how to _safely_ use aggregate functions in your application. Because of the potential performance risks with aggregate functions, we have **[disabled** aggregate functions by default](https://postgrest.org/en/stable/references/configuration.html#db-aggregates-enabled). Only after reviewing the risks and ensuring appropriate safeguards are in place should you enable this feature. On Supabase, you can enable it by modifying the PostgREST connection role and then reloading the server configuration, like so:
 
+{/* prettier-ignore */}
 ```sql
 ALTER ROLE authenticator SET pgrst.db_aggregates_enabled = 'true';
 NOTIFY pgrst, 'reload config';
@@ -211,8 +208,8 @@ Even worse, imagine that someone with bad intentions wants to do bad things to y
 
 One strategy for preventing potential performance issues is using the `[pg_plan_filter_module](https://github.com/pgexperts/pg_plan_filter)` . Using this extension, you can set an upper limit on the _cost_ of queries that PostgREST will run.
 
+{/* prettier-ignore */}
 ```sql
-
 ALTER USER authenticator SET plan_filter.statement_cost_limit = 1e7;
 ```
 
@@ -220,8 +217,8 @@ Before PostgreSQL executes a query, it first comes up with a plan on how it will
 
 You can even change this limit on a per-role basis, allowing more privileged roles free rein in the queries they run, while less-privileged roles — perhaps external users of your public API, for instance — could have tighter limits.
 
+{/* prettier-ignore */}
 ```sql
-
 -- anonymous users can only run cheap queries
 ALTER
   USER anon
