@@ -67,16 +67,16 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 An optional step is to update the CSS file `app/globals.css` to make the app look nice.
 You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/nextjs-user-management/app/globals.css).
 
-### Supabase Auth Helpers
+### Supabase Server-Side Auth
 
 Next.js is a highly versatile framework offering pre-rendering at build time (SSG), server-side rendering at request time (SSR), API routes, and middleware edge-functions.
 
-It can be challenging to authenticate your users in all these different environments, that's why we've created the [Supabase Auth Helpers](/docs/guides/auth/auth-helpers/nextjs) to make user management and data fetching within Next.js as easy as possible.
+To better integrate with the framework, we've create the `@supabase/ssr` package for server-side auth. It has all the functionalities to quickly configure your Supabase project to use cookies for storing user sessions. For more information, checkout this [Next.js Server-Side Auth guide](/docs/guides/auth/server-side/nextjs).
 
-Install the auth helpers for Next.js
+Install the auth helpers for Next.js.
 
 ```bash
-npm install @supabase/auth-helpers-nextjs @supabase/supabase-js
+npm install @supabase/ssr
 ```
 
 ### Next.js middleware
