@@ -101,7 +101,7 @@ const FavoriteButton = ({ id }: FavoriteButtonProps) => {
           />
         )}
       </TooltipTrigger_Shadcn_>
-      <TooltipContent_Shadcn_ side="bottom">Add to favourites</TooltipContent_Shadcn_>
+      <TooltipContent_Shadcn_ side="bottom">Add to favorites</TooltipContent_Shadcn_>
     </Tooltip_Shadcn_>
   )
 }
