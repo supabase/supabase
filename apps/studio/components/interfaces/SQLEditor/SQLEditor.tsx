@@ -48,8 +48,8 @@ import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-i
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useIsSQLEditorAiAssistantEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
-import { AISQLEditorPolicyChat } from './AIPolicyChat'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
+import { AISQLEditorPolicyChat } from './AiAssistantPanel'
 import { DiffActionBar } from './DiffActionBar'
 import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
 import {
@@ -59,7 +59,13 @@ import {
   IStandaloneDiffEditor,
   SQLEditorContextValues,
 } from './SQLEditor.types'
-import { checkDestructiveQuery, createSqlSnippetSkeleton } from './SQLEditor.utils'
+import {
+  checkDestructiveQuery,
+  compareAsAddition,
+  compareAsModification,
+  compareAsNewSnippet,
+  createSqlSnippetSkeleton,
+} from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
 
 // Load the monaco editor client-side only (does not behave well server-side)
@@ -112,7 +118,7 @@ const SQLEditor = () => {
 
   const [aiInput, setAiInput] = useState('')
   const [debugSolution, setDebugSolution] = useState<string>()
-  const [sqlDiff, setSqlDiff] = useState<ContentDiff>()
+  const [sourceSqlDiff, setSourceSqlDiff] = useState<ContentDiff>()
   const [pendingTitle, setPendingTitle] = useState<string>()
   const [hasSelection, setHasSelection] = useState<boolean>(false)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -143,7 +149,7 @@ const SQLEditor = () => {
 
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
 
-  const [selectedDiffType, setSelectedDiffType] = useState(DiffType.Modification)
+  const [selectedDiffType, setSelectedDiffType] = useState<DiffType | undefined>(undefined)
   const [isFirstRender, setIsFirstRender] = useState(true)
   const [lineHighlights, setLineHighlights] = useState<string[]>([])
 
@@ -171,7 +177,7 @@ const SQLEditor = () => {
 
   const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
 
-  const isDiffOpen = !!sqlDiff
+  const isDiffOpen = !!sourceSqlDiff
 
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<Monaco | null>(null)
@@ -397,7 +403,7 @@ const SQLEditor = () => {
     try {
       setIsAcceptDiffLoading(true)
 
-      if (!sqlDiff) {
+      if (!sourceSqlDiff) {
         return
       }
 
@@ -444,13 +450,13 @@ const SQLEditor = () => {
       setAiInput('')
       setSelectedDiffType(DiffType.Modification)
       setDebugSolution(undefined)
-      setSqlDiff(undefined)
+      setSourceSqlDiff(undefined)
       setPendingTitle(undefined)
     } finally {
       setIsAcceptDiffLoading(false)
     }
   }, [
-    sqlDiff,
+    sourceSqlDiff,
     selectedDiffType,
     handleNewQuery,
     titleSql,
@@ -474,7 +480,7 @@ const SQLEditor = () => {
     )
 
     setDebugSolution(undefined)
-    setSqlDiff(undefined)
+    setSourceSqlDiff(undefined)
     setPendingTitle(undefined)
   }, [debugSolution, telemetryProps, router])
 
@@ -499,66 +505,75 @@ const SQLEditor = () => {
     return () => window.removeEventListener('keydown', handler)
   }, [isDiffOpen, acceptAiHandler, discardAiHandler])
 
-  const compareAsModification = useCallback(() => {
+  useEffect(() => {
+    const applyDiff = ({ original, modified }: { original: string; modified: string }) => {
+      const model = diffEditorRef.current?.getModel()
+      if (model && model.original && model.modified) {
+        model.original.setValue(original)
+        model.modified.setValue(modified)
+      }
+    }
+
     const model = diffEditorRef.current?.getModel()
+    try {
+      if (model?.original && model.modified && sourceSqlDiff) {
+        switch (selectedDiffType) {
+          case DiffType.Modification: {
+            const transformedDiff = compareAsModification(sourceSqlDiff)
+            applyDiff(transformedDiff)
+            return
+          }
 
-    if (!model) {
-      throw new Error("Diff editor's model not available")
+          case DiffType.Addition: {
+            const transformedDiff = compareAsAddition(sourceSqlDiff)
+            applyDiff(transformedDiff)
+            return
+          }
+
+          case DiffType.NewSnippet: {
+            const transformedDiff = compareAsNewSnippet(sourceSqlDiff)
+            applyDiff(transformedDiff)
+            return
+          }
+
+          default:
+            throw new Error(`Unknown diff type '${selectedDiffType}'`)
+        }
+      }
+    } catch (e) {
+      console.log(e)
     }
+  }, [selectedDiffType, sourceSqlDiff])
 
-    if (!sqlDiff) {
-      throw new Error('Returned SQL diff not available')
+  const defaultSqlDiff = useMemo(() => {
+    if (!sourceSqlDiff) {
+      return { original: '', modified: '' }
     }
+    switch (selectedDiffType) {
+      case DiffType.Modification: {
+        return compareAsModification(sourceSqlDiff)
+      }
 
-    model.original.setValue(sqlDiff.original)
-    model.modified.setValue(sqlDiff.modified)
-  }, [sqlDiff])
+      case DiffType.Addition: {
+        return compareAsAddition(sourceSqlDiff)
+      }
 
-  const compareAsAddition = useCallback(() => {
-    const model = diffEditorRef.current?.getModel()
+      case DiffType.NewSnippet: {
+        return compareAsNewSnippet(sourceSqlDiff)
+      }
 
-    if (!model) {
-      throw new Error("Diff editor's model not available")
+      default:
+        return { original: '', modified: '' }
     }
-
-    if (!sqlDiff) {
-      throw new Error('Returned SQL diff not available')
-    }
-
-    const formattedOriginal = sqlDiff.original.replace(sqlAiDisclaimerComment, '').trim()
-    const formattedModified = sqlDiff.modified.replace(sqlAiDisclaimerComment, '').trim()
-    const newModified =
-      sqlAiDisclaimerComment +
-      '\n\n' +
-      (formattedOriginal ? formattedOriginal + '\n\n' : '') +
-      formattedModified
-
-    model.original.setValue(sqlDiff.original)
-    model.modified.setValue(newModified)
-  }, [sqlDiff])
-
-  const compareAsNewSnippet = useCallback(() => {
-    const model = diffEditorRef.current?.getModel()
-
-    if (!model) {
-      throw new Error("Diff editor's model not available")
-    }
-
-    if (!sqlDiff) {
-      throw new Error('Returned SQL diff not available')
-    }
-
-    model.original.setValue('')
-    model.modified.setValue(sqlDiff.modified)
-  }, [sqlDiff])
+  }, [selectedDiffType, sourceSqlDiff])
 
   return (
     <SQLEditorContext.Provider
       value={{
         aiInput,
         setAiInput,
-        sqlDiff,
-        setSqlDiff,
+        sqlDiff: sourceSqlDiff,
+        setSqlDiff: setSourceSqlDiff,
         debugSolution,
         setDebugSolution,
       }}
@@ -699,7 +714,7 @@ const SQLEditor = () => {
                                       return
                                     }
 
-                                    setSqlDiff({
+                                    setSourceSqlDiff({
                                       original: currentSql ?? '',
                                       modified: formattedSql,
                                     })
@@ -749,20 +764,8 @@ const SQLEditor = () => {
                         {isDiffOpen ? (
                           <DiffActionBar
                             loading={isAcceptDiffLoading}
-                            selectedDiffType={selectedDiffType}
-                            onChangeDiffType={(diffType) => {
-                              setSelectedDiffType(diffType)
-                              switch (diffType) {
-                                case DiffType.Modification:
-                                  return compareAsModification()
-                                case DiffType.Addition:
-                                  return compareAsAddition()
-                                case DiffType.NewSnippet:
-                                  return compareAsNewSnippet()
-                                default:
-                                  throw new Error(`Unknown diff type '${diffType}'`)
-                              }
-                            }}
+                            selectedDiffType={selectedDiffType || DiffType.Modification}
+                            onChangeDiffType={(diffType) => setSelectedDiffType(diffType)}
                             onAccept={acceptAiHandler}
                             onCancel={discardAiHandler}
                           />
@@ -810,20 +813,8 @@ const SQLEditor = () => {
                   >
                     <DiffActionBar
                       loading={isAcceptDiffLoading}
-                      selectedDiffType={selectedDiffType}
-                      onChangeDiffType={(diffType) => {
-                        setSelectedDiffType(diffType)
-                        switch (diffType) {
-                          case DiffType.Modification:
-                            return compareAsModification()
-                          case DiffType.Addition:
-                            return compareAsAddition()
-                          case DiffType.NewSnippet:
-                            return compareAsNewSnippet()
-                          default:
-                            throw new Error(`Unknown diff type '${diffType}'`)
-                        }
-                      }}
+                      selectedDiffType={selectedDiffType || DiffType.Modification}
+                      onChangeDiffType={(diffType) => setSelectedDiffType(diffType)}
                       onAccept={acceptAiHandler}
                       onCancel={discardAiHandler}
                     />
@@ -864,10 +855,17 @@ const SQLEditor = () => {
                       <DiffEditor
                         theme="supabase"
                         language="pgsql"
-                        original={sqlDiff.original}
-                        modified={sqlDiff.modified}
+                        original={defaultSqlDiff.original}
+                        modified={defaultSqlDiff.modified}
                         onMount={(editor) => {
                           diffEditorRef.current = editor
+
+                          // This logic deducts whether the diff should be addition or replacement on initial diffing.
+                          // With the AI assistant is not neccessary because it has separate buttons for addition and
+                          // replacement. Using this logic with the AI assistant would probably annoy the users.
+                          if (isAiAssistantOn) {
+                            return
+                          }
                           let isFirstLoad = true
 
                           editor.onDidUpdateDiff(() => {
@@ -911,9 +909,7 @@ const SQLEditor = () => {
 
                             if (isAddition) {
                               setSelectedDiffType(DiffType.Addition)
-                              compareAsAddition()
                             }
-
                             isFirstLoad = false
                           })
                         }}
@@ -971,34 +967,14 @@ const SQLEditor = () => {
                 createdAt: new Date(),
               })
             }
-            onDiff={(sql) => {
-              try {
-                const currentSql = editorRef.current?.getValue()
+            onDiff={(diffType, sql) => {
+              setAiQueryCount((count) => count + 1)
 
-                let title: string | undefined
+              const currentSql = editorRef.current?.getValue()
+              const diff = { original: currentSql || '', modified: sql }
 
-                setAiQueryCount((count) => count + 1)
-
-                const formattedSql =
-                  sqlAiDisclaimerComment +
-                  '\n\n' +
-                  format(sql, {
-                    language: 'postgresql',
-                    keywordCase: 'lower',
-                  })
-
-                setSqlDiff({
-                  original: currentSql ?? '',
-                  modified: formattedSql,
-                })
-              } catch (error: unknown) {
-                if (isError(error)) {
-                  ui.setNotification({
-                    category: 'error',
-                    message: error.message,
-                  })
-                }
-              }
+              setSourceSqlDiff(diff)
+              setSelectedDiffType(diffType)
             }}
             onChange={() => {}}
             onClose={() => setIsAiOpen(false)}

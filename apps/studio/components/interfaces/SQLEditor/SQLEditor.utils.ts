@@ -1,9 +1,14 @@
 // @ts-ignore
-import { NEW_SQL_SNIPPET_SKELETON, destructiveSqlRegex } from './SQLEditor.constants'
-import { SqlSnippets, UserContent } from 'types'
-import { DiffType } from './SQLEditor.types'
-import { removeCommentsFromSql } from 'lib/helpers'
 import { stripIndent } from 'common-tags'
+
+import { removeCommentsFromSql } from 'lib/helpers'
+import { SqlSnippets, UserContent } from 'types'
+import {
+  NEW_SQL_SNIPPET_SKELETON,
+  destructiveSqlRegex,
+  sqlAiDisclaimerComment,
+} from './SQLEditor.constants'
+import { ContentDiff, DiffType } from './SQLEditor.types'
 
 export const createSqlSnippetSkeleton = ({
   id,
@@ -76,3 +81,29 @@ export const generateFileCliCommand = (id: string, name: string, isNpx = false) 
   ${isNpx ? 'npx ' : ''}supabase snippets download ${id} > \\
       ${name}.sql
 `
+
+export const compareAsModification = (sqlDiff: ContentDiff) => {
+  return { ...sqlDiff }
+}
+
+export const compareAsAddition = (sqlDiff: ContentDiff) => {
+  const formattedOriginal = sqlDiff.original.replace(sqlAiDisclaimerComment, '').trim()
+  const formattedModified = sqlDiff.modified.replace(sqlAiDisclaimerComment, '').trim()
+  const newModified =
+    sqlAiDisclaimerComment +
+    '\n\n' +
+    (formattedOriginal ? formattedOriginal + '\n\n' : '') +
+    formattedModified
+
+  return {
+    original: sqlDiff.original,
+    modified: newModified,
+  }
+}
+
+export const compareAsNewSnippet = (sqlDiff: ContentDiff) => {
+  return {
+    original: '',
+    modified: sqlDiff.modified,
+  }
+}
