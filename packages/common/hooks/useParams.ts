@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import { useSearchParams } from 'next/navigation'
 import { useMemo } from 'react'
 
 /**
@@ -22,20 +22,20 @@ function convertToCamelCase(key: string): string {
 export function useParams(): {
   [k: string]: string | undefined
 } {
-  const { query } = useRouter()
+  const query = useSearchParams()
 
   const modifiedQuery = {
-    ...query,
+    ...query?.entries,
   }
 
   // Convert kebab case keys to camel case
-  Object.keys(modifiedQuery).forEach((key) => {
-    const modifiedKey = convertToCamelCase(key)
-    if (modifiedKey !== key) {
-      modifiedQuery[modifiedKey] = modifiedQuery[key]
-      delete modifiedQuery[key]
-    }
-  })
+  // Object.keys(modifiedQuery).forEach((key) => {
+  //   const modifiedKey = convertToCamelCase(key)
+  //   if (modifiedKey !== key) {
+  //     modifiedQuery[modifiedKey] = modifiedQuery[key]
+  //     delete modifiedQuery[key]
+  //   }
+  // })
 
   return useMemo(
     () =>

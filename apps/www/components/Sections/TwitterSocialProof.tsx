@@ -1,14 +1,12 @@
+'use client'
+
 import { useState } from 'react'
-import { useRouter } from 'next/router'
 import { Button, IconMessageCircle } from 'ui'
 import Tweets from '../../data/tweets/Tweets.json'
 import Link from 'next/link'
 import { TweetCard } from 'ui-patterns/TweetCard'
 
 function TwitterSocialProof() {
-  // base path for images
-  const { basePath } = useRouter()
-
   const [tweets, setTweets] = useState(Tweets.slice(0, 10))
   const [showButton, setShowButton] = useState(true)
 
@@ -64,7 +62,7 @@ function TwitterSocialProof() {
                 <TweetCard
                   handle={`@${tweet.handle}`}
                   quote={tweet.text}
-                  img_url={`${basePath}${tweet.img_url}`}
+                  img_url={`${tweet.img_url}`}
                 />
               </Link>
             </div>

@@ -1,8 +1,8 @@
 import React from 'react'
 import Link from 'next/link'
 import Telemetry from '~/lib/telemetry'
-import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
-import { useRouter } from 'next/router'
+// import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
+import { useRouter } from 'next/navigation'
 import { useBreakpoint } from 'common'
 
 const frameworks = [
@@ -46,19 +46,19 @@ const frameworks = [
 
 const HeroFrameworks = ({ className }: { className?: string }) => {
   const router = useRouter()
-  const telemetryProps = useTelemetryProps()
+  // const telemetryProps = useTelemetryProps()
   const isXs = useBreakpoint(640)
 
   const sendTelemetryEvent = async (gaEvent: string) => {
-    return await Telemetry.sendEvent(
-      {
-        action: gaEvent,
-        category: 'link',
-        label: '',
-      },
-      telemetryProps,
-      router
-    )
+    // return await Telemetry.sendEvent(
+    //   {
+    //     action: gaEvent,
+    //     category: 'link',
+    //     label: '',
+    //   },
+    //   telemetryProps,
+    //   router
+    // )
   }
 
   return (

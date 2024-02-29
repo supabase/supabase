@@ -1,4 +1,6 @@
-import { useRouter } from 'next/router'
+'use client'
+
+// import { useRouter } from 'next/router'
 import Image from 'next/image'
 import Telemetry from '~/lib/telemetry'
 import gaEvents from '~/lib/gaEvents'
@@ -16,49 +18,49 @@ import StorageVisual from './StorageVisual'
 import VectorVisual from './VectorVisual'
 
 const Products = (props: any) => {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
+  // const router = useRouter()
+  // const telemetryProps = useTelemetryProps()
 
-  const sendTelemetryEvent = async (product: PRODUCT_SHORTNAMES) => {
-    switch (product) {
-      case PRODUCT_SHORTNAMES.DATABASE:
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_database'],
-          telemetryProps,
-          router
-        )
-      case PRODUCT_SHORTNAMES.AUTHENTICATION:
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_auth'],
-          telemetryProps,
-          router
-        )
-      case PRODUCT_SHORTNAMES.STORAGE:
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_storage'],
-          telemetryProps,
-          router
-        )
-      case PRODUCT_SHORTNAMES.FUNCTIONS:
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_edgeFunctions'],
-          telemetryProps,
-          router
-        )
-      case PRODUCT_SHORTNAMES.REALTIME:
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_realtime'],
-          telemetryProps,
-          router
-        )
-      case PRODUCT_SHORTNAMES.VECTOR:
-        return await Telemetry.sendEvent(
-          gaEvents['www_hp_subhero_products_vector'],
-          telemetryProps,
-          router
-        )
-    }
-  }
+  // const sendTelemetryEvent = async (product: PRODUCT_SHORTNAMES) => {
+  //   switch (product) {
+  //     case PRODUCT_SHORTNAMES.DATABASE:
+  //       return await Telemetry.sendEvent(
+  //         gaEvents['www_hp_subhero_products_database'],
+  //         telemetryProps,
+  //         router
+  //       )
+  //     case PRODUCT_SHORTNAMES.AUTHENTICATION:
+  //       return await Telemetry.sendEvent(
+  //         gaEvents['www_hp_subhero_products_auth'],
+  //         telemetryProps,
+  //         router
+  //       )
+  //     case PRODUCT_SHORTNAMES.STORAGE:
+  //       return await Telemetry.sendEvent(
+  //         gaEvents['www_hp_subhero_products_storage'],
+  //         telemetryProps,
+  //         router
+  //       )
+  //     case PRODUCT_SHORTNAMES.FUNCTIONS:
+  //       return await Telemetry.sendEvent(
+  //         gaEvents['www_hp_subhero_products_edgeFunctions'],
+  //         telemetryProps,
+  //         router
+  //       )
+  //     case PRODUCT_SHORTNAMES.REALTIME:
+  //       return await Telemetry.sendEvent(
+  //         gaEvents['www_hp_subhero_products_realtime'],
+  //         telemetryProps,
+  //         router
+  //       )
+  //     case PRODUCT_SHORTNAMES.VECTOR:
+  //       return await Telemetry.sendEvent(
+  //         gaEvents['www_hp_subhero_products_vector'],
+  //         telemetryProps,
+  //         router
+  //       )
+  //   }
+  // }
 
   return (
     <SectionContainer className="!pt-0 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 lg:gap-6 md:grid-cols-12">
@@ -82,7 +84,7 @@ const Products = (props: any) => {
             </li>
           </ul>
         }
-        onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.DATABASE)}
+        // onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.DATABASE)}
         image={<DatabaseVisual />}
       />
       <ProductCard
@@ -98,7 +100,7 @@ const Products = (props: any) => {
           </>
         }
         image={<AuthVisual />}
-        onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.AUTHENTICATION)}
+        // onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.AUTHENTICATION)}
       />
       <ProductCard
         className="col-span-6 xl:col-span-3"
@@ -112,7 +114,7 @@ const Products = (props: any) => {
             servers.
           </>
         }
-        onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.FUNCTIONS)}
+        // onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.FUNCTIONS)}
         image={<FunctionsVisual />}
       />
       <ProductCard
@@ -127,7 +129,7 @@ const Products = (props: any) => {
           </>
         }
         image={<StorageVisual />}
-        onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.STORAGE)}
+        // onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.STORAGE)}
       />
       <ProductCard
         url={props.products['realtime'].url}
@@ -140,7 +142,7 @@ const Products = (props: any) => {
             synchronization.
           </>
         }
-        onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.REALTIME)}
+        // onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.REALTIME)}
         image={<RealtimeVisual />}
         className="col-span-6 xl:col-span-3 hover:!cursor-[url('/images/index/products/realtime-cursor.svg'),_auto]"
       />
@@ -174,7 +176,7 @@ const Products = (props: any) => {
             </li>
           </ul>
         }
-        onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.VECTOR)}
+        // onClick={() => sendTelemetryEvent(PRODUCT_SHORTNAMES.VECTOR)}
         image={<VectorVisual />}
       />
     </SectionContainer>

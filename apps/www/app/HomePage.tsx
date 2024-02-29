@@ -1,3 +1,5 @@
+'use client'
+
 // Import Swiper styles if swiper used on page
 import 'swiper/swiper.min.css'
 
@@ -15,7 +17,7 @@ const CustomerStories = dynamic(() => import('components/CustomerStories'))
 const TwitterSocialSection = dynamic(() => import('~/components/TwitterSocialSection'))
 const ReactTooltip = dynamic(() => import('react-tooltip'), { ssr: false })
 
-const Index = () => {
+const HomePage = () => {
   return (
     <Layout>
       <Hero />
@@ -38,4 +40,4 @@ const Index = () => {
   )
 }
 
-export default Index
+export default HomePage

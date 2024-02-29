@@ -1,3 +1,4 @@
+import { Divider } from 'ui'
 import { PrivacySettings } from 'ui-patterns/PrivacySettings'
 
 const footerData = [
@@ -145,7 +146,8 @@ const footerData = [
       },
       {
         text: 'Privacy Settings',
-        component: PrivacySettings,
+        // component: PrivacySettings,
+        component: Divider,
       },
       {
         text: 'Acceptable Use Policy',

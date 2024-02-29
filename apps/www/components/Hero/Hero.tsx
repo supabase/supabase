@@ -1,5 +1,7 @@
+'use client'
+
 import Link from 'next/link'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import gaEvents from '~/lib/gaEvents'
@@ -9,9 +11,9 @@ import HeroFrameworks from './HeroFrameworks'
 
 const Hero = () => {
   const router = useRouter()
-  const telemetryProps = useTelemetryProps()
+  // const telemetryProps = useTelemetryProps()
   const sendTelemetryEvent = async (event: TelemetryEvent) => {
-    await Telemetry.sendEvent(event, telemetryProps, router)
+    // await Telemetry.sendEvent(event, telemetryProps, router)
   }
 
   return (

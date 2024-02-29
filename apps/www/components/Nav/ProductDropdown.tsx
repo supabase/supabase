@@ -1,6 +1,5 @@
 import React from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/router'
 import Link from 'next/link'
 
 import { useBreakpoint } from 'common'
@@ -13,7 +12,6 @@ import CustomersData from 'data/CustomerStories'
 import SolutionsData from 'data/Solutions'
 
 const ProductDropdown = () => {
-  const { basePath } = useRouter()
   const isTablet = useBreakpoint(1279)
 
   return (
@@ -50,7 +48,7 @@ const ProductDropdown = () => {
                 >
                   <div className="relative rounded-md bg-background p-2 border group-hover:border-foreground-muted/50 h-16 w-32 flex-shrink-0 overflow-auto">
                     <Image
-                      src={`${basePath}/${customer.imgUrl}`}
+                      src={`/${customer.imgUrl}`}
                       alt={customer.title}
                       fill
                       className="!p-4 object-contain brightness-70 contrast-[.35] filter"
