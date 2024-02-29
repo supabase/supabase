@@ -12,6 +12,7 @@ import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { untitledSnippetTitle } from './SQLEditor.constants'
 import { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeleton } from './SQLEditor.utils'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export type MonacoEditorProps = {
   id: string
@@ -38,8 +39,8 @@ const MonacoEditor = ({
   const project = useSelectedProject()
 
   const [intellisenseEnabled] = useLocalStorageQuery(
-    'supabase_sql-editor-intellisense-enabled',
-    true
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
+    typeof window !== 'undefined' ? false : true
   )
 
   const snap = useSqlEditorStateSnapshot({ sync: true })
