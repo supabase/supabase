@@ -1,4 +1,6 @@
-export default {
+import { CardProps } from '~/components/NewFeatureCard'
+
+const cards: { [name: string]: CardProps } = {
   branching: {
     title: 'Branching',
     badge: 'New',
@@ -50,3 +52,5 @@ export default {
     },
   },
 }
+
+export default cards
