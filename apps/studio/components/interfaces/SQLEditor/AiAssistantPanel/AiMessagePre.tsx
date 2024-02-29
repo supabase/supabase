@@ -10,13 +10,13 @@ import { Button, CodeBlock, cn } from 'ui'
 import Telemetry from 'lib/telemetry'
 import { DiffType } from '../SQLEditor.types'
 
-interface AAIPolicyPreProps {
+interface AiMessagePreProps {
   onDiff: (type: DiffType, s: string) => void
   children: string[]
   className?: string
 }
 
-export const AiMessagePre = ({ onDiff, children, className }: AAIPolicyPreProps) => {
+export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps) => {
   const [copied, setCopied] = useState(false)
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
@@ -65,9 +65,9 @@ export const AiMessagePre = ({ onDiff, children, className }: AAIPolicyPreProps)
                 onDiff(DiffType.Addition, formatted)
                 Telemetry.sendEvent(
                   {
-                    category: 'rls_editor',
-                    action: 'ai_suggestion_diffed',
-                    label: 'rls-ai-assistant',
+                    category: 'sql_editor_ai_assistant',
+                    action: 'ai_suggestion_inserted',
+                    label: 'sql-editor-ai-assistant',
                   },
                   telemetryProps,
                   router
@@ -81,10 +81,10 @@ export const AiMessagePre = ({ onDiff, children, className }: AAIPolicyPreProps)
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
-                className={[
+                className={cn([
                   'rounded bg-alternative py-1 px-2 leading-none shadow',
                   'border border-background',
-                ].join(' ')}
+                ])}
               >
                 <span className="text-xs text-foreground">Insert code</span>
               </div>
@@ -100,9 +100,9 @@ export const AiMessagePre = ({ onDiff, children, className }: AAIPolicyPreProps)
                 onDiff(DiffType.Modification, formatted)
                 Telemetry.sendEvent(
                   {
-                    category: 'rls_editor',
-                    action: 'ai_suggestion_diffed',
-                    label: 'rls-ai-assistant',
+                    category: 'sql_editor_ai_assistant',
+                    action: 'ai_suggestion_replaced',
+                    label: 'sql-editor-ai-assistant',
                   },
                   telemetryProps,
                   router
@@ -116,10 +116,10 @@ export const AiMessagePre = ({ onDiff, children, className }: AAIPolicyPreProps)
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
-                className={[
+                className={cn(
                   'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
-                ].join(' ')}
+                  'border border-background'
+                )}
               >
                 <span className="text-xs text-foreground">Replace code</span>
               </div>
@@ -135,9 +135,9 @@ export const AiMessagePre = ({ onDiff, children, className }: AAIPolicyPreProps)
                 handleCopy(formatted)
                 Telemetry.sendEvent(
                   {
-                    category: 'rls_editor',
+                    category: 'sql_editor_ai_assistant',
                     action: 'ai_suggestion_copied',
-                    label: 'rls-ai-assistant',
+                    label: 'sql-editor-ai-assistant',
                   },
                   telemetryProps,
                   router
@@ -151,10 +151,10 @@ export const AiMessagePre = ({ onDiff, children, className }: AAIPolicyPreProps)
             <Tooltip.Content side="bottom">
               <Tooltip.Arrow className="radix-tooltip-arrow" />
               <div
-                className={[
+                className={cn(
                   'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
-                ].join(' ')}
+                  'border border-background'
+                )}
               >
                 <span className="text-xs text-foreground">Copy code</span>
               </div>

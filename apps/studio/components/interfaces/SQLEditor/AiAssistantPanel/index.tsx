@@ -24,7 +24,7 @@ import { DiffType } from '../SQLEditor.types'
 import Message from './Message'
 import { MessageWithDebug } from './utils'
 
-interface AIPolicyChatProps {
+interface AISQLEditorPolicyChatProps {
   messages: MessageWithDebug[]
   loading: boolean
   onSubmit: (s: string) => void
@@ -40,7 +40,7 @@ export const AISQLEditorPolicyChat = ({
   onDiff,
   onClose,
   onChange,
-}: AIPolicyChatProps) => {
+}: AISQLEditorPolicyChatProps) => {
   const { profile } = useProfile()
   const snap = useAppStateSnapshot()
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -80,10 +80,7 @@ export const AISQLEditorPolicyChat = ({
   }, [formChatValue])
 
   return (
-    <div
-      id={'ai-chat-assistant'}
-      className="flex flex-col h-full min-w-[400px] w-[400px] border-l border-control"
-    >
+    <div className="flex flex-col h-full min-w-[400px] w-[400px] border-l border-control">
       <div className="overflow-auto flex-1">
         <Message
           key="zero"
@@ -129,15 +126,14 @@ export const AISQLEditorPolicyChat = ({
 
       <Form_Shadcn_ {...form}>
         <form
-          id="rls-chat"
           className="sticky p-5 flex-0 border-t"
           onSubmit={form.handleSubmit((data: z.infer<typeof FormSchema>) => {
             onSubmit(data.chat)
             Telemetry.sendEvent(
               {
-                category: 'rls_editor',
+                category: 'sql_editor_ai_assistant',
                 action: 'ai_suggestion_asked',
-                label: 'rls-ai-assistant',
+                label: 'sql-editor-ai-assistant',
               },
               telemetryProps,
               router
@@ -160,7 +156,7 @@ export const AISQLEditorPolicyChat = ({
                       className={`bg-surface-300 dark:bg-black rounded-full pl-10 ${
                         loading ? 'pr-10' : ''
                       }`}
-                      placeholder="Ask for some changes to your policy"
+                      placeholder="Ask a question about your SQL query"
                     />
                     {loading && <Loader2 className="absolute top-2 right-3 animate-spin" />}
                   </div>
