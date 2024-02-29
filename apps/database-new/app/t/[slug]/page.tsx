@@ -12,12 +12,11 @@ export default async function Page({ params }: PageProps) {
   // maybe a mis-use of profile_threads here
   // it has both the thread_id and the latest message_id
 
+  // need to handle error fallback here
   const { data, error } = await supabase
     .from('profile_threads')
     .select()
-    .eq('thread_id', '942ac327-f9bf-44a7-9310-0d0f5b04cbe4')
-
-    //.ilike('thread_id', `%${params.slug}%`)
+    .ilike('slug', `%${params.slug}%`)
     .single()
 
   // immediately redirect to the thread

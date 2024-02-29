@@ -4,6 +4,7 @@ create table if not exists public.threads (
 	user_id uuid null,
 	thread_title text not null,
 	is_public boolean default true not null,
+  	slug text generated always as (substring(id::text, 1, 8)) stored unique,
 	constraint threads_pkey primary key (id),
 	constraint threads_user_id_fkey foreign key (user_id) references auth.users (id) on update cascade on delete cascade
 );
@@ -21,20 +22,21 @@ create table if not exists public.messages (
 	constraint messages_thread_id_fkey foreign key (thread_id) references threads (id) on update cascade on delete cascade,
 	constraint messages_user_id_fkey foreign key (user_id) references auth.users (id) on update cascade on delete cascade
 );
-create or replace view profile_threads as
-select distinct on (m.thread_id)
+CREATE OR REPLACE VIEW profile_threads AS
+SELECT DISTINCT ON (m.thread_id)
     m.thread_id,
     m.message_id,
     m.user_id,
     m.created_at,
     t.thread_title,
     t.is_public,
-    u.raw_user_meta_data->>'avatar_url' as user_avatar_url
-from
+    t.slug,
+    u.raw_user_meta_data->>'avatar_url' AS user_avatar_url
+FROM
     public.messages m
-join public.threads t on m.thread_id = t.id
-join auth.users u on t.user_id = u.id
-order by
+JOIN public.threads t ON m.thread_id = t.id
+JOIN auth.users u ON t.user_id = u.id
+ORDER BY
     m.thread_id,
-    m.created_at asc;
+    m.created_at ASC;
 

@@ -33,8 +33,7 @@ const SaveSchemaDropdown = () => {
 
   const shareSchema = () => {
     console.log({ params })
-    const shareUrl = SITE_URL + '/' + thread_id.substring(0, 8)
-    const snap = getAppStateSnapshot()
+    const shareUrl = SITE_URL + '/t/' + thread_id.substring(0, 8)
     const focused = window.document.hasFocus()
     if (focused) {
       window.navigator?.clipboard?.writeText(shareUrl)
