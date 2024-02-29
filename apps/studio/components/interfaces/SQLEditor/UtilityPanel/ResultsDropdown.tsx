@@ -125,13 +125,7 @@ const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button type="text" iconRight={<IconChevronDown />}>
-          <span>
-            Export
-            {!isExecuting &&
-              result &&
-              result.rows.length > 0 &&
-              ` (${result.rows.length.toLocaleString()})`}
-          </span>
+          Export
         </Button>
       </DropdownMenuTrigger>
 

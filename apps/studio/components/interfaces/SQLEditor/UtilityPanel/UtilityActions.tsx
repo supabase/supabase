@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
-import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft } from 'ui'
+import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft, IconLoader } from 'ui'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
@@ -71,18 +71,23 @@ const UtilityActions = ({
           <Button
             onClick={() => executeQuery()}
             disabled={isDisabled || isExecuting}
-            loading={isExecuting}
             type="primary"
             size="tiny"
             iconRight={
-              <div className="flex items-center space-x-1">
-                {os === 'macos' ? (
-                  <IconCommand size={10} strokeWidth={1.5} />
-                ) : (
-                  <p className="text-xs text-foreground-light">CTRL</p>
-                )}
-                <IconCornerDownLeft size={10} strokeWidth={1.5} />
-              </div>
+              isExecuting ? (
+                <div className="w-6 flex items-center justify-center">
+                  <IconLoader className="animate-spin" size={10} strokeWidth={1.5} />
+                </div>
+              ) : (
+                <div className="flex items-center space-x-1">
+                  {os === 'macos' ? (
+                    <IconCommand size={10} strokeWidth={1.5} />
+                  ) : (
+                    <p className="text-xs text-foreground-light">CTRL</p>
+                  )}
+                  <IconCornerDownLeft size={10} strokeWidth={1.5} />
+                </div>
+              )
             }
             className="rounded-l-none"
           >

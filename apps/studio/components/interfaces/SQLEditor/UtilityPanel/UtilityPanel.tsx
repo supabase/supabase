@@ -44,14 +44,17 @@ const UtilityPanel = ({
   return (
     <>
       <div className="h-full">
-        <Tabs_Shadcn_ defaultValue={'results'} className="w-full h-full">
-          <TabsList_Shadcn_ className="flex justify-between">
+        <Tabs_Shadcn_ defaultValue="results" className="w-full h-full">
+          <TabsList_Shadcn_ className="flex justify-between px-2">
             <div>
-              <TabsTrigger_Shadcn_ className="py-3" value="results">
-                Results
+              <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
+                Results{' '}
+                {!isExecuting &&
+                  result.rows.length > 0 &&
+                  `(${result.rows.length.toLocaleString()})`}
               </TabsTrigger_Shadcn_>
               {showCharts && (
-                <TabsTrigger_Shadcn_ className="py-3" value="chart">
+                <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
                   Chart
                 </TabsTrigger_Shadcn_>
               )}
