@@ -180,8 +180,8 @@ type FnRef = string
 
 function getCommonParamValues(param: ParamAtom) {
   return {
-    // __type is an internal marker and not useful for display
-    ...(param.name && param.name !== '__type' && { name: param.name }),
+    // __type nad __index are internal marke and not useful for display
+    ...(param.name && param.name !== '__type' && param.name !== '__index' && { name: param.name }),
     ...(param.comment && { comment: param.comment }),
     ...(param.defaultValue && { defaultValue: param.defaultValue }),
     ...(param.flags?.isOptional && { optional: param.flags?.isOptional }),
@@ -208,11 +208,11 @@ function getTypeParameters(
   return [undefined, undefined]
 }
 
-function hasParseableDereferenced(param: ParamAtom) {
+function hasDereferenced(param: ParamAtom) {
   return (
     typeof param.type === 'object' &&
     !!param.type.dereferenced &&
-    isParseable(param.type.dereferenced)
+    Object.keys(param.type.dereferenced).length > 0
   )
 }
 
@@ -310,10 +310,8 @@ function parseDereferenced(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) {
 function parseReferenceType(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) {
   return (
     (hasTypeParameter(parent) && parseTypeParameter(param, parent, fnRef)) ||
-    (hasParseableDereferenced(
-      param
-    ) && // @ts-ignore -- param.type.dereferenced is checked by hasParseableDereferenced
-    {
+    (hasDereferenced(param) && {
+      // @ts-ignore -- param.type.dereferenced is checked by hasParseableDereferenced
       ...parseDereferenced(param.type.dereferenced, { ...param, parent }, fnRef),
       ...getCommonParamValues(param),
     }) ||
@@ -345,8 +343,13 @@ function parseIndexSignature(param: ParamAtom, parent: ParentAtom, fnRef: FnRef)
           parseParam(innerParam.type.type, innerParam, { ...param, parent }, fnRef)
         ),
       value:
-        typeof param.indexSignature.type === 'string'
-          ? parseParam(param.indexSignature.type, param.indexSignature, { ...param, parent }, fnRef)
+        typeof param.indexSignature.type.type === 'string'
+          ? parseParam(
+              param.indexSignature.type.type,
+              param.indexSignature,
+              { ...param, parent },
+              fnRef
+            )
           : undefined,
     },
   } satisfies ParsedIndexObjectNode
