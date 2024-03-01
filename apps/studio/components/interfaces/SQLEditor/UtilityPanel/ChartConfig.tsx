@@ -5,7 +5,6 @@ import { ArrowUpDown } from 'lucide-react'
 import { useMemo } from 'react'
 import {
   Button,
-  Checkbox,
   Checkbox_Shadcn_,
   Label_Shadcn_,
   ResizableHandle,
@@ -88,20 +87,18 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
   return (
     <ResizablePanelGroup direction="horizontal" className="flex-grow h-full">
       <>
-        <ResizablePanel className="p-4" defaultSize={85}>
-          <div className="h-full">
-            {config.type === 'bar' && (
-              <BarChart
-                showLegend
-                size="normal"
-                xAxisIsDate={xKeyDateFormat === 'date'}
-                data={resultToRender as any}
-                xAxisKey={config.xKey}
-                yAxisKey={config.yKey}
-                emptyStateMessage="Execute a query and configure the chart options"
-              />
-            )}
-          </div>
+        <ResizablePanel className="p-4 h-full" defaultSize={85}>
+          {config.type === 'bar' && (
+            <BarChart
+              showLegend
+              size="normal"
+              xAxisIsDate={xKeyDateFormat === 'date'}
+              data={resultToRender as any}
+              xAxisKey={config.xKey}
+              yAxisKey={config.yKey}
+              emptyStateMessage="Execute a query and configure the chart options"
+            />
+          )}
         </ResizablePanel>
         <ResizableHandle withHandle />
         <ResizablePanel defaultSize={15} minSize={15} className="px-3 py-3 space-y-4">

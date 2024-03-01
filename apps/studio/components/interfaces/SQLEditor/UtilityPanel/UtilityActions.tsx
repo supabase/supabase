@@ -108,9 +108,7 @@ const UtilityActions = ({
             size="tiny"
             iconRight={
               isExecuting ? (
-                <div className="w-6 flex items-center justify-center">
-                  <IconLoader className="animate-spin" size={10} strokeWidth={1.5} />
-                </div>
+                <IconLoader className="animate-spin" size={10} strokeWidth={1.5} />
               ) : (
                 <div className="flex items-center space-x-1">
                   {os === 'macos' ? (
