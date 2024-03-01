@@ -1,7 +1,7 @@
-import type { PostgresType } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
 import { Checkbox, IconMenu, IconSettings, IconX, Input, Popover } from 'ui'
 
+import { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { EMPTY_ARR, EMPTY_OBJ } from 'lib/void'
 import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
 import { Suggestion } from '../ColumnEditor/ColumnEditor.types'
@@ -29,7 +29,7 @@ import { ColumnField } from '../SidePanelEditor.types'
 
 interface ColumnProps {
   column: ColumnField
-  enumTypes: PostgresType[]
+  enumTypes: EnumeratedType[]
   isNewRecord: boolean
   hasForeignKeys: boolean
   hasImportContent: boolean
@@ -40,7 +40,7 @@ interface ColumnProps {
 
 const Column = ({
   column = EMPTY_OBJ as ColumnField,
-  enumTypes = EMPTY_ARR as PostgresType[],
+  enumTypes = EMPTY_ARR as EnumeratedType[],
   isNewRecord = false,
   hasForeignKeys = false,
   hasImportContent = false,
