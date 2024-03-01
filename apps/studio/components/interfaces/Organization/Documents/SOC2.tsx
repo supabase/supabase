@@ -11,7 +11,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { Button, IconDownload, Modal } from 'ui'
 import { useState } from 'react'
 import { useStore } from 'hooks'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { getDocument } from 'data/documents/document-query'
 
 const SOC2 = () => {

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Button, IconExternalLink, IconTrash } from 'ui'
 
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import Panel from 'components/ui/Panel'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'

@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { Button, IconTrash, Modal } from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useStore } from 'hooks'
 
 const AccessTokenList = observer(() => {
