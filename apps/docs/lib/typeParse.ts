@@ -13,7 +13,7 @@
  *
  * May be nested with additional params within.
  */
-type ParamAtom = {
+type ParamBase = {
   name?: string
   comment?: unknown
   defaultValue?: unknown
@@ -22,12 +22,13 @@ type ParamAtom = {
     name?: string
     value?: unknown
     dereferenced?: Dereferenced
-    declaration?: Omit<ParamAtom, 'kindString'> & Pick<Required<ParamAtom>, 'kindString'>
-    typeArguments?: ParamAtom['type']
+    declaration?: Omit<ParamBase, 'kindString' | 'type'> & Pick<Required<ParamBase>, 'kindString'>
+    typeArguments?: Array<ParamBase['type']>
   }
   kindString?: string
   indexSignature?: SignatureParam
-  children?: Array<ParamAtom>
+  children?: Array<ParamBase>
+  signatures?: Array<ParamBase & { parameters: Array<ParamBase> }>
   flags?: {
     isOptional?: boolean
     isRest?: boolean
@@ -46,50 +47,50 @@ function isParseableWithName(
   return isParseable(unknown) && 'name' in unknown
 }
 
-type ArrayParam = Omit<ParamAtom, 'type'> & {
-  type: { type: 'array'; elementType: ParamAtom['type'] }
+type ArrayParam = Omit<ParamBase, 'type'> & {
+  type: { type: 'array'; elementType: ParamBase['type'] }
 }
 
-type SignatureParam = ParamAtom & {
-  parameters: Array<ParamAtom>
+type SignatureParam = ParamBase & {
+  parameters: Array<ParamBase>
 }
 
-type TypeOperatorParam = ParamAtom & {
+type TypeOperatorParam = ParamBase & {
   type: {
     type: 'typeOperator'
     operator: string
-    target: ParamAtom['type']
+    target: ParamBase['type']
   }
 }
 
-type UnionParam = Omit<ParamAtom, 'type'> & {
-  type: { type: 'union'; types: Array<ParamAtom['type']> }
+type UnionParam = Omit<ParamBase, 'type'> & {
+  type: { type: 'union'; types: Array<ParamBase['type']> }
 }
 
-type IndexedAccessParam = {
-  type: { type: 'indexedAccess'; indexType: ParamAtom['type']; objectType: ParamAtom['type'] }
+type IndexedAccessParam = Omit<ParamBase, 'type'> & {
+  type: { type: 'indexedAccess'; indexType: ParamBase['type']; objectType: ParamBase['type'] }
 }
 
-type IntersectionParam = Omit<ParamAtom, 'type'> & {
+type IntersectionParam = Omit<ParamBase, 'type'> & {
   type: {
     type: 'intersection'
-    types: Array<ParamAtom['type']>
+    types: Array<ParamBase['type']>
   }
 }
 
-type TypeParameter = Omit<ParamAtom, 'type'> & {
-  type?: ParamAtom['type']
-  default?: ParamAtom['type']
+type TypeParameter = Omit<ParamBase, 'type'> & {
+  type?: ParamBase['type']
+  default?: ParamBase['type']
 }
 
-type ParentAtom = {
+type ParentBase = {
   typeParameter?: Array<TypeParameter>
   /**
    * The chain of ancestor params must always be trackable back to the origin
    * parent, because that is the only node with the `typeParameter`, which often
    * needs to be read in a deeper node.
    */
-  parent?: ParentAtom
+  parent?: ParentBase
 }
 
 /**
@@ -143,10 +144,6 @@ type ParsedReadOnlyNode = ParsedAtom & {
   type: { type: `readonly ${string}`; innerType: ParsedNode }
 }
 
-type ParsedKeyOfNode = ParsedAtom & {
-  type: { type: `keyof ${string}`; innerType: ParsedNode }
-}
-
 type ParsedIndexedAccessNode = ParsedAtom & {
   type: {
     type: 'indexedAccess'
@@ -178,7 +175,9 @@ type ParsedNode =
  */
 type FnRef = string
 
-function getCommonParamValues(param: ParamAtom) {
+function getCommonParamValues<
+  P extends Pick<ParamBase, 'name' | 'defaultValue' | 'flags' | 'comment'>,
+>(param: P) {
   return {
     // __type nad __index are internal marke and not useful for display
     ...(param.name && param.name !== '__type' && param.name !== '__index' && { name: param.name }),
@@ -188,7 +187,7 @@ function getCommonParamValues(param: ParamAtom) {
   }
 }
 
-function hasTypeParameter(parent: ParentAtom) {
+function hasTypeParameter(parent: ParentBase) {
   let curr = parent
   while (curr) {
     if ('typeParameter' in curr) return true
@@ -198,8 +197,8 @@ function hasTypeParameter(parent: ParentAtom) {
 }
 
 function getTypeParameters(
-  parent: ParentAtom
-): [Array<TypeParameter>, ParentAtom] | [undefined, undefined] {
+  parent: ParentBase
+): [Array<TypeParameter>, ParentBase] | [undefined, undefined] {
   let curr = parent
   while (curr) {
     if ('typeParameter' in curr) return [curr.typeParameter, curr]
@@ -208,7 +207,7 @@ function getTypeParameters(
   return [undefined, undefined]
 }
 
-function hasDereferenced(param: ParamAtom) {
+function hasDereferenced(param: ParamBase) {
   return (
     typeof param.type === 'object' &&
     !!param.type.dereferenced &&
@@ -216,7 +215,7 @@ function hasDereferenced(param: ParamAtom) {
   )
 }
 
-function parseArrayType(param: ArrayParam, parent: ParentAtom, fnRef: FnRef) {
+function parseArrayType(param: ArrayParam, parent: ParentBase, fnRef: FnRef) {
   return {
     ...getCommonParamValues(param),
     type: {
@@ -234,7 +233,9 @@ function parseArrayType(param: ArrayParam, parent: ParentAtom, fnRef: FnRef) {
   } satisfies ParsedArrayNode
 }
 
-function parseInterfaceType(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) {
+function parseInterfaceType<
+  P extends Pick<ParamBase, 'name' | 'defaultValue' | 'flags' | 'comment' | 'children'>,
+>(param: P, parent: ParentBase, fnRef: FnRef) {
   if (!param.children) return undefined
 
   return {
@@ -248,7 +249,7 @@ function parseInterfaceType(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) 
   } satisfies ParsedInterfaceNode
 }
 
-function parseTypeParameter(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) {
+function parseTypeParameter(param: ParamBase, parent: ParentBase, fnRef: FnRef) {
   if (!isParseableWithName(param.type)) return undefined
 
   const [typeParameters, ancestor] = getTypeParameters(parent)
@@ -286,7 +287,7 @@ function parseTypeParameter(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) 
   return undefined
 }
 
-function parseDereferenced(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) {
+function parseDereferenced(param: ParamBase, parent: ParentBase, fnRef: FnRef) {
   function parseAndAnnotate() {
     const parsed = parseParam(param.type.type, param, parent, fnRef)
     return {
@@ -300,11 +301,12 @@ function parseDereferenced(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) {
 
   return (
     (isParseable(param) && parseAndAnnotate()) ||
-    (param.kindString === 'Interface' && parseInterfaceType(param, parent, fnRef))
+    (param.kindString === 'Interface' && parseInterfaceType(param, parent, fnRef)) ||
+    undefined
   )
 }
 
-function parseReferenceType(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) {
+function parseReferenceType(param: ParamBase, parent: ParentBase, fnRef: FnRef) {
   return (
     (hasTypeParameter(parent) && parseTypeParameter(param, parent, fnRef)) ||
     (hasDereferenced(param) && {
@@ -319,7 +321,7 @@ function parseReferenceType(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) 
       type: {
         type: 'reference',
         // @ts-ignore
-        typeArguments: (param.type.typeArguments ?? []).map((typeArg) =>
+        typeArguments: (param.type.typeArguments ?? []).map((typeArg: ParamBase['type']) =>
           parseParam(typeArg.type, { type: typeArg }, { ...param, parent }, fnRef)
         ),
       },
@@ -327,7 +329,9 @@ function parseReferenceType(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) 
   )
 }
 
-function parseIndexSignature(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) {
+function parseIndexSignature<
+  P extends Pick<ParamBase, 'name' | 'defaultValue' | 'flags' | 'comment' | 'indexSignature'>,
+>(param: P, parent: ParentBase, fnRef: FnRef) {
   if (!('indexSignature' in param)) return undefined
 
   return {
@@ -352,7 +356,7 @@ function parseIndexSignature(param: ParamAtom, parent: ParentAtom, fnRef: FnRef)
   } satisfies ParsedIndexObjectNode
 }
 
-function parseCallSignature(param: SignatureParam, parent: ParentAtom, fnRef: FnRef) {
+function parseCallSignature(param: SignatureParam, parent: ParentBase, fnRef: FnRef) {
   if (param.kindString !== 'Call signature') return undefined
 
   return {
@@ -370,7 +374,9 @@ function parseCallSignature(param: SignatureParam, parent: ParentAtom, fnRef: Fn
   } satisfies ParsedCallSignatureNode
 }
 
-function parseSignatures(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) {
+function parseSignatures<
+  P extends Pick<ParamBase, 'name' | 'defaultValue' | 'flags' | 'comment' | 'signatures'>,
+>(param: P, parent: ParentBase, fnRef: FnRef) {
   if (!('signatures' in param && Array.isArray(param.signatures))) return undefined
 
   return {
@@ -384,7 +390,7 @@ function parseSignatures(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) {
   } satisfies ParsedSignatureNode
 }
 
-function parseReflectionType(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) {
+function parseReflectionType(param: ParamBase, parent: ParentBase, fnRef: FnRef) {
   if (!(isParseable(param.type) && 'declaration' in param.type)) return undefined
 
   return {
@@ -395,7 +401,7 @@ function parseReflectionType(param: ParamAtom, parent: ParentAtom, fnRef: FnRef)
   } satisfies ParsedNode
 }
 
-function parseIntrinsicType(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) {
+function parseIntrinsicType(param: ParamBase, _: ParentBase, __: FnRef) {
   return {
     ...getCommonParamValues(param),
     type: {
@@ -404,7 +410,7 @@ function parseIntrinsicType(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) 
   } satisfies ParsedNode
 }
 
-function parseLiteralType(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) {
+function parseLiteralType(param: ParamBase, _: ParentBase, __: FnRef) {
   return {
     ...getCommonParamValues(param),
     type: {
@@ -414,7 +420,7 @@ function parseLiteralType(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) {
   } satisfies ParsedLiteralNode
 }
 
-function parseUnionType(param: UnionParam, parent: ParentAtom, fnRef: FnRef) {
+function parseUnionType(param: UnionParam, parent: ParentBase, fnRef: FnRef) {
   return {
     ...getCommonParamValues(param),
     type: {
@@ -427,7 +433,7 @@ function parseUnionType(param: UnionParam, parent: ParentAtom, fnRef: FnRef) {
   } satisfies ParsedUnionNode
 }
 
-function parseTypeOperator(param: TypeOperatorParam, parent: ParentAtom, fnRef: FnRef) {
+function parseTypeOperator(param: TypeOperatorParam, parent: ParentBase, fnRef: FnRef) {
   switch (param.type.operator) {
     case 'readonly': {
       const parsedTarget = parseParam(
@@ -465,7 +471,7 @@ function parseTypeOperator(param: TypeOperatorParam, parent: ParentAtom, fnRef: 
   }
 }
 
-function parseIndexedAccess(param: IndexedAccessParam, parent: ParentAtom, fnRef: FnRef) {
+function parseIndexedAccess(param: IndexedAccessParam, parent: ParentBase, fnRef: FnRef) {
   return {
     ...getCommonParamValues(param),
     type: {
@@ -486,7 +492,7 @@ function parseIndexedAccess(param: IndexedAccessParam, parent: ParentAtom, fnRef
   } satisfies ParsedIndexedAccessNode
 }
 
-function parseIntersectionType(param: IntersectionParam, parent: ParentAtom, fnRef: FnRef) {
+function parseIntersectionType(param: IntersectionParam, parent: ParentBase, fnRef: FnRef) {
   return {
     ...getCommonParamValues(param),
     type: {
@@ -500,8 +506,8 @@ function parseIntersectionType(param: IntersectionParam, parent: ParentAtom, fnR
 
 function parseParam(
   type: string,
-  param: ParamAtom,
-  parent: ParentAtom,
+  param: ParamBase,
+  parent: ParentBase,
   fnRef: FnRef
 ): ParsedNode | undefined {
   switch (type) {
@@ -530,4 +536,5 @@ function parseParam(
   }
 }
 
+export type { ParentBase }
 export { parseParam }

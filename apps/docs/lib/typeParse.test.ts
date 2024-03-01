@@ -1,4 +1,4 @@
-import { parseParam } from './typeParse'
+import { type ParentBase, parseParam } from './typeParse'
 
 const EMPTY_PARENT = {}
 const EMPTY_FN_REF = ''
@@ -2142,8 +2142,12 @@ describe('miscellaneous combinations', () => {
       },
     }
 
-    expect(parseParam('intrinsic', param1, parent, EMPTY_FN_REF)).toStrictEqual(result1)
-    expect(parseParam('reflection', param2, parent, EMPTY_FN_REF)).toStrictEqual(result2)
+    expect(parseParam('intrinsic', param1, parent as ParentBase, EMPTY_FN_REF)).toStrictEqual(
+      result1
+    )
+    expect(parseParam('reflection', param2, parent as ParentBase, EMPTY_FN_REF)).toStrictEqual(
+      result2
+    )
   })
 
   it('auth.signInWithOTP()', () => {
@@ -2748,6 +2752,6 @@ describe('miscellaneous combinations', () => {
       },
     }
 
-    expect(parseParam('reference', param, parent, EMPTY_FN_REF)).toStrictEqual(result)
+    expect(parseParam('reference', param, parent as ParentBase, EMPTY_FN_REF)).toStrictEqual(result)
   })
 })
