@@ -1,3 +1,5 @@
+'use client'
+
 import {
   type DocsSearchResult as Page,
   type DocsSearchResultSection as PageSection,

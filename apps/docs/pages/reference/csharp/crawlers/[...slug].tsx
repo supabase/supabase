@@ -15,8 +15,8 @@ const libraryPath = '/csharp'
 
 export default function CSharpReference(props) {
   const router = useRouter()
-  const slug = router.query.slug[0]
-  const filteredSection = sections.filter((section) => section.id === slug)
+  const slug = router.query.slug?.[0]
+  const filteredSection = sections.filter((section) => slug && section.id === slug)
 
   const pageTitle = filteredSection[0]?.title
     ? `${filteredSection[0]?.title} | Supabase`

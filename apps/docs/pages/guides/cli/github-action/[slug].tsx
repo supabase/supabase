@@ -73,10 +73,10 @@ export default function ActionDocs({ source, meta }: ActionDocsProps) {
  * Fetch markdown from external repo and transform links
  */
 export const getStaticProps: GetStaticProps<ActionDocsProps> = async ({ params }) => {
-  const page = pageMap.find(({ slug }) => slug === params.slug)
+  const page = pageMap.find(({ slug }) => params && slug === params.slug)
 
   if (!page) {
-    throw new Error(`No page mapping found for slug '${params.slug}'`)
+    throw new Error(`No page mapping found for slug '${params?.slug}'`)
   }
 
   const { remoteFile, meta } = page

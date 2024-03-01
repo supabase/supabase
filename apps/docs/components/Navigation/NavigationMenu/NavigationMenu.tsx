@@ -61,7 +61,7 @@ interface ReferenceMenu extends BaseMenu {
 
 type Menu = HomeMenu | GuideMenu | ReferenceMenu
 
-const menus: Menu[] = [
+const menus = [
   {
     id: MenuId.Home,
     type: 'home',
@@ -241,13 +241,15 @@ const menus: Menu[] = [
     type: 'reference',
     path: '/reference/self-hosting-functions',
   },
-]
+] as Menu[]
 
 function getMenuById(id: MenuId) {
   return menus.find((menu) => menu.id === id) ?? menus.find((menu) => menu.id === MenuId.Home)
 }
 
-function getMenuElement(menu: Menu) {
+function getMenuElement(menu: Menu | undefined) {
+  if (!menu) throw Error('No menu found for this menuId')
+
   const menuType = menu.type
   switch (menuType) {
     case 'home':

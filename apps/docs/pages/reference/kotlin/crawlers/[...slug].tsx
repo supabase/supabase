@@ -8,14 +8,15 @@ import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 import { useRouter } from 'next/router'
 import RefSEO from '~/components/reference/RefSEO'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { TypeSpec } from '~/components/reference/Reference.types'
 
 const sections = flattenSections(clientLibsCommonSections)
 const libraryPath = '/kotlin'
 
 export default function KotlinReference(props) {
   const router = useRouter()
-  const slug = router.query.slug[0]
-  const filteredSection = sections.filter((section) => section.slug === slug)
+  const slug = router.query.slug?.[0]
+  const filteredSection = sections.filter((section) => slug && section.slug === slug)
 
   const pageTitle = filteredSection[0]?.title
     ? `${filteredSection[0]?.title} | Supabase`
@@ -29,7 +30,7 @@ export default function KotlinReference(props) {
         menuId={MenuId.RefKotlinV2}
         sections={filteredSection}
         spec={spec}
-        typeSpec={typeSpec}
+        typeSpec={typeSpec as TypeSpec}
         pageProps={props}
         type="client-lib"
       />

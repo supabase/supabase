@@ -29,7 +29,7 @@ const useSendTelemetryEvent = () => {
       body: {
         ...event,
         page_title: document?.title,
-        page_location: pathname,
+        page_location: pathname ?? undefined,
       },
     })
       .then(({ error }) => {

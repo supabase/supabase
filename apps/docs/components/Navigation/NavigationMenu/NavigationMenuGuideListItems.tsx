@@ -33,7 +33,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
   const router = useRouter()
   const { resolvedTheme } = useTheme()
   const activeItem = props.subItem.url === getPathWithoutHash(router.asPath)
-  const activeItemRef = useRef(null)
+  const activeItemRef = useRef<HTMLLIElement>(null)
 
   const LinkContainer = (props) => {
     return (

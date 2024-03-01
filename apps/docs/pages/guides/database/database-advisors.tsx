@@ -40,7 +40,7 @@ You can use the Database Performance and Security Advisors to check your databas
 In the dashboard, navigate to [Security Advisor](https://supabase.com/dashboard/project/_/database/security-advisor) and [Performance Advisor](https://supabase.com/dashboard/project/_/database/performance-advisor) under Database. The advisors run automatically. You can also manually rerun them after you've resolved issues.
 `.trim()
 
-const getBasename = (path: string) => path.split('/').at(-1).replace(/\.md$/, '')
+const getBasename = (path: string) => path.split('/').at(-1)!.replace(/\.md$/, '')
 
 export default function DatabaseAdvisorDocs({
   intro,

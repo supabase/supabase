@@ -1,3 +1,4 @@
+import type { TypeSpec } from '~/components/reference/Reference.types'
 import clientLibsCommonSections from '~/spec/common-client-libs-sections.json'
 import typeSpec from '~/spec/enrichments/tsdoc_v2/combined.json'
 import spec from '~/spec/supabase_py_v2.yml' assert { type: 'yml' }
@@ -16,7 +17,7 @@ export default function PyReference(props) {
       menuId={MenuId.RefPythonV2}
       sections={sections}
       spec={spec}
-      typeSpec={typeSpec}
+      typeSpec={typeSpec as TypeSpec}
       pageProps={props}
       type="client-lib"
     />

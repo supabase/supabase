@@ -15,11 +15,13 @@ const RevVersionDropdown = () => {
   const pathSegments = asPath.split('/')
 
   const library = pathSegments.length >= 3 ? pathSegments[2] : undefined
-  const libraryMeta = REFERENCES?.[library] ?? undefined
+  const libraryMeta = library ? REFERENCES?.[library] : undefined
   const versions = libraryMeta?.versions ?? []
 
-  const currentVersion = versions.includes(pathSegments[pathSegments.indexOf(library) + 1])
-    ? pathSegments[pathSegments.indexOf(library) + 1]
+  const currentVersion = library
+    ? versions.includes(pathSegments[pathSegments.indexOf(library) + 1])
+      ? pathSegments[pathSegments.indexOf(library) + 1]
+      : versions[0]
     : versions[0]
 
   const onSelectVersion = (version: string) => {

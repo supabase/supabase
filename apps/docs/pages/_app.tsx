@@ -76,14 +76,14 @@ function AuthContainer({ children }: PropsWithChildren) {
   const [supabase] = useState(() =>
     IS_PLATFORM
       ? createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
         )
       : undefined
   )
 
   return IS_PLATFORM ? (
-    <SessionContextProvider supabaseClient={supabase}>
+    <SessionContextProvider supabaseClient={supabase!}>
       <AuthProvider>{children}</AuthProvider>
     </SessionContextProvider>
   ) : (

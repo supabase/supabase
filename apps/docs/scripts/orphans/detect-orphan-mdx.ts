@@ -49,7 +49,7 @@ type RefItem = {
 
 const recGetUrl = (items: readonly RefItem[], acc: string[] = []) =>
   items.reduce((acc, item) => {
-    if (item.href || item.url) acc.push(item.href || item.url)
+    if (item.href || item.url) acc.push((item.href || item.url)!)
     if (item.items) acc.push(...recGetUrl(item.items, acc))
     return acc
   }, acc)

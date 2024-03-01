@@ -1,26 +1,24 @@
-import Head from 'next/head'
+import specFile from '~/spec/cli_v1_config.yaml' assert { type: 'yml' }
+import { Parameter } from '~/lib/refGenerator/refTypes'
 import ReactMarkdown from 'react-markdown'
-
-import { CodeBlock, cn } from 'ui'
-
+import GuidesTableOfContents, { type TOCHeader } from '~/components/GuidesTableOfContents'
 import { Heading } from '~/components/CustomHTMLElements'
-import GuidesTableOfContents from '~/components/GuidesTableOfContents'
+import Head from 'next/head'
+import { CodeBlock, cn } from 'ui'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import { MainSkeleton } from '~/layouts/MainSkeleton'
-import { Parameter } from '~/lib/refGenerator/refTypes'
-import specFile from '~/spec/cli_v1_config.yaml' assert { type: 'yml' }
 
 // Parameters are grouped on the page by tag
-const tocList = []
-const content = specFile.info.tags.map((tag) => {
-  tocList.push({ text: tag.title, link: `${tag.id}-config`, level: 2 })
+const tocList: Array<TOCHeader> = []
+const content = specFile.info.tags.map((tag, id) => {
+  tocList.push({ id, text: tag.title, link: `${tag.id}-config`, level: 2 })
   return (
     <div>
       <Heading tag="h2">{tag.title} Config</Heading>
       {specFile.parameters
-        .filter((param: Parameter) => param.tags[0] === tag.id)
-        .map((parameter: Parameter) => {
-          tocList.push({ text: parameter.id, link: `#${parameter.id}`, level: 3 })
+        .filter((param: Parameter) => param.tags && param.tags[0] === tag.id)
+        .map((parameter: Parameter, id) => {
+          tocList.push({ id, text: parameter.id, link: `#${parameter.id}`, level: 3 })
           return <Info parameter={parameter} />
         })}
     </div>
@@ -81,7 +79,7 @@ function Info({ parameter }: { parameter: Parameter }) {
                   <tr>
                     <td>{parameter.id}</td>
                     <td>{parameter.default ? parameter.default.toString() : 'None'}</td>
-                    <td>{parameter.required.toString()}</td>
+                    <td>{parameter.required !== undefined && parameter.required.toString()}</td>
                   </tr>
                 </tbody>
               </table>

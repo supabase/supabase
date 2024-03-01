@@ -22,7 +22,7 @@ function getSupabaseClient() {
 
 export async function fetchPartners() {
   const supabase = getSupabaseClient()
-  const { data: partners } = await supabase
+  const { data: partners } = await supabase!
     .from('partners')
     .select('slug,overview')
     .eq('approved', true)

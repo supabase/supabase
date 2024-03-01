@@ -70,6 +70,7 @@ const Layout: FC<Props> = (props) => {
               alt: props.meta?.title,
             },
           ],
+          // @ts-ignore
           videos: props.meta?.video && [
             {
               // youtube based video meta

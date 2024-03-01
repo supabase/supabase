@@ -39,6 +39,7 @@ const HomeLayout: FC<Props> = (props: Props) => {
         openGraph={{
           url: `https://supabase.com/docs${asPath}`,
           type: 'article',
+          // @ts-ignore
           videos: props.meta?.video && [
             {
               // youtube based video meta
