@@ -14,19 +14,20 @@ const config = {
     // local stories
     '../stories/**/*.mdx',
     '../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
-    // '../../apps/**/*.stories.@(js|jsx|mjs|ts|tsx)',
-    // only expose a few stories as most older based ones are broken
+    // app based stories
+    '../../studio/components/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    // package based stories
     '../../../packages/ui/src/components/shadcn/**/*.stories.@(js|jsx|mjs|ts|tsx)',
-    // '../../../packages/ui-patterns/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../../../packages/ui-patterns/**/*.stories.@(js|jsx|mjs|ts|tsx)',
   ],
   addons: [
     getAbsolutePath('@storybook/addon-links'),
     getAbsolutePath('@storybook/addon-essentials'),
     getAbsolutePath('@storybook/addon-onboarding'),
     getAbsolutePath('@storybook/addon-interactions'),
-    getAbsolutePath("@storybook/addon-mdx-gfm"),
+    getAbsolutePath('@storybook/addon-mdx-gfm'),
     '@storybook/addon-styling-webpack',
-    '@storybook/addon-themes'
+    '@storybook/addon-themes',
   ],
   framework: {
     name: getAbsolutePath('@storybook/nextjs'),
