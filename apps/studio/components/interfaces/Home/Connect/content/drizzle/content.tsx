@@ -8,7 +8,7 @@ import {
 } from 'components/interfaces/Home/Connect/ConnectTabs'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 
-const ContentFile = ({ projectRef, region }: ContentFileProps) => {
+const ContentFile = ({ connectionStringPooler, connectionStringDirect }: ContentFileProps) => {
   return (
     <ConnectTabs>
       <ConnectTabTriggers>
@@ -21,10 +21,10 @@ const ContentFile = ({ projectRef, region }: ContentFileProps) => {
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 # Connect to Supabase via connection pooling with Supavisor.
-DATABASE_URL="postgres://postgres.${projectRef}:[password]@aws-0-${region}.pooler.supabase.com:6543/postgres"
+DATABASE_URL="${connectionStringPooler}"
 
-# Or if you want to use direct connection to the database. Used for migrations.
-DATABASE_URL="postgres://postgres:[password]@db.${projectRef}.supabase.co:5432/postgres"
+# Or if you want to use direct connection to the database.
+DATABASE_URL="${connectionStringDirect}"
         `}
         </SimpleCodeBlock>
       </ConnectTabContent>
