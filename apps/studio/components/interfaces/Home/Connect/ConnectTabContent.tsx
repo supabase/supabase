@@ -1,13 +1,12 @@
 import { useParams } from 'common'
 import dynamic from 'next/dynamic'
 
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { projectKeys } from './Connect.types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { getConnectionStrings } from 'components/interfaces/Settings/Database/DatabaseSettings/DatabaseSettings.utils'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
-import { pluckObjectFields } from 'lib/helpers'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
+import { pluckObjectFields } from 'lib/helpers'
+import { projectKeys } from './Connect.types'
 
 interface ConnectContentTabProps {
   projectKeys: projectKeys
@@ -42,8 +41,8 @@ const ConnectTabContentNew = ({ projectKeys, filePath }: ConnectContentTabProps)
           usePoolerConnection: false,
         })
       : { uri: '' }
-  const connectionStringPooler = connectionStringsPooler.uri
-  const connectionStringDirect = connectionStringsDirect.uri
+  const connectionStringPooler = connectionStringsPooler.uri.replace('6543', '5432')
+  const connectionStringDirect = connectionStringsDirect.uri.replace('6543', '5432')
 
   const ContentFile = dynamic<ConnectContentTabProps>(
     () => import(`./content/${filePath}/content`),
