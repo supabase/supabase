@@ -1,7 +1,7 @@
-import type { PostgresType } from '@supabase/postgres-meta'
 import { noop } from 'lodash'
 import { Select } from 'ui'
 
+import { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { POSTGRES_DATA_TYPES } from '../SidePanelEditor.constants'
 import { ColumnField } from '../SidePanelEditor.types'
 import { typeExpressionSuggestions } from './ColumnEditor.constants'
@@ -10,7 +10,7 @@ import InputWithSuggestions from './InputWithSuggestions'
 
 interface ColumnDefaultValueProps {
   columnFields: ColumnField
-  enumTypes: PostgresType[]
+  enumTypes: EnumeratedType[]
   onUpdateField: (changes: Partial<ColumnField>) => void
 }
 
