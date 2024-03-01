@@ -24,7 +24,7 @@ import {
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import CopyButton from 'components/ui/CopyButton'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'

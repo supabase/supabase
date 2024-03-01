@@ -8,7 +8,7 @@ import {
   Modal,
 } from 'ui'
 
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'
 import { Database } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
