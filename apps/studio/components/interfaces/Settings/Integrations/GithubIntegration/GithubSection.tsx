@@ -129,35 +129,33 @@ const GitHubSection = () => {
                     }}
                     type={'GitHub' as IntegrationName}
                     onDeleteConnection={onDeleteGitHubConnection}
-                    className={cn(isBranchingEnabled ? '!rounded-b-none !mb-0' : '')}
+                    className="!rounded-b-none !mb-0"
                   />
 
-                  {isBranchingEnabled && (
-                    <div className="border-b border-l border-r rounded-b-lg">
-                      <GitHubIntegrationConnectionForm
-                        connection={{
-                          id: String(connection.id),
-                          added_by: {
-                            id: String(connection.user?.id),
-                            primary_email: connection.user?.primary_email ?? '',
-                            username: connection.user?.username ?? '',
+                  <div className="border-b border-l border-r rounded-b-lg">
+                    <GitHubIntegrationConnectionForm
+                      connection={{
+                        id: String(connection.id),
+                        added_by: {
+                          id: String(connection.user?.id),
+                          primary_email: connection.user?.primary_email ?? '',
+                          username: connection.user?.username ?? '',
+                        },
+                        foreign_project_id: String(connection.repository.id),
+                        supabase_project_ref: connection.project.ref,
+                        organization_integration_id: 'unused',
+                        inserted_at: connection.inserted_at,
+                        updated_at: connection.updated_at,
+                        metadata: {
+                          name: connection.repository.name,
+                          supabaseConfig: {
+                            supabaseDirectory: connection.workdir,
+                            supabaseChangesOnly: connection.supabase_changes_only,
                           },
-                          foreign_project_id: String(connection.repository.id),
-                          supabase_project_ref: connection.project.ref,
-                          organization_integration_id: 'unused',
-                          inserted_at: connection.inserted_at,
-                          updated_at: connection.updated_at,
-                          metadata: {
-                            name: connection.repository.name,
-                            supabaseConfig: {
-                              supabaseDirectory: connection.workdir,
-                              supabaseChangesOnly: connection.supabase_changes_only,
-                            },
-                          } as any,
-                        }}
-                      />
-                    </div>
-                  )}
+                        } as any,
+                      }}
+                    />
+                  </div>
                 </div>
               ))}
             </ul>

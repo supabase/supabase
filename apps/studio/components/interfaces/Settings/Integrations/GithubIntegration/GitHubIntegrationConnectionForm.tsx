@@ -48,10 +48,15 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
   const project = useSelectedProject()
   const [open, setOpen] = useState(false)
   const comboBoxRef = useRef<HTMLButtonElement>(null)
+  const isBranchingEnabled =
+    project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
 
-  const { data: githubBranches, isLoading: isLoadingBranches } = useGitHubBranchesQuery({
-    connectionId: Number(connection.id),
-  })
+  const { data: githubBranches, isLoading: isLoadingBranches } = useGitHubBranchesQuery(
+    {
+      connectionId: Number(connection.id),
+    },
+    { enabled: isBranchingEnabled }
+  )
 
   const { mutate: updateConnection, isLoading: isUpdatingConnection } =
     useGitHubConnectionUpdateMutation({
@@ -111,90 +116,85 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
 
   return (
     <div className="flex flex-col gap-6 px-6 py-4">
-      <div>
-        <Label_Shadcn_ className="text-foreground">Production branch</Label_Shadcn_>
-        <p className="text-xs text-foreground-light mb-3">
-          All other branches will be treated as Preview branches
-        </p>
+      {isBranchingEnabled && (
+        <div>
+          <Label_Shadcn_ className="text-foreground">Production branch</Label_Shadcn_>
+          <p className="text-xs text-foreground-light mb-3">
+            All other branches will be treated as Preview branches
+          </p>
 
-        <Alert_Shadcn_ className="mb-4">
-          <AlertTitle_Shadcn_ className="text-sm">
-            Changing Git branch for Production Branch coming soon
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_ className="text-xs">
-            If you wish to change the Git branch that is used for the Production Branch you will
-            need to disable Branching and opt back in.
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
+          {/* <pre>! This should only work if branching is turned on !</pre> */}
 
-        {/* <pre>! This should only work if branching is turned on !</pre> */}
-        <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-          <PopoverTrigger_Shadcn_ asChild name="branch-selector">
-            <Button
-              disabled
-              type="default"
-              size="medium"
-              ref={comboBoxRef}
-              className={cn(
-                'justify-start w-80',
-                productionPreviewBranch?.git_branch === undefined ? 'text-foreground-light' : 'text'
-              )}
-              icon={
-                productionPreviewBranch?.git_branch && (
-                  <Shield className="w-4 h-4 text-warning" strokeWidth={1} />
-                )
-              }
-              loading={isUpdatingProdBranch || isLoadingBranches}
-              iconRight={
-                <span className="grow flex justify-end">
-                  <IconChevronDown className={''} />
-                </span>
-              }
+          <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+            <PopoverTrigger_Shadcn_ asChild name="branch-selector">
+              <Button
+                disabled
+                type="default"
+                size="medium"
+                ref={comboBoxRef}
+                className={cn(
+                  'justify-start w-80 mt-4',
+                  productionPreviewBranch?.git_branch === undefined
+                    ? 'text-foreground-light'
+                    : 'text'
+                )}
+                icon={
+                  productionPreviewBranch?.git_branch && (
+                    <Shield className="w-4 h-4 text-warning" strokeWidth={1} />
+                  )
+                }
+                loading={isUpdatingProdBranch || isLoadingBranches}
+                iconRight={
+                  <span className="grow flex justify-end">
+                    <IconChevronDown className={''} />
+                  </span>
+                }
+              >
+                {productionPreviewBranch?.git_branch || 'Select a branch'}
+              </Button>
+            </PopoverTrigger_Shadcn_>
+            <PopoverContent_Shadcn_
+              className="p-0"
+              side="bottom"
+              align="start"
+              style={{ width: comboBoxRef.current?.offsetWidth }}
             >
-              {productionPreviewBranch?.git_branch || 'Select a branch'}
-            </Button>
-          </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_
-            className="p-0"
-            side="bottom"
-            align="start"
-            style={{ width: comboBoxRef.current?.offsetWidth }}
-          >
-            <Command_Shadcn_>
-              <CommandInput_Shadcn_ placeholder="Find branch..." />
-              <CommandList_Shadcn_>
-                <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>
-                <CommandGroup_Shadcn_>
-                  {githubBranches?.map((branch) => {
-                    const active = branch.name === productionPreviewBranch?.git_branch
-                    return (
-                      <CommandItem_Shadcn_
-                        key={branch.name}
-                        value={(branch.name as string).replaceAll('"', '')}
-                        className="cursor-pointer w-full flex items-center justify-between"
-                        onSelect={() => {
-                          setOpen(false)
-                          onUpdateProductionBranch(branch.name)
-                        }}
-                      >
-                        <div className="flex items-center gap-2">
-                          {active ? (
-                            <Shield className="w-4 h-4 text-warning" strokeWidth={1} />
-                          ) : (
-                            <GitBranch className="w-4 h-4" strokeWidth={1} />
-                          )}
-                          {branch.name}
-                        </div>
-                        {branch.name === productionPreviewBranch?.git_branch && <IconCheck />}
-                      </CommandItem_Shadcn_>
-                    )
-                  })}
-                </CommandGroup_Shadcn_>
-              </CommandList_Shadcn_>
-            </Command_Shadcn_>
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
-      </div>
+              <Command_Shadcn_>
+                <CommandInput_Shadcn_ placeholder="Find branch..." />
+                <CommandList_Shadcn_>
+                  <CommandEmpty_Shadcn_>No branches found</CommandEmpty_Shadcn_>
+                  <CommandGroup_Shadcn_>
+                    {githubBranches?.map((branch) => {
+                      const active = branch.name === productionPreviewBranch?.git_branch
+                      return (
+                        <CommandItem_Shadcn_
+                          key={branch.name}
+                          value={(branch.name as string).replaceAll('"', '')}
+                          className="cursor-pointer w-full flex items-center justify-between"
+                          onSelect={() => {
+                            setOpen(false)
+                            onUpdateProductionBranch(branch.name)
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            {active ? (
+                              <Shield className="w-4 h-4 text-warning" strokeWidth={1} />
+                            ) : (
+                              <GitBranch className="w-4 h-4" strokeWidth={1} />
+                            )}
+                            {branch.name}
+                          </div>
+                          {branch.name === productionPreviewBranch?.git_branch && <IconCheck />}
+                        </CommandItem_Shadcn_>
+                      )
+                    })}
+                  </CommandGroup_Shadcn_>
+                </CommandList_Shadcn_>
+              </Command_Shadcn_>
+            </PopoverContent_Shadcn_>
+          </Popover_Shadcn_>
+        </div>
+      )}
 
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
@@ -255,7 +255,7 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
             control={form.control}
             name="supabaseChangesOnly"
             render={({ field }) => (
-              <FormItem_Shadcn_ className="space-y-0 flex gap-x-4 justify-between">
+              <FormItem_Shadcn_ className="space-y-0 flex gap-x-4">
                 <FormControl_Shadcn_>
                   <Switch
                     className="mt-1"

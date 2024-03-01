@@ -93,7 +93,7 @@ The GitHub app will watch for changes in your repository such as file changes, b
         <ScaffoldSectionContent>
           <Markdown content={GitHubContentSectionTop} />
 
-          <ul className="flex flex-col">
+          <ul className="flex flex-col gap-y-2">
             {connections?.map((connection) => (
               <IntegrationConnectionItem
                 key={connection.id}
