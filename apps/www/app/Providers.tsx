@@ -1,69 +1,56 @@
 'use client'
 
-import React from 'react'
-
+import React, { useEffect } from 'react'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
-import { AuthProvider, ThemeProvider, useThemeSandbox } from 'common'
-import { DefaultSeo } from 'next-seo'
-import { AppProps } from 'next/app'
-import Head from 'next/head'
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { usePathname, useSearchParams } from 'next/navigation'
+import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
 import { CommandMenuProvider, PortalToast, themes } from 'ui'
-// import { useConsent } from 'ui-patterns/ConsentToast'
+import { useConsent } from 'ui-patterns/ConsentToast'
 
-import Meta from '~/components/Favicons'
-import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
+import { API_URL } from '~/lib/constants'
 import { post } from '~/lib/fetchWrapper'
 import supabase from '~/lib/supabase'
 
 function Providers({ children }: any) {
-  const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  // const telemetryProps = useTelemetryProps()
-  // const { consentValue, hasAcceptedConsent } = useConsent()
+  const telemetryProps = useTelemetryProps()
+  const { consentValue, hasAcceptedConsent } = useConsent()
 
   useThemeSandbox()
 
-  // function handlePageTelemetry(route: string) {
-  //   return post(`${API_URL}/telemetry/page`, {
-  //     referrer: document.referrer,
-  //     title: document.title,
-  //     route,
-  //     ga: {
-  //       screen_resolution: telemetryProps?.screenResolution,
-  //       language: telemetryProps?.language,
-  //     },
-  //   })
-  // }
+  function handlePageTelemetry(route: string) {
+    return post(`${API_URL}/telemetry/page`, {
+      referrer: document.referrer,
+      title: document.title,
+      route,
+      ga: {
+        screen_resolution: telemetryProps?.screenResolution,
+        language: telemetryProps?.language,
+      },
+    })
+  }
 
-  // useEffect(() => {
-  //   if (!hasAcceptedConsent) return
+  useEffect(() => {
+    if (!hasAcceptedConsent) return
 
-  //   function handleRouteChange(url: string) {
-  //     handlePageTelemetry(url)
-  //   }
+    function handleRouteChange(url: string) {
+      handlePageTelemetry(url)
+    }
 
-  //   // Listen for page changes after a navigation or when the query changes
-  //   router.events.on('routeChangeComplete', handleRouteChange)
-  //   return () => {
-  //     router.events.off('routeChangeComplete', handleRouteChange)
-  //   }
-  // }, [router.events, consentValue])
+    // Listen for page changes after a navigation or when the query changes
+    handleRouteChange(pathname!)
+  }, [pathname, consentValue])
 
-  // useEffect(() => {
-  //   if (!hasAcceptedConsent) return
-  //   /**
-  //    * Send page telemetry on first page load
-  //    */
-  //   if (searchParams) {
-  //     handlePageTelemetry(pathname!)
-  //   }
-  // }, [searchParams, consentValue, pathname])
-
-  const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
-  // const { basePath, pathname } = useRouter()
+  useEffect(() => {
+    if (!hasAcceptedConsent) return
+    /**
+     * Send page telemetry on first page load
+     */
+    if (searchParams) {
+      handlePageTelemetry(pathname!)
+    }
+  }, [searchParams, consentValue, pathname])
 
   const forceDarkMode = pathname === '/' || pathname?.startsWith('/launch-week')
 
