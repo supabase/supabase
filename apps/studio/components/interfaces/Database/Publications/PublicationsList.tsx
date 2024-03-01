@@ -38,7 +38,6 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
       setToggleListenEventValue(null)
     },
   })
-  console.log(data)
 
   const canUpdatePublications = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,

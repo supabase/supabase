@@ -69,7 +69,6 @@ const QueryItem = ({
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess: (data) => onDeleteQuery(data),
     onError: (error, data) => {
-      console.log({ error })
       if (error.message.includes('Contents not found')) {
         onDeleteQuery(data.ids)
       } else {
