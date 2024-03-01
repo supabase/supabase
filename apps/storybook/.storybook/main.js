@@ -10,7 +10,15 @@ function getAbsolutePath(value) {
 
 /** @type { import('@storybook/nextjs').StorybookConfig } */
 const config = {
-  stories: ['../stories/**/*.mdx', '../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
+  stories: [
+    // local stories
+    '../stories/**/*.mdx',
+    '../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    // '../../apps/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    // only expose a few stories as most older based ones are broken
+    '../../../packages/ui/src/components/shadcn/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../../../packages/ui-patterns/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+  ],
   addons: [
     getAbsolutePath('@storybook/addon-links'),
     getAbsolutePath('@storybook/addon-essentials'),
