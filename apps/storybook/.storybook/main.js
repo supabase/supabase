@@ -15,7 +15,7 @@ const config = {
     '../stories/**/*.mdx',
     '../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
     // app based stories
-    '../../studio/components/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    // -- add app based stories here
     // package based stories
     '../../../packages/ui/src/components/shadcn/**/*.stories.@(js|jsx|mjs|ts|tsx)',
     '../../../packages/ui-patterns/**/*.stories.@(js|jsx|mjs|ts|tsx)',
