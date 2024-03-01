@@ -252,10 +252,7 @@ function parseTypeParameter(param: ParamAtom, parent: ParentAtom, fnRef: FnRef) 
   if (!isParseableWithName(param.type)) return undefined
 
   const [typeParameters, ancestor] = getTypeParameters(parent)
-  console.log('laaaa')
-  console.log(typeParameters, param)
   const typeParam = typeParameters.find((some) => some.name === param.type.name)
-  console.log(typeParam)
   if (!typeParam) return undefined
 
   if (isParseable(typeParam)) {
