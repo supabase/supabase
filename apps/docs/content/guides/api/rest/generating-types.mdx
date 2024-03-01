@@ -30,6 +30,12 @@ Generate types for your project to produce the `types/supabase.ts` file:
 npx supabase gen types typescript --project-id "$PROJECT_REF" --schema public > types/supabase.ts
 ```
 
+or in case of local development:
+
+```bash
+npx supabase gen types typescript --local > types/supabase.ts
+```
+
 These types are generated from your database schema. Given a table `public.movies`, the generated types will look like:
 
 ```sql
