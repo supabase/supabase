@@ -6,7 +6,7 @@ import { Button, Input } from 'ui'
 
 import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { useProjectDeleteMutation } from 'data/projects/project-delete-mutation'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
