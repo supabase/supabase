@@ -174,6 +174,8 @@ export { Checkbox as Checkbox_Shadcn_ } from './src/components/shadcn/ui/checkbo
 
 export * from './src/components/shadcn/ui/scroll-area'
 
+export * from './src/components/shadcn/ui/hover-card'
+
 export {
   Collapsible as Collapsible_Shadcn_,
   CollapsibleTrigger as CollapsibleTrigger_Shadcn_,
@@ -204,6 +206,8 @@ export {
   TooltipTrigger as TooltipTrigger_Shadcn_,
   TooltipContent as TooltipContent_Shadcn_,
 } from './src/components/shadcn/ui/tooltip'
+
+export { Toggle as Toggle_Shadcn } from './src/components/shadcn/ui/toggle'
 
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
