@@ -37,10 +37,6 @@ const UtilityPanel = ({
     yKey: '',
   })
 
-  if (result?.error) {
-    return <div>{result.error}</div>
-  }
-
   return (
     <Tabs_Shadcn_ defaultValue="results" className="w-full h-full">
       <TabsList_Shadcn_ className="flex justify-between px-2">
