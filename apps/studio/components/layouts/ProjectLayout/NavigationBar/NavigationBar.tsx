@@ -118,6 +118,7 @@ const NavigationBar = () => {
               icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
               link: `/project/${projectRef}`,
             }}
+            onClick={() => snap.setNavigationPanelOpen(false)}
           />
           <Separator className="my-1 bg-border-muted" />
           {toolRoutes.map((route) => (
@@ -125,6 +126,7 @@ const NavigationBar = () => {
               key={route.key}
               route={route}
               isActive={activeRoute === route.key}
+              onClick={() => snap.setNavigationPanelOpen(false)}
             />
           ))}
           <Separator className="my-1 bg-border-muted" />
@@ -133,6 +135,7 @@ const NavigationBar = () => {
               key={route.key}
               route={route}
               isActive={activeRoute === route.key}
+              onClick={() => snap.setNavigationPanelOpen(false)}
             />
           ))}
           <Separator className="my-1 bg-border-muted" />
@@ -141,7 +144,10 @@ const NavigationBar = () => {
               return (
                 <NavigationIconButton
                   key={route.key}
-                  onClick={() => snap.setShowProjectApiDocs(true)}
+                  onClick={() => {
+                    snap.setShowProjectApiDocs(true)
+                    snap.setNavigationPanelOpen(false)
+                  }}
                   icon={<FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
                 >
                   Project API
@@ -153,6 +159,7 @@ const NavigationBar = () => {
                   key={route.key}
                   route={route}
                   isActive={activeRoute === route.key}
+                  onClick={() => snap.setNavigationPanelOpen(false)}
                 />
               )
             }
@@ -165,13 +172,17 @@ const NavigationBar = () => {
               key={route.key}
               route={route}
               isActive={activeRoute === route.key}
+              onClick={() => snap.setNavigationPanelOpen(false)}
             />
           ))}
 
           {IS_PLATFORM && (
             <NavigationIconButton
               size="tiny"
-              onClick={() => setIsOpen(true)}
+              onClick={() => {
+                setIsOpen(true)
+                snap.setNavigationPanelOpen(false)
+              }}
               type="text"
               icon={<Search size={ICON_SIZE} strokeWidth={2} />}
               rightText={

@@ -1,3 +1,4 @@
+import { noop } from 'lodash'
 import Link from 'next/link'
 import { AnchorHTMLAttributes, forwardRef } from 'react'
 import { cn } from 'ui'
@@ -11,7 +12,7 @@ interface NavigationIconButtonProps extends AnchorHTMLAttributes<HTMLAnchorEleme
 }
 
 const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonProps>(
-  ({ route, isActive = false, ...props }, ref) => {
+  ({ route, isActive = false, onClick = noop, ...props }, ref) => {
     const snap = useAppStateSnapshot()
 
     const iconClasses = [
@@ -38,6 +39,7 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
         ref={ref}
         href={route.link!}
         {...props}
+        onClick={onClick}
         className={cn(classes, props.className)}
       >
         <span className={cn(...iconClasses)} {...props}>
