@@ -248,6 +248,7 @@ export const ForeignKeySelector = ({
                   key={schema.id}
                   value={schema.name}
                   label={schema.name}
+                  className="min-w-96"
                   addOnBefore={() => <IconDatabase size={16} strokeWidth={1.5} />}
                 >
                   <div className="flex items-center gap-2">
@@ -266,7 +267,7 @@ export const ForeignKeySelector = ({
             value={selectedTable?.id ?? 1}
             onChange={(value: string) => updateSelectedTable(Number(value))}
           >
-            <Listbox.Option key="empty" value={1} label="---">
+            <Listbox.Option key="empty" className="min-w-96" value={1} label="---">
               ---
             </Listbox.Option>
             {sortBy(tables, ['schema']).map((table) => {
@@ -275,6 +276,7 @@ export const ForeignKeySelector = ({
                   key={table.id}
                   value={table.id}
                   label={table.name}
+                  className="min-w-96"
                   addOnBefore={() => <Table size={16} strokeWidth={1.5} />}
                 >
                   <div className="flex items-center gap-2">

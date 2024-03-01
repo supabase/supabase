@@ -338,6 +338,8 @@ export const updateColumn = async ({
   payload,
   selectedTable,
   primaryKey,
+  foreignKeyRelations = [],
+  existingForeignKeyRelations = [],
   skipPKCreation,
   skipSuccessMessage = false,
 }: {
@@ -347,14 +349,16 @@ export const updateColumn = async ({
   payload: UpdateColumnPayload
   selectedTable: PostgresTable
   primaryKey?: Constraint
+  foreignKeyRelations?: ForeignKey[]
+  existingForeignKeyRelations?: ForeignKeyConstraint[]
   skipPKCreation?: boolean
   skipSuccessMessage?: boolean
 }) => {
   try {
     const { isPrimaryKey, ...formattedPayload } = payload
     const column = await updateDatabaseColumn({
-      projectRef: projectRef,
-      connectionString: connectionString,
+      projectRef,
+      connectionString,
       id,
       payload: formattedPayload,
     })
@@ -387,6 +391,18 @@ export const updateColumn = async ({
         )
       }
     }
+
+    // Then update foreign keys
+    if (foreignKeyRelations.length > 0) {
+      await updateForeignKeys({
+        projectRef,
+        connectionString,
+        table: { schema: column.schema, name: column.table },
+        foreignKeys: foreignKeyRelations,
+        existingForeignKeyRelations,
+      })
+    }
+
     if (!skipSuccessMessage) toast.success(`Successfully updated column "${column.name}"`)
   } catch (error: any) {
     return { error }
@@ -775,43 +791,13 @@ export const updateTable = async ({
   }
 
   // Foreign keys will get updated here accordingly
-  const relationsToAdd = foreignKeyRelations.filter((x) => typeof x.id === 'string')
-  if (relationsToAdd.length > 0) {
-    await addForeignKey({
-      projectRef,
-      connectionString,
-      table: updatedTable,
-      foreignKeys: relationsToAdd,
-    })
-  }
-
-  const relationsToRemove = foreignKeyRelations.filter((x) => x.toRemove)
-  if (relationsToRemove.length > 0) {
-    await removeForeignKey({
-      projectRef,
-      connectionString,
-      table: updatedTable,
-      foreignKeys: relationsToRemove,
-    })
-  }
-
-  const remainingRelations = foreignKeyRelations.filter(
-    (x) => typeof x.id === 'number' && !x.toRemove
-  )
-  const relationsToUpdate = remainingRelations.filter((x) => {
-    const existingRelation = existingForeignKeyRelations.find((y) => x.id === y.id)
-    if (existingRelation !== undefined) {
-      return checkIfRelationChanged(existingRelation as unknown as ForeignKeyConstraint, x)
-    } else return false
+  await updateForeignKeys({
+    projectRef,
+    connectionString,
+    table: updatedTable,
+    foreignKeys: foreignKeyRelations,
+    existingForeignKeyRelations,
   })
-  if (relationsToUpdate.length > 0) {
-    await updateForeignKey({
-      projectRef,
-      connectionString,
-      table: updatedTable,
-      foreignKeys: relationsToUpdate,
-    })
-  }
 
   const queryClient = getQueryClient()
 
@@ -951,4 +937,55 @@ export const insertTableRows = async (
     onProgressUpdate(insertProgress * 100)
   }
   return { error: insertError }
+}
+
+const updateForeignKeys = async ({
+  projectRef,
+  connectionString,
+  table,
+  foreignKeys,
+  existingForeignKeyRelations,
+}: {
+  projectRef: string
+  connectionString?: string
+  table: { schema: string; name: string }
+  foreignKeys: ForeignKey[]
+  existingForeignKeyRelations: ForeignKeyConstraint[]
+}) => {
+  // Foreign keys will get updated here accordingly
+  const relationsToAdd = foreignKeys.filter((x) => typeof x.id === 'string')
+  if (relationsToAdd.length > 0) {
+    await addForeignKey({
+      projectRef,
+      connectionString,
+      table,
+      foreignKeys: relationsToAdd,
+    })
+  }
+
+  const relationsToRemove = foreignKeys.filter((x) => x.toRemove)
+  if (relationsToRemove.length > 0) {
+    await removeForeignKey({
+      projectRef,
+      connectionString,
+      table,
+      foreignKeys: relationsToRemove,
+    })
+  }
+
+  const remainingRelations = foreignKeys.filter((x) => typeof x.id === 'number' && !x.toRemove)
+  const relationsToUpdate = remainingRelations.filter((x) => {
+    const existingRelation = existingForeignKeyRelations.find((y) => x.id === y.id)
+    if (existingRelation !== undefined) {
+      return checkIfRelationChanged(existingRelation as unknown as ForeignKeyConstraint, x)
+    } else return false
+  })
+  if (relationsToUpdate.length > 0) {
+    await updateForeignKey({
+      projectRef,
+      connectionString,
+      table,
+      foreignKeys: relationsToUpdate,
+    })
+  }
 }

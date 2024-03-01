@@ -206,11 +206,12 @@ const SidePanelEditor = ({
       columnId?: string
       primaryKey?: Constraint
       foreignKeyRelations: ForeignKey[]
+      existingForeignKeyRelations: ForeignKeyConstraint[]
     },
     resolve: any
   ) => {
     const selectedColumnToEdit = snap.sidePanel?.type === 'column' && snap.sidePanel.column
-    const { columnId, primaryKey, foreignKeyRelations } = configuration
+    const { columnId, primaryKey, foreignKeyRelations, existingForeignKeyRelations } = configuration
 
     const response = isNewRecord
       ? await createColumn({
@@ -228,6 +229,8 @@ const SidePanelEditor = ({
           payload: payload as UpdateColumnPayload,
           selectedTable: selectedTable as PostgresTable,
           primaryKey,
+          foreignKeyRelations,
+          existingForeignKeyRelations,
         })
 
     if (response?.error) {

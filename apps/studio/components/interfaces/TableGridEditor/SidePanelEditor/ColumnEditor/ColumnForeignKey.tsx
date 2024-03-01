@@ -1,12 +1,10 @@
 import { useParams } from 'common'
-import { noop } from 'lodash'
 import { useState } from 'react'
 import { Button } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import useTable from 'hooks/misc/useTable'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
 import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { ColumnField } from '../SidePanelEditor.types'
@@ -30,6 +28,7 @@ const ColumnForeignKey = ({
 }: ColumnForeignKeyProps) => {
   const { id: _id } = useParams()
   const [open, setOpen] = useState(false)
+  const [selectedFk, setSelectedFk] = useState<ForeignKey>()
 
   const { project } = useProjectContext()
   const { data } = useForeignKeyConstraintsQuery({
@@ -37,8 +36,6 @@ const ColumnForeignKey = ({
     connectionString: project?.connectionString,
     schema: column.schema,
   })
-
-  console.log({ column })
 
   const id = _id ? Number(_id) : undefined
   const { data: table } = useTable(id)
@@ -59,24 +56,45 @@ const ColumnForeignKey = ({
   return (
     <>
       <div className="flex flex-col gap-y-2">
-        <div>
-          {relations.map((relation) => {
-            const status = getRelationStatus(relation)
-            return (
-              <ForeignKeyRow
-                disabled
-                key={relation.id}
-                layout="vertical"
-                status={status}
-                foreignKey={relation}
-                closePanel={closePanel}
-                onSelectEdit={noop}
-                onSelectRemove={noop}
-                onSelectUndoRemove={noop}
-              />
-            )
-          })}
-        </div>
+        {relations.length > 0 && (
+          <div>
+            {relations.map((relation) => {
+              const status = getRelationStatus(relation)
+              return (
+                <ForeignKeyRow
+                  key={relation.id}
+                  layout="vertical"
+                  status={status}
+                  foreignKey={relation}
+                  closePanel={closePanel}
+                  onSelectEdit={() => {
+                    setOpen(true)
+                    setSelectedFk(relation)
+                  }}
+                  onSelectRemove={() => {
+                    if (status === 'ADD') {
+                      const updatedRelations = relations.filter((x) => x.id !== relation.id)
+                      onUpdateFkRelations(updatedRelations)
+                    } else {
+                      const updatedRelations = relations.map((x) => {
+                        if (x.id === relation.id) return { ...x, toRemove: true }
+                        else return x
+                      })
+                      onUpdateFkRelations(updatedRelations)
+                    }
+                  }}
+                  onSelectUndoRemove={() => {
+                    const updatedRelations = relations.map((x) => {
+                      if (x.id === relation.id) return { ...x, toRemove: false }
+                      else return x
+                    })
+                    onUpdateFkRelations(updatedRelations)
+                  }}
+                />
+              )
+            })}
+          </div>
+        )}
 
         <Button type="default" className="w-min" onClick={() => setOpen(true)}>
           Add foreign key
@@ -95,10 +113,10 @@ const ColumnForeignKey = ({
                 ? (table.columns as any[]).concat(column)
                 : (table.columns as any[]),
           }}
-          foreignKey={undefined}
+          foreignKey={selectedFk}
           onClose={() => {
             setOpen(false)
-            // setSelectedFk(undefined)
+            setSelectedFk(undefined)
           }}
           onSaveRelation={(fk) => {
             const existingRelationIds = relations.map((x) => x.id)
