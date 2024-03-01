@@ -28,7 +28,7 @@ import SchemaSelector from 'components/ui/SchemaSelector'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
-import { useCheckPermissions, useLocalStorage } from 'hooks'
+import { useCheckPermissions, useLocalStorage, useLocalStorageQuery } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
@@ -45,6 +45,12 @@ const TableEditorMenu = () => {
     'table-editor-sort',
     'alphabetical'
   )
+
+  const [selectedSchema, setSelectedSchema] = useLocalStorageQuery(
+    'supabase_table-editor-selected-schema',
+    'public'
+  )
+
   const [isSearchOpen, setIsSearchOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement | null>(null)
   const [isSearchInputFocused, setIsSearchInputFocused] = useState(false)
@@ -66,7 +72,7 @@ const TableEditorMenu = () => {
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schema: snap.selectedSchemaName,
+      schema: selectedSchema,
       search: searchText || undefined,
       sort,
     },
@@ -85,7 +91,7 @@ const TableEditorMenu = () => {
     connectionString: project?.connectionString,
   })
 
-  const schema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
+  const schema = schemas?.find((schema) => schema.name === selectedSchema)
   const canCreateTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   const refreshTables = async () => {
@@ -122,10 +128,10 @@ const TableEditorMenu = () => {
         <div className="flex flex-col gap-1">
           <SchemaSelector
             className="mx-4 h-7"
-            selectedSchemaName={snap.selectedSchemaName}
+            selectedSchemaName={selectedSchema}
             onSelectSchema={(name: string) => {
               setSearchText('')
-              snap.setSelectedSchemaName(name)
+              setSelectedSchema(name)
               router.push(`/project/${project?.ref}/editor`)
             }}
             onSelectCreateSchema={() => snap.onAddSchema()}
