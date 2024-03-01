@@ -1,4 +1,10 @@
-import { Button, IconHeart } from 'ui'
+import {
+  Button,
+  IconHeart,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
 import { useQueryClient } from '@tanstack/react-query'
 import { contentKeys } from 'data/content/keys'
 import { Content, ContentData } from 'data/content/content-query'
@@ -75,23 +81,28 @@ const FavoriteButton = ({ id }: FavoriteButtonProps) => {
   }
 
   return (
-    <>
-      {isFavorite ? (
-        <Button
-          type="text"
-          size="tiny"
-          onClick={removeFavorite}
-          icon={<IconHeart size="tiny" fill="#48bb78" />}
-        />
-      ) : (
-        <Button
-          type="text"
-          size="tiny"
-          onClick={addFavorite}
-          icon={<IconHeart size="tiny" fill="gray" />}
-        />
-      )}
-    </>
+    <Tooltip_Shadcn_>
+      <TooltipTrigger_Shadcn_ asChild>
+        {isFavorite ? (
+          <Button
+            type="text"
+            size="tiny"
+            onClick={removeFavorite}
+            className="px-1"
+            icon={<IconHeart size="tiny" fill="#48bb78" />}
+          />
+        ) : (
+          <Button
+            type="text"
+            size="tiny"
+            onClick={addFavorite}
+            className="px-1"
+            icon={<IconHeart size="tiny" fill="gray" />}
+          />
+        )}
+      </TooltipTrigger_Shadcn_>
+      <TooltipContent_Shadcn_ side="bottom">Add to favorites</TooltipContent_Shadcn_>
+    </Tooltip_Shadcn_>
   )
 }
 
