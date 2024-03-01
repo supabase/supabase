@@ -26,7 +26,7 @@ import {
   cn,
 } from 'ui'
 
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
 import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
