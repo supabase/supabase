@@ -23,7 +23,13 @@ import {
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
-import { useCheckPermissions, useProjectByRef, useSelectedOrganization, useStore } from 'hooks'
+import {
+  useCheckPermissions,
+  useFlag,
+  useProjectByRef,
+  useSelectedOrganization,
+  useStore,
+} from 'hooks'
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
 
@@ -31,6 +37,10 @@ const General = () => {
   const { ui } = useStore()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
+
+  // Also doubles up as a feature flag to enable display of the related alert,
+  // another dedicated flag would be redundant.
+  const v2AnnouncementUrl = useFlag('v2AnnouncementUrl')
 
   const parentProject = useProjectByRef(project?.parent_project_ref)
   const isBranch = parentProject !== undefined
@@ -120,16 +130,44 @@ const General = () => {
         <>
           <div className="mt-6" id="restart-project">
             <FormPanel>
-              <div className="flex w-full items-center justify-between px-8 py-4">
-                <div>
-                  <p className="text-sm">Restart project</p>
-                  <div className="max-w-[420px]">
-                    <p className="text-sm text-foreground-light">
-                      Your project will not be available for a few minutes.
-                    </p>
+              <div className="flex flex-col px-8 py-4">
+                {project?.v2MaintenanceWindow && v2AnnouncementUrl !== 'https://' && (
+                  <Alert_Shadcn_ variant="warning" className="mb-4">
+                    <IconAlertCircle strokeWidth={2} />
+                    <AlertTitle_Shadcn_>Migration to v2 platform architecture</AlertTitle_Shadcn_>
+                    <AlertDescription_Shadcn_>
+                      Your project has been scheduled for{' '}
+                      <a href={v2AnnouncementUrl}>migration to v2 platform architecture</a>, which
+                      requires a restart.
+                      <br />
+                      <br />
+                      If you don't take any action, we plan to do the restart automatically during
+                      the following 30-minute maintenance window, where your project has
+                      historically had the least database queries across the previous 10 weeks:
+                      <br />
+                      <br />
+                      {project.v2MaintenanceWindow.start?.substring(0, 10)}{' '}
+                      {project.v2MaintenanceWindow.start?.substring(11, 16)} to{' '}
+                      {project.v2MaintenanceWindow.end?.substring(11, 16)} UTC
+                      <br />
+                      <br />
+                      Any time before the maintenance window, you may choose to restart your project
+                      yourself from here, at a time most convenient for you. Your project will be
+                      restarted on v2 architecture.
+                    </AlertDescription_Shadcn_>
+                  </Alert_Shadcn_>
+                )}
+                <div className="flex justify-between">
+                  <div>
+                    <p className="text-sm">Restart project</p>
+                    <div className="max-w-[420px]">
+                      <p className="text-sm text-foreground-light">
+                        Your project will not be available for a few minutes.
+                      </p>
+                    </div>
                   </div>
+                  <RestartServerButton />
                 </div>
-                <RestartServerButton />
               </div>
               <div
                 className="flex w-full items-center justify-between px-8 py-4"
