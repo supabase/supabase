@@ -20,6 +20,7 @@ import {
   IconSettings,
   IconX,
   Input_Shadcn_,
+  Loading,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
@@ -868,7 +869,11 @@ const SQLEditor = () => {
             )}
 
             {isLoading ? (
-              <div className="flex h-full w-full items-center justify-center">Loading...</div>
+              <div className="flex h-full w-full items-center justify-center">
+                <Loading active={true}>
+                  <></>
+                </Loading>
+              </div>
             ) : (
               <>
                 {isDiffOpen && (
@@ -980,7 +985,11 @@ const SQLEditor = () => {
           <ResizableHandle withHandle />
           <ResizablePanel collapsible collapsedSize={10} minSize={20}>
             {isLoading ? (
-              <div className="flex h-full w-full items-center justify-center">Loading...</div>
+              <div className="flex h-full w-full items-center justify-center">
+                <Loading active={true}>
+                  <></>
+                </Loading>
+              </div>
             ) : (
               <UtilityPanel
                 id={id}
