@@ -269,12 +269,14 @@ export const createColumn = async ({
   payload,
   selectedTable,
   primaryKey,
+  foreignKeyRelations = [],
 }: {
   projectRef: string
   connectionString: string | undefined
   payload: CreateColumnPayload
   selectedTable: PostgresTable
   primaryKey?: Constraint
+  foreignKeyRelations?: ForeignKey[]
 }) => {
   const toastId = toast.loading(`Creating column "${payload.name}"...`)
   try {
@@ -311,6 +313,17 @@ export const createColumn = async ({
         primaryKeyColumns
       )
     }
+
+    // Then add the foreign key constraints here
+    if (foreignKeyRelations.length > 0) {
+      await addForeignKey({
+        projectRef,
+        connectionString,
+        table: { schema: column.schema, name: column.table },
+        foreignKeys: foreignKeyRelations,
+      })
+    }
+
     toast.success(`Successfully created column "${column.name}"`, { id: toastId })
   } catch (error: any) {
     toast.error(`An error occurred while creating the column "${payload.name}"`, { id: toastId })

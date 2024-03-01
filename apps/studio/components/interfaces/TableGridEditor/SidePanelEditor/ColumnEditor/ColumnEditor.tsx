@@ -45,6 +45,7 @@ import {
 import ColumnForeignKey from './ColumnForeignKey'
 import ColumnType from './ColumnType'
 import HeaderTitle from './HeaderTitle'
+import toast from 'react-hot-toast'
 
 export interface ColumnEditorProps {
   column?: PostgresColumn
@@ -57,6 +58,7 @@ export interface ColumnEditorProps {
     configuration: {
       columnId?: string
       primaryKey?: Constraint
+      foreignKeyRelations: ForeignKey[]
     },
     resolve: any
   ) => void
@@ -147,7 +149,7 @@ const ColumnEditor = ({
         const payload = isNewRecord
           ? generateCreateColumnPayload(selectedTable.id, columnFields)
           : generateUpdateColumnPayload(column!, selectedTable, columnFields)
-        const configuration = { columnId: column?.id, primaryKey }
+        const configuration = { columnId: column?.id, primaryKey, foreignKeyRelations: fkRelations }
         saveChanges(payload, isNewRecord, configuration, resolve)
       } else {
         resolve()
@@ -291,13 +293,13 @@ const ColumnEditor = ({
         header={<FormSectionLabel className="lg:!col-span-4">Foreign Keys</FormSectionLabel>}
       >
         <FormSectionContent loading={false} className="lg:!col-span-8">
-          <div>
-            <ColumnForeignKey
-              column={columnFields}
-              relations={fkRelations}
-              closePanel={closePanel}
-            />
-          </div>
+          <ColumnForeignKey
+            column={columnFields}
+            relations={fkRelations}
+            closePanel={closePanel}
+            onUpdateColumnType={(format: string) => onUpdateField({ format, defaultValue: null })}
+            onUpdateFkRelations={setFkRelations}
+          />
         </FormSectionContent>
       </FormSection>
       <SidePanel.Separator />
