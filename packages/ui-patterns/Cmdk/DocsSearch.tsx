@@ -16,8 +16,12 @@ import {
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 import { Button } from 'ui'
-import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'
 import { useCommandMenu } from './CommandMenuProvider'
+import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'
+
+const NUMBER_SOURCES = 2
+
+const FUNCTIONS_URL = '/functions/v1/'
 
 const questions = [
   'How do I get started with Supabase?',

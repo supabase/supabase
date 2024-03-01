@@ -1,7 +1,7 @@
 'use client'
 
 import { useTelemetryProps } from 'common'
-import { useRouter } from 'next/compat/router'
+import { usePathname } from 'next/navigation'
 import { useCallback, useEffect } from 'react'
 
 import { useConsent } from 'ui-patterns/ConsentToast'
@@ -38,40 +38,15 @@ const useSendPageTelemetryWithConsentCheck = () => {
   return sendPageTelemetry
 }
 
-const useTriggerPageTelemetryOnFirstLoad = () => {
-  const router = useRouter()
-  const sendPageTelemetry = useSendPageTelemetryWithConsentCheck()
-
-  /**
-   * [Charis] I suspect this is running too often (copied from existing code),
-   * but not going to mess about and potentially break something right now.
-   */
-  useEffect(() => {
-    if (router && router.isReady) {
-      sendPageTelemetry(router.basePath + router.asPath)
-    }
-  }, [router, sendPageTelemetry])
-}
-
-const useTriggerPageTelemetryOnPageChange = () => {
-  const router = useRouter()
-  const sendPageTelemetry = useSendPageTelemetryWithConsentCheck()
-
-  useEffect(() => {
-    const handleRouteChange = (url: string) => {
-      sendPageTelemetry(url)
-    }
-
-    if (router) router.events.on('routeChangeComplete', handleRouteChange)
-    return () => {
-      if (router) router.events.off('routeChangeComplete', handleRouteChange)
-    }
-  }, [router, sendPageTelemetry])
-}
-
 const PageTelemetry = () => {
-  useTriggerPageTelemetryOnFirstLoad()
-  useTriggerPageTelemetryOnPageChange()
+  const pathname = usePathname()
+  const sendPageTelemetry = useSendPageTelemetryWithConsentCheck()
+
+  useEffect(() => {
+    if (pathname) {
+      sendPageTelemetry(pathname)
+    }
+  }, [pathname, sendPageTelemetry])
 
   return null
 }

@@ -1,4 +1,4 @@
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/compat/router'
 import { useMemo } from 'react'
 
 /**
@@ -22,7 +22,8 @@ function convertToCamelCase(key: string): string {
 export function useParams(): {
   [k: string]: string | undefined
 } {
-  const { query } = useRouter()
+  const router = useRouter()
+  const query = router?.query
 
   const modifiedQuery = {
     ...query,

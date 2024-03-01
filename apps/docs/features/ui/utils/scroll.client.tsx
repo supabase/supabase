@@ -1,30 +1,23 @@
 'use client'
 
-import { useRouter } from 'next/compat/router'
+import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 
 import { DOCS_CONTENT_CONTAINER_ID } from './uiConstants'
 
 const useScrollTopOnPageChange = () => {
-  const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
-    const handleRouteChange = (url: string) => {
-      if (document) {
-        // Don't scroll on reference pages
-        if (url.includes('reference/')) return
+    if (document && pathname) {
+      // Don't scroll on reference pages
+      if (pathname.includes('reference/')) return
 
-        const container = document.getElementById(DOCS_CONTENT_CONTAINER_ID)
-        if (container) container.scrollTop = 0
-        // TODO: Check and handle focus management for a11y
-      }
+      const container = document.getElementById(DOCS_CONTENT_CONTAINER_ID)
+      if (container) container.scrollTop = 0
+      // TODO: Check and handle focus management for a11y
     }
-
-    if (router) router.events.on('routeChangeComplete', handleRouteChange)
-    return () => {
-      if (router) router.events.off('routeChangeComplete', handleRouteChange)
-    }
-  }, [router])
+  }, [pathname])
 }
 
 /**
@@ -42,7 +35,7 @@ const isPerformanceNavigationTiming = (
  * Required since scroll happens within a sub-container, not the page root.
  */
 const useRestoreScroll = () => {
-  const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     const STORAGE_KEY = 'scroll-position'
@@ -52,17 +45,19 @@ const useRestoreScroll = () => {
       return
     }
 
-    const previousScroll = Number(sessionStorage.getItem(STORAGE_KEY))
-    const [entry] = window.performance.getEntriesByType('navigation')
+    if (pathname !== '/') {
+      const previousScroll = Number(sessionStorage.getItem(STORAGE_KEY))
+      const [entry] = window.performance.getEntriesByType('navigation')
 
-    // Only restore scroll position on reload and back/forward events
-    if (
-      previousScroll &&
-      entry &&
-      isPerformanceNavigationTiming(entry) &&
-      ['reload', 'back_forward'].includes(entry.type)
-    ) {
-      container.scrollTop = previousScroll
+      // Only restore scroll position on reload and back/forward events
+      if (
+        previousScroll &&
+        entry &&
+        isPerformanceNavigationTiming(entry) &&
+        ['reload', 'back_forward'].includes(entry.type)
+      ) {
+        container.scrollTop = previousScroll
+      }
     }
 
     const handler = () => {
@@ -73,7 +68,7 @@ const useRestoreScroll = () => {
     window.addEventListener('beforeunload', handler)
 
     return () => window.removeEventListener('beforeunload', handler)
-  }, [router])
+  }, [pathname])
 }
 
 const ScrollRestoration = () => {

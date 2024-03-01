@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/compat/router'
+import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 /**
@@ -15,7 +15,7 @@ const RefDocHistoryHandler = () => {
 
   useEffect(() => {
     const handler = () => {
-      if (router) router.replace(window.location.href)
+      router.replace(window.location.href)
     }
 
     window.addEventListener('popstate', handler)

@@ -26,7 +26,9 @@ const metadata: Metadata = {
     'Supabase is an open source Firebase alternative providing all the backend features you need to build a product.',
   ...generalMetadata,
   ...alternates,
-  ...favicons,
+  icons: {
+    other: favicons,
+  },
 }
 
 const RootLayout = ({ children }: { children: React.ReactNode }) => {
