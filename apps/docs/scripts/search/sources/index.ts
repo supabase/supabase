@@ -105,7 +105,7 @@ export async function fetchSources() {
 
   const guideSources = [...pagesSources, ...contentSources]
 
-  const partnerIntegrationSources = (await fetchPartners()).map((partner) =>
+  const partnerIntegrationSources = ((await fetchPartners()) ?? []).map((partner) =>
     new IntegrationLoader(partner.slug, partner).load()
   )
 
@@ -117,6 +117,7 @@ export async function fetchSources() {
     )
   ).map((discussion) => new GitHubDiscussionLoader('supabase/supabase', discussion).load())
 
+  // @ts-ignore - undefined is taken care of the filter(Boolean)
   const sources: SearchSource[] = (
     await Promise.all([
       openApiReferenceSource,
@@ -131,7 +132,7 @@ export async function fetchSources() {
       ...partnerIntegrationSources,
       ...guideSources,
     ])
-  ).flat()
+  ).flat().filter(Boolean)
 
   return sources
 }

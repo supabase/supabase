@@ -1,3 +1,5 @@
+'use client'
+
 import { useParams } from 'common'
 import { useRouter } from 'next/navigation'
 import * as React from 'react'

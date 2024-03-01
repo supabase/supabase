@@ -132,7 +132,7 @@ const AppleSecretGenerator = () => {
         <input
           type="file"
           onChange={(e) => {
-            setFile({ file: e.target.files[0] })
+            if (e.target.files) setFile({ file: e.target.files[0] })
           }}
         />
       </div>
@@ -151,6 +151,8 @@ const AppleSecretGenerator = () => {
           setError('')
 
           try {
+            if (!file.file) throw Error('No file selected.')
+
             const { kid, jwt, exp } = await generateAppleSecretKey(
               keyID,
               teamID,

@@ -1,8 +1,8 @@
 import { createContext, useContext } from 'react'
 
 interface ContextProps {
-  activeRefItem: string
-  setActiveRefItem: (x: string) => void
+  activeRefItem: string | undefined
+  setActiveRefItem: ((x: string) => void) | undefined
 }
 
 interface Provider extends ContextProps {

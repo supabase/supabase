@@ -28,7 +28,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
     if (foundItem) return group
   })
 
-  const currentSubSection: NavMenuSection =
+  const currentSubSection: NavMenuSection | undefined =
     currentSection !== undefined
       ? currentSection.items.find((section) => {
           if (section.items.length === 0) {
@@ -113,7 +113,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                 {group.items.map((section: NavMenuSection) => {
                   if (section.items.length === 0) {
                     return (
-                      <Link href={section.url} key={section.name}>
+                      <Link href={section.url || '#'} key={section.name}>
                         <div
                           className={[
                             'py-1.5 px-5 rounded text-sm transition',
@@ -150,7 +150,7 @@ const SideBar = ({ menuItems = [] }: { menuItems: any }) => {
                           </Accordion.Trigger>
                           <Accordion.Content className="my-2 data-open:animate-slide-down data-closed:animate-slide-up">
                             {section.items.map((item: NavMenuSection) => (
-                              <Link key={item.name} href={item.url}>
+                              <Link key={item.name} href={item.url || '#'}>
                                 <div
                                   key={item.name}
                                   className={[

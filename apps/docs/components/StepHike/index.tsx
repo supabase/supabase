@@ -3,7 +3,7 @@ import { useInView } from 'react-intersection-observer'
 import { StepHikeContext } from './StepHikeContext'
 
 const StepHike = ({ children, title }) => {
-  const [activeStep, setActiveStep] = useState(undefined)
+  const [activeStep, setActiveStep] = useState<{ titleId: string; step: number }>()
 
   // check if there are any children
   if (!children) throw 'StepHike component requires <StepHike.Step> children'
@@ -17,7 +17,7 @@ const StepHike = ({ children, title }) => {
       titleId: steps[0].props.title.replaceAll(' ', '-').toLowerCase(),
       step: 0,
     })
-  }, [])
+  }, [steps])
 
   // check if there is at least 1 StepHike subcomponent
   if (steps.length === 0 || !steps)

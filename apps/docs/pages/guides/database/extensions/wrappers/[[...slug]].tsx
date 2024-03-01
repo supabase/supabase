@@ -123,7 +123,9 @@ export default function WrappersDocs({
  */
 export const getStaticProps: GetStaticProps = async (args) => {
   const { params } = args
-  const federatedPage = pageMap.find(({ slug }) => slug === params.slug.at(0))
+  const federatedPage = pageMap.find(
+    ({ slug }) => params && params.slug && slug === params.slug.at(0)
+  )
 
   if (!federatedPage) {
     const { props } = await getGuidesStaticProps('database/extensions/wrappers', args)

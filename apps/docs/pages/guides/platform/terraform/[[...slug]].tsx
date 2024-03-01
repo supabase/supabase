@@ -99,7 +99,7 @@ const urlTransform: UrlTransformFunction = (url: string) => {
  * Fetch markdown from external repo and transform links
  */
 export const getStaticProps = (async ({ params }) => {
-  const [slug] = params.slug ?? []
+  const [slug] = params?.slug ?? []
   const page = pageMap.find((page) => page.slug === slug)
 
   if (!page) {

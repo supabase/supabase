@@ -10,6 +10,13 @@ import { useRerenderOnEvt } from '~/hooks/useManualRerender'
 import { removeAnchor } from './CustomHTMLElements/CustomHTMLElements.utils'
 import { Feedback } from './Feedback'
 
+export interface TOCHeader {
+  id: string
+  text: string
+  link: string
+  level: number
+}
+
 const formatSlug = (slug: string) => {
   // [Joshen] We will still provide support for headers declared like this:
   //    ## REST API {#rest-api-overview}
@@ -20,7 +27,7 @@ const formatSlug = (slug: string) => {
 
 const formatTOCHeader = (content: string) => {
   let begin = false
-  const res = []
+  const res: Array<string> = []
   for (const x of content) {
     if (x === '`') {
       if (!begin) {
@@ -46,7 +53,7 @@ const GuidesTableOfContents = ({
   overrideToc?: Array<{ text: string; link: string; level: number }>
   video?: string
 }) => {
-  const [tocList, setTocList] = useState([])
+  const [tocList, setTocList] = useState<TOCHeader[]>([])
   const pathname = usePathname()
   const [hash] = useHash()
 
@@ -66,11 +73,13 @@ const GuidesTableOfContents = ({
       const newHeadings = headings
         .filter((heading) => heading.id)
         .map((heading) => {
-          const text = heading.textContent.replace('#', '')
-          const link = heading.querySelector('a').getAttribute('href')
+          const text = heading.textContent?.replace('#', '')
+          const link = heading.querySelector('a')?.getAttribute('href')
           const level = heading.tagName === 'H2' ? 2 : 3
-          return { text, link, level }
+
+          return { text, link, level } as Partial<TOCHeader>
         })
+        .filter((x): x is TOCHeader => !!x.text && !!x.link && !!x.level)
       setTocList(newHeadings)
     })
 

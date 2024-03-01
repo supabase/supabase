@@ -36,45 +36,41 @@ export async function constructHeaders(
   return headers
 }
 
-export const get: typeof _get = async (url, init) => {
-  let headers: Headers = null
-  try {
-    headers = await constructHeaders(init?.headers)
-  } catch (err) {
-    console.error(err)
-    return { error: err, response: undefined }
-  }
+/**
+ * [Charis] A bunch of ts-ignore here because there's soemthing on with the
+ * type inference, where I can't get it to both:
+ * 
+ * - Be happy with the passed init argument
+ * - Properly infer the types of the fetch responses, as intended
+ */
 
+// @ts-ignore
+export const get: typeof _get = async (url, init) => {
+  const headers = await constructHeaders(init?.headers)
+
+  // @ts-ignore
   return await _get(url, {
     ...init,
     headers,
   })
 }
 
+// @ts-ignore
 export const post: typeof _post = async (url, init) => {
-  let headers: Headers = null
-  try {
-    headers = await constructHeaders(init?.headers)
-  } catch (err) {
-    console.error(err)
-    return { error: err, response: undefined }
-  }
+  const headers = await constructHeaders(init?.headers)
 
+  // @ts-ignore
   return await _post(url, {
     ...init,
     headers,
   })
 }
 
+// @ts-ignore
 export const unauthedAllowedPost: typeof _post = async (url, init) => {
-  let headers: Headers = null
-  try {
-    headers = await constructHeaders(init?.headers, { allowUnauthenticated: true })
-  } catch (err) {
-    console.error(err)
-    return { error: err, response: undefined }
-  }
+  const headers = await constructHeaders(init?.headers, { allowUnauthenticated: true })
 
+  // @ts-ignore
   return await _post(url, {
     ...init,
     headers,

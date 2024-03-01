@@ -54,7 +54,7 @@ export abstract class ReferenceLoader<SpecSection> extends BaseLoader {
           this.meta
         )
       })
-      .filter(Boolean)
+      .filter(Boolean) as Array<ReferenceSource<SpecSection>>
 
     return sections
   }
@@ -133,7 +133,7 @@ export class OpenApiReferenceLoader extends ReferenceLoader<enrichedOperation> {
     return generatedSpec.operations
   }
   matchSpecSection(operations: enrichedOperation[], id: string): enrichedOperation {
-    return operations.find((operation) => operation.operationId === id)
+    return operations.find((operation) => operation.operationId === id)!
   }
 }
 
@@ -162,7 +162,7 @@ export class OpenApiReferenceSource extends ReferenceSource<enrichedOperation> {
 
   extractIndexedContent(): string {
     const { summary, description, operation, tags } = this.specSection
-    return `${this.meta.title}\n\n${summary}\n\n${description}\n\n${operation}\n\n${tags.join(
+    return `${this.meta.title}\n\n${summary}\n\n${description}\n\n${operation}\n\n${(tags ?? []).join(
       ', '
     )}`
   }
@@ -186,7 +186,7 @@ export class ClientLibReferenceLoader extends ReferenceLoader<IFunctionDefinitio
     return spec.functions
   }
   matchSpecSection(functionDefinitions: IFunctionDefinition[], id: string): IFunctionDefinition {
-    return functionDefinitions.find((functionDefinition) => functionDefinition.id === id)
+    return functionDefinitions.find((functionDefinition) => functionDefinition.id === id)!
   }
 }
 
@@ -234,7 +234,7 @@ export class CliReferenceLoader extends ReferenceLoader<CliCommand> {
     return spec.commands
   }
   matchSpecSection(cliCommands: CliCommand[], id: string): CliCommand {
-    return cliCommands.find((cliCommand) => cliCommand.id === id)
+    return cliCommands.find((cliCommand) => cliCommand.id === id)!
   }
 }
 

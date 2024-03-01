@@ -1,3 +1,5 @@
+'use client'
+
 import type OpenAI from 'openai'
 import {
   Dispatch,
