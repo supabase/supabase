@@ -87,7 +87,7 @@ function kebabToNested(obj) {
  */
 const uiConfig = ui({
   mode: 'JIT',
-  darkMode: [ 'class', '[data-theme*="dark"]' ],
+  darkMode: ['class', '[data-theme*="dark"]'],
   theme: {
     /**
      * Spread all theme colors and custom generated colors into theme
@@ -102,7 +102,7 @@ const uiConfig = ui({
       /*
        * custom background re-maps
        */
-      "studio": `hsl(var(--background-200)/ <alpha-value>)`
+      studio: `hsl(var(--background-200)/ <alpha-value>)`,
     }),
     borderColor: (theme) => ({
       ...theme('colors'),
@@ -361,8 +361,8 @@ const uiConfig = ui({
         xs: '480px',
       },
       fontFamily: {
-        sans: [ 'Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif' ],
-        mono: [ 'Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace' ],
+        sans: ['Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+        mono: ['Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace'],
       },
 
       // shadcn defaults START
@@ -375,6 +375,15 @@ const uiConfig = ui({
       animation: {
         'flash-code': 'flash-code 1s forwards',
         'flash-code-slow': 'flash-code 2s forwards',
+      },
+      borderRadius: {
+        // lg: `var(--radius)`,
+        // md: `calc(var(--radius) - 2px)`,
+        // sm: 'calc(var(--radius) - 4px)',
+        panel: '6px',
+      },
+      padding: {
+        content: '21px',
       },
       // borderRadius: {
       //   lg: `var(--radius)`,
@@ -397,8 +406,8 @@ const uiConfig = ui({
       // shadcn defaults END
     },
   },
-  plugins: [ require('@tailwindcss/typography'), require('tailwindcss-animate') ],
-});
+  plugins: [require('@tailwindcss/typography'), require('tailwindcss-animate')],
+})
 
 function arrayMergeFn(destinationArray, sourceArray) {
   return destinationArray.concat(sourceArray).reduce((acc, cur) => {

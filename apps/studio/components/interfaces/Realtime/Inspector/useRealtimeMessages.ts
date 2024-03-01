@@ -64,16 +64,12 @@ export const useRealtimeMessages = ({
   enableDbChanges,
   enableBroadcast,
 }: RealtimeConfig) => {
+  const { data } = useProjectApiQuery({ projectRef: projectRef })
+
   // the default host is prod until the correct one comes through an API call.
-  const [host, setHost] = useState(`https://${projectRef}.supabase.co`)
-  useProjectApiQuery(
-    { projectRef: projectRef },
-    {
-      onSuccess: (data) => {
-        setHost(`${data.autoApiService.protocol}://${data.autoApiService.endpoint}`)
-      },
-    }
-  )
+  const host = data
+    ? `${data.autoApiService.protocol}://${data.autoApiService.endpoint}`
+    : `https://${projectRef}.supabase.co`
 
   const [logData, dispatch] = useReducer(reducer, [] as LogData[])
   const pushMessage = (messageType: string, metadata: any) => {
