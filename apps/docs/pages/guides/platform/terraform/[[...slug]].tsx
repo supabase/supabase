@@ -39,7 +39,7 @@ const pageMap = [
   },
 ]
 
-export default function PGGraphQLDocs({
+export default function TerraformDocs({
   source,
   meta,
   editLink,
