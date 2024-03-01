@@ -4,5 +4,8 @@ teams/docs:
 teams/frontend:
   - apps/studio/**/*
 
-teams/devrel:
+teams/website:
   - apps/www/**/*
+
+teams/cli:
+  - docker/**/*
