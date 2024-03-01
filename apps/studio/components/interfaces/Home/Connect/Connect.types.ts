@@ -4,6 +4,7 @@ export type projectKeys = {
 }
 
 export interface ContentFileProps {
+  region?: string
   projectRef?: string
   projectKeys: {
     apiUrl: string
