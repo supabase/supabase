@@ -19,7 +19,7 @@ import { useTheme } from 'next-themes'
 
 export interface CodeBlockProps {
   title?: string
-  language: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json' | 'csharp' | 'kotlin'
+  language?: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json' | 'csharp' | 'kotlin'
   linesToHighlight?: number[]
   hideCopy?: boolean
   hideLineNumbers?: boolean
