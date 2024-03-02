@@ -9,6 +9,7 @@ import rehypeSlug from 'rehype-slug'
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
 import components from '~/components'
+import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import Layout from '~/layouts/DefaultGuideLayout'
 import { isValidGuideFrontmatter } from '~/lib/docs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
@@ -17,18 +18,19 @@ import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
 
 // We fetch these docs at build time from an external repo
-const org = 'supabase'
-const repo = 'terraform-provider-supabase'
-const branch = 'main'
-const docsDir = 'docs'
+export const org = 'supabase'
+export const repo = 'terraform-provider-supabase'
+export const branch = 'v1.1.3'
+export const docsDir = 'docs'
 
 // Each external docs page is mapped to a local page
 const pageMap = [
   {
-    remoteFile: 'index.md',
+    remoteFile: 'README.md',
     meta: {
       title: 'Terraform Provider',
     },
+    useRoot: true,
   },
   {
     slug: 'tutorial',
@@ -45,10 +47,52 @@ export default function TerraformDocs({
   editLink,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
-    <Layout meta={meta} editLink={editLink}>
+    <Layout menuId={MenuId.Platform} meta={meta} editLink={editLink}>
       <MDXRemote {...source} components={components} />
     </Layout>
   )
+}
+
+/**
+ * The GitHub repo uses relative links, which don't lead to the right locations
+ * in docs.
+ *
+ * @param url The original link, as written in the Markdown file
+ * @returns The rewritten link
+ */
+const urlTransform: UrlTransformFunction = (url: string) => {
+  try {
+    const placeholderHostname = 'placeholder'
+    const { hostname, pathname, hash } = new URL(url, `http://${placeholderHostname}`)
+
+    // Don't modify a url with a FQDN or a url that's only a hash
+    if (hostname !== placeholderHostname || pathname === '/') {
+      return url
+    }
+
+    const getBasename = (pathname: string) =>
+      pathname.endsWith('.md') ? pathname.replace(/\.md$/, '') : pathname
+    const stripLeadingPrefix = (pathname: string) => pathname.replace(/^\//, '')
+    const stripLeadingDocs = (pathname: string) => pathname.replace(/^docs\//, '')
+
+    const relativePath = stripLeadingPrefix(getBasename(pathname))
+
+    const page = pageMap.find(
+      ({ remoteFile, useRoot }) =>
+        (useRoot && `${relativePath}.md` === remoteFile) ||
+        (!useRoot && `${stripLeadingDocs(relativePath)}.md` === remoteFile)
+    )
+
+    if (page) {
+      return 'terraform' + `/${page.slug}` + hash
+    }
+
+    // If we don't have this page in our docs, link to GitHub repo
+    return `https://github.com/${org}/${repo}/blob/${branch}${pathname}${hash}`
+  } catch (err) {
+    console.error('Error transforming markdown URL', err)
+    return url
+  }
 }
 
 /**
@@ -62,10 +106,10 @@ export const getStaticProps = (async ({ params }) => {
     throw new Error(`No page mapping found for slug '${slug}'`)
   }
 
-  const { meta, remoteFile } = page
+  const { meta, remoteFile, useRoot } = page
 
   let response = await fetch(
-    `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
+    `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${useRoot ? '' : `${docsDir}/`}${remoteFile}`
   )
 
   let content = await response.text()
@@ -76,32 +120,6 @@ export const getStaticProps = (async ({ params }) => {
 
   if (!isValidGuideFrontmatter(meta)) {
     throw Error('Guide frontmatter is invalid.')
-  }
-
-  const urlTransform: UrlTransformFunction = (url) => {
-    try {
-      const placeholderHostname = 'placeholder'
-      const { hostname, pathname, hash } = new URL(url, `http://${placeholderHostname}`)
-
-      // Don't modify a url with a FQDN
-      if (hostname !== placeholderHostname) {
-        return url
-      }
-
-      const page = pageMap.find(
-        ({ remoteFile }) => `${pathname.replace(/^\//, '')}.md` === remoteFile
-      )
-
-      // If we have a mapping for this page, use the mapped path
-      if (page) {
-        return 'terraform/' + page.slug + hash
-      }
-
-      throw Error("We don't have this page.")
-    } catch (err) {
-      console.error('Error transforming markdown URL', err)
-      return url
-    }
   }
 
   const codeHikeOptions: CodeHikeConfig = {

@@ -1668,6 +1668,10 @@ export const platform: NavMenuConstant = {
           name: 'Terraform Tutorial',
           url: '/guides/platform/terraform/tutorial',
         },
+        {
+          name: 'Reference',
+          url: '/guides/platform/terraform/reference'
+        }
       ],
     },
     {
