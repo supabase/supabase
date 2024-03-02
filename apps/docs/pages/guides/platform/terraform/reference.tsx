@@ -137,7 +137,7 @@ function Resources({ schema }: { schema: any }) {
                           <PopoverTrigger_Shadcn_ asChild>
                             <button className="flex items-center justify-between gap-2">
                               Nested type
-                              <IconPlusCircle size={14} />
+                              <IconPlusCircle size={14} className="shrink-0" />
                             </button>
                           </PopoverTrigger_Shadcn_>
                           <PopoverContent_Shadcn_ className="max-h-[50vh] overflow-auto">
