@@ -422,7 +422,199 @@ export async function updateSession(request: NextRequest) {
 </TabPanel>
 </Tabs>
 
-## Set up a login component
+## Set up a login page
+
+### Login and Signup form
+Standard to any application with authentication. We need to have a login/signup page. 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+First, we need to create a new folder `login`, and a new `page.jsx` with the following form to accept login/signup request.
+```jsx app/login/page.jsx
+import { login, signup } from './actions'
+
+export default function LoginPage() {
+  return (
+    <form>
+      <label htmlFor="email">Email:</label>
+      <input id="email" name="email" type="email" required />
+      <label htmlFor="password">Password:</label>
+      <input id="password" name="password" type="password" required />
+      <button formAction={login}>Log in</button>
+      <button formAction={signup}>Sign up</button>
+    </form>
+  )
+}
+```
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+First, we need to create a new folder `login`, and a new `page.tsx` with the following form to accept login/signup request.
+```tsx app/login/page.tsx
+import { login, signup } from './actions'
+
+export default function LoginPage() {
+  return (
+    <form>
+      <label htmlFor="email">Email:</label>
+      <input id="email" name="email" type="email" required />
+      <label htmlFor="password">Password:</label>
+      <input id="password" name="password" type="password" required />
+      <button formAction={login}>Log in</button>
+      <button formAction={signup}>Sign up</button>
+    </form>
+  )
+}
+```
+</TabPanel>
+
+</Tabs>
+
+Now you should have a login page at `http://localhost:3000/login` without much functionalities. Next is to create the login/singup actions. They need to fulfill the following requirement:
+- Retrieve the user's given information.
+- Send that information to Supabase as a signup request, which in turns will send a confirmation email.
+- Handle any error that arises.
+
+<Admonition type="caution">
+Note that cookies is called before any calls to Supabase, which opts fetch calls out of Next.js's caching. This is important for authenticated data fetches, to ensure that users get access only to their own data.
+
+See the Next.js docs to learn more about [opting out of data caching](https://nextjs.org/docs/app/building-your-application/data-fetching/fetching-caching-and-revalidating#opting-out-of-data-caching).
+</Admonition>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+
+<TabPanel id="js" label="JavaScript">
+<CH.Code className="max-h-[30rem]">
+```js app/login/action.js
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+
+import { createClient } from '@/utils/supabase/server'
+
+export async function login(formData) {
+  const supabase = createClient()
+
+  // type-casting here for convenience
+  // in practice, you should validate your inputs
+  const data = {
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
+  }
+
+  const { error } = await supabase.auth.signInWithPassword(data)
+
+  if (error) {
+    redirect('/error')
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/')
+}
+
+export async function signup(formData) {
+  const supabase = createClient()
+
+  // type-casting here for convenience
+  // in practice, you should validate your inputs
+  const data = {
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
+  }
+
+  const { error } = await supabase.auth.signUp(data)
+
+  if (error) {
+    redirect('/error')
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/')
+}
+```
+
+```jsx app/error/page.jsx
+export default function ErrorPage() {
+  return <p>Sorry, something went wrong</p>
+}
+```
+</CH.Code>
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+<CH.Code className="max-h-[30rem]">
+```ts app/login/action.ts
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+
+import { createClient } from '@/utils/supabase/server'
+
+export async function login(formData: FormData) {
+  const supabase = createClient()
+
+  // type-casting here for convenience
+  // in practice, you should validate your inputs
+  const data = {
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
+  }
+
+  const { error } = await supabase.auth.signInWithPassword(data)
+
+  if (error) {
+    redirect('/error')
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/')
+}
+
+export async function signup(formData: FormData) {
+  const supabase = createClient()
+
+  // type-casting here for convenience
+  // in practice, you should validate your inputs
+  const data = {
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
+  }
+
+  const { error } = await supabase.auth.signUp(data)
+
+  if (error) {
+    redirect('/error')
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/')
+}
+```
+
+```tsx app/error/page.tsx
+export default function ErrorPage() {
+  return <p>Sorry, something went wrong</p>
+}
+```
+</CH.Code>
+</TabPanel>
+
+When you enter your email and password, you will receive an email with the title `Confirm Your Signup`. Congrats 🎉!!!
+
+</Tabs>
 
 ### Supabase Auth UI
 
