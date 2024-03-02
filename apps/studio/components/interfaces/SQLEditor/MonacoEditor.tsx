@@ -40,7 +40,7 @@ const MonacoEditor = ({
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
-    typeof window !== 'undefined' ? false : true
+    true
   )
 
   const snap = useSqlEditorStateSnapshot({ sync: true })
