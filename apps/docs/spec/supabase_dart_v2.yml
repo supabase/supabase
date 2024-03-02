@@ -15,6 +15,11 @@ info:
 functions:
   - id: initializing
     title: 'Initializing'
+    description: |
+      You can initialize Supabase with the static `initialize()` method of the `Supabase` class.
+
+      The Supabase client is your entrypoint to the rest of the Supabase functionality
+      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
     params:
       - name: url
         isOptional: false
@@ -50,13 +55,6 @@ functions:
             isOptional: true
             type: RealtimeLogLevel
             description: Level of realtime server logs to to be logged.
-
-    description: |
-      You can initialize Supabase with the static `initialize()` method of the `Supabase` class.
-
-      The Supabase client is your entrypoint to the rest of the Supabase functionality
-      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
-
     examples:
       - id: flutter-initialize
         name: For Flutter
