@@ -95,7 +95,7 @@ function Resources({ schema }: { schema: any }) {
           <Tabs.Panel id={resource} label={resource}>
             <Heading tag="h4">Example usage</Heading>
             <CodeBlock className="not-prose">{codeBlock`
-                resource "${resource}" "new" {
+                resource "${resource}" "<label>" {
                     ${Object.keys(schema[resource].block.attributes)
                       .filter((attribute) => !schema[resource].block.attributes[attribute].computed)
                       .map(
