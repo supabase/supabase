@@ -27,6 +27,12 @@ const getSecrets = async (name, region) => {
     if (!data.SecretString) {
       throw new Error('Secrets not found')
     }
+    else if(data.SecretString === undefined){
+      throw new Error('Secrets not found')
+    }
+    else if(data.SecretString === null){
+      throw new Error('Secrets not found')
+    }
     return JSON.parse(data.SecretString)
   } catch (err) {
     console.log('Error getting secrets', err)
