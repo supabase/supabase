@@ -210,6 +210,23 @@ export function createClient() {
 </TabPanel>
 </Tabs>
 ### Next.js middleware
+Since Server Components can't write cookies, you need middleware to refresh expired Auth tokens and store them. This is accomplished by:
+- Refreshing the Auth token with the call to `supabase.auth.getUser`.
+- Passing the refreshed Auth token to Server Components through `request.cookies.set`, so they don't attempt to refresh the same token themselves.
+- Passing the refreshed Auth token to the browser, so it replaces the old token. This is done with `response.cookies.set`.
+
+You could also add a matcher, so that the middleware only runs on route that access Supabase. For more information, check out this [documentation](https://nextjs.org/docs/app/building-your-application/routing/middleware#matching-paths).
+<Admonition type="danger">
+
+Be careful when protecting pages. The server gets the user session from the cookies, which can be spoofed by anyone.
+
+Always use `supabase.auth.getUser()` to protect pages and user data.
+
+_Never_ trust `supabase.auth.getSession()` inside server code such as middleware. It isn't guaranteed to revalidate the Auth token.
+
+It's safe to trust `getUser()` because it sends a request to the Supabase Auth server every time to revalidate the Auth token.
+
+</Admonition>
 
 <Tabs
   scrollable
@@ -220,82 +237,187 @@ export function createClient() {
 >
 <TabPanel id="js" label="JavaScript">
 
-Create a `middleware.js` file and include the following content to:
+Create a `middleware.js` file at project's root and another one within the `util/supbase` (since we need to create a server supabase client to refresh the tokens).
 
-- Verify if there is an authenticated Supabase user
-- Validate if the user is authenticated and currently on the sign-in page, redirecting them to the `account` page
-- Verify if the user is not authenticated and currently on the account page, redirecting them to the `sign-in` page.
+<CH.Code className="min-h-[30rem]">
+```jsx middleware.js
+import { updateSession } from '@/utils/supabase/middleware'
 
-```tsx middleware.js
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
-import { NextResponse } from 'next/server'
-
-export async function middleware(req) {
-  const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // if user is signed in and the current path is / redirect the user to /account
-  if (user && req.nextUrl.pathname === '/') {
-    return NextResponse.redirect(new URL('/account', req.url))
-  }
-
-  // if user is not signed in and the current path is not / redirect the user to /
-  if (!user && req.nextUrl.pathname !== '/') {
-    return NextResponse.redirect(new URL('/', req.url))
-  }
-
-  return res
+export async function middleware(request) {
+  // update user's auth session
+  return await updateSession(request)
 }
 
 export const config = {
-  matcher: ['/', '/account'],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }
 ```
+```jsx utils/supabase/middleware.js
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse } from 'next/server'
+
+export async function updateSession(request) {
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name) {
+          return request.cookies.get(name)?.value
+        },
+        set(name, value, options) {
+          request.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+        },
+        remove(name, options) {
+          request.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+        },
+      },
+    }
+  )
+
+  // refreshing the auth token
+  await supabase.auth.getUser()
+
+  return response
+}
+```
+</CH.Code>
 
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
 
-Create a `middleware.ts` file and include the following content to:
+Create a `middleware.ts` file at project's root and another one within the `util/supbase` (since we need to create a server supabase client to refresh the tokens).
 
-- Verify if there is an authenticated Supabase user
-- Validate if the user is authenticated and currently on the sign-in page, redirecting them to the `account` page
-- Verify if the user is not authenticated and currently on the account page, redirecting them to the `sign-in` page.
-
+<CH.Code className="min-h-[30rem]">
 ```tsx middleware.ts
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
-import { NextResponse } from 'next/server'
+import { type NextRequest } from 'next/server';
+import { updateSession } from '@/utils/supabase/middleware'
 
-import type { NextRequest } from 'next/server'
-
-export async function middleware(req: NextRequest) {
-  const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // if user is signed in and the current path is / redirect the user to /account
-  if (user && req.nextUrl.pathname === '/') {
-    return NextResponse.redirect(new URL('/account', req.url))
-  }
-
-  // if user is not signed in and the current path is not / redirect the user to /
-  if (!user && req.nextUrl.pathname !== '/') {
-    return NextResponse.redirect(new URL('/', req.url))
-  }
-
-  return res
+export async function middleware(request: NextRequest) {
+  // update user's auth session
+  return await updateSession(request)
 }
 
 export const config = {
-  matcher: ['/', '/account'],
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }
 ```
+```tsx utils/supabase/middleware.ts
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
+
+export async function updateSession(request: NextRequest) {
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return request.cookies.get(name)?.value
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+        },
+        remove(name: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+        },
+      },
+    }
+  )
+
+  // refreshing the auth token
+  await supabase.auth.getUser()
+
+  return response
+}
+```
+</CH.Code>
 
 </TabPanel>
 </Tabs>
