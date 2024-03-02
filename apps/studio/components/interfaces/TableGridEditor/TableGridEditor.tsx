@@ -283,11 +283,12 @@ const TableGridEditor = ({
         table={gridTable}
         headerActions={
           isTableSelected || isViewSelected || canEditViaTableEditor ? (
-            <>
-              {canEditViaTableEditor && (
-                <GridHeaderActions table={selectedTable as PostgresTable} />
-              )}
-            </>
+            <GridHeaderActions
+              table={selectedTable as PostgresTable}
+              canEditViaTableEditor={canEditViaTableEditor}
+              isViewSelected={isViewSelected}
+              isTableSelected={isTableSelected}
+            />
           ) : null
         }
         onAddColumn={snap.onAddColumn}

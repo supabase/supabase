@@ -7,7 +7,7 @@ import { extensions } from 'shared-data'
 import { Badge, IconExternalLink, IconLoader, Modal, Toggle } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useDatabaseExtensionDisableMutation } from 'data/database-extensions/database-extension-disable-mutation'
 import { useCheckPermissions } from 'hooks'
 import EnableExtensionModal from './EnableExtensionModal'

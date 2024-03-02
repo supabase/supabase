@@ -197,7 +197,11 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
           }
           footer={
             <div key="panel-footer" className="flex w-full items-center justify-between">
-              <Button type="default" onClick={() => router.push('/projects')}>
+              <Button
+                type="default"
+                disabled={newOrgLoading}
+                onClick={() => router.push('/projects')}
+              >
                 Cancel
               </Button>
               <div className="flex items-center space-x-3">
@@ -216,7 +220,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
             </div>
           }
         >
-          <Panel.Content className="pt-0">
+          <Panel.Content>
             <p className="text-sm">This is your organization within Supabase.</p>
             <p className="text-sm text-foreground-light">
               For example, you can use the name of your company or department.

@@ -1,4 +1,4 @@
-import { createClient, RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
+import { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
 import { sortBy, take } from 'lodash'
 import { useCallback, useEffect, useReducer, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -64,16 +64,12 @@ export const useRealtimeMessages = ({
   enableDbChanges,
   enableBroadcast,
 }: RealtimeConfig) => {
+  const { data } = useProjectApiQuery({ projectRef: projectRef })
+
   // the default host is prod until the correct one comes through an API call.
-  const [host, setHost] = useState(`https://${projectRef}.supabase.co`)
-  useProjectApiQuery(
-    { projectRef: projectRef },
-    {
-      onSuccess: (data) => {
-        setHost(`${data.autoApiService.protocol}://${data.autoApiService.endpoint}`)
-      },
-    }
-  )
+  const host = data
+    ? `${data.autoApiService.protocol}://${data.autoApiService.endpoint}`
+    : `https://${projectRef}.supabase.co`
 
   const [logData, dispatch] = useReducer(reducer, [] as LogData[])
   const pushMessage = (messageType: string, metadata: any) => {
@@ -89,13 +85,18 @@ export const useRealtimeMessages = ({
       return
     }
     const opts = {
+      global: {
+        headers: {
+          'User-Agent': `supabase-api/${process.env.VERCEL_GIT_COMMIT_SHA || 'unknown-sha'}`,
+        },
+      },
       realtime: {
         params: {
           log_level: logLevel,
         },
       },
     }
-    const newClient = createClient(host, token, opts)
+    const newClient = new SupabaseClient(host, token, opts)
     if (bearer != '') {
       newClient.realtime.setAuth(bearer)
     }

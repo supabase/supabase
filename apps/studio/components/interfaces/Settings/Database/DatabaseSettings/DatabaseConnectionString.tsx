@@ -23,10 +23,10 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useFlag } from 'hooks'
 import { pluckObjectFields } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import { IPv4DeprecationNotice } from '../IPv4DeprecationNotice'
 import { UsePoolerCheckbox } from '../UsePoolerCheckbox'
 import {
@@ -52,15 +52,14 @@ interface DatabaseConnectionStringProps {
 
 export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStringProps) => {
   const router = useRouter()
-  const { project: projectDetails, isLoading: isProjectLoading } = useProjectContext()
-  const { ref: projectRef, connectionString } = useParams()
   const telemetryProps = useTelemetryProps()
-  const readReplicasEnabled = useFlag('readReplicas') && projectDetails?.is_read_replicas_enabled
-
+  const { ref: projectRef, connectionString } = useParams()
+  const snap = useDatabaseSettingsStateSnapshot()
   const state = useDatabaseSelectorStateSnapshot()
+  const { project: projectDetails, isLoading: isProjectLoading } = useProjectContext()
+  const readReplicasEnabled = projectDetails?.is_read_replicas_enabled
 
   const connectionStringsRef = useRef<HTMLDivElement>(null)
-  const [usePoolerConnection, setUsePoolerConnection] = useState(true)
   const [poolingMode, setPoolingMode] = useState<'transaction' | 'session' | 'statement'>('session')
   const [selectedTab, setSelectedTab] = useState<
     'uri' | 'psql' | 'golang' | 'jdbc' | 'dotnet' | 'nodejs' | 'php' | 'python'
@@ -69,6 +68,9 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   const { data: poolingInfo, isSuccess: isSuccessPoolingInfo } = usePoolingConfigurationQuery({
     projectRef,
   })
+  const poolingConfiguration = readReplicasEnabled
+    ? poolingInfo?.find((x) => x.identifier === state.selectedDatabaseId)
+    : poolingInfo?.find((x) => x.database_type === 'PRIMARY')
 
   const {
     data,
@@ -119,28 +121,33 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
     )
   }
 
-  const connectionStrings = isSuccessPoolingInfo
-    ? getConnectionStrings(connectionInfo, poolingInfo, {
-        projectRef,
-        usePoolerConnection,
-      })
-    : { uri: '', psql: '', golang: '', jdbc: '', dotnet: '', nodejs: '', php: '', python: '' }
-  const poolerTld = isSuccessPoolingInfo ? getPoolerTld(poolingInfo.connectionString) : 'com'
-  const poolerConnStringSyntax = isSuccessPoolingInfo
-    ? constructConnStringSyntax(poolingInfo.connectionString, {
-        selectedTab,
-        usePoolerConnection,
-        ref: projectRef as string,
-        cloudProvider: isProjectLoading ? '' : project?.cloud_provider || '',
-        region: isProjectLoading ? '' : project?.region || '',
-        tld: usePoolerConnection ? poolerTld : connectionTld,
-        portNumber: usePoolerConnection
-          ? poolingMode === 'transaction'
-            ? poolingInfo.db_port.toString()
-            : '5432'
-          : connectionInfo.db_port.toString(),
-      })
-    : []
+  const connectionStrings =
+    isSuccessPoolingInfo && poolingConfiguration !== undefined
+      ? getConnectionStrings(connectionInfo, poolingConfiguration, {
+          projectRef,
+          usePoolerConnection: snap.usePoolerConnection,
+        })
+      : { uri: '', psql: '', golang: '', jdbc: '', dotnet: '', nodejs: '', php: '', python: '' }
+  const poolerTld =
+    isSuccessPoolingInfo && poolingConfiguration !== undefined
+      ? getPoolerTld(poolingConfiguration?.connectionString)
+      : 'com'
+  const poolerConnStringSyntax =
+    isSuccessPoolingInfo && poolingConfiguration !== undefined
+      ? constructConnStringSyntax(poolingConfiguration?.connectionString, {
+          selectedTab,
+          usePoolerConnection: snap.usePoolerConnection,
+          ref: projectRef as string,
+          cloudProvider: isProjectLoading ? '' : project?.cloud_provider || '',
+          region: isProjectLoading ? '' : project?.region || '',
+          tld: snap.usePoolerConnection ? poolerTld : connectionTld,
+          portNumber: snap.usePoolerConnection
+            ? poolingMode === 'transaction'
+              ? poolingConfiguration?.db_port.toString()
+              : '5432'
+            : connectionInfo.db_port.toString(),
+        })
+      : []
 
   useEffect(() => {
     if (
@@ -154,10 +161,10 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
   }, [connectionString])
 
   useEffect(() => {
-    if (poolingInfo?.pool_mode === 'session') {
-      setPoolingMode(poolingInfo.pool_mode)
+    if (poolingConfiguration?.pool_mode === 'session') {
+      setPoolingMode(poolingConfiguration.pool_mode)
     }
-  }, [poolingInfo?.pool_mode])
+  }, [poolingConfiguration?.pool_mode])
 
   return (
     <div id="connection-string" className="w-full">
@@ -223,12 +230,12 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
             <div className="flex flex-col gap-y-4 pt-2">
               <UsePoolerCheckbox
                 id="connection-string"
-                checked={usePoolerConnection}
+                checked={snap.usePoolerConnection}
                 poolingMode={poolingMode}
-                onCheckedChange={setUsePoolerConnection}
+                onCheckedChange={snap.setUsePoolerConnection}
                 onSelectPoolingMode={setPoolingMode}
               />
-              {!usePoolerConnection && <IPv4DeprecationNotice />}
+              {!snap.usePoolerConnection && <IPv4DeprecationNotice />}
               <Input
                 copy
                 readOnly
@@ -265,7 +272,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
                   <div className="text-foreground-light">
                     <p className="text-xs">
                       You can use the following URI format to switch to a different database or user
-                      {usePoolerConnection ? ' when using connection pooling' : ''}.
+                      {snap.usePoolerConnection ? ' when using connection pooling' : ''}.
                     </p>
                     <p className="text-sm font-mono tracking-tight text-foreground-lighter">
                       {poolerConnStringSyntax.map((x, idx) => {

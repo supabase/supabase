@@ -1,0 +1,57 @@
+{
+  "$id": "https://lucide.dev/icons.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$vocabulary": {
+    "https://json-schema.org/draft/2020-12/vocab/core": true,
+    "https://json-schema.org/draft/2020-12/vocab/applicator": true,
+    "https://json-schema.org/draft/2020-12/vocab/unevaluated": true,
+    "https://json-schema.org/draft/2020-12/vocab/validation": true,
+    "https://json-schema.org/draft/2020-12/vocab/meta-data": true,
+    "https://json-schema.org/draft/2020-12/vocab/format-annotation": true,
+    "https://json-schema.org/draft/2020-12/vocab/content": true
+  },
+  "title": "Supabase icon schema (Originally from lucide.dev)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["$schema", "categories", "tags"],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "contributors": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "deprecated": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "description": "A JSON Schema for icons, originally defined by Lucide Icons."
+}

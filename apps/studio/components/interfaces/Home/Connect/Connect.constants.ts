@@ -42,6 +42,21 @@ export const FRAMEWORKS: ConnectionType[] = [
     ],
   },
   {
+    key: 'remix',
+    label: 'Remix',
+    icon: 'remix',
+    guideLink:
+      'https://supabase.com/docs/guides/auth/server-side/creating-a-client?framework=remix&environment=remix-loader',
+    children: [
+      {
+        key: 'supabasejs',
+        label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
+  {
     key: 'react',
     label: 'React',
     icon: 'react',
@@ -113,10 +128,38 @@ export const FRAMEWORKS: ConnectionType[] = [
     ],
   },
   {
+    key: 'astro',
+    label: 'Astro',
+    icon: 'astro',
+    guideLink: 'https://docs.astro.build/en/guides/backend/supabase/',
+    children: [
+      {
+        key: 'supabasejs',
+        label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
+  {
     key: 'refine',
     label: 'refine',
     icon: 'refine',
     guideLink: 'https://supabase.com/docs/guides/getting-started/quickstarts/refine',
+    children: [
+      {
+        key: 'supabasejs',
+        label: 'Supabase-js',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
+  {
+    key: 'exporeactnative',
+    label: 'Expo React Native',
+    icon: 'expo',
+    guideLink: 'https://supabase.com/docs/guides/getting-started/tutorials/with-expo-react-native',
     children: [
       {
         key: 'supabasejs',

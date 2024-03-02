@@ -6,7 +6,7 @@ import { Button, IconAlertCircle, IconSearch, Input, Modal, Toggle } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
