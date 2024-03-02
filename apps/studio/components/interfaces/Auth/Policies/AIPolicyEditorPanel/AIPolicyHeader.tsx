@@ -24,7 +24,7 @@ export const AIPolicyHeader = ({
     <SheetHeader_Shadcn_
       className={cn(
         selectedPolicy !== undefined ? 'pt-3 pb-0' : 'py-3',
-        'flex flex-row justify-between items-center'
+        'flex flex-row justify-between items-center border-b'
       )}
     >
       <div className="flex flex-row gap-3 items-center max-w-[75%]">

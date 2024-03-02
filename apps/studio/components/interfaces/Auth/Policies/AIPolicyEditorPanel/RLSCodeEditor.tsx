@@ -18,6 +18,7 @@ interface RLSCodeEditorProps {
   value?: string
   placeholder?: string
   editorRef: MutableRefObject<editor.IStandaloneCodeEditor | null>
+  readOnly?: boolean
 }
 
 const RLSCodeEditor = ({
@@ -28,6 +29,7 @@ const RLSCodeEditor = ({
   value,
   placeholder,
   editorRef,
+  readOnly = false,
 }: RLSCodeEditorProps) => {
   const hasValue = useRef<any>()
 
@@ -78,7 +80,7 @@ const RLSCodeEditor = ({
   const options = {
     tabSize: 2,
     fontSize: 13,
-    readOnly: false,
+    readOnly,
     minimap: { enabled: false },
     wordWrap: 'on' as const,
     contextmenu: true,

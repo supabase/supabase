@@ -12,6 +12,7 @@ import {
   Button,
   IconEdit,
   IconGrid,
+  IconLock,
   Modal,
   ScrollArea,
   SheetContent_Shadcn_,
@@ -52,7 +53,7 @@ import RLSCodeEditor from './RLSCodeEditor'
 import { PolicyTemplates } from './PolicyTemplates'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import CardButton from 'components/ui/CardButton'
+import { PolicyDetailsV2 } from './PolicyDetailsV2'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -83,6 +84,9 @@ export const AIPolicyEditorPanel = memo(function ({
 
   // use chat id because useChat doesn't have a reset function to clear all messages
   const [chatId, setChatId] = useState(uuidv4())
+
+  const lockedEditorRef = useRef<IStandaloneCodeEditor | null>(null)
+
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
   const isTogglingPreviewRef = useRef<boolean>(false)
@@ -311,6 +315,9 @@ export const AIPolicyEditorPanel = memo(function ({
               showDetails={showDetails}
               toggleShowDetails={() => setShowDetails(!showDetails)}
             />
+
+            <PolicyDetailsV2 />
+
             <div className="flex flex-col h-full w-full justify-between">
               {incomingChange ? (
                 <div className="px-5 py-3 flex justify-between gap-3 bg-surface-75">
@@ -382,6 +389,25 @@ export const AIPolicyEditorPanel = memo(function ({
                   }}
                 />
               ) : null}
+
+              <div className="bg-surface-300 py-2">
+                <div className="flex items-center gap-x-2 px-5">
+                  <IconLock size={14} className="text-foreground-light" />
+                  <p className="text-xs text-foreground-light font-mono uppercase">
+                    Use options above to edit
+                  </p>
+                </div>
+                <div className="relative h-32">
+                  <RLSCodeEditor
+                    readOnly
+                    id="rls-sql-partial"
+                    defaultValue="create policy policy_name"
+                    className="monaco-editor-alt pointer-events-none"
+                    editorRef={lockedEditorRef}
+                  />
+                </div>
+              </div>
+
               <div className={`relative h-full ${incomingChange ? 'hidden' : 'block'}`}>
                 <RLSCodeEditor
                   id="rls-sql-policy"
@@ -400,7 +426,7 @@ export const AIPolicyEditorPanel = memo(function ({
                     setOpen={setErrorPanelOpen}
                   />
                 )}
-                <SheetFooter_Shadcn_ className="flex items-center !justify-between px-5 py-4 w-full">
+                <SheetFooter_Shadcn_ className="flex items-center !justify-between px-5 py-4 w-full border-t">
                   <Button type="text" onClick={toggleFeaturePreviewModal}>
                     Toggle feature preview
                   </Button>
@@ -484,34 +510,33 @@ export const AIPolicyEditorPanel = memo(function ({
               </Tabs_Shadcn_>
             </div>
           )}
-
-          <ConfirmationModal
-            visible={isClosingPolicyEditorPanel}
-            header="Discard changes"
-            buttonLabel="Discard"
-            onSelectCancel={() => {
-              isTogglingPreviewRef.current = false
-              setIsClosingPolicyEditorPanel(false)
-            }}
-            onSelectConfirm={() => {
-              if (isTogglingPreviewRef.current) {
-                snap.setSelectedFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT)
-                snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
-              }
-              onSelectCancel()
-              isTogglingPreviewRef.current = false
-              setIsClosingPolicyEditorPanel(false)
-            }}
-          >
-            <Modal.Content>
-              <p className="py-4 text-sm text-foreground-light">
-                Are you sure you want to close the editor? Any unsaved changes on your policy and
-                conversations with the Assistant will be lost.
-              </p>
-            </Modal.Content>
-          </ConfirmationModal>
         </SheetContent_Shadcn_>
       </Sheet_Shadcn_>
+      <ConfirmationModal
+        visible={isClosingPolicyEditorPanel}
+        header="Discard changes"
+        buttonLabel="Discard"
+        onSelectCancel={() => {
+          isTogglingPreviewRef.current = false
+          setIsClosingPolicyEditorPanel(false)
+        }}
+        onSelectConfirm={() => {
+          if (isTogglingPreviewRef.current) {
+            snap.setSelectedFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT)
+            snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
+          }
+          onSelectCancel()
+          isTogglingPreviewRef.current = false
+          setIsClosingPolicyEditorPanel(false)
+        }}
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-foreground-light">
+            Are you sure you want to close the editor? Any unsaved changes on your policy and
+            conversations with the Assistant will be lost.
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
     </>
   )
 })
