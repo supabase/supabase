@@ -28,7 +28,7 @@ import {
   IStandaloneCodeEditor,
   IStandaloneDiffEditor,
 } from 'components/interfaces/SQLEditor/SQLEditor.types'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'

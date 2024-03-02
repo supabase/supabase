@@ -1,19 +1,9 @@
+import { useParams } from 'common'
 import { partition } from 'lodash'
+import { MessageCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-
-import { useParams } from 'common'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
-import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
-import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
-import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useGitHubPullRequestsQuery } from 'data/integrations/github-pull-requests-query'
-import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -22,10 +12,19 @@ import {
   IconAlertTriangle,
   IconExternalLink,
   IconGitHub,
-  IconSearch,
-  Input,
   Modal,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
+import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
+import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
+import { Branch, useBranchesQuery } from 'data/branches/branches-query'
+import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import { useGitHubPullRequestsQuery } from 'data/integrations/github-pull-requests-query'
+import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
 import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
 import CreateBranchModal from './CreateBranchModal'
 import {
@@ -34,7 +33,6 @@ import {
   PullRequestsEmptyState,
 } from './EmptyStates'
 import Overview from './Overview'
-import { MessageCircle } from 'lucide-react'
 
 const BranchManagement = () => {
   const { ui } = useStore()

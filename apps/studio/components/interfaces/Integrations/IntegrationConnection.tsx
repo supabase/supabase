@@ -17,12 +17,12 @@ import {
   IconTrash,
   Modal,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import {
   IntegrationConnection,
   IntegrationConnectionProps,
 } from 'components/interfaces/Integrations/IntegrationPanels'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { WarningIcon } from 'components/ui/Icons'
 import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
