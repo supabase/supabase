@@ -399,7 +399,7 @@ const ComputeInstanceSidePanel = () => {
               <Alert_Shadcn_>
                 <WarningIcon />
                 <AlertTitle_Shadcn_>
-                  Your project will need to be restarted when changing it's compute size
+                  Your project will need to be restarted when changing its compute size
                 </AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
                   Your project will be unavailable for up to 2 minutes while the changes take place.
@@ -485,7 +485,7 @@ const ComputeInstanceSidePanel = () => {
             <Alert
               withIcon
               variant="warning"
-              title="Your project will need to be restarted when changing it's compute size"
+              title="Your project will need to be restarted when changing its compute size"
             >
               Your project will be unavailable for up to 2 minutes while the changes take place.
             </Alert>
