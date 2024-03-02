@@ -1,6 +1,6 @@
 import { observer } from 'mobx-react-lite'
-import { NextPageWithLayout } from 'types'
-import { ReportFilterItem } from 'components/interfaces/Reports/Reports.types'
+import type { NextPageWithLayout } from 'types'
+import type { ReportFilterItem } from 'components/interfaces/Reports/Reports.types'
 import { ReportsLayout } from 'components/layouts'
 import {
   PRESET_CONFIG,

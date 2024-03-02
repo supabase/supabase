@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast'
 
 import { delete_, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 import { TaxId } from './organization-tax-ids-query'
 

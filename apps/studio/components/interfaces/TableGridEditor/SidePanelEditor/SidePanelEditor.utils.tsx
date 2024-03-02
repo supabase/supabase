@@ -1,4 +1,4 @@
-import { PostgresPrimaryKey, PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresPrimaryKey, PostgresTable } from '@supabase/postgres-meta'
 import { chunk, find, isEmpty, isEqual } from 'lodash'
 import Papa from 'papaparse'
 import { useEffect, useState } from 'react'
@@ -29,10 +29,10 @@ import {
   generateCreateColumnPayload,
   generateUpdateColumnPayload,
 } from './ColumnEditor/ColumnEditor.utils'
-import { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
-import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
+import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
+import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import { checkIfRelationChanged } from './TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
-import { ImportContent } from './TableEditor/TableEditor.types'
+import type { ImportContent } from './TableEditor/TableEditor.types'
 import { Constraint } from 'data/database/constraints-query'
 
 const BATCH_SIZE = 1000

@@ -1,4 +1,4 @@
-import { Route } from 'components/ui/ui.types'
+import type { Route } from 'components/ui/ui.types'
 import { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import {

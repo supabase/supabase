@@ -19,7 +19,7 @@ import {
   cn,
 } from 'ui'
 
-import { parseSupaTable } from 'components/grid'
+import { parseSupaTable } from 'components/grid/SupabaseGrid.utils'
 import { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { Entity } from 'data/entity-types/entity-type-query'

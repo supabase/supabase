@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 
-import BaseLayout from 'components/layouts'
+import BaseLayout from 'components/layouts/ProjectLayout/ProjectLayout'
 import { useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
 import { IconX } from 'ui'
 

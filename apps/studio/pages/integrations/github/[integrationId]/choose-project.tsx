@@ -13,7 +13,7 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import { IconBook, IconLifeBuoy, LoadingLine } from 'ui'
 
 const GITHUB_ICON = (

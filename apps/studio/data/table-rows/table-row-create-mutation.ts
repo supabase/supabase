@@ -1,12 +1,13 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { Query, SupaTable } from 'components/grid'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
+import type { SupaTable } from 'components/grid/types'
+import { Query } from 'components/grid/query/Query'
 
 export type TableRowCreateVariables = {
   projectRef: string

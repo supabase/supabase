@@ -5,6 +5,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+// @ts-ignore
+import Prism from 'prism-react-renderer/prism'
 import rangeParser from 'parse-numeric-range'
 import Highlight, { Language, defaultProps } from 'prism-react-renderer'
 import darkTheme from 'prism-react-renderer/themes/vsDark'
@@ -13,6 +15,9 @@ import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 import { useTheme } from 'next-themes'
 import { copyToClipboard } from 'lib/helpers'
+import { dart } from 'lib/constants/prism'
+
+dart(Prism)
 
 const highlightLinesRangeRegex = /{([\d,-]+)}/
 const prism = {

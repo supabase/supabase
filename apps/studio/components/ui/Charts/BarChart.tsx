@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { Bar, BarChart as RechartBarChart, Cell, Tooltip, XAxis } from 'recharts'
 import { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart'
 import ChartHeader from './ChartHeader'
-import { CommonChartProps, Datum } from './Charts.types'
+import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import ChartNoData from './NoDataPlaceholder'
 dayjs.extend(utc)

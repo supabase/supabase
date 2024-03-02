@@ -1,4 +1,9 @@
-import { QueryClient, QueryKey, useQuery, UseQueryOptions } from '@tanstack/react-query'
+import {
+  type QueryClient,
+  type QueryKey,
+  useQuery,
+  type UseQueryOptions,
+} from '@tanstack/react-query'
 
 import { post, handleError as handleErrorFetchers } from 'data/fetchers'
 import {

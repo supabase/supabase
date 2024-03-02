@@ -8,7 +8,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useTableQuery } from 'data/tables/table-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { SupaRow } from '../../types'
+import type { SupaRow } from '../../types'
 import { NullValue } from '../common'
 
 interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {

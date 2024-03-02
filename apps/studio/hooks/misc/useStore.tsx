@@ -2,8 +2,8 @@ import { autorun } from 'mobx'
 import { createContext, PropsWithChildren, useContext, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
-import SparkBar from 'components/ui/SparkBar'
-import { IRootStore } from 'stores'
+//import SparkBar from 'components/ui/SparkBar'
+import type { IRootStore } from 'stores'
 import { useSelectedProject } from './useSelectedProject'
 
 const StoreContext = createContext<IRootStore>(undefined!)
@@ -47,14 +47,7 @@ export const StoreProvider = ({ children, rootStore }: PropsWithChildren<StorePr
             if (progress !== undefined) {
               return toast.loading(
                 <div className="flex flex-col space-y-2" style={{ minWidth: '220px' }}>
-                  <SparkBar
-                    value={progress}
-                    max={100}
-                    type="horizontal"
-                    barClass="bg-brand"
-                    labelBottom={message}
-                    labelTop={`${progress.toFixed(2)}%`}
-                  />
+                  
                   {description !== undefined && (
                     <p className="text-xs text-foreground-light">{description}</p>
                   )}

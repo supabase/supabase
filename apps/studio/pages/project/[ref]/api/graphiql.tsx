@@ -18,7 +18,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const GraphiQLPage: NextPageWithLayout = () => {
   const { resolvedTheme } = useTheme()

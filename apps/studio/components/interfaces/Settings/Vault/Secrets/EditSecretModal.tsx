@@ -8,7 +8,7 @@ import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
 import { useStore } from 'hooks'
-import { VaultSecret } from 'types'
+import type { VaultSecret } from 'types'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
 
 interface EditSecretModalProps {

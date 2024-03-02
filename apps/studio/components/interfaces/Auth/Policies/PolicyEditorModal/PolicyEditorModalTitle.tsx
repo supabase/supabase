@@ -1,7 +1,7 @@
 import { noop } from 'lodash'
 import { Button, IconChevronLeft, IconExternalLink } from 'ui'
 
-import { POLICY_MODAL_VIEWS } from 'components/interfaces/Auth/Policies'
+import { POLICY_MODAL_VIEWS } from 'components/interfaces/Auth/Policies/Policies.constants'
 import { FlaskConical } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
 

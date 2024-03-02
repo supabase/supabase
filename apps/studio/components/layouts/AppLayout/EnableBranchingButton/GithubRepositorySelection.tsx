@@ -18,7 +18,7 @@ import {
   EmptyIntegrationConnection,
   IntegrationConnection,
 } from 'components/interfaces/Integrations/IntegrationPanels'
-import { Integration } from 'data/integrations/integrations.types'
+import type { Integration } from 'data/integrations/integrations.types'
 import { useSelectedOrganization } from 'hooks'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 

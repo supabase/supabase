@@ -1,7 +1,7 @@
 import { Item, ItemParams, Menu, PredicateParams, Separator } from 'react-contexify'
 import { IconClipboard, IconEdit, IconTrash } from 'ui'
 
-import { SupaRow } from 'components/grid/types'
+import type { SupaRow } from 'components/grid/types'
 import { useCallback } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTrackedState } from '../../store'

@@ -5,7 +5,7 @@ import { devtools, proxySet } from 'valtio/utils'
 
 import { upsertContent, UpsertContentPayload } from 'data/content/content-upsert-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { SqlSnippets } from 'types'
+import type { SqlSnippets } from 'types'
 
 export type StateSnippet = {
   snippet: SqlSnippet

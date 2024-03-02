@@ -13,14 +13,14 @@ import {
   AlertTitle_Shadcn_,
 } from 'ui'
 
-import CodeEditor from 'components/ui/CodeEditor'
+import CodeEditor from 'components/ui/CodeEditor/CodeEditor'
 import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import InformationBox from 'components/ui/InformationBox'
 
 import { useParams } from 'common'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions, useStore } from 'hooks'
-import { FormSchema } from 'types'
+import type { FormSchema } from 'types'
 
 interface TemplateEditorProps {
   template: FormSchema

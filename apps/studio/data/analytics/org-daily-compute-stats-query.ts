@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { get } from 'data/fetchers'
 import { AnalyticsData } from './constants'
 import { analyticsKeys } from './keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type OrgDailyComputeStatsVariables = {
   // API parameters

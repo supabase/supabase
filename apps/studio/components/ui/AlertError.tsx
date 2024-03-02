@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,

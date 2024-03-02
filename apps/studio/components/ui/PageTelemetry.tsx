@@ -4,8 +4,8 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
 import { useSelectedOrganization } from 'hooks'
-import { post } from 'lib/common/fetch'
-import { API_URL, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { post } from 'data/fetchers'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 
 const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
@@ -61,8 +61,9 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
       /**
        * Send page telemetry
        */
-      post(`${API_URL}/telemetry/page`, {
+      post(`/platform/telemetry/page`, {
         referrer: referrer,
+        // @ts-ignore
         title: document.title,
         route,
         ga: {
@@ -72,10 +73,11 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
       })
 
       if (isLoggedIn) {
-        post(`${API_URL}/telemetry/pageview`, {
+        post(`/platform/telemetry/pageview`, {
           ...(ref && { projectRef: ref }),
           ...(selectedOrganization && { orgSlug: selectedOrganization.slug }),
           referrer: referrer,
+          // @ts-ignore
           title: document.title,
           path: router.route,
           location: router.asPath,

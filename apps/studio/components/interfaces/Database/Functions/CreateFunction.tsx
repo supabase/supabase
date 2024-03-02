@@ -15,7 +15,7 @@ import { useDatabaseFunctionCreateMutation } from 'data/database-functions/datab
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 import { convertArgumentTypes, convertConfigParams, hasWhitespace } from './Functions.utils'
 
 // [Refactor] Remove local state, just use the Form component

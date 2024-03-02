@@ -17,7 +17,7 @@ import meanBy from 'lodash/meanBy'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
-import { ChartIntervals, NextPageWithLayout } from 'types'
+import type { ChartIntervals, NextPageWithLayout } from 'types'
 import { Button } from 'ui'
 
 const CHART_INTERVALS: ChartIntervals[] = [

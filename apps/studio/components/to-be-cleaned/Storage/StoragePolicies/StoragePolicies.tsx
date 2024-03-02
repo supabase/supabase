@@ -4,7 +4,7 @@ import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { IconLoader } from 'ui'
 
-import { PolicyEditorModal } from 'components/interfaces/Auth/Policies'
+import PolicyEditorModal from 'components/interfaces/Auth/Policies/PolicyEditorModal'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'

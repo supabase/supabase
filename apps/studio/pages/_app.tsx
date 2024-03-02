@@ -1,3 +1,4 @@
+import 'styles/reactflow.scss'
 import 'styles/code.scss'
 import 'styles/contextMenu.scss'
 import 'styles/date-picker.scss'
@@ -8,21 +9,19 @@ import 'styles/main.scss'
 import 'styles/markdown-preview.scss'
 import 'styles/monaco.scss'
 import 'styles/react-data-grid-logs.scss'
-import 'styles/reactflow.scss'
 import 'styles/storage.scss'
-import 'styles/stripe.scss'
 import 'styles/toast.scss'
 import 'styles/ui.scss'
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
+import 'styles/stripe.scss'
 
 import { loader } from '@monaco-editor/react'
-import { TooltipProvider } from '@radix-ui/react-tooltip'
+//import { TooltipProvider } from '@radix-ui/react-tooltip'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import { ThemeProvider, useThemeSandbox } from 'common'
 import dayjs from 'dayjs'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -30,42 +29,33 @@ import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import toast from 'react-hot-toast'
-// @ts-ignore
-import Prism from 'prism-react-renderer/prism'
-import { ConsentToast } from 'ui-patterns/ConsentToast'
-import PortalToast from 'ui/src/layout/PortalToast'
+// import toast from 'react-hot-toast'
+// import { ConsentToast } from 'ui-patterns/ConsentToast'
+// import PortalToast from 'ui/src/layout/PortalToast'
 
 import Favicons from 'components/head/Favicons'
-import {
-  AppBannerWrapper,
-  CommandMenuWrapper,
-  RouteValidationWrapper,
-} from 'components/interfaces/App'
-import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
-import {
-  FeaturePreviewContextProvider,
-  FeaturePreviewModal,
-} from 'components/interfaces/App/FeaturePreview'
+// import RouteValidationWrapper from 'components/interfaces/App/RouteValidationWrapper'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
-import PageTelemetry from 'components/ui/PageTelemetry'
+//import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
 import { StoreProvider } from 'hooks'
 import { AuthProvider } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { dart } from 'lib/constants/prism'
+
 import { ProfileProvider } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import { RootStore } from 'stores'
-import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
-import { AppPropsWithLayout } from 'types'
-import { Toaster } from 'ui'
+//import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
+import type { AppPropsWithLayout } from 'types'
+// import { Toaster } from 'ui'
+// import { ThemeProvider, useThemeSandbox } from 'common'
+//import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+//import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
-dart(Prism)
 
 loader.config({
   // [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
@@ -123,30 +113,30 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     if (typeof window !== 'undefined') {
       const onAcceptConsent = () => {
         snap.setIsOptedInTelemetry(true)
-        if (consentToastId.current) toast.dismiss(consentToastId.current)
+        // if (consentToastId.current) toast.dismiss(consentToastId.current)
       }
 
       const onOptOut = () => {
         snap.setIsOptedInTelemetry(false)
-        if (consentToastId.current) toast.dismiss(consentToastId.current)
+        // if (consentToastId.current) toast.dismiss(consentToastId.current)
       }
 
       const hasAcknowledgedConsent = localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
       if (IS_PLATFORM && hasAcknowledgedConsent === null) {
-        consentToastId.current = toast(
-          <ConsentToast onAccept={onAcceptConsent} onOptOut={onOptOut} />,
-          {
-            id: 'consent-toast',
-            position: 'bottom-right',
-            duration: Infinity,
-          }
-        )
+        // consentToastId.current = toast(
+        //   <ConsentToast onAccept={onAcceptConsent} onOptOut={onOptOut} />,
+        //   {
+        //     id: 'consent-toast',
+        //     position: 'bottom-right',
+        //     duration: Infinity,
+        //   }
+        // )
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useThemeSandbox()
+  // useThemeSandbox()
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
@@ -163,28 +153,29 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 </Head>
                 <Favicons />
 
-                <PageTelemetry>
-                  <TooltipProvider>
-                    <RouteValidationWrapper>
-                      <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-                        <AppBannerContextProvider>
-                          <CommandMenuWrapper>
-                            <AppBannerWrapper>
-                              <FeaturePreviewContextProvider>
+                {/* <PageTelemetry>
+                  <TooltipProvider> */}
+                {/* <RouteValidationWrapper> */}
+                {/* <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange> */}
+                {/* <AppBannerContextProvider> */}
+                {/* <CommandMenuWrapper> */}
+                {/* <AppBannerWrapper> */}
+                {getLayout(<Component {...pageProps} />)}
+                {/* <FeaturePreviewContextProvider>
                                 {getLayout(<Component {...pageProps} />)}
                                 <FeaturePreviewModal />
-                              </FeaturePreviewContextProvider>
-                            </AppBannerWrapper>
-                          </CommandMenuWrapper>
-                        </AppBannerContextProvider>
-                      </ThemeProvider>
-                    </RouteValidationWrapper>
-                  </TooltipProvider>
-                </PageTelemetry>
+                              </FeaturePreviewContextProvider> */}
+                {/* </AppBannerWrapper> */}
+                {/* </CommandMenuWrapper> */}
+                {/* </AppBannerContextProvider> */}
+                {/* </ThemeProvider> */}
+                {/* </RouteValidationWrapper> */}
+                {/* </TooltipProvider>
+                </PageTelemetry> */}
 
-                <HCaptchaLoadedStore />
-                <Toaster />
-                <PortalToast />
+                {/* <HCaptchaLoadedStore /> */}
+                {/* <Toaster />
+                <PortalToast /> */}
                 {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
               </FlagProvider>
             </ProfileProvider>

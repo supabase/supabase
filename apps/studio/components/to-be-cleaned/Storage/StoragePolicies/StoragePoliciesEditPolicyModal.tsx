@@ -10,13 +10,11 @@ import {
 } from '../Storage.utils'
 import { STORAGE_POLICY_TEMPLATES } from './StoragePolicies.constants'
 
-import {
-  POLICY_MODAL_VIEWS,
-  PolicySelection,
-  PolicyTemplates,
-} from 'components/interfaces/Auth/Policies'
 import StoragePoliciesEditor from './StoragePoliciesEditor'
 import StoragePoliciesReview from './StoragePoliciesReview'
+import { POLICY_MODAL_VIEWS } from 'components/interfaces/Auth/Policies/Policies.constants'
+import PolicySelection from 'components/interfaces/Auth/Policies/PolicySelection'
+import PolicyTemplates from 'components/interfaces/Auth/Policies/PolicyTemplates'
 
 const newPolicyTemplate: any = {
   name: '',

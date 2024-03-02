@@ -4,7 +4,7 @@ import { LogsTableName } from 'components/interfaces/Settings/Logs'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import { LogsLayout } from 'components/layouts'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import Connecting from 'components/ui/Loading/Loading'
 
 export const LogPage: NextPageWithLayout = () => {

@@ -5,7 +5,7 @@ import { useRef } from 'react'
 import { cn } from 'ui'
 
 import { timeout } from 'lib/helpers'
-import Connecting from '../Loading'
+import Connecting from '../Loading/Loading'
 import { alignEditor } from './CodeEditor.utils'
 
 interface CodeEditorProps {

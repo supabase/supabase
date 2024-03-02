@@ -1,9 +1,9 @@
 import { some } from 'lodash'
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 
-import { ImportContent, TableField } from './TableEditor.types'
+import type { ImportContent, TableField } from './TableEditor.types'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
-import { ColumnField } from '../SidePanelEditor.types'
+import type { ColumnField } from '../SidePanelEditor.types'
 import {
   generateColumnField,
   generateColumnFieldFromPostgresColumn,

@@ -1,4 +1,4 @@
-import { User } from 'data/auth/users-query'
+import type { User } from 'data/auth/users-query'
 import { uuidv4 } from './helpers'
 
 type PostgrestImpersonationRole =

@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
 import { DatetimeHelper } from '../Settings/Logs'
-import { PresetConfig, Presets, ReportFilterItem } from './Reports.types'
+import type { PresetConfig, ReportFilterItem } from './Reports.types'
+import { Presets } from './Reports.types'
 
 export const LAYOUT_COLUMN_COUNT = 24
 

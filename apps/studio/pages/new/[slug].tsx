@@ -6,12 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 
-import {
-  FreeProjectLimitWarning,
-  NotOrganizationOwnerWarning,
-} from 'components/interfaces/Organization/NewProject'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
-import { WizardLayoutWithoutAuth } from 'components/layouts'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
@@ -34,9 +29,12 @@ import {
   Region,
 } from 'lib/constants'
 import { passwordStrength, pluckObjectFields } from 'lib/helpers'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import { Badge, Button, IconExternalLink, IconUsers, Input, Listbox } from 'ui'
-import { components } from 'data/api'
+import type { components } from 'data/api'
+import NotOrganizationOwnerWarning from 'components/interfaces/Organization/NewProject/NotOrganizationOwnerWarning'
+import FreeProjectLimitWarning from 'components/interfaces/Organization/NewProject/FreeProjectLimitWarning'
+import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 

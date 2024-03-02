@@ -1,5 +1,5 @@
 import BarChart from 'components/ui/Charts/BarChart'
-import { Datum } from 'components/ui/Charts/Charts.types'
+import type { Datum } from 'components/ui/Charts/Charts.types'
 import { EventChartData } from '.'
 
 export interface LogEventChartProps {

@@ -1,6 +1,6 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { find, isEqual, isNull } from 'lodash'
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'

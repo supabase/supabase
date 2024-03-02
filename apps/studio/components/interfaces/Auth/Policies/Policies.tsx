@@ -1,6 +1,7 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { useParams } from 'common/hooks'
-import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
+import PolicyTableRow from 'components/interfaces/Auth/Policies/PolicyTableRow'
+import PolicyEditorModal from 'components/interfaces/Auth/Policies/PolicyEditorModal'
 import { isEmpty } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'

@@ -5,7 +5,7 @@ import { IconCode, Button, Popover } from 'ui'
 import { LogTemplate, TEMPLATES } from 'components/interfaces/Settings/Logs'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import CardButton from 'components/ui/CardButton'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 
 export const LogsTemplatesPage: NextPageWithLayout = () => {

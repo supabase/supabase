@@ -3,8 +3,8 @@ import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } f
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
-import { ColumnField } from '../SidePanelEditor.types'
+import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
+import type { ColumnField } from '../SidePanelEditor.types'
 import { ForeignKeyRow } from '../TableEditor/ForeignKeysManagement/ForeignKeyRow'
 import { checkIfRelationChanged } from '../TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 import { useTableEditorStateSnapshot } from 'state/table-editor'

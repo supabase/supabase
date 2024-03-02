@@ -1,7 +1,7 @@
 import { noop } from 'lodash'
 import { Button, IconGlobe, IconTrash } from 'ui'
 
-import { EmptyListState } from 'components/ui/States'
+import { EmptyListState } from 'components/ui/States/EmptyListState'
 import ValueContainer from './ValueContainer'
 
 interface RedirectUrlListProps {

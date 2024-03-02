@@ -17,7 +17,8 @@ import {
   IconUser,
 } from 'ui'
 
-import { FilterPopover, LogDetailsPanel } from 'components/interfaces/AuditLogs'
+import LogDetailsPanel from 'components/interfaces/AuditLogs/LogDetailsPanel'
+import FilterPopover from 'components/interfaces/AuditLogs/FilterPopover'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'

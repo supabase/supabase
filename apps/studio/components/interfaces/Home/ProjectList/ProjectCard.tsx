@@ -1,7 +1,7 @@
 import { GitBranch, Github } from 'lucide-react'
 
 import CardButton from 'components/ui/CardButton'
-import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { ProjectInfo } from 'data/projects/projects-query'
 import { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { BASE_PATH } from 'lib/constants'

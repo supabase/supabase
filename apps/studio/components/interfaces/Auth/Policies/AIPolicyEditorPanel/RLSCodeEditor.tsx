@@ -3,7 +3,7 @@ import { editor } from 'monaco-editor'
 import { MutableRefObject, useRef } from 'react'
 import { cn } from 'ui'
 
-import { alignEditor } from 'components/ui/CodeEditor'
+import { alignEditor } from 'components/ui/CodeEditor/CodeEditor.utils'
 import { Markdown } from 'components/interfaces/Markdown'
 
 // [Joshen] Is there a way we can just have one single MonacoEditor component that's shared across the dashboard?

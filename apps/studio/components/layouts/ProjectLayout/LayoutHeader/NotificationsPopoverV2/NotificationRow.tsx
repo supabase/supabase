@@ -12,7 +12,7 @@ import { CriticalIcon, WarningIcon } from 'components/ui/Icons'
 import { ItemRenderer } from 'components/ui/InfiniteList'
 import { Notification, NotificationData } from 'data/notifications/notifications-v2-query'
 import { ProjectInfo } from 'data/projects/projects-query'
-import { Organization } from 'types'
+import type { Organization } from 'types'
 
 interface NotificationRowProps {
   setRowHeight: (idx: number, height: number) => void

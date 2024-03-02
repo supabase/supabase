@@ -10,7 +10,7 @@ import { useLocalStorageQuery, useSelectedProject } from 'hooks'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { untitledSnippetTitle } from './SQLEditor.constants'
-import { IStandaloneCodeEditor } from './SQLEditor.types'
+import type { IStandaloneCodeEditor } from './SQLEditor.types'
 import { createSqlSnippetSkeleton } from './SQLEditor.utils'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 

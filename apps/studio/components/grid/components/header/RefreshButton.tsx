@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common/hooks'
-import { SupaTable } from 'components/grid/types'
+import type { SupaTable } from 'components/grid/types'
 import { sqlKeys } from 'data/sql/keys'
 import { useEffect, useState } from 'react'
 import { Button, IconCheck, IconRefreshCw } from 'ui'

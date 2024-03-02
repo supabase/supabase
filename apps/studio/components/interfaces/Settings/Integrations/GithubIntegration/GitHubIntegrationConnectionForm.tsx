@@ -34,7 +34,7 @@ import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useGithubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutate'
 import { useGithubBranchesQuery } from 'data/integrations/integrations-github-branches-query'
-import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import type { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedProject, useStore } from 'hooks'
 
 const GitHubIntegrationConnectionForm = ({

@@ -1,7 +1,8 @@
 import { QueryKey, UseQueryOptions } from '@tanstack/react-query'
 
 import { IS_PLATFORM } from 'common'
-import { Filter, Query, Sort, SupaRow, SupaTable } from 'components/grid'
+import type { Filter, Sort, SupaRow, SupaTable } from 'components/grid/types'
+import { Query } from 'components/grid/query/Query'
 import {
   ImpersonationRole,
   ROLE_IMPERSONATION_NO_RESULTS,

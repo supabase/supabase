@@ -11,7 +11,7 @@ import { useGitHubIntegrationCreateMutation } from 'data/integrations/github-int
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useStore } from 'hooks'
-import { NextPageWithLayout, Organization } from 'types'
+import type { NextPageWithLayout, Organization } from 'types'
 import {
   Alert,
   AlertDescription_Shadcn_,

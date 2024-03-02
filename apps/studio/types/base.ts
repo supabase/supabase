@@ -1,4 +1,4 @@
-import jsonLogic from 'json-logic-js'
+import type jsonLogic from 'json-logic-js'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
 export interface Organization {

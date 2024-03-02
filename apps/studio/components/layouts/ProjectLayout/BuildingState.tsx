@@ -7,13 +7,13 @@ import { useEffect, useRef } from 'react'
 import { Badge, Button, IconArrowRight, IconLoader } from 'ui'
 
 import { useParams } from 'common'
-import { DisplayApiSettings, DisplayConfigSettings } from 'components/ui/ProjectSettings'
+import DisplayApiSettings from 'components/ui/ProjectSettings/DisplayApiSettings'
+import DisplayConfigSettings from 'components/ui/ProjectSettings/DisplayConfigSettings'
 import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedProject } from 'hooks'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import Connect from 'components/interfaces/Home/Connect/Connect'
 
 const BuildingState = () => {
   const { ref } = useParams()

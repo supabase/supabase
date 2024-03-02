@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic'
-import { projectKeys } from './Connect.types'
+import type { projectKeys } from './Connect.types'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 
 interface ConnectContentTabProps {

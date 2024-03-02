@@ -1,6 +1,6 @@
 import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/ForeignRowSelector/ForeignRowSelector'
 import React, { ReactNode } from 'react'
-import { SupaRow, SupaTable } from './table'
+import type { SupaRow, SupaTable } from './table'
 
 export interface GridProps {
   width?: string | number

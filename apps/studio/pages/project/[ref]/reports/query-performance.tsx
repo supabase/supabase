@@ -12,13 +12,12 @@ import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useFlag } from 'hooks'
-import { sortBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import {
   Accordion,
   Button,
@@ -31,7 +30,6 @@ import {
   IconArrowDown,
   IconArrowUp,
   IconCheckCircle,
-  IconList,
   IconRefreshCw,
   IconSearch,
   Input,

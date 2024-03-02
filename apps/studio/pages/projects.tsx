@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
-import ProjectList from 'components/interfaces/Home/ProjectList'
+import ProjectList from 'components/interfaces/Home/ProjectList/ProjectList'
 import HomePageActions from 'components/interfaces/HomePageActions'
 import { AccountLayout } from 'components/layouts'
 import AlertError from 'components/ui/AlertError'
@@ -10,7 +10,7 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()

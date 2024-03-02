@@ -51,11 +51,11 @@ import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
 import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
 import {
-  ContentDiff,
+  type ContentDiff,
   DiffType,
-  IStandaloneCodeEditor,
-  IStandaloneDiffEditor,
-  SQLEditorContextValues,
+  type IStandaloneCodeEditor,
+  type IStandaloneDiffEditor,
+  type SQLEditorContextValues,
 } from './SQLEditor.types'
 import {
   checkDestructiveQuery,

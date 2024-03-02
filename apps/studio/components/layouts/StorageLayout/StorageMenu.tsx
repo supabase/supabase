@@ -17,7 +17,7 @@ import {
 
 import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
 import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
-import { StorageBucket } from 'components/interfaces/Storage/Storage.types'
+import type { StorageBucket } from 'components/interfaces/Storage/Storage.types'
 import { DeleteBucketModal } from 'components/to-be-cleaned/Storage'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBucketsQuery } from 'data/storage/buckets-query'

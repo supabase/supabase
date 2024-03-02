@@ -21,7 +21,7 @@ import {
 } from 'components/interfaces/Integrations/IntegrationPanels'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
-import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useStore } from 'hooks'
 
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {

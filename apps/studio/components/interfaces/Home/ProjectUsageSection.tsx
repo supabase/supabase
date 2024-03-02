@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite'
 import { IconAlertCircle } from 'ui'
 
-import { NewProjectPanel } from 'components/interfaces/Home'
+import NewProjectPanel from 'components/interfaces/Home/NewProjectPanel/NewProjectPanel'
 import { ProjectUsageLoadingState } from 'components/layouts/ProjectLayout/LoadingState'
 import InformationBox from 'components/ui/InformationBox'
 import { useProjectLogRequestsCountQuery } from 'data/analytics/project-log-requests-count-query'

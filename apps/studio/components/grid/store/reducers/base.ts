@@ -1,6 +1,6 @@
 import { CalculatedColumn } from 'react-data-grid'
 import { TOTAL_ROWS_RESET } from '../../constants'
-import { GridProps, SavedState, SupaTable } from '../../types'
+import type { GridProps, SavedState, SupaTable } from '../../types'
 
 export interface BaseInitialState {
   table: SupaTable | null

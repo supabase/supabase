@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast'
 
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { oauthAppKeys } from './keys'
 
 export type OAuthAppCreateVariables = {

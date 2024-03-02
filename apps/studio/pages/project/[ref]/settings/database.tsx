@@ -1,11 +1,7 @@
-import {
-  ConnectionPooling,
-  DatabaseSettings,
-  NetworkRestrictions,
-} from 'components/interfaces/Settings/Database'
+import { DatabaseSettings, NetworkRestrictions } from 'components/interfaces/Settings/Database'
 import { SettingsLayout } from 'components/layouts'
 import { observer } from 'mobx-react-lite'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 import BannedIPs from 'components/interfaces/Settings/Database/BannedIPs'
 import { DatabaseReadOnlyAlert } from 'components/interfaces/Settings/Database/DatabaseReadOnlyAlert'
@@ -13,6 +9,7 @@ import { DatabaseConnectionString } from 'components/interfaces/Settings/Databas
 import DiskSizeConfiguration from 'components/interfaces/Settings/Database/DiskSizeConfiguration'
 import { PoolingModesModal } from 'components/interfaces/Settings/Database/PoolingModesModal'
 import SSLConfiguration from 'components/interfaces/Settings/Database/SSLConfiguration'
+import { ConnectionPooling } from 'components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling'
 
 const ProjectSettings: NextPageWithLayout = () => {
   return (

@@ -1,11 +1,12 @@
 import * as Sentry from '@sentry/nextjs'
-import { match } from 'path-to-regexp'
+//import { match } from 'path-to-regexp'
 
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
-  tracesSampleRate: 0.01,
+  //tracesSampleRate: 0.01,
+  enableTracing: false,
   debug: false,
-  integrations: [
+  integrations: [/*
     new Sentry.BrowserTracing({
       // TODO: update gotrue + api to support Access-Control-Request-Headers: authorization,baggage,sentry-trace,x-client-info
       // then remove these options
@@ -17,7 +18,7 @@ Sentry.init({
           name: standardiseRouterUrl(location.pathname),
         }
       },
-    }),
+    }),*/
   ],
   ignoreErrors: [
     // Used exclusively in Monaco Editor.
@@ -48,6 +49,7 @@ Sentry.init({
 
 // Replace dynamic query param with a template text
 // Support grouping sentry transaction
+/*
 function standardiseRouterUrl(url: string) {
   let finalUrl = url
 
@@ -71,3 +73,4 @@ function standardiseRouterUrl(url: string) {
 
   return finalUrl
 }
+*/

@@ -1,15 +1,12 @@
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
-import { Tabs, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
 
 import { EncryptionKeysManagement, VaultToggle } from 'components/interfaces/Settings/Vault'
 import { SettingsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import Link from 'next/link'
 import VaultNavTabs from 'components/interfaces/Settings/Vault/VaultNavTabs'
 
 const VaultSettingsSecrets: NextPageWithLayout = () => {

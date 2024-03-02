@@ -22,7 +22,7 @@ import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/or
 import { OrganizationMember } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization, useStore } from 'hooks'
-import { Role } from 'types'
+import type { Role } from 'types'
 import { isInviteExpired } from '../Organization.utils'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 

@@ -5,7 +5,7 @@ import { useState } from 'react'
 
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import {
   AlertDescription_Shadcn_,
   Alert_Shadcn_,

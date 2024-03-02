@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { del } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { sqlKeys } from 'data/sql/keys'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { TableLike } from 'hooks/misc/useTable'

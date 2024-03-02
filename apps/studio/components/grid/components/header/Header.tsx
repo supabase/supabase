@@ -7,7 +7,7 @@ import { ReactNode, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useDispatch, useTrackedState } from 'components/grid/store'
-import { Filter, Sort, SupaTable } from 'components/grid/types'
+import type { Filter, Sort, SupaTable } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows-query'
@@ -32,8 +32,8 @@ import {
   cn,
 } from 'ui'
 
-import FilterDropdown from './filter'
-import SortPopover from './sort'
+import FilterDropdown from './filter/FilterPopover'
+import SortPopover from './sort/SortPopover'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before

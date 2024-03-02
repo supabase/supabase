@@ -20,14 +20,14 @@ import { getTables } from 'data/tables/tables-query'
 import { useStore, useUrlState } from 'hooks'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
-import { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
+import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
 import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
 import { TextEditor } from './RowEditor/TextEditor'
 import SchemaEditor from './SchemaEditor'
-import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
+import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import {
   createColumn,
   createTable,
@@ -37,7 +37,7 @@ import {
   updateColumn,
   updateTable,
 } from './SidePanelEditor.utils'
-import { ImportContent } from './TableEditor/TableEditor.types'
+import type { ImportContent } from './TableEditor/TableEditor.types'
 import { Constraint } from 'data/database/constraints-query'
 
 export interface SidePanelEditorProps {

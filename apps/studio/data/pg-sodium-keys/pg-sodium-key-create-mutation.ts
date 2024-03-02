@@ -3,7 +3,7 @@ import toast from 'react-hot-toast'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { pgSodiumKeys } from './keys'
 
 export type CreateEncryptionKeyVariables = {

@@ -10,7 +10,7 @@ import {
   LogsEndpointParams,
   unixMicroToIsoTimestamp,
 } from '.'
-import { LogData, QueryType } from './Logs.types'
+import type { LogData, QueryType } from './Logs.types'
 import AuthSelectionRenderer from './LogSelectionRenderers/AuthSelectionRenderer'
 import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
 import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'

@@ -2,7 +2,7 @@ import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { oauthAppKeys } from './keys'
 
 export type OAuthAppsVariables = {

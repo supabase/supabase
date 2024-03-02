@@ -16,7 +16,7 @@ import {
 } from 'components/layouts/Scaffold'
 import { useIntegrationsGitHubInstalledConnectionDeleteMutation } from 'data/integrations/integrations-github-connection-delete-mutation'
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { IntegrationName, IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import type { IntegrationName, IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { pluralize } from 'lib/helpers'

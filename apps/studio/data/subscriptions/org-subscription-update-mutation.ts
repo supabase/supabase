@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast'
 import { ResponseError } from 'types/base'
 import { subscriptionKeys } from './keys'
 import { usageKeys } from 'data/usage/keys'
-import { SubscriptionTier } from './types'
+import type { SubscriptionTier } from './types'
 import { invoicesKeys } from 'data/invoices/keys'
 
 export type OrgSubscriptionUpdateVariables = {

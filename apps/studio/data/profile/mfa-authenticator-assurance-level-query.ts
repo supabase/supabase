@@ -2,7 +2,7 @@ import { AuthMFAGetAuthenticatorAssuranceLevelResponse } from '@supabase/supabas
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { auth } from 'lib/gotrue'
 import { profileKeys } from './keys'
-import { Profile } from './types'
+import type { Profile } from './types'
 
 export type ProfileResponse = Profile
 
