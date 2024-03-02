@@ -1,8 +1,9 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import * as Tooltip from '@radix-ui/react-tooltip'
-import React from 'react'
+import React, { useState } from 'react'
 import { Button } from '../../../index'
 import styleHandler from '../../lib/theme/styleHandler'
+import { Maximize2, Minimize2 } from 'lucide-react'
 
 export type SidePanelProps = RadixProps & CustomProps
 
@@ -60,6 +61,7 @@ const SidePanel = ({
   ...props
 }: SidePanelProps) => {
   const __styles = styleHandler('sidepanel')
+  const [fullscreen, setFullscreen] = useState(false)
 
   const footerContent = customFooter ? (
     customFooter
@@ -127,7 +129,7 @@ const SidePanel = ({
         <Dialog.Content
           className={[
             __styles.base,
-            __styles.size[size],
+            fullscreen ? 'max-w-full w-screen' : __styles.size[size],
             __styles.align[align],
             className && className,
           ].join(' ')}
@@ -141,7 +143,24 @@ const SidePanel = ({
             if (props.onInteractOutside) props.onInteractOutside(event)
           }}
         >
-          {header && <header className={__styles.header}>{header}</header>}
+          {header && (
+            <header className={__styles.header}>
+              {header}
+              <div>
+                {!fullscreen ? (
+                  <Maximize2
+                    className="h-4 w-4 cursor-pointer"
+                    onClick={() => setFullscreen(true)}
+                  />
+                ) : (
+                  <Minimize2
+                    className="h-4 w-4 cursor-pointer"
+                    onClick={() => setFullscreen(false)}
+                  />
+                )}
+              </div>
+            </header>
+          )}
           <div className={__styles.contents}>{children}</div>
           {!hideFooter && footerContent}
         </Dialog.Content>

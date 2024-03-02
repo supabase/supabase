@@ -859,7 +859,8 @@ export default {
     `,
     header: `
       space-y-1 py-4 px-4 bg-overlay sm:px-6
-      border-b border-overlay
+      border-b border-overlay flex justify-between
+      items-center
     `,
     contents: `
       relative
