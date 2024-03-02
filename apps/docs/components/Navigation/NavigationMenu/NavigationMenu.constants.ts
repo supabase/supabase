@@ -1670,8 +1670,8 @@ export const platform: NavMenuConstant = {
         },
         {
           name: 'Reference',
-          url: '/guides/platform/terraform/reference'
-        }
+          url: '/guides/platform/terraform/reference',
+        },
       ],
     },
     {
