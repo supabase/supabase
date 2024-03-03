@@ -11,7 +11,7 @@ interface UpgradeToProProps {
   icon?: ReactNode
   primaryText: string
   projectRef: string
-  organizationSlug: string
+  organizationSlug?: string
   secondaryText: string
   addon?: 'pitr' | 'customDomain' | 'computeInstance'
   buttonText?: string
@@ -63,7 +63,7 @@ const UpgradeToPro = ({
                 <Link
                   href={
                     plan === 'free'
-                      ? `/org/${organizationSlug}/billing?panel=subscriptionPlan`
+                      ? `/org/${organizationSlug ?? '_'}/billing?panel=subscriptionPlan`
                       : `/project/${projectRef}/settings/addons?panel=${addon}`
                   }
                 >
