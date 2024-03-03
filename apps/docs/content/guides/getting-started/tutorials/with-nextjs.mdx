@@ -1144,12 +1144,12 @@ Let's create an avatar widget for the user so that they can upload a profile pho
 ```jsx app/account/avatar.jsx
 'use client'
 import React, { useEffect, useState } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/utils/supabase/client'
 import Image from 'next/image'
 
 export default function Avatar({ uid, url, size, onUpload }) {
-  const supabase = createClientComponentClient()
-  const [avatarUrl, setAvatarUrl] = useState(null)
+  const supabase = createClient()
+  const [avatarUrl, setAvatarUrl] = useState(url)
   const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
@@ -1215,10 +1215,11 @@ export default function Avatar({ uid, url, size, onUpload }) {
           {uploading ? 'Uploading ...' : 'Upload'}
         </label>
         <input
-          style={{
-            visibility: 'hidden',
-            position: 'absolute',
-          }}
+            style={{
+                visibility: 'hidden',
+                position: 'absolute',
+            }}
+          className='invisible absolute'
           type="file"
           id="single"
           accept="image/*"
@@ -1237,24 +1238,22 @@ export default function Avatar({ uid, url, size, onUpload }) {
 ```tsx app/account/avatar.tsx
 'use client'
 import React, { useEffect, useState } from 'react'
-import { Database } from '../database.types'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/utils/supabase/client'
 import Image from 'next/image'
-type Profiles = Database['public']['Tables']['profiles']['Row']
 
 export default function Avatar({
   uid,
   url,
   size,
-  onUpload,
+  onUpload
 }: {
-  uid: string
-  url: Profiles['avatar_url']
+  uid: string | null
+  url: string | null
   size: number
   onUpload: (url: string) => void
 }) {
-  const supabase = createClientComponentClient<Database>()
-  const [avatarUrl, setAvatarUrl] = useState<Profiles['avatar_url']>(url)
+  const supabase = createClient()
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(url)
   const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
@@ -1320,10 +1319,11 @@ export default function Avatar({
           {uploading ? 'Uploading ...' : 'Upload'}
         </label>
         <input
-          style={{
-            visibility: 'hidden',
-            position: 'absolute',
-          }}
+            style={{
+                visibility: 'hidden',
+                position: 'absolute',
+            }}
+          className='invisible absolute'
           type="file"
           id="single"
           accept="image/*"
@@ -1342,8 +1342,15 @@ export default function Avatar({
 ### Add the new widget
 
 And then we can add the widget to the `AccountForm` component:
-
-```jsx app/account/account-form.js
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+```jsx app/account/account-form.jsx
 // Import the new component
 import Avatar from './avatar'
 
@@ -1353,7 +1360,7 @@ return (
   <div className="form-widget">
     {/* Add to the body */}
     <Avatar
-      uid={user.id}
+      uid={user?.id}
       url={avatar_url}
       size={150}
       onUpload={(url) => {
@@ -1365,6 +1372,33 @@ return (
   </div>
 )
 ```
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+```tsx app/account/account-form.tsx
+// Import the new component
+import Avatar from './avatar'
+
+// ...
+
+return (
+  <div className="form-widget">
+    {/* Add to the body */}
+    <Avatar
+      uid={user?.id ?? null}
+      url={avatar_url}
+      size={150}
+      onUpload={(url) => {
+        setAvatarUrl(url)
+        updateProfile({ fullname, username, website, avatar_url: url })
+      }}
+    />
+    {/* ... */}
+  </div>
+)
+```
+</TabPanel>
+</Tabs>
 
 ### Storage management
 
