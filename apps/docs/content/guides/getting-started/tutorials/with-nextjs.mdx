@@ -521,7 +521,7 @@ export async function login(formData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/account')
 }
 
 export async function signup(formData) {
@@ -541,7 +541,7 @@ export async function signup(formData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/account')
 }
 ```
 
@@ -580,7 +580,7 @@ export async function login(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/account')
 }
 
 export async function signup(formData: FormData) {
@@ -600,7 +600,7 @@ export async function signup(formData: FormData) {
   }
 
   revalidatePath('/', 'layout')
-  redirect('/')
+  redirect('/account')
 }
 ```
 
@@ -612,7 +612,7 @@ export default function ErrorPage() {
 </CH.Code>
 </TabPanel>
 
-When you enter your email and password, you will receive an email with the title `Confirm Your Signup`. Congrats 🎉!!!
+When you enter your email and password, you will receive an email with the title **Confirm Your Signup**. Congrats 🎉!!!
 
 </Tabs>
 
@@ -1052,7 +1052,7 @@ export default async function Account() {
 
 ### Sign out
 
-Let's create a route handler to handle the signout from the server side.
+Let's create a route handler to handle the signout from the server side. Make sure to check if the user is logged in first!
 
 <Tabs
   scrollable
