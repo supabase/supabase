@@ -724,73 +724,6 @@ export async function GET(request: NextRequest) {
 </TabPanel>
 </Tabs>
 
-### Sign out
-
-Let's create a route handler to handle the signout from the server side.
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-<TabPanel id="js" label="JavaScript">
-
-```js app/auth/signout/route.js
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
-
-export async function POST(req) {
-  const cookieStore = cookies()
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
-
-  // Check if we have a session
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (user) {
-    await supabase.auth.signOut()
-  }
-
-  return NextResponse.redirect(new URL('/', req.url), {
-    status: 302,
-  })
-}
-```
-
-</TabPanel>
-<TabPanel id="ts" label="TypeScript">
-
-```ts app/auth/signout/route.ts
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import { type NextRequest, NextResponse } from 'next/server'
-
-export async function POST(req: NextRequest) {
-  const cookieStore = cookies()
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
-
-  // Check if we have a session
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
-
-  if (session) {
-    await supabase.auth.signOut()
-  }
-
-  return NextResponse.redirect(new URL('/', req.url), {
-    status: 302,
-  })
-}
-```
-
-</TabPanel>
-</Tabs>
-
 ### Account page
 
 After a user is signed in we can allow them to edit their profile details and manage their account.
@@ -806,13 +739,14 @@ Let's create a new component for that called `AccountForm` within the `app/accou
 >
 <TabPanel id="js" label="JavaScript">
 
+<CH.Code className="max-h-[40rem]">
 ```jsx app/account/account-form.jsx
 'use client'
 import { useCallback, useEffect, useState } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/utils/supabase/client'
 
 export default function AccountForm({ user }) {
-  const supabase = createClientComponentClient()
+  const supabase = createClient()
   const [loading, setLoading] = useState(true)
   const [fullname, setFullname] = useState(null)
   const [username, setUsername] = useState(null)
@@ -926,18 +860,20 @@ export default function AccountForm({ user }) {
   )
 }
 ```
+</CH.Code>
 
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
 
+<CH.Code className="max-h-[40rem]">
 ```tsx app/account/account-form.tsx
 'use client'
 import { useCallback, useEffect, useState } from 'react'
-import { Database } from '../database.types'
-import { User, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/utils/supabase/client'
+import { type User } from '@supabase/supabase-js'
 
 export default function AccountForm({ user }: { user: User | null }) {
-  const supabase = createClientComponentClient<Database>()
+  const supabase = createClient()
   const [loading, setLoading] = useState(true)
   const [fullname, setFullname] = useState<string | null>(null)
   const [username, setUsername] = useState<string | null>(null)
@@ -955,6 +891,7 @@ export default function AccountForm({ user }: { user: User | null }) {
         .single()
 
       if (error && status !== 406) {
+        console.log(error)
         throw error
       }
 
@@ -1056,10 +993,11 @@ export default function AccountForm({ user }: { user: User | null }) {
           </button>
         </form>
       </div>
-    </div>
+    </div>  
   )
 }
 ```
+</CH.Code>
 
 </TabPanel>
 </Tabs>
@@ -1076,13 +1014,11 @@ Create an account page for the `AccountForm` component we just created
 <TabPanel id="js" label="JavaScript">
 
 ```jsx app/account/page.jsx
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
 import AccountForm from './account-form'
+import { createClient } from '@/utils/supabase/server'
 
 export default async function Account() {
-  const cookieStore = cookies()
-  const supabase = createServerComponentClient({ cookies: () => cookieStore })
+  const supabase = createClient()
 
   const {
     data: { user },
@@ -1096,19 +1032,85 @@ export default async function Account() {
 <TabPanel id="ts" label="TypeScript">
 
 ```tsx app/account/page.tsx
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import { Database } from '../database.types'
 import AccountForm from './account-form'
+import { createClient } from '@/utils/supabase/server'
 
 export default async function Account() {
-  const supabase = createServerComponentClient<Database>({ cookies })
+  const supabase = createClient()
 
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
   return <AccountForm user={user} />
+}
+```
+
+</TabPanel>
+</Tabs>
+
+
+### Sign out
+
+Let's create a route handler to handle the signout from the server side.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js app/auth/signout/route.js
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { NextResponse } from 'next/server'
+
+export async function POST(req) {
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+
+  // Check if we have a session
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (user) {
+    await supabase.auth.signOut()
+  }
+
+  return NextResponse.redirect(new URL('/', req.url), {
+    status: 302,
+  })
+}
+```
+
+</TabPanel>
+<TabPanel id="ts" label="TypeScript">
+
+```ts app/auth/signout/route.ts
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
+import { cookies } from 'next/headers'
+import { type NextRequest, NextResponse } from 'next/server'
+
+export async function POST(req: NextRequest) {
+  const cookieStore = cookies()
+  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+
+  // Check if we have a session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  if (session) {
+    await supabase.auth.signOut()
+  }
+
+  return NextResponse.redirect(new URL('/', req.url), {
+    status: 302,
+  })
 }
 ```
 
