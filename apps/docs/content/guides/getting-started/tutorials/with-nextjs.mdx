@@ -1064,15 +1064,13 @@ Let's create a route handler to handle the signout from the server side.
 <TabPanel id="js" label="JavaScript">
 
 ```js app/auth/signout/route.js
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClient } from '@/utils/supabase/server'
 import { NextResponse } from 'next/server'
 
 export async function POST(req) {
-  const cookieStore = cookies()
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+  const supabase = createClient()
 
-  // Check if we have a session
+  // Check if a user's logged in
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -1081,7 +1079,7 @@ export async function POST(req) {
     await supabase.auth.signOut()
   }
 
-  return NextResponse.redirect(new URL('/', req.url), {
+  return NextResponse.redirect(new URL('/login', req.url), {
     status: 302,
   })
 }
@@ -1091,24 +1089,22 @@ export async function POST(req) {
 <TabPanel id="ts" label="TypeScript">
 
 ```ts app/auth/signout/route.ts
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { createClient } from '@/utils/supabase/server'
 import { type NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
-  const cookieStore = cookies()
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+  const supabase = createClient()
 
-  // Check if we have a session
+  // Check if a user's logged in
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (session) {
+  if (user) {
     await supabase.auth.signOut()
   }
 
-  return NextResponse.redirect(new URL('/', req.url), {
+  return NextResponse.redirect(new URL('/login', req.url), {
     status: 302,
   })
 }
