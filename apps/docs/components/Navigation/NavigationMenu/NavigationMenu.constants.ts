@@ -1657,6 +1657,24 @@ export const platform: NavMenuConstant = {
       ],
     },
     {
+      name: 'Terraform',
+      url: undefined,
+      items: [
+        {
+          name: 'Terraform Provider',
+          url: '/guides/platform/terraform',
+        },
+        {
+          name: 'Terraform Tutorial',
+          url: '/guides/platform/terraform/tutorial',
+        },
+        {
+          name: 'Reference',
+          url: '/guides/platform/terraform/reference',
+        },
+      ],
+    },
+    {
       name: 'Production Readiness',
       url: undefined,
       items: [

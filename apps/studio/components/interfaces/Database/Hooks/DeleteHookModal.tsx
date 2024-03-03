@@ -1,7 +1,7 @@
 import { PostgresTrigger } from '@supabase/postgres-meta'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
 import { useStore } from 'hooks'
 
