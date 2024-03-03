@@ -10,7 +10,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 interface UpgradeToProProps {
   icon?: ReactNode
   primaryText: string
-  projectRef: string
+  projectRef?: string
   organizationSlug?: string
   secondaryText: string
   addon?: 'pitr' | 'customDomain' | 'computeInstance'
@@ -64,7 +64,7 @@ const UpgradeToPro = ({
                   href={
                     plan === 'free'
                       ? `/org/${organizationSlug ?? '_'}/billing?panel=subscriptionPlan`
-                      : `/project/${projectRef}/settings/addons?panel=${addon}`
+                      : `/project/${projectRef ?? '_'}/settings/addons?panel=${addon}`
                   }
                 >
                   {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon')}
