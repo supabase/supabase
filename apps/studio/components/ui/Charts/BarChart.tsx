@@ -2,7 +2,7 @@ import { CHART_COLORS, DateTimeFormats } from 'components/ui/Charts/Charts.const
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useState } from 'react'
-import { Bar, BarChart as RechartBarChart, Cell, Tooltip, XAxis } from 'recharts'
+import { Bar, BarChart as RechartBarChart, Cell, Tooltip, XAxis, Legend } from 'recharts'
 import { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart'
 import ChartHeader from './ChartHeader'
 import { CommonChartProps, Datum } from './Charts.types'
@@ -16,6 +16,9 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   customDateFormat?: string
   displayDateInUtc?: boolean
   onBarClick?: (datum: Datum, tooltipData?: CategoricalChartState) => void
+  emptyStateMessage?: string
+  showLegend?: boolean
+  xAxisIsDate?: boolean
 }
 
 const BarChart = ({
@@ -32,12 +35,16 @@ const BarChart = ({
   valuePrecision,
   className = '',
   size = 'normal',
+  emptyStateMessage,
   onBarClick,
+  showLegend = false,
+  xAxisIsDate = true,
 }: BarChartProps) => {
   const { Container } = useChartSize(size)
   const [focusDataIndex, setFocusDataIndex] = useState<number | null>(null)
 
-  if (data.length === 0) return <ChartNoData size={size} className={className} />
+  if (data.length === 0)
+    return <ChartNoData message={emptyStateMessage} size={size} className={className} />
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
   const resolvedHighlightedLabel =
@@ -87,6 +94,7 @@ const BarChart = ({
             if (onBarClick) onBarClick(datum, tooltipData)
           }}
         >
+          {showLegend && <Legend />}
           <XAxis
             dataKey={xAxisKey}
             interval={data.length - 2}
@@ -122,8 +130,14 @@ const BarChart = ({
       </Container>
       {data && (
         <div className="text-foreground-lighter -mt-9 flex items-center justify-between text-xs">
-          <span>{day(data[0][xAxisKey]).format(customDateFormat)}</span>
-          <span>{day(data[data?.length - 1]?.[xAxisKey]).format(customDateFormat)}</span>
+          <span>
+            {xAxisIsDate ? day(data[0][xAxisKey]).format(customDateFormat) : data[0][xAxisKey]}
+          </span>
+          <span>
+            {xAxisIsDate
+              ? day(data[data?.length - 1]?.[xAxisKey]).format(customDateFormat)
+              : data[data?.length - 1]?.[xAxisKey]}
+          </span>
         </div>
       )}
     </div>

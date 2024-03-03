@@ -5,7 +5,7 @@ import { Button, IconExternalLink, IconSearch, Input, Modal } from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSecretsDeleteMutation } from 'data/secrets/secrets-delete-mutation'
 import { ProjectSecret, useSecretsQuery } from 'data/secrets/secrets-query'

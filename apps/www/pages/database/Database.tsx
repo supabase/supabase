@@ -1,30 +1,38 @@
 // Import Swiper styles
 import 'swiper/swiper.min.css'
 
+import dynamic from 'next/dynamic'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Badge, Button, IconArrowUpRight, IconX, Tabs } from 'ui'
+import { Swiper, SwiperSlide } from 'swiper/react'
+
 // data
+import Solutions from 'data/Solutions'
 import ApiExamplesData from 'data/products/database/api-examples'
+import HighlightsCards from '~/data/products/database/highlight-cards'
 import ExtensionsExamplesData from 'data/products/database/extensions-examples'
 import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
 import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
-import Solutions from 'data/Solutions'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import ImageCarousel from '~/components/Carousels/ImageCarousel'
-import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
-import FeatureColumn from '~/components/FeatureColumn'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import ProductIcon from '~/components/ProductIcon'
-import APISection from '~/components/Sections/APISection'
-import GithubExamples from '~/components/Sections/GithubExamples'
-import ProductHeader from '~/components/Sections/ProductHeader'
+
 import { ThemeImage } from 'ui-patterns/ThemeImage'
 import { TweetCard } from 'ui-patterns/TweetCard'
+import ProductHeader from '~/components/Sections/ProductHeader'
+
+const NewFeatureCard = dynamic(() => import('~/components/NewFeatureCard'))
+const ImageCarousel = dynamic(() => import('~/components/Carousels/ImageCarousel'))
+const SplitCodeBlockCarousel = dynamic(
+  () => import('~/components/Carousels/SplitCodeBlockCarousel')
+)
+const FeatureColumn = dynamic(() => import('~/components/FeatureColumn'))
+const DefaultLayout = dynamic(() => import('~/components/Layouts/Default'))
+const SectionContainer = dynamic(() => import('~/components/Layouts/SectionContainer'))
+const ProductIcon = dynamic(() => import('~/components/ProductIcon'))
+const APISection = dynamic(() => import('~/components/Sections/APISection'))
+const GithubExamples = dynamic(() => import('~/components/Sections/GithubExamples'))
 
 function Database() {
   // base path for images
@@ -137,6 +145,11 @@ function Database() {
               </p>
             </div>
           </div>
+        </SectionContainer>
+
+        <SectionContainer className="!py-0 grid lg:grid-cols-2 gap-2 lg:gap-4">
+          <NewFeatureCard {...HighlightsCards.branching} />
+          <NewFeatureCard {...HighlightsCards.readReplicas} />
         </SectionContainer>
 
         {/* <SectionContainer>÷ */}

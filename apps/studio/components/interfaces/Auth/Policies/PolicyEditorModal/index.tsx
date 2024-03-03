@@ -2,7 +2,7 @@ import { isEmpty, noop } from 'lodash'
 import { useEffect, useState } from 'react'
 import { Modal } from 'ui'
 
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useStore } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
@@ -237,7 +237,7 @@ const PolicyEditorModal = ({
           />
         ) : view === POLICY_MODAL_VIEWS.TEMPLATES ? (
           <PolicyTemplates
-            templates={getGeneralPolicyTemplates(schema, table)}
+            templates={getGeneralPolicyTemplates(schema, table).filter((policy) => !policy.preview)}
             templatesNote="* References a specific column in the table"
             onUseTemplate={onUseTemplate}
           />
