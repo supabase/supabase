@@ -20,11 +20,7 @@ const ContentFile = ({ connectionStringPooler, connectionStringDirect }: Content
       <ConnectTabContent value=".env">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
-# Connect to Supabase via connection pooling with Supavisor.
 DATABASE_URL="${connectionStringPooler}"
-
-# Or if you want to use direct connection to the database.
-DATABASE_URL="${connectionStringDirect}"
         `}
         </SimpleCodeBlock>
       </ConnectTabContent>

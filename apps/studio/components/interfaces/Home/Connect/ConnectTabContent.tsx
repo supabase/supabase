@@ -17,7 +17,6 @@ interface ConnectContentTabProps {
 
 const ConnectTabContentNew = ({ projectKeys, filePath }: ConnectContentTabProps) => {
   const { ref } = useParams()
-
   const { data } = useProjectSettingsQuery({ projectRef: ref })
   const { data: poolingInfo } = usePoolingConfigurationQuery({ projectRef: ref })
 
@@ -41,8 +40,14 @@ const ConnectTabContentNew = ({ projectKeys, filePath }: ConnectContentTabProps)
           usePoolerConnection: false,
         })
       : { uri: '' }
-  const connectionStringPooler = connectionStringsPooler.uri.replace('6543', '5432')
-  const connectionStringDirect = connectionStringsDirect.uri.replace('6543', '5432')
+  const connectionStringPooler =
+    filePath !== 'drizzle'
+      ? connectionStringsPooler.uri.replace('6543', '5432')
+      : connectionStringsPooler.uri
+  const connectionStringDirect =
+    filePath !== 'drizzle'
+      ? connectionStringsDirect.uri.replace('6543', '5432')
+      : connectionStringsDirect.uri
 
   const ContentFile = dynamic<ConnectContentTabProps>(
     () => import(`./content/${filePath}/content`),
