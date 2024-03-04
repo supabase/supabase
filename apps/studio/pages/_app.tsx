@@ -31,8 +31,6 @@ import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-// @ts-ignore
-import Prism from 'prism-react-renderer/prism'
 import { ConsentToast } from 'ui-patterns/ConsentToast'
 import PortalToast from 'ui/src/layout/PortalToast'
 
@@ -49,11 +47,10 @@ import { useRootQueryClient } from 'data/query-client'
 import { StoreProvider } from 'hooks'
 import { AuthProvider } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { dart } from 'lib/constants/prism'
+
 import { ProfileProvider } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import { RootStore } from 'stores'
-import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import type { AppPropsWithLayout } from 'types'
 import { Toaster } from 'ui'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -63,7 +60,6 @@ dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
-dart(Prism)
 
 loader.config({
   // [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
@@ -180,7 +176,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   </TooltipProvider>
                 </PageTelemetry>
 
-                <HCaptchaLoadedStore />
                 <Toaster />
                 <PortalToast />
                 {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
