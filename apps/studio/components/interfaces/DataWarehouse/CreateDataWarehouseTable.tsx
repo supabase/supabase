@@ -6,7 +6,7 @@ import { Button, IconPlus, Input, Modal } from 'ui'
 
 type Props = {}
 
-const CreateCollectionModal = (props: Props) => {
+export const CreateDataWarehouseTableModal = (props: Props) => {
   const [isOpen, setIsOpen] = React.useState(false)
   const router = useRouter()
   const projectRef = router.query.projectRef as string
@@ -24,7 +24,7 @@ const CreateCollectionModal = (props: Props) => {
           setIsOpen(!isOpen)
         }}
       >
-        New event collection
+        New table
       </Button>
       <Modal
         size="medium"
@@ -85,5 +85,3 @@ const CreateCollectionModal = (props: Props) => {
     </>
   )
 }
-
-export default CreateCollectionModal

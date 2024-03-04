@@ -10,9 +10,8 @@ import { generateLogsMenu } from './LogsMenu.utils'
 import { useCollectionsQuery } from 'data/collections/collections-query'
 import { Menu } from 'ui'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import CreateCollectionModal from 'components/interfaces/Collections/CreateCollectionModal'
-import CollectionMenuItem from 'components/interfaces/Collections/CollectionMenuItem'
-
+import { CreateDataWarehouseTableModal } from 'components/interfaces/DataWarehouse/CreateDataWarehouseTable'
+import { DatawarehouseMenuItem } from 'components/interfaces/DataWarehouse/DataWarehouseMenuItem'
 interface LogsLayoutProps {
   title?: string
 }
@@ -65,7 +64,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
           <div className="h-px w-full bg-overlay"></div>
           <div className="py-6">
             <div className="px-6">
-              <Menu.Group title="Event Collections" />
+              <Menu.Group title="Data Warehouse" />
             </div>
             {collectionsLoading ? (
               <div className="py-3 px-3 space-y-1.5">
@@ -76,10 +75,10 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
             ) : (
               <div className="px-3 flex flex-col  editor-product-menu">
                 <div className="space-y-1">
-                  <CreateCollectionModal />
-                  <div className=" py-3">
+                  <CreateDataWarehouseTableModal />
+                  <div className="py-3">
                     {collections?.map((item) => (
-                      <CollectionMenuItem item={item} key={item.id + '-collection-item'} />
+                      <DatawarehouseMenuItem item={item} key={item.id + '-collection-item'} />
                     ))}
                   </div>
                 </div>

@@ -5,7 +5,7 @@ import React from 'react'
 
 type Props = {}
 
-const CollectionDetail = (props: Props) => {
+export const DataWarehouseTableDetail = (props: Props) => {
   const router = useRouter()
   const collectionId = router.query.collectionId as string
   const projectRef = router.query.ref as string
@@ -25,5 +25,3 @@ const CollectionDetail = (props: Props) => {
     />
   )
 }
-
-export default CollectionDetail

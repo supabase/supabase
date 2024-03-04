@@ -30,7 +30,7 @@ type Props = {
   }
 }
 
-const CollectionMenuItem = ({ item }: Props) => {
+export const DatawarehouseMenuItem = ({ item }: Props) => {
   const router = useRouter()
   const project = useSelectedProject()
   const projectRef = project?.ref || 'default'
@@ -220,5 +220,3 @@ const CollectionMenuItem = ({ item }: Props) => {
     </>
   )
 }
-
-export default CollectionMenuItem
