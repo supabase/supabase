@@ -231,7 +231,7 @@ const NavigationBar = () => {
                       'transition-all'
                     )}
                   >
-                    {profile && (
+                    {profile && IS_PLATFORM && (
                       <>
                         <span
                           title={profile.username}
