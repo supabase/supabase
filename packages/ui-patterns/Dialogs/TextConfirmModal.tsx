@@ -10,6 +10,8 @@ import {
   Alert_Shadcn_,
   Button,
   DialogContent_Shadcn_,
+  DialogSectionSeparator_Shadcn_,
+  DialogSection_Shadcn_,
   DialogTitle_Shadcn_,
   Dialog_Shadcn_,
   FormControl_Shadcn_,
@@ -28,7 +30,7 @@ export interface TextConfirmModalProps {
   loading: boolean
   visible: boolean
   title: string
-  // size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge'
+  size?: React.ComponentProps<typeof DialogContent_Shadcn_>['size']
   cancelLabel?: string
   confirmLabel?: string
   confirmPlaceholder: string
@@ -109,34 +111,31 @@ const TextConfirmModal = forwardRef<
           }
         }}
       >
-        <DialogContent_Shadcn_ ref={ref} className="p-0 gap-0 max-w-sm pb-5">
+        <DialogContent_Shadcn_ ref={ref} className="p-0 gap-0 pb-5" size={size}>
           <DialogTitle_Shadcn_ className="border-b px-5 py-4">{title}</DialogTitle_Shadcn_>
           {alert && (
-            <>
-              <Admonition
-                type={variant as 'default' | 'destructive' | 'warning'}
-                label={alert.title}
-                description={alert.description}
-                className="border-r-0 border-l-0 rounded-none -mt-px [&_svg]:ml-0.5 mb-0"
-                {...alert?.base}
-              />
-            </>
-            // <Alert_Shadcn_
-            //   className="border-r-0 border-l-0 rounded-none -mt-px"
-            //   {...alert?.base}
-            //   variant={variant}
-            // >
-            //   <IconAlertCircle strokeWidth={2} className="ml-0.5" />
-            //   <AlertTitle_Shadcn_ {...alert?.title} />
-            //   <AlertDescription_Shadcn_ {...alert?.description} />
-            // </Alert_Shadcn_>
+            <Admonition
+              type={variant as 'default' | 'destructive' | 'warning'}
+              label={alert.title}
+              description={alert.description}
+              className="border-r-0 border-l-0 rounded-none -mt-px [&_svg]:ml-0.5 mb-0"
+              {...alert?.base}
+            />
           )}
-          {children && <div className="p-5">{children}</div>}
+          {children && (
+            <>
+              <DialogSection_Shadcn_ className="p-5">{children}</DialogSection_Shadcn_>
+              <DialogSectionSeparator_Shadcn_ />
+            </>
+          )}
           {/* // older prop from before refactor */}
           {text !== undefined && (
-            <div className="p-5">
-              <p className="mb-2 block text-sm break-all">{text}</p>
-            </div>
+            <>
+              <DialogSection_Shadcn_ className="p-5">
+                <p className="mb-2 block text-sm break-all">{text}</p>
+              </DialogSection_Shadcn_>
+              <DialogSectionSeparator_Shadcn_ />
+            </>
           )}
           <Form_Shadcn_ {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="px-5 flex flex-col gap-2 pt-3">

@@ -38,6 +38,7 @@ export const Primary: Story = {
     confirmString: 'project name',
     visible: false,
     title: 'Are you sure you want to delete?',
+    size: 'small',
     // label: 'Try Me!',
   },
   /**
@@ -258,6 +259,36 @@ export const withChildren: Story = {
             </div>
           </div>
         </TextConfirmModal>
+      </>
+    )
+  },
+}
+
+export const withSize: Story = {
+  args: {
+    confirmString: 'project name',
+    visible: false,
+    size: 'xlarge',
+    variant: 'destructive',
+    title: 'Are you sure you want to delete?',
+  },
+  /**
+   * 👇 To avoid linting issues, it is recommended to use a function with a capitalized name.
+   * If you are not concerned with linting, you may use an arrow function.
+   */
+  render: function Render(args) {
+    const [{ visible }, updateArgs] = useArgs()
+
+    function onVisibleChange() {
+      updateArgs({ visible: !visible })
+    }
+
+    return (
+      <>
+        <Button type="default" onClick={() => onVisibleChange()}>
+          Open warning text confirm dialog
+        </Button>
+        <TextConfirmModal key="withWarningAlert" {...args} onCancel={() => onVisibleChange()} />
       </>
     )
   },

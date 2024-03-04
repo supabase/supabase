@@ -5,6 +5,7 @@ import { X } from 'lucide-react'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
+import { VariantProps, cva } from 'class-variance-authority'
 
 export const DIALOG_PADDING_Y = 'py-6'
 export const DIALOG_PADDING_X = 'px-7'
@@ -36,25 +37,45 @@ const DialogOverlay = React.forwardRef<
 ))
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
+const DialogContentVariants = cva(
+  cn(
+    'my-8',
+    'relative z-50 grid w-full gap-4 border p-6 shadow-md dark:shadow-sm duration-200',
+    'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+    'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+    'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%',
+    'data-[state=open]:slide-in-from-left-[0%] data-[state=open]:slide-in-from-top-[0%]',
+    'sm:rounded-lg md:w-full',
+    'bg-overlay'
+  ),
+  {
+    variants: {
+      size: {
+        tiny: `sm:align-middle sm:w-full sm:max-w-xs`,
+        small: `sm:align-middle sm:w-full sm:max-w-sm`,
+        medium: `sm:align-middle sm:w-full sm:max-w-lg`,
+        large: `sm:align-middle sm:w-full max-w-xl`,
+        xlarge: `sm:align-middle sm:w-full max-w-3xl`,
+        xxlarge: `sm:align-middle sm:w-full max-w-6xl`,
+        xxxlarge: `sm:align-middle sm:w-full max-w-7xl`,
+      },
+    },
+    defaultVariants: {
+      size: 'medium',
+    },
+  }
+)
+
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> &
+    VariantProps<typeof DialogContentVariants>
+>(({ className, children, size, ...props }, ref) => (
   <DialogPortal>
     <DialogOverlay>
       <DialogPrimitive.Content
         ref={ref}
-        className={cn(
-          'my-8',
-          'relative z-50 grid w-full max-w-lg gap-4 border p-6 shadow-md dark:shadow-sm duration-200',
-          'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-          'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
-          'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%',
-          'data-[state=open]:slide-in-from-left-[0%] data-[state=open]:slide-in-from-top-[0%]',
-          'sm:rounded-lg md:w-full',
-          'bg-overlay',
-          className
-        )}
+        className={cn(DialogContentVariants({ size }), className)}
         {...props}
       >
         {children}
@@ -141,6 +162,14 @@ const DialogSection = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
 )
 DialogSection.displayName = 'DialogSection'
 
+const DialogSectionSeparator = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, children, ...props }, ref) => (
+  <div ref={ref} {...props} className={cn('w-full h-px bg-border-overlay', className)} />
+))
+DialogSectionSeparator.displayName = 'DialogSectionSeparator'
+
 export {
   Dialog,
   DialogContent,
@@ -151,4 +180,5 @@ export {
   DialogTitle,
   DialogTrigger,
   DialogSection,
+  DialogSectionSeparator,
 }
