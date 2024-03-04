@@ -1,0 +1,226 @@
+import { useArgs } from '@storybook/preview-api'
+import { StoryObj } from '@storybook/react'
+import { Button } from 'ui'
+import TextConfirmModal from './TextConfirmModal'
+
+// More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
+export default {
+  title: 'Dialog Patterns/TextConfirmModal',
+  component: TextConfirmModal,
+  parameters: {
+    // Optional parameter to center the component in the Canvas. More info: https://storybook.js.org/docs/configure/story-layout
+    layout: 'centered',
+  },
+  // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
+  tags: ['autodocs'],
+  // More on argTypes: https://storybook.js.org/docs/api/argtypes
+  // argTypes: {
+  //   backgroundColor: { control: 'color' },
+  // },
+}
+
+// export default meta
+
+// More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
+// export const Primary = {
+//   args: {
+//     size: 'small',
+//     // visible: true,
+//   },
+// }
+
+type Story = StoryObj<typeof TextConfirmModal>
+
+export const Primary: Story = {
+  args: {
+    visible: false,
+    title: 'Are you sure you want to delete?',
+    // label: 'Try Me!',
+  },
+  /**
+   * 👇 To avoid linting issues, it is recommended to use a function with a capitalized name.
+   * If you are not concerned with linting, you may use an arrow function.
+   */
+  render: function Render(args) {
+    const [{ visible }, updateArgs] = useArgs()
+    // const [visible, setVisibleState] = useState(args.visible)
+
+    function onVisibleChange() {
+      updateArgs({ visible: !visible })
+    }
+
+    return (
+      <>
+        <Button type="default" onClick={() => onVisibleChange()}>
+          Open text confirm dialog
+        </Button>
+        <TextConfirmModal
+          // visible={visible}
+          key="primary"
+          {...args}
+          onCancel={() => onVisibleChange()}
+          // onChange={onChange}
+
+          // isChecked={isChecked}
+        />
+      </>
+    )
+  },
+}
+
+export const withWarningAlert: Story = {
+  args: {
+    visible: false,
+    variant: 'warning',
+    title: 'Are you sure you want to delete?',
+    alert: {
+      base: {
+        variant: 'warning',
+      },
+      title: {
+        children: 'This is a warning',
+      },
+      description: {
+        children: 'You are about to delete this item. This action cannot be undone.',
+      },
+    },
+    // label: 'Try Me!',
+  },
+  /**
+   * 👇 To avoid linting issues, it is recommended to use a function with a capitalized name.
+   * If you are not concerned with linting, you may use an arrow function.
+   */
+  render: function Render(args) {
+    const [{ visible }, updateArgs] = useArgs()
+    // const [visible, setVisibleState] = useState(args.visible)
+
+    function onVisibleChange() {
+      updateArgs({ visible: !visible })
+    }
+
+    return (
+      <>
+        <Button type="default" onClick={() => onVisibleChange()}>
+          Open warning text confirm dialog
+        </Button>
+        <TextConfirmModal
+          key="withWarningAlert"
+          // visible={visible}
+          {...args}
+          onCancel={() => onVisibleChange()}
+          // onChange={onChange}
+
+          // isChecked={isChecked}
+        />
+      </>
+    )
+  },
+}
+
+export const withDestructiveAlert: Story = {
+  args: {
+    visible: false,
+    variant: 'destructive',
+    title: 'Are you sure you want to delete?',
+    alert: {
+      base: {
+        variant: 'warning',
+      },
+      title: {
+        children: 'This is a warning',
+      },
+      description: {
+        children: 'You are about to delete this item. This action cannot be undone.',
+      },
+    },
+    // label: 'Try Me!',
+  },
+  /**
+   * 👇 To avoid linting issues, it is recommended to use a function with a capitalized name.
+   * If you are not concerned with linting, you may use an arrow function.
+   */
+  render: function Render(args) {
+    const [{ visible }, updateArgs] = useArgs()
+    // const [visible, setVisibleState] = useState(args.visible)
+
+    function onVisibleChange() {
+      updateArgs({ visible: !visible })
+    }
+
+    return (
+      <>
+        <Button type="default" onClick={() => onVisibleChange()}>
+          Open warning text confirm dialog
+        </Button>
+        <TextConfirmModal
+          key="withWarningAlert"
+          // visible={visible}
+          {...args}
+          onCancel={() => onVisibleChange()}
+          // onChange={onChange}
+
+          // isChecked={isChecked}
+        />
+      </>
+    )
+  },
+}
+
+export const withCancelButton: Story = {
+  args: {
+    visible: false,
+    variant: 'destructive',
+    title: 'Are you sure you want to delete?',
+    blockDeleteButton: false,
+    // label: 'Try Me!',
+  },
+  /**
+   * 👇 To avoid linting issues, it is recommended to use a function with a capitalized name.
+   * If you are not concerned with linting, you may use an arrow function.
+   */
+  render: function Render(args) {
+    const [{ visible }, updateArgs] = useArgs()
+    // const [visible, setVisibleState] = useState(args.visible)
+
+    function onVisibleChange() {
+      updateArgs({ visible: !visible })
+    }
+
+    return (
+      <>
+        <Button type="default" onClick={() => onVisibleChange()}>
+          Open warning text confirm dialog
+        </Button>
+        <TextConfirmModal
+          key="withWarningAlert"
+          // visible={visible}
+          {...args}
+          onCancel={() => onVisibleChange()}
+          // onChange={onChange}
+
+          // isChecked={isChecked}
+        />
+      </>
+    )
+  },
+}
+
+// export const Secondary = {
+//   args: {
+//     label: 'Button',
+//   },
+// }
+
+// export const Large = {
+//   args: {
+//     size: 'large',
+//     label: 'Button',
+//   },
+// }
+
+// export const Small = {
+//   args: {
+//     size: 'small',
+//     label: 'Button',
+//   },
+// }

@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 @import './../../../packages/ui/build/css/source/global.css';
-@import './../../../packages/ui/build/css/themes/deep-dark.css';
 @import './../../../packages/ui/build/css/themes/dark.css';
+@import './../../../packages/ui/build/css/themes/deep-dark.css';
 @import './../../../packages/ui/build/css/themes/light.css';
 
 @layer base {
@@ -74,7 +74,7 @@
 }
 
 html {
-  @apply bg text font-[400];
+  @apply bg text;
   font-feature-settings:
     'rlig' 1,
     'calt' 1;
