@@ -19,7 +19,7 @@ import {
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import CodeEditor from 'components/ui/CodeEditor'
+import { CodeEditor } from 'components/ui/CodeEditor'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'

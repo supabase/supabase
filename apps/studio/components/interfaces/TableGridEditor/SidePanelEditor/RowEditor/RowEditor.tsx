@@ -10,7 +10,7 @@ import ActionBar from '../ActionBar'
 import ForeignRowSelector from './ForeignRowSelector/ForeignRowSelector'
 import HeaderTitle from './HeaderTitle'
 import InputField from './InputField'
-import JsonEdit from './JsonEditor'
+import { JsonEditor } from './JsonEditor'
 import { JsonEditValue, RowField } from './RowEditor.types'
 import {
   generateRowFields,
@@ -190,7 +190,7 @@ const RowEditor = ({
                 </SidePanel.Content>
               </>
             )}
-            <JsonEdit
+            <JsonEditor
               visible={isEditingJson}
               column={selectedValueForJsonEdit?.column ?? ''}
               jsonString={selectedValueForJsonEdit?.jsonString ?? ''}

@@ -24,7 +24,7 @@ import { Dictionary } from 'types'
 import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
 import { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
-import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
+import JsonEditor from './RowEditor/JsonEditor/JsonEditor'
 import { TextEditor } from './RowEditor/TextEditor'
 import SchemaEditor from './SchemaEditor'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
@@ -608,7 +608,7 @@ const SidePanelEditor = ({
         updateEditorDirty={() => setIsEdited(true)}
       />
       <SchemaEditor visible={snap.sidePanel?.type === 'schema'} closePanel={onClosePanel} />
-      <JsonEdit
+      <JsonEditor
         visible={snap.sidePanel?.type === 'json'}
         column={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.column) || ''}
         jsonString={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.jsonString) || ''}
