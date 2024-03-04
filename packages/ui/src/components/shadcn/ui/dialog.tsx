@@ -41,9 +41,10 @@ const DialogContent = React.forwardRef<
   <DialogPortal>
     {/* <DialogOverlay /> */}
     <DialogPrimitive.Overlay
-      className={
+      className={cn(
+        'bg-alternative/90 backdrop-blur-sm',
         'z-50 fixed inset-0 grid place-items-center overflow-y-auto data-open:animate-overlay-show data-closed:animate-overlay-hide'
-      }
+      )}
     >
       <DialogPrimitive.Content
         ref={ref}
