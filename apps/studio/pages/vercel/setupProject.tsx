@@ -216,6 +216,7 @@ const CreateProject = observer(() => {
       length: 16,
       numbers: true,
       uppercase: true,
+      exclude: '@:/',
     })
 
     setDbPass(password)

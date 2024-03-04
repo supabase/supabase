@@ -134,6 +134,7 @@ const CreateProject = () => {
       length: 16,
       numbers: true,
       uppercase: true,
+      exclude: '@:/',
     })
 
     setDbPass(password)

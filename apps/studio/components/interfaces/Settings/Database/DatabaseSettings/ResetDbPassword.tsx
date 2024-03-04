@@ -91,6 +91,7 @@ const ResetDbPassword = ({ disabled = false }) => {
       length: 16,
       numbers: true,
       uppercase: true,
+      exclude: '@:/',
     })
     setPassword(password)
     delayedCheckPasswordStrength(password)

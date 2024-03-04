@@ -200,6 +200,7 @@ const Wizard: NextPageWithLayout = () => {
       length: 16,
       numbers: true,
       uppercase: true,
+      exclude: '@:/',
     })
 
     setDbPass(password)
@@ -539,6 +540,7 @@ const Wizard: NextPageWithLayout = () => {
                 )}
 
                 <Panel.Content className="border-b border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
+                  {dbPass}
                   <Input
                     id="password"
                     copy={dbPass.length > 0}
