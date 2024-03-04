@@ -26,7 +26,7 @@ import Message from './Message'
 
 export type MessageWithDebug = MessageType & { isDebug: boolean }
 
-interface AISQLEditorPolicyChatProps {
+interface AiAssistantPanelProps {
   messages: MessageWithDebug[]
   loading: boolean
   onSubmit: (s: string) => void
@@ -35,14 +35,14 @@ interface AISQLEditorPolicyChatProps {
   onChange: (value: boolean) => void
 }
 
-export const AISQLEditorPolicyChat = ({
+export const AiAssistantPanel = ({
   messages,
   loading,
   onSubmit,
   onDiff,
   onClose,
   onChange,
-}: AISQLEditorPolicyChatProps) => {
+}: AiAssistantPanelProps) => {
   const { profile } = useProfile()
   const snap = useAppStateSnapshot()
   const bottomRef = useRef<HTMLDivElement>(null)

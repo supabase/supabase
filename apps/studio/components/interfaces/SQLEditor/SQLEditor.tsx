@@ -50,7 +50,7 @@ import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-
 import { useIsSQLEditorAiAssistantEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
-import { AISQLEditorPolicyChat } from './AiAssistantPanel'
+import { AiAssistantPanel } from './AiAssistantPanel'
 import { DiffActionBar } from './DiffActionBar'
 import { sqlAiDisclaimerComment, untitledSnippetTitle } from './SQLEditor.constants'
 import {
@@ -976,7 +976,7 @@ const SQLEditor = () => {
           </ResizablePanel>
         </ResizablePanelGroup>
         {isAiOpen && isAiAssistantOn && (
-          <AISQLEditorPolicyChat
+          <AiAssistantPanel
             messages={messages}
             loading={isLoadingChat}
             onSubmit={(message) =>
