@@ -10,7 +10,7 @@ import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
-import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import BreadcrumbsView from './BreadcrumbsView'
 import FeedbackDropdown from './FeedbackDropdown'
@@ -21,9 +21,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
-
-  const isBranchingEnabled =
-    selectedProject?.is_branch_enabled === true || selectedProject?.parent_project_ref !== undefined
+  const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
   const { data: orgUsage } = useOrgUsageQuery({ orgSlug: selectedOrganization?.slug })
 
