@@ -14,7 +14,7 @@ import {
   Modal,
   Badge,
 } from 'ui'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
 import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'

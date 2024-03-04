@@ -7,7 +7,7 @@ import { Button, IconPlus, IconTrash, Input, Listbox, Modal, Radio, SidePanel, T
 
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import Panel from 'components/ui/Panel'
 import SqlEditor from 'components/ui/SqlEditor'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'

@@ -12,7 +12,7 @@ import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePre
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import InformationBox from 'components/ui/InformationBox'
 import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
