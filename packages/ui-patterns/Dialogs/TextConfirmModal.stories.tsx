@@ -70,6 +70,40 @@ export const Primary: Story = {
   },
 }
 
+export const withInfoAlert: Story = {
+  args: {
+    confirmString: 'project name',
+    visible: false,
+    variant: 'default',
+    title: 'Are you sure you want to move?',
+    alert: {
+      title: 'This is a reminder banner',
+      description: 'This should not be used for important CRUD events.',
+    },
+  },
+  /**
+   * 👇 To avoid linting issues, it is recommended to use a function with a capitalized name.
+   * If you are not concerned with linting, you may use an arrow function.
+   */
+  render: function Render(args) {
+    const [{ visible }, updateArgs] = useArgs()
+    // const [visible, setVisibleState] = useState(args.visible)
+
+    function onVisibleChange() {
+      updateArgs({ visible: !visible })
+    }
+
+    return (
+      <>
+        <Button type="default" onClick={() => onVisibleChange()}>
+          Open warning text confirm dialog
+        </Button>
+        <TextConfirmModal key="withWarningAlert" {...args} onCancel={() => onVisibleChange()} />
+      </>
+    )
+  },
+}
+
 export const withWarningAlert: Story = {
   args: {
     confirmString: 'project name',
@@ -77,12 +111,8 @@ export const withWarningAlert: Story = {
     variant: 'warning',
     title: 'Are you sure you want to delete?',
     alert: {
-      title: {
-        children: 'This is a warning',
-      },
-      description: {
-        children: 'You are about to delete this item. This action cannot be undone.',
-      },
+      title: 'This is a warning',
+      description: 'You are about to delete this item. This action cannot be undone.',
     },
   },
   /**
@@ -115,12 +145,8 @@ export const withDestructiveAlert: Story = {
     variant: 'destructive',
     title: 'Are you sure you want to delete?',
     alert: {
-      title: {
-        children: 'This is a warning',
-      },
-      description: {
-        children: 'You are about to delete this item. This action cannot be undone.',
-      },
+      title: 'This is a warning',
+      description: 'You are about to delete this item. This action cannot be undone.',
     },
     // label: 'Try Me!',
   },

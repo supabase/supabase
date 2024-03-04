@@ -124,14 +124,10 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
         title={`Confirm deletion of ${project?.name}`}
         variant="destructive"
         alert={{
-          title: {
-            children: isFree
-              ? 'This action cannot be undone.'
-              : `This will permanently delete the ${project?.name}`,
-          },
-          description: {
-            children: !isFree && `All project data will be lost, and cannot be undone`,
-          },
+          title: isFree
+            ? 'This action cannot be undone.'
+            : `This will permanently delete the ${project?.name}`,
+          description: !isFree ? `All project data will be lost, and cannot be undone` : '',
         }}
         text={
           isFree && `This will permanently delete the ${project?.name} project and all of its data.`

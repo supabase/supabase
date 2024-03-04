@@ -90,6 +90,7 @@ const FormLabel = React.forwardRef<
       ref={ref}
       className={cn(
         'text-foreground-light',
+        'transition-colors',
         error && 'text-destructive',
         className,
         'leading-normal'

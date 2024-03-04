@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { ReactNode, forwardRef } from 'react'
 import { useForm } from 'react-hook-form'
 import {
+  Admonition,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -35,11 +36,11 @@ export interface TextConfirmModalProps {
   text?: string | ReactNode
   onConfirm: () => void
   onCancel: () => void
-  variant?: React.ComponentProps<typeof Alert_Shadcn_>['variant']
+  variant: React.ComponentProps<typeof Alert_Shadcn_>['variant']
   alert?: {
     base?: React.ComponentProps<typeof Alert_Shadcn_>
-    title?: React.ComponentProps<typeof AlertTitle_Shadcn_>
-    description?: React.ComponentProps<typeof AlertDescription_Shadcn_>
+    title?: string
+    description?: string
   }
   input?: React.ComponentProps<typeof Input_Shadcn_>
   label?: React.ComponentProps<typeof FormLabel_Shadcn_>
@@ -72,7 +73,7 @@ const TextConfirmModal = forwardRef<
       text,
       children,
       blockDeleteButton = true,
-      variant,
+      variant = 'default',
       ...props
     },
     ref
@@ -108,18 +109,27 @@ const TextConfirmModal = forwardRef<
           }
         }}
       >
-        <DialogContent_Shadcn_ ref={ref} className="p-0 gap-0 max-w-md">
+        <DialogContent_Shadcn_ ref={ref} className="p-0 gap-0 max-w-sm pb-5">
           <DialogTitle_Shadcn_ className="border-b px-5 py-4">{title}</DialogTitle_Shadcn_>
           {alert && (
-            <Alert_Shadcn_
-              className="border-r-0 border-l-0 rounded-none -mt-px"
-              {...alert?.base}
-              variant={variant}
-            >
-              <IconAlertCircle strokeWidth={2} className="ml-0.5" />
-              <AlertTitle_Shadcn_ {...alert?.title} />
-              <AlertDescription_Shadcn_ {...alert?.description} />
-            </Alert_Shadcn_>
+            <>
+              <Admonition
+                type={variant as 'default' | 'destructive' | 'warning'}
+                label={alert.title}
+                description={alert.description}
+                className="border-r-0 border-l-0 rounded-none -mt-px [&_svg]:ml-0.5 mb-0"
+                {...alert?.base}
+              />
+            </>
+            // <Alert_Shadcn_
+            //   className="border-r-0 border-l-0 rounded-none -mt-px"
+            //   {...alert?.base}
+            //   variant={variant}
+            // >
+            //   <IconAlertCircle strokeWidth={2} className="ml-0.5" />
+            //   <AlertTitle_Shadcn_ {...alert?.title} />
+            //   <AlertDescription_Shadcn_ {...alert?.description} />
+            // </Alert_Shadcn_>
           )}
           {children && <div className="p-5">{children}</div>}
           {/* // older prop from before refactor */}
@@ -129,7 +139,7 @@ const TextConfirmModal = forwardRef<
             </div>
           )}
           <Form_Shadcn_ {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 px-5 py-3">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="px-5 flex flex-col gap-2 pt-3">
               <FormField_Shadcn_
                 control={form.control}
                 name="confirmValue"
@@ -142,9 +152,7 @@ const TextConfirmModal = forwardRef<
                     <FormControl_Shadcn_>
                       <Input_Shadcn_ placeholder={confirmPlaceholder} {...input} {...field} />
                     </FormControl_Shadcn_>
-                    <FormDescription_Shadcn_ {...description}>
-                      This is your public display name.
-                    </FormDescription_Shadcn_>
+                    <FormDescription_Shadcn_ {...description} />
                     <FormMessage_Shadcn_ {...formMessage} />
                   </FormItem_Shadcn_>
                 )}
