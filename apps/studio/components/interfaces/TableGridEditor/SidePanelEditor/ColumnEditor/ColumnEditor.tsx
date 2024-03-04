@@ -36,7 +36,11 @@ import ActionBar from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
-import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
+import type {
+  ColumnField,
+  CreateColumnPayload,
+  UpdateColumnPayload,
+} from '../SidePanelEditor.types'
 import ColumnDefaultValue from './ColumnDefaultValue'
 import {
   generateColumnField,
