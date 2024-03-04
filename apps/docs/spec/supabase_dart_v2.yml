@@ -10,7 +10,7 @@ info:
   specUrl: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_dart_v2.yml
   libraries:
     - name: 'Dart'
-    - id: 'dart'
+      id: 'dart'
       version: '0.0.1'
 
 functions:
