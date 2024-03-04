@@ -6,7 +6,7 @@ import { Command, FileText, FlaskConical, Search, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { MouseEvent, useState } from 'react'
 import {
   Button,
   DropdownMenu,
@@ -82,6 +82,13 @@ const NavigationBar = () => {
   const otherRoutes = generateOtherRoutes(projectRef, project)
   const settingsRoutes = generateSettingsRoutes(projectRef, project)
 
+  const onCloseNavigationIconLink = (event: any) => {
+    snap.setNavigationPanelOpen(
+      false,
+      event.target.id === 'icon-link' || ['svg', 'path'].includes(event.target.localName)
+    )
+  }
+
   return (
     <div className="w-14 h-full flex flex-col">
       <nav
@@ -118,12 +125,7 @@ const NavigationBar = () => {
               icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
               link: `/project/${projectRef}`,
             }}
-            onClick={(event) => {
-              snap.setNavigationPanelOpen(
-                false,
-                ['svg', 'path'].includes((event.target as any).localName)
-              )
-            }}
+            onClick={onCloseNavigationIconLink}
           />
           <Separator className="my-1 bg-border-muted" />
           {toolRoutes.map((route) => (
@@ -131,12 +133,7 @@ const NavigationBar = () => {
               key={route.key}
               route={route}
               isActive={activeRoute === route.key}
-              onClick={(event) => {
-                snap.setNavigationPanelOpen(
-                  false,
-                  ['svg', 'path'].includes((event.target as any).localName)
-                )
-              }}
+              onClick={onCloseNavigationIconLink}
             />
           ))}
           <Separator className="my-1 bg-border-muted" />
@@ -145,12 +142,7 @@ const NavigationBar = () => {
               key={route.key}
               route={route}
               isActive={activeRoute === route.key}
-              onClick={(event) => {
-                snap.setNavigationPanelOpen(
-                  false,
-                  ['svg', 'path'].includes((event.target as any).localName)
-                )
-              }}
+              onClick={onCloseNavigationIconLink}
             />
           ))}
           <Separator className="my-1 bg-border-muted" />
@@ -174,12 +166,7 @@ const NavigationBar = () => {
                   key={route.key}
                   route={route}
                   isActive={activeRoute === route.key}
-                  onClick={(event) => {
-                    snap.setNavigationPanelOpen(
-                      false,
-                      ['svg', 'path'].includes((event.target as any).localName)
-                    )
-                  }}
+                  onClick={onCloseNavigationIconLink}
                 />
               )
             }
@@ -192,12 +179,7 @@ const NavigationBar = () => {
               key={route.key}
               route={route}
               isActive={activeRoute === route.key}
-              onClick={(event) => {
-                snap.setNavigationPanelOpen(
-                  false,
-                  ['svg', 'path'].includes((event.target as any).localName)
-                )
-              }}
+              onClick={onCloseNavigationIconLink}
             />
           ))}
 

@@ -42,7 +42,7 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
         onClick={onClick}
         className={cn(classes, props.className)}
       >
-        <span className={cn(...iconClasses)} {...props}>
+        <span id="icon-link" className={cn(...iconClasses)} {...props}>
           {route.icon}
         </span>
         <span
