@@ -74,7 +74,7 @@ export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps)
                 )
               }}
             >
-              <ReplaceCode className="h-4 w-4" />
+              <ReplaceCode className="h-4 w-4 text-foreground-light" strokeWidth={1.5} />
             </Button>
           </Tooltip.Trigger>
           <Tooltip.Portal>
@@ -109,7 +109,7 @@ export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps)
                 )
               }}
             >
-              <InsertCode className="h-4 w-4" />
+              <InsertCode className="h-4 w-4 text-foreground-light" strokeWidth={1.5} />
             </Button>
           </Tooltip.Trigger>
           <Tooltip.Portal>
@@ -144,7 +144,11 @@ export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps)
                 )
               }}
             >
-              {copied ? <Check size={16} className="text-brand-600" /> : <Copy size={16} />}
+              {copied ? (
+                <Check size={16} className="text-brand-600" />
+              ) : (
+                <Copy size={16} className="text-foreground-light" strokeWidth={1.5} />
+              )}
             </Button>
           </Tooltip.Trigger>
           <Tooltip.Portal>
