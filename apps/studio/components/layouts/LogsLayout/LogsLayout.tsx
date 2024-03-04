@@ -64,7 +64,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
 
           <div className="h-px w-full bg-overlay"></div>
           <div className="py-6">
-            <div className="px-3">
+            <div className="px-6">
               <Menu.Group title="Event Collections" />
             </div>
             {collectionsLoading ? (
@@ -76,7 +76,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
             ) : (
               <div className="px-3 flex flex-col  editor-product-menu">
                 <div className="space-y-1">
-                  <CreateCollectionModal></CreateCollectionModal>
+                  <CreateCollectionModal />
                   <div className=" py-3">
                     {collections?.map((item) => (
                       <CollectionMenuItem item={item} key={item.id + '-collection-item'} />
