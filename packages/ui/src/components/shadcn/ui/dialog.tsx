@@ -7,8 +7,23 @@ import * as React from 'react'
 import { cn } from '../../../lib/utils/cn'
 import { VariantProps, cva } from 'class-variance-authority'
 
+export const DIALOG_PADDING_Y_SMALL = 'py-4'
+export const DIALOG_PADDING_X_SMALL = 'px-5'
+
 export const DIALOG_PADDING_Y = 'py-6'
 export const DIALOG_PADDING_X = 'px-7'
+
+const DialogPaddingVariants = cva('', {
+  variants: {
+    padding: {
+      default: `${DIALOG_PADDING_Y} ${DIALOG_PADDING_X}`,
+      small: `${DIALOG_PADDING_Y_SMALL} ${DIALOG_PADDING_X_SMALL}`,
+    },
+  },
+  defaultVariants: {
+    padding: 'default',
+  },
+})
 
 const Dialog = DialogPrimitive.Root
 
@@ -89,17 +104,21 @@ const DialogContent = React.forwardRef<
 ))
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
-const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+const DialogHeader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof DialogPaddingVariants>
+>(({ className, padding = 'default', ...props }, ref) => (
   <div
+    ref={ref}
+    {...props}
     className={cn(
-      'flex flex-col space-y-1.5 text-center sm:text-left',
-      DIALOG_PADDING_X,
-      DIALOG_PADDING_Y,
+      'flex flex-col gap-1.5 text-center sm:text-left',
+      DialogPaddingVariants({ padding }),
       className
     )}
-    {...props}
   />
-)
+))
+
 DialogHeader.displayName = 'DialogHeader'
 
 const DialogFooter = ({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
@@ -153,13 +172,18 @@ const DialogClose = React.forwardRef<
 ))
 DialogClose.displayName = DialogPrimitive.Close.displayName
 
-const DialogSection = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, children, ...props }, ref) => (
-    <div ref={ref} {...props} className={cn('px-5 py-3', className)}>
-      {children}
-    </div>
-  )
-)
+const DialogSection = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof DialogPaddingVariants>
+>(({ className, children, padding, ...props }, ref) => (
+  <div
+    ref={ref}
+    {...props}
+    className={cn('px-5 py-3', DialogPaddingVariants({ padding }), className)}
+  >
+    {children}
+  </div>
+))
 DialogSection.displayName = 'DialogSection'
 
 const DialogSectionSeparator = React.forwardRef<

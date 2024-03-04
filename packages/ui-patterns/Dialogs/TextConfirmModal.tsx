@@ -23,7 +23,13 @@ import {
   Form_Shadcn_,
   IconAlertCircle,
   Input_Shadcn_,
+  cn,
 } from 'ui'
+import {
+  DIALOG_PADDING_X_SMALL,
+  DIALOG_PADDING_Y_SMALL,
+  DialogHeader,
+} from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
 
 export interface TextConfirmModalProps {
@@ -112,7 +118,9 @@ const TextConfirmModal = forwardRef<
         }}
       >
         <DialogContent_Shadcn_ ref={ref} className="p-0 gap-0 pb-5" size={size}>
-          <DialogTitle_Shadcn_ className="border-b px-5 py-4">{title}</DialogTitle_Shadcn_>
+          <DialogHeader className={cn('border-b')} padding={'small'}>
+            <DialogTitle_Shadcn_ className="">{title}</DialogTitle_Shadcn_>
+          </DialogHeader>
           {alert && (
             <Admonition
               type={variant as 'default' | 'destructive' | 'warning'}
@@ -124,15 +132,15 @@ const TextConfirmModal = forwardRef<
           )}
           {children && (
             <>
-              <DialogSection_Shadcn_ className="p-5">{children}</DialogSection_Shadcn_>
+              <DialogSection_Shadcn_ padding={'small'}>{children}</DialogSection_Shadcn_>
               <DialogSectionSeparator_Shadcn_ />
             </>
           )}
           {/* // older prop from before refactor */}
           {text !== undefined && (
             <>
-              <DialogSection_Shadcn_ className="p-5">
-                <p className="mb-2 block text-sm break-all">{text}</p>
+              <DialogSection_Shadcn_ className="p-5" padding={'small'}>
+                <p className="text-foreground-light text-sm">{text}</p>
               </DialogSection_Shadcn_>
               <DialogSectionSeparator_Shadcn_ />
             </>
