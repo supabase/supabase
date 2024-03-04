@@ -1,5 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useEffect } from 'react'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -11,7 +13,6 @@ import {
 } from 'ui'
 import { boolean, number, object } from 'yup'
 
-import { useParams } from 'common'
 import {
   FormActions,
   FormHeader,
@@ -23,7 +24,6 @@ import {
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks'
-import toast from 'react-hot-toast'
 
 const schema = object({
   JWT_EXP: number()

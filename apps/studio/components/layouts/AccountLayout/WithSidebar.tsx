@@ -174,7 +174,7 @@ const SidebarLinkItem = ({
       icon = <IconArrowUpRight size={'tiny'} />
     }
 
-    if (label === 'Logout') {
+    if (label === 'Log out') {
       icon = <IconLogOut size={'tiny'} />
     }
 
