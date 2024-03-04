@@ -210,7 +210,7 @@ To learn more about Auth Hooks, see the [Auth Hooks docs](/guides/auth/auth-hook
 
 </Admonition>
 
-## Using roles in RLS policies
+## Accessing custom claims in RLS policies
 
 To utilize Role-Based Access Control (RBAC) in Row Level Security (RLS) policies, create an `authorize` method that reads the user's role from their JWT and checks the role's permissions:
 
@@ -246,6 +246,27 @@ You can then use the `authorize` method within your RLS policies. For example, t
 create policy "Allow authorized delete access" on public.channels for delete using ( authorize('channels.delete', auth.uid()) );
 create policy "Allow authorized delete access" on public.messages for delete using ( authorize('messages.delete', auth.uid()) );
 ```
+
+## Accessing custom claims in your application
+
+The auth hook will only modify the access token JWT but not the auth response. Therefore, to access the custom claims in your application, e.g. your browser client, or server-side middleware, you will need to decode the `access_token` JWT on the auth session.
+
+In a JavaScript client application you can for example use the [`jwt-decode` package](https://www.npmjs.com/package/jwt-decode):
+
+```js
+import { jwtDecode } from 'jwt-decode'
+
+const { subscription: authListener } = supabase.auth.onAuthStateChange(async (event, session) => {
+  if (session) {
+    const jwt = jwtDecode(session.access_token)
+    const userRole = jwt.user_role
+  }
+})
+```
+
+For server-side logic you can use packages like [express-jwt](https://github.com/auth0/express-jwt), [koa-jwt](https://github.com/stiang/koa-jwt), [PyJWT](https://github.com/jpadilla/pyjwt), [dart_jsonwebtoken](https://pub.dev/packages/dart_jsonwebtoken), [Microsoft.AspNetCore.Authentication.JwtBearer](https://www.nuget.org/packages/Microsoft.AspNetCore.Authentication.JwtBearer), etc.
+
+## Conclusion
 
 You now have a robust system in place to manage user roles and permissions within your database that automatically propagates to Supabase Auth.
 
