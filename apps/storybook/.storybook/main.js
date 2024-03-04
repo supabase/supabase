@@ -26,9 +26,9 @@ const config = {
     getAbsolutePath('@storybook/addon-onboarding'),
     getAbsolutePath('@storybook/addon-interactions'),
     getAbsolutePath('@storybook/addon-mdx-gfm'),
-    getAbsolutePath("@storybook/addon-styling-webpack"),
-    getAbsolutePath("@storybook/addon-themes"),
-    getAbsolutePath("@storybook/addon-mdx-gfm")
+    getAbsolutePath('@storybook/addon-styling-webpack'),
+    getAbsolutePath('@storybook/addon-themes'),
+    getAbsolutePath('@storybook/addon-mdx-gfm'),
   ],
   framework: {
     name: getAbsolutePath('@storybook/nextjs'),
