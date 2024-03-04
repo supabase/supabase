@@ -154,7 +154,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
         ref={ref}
         key={connection.id}
         {...props}
-        className={cn(showNode && 'pl-8 ml-6 border-l border-muted', 'pb-2', 'relative')}
+        className={cn(showNode && 'pl-8 ml-6 border-l border-muted', 'relative')}
       >
         {showNode && (
           <div className="absolute w-8 rounded-bl-full border-b border-l border-muted h-10 -left-px"></div>
@@ -164,14 +164,16 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
             orientation === 'horizontal'
               ? 'flex items-center justify-between'
               : 'flex flex-col gap-3',
-            'bg-surface-100 border shadow-sm px-8 py-4 rounded-lg',
+            'bg-surface-100 border shadow-sm px-6 py-4 rounded-lg',
             className
           )}
         >
           <div className={'flex flex-col gap-1'}>
             <div className="flex gap-2 items-center">
               <HandleIcon type={'Supabase'} />
-              <span className="text-sm">{project?.name}</span>
+              <span title={project?.name} className="text-sm truncate">
+                {project?.name}
+              </span>
               <IconArrowRight size={14} className="text-foreground-lighter" strokeWidth={1.5} />
               {!connection?.metadata?.framework ? (
                 <div className="bg-black text-white w-4 h-4 rounded flex items-center justify-center">
@@ -185,7 +187,21 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
                   alt={`icon`}
                 />
               )}
-              <span className="text-sm truncate">{connection.metadata?.name}</span>
+              {type === 'GitHub' ? (
+                <a
+                  title={connection.metadata.name}
+                  href={`https://github.com/${connection.metadata?.name}`}
+                  className="text-sm truncate"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {connection.metadata?.name}
+                </a>
+              ) : (
+                <span title={connection.metadata.name} className="text-sm truncate">
+                  {connection.metadata?.name}
+                </span>
+              )}
             </div>
 
             <div className="flex flex-col gap-0">

@@ -3,46 +3,49 @@ import { toast } from 'react-hot-toast'
 
 import { patch } from 'data/fetchers'
 import { ResponseError } from 'types'
-import { UpdateConnectionPayload } from './integrations.types'
 import { integrationKeys } from './keys'
 
-export async function updateGithubConnection({
-  id,
-  metadata,
-  organizationIntegrationId,
-}: UpdateConnectionPayload) {
-  const { data, error } = await patch('/platform/integrations/github/connections/{connection_id}', {
-    params: {
-      path: { connection_id: id },
-    },
-    body: {
-      // @ts-expect-error
-      metadata,
-    },
-  })
+type UpdateVariables = {
+  connectionId: string | number
+  organizationId: number
+  workdir: string
+  supabaseChangesOnly: boolean
+}
 
+export async function updateConnection(
+  { connectionId, workdir, supabaseChangesOnly }: UpdateVariables,
+  signal?: AbortSignal
+) {
+  const { data, error } = await patch('/platform/integrations/github/connections/{connection_id}', {
+    params: { path: { connection_id: String(connectionId) } },
+    signal,
+    body: { workdir, supabase_changes_only: supabaseChangesOnly },
+  })
   if (error) throw error
+
   return data
 }
 
-type UpdateGithubConnectionData = Awaited<ReturnType<typeof updateGithubConnection>>
+type UpdateContentData = Awaited<ReturnType<typeof updateConnection>>
 
-export const useGithubConnectionUpdateMutation = ({
+export const useGitHubConnectionUpdateMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<UpdateGithubConnectionData, ResponseError, UpdateConnectionPayload>,
+  UseMutationOptions<UpdateContentData, ResponseError, UpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<UpdateGithubConnectionData, ResponseError, UpdateConnectionPayload>(
-    (vars) => updateGithubConnection(vars),
+  return useMutation<UpdateContentData, ResponseError, UpdateVariables>(
+    (args) => updateConnection(args),
     {
       async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(
-          integrationKeys.githubConnectionsList(variables.organizationIntegrationId)
-        )
+        await Promise.all([
+          queryClient.invalidateQueries(
+            integrationKeys.githubConnectionsList(variables.organizationId)
+          ),
+        ])
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

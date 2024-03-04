@@ -1,5 +1,6 @@
 import { useParams } from 'common'
 import { partition } from 'lodash'
+import { MessageCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -11,20 +12,18 @@ import {
   IconAlertTriangle,
   IconExternalLink,
   IconGitHub,
-  IconSearch,
-  Input,
   Modal,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useGithubPullRequestsQuery } from 'data/integrations/integrations-github-pull-requests-query'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import { useGitHubPullRequestsQuery } from 'data/integrations/github-pull-requests-query'
 import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
 import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
 import CreateBranchModal from './CreateBranchModal'
@@ -34,7 +33,6 @@ import {
   PullRequestsEmptyState,
 } from './EmptyStates'
 import Overview from './Overview'
-import { MessageCircle } from 'lucide-react'
 
 const BranchManagement = () => {
   const { ui } = useStore()
@@ -55,12 +53,14 @@ const BranchManagement = () => {
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
 
   const {
-    data: integrations,
-    error: integrationsError,
-    isLoading: isLoadingIntegrations,
-    isError: isErrorIntegrations,
-    isSuccess: isSuccessIntegrations,
-  } = useOrgIntegrationsQuery({ orgSlug: selectedOrg?.slug })
+    data: connections,
+    error: connectionsError,
+    isLoading: isLoadingConnections,
+    isSuccess: isSuccessConnections,
+    isError: isErrorConnections,
+  } = useGitHubConnectionsQuery({
+    organizationId: selectedOrg?.id,
+  })
 
   const {
     data: branches,
@@ -79,16 +79,8 @@ const BranchManagement = () => {
       ? (branchesWithPRs.map((branch) => branch.pr_number).filter(Boolean) as number[])
       : undefined
 
-  const githubIntegration = integrations?.find(
-    (integration) =>
-      integration.integration.name === 'GitHub' &&
-      integration.organization.slug === selectedOrg?.slug
-  )
-  const githubConnection = githubIntegration?.connections?.find(
-    (connection) => connection.supabase_project_ref === projectRef
-  )
-  const repo = githubConnection?.metadata.name ?? ''
-  const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') || []
+  const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
+  const repo = githubConnection?.repository.name ?? ''
 
   const {
     data: allPullRequests,
@@ -96,17 +88,15 @@ const BranchManagement = () => {
     isLoading: isLoadingPullRequests,
     isError: isErrorPullRequests,
     isSuccess: isSuccessPullRequests,
-  } = useGithubPullRequestsQuery({
-    organizationIntegrationId: githubIntegration?.id,
-    repoOwner,
-    repoName,
+  } = useGitHubPullRequestsQuery({
+    connectionId: githubConnection?.id,
     prNumbers,
   })
   const pullRequests = allPullRequests ?? []
 
-  const isError = isErrorIntegrations || isErrorBranches
-  const isLoading = isLoadingIntegrations || isLoadingBranches
-  const isSuccess = isSuccessIntegrations && isSuccessBranches
+  const isError = isErrorConnections || isErrorBranches
+  const isLoading = isLoadingConnections || isLoadingBranches
+  const isSuccess = isSuccessConnections && isSuccessBranches
 
   const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
     onSuccess: () => {
@@ -138,8 +128,8 @@ const BranchManagement = () => {
     if (githubConnection === undefined) return 'https://github.com'
 
     return branch !== undefined
-      ? `https://github.com/${githubConnection.metadata.name}/compare/${mainBranch?.git_branch}...${branch}`
-      : `https://github.com/${githubConnection.metadata.name}/compare`
+      ? `https://github.com/${githubConnection.repository.name}/compare/${mainBranch?.git_branch}...${branch}`
+      : `https://github.com/${githubConnection.repository.name}/compare`
   }
 
   const onConfirmDeleteBranch = () => {
@@ -219,14 +209,14 @@ const BranchManagement = () => {
                 </div>
               </div>
 
-              {isErrorIntegrations && (
+              {isErrorConnections && (
                 <AlertError
-                  error={integrationsError}
+                  error={connectionsError}
                   subject="Failed to retrieve GitHub integration connection"
                 />
               )}
 
-              {isSuccessIntegrations && (
+              {isSuccessConnections && (
                 <div className="border rounded-lg px-6 py-2 flex items-center justify-between">
                   <div className="flex items-center gap-x-4">
                     <div className="w-8 h-8 bg-scale-300 border rounded-md flex items-center justify-center">

@@ -6,15 +6,14 @@ import { ResponseError } from 'types'
 import { integrationKeys } from './keys'
 
 type DeleteVariables = {
-  connectionId: string
-
-  integrationId: string
-  orgSlug: string | undefined
+  connectionId: string | number
+  organizationId: number
 }
 
 export async function deleteConnection({ connectionId }: DeleteVariables, signal?: AbortSignal) {
   const { data, error } = await del('/platform/integrations/github/connections/{connection_id}', {
-    params: { path: { connection_id: connectionId } },
+    params: { path: { connection_id: String(connectionId) } },
+    signal,
   })
   if (error) throw error
 
@@ -23,7 +22,7 @@ export async function deleteConnection({ connectionId }: DeleteVariables, signal
 
 type DeleteContentData = Awaited<ReturnType<typeof deleteConnection>>
 
-export const useIntegrationsGitHubInstalledConnectionDeleteMutation = ({
+export const useGitHubConnectionDeleteMutation = ({
   onSuccess,
   onError,
   ...options
@@ -37,11 +36,8 @@ export const useIntegrationsGitHubInstalledConnectionDeleteMutation = ({
     {
       async onSuccess(data, variables, context) {
         await Promise.all([
-          queryClient.invalidateQueries(integrationKeys.integrationsList()),
-          queryClient.invalidateQueries(integrationKeys.integrationsListWithOrg(variables.orgSlug)),
-          queryClient.invalidateQueries(integrationKeys.githubRepoList(variables.integrationId)),
           queryClient.invalidateQueries(
-            integrationKeys.githubConnectionsList(variables.integrationId)
+            integrationKeys.githubConnectionsList(variables.organizationId)
           ),
         ])
         await onSuccess?.(data, variables, context)

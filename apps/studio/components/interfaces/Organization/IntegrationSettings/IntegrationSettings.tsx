@@ -1,12 +1,8 @@
 import { useCallback } from 'react'
 
-import {
-  EmptyIntegrationConnection,
-  IntegrationConnectionHeader,
-  IntegrationInstallation,
-} from 'components/interfaces/Integrations/IntegrationPanels'
-import VercelSection from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
+import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
+import VercelSection from 'components/interfaces/Settings/Integrations/VercelIntegration/VercelSection'
 import {
   ScaffoldContainer,
   ScaffoldDivider,
@@ -14,12 +10,11 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { useIntegrationsGitHubInstalledConnectionDeleteMutation } from 'data/integrations/integrations-github-connection-delete-mutation'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
-import { IntegrationName, IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
+import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedOrganization, useStore } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-import { pluralize } from 'lib/helpers'
+import { BASE_PATH, OPT_IN_TAGS } from 'lib/constants'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationConnectionItem } from '../../Integrations/IntegrationConnection'
 import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
@@ -38,41 +33,36 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 const IntegrationSettings = () => {
   const { ui } = useStore()
   const org = useSelectedOrganization()
-  const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
+  const hasAccessToBranching = org?.opt_in_tags?.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) ?? false
+  const { data: connections } = useGitHubConnectionsQuery({ organizationId: org?.id })
+
+  const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
+    onSuccess: () => {
+      ui.setNotification({
+        category: 'success',
+        message: 'Successfully deleted Github connection',
+      })
+    },
+  })
+
   const sidePanelsStateSnapshot = useSidePanelsStateSnapshot()
 
-  const { mutate: deleteGitHubConnection } = useIntegrationsGitHubInstalledConnectionDeleteMutation(
-    {
-      onSuccess: () => {
-        ui.setNotification({
-          category: 'success',
-          message: 'Successfully deleted Github connection',
-        })
-      },
-    }
-  )
-
-  const githubIntegrations = data?.filter(
-    (integration) => integration.integration.name === 'GitHub'
-  )
-
-  const onAddGitHubConnection = useCallback(
-    (integrationId: string) => {
-      sidePanelsStateSnapshot.setGithubConnectionsIntegrationId(integrationId)
-      sidePanelsStateSnapshot.setGithubConnectionsOpen(true)
-    },
-    [sidePanelsStateSnapshot]
-  )
+  const onAddGitHubConnection = useCallback(() => {
+    sidePanelsStateSnapshot.setGithubConnectionsOpen(true)
+  }, [sidePanelsStateSnapshot])
 
   const onDeleteGitHubConnection = useCallback(
     async (connection: IntegrationProjectConnection) => {
+      if (!org?.id) {
+        throw new Error('Organization not found')
+      }
+
       deleteGitHubConnection({
         connectionId: connection.id,
-        integrationId: connection.organization_integration_id,
-        orgSlug: org?.slug,
+        organizationId: org.id,
       })
     },
-    [deleteGitHubConnection, org?.slug]
+    [deleteGitHubConnection, org?.id]
   )
 
   /**
@@ -91,8 +81,6 @@ Connect any of your GitHub repositories to a project.
 
 You will be able to connect a GitHub repository to a Supabase project.
 The GitHub app will watch for changes in your repository such as file changes, branch changes as well as pull request activity.
-
-These connections will be part of a GitHub workflow that is currently in development.
 `
 
   const GitHubSection = () => (
@@ -104,51 +92,54 @@ These connections will be part of a GitHub workflow that is currently in develop
         </ScaffoldSectionDetail>
         <ScaffoldSectionContent>
           <Markdown content={GitHubContentSectionTop} />
-          {githubIntegrations &&
-            githubIntegrations.length > 0 &&
-            githubIntegrations.map((integration, i) => {
-              const ConnectionHeaderTitle = `${integration.connections.length} project ${pluralize(
-                integration.connections.length,
-                'connection'
-              )} `
 
-              return (
-                <div key={integration.id}>
-                  <IntegrationInstallation title={'GitHub'} integration={integration} />
-                  {integration.connections.length > 0 ? (
-                    <>
-                      <IntegrationConnectionHeader
-                        title={ConnectionHeaderTitle}
-                        markdown={`Repository connections for GitHub`}
-                      />
-                      <ul className="flex flex-col">
-                        {integration.connections.map((connection) => (
-                          <IntegrationConnectionItem
-                            key={connection.id}
-                            connection={connection}
-                            type={'GitHub' as IntegrationName}
-                            onDeleteConnection={onDeleteGitHubConnection}
-                          />
-                        ))}
-                      </ul>
-                    </>
-                  ) : (
-                    <IntegrationConnectionHeader
-                      markdown={`### ${integration.connections.length} project ${pluralize(
-                        integration.connections.length,
-                        'connection'
-                      )} Repository connections for GitHub`}
-                    />
-                  )}
-                  <EmptyIntegrationConnection
-                    onClick={() => onAddGitHubConnection(integration.id)}
-                    orgSlug={org?.slug}
-                  >
-                    Add new project connection
-                  </EmptyIntegrationConnection>
-                </div>
-              )
-            })}
+          <ul className="flex flex-col gap-y-2">
+            {connections?.map((connection) => (
+              <IntegrationConnectionItem
+                key={connection.id}
+                connection={{
+                  id: String(connection.id),
+                  added_by: {
+                    id: String(connection.user?.id),
+                    primary_email: connection.user?.primary_email ?? '',
+                    username: connection.user?.username ?? '',
+                  },
+                  foreign_project_id: String(connection.repository.id),
+                  supabase_project_ref: connection.project.ref,
+                  organization_integration_id: 'unused',
+                  inserted_at: connection.inserted_at,
+                  updated_at: connection.updated_at,
+                  metadata: {
+                    name: connection.repository.name,
+                  } as any,
+                }}
+                type="GitHub"
+                onDeleteConnection={onDeleteGitHubConnection}
+              />
+            ))}
+          </ul>
+          {hasAccessToBranching ? (
+            <EmptyIntegrationConnection
+              onClick={onAddGitHubConnection}
+              orgSlug={org?.slug}
+              showNode={false}
+            >
+              Add new project connection
+            </EmptyIntegrationConnection>
+          ) : (
+            <p className="text-sm text-foreground-light">
+              Access to{' '}
+              <a
+                href="https://supabase.com/docs/guides/platform/branching"
+                target="_blank"
+                rel="noreferrer"
+                className="text-foreground"
+              >
+                branching
+              </a>{' '}
+              is required to add GitHub connections.
+            </p>
+          )}
         </ScaffoldSectionContent>
       </ScaffoldSection>
     </ScaffoldContainer>
