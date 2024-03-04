@@ -1,6 +1,4 @@
-import EdgeFunctionDetails from './EdgeFunctionDetails/EdgeFunctionDetails'
-import EdgeFunctionsListItem from './EdgeFunctionsListItem'
-import FunctionsEmptyState from './FunctionsEmptyState'
-import TerminalInstructions from './TerminalInstructions'
-
-export { EdgeFunctionDetails, EdgeFunctionsListItem, FunctionsEmptyState, TerminalInstructions }
+export { default as EdgeFunctionDetails } from './EdgeFunctionDetails/EdgeFunctionDetails'
+export { default as EdgeFunctionsListItem } from './EdgeFunctionsListItem'
+export { default as FunctionsEmptyState } from './FunctionsEmptyState'
+export { default as TerminalInstructions } from './TerminalInstructions'

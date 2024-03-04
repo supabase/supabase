@@ -10,7 +10,7 @@ import ExtensionCard from 'components/interfaces/Database/Extensions/ExtensionCa
 import GraphiQL from 'components/interfaces/GraphQL/GraphiQL'
 import { DocsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Connecting from 'components/ui/Loading/Loading'
+import { Loading } from 'components/ui/Loading'
 import { useSessionAccessTokenQuery } from 'data/auth/session-access-token-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
@@ -86,7 +86,7 @@ const GraphiQLPage: NextPageWithLayout = () => {
   }, [projectRef, getImpersonatedRole, jwtSecret, accessToken, serviceRoleKey])
 
   if ((IS_PLATFORM && !accessToken) || !isFetched || (isExtensionsLoading && !pgGraphqlExtension)) {
-    return <Connecting />
+    return <Loading />
   }
 
   if (pgGraphqlExtension?.installed_version === null) {

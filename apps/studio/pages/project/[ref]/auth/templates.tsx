@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import { EmailTemplates } from 'components/interfaces'
+import { EmailTemplates } from 'components/interfaces/Auth'
 import { AuthLayout } from 'components/layouts'
 import { FormsContainer } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'

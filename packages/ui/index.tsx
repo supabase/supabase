@@ -81,6 +81,9 @@ export * from './src/components/ThemeProvider/prefixedThemes'
 
 // shadcn
 export * from './src/components/shadcn/ui/dropdown-menu'
+export * from './src/components/shadcn/ui/use-toast'
+export * from './src/components/shadcn/ui/toast'
+export * from './src/components/shadcn/ui/toaster'
 
 export {
   Command as Command_Shadcn_,
@@ -171,6 +174,8 @@ export { Checkbox as Checkbox_Shadcn_ } from './src/components/shadcn/ui/checkbo
 
 export * from './src/components/shadcn/ui/scroll-area'
 
+export * from './src/components/shadcn/ui/hover-card'
+
 export {
   Collapsible as Collapsible_Shadcn_,
   CollapsibleTrigger as CollapsibleTrigger_Shadcn_,
@@ -202,9 +207,13 @@ export {
   TooltipContent as TooltipContent_Shadcn_,
 } from './src/components/shadcn/ui/tooltip'
 
+export { Toggle as Toggle_Shadcn } from './src/components/shadcn/ui/toggle'
+
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
 
 export { Separator } from './src/components/shadcn/ui/separator'
+
+export * from './src/components/shadcn/ui/resizable'
 
 // links
 

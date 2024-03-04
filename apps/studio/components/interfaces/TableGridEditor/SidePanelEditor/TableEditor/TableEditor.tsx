@@ -5,13 +5,18 @@ import { useEffect, useState } from 'react'
 import { Alert, Badge, Button, Checkbox, IconBookOpen, Input, Modal, SidePanel } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
+import {
+  CONSTRAINT_TYPE,
+  Constraint,
+  useTableConstraintsQuery,
+} from 'data/database/constraints-query'
 import {
   ForeignKeyConstraint,
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
-import { usePostgresTypesQuery } from 'data/database/types-query'
+import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useIsFeatureEnabled, useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
@@ -54,6 +59,7 @@ export interface TableEditorProps {
       isRealtimeEnabled: boolean
       isDuplicateRows: boolean
       existingForeignKeyRelations: ForeignKeyConstraint[]
+      primaryKey?: Constraint
     },
     resolve: any
   ) => void
@@ -74,7 +80,7 @@ const TableEditor = ({
   const isNewRecord = isUndefined(table)
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
 
-  const { data: types } = usePostgresTypesQuery({
+  const { data: types } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -102,6 +108,16 @@ const TableEditor = ({
   const [importContent, setImportContent] = useState<ImportContent>()
   const [isImportingSpreadsheet, setIsImportingSpreadsheet] = useState<boolean>(false)
   const [rlsConfirmVisible, setRlsConfirmVisible] = useState<boolean>(false)
+
+  const { data: constraints } = useTableConstraintsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: table?.schema,
+    table: table?.name,
+  })
+  const primaryKey = (constraints ?? []).find(
+    (constraint) => constraint.type === CONSTRAINT_TYPE.PRIMARY_KEY_CONSTRAINT
+  )
 
   const { data: foreignKeyMeta } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
@@ -173,6 +189,7 @@ const TableEditor = ({
           isRealtimeEnabled: tableFields.isRealtimeEnabled,
           isDuplicateRows: isDuplicateRows,
           existingForeignKeyRelations: foreignKeys,
+          primaryKey,
         }
 
         saveChanges(payload, tableFields.columns, fkRelations, isNewRecord, configuration, resolve)

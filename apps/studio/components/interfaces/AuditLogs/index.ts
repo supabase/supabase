@@ -1,4 +1,2 @@
-import FilterPopover from './FilterPopover'
-import LogDetailsPanel from './LogDetailsPanel'
-
-export { FilterPopover, LogDetailsPanel }
+export { default as FilterPopover } from './FilterPopover'
+export { default as LogDetailsPanel } from './LogDetailsPanel'

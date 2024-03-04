@@ -6,8 +6,7 @@ import { useCallback } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useTrackedState } from '../../store'
 import { copyToClipboard, formatClipboardValue } from '../../utils'
-
-export const ROW_CONTEXT_MENU_ID = 'row-context-menu-id'
+import { ROW_CONTEXT_MENU_ID } from '.'
 
 export type RowContextMenuProps = {
   rows: SupaRow[]

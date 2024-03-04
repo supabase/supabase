@@ -52,8 +52,9 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
     )
   }
   const columnRender = (name: string) => {
-    return <div className="flex h-full items-center justify-center font-mono">{name}</div>
+    return <div className="flex h-full items-center justify-center font-mono text-xs">{name}</div>
   }
+
   const columns: CalculatedColumn<any>[] = Object.keys(rows?.[0] ?? []).map((key, idx) => ({
     idx,
     key,
@@ -90,7 +91,7 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
         columns={columns}
         rows={rows}
         // style={{ height: '100%' }}
-        className="flex-grow"
+        className="flex-grow border-t-0"
         rowClass={() => '[&>.rdg-cell]:items-center'}
         onSelectedCellChange={onSelectedCellChange}
       />

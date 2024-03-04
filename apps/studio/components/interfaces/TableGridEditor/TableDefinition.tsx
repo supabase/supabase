@@ -14,7 +14,7 @@ import useEntityType from 'hooks/misc/useEntityType'
 import { timeout } from 'lib/helpers'
 import Link from 'next/link'
 import { Button } from 'ui'
-import Footer from 'components/grid/components/footer'
+import Footer from 'components/grid/components/footer/Footer'
 
 export interface TableDefinitionProps {
   id?: number

@@ -81,7 +81,6 @@ const RLSCodeEditor = ({
     readOnly: false,
     minimap: { enabled: false },
     wordWrap: 'on' as const,
-    fixedOverflowWidgets: true,
     contextmenu: true,
     lineNumbers: undefined,
     glyphMargin: undefined,

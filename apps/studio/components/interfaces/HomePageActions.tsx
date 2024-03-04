@@ -54,7 +54,7 @@ const HomePageActions = ({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {IS_PLATFORM && organizationCreationEnabled && orgsLoaded && organizations.length !== 0 && (
+      {IS_PLATFORM && organizationCreationEnabled && orgsLoaded && (
         <Button type="default" asChild>
           <Link href="/new" className="flex items-center gap-2">
             New organization

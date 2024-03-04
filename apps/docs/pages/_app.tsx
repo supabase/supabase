@@ -14,7 +14,6 @@ import { CommandMenuProvider, PortalToast, TabsProvider } from 'ui'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
 import Favicons from '~/components/Favicons'
-import { IPv4DeprecationBanner } from '~/components/IPv4DeprecationBanner'
 import SiteLayout from '~/layouts/SiteLayout'
 import { IS_PLATFORM, IS_PREVIEW } from '~/lib/constants'
 import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
@@ -223,7 +222,6 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
               <CommandMenuProvider site="docs">
                 <TabsProvider>
                   <div className="h-screen flex flex-col">
-                    <IPv4DeprecationBanner />
                     <SiteLayout>
                       <PortalToast />
                       <Component {...pageProps} />

@@ -77,9 +77,10 @@ export const useReadReplicaSetUpMutation = ({
           return [...old, scaffoldNewDatabase]
         })
 
+        // [Joshen] Wait 30 seconds before checking if the replica actually is coming up
         setTimeout(async () => {
           await queryClient.invalidateQueries(replicaKeys.list(projectRef))
-        }, 5000)
+        }, 30000)
 
         await onSuccess?.(data, variables, context)
       },
