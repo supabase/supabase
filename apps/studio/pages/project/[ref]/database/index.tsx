@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite'
 import { DatabaseLayout } from 'components/layouts'
 import { NextPageWithLayout } from 'types'
 
@@ -8,4 +7,4 @@ const Database: NextPageWithLayout = () => {
 
 Database.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
 
-export default observer(Database)
+export default Database
