@@ -20,7 +20,7 @@ import {
   Input,
 } from 'ui'
 
-import { Suggestion } from './ColumnEditor.types'
+import type { Suggestion } from './ColumnEditor.types'
 
 const MAX_SUGGESTIONS = 3
 

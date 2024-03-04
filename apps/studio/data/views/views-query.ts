@@ -2,7 +2,7 @@ import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query
 import { useCallback } from 'react'
 
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { viewKeys } from './keys'
 
 export type ViewsVariables = {

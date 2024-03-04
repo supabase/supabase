@@ -1,4 +1,4 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
+import type { PostgresPolicy } from '@supabase/postgres-meta'
 import clsx from 'clsx'
 import { PanelLeftClose, PanelRightClose, X } from 'lucide-react'
 import {

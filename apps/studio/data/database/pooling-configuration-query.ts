@@ -1,8 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { components } from 'data/api'
+import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { databaseKeys } from './keys'
 
 export type PoolingConfigurationVariables = {

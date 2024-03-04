@@ -16,7 +16,7 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
-import Loading from 'components/ui/Loading'
+import { Loading } from 'components/ui/Loading'
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { useFDWsQuery } from 'data/fdw/fdws-query'

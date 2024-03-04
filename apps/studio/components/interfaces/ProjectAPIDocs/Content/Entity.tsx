@@ -6,7 +6,7 @@ import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
-import { ContentProps } from './Content.types'
+import type { ContentProps } from './Content.types'
 import { tempRemovePostgrestText } from './Content.utils'
 import LanguageSelector from '../LanguageSelector'
 

@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import toast from 'react-hot-toast'
 
 import { post } from 'lib/common/fetch'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { API_URL } from 'lib/constants'
 import { authKeys } from './keys'
 

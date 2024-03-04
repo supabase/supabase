@@ -7,8 +7,8 @@ import { useInView } from 'react-intersection-observer'
 
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBranchQuery } from 'data/branches/branch-query'
-import { Branch } from 'data/branches/branches-query'
-import { GitHubPullRequest } from 'data/integrations/github-pull-requests-query'
+import type { Branch } from 'data/branches/branches-query'
+import type { GitHubPullRequest } from 'data/integrations/github-pull-requests-query'
 import {
   Badge,
   Button,

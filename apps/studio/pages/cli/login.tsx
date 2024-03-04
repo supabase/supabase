@@ -5,7 +5,7 @@ import { createCliLoginSession } from 'data/cli/login'
 import { useIsLoggedIn, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { withAuth } from 'hooks'
-import Connecting from 'components/ui/Loading/Loading'
+import { Loading } from 'components/ui/Loading'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
@@ -63,7 +63,7 @@ const CliLoginPage: NextPage = () => {
             </p>
           </>
         ) : (
-          <Connecting />
+          <Loading />
         )}
       </div>
     </APIAuthorizationLayout>

@@ -2,7 +2,7 @@
 import { stripIndent } from 'common-tags'
 
 import { removeCommentsFromSql } from 'lib/helpers'
-import { SqlSnippets, UserContent } from 'types'
+import type { SqlSnippets, UserContent } from 'types'
 import {
   NEW_SQL_SNIPPET_SKELETON,
   destructiveSqlRegex,

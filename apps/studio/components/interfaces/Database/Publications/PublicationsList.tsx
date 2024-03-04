@@ -1,19 +1,18 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, IconAlertCircle, IconSearch, Input, Modal, Toggle } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import InformationBox from 'components/ui/InformationBox'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import PublicationSkeleton from './PublicationSkeleton'
-import toast from 'react-hot-toast'
 
 interface PublicationEvent {
   event: string
@@ -194,4 +193,4 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
   )
 }
 
-export default observer(PublicationsList)
+export default PublicationsList

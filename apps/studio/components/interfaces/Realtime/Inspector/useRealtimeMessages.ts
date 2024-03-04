@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { uuidv4 } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
-import { LogData } from './Messages.types'
+import type { LogData } from './Messages.types'
 
 function reducer(
   state: LogData[],

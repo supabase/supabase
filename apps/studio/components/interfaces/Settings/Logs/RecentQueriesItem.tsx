@@ -1,7 +1,7 @@
 import { Button, IconPlay } from 'ui'
 import Table from 'components/to-be-cleaned/Table'
 import { useRouter } from 'next/router'
-import { LogSqlSnippets } from 'types'
+import type { LogSqlSnippets } from 'types'
 import SqlSnippetCode from './Logs.SqlSnippetCode'
 
 interface Props {

@@ -1,4 +1,4 @@
-import { PostgresRole } from '@supabase/postgres-meta'
+import type { PostgresRole } from '@supabase/postgres-meta'
 import { useParams } from 'common'
 import { XIcon } from 'lucide-react'
 import Link from 'next/link'
@@ -35,7 +35,7 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import { useAppStateSnapshot } from 'state/app-state'
 
 const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']

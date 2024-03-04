@@ -23,7 +23,7 @@ import {
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useCheckPermissions } from 'hooks'
-import { VaultSecret } from 'types'
+import type { VaultSecret } from 'types'
 
 interface SecretRowProps {
   secret: VaultSecret

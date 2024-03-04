@@ -25,7 +25,7 @@ import {
 } from 'components/interfaces/Integrations/IntegrationPanels'
 import { WarningIcon } from 'components/ui/Icons'
 import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
-import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useStore } from 'hooks'
 

@@ -6,7 +6,7 @@ import TwoOptionToggle from 'components/ui/TwoOptionToggle'
 import { minifyJSON, prettifyJSON, tryParseJson, removeJSONTrailingComma } from 'lib/helpers'
 import toast from 'react-hot-toast'
 import ActionBar from '../../ActionBar'
-import DrilldownViewer from './DrilldownViewer'
+import { DrilldownViewer } from './DrilldownViewer'
 import JsonCodeEditor from './JsonCodeEditor'
 
 interface JsonEditProps {

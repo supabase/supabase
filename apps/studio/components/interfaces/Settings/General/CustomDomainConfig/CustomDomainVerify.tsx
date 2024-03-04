@@ -14,9 +14,9 @@ import {
 } from 'ui'
 
 import Panel from 'components/ui/Panel'
-import { ProjectApiResponse } from 'data/config/project-api-query'
+import type { ProjectApiResponse } from 'data/config/project-api-query'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
-import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
+import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
 import DNSRecord from './DNSRecord'
 

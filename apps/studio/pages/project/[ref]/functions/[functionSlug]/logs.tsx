@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import { useParams } from 'common/hooks'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import FunctionsLayout from 'components/layouts/FunctionsLayout'
