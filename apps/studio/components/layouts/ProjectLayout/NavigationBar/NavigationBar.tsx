@@ -231,20 +231,22 @@ const NavigationBar = () => {
                       'transition-all'
                     )}
                   >
-                    {profile?.username && (
-                      <span
-                        title={profile?.username}
-                        className="w-full text-left text-foreground truncate"
-                      >
-                        {profile?.username}
-                      </span>
+                    {profile && (
+                      <>
+                        <span
+                          title={profile.username}
+                          className="w-full text-left text-foreground truncate"
+                        >
+                          {profile.username}
+                        </span>
+                        <span
+                          title={profile.primary_email}
+                          className="w-full text-left text-foreground-light text-xs truncate"
+                        >
+                          {profile.primary_email}
+                        </span>
+                      </>
                     )}
-                    <span
-                      title={profile?.primary_email}
-                      className="w-full text-left text-foreground-light text-xs truncate"
-                    >
-                      {profile?.primary_email}
-                    </span>
                   </span>
                 </div>
               </Button>
@@ -253,20 +255,22 @@ const NavigationBar = () => {
               {IS_PLATFORM && (
                 <>
                   <div className="px-2 py-1 flex flex-col gap-0 text-sm">
-                    {profile?.username && (
-                      <span
-                        title={profile?.username}
-                        className="w-full text-left text-foreground truncate"
-                      >
-                        {profile?.username}
-                      </span>
+                    {profile && (
+                      <>
+                        <span
+                          title={profile.username}
+                          className="w-full text-left text-foreground truncate"
+                        >
+                          {profile.username}
+                        </span>
+                        <span
+                          title={profile.primary_email}
+                          className="w-full text-left text-foreground-light text-xs truncate"
+                        >
+                          {profile.primary_email}
+                        </span>
+                      </>
                     )}
-                    <span
-                      title={profile?.primary_email}
-                      className="w-full text-left text-foreground-light text-xs truncate"
-                    >
-                      {profile?.primary_email}
-                    </span>
                   </div>
                   <DropdownMenuSeparator />
                   <DropdownMenuGroup>
