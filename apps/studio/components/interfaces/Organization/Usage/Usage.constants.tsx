@@ -254,7 +254,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         name: 'Edge Function Invocations',
         unit: 'absolute',
         description:
-          'Every serverless function invocation independent of response status is counted, encompassing operations initiated by the HTTP verbs: GET, POST, PUT, PATCH, DELETE.\n Billing is based on the sum of all invocations throughout your billing period.',
+          'Billing counts all serverless function invocations independent of response status. OPTIONS and HEAD requests do not count towards this metric.\nBilling is based on the sum of all invocations throughout your billing period.',
         chartDescription: 'The data refreshes every 24 hours.',
         links: [
           {
