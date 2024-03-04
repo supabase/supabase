@@ -1515,4 +1515,3 @@ revoke execute on function public.custom_access_token_hook from authenticated, a
     `,
   },
 ]
-
