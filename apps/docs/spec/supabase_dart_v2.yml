@@ -2,13 +2,14 @@ openref: 0.1
 
 info:
   id: reference/dart
-  title: Supabase Flutter Client
+  title: Supabase Dart Client
   description: |
 
-    Supabase Flutter.
+    Supabase Dart.
   slugPrefix: '/'
   specUrl: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_dart_v2.yml
   libraries:
+    - name: 'Dart'
     - id: 'dart'
       version: '0.0.1'
 
