@@ -493,7 +493,7 @@ export const PhoneLoginsItems = [
     hasLightIcon: true,
   },
   {
-    name: 'Textlocal SMS Login',
+    name: 'Textlocal SMS Login (Community Maintained)',
     icon: '/docs/img/icons/textlocal-icon',
     url: '/guides/auth/phone-login/textlocal',
     linkDescription: 'Textlocal is a cloud-based SMS platform offering bulk messaging services.',
