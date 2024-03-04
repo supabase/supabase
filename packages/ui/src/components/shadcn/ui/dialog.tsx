@@ -39,7 +39,7 @@ const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
   <DialogPortal>
-    <DialogOverlay />
+    {/* <DialogOverlay /> */}
     <DialogPrimitive.Overlay
       className={
         'z-50 fixed inset-0 grid place-items-center overflow-y-auto data-open:animate-overlay-show data-closed:animate-overlay-hide'
@@ -49,7 +49,12 @@ const DialogContent = React.forwardRef<
         ref={ref}
         className={cn(
           'my-8',
-          'relative z-50 grid w-full max-w-lg gap-4 border p-6 shadow-md dark:shadow-sm duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg md:w-full',
+          'relative z-50 grid w-full max-w-lg gap-4 border p-6 shadow-md dark:shadow-sm duration-200',
+          'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+          'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+          'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%',
+          'data-[state=open]:slide-in-from-left-[0%] data-[state=open]:slide-in-from-top-[0%]',
+          'sm:rounded-lg md:w-full',
           'bg-overlay',
           className
         )}
