@@ -130,7 +130,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
               {
                 key: `logout`,
                 icon: '/icons/feather/power.svg',
-                label: 'Logout',
+                label: 'Log out',
                 href: undefined,
                 onClick: onClickLogout,
               },
