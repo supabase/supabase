@@ -13,13 +13,14 @@ import {
   IconSettings,
   IconX,
   Input_Shadcn_,
+  Loading,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
   cn,
 } from 'ui'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
 import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
@@ -357,6 +358,9 @@ const SQLEditor = () => {
             role: impersonatedRole,
           }),
           isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+          handleError: (error) => {
+            throw error
+          },
         })
       }
     },
@@ -846,7 +850,11 @@ const SQLEditor = () => {
               )}
 
               {isLoading ? (
-                <div className="flex h-full w-full items-center justify-center">Loading...</div>
+                <div className="flex h-full w-full items-center justify-center">
+                  <Loading active={true}>
+                    <></>
+                  </Loading>
+                </div>
               ) : (
                 <>
                   {isDiffOpen && (
@@ -950,7 +958,11 @@ const SQLEditor = () => {
           <ResizableHandle withHandle />
           <ResizablePanel collapsible collapsedSize={10} minSize={20}>
             {isLoading ? (
-              <div className="flex h-full w-full items-center justify-center">Loading...</div>
+              <div className="flex h-full w-full items-center justify-center">
+                <Loading active={true}>
+                  <></>
+                </Loading>
+              </div>
             ) : (
               <UtilityPanel
                 id={id}

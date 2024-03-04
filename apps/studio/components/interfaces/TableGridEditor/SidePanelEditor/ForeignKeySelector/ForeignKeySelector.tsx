@@ -28,6 +28,7 @@ import { NUMERICAL_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import { FOREIGN_KEY_CASCADE_OPTIONS } from './ForeignKeySelector.constants'
 import { ForeignKey } from './ForeignKeySelector.types'
 import { generateCascadeActionDescription } from './ForeignKeySelector.utils'
+import { ColumnField } from '../SidePanelEditor.types'
 
 const EMPTY_STATE: ForeignKey = {
   id: undefined,
@@ -40,7 +41,12 @@ const EMPTY_STATE: ForeignKey = {
 
 interface ForeignKeySelectorProps {
   visible: boolean
-  table: { id: number; name: string; columns: any[] }
+  table: {
+    id: number
+    name: string
+    columns: { id: string; name: string; format: string; isNewColumn: boolean }[]
+  }
+  column?: ColumnField // For ColumnEditor, to prefill when adding a new foreign key
   foreignKey?: ForeignKey
   onClose: () => void
   onSaveRelation: (fk: ForeignKey) => void
@@ -49,6 +55,7 @@ interface ForeignKeySelectorProps {
 export const ForeignKeySelector = ({
   visible,
   table,
+  column,
   foreignKey,
   onClose,
   onSaveRelation,
@@ -83,17 +90,8 @@ export const ForeignKeySelector = ({
 
   const updateSelectedTable = (tableId: number) => {
     setErrors({})
-    if (!tableId) {
-      return setFk({
-        ...EMPTY_STATE,
-        id: fk.id,
-        name: fk.name,
-        schema: fk.schema,
-        columns: [{ source: '', target: '' }],
-      })
-    }
     const table = (tables ?? []).find((x) => x.id === tableId)
-    if (table)
+    if (table) {
       setFk({
         ...EMPTY_STATE,
         id: fk.id,
@@ -101,8 +99,12 @@ export const ForeignKeySelector = ({
         tableId: table.id,
         schema: table.schema,
         table: table.name,
-        columns: [{ source: '', target: '' }],
+        columns:
+          column !== undefined
+            ? [{ source: column.name, target: '' }]
+            : [{ source: '', target: '' }],
       })
+    }
   }
 
   const addColumn = () => {
@@ -160,7 +162,7 @@ export const ForeignKeySelector = ({
     fk.columns.forEach((column) => {
       const { source, target, sourceType: sType, targetType: tType } = column
       const sourceColumn = table.columns.find((col) => col.name === source)
-      const sourceType = sType ?? sourceColumn?.format
+      const sourceType = sType ?? sourceColumn?.format ?? ''
       const targetType =
         tType ?? selectedTable?.columns?.find((col) => col.name === target)?.format ?? ''
 
@@ -246,6 +248,7 @@ export const ForeignKeySelector = ({
                   key={schema.id}
                   value={schema.name}
                   label={schema.name}
+                  className="min-w-96"
                   addOnBefore={() => <IconDatabase size={16} strokeWidth={1.5} />}
                 >
                   <div className="flex items-center gap-2">
@@ -264,7 +267,7 @@ export const ForeignKeySelector = ({
             value={selectedTable?.id ?? 1}
             onChange={(value: string) => updateSelectedTable(Number(value))}
           >
-            <Listbox.Option key="empty" value={1} label="---">
+            <Listbox.Option key="empty" className="min-w-96" value={1} label="---">
               ---
             </Listbox.Option>
             {sortBy(tables, ['schema']).map((table) => {
@@ -273,6 +276,7 @@ export const ForeignKeySelector = ({
                   key={table.id}
                   value={table.id}
                   label={table.name}
+                  className="min-w-96"
                   addOnBefore={() => <Table size={16} strokeWidth={1.5} />}
                 >
                   <div className="flex items-center gap-2">
@@ -312,7 +316,7 @@ export const ForeignKeySelector = ({
                     </Alert_Shadcn_>
                   )}
                   {fk.columns.map((_, idx) => (
-                    <Fragment key={`${uuidv4}`}>
+                    <Fragment key={`${uuidv4()}`}>
                       <div className="col-span-4">
                         <Listbox
                           id="column"

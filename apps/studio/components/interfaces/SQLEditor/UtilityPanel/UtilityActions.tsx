@@ -12,6 +12,7 @@ import {
   IconCheck,
   IconCommand,
   IconCornerDownLeft,
+  IconLoader,
   IconSettings,
   Toggle_Shadcn,
   TooltipContent_Shadcn_,
@@ -48,15 +49,14 @@ const UtilityActions = ({
   const os = detectOS()
   const project = useSelectedProject()
   const showReadReplicasUI = project?.is_read_replicas_enabled
+
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
-    typeof window !== 'undefined' ? false : true
+    true
   )
 
   return (
     <div className="inline-flex items-center justify-end gap-x-2">
-      <SavingIndicator id={id} />
-
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
@@ -105,18 +105,21 @@ const UtilityActions = ({
           <Button
             onClick={() => executeQuery()}
             disabled={isDisabled || isExecuting}
-            loading={isExecuting}
             type="primary"
             size="tiny"
             iconRight={
-              <div className="flex items-center space-x-1">
-                {os === 'macos' ? (
-                  <IconCommand size={10} strokeWidth={1.5} />
-                ) : (
-                  <p className="text-xs text-foreground-light">CTRL</p>
-                )}
-                <IconCornerDownLeft size={10} strokeWidth={1.5} />
-              </div>
+              isExecuting ? (
+                <IconLoader className="animate-spin" size={10} strokeWidth={1.5} />
+              ) : (
+                <div className="flex items-center space-x-1">
+                  {os === 'macos' ? (
+                    <IconCommand size={10} strokeWidth={1.5} />
+                  ) : (
+                    <p className="text-xs text-foreground-light">CTRL</p>
+                  )}
+                  <IconCornerDownLeft size={10} strokeWidth={1.5} />
+                </div>
+              )
             }
             className="rounded-l-none"
           >
