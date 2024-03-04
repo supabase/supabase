@@ -1,6 +1,6 @@
 import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
-import { Entity } from './entity-type-query'
+import type { Entity } from './entity-type-query'
 import { entityTypeKeys } from './keys'
 
 export type EntityTypesVariables = {

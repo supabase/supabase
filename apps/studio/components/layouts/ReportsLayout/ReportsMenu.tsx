@@ -252,7 +252,6 @@ const ReportsMenu = () => {
           ))}
           <UpdateCustomReportModal
             onSubmit={async (newVals) => {
-              console.log('debug', newVals)
               try {
                 if (!selectedReport) return
                 if (!selectedReport.id) return

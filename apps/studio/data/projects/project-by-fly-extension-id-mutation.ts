@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
 import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type ProjectByFlyExtensionIdVariables = {
   flyExtensionId: string

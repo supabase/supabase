@@ -1,26 +1,25 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { IconAlertCircle, IconClock, Modal } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import InformationBox from 'components/ui/InformationBox'
 import Panel from 'components/ui/Panel'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useBackupRestoreMutation } from 'data/database/backup-restore-mutation'
 import { DatabaseBackup, useBackupsQuery } from 'data/database/backups-query'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import BackupItem from './BackupItem'
 import BackupsEmpty from './BackupsEmpty'
 
 const BackupsList = () => {
-  const { ui } = useStore()
   const router = useRouter()
   const queryClient = useQueryClient()
   const organization = useSelectedOrganization()
@@ -45,12 +44,11 @@ const BackupsList = () => {
     onSuccess: () => {
       setTimeout(() => {
         setProjectStatus(queryClient, projectRef, PROJECT_STATUS.RESTORING)
-        ui.setNotification({
-          category: 'success',
-          message: `Restoring database back to ${dayjs(selectedBackup?.inserted_at).format(
+        toast.success(
+          `Restoring database back to ${dayjs(selectedBackup?.inserted_at).format(
             'DD MMM YYYY HH:mm:ss'
-          )}`,
-        })
+          )}`
+        )
         router.push(`/project/${projectRef}`)
       }, 3000)
     },
@@ -134,4 +132,4 @@ const BackupsList = () => {
   )
 }
 
-export default observer(BackupsList)
+export default BackupsList

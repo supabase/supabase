@@ -29,7 +29,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import type { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { INSTANCE_MICRO_SPECS, PROJECT_STATUS } from 'lib/constants'

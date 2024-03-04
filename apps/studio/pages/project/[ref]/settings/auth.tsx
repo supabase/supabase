@@ -10,7 +10,7 @@ import { FormHeader } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const AuthSettings: NextPageWithLayout = () => {
   const isPermissionsLoaded = usePermissionsLoaded()

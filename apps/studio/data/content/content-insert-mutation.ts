@@ -1,10 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
-import { components } from 'data/api'
+import type { components } from 'data/api'
 import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
-import { Content } from './content-query'
+import type { ResponseError } from 'types'
+import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
 export type InsertContentPayload = Omit<components['schemas']['CreateContentParams'], 'content'> & {

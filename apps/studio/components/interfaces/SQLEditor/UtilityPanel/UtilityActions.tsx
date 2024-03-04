@@ -49,9 +49,10 @@ const UtilityActions = ({
   const os = detectOS()
   const project = useSelectedProject()
   const showReadReplicasUI = project?.is_read_replicas_enabled
+
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
-    typeof window !== 'undefined' ? false : true
+    true
   )
 
   return (
