@@ -239,12 +239,14 @@ const NavigationBar = () => {
                         >
                           {profile.username}
                         </span>
-                        <span
-                          title={profile.primary_email}
-                          className="w-full text-left text-foreground-light text-xs truncate"
-                        >
-                          {profile.primary_email}
-                        </span>
+                        {profile.primary_email !== profile.username && (
+                          <span
+                            title={profile.primary_email}
+                            className="w-full text-left text-foreground-light text-xs truncate"
+                          >
+                            {profile.primary_email}
+                          </span>
+                        )}
                       </>
                     )}
                   </span>
@@ -263,12 +265,14 @@ const NavigationBar = () => {
                         >
                           {profile.username}
                         </span>
-                        <span
-                          title={profile.primary_email}
-                          className="w-full text-left text-foreground-light text-xs truncate"
-                        >
-                          {profile.primary_email}
-                        </span>
+                        {profile.primary_email !== profile.username && (
+                          <span
+                            title={profile.primary_email}
+                            className="w-full text-left text-foreground-light text-xs truncate"
+                          >
+                            {profile.primary_email}
+                          </span>
+                        )}
                       </>
                     )}
                   </div>
