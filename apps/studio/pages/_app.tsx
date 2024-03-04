@@ -53,7 +53,6 @@ import { dart } from 'lib/constants/prism'
 import { ProfileProvider } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import { RootStore } from 'stores'
-import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import type { AppPropsWithLayout } from 'types'
 import { Toaster } from 'ui'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -180,7 +179,6 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   </TooltipProvider>
                 </PageTelemetry>
 
-                <HCaptchaLoadedStore />
                 <Toaster />
                 <PortalToast />
                 {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
