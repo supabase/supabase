@@ -1,5 +1,4 @@
 import dayjs from 'dayjs'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Alert, Button, IconExternalLink, IconSearch, Input, SidePanel } from 'ui'
@@ -184,4 +183,4 @@ const Migrations = () => {
   )
 }
 
-export default observer(Migrations)
+export default Migrations
