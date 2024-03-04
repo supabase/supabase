@@ -377,7 +377,7 @@ select logging_example('LOGGED MESSAGE', 'WARNING MESSAGE', 'ERROR MESSAGE');
 
 You can create custom errors with the `raise exception` keywords.
 
-A common pattern is to throw an error when a varaible does not meet a condtion:
+A common pattern is to throw an error when a variable doesn't meet a condition:
 
 ```sql
 create or replace function error_if_null(val text)
@@ -397,7 +397,7 @@ $$;
 select error_if_null(NULL);
 ```
 
-Value checking is so common that PostgreSQL provides a shorthand: the `assert` keyword. It uses the following format:
+Value checking is common, so Postgres provides a shorthand: the `assert` keyword. It uses the following format:
 
 ```sql
 -- throw error when condition is false
@@ -420,7 +420,7 @@ begin
   from attendance_table
   where student = name;
 
-  -- if the user cannot be found, throw an error
+  -- throw an error if the student_id is null
   assert student_id is not null, 'assert_example() ERROR: student not found';
 
   -- otherwise, return the user's id
