@@ -14,7 +14,7 @@ import {
   fetchVercelProject,
   prepareVercelEvns,
 } from 'components/to-be-cleaned/Integration/Vercel.utils'
-import Loading from 'components/ui/Loading'
+import { Loading } from 'components/ui/Loading'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
 import {

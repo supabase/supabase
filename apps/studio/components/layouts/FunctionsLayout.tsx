@@ -12,7 +12,7 @@ import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useCheckPermissions, withAuth } from 'hooks'
 import FunctionsNav from '../interfaces/Functions/FunctionsNav'
-import ProjectLayout from './'
+import { ProjectLayout } from './'
 
 interface FunctionsLayoutProps {
   title?: string
