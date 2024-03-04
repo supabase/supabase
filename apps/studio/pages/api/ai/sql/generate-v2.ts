@@ -51,7 +51,11 @@ async function handlePost(request: NextRequest) {
     const stream = await generateV2(openai, messages, existingSql, entityDefinitions)
     return new StreamingTextResponse(stream)
   } catch (error) {
-    console.error(error)
+    if (error instanceof Error) {
+      console.error(`AI SQL generation-v2 failed: ${error.message}`)
+    } else {
+      console.error(`AI SQL generation-v2 failed: ${error}`)
+    }
 
     return new Response(
       JSON.stringify({

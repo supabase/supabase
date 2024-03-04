@@ -146,7 +146,6 @@ export async function generateV2(
     initMessages.push(...messages)
   }
 
-  console.log(initMessages)
   try {
     const response = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo-0125',
