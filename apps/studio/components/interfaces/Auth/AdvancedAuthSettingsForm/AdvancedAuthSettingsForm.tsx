@@ -67,7 +67,7 @@ const AdvancedAuthSettingsForm = () => {
       { projectRef: projectRef!, config: payload },
       {
         onError: (error) => {
-          toast.error(`Failed to update settings:  ${error?.message}`)
+          toast.error(`Failed to update settings: ${error?.message}`)
         },
         onSuccess: () => {
           toast.success('Successfully updated settings')

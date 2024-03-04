@@ -1,24 +1,8 @@
 import { useParams } from 'common'
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
-import ReportQueryPerformanceTableRow from 'components/interfaces/Reports/ReportQueryPerformanceTableRow'
-import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
-import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
-import { Presets } from 'components/interfaces/Reports/Reports.types'
-import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
-import { ReportsLayout } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Table from 'components/to-be-cleaned/Table'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { useFlag } from 'hooks'
-import { sortBy } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { NextPageWithLayout } from 'types'
 import {
   Accordion,
   Button,
@@ -31,21 +15,37 @@ import {
   IconArrowDown,
   IconArrowUp,
   IconCheckCircle,
-  IconList,
   IconRefreshCw,
   IconSearch,
   Input,
   Tabs,
 } from 'ui'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+
+import ReportHeader from 'components/interfaces/Reports/ReportHeader'
+import ReportQueryPerformanceTableRow from 'components/interfaces/Reports/ReportQueryPerformanceTableRow'
+import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
+import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
+import { Presets } from 'components/interfaces/Reports/Reports.types'
+import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
+import { ReportsLayout } from 'components/layouts'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import Table from 'components/to-be-cleaned/Table'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { useFlag } from 'hooks'
+import type { NextPageWithLayout } from 'types'
 
 type QueryPerformancePreset = 'time' | 'frequent' | 'slowest'
+
 const QueryPerformanceReport: NextPageWithLayout = () => {
+  const router = useRouter()
+  const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const [showResetgPgStatStatements, setShowResetgPgStatStatements] = useState(false)
+
   const tableIndexEfficiencyEnabled = useFlag('tableIndexEfficiency')
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
-  const { ref: projectRef } = useParams()
-  const router = useRouter()
   const hooks = queriesFactory(config.queries, projectRef ?? 'default')
   const queryHitRate = hooks.queryHitRate()
 
@@ -418,7 +418,7 @@ QueryPerformanceReport.getLayout = (page) => (
   <ReportsLayout title="Query performance">{page}</ReportsLayout>
 )
 
-export default observer(QueryPerformanceReport)
+export default QueryPerformanceReport
 
 function QueryPerformanceFilterBar({
   isLoading,

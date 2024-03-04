@@ -3,7 +3,7 @@ import { Badge } from 'ui'
 
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import Table from 'components/to-be-cleaned/Table'
-import { User } from 'data/auth/users-query'
+import type { User } from 'data/auth/users-query'
 import UserDropdown from './UserDropdown'
 import { getDisplayName } from './UserListItem.utils'
 

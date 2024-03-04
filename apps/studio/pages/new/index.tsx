@@ -10,7 +10,7 @@ import { WizardLayout } from 'components/layouts'
 import { useSetupIntent } from 'data/stripe/setup-intent-mutation'
 import { STRIPE_PUBLIC_KEY } from 'lib/constants'
 import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 

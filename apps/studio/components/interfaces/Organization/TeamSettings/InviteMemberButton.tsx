@@ -7,9 +7,9 @@ import { Button, Form, IconMail, Input, Listbox, Modal } from 'ui'
 import { object, string } from 'yup'
 
 import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
-import { OrganizationMember } from 'data/organizations/organization-members-query'
+import type { OrganizationMember } from 'data/organizations/organization-members-query'
 import { doPermissionsCheck, useGetPermissions, useStore } from 'hooks'
-import { Role } from 'types'
+import type { Role } from 'types'
 
 export interface InviteMemberButtonProps {
   orgId: number

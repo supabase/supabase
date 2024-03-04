@@ -8,7 +8,7 @@ import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
 import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mutation'
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
-import { User } from 'data/auth/users-query'
+import type { User } from 'data/auth/users-query'
 import { useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
 import {

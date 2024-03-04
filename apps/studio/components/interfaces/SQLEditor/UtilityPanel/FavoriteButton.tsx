@@ -7,7 +7,7 @@ import {
 } from 'ui'
 import { useQueryClient } from '@tanstack/react-query'
 import { contentKeys } from 'data/content/keys'
-import { Content, ContentData } from 'data/content/content-query'
+import type { Content, ContentData } from 'data/content/content-query'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 

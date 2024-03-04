@@ -1,14 +1,14 @@
 import clsx from 'clsx'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 
-import { OAuthScope } from '@supabase/shared-types/out/constants'
+import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import {
   OAuthAppCreateResponse,
   useOAuthAppCreateMutation,
 } from 'data/oauth/oauth-app-create-mutation'
 import { useOAuthAppUpdateMutation } from 'data/oauth/oauth-app-update-mutation'
-import { OAuthApp } from 'data/oauth/oauth-apps-query'
+import type { OAuthApp } from 'data/oauth/oauth-apps-query'
 import { useStore } from 'hooks'
 import { isValidHttpUrl, uuidv4 } from 'lib/helpers'
 import { uploadAttachment } from 'lib/upload'

@@ -36,7 +36,7 @@ import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubBranchesQuery } from 'data/integrations/github-branches-query'
 import { useGitHubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutation'
-import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
 
 interface GitHubIntegrationConnectionFormProps {

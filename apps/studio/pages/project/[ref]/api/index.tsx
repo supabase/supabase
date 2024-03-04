@@ -9,7 +9,7 @@ import { DocsLayout } from 'components/layouts'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { snakeToCamel } from 'lib/helpers'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const PageContext = createContext(null)
 

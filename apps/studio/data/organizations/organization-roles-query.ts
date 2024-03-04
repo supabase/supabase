@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { ResponseError, Role } from 'types'
+import type { ResponseError, Role } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationRolesVariables = {

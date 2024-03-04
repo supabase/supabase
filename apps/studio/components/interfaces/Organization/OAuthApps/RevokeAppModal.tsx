@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { useAuthorizedAppRevokeMutation } from 'data/oauth/authorized-app-revoke-mutation'
-import { AuthorizedApp } from 'data/oauth/authorized-apps-query'
+import type { AuthorizedApp } from 'data/oauth/authorized-apps-query'
 import { useStore } from 'hooks'
 import { Alert, IconLock, Modal } from 'ui'
 

@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { useOrganizationPaymentMethodDeleteMutation } from 'data/organizations/organization-payment-method-delete-mutation'
-import { OrganizationPaymentMethod } from 'data/organizations/organization-payment-methods-query'
+import type { OrganizationPaymentMethod } from 'data/organizations/organization-payment-methods-query'
 import { useStore } from 'hooks'
 import { Alert, Button, Modal } from 'ui'
 

@@ -24,7 +24,7 @@ import {
   SidePanel,
 } from 'ui'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { AddonVariantId } from 'data/subscriptions/types'
+import type { AddonVariantId } from 'data/subscriptions/types'
 import { formatCurrency } from 'lib/helpers'
 import { useFlag } from 'hooks'
 

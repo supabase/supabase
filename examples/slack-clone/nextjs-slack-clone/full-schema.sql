@@ -9,7 +9,7 @@ create type public.user_status as enum ('ONLINE', 'OFFLINE');
 
 -- USERS
 create table public.users (
-  id          uuid not null primary key, -- UUID from auth.users
+  id          uuid references auth.users not null primary key, -- UUID from auth.users
   username    text,
   status      user_status default 'OFFLINE'::public.user_status
 );
@@ -64,14 +64,13 @@ declare
 begin
   select count(*)
   from public.role_permissions
-  inner join public.user_roles on role_permissions.role = user_roles.role
   where role_permissions.permission = authorize.requested_permission
-    and user_roles.user_id = authorize.user_id
+    and role_permissions.role = (auth.jwt() ->> 'user_role')::public.app_role
   into bind_permissions;
   
   return bind_permissions > 0;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 -- Secure the tables
 alter table public.users enable row level security;
@@ -116,7 +115,7 @@ begin
   
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = auth, public;
 
 -- trigger the function every time a user is created
 create trigger on_auth_user_created
@@ -141,24 +140,86 @@ alter publication supabase_realtime add table public.channels;
 alter publication supabase_realtime add table public.messages;
 alter publication supabase_realtime add table public.users;
 
--- DUMMY DATA
-insert into public.users (id, username)
-values
-    ('8d0fd2b3-9ca7-4d9e-a95f-9e13dded323e', 'supabot');
+/**
+ * AUTH HOOKS
+ * Create an auth hook to add a custom claim to the access token jwt.
+ */
 
-insert into public.channels (slug, created_by)
-values
-    ('public', '8d0fd2b3-9ca7-4d9e-a95f-9e13dded323e'),
-    ('random', '8d0fd2b3-9ca7-4d9e-a95f-9e13dded323e');
+-- Create the auth hook function
+-- https://supabase.com/docs/guides/auth/auth-hooks#hook-custom-access-token
+create or replace function public.custom_access_token_hook(event jsonb)
+returns jsonb
+language plpgsql
+immutable
+as $$
+  declare
+    claims jsonb;
+    user_role public.app_role;
+  begin
+    -- Check if the user is marked as admin in the profiles table
+    select role into user_role from public.user_roles where user_id = (event->>'user_id')::uuid;
 
-insert into public.messages (message, channel_id, user_id)
-values
-    ('Hello World 👋', 1, '8d0fd2b3-9ca7-4d9e-a95f-9e13dded323e'),
-    ('Perfection is attained, not when there is nothing more to add, but when there is nothing left to take away.', 2, '8d0fd2b3-9ca7-4d9e-a95f-9e13dded323e');
+    claims := event->'claims';
+
+    if user_role is not null then
+      -- Set the claim
+      claims := jsonb_set(claims, '{user_role}', to_jsonb(user_role));
+    else 
+      claims := jsonb_set(claims, '{user_role}', 'null');
+    end if;
+
+    -- Update the 'claims' object in the original event
+    event := jsonb_set(event, '{claims}', claims);
+
+    -- Return the modified or original event
+    return event;
+  end;
+$$;
+
+grant usage on schema public to supabase_auth_admin;
+
+grant execute
+  on function public.custom_access_token_hook
+  to supabase_auth_admin;
+
+revoke execute
+  on function public.custom_access_token_hook
+  from authenticated, anon;
+
+grant all
+  on table public.user_roles
+to supabase_auth_admin;
+
+revoke all
+  on table public.user_roles
+  from authenticated, anon;
+
+create policy "Allow auth admin to read user roles" ON public.user_roles
+as permissive for select
+to supabase_auth_admin
+using (true)
+
+
+/**
+ * HELPER FUNCTIONS
+ * Create test user helper method.
+ */
+create or replace function public.create_user(
+    email text
+) returns uuid
+    security definer
+    set search_path = auth
+as $$
+  declare
+  user_id uuid;
+begin
+  user_id := extensions.uuid_generate_v4();
   
-insert into public.role_permissions (role, permission)
-values
-    ('admin', 'channels.delete'),
-    ('admin', 'messages.delete'),
-    ('moderator', 'messages.delete');
+  insert into auth.users (id, email)
+    values (user_id, email)
+    returning id into user_id;
+
+    return user_id;
+end;
+$$ language plpgsql;
 
