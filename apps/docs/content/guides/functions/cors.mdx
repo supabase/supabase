@@ -50,3 +50,59 @@ Deno.serve(async (req) => {
   }
 })
 ```
+
+### Alternate setup (Proxy)
+
+Each ``OPTIONS`` request from the browser to check for CORS counts towards your invocations count. You can get around this by setting up a reverse proxy on your website domain.
+Reverse proxying allow you to send users to different URLs without modifying the visible URL. This prevents any CORS checks as the browser is making a request through the same origin.
+
+Many hosting services like Vercel, Netlify, and Amplify have native support for using a reverse proxy. Let's take a look at how to set up rewrites to proxy requests to Supabase on Vercel [Docs](https://vercel.com/docs/edge-network/rewrites).
+
+First, we need to create a vercel.json file in the root directory of our app, and then add the following. Make sure to replace `<PROJECT_ID>` with your actual supabase project id.
+
+```json vercel.json
+{
+  "rewrites": [
+    {
+      "source": "/functions/v1/:path*",
+      "destination": "https://<PROJECT_ID>.supabase.co/functions/v1/:path*"
+    }
+  ]
+}
+```
+
+You can now trigger functions from the client/browser as if the function was under the same domain. Make sure you don't have any app routes under the same source as configured above.
+```tsx page.tsx
+const response = await fetch('/functions/v1/hello-world', { 
+  method: 'POST', 
+  body: JSON.stringify({ name: 'Supabase' })
+})
+const json = await response.json()
+
+console.log(json) // Output = { message: "Hello Supabase" }
+```
+
+If you have a middleware configured, we can also tell it to ignore Supabase function routes with something like the following:
+```ts middleware.ts
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - supabase functions
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    {
+      source: '/((?!api|functions/v1|_next/static|_next/image|favicon.ico).*)',
+      missing: [
+        { type: 'header', key: 'next-router-prefetch' },
+        { type: 'header', key: 'purpose', value: 'prefetch' },
+      ],
+    },
+  ],
+}
+```
+
+To verify the reverse proxy is working correctly, you can check the network tab in developer tools. You should see the request url as the same origin and the ``X-Served-By`` header equal to ``supabase-edge-runtime``.
