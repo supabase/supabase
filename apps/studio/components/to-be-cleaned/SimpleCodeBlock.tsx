@@ -36,7 +36,6 @@ const SimpleCodeBlock = ({
   const target = useRef(null)
   let highlightLines: any = []
 
-
   useEffect(() => {
     if (!showCopied) return
     const timer = setTimeout(() => setShowCopied(false), 2000)
