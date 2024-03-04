@@ -1,4 +1,4 @@
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import { Badge, cn, Collapsible, IconSmartphone } from 'ui'
 
 import { TOTPFactors } from 'components/interfaces/Account'

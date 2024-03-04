@@ -3,7 +3,7 @@ import toast from 'react-hot-toast'
 
 import { Query } from 'components/grid/query/Query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { vaultSecretsKeys } from './keys'
 import { sqlKeys } from 'data/sql/keys'
 

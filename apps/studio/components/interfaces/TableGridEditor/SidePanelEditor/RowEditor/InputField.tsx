@@ -3,7 +3,7 @@ import { Button, IconEdit2, IconLink, Input, Listbox, Select } from 'ui'
 
 import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import { DateTimeInput } from './DateTimeInput'
-import { RowField } from './RowEditor.types'
+import type { RowField } from './RowEditor.types'
 
 export interface InputFieldProps {
   field: RowField

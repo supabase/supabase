@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import { SQLEditorLayout } from 'components/layouts'
 import SQLQuickstarts from 'components/interfaces/SQLEditor/SQLTemplates/SQLQuickstarts'
 

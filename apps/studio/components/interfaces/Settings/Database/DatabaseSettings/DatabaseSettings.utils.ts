@@ -1,4 +1,4 @@
-import { PoolingConfiguration } from 'data/database/pooling-configuration-query'
+import type { PoolingConfiguration } from 'data/database/pooling-configuration-query'
 
 export const getConnectionStrings = (
   connectionInfo: {

@@ -9,7 +9,7 @@ import { useKeywordsQuery } from 'data/database/keywords-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
 import { SQLEditorLayout } from 'components/layouts'

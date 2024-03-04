@@ -19,7 +19,7 @@ import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from '
 import InformationBox from 'components/ui/InformationBox'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks'
-import { FormSchema } from 'types'
+import type { FormSchema } from 'types'
 
 interface TemplateEditorProps {
   template: FormSchema

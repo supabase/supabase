@@ -2,8 +2,8 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
-import { GitHubConnectionCreateVariables } from './integrations.types'
+import type { ResponseError } from 'types'
+import type { GitHubConnectionCreateVariables } from './integrations.types'
 import { integrationKeys } from './keys'
 
 export async function createGitHubConnection({ connection }: GitHubConnectionCreateVariables) {

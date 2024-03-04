@@ -5,7 +5,7 @@ import { Button, IconX, cn } from 'ui'
 
 import CopyButton from 'components/ui/CopyButton'
 import Telemetry from 'lib/telemetry'
-import { LogData } from './Messages.types'
+import type { LogData } from './Messages.types'
 import { SelectedRealtimeMessagePanel } from './SelectedRealtimeMessagePanel'
 
 export interface MessageSelectionProps {

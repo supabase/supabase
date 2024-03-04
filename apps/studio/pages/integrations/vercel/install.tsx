@@ -13,7 +13,7 @@ import { useVercelIntegrationCreateMutation } from 'data/integrations/vercel-int
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useStore } from 'hooks'
 import Link from 'next/link'
-import { NextPageWithLayout, Organization } from 'types'
+import type { NextPageWithLayout, Organization } from 'types'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
