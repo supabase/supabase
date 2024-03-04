@@ -131,13 +131,6 @@ const QueryItem = ({
                 )}
                 checked={isSelected}
                 onCheckedChange={onSelectQuery}
-                onClick={(e: any) => {
-                  // e.preventDefault() // Prevent the default click behavior
-                  // Optionally stop the click event propagation based on conditions
-                  // if (condition) {
-                  // e.stopPropagation() // Stop the click event propagation
-                  // }
-                }}
               />
             )}
             <span
@@ -169,7 +162,7 @@ const QueryItem = ({
           </InnerSideMenuItem>
         </HoverCardTrigger_Shadcn_>
         {!hideTooltip && (
-          <HoverCardContent_Shadcn_ side="right" align="center" className="w-96">
+          <HoverCardContent_Shadcn_ side="right" align="center" className="w-96" animate="slide-in">
             <>
               {content.sql.trim() ? (
                 <SimpleCodeBlock

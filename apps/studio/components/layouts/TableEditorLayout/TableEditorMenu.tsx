@@ -1,19 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { partition } from 'lodash'
-import { ArrowDownAZ, Plus } from 'lucide-react'
-import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import {
-  InnerSideBarFilterSearchInput,
-  InnerSideBarFilterSortDropdown,
-  InnerSideBarFilterSortDropdownItem,
-  InnerSideBarFilters,
-  InnerSideBarShimmeringLoaders,
-} from 'ui-patterns/InnerSideMenu'
-
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import AlertError from 'components/ui/AlertError'
 import InfiniteList from 'components/ui/InfiniteList'
@@ -22,7 +9,19 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { useCheckPermissions, useLocalStorage } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { partition } from 'lodash'
+import { Plus } from 'lucide-react'
+import { useRouter } from 'next/router'
+import { useMemo, useState } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import {
+  InnerSideBarFilterSearchInput,
+  InnerSideBarFilterSortDropdown,
+  InnerSideBarFilterSortDropdownItem,
+  InnerSideBarFilters,
+  InnerSideBarShimmeringLoaders,
+} from 'ui-patterns/InnerSideMenu'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import EntityListItem from './EntityListItem'
 
@@ -179,7 +178,6 @@ const TableEditorMenu = () => {
                   value="alphabetical"
                   className="flex gap-2"
                 >
-                  <ArrowDownAZ size={16} className="text-foreground-muted" strokeWidth={1.5} />
                   Alphabetical
                 </InnerSideBarFilterSortDropdownItem>
                 <InnerSideBarFilterSortDropdownItem
