@@ -70,7 +70,7 @@ begin
   
   return bind_permissions > 0;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 
 -- Secure the tables
 alter table public.users enable row level security;
@@ -115,7 +115,7 @@ begin
   
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = auth, public;
 
 -- trigger the function every time a user is created
 create trigger on_auth_user_created

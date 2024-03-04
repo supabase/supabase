@@ -8,6 +8,7 @@ Custom Claims are special attributes attached to a user that you can use to cont
 
 ```json
 {
+  "user_role": "admin",
   "plan": "TRIAL",
   "user_level": 100,
   "group_name": "Super Guild!",
@@ -197,6 +198,12 @@ using (true)
 </TabPanel>
 </Tabs>
 
+### Enable the hook
+
+In the dashboard, navigate to [`Authentication > Hooks (Beta)`](/dashboard/project/_/auth/hooks) and select the appropriate PostgreSQL function from the dropdown menu.
+
+When developing locally, follow the [local development](/guides/auth/auth-hooks#local-development) instructions.
+
 <Admonition type="note">
   
 To learn more about Auth Hooks, see the [Auth Hooks docs](/guides/auth/auth-hooks).
@@ -224,7 +231,7 @@ begin
 
   return bind_permissions > 0;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql security definer set search_path = public;
 ```
 
 <Admonition type="note">
