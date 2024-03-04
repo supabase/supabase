@@ -9,7 +9,7 @@ import { ProductMenu } from 'components/ui/ProductMenu'
 import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
 import { useIsFeatureEnabled, useSelectedProject, withAuth } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
-import {ProjectLayout} from '../'
+import { ProjectLayout } from '../'
 import { generateDocsMenu } from './DocsLayout.utils'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {

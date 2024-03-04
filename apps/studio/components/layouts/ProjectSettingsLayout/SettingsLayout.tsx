@@ -5,7 +5,7 @@ import { PropsWithChildren } from 'react'
 import { generateSettingsMenu } from './SettingsMenu.utils'
 
 import { useParams } from 'common'
-import {ProductMenu} from 'components/ui/ProductMenu'
+import { ProductMenu } from 'components/ui/ProductMenu'
 import { ProjectLayout } from '..'
 
 interface SettingsLayoutProps {
