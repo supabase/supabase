@@ -44,7 +44,7 @@ const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
         confirmPlaceholder="Type in name of function"
         confirmString={name}
         text={`This will delete your function called ${name} of schema ${schema}.`}
-        alert={{ title: { children: 'You cannot recover this function once it is deleted!' } }}
+        alert={{ children: 'You cannot recover this function once it is deleted!' }}
       />
     </>
   )

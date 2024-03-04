@@ -84,7 +84,9 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
           permanently deleted.
         </>
       }
-      alert="You cannot recover this bucket once it is deleted."
+      alert={{
+        title: 'You cannot recover this bucket once it is deleted.',
+      }}
       confirmLabel={`Delete bucket ${bucket?.name}`}
     />
   )

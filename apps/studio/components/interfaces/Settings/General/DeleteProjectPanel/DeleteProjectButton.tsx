@@ -2,7 +2,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, Input } from 'ui'
+import { Button, DialogSectionSeparator_Shadcn_, Input } from 'ui'
 
 import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -130,7 +130,9 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
           description: !isFree ? `All project data will be lost, and cannot be undone` : '',
         }}
         text={
-          isFree && `This will permanently delete the ${project?.name} project and all of its data.`
+          isFree
+            ? `This will permanently delete the ${project?.name} project and all of its data.`
+            : undefined
         }
         confirmPlaceholder="Type the project name in here"
         confirmString={project?.name || ''}
