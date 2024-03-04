@@ -9,7 +9,7 @@ import { SignInLayout } from 'components/layouts'
 import { Loading } from 'components/ui/Loading'
 import { auth, buildPathWithParams, getAccessToken, getReturnToPath } from 'lib/gotrue'
 import Telemetry from 'lib/telemetry'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const SignInMfaPage: NextPageWithLayout = () => {
   const router = useRouter()

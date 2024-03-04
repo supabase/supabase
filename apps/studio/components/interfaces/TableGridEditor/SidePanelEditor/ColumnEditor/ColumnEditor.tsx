@@ -31,12 +31,16 @@ import {
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 import ActionBar from '../ActionBar'
-import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
+import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
 import { TEXT_TYPES } from '../SidePanelEditor.constants'
-import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from '../SidePanelEditor.types'
+import type {
+  ColumnField,
+  CreateColumnPayload,
+  UpdateColumnPayload,
+} from '../SidePanelEditor.types'
 import ColumnDefaultValue from './ColumnDefaultValue'
 import {
   generateColumnField,

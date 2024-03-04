@@ -10,7 +10,7 @@ import {
 
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'
-import { Database } from 'data/read-replicas/replicas-query'
+import type { Database } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 
 interface DropReplicaConfirmationModalProps {

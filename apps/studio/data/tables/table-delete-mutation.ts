@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { del, handleError } from 'data/fetchers'
 import { viewKeys } from 'data/views/keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { tableKeys } from './keys'
 
 export type TableDeleteVariables = {

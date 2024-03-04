@@ -8,7 +8,7 @@ import { FormPanel } from 'components/ui/Forms'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useCheckPermissions } from 'hooks'
-import { Timezone } from './PITR.types'
+import type { Timezone } from './PITR.types'
 import { TimezoneSelection } from './TimezoneSelection'
 
 interface PITRStatusProps {

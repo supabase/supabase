@@ -10,7 +10,7 @@ import { Loading } from 'components/ui/Loading'
 import { useCheckPermissions, useStore } from 'hooks'
 import { useProfile } from 'lib/profile'
 import { useProjectContentStore } from 'stores/projectContentStore'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import { CreateReportModal } from 'components/interfaces/Reports/Reports.CreateReportModal'
 
 export const UserReportPage: NextPageWithLayout = () => {

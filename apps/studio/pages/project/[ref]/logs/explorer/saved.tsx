@@ -7,7 +7,7 @@ import { LogsLayout } from 'components/layouts'
 import Table from 'components/to-be-cleaned/Table'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 import { useContentQuery } from 'data/content/content-query'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { ref } = useParams()

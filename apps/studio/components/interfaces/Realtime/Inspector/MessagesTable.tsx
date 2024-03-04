@@ -10,7 +10,7 @@ import ShimmerLine from 'components/ui/ShimmerLine'
 import Telemetry from 'lib/telemetry'
 import { useRouter } from 'next/router'
 import MessageSelection from './MessageSelection'
-import { LogData } from './Messages.types'
+import type { LogData } from './Messages.types'
 import NoChannelEmptyState from './NoChannelEmptyState'
 import { ColumnRenderer } from './RealtimeMessageColumnRenderer'
 

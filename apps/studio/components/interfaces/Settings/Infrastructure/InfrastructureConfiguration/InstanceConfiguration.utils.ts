@@ -8,8 +8,8 @@ import {
   NODE_WIDTH,
 } from './InstanceConfiguration.constants'
 import { groupBy } from 'lodash'
-import { Database } from 'data/read-replicas/replicas-query'
-import { LoadBalancer } from 'data/read-replicas/load-balancers-query'
+import type { Database } from 'data/read-replicas/replicas-query'
+import type { LoadBalancer } from 'data/read-replicas/load-balancers-query'
 
 // [Joshen] Just FYI the nodes generation assumes each project only has one load balancer
 // Will need to change if this eventually becomes otherwise

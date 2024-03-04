@@ -17,7 +17,7 @@ import {
   IconXCircle,
 } from 'ui'
 
-import { Bucket } from 'data/storage/buckets-query'
+import type { Bucket } from 'data/storage/buckets-query'
 import { useCheckPermissions } from 'hooks'
 
 export interface BucketRowProps {

@@ -1,6 +1,6 @@
 import { UseQueryOptions } from '@tanstack/react-query'
 import { Query } from 'components/grid/query/Query'
-import { VaultSecret } from 'types'
+import type { VaultSecret } from 'types'
 import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
 import { vaultSecretsKeys } from './keys'
 

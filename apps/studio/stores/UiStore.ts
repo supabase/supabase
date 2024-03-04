@@ -1,8 +1,8 @@
 import { action, makeAutoObservable } from 'mobx'
 
 import { uuidv4 } from 'lib/helpers'
-import { Notification } from 'types'
-import { IRootStore } from './RootStore'
+import type { Notification } from 'types'
+import type { IRootStore } from './RootStore'
 
 export interface IUiStore {
   language: 'en-US'

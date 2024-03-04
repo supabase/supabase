@@ -2,7 +2,7 @@ import Link from 'next/link'
 import toast from 'react-hot-toast'
 import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
 
-import { SupaRow } from 'components/grid'
+import type { SupaRow } from 'components/grid'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -13,11 +13,10 @@ import { useTableRowTruncateMutation } from 'data/table-rows/table-row-truncate-
 import { useTableDeleteMutation } from 'data/tables/table-delete-mutation'
 import { useGetTables } from 'data/tables/tables-query'
 import { useUrlState } from 'hooks'
-import { TableLike } from 'hooks/misc/useTable'
+import type { TableLike } from 'hooks/misc/useTable'
 import { noop } from 'lib/void'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { tableKeys } from 'data/tables/keys'
 
 export type DeleteConfirmationDialogsProps = {
   projectRef?: string

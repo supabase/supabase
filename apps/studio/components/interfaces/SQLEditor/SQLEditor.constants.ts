@@ -1,6 +1,6 @@
 import { stripIndent } from 'common-tags'
-import { SqlSnippets, UserContent } from 'types'
-import { SQLTemplate } from './SQLEditor.types'
+import type { SqlSnippets, UserContent } from 'types'
+import type { SQLTemplate } from './SQLEditor.types'
 
 export const SQL_TEMPLATES: SQLTemplate[] = [
   {

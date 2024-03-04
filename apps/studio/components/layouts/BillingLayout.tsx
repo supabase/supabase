@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 
 import { ProjectLayout } from 'components/layouts'
 import { useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'

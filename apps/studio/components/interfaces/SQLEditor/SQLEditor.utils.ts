@@ -1,6 +1,6 @@
 // @ts-ignore
 import { NEW_SQL_SNIPPET_SKELETON, destructiveSqlRegex } from './SQLEditor.constants'
-import { SqlSnippets, UserContent } from 'types'
+import type { SqlSnippets, UserContent } from 'types'
 import { DiffType } from './SQLEditor.types'
 import { removeCommentsFromSql } from 'lib/helpers'
 import { stripIndent } from 'common-tags'

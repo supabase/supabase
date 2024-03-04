@@ -34,7 +34,7 @@ import Table from 'components/to-be-cleaned/Table'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useFlag } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 type QueryPerformancePreset = 'time' | 'frequent' | 'slowest'
 

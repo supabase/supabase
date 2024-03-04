@@ -57,11 +57,9 @@ const TableEditorMenu = () => {
     isError,
     error,
     refetch,
-    isRefetching,
     hasNextPage,
     isFetchingNextPage,
     fetchNextPage,
-    isPreviousData: isSearching,
   } = useEntityTypesQuery(
     {
       projectRef: project?.ref,

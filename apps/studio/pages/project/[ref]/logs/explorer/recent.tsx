@@ -7,7 +7,7 @@ import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import Table from 'components/to-be-cleaned/Table'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
 import { useLocalStorage } from 'hooks'
-import { LogSqlSnippets, NextPageWithLayout } from 'types'
+import type { LogSqlSnippets, NextPageWithLayout } from 'types'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { ref } = useParams()

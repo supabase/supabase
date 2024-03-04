@@ -5,7 +5,7 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import SVG from 'react-inlinesvg'
 
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import FormEmptyBox from 'components/ui/FormBoxEmpty'
