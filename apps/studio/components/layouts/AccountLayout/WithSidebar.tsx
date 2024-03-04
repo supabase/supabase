@@ -5,7 +5,7 @@ import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
 
 import { useFlag } from 'hooks'
 import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
-import { SidebarLink, SidebarSection } from './AccountLayout.types'
+import type { SidebarLink, SidebarSection } from './AccountLayout.types'
 
 interface WithSidebarProps {
   title: string

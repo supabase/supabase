@@ -1,5 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { RenderEditCellProps } from 'react-data-grid'
+import type { RenderEditCellProps } from 'react-data-grid'
 import { useCallback, useState } from 'react'
 import { IconMaximize, Popover } from 'ui'
 

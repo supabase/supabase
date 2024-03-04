@@ -4,7 +4,7 @@ import { isNaN, noop } from 'lodash'
 import { ChangeEvent, useEffect, useState } from 'react'
 import { IconClock } from 'ui'
 
-import { Time } from './PITR.types'
+import type { Time } from './PITR.types'
 import { formatNumberToTwoDigits, formatTimeToTimeString } from './PITR.utils'
 
 // [Joshen] This is trying to do the same thing as TimeSplitInput.tsx

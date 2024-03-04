@@ -12,7 +12,7 @@ import ProjectUpgradeFailedBanner from 'components/ui/ProjectUpgradeFailedBanner
 import { useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const Home: NextPageWithLayout = () => {
   const project = useSelectedProject()

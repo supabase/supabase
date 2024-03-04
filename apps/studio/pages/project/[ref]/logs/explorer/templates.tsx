@@ -6,7 +6,7 @@ import { LogTemplate, TEMPLATES } from 'components/interfaces/Settings/Logs'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import CardButton from 'components/ui/CardButton'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 export const LogsTemplatesPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()

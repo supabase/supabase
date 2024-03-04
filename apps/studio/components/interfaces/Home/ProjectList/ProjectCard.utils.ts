@@ -1,4 +1,4 @@
-import { ProjectInfo } from 'data/projects/projects-query'
+import type { ProjectInfo } from 'data/projects/projects-query'
 import { PROJECT_STATUS } from 'lib/constants'
 
 export const inferProjectStatus = (project: ProjectInfo) => {

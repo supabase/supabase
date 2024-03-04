@@ -1,4 +1,4 @@
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { sortBy } from 'lodash'
 import { Table } from 'lucide-react'
 import { Fragment, useEffect, useState } from 'react'
@@ -26,9 +26,9 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 import ActionBar from '../ActionBar'
 import { NUMERICAL_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import { FOREIGN_KEY_CASCADE_OPTIONS } from './ForeignKeySelector.constants'
-import { ForeignKey } from './ForeignKeySelector.types'
+import type { ForeignKey } from './ForeignKeySelector.types'
 import { generateCascadeActionDescription } from './ForeignKeySelector.utils'
-import { ColumnField } from '../SidePanelEditor.types'
+import type { ColumnField } from '../SidePanelEditor.types'
 
 const EMPTY_STATE: ForeignKey = {
   id: undefined,

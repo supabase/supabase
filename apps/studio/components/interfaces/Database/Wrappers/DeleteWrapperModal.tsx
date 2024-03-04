@@ -1,6 +1,6 @@
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
-import { FDW } from 'data/fdw/fdws-query'
+import type { FDW } from 'data/fdw/fdws-query'
 import { useStore } from 'hooks'
 import { Modal } from 'ui'
 import { WRAPPERS } from './Wrappers.constants'

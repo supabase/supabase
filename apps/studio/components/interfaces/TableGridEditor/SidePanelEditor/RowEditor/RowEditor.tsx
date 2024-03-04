@@ -1,5 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 import { isEmpty, isUndefined, noop, partition } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
 import { SidePanel } from 'ui'
@@ -11,7 +11,7 @@ import ForeignRowSelector from './ForeignRowSelector/ForeignRowSelector'
 import HeaderTitle from './HeaderTitle'
 import InputField from './InputField'
 import { JsonEditor } from './JsonEditor'
-import { JsonEditValue, RowField } from './RowEditor.types'
+import type { JsonEditValue, RowField } from './RowEditor.types'
 import {
   generateRowFields,
   generateRowObjectFromFields,

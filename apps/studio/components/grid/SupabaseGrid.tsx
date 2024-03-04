@@ -23,7 +23,7 @@ import { Grid } from './components/grid'
 import Header from './components/header/Header'
 import { RowContextMenu } from './components/menu'
 import { StoreProvider, useDispatch, useTrackedState } from './store'
-import { SupabaseGridProps } from './types'
+import type { SupabaseGridProps } from './types'
 
 /** Supabase Grid: React component to render database table */
 

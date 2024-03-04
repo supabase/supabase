@@ -27,7 +27,7 @@ import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import CopyButton from 'components/ui/CopyButton'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { SqlSnippet } from 'data/content/sql-snippets-query'
+import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { QueryItemActions } from './QueryItemActions'
 

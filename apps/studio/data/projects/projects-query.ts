@@ -1,11 +1,11 @@
 import { QueryClient, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { useCallback, useRef } from 'react'
 
-import { components } from 'data/api'
+import type { components } from 'data/api'
 import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
-import { Project } from './project-detail-query'
+import type { Project } from './project-detail-query'
 
 export type ProjectsVariables = {
   ref?: string

@@ -6,7 +6,7 @@ import * as React from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 import { IconArrowRight, IconKey, IconLink, IconLock } from 'ui'
 import { useDispatch, useTrackedState } from '../../store'
-import { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
+import type { ColumnHeaderProps, ColumnType, DragItem, GridForeignKey } from '../../types'
 import { ColumnMenu } from '../menu'
 import { useEffect } from 'react'
 
