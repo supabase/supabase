@@ -71,10 +71,7 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
               key={column.id}
             >
               <div
-                className={cn(
-                  'gap-[0.24rem] flex mx-2 align-middle items-center justify-start',
-                  column.isPrimary && 'basis-1/5'
-                )}
+                className="gap-[0.24rem] flex mx-2 align-middle basis-1/5 items-center justify-start"
               >
                 {column.isPrimary && (
                   <Key
@@ -106,7 +103,7 @@ const TableNode = ({ data, targetPosition, sourcePosition }: NodeProps<TableNode
                 )}
               </div>
               <div className="flex w-full justify-between">
-                <span className="text-ellipsis overflow-hidden whitespace-nowrap max-w-[85px]">
+                <span className="text-ellipsis overflow-hidden whitespace-nowrap">
                   {column.name}
                 </span>
                 <span className="px-2 inline-flex justify-end font-mono text-lighter text-[0.4rem]">
