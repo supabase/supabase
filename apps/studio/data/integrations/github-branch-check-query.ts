@@ -5,27 +5,21 @@ import { get } from 'data/fetchers'
 import { ResponseError } from 'types'
 
 export type GithubBranchVariables = {
-  organizationIntegrationId?: string
-  repoOwner: string
-  repoName: string
+  connectionId: number
   branchName: string
 }
 
 export async function checkGithubBranchValidity(
-  { organizationIntegrationId, repoOwner, repoName, branchName }: GithubBranchVariables,
+  { connectionId, branchName }: GithubBranchVariables,
   signal?: AbortSignal
 ) {
-  if (!organizationIntegrationId) throw new Error('Organization integration ID is required')
-
   const { data, error } = await get(
-    '/platform/integrations/github/branches/{organization_integration_id}/{repo_owner}/{repo_name}/{branch_name}',
+    '/platform/integrations/github/branches/{connectionId}/{branchName}',
     {
       params: {
         path: {
-          organization_integration_id: organizationIntegrationId,
-          repo_owner: repoOwner,
-          repo_name: repoName,
-          branch_name: branchName,
+          connectionId,
+          branchName,
         },
       },
       signal,

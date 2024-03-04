@@ -24,7 +24,7 @@ import { Dictionary } from 'types'
 import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
 import { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
-import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
+import JsonEditor from './RowEditor/JsonEditor/JsonEditor'
 import { TextEditor } from './RowEditor/TextEditor'
 import SchemaEditor from './SchemaEditor'
 import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
@@ -202,11 +202,16 @@ const SidePanelEditor = ({
   const saveColumn = async (
     payload: CreateColumnPayload | UpdateColumnPayload,
     isNewRecord: boolean,
-    configuration: { columnId?: string; primaryKey?: Constraint },
+    configuration: {
+      columnId?: string
+      primaryKey?: Constraint
+      foreignKeyRelations: ForeignKey[]
+      existingForeignKeyRelations: ForeignKeyConstraint[]
+    },
     resolve: any
   ) => {
     const selectedColumnToEdit = snap.sidePanel?.type === 'column' && snap.sidePanel.column
-    const { columnId, primaryKey } = configuration
+    const { columnId, primaryKey, foreignKeyRelations, existingForeignKeyRelations } = configuration
 
     const response = isNewRecord
       ? await createColumn({
@@ -215,6 +220,7 @@ const SidePanelEditor = ({
           payload: payload as CreateColumnPayload,
           selectedTable: selectedTable as PostgresTable,
           primaryKey,
+          foreignKeyRelations,
         })
       : await updateColumn({
           projectRef: project?.ref!,
@@ -223,6 +229,8 @@ const SidePanelEditor = ({
           payload: payload as UpdateColumnPayload,
           selectedTable: selectedTable as PostgresTable,
           primaryKey,
+          foreignKeyRelations,
+          existingForeignKeyRelations,
         })
 
     if (response?.error) {
@@ -600,7 +608,7 @@ const SidePanelEditor = ({
         updateEditorDirty={() => setIsEdited(true)}
       />
       <SchemaEditor visible={snap.sidePanel?.type === 'schema'} closePanel={onClosePanel} />
-      <JsonEdit
+      <JsonEditor
         visible={snap.sidePanel?.type === 'json'}
         column={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.column) || ''}
         jsonString={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.jsonString) || ''}

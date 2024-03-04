@@ -1,6 +1,6 @@
 import { useTheme } from 'next-themes'
 import { useParams } from 'common/hooks'
-import { TableGridEditor } from 'components/interfaces'
+import { TableGridEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import { TableEditorLayout } from 'components/layouts'
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'

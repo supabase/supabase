@@ -26,8 +26,8 @@ import {
   ResizablePanelGroup,
   cn,
 } from 'ui'
-
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
 import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
@@ -329,6 +329,9 @@ const SQLEditor = () => {
             role: impersonatedRole,
           }),
           isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+          handleError: (error) => {
+            throw error
+          },
         })
       }
     },

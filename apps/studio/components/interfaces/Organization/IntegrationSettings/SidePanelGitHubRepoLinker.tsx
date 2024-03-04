@@ -1,16 +1,17 @@
 import { useMemo } from 'react'
+import toast from 'react-hot-toast'
+import { Button, SidePanel } from 'ui'
 
 import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
-import { useIntegrationGitHubConnectionsCreateMutation } from 'data/integrations/integrations-github-connections-create-mutation'
-import { useGitHubReposQuery } from 'data/integrations/integrations-github-repos-query'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
+import { useGitHubConnectionCreateMutation } from 'data/integrations/github-connection-create-mutation'
+import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
+import { IntegrationConnectionsCreateVariables } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedOrganization } from 'hooks'
+import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { EMPTY_ARR } from 'lib/void'
-import { SidePanel } from 'ui'
-import { useIntegrationsGitHubInstalledConnectionDeleteMutation } from 'data/integrations/integrations-github-connection-delete-mutation'
-import { IntegrationConnectionsCreateVariables } from 'data/integrations/integrations.types'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 
 const GITHUB_ICON = (
@@ -32,31 +33,17 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
   const selectedOrganization = useSelectedOrganization()
   const sidePanelStateSnapshot = useSidePanelsStateSnapshot()
 
-  const organizationIntegrationId = sidePanelStateSnapshot.githubConnectionsIntegrationId
+  const { data: gitHubAuthorization, isLoading: isLoadingGitHubAuthorization } =
+    useGitHubAuthorizationQuery()
 
-  const { data: integrationData } = useOrgIntegrationsQuery({
-    orgSlug: selectedOrganization?.slug,
-  })
-  const githubIntegrations = integrationData?.filter(
-    (integration) => integration.integration.name === 'GitHub'
-  ) // github
-  const existingProjectGithubConnection = githubIntegrations?.[0]?.connections.find(
-    (connection) => connection.supabase_project_ref === projectRef
-  )
-
-  /**
-   * Find the right integration
-   *
-   * we use the snapshot.organizationIntegrationId which should be set whenever this sidepanel is opened
-   */
-  const selectedIntegration = githubIntegrations?.find((x) => x.id === organizationIntegrationId)
+  // [Alaister]: temp override with <any> until the typegen is fixed
+  const { data: githubReposData, isLoading: isLoadingGitHubRepos } =
+    useGitHubRepositoriesQuery<any[]>()
 
   /**
    * Supabase projects available
    */
-  const { data: supabaseProjectsData, isLoading: isLoadingSupabaseProjects } = useProjectsQuery({
-    enabled: organizationIntegrationId !== undefined,
-  })
+  const { data: supabaseProjectsData, isLoading: isLoadingSupabaseProjects } = useProjectsQuery()
 
   const supabaseProjects = useMemo(
     () =>
@@ -67,45 +54,36 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     [selectedOrganization?.id, supabaseProjectsData]
   )
 
-  const { data: githubProjectsData, isLoading: isLoadingGitHubRepos } = useGitHubReposQuery(
-    {
-      integrationId: organizationIntegrationId,
-    },
-    { enabled: organizationIntegrationId !== undefined }
-  )
-
   const githubRepos = useMemo(
     () =>
-      githubProjectsData?.map((repo) => ({
+      githubReposData?.map((repo: any) => ({
         id: repo.id.toString(),
-        name: repo.full_name,
+        name: repo.name,
+        installation_id: repo.installation_id,
       })) ?? EMPTY_ARR,
-    [githubProjectsData]
+    [githubReposData]
   )
 
   const { mutate: createConnections, isLoading: isCreatingConnection } =
-    useIntegrationGitHubConnectionsCreateMutation({
+    useGitHubConnectionCreateMutation({
       onSuccess() {
+        toast.success('Successfully linked project to repository!')
         sidePanelStateSnapshot.setGithubConnectionsOpen(false)
       },
     })
 
-  const { mutate: deleteGitHubConnection } =
-    useIntegrationsGitHubInstalledConnectionDeleteMutation()
-
-  const createGithubConnection = (variables: IntegrationConnectionsCreateVariables) => {
-    const existingProjectGithubConnection = githubIntegrations?.[0].connections.find(
-      (connection) => connection.supabase_project_ref === variables.connection.supabase_project_ref
-    )
-    if (existingProjectGithubConnection !== undefined && selectedOrganization !== undefined) {
-      deleteGitHubConnection({
-        connectionId: existingProjectGithubConnection.id,
-        integrationId: existingProjectGithubConnection.organization_integration_id,
-        orgSlug: selectedOrganization.slug,
-      })
+  const createGithubConnection = async (variables: IntegrationConnectionsCreateVariables) => {
+    if (!selectedOrganization?.id) {
+      throw new Error('No organization id')
+    }
+    if (!variables.new) {
+      throw new Error('No new connection')
     }
 
-    createConnections(variables)
+    createConnections({
+      organizationId: selectedOrganization.id,
+      connection: variables.new,
+    })
   }
 
   return (
@@ -125,22 +103,38 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
 Check the details below before proceeding
           `}
           />
-        </SidePanel.Content>
-        <SidePanel.Content className="flex flex-col gap-2">
-          <ProjectLinker
-            defaultSupabaseProjectRef={projectRef}
-            defaultForeignProjectId={existingProjectGithubConnection?.foreign_project_id}
-            organizationIntegrationId={selectedIntegration?.id}
-            foreignProjects={githubRepos}
-            supabaseProjects={supabaseProjects}
-            onCreateConnections={createGithubConnection}
-            installedConnections={selectedIntegration?.connections}
-            isLoading={isCreatingConnection}
-            loadingForeignProjects={isLoadingGitHubRepos}
-            loadingSupabaseProjects={isLoadingSupabaseProjects}
-            integrationIcon={GITHUB_ICON}
-            choosePrompt="Choose GitHub Repo"
-          />
+
+          {gitHubAuthorization === null ? (
+            <div className="flex flex-col items-center justify-center mt-8 relative border rounded-lg p-12 bg shadow px-20s">
+              <p className="text-sm text-center">
+                Connect your Supabase projects with your GitHub repositories
+              </p>
+              <p className="text-sm text-center text-foreground-light">
+                Authorize with GitHub to retrieve your GitHub repositories
+              </p>
+              <Button
+                className="w-min mt-3"
+                onClick={() => {
+                  openInstallGitHubIntegrationWindow('authorize')
+                }}
+              >
+                Authorize GitHub
+              </Button>
+            </div>
+          ) : (
+            <ProjectLinker
+              defaultSupabaseProjectRef={projectRef}
+              foreignProjects={githubRepos}
+              supabaseProjects={supabaseProjects}
+              onCreateConnections={createGithubConnection}
+              isLoading={isCreatingConnection}
+              loadingForeignProjects={isLoadingGitHubRepos}
+              loadingSupabaseProjects={isLoadingSupabaseProjects}
+              integrationIcon={GITHUB_ICON}
+              choosePrompt="Choose GitHub Repo"
+              showNoEntitiesState={false}
+            />
+          )}
         </SidePanel.Content>
       </div>
     </SidePanel>

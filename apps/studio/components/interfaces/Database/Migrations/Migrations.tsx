@@ -5,7 +5,7 @@ import { Alert, Button, IconExternalLink, IconSearch, Input, SidePanel } from 'u
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
-import CodeEditor from 'components/ui/CodeEditor'
+import { CodeEditor } from 'components/ui/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { DatabaseMigration, useMigrationsQuery } from 'data/database/migrations-query'
 import MigrationsEmptyState from './MigrationsEmptyState'

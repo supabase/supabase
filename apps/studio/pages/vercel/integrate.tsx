@@ -15,7 +15,7 @@ import {
   prepareVercelEvns,
 } from 'components/to-be-cleaned/Integration/Vercel.utils'
 import { databaseIcon, vercelIcon } from 'components/to-be-cleaned/ListIcons'
-import Loading from 'components/ui/Loading'
+import { Loading } from 'components/ui/Loading'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { withAuth } from 'hooks'
 import { get } from 'lib/common/fetch'

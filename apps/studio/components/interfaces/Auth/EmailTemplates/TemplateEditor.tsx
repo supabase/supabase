@@ -1,5 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams } from 'common'
 import { useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
 import ReactMarkdown from 'react-markdown'
 import {
   AlertTitle_Shadcn_,
@@ -12,12 +14,9 @@ import {
   Tabs,
 } from 'ui'
 
-import { useParams } from 'common'
-import CodeEditor from 'components/ui/CodeEditor'
+import { CodeEditor } from 'components/ui/CodeEditor'
 import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import InformationBox from 'components/ui/InformationBox'
-import toast from 'react-hot-toast'
-
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks'
 import { FormSchema } from 'types'
