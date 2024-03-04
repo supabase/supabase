@@ -52,7 +52,7 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
       confirmPlaceholder="Type in name of webhook"
       confirmString={name || ''}
       text={`This will delete the webhook "${name}" from the schema "${schema}".`}
-      alert="You cannot recover this webhook once it is deleted!"
+      alert={{ title: { children: 'You cannot recover this webhook once it is deleted!' } }}
     />
   )
 }

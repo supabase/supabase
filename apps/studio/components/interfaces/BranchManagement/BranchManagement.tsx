@@ -359,7 +359,7 @@ const BranchManagement = () => {
         confirmPlaceholder="Type in name of branch"
         confirmString={selectedBranchToDelete?.name ?? ''}
         text={`This will delete your database preview branch "${selectedBranchToDelete?.name}"`}
-        alert="You cannot recover this branch once it is deleted!"
+        alert={{ title: { children: 'You cannot recover this branch once it is deleted!' } }}
       />
 
       <ConfirmationModal

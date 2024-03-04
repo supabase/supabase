@@ -46,7 +46,8 @@ const DeleteTrigger = ({ trigger, visible, setVisible }: DeleteTriggerProps) => 
       confirmPlaceholder="Type in name of trigger"
       confirmString={name}
       text={`This will delete your trigger called ${name} of schema ${schema}.`}
-      alert="You cannot recover this trigger once it is deleted!"
+      variant={'warning'}
+      alert={{ title: { children: 'You cannot recover this trigger once it is deleted' } }}
     />
   )
 }

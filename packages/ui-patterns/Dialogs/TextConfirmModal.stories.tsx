@@ -1,6 +1,6 @@
 import { useArgs } from '@storybook/preview-api'
 import { StoryObj } from '@storybook/react'
-import { Button } from 'ui'
+import { Button, IconUserPlus } from 'ui'
 import TextConfirmModal from './TextConfirmModal'
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
@@ -14,9 +14,11 @@ export default {
   // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
   tags: ['autodocs'],
   // More on argTypes: https://storybook.js.org/docs/api/argtypes
-  // argTypes: {
-  //   backgroundColor: { control: 'color' },
-  // },
+  argTypes: {
+    title: { control: 'text' },
+    cancelLabel: { control: 'text' },
+    confirmLabel: { control: 'text' },
+  },
 }
 
 // export default meta
@@ -33,6 +35,7 @@ type Story = StoryObj<typeof TextConfirmModal>
 
 export const Primary: Story = {
   args: {
+    confirmString: 'project name',
     visible: false,
     title: 'Are you sure you want to delete?',
     // label: 'Try Me!',
@@ -43,7 +46,6 @@ export const Primary: Story = {
    */
   render: function Render(args) {
     const [{ visible }, updateArgs] = useArgs()
-    // const [visible, setVisibleState] = useState(args.visible)
 
     function onVisibleChange() {
       updateArgs({ visible: !visible })
@@ -70,13 +72,11 @@ export const Primary: Story = {
 
 export const withWarningAlert: Story = {
   args: {
+    confirmString: 'project name',
     visible: false,
     variant: 'warning',
     title: 'Are you sure you want to delete?',
     alert: {
-      base: {
-        variant: 'warning',
-      },
       title: {
         children: 'This is a warning',
       },
@@ -84,7 +84,6 @@ export const withWarningAlert: Story = {
         children: 'You are about to delete this item. This action cannot be undone.',
       },
     },
-    // label: 'Try Me!',
   },
   /**
    * 👇 To avoid linting issues, it is recommended to use a function with a capitalized name.
@@ -103,15 +102,7 @@ export const withWarningAlert: Story = {
         <Button type="default" onClick={() => onVisibleChange()}>
           Open warning text confirm dialog
         </Button>
-        <TextConfirmModal
-          key="withWarningAlert"
-          // visible={visible}
-          {...args}
-          onCancel={() => onVisibleChange()}
-          // onChange={onChange}
-
-          // isChecked={isChecked}
-        />
+        <TextConfirmModal key="withWarningAlert" {...args} onCancel={() => onVisibleChange()} />
       </>
     )
   },
@@ -119,13 +110,11 @@ export const withWarningAlert: Story = {
 
 export const withDestructiveAlert: Story = {
   args: {
+    confirmString: 'project name',
     visible: false,
     variant: 'destructive',
     title: 'Are you sure you want to delete?',
     alert: {
-      base: {
-        variant: 'warning',
-      },
       title: {
         children: 'This is a warning',
       },
@@ -152,15 +141,7 @@ export const withDestructiveAlert: Story = {
         <Button type="default" onClick={() => onVisibleChange()}>
           Open warning text confirm dialog
         </Button>
-        <TextConfirmModal
-          key="withWarningAlert"
-          // visible={visible}
-          {...args}
-          onCancel={() => onVisibleChange()}
-          // onChange={onChange}
-
-          // isChecked={isChecked}
-        />
+        <TextConfirmModal key="withWarningAlert" {...args} onCancel={() => onVisibleChange()} />
       </>
     )
   },
@@ -168,6 +149,7 @@ export const withDestructiveAlert: Story = {
 
 export const withCancelButton: Story = {
   args: {
+    confirmString: 'project name',
     visible: false,
     variant: 'destructive',
     title: 'Are you sure you want to delete?',
@@ -191,6 +173,35 @@ export const withCancelButton: Story = {
         <Button type="default" onClick={() => onVisibleChange()}>
           Open warning text confirm dialog
         </Button>
+        <TextConfirmModal key="withWarningAlert" {...args} onCancel={() => onVisibleChange()} />
+      </>
+    )
+  },
+}
+
+export const withChildren: Story = {
+  args: {
+    confirmString: 'project name',
+    visible: false,
+    variant: 'destructive',
+    title: 'Are you sure you want to delete?',
+  },
+  /**
+   * 👇 To avoid linting issues, it is recommended to use a function with a capitalized name.
+   * If you are not concerned with linting, you may use an arrow function.
+   */
+  render: function Render(args) {
+    const [{ visible }, updateArgs] = useArgs()
+
+    function onVisibleChange() {
+      updateArgs({ visible: !visible })
+    }
+
+    return (
+      <>
+        <Button type="default" onClick={() => onVisibleChange()}>
+          Open warning text confirm dialog
+        </Button>
         <TextConfirmModal
           key="withWarningAlert"
           // visible={visible}
@@ -199,28 +210,29 @@ export const withCancelButton: Story = {
           // onChange={onChange}
 
           // isChecked={isChecked}
-        />
+        >
+          <div className="flex flex-col gap-3 text-sm">
+            <div className="flex gap-3 items-center">
+              <IconUserPlus className="text-foreground-lighter" />
+              <p>
+                This is a paragraph <strong>with some bold text</strong>
+              </p>
+            </div>
+            <div className="flex gap-3 items-center">
+              <IconUserPlus className="text-foreground-lighter" />
+              <p>
+                This is a paragraph <strong>with some bold text</strong>
+              </p>
+            </div>
+            <div className="flex gap-3 items-center">
+              <IconUserPlus className="text-foreground-lighter" />
+              <p>
+                This is a paragraph <strong>with some bold text</strong>
+              </p>
+            </div>
+          </div>
+        </TextConfirmModal>
       </>
     )
   },
 }
-
-// export const Secondary = {
-//   args: {
-//     label: 'Button',
-//   },
-// }
-
-// export const Large = {
-//   args: {
-//     size: 'large',
-//     label: 'Button',
-//   },
-// }
-
-// export const Small = {
-//   args: {
-//     size: 'small',
-//     label: 'Button',
-//   },
-// }

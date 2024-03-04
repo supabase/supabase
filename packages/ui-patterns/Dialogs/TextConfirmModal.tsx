@@ -27,21 +27,24 @@ export interface TextConfirmModalProps {
   loading: boolean
   visible: boolean
   title: string
-  size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge'
+  // size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge' | 'xxlarge'
   cancelLabel?: string
   confirmLabel?: string
   confirmPlaceholder: string
   confirmString: string
-  // alert?: string
   text?: string | ReactNode
   onConfirm: () => void
   onCancel: () => void
-  variant?: 'default' | 'warning' | 'destructive'
+  variant?: React.ComponentProps<typeof Alert_Shadcn_>['variant']
   alert?: {
-    base: React.ComponentProps<typeof Alert_Shadcn_>
-    title: React.ComponentProps<typeof AlertTitle_Shadcn_>
-    description: React.ComponentProps<typeof AlertDescription_Shadcn_>
+    base?: React.ComponentProps<typeof Alert_Shadcn_>
+    title?: React.ComponentProps<typeof AlertTitle_Shadcn_>
+    description?: React.ComponentProps<typeof AlertDescription_Shadcn_>
   }
+  input?: React.ComponentProps<typeof Input_Shadcn_>
+  label?: React.ComponentProps<typeof FormLabel_Shadcn_>
+  formMessage?: React.ComponentProps<typeof FormMessage_Shadcn_>
+  description?: React.ComponentProps<typeof FormDescription_Shadcn_>
   blockDeleteButton?: boolean
 }
 
@@ -62,6 +65,10 @@ const TextConfirmModal = forwardRef<
       confirmPlaceholder,
       confirmString,
       alert,
+      input,
+      label,
+      description,
+      formMessage,
       text,
       children,
       blockDeleteButton = true,
@@ -70,26 +77,9 @@ const TextConfirmModal = forwardRef<
     },
     ref
   ) => {
-    // Your component logic here
-
-    // [Joshen] Have to keep the loading prop here as this component itself doesn't
-    // directly trigger any potential async job that follows onConfirm. It only triggers
-    // the onConfirm callback function, and hence if anything fails in the callback,
-    // have to depend on loading prop to unfreeze the UI state
-
-    // const validate = (values: any) => {
-    //   const errors: any = {}
-    //   if (values.confirmValue.length === 0) {
-    //     errors.confirmValue = 'Enter the required value.'
-    //   } else if (values.confirmValue !== confirmString) {
-    //     errors.confirmValue = 'Value entered does not match.'
-    //   }
-    //   return errors
-    // }
-
     const formSchema = z.object({
-      username: z.string().min(2, {
-        message: 'Username must be at least 2 characters.',
+      confirmValue: z.literal(confirmString, {
+        required_error: 'Value entered does not match.',
       }),
     })
 
@@ -97,7 +87,7 @@ const TextConfirmModal = forwardRef<
     const form = useForm<z.infer<typeof formSchema>>({
       resolver: zodResolver(formSchema),
       defaultValues: {
-        username: '',
+        confirmValue: '',
       },
     })
 
@@ -105,27 +95,20 @@ const TextConfirmModal = forwardRef<
     function onSubmit(values: z.infer<typeof formSchema>) {
       // Do something with the form values.
       // ✅ This will be type-safe and validated.
-      console.log(values)
+      onConfirm()
     }
 
     return (
-      // <span>hello world</span>
-
       <Dialog_Shadcn_
         open={visible}
-        // hideFooter
-        // closable
-        // size={size}
-        // visible={visible}
-        // header={title}
-        // onCancel={onCancel}
+        {...props}
         onOpenChange={() => {
           if (visible) {
             onCancel()
           }
         }}
       >
-        <DialogContent_Shadcn_ ref={ref} className="p-0 gap-0">
+        <DialogContent_Shadcn_ ref={ref} className="p-0 gap-0 max-w-md">
           <DialogTitle_Shadcn_ className="border-b px-5 py-4">{title}</DialogTitle_Shadcn_>
           {alert && (
             <Alert_Shadcn_
@@ -139,24 +122,30 @@ const TextConfirmModal = forwardRef<
             </Alert_Shadcn_>
           )}
           {children && <div className="p-5">{children}</div>}
+          {/* // older prop from before refactor */}
+          {text !== undefined && (
+            <div className="p-5">
+              <p className="mb-2 block text-sm break-all">{text}</p>
+            </div>
+          )}
           <Form_Shadcn_ {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 px-5 py-3">
               <FormField_Shadcn_
                 control={form.control}
-                name="username"
+                name="confirmValue"
                 render={({ field }) => (
                   <FormItem_Shadcn_>
-                    <FormLabel_Shadcn_>
+                    <FormLabel_Shadcn_ {...label}>
                       Type <span className="text-foreground break-all">{confirmString}</span> to
                       confirm.
                     </FormLabel_Shadcn_>
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ placeholder={confirmPlaceholder} {...field} />
+                      <Input_Shadcn_ placeholder={confirmPlaceholder} {...input} {...field} />
                     </FormControl_Shadcn_>
-                    <FormDescription_Shadcn_>
+                    <FormDescription_Shadcn_ {...description}>
                       This is your public display name.
                     </FormDescription_Shadcn_>
-                    <FormMessage_Shadcn_ />
+                    <FormMessage_Shadcn_ {...formMessage} />
                   </FormItem_Shadcn_>
                 )}
               />
@@ -183,62 +172,6 @@ const TextConfirmModal = forwardRef<
                   {confirmLabel}
                 </Button>
               </div>
-
-              {/* <Form
-        validateOnBlur
-        initialValues={{ confirmValue: '' }}
-        validate={validate}
-        onSubmit={onConfirm}
-      >
-        {() => (
-          <div className="w-full py-4">
-            <div className="space-y-4">
-              {children && (
-                <>
-                  <Modal.Content>{children}</Modal.Content>
-                  <Modal.Separator />
-                </>
-              )}
-              {alert && (
-                <Modal.Content>
-                  <Alert variant="warning" withIcon title={alert} />
-                </Modal.Content>
-              )}
-              {text !== undefined && (
-                <Modal.Content>
-                  <p className="mb-2 block text-sm break-all">{text}</p>
-                </Modal.Content>
-              )}
-              <Modal.Separator />
-              <Modal.Content>
-                <Input
-                  id="confirmValue"
-                  label={
-                    <span>
-                      Type <span className="text-foreground break-all">{confirmString}</span> to
-                      confirm.
-                    </span>
-                  }
-                  placeholder={confirmPlaceholder}
-                />
-              </Modal.Content>
-              <Modal.Separator />
-              <Modal.Content>
-                <Button
-                  block
-                  type="danger"
-                  size="medium"
-                  htmlType="submit"
-                  loading={loading}
-                  disabled={loading}
-                >
-                  {confirmLabel}
-                </Button>
-              </Modal.Content>
-            </div>
-          </div>
-        )}
-      </Form> */}
             </form>
           </Form_Shadcn_>
         </DialogContent_Shadcn_>

@@ -122,15 +122,19 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
         loading={isSubmitting}
         size={isFree ? 'small' : 'xlarge'}
         title={`Confirm deletion of ${project?.name}`}
-        alert={
-          isFree
-            ? 'This action cannot be undone.'
-            : `This will permanently delete the ${project?.name} project and all of its data, and cannot be undone`
-        }
+        variant="destructive"
+        alert={{
+          title: {
+            children: isFree
+              ? 'This action cannot be undone.'
+              : `This will permanently delete the ${project?.name}`,
+          },
+          description: {
+            children: !isFree && `All project data will be lost, and cannot be undone`,
+          },
+        }}
         text={
-          isFree
-            ? `This will permanently delete the ${project?.name} project and all of its data.`
-            : undefined
+          isFree && `This will permanently delete the ${project?.name} project and all of its data.`
         }
         confirmPlaceholder="Type the project name in here"
         confirmString={project?.name || ''}
