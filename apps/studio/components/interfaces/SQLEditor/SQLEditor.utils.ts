@@ -61,16 +61,16 @@ export function checkDestructiveQuery(sql: string) {
 }
 
 export const generateMigrationCliCommand = (id: string, name: string, isNpx = false) => `
-  ${isNpx ? 'npx ' : ''}supabase snippets download ${id} |
-      ${isNpx ? 'npx ' : ''}supabase migration new ${name}
+${isNpx ? 'npx ' : ''}supabase snippets download ${id} |
+${isNpx ? 'npx ' : ''}supabase migration new ${name}
 `
 
 export const generateSeedCliCommand = (id: string, isNpx = false) => `
-  ${isNpx ? 'npx ' : ''}supabase snippets download ${id} >> \\
-      supabase/seed.sql
+${isNpx ? 'npx ' : ''}supabase snippets download ${id} >> \\
+  supabase/seed.sql
 `
 
 export const generateFileCliCommand = (id: string, name: string, isNpx = false) => `
-  ${isNpx ? 'npx ' : ''}supabase snippets download ${id} > \\
-      ${name}.sql
+${isNpx ? 'npx ' : ''}supabase snippets download ${id} > \\
+  ${name}.sql
 `
