@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 
 import { LogsTableName } from 'components/interfaces/Settings/Logs'
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import type { LogsLayout } from 'components/layouts'
+import { LogsLayout } from 'components/layouts'
 import type { NextPageWithLayout } from 'types'
 
 export const LogPage: NextPageWithLayout = () => {
