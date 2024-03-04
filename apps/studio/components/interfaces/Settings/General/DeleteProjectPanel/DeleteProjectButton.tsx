@@ -120,7 +120,7 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
       <TextConfirmModal
         visible={isOpen}
         loading={isSubmitting}
-        size={isFree ? 'small' : 'large'}
+        size={isFree ? 'small' : 'medium'}
         title={`Confirm deletion of ${project?.name}`}
         variant="destructive"
         alert={{
