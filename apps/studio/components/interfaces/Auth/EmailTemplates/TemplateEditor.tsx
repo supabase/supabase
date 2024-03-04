@@ -13,7 +13,7 @@ import {
   AlertTitle_Shadcn_,
 } from 'ui'
 
-import CodeEditor from 'components/ui/CodeEditor'
+import { CodeEditor } from 'components/ui/CodeEditor'
 import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import InformationBox from 'components/ui/InformationBox'
 

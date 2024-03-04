@@ -1,11 +1,11 @@
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
-import ProjectList from 'components/interfaces/Home/ProjectList'
+import { ProjectList } from 'components/interfaces/Home/ProjectList'
 import HomePageActions from 'components/interfaces/HomePageActions'
 import { AccountLayout } from 'components/layouts'
 import AlertError from 'components/ui/AlertError'
-import Connecting from 'components/ui/Loading/Loading'
+import { Loading } from 'components/ui/Loading'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
@@ -48,7 +48,7 @@ const ProjectsPage: NextPageWithLayout = () => {
 
       {navLayoutV2 && (
         <div className={`flex items-center justify-center h-full`}>
-          <Connecting />
+          <Loading />
         </div>
       )}
       {!navLayoutV2 && (

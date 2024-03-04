@@ -1,4 +1,4 @@
-import { Users } from 'components/interfaces/Auth'
+import { Users } from 'components/interfaces/Auth/Users'
 import { AuthLayout } from 'components/layouts'
 import { NextPageWithLayout } from 'types'
 
