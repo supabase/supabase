@@ -371,7 +371,7 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: csp,
+            value: process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? csp : "frame-ancestors 'none';",
           },
           {
             key: 'Referrer-Policy',
