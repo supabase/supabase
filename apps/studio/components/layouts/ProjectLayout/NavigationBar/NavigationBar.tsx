@@ -118,7 +118,12 @@ const NavigationBar = () => {
               icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
               link: `/project/${projectRef}`,
             }}
-            onClick={() => snap.setNavigationPanelOpen(false)}
+            onClick={(event) => {
+              snap.setNavigationPanelOpen(
+                false,
+                ['svg', 'path'].includes((event.target as any).localName)
+              )
+            }}
           />
           <Separator className="my-1 bg-border-muted" />
           {toolRoutes.map((route) => (
@@ -126,7 +131,12 @@ const NavigationBar = () => {
               key={route.key}
               route={route}
               isActive={activeRoute === route.key}
-              onClick={() => snap.setNavigationPanelOpen(false)}
+              onClick={(event) => {
+                snap.setNavigationPanelOpen(
+                  false,
+                  ['svg', 'path'].includes((event.target as any).localName)
+                )
+              }}
             />
           ))}
           <Separator className="my-1 bg-border-muted" />
@@ -135,7 +145,12 @@ const NavigationBar = () => {
               key={route.key}
               route={route}
               isActive={activeRoute === route.key}
-              onClick={() => snap.setNavigationPanelOpen(false)}
+              onClick={(event) => {
+                snap.setNavigationPanelOpen(
+                  false,
+                  ['svg', 'path'].includes((event.target as any).localName)
+                )
+              }}
             />
           ))}
           <Separator className="my-1 bg-border-muted" />
@@ -159,7 +174,12 @@ const NavigationBar = () => {
                   key={route.key}
                   route={route}
                   isActive={activeRoute === route.key}
-                  onClick={() => snap.setNavigationPanelOpen(false)}
+                  onClick={(event) => {
+                    snap.setNavigationPanelOpen(
+                      false,
+                      ['svg', 'path'].includes((event.target as any).localName)
+                    )
+                  }}
                 />
               )
             }
@@ -172,7 +192,12 @@ const NavigationBar = () => {
               key={route.key}
               route={route}
               isActive={activeRoute === route.key}
-              onClick={() => snap.setNavigationPanelOpen(false)}
+              onClick={(event) => {
+                snap.setNavigationPanelOpen(
+                  false,
+                  ['svg', 'path'].includes((event.target as any).localName)
+                )
+              }}
             />
           ))}
 
