@@ -129,7 +129,7 @@ const ProjectUsage = () => {
                 yAxisKey="total_rest_requests"
                 onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'rest')}
                 customDateFormat={datetimeFormat}
-                highlightedValue={sumBy(charts, 'total_rest_requests')}
+                highlightedValue={Intl.NumberFormat("en-US").format(sumBy(charts, 'total_rest_requests'))}
               />
             </Loading>
           </Panel.Content>
@@ -154,7 +154,7 @@ const ProjectUsage = () => {
                   yAxisKey="total_auth_requests"
                   onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'auth')}
                   customDateFormat={datetimeFormat}
-                  highlightedValue={sumBy(charts || [], 'total_auth_requests')}
+                  highlightedValue={Intl.NumberFormat("en-US").format(sumBy(charts || [], 'total_auth_requests'))}
                 />
               </Loading>
             </Panel.Content>
@@ -181,7 +181,7 @@ const ProjectUsage = () => {
                   yAxisKey="total_storage_requests"
                   onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'storage')}
                   customDateFormat={datetimeFormat}
-                  highlightedValue={sumBy(charts, 'total_storage_requests')}
+                  highlightedValue={Intl.NumberFormat("en-US").format(sumBy(charts, 'total_storage_requests'))}
                 />
               </Loading>
             </Panel.Content>
@@ -206,7 +206,7 @@ const ProjectUsage = () => {
                 yAxisKey="total_realtime_requests"
                 onBarClick={(v: unknown) => handleBarClick(v as UsageApiCounts, 'realtime')}
                 customDateFormat={datetimeFormat}
-                highlightedValue={sumBy(charts, 'total_realtime_requests')}
+                highlightedValue={Intl.NumberFormat("en-US").format(sumBy(charts, 'total_realtime_requests'))}
               />
             </Loading>
           </Panel.Content>
