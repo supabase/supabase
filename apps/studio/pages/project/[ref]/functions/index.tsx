@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { Button, Modal } from 'ui'
 
@@ -97,4 +96,4 @@ const PageLayout: NextPageWithLayout = () => {
 
 PageLayout.getLayout = (page) => <FunctionsLayout>{page}</FunctionsLayout>
 
-export default observer(PageLayout)
+export default PageLayout

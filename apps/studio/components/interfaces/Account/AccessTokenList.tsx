@@ -1,19 +1,17 @@
 import { useAccessTokenDeleteMutation } from 'data/access-tokens/access-tokens-delete-mutation'
 import { AccessToken, useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, IconTrash, Modal } from 'ui'
 
 import Table from 'components/to-be-cleaned/Table'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useStore } from 'hooks'
 
-const AccessTokenList = observer(() => {
-  const { ui } = useStore()
+const AccessTokenList = () => {
   const { data: tokens, isLoading } = useAccessTokensQuery()
   const { mutate: deleteToken } = useAccessTokenDeleteMutation({
     onSuccess: () => {
-      ui.setNotification({ category: 'success', message: 'Successfully deleted access token' })
+      toast.success('Successfully deleted access token')
       setIsOpen(false)
     },
   })
@@ -96,6 +94,6 @@ const AccessTokenList = observer(() => {
       </ConfirmationModal>
     </>
   )
-})
+}
 
 export default AccessTokenList

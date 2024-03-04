@@ -1,5 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 import {
   AlertDescription_Shadcn_,
@@ -23,7 +22,8 @@ import {
 } from 'components/ui/Forms'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
+import toast from 'react-hot-toast'
 
 const schema = object({
   JWT_EXP: number()
@@ -38,8 +38,7 @@ const schema = object({
     .max(30, 'Must be a value less than 30'),
 })
 
-const AdvancedAuthSettingsForm = observer(() => {
-  const { ui } = useStore()
+const AdvancedAuthSettingsForm = () => {
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -68,16 +67,10 @@ const AdvancedAuthSettingsForm = observer(() => {
       { projectRef: projectRef!, config: payload },
       {
         onError: (error) => {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to update settings:  ${error?.message}`,
-          })
+          toast.error(`Failed to update settings: ${error?.message}`)
         },
         onSuccess: () => {
-          ui.setNotification({
-            category: 'success',
-            message: `Successfully updated settings`,
-          })
+          toast.success('Successfully updated settings')
           resetForm({ values: values, initialValues: values })
         },
       }
@@ -100,6 +93,7 @@ const AdvancedAuthSettingsForm = observer(() => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
 
         // Form is reset once remote data is loaded in store
+        // eslint-disable-next-line react-hooks/rules-of-hooks
         useEffect(() => {
           if (isSuccess) resetForm({ values: INITIAL_VALUES, initialValues: INITIAL_VALUES })
         }, [isSuccess])
@@ -183,6 +177,6 @@ const AdvancedAuthSettingsForm = observer(() => {
       }}
     </Form>
   )
-})
+}
 
 export default AdvancedAuthSettingsForm
