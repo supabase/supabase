@@ -1,6 +1,5 @@
-import { Button, cn } from 'ui'
-import { noop } from 'lodash'
 import { ComponentProps, ReactNode, forwardRef } from 'react'
+import { Button, cn } from 'ui'
 
 export const NavigationIconButton = forwardRef<
   HTMLButtonElement,
@@ -12,7 +11,7 @@ export const NavigationIconButton = forwardRef<
   > & {
     rightText?: ReactNode
   }
->(({ icon, rightText, onClick = noop, ...props }, ref) => {
+>(({ icon, rightText, ...props }, ref) => {
   return (
     <Button
       ref={ref}
