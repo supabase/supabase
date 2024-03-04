@@ -1,13 +1,13 @@
-import {
-  AccessTokenList,
-  NewAccessTokenButton,
-  NewTokenBanner,
-} from 'components/interfaces/Account'
-import { AccountLayout } from 'components/layouts'
-import { FormHeader } from 'components/ui/Forms'
-import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
 import { useState } from 'react'
 import type { NextPageWithLayout } from 'types'
+import { FormHeader } from 'components/ui/Forms'
+import { AccountLayout } from 'components/layouts'
+import {
+  AccessTokenList,
+  NewTokenBanner,
+  NewAccessTokenButton,
+} from 'components/interfaces/Account'
+import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
 
 import { IS_PLATFORM } from 'lib/constants'
 import Link from 'next/link'
