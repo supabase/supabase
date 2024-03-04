@@ -2,7 +2,7 @@ import { PostgresTable } from '@/lib/types'
 import dagre from '@dagrejs/dagre'
 import { uniqBy } from 'lodash'
 import { Edge, Node, Position } from 'reactflow'
-import { TableNodeData } from 'ui-patterns/SchemaTableNode'
+import { TableNodeData } from './TableNode'
 
 import { NODE_ROW_HEIGHT, NODE_WIDTH } from './SchemaFlow.constants'
 
