@@ -99,7 +99,7 @@ export const UsePoolerCheckbox = ({
                               </DropdownMenuItem>
                               {poolingConfiguration?.pool_mode === 'transaction' && (
                                 <DropdownMenuItem
-                                  key="session"
+                                  key="transaction"
                                   className="flex items-center justify-between"
                                   onClick={() => onSelectOption('transaction')}
                                 >
