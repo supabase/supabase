@@ -16,6 +16,7 @@ import { useMemo, useState } from 'react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import {
+  InnerSideBarEmptyPanel,
   InnerSideBarFilterSearchInput,
   InnerSideBarFilterSortDropdown,
   InnerSideBarFilterSortDropdownItem,
@@ -199,20 +200,18 @@ const TableEditorMenu = () => {
           {isSuccess && (
             <>
               {searchText.length === 0 && (entityTypes?.length ?? 0) <= 0 && (
-                <div className="mx-2 my-2 space-y-1 rounded-md border border-muted bg-surface-100 py-3 px-4">
-                  <p className="text-xs">No entities available</p>
-                  <p className="text-xs text-foreground-light">
-                    This schema has no entities available yet
-                  </p>
-                </div>
+                <InnerSideBarEmptyPanel
+                  className="mx-2"
+                  title="No entities available"
+                  description="This schema has no entities available yet"
+                />
               )}
               {searchText.length > 0 && (entityTypes?.length ?? 0) <= 0 && (
-                <div className="mx-2 my-2 space-y-1 rounded-md border border-muted bg-surface-100 py-3 px-4">
-                  <p className="text-xs">No results found</p>
-                  <p className="text-xs text-foreground-light">
-                    Your search for "{searchText}" did not return any results
-                  </p>
-                </div>
+                <InnerSideBarEmptyPanel
+                  className="mx-2"
+                  title="No results found"
+                  description={`Your search for "${searchText}" did not return any results`}
+                />
               )}
               {(entityTypes?.length ?? 0) > 0 && (
                 <div className="flex flex-1">

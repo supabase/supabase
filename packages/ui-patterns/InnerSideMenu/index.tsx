@@ -199,7 +199,14 @@ const InnerSideBarEmptyPanel = forwardRef<
   }
 >(({ illustration, title, description, actions, ...props }, ref) => {
   return (
-    <div className="border bg-surface-100/50 flex flex-col gap-y-3 items-center justify-center rounded-md px-3 py-4 mx-4">
+    <div
+      ref={ref}
+      {...props}
+      className={cn(
+        'border bg-surface-100/50 flex flex-col gap-y-3 items-center justify-center rounded-md px-3 py-4',
+        props.className
+      )}
+    >
       <div className="flex flex-col gap-y-1 items-center justify-center">
         {illustration}
         {title && <p className="text-xs text-foreground-light">{title}</p>}

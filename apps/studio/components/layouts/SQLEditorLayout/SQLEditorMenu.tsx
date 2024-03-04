@@ -267,6 +267,7 @@ const SideBarContent = observer(() => {
                 filteredFavoriteSnippets.length === 0 &&
                 filteredProjectSnippets.length === 0 && (
                   <InnerSideBarEmptyPanel
+                    className="mx-4"
                     title="No project queries found"
                     description="Click the New query button to create a new query"
                     actions={
