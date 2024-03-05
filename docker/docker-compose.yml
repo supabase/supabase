@@ -375,11 +375,11 @@ services:
       # Must be superuser to alter reserved role
       - ./volumes/db/99999005_roles.sql:/docker-entrypoint-initdb.d/init-scripts/99999005_roles.sql:Z
       # Initialize the database settings with JWT_SECRET and JWT_EXP
-      - ./volumes/db/99999002_roles.sql:/docker-entrypoint-initdb.d/init-scripts/99999002_roles.sql:Z
+      - ./volumes/db/99999002_jwt.sql:/docker-entrypoint-initdb.d/init-scripts/99999002_jwt.sql:Z
       # PGDATA directory is persisted between restarts
       - ./volumes/db/data:/var/lib/postgresql/data:Z
       # Changes required for Analytics support
-      - ./volumes/db/99999003_roles.sql:/docker-entrypoint-initdb.d/migrations/99999003_roles.sql:Z
+      - ./volumes/db/99999003_logs.sql:/docker-entrypoint-initdb.d/migrations/99999003_logs.sql:Z
 
   vector:
     container_name: supabase-vector
