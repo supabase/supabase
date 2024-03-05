@@ -118,6 +118,7 @@ const SQLEditor = () => {
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
 
   const [aiInput, setAiInput] = useState('')
+  const [selectedMessage, setSelectedMessage] = useState<string>()
   const [debugSolution, setDebugSolution] = useState<string>()
   const [sourceSqlDiff, setSourceSqlDiff] = useState<ContentDiff>()
   const [pendingTitle, setPendingTitle] = useState<string>()
@@ -403,7 +404,15 @@ const SQLEditor = () => {
     [profile?.id, project?.id, ref, router, snap, ui]
   )
 
-  const updateEditorWithCheckForDiff = (diffType: DiffType, sql: string) => {
+  const updateEditorWithCheckForDiff = ({
+    id,
+    diffType,
+    sql,
+  }: {
+    id: string
+    diffType: DiffType
+    sql: string
+  }) => {
     const editorModel = editorRef.current?.getModel()
     if (!editorModel) return
 
@@ -418,6 +427,7 @@ const SQLEditor = () => {
         },
       ])
     } else {
+      setSelectedMessage(id)
       const currentSql = editorRef.current?.getValue()
       const diff = { original: currentSql || '', modified: sql }
       setSourceSqlDiff(diff)
@@ -474,6 +484,7 @@ const SQLEditor = () => {
       )
 
       setAiInput('')
+      setSelectedMessage(undefined)
       setSelectedDiffType(DiffType.Modification)
       setDebugSolution(undefined)
       setSourceSqlDiff(undefined)
@@ -505,6 +516,7 @@ const SQLEditor = () => {
       router
     )
 
+    setSelectedMessage(undefined)
     setDebugSolution(undefined)
     setSourceSqlDiff(undefined)
     setPendingTitle(undefined)
@@ -835,7 +847,7 @@ const SQLEditor = () => {
                     initial={isFirstRender ? 'visible' : 'hidden'}
                     animate="visible"
                     className={cn(
-                      'flex flex-row items-center gap-3 justify-end px-5 h-[60px] w-full z-10',
+                      'flex flex-row items-center gap-3 justify-end px-2 py-2 w-full z-10',
                       'bg-brand-200 border-b border-brand-400  !shadow-none'
                     )}
                   >
@@ -1000,6 +1012,7 @@ const SQLEditor = () => {
         {isAiOpen && isAiAssistantOn && (
           <AiAssistantPanel
             messages={messages}
+            selectedMessage={selectedMessage}
             loading={isLoadingChat}
             onSubmit={(message) =>
               append({

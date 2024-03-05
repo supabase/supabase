@@ -82,9 +82,10 @@ const Message = memo(function Message({
             return (
               <AIPolicyPre
                 onDiff={onDiff}
-                className={
+                className={cn(
+                  'transition',
                   isSelected ? '[&>div>pre]:!border-stronger [&>div>pre]:!bg-surface-200' : ''
-                }
+                )}
               >
                 {props.children[0].props.children}
               </AIPolicyPre>

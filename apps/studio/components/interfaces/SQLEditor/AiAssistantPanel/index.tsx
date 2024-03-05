@@ -30,15 +30,17 @@ export type MessageWithDebug = MessageType & { isDebug: boolean }
 
 interface AiAssistantPanelProps {
   messages: MessageWithDebug[]
+  selectedMessage?: string
   loading: boolean
   onSubmit: (s: string) => void
-  onDiff: (type: DiffType, s: string) => void
+  onDiff: ({ id, diffType, sql }: { id: string; diffType: DiffType; sql: string }) => void
   onClose: () => void
   onChange: (value: boolean) => void
 }
 
 export const AiAssistantPanel = ({
   messages,
+  selectedMessage,
   loading,
   onSubmit,
   onDiff,
@@ -130,7 +132,8 @@ export const AiAssistantPanel = ({
             content={m.content}
             createdAt={new Date(m.createdAt || new Date()).getTime()}
             isDebug={m.isDebug}
-            onDiff={onDiff}
+            isSelected={selectedMessage === m.id}
+            onDiff={(diffType, sql) => onDiff({ id: m.id, diffType, sql })}
           />
         ))}
 

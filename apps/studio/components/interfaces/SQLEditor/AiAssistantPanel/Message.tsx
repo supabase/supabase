@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { PropsWithChildren, memo, useMemo } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { AiIconAnimation, Badge, markdownComponents } from 'ui'
+import { AiIconAnimation, Badge, cn, markdownComponents } from 'ui'
 
 import { useProfile } from 'lib/profile'
 import { DiffType } from '../SQLEditor.types'
@@ -16,6 +16,7 @@ interface MessageProps {
   content?: string
   createdAt?: number
   isDebug?: boolean
+  isSelected?: boolean
   onDiff?: (type: DiffType, s: string) => void
   action?: React.ReactNode
 }
@@ -26,6 +27,7 @@ const Message = memo(function Message({
   content,
   createdAt,
   isDebug,
+  isSelected = false,
   onDiff = noop,
   children,
   action = <></>,
@@ -70,13 +72,19 @@ const Message = memo(function Message({
         {action}
       </div>
       <ReactMarkdown
-        className="gap-2.5 flex flex-col"
+        className="gap-2.5 flex flex-col [&>*>code]:text-xs [&>*>*>code]:text-xs"
         remarkPlugins={[remarkGfm]}
         components={{
           ...markdownComponents,
           pre: (props: any) => {
             return (
-              <AiMessagePre onDiff={onDiff} className="pt-3">
+              <AiMessagePre
+                onDiff={onDiff}
+                className={cn(
+                  'transition',
+                  isSelected ? '[&>div>pre]:!border-stronger [&>div>pre]:!bg-surface-200' : ''
+                )}
+              >
                 {props.children[0].props.children}
               </AiMessagePre>
             )

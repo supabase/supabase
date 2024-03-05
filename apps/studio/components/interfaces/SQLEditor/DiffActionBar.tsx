@@ -4,11 +4,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconCheck,
   IconChevronDown,
   IconCornerDownLeft,
   IconLoader,
-  IconX,
 } from 'ui'
 
 import { DiffType } from './SQLEditor.types'
@@ -36,12 +34,8 @@ export const DiffActionBar = ({
           className="rounded-r-none"
           type="primary"
           size="tiny"
-          icon={!loading ? <IconCheck /> : <IconLoader className="animate-spin" size={14} />}
-          iconRight={
-            <div className="opacity-30">
-              <IconCornerDownLeft size={12} strokeWidth={1.5} />
-            </div>
-          }
+          icon={loading && <IconLoader className="animate-spin" size={14} />}
+          iconRight={<IconCornerDownLeft size={12} strokeWidth={1.5} className="text-foreground" />}
           onClick={onAccept}
         >
           {getDiffTypeButtonLabel(selectedDiffType)}
@@ -68,8 +62,7 @@ export const DiffActionBar = ({
       <Button
         type="alternative"
         size="tiny"
-        icon={<IconX />}
-        iconRight={<span className="text-brand-500">ESC</span>}
+        iconRight={<span className="text-foreground-lighter">ESC</span>}
         onClick={onCancel}
       >
         Discard
