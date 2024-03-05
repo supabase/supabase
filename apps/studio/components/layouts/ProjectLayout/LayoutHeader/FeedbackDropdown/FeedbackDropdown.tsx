@@ -1,18 +1,8 @@
 import { useState } from 'react'
-import {
-  Button,
-  IconMessageCircle,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-} from 'ui'
+import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
 import FeedbackWidget from './FeedbackWidget'
 
-interface FeedbackDropdownProps {
-  alt?: boolean
-}
-
-const FeedbackDropdown = ({ alt = false }: FeedbackDropdownProps) => {
+const FeedbackDropdown = () => {
   const [isOpen, setIsOpen] = useState(false)
   const [feedback, setFeedback] = useState('')
   const [screenshot, setScreenshot] = useState<string>()
@@ -37,16 +27,7 @@ const FeedbackDropdown = ({ alt = false }: FeedbackDropdownProps) => {
       }}
     >
       <PopoverTrigger_Shadcn_ asChild>
-        <Button
-          asChild
-          onClick={onOpen}
-          type={alt ? 'outline' : 'default'}
-          icon={
-            alt ? null : (
-              <IconMessageCircle size={16} strokeWidth={1.5} className="text-foreground-lighter" />
-            )
-          }
-        >
+        <Button asChild onClick={onOpen} type="outline">
           <span className="hidden md:flex">Feedback</span>
         </Button>
       </PopoverTrigger_Shadcn_>

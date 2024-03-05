@@ -27,12 +27,10 @@
     "allure-commandline": "^2.17.2",
     "allure-js-commons": "^2.0.0-beta.14",
     "cross-fetch": "^3.1.5",
-    "eslint": "^8.56.0",
     "ts-jest": "^29.1.1",
     "jest-allure2-adapter": "^0.3.12",
     "jest-environment-jsdom": "^29.7.0",
     "postgres": "^3.0.5",
-    "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   }
 }

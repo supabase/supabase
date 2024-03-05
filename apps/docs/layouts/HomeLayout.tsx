@@ -4,9 +4,11 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { FC } from 'react'
 import components from '~/components'
+import HomePageCover from '~/components/HomePageCover'
+import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import TableOfContents from '~/components/TableOfContents'
-import HomePageCover from '../components/HomePageCover'
 import { LayoutMainContent } from './DefaultLayout'
+import { MainSkeleton } from './MainSkeleton'
 
 interface Props {
   meta: {
@@ -61,26 +63,28 @@ const HomeLayout: FC<Props> = (props: Props) => {
           },
         }}
       />
-      <article>
-        <HomePageCover meta={props.meta} />
-        <LayoutMainContent>
-          <div className={['relative transition-all ease-out', 'duration-150 '].join(' ')}>
-            <div className="prose max-w-none">
-              <MDXProvider components={components}>{props.children}</MDXProvider>
+      <MainSkeleton menuId={MenuId.Home}>
+        <article>
+          <HomePageCover meta={props.meta} />
+          <LayoutMainContent>
+            <div className={['relative transition-all ease-out', 'duration-150 '].join(' ')}>
+              <div className="prose max-w-none">
+                <MDXProvider components={components}>{props.children}</MDXProvider>
+              </div>
             </div>
-          </div>
-          {hasTableOfContents && !props.meta?.hide_table_of_contents && (
-            <div
-              className={[
-                'border-default bg-background table-of-contents-height border-l',
-                'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
-              ].join(' ')}
-            >
-              <TableOfContents toc={props.toc} video={props.meta.video} />
-            </div>
-          )}
-        </LayoutMainContent>
-      </article>
+            {hasTableOfContents && !props.meta?.hide_table_of_contents && (
+              <div
+                className={[
+                  'border-default bg-background table-of-contents-height border-l',
+                  'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
+                ].join(' ')}
+              >
+                <TableOfContents toc={props.toc} video={props.meta.video} />
+              </div>
+            )}
+          </LayoutMainContent>
+        </article>
+      </MainSkeleton>
     </>
   )
 }

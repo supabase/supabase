@@ -1,20 +1,23 @@
 import { useParams } from 'common'
 import { useState } from 'react'
+import type { PostgresTable } from '@supabase/postgres-meta'
 
 import { ColumnList, TableList } from 'components/interfaces/Database'
 import { SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import DeleteConfirmationDialogs from 'components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
 import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { Table } from 'data/tables/table-query'
+import type { Table } from 'data/tables/table-query'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
+import useTable from 'hooks/misc/useTable'
 
 const DatabaseTables: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
 
   const snap = useTableEditorStateSnapshot()
   const [selectedTable, setSelectedTable] = useState<Table>()
+  const { data: selectedTableData } = useTable(selectedTable?.id)
 
   // [Joshen] Separate state required to handle edit/delete table
   // since selectedTable above handles the state for ColumnList
@@ -54,9 +57,12 @@ const DatabaseTables: NextPageWithLayout = () => {
       <DeleteConfirmationDialogs
         includeColumns
         projectRef={projectRef}
-        selectedTable={selectedTableToEdit}
+        selectedTable={selectedTableToEdit || selectedTableData}
       />
-      <SidePanelEditor includeColumns selectedTable={selectedTable || selectedTableToEdit} />
+      <SidePanelEditor
+        includeColumns
+        selectedTable={selectedTableToEdit || (selectedTableData as PostgresTable)}
+      />
     </>
   )
 }

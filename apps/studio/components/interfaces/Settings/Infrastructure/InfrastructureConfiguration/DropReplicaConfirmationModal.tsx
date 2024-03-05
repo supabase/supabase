@@ -1,8 +1,4 @@
 import { useParams } from 'common'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'
-import { Database } from 'data/read-replicas/replicas-query'
-import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
@@ -11,6 +7,11 @@ import {
   IconAlertTriangle,
   Modal,
 } from 'ui'
+
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'
+import type { Database } from 'data/read-replicas/replicas-query'
+import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 
 interface DropReplicaConfirmationModalProps {
   selectedReplica?: Database
@@ -25,9 +26,9 @@ const DropReplicaConfirmationModal = ({
 }: DropReplicaConfirmationModalProps) => {
   const { ref: projectRef } = useParams()
   const formattedId = formatDatabaseID(selectedReplica?.identifier ?? '')
-  const { mutateAsync: removeReadReplica } = useReadReplicaRemoveMutation({
+  const { mutateAsync: removeReadReplica, isLoading: isRemoving } = useReadReplicaRemoveMutation({
     onSuccess: () => {
-      toast.success(`Successfully removed read replica (ID: ${formattedId})`)
+      toast.success(`Tearing down read replica (ID: ${formattedId})`)
       onSuccess()
       onCancel()
     },
@@ -44,6 +45,7 @@ const DropReplicaConfirmationModal = ({
     <ConfirmationModal
       danger
       size="medium"
+      loading={isRemoving}
       visible={selectedReplica !== undefined}
       header={`Confirm to drop selected replica? (ID: ${formattedId})`}
       buttonLabel="Drop replica"

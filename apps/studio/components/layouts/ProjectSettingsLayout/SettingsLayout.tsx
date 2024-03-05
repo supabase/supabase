@@ -5,8 +5,8 @@ import { PropsWithChildren } from 'react'
 import { generateSettingsMenu } from './SettingsMenu.utils'
 
 import { useParams } from 'common'
-import ProductMenu from 'components/ui/ProductMenu'
-import ProjectLayout from '..'
+import { ProductMenu } from 'components/ui/ProductMenu'
+import { ProjectLayout } from '..'
 
 interface SettingsLayoutProps {
   title?: string
@@ -45,6 +45,7 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
 
   return (
     <ProjectLayout
+      isBlocking={false}
       title={title || 'Settings'}
       product="Settings"
       productMenu={<ProductMenu page={page} menu={menuRoutes} />}

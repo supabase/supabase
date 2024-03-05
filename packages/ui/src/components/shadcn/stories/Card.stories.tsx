@@ -1,5 +1,6 @@
 import { Meta } from '@storybook/react'
 import { BellRing, Check } from 'lucide-react'
+import React from 'react'
 import { cn } from '../../../lib/utils/cn'
 import { Button } from '../ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card'

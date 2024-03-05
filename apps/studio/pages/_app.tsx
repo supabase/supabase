@@ -1,5 +1,3 @@
-import 'ui/build/css/themes/dark.css'
-import 'ui/build/css/themes/light.css'
 import 'styles/code.scss'
 import 'styles/contextMenu.scss'
 import 'styles/date-picker.scss'
@@ -7,14 +5,16 @@ import 'styles/editor.scss'
 import 'styles/graphiql-base.scss'
 import 'styles/grid.scss'
 import 'styles/main.scss'
+import 'styles/markdown-preview.scss'
 import 'styles/monaco.scss'
 import 'styles/react-data-grid-logs.scss'
+import 'styles/reactflow.scss'
 import 'styles/storage.scss'
 import 'styles/stripe.scss'
 import 'styles/toast.scss'
 import 'styles/ui.scss'
-import 'styles/reactflow.scss'
-import 'styles/markdown-preview.scss'
+import 'ui/build/css/themes/dark.css'
+import 'ui/build/css/themes/light.css'
 
 import { loader } from '@monaco-editor/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
@@ -31,9 +31,7 @@ import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-// @ts-ignore
-import Prism from 'prism-react-renderer/prism'
-import ConsentToast from 'ui/src/components/ConsentToast'
+import { ConsentToast } from 'ui-patterns/ConsentToast'
 import PortalToast from 'ui/src/layout/PortalToast'
 
 import Favicons from 'components/head/Favicons'
@@ -42,29 +40,38 @@ import {
   CommandMenuWrapper,
   RouteValidationWrapper,
 } from 'components/interfaces/App'
-import {
-  FeaturePreviewContextProvider,
-  FeaturePreviewModal,
-} from 'components/interfaces/App/FeaturePreview'
+import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
 import { StoreProvider } from 'hooks'
 import { AuthProvider } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { dart } from 'lib/constants/prism'
+
 import { ProfileProvider } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import { RootStore } from 'stores'
-import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
-import { AppPropsWithLayout } from 'types'
-import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
+import type { AppPropsWithLayout } from 'types'
+import { Toaster } from 'ui'
+import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import dynamic from 'next/dynamic'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
-dart(Prism)
+
+/**
+ * FeaturePreviewModal is quite heavy with react-markdown and other dependencies, not needed on initial load,
+ * so we will load it lazily.
+ */
+const LazyFeaturePreviewModal = dynamic(
+  () =>
+    import('components/interfaces/App/FeaturePreview/FeaturePreviewModal').then(
+      (mod) => mod.default
+    ),
+  { ssr: false }
+)
 
 loader.config({
   // [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
@@ -147,6 +154,8 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   useThemeSandbox()
 
+  const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
+
   return (
     <QueryClientProvider client={queryClient}>
       <Hydrate state={pageProps.dehydratedState}>
@@ -169,7 +178,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                             <AppBannerWrapper>
                               <FeaturePreviewContextProvider>
                                 {getLayout(<Component {...pageProps} />)}
-                                <FeaturePreviewModal />
+                                <LazyFeaturePreviewModal />
                               </FeaturePreviewContextProvider>
                             </AppBannerWrapper>
                           </CommandMenuWrapper>
@@ -179,9 +188,9 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   </TooltipProvider>
                 </PageTelemetry>
 
-                <HCaptchaLoadedStore />
+                <Toaster />
                 <PortalToast />
-                <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />
+                {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
               </FlagProvider>
             </ProfileProvider>
           </AuthContainer>

@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
 import {
@@ -21,7 +20,7 @@ export interface NewAccessTokenButtonProps {
   onCreateToken: (token: any) => void
 }
 
-const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonProps) => {
+const NewAccessTokenButton = ({ onCreateToken }: NewAccessTokenButtonProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const [tokenScope, setTokenScope] = useState<'V0' | undefined>(undefined)
 
@@ -157,6 +156,6 @@ const NewAccessTokenButton = observer(({ onCreateToken }: NewAccessTokenButtonPr
       </Modal>
     </>
   )
-})
+}
 
 export default NewAccessTokenButton

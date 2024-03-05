@@ -1,4 +1,4 @@
-import { SupaColumn } from '../types'
+import type { SupaColumn } from '../types'
 
 const NUMERICAL_TYPES = [
   'smallint',

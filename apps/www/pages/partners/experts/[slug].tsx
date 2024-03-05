@@ -250,7 +250,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   return {
     props: { partner, overview },
-    revalidate: 1800, // 5 hours
+    revalidate: 1800, // 30 minutes
   }
 }
 

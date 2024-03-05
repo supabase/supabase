@@ -22,7 +22,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
     {
       label: 'Database',
       icon: 'database',
-      href: '/guides/database',
+      href: '/guides/database/overview',
       level: 'database',
     },
     {
@@ -264,7 +264,7 @@ export const gettingstarted: NavMenuConstant = {
       ],
     },
     {
-      name: 'Web app tutorials',
+      name: 'Web app demos',
       items: [
         {
           name: 'Next.js',
@@ -492,6 +492,12 @@ export const PhoneLoginsItems = [
     isDarkMode: true,
     hasLightIcon: true,
   },
+  {
+    name: 'Textlocal SMS Login (Community Supported)',
+    icon: '/docs/img/icons/textlocal-icon',
+    url: '/guides/auth/phone-login/textlocal',
+    linkDescription: 'Textlocal is a cloud-based SMS platform offering bulk messaging services.',
+  },
 ]
 
 export const auth = {
@@ -607,6 +613,10 @@ export const auth = {
           name: 'Column Level Security',
           url: '/guides/auth/column-level-security',
         },
+        {
+          name: 'Custom Claims & RBAC',
+          url: '/guides/auth/custom-claims-and-role-based-access-control-rbac',
+        },
       ],
     },
     {
@@ -657,20 +667,20 @@ export const auth = {
       items: [
         {
           name: 'Part One: JWTs',
-          url: '/learn/auth-deep-dive/auth-deep-dive-jwts',
+          url: '/guides/auth/auth-deep-dive/auth-deep-dive-jwts',
         },
         {
           name: 'Part Two: Row Level Security',
-          url: '/learn/auth-deep-dive/auth-row-level-security',
+          url: '/guides/auth/auth-deep-dive/auth-row-level-security',
         },
         {
           name: 'Part Three: Policies',
-          url: '/learn/auth-deep-dive/auth-policies',
+          url: '/guides/auth/auth-deep-dive/auth-policies',
         },
-        { name: 'Part Four: GoTrue', url: '/learn/auth-deep-dive/auth-gotrue' },
+        { name: 'Part Four: GoTrue', url: '/guides/auth/auth-deep-dive/auth-gotrue' },
         {
           name: 'Part Five: Google OAuth',
-          url: '/learn/auth-deep-dive/auth-google-oauth',
+          url: '/guides/auth/auth-deep-dive/auth-google-oauth',
         },
       ],
     },
@@ -680,9 +690,9 @@ export const auth = {
 export const database: NavMenuConstant = {
   icon: 'database',
   title: 'Database',
-  url: '/guides/database',
+  url: '/guides/database/overview',
   items: [
-    { name: 'Overview', url: '/guides/database' },
+    { name: 'Overview', url: '/guides/database/overview' },
     {
       name: 'Fundamentals',
       url: undefined,
@@ -755,6 +765,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/roles',
         },
         { name: 'Managing secrets with Vault', url: '/guides/database/vault' },
+        {
+          name: 'Superuser Access and Unsupported Operations',
+          url: '/guides/database/postgres/roles-superuser',
+        },
       ],
     },
     {
@@ -836,7 +850,7 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'pg_net: Async Networking',
-          url: '/guides/database/extensions/pgnet',
+          url: '/guides/database/extensions/pg_net',
         },
         {
           name: 'pg_plan_filter: Restrict Total Cost',
@@ -941,6 +955,10 @@ export const database: NavMenuConstant = {
         {
           name: 'Print PostgreSQL Version',
           url: '/guides/database/postgres/which-version-of-postgres',
+        },
+        {
+          name: 'Replicating from Supabase to External Postgres',
+          url: '/guides/database/postgres/setup-replication-external',
         },
       ],
     },
@@ -1626,6 +1644,10 @@ export const platform: NavMenuConstant = {
           name: 'Enterprise Billing',
           url: '/guides/platform/enterprise-billing',
         },
+        {
+          name: 'Billing FAQ',
+          url: '/guides/platform/billing-faq',
+        },
       ],
     },
     {
@@ -1642,6 +1664,24 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/sso/gsuite',
         },
         { name: 'SSO with Okta', url: '/guides/platform/sso/okta' },
+      ],
+    },
+    {
+      name: 'Terraform',
+      url: undefined,
+      items: [
+        {
+          name: 'Terraform Provider',
+          url: '/guides/platform/terraform',
+        },
+        {
+          name: 'Terraform Tutorial',
+          url: '/guides/platform/terraform/tutorial',
+        },
+        {
+          name: 'Reference',
+          url: '/guides/platform/terraform/reference',
+        },
       ],
     },
     {
@@ -2114,3 +2154,9 @@ export const references = [
     ],
   },
 ]
+
+export const navDataForMdx = {
+  nativeMobileLoginItems: NativeMobileLoginItems,
+  phoneLoginsItems: PhoneLoginsItems,
+  socialLoginItems: SocialLoginItems,
+}

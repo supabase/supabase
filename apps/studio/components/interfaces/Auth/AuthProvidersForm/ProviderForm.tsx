@@ -2,32 +2,20 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 import ReactMarkdown from 'react-markdown'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Collapsible,
-  Form,
-  IconAlertTriangle,
-  IconCheck,
-  IconChevronUp,
-  Input,
-} from 'ui'
+import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from 'ui'
 
 import { useParams } from 'common'
-import { components } from 'data/api'
+import type { components } from 'data/api'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
-import { Provider } from './AuthProvidersForm.types'
+import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
 
 export interface ProviderFormProps {
-  config: components['schemas']['GetGoTrueConfigResponse']
+  config: components['schemas']['GoTrueConfigResponse']
   provider: Provider
 }
 

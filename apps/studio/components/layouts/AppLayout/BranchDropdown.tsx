@@ -26,7 +26,6 @@ import {
   ScrollArea,
 } from 'ui'
 import { sanitizeRoute } from './ProjectDropdown'
-import { CommandSeparator } from '@ui/components/Command/Command.utils'
 
 const BranchLink = ({
   branch,
@@ -45,7 +44,7 @@ const BranchLink = ({
   return (
     <Link passHref href={href}>
       <CommandItem_Shadcn_
-        value={branch.name}
+        value={branch.name.replaceAll('"', '')}
         className="cursor-pointer w-full flex items-center justify-between"
         onSelect={() => {
           setOpen(false)

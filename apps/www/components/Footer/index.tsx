@@ -1,19 +1,19 @@
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
 import { CheckIcon } from '@heroicons/react/outline'
 import SectionContainer from '../Layouts/SectionContainer'
 
 import footerData from 'data/Footer'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 interface Props {
   className?: string
+  hideFooter?: boolean
 }
 
 const Footer = (props: Props) => {
@@ -23,18 +23,7 @@ const Footer = (props: Props) => {
   const isLaunchWeek = pathname.includes('launch-week')
   const forceDark = isLaunchWeek || pathname === '/'
 
-  /**
-   * Temporary fix for next-theme client side bug
-   * https://github.com/pacocoursey/next-themes/issues/169
-   * TODO: remove when bug has been fixed
-   */
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
+  if (props.hideFooter) {
     return null
   }
 
@@ -75,7 +64,7 @@ const Footer = (props: Props) => {
                 src={
                   forceDark
                     ? supabaseLogoWordmarkDark
-                    : mounted && resolvedTheme?.includes('dark')
+                    : resolvedTheme?.includes('dark')
                       ? supabaseLogoWordmarkDark
                       : supabaseLogoWordmarkLight
                 }

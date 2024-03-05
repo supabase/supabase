@@ -7,7 +7,7 @@ import { generateTypes } from 'data/projects/project-type-generation-query'
 import { useStore } from 'hooks'
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
-import { ContentProps } from './Content.types'
+import type { ContentProps } from './Content.types'
 
 const Entities = ({ language }: ContentProps) => {
   const { ui } = useStore()

@@ -39,13 +39,17 @@ export const AWS_REGIONS_VALUES: { [key: string]: string } = {
   NORTHEAST_ASIA_2: 'ap-northeast-2',
   CENTRAL_CANADA: 'ca-central-1',
   WEST_US: 'us-west-1',
-  EAST_US: 'es-east-1',
+  EAST_US: 'us-east-1',
   WEST_EU: 'eu-west-1',
   WEST_EU_2: 'eu-west-2',
   CENTRAL_EU: 'eu-central-1',
   SOUTH_ASIA: 'ap-south-1',
   OCEANIA: 'ap-southeast-2',
   SOUTH_AMERICA: 'sa-east-1',
+}
+
+export const FLY_REGIONS_VALUES: { [key: string]: string } = {
+  SOUTHEAST_ASIA: 'sin',
 }
 
 // [Joshen] Just to make sure that we just depend on AWS_REGIONS to determine available

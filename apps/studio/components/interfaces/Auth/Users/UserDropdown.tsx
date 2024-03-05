@@ -2,13 +2,13 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
 import { useState } from 'react'
 
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useUserDeleteMFAFactorsMutation } from 'data/auth/user-delete-mfa-factors-mutation'
 import { useUserDeleteMutation } from 'data/auth/user-delete-mutation'
 import { useUserResetPasswordMutation } from 'data/auth/user-reset-password-mutation'
 import { useUserSendMagicLinkMutation } from 'data/auth/user-send-magic-link-mutation'
 import { useUserSendOTPMutation } from 'data/auth/user-send-otp-mutation'
-import { User } from 'data/auth/users-query'
+import type { User } from 'data/auth/users-query'
 import { useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
 import {
@@ -23,6 +23,7 @@ import {
   IconMoreVertical,
   IconShieldOff,
   IconTrash,
+  IconUser,
   Modal,
 } from 'ui'
 
@@ -30,9 +31,17 @@ interface UserDropdownProps {
   user: User
   canRemoveUser: boolean
   canRemoveMFAFactors: boolean
+  setSelectedUser: (user: User) => void
+  setUserSidePanelOpen: (open: boolean) => void
 }
 
-const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdownProps) => {
+const UserDropdown = ({
+  user,
+  canRemoveUser,
+  canRemoveMFAFactors,
+  setSelectedUser,
+  setUserSidePanelOpen,
+}: UserDropdownProps) => {
   const { ui } = useStore()
   const { ref } = useParams()
 
@@ -122,6 +131,11 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
     }
   }
 
+  const handleViewUserInfo = () => {
+    setSelectedUser(user)
+    setUserSidePanelOpen(true)
+  }
+
   return (
     <>
       <DropdownMenu>
@@ -132,6 +146,11 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <>
+            <DropdownMenuItem className="space-x-2" onClick={handleViewUserInfo}>
+              <IconUser size="tiny" />
+              <p>View user info</p>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
             {user.email !== null ? (
               <>
                 <DropdownMenuItem className="space-x-2" onClick={handleResetPassword}>
@@ -151,6 +170,7 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
               </DropdownMenuItem>
             ) : null}
             <DropdownMenuSeparator />
+
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>
                 <DropdownMenuItem
@@ -164,9 +184,9 @@ const UserDropdown = ({ user, canRemoveUser, canRemoveMFAFactors }: UserDropdown
                   <p>Remove MFA factors</p>
                 </DropdownMenuItem>
               </Tooltip.Trigger>
-              {/* 
+              {/*
                 [Joshen] Deleting MFA factors should be different ABAC perms i think
-                 need to double check with KM / anyone familiar with ABAC 
+                 need to double check with KM / anyone familiar with ABAC
               */}
               {!canRemoveMFAFactors && (
                 <Tooltip.Portal>
