@@ -39,7 +39,7 @@ const InnerSideMenuCollapsibleTrigger = forwardRef<
       ref={ref}
       {...props}
       className={cn(
-        'w-full flex gap-1 items-center group px-3 text-sm font-normal text-lighter tracking-wide',
+        'w-full flex gap-1 items-center group px-3 text-xs font-normal font-mono uppercase text-lighter tracking-wide',
         props.className
       )}
     >
@@ -60,7 +60,7 @@ const InnerSideMenuCollapsibleContent = forwardRef<
   return (
     <CollapsibleContent_Shadcn_
       {...props}
-      className={cn('w-full data-[state=open]:py-1 flex flex-col gap-2', props.className)}
+      className={cn('w-full data-[state=open]:pt-1 flex flex-col gap-2', props.className)}
     />
   )
 })

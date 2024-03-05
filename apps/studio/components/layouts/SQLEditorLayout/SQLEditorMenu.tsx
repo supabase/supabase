@@ -114,7 +114,7 @@ const SideBarContent = observer(() => {
       return ss.filter((tab) => tab.name.toLowerCase().includes(searchText.toLowerCase()))
     }
     return ss
-  }, [snippets, searchText])
+  }, [searchText, snippets])
 
   const favoriteSnippets = useMemo(() => {
     return snippets.filter((snippet) => snippet.content.favorite)
@@ -335,7 +335,7 @@ const SideBarContent = observer(() => {
                 </InnerSideMenuCollapsible>
               )}
 
-              {filteredProjectSnippets.length > 0 && (
+              {personalSnippets.length > 0 && (
                 <InnerSideMenuCollapsible className="editor-product-menu" defaultOpen>
                   <InnerSideMenuCollapsibleTrigger title="Your queries" />
                   <InnerSideMenuCollapsibleContent className="editor-product-menu">
@@ -352,17 +352,6 @@ const SideBarContent = observer(() => {
                           />
                         ))}
                       </div>
-                      {searchText.length > 0 && personalSnippets.length === 0 && (
-                        <InnerSideBarEmptyPanel
-                          title="No personal queries found"
-                          description="Click the New query button to create a new query"
-                          actions={
-                            <Button type="default" onClick={() => handleNewQuery()}>
-                              New query
-                            </Button>
-                          }
-                        />
-                      )}
                     </>
                   </InnerSideMenuCollapsibleContent>
                 </InnerSideMenuCollapsible>
