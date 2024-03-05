@@ -3,9 +3,29 @@
 @tailwind utilities;
 
 @import './../../../packages/ui/build/css/source/global.css';
-@import './../../../packages/ui/build/css/themes/deep-dark.css';
 @import './../../../packages/ui/build/css/themes/dark.css';
+@import './../../../packages/ui/build/css/themes/deep-dark.css';
 @import './../../../packages/ui/build/css/themes/light.css';
+
+@font-face {
+  font-family: 'custom-font';
+  src:
+    url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
+    url(../../../packages/common/assets/fonts/CustomFont-Book.woff) format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'custom-font';
+  src:
+    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff2) format('woff2'),
+    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff) format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
 
 @layer base {
   :root {
@@ -73,10 +93,15 @@
   }
 }
 
-html {
-  @apply bg text font-[400];
-  font-feature-settings:
-    'rlig' 1,
-    'calt' 1;
-  font-family: 'Circular std';
+html,
+body,
+#__next,
+.main {
+  @apply bg-studio;
+  @apply text-foreground;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
 }

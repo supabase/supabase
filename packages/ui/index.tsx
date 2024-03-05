@@ -107,6 +107,7 @@ export {
   DialogTitle as DialogTitle_Shadcn_,
   DialogDescription as DialogDescription_Shadcn_,
   DialogSection as DialogSection_Shadcn_,
+  DialogSectionSeparator as DialogSectionSeparator_Shadcn_,
   DIALOG_PADDING_X as DIALOG_PADDING_X_Shadcn_,
   DIALOG_PADDING_Y as DIALOG_PADDING_Y_Shadcn_,
 } from './src/components/shadcn/ui/dialog'

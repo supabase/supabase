@@ -349,7 +349,7 @@ const BranchManagement = () => {
       </ScaffoldContainer>
 
       <TextConfirmModal
-        size="medium"
+        variant={'warning'}
         visible={selectedBranchToDelete !== undefined}
         onCancel={() => setSelectedBranchToDelete(undefined)}
         onConfirm={() => onConfirmDeleteBranch()}
@@ -358,8 +358,13 @@ const BranchManagement = () => {
         confirmLabel="Delete branch"
         confirmPlaceholder="Type in name of branch"
         confirmString={selectedBranchToDelete?.name ?? ''}
-        text={`This will delete your database preview branch "${selectedBranchToDelete?.name}"`}
-        alert="You cannot recover this branch once it is deleted!"
+        alert={{ title: 'You cannot recover this branch once deleted' }}
+        text={
+          <>
+            This will delete your database preview branch
+            <span className="text-bold text-foreground">{selectedBranchToDelete?.name}</span>.
+          </>
+        }
       />
 
       <ConfirmationModal
