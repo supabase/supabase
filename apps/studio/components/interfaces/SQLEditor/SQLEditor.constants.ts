@@ -23,3 +23,28 @@ export const sqlAiDisclaimerComment = `
 export const untitledSnippetTitle = 'Untitled query'
 
 export const destructiveSqlRegex = [/^(.*;)?\s*(drop|delete|truncate)\s/is]
+
+export const ASSISTANT_TEMPLATES = [
+  {
+    name: 'Twitter clone',
+    description: 'Simplified schema that mimics the Twitter application',
+    prompt: 'Create a twitter clone',
+  },
+  {
+    name: 'Chat application',
+    description: 'Send messages through channels or direct messages',
+    prompt:
+      'Create a chat application that supports sending messages either through channels or directly between users',
+  },
+  {
+    name: 'User management schema',
+    description: 'With role based access control',
+    prompt: 'Create a simple user management schema that supports role based access control',
+  },
+  {
+    name: 'Countries and Cities',
+    description: 'With each city belonging to a country',
+    prompt:
+      'Create a table of countries and a table of cities, with each city belonging to a country',
+  },
+]

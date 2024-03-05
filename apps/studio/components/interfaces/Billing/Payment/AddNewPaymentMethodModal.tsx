@@ -8,6 +8,7 @@ import { Modal } from 'ui'
 import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { STRIPE_PUBLIC_KEY } from 'lib/constants'
+import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import AddPaymentMethodForm from './AddPaymentMethodForm'
 
 interface AddNewPaymentMethodModalProps {
@@ -30,7 +31,7 @@ const AddNewPaymentMethodModal = ({
   const [intent, setIntent] = useState<any>()
   const selectedOrganization = useSelectedOrganization()
 
-  const [captchaLoaded, setHCaptchaLoaded] = useState(false)
+  const captchaLoaded = useIsHCaptchaLoaded()
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
 
@@ -125,7 +126,6 @@ const AddNewPaymentMethodModal = ({
         onExpire={() => {
           setCaptchaToken(null)
         }}
-        onLoad={() => setHCaptchaLoaded(true)}
       />
 
       <Modal
