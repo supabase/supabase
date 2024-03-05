@@ -1,13 +1,33 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { IS_PLATFORM } from 'lib/constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
-import { Button, IconAlignLeft, IconCommand, IconCornerDownLeft } from 'ui'
+import {
+  Button,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  IconAlignLeft,
+  IconCheck,
+  IconCommand,
+  IconCornerDownLeft,
+  IconLoader,
+  IconSettings,
+  Toggle_Shadcn,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  cn,
+} from 'ui'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { useSelectedProject } from 'hooks'
+import { useLocalStorageQuery, useSelectedProject } from 'hooks'
 import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
+import toast from 'react-hot-toast'
+import { FileCog, Keyboard, SlidersHorizontal } from 'lucide-react'
 
 export type UtilityActionsProps = {
   id: string
@@ -29,60 +49,76 @@ const UtilityActions = ({
   const os = detectOS()
   const project = useSelectedProject()
   const showReadReplicasUI = project?.is_read_replicas_enabled
+  const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
+    typeof window !== 'undefined' ? false : true
+  )
 
   return (
-    <>
-      <SavingIndicator id={id} />
+    <div className="inline-flex items-center justify-end gap-x-2">
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            type="text"
+            className="px-1"
+            icon={<Keyboard size={14} className="text-foreground-light" />}
+          />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-48">
+          <DropdownMenuItem
+            className="justify-between"
+            onClick={() => {
+              setIntellisenseEnabled(!intellisenseEnabled)
+              toast.success(
+                `Successfully ${intellisenseEnabled ? 'disabled' : 'enabled'} intellisense. ${intellisenseEnabled ? 'Please refresh your browser for changes to take place.' : ''}`
+              )
+            }}
+          >
+            <p>Intellisense enabled</p>
+            {intellisenseEnabled && <IconCheck className="text-brand" />}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       {IS_PLATFORM && <FavoriteButton id={id} />}
 
-      <Tooltip.Root delayDuration={0}>
-        <Tooltip.Trigger asChild>
+      <Tooltip_Shadcn_>
+        <TooltipTrigger_Shadcn_ asChild>
           <Button
             type="text"
             onClick={() => prettifyQuery()}
+            className="px-1"
             icon={<IconAlignLeft size="tiny" strokeWidth={2} className="text-gray-1100" />}
           />
-        </Tooltip.Trigger>
-        <Tooltip.Portal>
-          <Tooltip.Content side="bottom">
-            <Tooltip.Arrow className="radix-tooltip-arrow" />
-            <div
-              className={[
-                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                'border border-background',
-              ].join(' ')}
-            >
-              <span className="text-xs text-foreground">Prettify SQL</span>
-            </div>
-          </Tooltip.Content>
-        </Tooltip.Portal>
-      </Tooltip.Root>
+        </TooltipTrigger_Shadcn_>
+        <TooltipContent_Shadcn_ side="bottom">Prettify SQL</TooltipContent_Shadcn_>
+      </Tooltip_Shadcn_>
 
       <div className="flex items-center justify-between gap-x-2 mx-2">
         <div className="flex items-center">
           {showReadReplicasUI && <DatabaseSelector variant="connected-on-right" />}
-
           <RoleImpersonationPopover
             serviceRoleLabel="postgres"
             variant={showReadReplicasUI ? 'connected-on-both' : 'connected-on-right'}
           />
-
           <Button
             onClick={() => executeQuery()}
             disabled={isDisabled || isExecuting}
-            loading={isExecuting}
             type="primary"
             size="tiny"
             iconRight={
-              <div className="flex items-center space-x-1">
-                {os === 'macos' ? (
-                  <IconCommand size={10} strokeWidth={1.5} />
-                ) : (
-                  <p className="text-xs text-foreground-light">CTRL</p>
-                )}
-                <IconCornerDownLeft size={10} strokeWidth={1.5} />
-              </div>
+              isExecuting ? (
+                <IconLoader className="animate-spin" size={10} strokeWidth={1.5} />
+              ) : (
+                <div className="flex items-center space-x-1">
+                  {os === 'macos' ? (
+                    <IconCommand size={10} strokeWidth={1.5} />
+                  ) : (
+                    <p className="text-xs text-foreground-light">CTRL</p>
+                  )}
+                  <IconCornerDownLeft size={10} strokeWidth={1.5} />
+                </div>
+              )
             }
             className="rounded-l-none"
           >
@@ -90,7 +126,7 @@ const UtilityActions = ({
           </Button>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 

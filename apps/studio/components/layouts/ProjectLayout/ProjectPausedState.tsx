@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Button, IconPauseCircle, Modal } from 'ui'
 
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'

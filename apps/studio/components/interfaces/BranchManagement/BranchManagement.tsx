@@ -18,8 +18,8 @@ import {
 
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
