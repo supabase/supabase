@@ -13,6 +13,7 @@ import APISidePanelPreview from './APISidePanelPreview'
 import CLSPreview from './CLSPreview'
 import { useFeaturePreviewContext } from './FeaturePreviewContext'
 import RLSAIAssistantPreview from './RLSAIAssistantPreview'
+import { SQLEditorAIAssistantPreview } from './SQLEditorAIAssistantPreview'
 
 const FeaturePreviewModal = () => {
   const isAIConversational = useFlag('sqlEditorConversationalAi')
@@ -43,7 +44,7 @@ const FeaturePreviewModal = () => {
           {
             key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_AI_ASSISTANT,
             name: 'Supabase Assistant for SQL editor',
-            content: <></>,
+            content: <SQLEditorAIAssistantPreview />,
             discussionsUrl: '',
           },
         ]
