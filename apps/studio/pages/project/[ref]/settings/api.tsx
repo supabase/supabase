@@ -1,6 +1,6 @@
 import ServiceList from 'components/interfaces/Settings/API/ServiceList'
 import { SettingsLayout } from 'components/layouts'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const ApiSettings: NextPageWithLayout = () => {
   return (

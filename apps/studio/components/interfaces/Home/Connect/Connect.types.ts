@@ -8,4 +8,6 @@ export interface ContentFileProps {
     apiUrl: string
     anonKey: string
   }
+  connectionStringPooler: string
+  connectionStringDirect: string
 }

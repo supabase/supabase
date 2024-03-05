@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { last } from 'lodash'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -19,17 +20,17 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
-import { useCheckGithubBranchValidity } from 'data/integrations/integrations-github-branch-check'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
+import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { useAppStateSnapshot } from 'state/app-state'
 import BranchingPITRNotice from './BranchingPITRNotice'
+import BranchingPlanNotice from './BranchingPlanNotice'
 import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
 import GithubRepositorySelection from './GithubRepositorySelection'
-import Link from 'next/link'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import BranchingPlanNotice from './BranchingPlanNotice'
 
 const EnableBranchingModal = () => {
   const { ui } = useStore()
@@ -43,14 +44,20 @@ const EnableBranchingModal = () => {
   const [isValid, setIsValid] = useState(false)
 
   const {
-    data: integrations,
-    error: integrationsError,
-    isLoading: isLoadingIntegrations,
-    isSuccess: isSuccessIntegrations,
-    isError: isErrorIntegrations,
-  } = useOrgIntegrationsQuery({
-    orgSlug: selectedOrg?.slug,
-  })
+    data: repositories,
+    error: repositoriesError,
+    isLoading: isLoadingRepositories,
+    isSuccess: isSuccessRepositories,
+    isError: isErrorRepositories,
+  } = useGitHubRepositoriesQuery()
+
+  const {
+    data: connections,
+    error: connectionsError,
+    isLoading: isLoadingConnections,
+    isSuccess: isSuccessConnections,
+    isError: isErrorConnections,
+  } = useGitHubConnectionsQuery({ organizationId: selectedOrg?.id })
 
   const {
     data,
@@ -71,17 +78,8 @@ const EnableBranchingModal = () => {
   const hasPitrEnabled =
     (addons?.selected_addons ?? []).find((addon) => addon.type === 'pitr') !== undefined
 
-  const hasGithubIntegrationInstalled =
-    integrations?.some((integration) => integration.integration.name === 'GitHub') ?? false
-  const githubIntegration = integrations?.find(
-    (integration) =>
-      integration.integration.name === 'GitHub' &&
-      integration.organization.slug === selectedOrg?.slug
-  )
-  const githubConnection = githubIntegration?.connections.find(
-    (connection) => connection.supabase_project_ref === ref
-  )
-  const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') ?? []
+  const githubConnection = connections?.find((connection) => connection.project.ref === ref)
+  const [repoOwner, repoName] = githubConnection?.repository.name.split('/') ?? []
 
   const { mutateAsync: checkGithubBranchValidity, isLoading: isChecking } =
     useCheckGithubBranchValidity({ onError: () => {} })
@@ -101,10 +99,12 @@ const EnableBranchingModal = () => {
       .refine(async (val) => {
         try {
           if (val.length > 0) {
+            if (!githubConnection?.id) {
+              throw new Error('No GitHub connection found')
+            }
+
             await checkGithubBranchValidity({
-              organizationIntegrationId: githubIntegration?.id,
-              repoOwner,
-              repoName,
+              connectionId: githubConnection.id,
               branchName: val,
             })
             setIsValid(true)
@@ -123,9 +123,9 @@ const EnableBranchingModal = () => {
     defaultValues: { branchName: '' },
   })
 
-  const isLoading = isLoadingIntegrations || isLoadingUpgradeEligibility
-  const isError = isErrorIntegrations || isErrorUpgradeEligibility
-  const isSuccess = isSuccessIntegrations && isSuccessUpgradeEligibility
+  const isLoading = isLoadingRepositories
+  const isError = isErrorRepositories || isErrorUpgradeEligibility
+  const isSuccess = isSuccessRepositories && isSuccessUpgradeEligibility
 
   const canSubmit = form.getValues('branchName').length > 0 && !isChecking && isValid
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
@@ -183,15 +183,14 @@ const EnableBranchingModal = () => {
                 <Modal.Separator />
               </>
             )}
-
             {isError && (
               <>
                 <Modal.Separator />
                 <Modal.Content className="px-7 py-6">
-                  {isErrorIntegrations ? (
+                  {isErrorRepositories ? (
                     <AlertError
-                      error={integrationsError}
-                      subject="Failed to retrieve integrations"
+                      error={repositoriesError}
+                      subject="Failed to retrieve repositories"
                     />
                   ) : isErrorUpgradeEligibility ? (
                     <AlertError
@@ -203,7 +202,6 @@ const EnableBranchingModal = () => {
                 <Modal.Separator />
               </>
             )}
-
             {isSuccess && (
               <>
                 {isFreePlan ? (
@@ -216,8 +214,7 @@ const EnableBranchingModal = () => {
                       form={form}
                       isChecking={isChecking}
                       isValid={canSubmit}
-                      integration={githubIntegration}
-                      hasGithubIntegrationInstalled={hasGithubIntegrationInstalled}
+                      githubConnection={githubConnection}
                     />
                     {!hasPitrEnabled && <BranchingPITRNotice />}
                   </>
@@ -262,10 +259,9 @@ const EnableBranchingModal = () => {
                     </div>
                   </div>
                 </Modal.Content>
+                <Modal.Separator />
               </>
             )}
-
-            <Modal.Separator />
 
             <Modal.Content className="px-7">
               <div className="flex items-center space-x-2 py-2 pb-4">

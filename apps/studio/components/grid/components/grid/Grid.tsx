@@ -16,7 +16,7 @@ import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constra
 import { useKeyboardShortcuts, useUrlState } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import { useDispatch, useTrackedState } from '../../store'
-import { Filter, GridProps, SupaRow } from '../../types'
+import type { Filter, GridProps, SupaRow } from '../../types'
 import RowRenderer from './RowRenderer'
 
 const rowKeyGetter = (row: SupaRow) => {

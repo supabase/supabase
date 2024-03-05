@@ -1,7 +1,7 @@
 import { isNull, noop } from 'lodash'
 import { IconChevronRight } from 'ui'
 
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 
 interface DrilldownPaneProps {
   pane: number

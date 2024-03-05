@@ -107,6 +107,7 @@ export {
   DialogTitle as DialogTitle_Shadcn_,
   DialogDescription as DialogDescription_Shadcn_,
   DialogSection as DialogSection_Shadcn_,
+  DialogSectionSeparator as DialogSectionSeparator_Shadcn_,
   DIALOG_PADDING_X as DIALOG_PADDING_X_Shadcn_,
   DIALOG_PADDING_Y as DIALOG_PADDING_Y_Shadcn_,
 } from './src/components/shadcn/ui/dialog'
@@ -206,6 +207,12 @@ export {
   TooltipTrigger as TooltipTrigger_Shadcn_,
   TooltipContent as TooltipContent_Shadcn_,
 } from './src/components/shadcn/ui/tooltip'
+
+export {
+  HoverCard as HoverCard_Shadcn_,
+  HoverCardTrigger as HoverCardTrigger_Shadcn_,
+  HoverCardContent as HoverCardContent_Shadcn_,
+} from './src/components/shadcn/ui/hover-card'
 
 export { Toggle as Toggle_Shadcn } from './src/components/shadcn/ui/toggle'
 

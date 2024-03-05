@@ -3,7 +3,7 @@ import { get } from 'data/fetchers'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
 import { storageKeys } from './keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type BucketsVariables = { projectRef?: string }
 

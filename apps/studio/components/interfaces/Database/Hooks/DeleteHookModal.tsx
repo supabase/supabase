@@ -1,4 +1,4 @@
-import { PostgresTrigger } from '@supabase/postgres-meta'
+import type { PostgresTrigger } from '@supabase/postgres-meta'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
@@ -42,6 +42,7 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
 
   return (
     <TextConfirmModal
+      variant={'warning'}
       visible={visible}
       size="medium"
       onCancel={() => onClose()}
@@ -51,8 +52,14 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
       confirmLabel={`Delete ${name}`}
       confirmPlaceholder="Type in name of webhook"
       confirmString={name || ''}
-      text={`This will delete the webhook "${name}" from the schema "${schema}".`}
-      alert="You cannot recover this webhook once it is deleted!"
+      text={
+        <>
+          This will delete the webhook
+          <span className="text-bold text-foreground">{name}</span> rom the schema
+          <span className="text-bold text-foreground">{schema}</span>
+        </>
+      }
+      alert={{ title: 'You cannot recover this webhook once deleted.' }}
     />
   )
 }

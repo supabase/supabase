@@ -120,7 +120,13 @@ called `supabase_realtime`, and by managing this publication you can control whi
 ## Examples
 
 <div className="grid md:grid-cols-12 gap-4 not-prose">
-  {examples.map((x) => (
+  {[
+    {
+      name: 'Multiplayer.dev',
+      description: 'Mouse movements and chat messages.',
+      href: 'https://multiplayer.dev',
+    },
+  ].map((x) => (
     <div className="col-span-12" key={x.href}>
       <Link href={x.href} passHref>
         <GlassPanel title={x.name}>{x.description}</GlassPanel>
@@ -128,14 +134,6 @@ called `supabase_realtime`, and by managing this publication you can control whi
     </div>
   ))}
 </div>
-
-export const examples = [
-  {
-    name: 'Multiplayer.dev',
-    description: 'Mouse movements and chat messages.',
-    href: 'https://multiplayer.dev',
-  },
-]
 
 ## Resources
 

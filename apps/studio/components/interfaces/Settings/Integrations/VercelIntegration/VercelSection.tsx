@@ -18,7 +18,10 @@ import {
 import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
 import { useIntegrationsVercelInstalledConnectionDeleteMutation } from 'data/integrations/integrations-vercel-installed-connection-delete-mutation'
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
-import { IntegrationName, IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import type {
+  IntegrationName,
+  IntegrationProjectConnection,
+} from 'data/integrations/integrations.types'
 import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'

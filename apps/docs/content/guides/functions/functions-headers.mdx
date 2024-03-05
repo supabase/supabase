@@ -1,0 +1,71 @@
+---
+id: 'functions-headers'
+title: 'Logging and Using Headers'
+description: 'How to log the headers to console.'
+subtitle: 'How to log the headers received and use them.'
+---
+
+When debugging Edge Functions, a common mistake is to try to log headers to the developer console via code like this:
+
+```ts index.ts
+Deno.serve(async (req) => {
+  const headers = JSON.stringify(req.headers)
+  console.log(`Request headers: ${headers}`)
+  // OR
+  console.log(`Request headers: ${JSON.stringify(req.headers)}`)
+  return new Response('ok', {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    status: 200,
+  })
+})
+```
+
+Both attempts will give as output the string `"{}"`, even though retrieving the value using `request.headers.get("Your-Header-Name")` will indeed give you the correct value. This behavior mirrors that of browsers.
+
+The reason behind this behavior is that [Headers](https://developer.mozilla.org/en-US/docs/Web/API/Headers) objects don't store headers in JavaScript properties that can be enumerated. As a result, neither the developer console nor the JSON stringifier can properly interpret the names and values of the headers. Essentially, it's not an empty object, but rather an opaque one.
+
+However, `Headers` objects are iterable. You can utilize this feature to craft a couple of succinct one-liners for debugging and printing headers.
+
+### Convert headers into an object with Object.fromEntries:
+
+You can use `Object.fromEntries` which is a call to convert the headers into an object:
+
+```ts index.ts
+Deno.serve(async (req) => {
+  let headersObject = Object.fromEntries(req.headers)
+  let requestHeaders = JSON.stringify(headersObject, null, 2)
+  console.log(`Request headers: ${requestHeaders}`)
+  return new Response('ok', {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    status: 200,
+  })
+})
+```
+
+This results in something like:
+
+```ts index.ts
+Request headers: {
+    "accept": "*/*",
+    "accept-encoding": "gzip",
+    "authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN1cGFuYWNobyIsInJvbGUiOiJhbm9uIiwieW91IjoidmVyeSBzbmVha3ksIGh1aD8iLCJpYXQiOjE2NTQ1NDA5MTYsImV4cCI6MTk3MDExNjkxNn0.cwBbk2tq-fUcKF1S0jVKkOAG2FIQSID7Jjvff5Do99Y",
+    "cdn-loop": "cloudflare; subreqs=1",
+    "cf-ew-via": "15",
+    "cf-ray": "8597a2fcc558a5d7-GRU",
+    "cf-visitor": "{\"scheme\":\"https\"}",
+    "cf-worker": "supabase.co",
+    "content-length": "20",
+    "content-type": "application/x-www-form-urlencoded",
+    "host": "edge-runtime.supabase.com",
+    "my-custom-header": "abcd",
+    "user-agent": "curl/8.4.0",
+    "x-deno-subhost": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImtpZCI6InN1cGFiYXNlIn0.eyJkZXBsb3ltZW50X2lkIjoic3VwYW5hY2hvX2M1ZGQxMWFiLTFjYmUtNDA3NS1iNDAxLTY3ZTRlZGYxMjVjNV8wMDciLCJycGNfcm9vdCI6Imh0dHBzOi8vc3VwYWJhc2Utb3JpZ2luLmRlbm8uZGV2L3YwLyIsImV4cCI6MTcwODYxMDA4MiwiaWF0IjoxNzA4NjA5MTgyfQ.-fPid2kEeEM42QHxWeMxxv2lJHZRSkPL-EhSH0r_iV4",
+    "x-forwarded-host": "edge-runtime.supabase.com",
+    "x-forwarded-port": "443",
+    "x-forwarded-proto": "https"
+}
+```
