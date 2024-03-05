@@ -16,35 +16,35 @@ toc_depth: 3
 
 ## Introduction
 
-In database management and support operations, ensuring Service Level Agreement (SLA) compliance is paramount. Supabase, known for its innovative approach to database management and support, introduces SLA-Buddy, a robust support tool aimed at efficient SLA enforcement. This blog post delves into the intricacies of SLA-Buddy, shedding light on its functions, operations, and interactions within the Supabase ecosystem.
+In database management and support operations, ensuring Service Level Agreement (SLA) compliance is paramount. Supabase, known for its innovative approach to database management and support, introduces SLA Buddy, a robust support tool aimed at efficient SLA enforcement. This blog post delves into the intricacies of SLA Buddy, shedding light on its functions, operations, and interactions within the Supabase ecosystem.
 
-### Introducing SLA-Buddy
+### Introducing SLA Buddy
 
-Supabase's commitment to innovation extends beyond database solutions; it encompasses robust support operations. SLA-Buddy stands as a testament to Supabase's dedication to streamlining support processes and ensuring timely resolution of user queries.
+Supabase's commitment to innovation extends beyond database solutions; it encompasses robust support operations. SLA Buddy stands as a testament to Supabase's dedication to streamlining support processes and ensuring timely resolution of user queries.
 
-## Dogfooding: The Birth of SLA-Buddy
+## Dogfooding: The Birth of SLA Buddy
 
-Supabase firmly believes in "eating your own dog food," a philosophy that entails using one's own products internally. This approach played a pivotal role in the creation of SLA-Buddy. Leveraging Supabase's suite of tools, including Edge Functions and Database functionalities, SLA-Buddy was meticulously developed to meet the stringent demands of support operations.
+Supabase firmly believes in dogfooding a philosophy that entails using one's own products internally. This approach played a pivotal role in the creation of SLA Buddy. Leveraging Supabase's suite of tools, including Edge Functions and Database functionalities, SLA Buddy was meticulously developed to meet the stringent demands of support operations.
 
-## Understanding SLA-Buddy's Functions
+## Understanding SLA Buddy's Functions
 
-SLA-Buddy's core function revolves around enforcing SLAs effectively. Let's delve into its primary functions:
+SLA Buddy's core function revolves around enforcing SLAs effectively. Let's delve into its primary functions:
 
 ### SLA Enforcement
 
-SLA-Buddy ensures SLA compliance through a series of intricate processes. This includes:
+SLA Buddy ensures SLA compliance through a series of intricate processes. This includes:
 
 - **Slack Reminders**: Utilizing Slack reminders to prompt support engineers about impending SLA deadlines.
 - **Calendar Checks**: Employing calendar integration to determine who's currently available to answer support tickets.
 
-## In-depth Look into SLA-Buddy's Operations
+## Let's take a look at SLA Buddy's Operations
 
-To gain a deeper understanding of SLA-Buddy's operations, let's take a look on the main diagram of operations:
-![SLA-Buddy Operations](/images/blog/2024-03-01-exploring-support-tooling/slabuddy_diagram.svg)
+To gain a deeper understanding of SLA Buddy's operations, let's take a look on the main diagram of operations:
+![SLA Buddy Operations](/images/blog/2024-03-01-exploring-support-tooling/slabuddy_diagram.svg)
 
 ### Watching Messages
 
-SLA-Buddy actively monitors Slack channels using PostgreSQL functions like **`process_channels`**. This function scans Slack channels, handles new messages, and adds tasks to the queue for each new ticket that comes to the platform. Once the channel is scanned through the scan_channel edge function it adds rows to the `slack_watcher` table. There is a trigger function on that table that creates tasks for each ticket according to the SLA which depends on which is the channel that the message came. Tickets have different SLAs, depending on both severity and the subscription level of the user opening the ticket.
+SLA Buddy actively monitors Slack channels using PostgreSQL functions like **`process_channels`**. This function scans Slack channels, handles new messages, and adds tasks to the queue for each new ticket that comes to the platform. Once the channel is scanned through the scan_channel edge function it adds rows to the `slack_watcher` table. There is a trigger function on that table that creates tasks for each ticket according to the SLA which depends on which channel that the message came from. Tickets have different SLAs, depending on both severity and the subscription level of the user opening the ticket.
 
 ```sql
 CREATE OR REPLACE FUNCTION "public"."insert_tasks"() RETURNS "trigger"
@@ -68,7 +68,7 @@ BEGIN
         -- set the current escalation time interval
         currentinterval := escalationtimeintervals[i];
         -- format thread_ts as (epoch time as a big int) + '.' + ts_ms
-        threadts := extract(epoch FROM new.ts)::bigint::text || '.' || new.ts_ms;
+        thread_timestamp := extract(epoch FROM new.ts)::bigint::text || '.' || new.ts_ms;
 
         -- check IF ticket_type is not 'feedback'
         IF lower(new.ticket_type) <> 'feedback' THEN
@@ -77,7 +77,7 @@ BEGIN
                 'POST',
                 jsonb_build_object(
                     'channel_id', new.channel_id,
-                    'thread_ts', threadts,
+                    'thread_ts', thread_timestamp,
                     'escalation_level', i,
                     'ticket_id', new.ticket_number,
                     'ticket_priority', new.ticket_priority,
@@ -193,17 +193,17 @@ $$;
 
 ### Posting SLA Enforcement Messages on Slack
 
-SLA-Buddy employs the Edge Function **`post_ticket_escalation`** to post SLA enforcement messages on Slack. This integration with PostgreSQL functions ensures streamlined execution and effective communication with support engineers.
+SLA Buddy employs the Edge Function **`post_ticket_escalation`** to post SLA enforcement messages on Slack. This integration with PostgreSQL functions ensures streamlined execution and effective communication with support engineers.
 
 ## Interactions with Support Members
 
-SLA-Buddy fosters seamless interactions between support engineers and the tool itself. Through Slack threads, support members can postpone the next steps in the escalation process by 30 min by `@mentioning` the bot in the thread. We also pushed a [guide on how to interact with mentions](https://supabase.com/docs/guides/functions/examples/slack-bot-mention) in Slack as part of the bot's development.
+SLA Buddy fosters seamless interactions between support engineers and the tool itself. Through Slack threads, support members can postpone the next steps in the escalation process by 30 min by `@mentioning` the bot in the thread. We also pushed a [guide on how to interact with mentions](https://supabase.com/docs/guides/functions/examples/slack-bot-mention) in Slack as part of the bot's development.
 
 The bot won't get disarmed until a response is sent in the ticket because we believe that even if the Support Engineer is unable to help the user, they can at least triage and set expectations for the next steps in the ticket like escalating to a specific team.
 
 ## Watching Support Events
 
-Another crucial aspect of SLA-Buddy is its ability to monitor support events seamlessly. At Supabase we have the concept of Embedded Support when a member of the support team will work on more advanced tickets related to a specific Supabase product such as Edge Functions, Dashboard, Storage, Auth, Realtime etc.
+Another crucial aspect of SLA Buddy is its ability to monitor support events seamlessly. At Supabase we have the concept of Embedded Support when a member of the support team will work on more advanced tickets related to a specific Supabase product such as Edge Functions, Dashboard, Storage, Auth, Realtime etc.
 
 The shift information about Support Engineers is hosted in a Google Calendar. This information is retrieved using the following function:
 
@@ -247,7 +247,7 @@ $$;
 
 **Escalation Logic**
 
-SLA-Buddy's escalation logic is defined in 4 steps of escalation going from a more narrow set of Support Engineers to the Head of Success. Here's the progression:
+SLA Buddy's escalation logic is defined in 4 steps of escalation going from a more narrow set of Support Engineers to the Head of Success. Here's the progression:
 
 | Target     | Level | Action               | Timeline |
 | ---------- | ----- | -------------------- | -------- |
@@ -262,15 +262,15 @@ SLA-Buddy's escalation logic is defined in 4 steps of escalation going from a mo
 
 ## Conclusion
 
-SLA-Buddy is a core operational component for Supabsae support operations, keeping the whole team informed and engaged, and assisting with prioritizing tickets by their SLA restrictions.
+SLA Buddy is a core operational component for Supabsae support operations, keeping the whole team informed and engaged, and assisting with prioritizing tickets by their SLA restrictions.
 
-We are firm believers in letting technology streamline operational work and allowing humans to focus on solving real problems, and SLA-Buddy is a great example of that.
+We are firm believers in letting technology streamline operational work and allowing humans to focus on solving real problems, and SLA Buddy is a great example of that.
 
 ## Final Thoughts
 
-SLA-Buddy started a passion project, born from a need to ensure that we're providing top-quality support to Supabase's users. We're big fans of personal exploration and kaizen incremental change.
+SLA Buddy started a passion project, born from a need to ensure that we're providing top-quality support to Supabase's users. We're big fans of personal exploration and kaizen incremental change.
 
-And we're not done with SLA-Buddy. It'll grow and evolve as Supabase grows, and our needs and the needs of our users change. Because it's built on Supabase features, it'll be easy to update and maintain, and it'll provide more and more value to our internal operations, we hope it might provide some value to you, too. We're also big believers in the Open Source community, and welcome any feedback or ideas you might have to make SLA-Buddy even better for everyone.
+And we're not done with SLA Buddy. It'll grow and evolve as Supabase grows, and our needs and the needs of our users change. Because it's built on Supabase features, it'll be easy to update and maintain, and it'll provide more and more value to our internal operations, we hope it might provide some value to you, too. We're also big believers in the Open Source community, and welcome any feedback or ideas you might have to make SLA Buddy even better for everyone.
 
 ## More Resources About Slack and Edge Functions
 
