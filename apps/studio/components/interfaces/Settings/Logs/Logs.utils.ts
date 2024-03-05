@@ -6,7 +6,7 @@ import { useEffect } from 'react'
 import logConstants from 'shared-data/logConstants'
 
 import BackwardIterator from 'components/ui/CodeEditor/Providers/BackwardIterator'
-import { PlanId } from 'data/subscriptions/types'
+import type { PlanId } from 'data/subscriptions/types'
 import { Filters, LogData, LogsEndpointParams, LogsTableName, SQL_FILTER_TEMPLATES } from '.'
 
 /**

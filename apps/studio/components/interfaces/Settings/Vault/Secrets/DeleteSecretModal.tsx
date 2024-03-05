@@ -4,7 +4,7 @@ import { Modal } from 'ui'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useVaultSecretDeleteMutation } from 'data/vault/vault-secret-delete-mutation'
 import { useStore } from 'hooks'
-import { VaultSecret } from 'types'
+import type { VaultSecret } from 'types'
 
 interface DeleteSecretModalProps {
   selectedSecret: VaultSecret | undefined

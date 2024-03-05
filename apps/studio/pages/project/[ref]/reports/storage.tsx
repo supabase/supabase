@@ -1,5 +1,5 @@
 import { observer } from 'mobx-react-lite'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import { ReportsLayout } from 'components/layouts'
 import {
   PRESET_CONFIG,

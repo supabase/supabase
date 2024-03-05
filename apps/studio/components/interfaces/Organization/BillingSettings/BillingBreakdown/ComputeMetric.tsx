@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import Link from 'next/link'
 
-import { OrgUsageResponse } from 'data/usage/org-usage-query'
+import type { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { IconChevronRight, IconPieChart } from 'ui'
 import { Metric } from './BillingBreakdown.constants'
 import { formatUsage } from '../helpers'

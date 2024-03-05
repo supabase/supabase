@@ -11,13 +11,13 @@ import {
   Modal,
 } from 'ui'
 
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import Panel from 'components/ui/Panel'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
 import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-domains-activate-mutation'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
-import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
+import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import { useStore } from 'hooks'
 
 export type CustomDomainActivateProps = {

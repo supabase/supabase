@@ -55,7 +55,7 @@ npm install @supabase/supabase-js
 ```
 
 And finally we want to save the environment variables in a `.env.local`.
-All we need are the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
+Create a `.env.local` file at the root of the project, and paste the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 
 ```bash .env.local
 NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
@@ -67,280 +67,613 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 An optional step is to update the CSS file `app/globals.css` to make the app look nice.
 You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/nextjs-user-management/app/globals.css).
 
-### Supabase Auth Helpers
+### Supabase Server-Side Auth
 
 Next.js is a highly versatile framework offering pre-rendering at build time (SSG), server-side rendering at request time (SSR), API routes, and middleware edge-functions.
 
-It can be challenging to authenticate your users in all these different environments, that's why we've created the [Supabase Auth Helpers](/docs/guides/auth/auth-helpers/nextjs) to make user management and data fetching within Next.js as easy as possible.
+To better integrate with the framework, we've created the `@supabase/ssr` package for Server-Side Auth. It has all the functionalities to quickly configure your Supabase project to use cookies for storing user sessions. See the [Next.js Server-Side Auth guide](/docs/guides/auth/server-side/nextjs) for more information.
 
-Install the auth helpers for Next.js
+Install the package for Next.js.
 
 ```bash
-npm install @supabase/auth-helpers-nextjs @supabase/supabase-js
+npm install @supabase/ssr
 ```
+
+### Supabase utilities
+
+There are two different types of clients in Supabase:
+
+1. **Client Component client** - To access Supabase from Client Components, which run in the browser.
+2. **Server Component client** - To access Supabase from Server Components, Server Actions, and Route Handlers, which run only on the server.
+
+It is recommended to create the following essential utilities files for creating clients, and organize them within `utils/supabase` at the root of the project.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+
+<TabPanel id="js" label="JavaScript">
+
+Create a `client.js` and a `server.js` with the following functionalities for client-side Supabase and server-side Supabase, respectively.
+
+<CH.Code className="min-h-[30rem]">
+
+```jsx utils/supabase/client.js
+import { createBrowserClient } from '@supabase/ssr'
+
+export function createClient() {
+  // Create a supabase client on the browser with project's credentials
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
+```
+
+```jsx utils/supabase/server.js
+import { createServerClient } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+
+export function createClient() {
+  const cookieStore = cookies()
+
+  // Create a server's supabase client with newly configured cookie,
+  // which could be used to maintain user's session
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+        set(name, value, options) {
+          try {
+            cookieStore.set({ name, value, ...options })
+          } catch (error) {
+            // The `set` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
+        },
+        remove(name, options) {
+          try {
+            cookieStore.set({ name, value: '', ...options })
+          } catch (error) {
+            // The `delete` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
+        },
+      },
+    }
+  )
+}
+```
+
+</CH.Code>
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+<CH.Code className="min-h-[30rem]">
+
+```tsx utils/supabase/client.ts
+import { createBrowserClient } from '@supabase/ssr'
+
+export function createClient() {
+  // Create a supabase client on the browser with project's credentials
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+}
+```
+
+```tsx utils/supabase/server.ts
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+
+export function createClient() {
+  const cookieStore = cookies()
+
+  // Create a server's supabase client with newly configured cookie,
+  // which could be used to maintain user's session
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          try {
+            cookieStore.set({ name, value, ...options })
+          } catch (error) {
+            // The `set` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
+        },
+        remove(name: string, options: CookieOptions) {
+          try {
+            cookieStore.set({ name, value: '', ...options })
+          } catch (error) {
+            // The `delete` method was called from a Server Component.
+            // This can be ignored if you have middleware refreshing
+            // user sessions.
+          }
+        },
+      },
+    }
+  )
+}
+```
+
+</CH.Code>
+
+</TabPanel>
+
+</Tabs>
 
 ### Next.js middleware
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-<TabPanel id="js" label="JavaScript">
+Since Server Components can't write cookies, you need middleware to refresh expired Auth tokens and store them. This is accomplished by:
 
-Create a `middleware.js` file and include the following content to:
+- Refreshing the Auth token with the call to `supabase.auth.getUser`.
+- Passing the refreshed Auth token to Server Components through `request.cookies.set`, so they don't attempt to refresh the same token themselves.
+- Passing the refreshed Auth token to the browser, so it replaces the old token. This is done with `response.cookies.set`.
 
-- Verify if there is an authenticated Supabase user
-- Validate if the user is authenticated and currently on the sign-in page, redirecting them to the `account` page
-- Verify if the user is not authenticated and currently on the account page, redirecting them to the `sign-in` page.
+You could also add a matcher, so that the middleware only runs on route that access Supabase. For more information, check out this [documentation](https://nextjs.org/docs/app/building-your-application/routing/middleware#matching-paths).
 
-```tsx middleware.js
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
-import { NextResponse } from 'next/server'
+<Admonition type="danger">
 
-export async function middleware(req) {
-  const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
+Be careful when protecting pages. The server gets the user session from the cookies, which can be spoofed by anyone.
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+Always use `supabase.auth.getUser()` to protect pages and user data.
 
-  // if user is signed in and the current path is / redirect the user to /account
-  if (user && req.nextUrl.pathname === '/') {
-    return NextResponse.redirect(new URL('/account', req.url))
-  }
+_Never_ trust `supabase.auth.getSession()` inside server code such as middleware. It isn't guaranteed to revalidate the Auth token.
 
-  // if user is not signed in and the current path is not / redirect the user to /
-  if (!user && req.nextUrl.pathname !== '/') {
-    return NextResponse.redirect(new URL('/', req.url))
-  }
-
-  return res
-}
-
-export const config = {
-  matcher: ['/', '/account'],
-}
-```
-
-</TabPanel>
-<TabPanel id="ts" label="TypeScript">
-
-Create a `middleware.ts` file and include the following content to:
-
-- Verify if there is an authenticated Supabase user
-- Validate if the user is authenticated and currently on the sign-in page, redirecting them to the `account` page
-- Verify if the user is not authenticated and currently on the account page, redirecting them to the `sign-in` page.
-
-```tsx middleware.ts
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs'
-import { NextResponse } from 'next/server'
-
-import type { NextRequest } from 'next/server'
-
-export async function middleware(req: NextRequest) {
-  const res = NextResponse.next()
-  const supabase = createMiddlewareClient({ req, res })
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // if user is signed in and the current path is / redirect the user to /account
-  if (user && req.nextUrl.pathname === '/') {
-    return NextResponse.redirect(new URL('/account', req.url))
-  }
-
-  // if user is not signed in and the current path is not / redirect the user to /
-  if (!user && req.nextUrl.pathname !== '/') {
-    return NextResponse.redirect(new URL('/', req.url))
-  }
-
-  return res
-}
-
-export const config = {
-  matcher: ['/', '/account'],
-}
-```
-
-</TabPanel>
-</Tabs>
-
-### Set up a login component
-
-#### Supabase Auth UI
-
-We can use the [Supabase Auth UI](/docs/guides/auth/auth-helpers/auth-ui) a pre-built React component for authenticating users via OAuth, email, and magic links.
-
-Install the Supabase Auth UI for React
-
-```bash
-npm install @supabase/auth-ui-react @supabase/auth-ui-shared
-```
-
-Create an `AuthForm` client side component with the `Auth` component rendered within it:
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-<TabPanel id="js" label="JavaScript">
-
-```jsx app/auth-form.jsx
-'use client'
-import { Auth } from '@supabase/auth-ui-react'
-import { ThemeSupa } from '@supabase/auth-ui-shared'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-
-export default function AuthForm() {
-  const supabase = createClientComponentClient()
-
-  return (
-    <Auth
-      supabaseClient={supabase}
-      view="magic_link"
-      appearance={{ theme: ThemeSupa }}
-      theme="dark"
-      showLinks={false}
-      providers={[]}
-      redirectTo="http://localhost:3000/auth/callback"
-    />
-  )
-}
-```
-
-</TabPanel>
-<TabPanel id="ts" label="TypeScript">
-
-```jsx app/auth-form.tsx
-'use client'
-import { Auth } from '@supabase/auth-ui-react'
-import { ThemeSupa } from '@supabase/auth-ui-shared'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { Database } from './database.types'
-
-export default function AuthForm() {
-  const supabase = createClientComponentClient<Database>()
-
-  return (
-    <Auth
-      supabaseClient={supabase}
-      view="magic_link"
-      appearance={{ theme: ThemeSupa }}
-      theme="dark"
-      showLinks={false}
-      providers={[]}
-      redirectTo="http://localhost:3000/auth/callback"
-    />
-  )
-}
-```
-
-</TabPanel>
-</Tabs>
-
-<Admonition type="note">
-
-If you are using TypeScript for this project, see [generating types](/docs/guides/api/rest/generating-types) to automatically generate types from your database tables.
+It's safe to trust `getUser()` because it sends a request to the Supabase Auth server every time to revalidate the Auth token.
 
 </Admonition>
 
-Add the `AuthForm` component to your home page
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
 
-```jsx app/page.js
-import AuthForm from './auth-form'
+<TabPanel id="js" label="JavaScript">
 
-export default function Home() {
+Create a `middleware.js` file at the project root and another one within the `utils/supabase` folder. The `utils/supabase` file contains the logic for updating the session. This is used by the `middleware.js` file, which is a Next.js convention.
+
+<CH.Code className="min-h-[30rem]">
+
+```jsx middleware.js
+import { updateSession } from '@/utils/supabase/middleware'
+
+export async function middleware(request) {
+  // update user's auth session
+  return await updateSession(request)
+}
+
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+}
+```
+
+```jsx utils/supabase/middleware.js
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse } from 'next/server'
+
+export async function updateSession(request) {
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        get(name) {
+          return request.cookies.get(name)?.value
+        },
+        set(name, value, options) {
+          request.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+        },
+        remove(name, options) {
+          request.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+        },
+      },
+    }
+  )
+
+  // refreshing the auth token
+  await supabase.auth.getUser()
+
+  return response
+}
+```
+
+</CH.Code>
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+Create a `middleware.ts` file at the project root and another one within the `util/ssupbase` folder. The `utils/supabase` file contains the logic for updating the session. This is used by the `middleware.js` file, which is a Next.js convention.
+
+<CH.Code className="min-h-[30rem]">
+
+```tsx middleware.ts
+import { type NextRequest } from 'next/server'
+import { updateSession } from '@/utils/supabase/middleware'
+
+export async function middleware(request: NextRequest) {
+  // update user's auth session
+  return await updateSession(request)
+}
+
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+}
+```
+
+```tsx utils/supabase/middleware.ts
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
+
+export async function updateSession(request: NextRequest) {
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return request.cookies.get(name)?.value
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+        },
+        remove(name: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+        },
+      },
+    }
+  )
+
+  // refreshing the auth token
+  await supabase.auth.getUser()
+
+  return response
+}
+```
+
+</CH.Code>
+
+</TabPanel>
+
+</Tabs>
+
+## Set up a login page
+
+### Login and Signup form
+
+Create a login/signup page for your application:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+
+<TabPanel id="js" label="JavaScript">
+
+Create a new folder named `login`, containing a `page.jsx` file with a login/signup form.
+
+```jsx app/login/page.jsx
+import { login, signup } from './actions'
+
+export default function LoginPage() {
   return (
-    <div className="row">
-      <div className="col-6">
-        <h1 className="header">Supabase Auth + Storage</h1>
-        <p>
-          Experience our Auth and Storage through a simple profile management example. Create a user
-          profile and upload an avatar image. Fast, simple, secure.
-        </p>
-      </div>
-      <div className="col-6 auth-widget">
-        <AuthForm />
-      </div>
-    </div>
+    <form>
+      <label htmlFor="email">Email:</label>
+      <input id="email" name="email" type="email" required />
+      <label htmlFor="password">Password:</label>
+      <input id="password" name="password" type="password" required />
+      <button formAction={login}>Log in</button>
+      <button formAction={signup}>Sign up</button>
+    </form>
   )
 }
 ```
 
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+Create a new folder named `login`, containing a `page.jsx` file with a login/signup form.
+
+```tsx app/login/page.tsx
+import { login, signup } from './actions'
+
+export default function LoginPage() {
+  return (
+    <form>
+      <label htmlFor="email">Email:</label>
+      <input id="email" name="email" type="email" required />
+      <label htmlFor="password">Password:</label>
+      <input id="password" name="password" type="password" required />
+      <button formAction={login}>Log in</button>
+      <button formAction={signup}>Sign up</button>
+    </form>
+  )
+}
+```
+
+</TabPanel>
+
+</Tabs>
+
+Navigate to `http://localhost:3000/login`. You should see your login form, but it's not yet hooked up to the actual login function. Next, you need to create the login/signup actions. They will:
+
+- Retrieve the user's information.
+- Send that information to Supabase as a signup request, which in turns will send a confirmation email.
+- Handle any error that arises.
+
+<Admonition type="caution">
+
+Note that cookies is called before any calls to Supabase, which opts fetch calls out of Next.js's caching. This is important for authenticated data fetches, to ensure that users get access only to their own data.
+
+See the Next.js docs to learn more about [opting out of data caching](https://nextjs.org/docs/app/building-your-application/data-fetching/fetching-caching-and-revalidating#opting-out-of-data-caching).
+
+</Admonition>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+
+<TabPanel id="js" label="JavaScript">
+
+<CH.Code className="max-h-[30rem]">
+
+```js app/login/action.js
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+
+import { createClient } from '@/utils/supabase/server'
+
+export async function login(formData) {
+  const supabase = createClient()
+
+  // type-casting here for convenience
+  // in practice, you should validate your inputs
+  const data = {
+    email: formData.get('email'),
+    password: formData.get('password'),
+  }
+
+  const { error } = await supabase.auth.signInWithPassword(data)
+
+  if (error) {
+    redirect('/error')
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/account')
+}
+
+export async function signup(formData) {
+  const supabase = createClient()
+
+  const data = {
+    email: formData.get('email'),
+    password: formData.get('password'),
+  }
+
+  const { error } = await supabase.auth.signUp(data)
+
+  if (error) {
+    redirect('/error')
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/account')
+}
+```
+
+```jsx app/error/page.jsx
+export default function ErrorPage() {
+  return <p>Sorry, something went wrong</p>
+}
+```
+
+</CH.Code>
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+<CH.Code className="max-h-[30rem]">
+
+```ts app/login/action.ts
+'use server'
+
+import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
+
+import { createClient } from '@/utils/supabase/server'
+
+export async function login(formData: FormData) {
+  const supabase = createClient()
+
+  // type-casting here for convenience
+  // in practice, you should validate your inputs
+  const data = {
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
+  }
+
+  const { error } = await supabase.auth.signInWithPassword(data)
+
+  if (error) {
+    redirect('/error')
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/account')
+}
+
+export async function signup(formData: FormData) {
+  const supabase = createClient()
+
+  // type-casting here for convenience
+  // in practice, you should validate your inputs
+  const data = {
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
+  }
+
+  const { error } = await supabase.auth.signUp(data)
+
+  if (error) {
+    redirect('/error')
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/account')
+}
+```
+
+```tsx app/error/page.tsx
+export default function ErrorPage() {
+  return <p>Sorry, something went wrong</p>
+}
+```
+
+</CH.Code>
+
+</TabPanel>
+
+When you enter your email and password, you will receive an email with the title **Confirm Your Signup**. Congrats 🎉!!!
+
+</Tabs>
+
 ### Proof Key for Code Exchange (PKCE)
 
-As we are employing Proof Key for Code Exchange (PKCE) in our authentication flow, it is necessary to create a route handler responsible for exchanging the code for a session.
+Upon sign up, an email will be sent to the user with a unique hash code. This key can then be sent back to the application for verification, thus authenticating the user. The method is referred to as Proof Key for Code Exchange (PKCE). As we are employing PKCE in our authentication flow, it is necessary to create a route handler responsible for exchanging the code for a session.
 
 In the following code snippet, we perform the following steps:
 
-- Retrieve the code sent back from the Supabase Auth server using the `code` query parameter.
+- Retrieve the code sent back from the Supabase Auth server using the `token_hash` query parameter.
 - Exchange this code for a session, which we store in our chosen storage mechanism (in this case, cookies).
 - Finally, we redirect the user to the `account` page.
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="js"
-  queryGroup="language"
->
-<TabPanel id="js" label="JavaScript">
+<Admonition type="tip">
 
-```js app/auth/callback/route.js
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
+Did you know? You could also customize emails sent out to new users, including the email's looks, content, and query parameters. Check out the [settings of your project](/dashboard/project/_/auth/templates).
 
-export async function GET(req) {
-  const cookieStore = cookies()
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
-  const { searchParams } = new URL(req.url)
-  const code = searchParams.get('code')
-
-  if (code) {
-    await supabase.auth.exchangeCodeForSession(code)
-  }
-
-  return NextResponse.redirect(new URL('/account', req.url))
-}
-```
-
-</TabPanel>
-<TabPanel id="ts" label="TypeScript">
-
-```ts app/auth/callback/route.ts
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import { NextRequest, NextResponse } from 'next/server'
-
-export async function GET(req: NextRequest) {
-  const cookieStore = cookies()
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
-  const { searchParams } = new URL(req.url)
-  const code = searchParams.get('code')
-
-  if (code) {
-    await supabase.auth.exchangeCodeForSession(code)
-  }
-
-  return NextResponse.redirect(new URL('/account', req.url))
-}
-```
-
-</TabPanel>
-</Tabs>
-
-### Sign out
-
-Let's create a route handler to handle the signout from the server side.
+</Admonition>
 
 <Tabs
   scrollable
@@ -349,60 +682,90 @@ Let's create a route handler to handle the signout from the server side.
   defaultActiveId="js"
   queryGroup="language"
 >
+
 <TabPanel id="js" label="JavaScript">
 
-```js app/auth/signout/route.js
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
-
-export async function POST(req) {
-  const cookieStore = cookies()
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
-
-  // Check if we have a session
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (user) {
-    await supabase.auth.signOut()
-  }
-
-  return NextResponse.redirect(new URL('/', req.url), {
-    status: 302,
-  })
-}
-```
-
-</TabPanel>
-<TabPanel id="ts" label="TypeScript">
-
-```ts app/auth/signout/route.ts
-import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+```js app/auth/confirm/route.js
 import { type NextRequest, NextResponse } from 'next/server'
 
-export async function POST(req: NextRequest) {
-  const cookieStore = cookies()
-  const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
+import { createClient } from '@/utils/supabase/server'
 
-  // Check if we have a session
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+// Creating a handler to a GET request to route /auth/confirm
+export async function GET(request) {
+  const { searchParams } = new URL(request.url)
+  const token_hash = searchParams.get('token_hash')
+  const type = searchParams.get('type')
+  const next = '/account'
 
-  if (session) {
-    await supabase.auth.signOut()
+  // Create redirect link without the secret token
+  const redirectTo = request.nextUrl.clone()
+  redirectTo.pathname = next
+  redirectTo.searchParams.delete('token_hash')
+  redirectTo.searchParams.delete('type')
+
+  if (token_hash && type) {
+    const supabase = createClient()
+
+    const { error } = await supabase.auth.verifyOtp({
+      type,
+      token_hash,
+    })
+    if (!error) {
+      redirectTo.searchParams.delete('next')
+      return NextResponse.redirect(redirectTo)
+    }
   }
 
-  return NextResponse.redirect(new URL('/', req.url), {
-    status: 302,
-  })
+  // return the user to an error page with some instructions
+  redirectTo.pathname = '/error'
+  return NextResponse.redirect(redirectTo)
 }
 ```
 
 </TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```ts app/auth/confirm/route.ts
+import { type EmailOtpType } from '@supabase/supabase-js'
+import { type NextRequest, NextResponse } from 'next/server'
+
+import { createClient } from '@/utils/supabase/server'
+
+// Creating a handler to a GET request to route /auth/confirm
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url)
+  const token_hash = searchParams.get('token_hash')
+  const type = searchParams.get('type') as EmailOtpType | null
+  const next = '/account'
+
+  // Create redirect link without the secret token
+  const redirectTo = request.nextUrl.clone()
+  redirectTo.pathname = next
+  redirectTo.searchParams.delete('token_hash')
+  redirectTo.searchParams.delete('type')
+
+  if (token_hash && type) {
+    const supabase = createClient()
+
+    const { error } = await supabase.auth.verifyOtp({
+      type,
+      token_hash,
+    })
+    if (!error) {
+      redirectTo.searchParams.delete('next')
+      return NextResponse.redirect(redirectTo)
+    }
+  }
+
+  // return the user to an error page with some instructions
+  redirectTo.pathname = '/error'
+  return NextResponse.redirect(redirectTo)
+}
+```
+
+</TabPanel>
+
 </Tabs>
 
 ### Account page
@@ -418,15 +781,18 @@ Let's create a new component for that called `AccountForm` within the `app/accou
   defaultActiveId="js"
   queryGroup="language"
 >
+
 <TabPanel id="js" label="JavaScript">
+
+<CH.Code className="max-h-[40rem]">
 
 ```jsx app/account/account-form.jsx
 'use client'
 import { useCallback, useEffect, useState } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/utils/supabase/client'
 
 export default function AccountForm({ user }) {
-  const supabase = createClientComponentClient()
+  const supabase = createClient()
   const [loading, setLoading] = useState(true)
   const [fullname, setFullname] = useState(null)
   const [username, setUsername] = useState(null)
@@ -541,17 +907,22 @@ export default function AccountForm({ user }) {
 }
 ```
 
+</CH.Code>
+
 </TabPanel>
+
 <TabPanel id="ts" label="TypeScript">
+
+<CH.Code className="max-h-[40rem]">
 
 ```tsx app/account/account-form.tsx
 'use client'
 import { useCallback, useEffect, useState } from 'react'
-import { Database } from '../database.types'
-import { User, createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/utils/supabase/client'
+import { type User } from '@supabase/supabase-js'
 
 export default function AccountForm({ user }: { user: User | null }) {
-  const supabase = createClientComponentClient<Database>()
+  const supabase = createClient()
   const [loading, setLoading] = useState(true)
   const [fullname, setFullname] = useState<string | null>(null)
   const [username, setUsername] = useState<string | null>(null)
@@ -569,6 +940,7 @@ export default function AccountForm({ user }: { user: User | null }) {
         .single()
 
       if (error && status !== 406) {
+        console.log(error)
         throw error
       }
 
@@ -675,7 +1047,10 @@ export default function AccountForm({ user }: { user: User | null }) {
 }
 ```
 
+</CH.Code>
+
 </TabPanel>
+
 </Tabs>
 
 Create an account page for the `AccountForm` component we just created
@@ -687,16 +1062,15 @@ Create an account page for the `AccountForm` component we just created
   defaultActiveId="js"
   queryGroup="language"
 >
+
 <TabPanel id="js" label="JavaScript">
 
 ```jsx app/account/page.jsx
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
 import AccountForm from './account-form'
+import { createClient } from '@/utils/supabase/server'
 
 export default async function Account() {
-  const cookieStore = cookies()
-  const supabase = createServerComponentClient({ cookies: () => cookieStore })
+  const supabase = createClient()
 
   const {
     data: { user },
@@ -707,16 +1081,15 @@ export default async function Account() {
 ```
 
 </TabPanel>
+
 <TabPanel id="ts" label="TypeScript">
 
 ```tsx app/account/page.tsx
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import { Database } from '../database.types'
 import AccountForm from './account-form'
+import { createClient } from '@/utils/supabase/server'
 
 export default async function Account() {
-  const supabase = createServerComponentClient<Database>({ cookies })
+  const supabase = createClient()
 
   const {
     data: { user },
@@ -727,6 +1100,76 @@ export default async function Account() {
 ```
 
 </TabPanel>
+</Tabs>
+
+### Sign out
+
+Let's create a route handler to handle the signout from the server side. Make sure to check if the user is logged in first!
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+
+<TabPanel id="js" label="JavaScript">
+
+```js app/auth/signout/route.js
+import { createClient } from '@/utils/supabase/server'
+import { revalidatePath } from 'next/cache'
+import { NextResponse } from 'next/server'
+
+export async function POST(req) {
+  const supabase = createClient()
+
+  // Check if a user's logged in
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (user) {
+    await supabase.auth.signOut()
+  }
+
+  revalidatePath('/', 'layout')
+  return NextResponse.redirect(new URL('/login', req.url), {
+    status: 302,
+  })
+}
+```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```ts app/auth/signout/route.ts
+import { createClient } from '@/utils/supabase/server'
+import { revalidatePath } from 'next/cache'
+import { type NextRequest, NextResponse } from 'next/server'
+
+export async function POST(req: NextRequest) {
+  const supabase = createClient()
+
+  // Check if a user's logged in
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (user) {
+    await supabase.auth.signOut()
+  }
+
+  revalidatePath('/', 'layout')
+  return NextResponse.redirect(new URL('/login', req.url), {
+    status: 302,
+  })
+}
+```
+
+</TabPanel>
+
 </Tabs>
 
 ### Launch!
@@ -755,17 +1198,18 @@ Let's create an avatar widget for the user so that they can upload a profile pho
   defaultActiveId="js"
   queryGroup="language"
 >
+
 <TabPanel id="js" label="JavaScript">
 
 ```jsx app/account/avatar.jsx
 'use client'
 import React, { useEffect, useState } from 'react'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/utils/supabase/client'
 import Image from 'next/image'
 
 export default function Avatar({ uid, url, size, onUpload }) {
-  const supabase = createClientComponentClient()
-  const [avatarUrl, setAvatarUrl] = useState(null)
+  const supabase = createClient()
+  const [avatarUrl, setAvatarUrl] = useState(url)
   const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
@@ -848,15 +1292,14 @@ export default function Avatar({ uid, url, size, onUpload }) {
 ```
 
 </TabPanel>
+
 <TabPanel id="ts" label="TypeScript">
 
 ```tsx app/account/avatar.tsx
 'use client'
 import React, { useEffect, useState } from 'react'
-import { Database } from '../database.types'
-import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@/utils/supabase/client'
 import Image from 'next/image'
-type Profiles = Database['public']['Tables']['profiles']['Row']
 
 export default function Avatar({
   uid,
@@ -864,13 +1307,13 @@ export default function Avatar({
   size,
   onUpload,
 }: {
-  uid: string
-  url: Profiles['avatar_url']
+  uid: string | null
+  url: string | null
   size: number
   onUpload: (url: string) => void
 }) {
-  const supabase = createClientComponentClient<Database>()
-  const [avatarUrl, setAvatarUrl] = useState<Profiles['avatar_url']>(url)
+  const supabase = createClient()
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(url)
   const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
@@ -953,13 +1396,24 @@ export default function Avatar({
 ```
 
 </TabPanel>
+
 </Tabs>
 
 ### Add the new widget
 
 And then we can add the widget to the `AccountForm` component:
 
-```jsx app/account/account-form.js
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+
+<TabPanel id="js" label="JavaScript">
+
+```jsx app/account/account-form.jsx
 // Import the new component
 import Avatar from './avatar'
 
@@ -969,7 +1423,7 @@ return (
   <div className="form-widget">
     {/* Add to the body */}
     <Avatar
-      uid={user.id}
+      uid={user?.id}
       url={avatar_url}
       size={150}
       onUpload={(url) => {
@@ -981,6 +1435,37 @@ return (
   </div>
 )
 ```
+
+</TabPanel>
+
+<TabPanel id="ts" label="TypeScript">
+
+```tsx app/account/account-form.tsx
+// Import the new component
+import Avatar from './avatar'
+
+// ...
+
+return (
+  <div className="form-widget">
+    {/* Add to the body */}
+    <Avatar
+      uid={user?.id ?? null}
+      url={avatar_url}
+      size={150}
+      onUpload={(url) => {
+        setAvatarUrl(url)
+        updateProfile({ fullname, username, website, avatar_url: url })
+      }}
+    />
+    {/* ... */}
+  </div>
+)
+```
+
+</TabPanel>
+
+</Tabs>
 
 ### Storage management
 

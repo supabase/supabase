@@ -1,7 +1,7 @@
 import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/Billing/Billing.constants'
 import { EgressType, PricingMetric } from 'data/analytics/org-daily-stats-query'
-import { OrgSubscription } from 'data/subscriptions/types'
-import { OrgUsageResponse } from 'data/usage/org-usage-query'
+import type { OrgSubscription } from 'data/subscriptions/types'
+import type { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { Alert } from 'ui'
 
 export const COLOR_MAP = {

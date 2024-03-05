@@ -2,7 +2,7 @@ import SignInWithGitHub from 'components/interfaces/SignIn/SignInWithGitHub'
 import SignUpForm from 'components/interfaces/SignIn/SignUpForm'
 import { SignInLayout } from 'components/layouts'
 import Link from 'next/link'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const SignUpPage: NextPageWithLayout = () => {
   return (
