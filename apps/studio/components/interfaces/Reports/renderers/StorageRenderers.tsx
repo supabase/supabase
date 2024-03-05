@@ -13,12 +13,12 @@ export const CacheHitRateChartRenderer = (
 ) => {
   const stackedData = props.data.flatMap((datum) => [
     {
-      timestamp: datum.timestamp,
+      timestamp: +datum.timestamp / 1000,
       count: datum.hit_count,
       type: 'hit',
     },
     {
-      timestamp: datum.timestamp,
+      timestamp: +datum.timestamp / 1000,
       count: datum.miss_count,
       type: 'miss',
     },
@@ -50,7 +50,7 @@ export const TopCacheMissesRenderer = (
 
   return (
     <>
-      <h4>Top Cache Misses</h4>
+      <h3 className="py-4 px-6">Top Cache Misses</h3>
       <Table
         head={
           <>
