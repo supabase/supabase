@@ -1,19 +1,23 @@
 import { Copy } from 'lucide-react'
-import React, { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'react'
+import React, {
+  ComponentProps,
+  ComponentPropsWithoutRef,
+  ElementRef,
+  forwardRef,
+  useState,
+} from 'react'
 import { Button, Input_Shadcn_, cn } from 'ui'
 import styleHandler from 'ui/src/lib/theme/styleHandler'
 import InputIconContainer from '../forms/layout/InputIconContainer'
 
 export const HIDDEN_PLACEHOLDER = '**** **** **** ****'
 
-export interface Props
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onCopy'> {
+export interface Props extends Omit<ComponentProps<typeof Input_Shadcn_>, 'size' | 'onCopy'> {
   copy?: boolean
   onCopy?: () => void
   icon?: any
   reveal?: boolean
   actions?: React.ReactNode
-  size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
   iconContainerClassName?: string
   containerClassName?: string
 }
@@ -28,7 +32,6 @@ const Input = forwardRef<
       icon,
       reveal = false,
       actions,
-      size = 'medium',
       onCopy,
       iconContainerClassName,
       containerClassName,
@@ -62,13 +65,17 @@ const Input = forwardRef<
       setHidden(false)
     }
 
+    let inputClasses = []
+    if (icon) inputClasses.push(__styles.with_icon)
+
     return (
       <div className={cn('relative', containerClassName)}>
         <Input_Shadcn_
           ref={ref}
-          onCopy={onCopy}
           {...props}
+          onCopy={onCopy}
           value={reveal && hidden ? HIDDEN_PLACEHOLDER : props.value}
+          className={cn(...inputClasses, props.className)}
         />
         {icon && <InputIconContainer icon={icon} className={iconContainerClassName} />}
         {copy || actions ? (
@@ -78,7 +85,7 @@ const Input = forwardRef<
               <Button
                 size="tiny"
                 type="default"
-                icon={<Copy />}
+                icon={<Copy size={16} className="text-foreground-muted" />}
                 onClick={() => _onCopy(props.value)}
               >
                 {copyLabel}
