@@ -25,8 +25,6 @@ import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import { DiffType } from '../SQLEditor.types'
 import Message from './Message'
-import { ASSISTANT_TEMPLATES } from '../SQLEditor.constants'
-import CardButton from 'components/ui/CardButton'
 
 export type MessageWithDebug = MessageType & { isDebug: boolean }
 
@@ -131,39 +129,34 @@ export const AiAssistantPanel = ({
           </Button>
         </Message>
 
-        {messages.length > 0 ? (
-          <>
-            {messages.map((m) => (
-              <Message
-                key={`message-${m.id}`}
-                name={m.name}
-                role={m.role}
-                content={m.content}
-                createdAt={new Date(m.createdAt || new Date()).getTime()}
-                isDebug={m.isDebug}
-                isSelected={selectedMessage === m.id}
-                onDiff={(diffType, sql) => onDiff({ id: m.id, diffType, sql })}
-              />
-            ))}
+        {messages.map((m) => (
+          <Message
+            key={`message-${m.id}`}
+            name={m.name}
+            role={m.role}
+            content={m.content}
+            createdAt={new Date(m.createdAt || new Date()).getTime()}
+            isDebug={m.isDebug}
+            isSelected={selectedMessage === m.id}
+            onDiff={(diffType, sql) => onDiff({ id: m.id, diffType, sql })}
+          />
+        ))}
 
-            {pendingReply && <Message key="thinking" role="assistant" content="Thinking..." />}
+        {pendingReply && <Message key="thinking" role="assistant" content="Thinking..." />}
 
-            <div ref={bottomRef} className="h-1" />
-          </>
-        ) : (
-          <div className="grid grid-cols-12 gap-2 p-2">
-            {ASSISTANT_TEMPLATES.map((template) => (
-              <CardButton
-                hideChevron
-                key={template.name}
-                title={template.name}
-                description={template.description}
-                className="!p-3 col-span-12 h-auto [&>div>div]:!mt-0 [&>div>h5]:text-sm"
-                onClick={() => onSubmit(template.prompt)}
-              />
-            ))}
-          </div>
-        )}
+        <div ref={bottomRef} className="h-1" />
+        {/* <div className="grid grid-cols-12 gap-2 p-2">
+          {ASSISTANT_TEMPLATES.map((template) => (
+            <CardButton
+              hideChevron
+              key={template.name}
+              title={template.name}
+              description={template.description}
+              className="!p-3 col-span-12 h-auto [&>div>div]:!mt-0 [&>div>h5]:text-sm"
+              onClick={() => onSubmit(template.prompt)}
+            />
+          ))}
+        </div> */}
       </div>
 
       <Form_Shadcn_ {...form}>
