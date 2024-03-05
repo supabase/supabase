@@ -7,20 +7,19 @@ subtitle: 'How to log the headers received and use them.'
 
 When debugging Edge Functions, a common mistake is to try to log headers to the developer console via code like this:
 
-
 ```ts index.ts
 Deno.serve(async (req) => {
-    const headers = JSON.stringify(req.headers);
-    console.log(`Request headers: ${headers}`);
-    // OR
-    console.log(`Request headers: ${JSON.stringify(req.headers)}`);
-    return new Response("ok", {
-        headers: {
-            "Content-Type": "application/json"
-        },
-        status: 200
-    });
-});
+  const headers = JSON.stringify(req.headers)
+  console.log(`Request headers: ${headers}`)
+  // OR
+  console.log(`Request headers: ${JSON.stringify(req.headers)}`)
+  return new Response('ok', {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    status: 200,
+  })
+})
 ```
 
 Both attempts will give as output the string `"{}"`, even though retrieving the value using `request.headers.get("Your-Header-Name")` will indeed give you the correct value. This behavior mirrors that of browsers.
@@ -35,16 +34,16 @@ You can use `Object.fromEntries` which is a call to convert the headers into an 
 
 ```ts index.ts
 Deno.serve(async (req) => {
-    let headersObject = Object.fromEntries(req.headers);
-    let requestHeaders = JSON.stringify(headersObject, null, 2);
-    console.log(`Request headers: ${requestHeaders}`);
-    return new Response("ok", {
-        headers: {
-            "Content-Type": "application/json"
-        },
-        status: 200
-    });
-});
+  let headersObject = Object.fromEntries(req.headers)
+  let requestHeaders = JSON.stringify(headersObject, null, 2)
+  console.log(`Request headers: ${requestHeaders}`)
+  return new Response('ok', {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    status: 200,
+  })
+})
 ```
 
 This results in something like:
