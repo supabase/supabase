@@ -1,10 +1,10 @@
 import { ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
+import { Select_Shadcn_ } from 'ui'
 import { FormLayout, FormLayoutProps } from '../forms/layout/FormLayout'
-import { Input } from './../data-inputs/Input'
 
-const InputWithLayout = forwardRef<
-  ElementRef<typeof Input>,
-  Omit<ComponentPropsWithoutRef<typeof Input>, 'name'> & FormLayoutProps
+const SelectWithLayout = forwardRef<
+  ElementRef<typeof Select_Shadcn_>,
+  Omit<ComponentPropsWithoutRef<typeof Select_Shadcn_>, 'name'> & FormLayoutProps
 >(
   (
     {
@@ -29,10 +29,10 @@ const InputWithLayout = forwardRef<
         descriptionText={description}
         isForm={isForm}
       >
-        <Input ref={ref} {...props} />
+        <Select_Shadcn_ {...props} />
       </FormLayout>
     )
   }
 )
 
-export { InputWithLayout }
+export { SelectWithLayout }

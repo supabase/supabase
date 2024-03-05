@@ -15,6 +15,7 @@ export type FormLayoutProps = {
   beforeLabel?: string
   labelOptional?: string | React.ReactNode
   layout?: 'horizontal' | 'vertical'
+  isForm?: boolean
 }
 
 type Props = {

@@ -5,7 +5,7 @@ import { InputWithLayout } from './InputWithLayout'
 export interface Props extends Omit<ComponentProps<typeof InputWithLayout>, 'ref'> {
   name: React.ComponentProps<typeof FormField_Shadcn_>['name']
   control: any // { key: string }
-  formField: Omit<React.ComponentProps<typeof FormField_Shadcn_>, 'ref'>
+  formField?: Omit<React.ComponentProps<typeof FormField_Shadcn_>, 'ref'>
 }
 
 const FormInput = forwardRef<
@@ -20,7 +20,7 @@ const FormInput = forwardRef<
       render={({ field }) => (
         <FormItem_Shadcn_>
           <FormControl_Shadcn_>
-            <InputWithLayout {...props} {...field} />
+            <InputWithLayout {...props} {...field} isForm={true} />
           </FormControl_Shadcn_>
         </FormItem_Shadcn_>
       )}

@@ -1,15 +1,18 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { StoryContext, StoryObj } from '@storybook/react'
-import { useForm } from 'react-hook-form'
-import { Button, Form_Shadcn_ } from 'ui'
-import { z } from 'zod'
 import { transformSourceForm } from '../lib/transformSource'
 import { FormInput } from './FormInput'
+import { SelectWithLayout } from './SelectWithLayout'
+import {
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+} from 'ui'
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 export default {
-  title: 'Form Data Inputs/FormInput',
-  component: FormInput,
+  title: 'Data Inputs with Layout/SelectWithLayout',
+  component: SelectWithLayout,
   decorators: [
     (Story: any) => {
       return <Story />
@@ -39,42 +42,30 @@ type Story = StoryObj<typeof FormInput>
 
 export const Primary: Story = {
   render: function Render(args) {
-    const formSchema = z.object({
-      username: z.string().min(2, {
-        message: 'Username must be at least 2 characters.',
-      }),
-    })
-
-    // 1. Define your form.
-    const form = useForm<z.infer<typeof formSchema>>({
-      resolver: zodResolver(formSchema),
-      defaultValues: {
-        username: '',
-      },
-    })
-
-    // 2. Define a submit handler.
-    function onSubmit(values: z.infer<typeof formSchema>) {
-      // Do something with the form values.
-      // ✅ This will be type-safe and validated.
-      console.log(values)
-      // action('form form.handleSubmit(onSubmit)')(values)
-    }
     return (
-      <Form_Shadcn_ {...form}>
-        <form className="w-96 flex flex-col gap-3" onSubmit={form.handleSubmit(onSubmit)}>
-          <FormInput {...args} name="username" control={form.control} />
-          <Button size="small" type="primary" htmlType="submit">
-            Submit
-          </Button>
-        </form>
-      </Form_Shadcn_>
+      <div className="w-80">
+        <SelectWithLayout
+          {...args}
+          name="email"
+          isForm={false}
+          defaultValue={'m@example.com'}
+          value={'m@example.com'}
+        >
+          <SelectTrigger_Shadcn_>
+            <SelectValue_Shadcn_ placeholder="Select a verified email to display" />
+          </SelectTrigger_Shadcn_>
+          <SelectContent_Shadcn_>
+            <SelectItem_Shadcn_ value="m@example.com">m@example.com</SelectItem_Shadcn_>
+            <SelectItem_Shadcn_ value="m@google.com">m@google.com</SelectItem_Shadcn_>
+            <SelectItem_Shadcn_ value="m@support.com">m@support.com</SelectItem_Shadcn_>
+          </SelectContent_Shadcn_>
+        </SelectWithLayout>
+      </div>
     )
   },
   args: {
     label: 'Username',
     description: 'this is the description',
     labelOptional: 'optional',
-    placeholder: 'shadcn',
   },
 }
