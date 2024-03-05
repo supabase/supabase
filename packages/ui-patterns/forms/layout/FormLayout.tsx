@@ -1,6 +1,6 @@
 import React from 'react'
 // @ts-ignore
-import defaultTheme from '../../theme/defaultTheme'
+import defaultTheme from '../../../ui/src/lib/theme/defaultTheme'
 import { FormDescription_Shadcn_, FormLabel_Shadcn_, FormMessage_Shadcn_ } from 'ui'
 // @ts-ignore
 // import FormLayoutStyles from './FormLayout.module.css'
@@ -114,7 +114,7 @@ export function FormLayout({
 
   const labelled = Boolean(label || beforeLabel || afterLabel)
 
-  const renderError = <FormMessage_Shadcn_ />
+  const renderError = <FormMessage_Shadcn_ className="mt-2" />
 
   const renderDescription = descriptionText && (
     <FormDescription_Shadcn_

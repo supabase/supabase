@@ -1,6 +1,5 @@
-import React from 'react'
-import styleHandler from '../theme/styleHandler'
-import { cn } from '../utils'
+import { cn } from 'ui'
+import styleHandler from '../../../ui/src/lib/theme/styleHandler'
 
 export default function InputIconContainer({ icon, className }: any) {
   const __styles = styleHandler('inputIconContainer')
