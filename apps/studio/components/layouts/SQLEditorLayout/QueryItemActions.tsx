@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
+import { Copy, Download, Edit, MoreHorizontal, Share, Trash } from 'lucide-react'
 import { useRouter } from 'next/router'
 import {
   Button,
@@ -16,11 +17,9 @@ import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { Copy, Download, Edit, MoreHorizontal, Share, Trash } from 'lucide-react'
 
 interface QueryItemActionsProps {
   tabInfo: SqlSnippet
-  activeId: string | undefined
   open: boolean
   setOpen: (value: boolean) => void
   onSelectRenameQuery: () => void
@@ -31,7 +30,6 @@ interface QueryItemActionsProps {
 
 export const QueryItemActions = ({
   tabInfo,
-  activeId,
   open,
   setOpen,
   onSelectRenameQuery,
@@ -112,10 +110,7 @@ export const QueryItemActions = ({
               type="text"
               className="px-1 text-lighter data-[state=open]:text-foreground"
               icon={<MoreHorizontal size={14} strokeWidth={2} />}
-              onClick={(e) => {
-                console.log('clicked')
-                e.preventDefault()
-              }}
+              onClick={(e) => e.preventDefault()}
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="start" className="w-52">

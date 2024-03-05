@@ -1,15 +1,11 @@
-import clsx from 'clsx'
 import { useParams } from 'common'
 import { noop } from 'lodash'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
-  Checkbox,
   Checkbox_Shadcn_,
   HoverCardContent_Shadcn_,
   HoverCardTrigger_Shadcn_,
@@ -19,22 +15,19 @@ import {
   IconEye,
   IconUnlock,
   Modal,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
   cn,
 } from 'ui'
+import { InnerSideMenuItem } from 'ui-patterns'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import CopyButton from 'components/ui/CopyButton'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { QueryItemActions } from './QueryItemActions'
-import { InnerSideMenuItem } from 'ui-patterns'
 
 export interface QueryItemProps {
   tabInfo: SqlSnippet
@@ -150,7 +143,6 @@ const QueryItem = ({
             {!hasQueriesSelected && (
               <QueryItemActions
                 tabInfo={tabInfo}
-                activeId={activeId}
                 open={open}
                 setOpen={setOpen}
                 onSelectDeleteQuery={() => setDeleteModalOpen(true)}
@@ -204,23 +196,17 @@ const QueryItem = ({
         onSelectConfirm={onConfirmDelete}
         onSelectCancel={() => setDeleteModalOpen(false)}
       >
-        <Modal.Content>
-          <div className="my-6">
-            <div className="text-sm text-foreground-light grid gap-4">
-              <div className="grid gap-1">
-                {visibility === 'project' && (
-                  <Alert_Shadcn_ variant="destructive">
-                    <IconAlertCircle strokeWidth={2} />
-                    <AlertTitle_Shadcn_>This SQL snippet will be lost forever</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      Deleting this query will remove it for all members of the project team.
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                )}
-                <p>Are you sure you want to delete '{name}'?</p>
-              </div>
-            </div>
-          </div>
+        <Modal.Content className="my-6 grid gap-1 text-sm text-foreground-light grid gap-4">
+          {visibility === 'project' && (
+            <Alert_Shadcn_ variant="destructive">
+              <IconAlertCircle strokeWidth={2} />
+              <AlertTitle_Shadcn_>This SQL snippet will be lost forever</AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                Deleting this query will remove it for all members of the project team.
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          )}
+          <p>Are you sure you want to delete '{name}'?</p>
         </Modal.Content>
       </ConfirmationModal>
       <ConfirmationModal
@@ -232,32 +218,26 @@ const QueryItem = ({
         onSelectConfirm={onConfirmShare}
         onSelectCancel={() => setShareModalOpen(false)}
       >
-        <Modal.Content>
-          <div className="my-6">
-            <div className="text-sm text-foreground-light grid gap-4">
-              <div className="grid gap-1">
-                <Alert_Shadcn_ variant="warning">
-                  <IconAlertTriangle strokeWidth={2} />
-                  <AlertTitle_Shadcn_>
-                    This SQL query will become public to all team members
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    Anyone with access to the project can view it
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
-                <ul className="mt-4 space-y-5">
-                  <li className="flex gap-3">
-                    <IconEye />
-                    <span>Project members will have read-only access to this query.</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <IconUnlock />
-                    <span>Anyone will be able to duplicate it to their personal snippets.</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
+        <Modal.Content className="my-6 text-sm text-foreground-light grid gap-4 grid gap-1">
+          <Alert_Shadcn_ variant="warning">
+            <IconAlertTriangle strokeWidth={2} />
+            <AlertTitle_Shadcn_>
+              This SQL query will become public to all team members
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Anyone with access to the project can view it
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+          <ul className="mt-4 space-y-5">
+            <li className="flex gap-3">
+              <IconEye />
+              <span>Project members will have read-only access to this query.</span>
+            </li>
+            <li className="flex gap-3">
+              <IconUnlock />
+              <span>Anyone will be able to duplicate it to their personal snippets.</span>
+            </li>
+          </ul>
         </Modal.Content>
       </ConfirmationModal>
       <DownloadSnippetModal

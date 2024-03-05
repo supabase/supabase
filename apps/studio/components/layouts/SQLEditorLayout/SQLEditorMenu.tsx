@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
-import { Heart, Plus, Pointer } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -12,11 +12,11 @@ import {
   Alert_Shadcn_,
   Button,
   Modal,
-  Separator,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   InnerSideBarEmptyPanel,
   InnerSideBarFilterSearchInput,
@@ -31,7 +31,6 @@ import {
 
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { WarningIcon } from 'components/ui/Icons'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
@@ -50,11 +49,6 @@ const SideBarContent = observer(() => {
   const project = useSelectedProject()
 
   const [searchText, setSearchText] = useState('')
-
-  // const [searchTextFavorite, setSearchTextFavoriteState] = useState('')
-  // const [searchTextPersonal, setSearchTextPersonalState] = useState('')
-  // const [searchTextProject, setSearchTextProjectState] = useState('')
-
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [selectedQueries, setSelectedQueries] = useState<string[]>([])
 
