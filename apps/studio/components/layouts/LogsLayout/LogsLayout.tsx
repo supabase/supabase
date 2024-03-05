@@ -66,24 +66,24 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
             <div className="px-6">
               <Menu.Group title="Data Warehouse" />
             </div>
-            {collectionsLoading ? (
-              <div className="py-3 px-3 space-y-1.5">
-                <ShimmeringLoader />
-                <ShimmeringLoader className="w-3/4" />
-                <ShimmeringLoader className="w-3/4" />
-              </div>
-            ) : (
-              <div className="px-3 flex flex-col  editor-product-menu">
-                <div className="space-y-1">
-                  <CreateDataWarehouseTableModal />
-                  <div className="py-3">
-                    {collections?.map((item) => (
+            <div className="px-3 flex flex-col  editor-product-menu">
+              <div className="space-y-1">
+                <CreateDataWarehouseTableModal />
+                <div className="py-3">
+                  {collectionsLoading ? (
+                    <div className="py-3 px-3 space-y-1.5">
+                      <ShimmeringLoader />
+                      <ShimmeringLoader className="w-3/4" />
+                      <ShimmeringLoader className="w-3/4" />
+                    </div>
+                  ) : (
+                    collections?.map((item) => (
                       <DatawarehouseMenuItem item={item} key={item.id + '-collection-item'} />
-                    ))}
-                  </div>
+                    ))
+                  )}
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </>
       }
