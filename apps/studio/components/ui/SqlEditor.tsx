@@ -49,9 +49,10 @@ const SqlEditor = ({
       
       const prefersDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
       const textColor = theme === 'dark' ? '#ffffff' : (theme === 'light' ? '#000000' : (prefersDarkTheme ? '#ffffff' : '#000000'));
+      const base = theme === 'dark' ? 'vs-dark' : (theme === 'light' ? 'vs' : (prefersDarkTheme ? 'vs-dark' : 'vs'));
       // create custom theme
       monaco?.editor.defineTheme('custom-theme', {
-        base: theme === 'dark' ? 'vs-dark' : 'vs',
+        base,
         inherit: true,
         rules: [],
         colors: {
