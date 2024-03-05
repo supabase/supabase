@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
+import { Plus } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -10,24 +11,27 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  IconPlus,
-  IconSearch,
-  IconX,
-  Input,
-  Menu,
   Modal,
-  Separator,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import {
+  InnerSideBarEmptyPanel,
+  InnerSideBarFilterSearchInput,
+  InnerSideBarFilters,
+  InnerSideBarShimmeringLoaders,
+  InnerSideMenuCollapsible,
+  InnerSideMenuCollapsibleContent,
+  InnerSideMenuCollapsibleTrigger,
+  InnerSideMenuItem,
+  InnerSideMenuSeparator,
+} from 'ui-patterns/InnerSideMenu'
 
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { WarningIcon } from 'components/ui/Icons'
-import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
@@ -209,176 +213,158 @@ const SideBarContent = observer(() => {
   return (
     <>
       <div className="mt-6">
-        <Menu type="pills">
-          {isLoading ? (
-            <div className="px-5 my-4 space-y-2">
-              <ShimmeringLoader />
-              <ShimmeringLoader className="w-3/4" />
-              <ShimmeringLoader className="w-1/2" />
-            </div>
-          ) : isSuccess ? (
-            <div className="space-y-6">
-              <div className="px-4 flex flex-col gap-2">
-                <Button
-                  type="default"
-                  className="justify-start"
-                  onClick={() => handleNewQuery()}
-                  icon={<IconPlus size="tiny" />}
-                >
-                  New query
-                </Button>
-                <Input
-                  className="table-editor-search border-none"
-                  icon={
-                    <IconSearch className="text-foreground-lighter" size={12} strokeWidth={1.5} />
-                  }
-                  placeholder="Search queries"
-                  onChange={(e) => setSearchText(e.target.value.trim())}
-                  value={searchText}
-                  size="tiny"
-                  actions={
-                    searchText && (
-                      <Button type="text" className="px-1" onClick={() => setSearchText('')}>
-                        <IconX size={12} strokeWidth={2} />
-                      </Button>
-                    )
-                  }
-                />
-              </div>
-              <div className="flex flex-col gap-y-6 px-2">
-                {searchText.length === 0 && (
-                  <div>
-                    <ProductMenuItem
-                      name="Templates"
-                      isActive={router.asPath === `/project/${ref}/sql/templates`}
-                      url={`/project/${ref}/sql/templates`}
-                    />
-                    <ProductMenuItem
-                      name="Quickstarts"
-                      isActive={router.asPath === `/project/${ref}/sql/quickstarts`}
-                      url={`/project/${ref}/sql/quickstarts`}
-                    />
-                  </div>
-                )}
+        {isLoading ? (
+          <InnerSideBarShimmeringLoaders />
+        ) : isSuccess ? (
+          <div>
+            <div className="flex flex-col gap-4">
+              <Button
+                type="default"
+                className="justify-start mx-4"
+                onClick={() => handleNewQuery()}
+                icon={<Plus className="text-foreground-muted" strokeWidth={1} size={14} />}
+              >
+                New query
+              </Button>
 
-                {searchText.length > 0 &&
-                  filteredFavoriteSnippets.length === 0 &&
-                  filteredProjectSnippets.length === 0 &&
-                  personalSnippets.length === 0 && (
-                    <div className="h-32 border border-dashed flex flex-col gap-y-3 items-center justify-center rounded px-3">
-                      <div className="flex flex-col gap-y-1 items-center justify-center">
-                        <p className="text-xs text-foreground">No queries found</p>
-                        <p className="text-xs text-foreground-light text-center">
-                          Your search for "{searchText}" did not return any results
-                        </p>
-                      </div>
+              <div className="px-2">
+                <InnerSideMenuItem
+                  title="Templates"
+                  isActive={router.asPath === `/project/${ref}/sql/templates`}
+                  href={`/project/${ref}/sql/templates`}
+                >
+                  Templates
+                </InnerSideMenuItem>
+                <InnerSideMenuItem
+                  title="Quickstarts"
+                  isActive={router.asPath === `/project/${ref}/sql/quickstarts`}
+                  href={`/project/${ref}/sql/quickstarts`}
+                >
+                  Quickstarts
+                </InnerSideMenuItem>
+              </div>
+
+              {snippets.length > 0 && (
+                <InnerSideBarFilters className="mx-2">
+                  <InnerSideBarFilterSearchInput
+                    name="search-queries"
+                    placeholder="Search queries..."
+                    onChange={(e) => setSearchText(e.target.value.trim())}
+                    value={searchText}
+                    aria-labelledby="Search queries"
+                  />
+                </InnerSideBarFilters>
+              )}
+
+              {searchText.length > 0 &&
+                filteredProjectSnippets.length === 0 &&
+                filteredFavoriteSnippets.length === 0 &&
+                filteredProjectSnippets.length === 0 && (
+                  <InnerSideBarEmptyPanel
+                    className="mx-4"
+                    title="No project queries found"
+                    description="Click the New query button to create a new query"
+                    actions={
                       <Button type="default" onClick={() => handleNewQuery()}>
                         New query
                       </Button>
-                    </div>
-                  )}
-
-                {filteredProjectSnippets.length > 0 ? (
-                  <div className="editor-product-menu">
-                    <Menu.Group title="Project queries" />
-
-                    <div className="space-y-1">
-                      {filteredProjectSnippets.map((tabInfo) => {
-                        const { id } = tabInfo || {}
-                        return (
-                          <QueryItem
-                            key={id}
-                            tabInfo={tabInfo}
-                            hasQueriesSelected={selectedQueries.length > 0}
-                          />
-                        )
-                      })}
-                    </div>
-                  </div>
-                ) : null}
-
-                {selectedQueries.length > 0 && (
-                  <>
-                    <Separator />
-                    <div className="px-2 flex items-center gap-x-2">
-                      <Button block type="default" onClick={() => setShowDeleteModal(true)}>
-                        Delete {selectedQueries.length.toLocaleString()} quer
-                        {selectedQueries.length > 1 ? 'ies' : 'y'}
-                      </Button>
-                      <Tooltip_Shadcn_ delayDuration={100}>
-                        <TooltipTrigger_Shadcn_ asChild>
-                          <Button
-                            type="default"
-                            className="px-1"
-                            icon={<IconX />}
-                            onClick={() => setSelectedQueries([])}
-                          />
-                        </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side="bottom" className="text-xs">
-                          Clear selection
-                        </TooltipContent_Shadcn_>
-                      </Tooltip_Shadcn_>
-                    </div>
-                  </>
+                    }
+                  />
                 )}
 
-                {filteredFavoriteSnippets.length > 0 ? (
-                  <div className="editor-product-menu">
-                    <Menu.Group title="Favorites" />
-                    <div className="space-y-1">
-                      {filteredFavoriteSnippets.map((tabInfo) => {
-                        const { id } = tabInfo || {}
-                        return (
-                          <QueryItem
-                            key={id}
-                            tabInfo={tabInfo}
-                            isSelected={selectedQueries.includes(id as string)}
-                            hasQueriesSelected={selectedQueries.length > 0}
-                            onSelectQuery={(isShiftHeld) => onSelectQuery(id, isShiftHeld)}
-                            onDeleteQuery={postDeleteCleanup}
-                          />
-                        )
-                      })}
-                    </div>
-                  </div>
-                ) : null}
+              {filteredProjectSnippets.length > 0 && (
+                <InnerSideMenuCollapsible className="editor-product-menu" defaultOpen>
+                  <InnerSideMenuCollapsibleTrigger title="Project queries" />
+                  <InnerSideMenuCollapsibleContent>
+                    <>
+                      {filteredProjectSnippets.map((tabInfo) => (
+                        <QueryItem
+                          key={tabInfo.id}
+                          tabInfo={tabInfo}
+                          hasQueriesSelected={selectedQueries.length > 0}
+                        />
+                      ))}
+                    </>
+                  </InnerSideMenuCollapsibleContent>
+                </InnerSideMenuCollapsible>
+              )}
 
-                {personalSnippets.length > 0 ? (
-                  <div className="editor-product-menu">
-                    <Menu.Group title="Your queries" />
-                    <div className="space-y-1 pb-8">
-                      {personalSnippets.map((tabInfo) => {
-                        const { id } = tabInfo || {}
-                        return (
+              {selectedQueries.length > 0 && (
+                <>
+                  <InnerSideMenuSeparator />
+                  <div className="px-4 flex items-center gap-x-2 py-2">
+                    <Button block type="danger" onClick={() => setShowDeleteModal(true)}>
+                      Delete {selectedQueries.length.toLocaleString()} quer
+                      {selectedQueries.length > 1 ? 'ies' : 'y'}
+                    </Button>
+                    <Tooltip_Shadcn_ delayDuration={100}>
+                      <TooltipTrigger_Shadcn_ asChild>
+                        <Button type="default" onClick={() => setSelectedQueries([])}>
+                          Cancel
+                        </Button>
+                      </TooltipTrigger_Shadcn_>
+                      <TooltipContent_Shadcn_ side="bottom">Clear selection</TooltipContent_Shadcn_>
+                    </Tooltip_Shadcn_>
+                  </div>
+                </>
+              )}
+
+              {filteredFavoriteSnippets.length > 0 && (
+                <InnerSideMenuCollapsible className="editor-product-menu" defaultOpen>
+                  <InnerSideMenuCollapsibleTrigger title="Favorites" />
+                  <InnerSideMenuCollapsibleContent>
+                    <>
+                      {filteredFavoriteSnippets.map((tabInfo) => (
+                        <QueryItem
+                          key={tabInfo.id}
+                          tabInfo={tabInfo}
+                          isSelected={selectedQueries.includes(tabInfo.id as string)}
+                          hasQueriesSelected={selectedQueries.length > 0}
+                          onSelectQuery={(isShiftHeld) => onSelectQuery(tabInfo.id, isShiftHeld)}
+                          onDeleteQuery={postDeleteCleanup}
+                        />
+                      ))}
+                    </>
+                  </InnerSideMenuCollapsibleContent>
+                </InnerSideMenuCollapsible>
+              )}
+
+              {personalSnippets.length > 0 && (
+                <InnerSideMenuCollapsible className="editor-product-menu" defaultOpen>
+                  <InnerSideMenuCollapsibleTrigger title="Your queries" />
+                  <InnerSideMenuCollapsibleContent className="editor-product-menu">
+                    <>
+                      <div className="space-y-0.5">
+                        {personalSnippets.map((tabInfo) => (
                           <QueryItem
-                            key={id}
+                            key={tabInfo.id}
                             tabInfo={tabInfo}
-                            isSelected={selectedQueries.includes(id as string)}
+                            isSelected={selectedQueries.includes(tabInfo.id as string)}
                             hasQueriesSelected={selectedQueries.length > 0}
-                            onSelectQuery={(isShiftHeld) => onSelectQuery(id, isShiftHeld)}
+                            onSelectQuery={(isShiftHeld) => onSelectQuery(tabInfo.id, isShiftHeld)}
                             onDeleteQuery={postDeleteCleanup}
                           />
-                        )
-                      })}
-                    </div>
-                  </div>
-                ) : null}
-              </div>
+                        ))}
+                      </div>
+                    </>
+                  </InnerSideMenuCollapsibleContent>
+                </InnerSideMenuCollapsible>
+              )}
             </div>
-          ) : (
-            <div></div>
-          )}
-        </Menu>
+          </div>
+        ) : null}
       </div>
+
       <ConfirmationModal
         header="Confirm to delete query"
-        buttonLabel="Delete query"
+        buttonLabel={`Delete ${selectedQueries.length.toLocaleString()} quer${selectedQueries.length > 1 ? 'ies' : 'y'}`}
         buttonLoadingLabel="Deleting query"
         size="medium"
         loading={isDeleting}
         visible={showDeleteModal}
         onSelectConfirm={onConfirmDelete}
         onSelectCancel={() => setShowDeleteModal(false)}
+        danger
       >
         <Modal.Content>
           <div className="my-6">

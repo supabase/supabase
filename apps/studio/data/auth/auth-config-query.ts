@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import { components } from 'data/api'
+import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import { useCallback } from 'react'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { authKeys } from './keys'
 
 export type AuthConfigVariables = {

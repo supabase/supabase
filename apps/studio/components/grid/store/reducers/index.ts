@@ -1,7 +1,7 @@
-import BaseReducer, { BaseInitialState, baseInitialState } from './base'
-import CallbackReducer, { CallbackInitialState, callbackInitialState } from './callback'
-import ColumnReducer, { ColumnInitialState, columnInitialState } from './column'
-import RowReducer, { RowInitialState, rowInitialState } from './row'
+import BaseReducer, { type BaseInitialState, baseInitialState } from './base'
+import CallbackReducer, { type CallbackInitialState, callbackInitialState } from './callback'
+import ColumnReducer, { type ColumnInitialState, columnInitialState } from './column'
+import RowReducer, { type RowInitialState, rowInitialState } from './row'
 
 export interface InitialStateType
   extends BaseInitialState,

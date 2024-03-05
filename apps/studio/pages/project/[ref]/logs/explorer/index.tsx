@@ -1,8 +1,8 @@
 import { useParams } from 'common/hooks'
 import dayjs from 'dayjs'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import {
   Button,
   Form,
@@ -27,23 +27,23 @@ import {
 } from 'components/interfaces/Settings/Logs'
 import UpgradePrompt from 'components/interfaces/Settings/Logs/UpgradePrompt'
 import { LogsLayout } from 'components/layouts'
-import CodeEditor from 'components/ui/CodeEditor'
+import { CodeEditor } from 'components/ui/CodeEditor'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useContentInsertMutation } from 'data/content/content-insert-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useLocalStorage, useSelectedOrganization, useStore } from 'hooks'
+import { useLocalStorage, useSelectedOrganization } from 'hooks'
 import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
-import { LogSqlSnippets, NextPageWithLayout } from 'types'
+import type { LogSqlSnippets, NextPageWithLayout } from 'types'
 
 const PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'
+
 export const LogsExplorerPage: NextPageWithLayout = () => {
   useEditorHints()
-  const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef, q, ite, its } = useParams()
   const organization = useSelectedOrganization()
@@ -179,18 +179,11 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
       const error = e as { message: string }
       console.error(error)
       setSaveModalOpen(false)
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to save query: ${error.message}`,
-      })
+      toast.error(`Failed to save query: ${error.message}`)
     },
     onSuccess: (values) => {
       setSaveModalOpen(false)
-      ui.setNotification({
-        category: 'success',
-        message: `Saved "${values[0].name}" log query`,
-      })
+      toast.success(`Saved "${values[0].name}" log query`)
     },
   })
 
@@ -327,4 +320,4 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
 
 LogsExplorerPage.getLayout = (page) => <LogsLayout>{page}</LogsLayout>
 
-export default observer(LogsExplorerPage)
+export default LogsExplorerPage

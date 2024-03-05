@@ -3,7 +3,7 @@ import { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import ProjectList from 'components/interfaces/Home/ProjectList'
+import { ProjectList } from 'components/interfaces/Home/ProjectList'
 import { withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 

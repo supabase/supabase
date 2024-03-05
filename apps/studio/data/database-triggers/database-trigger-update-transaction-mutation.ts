@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import { quoteLiteral } from 'lib/pg-format'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { databaseTriggerKeys } from './keys'
 
 // [Joshen] Writing this query within FE as the PATCH endpoint from pg-meta only supports updating

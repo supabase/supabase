@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import FeedbackDropdown from '../ProjectLayout/LayoutHeader/FeedbackDropdown'
+import { FeedbackDropdown } from '../ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from '../ProjectLayout/LayoutHeader/HelpPopover'
 import NotificationsPopoverV2 from '../ProjectLayout/LayoutHeader/NotificationsPopoverV2/NotificationsPopover'
 import BranchDropdown from './BranchDropdown'

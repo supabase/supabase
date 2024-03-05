@@ -1,4 +1,4 @@
-import { Monaco } from '@monaco-editor/react'
+import type { Monaco } from '@monaco-editor/react'
 import { useParams, useTelemetryProps } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
@@ -26,12 +26,12 @@ import {
   ResizablePanelGroup,
   cn,
 } from 'ui'
-
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
 import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
-import { SqlSnippet } from 'data/content/sql-snippets-query'
+import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
@@ -329,6 +329,9 @@ const SQLEditor = () => {
             role: impersonatedRole,
           }),
           isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+          handleError: (error) => {
+            throw error
+          },
         })
       }
     },

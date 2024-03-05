@@ -9,8 +9,7 @@ import { NewOrgForm } from 'components/interfaces/Organization'
 import { WizardLayout } from 'components/layouts'
 import { useSetupIntent } from 'data/stripe/setup-intent-mutation'
 import { STRIPE_PUBLIC_KEY } from 'lib/constants'
-import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
@@ -21,7 +20,7 @@ const Wizard: NextPageWithLayout = () => {
   const { resolvedTheme } = useTheme()
 
   const [intent, setIntent] = useState<any>()
-  const captchaLoaded = useIsHCaptchaLoaded()
+  const [captchaLoaded, setHCaptchaLoaded] = useState(false)
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
@@ -86,13 +85,19 @@ const Wizard: NextPageWithLayout = () => {
         ref={captchaRefCallback}
         sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY!}
         size="invisible"
+        onOpen={() => {
+          // [Joshen] This is to ensure that hCaptcha popup remains clickable
+          if (document !== undefined) document.body.classList.add('!pointer-events-auto')
+        }}
+        onClose={() => {
+          onLocalCancel()
+          if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+        }}
         onVerify={(token) => {
           setCaptchaToken(token)
+          if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
         }}
-        onClose={onLocalCancel}
-        onExpire={() => {
-          setCaptchaToken(null)
-        }}
+        onLoad={() => setHCaptchaLoaded(true)}
       />
 
       {intent && (

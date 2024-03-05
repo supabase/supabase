@@ -11,18 +11,22 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@storybook/addon-essentials": "^7.6.17",
-    "@storybook/addon-interactions": "^7.6.17",
-    "@storybook/addon-links": "^7.6.17",
-    "@storybook/addon-onboarding": "^1.0.11",
+    "@storybook/addon-essentials": "^8.0.0-rc.1",
+    "@storybook/addon-interactions": "^8.0.0-rc.1",
+    "@storybook/addon-links": "^8.0.0-rc.1",
+    "@storybook/addon-mdx-gfm": "^8.0.0-rc.1",
+    "@storybook/addon-onboarding": "^8.0.0-rc.1",
     "@storybook/addon-styling-webpack": "^0.0.6",
-    "@storybook/addon-themes": "^7.6.17",
-    "@storybook/blocks": "^7.6.17",
-    "@storybook/nextjs": "^7.6.17",
-    "@storybook/react": "^7.6.17",
-    "@storybook/test": "^7.6.17",
+    "@storybook/addon-themes": "^8.0.0-rc.1",
+    "@storybook/blocks": "^8.0.0-rc.1",
+    "@storybook/nextjs": "^8.0.0-rc.1",
+    "@storybook/react": "^8.0.0-rc.1",
+    "@storybook/test": "^8.0.0-rc.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "storybook": "^7.0.0"
+    "storybook": "^8.0.0-rc.1"
+  },
+  "dependencies": {
+    "@storybook/node-logger": "^8.0.0-rc.1"
   }
 }

@@ -39,7 +39,7 @@ export const AWS_REGIONS_VALUES: { [key: string]: string } = {
   NORTHEAST_ASIA_2: 'ap-northeast-2',
   CENTRAL_CANADA: 'ca-central-1',
   WEST_US: 'us-west-1',
-  EAST_US: 'es-east-1',
+  EAST_US: 'us-east-1',
   WEST_EU: 'eu-west-1',
   WEST_EU_2: 'eu-west-2',
   CENTRAL_EU: 'eu-central-1',

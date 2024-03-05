@@ -1,5 +1,3 @@
-import GeneralContent from './GeneralContent'
-import ResourceContent from './ResourceContent'
-import RpcContent from './RpcContent'
-
-export { GeneralContent, ResourceContent, RpcContent }
+export { default as GeneralContent } from './GeneralContent'
+export { default as ResourceContent } from './ResourceContent'
+export { default as RpcContent } from './RpcContent'
