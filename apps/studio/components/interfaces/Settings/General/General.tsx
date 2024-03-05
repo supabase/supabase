@@ -1,20 +1,4 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import Link from 'next/link'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
-  Form,
-  IconAlertCircle,
-  IconBarChart2,
-  IconChevronDown,
-  Input,
-} from 'ui'
-
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   FormActions,
@@ -34,6 +18,21 @@ import {
   useSelectedOrganization,
   useStore,
 } from 'hooks'
+import { ChevronRight } from 'lucide-react'
+import Link from 'next/link'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
+  Form,
+  IconAlertCircle,
+  IconBarChart2,
+  Input,
+} from 'ui'
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
 
@@ -148,22 +147,18 @@ const General = () => {
                     <Alert_Shadcn_ variant="warning" className="mb-4">
                       <IconAlertCircle strokeWidth={2} />
                       <AlertTitle_Shadcn_>Upcoming project restart scheduled</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
+                      <AlertDescription_Shadcn_ className="flex flex-col gap-3">
                         This project will automatically restart on {v2MaintenanceDate} between{' '}
                         {v2MaintenanceStartTime} and {v2MaintenanceEndTime} UTC, which will cause up
                         to a few minutes of downtime.
-                        <Collapsible_Shadcn_ className="my-2">
-                          <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:!-rotate-180">
-                            <div className="flex items-center gap-x-2 w-full">
-                              <p className="text-xs text-foreground-light group-hover:text-foreground transition">
-                                Why this time?
-                              </p>
-                              <IconChevronDown
-                                className="transition-transform duration-200"
-                                strokeWidth={1.5}
-                                size={14}
-                              />
-                            </div>
+                        <Collapsible_Shadcn_>
+                          <CollapsibleTrigger_Shadcn_ className="text-foreground-light transition-all [&[data-state=open]&_svg]:rotate-90 hover:text-foreground data-[state=open]:text-foreground flex items-center gap-x-2 w-full">
+                            <ChevronRight
+                              className="transition-transform"
+                              strokeWidth={1.5}
+                              size={14}
+                            />
+                            Why this time?
                           </CollapsibleTrigger_Shadcn_>
                           <CollapsibleContent_Shadcn_>
                             Your project has historically had the least database queries across the
