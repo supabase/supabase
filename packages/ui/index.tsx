@@ -207,6 +207,12 @@ export {
   TooltipContent as TooltipContent_Shadcn_,
 } from './src/components/shadcn/ui/tooltip'
 
+export {
+  HoverCard as HoverCard_Shadcn_,
+  HoverCardTrigger as HoverCardTrigger_Shadcn_,
+  HoverCardContent as HoverCardContent_Shadcn_,
+} from './src/components/shadcn/ui/hover-card'
+
 export { Toggle as Toggle_Shadcn } from './src/components/shadcn/ui/toggle'
 
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
