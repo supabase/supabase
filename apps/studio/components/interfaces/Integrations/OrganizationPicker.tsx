@@ -1,10 +1,10 @@
 import { getHasInstalledObject } from 'components/layouts/IntegrationsLayout/Integrations.utils'
 import { useIntegrationsQuery } from 'data/integrations/integrations-query'
-import { IntegrationName } from 'data/integrations/integrations.types'
+import type { IntegrationName } from 'data/integrations/integrations.types'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useMemo, useRef, useState } from 'react'
 
-import { Organization } from 'types'
+import type { Organization } from 'types'
 import {
   Badge,
   Button,

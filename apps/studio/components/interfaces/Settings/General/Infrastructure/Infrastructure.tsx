@@ -16,7 +16,7 @@ import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-e
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks'
 import PauseProjectButton from './PauseProjectButton'
-import ProjectUpgradeAlert from './ProjectUpgradeAlert'
+import { ProjectUpgradeAlert } from './ProjectUpgradeAlert'
 import RestartServerButton from './RestartServerButton'
 
 interface InfrastructureProps {}

@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast'
 
 import { patch } from 'data/fetchers'
 import { projectKeys } from 'data/projects/keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type DatabasePasswordResetVariables = {
   ref: string

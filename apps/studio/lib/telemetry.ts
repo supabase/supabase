@@ -1,7 +1,7 @@
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { NextRouter } from 'next/router'
-import { User } from 'types'
+import type { NextRouter } from 'next/router'
+import type { User } from 'types'
 
 export interface TelemetryProps {
   screenResolution?: string

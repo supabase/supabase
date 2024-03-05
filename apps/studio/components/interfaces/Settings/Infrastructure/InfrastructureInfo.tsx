@@ -25,7 +25,7 @@ import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-e
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from 'hooks'
 import { AWS_REGIONS, FLY_REGIONS } from 'lib/constants'
-import ProjectUpgradeAlert from '../General/Infrastructure/ProjectUpgradeAlert'
+import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
 import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
 import {
   AWS_REGIONS_VALUES,

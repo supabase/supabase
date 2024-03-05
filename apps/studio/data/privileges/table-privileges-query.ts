@@ -1,8 +1,8 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
-import { components } from 'data/api'
+import type { components } from 'data/api'
 import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { privilegeKeys } from './keys'
 
 export type TablePrivilegesVariables = {

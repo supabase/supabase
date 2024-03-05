@@ -6,7 +6,7 @@ import { Button, IconChevronDown, IconList, Popover } from 'ui'
 
 import { DropdownControl } from 'components/grid/components/common'
 import { formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
-import { Sort, SupaTable } from 'components/grid/types'
+import type { Sort, SupaTable } from 'components/grid/types'
 import SortRow from './SortRow'
 
 export interface SortPopoverProps {

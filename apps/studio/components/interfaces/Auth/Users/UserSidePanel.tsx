@@ -1,5 +1,5 @@
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
-import { User } from 'data/auth/users-query'
+import type { User } from 'data/auth/users-query'
 import { SidePanel } from 'ui'
 
 interface UsersSidePanelProps {
