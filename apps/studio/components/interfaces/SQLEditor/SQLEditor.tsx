@@ -140,7 +140,7 @@ const SQLEditor = () => {
   const selectedOrganization = useSelectedOrganization()
   const selectedProject = useSelectedProject()
   const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
-  const [hasEnabledAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema-enabled', true)
+  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
   const [isAcceptDiffLoading, setIsAcceptDiffLoading] = useState(false)
   const [, setAiQueryCount] = useLocalStorageQuery('supabase_sql-editor-ai-query-count', 0)
   const [, setIsSchemaSuggestionDismissed] = useLocalStorageQuery(

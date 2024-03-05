@@ -7,7 +7,7 @@ import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-quer
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { isError } from 'data/utils/error-check'
 import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
-import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useSqlEditor } from '../SQLEditor'
 import { sqlAiDisclaimerComment } from '../SQLEditor.constants'
@@ -28,7 +28,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   const selectedOrganization = useSelectedOrganization()
   const selectedProject = useSelectedProject()
   const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
-  const [hasEnabledAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema-enabled', true)
+  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
 
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
 

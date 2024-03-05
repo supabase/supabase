@@ -14,11 +14,13 @@ import {
   FormField_Shadcn_,
   FormItem_Shadcn_,
   Form_Shadcn_,
-  IconSettings,
   Input_Shadcn_,
+  cn,
 } from 'ui'
 import * as z from 'zod'
 
+import { useLocalStorageQuery, useSelectedOrganization } from 'hooks'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import { DiffType } from '../SQLEditor.types'
@@ -43,11 +45,16 @@ export const AiAssistantPanel = ({
   onClose,
   onChange,
 }: AiAssistantPanelProps) => {
+  const router = useRouter()
   const { profile } = useProfile()
   const snap = useAppStateSnapshot()
+  const organization = useSelectedOrganization()
   const bottomRef = useRef<HTMLDivElement>(null)
-  const router = useRouter()
   const telemetryProps = useTelemetryProps()
+
+  const isOptedInToAI = organization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
+  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
+  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
 
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
 
@@ -98,15 +105,21 @@ export const AiAssistantPanel = ({
             </Button>
           }
         >
-          <div>
-            <Button
-              type="default"
-              icon={<IconSettings strokeWidth={1.5} />}
-              onClick={() => snap.setShowAiSettingsModal(true)}
-            >
-              AI Settings
-            </Button>
-          </div>
+          <Button
+            type="default"
+            className="w-min"
+            icon={
+              <div
+                className={cn(
+                  'w-2 h-2 rounded-full',
+                  includeSchemaMetadata ? 'bg-brand' : 'border border-stronger'
+                )}
+              />
+            }
+            onClick={() => snap.setShowAiSettingsModal(true)}
+          >
+            {includeSchemaMetadata ? 'Include' : 'Exclude'} database metadata in queries
+          </Button>
         </Message>
 
         {messages.map((m) => (
