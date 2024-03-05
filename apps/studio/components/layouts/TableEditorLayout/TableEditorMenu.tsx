@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { ProtectedSchemaModal } from 'components/interfaces/Database/ProtectedSchemaWarning'
 import AlertError from 'components/ui/AlertError'
 import InfiniteList from 'components/ui/InfiniteList'
@@ -39,7 +40,7 @@ const TableEditorMenu = () => {
   )
 
   const [selectedSchema, setSelectedSchema] = useLocalStorageQuery(
-    'supabase_table-editor-selected-schema',
+    LOCAL_STORAGE_KEYS.TABLE_EDITOR_SELECTED_SCHEMA,
     'public'
   )
 

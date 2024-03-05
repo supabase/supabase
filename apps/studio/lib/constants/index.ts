@@ -48,6 +48,7 @@ export const LOCAL_STORAGE_KEYS = {
   PGBOUNCER_IPV6_DEPRECATION_WARNING: 'pgbouncer-ipv6-deprecation-warning-dismissed',
   VERCEL_IPV6_DEPRECATION_WARNING: 'vercel-ipv6-deprecation-warning-dismissed',
   PGBOUNCER_DEPRECATION_WARNING: 'pgbouncer-deprecation-warning-dismissed',
+  TABLE_EDITOR_SELECTED_SCHEMA: 'supabase_table-editor-selected-schema',
 }
 
 export const OPT_IN_TAGS = {

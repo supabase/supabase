@@ -5,6 +5,7 @@ import { ForeignRowSelectorProps } from 'components/interfaces/TableGridEditor/S
 import type { JsonEditValue } from 'components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import { PropsWithChildren, createContext, useContext, useRef } from 'react'
 import { proxy, useSnapshot } from 'valtio'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 type ForeignKey = {
   foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>
@@ -53,8 +54,13 @@ export type UIState =
     }
 
 export const createTableEditorState = () => {
+  const storedSchemaName =
+    typeof localStorage !== 'undefined'
+      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TABLE_EDITOR_SELECTED_SCHEMA)
+      : null
+
   const state = proxy({
-    selectedSchemaName: 'public',
+    selectedSchemaName: storedSchemaName ?? 'public',
     setSelectedSchemaName: (schemaName: string) => {
       state.selectedSchemaName = schemaName
     },

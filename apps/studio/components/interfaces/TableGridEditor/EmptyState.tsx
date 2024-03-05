@@ -11,10 +11,10 @@ export interface EmptyStateProps {}
 
 const EmptyState = ({}: EmptyStateProps) => {
   const snap = useTableEditorStateSnapshot()
-  const isProtectedSchema = EXCLUDED_SCHEMAS.includes(snap.selectedSchemaName)
+
+  const isProtectedSchema = EXCLUDED_SCHEMAS.includes(snap.selectedSchemaName.replace(/"/g, ''))
   const canCreateTables =
     useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables') && !isProtectedSchema
-
   const [sort] = useLocalStorage<'alphabetical' | 'grouped-alphabetical'>(
     'table-editor-sort',
     'alphabetical'
