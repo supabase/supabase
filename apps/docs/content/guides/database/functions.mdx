@@ -385,16 +385,16 @@ returns text
 language plpgsql
 as $$
 begin
-  -- error if "val" is null
+  -- error if val is null
   if val is null then
     raise exception 'Value should not be NULL';
   end if;
   -- return val if it is not null
-  return "val";
+  return val;
 end;
 $$;
 
-select error_if_null(NULL);
+select error_if_null(null);
 ```
 
 Value checking is common, so Postgres provides a shorthand: the `assert` keyword. It uses the following format:
@@ -447,8 +447,6 @@ begin
           raise exception 'An error occurred in function <function name>: %', sqlerrm;
 end;
 $$;
-
-select error_example();
 ```
 
 #### Advanced logging
