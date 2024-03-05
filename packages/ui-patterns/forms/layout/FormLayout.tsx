@@ -91,7 +91,7 @@ export function FormLayout({
     containerClasses.push(className)
   }
 
-  const labeled = Boolean(label || beforeLabel || afterLabel)
+  const hasLabel = Boolean(label || beforeLabel || afterLabel)
 
   const renderError = <FormMessage_Shadcn_ className="mt-2" />
 
@@ -107,7 +107,7 @@ export function FormLayout({
   return (
     <div className={containerClasses.join(' ')}>
       {flex && <div className={__styles.flex[align].content}>{children}</div>}
-      {labeled || labelOptional || layout === 'horizontal' ? (
+      {hasLabel || labelOptional || layout === 'horizontal' ? (
         <div
           // direction={
           //   (layout && layout === 'horizontal') ||
@@ -117,7 +117,7 @@ export function FormLayout({
           // }
           className={labelContainerClasses.join(' ')}
         >
-          {labeled && (
+          {hasLabel && (
             <FormLabel_Shadcn_>
               {beforeLabel && (
                 <span
