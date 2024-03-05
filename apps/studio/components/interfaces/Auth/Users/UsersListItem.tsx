@@ -56,9 +56,7 @@ const UserListItem = ({
       </Table.td>
       <Table.td className="table-cell">
         <div className="flex max-w-[72px] items-baseline">
-          <SimpleCodeBlock metastring="" className="font-xs bash">
-            {user.id}
-          </SimpleCodeBlock>
+          <SimpleCodeBlock className="font-xs bash">{user.id}</SimpleCodeBlock>
           <div>...</div>
         </div>
       </Table.td>

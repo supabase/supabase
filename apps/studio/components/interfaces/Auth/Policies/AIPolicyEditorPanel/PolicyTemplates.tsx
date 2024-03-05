@@ -8,7 +8,6 @@ import CardButton from 'components/ui/CardButton'
 import CopyButton from 'components/ui/CopyButton'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { getGeneralPolicyTemplates } from '../PolicyEditorModal/PolicyEditorModal.constants'
-import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
 
 interface PolicyTemplatesProps {
   selectedTemplate?: string
