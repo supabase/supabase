@@ -3,7 +3,7 @@ import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 
 import { useTelemetryProps } from 'common'
-import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
+import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useCheckPermissions, useStore } from 'hooks'

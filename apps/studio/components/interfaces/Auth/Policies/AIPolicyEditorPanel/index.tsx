@@ -52,7 +52,6 @@ import RLSCodeEditor from './RLSCodeEditor'
 import { PolicyTemplates } from './PolicyTemplates'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import CardButton from 'components/ui/CardButton'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
