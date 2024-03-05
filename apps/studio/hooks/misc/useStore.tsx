@@ -3,7 +3,7 @@ import { createContext, PropsWithChildren, useContext, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
 import SparkBar from 'components/ui/SparkBar'
-import { IRootStore } from 'stores'
+import type { IRootStore } from 'stores'
 import { useSelectedProject } from './useSelectedProject'
 
 const StoreContext = createContext<IRootStore>(undefined!)

@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
+import { capitalize } from 'lodash'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -12,7 +13,6 @@ import {
   Alert_Shadcn_,
   Button,
   IconAlertCircle,
-  IconAlertTriangle,
   IconChevronRight,
   IconExternalLink,
   IconInfo,
@@ -40,7 +40,7 @@ import { useInfraMonitoringQuery } from 'data/analytics/infra-monitoring-query'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import type { ProjectAddonVariantMeta } from 'data/subscriptions/types'
 import { useFlag, useProjectByRef, useSelectedOrganization } from 'hooks'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
 import { BASE_PATH, INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS } from 'lib/constants'
@@ -48,15 +48,13 @@ import { getDatabaseMajorVersion, getSemanticVersion } from 'lib/helpers'
 import { SUBSCRIPTION_PANEL_KEYS, useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
-import PITRSidePanel from './PITRSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
-import { capitalize } from 'lodash'
+import PITRSidePanel from './PITRSidePanel'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef, panel } = useParams()
   const snap = useSubscriptionPageStateSnapshot()
-  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
   const { project: selectedProject, isLoading: isLoadingProject } = useProjectContext()
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef })
   const selectedOrg = useSelectedOrganization()
@@ -69,6 +67,9 @@ const Addons = () => {
   if (panel && typeof panel === 'string' && allowedPanelValues.includes(panel)) {
     snap.setPanelKey(panel as SUBSCRIPTION_PANEL_KEYS)
   }
+
+  const computeSizeChangesDisabled = useFlag('disableComputeSizeChanges')
+  const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
 
@@ -249,14 +250,20 @@ const Addons = () => {
                       </p>
                     )}
                     <ProjectUpdateDisabledTooltip
-                      projectUpdateDisabled={projectUpdateDisabled}
+                      projectUpdateDisabled={projectUpdateDisabled || computeSizeChangesDisabled}
                       projectNotActive={!isProjectActive}
+                      tooltip="Compute size changes are currently disabled. Our engineers are working on a fix."
                     >
                       <Button
                         type="default"
                         className="mt-2 pointer-events-auto"
                         onClick={() => snap.setPanelKey('computeInstance')}
-                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
+                        disabled={
+                          isBranch ||
+                          !isProjectActive ||
+                          projectUpdateDisabled ||
+                          computeSizeChangesDisabled
+                        }
                       >
                         Change compute size
                       </Button>
@@ -386,7 +393,7 @@ const Addons = () => {
             <ScaffoldSection>
               <ScaffoldSectionDetail>
                 <div className="space-y-6">
-                  <p className="m-0">IPv4 address</p>
+                  <p className="m-0">Dedicated IPv4 address</p>
                   <div className="space-y-2">
                     <p className="text-sm text-foreground-light m-0">More information</p>
                     <div>
@@ -405,31 +412,6 @@ const Addons = () => {
                 </div>
               </ScaffoldSectionDetail>
               <ScaffoldSectionContent>
-                <Alert_Shadcn_ variant="warning">
-                  <IconAlertTriangle className="h-4 w-4" />
-                  <AlertTitle_Shadcn_>
-                    PGBouncer and IPv4 Deprecation on January, 26th
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    <p>
-                      Direct connections via db.{projectRef}.supabase.co will resolve to an IPv6
-                      address starting from January 26th. If you plan on not using our connection
-                      pooler and your environment does not support IPv6, consider enabling the
-                      add-on.
-                    </p>
-                    <div className="mt-2">
-                      <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                        <a
-                          href="https://supabase.com/docs/guides/platform/ipv4-address"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Learn more
-                        </a>
-                      </Button>
-                    </div>
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
                 <div className="flex space-x-6">
                   <div>
                     <div className="rounded-md bg-surface-100 border border-muted w-[160px] h-[96px] overflow-hidden">
@@ -453,8 +435,8 @@ const Addons = () => {
                     <p className="text-sm text-foreground-light">Current option:</p>
                     <p>
                       {ipv4 !== undefined
-                        ? 'IPv4 address is enabled'
-                        : 'IPv4 address is not enabled'}
+                        ? 'Dedicated IPv4 address is enabled'
+                        : 'Dedicated IPv4 address is not enabled'}
                     </p>
                     <Tooltip.Root delayDuration={0}>
                       <Tooltip.Trigger asChild>
@@ -470,7 +452,7 @@ const Addons = () => {
                               !(canUpdateIPv4 || ipv4)
                             }
                           >
-                            Change IPv4 address
+                            Change dedicated IPv4 address
                           </Button>
                         </div>
                       </Tooltip.Trigger>
@@ -494,19 +476,6 @@ const Addons = () => {
                         )}
                       </Tooltip.Portal>
                     </Tooltip.Root>
-                    {/*<ProjectUpdateDisabledTooltip
-                      projectUpdateDisabled={projectUpdateDisabled}
-                      projectNotActive={!isProjectActive}
-                    >
-                      <Button
-                        type="default"
-                        className="mt-2 pointer-events-auto"
-                        onClick={() => snap.setPanelKey('ipv4')}
-                        disabled={isBranch || !isProjectActive || projectUpdateDisabled}
-                      >
-                        Change IPv4 address
-                      </Button>
-                      </ProjectUpdateDisabledTooltip>*/}
                   </div>
                 </div>
               </ScaffoldSectionContent>

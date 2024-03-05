@@ -3,7 +3,7 @@ import toast from 'react-hot-toast'
 
 import { post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type SendDowngradeFeedbackVariables = {
   projectRef?: string

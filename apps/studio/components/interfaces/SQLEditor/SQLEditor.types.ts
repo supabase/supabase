@@ -1,4 +1,4 @@
-import { DiffOnMount, OnMount } from '@monaco-editor/react'
+import type { DiffOnMount, OnMount } from '@monaco-editor/react'
 import { Dispatch, SetStateAction } from 'react'
 
 export interface SQLTemplate {

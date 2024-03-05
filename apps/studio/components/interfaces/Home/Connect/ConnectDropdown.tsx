@@ -2,6 +2,8 @@ import { Box, Check, ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
@@ -59,29 +61,29 @@ const ConnectDropdown = ({
         </div>
         <PopoverContent_Shadcn_ className="p-0 max-w-48" side="bottom" align="start">
           <Command_Shadcn_>
-            <CommandInput_Shadcn_ placeholder="Search..." className="h-9" />
+            <CommandInput_Shadcn_ placeholder="Search..." />
             <CommandList_Shadcn_>
-              {items.map((item) => (
-                <CommandItem_Shadcn_
-                  key={item.key}
-                  value={item.key}
-                  onSelect={() => {
-                    onSelectLib(item.key)
-                    setOpen(false)
-                  }}
-                >
-                  <div className="flex items-center gap-2 py-0.5 w-full">
+              <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
+              <CommandGroup_Shadcn_>
+                {items.map((item) => (
+                  <CommandItem_Shadcn_
+                    key={item.key}
+                    value={item.key}
+                    onSelect={() => {
+                      onSelectLib(item.key)
+                      setOpen(false)
+                    }}
+                    className="flex gap-2 items-center"
+                  >
                     {item.icon ? <ConnectionIcon connection={item.icon} /> : <Box size={12} />}
-
                     {item.label}
-
                     <Check
                       size={15}
                       className={cn('ml-auto  ', item.key === state ? 'opacity-100' : 'opacity-0')}
                     />
-                  </div>
-                </CommandItem_Shadcn_>
-              ))}
+                  </CommandItem_Shadcn_>
+                ))}
+              </CommandGroup_Shadcn_>
             </CommandList_Shadcn_>
           </Command_Shadcn_>
         </PopoverContent_Shadcn_>

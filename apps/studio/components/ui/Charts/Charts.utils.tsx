@@ -2,7 +2,7 @@ import dayjs from 'dayjs'
 import React, { useMemo } from 'react'
 import { ResponsiveContainer } from 'recharts'
 import { DateTimeFormats } from './Charts.constants'
-import { CommonChartProps, StackedChartProps } from './Charts.types'
+import type { CommonChartProps, StackedChartProps } from './Charts.types'
 import utc from 'dayjs/plugin/utc'
 dayjs.extend(utc)
 

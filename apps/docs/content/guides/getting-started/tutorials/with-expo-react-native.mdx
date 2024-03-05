@@ -460,6 +460,8 @@ expo install expo-image-picker
 Let's create an avatar for the user so that they can upload a profile photo.
 We can start by creating a new component:
 
+{/* <!-- vale off --> */}
+
 ```tsx components/Avatar.tsx
 import { useState, useEffect } from 'react'
 import { supabase } from '../lib/supabase'
@@ -592,6 +594,8 @@ const styles = StyleSheet.create({
   },
 })
 ```
+
+{/* <!-- vale on --> */}
 
 ### Add the new widget
 

@@ -12,7 +12,7 @@ import { useApiAuthorizationDeclineMutation } from 'data/api-authorization/api-a
 import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useStore, withAuth } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import { Alert, Button, Listbox } from 'ui'
 
 // Need to handle if no organizations in account

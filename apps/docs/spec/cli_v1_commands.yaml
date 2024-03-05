@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.145.4
+  version: 1.148.6
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -2349,8 +2349,6 @@ commands:
   - id: supabase-gen-types-typescript
     title: supabase gen types typescript
     summary: Generate types for TypeScript
-    description: |
-      Generate types for TypeScript. Must specify one of --local, --linked, --project-id, or --db-url
     tags: []
     links: []
     usage: supabase gen types typescript [flags]
@@ -2378,8 +2376,8 @@ commands:
         description: Generate types from a project ID.
         default_value: ''
       - id: schema
-        name: --schema <stringArray>
-        description: Schemas to generate types for.
+        name: -s, --schema <strings>
+        description: Comma separated list of schema to include.
         default_value: '[]'
   - id: supabase-gen-keys
     title: supabase gen keys

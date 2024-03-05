@@ -1,4 +1,4 @@
-import Pagination from './pagination'
+import { Pagination } from './pagination'
 import useTable from 'hooks/misc/useTable'
 import { useParams } from 'common'
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'

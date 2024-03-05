@@ -1,7 +1,7 @@
 import { Button, IconX } from 'ui'
 
 import CopyButton from 'components/ui/CopyButton'
-import Connecting from 'components/ui/Loading/Loading'
+import { Loading } from 'components/ui/Loading'
 import useSingleLog from 'hooks/analytics/useSingleLog'
 import { useMemo } from 'react'
 import {
@@ -10,7 +10,7 @@ import {
   LogsEndpointParams,
   unixMicroToIsoTimestamp,
 } from '.'
-import { LogData, QueryType } from './Logs.types'
+import type { LogData, QueryType } from './Logs.types'
 import AuthSelectionRenderer from './LogSelectionRenderers/AuthSelectionRenderer'
 import DatabaseApiSelectionRender from './LogSelectionRenderers/DatabaseApiSelectionRender'
 import DatabasePostgresSelectionRender from './LogSelectionRenderers/DatabasePostgresSelectionRender'
@@ -170,7 +170,7 @@ ${JSON.stringify(fullLog.metadata, null, 2)}
           </div>
           <div className="h-px w-full bg-selection rounded " />
         </div>
-        {isLoading && <Connecting />}
+        {isLoading && <Loading />}
         <div className="flex flex-col space-y-6 bg-surface-100 py-4">
           {!isLoading && <Formatter />}
         </div>
