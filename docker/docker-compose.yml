@@ -369,17 +369,17 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXP: ${JWT_EXPIRY}
     volumes:
-      - ./volumes/db/realtime.sql:/docker-entrypoint-initdb.d/migrations/99-realtime.sql:Z
+      - ./volumes/db/00000004_realtime.sql:/docker-entrypoint-initdb.d/migrations/00000004_realtime.sql:Z
       # Must be superuser to create event trigger
-      - ./volumes/db/webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/98-webhooks.sql:Z
+      - ./volumes/db/00000001_webhooks.sql:/docker-entrypoint-initdb.d/init-scripts/00000001_webhooks.sql:Z
       # Must be superuser to alter reserved role
-      - ./volumes/db/roles.sql:/docker-entrypoint-initdb.d/init-scripts/99-roles.sql:Z
+      - ./volumes/db/00000005_roles.sql:/docker-entrypoint-initdb.d/init-scripts/00000005_roles.sql:Z
       # Initialize the database settings with JWT_SECRET and JWT_EXP
-      - ./volumes/db/jwt.sql:/docker-entrypoint-initdb.d/init-scripts/99-jwt.sql:Z
+      - ./volumes/db/00000002_roles.sql:/docker-entrypoint-initdb.d/init-scripts/00000002_roles.sql:Z
       # PGDATA directory is persisted between restarts
       - ./volumes/db/data:/var/lib/postgresql/data:Z
       # Changes required for Analytics support
-      - ./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
+      - ./volumes/db/00000003_roles.sql:/docker-entrypoint-initdb.d/migrations/00000003_roles.sql:Z
 
   vector:
     container_name: supabase-vector
