@@ -735,13 +735,10 @@ const SQLEditor = () => {
 
                                     setAiQueryCount((count) => count + 1)
 
-                                    const formattedSql =
-                                      sqlAiDisclaimerComment +
-                                      '\n\n' +
-                                      format(sql, {
-                                        language: 'postgresql',
-                                        keywordCase: 'lower',
-                                      })
+                                    const formattedSql = format(sql, {
+                                      language: 'postgresql',
+                                      keywordCase: 'lower',
+                                    })
 
                                     // If this was an edit and AI returned the same SQL as before
                                     if (currentSql && formattedSql.trim() === currentSql.trim()) {

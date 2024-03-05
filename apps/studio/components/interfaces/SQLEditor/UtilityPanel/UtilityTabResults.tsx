@@ -125,13 +125,10 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
                     entityDefinitions,
                   })
 
-                  const formattedSql =
-                    sqlAiDisclaimerComment +
-                    '\n\n' +
-                    format(sql, {
-                      language: 'postgresql',
-                      keywordCase: 'lower',
-                    })
+                  const formattedSql = format(sql, {
+                    language: 'postgresql',
+                    keywordCase: 'lower',
+                  })
                   setAiInput('')
                   setDebugSolution(solution)
                   setSqlDiff({
