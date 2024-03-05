@@ -351,7 +351,7 @@ In certain auth scenarios you will need to handle linking back into your applica
 
     The redirect callback url should have the format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.user-management://login-callback` is just an example. You can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
 
-    Now we have to edit the Android manifest to make sure the app opens when the user clicks on the magic link.
+    Now, edit the Android manifest to make sure the app opens when the user clicks on the magic link.
 
     ```xml
     <manifest ...>
@@ -377,7 +377,7 @@ In certain auth scenarios you will need to handle linking back into your applica
 
     Check the [Android documentation](https://developer.android.com/training/app-links/deep-linking) for more information.
 
-    Next we have to specify the scheme and host in the Supabase Client:
+    Next, specify the scheme and host in the Supabase Client:
     ```kotlin
     install(Auth) {
        host = "login-callback"
@@ -385,7 +385,7 @@ In certain auth scenarios you will need to handle linking back into your applica
     }
     ```
 
-    At last we have to call `Auth#handleDeeplinks` when our app opens:
+    Finally, call `Auth#handleDeeplinks` when the app opens:
 
     ```kotlin
     override fun onCreate(savedInstanceState: Bundle?) {
