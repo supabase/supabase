@@ -1,4 +1,4 @@
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import SchemaSelector from 'components/ui/SchemaSelector'
 
 import {

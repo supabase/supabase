@@ -8,8 +8,8 @@ import {
   NODE_WIDTH,
 } from './InstanceConfiguration.constants'
 import { groupBy } from 'lodash'
-import { Database } from 'data/read-replicas/replicas-query'
-import { LoadBalancer } from 'data/read-replicas/load-balancers-query'
+import type { Database } from 'data/read-replicas/replicas-query'
+import type { LoadBalancer } from 'data/read-replicas/load-balancers-query'
 
 // [Joshen] Just FYI the nodes generation assumes each project only has one load balancer
 // Will need to change if this eventually becomes otherwise
@@ -20,11 +20,9 @@ export const generateNodes = (
   loadBalancers: LoadBalancer[],
   {
     onSelectRestartReplica,
-    onSelectResizeReplica,
     onSelectDropReplica,
   }: {
     onSelectRestartReplica: (database: Database) => void
-    onSelectResizeReplica: (database: Database) => void
     onSelectDropReplica: (database: Database) => void
   }
 ): Node[] => {
@@ -88,7 +86,6 @@ export const generateNodes = (
           computeSize: database.size,
           status: database.status,
           onSelectRestartReplica: () => onSelectRestartReplica(database),
-          onSelectResizeReplica: () => onSelectResizeReplica(database),
           onSelectDropReplica: () => onSelectDropReplica(database),
         },
       }

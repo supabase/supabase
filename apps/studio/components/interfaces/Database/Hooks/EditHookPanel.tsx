@@ -1,10 +1,10 @@
-import { PostgresTable, PostgresTrigger } from '@supabase/postgres-meta'
+import type { PostgresTable, PostgresTrigger } from '@supabase/postgres-meta'
 import Image from 'next/legacy/image'
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
 
 import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-transaction-mutation'

@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -23,7 +24,7 @@ import {
 
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { WarningIcon } from 'components/ui/Icons'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -34,7 +35,6 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import QueryItem from './QueryItem'
-import { partition, uniq, uniqBy } from 'lodash'
 import { selectItemsInRange } from './SQLEditorLayout.utils'
 
 const SideBarContent = observer(() => {
@@ -314,7 +314,7 @@ const SideBarContent = observer(() => {
                             onClick={() => setSelectedQueries([])}
                           />
                         </TooltipTrigger_Shadcn_>
-                        <TooltipContent_Shadcn_ side="bottom">
+                        <TooltipContent_Shadcn_ side="bottom" className="text-xs">
                           Clear selection
                         </TooltipContent_Shadcn_>
                       </Tooltip_Shadcn_>

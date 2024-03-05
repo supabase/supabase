@@ -1,6 +1,6 @@
 import IntegrationSettings from 'components/interfaces/Settings/Integrations/IntegrationsSettings'
 import { SettingsLayout } from 'components/layouts'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const OrgIntegrationSettings: NextPageWithLayout = () => {
   return <IntegrationSettings />

@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button, Input, Listbox, SidePanel } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import CodeEditor from 'components/ui/CodeEditor'
+import { CodeEditor } from 'components/ui/CodeEditor'
 import MultiSelect, { MultiSelectOption } from 'components/ui/MultiSelect'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useIndexesQuery } from 'data/database/indexes-query'

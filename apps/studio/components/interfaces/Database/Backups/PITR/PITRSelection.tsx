@@ -28,7 +28,7 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { PROJECT_STATUS } from 'lib/constants'
 import Link from 'next/link'
 import BackupsEmpty from '../BackupsEmpty'
-import { Timezone } from './PITR.types'
+import type { Timezone } from './PITR.types'
 import {
   constrainDateToRange,
   formatNumberToTwoDigits,

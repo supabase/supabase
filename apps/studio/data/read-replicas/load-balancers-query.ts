@@ -1,10 +1,10 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
-import { replicaKeys } from './keys'
-import { components } from 'data/api'
-import { useFlag } from 'hooks'
+
+import type { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
+import type { ResponseError } from 'types'
+import { replicaKeys } from './keys'
 
 export type LoadBalancersVariables = {
   projectRef?: string
@@ -23,7 +23,7 @@ export async function getLoadBalancers(
     signal,
   })
 
-  if (error) throw new Error((error as ResponseError).message)
+  if (error) handleError(error)
   return data
 }
 
@@ -34,18 +34,13 @@ export const useLoadBalancersQuery = <TData = LoadBalancersData>(
   { projectRef }: LoadBalancersVariables,
   { enabled = true, ...options }: UseQueryOptions<LoadBalancersData, LoadBalancersError, TData> = {}
 ) => {
-  const readReplicasEnabled = useFlag('readReplicas')
   const { data } = useProjectDetailQuery({ ref: projectRef })
 
   return useQuery<LoadBalancersData, LoadBalancersError, TData>(
     replicaKeys.loadBalancers(projectRef),
     ({ signal }) => getLoadBalancers({ projectRef }, signal),
     {
-      enabled:
-        enabled &&
-        data?.is_read_replicas_enabled &&
-        readReplicasEnabled &&
-        typeof projectRef !== 'undefined',
+      enabled: enabled && data?.is_read_replicas_enabled && typeof projectRef !== 'undefined',
       ...options,
     }
   )

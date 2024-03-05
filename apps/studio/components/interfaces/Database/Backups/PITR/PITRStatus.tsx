@@ -1,15 +1,14 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import dayjs from 'dayjs'
-import { observer } from 'mobx-react-lite'
-import { Button, IconAlertCircle } from 'ui'
-
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import dayjs from 'dayjs'
+import { Button, IconAlertCircle } from 'ui'
+
 import { FormPanel } from 'components/ui/Forms'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useCheckPermissions } from 'hooks'
-import { Timezone } from './PITR.types'
+import type { Timezone } from './PITR.types'
 import { TimezoneSelection } from './TimezoneSelection'
 
 interface PITRStatusProps {
@@ -61,6 +60,7 @@ const PITRStatus = ({
             </div>
             <Tooltip.Root delayDuration={0}>
               <Tooltip.Trigger asChild>
+                {/* [Joshen TODO] Double check if this is intentional */}
                 <Button
                   disabled={hasReadReplicas || !canTriggerPhysicalBackup}
                   onClick={() => onSetConfiguration()}
@@ -68,23 +68,28 @@ const PITRStatus = ({
                   Start a restore
                 </Button>
               </Tooltip.Trigger>
-              {!canTriggerPhysicalBackup && (
-                <Tooltip.Portal>
-                  <Tooltip.Content side="left">
-                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                    <div
-                      className={[
-                        'rounded bg-alternative py-1 px-2 leading-none shadow',
-                        'border border-background',
-                      ].join(' ')}
-                    >
-                      <span className="text-xs text-foreground">
-                        You need additional permissions to trigger a PITR recovery
-                      </span>
-                    </div>
-                  </Tooltip.Content>
-                </Tooltip.Portal>
-              )}
+              {hasReadReplicas ||
+                (!canTriggerPhysicalBackup && (
+                  <Tooltip.Portal>
+                    <Tooltip.Content side="left">
+                      <Tooltip.Arrow className="radix-tooltip-arrow" />
+                      <div
+                        className={[
+                          'rounded bg-alternative py-1 px-2 leading-none shadow',
+                          'border border-background',
+                        ].join(' ')}
+                      >
+                        <span className="text-xs text-foreground">
+                          {hasReadReplicas
+                            ? 'You will need to remove all read replicas first to trigger a PITR recovery'
+                            : !canTriggerPhysicalBackup
+                              ? 'You need additional permissions to trigger a PITR recovery'
+                              : null}
+                        </span>
+                      </div>
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
+                ))}
             </Tooltip.Root>
           </div>
         }
@@ -112,4 +117,4 @@ const PITRStatus = ({
   )
 }
 
-export default observer(PITRStatus)
+export default PITRStatus

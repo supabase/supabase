@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
-import { SqlSnippet } from 'data/content/sql-snippets-query'
+import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { isError } from 'data/utils/error-check'
 import { useSelectedOrganization, useStore } from 'hooks'
 import { useEffect, useState } from 'react'

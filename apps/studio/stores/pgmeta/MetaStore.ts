@@ -2,9 +2,9 @@ import { makeObservable } from 'mobx'
 
 import { post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
-import { IRootStore } from '../RootStore'
+import type { IRootStore } from '../RootStore'
 
 export interface IMetaStore {
   projectRef?: string
