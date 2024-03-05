@@ -22,7 +22,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
 
   const tsDefinition =
     hasTsRef && props.typeSpec ? extractTsDocNode(hasTsRef, props.typeSpec) : null
-  const parameters = hasTsRef && tsDefinition ? generateParameters(tsDefinition) : ''
+  const parameters = hasTsRef && tsDefinition ? generateParameters(tsDefinition) : item.params
   const shortText = hasTsRef && tsDefinition ? tsDefinition.signatures[0].comment.shortText : ''
 
   return (
@@ -51,7 +51,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                 </ReactMarkdown>
               </div>
             )}
-            {/* // parameters */}
+            {/* parameters */}
             {parameters && (
               <div className="not-prose mt-12">
                 <h5 className="mb-3 text-base text-foreground">Parameters</h5>
