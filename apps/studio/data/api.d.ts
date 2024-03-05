@@ -3631,6 +3631,10 @@ export interface components {
       is_branch_enabled: boolean
       parent_project_ref?: string
       is_read_replicas_enabled: boolean
+      v2MaintenanceWindow: {
+        start?: string
+        end?: string
+      }
     }
     ProjectRefResponse: {
       id: number

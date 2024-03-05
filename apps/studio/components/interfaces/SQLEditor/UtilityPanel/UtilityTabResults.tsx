@@ -1,16 +1,18 @@
+import { format } from 'sql-formatter'
+import { AiIconAnimation, Button } from 'ui'
+
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { isError } from 'data/utils/error-check'
 import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
-import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
-import { format } from 'sql-formatter'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { AiIconAnimation, Button } from 'ui'
 import { useSqlEditor } from '../SQLEditor'
 import { sqlAiDisclaimerComment } from '../SQLEditor.constants'
+import { DiffType } from '../SQLEditor.types'
 import Results from './Results'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 export type UtilityTabResultsProps = {
   id: string
@@ -22,11 +24,11 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   const organization = useSelectedOrganization()
   const snap = useSqlEditorStateSnapshot()
   const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
-  const { setDebugSolution, setAiInput, setSqlDiff, sqlDiff } = useSqlEditor()
+  const { setDebugSolution, setAiInput, setSqlDiff, sqlDiff, setSelectedDiffType } = useSqlEditor()
   const selectedOrganization = useSelectedOrganization()
   const selectedProject = useSelectedProject()
   const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
-  const [hasEnabledAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema-enabled', true)
+  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
 
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
 
@@ -123,19 +125,17 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
                     entityDefinitions,
                   })
 
-                  const formattedSql =
-                    sqlAiDisclaimerComment +
-                    '\n\n' +
-                    format(sql, {
-                      language: 'postgresql',
-                      keywordCase: 'lower',
-                    })
+                  const formattedSql = format(sql, {
+                    language: 'postgresql',
+                    keywordCase: 'lower',
+                  })
                   setAiInput('')
                   setDebugSolution(solution)
                   setSqlDiff({
                     original: snippet.snippet.content.sql,
                     modified: formattedSql,
                   })
+                  setSelectedDiffType(DiffType.Modification)
                 } catch (error: unknown) {
                   if (isError(error)) {
                     ui.setNotification({

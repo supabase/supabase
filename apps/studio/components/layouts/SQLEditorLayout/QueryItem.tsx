@@ -1,30 +1,28 @@
-import clsx from 'clsx'
 import { useParams } from 'common'
 import { noop } from 'lodash'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
-  Checkbox,
   Checkbox_Shadcn_,
+  HoverCardContent_Shadcn_,
+  HoverCardTrigger_Shadcn_,
+  HoverCard_Shadcn_,
   IconAlertCircle,
   IconAlertTriangle,
   IconEye,
   IconUnlock,
   Modal,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  cn,
 } from 'ui'
+import { InnerSideMenuItem } from 'ui-patterns'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import DownloadSnippetModal from 'components/interfaces/SQLEditor/DownloadSnippetModal'
 import RenameQueryModal from 'components/interfaces/SQLEditor/RenameQueryModal'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import CopyButton from 'components/ui/CopyButton'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
@@ -106,71 +104,57 @@ const QueryItem = ({
 
   return (
     <>
-      <Tooltip_Shadcn_ delayDuration={100}>
-        <TooltipTrigger_Shadcn_ asChild>
-          <div
+      <HoverCard_Shadcn_ openDelay={200}>
+        <HoverCardTrigger_Shadcn_ asChild>
+          <InnerSideMenuItem
+            title={description || name}
+            ref={isActive ? (activeItemRef as React.RefObject<HTMLAnchorElement>) : null}
+            href={`/project/${ref}/sql/${id}`}
             key={id}
-            className={clsx(
-              'h-7 pl-3 pr-2',
-              'flex items-center justify-between rounded-md group relative',
-              isActive ? 'bg-surface-300' : 'hover:bg-surface-200'
-            )}
-            ref={isActive ? (activeItemRef as React.RefObject<HTMLDivElement>) : null}
+            className={'flex gap-3 items-center'}
+            forceHoverState={open}
+            isActive={isActive}
           >
             {visibility === 'user' && (
-              <Checkbox
-                className={clsx(
-                  'transition absolute left-2.5 top-1 [&>input]:border-foreground-lighter',
+              <Checkbox_Shadcn_
+                className={cn(
+                  'transition absolute left-2.5 border-strong',
                   hasQueriesSelected ? '' : 'opacity-0 group-hover:opacity-100'
                 )}
                 checked={isSelected}
-                onChange={(event) => {
-                  onSelectQuery((event.nativeEvent as KeyboardEvent).shiftKey)
-                }}
+                onCheckedChange={onSelectQuery}
               />
             )}
-            <div className="flex items-center justify-between w-full gap-x-2">
-              <Link
-                title={description || name}
-                href={`/project/${ref}/sql/${id}`}
-                className={clsx(
-                  'w-full overflow-hidden truncate',
-                  isActive
-                    ? 'text-foreground'
-                    : 'text-foreground-light group-hover:text-foreground/80',
-                  'text-sm transition-all overflow-hidden text-ellipsis',
-                  hasQueriesSelected && visibility === 'user'
-                    ? 'ml-5'
-                    : visibility === 'user'
-                      ? 'group-hover:ml-5'
-                      : ''
-                )}
-              >
-                {name}
-              </Link>
-              {!hasQueriesSelected && (
-                <QueryItemActions
-                  tabInfo={tabInfo}
-                  activeId={activeId}
-                  open={open}
-                  setOpen={setOpen}
-                  onSelectDeleteQuery={() => setDeleteModalOpen(true)}
-                  onSelectRenameQuery={() => setRenameModalOpen(true)}
-                  onSelectShareQuery={() => setShareModalOpen(true)}
-                  onSelectDownloadQuery={() => setIsDownloadSnippetModalOpen(true)}
-                />
+            <span
+              className={cn(
+                'transition-all',
+                'w-full overflow-hidden truncate',
+                hasQueriesSelected && visibility === 'user'
+                  ? 'ml-5'
+                  : visibility === 'user'
+                    ? 'group-hover:ml-5'
+                    : '',
+                'text-ellipsis truncate'
               )}
-            </div>
-          </div>
-        </TooltipTrigger_Shadcn_>
+            >
+              {name}
+            </span>
+            {!hasQueriesSelected && (
+              <QueryItemActions
+                tabInfo={tabInfo}
+                open={open}
+                setOpen={setOpen}
+                onSelectDeleteQuery={() => setDeleteModalOpen(true)}
+                onSelectRenameQuery={() => setRenameModalOpen(true)}
+                onSelectShareQuery={() => setShareModalOpen(true)}
+                onSelectDownloadQuery={() => setIsDownloadSnippetModalOpen(true)}
+              />
+            )}
+          </InnerSideMenuItem>
+        </HoverCardTrigger_Shadcn_>
         {!hideTooltip && (
-          <TooltipContent_Shadcn_
-            side="right"
-            align="start"
-            className="w-96 flex flex-col gap-y-2 py-3 -translate-y-[4px]"
-          >
-            <p className="text-xs">Query preview:</p>
-            <div className="bg-surface-300 py-2 px-3 rounded relative">
+          <HoverCardContent_Shadcn_ side="right" align="center" className="w-96" animate="slide-in">
+            <>
               {content.sql.trim() ? (
                 <SimpleCodeBlock
                   showCopy={false}
@@ -191,10 +175,10 @@ const QueryItem = ({
                   text={content.sql}
                 />
               )}
-            </div>
-          </TooltipContent_Shadcn_>
+            </>
+          </HoverCardContent_Shadcn_>
         )}
-      </Tooltip_Shadcn_>
+      </HoverCard_Shadcn_>
       <RenameQueryModal
         snippet={tabInfo}
         visible={renameModalOpen}
@@ -211,23 +195,17 @@ const QueryItem = ({
         onSelectConfirm={onConfirmDelete}
         onSelectCancel={() => setDeleteModalOpen(false)}
       >
-        <Modal.Content>
-          <div className="my-6">
-            <div className="text-sm text-foreground-light grid gap-4">
-              <div className="grid gap-1">
-                {visibility === 'project' && (
-                  <Alert_Shadcn_ variant="destructive">
-                    <IconAlertCircle strokeWidth={2} />
-                    <AlertTitle_Shadcn_>This SQL snippet will be lost forever</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      Deleting this query will remove it for all members of the project team.
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                )}
-                <p>Are you sure you want to delete '{name}'?</p>
-              </div>
-            </div>
-          </div>
+        <Modal.Content className="my-6 grid gap-1 text-sm text-foreground-light grid gap-4">
+          {visibility === 'project' && (
+            <Alert_Shadcn_ variant="destructive">
+              <IconAlertCircle strokeWidth={2} />
+              <AlertTitle_Shadcn_>This SQL snippet will be lost forever</AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                Deleting this query will remove it for all members of the project team.
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          )}
+          <p>Are you sure you want to delete '{name}'?</p>
         </Modal.Content>
       </ConfirmationModal>
       <ConfirmationModal
@@ -239,32 +217,26 @@ const QueryItem = ({
         onSelectConfirm={onConfirmShare}
         onSelectCancel={() => setShareModalOpen(false)}
       >
-        <Modal.Content>
-          <div className="my-6">
-            <div className="text-sm text-foreground-light grid gap-4">
-              <div className="grid gap-1">
-                <Alert_Shadcn_ variant="warning">
-                  <IconAlertTriangle strokeWidth={2} />
-                  <AlertTitle_Shadcn_>
-                    This SQL query will become public to all team members
-                  </AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    Anyone with access to the project can view it
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
-                <ul className="mt-4 space-y-5">
-                  <li className="flex gap-3">
-                    <IconEye />
-                    <span>Project members will have read-only access to this query.</span>
-                  </li>
-                  <li className="flex gap-3">
-                    <IconUnlock />
-                    <span>Anyone will be able to duplicate it to their personal snippets.</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
+        <Modal.Content className="my-6 text-sm text-foreground-light grid gap-4 grid gap-1">
+          <Alert_Shadcn_ variant="warning">
+            <IconAlertTriangle strokeWidth={2} />
+            <AlertTitle_Shadcn_>
+              This SQL query will become public to all team members
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Anyone with access to the project can view it
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+          <ul className="mt-4 space-y-5">
+            <li className="flex gap-3">
+              <IconEye />
+              <span>Project members will have read-only access to this query.</span>
+            </li>
+            <li className="flex gap-3">
+              <IconUnlock />
+              <span>Anyone will be able to duplicate it to their personal snippets.</span>
+            </li>
+          </ul>
         </Modal.Content>
       </ConfirmationModal>
       <DownloadSnippetModal

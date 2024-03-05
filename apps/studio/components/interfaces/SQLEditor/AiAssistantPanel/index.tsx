@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Message as MessageType } from 'ai'
 import { useTelemetryProps } from 'common'
 import Telemetry from 'lib/telemetry'
 import { compact, last } from 'lodash'
@@ -22,26 +23,30 @@ import { useLocalStorageQuery, useSelectedOrganization } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
-import { MessageWithDebug } from './AIPolicyEditorPanel.utils'
+import { DiffType } from '../SQLEditor.types'
 import Message from './Message'
 
-interface AIPolicyChatProps {
+export type MessageWithDebug = MessageType & { isDebug: boolean }
+
+interface AiAssistantPanelProps {
   messages: MessageWithDebug[]
   selectedMessage?: string
   loading: boolean
   onSubmit: (s: string) => void
-  onDiff: (message: { id: string; content: string }) => void
+  onDiff: ({ id, diffType, sql }: { id: string; diffType: DiffType; sql: string }) => void
+  onClose: () => void
   onChange: (value: boolean) => void
 }
 
-export const AIPolicyChat = ({
+export const AiAssistantPanel = ({
   messages,
   selectedMessage,
   loading,
   onSubmit,
   onDiff,
+  onClose,
   onChange,
-}: AIPolicyChatProps) => {
+}: AiAssistantPanelProps) => {
   const router = useRouter()
   const { profile } = useProfile()
   const snap = useAppStateSnapshot()
@@ -86,16 +91,26 @@ export const AIPolicyChat = ({
   }, [formChatValue])
 
   return (
-    <div id={'ai-chat-assistant'} className="flex flex-col h-full max-w-full">
-      <div className="overflow-auto flex-1 divide-y divide-border">
+    <div className="flex flex-col h-full min-w-[400px] w-[400px] border-l border-control">
+      <div
+        className={cn(
+          'overflow-auto flex-1',
+          messages.length === 0 ? 'flex flex-col justify-between' : ''
+        )}
+      >
         <Message
           key="zero"
           role="assistant"
           content={`Hi${
             name ? ' ' + name : ''
-          }, I can help you to write RLS policies. I'm powered by AI, so surprises and mistakes are possible.
+          }, how can I help you? I'm powered by AI, so surprises and mistakes are possible.
         Make sure to verify any generated code or suggestions, and share feedback so that we can
         learn and improve.`}
+          action={
+            <Button type="default" onClick={onClose}>
+              Close Assistant
+            </Button>
+          }
         >
           <Button
             type="default"
@@ -122,27 +137,38 @@ export const AIPolicyChat = ({
             content={m.content}
             createdAt={new Date(m.createdAt || new Date()).getTime()}
             isDebug={m.isDebug}
-            isSelected={m.id === selectedMessage}
-            onDiff={(content) => onDiff({ id: m.id, content })}
+            isSelected={selectedMessage === m.id}
+            onDiff={(diffType, sql) => onDiff({ id: m.id, diffType, sql })}
           />
         ))}
 
         {pendingReply && <Message key="thinking" role="assistant" content="Thinking..." />}
 
         <div ref={bottomRef} className="h-1" />
+        {/* <div className="grid grid-cols-12 gap-2 p-2">
+          {ASSISTANT_TEMPLATES.map((template) => (
+            <CardButton
+              hideChevron
+              key={template.name}
+              title={template.name}
+              description={template.description}
+              className="!p-3 col-span-12 h-auto [&>div>div]:!mt-0 [&>div>h5]:text-sm"
+              onClick={() => onSubmit(template.prompt)}
+            />
+          ))}
+        </div> */}
       </div>
 
       <Form_Shadcn_ {...form}>
         <form
-          id="rls-chat"
           className="sticky p-5 flex-0 border-t"
           onSubmit={form.handleSubmit((data: z.infer<typeof FormSchema>) => {
             onSubmit(data.chat)
             Telemetry.sendEvent(
               {
-                category: 'rls_editor',
+                category: 'sql_editor_ai_assistant',
                 action: 'ai_suggestion_asked',
-                label: 'rls-ai-assistant',
+                label: 'sql-editor-ai-assistant',
               },
               telemetryProps,
               router
@@ -165,7 +191,7 @@ export const AIPolicyChat = ({
                       className={`bg-surface-300 dark:bg-black rounded-full pl-10 ${
                         loading ? 'pr-10' : ''
                       }`}
-                      placeholder="Ask for some changes to your policy"
+                      placeholder="Ask a question about your SQL query"
                     />
                     {loading && <Loader2 className="absolute top-2 right-3 animate-spin" />}
                   </div>
