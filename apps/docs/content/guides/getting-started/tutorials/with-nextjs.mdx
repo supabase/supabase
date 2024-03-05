@@ -55,7 +55,7 @@ npm install @supabase/supabase-js
 ```
 
 And finally we want to save the environment variables in a `.env.local`.
-All we need to do is create `.env.local` file at the root of the project, and paste the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
+Create a `.env.local` file at the root of the project, and paste the API URL and the `anon` key that you copied [earlier](#get-the-api-keys).
 
 ```bash .env.local
 NEXT_PUBLIC_SUPABASE_URL=YOUR_SUPABASE_URL
@@ -71,7 +71,7 @@ You can find the full contents of this file [here](https://raw.githubusercontent
 
 Next.js is a highly versatile framework offering pre-rendering at build time (SSG), server-side rendering at request time (SSR), API routes, and middleware edge-functions.
 
-To better integrate with the framework, we've created the `@supabase/ssr` package for server-side auth. It has all the functionalities to quickly configure your Supabase project to use cookies for storing user sessions. For more information, checkout this [Next.js Server-Side Auth guide](/docs/guides/auth/server-side/nextjs).
+To better integrate with the framework, we've created the `@supabase/ssr` package for Server-Side Auth. It has all the functionalities to quickly configure your Supabase project to use cookies for storing user sessions. See the [Next.js Server-Side Auth guide](/docs/guides/auth/server-side/nextjs) for more information.
 
 Install the package for Next.js.
 
@@ -80,7 +80,8 @@ npm install @supabase/ssr
 ```
 
 ### Supabase utilities
-There are two different types of clients in supabase:
+
+There are two different types of clients in Supabase:
 1. **Client Component client** - To access Supabase from Client Components, which run in the browser.
 2. **Server Component client** - To access Supabase from Server Components, Server Actions, and Route Handlers, which run only on the server.
 
@@ -95,7 +96,7 @@ It is recommended to create the following essential utilities files for creating
 >
 
 <TabPanel id="js" label="JavaScript">
-Create a `client.js` and a `server.js` with the following functionalities for client-side supbase and server-side supabase, respectively. 
+Create a `client.js` and a `server.js` with the following functionalities for client-side Supabase and server-side Supabase, respectively. 
 <CH.Code className="min-h-[30rem]">
 ```jsx utils/supabase/client.js
 import { createBrowserClient } from '@supabase/ssr'
@@ -237,7 +238,7 @@ It's safe to trust `getUser()` because it sends a request to the Supabase Auth s
 >
 <TabPanel id="js" label="JavaScript">
 
-Create a `middleware.js` file at project's root and another one within the `util/supbase` (since we need to create a server supabase client to refresh the tokens).
+Create a `middleware.js` file at the project root and another one within the `utils/supabase` folder. The `utils/supabase` file contains the logic for updating the session. This is used by the `middleware.js` file, which is a Next.js convention.
 
 <CH.Code className="min-h-[30rem]">
 ```jsx middleware.js
@@ -329,7 +330,7 @@ export async function updateSession(request) {
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
 
-Create a `middleware.ts` file at project's root and another one within the `util/supbase` (since we need to create a server supabase client to refresh the tokens).
+Create a `middleware.ts` file at the project root and another one within the `util/ssupbase` folder. The `utils/supabase` file contains the logic for updating the session. This is used by the `middleware.js` file, which is a Next.js convention.
 
 <CH.Code className="min-h-[30rem]">
 ```tsx middleware.ts
@@ -425,7 +426,7 @@ export async function updateSession(request: NextRequest) {
 ## Set up a login page
 
 ### Login and Signup form
-Standard to any application with authentication. We need to have a login/signup page. 
+Create a login/signup page for your application:
 <Tabs
   scrollable
   size="small"
@@ -434,7 +435,7 @@ Standard to any application with authentication. We need to have a login/signup 
   queryGroup="language"
 >
 <TabPanel id="js" label="JavaScript">
-First, we need to create a new folder `login`, and a new `page.jsx` with the following form to accept login/signup request.
+Create a new folder named `login`, containing a `page.jsx` file with a login/signup form.
 ```jsx app/login/page.jsx
 import { login, signup } from './actions'
 
@@ -454,7 +455,7 @@ export default function LoginPage() {
 </TabPanel>
 
 <TabPanel id="ts" label="TypeScript">
-First, we need to create a new folder `login`, and a new `page.tsx` with the following form to accept login/signup request.
+Create a new folder named `login`, containing a `page.jsx` file with a login/signup form.
 ```tsx app/login/page.tsx
 import { login, signup } from './actions'
 
@@ -475,8 +476,8 @@ export default function LoginPage() {
 
 </Tabs>
 
-Now you should have a login page at `http://localhost:3000/login` without much functionalities. Next is to create the login/singup actions. They need to fulfill the following requirement:
-- Retrieve the user's given information.
+Navigate to `http://localhost:3000/login`. You should see your login form, but it's not yet hooked up to the actual login function. Next, you need to create the login/signup actions. They will:
+- Retrieve the user's information.
 - Send that information to Supabase as a signup request, which in turns will send a confirmation email.
 - Handle any error that arises.
 
@@ -616,13 +617,9 @@ When you enter your email and password, you will receive an email with the title
 
 </Tabs>
 
-<Admonition type="tip">
-Supabase also offers some pre-built React component that handles all the authentication functionalities under the hood for you. Check this [guide](/docs/guides/auth/auth-helpers/auth-ui) out.
-</Admonition>
-
 ### Proof Key for Code Exchange (PKCE)
 
-Upon sign up, an email will be sent to the user with a unique hash code. This key can then be sent back to the application for verification, and thus authenticating the user. The method is referred to as Proof Key for Code Exchange (PKCE). As we are employing PKCE in our authentication flow, it is necessary to create a route handler responsible for exchanging the code for a session.
+Upon sign up, an email will be sent to the user with a unique hash code. This key can then be sent back to the application for verification, thus authenticating the user. The method is referred to as Proof Key for Code Exchange (PKCE). As we are employing PKCE in our authentication flow, it is necessary to create a route handler responsible for exchanging the code for a session.
 
 In the following code snippet, we perform the following steps:
 
@@ -1065,6 +1062,7 @@ Let's create a route handler to handle the signout from the server side. Make su
 
 ```js app/auth/signout/route.js
 import { createClient } from '@/utils/supabase/server'
+import { revalidatePath } from 'next/cache'
 import { NextResponse } from 'next/server'
 
 export async function POST(req) {
@@ -1079,6 +1077,7 @@ export async function POST(req) {
     await supabase.auth.signOut()
   }
 
+revalidatePath('/', 'layout')
   return NextResponse.redirect(new URL('/login', req.url), {
     status: 302,
   })
@@ -1090,6 +1089,7 @@ export async function POST(req) {
 
 ```ts app/auth/signout/route.ts
 import { createClient } from '@/utils/supabase/server'
+import { revalidatePath } from 'next/cache'
 import { type NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
@@ -1104,6 +1104,7 @@ export async function POST(req: NextRequest) {
     await supabase.auth.signOut()
   }
 
+revalidatePath('/', 'layout')
   return NextResponse.redirect(new URL('/login', req.url), {
     status: 302,
   })
@@ -1219,7 +1220,6 @@ export default function Avatar({ uid, url, size, onUpload }) {
                 visibility: 'hidden',
                 position: 'absolute',
             }}
-          className='invisible absolute'
           type="file"
           id="single"
           accept="image/*"
@@ -1323,7 +1323,6 @@ export default function Avatar({
                 visibility: 'hidden',
                 position: 'absolute',
             }}
-          className='invisible absolute'
           type="file"
           id="single"
           accept="image/*"
