@@ -1,5 +1,5 @@
 import { WarningIcon } from 'components/ui/Icons'
-import { BranchData } from 'data/branches/branch-query'
+import type { BranchData } from 'data/branches/branch-query'
 import { ClockIcon } from 'lucide-react'
 import { Badge } from 'ui'
 

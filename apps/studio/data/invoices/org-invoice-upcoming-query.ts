@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
 import { invoicesKeys } from './keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 
 export type UpcomingInvoiceVariables = {

@@ -17,7 +17,7 @@ import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscri
 import { CriticalIcon, WarningIcon } from 'components/ui/Icons'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { AddonVariantId } from 'data/subscriptions/types'
+import type { AddonVariantId } from 'data/subscriptions/types'
 import { formatCurrency } from 'lib/helpers'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {

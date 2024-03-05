@@ -1,4 +1,4 @@
-import { QueryKey } from '@tanstack/react-query'
+import type { QueryKey } from '@tanstack/react-query'
 
 export const sqlKeys = {
   query: (projectRef: string | undefined, queryKey: QueryKey) =>

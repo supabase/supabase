@@ -7,7 +7,7 @@ import { useFlag, useSelectedOrganization, withAuth } from 'hooks'
 import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import SettingsLayout from '../SettingsLayout/SettingsLayout'
-import { SidebarSection } from './AccountLayout.types'
+import type { SidebarSection } from './AccountLayout.types'
 import WithSidebar from './WithSidebar'
 
 export interface AccountLayoutProps {
@@ -130,7 +130,7 @@ const AccountLayout = ({ children, title, breadcrumbs }: PropsWithChildren<Accou
               {
                 key: `logout`,
                 icon: '/icons/feather/power.svg',
-                label: 'Logout',
+                label: 'Log out',
                 href: undefined,
                 onClick: onClickLogout,
               },

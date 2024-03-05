@@ -1,5 +1,5 @@
 import { BASE_PATH } from 'lib/constants'
-import { WrapperMeta } from './Wrappers.types'
+import type { WrapperMeta } from './Wrappers.types'
 
 export const WRAPPER_HANDLERS = {
   STRIPE: 'stripe_fdw_handler',

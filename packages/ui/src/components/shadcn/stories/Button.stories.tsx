@@ -3,8 +3,8 @@ import { ChevronRight, Loader2, Mail } from 'lucide-react'
 import { Button } from '../ui/button'
 // import Link from 'next/link'
 
-const meta: Meta = {
-  title: 'Button',
+const meta: Meta<typeof Button> = {
+  title: 'shadcn/Button',
   component: Button,
 }
 
@@ -34,7 +34,7 @@ Ghost.storyName = 'Ghost'
 //   </Link>
 // )
 
-LinkButton.storyName = 'Link'
+// LinkButton.storyName = 'Link'
 
 export const Icon = () => (
   <Button>
@@ -70,12 +70,12 @@ export const WithIcon = () => (
 
 WithIcon.storyName = 'With Icon'
 
-export const AsChild = () => (
-  <Button>
-    <Link href="/">Login</Link>
-  </Button>
-)
+// export const AsChild = () => (
+//   <Button>
+//     <Link href="/">Login</Link>
+//   </Button>
+// )
 
-AsChild.storyName = 'As Child'
+// AsChild.storyName = 'As Child'
 
 export default meta

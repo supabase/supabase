@@ -1,3 +1,1 @@
-import DrilldownViewer from './DrilldownViewer'
-
-export default DrilldownViewer
+export { default as DrilldownViewer } from './DrilldownViewer'

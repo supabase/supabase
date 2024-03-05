@@ -1,8 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get } from 'data/fetchers'
-import { AuditLog } from 'data/organizations/organization-audit-logs-query'
-import { ResponseError } from 'types'
+import type { AuditLog } from 'data/organizations/organization-audit-logs-query'
+import type { ResponseError } from 'types'
 import { profileKeys } from './keys'
 
 export type ProfileAuditLogsVariables = {

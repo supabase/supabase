@@ -91,10 +91,19 @@ const Nav = (props: Props) => {
                     className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
                   >
                     <Image
-                      src={showDarkLogo ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
+                      src={supabaseLogoWordmarkLight}
                       width={124}
                       height={24}
                       alt="Supabase Logo"
+                      className="dark:hidden"
+                      priority
+                    />
+                    <Image
+                      src={supabaseLogoWordmarkDark}
+                      width={124}
+                      height={24}
+                      alt="Supabase Logo"
+                      className="hidden dark:block"
                       priority
                     />
                   </Link>
