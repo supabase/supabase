@@ -937,6 +937,7 @@ const SQLEditor = () => {
                                 keywordCase: 'lower',
                               }
                             )
+
                             const modified = model.modified.getValue()
 
                             const lineStart = original.includes(sqlAiDisclaimerComment)

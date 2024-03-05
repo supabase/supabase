@@ -80,7 +80,10 @@ ${isNpx ? 'npx ' : ''}supabase snippets download ${id} > \\
 `
 
 export const compareAsModification = (sqlDiff: ContentDiff) => {
-  return { ...sqlDiff }
+  return {
+    original: sqlDiff.original,
+    modified: `${sqlAiDisclaimerComment}\n\n${sqlDiff.modified}`,
+  }
 }
 
 export const compareAsAddition = (sqlDiff: ContentDiff) => {
