@@ -1,8 +1,6 @@
-import { useProjectContentStore } from 'stores/projectContentStore'
 import { PRESET_CONFIG } from './Reports.constants'
 import { Presets } from './Reports.types'
 import useDbQuery from 'hooks/analytics/useDbQuery'
-import { useMutation, useQuery } from '@tanstack/react-query'
 
 type QueryPerformanceQueryOpts = {
   searchQuery: string

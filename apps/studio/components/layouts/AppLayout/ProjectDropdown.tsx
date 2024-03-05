@@ -8,7 +8,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { useIsFeatureEnabled, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import { Organization } from 'types'
+import type { Organization } from 'types'
 import {
   Button,
   CommandEmpty_Shadcn_,

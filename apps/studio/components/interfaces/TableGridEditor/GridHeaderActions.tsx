@@ -18,8 +18,8 @@ import {
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
@@ -159,16 +159,20 @@ const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeade
             <div className="flex items-center gap-1">
               {policies.length < 1 ? (
                 <Tooltip.Root delayDuration={0}>
-                  <Tooltip.Trigger className="w-full">
-                    <Link passHref href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
-                      <Button
-                        type="default"
-                        className="group !h-[28px] !py-0"
-                        icon={<IconPlusCircle size={12} />}
+                  <Tooltip.Trigger asChild className="w-full">
+                    <Button
+                      asChild
+                      type="default"
+                      className="group !h-[28px] !py-0"
+                      icon={<IconPlusCircle size={12} />}
+                    >
+                      <Link
+                        passHref
+                        href={`/project/${projectRef}/auth/policies?search=${table.id}`}
                       >
                         Add RLS policy
-                      </Button>
-                    </Link>
+                      </Link>
+                    </Button>
                   </Tooltip.Trigger>
                   <Tooltip.Portal>
                     <Tooltip.Content side="bottom">
@@ -190,23 +194,24 @@ const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeade
                   </Tooltip.Portal>
                 </Tooltip.Root>
               ) : (
-                <Link passHref href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
-                  <Button
-                    type={policies.length < 1 ? 'warning' : 'default'}
-                    className="group !h-[28px] !py-0"
-                    icon={
-                      policies.length > 0 ? (
-                        <span className="text-right text-xs rounded-xl px-[6px] bg-foreground-lighter/30 text-brand-1100">
-                          {policies.length}
-                        </span>
-                      ) : (
-                        <IconPlusCircle size={12} />
-                      )
-                    }
-                  >
+                <Button
+                  asChild
+                  type={policies.length < 1 ? 'warning' : 'default'}
+                  className="group !h-[28px] !py-0"
+                  icon={
+                    policies.length > 0 ? (
+                      <span className="text-right text-xs rounded-xl px-[6px] bg-foreground-lighter/30 text-brand-1100">
+                        {policies.length}
+                      </span>
+                    ) : (
+                      <IconPlusCircle size={12} />
+                    )
+                  }
+                >
+                  <Link passHref href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
                     Auth {policies.length > 1 ? 'policies' : 'policy'}
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               )}
             </div>
           ) : (

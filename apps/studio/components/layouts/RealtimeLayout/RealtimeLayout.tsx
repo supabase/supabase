@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
-import ProductMenu from 'components/ui/ProductMenu'
+import { ProductMenu } from 'components/ui/ProductMenu'
 import { useSelectedProject, useStore, withAuth } from 'hooks'
-import ProjectLayout from '../'
+import { ProjectLayout } from '../'
 import { generateRealtimeMenu } from './RealtimeMenu.utils'
 
 export interface RealtimeLayoutProps {

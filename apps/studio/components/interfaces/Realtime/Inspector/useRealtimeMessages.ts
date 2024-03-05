@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { uuidv4 } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
-import { LogData } from './Messages.types'
+import type { LogData } from './Messages.types'
 
 function reducer(
   state: LogData[],
@@ -64,16 +64,12 @@ export const useRealtimeMessages = ({
   enableDbChanges,
   enableBroadcast,
 }: RealtimeConfig) => {
+  const { data } = useProjectApiQuery({ projectRef: projectRef })
+
   // the default host is prod until the correct one comes through an API call.
-  const [host, setHost] = useState(`https://${projectRef}.supabase.co`)
-  useProjectApiQuery(
-    { projectRef: projectRef },
-    {
-      onSuccess: (data) => {
-        setHost(`${data.autoApiService.protocol}://${data.autoApiService.endpoint}`)
-      },
-    }
-  )
+  const host = data
+    ? `${data.autoApiService.protocol}://${data.autoApiService.endpoint}`
+    : `https://${projectRef}.supabase.co`
 
   const [logData, dispatch] = useReducer(reducer, [] as LogData[])
   const pushMessage = (messageType: string, metadata: any) => {

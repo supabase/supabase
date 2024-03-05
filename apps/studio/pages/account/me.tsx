@@ -13,7 +13,7 @@ import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { useProfile } from 'lib/profile'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
   return (

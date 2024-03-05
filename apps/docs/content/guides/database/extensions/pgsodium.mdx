@@ -4,13 +4,13 @@ title: 'pgsodium: Encryption Features'
 description: 'Encryption library for PostgreSQL'
 ---
 
-[pgsodium](https://github.com/michelp/pgsodium) is a PostgreSQL extension which provides SQL access to [libsodium's](https://doc.libsodium.org/) high-level cryptographic algorithms.
+[`pgsodium`](https://github.com/michelp/pgsodium) is a PostgreSQL extension which provides SQL access to [`libsodium`'s](https://doc.libsodium.org/) high-level cryptographic algorithms.
 
-libsodium is a modern, easy-to-use software library for encryption, decryption, signatures, password hashing, and more. It is a portable, cross-compilable, installable, and packageable fork of the [NaCl](http://nacl.cr.yp.to/) library, with a compatible but extended API to improve usability even further.
+`libsodium` is a modern, easy-to-use software library for encryption, decryption, signatures, password hashing, and more. It is a portable, cross-compilable, installable, and packageable fork of the [NaCl](http://nacl.cr.yp.to/) library, with a compatible but extended API to improve usability even further.
 
 The design choices emphasize security and ease of use. But despite the emphasis on high security, primitives are faster across-the-board than most implementations.
 
-pgsodium exposes the following libsodium APIs to SQL:
+`pgsodium` exposes the following `libsodium` APIs to SQL:
 
 - [Generating Random Data](https://github.com/michelp/pgsodium/#generating-random-data)
 - [Secret key cryptography](https://github.com/michelp/pgsodium/#secret-key-cryptography)
@@ -53,7 +53,7 @@ Note that Supabase projects are already encrypted at rest by default.
 
 ## Get the root encryption key for your Supabase project
 
-Encryption requires keys. Keeping the keys in the same database as the encrypted data would be unsafe. For more information about managing the pgsodium root encryption key on your Supabase project see **[encryption key location](/docs/guides/database/vault#encryption-key-location)**. This key is required to decrypt values stored in [Supabase Vault](/docs/guides/database/vault) and data encrypted with Transparent Column Encryption.
+Encryption requires keys. Keeping the keys in the same database as the encrypted data would be unsafe. For more information about managing the `pgsodium` root encryption key on your Supabase project see **[encryption key location](/docs/guides/database/vault#encryption-key-location)**. This key is required to decrypt values stored in [Supabase Vault](/docs/guides/database/vault) and data encrypted with Transparent Column Encryption.
 
 ## Enable the extension
 
@@ -68,7 +68,7 @@ Encryption requires keys. Keeping the keys in the same database as the encrypted
 
 1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
-3. Search for "pgsodium" and enable the extension.
+3. Search for `pgsodium` and enable the extension.
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">

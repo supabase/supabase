@@ -29,7 +29,7 @@ Each Supabase project consists of several tools:
 
 ### PostgreSQL (database)
 
-PostgreSQL is the core of Supabase. We do not abstract the PostgreSQL database — you can access it and use it with full privileges. We simply provide tools which makes PostgreSQL as easy to use as Firebase.
+PostgreSQL is the core of Supabase. We do not abstract the PostgreSQL database—you can access it and use it with full privileges. We simply provide tools which makes PostgreSQL as easy to use as Firebase.
 
 - Official Docs: [postgresql.org/docs](https://www.postgresql.org/docs/current/index.html)
 - Source code: [github.com/postgres/postgres](https://github.com/postgres/postgres) (mirror)
@@ -57,7 +57,7 @@ A JWT-based API for managing users and issuing access tokens. This integrates wi
 ### PostgREST (API)
 
 A standalone web server that turns your PostgreSQL database directly into a RESTful API.
-We use this with our [pg_graphql](https://github.com/supabase/pg_graphql) extension to provide a GraphQL API.
+We use this with our [`pg_graphql`](https://github.com/supabase/pg_graphql) extension to provide a GraphQL API.
 
 - Official Docs: [postgrest.org](https://postgrest.org/)
 - Source code: [github.com/PostgREST/postgrest](https://github.com/PostgREST/postgrest)
@@ -86,8 +86,8 @@ An S3-compatible object storage service that stores metadata in Postgres.
 
 A modern runtime for JavaScript and TypeScript.
 
-- Official Docs: [deno.land](https://deno.land/)
-- Source code: [github.com/denoland/deno](https://github.com/denoland/deno)
+- Official Docs: [Deno documentation](https://deno.land/)
+- Source code: [Deno source code](https://github.com/denoland/deno)
 - License: [MIT](https://github.com/denoland/deno/blob/main/LICENSE.md)
 - Language: TypeScript / Rust
 
@@ -104,14 +104,14 @@ A RESTful API for managing your Postgres. Fetch tables, add roles, and run queri
 
 A cloud-native, multi-tenant Postgres connection pooler.
 
-- Official Docs: [Supavisor Github Pages](https://supabase.github.io/supavisor/)
-- Source code: [supabase/supavisor](https://github.com/supabase/supavisor)
+- Official Docs: [Supavisor GitHub Pages](https://supabase.github.io/supavisor/)
+- Source code: [`supabase/supavisor`](https://github.com/supabase/supavisor)
 - License: [Apache 2.0](https://github.com/supabase/supavisor/blob/main/LICENSE)
 - Language: Elixir
 
 ### Kong (API gateway)
 
-A cloud-native API gateway, built on top of Nginx.
+A cloud-native API gateway, built on top of NGINX.
 
 - Official Docs: [docs.konghq.com](https://docs.konghq.com/)
 - Source code: [github.com/kong/kong](https://github.com/kong/kong)
@@ -144,7 +144,7 @@ Less, but better.
 ### Everything is portable
 
 To avoid lock-in, we make it easy to migrate in and out. Our cloud offering is compatible with our self-hosted product.
-We use existing standards to increase portability (like pg_dump and CSV files). If a new standard emerges which competes with a "Supabase" approach, we will deprecate the approach in favor of the standard.
+We use existing standards to increase portability (like `pg_dump` and CSV files). If a new standard emerges which competes with a "Supabase" approach, we will deprecate the approach in favor of the standard.
 This forces us compete on experience. We aim to be the best Postgres hosting service.
 
 ### Play the long game

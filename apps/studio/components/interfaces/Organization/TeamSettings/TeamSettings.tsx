@@ -10,7 +10,7 @@ import {
   ScaffoldFilterAndContent,
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
