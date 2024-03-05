@@ -6,8 +6,6 @@ info:
   description: |
 
     Supabase Dart.
-
-  definition: spec/enrichments/tsdoc_v2/combined.json
   slugPrefix: '/'
   specUrl: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_dart_v2.yml
   libraries:
@@ -23,7 +21,41 @@ functions:
 
       The Supabase client is your entrypoint to the rest of the Supabase functionality
       and is the easiest way to interact with everything we offer within the Supabase ecosystem.
-
+    params:
+      - name: url
+        isOptional: false
+        type: string
+        description: The unique Supabase URL which is supplied when you create a new project in your project dashboard.
+      - name: anonKey
+        isOptional: false
+        type: string
+        description: The unique Supabase Key which is supplied when you create a new project in your project dashboard.
+      - name: authOptions
+        isOptional: true
+        type: FlutterAuthClientOptions
+        description: Options to change the Auth behaviors.
+        subContent:
+          - name: authFlowType
+            isOptional: true
+            type: AuthFlowType
+            description: Whether to use the `pkce` flow or the `implicit` flow. Defaults to `pkce`.
+          - name: localStorage
+            isOptional: true
+            type: LocalStorage
+            description: Parameter to override the local storage to store auth tokens.
+          - name: autoRefreshToken
+            isOptional: true
+            type: boolean
+            description: Whether to automatically refresh the token when it expires. Defaults to `true`.
+      - name: realtimeClientOptions
+        isOptional: true
+        type: RealtimeClientOptions
+        description: Options to change the Realtime behaviors.
+        subContent:
+          - name: logLevel
+            isOptional: true
+            type: RealtimeLogLevel
+            description: Level of realtime server logs to to be logged.
     examples:
       - id: flutter-initialize
         name: For Flutter

@@ -5,7 +5,7 @@ import { LogsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const LogsPage: NextPageWithLayout = () => {
   const { project } = useProjectContext()

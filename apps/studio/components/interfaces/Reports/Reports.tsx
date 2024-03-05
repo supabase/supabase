@@ -24,7 +24,7 @@ import {
 
 import { useParams } from 'common/hooks'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
-import Loading from 'components/ui/Loading'
+import { Loading } from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
 import { METRICS, METRIC_CATEGORIES, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'

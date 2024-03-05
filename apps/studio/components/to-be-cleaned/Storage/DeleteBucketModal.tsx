@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useBucketDeleteMutation } from 'data/storage/bucket-delete-mutation'

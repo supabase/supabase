@@ -1,10 +1,10 @@
-import { OAuthScope } from '@supabase/shared-types/out/constants'
+import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
 import { put } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { oauthAppKeys } from './keys'
 
 export type OAuthAppUpdateVariables = {

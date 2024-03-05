@@ -9,7 +9,7 @@ import { useRouter } from 'next/router'
 import { parseSupaTable, SupabaseGrid, SupaTable } from 'components/grid'
 import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Connecting from 'components/ui/Loading/Loading'
+import { Loading } from 'components/ui/Loading'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import {
   ForeignKeyConstraint,
@@ -20,15 +20,15 @@ import { sqlKeys } from 'data/sql/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { useCheckPermissions, useLatest, useStore, useUrlState } from 'hooks'
 import useEntityType from 'hooks/misc/useEntityType'
-import { TableLike } from 'hooks/misc/useTable'
+import type { TableLike } from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { EMPTY_ARR } from 'lib/void'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { Dictionary, SchemaView } from 'types'
+import type { Dictionary, SchemaView } from 'types'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
-import SidePanelEditor from './SidePanelEditor'
+import { SidePanelEditor } from './SidePanelEditor'
 import { useEncryptedColumns } from './SidePanelEditor/SidePanelEditor.utils'
 import TableDefinition from './TableDefinition'
 
@@ -134,7 +134,7 @@ const TableGridEditor = ({
 
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable) {
-    return <Connecting />
+    return <Loading />
   }
 
   if (isUndefined(selectedTable)) {

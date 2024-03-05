@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useTheme } from 'next-themes'
 import { useWindowSize } from 'react-use'
 
-import { Announcement, Button, IPV4Banner, cn } from 'ui'
+import { Button, cn } from 'ui'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -64,9 +64,6 @@ const Nav = (props: Props) => {
 
   return (
     <>
-      <Announcement dismissable={false} show>
-        <IPV4Banner />
-      </Announcement>
       <div
         className={cn('sticky top-0 z-40 transform', isLaunchWeekXPage && 'relative')}
         style={{ transform: 'translate3d(0,0,999px)' }}
@@ -94,10 +91,19 @@ const Nav = (props: Props) => {
                     className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
                   >
                     <Image
-                      src={showDarkLogo ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
+                      src={supabaseLogoWordmarkLight}
                       width={124}
                       height={24}
                       alt="Supabase Logo"
+                      className="dark:hidden"
+                      priority
+                    />
+                    <Image
+                      src={supabaseLogoWordmarkDark}
+                      width={124}
+                      height={24}
+                      alt="Supabase Logo"
+                      className="hidden dark:block"
                       priority
                     />
                   </Link>

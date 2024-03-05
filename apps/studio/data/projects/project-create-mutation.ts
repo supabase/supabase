@@ -1,10 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { components } from 'data/api'
+import type { components } from 'data/api'
 import { post } from 'data/fetchers'
-import { PRICING_TIER_PRODUCT_IDS, PROVIDERS } from 'lib/constants'
-import { ResponseError } from 'types'
+import { PROVIDERS } from 'lib/constants'
+import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
 
 export type DbInstanceSize = components['schemas']['DesiredInstanceSize']

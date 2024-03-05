@@ -11,8 +11,8 @@ import {
   SidePanel,
 } from 'ui'
 
-import { PostgresTable } from '@supabase/postgres-meta'
-import { SpreadsheetData } from './SpreadsheetImport.types'
+import type { PostgresTable } from '@supabase/postgres-meta'
+import type { SpreadsheetData } from './SpreadsheetImport.types'
 import SpreadsheetPreviewGrid from './SpreadsheetPreviewGrid'
 
 const MAX_ROWS = 20

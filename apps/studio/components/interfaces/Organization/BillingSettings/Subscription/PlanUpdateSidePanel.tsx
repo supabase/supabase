@@ -15,7 +15,7 @@ import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/or
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { OrgPlan, SubscriptionTier } from 'data/subscriptions/types'
+import type { OrgPlan, SubscriptionTier } from 'data/subscriptions/types'
 import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import Telemetry from 'lib/telemetry'

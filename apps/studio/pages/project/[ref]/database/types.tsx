@@ -9,7 +9,7 @@ import {
   ScaffoldSectionContent,
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const DatabaseEnumeratedTypes: NextPageWithLayout = () => {
   return (

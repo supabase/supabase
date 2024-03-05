@@ -104,17 +104,28 @@ const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
     }
   }
 
+  function onCopyAsJSON() {
+    if (navigator) {
+      if (!result || !result.rows) return 'results is empty'
+      if (result.rows.constructor !== Array && !!result.error) return result.error
+      if (result.rows.length == 0) return 'results is empty'
+
+      copyToClipboard(JSON.stringify(result.rows, null, 2), () => {
+        ui.setNotification({ category: 'success', message: 'Copied results to clipboard' })
+        Telemetry.sendEvent(
+          { category: 'sql_editor', action: 'sql_copy_as_json', label: '' },
+          telemetryProps,
+          router
+        )
+      })
+    }
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button type="text" iconRight={<IconChevronDown />}>
-          <span>
-            Results
-            {!isExecuting &&
-              result &&
-              result.rows.length > 0 &&
-              ` (${result.rows.length.toLocaleString()})`}
-          </span>
+          Export
         </Button>
       </DropdownMenuTrigger>
 
@@ -135,6 +146,10 @@ const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
           <DropdownMenuItem onClick={onCopyAsMarkdown} className="space-x-2">
             <IconClipboard size="tiny" />
             <p>Copy as markdown</p>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onCopyAsJSON} className="space-x-2">
+            <IconClipboard size="tiny" />
+            <p>Copy as JSON</p>
           </DropdownMenuItem>
         </>
       </DropdownMenuContent>
