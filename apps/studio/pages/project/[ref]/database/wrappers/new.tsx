@@ -4,7 +4,7 @@ import { CreateWrapper } from 'components/interfaces/Database'
 import { DatabaseLayout } from 'components/layouts'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const DatabaseWrappersNew: NextPageWithLayout = () => {
   const canCreateWrappers = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')

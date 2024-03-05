@@ -17,7 +17,7 @@ toc_depth: 3
 Recommending relevant content to the user is essential to keep the user interested in the app. Although it is a common feature that we would like to have in our apps, building it is not straightforward. This changed as vector databases and Open AI emerged. Today, we can perform semantic searches that are highly aware of the context of the content with just a single query into our vector database.
 In this article, we will go over how you can create a Flutter movie-viewing app that recommends another movie based on what the user is viewing.
 
-A quick disclaimer, this article provides an overview of what you can build with a vector database, so it will not go into every detail of the implementation. You can find the full code base of the app in this article [here](https://github.com/dshukertjr/flutter-movie-recommendation) to find more details.
+A quick disclaimer, this article provides an overview of what you can build with a vector database, so it will not go into every detail of the implementation. You can find the full code base of the app in this article [here](https://github.com/dshukertjr/examples/tree/main/movie-recommendation) to find more details.
 
 ## Why use a vector database for recommending content
 
@@ -75,7 +75,7 @@ create policy "Fils are public." on public.films for select using (true);
 
 Getting movie data is relatively straightforward. TMDB API provides an easy-to-use [movies endpoint](https://developer.themoviedb.org/reference/discover-movie) for querying information about movies while providing a wide range of filters to narrow down the query results.
 
-We need a backend to securely call the API, and for that, we will use [Supabase Edge Functions](https://supabase.com/docs/guides/functions). Steps 2 through 4 will be constructing this edge function code, and the full code sample can be found [here](https://github.com/dshukertjr/flutter-movie-recommendation/blob/main/supabase/functions/get_film_data/index.ts).
+We need a backend to securely call the API, and for that, we will use [Supabase Edge Functions](https://supabase.com/docs/guides/functions). Steps 2 through 4 will be constructing this edge function code, and the full code sample can be found [here](https://github.com/dshukertjr/examples/blob/main/movie-recommendation/supabase/functions/get_film_data/index.ts).
 
 The following code will give us the top 20 most popular movies in a given year.
 
@@ -145,7 +145,7 @@ const embedding = responseData.data[0].embedding
 
 Once we have the movie data as well as embedding data, we are left with the task of storing them. We can call the `upsert()` function on the Supabase client to easily store the data.
 
-Again, I omitted a lot of code here for simplicity, but you can find the full edge functions code of step 2 through step 4 [here](https://github.com/dshukertjr/flutter-movie-recommendation/blob/main/supabase/functions/get_film_data/index.ts).
+Again, I omitted a lot of code here for simplicity, but you can find the full edge functions code of step 2 through step 4 [here](https://github.com/dshukertjr/examples/blob/main/movie-recommendation/supabase/functions/get_film_data/index.ts).
 
 ```tsx
 // Code from Step 2
@@ -195,7 +195,7 @@ $$ security invoker;
 
 ### Step 6: Create the Flutter interface
 
-Now that we have the backend ready, all we need to do is create an interface to display and query the data from. Since the main focus of this article is to demonstrate similarity search using vectors, I will not go into all the details of the Flutter implementations, but you can find the full code base [here](https://github.com/dshukertjr/flutter-movie-recommendation/tree/main/flutter).
+Now that we have the backend ready, all we need to do is create an interface to display and query the data from. Since the main focus of this article is to demonstrate similarity search using vectors, I will not go into all the details of the Flutter implementations, but you can find the full code base [here](https://github.com/dshukertjr/examples/tree/main/movie-recommendation/flutter).
 
 Our app will have the following pages:
 
@@ -392,7 +392,7 @@ In this article, we looked at how we could take a single movie, and recommend a 
 
 ## Resources
 
-- [The full code base of the app in this article](https://github.com/dshukertjr/flutter-movie-recommendation)
+- [The full code base of the app in this article](https://github.com/dshukertjr/examples/tree/main/movie-recommendation)
 - [Matryoshka embeddings: faster OpenAI vector search using Adaptive Retrieval](https://supabase.com/blog/matryoshka-embeddings)
 - [Supabase pgvector guide](https://supabase.com/docs/guides/database/extensions/pgvector)
 - [Storing OpenAI embeddings in Postgres with pgvector](https://supabase.com/docs/guides/database/extensions/pgvector)

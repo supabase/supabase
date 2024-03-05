@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { useOAuthAppDeleteMutation } from 'data/oauth/oauth-app-delete-mutation'
-import { OAuthApp } from 'data/oauth/oauth-apps-query'
+import type { OAuthApp } from 'data/oauth/oauth-apps-query'
 import { useStore } from 'hooks'
 import { Alert, IconLock, Modal } from 'ui'
 

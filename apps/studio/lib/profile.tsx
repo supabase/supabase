@@ -5,10 +5,10 @@ import { useIsLoggedIn, useTelemetryProps } from 'common'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useProfileCreateMutation } from 'data/profile/profile-create-mutation'
 import { useProfileQuery } from 'data/profile/profile-query'
-import { Profile } from 'data/profile/types'
+import type { Profile } from 'data/profile/types'
 import { useStore } from 'hooks'
 import Telemetry from 'lib/telemetry'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type ProfileContextType = {
   profile: Profile | undefined

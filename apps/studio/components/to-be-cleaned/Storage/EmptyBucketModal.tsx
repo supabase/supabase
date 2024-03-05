@@ -1,9 +1,9 @@
 import { useParams } from 'common'
 import toast from 'react-hot-toast'
 
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useBucketEmptyMutation } from 'data/storage/bucket-empty-mutation'
-import { Bucket } from 'data/storage/buckets-query'
+import type { Bucket } from 'data/storage/buckets-query'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import {
   AlertDescription_Shadcn_,

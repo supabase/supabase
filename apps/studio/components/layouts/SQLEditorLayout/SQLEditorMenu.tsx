@@ -24,7 +24,7 @@ import {
 
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { WarningIcon } from 'components/ui/Icons'
 import ProductMenuItem from 'components/ui/ProductMenu/ProductMenuItem'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'

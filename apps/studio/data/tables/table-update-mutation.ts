@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { components } from 'data/api'
+import type { components } from 'data/api'
 import { handleError, patch } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { tableKeys } from './keys'
 
 export type UpdateTableBody = components['schemas']['UpdateTableBody']

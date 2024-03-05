@@ -4,7 +4,7 @@ import { PropsWithChildren, useMemo } from 'react'
 
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
-import { ProjectLayoutWithAuth } from '../'
+import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
 import TableEditorMenu from './TableEditorMenu'
 
 const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {

@@ -22,7 +22,7 @@ import {
   Modal,
   Toggle,
 } from 'ui'
-import { StorageBucket } from './Storage.types'
+import type { StorageBucket } from './Storage.types'
 
 export interface EditBucketModalProps {
   visible: boolean

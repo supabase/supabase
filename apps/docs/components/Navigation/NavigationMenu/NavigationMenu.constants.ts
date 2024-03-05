@@ -613,6 +613,10 @@ export const auth = {
           name: 'Column Level Security',
           url: '/guides/auth/column-level-security',
         },
+        {
+          name: 'Custom Claims & RBAC',
+          url: '/guides/auth/custom-claims-and-role-based-access-control-rbac',
+        },
       ],
     },
     {
@@ -1660,6 +1664,24 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/sso/gsuite',
         },
         { name: 'SSO with Okta', url: '/guides/platform/sso/okta' },
+      ],
+    },
+    {
+      name: 'Terraform',
+      url: undefined,
+      items: [
+        {
+          name: 'Terraform Provider',
+          url: '/guides/platform/terraform',
+        },
+        {
+          name: 'Terraform Tutorial',
+          url: '/guides/platform/terraform/tutorial',
+        },
+        {
+          name: 'Reference',
+          url: '/guides/platform/terraform/reference',
+        },
       ],
     },
     {
