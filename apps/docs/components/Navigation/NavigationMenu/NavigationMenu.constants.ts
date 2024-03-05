@@ -264,7 +264,7 @@ export const gettingstarted: NavMenuConstant = {
       ],
     },
     {
-      name: 'Web app tutorials',
+      name: 'Web app demos',
       items: [
         {
           name: 'Next.js',
