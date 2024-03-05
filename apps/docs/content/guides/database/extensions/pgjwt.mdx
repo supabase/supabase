@@ -4,7 +4,7 @@ title: 'pgjwt: JSON Web Tokens'
 description: 'Encode and decode JWTs in PostgreSQL'
 ---
 
-The [pgjwt](https://github.com/michelp/pgjwt) (PostgreSQL JSON Web Token) extension allows you to create and parse [JSON Web Tokens (JWTs)](https://en.wikipedia.org/wiki/JSON_Web_Token) within a PostgreSQL database. JWTs are commonly used for authentication and authorization in web applications and services.
+The [`pgjwt`](https://github.com/michelp/pgjwt) (PostgreSQL JSON Web Token) extension allows you to create and parse [JSON Web Tokens (JWTs)](https://en.wikipedia.org/wiki/JSON_Web_Token) within a PostgreSQL database. JWTs are commonly used for authentication and authorization in web applications and services.
 
 ## Enable the extension
 
@@ -19,7 +19,7 @@ The [pgjwt](https://github.com/michelp/pgjwt) (PostgreSQL JSON Web Token) extens
 
 1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
-3. Search for "pgjwt" and enable the extension.
+3. Search for `pgjwt` and enable the extension.
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
@@ -33,7 +33,7 @@ create extension pgjwt schema extensions;
 drop extension if exists pgjwt;
 ```
 
-Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+Even though the SQL code is `create extension`, this is the equivalent of enabling the extension.
 To disable an extension you can call `drop extension`.
 
 It's good practice to create the extension within a separate schema (like `extensions`) to keep the `public` schema clean.
@@ -67,7 +67,7 @@ select
   );
 ```
 
-The pgjwt_encode function returns a string that represents the JWT, which can then be safely transmitted between parties.
+The `pgjwt_encode` function returns a string that represents the JWT, which can then be safely transmitted between parties.
 
 {/* prettier-ignore */}
 ```

@@ -264,7 +264,7 @@ export const gettingstarted: NavMenuConstant = {
       ],
     },
     {
-      name: 'Web app tutorials',
+      name: 'Web app demos',
       items: [
         {
           name: 'Next.js',
@@ -491,6 +491,12 @@ export const PhoneLoginsItems = [
       'Vonage is a communication platform as a service (CPaaS) provider for consumers and businesses.',
     isDarkMode: true,
     hasLightIcon: true,
+  },
+  {
+    name: 'Textlocal SMS Login (Community Supported)',
+    icon: '/docs/img/icons/textlocal-icon',
+    url: '/guides/auth/phone-login/textlocal',
+    linkDescription: 'Textlocal is a cloud-based SMS platform offering bulk messaging services.',
   },
 ]
 

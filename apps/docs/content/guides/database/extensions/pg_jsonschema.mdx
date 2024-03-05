@@ -19,7 +19,7 @@ description: 'Validate json/jsonb with JSON Schema in PostgreSQL.'
 
 1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
-3. Search for "pg_jsonschema" and enable the extension.
+3. Search for `pg_jsonschema` and enable the extension.
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
@@ -33,7 +33,7 @@ create extension pg_jsonschema with schema extensions;
 drop extension if exists pg_jsonschema;
 ```
 
-Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+Even though the SQL code is `create extension`, this is the equivalent of enabling the extension.
 To disable an extension you can call `drop extension`.
 
 It's good practice to create the extension within a separate schema (like `extensions`) to keep the `public` schema clean.

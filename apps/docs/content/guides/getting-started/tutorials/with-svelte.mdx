@@ -117,7 +117,7 @@ Let's set up a Svelte component to manage logins and sign ups. We'll use Magic L
 After a user is signed in we can allow them to edit their profile details and manage their account.
 Let's create a new component for that called `Account.svelte`.
 
-```html src/lib/Account.svelte
+```tsx src/lib/Account.svelte
 <script lang="ts">
   import { onMount } from 'svelte'
   import type { AuthSession } from '@supabase/supabase-js'
@@ -204,8 +204,7 @@ Let's create a new component for that called `Account.svelte`.
       {loading ? 'Saving ...' : 'Update profile'}
     </button>
   </div>
-  <button type="button" class="button block" on:click="{()" ="">
-    supabase.auth.signOut()}> Sign Out
+  <button type="button" class="button block" on:click={() => supabase.auth.signOut()}> Sign Out
   </button>
 </form>
 ```

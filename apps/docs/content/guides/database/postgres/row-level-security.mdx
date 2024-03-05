@@ -11,7 +11,7 @@ When you need granular authorization rules, nothing beats Postgres's [Row Level 
 
 RLS is incredibly powerful and flexible, allowing you to write complex SQL rules that fit your unique business needs. RLS can be [combined with Supabase Auth](/docs/guides/auth/row-level-security) for end-to-end user security from the browser to the database.
 
-RLS is a Postgres primitive and can provide "[defense in depth](<https://en.wikipedia.org/wiki/Defense_in_depth_(computing)>)" to protect your data from malicious actors even when accessed through 3rd party tooling.
+RLS is a Postgres primitive and can provide "[defense in depth](<https://en.wikipedia.org/wiki/Defense_in_depth_(computing)>)" to protect your data from malicious actors even when accessed through third-party tooling.
 
 ## Policies
 
@@ -219,7 +219,7 @@ to authenticated
 using ( (select auth.uid()) = user_id );
 ```
 
-This method works well for JWT functions like `auth.uid()` and `auth.jwt()` as well as `security definer` Functions. Wrapping the function causes an initPlan to be run by the Postgres optimizer, which allows it to "cache" the results per-statement, rather than calling the function on each row.
+This method works well for JWT functions like `auth.uid()` and `auth.jwt()` as well as `security definer` Functions. Wrapping the function causes an `initPlan` to be run by the Postgres optimizer, which allows it to "cache" the results per-statement, rather than calling the function on each row.
 
 <Admonition type="caution">
 
@@ -239,7 +239,7 @@ You can only use this technique if the results of the query or function do not c
 
 ### Add filters to every query
 
-Policies are "implicit where clauses", so it's common to run `select` statements without any filters. This is a bad pattern for performance. Instead of doing this (JS client example):
+Policies are "implicit where clauses," so it's common to run `select` statements without any filters. This is a bad pattern for performance. Instead of doing this (JS client example):
 
 {/* prettier-ignore */}
 ```js
