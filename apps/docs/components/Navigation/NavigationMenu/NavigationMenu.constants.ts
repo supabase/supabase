@@ -264,7 +264,7 @@ export const gettingstarted: NavMenuConstant = {
       ],
     },
     {
-      name: 'Web app tutorials',
+      name: 'Web app demos',
       items: [
         {
           name: 'Next.js',
@@ -492,6 +492,12 @@ export const PhoneLoginsItems = [
     isDarkMode: true,
     hasLightIcon: true,
   },
+  {
+    name: 'Textlocal SMS Login (Community Supported)',
+    icon: '/docs/img/icons/textlocal-icon',
+    url: '/guides/auth/phone-login/textlocal',
+    linkDescription: 'Textlocal is a cloud-based SMS platform offering bulk messaging services.',
+  },
 ]
 
 export const auth = {
@@ -606,6 +612,10 @@ export const auth = {
         {
           name: 'Column Level Security',
           url: '/guides/auth/column-level-security',
+        },
+        {
+          name: 'Custom Claims & RBAC',
+          url: '/guides/auth/custom-claims-and-role-based-access-control-rbac',
         },
       ],
     },

@@ -1,14 +1,11 @@
-// @ts-ignore
-import { stripIndent } from 'common-tags'
-
-import { removeCommentsFromSql } from 'lib/helpers'
-import type { SqlSnippets, UserContent } from 'types'
 import {
   NEW_SQL_SNIPPET_SKELETON,
   destructiveSqlRegex,
   sqlAiDisclaimerComment,
 } from './SQLEditor.constants'
+import type { SqlSnippets, UserContent } from 'types'
 import { ContentDiff, DiffType } from './SQLEditor.types'
+import { removeCommentsFromSql } from 'lib/helpers'
 
 export const createSqlSnippetSkeleton = ({
   id,
@@ -67,19 +64,19 @@ export function checkDestructiveQuery(sql: string) {
   return destructiveSqlRegex.some((regex) => regex.test(removeCommentsFromSql(sql)))
 }
 
-export const generateMigrationCliCommand = (id: string, name: string, isNpx = false) => stripIndent`
-  ${isNpx ? 'npx ' : ''}supabase snippets download ${id} |
-      ${isNpx ? 'npx ' : ''}supabase migration new ${name}
+export const generateMigrationCliCommand = (id: string, name: string, isNpx = false) => `
+${isNpx ? 'npx ' : ''}supabase snippets download ${id} |
+${isNpx ? 'npx ' : ''}supabase migration new ${name}
 `
 
-export const generateSeedCliCommand = (id: string, isNpx = false) => stripIndent`
-  ${isNpx ? 'npx ' : ''}supabase snippets download ${id} >> \\
-      supabase/seed.sql
+export const generateSeedCliCommand = (id: string, isNpx = false) => `
+${isNpx ? 'npx ' : ''}supabase snippets download ${id} >> \\
+  supabase/seed.sql
 `
 
-export const generateFileCliCommand = (id: string, name: string, isNpx = false) => stripIndent`
-  ${isNpx ? 'npx ' : ''}supabase snippets download ${id} > \\
-      ${name}.sql
+export const generateFileCliCommand = (id: string, name: string, isNpx = false) => `
+${isNpx ? 'npx ' : ''}supabase snippets download ${id} > \\
+  ${name}.sql
 `
 
 export const compareAsModification = (sqlDiff: ContentDiff) => {

@@ -90,7 +90,7 @@ VITE_SUPABASE_URL=YOUR_SUPABASE_URL
 VITE_SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
 ```
 
-The `supabaseClient` will be used in fetch calls to Supabase endpoints from our app. As we'll see below, the client is instrumental in implementing authentication using refine's auth provider methods and CRUD actions with appropriate data provider methods.
+The `supabaseClient` will be used in fetch calls to Supabase endpoints from our app. As we'll see below, the client is instrumental in implementing authentication using Refine's auth provider methods and CRUD actions with appropriate data provider methods.
 
 One optional step is to update the CSS file `src/App.css` to make the app look nice.
 You can find the full contents of this file [here](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/refine-user-management/src/App.css).
@@ -404,7 +404,7 @@ Notice above that, we are using three refine hooks, namely the [`useGetIdentity(
 
 `useForm()`, in contrast, is a data hook that exposes a series of useful objects that serve the edit form. For example, we are grabbing the `onFinish` function to submit the form with the `handleSubmit` event handler. We are also using `formLoading` property to present state changes of the submitted form.
 
-The `useForm()` hook is a higher-level hook built on top of refine's `useForm()` core hook. It fully supports form state management, field validation and submission using React Hook Form. Behind the scenes, it invokes the `dataProvider.getOne` method to get the user profile data from our Supabase `/profiles` endpoint and also invokes `dataProvider.update` method when `onFinish()` is called.
+The `useForm()` hook is a higher-level hook built on top of Refine's `useForm()` core hook. It fully supports form state management, field validation and submission using React Hook Form. Behind the scenes, it invokes the `dataProvider.getOne` method to get the user profile data from our Supabase `/profiles` endpoint and also invokes `dataProvider.update` method when `onFinish()` is called.
 
 ### Launch!
 
