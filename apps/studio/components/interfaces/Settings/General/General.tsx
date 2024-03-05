@@ -5,9 +5,13 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
   Form,
   IconAlertCircle,
   IconBarChart2,
+  IconChevronDown,
   Input,
 } from 'ui'
 
@@ -41,6 +45,13 @@ const General = () => {
   // Also doubles up as a feature flag to enable display of the related alert,
   // another dedicated flag would be redundant.
   const v2AnnouncementUrl = useFlag('v2AnnouncementUrl')
+
+  const v2MaintenanceWindow = project?.v2MaintenanceWindow
+  const v2MaintenanceDate = v2MaintenanceWindow?.start
+    ? new Date(v2MaintenanceWindow.start).toUTCString().slice(0, 16)
+    : undefined
+  const v2MaintenanceStartTime = v2MaintenanceWindow?.start?.substring(11, 16)
+  const v2MaintenanceEndTime = v2MaintenanceWindow?.end?.substring(11, 16)
 
   const parentProject = useProjectByRef(project?.parent_project_ref)
   const isBranch = parentProject !== undefined
@@ -131,32 +142,53 @@ const General = () => {
           <div className="mt-6" id="restart-project">
             <FormPanel>
               <div className="flex flex-col px-8 py-4">
-                {project?.v2MaintenanceWindow && v2AnnouncementUrl !== 'https://' && (
-                  <Alert_Shadcn_ variant="warning" className="mb-4">
-                    <IconAlertCircle strokeWidth={2} />
-                    <AlertTitle_Shadcn_>Migration to v2 platform architecture</AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      Your project has been scheduled for{' '}
-                      <a href={v2AnnouncementUrl}>migration to v2 platform architecture</a>, which
-                      requires a restart.
-                      <br />
-                      <br />
-                      If you don't take any action, we plan to do the restart automatically during
-                      the following 30-minute maintenance window, where your project has
-                      historically had the least database queries across the previous 10 weeks:
-                      <br />
-                      <br />
-                      {project.v2MaintenanceWindow.start?.substring(0, 10)}{' '}
-                      {project.v2MaintenanceWindow.start?.substring(11, 16)} to{' '}
-                      {project.v2MaintenanceWindow.end?.substring(11, 16)} UTC
-                      <br />
-                      <br />
-                      Any time before the maintenance window, you may choose to restart your project
-                      yourself from here, at a time most convenient for you. Your project will be
-                      restarted on v2 architecture.
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                )}
+                {v2MaintenanceStartTime &&
+                  v2MaintenanceEndTime &&
+                  v2AnnouncementUrl !== 'https://' && (
+                    <Alert_Shadcn_ variant="warning" className="mb-4">
+                      <IconAlertCircle strokeWidth={2} />
+                      <AlertTitle_Shadcn_>Upcoming project restart scheduled</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        This project will automatically restart on {v2MaintenanceDate} between{' '}
+                        {v2MaintenanceStartTime} and {v2MaintenanceEndTime} UTC, which will cause up
+                        to a few minutes of downtime.
+                        <Collapsible_Shadcn_ className="my-2">
+                          <CollapsibleTrigger_Shadcn_ className="group font-normal p-0 [&[data-state=open]>div>svg]:!-rotate-180">
+                            <div className="flex items-center gap-x-2 w-full">
+                              <p className="text-xs text-foreground-light group-hover:text-foreground transition">
+                                Why this time?
+                              </p>
+                              <IconChevronDown
+                                className="transition-transform duration-200"
+                                strokeWidth={1.5}
+                                size={14}
+                              />
+                            </div>
+                          </CollapsibleTrigger_Shadcn_>
+                          <CollapsibleContent_Shadcn_>
+                            Your project has historically had the least database queries across the
+                            previous 10 weeks during this 30 minute window.
+                          </CollapsibleContent_Shadcn_>
+                        </Collapsible_Shadcn_>
+                        You may also manually restart this project anytime before{' '}
+                        {v2MaintenanceDate} {v2MaintenanceStartTime} UTC at a time that is
+                        convenient for you.
+                        <br />
+                        <br />
+                        <em>
+                          <a
+                            href={v2AnnouncementUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline"
+                          >
+                            Find out more
+                          </a>{' '}
+                          about our v2 platform architecture migration.
+                        </em>
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  )}
                 <div className="flex justify-between">
                   <div>
                     <p className="text-sm">Restart project</p>
