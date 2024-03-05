@@ -403,6 +403,28 @@ const SQLEditor = () => {
     [profile?.id, project?.id, ref, router, snap, ui]
   )
 
+  const updateEditorWithCheckForDiff = (diffType: DiffType, sql: string) => {
+    const editorModel = editorRef.current?.getModel()
+    if (!editorModel) return
+
+    setAiQueryCount((count) => count + 1)
+
+    const existingValue = editorRef.current?.getValue() ?? ''
+    if (existingValue.length === 0) {
+      editorRef.current?.executeEdits('apply-ai-message', [
+        {
+          text: `${sqlAiDisclaimerComment}\n\n${sql}`,
+          range: editorModel.getFullModelRange(),
+        },
+      ])
+    } else {
+      const currentSql = editorRef.current?.getValue()
+      const diff = { original: currentSql || '', modified: sql }
+      setSourceSqlDiff(diff)
+      setSelectedDiffType(diffType)
+    }
+  }
+
   const acceptAiHandler = useCallback(async () => {
     try {
       setIsAcceptDiffLoading(true)
@@ -986,15 +1008,7 @@ const SQLEditor = () => {
                 createdAt: new Date(),
               })
             }
-            onDiff={(diffType, sql) => {
-              setAiQueryCount((count) => count + 1)
-
-              const currentSql = editorRef.current?.getValue()
-              const diff = { original: currentSql || '', modified: sql }
-
-              setSourceSqlDiff(diff)
-              setSelectedDiffType(diffType)
-            }}
+            onDiff={updateEditorWithCheckForDiff}
             onChange={() => {}}
             onClose={() => setIsAiOpen(false)}
           />

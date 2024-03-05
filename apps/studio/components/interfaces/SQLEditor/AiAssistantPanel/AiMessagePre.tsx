@@ -1,11 +1,17 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { useTelemetryProps } from 'common'
 import { InsertCode, ReplaceCode } from 'icons'
 import { Check, Copy } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { format } from 'sql-formatter'
-import { Button, CodeBlock, cn } from 'ui'
+import {
+  Button,
+  CodeBlock,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  cn,
+} from 'ui'
 
 import Telemetry from 'lib/telemetry'
 import { DiffType } from '../SQLEditor.types'
@@ -56,8 +62,8 @@ export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps)
         hideLineNumbers
       />
       <div className="absolute top-5 right-2 bg-surface-100 border-muted border rounded-lg h-[28px] hidden group-hover:block">
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger asChild>
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_ asChild>
             <Button
               type="text"
               size="tiny"
@@ -74,25 +80,16 @@ export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps)
                 )
               }}
             >
-              <ReplaceCode className="h-4 w-4 text-foreground-light" strokeWidth={1.5} />
+              <InsertCode className="h-4 w-4 text-foreground-light" strokeWidth={1.5} />
             </Button>
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={cn([
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
-                ])}
-              >
-                <span className="text-xs text-foreground">Insert code</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger asChild>
+          </TooltipTrigger_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom" className="font-sans">
+            Insert code
+          </TooltipContent_Shadcn_>
+        </Tooltip_Shadcn_>
+
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_ asChild>
             <Button
               type="text"
               size="tiny"
@@ -109,25 +106,16 @@ export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps)
                 )
               }}
             >
-              <InsertCode className="h-4 w-4 text-foreground-light" strokeWidth={1.5} />
+              <ReplaceCode className="h-4 w-4 text-foreground-light" strokeWidth={1.5} />
             </Button>
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={cn(
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background'
-                )}
-              >
-                <span className="text-xs text-foreground">Replace code</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger asChild>
+          </TooltipTrigger_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom" className="font-sans">
+            Replace code
+          </TooltipContent_Shadcn_>
+        </Tooltip_Shadcn_>
+
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_ asChild>
             <Button
               type="text"
               size="tiny"
@@ -150,21 +138,11 @@ export const AiMessagePre = ({ onDiff, children, className }: AiMessagePreProps)
                 <Copy size={16} className="text-foreground-light" strokeWidth={1.5} />
               )}
             </Button>
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={cn(
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background'
-                )}
-              >
-                <span className="text-xs text-foreground">Copy code</span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+          </TooltipTrigger_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom" className="font-sans">
+            Copy code
+          </TooltipContent_Shadcn_>
+        </Tooltip_Shadcn_>
       </div>
     </pre>
   )
