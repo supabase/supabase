@@ -1,9 +1,6 @@
 import React from 'react'
-// @ts-ignore
-import defaultTheme from '../../../ui/src/lib/theme/defaultTheme'
 import { FormDescription_Shadcn_, FormLabel_Shadcn_, FormMessage_Shadcn_ } from 'ui'
-// @ts-ignore
-// import FormLayoutStyles from './FormLayout.module.css'
+import defaultTheme from '../../../ui/src/lib/theme/defaultTheme'
 
 type Props = {
   align?: 'left' | 'right'
@@ -30,7 +27,6 @@ export function FormLayout({
   children,
   className,
   descriptionText,
-  error,
   id,
   label,
   labelOptional,
@@ -44,23 +40,6 @@ export function FormLayout({
   afterLabel,
   nonBoxInput = label ? false : true,
 }: Props) {
-  // _error is used label && to delay the error string beind removed too soon
-  // once it has animated out, the string will be removed
-  // const [_error, _setError] = useState(error)
-
-  // useEffect(() => {
-  //   if (!error) {
-  //     console.log('no error')
-  //     setTimeout(function () {
-  //       _setError(error)
-  //     }, 500)
-  //   } else {
-  //     console.log('has error')
-  //     _setError(error)
-  //   }
-  //   // Update the document title using the browser API
-  // }, [error])
-
   const __styles = defaultTheme.form_layout
 
   const flex = layout === 'flex'
@@ -139,10 +118,7 @@ export function FormLayout({
           className={labelContainerClasses.join(' ')}
         >
           {labelled && (
-            <FormLabel_Shadcn_
-              className={[__styles.label.base, __styles.label.size[size]].join(' ')}
-              htmlFor={id}
-            >
+            <FormLabel_Shadcn_>
               {beforeLabel && (
                 <span
                   className={[__styles.label_before.base, __styles.label_before.size[size]].join(

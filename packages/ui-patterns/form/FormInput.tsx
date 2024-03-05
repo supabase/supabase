@@ -12,12 +12,12 @@ export interface Props {
   layout?: 'horizontal' | 'vertical'
   name: React.ComponentProps<typeof FormField_Shadcn_>['name']
   control: React.ComponentProps<typeof FormField_Shadcn_>['control']
-  formField: React.ComponentProps<typeof FormField_Shadcn_>
+  formField: Omit<React.ComponentProps<typeof FormField_Shadcn_>, 'ref'>
 }
 
 const FormInput = forwardRef<
   ElementRef<typeof Input>,
-  ComponentPropsWithoutRef<typeof Input> & Props
+  Omit<ComponentPropsWithoutRef<typeof Input>, 'name'> & Props
 >(
   (
     {
@@ -49,10 +49,9 @@ const FormInput = forwardRef<
               layout={layout}
               descriptionText={description}
               size={props.size}
-              {...field}
             >
               <FormControl_Shadcn_>
-                <Input ref={ref} {...props} />
+                <Input {...props} {...field} />
               </FormControl_Shadcn_>
             </FormLayout>
           </FormItem_Shadcn_>
