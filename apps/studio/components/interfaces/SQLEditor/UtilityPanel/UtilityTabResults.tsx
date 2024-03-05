@@ -139,11 +139,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
             )}
             {!hasHipaaAddon && (
               <Button
-                icon={
-                  <div className="scale-75">
-                    <AiIconAnimation className="w-3 h-3" loading={isDebugSqlLoading} />
-                  </div>
-                }
+                icon={<AiIconAnimation className="scale-75 w-3 h-3" loading={isDebugSqlLoading} />}
                 disabled={!!sqlDiff || isDebugSqlLoading}
                 onClick={async () => {
                   try {
