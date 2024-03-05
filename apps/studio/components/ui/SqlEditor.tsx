@@ -43,6 +43,18 @@ const SqlEditor = ({
         },
       })
 
+      // create custom theme
+      monaco?.editor.defineTheme('custom-theme', {
+        base: 'vs-dark',
+        inherit: true,
+        rules: [],
+        colors: {
+          'editor.foreground': '#000000'
+        },
+    });
+
+    monaco.editor.setTheme('custom-theme');
+
       return () => {
         formatprovider.dispose()
       }
@@ -87,11 +99,12 @@ const SqlEditor = ({
   }
 
   const Loading = () => <h4 className="text-lg">Loading</h4>
+  
 
   return (
     <Editor
       className="monaco-editor"
-      theme="vs-dark"
+      theme="custom-theme"
       defaultLanguage={language}
       defaultValue={defaultValue}
       path={queryId}
