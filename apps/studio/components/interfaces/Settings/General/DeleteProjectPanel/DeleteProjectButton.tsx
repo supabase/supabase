@@ -2,15 +2,16 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, DialogSectionSeparator_Shadcn_, Input } from 'ui'
+import { Button, Input } from 'ui'
+import toast from 'react-hot-toast'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 import { CANCELLATION_REASONS } from 'components/interfaces/Billing/Billing.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
 import { useProjectDeleteMutation } from 'data/projects/project-delete-mutation'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 
 export interface DeleteProjectButtonProps {
   type?: 'danger' | 'default'
@@ -18,7 +19,6 @@ export interface DeleteProjectButtonProps {
 
 const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
   const router = useRouter()
-  const { ui } = useStore()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
 
@@ -66,11 +66,7 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
     if (project === undefined) return
 
     if (!isFree && selectedReasons.length === 0) {
-      return ui.setNotification({
-        category: 'error',
-        duration: 4000,
-        message: 'Please select at least one reason for deleting your project',
-      })
+      return toast.error('Please select at least one reason for deleting your project')
     }
 
     try {
@@ -85,7 +81,7 @@ const DeleteProjectButton = ({ type = 'danger' }: DeleteProjectButtonProps) => {
         })
       }
 
-      ui.setNotification({ category: 'success', message: `Successfully deleted ${project.name}` })
+      toast.success(`Successfully deleted ${project.name}`)
       router.push(`/projects`)
     } finally {
     }
