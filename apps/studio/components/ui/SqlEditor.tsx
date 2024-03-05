@@ -1,7 +1,7 @@
 import Editor, { OnChange, useMonaco } from '@monaco-editor/react'
 import { noop } from 'lodash'
 import { useEffect, useRef } from 'react'
-
+import { useTheme } from 'next-themes';
 import { useStore } from 'hooks'
 
 // [Joshen] We should deprecate this and use CodeEditor instead
@@ -27,8 +27,12 @@ const SqlEditor = ({
   const { meta } = useStore()
   const editorRef = useRef<any>()
 
+
+  const { theme, setTheme } = useTheme();
+
   useEffect(() => {
     if (monaco) {
+
       // Enable pgsql format
       const formatprovider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
         async provideDocumentFormattingEdits(model: any) {
@@ -42,14 +46,16 @@ const SqlEditor = ({
           ]
         },
       })
-
+      
+      const prefersDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const textColor = theme === 'dark' ? '#ffffff' : (theme === 'light' ? '#000000' : (prefersDarkTheme ? '#ffffff' : '#000000'));
       // create custom theme
       monaco?.editor.defineTheme('custom-theme', {
-        base: 'vs-dark',
+        base: theme === 'dark' ? 'vs-dark' : 'vs',
         inherit: true,
         rules: [],
         colors: {
-          'editor.foreground': '#000000'
+          'editor.foreground': textColor
         },
     });
 
