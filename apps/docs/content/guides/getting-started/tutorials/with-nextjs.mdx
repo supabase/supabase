@@ -97,8 +97,11 @@ It is recommended to create the following essential utilities files for creating
 >
 
 <TabPanel id="js" label="JavaScript">
-Create a `client.js` and a `server.js` with the following functionalities for client-side Supabase and server-side Supabase, respectively. 
+
+Create a `client.js` and a `server.js` with the following functionalities for client-side Supabase and server-side Supabase, respectively.
+
 <CH.Code className="min-h-[30rem]">
+
 ```jsx utils/supabase/client.js
 import { createBrowserClient } from '@supabase/ssr'
 
@@ -153,10 +156,13 @@ export function createClient() {
 ```
 
 </CH.Code>
+
 </TabPanel>
 
 <TabPanel id="ts" label="TypeScript">
+
 <CH.Code className="min-h-[30rem]">
+
 ```tsx utils/supabase/client.ts
 import { createBrowserClient } from '@supabase/ssr'
 
@@ -211,10 +217,15 @@ export function createClient() {
 ```
 
 </CH.Code>
+
 </TabPanel>
+
 </Tabs>
+
 ### Next.js middleware
+
 Since Server Components can't write cookies, you need middleware to refresh expired Auth tokens and store them. This is accomplished by:
+
 - Refreshing the Auth token with the call to `supabase.auth.getUser`.
 - Passing the refreshed Auth token to Server Components through `request.cookies.set`, so they don't attempt to refresh the same token themselves.
 - Passing the refreshed Auth token to the browser, so it replaces the old token. This is done with `response.cookies.set`.
@@ -240,11 +251,13 @@ It's safe to trust `getUser()` because it sends a request to the Supabase Auth s
   defaultActiveId="js"
   queryGroup="language"
 >
+
 <TabPanel id="js" label="JavaScript">
 
 Create a `middleware.js` file at the project root and another one within the `utils/supabase` folder. The `utils/supabase` file contains the logic for updating the session. This is used by the `middleware.js` file, which is a Next.js convention.
 
 <CH.Code className="min-h-[30rem]">
+
 ```jsx middleware.js
 import { updateSession } from '@/utils/supabase/middleware'
 
@@ -266,6 +279,7 @@ export const config = {
   ],
 }
 ```
+
 ```jsx utils/supabase/middleware.js
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
@@ -277,69 +291,71 @@ export async function updateSession(request) {
     },
   })
 
-const supabase = createServerClient(
-process.env.NEXT_PUBLIC_SUPABASE_URL!,
-process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-{
-cookies: {
-get(name) {
-return request.cookies.get(name)?.value
-},
-set(name, value, options) {
-request.cookies.set({
-name,
-value,
-...options,
-})
-response = NextResponse.next({
-request: {
-headers: request.headers,
-},
-})
-response.cookies.set({
-name,
-value,
-...options,
-})
-},
-remove(name, options) {
-request.cookies.set({
-name,
-value: '',
-...options,
-})
-response = NextResponse.next({
-request: {
-headers: request.headers,
-},
-})
-response.cookies.set({
-name,
-value: '',
-...options,
-})
-},
-},
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        get(name) {
+          return request.cookies.get(name)?.value
+        },
+        set(name, value, options) {
+          request.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+        },
+        remove(name, options) {
+          request.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+        },
+      },
+    }
+  )
+
+  // refreshing the auth token
+  await supabase.auth.getUser()
+
+  return response
 }
-)
+```
 
-// refreshing the auth token
-await supabase.auth.getUser()
-
-return response
-}
-
-````
 </CH.Code>
 
 </TabPanel>
+
 <TabPanel id="ts" label="TypeScript">
 
 Create a `middleware.ts` file at the project root and another one within the `util/ssupbase` folder. The `utils/supabase` file contains the logic for updating the session. This is used by the `middleware.js` file, which is a Next.js convention.
 
 <CH.Code className="min-h-[30rem]">
+
 ```tsx middleware.ts
-import { type NextRequest } from 'next/server';
+import { type NextRequest } from 'next/server'
 import { updateSession } from '@/utils/supabase/middleware'
 
 export async function middleware(request: NextRequest) {
@@ -359,7 +375,7 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
-````
+```
 
 ```tsx utils/supabase/middleware.ts
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
@@ -428,6 +444,7 @@ export async function updateSession(request: NextRequest) {
 </CH.Code>
 
 </TabPanel>
+
 </Tabs>
 
 ## Set up a login page
@@ -443,8 +460,11 @@ Create a login/signup page for your application:
   defaultActiveId="js"
   queryGroup="language"
 >
+
 <TabPanel id="js" label="JavaScript">
+
 Create a new folder named `login`, containing a `page.jsx` file with a login/signup form.
+
 ```jsx app/login/page.jsx
 import { login, signup } from './actions'
 
@@ -461,10 +481,13 @@ export default function LoginPage() {
   )
 }
 ```
+
 </TabPanel>
 
 <TabPanel id="ts" label="TypeScript">
+
 Create a new folder named `login`, containing a `page.jsx` file with a login/signup form.
+
 ```tsx app/login/page.tsx
 import { login, signup } from './actions'
 
@@ -481,6 +504,7 @@ export default function LoginPage() {
   )
 }
 ```
+
 </TabPanel>
 
 </Tabs>
@@ -492,6 +516,7 @@ Navigate to `http://localhost:3000/login`. You should see your login form, but i
 - Handle any error that arises.
 
 <Admonition type="caution">
+
 Note that cookies is called before any calls to Supabase, which opts fetch calls out of Next.js's caching. This is important for authenticated data fetches, to ensure that users get access only to their own data.
 
 See the Next.js docs to learn more about [opting out of data caching](https://nextjs.org/docs/app/building-your-application/data-fetching/fetching-caching-and-revalidating#opting-out-of-data-caching).
@@ -507,7 +532,9 @@ See the Next.js docs to learn more about [opting out of data caching](https://ne
 >
 
 <TabPanel id="js" label="JavaScript">
+
 <CH.Code className="max-h-[30rem]">
+
 ```js app/login/action.js
 'use server'
 
@@ -555,20 +582,22 @@ redirect('/error')
 revalidatePath('/', 'layout')
 redirect('/account')
 }
-
-````
+```
 
 ```jsx app/error/page.jsx
 export default function ErrorPage() {
   return <p>Sorry, something went wrong</p>
 }
-````
+```
 
 </CH.Code>
+
 </TabPanel>
 
 <TabPanel id="ts" label="TypeScript">
+
 <CH.Code className="max-h-[30rem]">
+
 ```ts app/login/action.ts
 'use server'
 
@@ -580,52 +609,52 @@ import { createClient } from '@/utils/supabase/server'
 export async function login(formData: FormData) {
   const supabase = createClient()
 
-// type-casting here for convenience
-// in practice, you should validate your inputs
-const data = {
-email: formData.get('email') as string,
-password: formData.get('password') as string,
-}
+  // type-casting here for convenience
+  // in practice, you should validate your inputs
+  const data = {
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
+  }
 
-const { error } = await supabase.auth.signInWithPassword(data)
+  const { error } = await supabase.auth.signInWithPassword(data)
 
-if (error) {
-redirect('/error')
-}
+  if (error) {
+    redirect('/error')
+  }
 
-revalidatePath('/', 'layout')
-redirect('/account')
+  revalidatePath('/', 'layout')
+  redirect('/account')
 }
 
 export async function signup(formData: FormData) {
   const supabase = createClient()
 
-// type-casting here for convenience
-// in practice, you should validate your inputs
-const data = {
-email: formData.get('email') as string,
-password: formData.get('password') as string,
+  // type-casting here for convenience
+  // in practice, you should validate your inputs
+  const data = {
+    email: formData.get('email') as string,
+    password: formData.get('password') as string,
+  }
+
+  const { error } = await supabase.auth.signUp(data)
+
+  if (error) {
+    redirect('/error')
+  }
+
+  revalidatePath('/', 'layout')
+  redirect('/account')
 }
-
-const { error } = await supabase.auth.signUp(data)
-
-if (error) {
-redirect('/error')
-}
-
-revalidatePath('/', 'layout')
-redirect('/account')
-}
-
-````
+```
 
 ```tsx app/error/page.tsx
 export default function ErrorPage() {
   return <p>Sorry, something went wrong</p>
 }
-````
+```
 
 </CH.Code>
+
 </TabPanel>
 
 When you enter your email and password, you will receive an email with the title **Confirm Your Signup**. Congrats 🎉!!!
@@ -643,9 +672,9 @@ In the following code snippet, we perform the following steps:
 - Finally, we redirect the user to the `account` page.
 
 <Admonition type="tip">
-  Did you know? You could also customize emails sent out to new users, including the email's looks,
-  content, and query parameters. Check out the [settings of your
-  project](/dashboard/project/_/auth/templates).
+
+Did you know? You could also customize emails sent out to new users, including the email's looks, content, and query parameters. Check out the [settings of your project](/dashboard/project/_/auth/templates).
+
 </Admonition>
 
 <Tabs
@@ -655,6 +684,7 @@ In the following code snippet, we perform the following steps:
   defaultActiveId="js"
   queryGroup="language"
 >
+
 <TabPanel id="js" label="JavaScript">
 
 ```js app/auth/confirm/route.js
@@ -695,6 +725,7 @@ export async function GET(request) {
 ```
 
 </TabPanel>
+
 <TabPanel id="ts" label="TypeScript">
 
 ```ts app/auth/confirm/route.ts
@@ -736,6 +767,7 @@ export async function GET(request: NextRequest) {
 ```
 
 </TabPanel>
+
 </Tabs>
 
 ### Account page
@@ -751,9 +783,11 @@ Let's create a new component for that called `AccountForm` within the `app/accou
   defaultActiveId="js"
   queryGroup="language"
 >
+
 <TabPanel id="js" label="JavaScript">
 
 <CH.Code className="max-h-[40rem]">
+
 ```jsx app/account/account-form.jsx
 'use client'
 import { useCallback, useEffect, useState } from 'react'
@@ -767,9 +801,9 @@ export default function AccountForm({ user }) {
   const [website, setWebsite] = useState(null)
   const [avatar_url, setAvatarUrl] = useState(null)
 
-const getProfile = useCallback(async () => {
-try {
-setLoading(true)
+  const getProfile = useCallback(async () => {
+    try {
+      setLoading(true)
 
       const { data, error, status } = await supabase
         .from('profiles')
@@ -792,16 +826,15 @@ setLoading(true)
     } finally {
       setLoading(false)
     }
+  }, [user, supabase])
 
-}, [user, supabase])
+  useEffect(() => {
+    getProfile()
+  }, [user, getProfile])
 
-useEffect(() => {
-getProfile()
-}, [user, getProfile])
-
-async function updateProfile({ username, website, avatar_url }) {
-try {
-setLoading(true)
+  async function updateProfile({ username, website, avatar_url }) {
+    try {
+      setLoading(true)
 
       const { error } = await supabase.from('profiles').upsert({
         id: user?.id,
@@ -818,42 +851,41 @@ setLoading(true)
     } finally {
       setLoading(false)
     }
+  }
 
-}
-
-return (
-<div className="form-widget">
-<div>
-<label htmlFor="email">Email</label>
-<input id="email" type="text" value={user?.email} disabled />
-</div>
-<div>
-<label htmlFor="fullName">Full Name</label>
-<input
-id="fullName"
-type="text"
-value={fullname || ''}
-onChange={(e) => setFullname(e.target.value)}
-/>
-</div>
-<div>
-<label htmlFor="username">Username</label>
-<input
-id="username"
-type="text"
-value={username || ''}
-onChange={(e) => setUsername(e.target.value)}
-/>
-</div>
-<div>
-<label htmlFor="website">Website</label>
-<input
-id="website"
-type="url"
-value={website || ''}
-onChange={(e) => setWebsite(e.target.value)}
-/>
-</div>
+  return (
+    <div className="form-widget">
+      <div>
+        <label htmlFor="email">Email</label>
+        <input id="email" type="text" value={user?.email} disabled />
+      </div>
+      <div>
+        <label htmlFor="fullName">Full Name</label>
+        <input
+          id="fullName"
+          type="text"
+          value={fullname || ''}
+          onChange={(e) => setFullname(e.target.value)}
+        />
+      </div>
+      <div>
+        <label htmlFor="username">Username</label>
+        <input
+          id="username"
+          type="text"
+          value={username || ''}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+      </div>
+      <div>
+        <label htmlFor="website">Website</label>
+        <input
+          id="website"
+          type="url"
+          value={website || ''}
+          onChange={(e) => setWebsite(e.target.value)}
+        />
+      </div>
 
       <div>
         <button
@@ -873,17 +905,18 @@ onChange={(e) => setWebsite(e.target.value)}
         </form>
       </div>
     </div>
-
-)
+  )
 }
+```
 
-````
 </CH.Code>
 
 </TabPanel>
+
 <TabPanel id="ts" label="TypeScript">
 
 <CH.Code className="max-h-[40rem]">
+
 ```tsx app/account/account-form.tsx
 'use client'
 import { useCallback, useEffect, useState } from 'react'
@@ -1014,11 +1047,12 @@ export default function AccountForm({ user }: { user: User | null }) {
     </div>
   )
 }
-````
+```
 
 </CH.Code>
 
 </TabPanel>
+
 </Tabs>
 
 Create an account page for the `AccountForm` component we just created
@@ -1030,6 +1064,7 @@ Create an account page for the `AccountForm` component we just created
   defaultActiveId="js"
   queryGroup="language"
 >
+
 <TabPanel id="js" label="JavaScript">
 
 ```jsx app/account/page.jsx
@@ -1048,6 +1083,7 @@ export default async function Account() {
 ```
 
 </TabPanel>
+
 <TabPanel id="ts" label="TypeScript">
 
 ```tsx app/account/page.tsx
@@ -1079,6 +1115,7 @@ Let's create a route handler to handle the signout from the server side. Make su
   defaultActiveId="js"
   queryGroup="language"
 >
+
 <TabPanel id="js" label="JavaScript">
 
 ```js app/auth/signout/route.js
@@ -1106,6 +1143,7 @@ export async function POST(req) {
 ```
 
 </TabPanel>
+
 <TabPanel id="ts" label="TypeScript">
 
 ```ts app/auth/signout/route.ts
@@ -1133,6 +1171,7 @@ export async function POST(req: NextRequest) {
 ```
 
 </TabPanel>
+
 </Tabs>
 
 ### Launch!
@@ -1161,6 +1200,7 @@ Let's create an avatar widget for the user so that they can upload a profile pho
   defaultActiveId="js"
   queryGroup="language"
 >
+
 <TabPanel id="js" label="JavaScript">
 
 ```jsx app/account/avatar.jsx
@@ -1254,6 +1294,7 @@ export default function Avatar({ uid, url, size, onUpload }) {
 ```
 
 </TabPanel>
+
 <TabPanel id="ts" label="TypeScript">
 
 ```tsx app/account/avatar.tsx
@@ -1357,6 +1398,7 @@ export default function Avatar({
 ```
 
 </TabPanel>
+
 </Tabs>
 
 ### Add the new widget
@@ -1370,7 +1412,9 @@ And then we can add the widget to the `AccountForm` component:
   defaultActiveId="js"
   queryGroup="language"
 >
+
 <TabPanel id="js" label="JavaScript">
+
 ```jsx app/account/account-form.jsx
 // Import the new component
 import Avatar from './avatar'
@@ -1378,7 +1422,6 @@ import Avatar from './avatar'
 // ...
 
 return (
-
   <div className="form-widget">
     {/* Add to the body */}
     <Avatar
@@ -1394,9 +1437,11 @@ return (
   </div>
 )
 ```
+
 </TabPanel>
 
 <TabPanel id="ts" label="TypeScript">
+
 ```tsx app/account/account-form.tsx
 // Import the new component
 import Avatar from './avatar'
@@ -1404,7 +1449,6 @@ import Avatar from './avatar'
 // ...
 
 return (
-
   <div className="form-widget">
     {/* Add to the body */}
     <Avatar
@@ -1420,7 +1464,9 @@ return (
   </div>
 )
 ```
+
 </TabPanel>
+
 </Tabs>
 
 ### Storage management
