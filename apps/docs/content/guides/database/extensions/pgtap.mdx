@@ -26,7 +26,7 @@ Let's cover some basic concepts:
 
 1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
-3. Search for "pgtap" and enable the extension.
+3. Search for `pgtap` and enable the extension.
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
@@ -39,7 +39,7 @@ create extension pgtap with schema extensions;
 drop extension if exists pgtap;
 ```
 
-Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+Even though the SQL code is `create extension`, this is the equivalent of enabling the extension.
 To disable an extension you can call `drop extension`.
 
 It's good practice to create the extension within a separate schema (like `extensions`) to keep the `public` schema clean.
@@ -149,7 +149,7 @@ rollback;
 API:
 
 - [`function_returns()`](https://pgtap.org/documentation.html#function_returns): Tests that a particular function returns a particular data type
-- [`is_definer()`](https://pgtap.org/documentation.html#is_definer): Tests that a function is a security definer (i.e., a “setuid” function).
+- [`is_definer()`](https://pgtap.org/documentation.html#is_definer): Tests that a function is a security definer (that is, a `setuid` function).
 
 ## Resources
 

@@ -10,7 +10,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
-import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { sqlKeys } from 'data/sql/keys'
 import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-mutation'
@@ -20,14 +20,14 @@ import { getTables } from 'data/tables/tables-query'
 import { useStore, useUrlState } from 'hooks'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
-import { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
+import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
-import JsonEdit from './RowEditor/JsonEditor/JsonEditor'
+import JsonEditor from './RowEditor/JsonEditor/JsonEditor'
 import { TextEditor } from './RowEditor/TextEditor'
 import SchemaEditor from './SchemaEditor'
-import { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
+import type { ColumnField, CreateColumnPayload, UpdateColumnPayload } from './SidePanelEditor.types'
 import {
   createColumn,
   createTable,
@@ -37,8 +37,8 @@ import {
   updateColumn,
   updateTable,
 } from './SidePanelEditor.utils'
-import { ImportContent } from './TableEditor/TableEditor.types'
-import { Constraint } from 'data/database/constraints-query'
+import type { ImportContent } from './TableEditor/TableEditor.types'
+import type { Constraint } from 'data/database/constraints-query'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -202,11 +202,16 @@ const SidePanelEditor = ({
   const saveColumn = async (
     payload: CreateColumnPayload | UpdateColumnPayload,
     isNewRecord: boolean,
-    configuration: { columnId?: string; primaryKey?: Constraint },
+    configuration: {
+      columnId?: string
+      primaryKey?: Constraint
+      foreignKeyRelations: ForeignKey[]
+      existingForeignKeyRelations: ForeignKeyConstraint[]
+    },
     resolve: any
   ) => {
     const selectedColumnToEdit = snap.sidePanel?.type === 'column' && snap.sidePanel.column
-    const { columnId, primaryKey } = configuration
+    const { columnId, primaryKey, foreignKeyRelations, existingForeignKeyRelations } = configuration
 
     const response = isNewRecord
       ? await createColumn({
@@ -215,6 +220,7 @@ const SidePanelEditor = ({
           payload: payload as CreateColumnPayload,
           selectedTable: selectedTable as PostgresTable,
           primaryKey,
+          foreignKeyRelations,
         })
       : await updateColumn({
           projectRef: project?.ref!,
@@ -223,6 +229,8 @@ const SidePanelEditor = ({
           payload: payload as UpdateColumnPayload,
           selectedTable: selectedTable as PostgresTable,
           primaryKey,
+          foreignKeyRelations,
+          existingForeignKeyRelations,
         })
 
     if (response?.error) {
@@ -600,7 +608,7 @@ const SidePanelEditor = ({
         updateEditorDirty={() => setIsEdited(true)}
       />
       <SchemaEditor visible={snap.sidePanel?.type === 'schema'} closePanel={onClosePanel} />
-      <JsonEdit
+      <JsonEditor
         visible={snap.sidePanel?.type === 'json'}
         column={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.column) || ''}
         jsonString={(snap.sidePanel?.type === 'json' && snap.sidePanel.jsonValue.jsonString) || ''}

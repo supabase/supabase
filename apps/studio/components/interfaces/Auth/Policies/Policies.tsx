@@ -2,24 +2,23 @@ import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { useParams } from 'common/hooks'
 import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
 import { isEmpty } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useCallback, useState } from 'react'
 import toast from 'react-hot-toast'
 import { IconHelpCircle } from 'ui'
 
 import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import InformationBox from 'components/ui/InformationBox'
 import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
-import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 interface PoliciesProps {
   tables: PostgresTable[]
@@ -270,4 +269,4 @@ const Policies = ({
   )
 }
 
-export default observer(Policies)
+export default Policies

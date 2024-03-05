@@ -1,4 +1,4 @@
-import { SupaRow } from '../../types'
+import type { SupaRow } from '../../types'
 
 export interface CallbackInitialState {
   onAddColumn: (() => void) | null

@@ -1,13 +1,13 @@
 import { noop } from 'lodash'
 import { Checkbox, IconMenu, IconSettings, IconX, Input, Popover } from 'ui'
 
-import { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { EMPTY_ARR, EMPTY_OBJ } from 'lib/void'
 import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
-import { Suggestion } from '../ColumnEditor/ColumnEditor.types'
+import type { Suggestion } from '../ColumnEditor/ColumnEditor.types'
 import ColumnType from '../ColumnEditor/ColumnType'
 import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
-import { ColumnField } from '../SidePanelEditor.types'
+import type { ColumnField } from '../SidePanelEditor.types'
 
 /**
  * [Joshen] For context:

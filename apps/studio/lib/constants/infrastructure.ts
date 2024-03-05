@@ -1,4 +1,4 @@
-import { components } from 'data/api'
+import type { components } from 'data/api'
 
 export type CloudProvider = 'FLY' | 'AWS'
 export type Region = typeof AWS_REGIONS | typeof FLY_REGIONS

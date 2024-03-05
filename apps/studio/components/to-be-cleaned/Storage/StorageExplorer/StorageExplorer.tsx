@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { Bucket } from 'data/storage/buckets-query'
+import type { Bucket } from 'data/storage/buckets-query'
 import { useStore } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import { copyToClipboard } from 'lib/helpers'
