@@ -82,6 +82,7 @@ npm install @supabase/ssr
 ### Supabase utilities
 
 There are two different types of clients in Supabase:
+
 1. **Client Component client** - To access Supabase from Client Components, which run in the browser.
 2. **Server Component client** - To access Supabase from Server Components, Server Actions, and Route Handlers, which run only on the server.
 
@@ -150,6 +151,7 @@ export function createClient() {
   )
 }
 ```
+
 </CH.Code>
 </TabPanel>
 
@@ -207,6 +209,7 @@ export function createClient() {
   )
 }
 ```
+
 </CH.Code>
 </TabPanel>
 </Tabs>
@@ -217,6 +220,7 @@ Since Server Components can't write cookies, you need middleware to refresh expi
 - Passing the refreshed Auth token to the browser, so it replaces the old token. This is done with `response.cookies.set`.
 
 You could also add a matcher, so that the middleware only runs on route that access Supabase. For more information, check out this [documentation](https://nextjs.org/docs/app/building-your-application/routing/middleware#matching-paths).
+
 <Admonition type="danger">
 
 Be careful when protecting pages. The server gets the user session from the cookies, which can be spoofed by anyone.
@@ -273,58 +277,59 @@ export async function updateSession(request) {
     },
   })
 
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name) {
-          return request.cookies.get(name)?.value
-        },
-        set(name, value, options) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-        },
-        remove(name, options) {
-          request.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
-        },
-      },
-    }
-  )
-
-  // refreshing the auth token
-  await supabase.auth.getUser()
-
-  return response
+const supabase = createServerClient(
+process.env.NEXT_PUBLIC_SUPABASE_URL!,
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+{
+cookies: {
+get(name) {
+return request.cookies.get(name)?.value
+},
+set(name, value, options) {
+request.cookies.set({
+name,
+value,
+...options,
+})
+response = NextResponse.next({
+request: {
+headers: request.headers,
+},
+})
+response.cookies.set({
+name,
+value,
+...options,
+})
+},
+remove(name, options) {
+request.cookies.set({
+name,
+value: '',
+...options,
+})
+response = NextResponse.next({
+request: {
+headers: request.headers,
+},
+})
+response.cookies.set({
+name,
+value: '',
+...options,
+})
+},
+},
 }
-```
+)
+
+// refreshing the auth token
+await supabase.auth.getUser()
+
+return response
+}
+
+````
 </CH.Code>
 
 </TabPanel>
@@ -354,7 +359,8 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
-```
+````
+
 ```tsx utils/supabase/middleware.ts
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
@@ -418,6 +424,7 @@ export async function updateSession(request: NextRequest) {
   return response
 }
 ```
+
 </CH.Code>
 
 </TabPanel>
@@ -426,7 +433,9 @@ export async function updateSession(request: NextRequest) {
 ## Set up a login page
 
 ### Login and Signup form
+
 Create a login/signup page for your application:
+
 <Tabs
   scrollable
   size="small"
@@ -477,6 +486,7 @@ export default function LoginPage() {
 </Tabs>
 
 Navigate to `http://localhost:3000/login`. You should see your login form, but it's not yet hooked up to the actual login function. Next, you need to create the login/signup actions. They will:
+
 - Retrieve the user's information.
 - Send that information to Supabase as a signup request, which in turns will send a confirmation email.
 - Handle any error that arises.
@@ -485,6 +495,7 @@ Navigate to `http://localhost:3000/login`. You should see your login form, but i
 Note that cookies is called before any calls to Supabase, which opts fetch calls out of Next.js's caching. This is important for authenticated data fetches, to ensure that users get access only to their own data.
 
 See the Next.js docs to learn more about [opting out of data caching](https://nextjs.org/docs/app/building-your-application/data-fetching/fetching-caching-and-revalidating#opting-out-of-data-caching).
+
 </Admonition>
 
 <Tabs
@@ -508,49 +519,51 @@ import { createClient } from '@/utils/supabase/server'
 export async function login(formData) {
   const supabase = createClient()
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  }
+// type-casting here for convenience
+// in practice, you should validate your inputs
+const data = {
+email: formData.get('email') as string,
+password: formData.get('password') as string,
+}
 
-  const { error } = await supabase.auth.signInWithPassword(data)
+const { error } = await supabase.auth.signInWithPassword(data)
 
-  if (error) {
-    redirect('/error')
-  }
+if (error) {
+redirect('/error')
+}
 
-  revalidatePath('/', 'layout')
-  redirect('/account')
+revalidatePath('/', 'layout')
+redirect('/account')
 }
 
 export async function signup(formData) {
   const supabase = createClient()
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  }
-
-  const { error } = await supabase.auth.signUp(data)
-
-  if (error) {
-    redirect('/error')
-  }
-
-  revalidatePath('/', 'layout')
-  redirect('/account')
+// type-casting here for convenience
+// in practice, you should validate your inputs
+const data = {
+email: formData.get('email') as string,
+password: formData.get('password') as string,
 }
-```
+
+const { error } = await supabase.auth.signUp(data)
+
+if (error) {
+redirect('/error')
+}
+
+revalidatePath('/', 'layout')
+redirect('/account')
+}
+
+````
 
 ```jsx app/error/page.jsx
 export default function ErrorPage() {
   return <p>Sorry, something went wrong</p>
 }
-```
+````
+
 </CH.Code>
 </TabPanel>
 
@@ -567,49 +580,51 @@ import { createClient } from '@/utils/supabase/server'
 export async function login(formData: FormData) {
   const supabase = createClient()
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  }
+// type-casting here for convenience
+// in practice, you should validate your inputs
+const data = {
+email: formData.get('email') as string,
+password: formData.get('password') as string,
+}
 
-  const { error } = await supabase.auth.signInWithPassword(data)
+const { error } = await supabase.auth.signInWithPassword(data)
 
-  if (error) {
-    redirect('/error')
-  }
+if (error) {
+redirect('/error')
+}
 
-  revalidatePath('/', 'layout')
-  redirect('/account')
+revalidatePath('/', 'layout')
+redirect('/account')
 }
 
 export async function signup(formData: FormData) {
   const supabase = createClient()
 
-  // type-casting here for convenience
-  // in practice, you should validate your inputs
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  }
-
-  const { error } = await supabase.auth.signUp(data)
-
-  if (error) {
-    redirect('/error')
-  }
-
-  revalidatePath('/', 'layout')
-  redirect('/account')
+// type-casting here for convenience
+// in practice, you should validate your inputs
+const data = {
+email: formData.get('email') as string,
+password: formData.get('password') as string,
 }
-```
+
+const { error } = await supabase.auth.signUp(data)
+
+if (error) {
+redirect('/error')
+}
+
+revalidatePath('/', 'layout')
+redirect('/account')
+}
+
+````
 
 ```tsx app/error/page.tsx
 export default function ErrorPage() {
   return <p>Sorry, something went wrong</p>
 }
-```
+````
+
 </CH.Code>
 </TabPanel>
 
@@ -628,7 +643,9 @@ In the following code snippet, we perform the following steps:
 - Finally, we redirect the user to the `account` page.
 
 <Admonition type="tip">
-Did you know? You could also customize emails sent out to new users, including the email's looks, content, and query parameters. Check out the [settings of your project](/dashboard/project/_/auth/templates).
+  Did you know? You could also customize emails sent out to new users, including the email's looks,
+  content, and query parameters. Check out the [settings of your
+  project](/dashboard/project/_/auth/templates).
 </Admonition>
 
 <Tabs
@@ -750,9 +767,9 @@ export default function AccountForm({ user }) {
   const [website, setWebsite] = useState(null)
   const [avatar_url, setAvatarUrl] = useState(null)
 
-  const getProfile = useCallback(async () => {
-    try {
-      setLoading(true)
+const getProfile = useCallback(async () => {
+try {
+setLoading(true)
 
       const { data, error, status } = await supabase
         .from('profiles')
@@ -775,15 +792,16 @@ export default function AccountForm({ user }) {
     } finally {
       setLoading(false)
     }
-  }, [user, supabase])
 
-  useEffect(() => {
-    getProfile()
-  }, [user, getProfile])
+}, [user, supabase])
 
-  async function updateProfile({ username, website, avatar_url }) {
-    try {
-      setLoading(true)
+useEffect(() => {
+getProfile()
+}, [user, getProfile])
+
+async function updateProfile({ username, website, avatar_url }) {
+try {
+setLoading(true)
 
       const { error } = await supabase.from('profiles').upsert({
         id: user?.id,
@@ -800,41 +818,42 @@ export default function AccountForm({ user }) {
     } finally {
       setLoading(false)
     }
-  }
 
-  return (
-    <div className="form-widget">
-      <div>
-        <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={user?.email} disabled />
-      </div>
-      <div>
-        <label htmlFor="fullName">Full Name</label>
-        <input
-          id="fullName"
-          type="text"
-          value={fullname || ''}
-          onChange={(e) => setFullname(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="username">Username</label>
-        <input
-          id="username"
-          type="text"
-          value={username || ''}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="website">Website</label>
-        <input
-          id="website"
-          type="url"
-          value={website || ''}
-          onChange={(e) => setWebsite(e.target.value)}
-        />
-      </div>
+}
+
+return (
+<div className="form-widget">
+<div>
+<label htmlFor="email">Email</label>
+<input id="email" type="text" value={user?.email} disabled />
+</div>
+<div>
+<label htmlFor="fullName">Full Name</label>
+<input
+id="fullName"
+type="text"
+value={fullname || ''}
+onChange={(e) => setFullname(e.target.value)}
+/>
+</div>
+<div>
+<label htmlFor="username">Username</label>
+<input
+id="username"
+type="text"
+value={username || ''}
+onChange={(e) => setUsername(e.target.value)}
+/>
+</div>
+<div>
+<label htmlFor="website">Website</label>
+<input
+id="website"
+type="url"
+value={website || ''}
+onChange={(e) => setWebsite(e.target.value)}
+/>
+</div>
 
       <div>
         <button
@@ -854,9 +873,11 @@ export default function AccountForm({ user }) {
         </form>
       </div>
     </div>
-  )
+
+)
 }
-```
+
+````
 </CH.Code>
 
 </TabPanel>
@@ -990,10 +1011,11 @@ export default function AccountForm({ user }: { user: User | null }) {
           </button>
         </form>
       </div>
-    </div>  
+    </div>
   )
 }
-```
+````
+
 </CH.Code>
 
 </TabPanel>
@@ -1046,7 +1068,6 @@ export default async function Account() {
 </TabPanel>
 </Tabs>
 
-
 ### Sign out
 
 Let's create a route handler to handle the signout from the server side. Make sure to check if the user is logged in first!
@@ -1077,7 +1098,7 @@ export async function POST(req) {
     await supabase.auth.signOut()
   }
 
-revalidatePath('/', 'layout')
+  revalidatePath('/', 'layout')
   return NextResponse.redirect(new URL('/login', req.url), {
     status: 302,
   })
@@ -1104,7 +1125,7 @@ export async function POST(req: NextRequest) {
     await supabase.auth.signOut()
   }
 
-revalidatePath('/', 'layout')
+  revalidatePath('/', 'layout')
   return NextResponse.redirect(new URL('/login', req.url), {
     status: 302,
   })
@@ -1216,10 +1237,10 @@ export default function Avatar({ uid, url, size, onUpload }) {
           {uploading ? 'Uploading ...' : 'Upload'}
         </label>
         <input
-            style={{
-                visibility: 'hidden',
-                position: 'absolute',
-            }}
+          style={{
+            visibility: 'hidden',
+            position: 'absolute',
+          }}
           type="file"
           id="single"
           accept="image/*"
@@ -1245,7 +1266,7 @@ export default function Avatar({
   uid,
   url,
   size,
-  onUpload
+  onUpload,
 }: {
   uid: string | null
   url: string | null
@@ -1319,10 +1340,10 @@ export default function Avatar({
           {uploading ? 'Uploading ...' : 'Upload'}
         </label>
         <input
-            style={{
-                visibility: 'hidden',
-                position: 'absolute',
-            }}
+          style={{
+            visibility: 'hidden',
+            position: 'absolute',
+          }}
           type="file"
           id="single"
           accept="image/*"
@@ -1341,6 +1362,7 @@ export default function Avatar({
 ### Add the new widget
 
 And then we can add the widget to the `AccountForm` component:
+
 <Tabs
   scrollable
   size="small"
@@ -1356,6 +1378,7 @@ import Avatar from './avatar'
 // ...
 
 return (
+
   <div className="form-widget">
     {/* Add to the body */}
     <Avatar
@@ -1381,6 +1404,7 @@ import Avatar from './avatar'
 // ...
 
 return (
+
   <div className="form-widget">
     {/* Add to the body */}
     <Avatar
