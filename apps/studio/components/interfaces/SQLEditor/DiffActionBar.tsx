@@ -35,7 +35,7 @@ export const DiffActionBar = ({
           type="primary"
           size="tiny"
           icon={loading && <IconLoader className="animate-spin" size={14} />}
-          iconRight={<IconCornerDownLeft size={12} strokeWidth={1.5} className="text-foreground" />}
+          iconRight={<IconCornerDownLeft size={12} strokeWidth={1.5} />}
           onClick={onAccept}
         >
           {getDiffTypeButtonLabel(selectedDiffType)}
@@ -62,7 +62,8 @@ export const DiffActionBar = ({
       <Button
         type="alternative"
         size="tiny"
-        iconRight={<span className="text-foreground-lighter">ESC</span>}
+        className="bg-brand-300 hover:bg-brand-400 dark:bg-brand-400 dark:hover:bg-brand-500 text-brand-600 group"
+        iconRight={<span className="dark:text-brand-500 group-hover:text-brand-600">ESC</span>}
         onClick={onCancel}
       >
         Discard
