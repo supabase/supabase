@@ -84,7 +84,7 @@ The functions we'll cover in this guide are:
 
 ### `to_tsvector()` [#to-tsvector]
 
-Converts your data into searchable "tokens." `to_tsvector()` stands for "to text search vector." For example:
+Converts your data into searchable tokens. `to_tsvector()` stands for "to text search vector." For example:
 
 ```sql
 select to_tsvector('green eggs and ham');
@@ -95,10 +95,10 @@ Collectively these tokens are called a "document" which Postgres can use for com
 
 ### `to_tsquery()` [#to-tsquery]
 
-Converts a query string into "tokens" to match. `to_tsquery()` stands for "to text search query."
+Converts a query string into tokens to match. `to_tsquery()` stands for "to text search query."
 
 This conversion step is important because we will want to "fuzzy match" on keywords.
-For example if a user searches for "eggs," and a column has the value "egg," we probably still want to return a match.
+For example if a user searches for `eggs`, and a column has the value `egg`, we probably still want to return a match.
 
 ### Match: `@@` [#match]
 
