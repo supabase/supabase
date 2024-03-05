@@ -1,5 +1,5 @@
 import { CalculatedColumn } from 'react-data-grid'
-import { ColumnType, SupaColumn, SupaRow, SupaTable } from '../types'
+import type { ColumnType, SupaColumn, SupaRow, SupaTable } from '../types'
 import {
   isArrayColumn,
   isBoolColumn,

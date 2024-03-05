@@ -1,17 +1,17 @@
 import Link from 'next/link'
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { debounce, includes, noop } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
 import { Button, IconExternalLink, SidePanel, Tabs } from 'ui'
 
 import { useStore } from 'hooks'
 import ActionBar from '../ActionBar'
-import { ImportContent } from '../TableEditor/TableEditor.types'
+import type { ImportContent } from '../TableEditor/TableEditor.types'
 import SpreadSheetFileUpload from './SpreadSheetFileUpload'
 import SpreadsheetImportConfiguration from './SpreadSheetImportConfiguration'
 import SpreadSheetTextInput from './SpreadSheetTextInput'
 import { EMPTY_SPREADSHEET_DATA, UPLOAD_FILE_TYPES } from './SpreadsheetImport.constants'
-import { SpreadsheetData } from './SpreadsheetImport.types'
+import type { SpreadsheetData } from './SpreadsheetImport.types'
 import {
   acceptedFileExtension,
   parseSpreadsheet,

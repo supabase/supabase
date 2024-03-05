@@ -99,7 +99,7 @@ execute function after_delete_function();
 There are two options available for executing triggers:
 
 - `for each row`: specifies that the trigger function should be executed once for each affected row.
-- `for each statement`: the trigger is executed once for the entire operation (eg, once on insert). This can be more efficient than `for each row` when dealing with multiple rows affected by a single SQL statement, as they allow you to perform calculations or updates on groups of rows at once.
+- `for each statement`: the trigger is executed once for the entire operation (for example, once on insert). This can be more efficient than `for each row` when dealing with multiple rows affected by a single SQL statement, as they allow you to perform calculations or updates on groups of rows at once.
 
 ## Dropping a trigger
 

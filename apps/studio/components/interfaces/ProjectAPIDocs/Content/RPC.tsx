@@ -8,7 +8,7 @@ import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
 import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
-import { ContentProps } from './Content.types'
+import type { ContentProps } from './Content.types'
 
 const RPC = ({ language }: ContentProps) => {
   const { ref } = useParams()

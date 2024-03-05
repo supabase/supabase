@@ -10,7 +10,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20240205-b145c86
+    image: supabase/studio:20240301-0942bfe
     restart: unless-stopped
     healthcheck:
       test:
@@ -76,7 +76,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.132.3
+    image: supabase/gotrue:v2.143.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -156,7 +156,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.25.50
+    image: supabase/realtime:v2.25.66
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -256,7 +256,7 @@ services:
 
   meta:
     container_name: supabase-meta
-    image: supabase/postgres-meta:v0.77.2
+    image: supabase/postgres-meta:v0.79.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -274,7 +274,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.36.1
+    image: supabase/edge-runtime:v1.38.0
     restart: unless-stopped
     depends_on:
       analytics:

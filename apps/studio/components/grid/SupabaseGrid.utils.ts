@@ -1,11 +1,11 @@
 import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { STORAGE_KEY_PREFIX } from './constants'
 import { InitialStateType } from './store/reducers'
-import { Sort, SupabaseGridProps, SupaColumn, SupaTable } from './types'
+import type { Sort, SupabaseGridProps, SupaColumn, SupaTable } from './types'
 import type { Dictionary } from 'types'
 import { getGridColumns } from './utils/gridColumns'
 import { FilterOperatorOptions } from './components/header/filter'
-import { Filter } from 'components/grid/types'
+import type { Filter } from 'components/grid/types'
 
 export function defaultErrorHandler(error: any) {
   console.error('Supabase grid error: ', error)

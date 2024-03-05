@@ -28,7 +28,7 @@ import {
   IconTrash2,
 } from 'ui'
 
-import { ItemRenderer } from 'components/ui/InfiniteList'
+import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { formatBytes } from 'lib/helpers'

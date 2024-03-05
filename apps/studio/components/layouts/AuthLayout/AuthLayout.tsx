@@ -3,10 +3,10 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
 import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import ProductMenu from 'components/ui/ProductMenu'
+import { ProductMenu } from 'components/ui/ProductMenu'
 import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
 import { withAuth } from 'hooks'
-import ProjectLayout from '../'
+import { ProjectLayout } from '../'
 import { generateAuthMenu } from './AuthLayout.utils'
 
 export interface AuthLayoutProps {

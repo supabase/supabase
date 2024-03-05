@@ -7,7 +7,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import StorageBucketsError from 'components/layouts/StorageLayout/StorageBucketsError'
 import { StorageExplorer } from 'components/to-be-cleaned/Storage'
 import { useBucketsQuery } from 'data/storage/buckets-query'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => {
   const { ref, bucketId } = useParams()

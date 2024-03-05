@@ -1,6 +1,6 @@
 import { SettingsLayout } from 'components/layouts'
 import { StorageSettings } from 'components/to-be-cleaned/Storage'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => {
   return (

@@ -11,7 +11,7 @@ import { Button, IconMaximize2 } from 'ui'
 
 import { SELECT_COLUMN_KEY } from '../../constants'
 import { useTrackedState } from '../../store'
-import { SupaRow } from '../../types'
+import type { SupaRow } from '../../types'
 
 export const SelectColumn: CalculatedColumn<any, any> = {
   key: SELECT_COLUMN_KEY,

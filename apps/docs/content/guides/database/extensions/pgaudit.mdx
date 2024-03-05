@@ -21,7 +21,7 @@ PGAudit grants fine grain control over which statements and objects are emitted 
 
 1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
-3. Search for "pgaudit" and enable the extension.
+3. Search for `pgaudit` and enable the extension.
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
@@ -35,7 +35,7 @@ create extension pgaudit;
 drop extension if exists pgaudit;
 ```
 
-Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+Even though the SQL code is `create extension`, this is the equivalent of enabling the extension.
 To disable an extension you can call `drop extension`.
 
 </TabPanel>
@@ -45,13 +45,13 @@ To disable an extension you can call `drop extension`.
 
 The `pgaudit.log` setting controls which statements to log. Available values include:
 
-- **read**: `SELECT` and `COPY` when the source is a relation or a query.
-- **write**: `INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`, and `COPY` when the destination is a relation.
-- **function**: Function calls and `DO` blocks.
-- **role**: Statements related to roles and privileges: `GRANT`, `REVOKE`, `CREATE/ALTER/DROP ROLE`.
-- **ddl**: All `DDL` that is not included in the `ROLE` class.
-- **misc**: Miscellaneous commands, e.g. `DISCARD`, `FETCH`, `CHECKPOINT`, `VACUUM`, `SET`.
-- **misc_set**: Miscellaneous `SET` commands, e.g. `SET ROLE`.
+- `read`: `SELECT` and `COPY` when the source is a relation or a query.
+- `write`: `INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`, and `COPY` when the destination is a relation.
+- `function`: Function calls and `DO` blocks.
+- `role`: Statements related to roles and privileges: `GRANT`, `REVOKE`, `CREATE/ALTER/DROP ROLE`.
+- `ddl`: All `DDL` that is not included in the `ROLE` class.
+- `misc`: Miscellaneous commands, for example, `DISCARD`, `FETCH`, `CHECKPOINT`, `VACUUM`, `SET`.
+- `misc_set`: Miscellaneous `SET` commands, for example, `SET ROLE`.
 
 - **all**: Include all of the above.
 
@@ -59,7 +59,7 @@ For a full list of available settings see [settings docs](https://github.com/pga
 
 <Admonition type="note">
 
-We don't currently support configuring `pgaudit.log_parameter` because it may log secrets in encrypted columns if you are using [pgsodium](/docs/guides/database/extensions/pgsodium) or [Vault](/docs/guides/database/vault).
+We don't currently support configuring `pgaudit.log_parameter` because it may log secrets in encrypted columns if you are using [`pgsodium`](/docs/guides/database/extensions/pgsodium) or [Vault](/docs/guides/database/vault).
 
 You can upvote this [feature request](https://github.com/orgs/supabase/discussions/20183) if you'd like this restriction lifted.
 
@@ -67,7 +67,7 @@ You can upvote this [feature request](https://github.com/orgs/supabase/discussio
 
 ## Example
 
-Given a pgaudit setting
+Given a `pgaudit` setting
 
 {/* prettier-ignore */}
 ```sql

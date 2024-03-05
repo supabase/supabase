@@ -5,38 +5,38 @@ import { useEffect, useState } from 'react'
 import { Alert, Badge, Button, Checkbox, IconBookOpen, Input, Modal, SidePanel } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
+import {
+  CONSTRAINT_TYPE,
+  Constraint,
+  useTableConstraintsQuery,
+} from 'data/database/constraints-query'
 import {
   ForeignKeyConstraint,
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
-import { usePostgresTypesQuery } from 'data/database/types-query'
+import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useIsFeatureEnabled, useStore } from 'hooks'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SpreadsheetImport } from '../'
 import ActionBar from '../ActionBar'
-import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
+import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
-import { ColumnField } from '../SidePanelEditor.types'
+import type { ColumnField } from '../SidePanelEditor.types'
 import ColumnManagement from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
 import HeaderTitle from './HeaderTitle'
 import RLSDisableModalContent from './RLSDisableModal'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
-import { ImportContent, TableField } from './TableEditor.types'
+import type { ImportContent, TableField } from './TableEditor.types'
 import {
   formatImportedContentToColumnFields,
   generateTableField,
   generateTableFieldFromPostgresTable,
   validateFields,
 } from './TableEditor.utils'
-import {
-  CONSTRAINT_TYPE,
-  Constraint,
-  useTableConstraintsQuery,
-} from 'data/database/constraints-query'
 
 export interface TableEditorProps {
   table?: PostgresTable
@@ -80,7 +80,7 @@ const TableEditor = ({
   const isNewRecord = isUndefined(table)
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
 
-  const { data: types } = usePostgresTypesQuery({
+  const { data: types } = useEnumeratedTypesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
