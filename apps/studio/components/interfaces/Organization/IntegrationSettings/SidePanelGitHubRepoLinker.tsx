@@ -119,7 +119,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
       onCancel={() => sidePanelStateSnapshot.setGithubConnectionsOpen(false)}
     >
       <div className="py-10 flex flex-col gap-6 bg-studio h-full">
-        <SidePanel.Content>
+        <SidePanel.Content className="flex flex-col gap-4">
           <Markdown
             content={`
 ### Choose repository to connect to
