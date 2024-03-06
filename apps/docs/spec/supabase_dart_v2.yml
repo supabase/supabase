@@ -963,6 +963,11 @@ functions:
       - `select()` can be combined with [Filters](/docs/reference/dart/using-filters)
       - `select()` can be combined with [Modifiers](/docs/reference/dart/using-modifiers)
       - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+    params:
+      - name: columns
+        isOptional: true
+        type: String?
+        description: The columns to retrieve, separated by commas. Columns can be renamed when returned with `customName:columnName`
     examples:
       - id: getting-your-data
         name: Getting your data
@@ -1081,6 +1086,11 @@ functions:
     description: |
       Perform an INSERT into the table or view.
     title: 'Create data: insert()'
+    params:
+      - name: values
+        isOptional: false
+        type: Map<String, dynamic> or List<Map<String, dynamic>>
+        description: The values to insert. Pass an object to insert a single row or an array to insert multiple rows.
     examples:
       - id: create-a-record
         name: Create a record
@@ -1117,6 +1127,11 @@ functions:
     title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to update.
+    params:
+      - name: values
+        isOptional: false
+        type: Map<String, dynamic>
+        description: The values to update with.
     examples:
       - id: updating-your-data
         name: Update your data
@@ -1166,6 +1181,11 @@ functions:
     title: 'Upsert data: upsert()'
     notes: |
       - Primary keys must be included in `values` to use upsert.
+    params:
+      - name: values
+        isOptional: false
+        type: Map<String, dynamic> or List<Map<String, dynamic>>
+        description: The values to upsert with. Pass a Map to upsert a single row or an List to upsert multiple rows.
     examples:
       - id: upsert-your-data
         name: Upsert your data
