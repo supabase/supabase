@@ -16,7 +16,7 @@ const noop = () => {}
 
 /**
  * Sends a telemetry event to Logflare for tracking by the product team.
- * 
+ *
  * Checks for user consent to telemetry before sending.
  */
 const useSendTelemetryEvent = () => {
@@ -27,15 +27,16 @@ const useSendTelemetryEvent = () => {
   if (!IS_PROD && !DEBUG_TELEMETRY) return noop
   if (!hasAcceptedConsent) return noop
 
-  return (event: TelemetryEvent) => unauthedAllowedPost('/platform/telemetry/event', {
-    body: {
-      ...event,
-      page_title: document?.title,
-      page_location: pathname,
-      // @ts-ignore -- fine to not send session_id
-      ga: telemetryProps
-    },
-  })
+  return (event: TelemetryEvent) =>
+    unauthedAllowedPost('/platform/telemetry/event', {
+      body: {
+        ...event,
+        page_title: document?.title,
+        page_location: pathname,
+        // @ts-ignore -- fine to not send session_id
+        ga: telemetryProps,
+      },
+    })
 }
 
 export { useSendTelemetryEvent }
