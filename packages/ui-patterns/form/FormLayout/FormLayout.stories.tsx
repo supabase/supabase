@@ -7,16 +7,23 @@ import {
   FormField_Shadcn_,
   FormItem_Shadcn_,
   Form_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Select_Shadcn_,
+  Calendar,
+  cn,
 } from 'ui'
 import { z } from 'zod'
 import { transformSourceForm } from '../../lib/transformSource'
 import { FormLayout } from './FormLayout'
 import { Input } from '../../data-inputs/Input'
+import { Calendar as CalendarIcon } from 'lucide-react'
+import { format } from 'date-fns'
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 export default {
@@ -217,6 +224,75 @@ export const withLayoutChange: Story = {
     layout: 'horizontal',
     label: 'Username',
     description: 'this is the description',
+    labelOptional: 'optional',
+    placeholder: 'shadcn',
+  },
+}
+
+export const withCalendar: Story = {
+  render: function Render(args) {
+    const FormSchema = z.object({
+      dob: z.date({
+        required_error: 'A date of birth is required.',
+      }),
+    })
+
+    const form = useForm<z.infer<typeof FormSchema>>({
+      resolver: zodResolver(FormSchema),
+    })
+    // 2. Define a submit handler.
+    function onSubmit(values: z.infer<typeof FormSchema>) {
+      // Do something with the form values.
+      // ✅ This will be type-safe and validated.
+      console.log(values)
+      // action('form form.handleSubmit(onSubmit)')(values)
+    }
+    return (
+      <Form_Shadcn_ {...form}>
+        <form className="w-[280px] flex flex-col gap-8" onSubmit={form.handleSubmit(onSubmit)}>
+          <FormField_Shadcn_
+            name="dob"
+            control={form.control}
+            render={({ field }) => (
+              <FormLayout {...args}>
+                <FormItem_Shadcn_ className="flex flex-col">
+                  <Popover_Shadcn_>
+                    <PopoverTrigger_Shadcn_ asChild>
+                      <FormControl_Shadcn_>
+                        <Button
+                          icon={<CalendarIcon className="text-foreground-muted" size={16} />}
+                          type={'default'}
+                          className={cn(!field.value && 'text-muted-foreground', 'justify-start')}
+                        >
+                          {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
+                        </Button>
+                      </FormControl_Shadcn_>
+                    </PopoverTrigger_Shadcn_>
+                    <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={field.onChange}
+                        disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
+                        initialFocus
+                      />
+                    </PopoverContent_Shadcn_>
+                  </Popover_Shadcn_>
+                </FormItem_Shadcn_>
+              </FormLayout>
+            )}
+          />
+          <Button size="small" type="primary" htmlType="submit">
+            Submit
+          </Button>
+        </form>
+      </Form_Shadcn_>
+    )
+  },
+  args: {
+    layout: 'vertical',
+    label: 'Date of birth',
+    description: 'Your date of birth is used to calculate your age.',
     labelOptional: 'optional',
     placeholder: 'shadcn',
   },

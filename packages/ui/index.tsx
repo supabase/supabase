@@ -214,6 +214,8 @@ export {
   HoverCardContent as HoverCardContent_Shadcn_,
 } from './src/components/shadcn/ui/hover-card'
 
+export * from './src/components/shadcn/ui/calendar'
+
 export { Toggle as Toggle_Shadcn } from './src/components/shadcn/ui/toggle'
 
 export { ScrollArea, ScrollBar } from './src/components/shadcn/ui/scroll-area'
