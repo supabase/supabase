@@ -7,7 +7,16 @@ const CheckboxWithLayout = forwardRef<
   ComponentPropsWithoutRef<typeof Checkbox_Shadcn_> & Omit<FormLayoutProps, 'layout'>
 >(
   (
-    { afterLabel, beforeLabel, labelOptional, label, description, isReactForm = false, ...props },
+    {
+      afterLabel,
+      beforeLabel,
+      labelOptional,
+      label,
+      description,
+      hideMessage,
+      isReactForm = false,
+      ...props
+    },
     ref
   ) => {
     return (
@@ -18,6 +27,7 @@ const CheckboxWithLayout = forwardRef<
         labelOptional={labelOptional}
         layout="flex"
         descriptionText={description}
+        hideMessage={hideMessage}
         isReactForm={isReactForm}
         name={props.name}
       >

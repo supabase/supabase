@@ -3,22 +3,21 @@ import { StoryContext, StoryObj } from '@storybook/react'
 import { useForm } from 'react-hook-form'
 import {
   Button,
-  Checkbox_Shadcn_,
-  FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
   Form_Shadcn_,
 } from 'ui'
 import { z } from 'zod'
 import { transformSourceForm } from '../../lib/transformSource'
-import { FormCheckbox } from './FormCheckbox'
+import { FormFieldCheckbox, FormItemCheckbox } from './FormCheckbox'
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 export default {
   title: 'Form Data Inputs/FormCheckbox',
-  component: FormCheckbox,
+  component: FormFieldCheckbox,
   decorators: [
     (Story: any) => {
       return <Story />
@@ -44,7 +43,7 @@ export default {
 
 // export default meta
 
-type Story = StoryObj<typeof FormCheckbox>
+type Story = StoryObj<typeof FormFieldCheckbox>
 
 export const Primary: Story = {
   render: function Render(args) {
@@ -63,74 +62,113 @@ export const Primary: Story = {
       console.log(data)
     }
     return (
-      // <Form_Shadcn_ {...form}>
-      //   <form className="w-96 flex flex-col gap-3" onSubmit={form.handleSubmit(onSubmit)}>
-      //     <FormCheckbox {...args} name="username" control={form.control} />
-      //     <Button size="small" type="primary" htmlType="submit">
-      //       Submit
-      //     </Button>
-      //   </form>
-      // </Form_Shadcn_>
-
       <Form_Shadcn_ {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* <FormCheckbox
-            control={form.control}
-            name="mobile"
-            label="Use different settings for my mobile devices"
-            description="You can manage your mobile notifications in the mobile settings page."
-          /> */}
-          <FormField_Shadcn_
-            control={form.control}
-            name="mobile"
-            render={({ field }) => (
-              <FormItem_Shadcn_ className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                <FormControl_Shadcn_>
-                  <Checkbox_Shadcn_ checked={field.value} onCheckedChange={field.onChange} />
-                </FormControl_Shadcn_>
-                <div className="space-y-1 leading-none">
-                  <FormLabel_Shadcn_>
-                    Use different settings for my mobile devices
-                  </FormLabel_Shadcn_>
-                  <FormDescription_Shadcn_>
-                    You can manage your mobile notifications in the mobile settings page.
-                  </FormDescription_Shadcn_>
-                </div>
-              </FormItem_Shadcn_>
-            )}
-          />
-          {/* <FormField_Shadcn_
-          control={form.control}
-          name="mobile"
-          render={({ field }) => (
-            <FormItem_Shadcn_ className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-              <FormControl_Shadcn_>
-                <Checkbox_Shadcn_
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
-              <div className="space-y-1 leading-none">
-                <FormLabel>
-                  Use different settings for my mobile devices
-                </FormLabel>
-                <FormDescription>
-                  You can manage your mobile notifications in the{" "}
-                  <Link href="/examples/forms">mobile settings</Link> page.
-                </FormDescription>
-              </div>
-            </FormItem>
-          )}
-        /> */}
+          <FormFieldCheckbox {...args} control={form.control} name="mobile" />
           <Button htmlType="submit">Submit</Button>
         </form>
       </Form_Shadcn_>
     )
   },
   args: {
-    label: 'Username',
-    description: 'this is the description',
-    labelOptional: 'optional',
-    placeholder: 'shadcn',
+    label: 'Use different settings for my mobile devices',
+    description: 'You can manage your mobile notifications in the mobile settings page.',
   },
+}
+
+export const multipleItems: Story = {
+  render: function Render(args) {
+    const FormSchema = z.object({
+      items: z.array(z.string()).refine((value) => value.some((item) => item), {
+        message: 'You have to select at least one item.',
+      }),
+    })
+    const items = [
+      {
+        id: 'recents',
+        label: 'Recents',
+      },
+      {
+        id: 'home',
+        label: 'Home',
+      },
+      {
+        id: 'applications',
+        label: 'Applications',
+      },
+      {
+        id: 'desktop',
+        label: 'Desktop',
+      },
+      {
+        id: 'downloads',
+        label: 'Downloads',
+      },
+      {
+        id: 'documents',
+        label: 'Documents',
+      },
+    ] as const
+
+    const form = useForm<z.infer<typeof FormSchema>>({
+      resolver: zodResolver(FormSchema),
+      defaultValues: {
+        items: ['recents', 'home'],
+      },
+    })
+
+    function onSubmit(data: z.infer<typeof FormSchema>) {
+      console.log(data)
+    }
+
+    return (
+      <Form_Shadcn_ {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <FormField_Shadcn_
+            control={form.control}
+            name="items"
+            render={() => (
+              <FormItem_Shadcn_>
+                <div className="mb-4">
+                  <FormLabel_Shadcn_ className="text-base text-foreground">
+                    Sidebar
+                  </FormLabel_Shadcn_>
+                  <FormDescription_Shadcn_>
+                    Select the items you want to display in the sidebar.
+                  </FormDescription_Shadcn_>
+                </div>
+                {items.map((item) => {
+                  return (
+                    <FormField_Shadcn_
+                      key={item.id}
+                      control={form.control}
+                      name="items"
+                      render={({ field }) => {
+                        return (
+                          <FormItemCheckbox
+                            field={field}
+                            hideMessage
+                            label={item.label}
+                            checked={field.value?.includes(item.id)}
+                            onCheckedChange={(checked) => {
+                              return checked
+                                ? field.onChange([...field.value, item.id])
+                                : field.onChange(field.value?.filter((value) => value !== item.id))
+                            }}
+                          />
+                        )
+                      }}
+                    />
+                  )
+                })}
+                <FormMessage_Shadcn_ />
+              </FormItem_Shadcn_>
+            )}
+          />
+          <Button htmlType="submit">Submit</Button>
+        </form>
+      </Form_Shadcn_>
+    )
+  },
+  args: {},
 }

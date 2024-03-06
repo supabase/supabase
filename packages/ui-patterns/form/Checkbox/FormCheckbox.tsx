@@ -1,38 +1,43 @@
-import React, { ComponentProps, ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
-import { FormControl_Shadcn_, FormField_Shadcn_, FormItem_Shadcn_ } from 'ui'
-import { InputWithLayout } from '../withLayout/InputWithLayout'
+import React, { ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
+import { FieldPath, FieldValues } from 'react-hook-form'
+import { FormField_Shadcn_ } from 'ui'
+import { FormItemProps, FormItemWrapper } from '../utils'
 import { CheckboxWithLayout } from '../withLayout/CheckboxWithLayout'
 
-export interface Props extends Omit<ComponentProps<typeof InputWithLayout>, 'ref'> {
-  name: React.ComponentProps<typeof FormField_Shadcn_>['name']
+const FormItemCheckbox = forwardRef<
+  ElementRef<typeof CheckboxWithLayout>,
+  ComponentPropsWithoutRef<typeof CheckboxWithLayout> & FormItemProps<any, any>
+>(({ field, ...props }, ref) => (
+  <FormItemWrapper>
+    <CheckboxWithLayout {...props} {...field} isReactForm={true} ref={ref} />
+  </FormItemWrapper>
+))
+
+FormItemCheckbox.displayName = 'FormItemCheckbox'
+
+export interface FormFieldProps<
+  TFieldValues extends FieldValues,
+  TName extends FieldPath<TFieldValues>,
+> {
+  name: TName
   control: any // { key: string }
   formField?: Omit<React.ComponentProps<typeof FormField_Shadcn_>, 'ref'>
 }
 
-const FormCheckbox = forwardRef<
-  ElementRef<typeof CheckboxWithLayout>,
-  Omit<ComponentPropsWithoutRef<typeof CheckboxWithLayout>, 'name'> & Props
+const FormFieldCheckbox = forwardRef<
+  ElementRef<typeof FormItemCheckbox>,
+  ComponentPropsWithoutRef<typeof FormItemCheckbox> & FormFieldProps<any, any> // Use any as placeholder types
 >(({ formField, name, control, ...props }, ref) => {
   return (
     <FormField_Shadcn_
       {...formField}
       name={name}
       control={control}
-      render={({ field }) => (
-        <FormItem_Shadcn_>
-          <FormControl_Shadcn_>
-            <CheckboxWithLayout
-              {...props}
-              {...field}
-              isReactForm={true}
-              checked={field.value}
-              onCheckedChange={field.onChange}
-            />
-          </FormControl_Shadcn_>
-        </FormItem_Shadcn_>
-      )}
+      render={({ field }) => <FormItemCheckbox ref={ref} {...props} field={field} />}
     />
   )
 })
 
-export { FormCheckbox }
+FormFieldCheckbox.displayName = 'FormFieldCheckbox'
+
+export { FormFieldCheckbox, FormItemCheckbox }

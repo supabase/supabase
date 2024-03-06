@@ -96,7 +96,8 @@
 html,
 body,
 #__next,
-.main {
+.main,
+.docs-story {
   @apply bg-studio;
   @apply text-foreground;
   height: 100%;
@@ -105,3 +106,14 @@ body,
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
 }
+/* 
+.dark,
+.light,
+.light .docs-story,
+.dark .docs-story {
+  @apply bg text font-[400];
+  font-feature-settings:
+    'rlig' 1,
+    'calt' 1;
+  font-family: 'Circular std';
+} */

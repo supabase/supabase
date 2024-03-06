@@ -4,7 +4,7 @@ import { Input } from '../../data-inputs/Input'
 
 const InputWithLayout = forwardRef<
   ElementRef<typeof Input>,
-  Omit<ComponentPropsWithoutRef<typeof Input>, 'name'> & FormLayoutProps
+  ComponentPropsWithoutRef<typeof Input> & FormLayoutProps
 >(
   (
     {

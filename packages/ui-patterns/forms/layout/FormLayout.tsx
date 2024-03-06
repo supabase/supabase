@@ -16,6 +16,7 @@ export type FormLayoutProps = {
   labelOptional?: string | React.ReactNode
   layout?: 'horizontal' | 'vertical'
   isReactForm?: boolean
+  hideMessage?: boolean
 }
 
 type Props = {
@@ -34,6 +35,7 @@ type Props = {
   labelLayout?: 'horizontal' | 'vertical'
   isReactForm?: boolean
   name?: string
+  hideMessage?: boolean
 }
 
 export const FormLayout = React.forwardRef<
@@ -57,6 +59,7 @@ export const FormLayout = React.forwardRef<
       beforeLabel,
       afterLabel,
       nonBoxInput = label ? false : true,
+      hideMessage = false,
       ...props
     },
     ref
@@ -110,7 +113,9 @@ export const FormLayout = React.forwardRef<
 
     const hasLabel = Boolean(label || beforeLabel || afterLabel)
 
-    const renderError = props.isReactForm && <FormMessage_Shadcn_ className="mt-2" />
+    const renderError = props.isReactForm && !hideMessage && (
+      <FormMessage_Shadcn_ className="mt-2" />
+    )
 
     const renderDescription =
       descriptionText && props.isReactForm ? (
@@ -166,8 +171,8 @@ export const FormLayout = React.forwardRef<
             // }
             className={labelContainerClasses.join(' ')}
           >
-            {hasLabel && props.isForm ? (
-              <FormLabel_Shadcn_ htmlFor={props.name}>
+            {hasLabel && props.isReactForm ? (
+              <FormLabel_Shadcn_>
                 <LabelContents />
               </FormLabel_Shadcn_>
             ) : (

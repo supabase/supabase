@@ -4,12 +4,12 @@ import { useForm } from 'react-hook-form'
 import { Button, Form_Shadcn_ } from 'ui'
 import { z } from 'zod'
 import { transformSourceForm } from '../../lib/transformSource'
-import { FormInput } from './FormInput'
+import { FormFieldInput } from './FormInput'
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 export default {
-  title: 'Form Data Inputs/FormInput',
-  component: FormInput,
+  title: 'Form Data Inputs/FormFieldInput',
+  component: FormFieldInput,
   decorators: [
     (Story: any) => {
       return <Story />
@@ -35,7 +35,7 @@ export default {
 
 // export default meta
 
-type Story = StoryObj<typeof FormInput>
+type Story = StoryObj<typeof FormFieldInput>
 
 export const Primary: Story = {
   render: function Render(args) {
@@ -63,7 +63,7 @@ export const Primary: Story = {
     return (
       <Form_Shadcn_ {...form}>
         <form className="w-96 flex flex-col gap-3" onSubmit={form.handleSubmit(onSubmit)}>
-          <FormInput {...args} name="username" control={form.control} />
+          <FormFieldInput {...args} name="username" control={form.control} />
           <Button size="small" type="primary" htmlType="submit">
             Submit
           </Button>
