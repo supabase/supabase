@@ -83,8 +83,6 @@ export const AIPolicyEditorPanel = memo(function ({
   // use chat id because useChat doesn't have a reset function to clear all messages
   const [chatId, setChatId] = useState(uuidv4())
 
-  const lockedEditorRef = useRef<IStandaloneCodeEditor | null>(null)
-
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
   const isTogglingPreviewRef = useRef<boolean>(false)
@@ -308,13 +306,12 @@ export const AIPolicyEditorPanel = memo(function ({
               assistantVisible={assistantVisible}
               setAssistantVisible={setAssistantPanel}
             />
+
             <PolicyDetails
               policy={selectedPolicy}
               showDetails={showDetails}
               toggleShowDetails={() => setShowDetails(!showDetails)}
             />
-
-            <PolicyDetailsV2 />
 
             <div className="flex flex-col h-full w-full justify-between">
               {incomingChange ? (
@@ -388,32 +385,16 @@ export const AIPolicyEditorPanel = memo(function ({
                 />
               ) : null}
 
-              <div className="bg-surface-300 py-2">
-                <div className="flex items-center gap-x-2 px-5">
-                  <IconLock size={14} className="text-foreground-light" />
-                  <p className="text-xs text-foreground-light font-mono uppercase">
-                    Use options above to edit
-                  </p>
-                </div>
-                <div className="relative h-32">
-                  <RLSCodeEditor
-                    readOnly
-                    id="rls-sql-partial"
-                    defaultValue="create policy policy_name"
-                    className="monaco-editor-alt pointer-events-none"
-                    editorRef={lockedEditorRef}
-                  />
-                </div>
-              </div>
+              <PolicyDetailsV2 />
 
-              <div className={`relative h-full ${incomingChange ? 'hidden' : 'block'}`}>
+              {/* <div className={`relative h-full ${incomingChange ? 'hidden' : 'block'}`}>
                 <RLSCodeEditor
                   id="rls-sql-policy"
                   defaultValue={''}
                   editorRef={editorRef}
                   placeholder={placeholder}
                 />
-              </div>
+              </div> */}
 
               <div className="flex flex-col">
                 {error !== undefined && (

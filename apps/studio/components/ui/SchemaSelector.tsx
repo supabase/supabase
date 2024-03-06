@@ -12,8 +12,6 @@ import {
   CommandSeparator_Shadcn_,
   Command_Shadcn_,
   IconCheck,
-  IconCode,
-  IconLoader,
   IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -23,7 +21,7 @@ import {
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { ChevronDownIcon, ChevronsUpDown } from 'lucide-react'
+import { ChevronsUpDown } from 'lucide-react'
 
 interface SchemaSelectorProps {
   className?: string
