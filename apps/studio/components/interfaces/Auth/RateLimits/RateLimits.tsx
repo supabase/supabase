@@ -12,7 +12,6 @@ import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
-  FormMessage_Shadcn_,
   Form_Shadcn_,
   IconAlertCircle,
   Input_Shadcn_,
@@ -58,6 +57,7 @@ const RateLimits = () => {
 
   const canUpdateEmailLimit = authConfig?.EXTERNAL_EMAIL_ENABLED && isSmtpEnabled(authConfig)
   const canUpdateSMSRateLimit = authConfig?.EXTERNAL_PHONE_ENABLED && !authConfig?.SMS_AUTOCONFIRM
+  const canUpdateAnonymousUsersRateLimit = authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED
 
   const FormSchema = z.object({
     RATE_LIMIT_TOKEN_REFRESH: z.coerce
@@ -73,6 +73,10 @@ const RateLimits = () => {
       .min(0, 'Must be not be lower than 0')
       .max(32767, 'Must not be more than 32,767 an hour'),
     RATE_LIMIT_SMS_SENT: z.coerce
+      .number()
+      .min(0, 'Must be not be lower than 0')
+      .max(32767, 'Must not be more than 32,767 an hour'),
+    RATE_LIMIT_ANONYMOUS_USERS: z.coerce
       .number()
       .min(0, 'Must be not be lower than 0')
       .max(32767, 'Must not be more than 32,767 an hour'),
@@ -97,6 +101,7 @@ const RateLimits = () => {
       'RATE_LIMIT_VERIFY',
       'RATE_LIMIT_EMAIL_SENT',
       'RATE_LIMIT_SMS_SENT',
+      'RATE_LIMIT_ANONYMOUS_USERS',
     ] as (keyof typeof payload)[]
     params.forEach((param) => {
       if (data[param] !== authConfig?.[param]) payload[param] = data[param]
@@ -112,6 +117,7 @@ const RateLimits = () => {
         RATE_LIMIT_VERIFY: authConfig.RATE_LIMIT_VERIFY,
         RATE_LIMIT_EMAIL_SENT: authConfig.RATE_LIMIT_EMAIL_SENT,
         RATE_LIMIT_SMS_SENT: authConfig.RATE_LIMIT_SMS_SENT,
+        RATE_LIMIT_ANONYMOUS_USERS: authConfig.RATE_LIMIT_ANONYMOUS_USERS,
       })
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -173,7 +179,6 @@ const RateLimits = () => {
                         <FormControl_Shadcn_>
                           <Input_Shadcn_ disabled={!canUpdateEmailLimit} type="number" {...field} />
                         </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
                         {!canUpdateEmailLimit && (
                           <Alert_Shadcn_>
                             <IconAlertCircle strokeWidth={1.5} />
@@ -239,7 +244,6 @@ const RateLimits = () => {
                             {...field}
                           />
                         </FormControl_Shadcn_>
-                        <FormMessage_Shadcn_ />
                         {!canUpdateSMSRateLimit && (
                           <Alert_Shadcn_>
                             <IconAlertCircle strokeWidth={1.5} />
@@ -295,7 +299,6 @@ const RateLimits = () => {
                             </p>
                           </>
                         )}
-                        <FormMessage_Shadcn_ />
                       </FormItem_Shadcn_>
                     )}
                   />
@@ -331,7 +334,58 @@ const RateLimits = () => {
                             This is equivalent to {field.value * 12} requests per hour
                           </p>
                         )}
-                        <FormMessage_Shadcn_ />
+                      </FormItem_Shadcn_>
+                    )}
+                  />
+                </FormSectionContent>
+              </FormSection>
+
+              <FormSection
+                id="anonymous-users"
+                header={
+                  <FormSectionLabel
+                    description={
+                      <p className="text-foreground-light text-sm">
+                        Number of anonymous sign-ins that can be made per hour
+                      </p>
+                    }
+                  >
+                    Rate limit for anonymous users
+                  </FormSectionLabel>
+                }
+              >
+                <FormSectionContent loading={false}>
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="RATE_LIMIT_ANONYMOUS_USERS"
+                    render={({ field }) => (
+                      <FormItem_Shadcn_>
+                        <FormControl_Shadcn_>
+                          <Input_Shadcn_
+                            disabled={!canUpdateAnonymousUsersRateLimit}
+                            type="number"
+                            {...field}
+                          />
+                        </FormControl_Shadcn_>
+                        {!canUpdateAnonymousUsersRateLimit && (
+                          <Alert_Shadcn_>
+                            <IconAlertCircle strokeWidth={1.5} />
+                            <AlertTitle_Shadcn_>
+                              Enable anonymous logins to update this configuration
+                            </AlertTitle_Shadcn_>
+                            <AlertDescription_Shadcn_>
+                              <p className="!leading-tight">
+                                Head over to the providers page to enable anonymous logins before
+                                updating your rate limit
+                              </p>
+                              <Button asChild type="default" className="mt-2">
+                                <Link href={`/project/${projectRef}/auth/providers`}>
+                                  View providers configuration
+                                </Link>
+                              </Button>
+                            </AlertDescription_Shadcn_>
+                          </Alert_Shadcn_>
+                        )}
                       </FormItem_Shadcn_>
                     )}
                   />

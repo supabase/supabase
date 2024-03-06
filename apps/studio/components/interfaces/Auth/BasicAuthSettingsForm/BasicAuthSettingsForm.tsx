@@ -40,6 +40,7 @@ const LOWER_UPPER_DIGITS_SYMBOLS = LOWER_UPPER_DIGITS + ':!@#$%^&*()_+-=[]{};\'\
 
 const schema = object({
   DISABLE_SIGNUP: boolean().required(),
+  EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean().required(),
   SECURITY_MANUAL_LINKING_ENABLED: boolean().required(),
   SITE_URL: string().required('Must have a Site URL'),
   SECURITY_CAPTCHA_ENABLED: boolean().required(),
@@ -101,6 +102,7 @@ const BasicAuthSettingsForm = () => {
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig?.DISABLE_SIGNUP,
+    EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED,
     SECURITY_MANUAL_LINKING_ENABLED: authConfig?.SECURITY_MANUAL_LINKING_ENABLED || false,
     SITE_URL: authConfig?.SITE_URL,
     SECURITY_CAPTCHA_ENABLED: authConfig?.SECURITY_CAPTCHA_ENABLED || false,
@@ -192,6 +194,20 @@ const BasicAuthSettingsForm = () => {
                     label="Allow new users to sign up"
                     layout="flex"
                     descriptionText="If this is disabled, new users will not be able to sign up to your application."
+                    disabled={!canUpdateConfig}
+                  />
+                  <Toggle
+                    id="EXTERNAL_ANONYMOUS_USERS_ENABLED"
+                    size="small"
+                    label="Allow anonymous sign-ins"
+                    layout="flex"
+                    descriptionText={
+                      <Markdown
+                        extLinks
+                        className="[&>p>a]:text-foreground-light [&>p>a]:transition-all [&>p>a]:hover:text-foreground [&>p>a]:hover:decoration-brand"
+                        content="Enable [anonymous sign-ins](https://supabase.com/docs/guides/auth/auth-anonymous) for your project."
+                      />
+                    }
                     disabled={!canUpdateConfig}
                   />
                   <Toggle
