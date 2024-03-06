@@ -148,7 +148,7 @@ const ProjectLinker = ({
     return (
       <div
         className={cn(
-          'flex flex-col grow gap-6 px-5 mx-auto w-full justify-center items-center',
+          'flex-1 min-w-0 flex flex-col grow gap-6 px-5 mx-auto w-full justify-center items-center',
           className
         )}
         {...props}
