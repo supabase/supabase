@@ -1,6 +1,6 @@
 import { withAuth } from 'hooks'
 import { ReactNode, useMemo } from 'react'
-import ProjectLayout from '../'
+import { ProjectLayout } from '../'
 import SQLEditorMenu from './SQLEditorMenu'
 
 export interface SQLEditorLayoutProps {

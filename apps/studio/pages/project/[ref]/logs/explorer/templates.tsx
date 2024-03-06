@@ -1,12 +1,12 @@
-import React, { useState } from 'react'
-import { observer } from 'mobx-react-lite'
 import { useParams } from 'common'
-import { IconCode, Button, Popover } from 'ui'
+import { useState } from 'react'
+import { Button, IconCode, Popover } from 'ui'
+
 import { LogTemplate, TEMPLATES } from 'components/interfaces/Settings/Logs'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
 import CardButton from 'components/ui/CardButton'
-import { NextPageWithLayout } from 'types'
 import LogsExplorerHeader from 'components/ui/Logs/LogsExplorerHeader'
+import type { NextPageWithLayout } from 'types'
 
 export const LogsTemplatesPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
@@ -27,7 +27,7 @@ export const LogsTemplatesPage: NextPageWithLayout = () => {
 
 LogsTemplatesPage.getLayout = (page) => <LogsLayout>{page}</LogsLayout>
 
-export default observer(LogsTemplatesPage)
+export default LogsTemplatesPage
 
 const Template = ({ projectRef, template }: { projectRef?: string; template: LogTemplate }) => {
   const [showPreview, setShowPreview] = useState(false)

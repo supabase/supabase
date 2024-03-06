@@ -3,7 +3,7 @@ import {
   EmptyIntegrationConnection,
   IntegrationConnection,
 } from 'components/interfaces/Integrations/IntegrationPanels'
-import { GitHubConnection } from 'data/integrations/github-connections-query'
+import type { GitHubConnection } from 'data/integrations/github-connections-query'
 import { useSelectedOrganization } from 'hooks'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import {

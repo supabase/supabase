@@ -1,6 +1,7 @@
 import { useParams } from 'common'
 import toast from 'react-hot-toast'
 import { format } from 'sql-formatter'
+import { AiIconAnimation, Button } from 'ui'
 
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
@@ -8,12 +9,12 @@ import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-quer
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { isError } from 'data/utils/error-check'
 import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject } from 'hooks'
-import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { AiIconAnimation, Button } from 'ui'
 import { useSqlEditor } from '../SQLEditor'
 import { sqlAiDisclaimerComment } from '../SQLEditor.constants'
+import { DiffType } from '../SQLEditor.types'
 import Results from './Results'
 
 export type UtilityTabResultsProps = {
@@ -28,11 +29,11 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
   const selectedProject = useSelectedProject()
   const organization = useSelectedOrganization()
 
-  const { setDebugSolution, setAiInput, setSqlDiff, sqlDiff } = useSqlEditor()
+  const { sqlDiff, setDebugSolution, setAiInput, setSqlDiff, setSelectedDiffType } = useSqlEditor()
   const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
 
   const isOptedInToAI = organization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
-  const [hasEnabledAISchema] = useLocalStorageQuery('supabase_sql-editor-ai-schema-enabled', true)
+  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
 
   const { data } = useEntityDefinitionsQuery(
@@ -162,6 +163,7 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
                       original: snippet.snippet.content.sql,
                       modified: formattedSql,
                     })
+                    setSelectedDiffType(DiffType.Modification)
                   } catch (error: unknown) {
                     if (isError(error)) toast.error(`Failed to debug: ${error.message}`)
                   }

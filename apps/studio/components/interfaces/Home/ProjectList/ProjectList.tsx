@@ -16,7 +16,7 @@ import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-w
 import { useSelectedOrganization } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
-import { Organization, ResponseError } from 'types'
+import type { Organization, ResponseError } from 'types'
 import { Button, IconPlus } from 'ui'
 import ProjectCard from './ProjectCard'
 import ShimmeringCard from './ShimmeringCard'

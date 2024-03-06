@@ -14,7 +14,7 @@ This guide is intended to:
 
 This is not a comprehensive resource, but rather a helpful starting point for your optimization journey.
 
-If you're new to query optimization, you may be interested in [index_advisor](/docs/guides/database/extensions/index_advisor), our tool for automatically detecting indexes that improve performance on a given query.
+If you're new to query optimization, you may be interested in [`index_advisor`](/docs/guides/database/extensions/index_advisor), our tool for automatically detecting indexes that improve performance on a given query.
 
 ## Example query
 
@@ -66,7 +66,7 @@ create index idx_orders_customer_id on orders (customer_id);
 
 Sorting can also be optimized by indexing:
 
-- An index on `b.date_of_purchase` wcan improve the sorting process, and is particularly beneficial when a subset of rows is being returned with a `limit` clause.
+- An index on `b.date_of_purchase` can improve the sorting process, and is particularly beneficial when a subset of rows is being returned with a `limit` clause.
 
 ```sql
 create index idx_orders_date_of_purchase on orders (date_of_purchase);

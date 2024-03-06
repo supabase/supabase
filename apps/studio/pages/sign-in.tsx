@@ -7,7 +7,7 @@ import { SignInLayout } from 'components/layouts'
 import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const SignInPage: NextPageWithLayout = () => {
   const router = useRouter()

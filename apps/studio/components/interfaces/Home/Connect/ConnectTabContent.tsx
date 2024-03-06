@@ -6,7 +6,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { pluckObjectFields } from 'lib/helpers'
-import { projectKeys } from './Connect.types'
+import type { projectKeys } from './Connect.types'
 
 interface ConnectContentTabProps {
   projectKeys: projectKeys

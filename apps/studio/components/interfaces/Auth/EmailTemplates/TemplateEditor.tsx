@@ -1,26 +1,25 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
+import { useParams } from 'common'
 import { useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
 import ReactMarkdown from 'react-markdown'
 import {
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Form,
   IconCode,
-  IconMonitor,
-  Tabs,
-  Input,
-  Alert_Shadcn_,
   IconInfo,
-  AlertTitle_Shadcn_,
+  IconMonitor,
+  Input,
+  Tabs,
 } from 'ui'
 
-import CodeEditor from 'components/ui/CodeEditor'
+import { CodeEditor } from 'components/ui/CodeEditor'
 import { FormActions, FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import InformationBox from 'components/ui/InformationBox'
-
-import { useParams } from 'common'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
-import { FormSchema } from 'types'
+import { useCheckPermissions } from 'hooks'
+import type { FormSchema } from 'types'
 
 interface TemplateEditorProps {
   template: FormSchema
@@ -28,7 +27,6 @@ interface TemplateEditorProps {
 }
 
 const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
 
@@ -58,11 +56,9 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
       {
-        onError: () => {
-          ui.setNotification({ category: 'error', message: 'Failed to update settings' })
-        },
+        onError: () => toast.error('Failed to update settings'),
         onSuccess: () => {
-          ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+          toast.success('Successfully updated settings')
           resetForm({
             values: values,
             initialValues: values,
@@ -198,4 +194,4 @@ const TemplateEditor = ({ template, authConfig }: TemplateEditorProps) => {
   )
 }
 
-export default observer(TemplateEditor)
+export default TemplateEditor

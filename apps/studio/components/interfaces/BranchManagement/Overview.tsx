@@ -1,8 +1,8 @@
 import { noop } from 'lodash'
 import { Button, IconChevronRight } from 'ui'
 
-import { Branch } from 'data/branches/branches-query'
-import { GitHubPullRequest } from 'data/integrations/github-pull-requests-query'
+import type { Branch } from 'data/branches/branches-query'
+import type { GitHubPullRequest } from 'data/integrations/github-pull-requests-query'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { PreviewBranchesEmptyState } from './EmptyStates'
 

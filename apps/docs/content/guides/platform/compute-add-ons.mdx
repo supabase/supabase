@@ -6,20 +6,28 @@ description: "Learn about your project's instance and additional add-ons."
 
 Every project on the Supabase Platform comes with its own dedicated Postgres instance running inside a virtual machine (VM). The following table describes the base instance with additional compute add-ons available if you need extra performance when scaling up Supabase.
 
-| Plan   | Hourly Price USD | Monthly Price USD | CPU                     | Memory | Connections: Direct | Connections: Pooler |
-| ------ | ---------------- | ----------------- | ----------------------- | ------ | ------------------- | ------------------- |
-| Micro  | $0.01344         | ~$10              | 2-core ARM (shared)     | 1 GB   | 60                  | 200                 |
-| Small  | $0.0206          | ~$15              | 2-core ARM (shared)     | 2 GB   | 90                  | 200                 |
-| Medium | $0.0822          | ~$60              | 2-core ARM (shared)     | 4 GB   | 120                 | 200                 |
-| Large  | $0.1517          | ~$110             | 2-core ARM (dedicated)  | 8 GB   | 160                 | 300                 |
-| XL     | $0.2877          | ~$210             | 4-core ARM (dedicated)  | 16 GB  | 240                 | 700                 |
-| 2XL    | $0.562           | ~$410             | 8-core ARM (dedicated)  | 32 GB  | 380                 | 1500                |
-| 4XL    | $1.32            | ~$960             | 16-core ARM (dedicated) | 64 GB  | 480                 | 3000                |
-| 8XL    | $2.562           | ~$1,870           | 32-core ARM (dedicated) | 128 GB | 490                 | 6000                |
-| 12XL   | $3.836           | ~$2,800           | 48-core ARM (dedicated) | 192 GB | 500                 | 9000                |
-| 16XL   | $5.12            | ~$3,730           | 64-core ARM (dedicated) | 256 GB | 500                 | 12,000              |
+| Plan   | Hourly Price USD | Monthly Price USD | CPU                     | Memory | Connections: Direct | Connections: Pooler | Recommended Maximum DB Size |
+| ------ | ---------------- | ----------------- | ----------------------- | ------ | ------------------- | ------------------- | --------------------------- |
+| Micro  | $0.01344         | ~$10              | 2-core ARM (shared)     | 1 GB   | 60                  | 200                 | 10GB                        |
+| Small  | $0.0206          | ~$15              | 2-core ARM (shared)     | 2 GB   | 90                  | 200                 | 50GB                        |
+| Medium | $0.0822          | ~$60              | 2-core ARM (shared)     | 4 GB   | 120                 | 200                 | 100GB                       |
+| Large  | $0.1517          | ~$110             | 2-core ARM (dedicated)  | 8 GB   | 160                 | 300                 | 200GB                       |
+| XL     | $0.2877          | ~$210             | 4-core ARM (dedicated)  | 16 GB  | 240                 | 700                 | 500GB                       |
+| 2XL    | $0.562           | ~$410             | 8-core ARM (dedicated)  | 32 GB  | 380                 | 1500                | 1TB                         |
+| 4XL    | $1.32            | ~$960             | 16-core ARM (dedicated) | 64 GB  | 480                 | 3000                | 2TB                         |
+| 8XL    | $2.562           | ~$1,870           | 32-core ARM (dedicated) | 128 GB | 490                 | 6000                | 4TB                         |
+| 12XL   | $3.836           | ~$2,800           | 48-core ARM (dedicated) | 192 GB | 500                 | 9000                | 6TB                         |
+| 16XL   | $5.12            | ~$3,730           | 64-core ARM (dedicated) | 256 GB | 500                 | 12,000              | 10TB                        |
 
 Number of connections above are recommended values.
+
+<Admonition type="note" label="Recommended Database Size">
+
+The database sizes recommended for each instance are intended purely as a guide and recommendation to ensure performance is optimal, these sizes are not enforced.
+
+The performance of your database is impacted by many factors, some of them being the resources available to it or the size of the data contained within it. See the [shared responsibility model](https://supabase.com/docs/guides/platform/shared-responsibility-model) for more information.
+
+</Admonition>
 
 We charge hourly for additional compute based on your usage. Read more about [usage-based billing for compute](/docs/guides/platform/org-based-billing#usage-based-billing-for-compute).
 

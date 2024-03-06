@@ -13,7 +13,10 @@ import {
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
 import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { IntegrationName, IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import type {
+  IntegrationName,
+  IntegrationProjectConnection,
+} from 'data/integrations/integrations.types'
 import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
 import { OPT_IN_TAGS } from 'lib/constants'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'

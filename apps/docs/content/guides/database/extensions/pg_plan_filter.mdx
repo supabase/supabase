@@ -4,7 +4,7 @@ title: 'pg_plan_filter: Restrict Total Cost'
 description: 'Block queries over a total cost limit'
 ---
 
-[pg_plan_filter](https://github.com/pgexperts/pg_plan_filter) is PostgreSQL extension to block execution of statements where query planner's estimate of the total cost exceeds a threshold. This is intended to give database administrators a way to restrict the contribution an individual query has on database load.
+[`pg_plan_filter`](https://github.com/pgexperts/pg_plan_filter) is PostgreSQL extension to block execution of statements where query planner's estimate of the total cost exceeds a threshold. This is intended to give database administrators a way to restrict the contribution an individual query has on database load.
 
 ## Enable the extension
 
@@ -27,7 +27,7 @@ alter database some_db set session_preload_libraries = 'plan_filter';
 `plan_filter.statement_cost_limit`: restricts the maximum total cost for executed statements
 `plan_filter.limit_select_only`: restricts to `select` statements
 
-Note that `limit_select_only = true` is not the same as read-only because `select` statements may modify data e.g. through a function call.
+Note that `limit_select_only = true` is not the same as read-only because `select` statements may modify data, for example, through a function call.
 
 ## Example
 
@@ -88,4 +88,4 @@ HINT:  The plan for your query shows that it would probably have an excessive ru
 
 ## Resources
 
-- Official [pg_plan_filter documentation](https://github.com/pgexperts/pg_plan_filter)
+- Official [`pg_plan_filter` documentation](https://github.com/pgexperts/pg_plan_filter)

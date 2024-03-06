@@ -2,9 +2,9 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { replicaKeys } from './keys'
-import { Database } from './replicas-query'
+import type { Database } from './replicas-query'
 
 export type ReadReplicaRemoveVariables = {
   projectRef: string

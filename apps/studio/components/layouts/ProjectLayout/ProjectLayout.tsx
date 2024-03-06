@@ -5,7 +5,7 @@ import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
 
 import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
 import AISettingsModal from 'components/ui/AISettingsModal'
-import Connecting from 'components/ui/Loading/Loading'
+import { Loading } from 'components/ui/Loading'
 import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { useFlag, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
@@ -14,7 +14,7 @@ import AppLayout from '../AppLayout/AppLayout'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
-import LayoutHeader from './LayoutHeader'
+import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
 import NavigationBar from './NavigationBar/NavigationBar'
 import PausingState from './PausingState'
@@ -22,7 +22,7 @@ import ProductMenuBar from './ProductMenuBar'
 import { ProjectContextProvider } from './ProjectContext'
 import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
-import UpgradingState from './UpgradingState'
+import { UpgradingState } from './UpgradingState'
 import { ResizableHandle, ResizablePanelGroup, ResizablePanel, cn } from 'ui'
 
 // [Joshen] This is temporary while we unblock users from managing their project
@@ -236,7 +236,7 @@ const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapp
   }, [ref])
 
   if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
-    return router.pathname.endsWith('[ref]') ? <LoadingState /> : <Connecting />
+    return router.pathname.endsWith('[ref]') ? <LoadingState /> : <Loading />
   }
 
   if (isProjectUpgrading) {

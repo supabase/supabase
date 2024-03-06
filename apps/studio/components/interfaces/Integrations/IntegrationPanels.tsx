@@ -3,7 +3,10 @@ import Image from 'next/legacy/image'
 import React from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import type {
+  Integration,
+  IntegrationProjectConnection,
+} from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
