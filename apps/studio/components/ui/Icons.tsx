@@ -1,9 +1,11 @@
+import { cn } from 'ui'
+
 export const CriticalIcon = ({ className }: { className?: string }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 22 20"
-      className={`w-4 h-4 p-0.5 text-destructive-200 bg-destructive-600 rounded ${className}`}
+      className={cn('w-4 h-4 p-0.5 text-destructive-200 bg-destructive-600 rounded', className)}
       fill="currentColor"
     >
       <path
@@ -20,7 +22,7 @@ export const WarningIcon = ({ className }: { className?: string }) => {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 21 20"
-      className={`w-4 h-4 p-0.5 text-warning-200 bg-warning-600 rounded ${className}`}
+      className={cn('w-4 h-4 p-0.5 text-warning-200 bg-warning-600 rounded', className)}
       fill="currentColor"
     >
       <path
