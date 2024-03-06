@@ -18,7 +18,7 @@ export const REPORTS_DATEPICKER_HELPERS: DatetimeHelper[] = [
   },
   {
     text: 'Last 14 days',
-    calcFrom: () => dayjs().subtract(7, 'day').startOf('day').toISOString(),
+    calcFrom: () => dayjs().subtract(14, 'day').startOf('day').toISOString(),
     calcTo: () => '',
   },
   {

@@ -264,7 +264,7 @@ export const gettingstarted: NavMenuConstant = {
       ],
     },
     {
-      name: 'Web app tutorials',
+      name: 'Web app demos',
       items: [
         {
           name: 'Next.js',
@@ -1127,6 +1127,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Debugging Edge Functions',
           url: '/guides/functions/debugging',
+        },
+        {
+          name: 'Logging and Using Headers',
+          url: '/guides/functions/functions-headers',
         },
         {
           name: 'Testing your Edge Functions',

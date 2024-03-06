@@ -15,7 +15,7 @@ dayjs.extend(utc)
  * numberFormatter(123, 2)    // "123.00"
  */
 export const numberFormatter = (num: number, precision = 2) =>
-  isFloat(num) ? precisionFormatter(num, precision) : String(num)
+  isFloat(num) ? precisionFormatter(num, precision) : num.toLocaleString()
 
 /**
  * Tests if a number is a float.
@@ -36,10 +36,10 @@ export const isFloat = (num: number) => String(num).includes('.')
 export const precisionFormatter = (num: number, precision: number): string => {
   if (isFloat(num)) {
     const [head, tail] = String(num).split('.')
-    return head + '.' + tail.slice(0, precision)
+    return Number(head).toLocaleString() + '.' + tail.slice(0, precision)
   } else {
     // pad int with 0
-    return String(num) + '.' + '0'.repeat(precision)
+    return num.toLocaleString() + '.' + '0'.repeat(precision)
   }
 }
 
