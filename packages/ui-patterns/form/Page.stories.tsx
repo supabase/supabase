@@ -1,5 +1,6 @@
 // import { within, userEvent, expect } from '@storybook/test'
-import { Page } from './Page'
+import { TooltipProvider_Shadcn_ } from 'ui'
+import { Page } from './LayoutOnly'
 
 export default {
   title: 'Form Examples/One',
@@ -8,6 +9,15 @@ export default {
     // More on how to position stories at: https://storybook.js.org/docs/configure/story-layout
     layout: 'centered',
   },
+  decorators: [
+    (Story: any) => {
+      return (
+        <TooltipProvider_Shadcn_>
+          <Story />
+        </TooltipProvider_Shadcn_>
+      )
+    },
+  ],
 }
 
 export const StateOne = {}

@@ -7,15 +7,16 @@ import {
   Label_Shadcn_,
   cn,
 } from 'ui'
+import { FormItem } from 'ui/src/components/shadcn/ui/form'
 import { SIZE } from 'ui/src/lib/constants'
 
 export type FormLayoutProps = {
   description?: string | React.ReactNode | undefined
   label?: string | React.ReactNode
-  afterLabel?: string
-  beforeLabel?: string
+  afterLabel?: string | React.ReactNode
+  beforeLabel?: string | React.ReactNode
   labelOptional?: string | React.ReactNode
-  layout?: 'horizontal' | 'vertical'
+  layout?: 'horizontal' | 'vertical' | 'flex'
   isReactForm?: boolean
   hideMessage?: boolean
 }
@@ -53,6 +54,11 @@ const ContainerVariants = cva('grid gap-2', {
       true: '',
       false: '',
     },
+    layout: {
+      horizontal: 'flex flex-row gap-6 justify-between',
+      vertical: 'flex flex-col gap-3',
+      flex: 'flex flex-row gap-3',
+    },
     flex: {
       true: '',
       false: '',
@@ -60,24 +66,9 @@ const ContainerVariants = cva('grid gap-2', {
   },
   compoundVariants: [
     {
-      flex: true,
-      align: 'left',
-      className: 'flex flex-row gap-6',
-    },
-    {
-      flex: true,
+      layout: 'flex',
       align: 'right',
-      className: 'flex flex-row gap-6 justify-between',
-    },
-    {
-      flex: false,
-      responsive: true,
-      className: 'md:grid md:grid-cols-12',
-    },
-    {
-      flex: false,
-      responsive: false,
-      className: 'grid grid-cols-12 gap-2',
+      className: 'justify-between',
     },
   ],
   defaultVariants: {},
@@ -94,9 +85,9 @@ const LabelContainerVariants = cva('', {
       right: '',
     },
     layout: {
-      horizontal: '',
-      vertical: '',
-      flex: '',
+      horizontal: 'flex flex-col gap-2',
+      vertical: 'flex flex-row gap-2 justify-between',
+      flex: 'flex flex-col gap-0',
     },
     labelLayout: {
       horizontal: '',
@@ -119,20 +110,12 @@ const LabelContainerVariants = cva('', {
       layout: 'vertical' || 'flex',
       labelLayout: undefined,
       flex: false,
-      className: 'flex flex-row space-x-2 justify-between col-span-12',
+      className: 'flex flex-row gap-2 justify-between',
     },
-    {
-      labelLayout: 'horizontal',
-      className: 'flex flex-row space-x-2 justify-between col-span-12',
-    },
-    {
-      labelLayout: 'vertical',
-      className: 'flex flex-col space-y-2 col-span-4',
-    },
+
     {
       layout: 'horizontal',
-      labelLayout: undefined,
-      className: 'flex flex-col space-y-2 col-span-4',
+      className: 'flex flex-col gap-2',
     },
   ],
   defaultVariants: {},
@@ -183,7 +166,21 @@ const DataContainerVariants = cva('', {
   defaultVariants: {},
 })
 
-const DescriptionVariants = cva('mt-2 text-foreground-lighter leading-normal', {
+const DescriptionVariants = cva('text-foreground-lighter leading-normal', {
+  variants: {
+    size: {
+      ...SIZE.text,
+    },
+    layout: {
+      vertical: 'mt-2',
+      horizontal: 'mt-2',
+      flex: '',
+    },
+  },
+  defaultVariants: {},
+})
+
+const LabelBeforeVariants = cva('text-foreground-muted', {
   variants: {
     size: {
       ...SIZE.text,
@@ -192,7 +189,7 @@ const DescriptionVariants = cva('mt-2 text-foreground-lighter leading-normal', {
   defaultVariants: {},
 })
 
-const LabelBeforeVariants = cva('text-foreground-lighter', {
+const LabelAfterVariants = cva('text-foreground-muted', {
   variants: {
     size: {
       ...SIZE.text,
@@ -201,16 +198,7 @@ const LabelBeforeVariants = cva('text-foreground-lighter', {
   defaultVariants: {},
 })
 
-const LabelAfterVariants = cva('text-foreground-lighter', {
-  variants: {
-    size: {
-      ...SIZE.text,
-    },
-  },
-  defaultVariants: {},
-})
-
-const LabelOptionalVariants = cva('text-foreground-lighter', {
+const LabelOptionalVariants = cva('text-foreground-muted', {
   variants: {
     size: {
       ...SIZE.text,
@@ -305,18 +293,26 @@ export const FormLayout = React.forwardRef<
   ) => {
     const flex = layout === 'flex'
     const hasLabel = Boolean(label || beforeLabel || afterLabel)
-    const renderError = isReactForm && !hideMessage && <FormMessage_Shadcn_ className="mt-2" />
+    const renderError = isReactForm && !hideMessage && (
+      <FormMessage_Shadcn_ className="mt-2" data-formlayout-id={'message'} />
+    )
+
+    console.log('layout', layout)
 
     const renderDescription =
       descriptionText && isReactForm ? (
         <FormDescription_Shadcn_
-          className={cn(DescriptionVariants({ size }))}
+          className={cn(DescriptionVariants({ size, layout }))}
+          data-formlayout-id={'description'}
           id={id + '-description'}
         >
           {descriptionText}
         </FormDescription_Shadcn_>
       ) : (
-        <p className={cn(DescriptionVariants({ size }), 'text-sm text-foreground-light')}>
+        <p
+          className={cn(DescriptionVariants({ size, layout }), 'text-sm text-foreground-light')}
+          data-formlayout-id={'description'}
+        >
           {descriptionText}
         </p>
       )
@@ -324,13 +320,21 @@ export const FormLayout = React.forwardRef<
     const LabelContents = () => (
       <>
         {beforeLabel && (
-          <span className={cn(LabelBeforeVariants({ size }))} id={id + '-before'}>
+          <span
+            className={cn(LabelBeforeVariants({ size }))}
+            id={id + '-before'}
+            data-formlayout-id={'beforeLabel'}
+          >
             {beforeLabel}
           </span>
         )}
         {label}
         {afterLabel && (
-          <span className={cn(LabelAfterVariants({ size }))} id={id + '-after'}>
+          <span
+            className={cn(LabelAfterVariants({ size }))}
+            id={id + '-after'}
+            data-formlayout-id={'afterLabel'}
+          >
             {afterLabel}
           </span>
         )}
@@ -338,34 +342,54 @@ export const FormLayout = React.forwardRef<
     )
 
     return (
-      <div ref={ref} {...props} className={cn(ContainerVariants({ size, flex, align }), className)}>
+      <div
+        ref={ref}
+        {...props}
+        className={cn(ContainerVariants({ size, flex, align, layout }), className)}
+      >
         {flex && <div className={cn(FlexContainer({ flex, align }))}>{props.children}</div>}
         {hasLabel || labelOptional || layout === 'horizontal' ? (
-          <div className={cn(LabelContainerVariants({ align, labelLayout, flex, layout }))}>
-            {hasLabel && isReactForm ? (
-              <FormLabel_Shadcn_>
-                <LabelContents />
-              </FormLabel_Shadcn_>
-            ) : (
-              <Label_Shadcn_ htmlFor={props.name}>
-                <LabelContents />
-              </Label_Shadcn_>
-            )}
-            {labelOptional && (
-              <span className={cn(LabelOptionalVariants({ size }))} id={id + '-optional'}>
-                {labelOptional}
-              </span>
-            )}
-            {flex && (
-              <>
-                {renderDescription}
-                {renderError}
-              </>
-            )}
-          </div>
+          <>
+            <div
+              className={cn(LabelContainerVariants({ align, labelLayout, flex, layout }))}
+              data-formlayout-id={'labelContainer'}
+            >
+              {hasLabel && isReactForm ? (
+                <FormLabel_Shadcn_
+                  className="flex gap-2 items-center"
+                  data-formlayout-id={'formLabel'}
+                >
+                  <LabelContents />
+                </FormLabel_Shadcn_>
+              ) : (
+                <Label_Shadcn_ htmlFor={props.name} data-formlayout-id={'label'}>
+                  <LabelContents />
+                </Label_Shadcn_>
+              )}
+              {labelOptional && (
+                <span
+                  className={cn(LabelOptionalVariants({ size }))}
+                  id={id + '-optional'}
+                  data-formlayout-id={'labelOptional'}
+                >
+                  {labelOptional}
+                </span>
+              )}
+              {flex && (
+                <>
+                  {renderDescription}
+                  {renderError}
+                </>
+              )}
+            </div>
+          </>
         ) : null}
         {!flex && (
-          <div className={cn(DataContainerVariants({ align, layout }))} style={style}>
+          <div
+            className={cn(DataContainerVariants({ align, layout }))}
+            style={style}
+            data-formlayout-id={'dataContainer'}
+          >
             <>
               <div
                 className={cn(
@@ -376,6 +400,7 @@ export const FormLayout = React.forwardRef<
                     layout,
                   })
                 )}
+                data-formlayout-id={'nonBoxInputContainer'}
               >
                 {props.children}
               </div>

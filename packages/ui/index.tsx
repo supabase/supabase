@@ -224,6 +224,8 @@ export { Separator } from './src/components/shadcn/ui/separator'
 
 export * from './src/components/shadcn/ui/resizable'
 
+export { Badge as Badge_Shadcn_ } from './src/components/shadcn/ui/badge'
+
 // links
 
 export * from './src/components/TextLink'

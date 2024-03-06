@@ -60,6 +60,7 @@ export const Page = () => {
           <p className="text-foreground-light">Please fill in the following</p>
         </div>
         <div role="separator" className="h-px bg-border w-full" />
+
         <FormFieldInput
           control={form.control}
           name="username"
@@ -69,6 +70,7 @@ export const Page = () => {
           labelOptional="Optional"
           icon={<User2 strokeWidth={1.5} size={16} className="text-foreground-muted" />}
         />
+
         <FormSelect
           control={form.control}
           name="email"
