@@ -1772,11 +1772,16 @@ export const resources: NavMenuConstant = {
       url: '/guides/resources/migrating-to-supabase',
       items: [
         {
+          name: 'Amazon RDS',
+          url: '/guides/resources/migrating-to-supabase/amazon-rds',
+          items: [],
+        },
+        {
           name: 'Firebase Auth',
           url: '/guides/resources/migrating-to-supabase/firebase-auth',
         },
         {
-          name: 'Firestore Data',
+          name: 'Firebase Firestore',
           url: '/guides/resources/migrating-to-supabase/firestore-data',
         },
         {
@@ -1784,22 +1789,8 @@ export const resources: NavMenuConstant = {
           url: '/guides/resources/migrating-to-supabase/firebase-storage',
         },
         {
-          name: 'Heroku',
+          name: 'Heroku Postgres',
           url: '/guides/resources/migrating-to-supabase/heroku',
-        },
-        {
-          name: 'Render',
-          url: '/guides/resources/migrating-to-supabase/render',
-        },
-        {
-          name: 'Amazon RDS',
-          url: '/guides/resources/migrating-to-supabase/amazon-rds',
-          items: [],
-        },
-        {
-          name: 'Postgres',
-          url: '/guides/resources/migrating-to-supabase/postgres',
-          items: [],
         },
         {
           name: 'MySQL',
@@ -1810,6 +1801,15 @@ export const resources: NavMenuConstant = {
           name: 'MSSQL',
           url: '/guides/resources/migrating-to-supabase/mssql',
           items: [],
+        },
+        {
+          name: 'Postgres',
+          url: '/guides/resources/migrating-to-supabase/postgres',
+          items: [],
+        },
+        {
+          name: 'Render',
+          url: '/guides/resources/migrating-to-supabase/render',
         },
       ],
     },
