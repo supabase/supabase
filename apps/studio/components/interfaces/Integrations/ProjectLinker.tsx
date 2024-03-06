@@ -1,6 +1,17 @@
 import { PlusIcon } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { ReactNode, useEffect, useRef, useState } from 'react'
 import { toast } from 'react-hot-toast'
+
+import ShimmerLine from 'components/ui/ShimmerLine'
+import {
+  IntegrationConnectionsCreateVariables,
+  IntegrationProjectConnection,
+} from 'data/integrations/integrations.types'
+import { useSelectedOrganization } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
+import { openInstallGitHubIntegrationWindow } from 'lib/github'
+import { EMPTY_ARR } from 'lib/void'
 import {
   Button,
   CommandEmpty_Shadcn_,
@@ -16,16 +27,6 @@ import {
   Popover_Shadcn_,
   cn,
 } from 'ui'
-import { useRouter } from 'next/router'
-
-import ShimmerLine from 'components/ui/ShimmerLine'
-import {
-  IntegrationConnectionsCreateVariables,
-  IntegrationProjectConnection,
-} from 'data/integrations/integrations.types'
-import { useSelectedOrganization } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-import { openInstallGitHubIntegrationWindow } from 'lib/github'
 
 export interface Project {
   id: string
@@ -63,7 +64,7 @@ const ProjectLinker = ({
   foreignProjects,
   supabaseProjects,
   onCreateConnections: _onCreateConnections,
-  installedConnections = [],
+  installedConnections = EMPTY_ARR,
   isLoading,
   integrationIcon,
   getForeignProjectIcon,
