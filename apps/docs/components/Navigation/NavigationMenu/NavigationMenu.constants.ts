@@ -1201,6 +1201,10 @@ export const functions: NavMenuConstant = {
           name: 'Hugging Face',
           url: '/guides/ai/examples/huggingface-image-captioning',
         },
+        {
+          name: 'Monitoring with Sentry',
+          url: '/guides/functions/examples/sentry-monitoring',
+        },
         { name: 'OpenAI API', url: '/guides/ai/examples/openai' },
         {
           name: 'Sending Emails with Resend',
@@ -1594,6 +1598,15 @@ export const platform: NavMenuConstant = {
       ],
     },
     {
+      name: 'Logging and observability',
+      url: undefined,
+      items: [
+        { name: 'Logging', url: '/guides/platform/logs' },
+        { name: 'Metrics', url: '/guides/platform/metrics' },
+        { name: 'Monitoring with Sentry', url: '/guides/platform/sentry-monitoring' },
+      ],
+    },
+    {
       name: 'Platform Management',
       url: undefined,
       items: [
@@ -1608,8 +1621,6 @@ export const platform: NavMenuConstant = {
           name: 'HTTP Status Codes',
           url: '/guides/platform/http-status-codes',
         },
-        { name: 'Logging', url: '/guides/platform/logs' },
-        { name: 'Metrics', url: '/guides/platform/metrics' },
         {
           name: 'Migrating and Upgrading',
           url: '/guides/platform/migrating-and-upgrading-projects',
