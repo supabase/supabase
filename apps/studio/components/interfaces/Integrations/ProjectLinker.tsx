@@ -283,7 +283,7 @@ const ProjectLinker = ({
               </Popover_Shadcn_>
             </Panel>
 
-            <div className="border border-foreground-lighter h-px w-16 border-dashed self-end mb-4" />
+            <div className="border border-foreground-lighter h-px w-8 border-dashed self-end mb-4" />
 
             <Panel>
               <div className="bg-black shadow rounded p-1 w-12 h-12 flex justify-center items-center">
@@ -303,9 +303,11 @@ const ProjectLinker = ({
                     loading={loadingForeignProjects}
                     className="justify-start"
                     icon={
-                      selectedForeignProject
-                        ? getForeignProjectIcon?.(selectedForeignProject)
-                        : integrationIcon
+                      <div>
+                        {selectedForeignProject
+                          ? getForeignProjectIcon?.(selectedForeignProject) ?? integrationIcon
+                          : integrationIcon}
+                      </div>
                     }
                     iconRight={
                       <span className="grow flex justify-end">

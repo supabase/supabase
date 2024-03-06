@@ -171,9 +171,9 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
             className
           )}
         >
-          <div className="flex-1 flex flex-col gap-1 min-w-0">
-            <div className="flex-1 flex items-center gap-2">
-              <div className="flex-shrink-0 flex gap-2 items-center">
+          <div className="flex flex-col gap-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <div className="flex-shrink-0 flex gap-x-2 items-center max-w-40 ">
                 <HandleIcon type={'Supabase'} />
                 <span title={project?.name} className="text-sm truncate">
                   {project?.name}
@@ -186,7 +186,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
                 strokeWidth={1.5}
               />
 
-              <div className="flex-shrink-0 flex gap-2 items-center">
+              <div className="flex-1 min-w-0 flex gap-2 items-center">
                 {!connection?.metadata?.framework ? (
                   <div className="bg-black text-white w-4 h-4 rounded flex items-center justify-center">
                     <HandleIcon type={type} className={'!w-2.5'} />
