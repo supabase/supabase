@@ -6,8 +6,8 @@ import {
   SelectTrigger_Shadcn_,
   Select_Shadcn_,
 } from 'ui'
-import { InputWithLayout } from './InputWithLayout'
-import { SelectWithLayout } from './SelectWithLayout'
+import { InputWithLayout } from '../withLayout/InputWithLayout'
+import { SelectWithLayout } from '../withLayout/SelectWithLayout'
 
 export interface Props extends Omit<ComponentProps<typeof InputWithLayout>, 'ref'> {
   name: React.ComponentProps<typeof FormField_Shadcn_>['name']
@@ -32,7 +32,7 @@ const FormSelect = forwardRef<
               defaultValue={field.value}
               {...props}
               {...field}
-              isForm={true}
+              isReactForm={true}
             />
           </FormControl_Shadcn_>
         </FormItem_Shadcn_>

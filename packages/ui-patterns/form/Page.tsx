@@ -20,9 +20,9 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { FormInput } from './FormInput'
+import { FormInput } from './Input/FormInput'
 import { Box, User, User2 } from 'lucide-react'
-import { FormSelect, FormSelectTrigger } from './FormSelect'
+import { FormSelect, FormSelectTrigger } from './Select/FormSelect'
 
 // import { Header } from './Header'
 

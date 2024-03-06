@@ -1,10 +1,10 @@
 import { ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
 import { Select_Shadcn_ } from 'ui'
-import { FormLayout, FormLayoutProps } from '../forms/layout/FormLayout'
+import { FormLayout, FormLayoutProps } from '../../forms/layout/FormLayout'
 
 const SelectWithLayout = forwardRef<
   ElementRef<typeof Select_Shadcn_>,
-  Omit<ComponentPropsWithoutRef<typeof Select_Shadcn_>, 'name'> & FormLayoutProps
+  ComponentPropsWithoutRef<typeof Select_Shadcn_> & FormLayoutProps
 >(
   (
     {
@@ -14,7 +14,7 @@ const SelectWithLayout = forwardRef<
       layout,
       label,
       description,
-      isForm = false,
+      isReactForm = false,
       ...props
     },
     ref
@@ -27,7 +27,7 @@ const SelectWithLayout = forwardRef<
         labelOptional={labelOptional}
         layout={layout}
         descriptionText={description}
-        isForm={isForm}
+        isReactForm={isReactForm}
       >
         <Select_Shadcn_ {...props} />
       </FormLayout>

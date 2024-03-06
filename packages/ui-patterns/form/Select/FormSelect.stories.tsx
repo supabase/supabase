@@ -17,10 +17,10 @@ import {
   SelectValue_Shadcn_,
 } from 'ui'
 import { z } from 'zod'
-import { transformSourceForm } from '../lib/transformSource'
+import { transformSourceForm } from '../../lib/transformSource'
 import { FormSelect, FormSelectTrigger } from './FormSelect'
-import { FormInput } from './FormInput'
-import { InputWithLayout } from './InputWithLayout'
+import { FormInput } from '../Input/FormInput'
+import { InputWithLayout } from '../withLayout/InputWithLayout'
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 export default {

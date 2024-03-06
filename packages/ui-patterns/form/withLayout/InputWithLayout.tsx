@@ -1,6 +1,6 @@
 import { ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
-import { FormLayout, FormLayoutProps } from '../forms/layout/FormLayout'
-import { Input } from './../data-inputs/Input'
+import { FormLayout, FormLayoutProps } from '../../forms/layout/FormLayout'
+import { Input } from '../../data-inputs/Input'
 
 const InputWithLayout = forwardRef<
   ElementRef<typeof Input>,
@@ -14,7 +14,7 @@ const InputWithLayout = forwardRef<
       layout,
       label,
       description,
-      isForm = false,
+      isReactForm = false,
       ...props
     },
     ref
@@ -27,7 +27,7 @@ const InputWithLayout = forwardRef<
         labelOptional={labelOptional}
         layout={layout}
         descriptionText={description}
-        isForm={isForm}
+        isReactForm={isReactForm}
       >
         <Input ref={ref} {...props} />
       </FormLayout>

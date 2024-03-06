@@ -15,7 +15,7 @@ export type FormLayoutProps = {
   beforeLabel?: string
   labelOptional?: string | React.ReactNode
   layout?: 'horizontal' | 'vertical'
-  isForm?: boolean
+  isReactForm?: boolean
 }
 
 type Props = {
@@ -32,7 +32,8 @@ type Props = {
   afterLabel?: string | React.ReactNode
   nonBoxInput?: boolean
   labelLayout?: 'horizontal' | 'vertical'
-  isForm?: boolean
+  isReactForm?: boolean
+  name?: string
 }
 
 export const FormLayout = React.forwardRef<
@@ -109,10 +110,10 @@ export const FormLayout = React.forwardRef<
 
     const hasLabel = Boolean(label || beforeLabel || afterLabel)
 
-    const renderError = props.isForm && <FormMessage_Shadcn_ className="mt-2" />
+    const renderError = props.isReactForm && <FormMessage_Shadcn_ className="mt-2" />
 
     const renderDescription =
-      descriptionText && props.isForm ? (
+      descriptionText && props.isReactForm ? (
         <FormDescription_Shadcn_
           className={[__styles.description.base, __styles.description.size[size]].join(' ')}
           id={id + '-description'}
@@ -130,7 +131,27 @@ export const FormLayout = React.forwardRef<
         </p>
       )
 
-    const Label = (props.isForm && FormLabel_Shadcn_) || Label_Shadcn_
+    const LabelContents = () => (
+      <>
+        {beforeLabel && (
+          <span
+            className={[__styles.label_before.base, __styles.label_before.size[size]].join(' ')}
+            id={id + '-before'}
+          >
+            {beforeLabel}
+          </span>
+        )}
+        {label}
+        {afterLabel && (
+          <span
+            className={[__styles.label_after.base, __styles.label_after.size[size]].join(' ')}
+            id={id + '-after'}
+          >
+            {afterLabel}
+          </span>
+        )}
+      </>
+    )
 
     return (
       <div ref={ref} {...props} className={cn(containerClasses.join(' '), className)}>
@@ -145,31 +166,16 @@ export const FormLayout = React.forwardRef<
             // }
             className={labelContainerClasses.join(' ')}
           >
-            {hasLabel && (
-              <Label>
-                {beforeLabel && (
-                  <span
-                    className={[__styles.label_before.base, __styles.label_before.size[size]].join(
-                      ' '
-                    )}
-                    id={id + '-before'}
-                  >
-                    {beforeLabel}
-                  </span>
-                )}
-                {label}
-                {afterLabel && (
-                  <span
-                    className={[__styles.label_after.base, __styles.label_after.size[size]].join(
-                      ' '
-                    )}
-                    id={id + '-after'}
-                  >
-                    {afterLabel}
-                  </span>
-                )}
-              </Label>
+            {hasLabel && props.isForm ? (
+              <FormLabel_Shadcn_ htmlFor={props.name}>
+                <LabelContents />
+              </FormLabel_Shadcn_>
+            ) : (
+              <Label_Shadcn_ htmlFor={props.name}>
+                <LabelContents />
+              </Label_Shadcn_>
             )}
+
             {labelOptional && (
               <span
                 className={[__styles.label_optional.base, __styles.label_optional.size[size]].join(

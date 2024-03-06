@@ -1,12 +1,15 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import { StoryContext, StoryObj } from '@storybook/react'
-import { transformSourceForm } from '../lib/transformSource'
+import { useForm } from 'react-hook-form'
+import { Button, Form_Shadcn_ } from 'ui'
+import { z } from 'zod'
+import { transformSourceForm } from '../../lib/transformSource'
 import { FormInput } from './FormInput'
-import { InputWithLayout } from './InputWithLayout'
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 export default {
-  title: 'Data Inputs with Layout/InputWithLayout',
-  component: InputWithLayout,
+  title: 'Form Data Inputs/FormInput',
+  component: FormInput,
   decorators: [
     (Story: any) => {
       return <Story />
@@ -36,10 +39,36 @@ type Story = StoryObj<typeof FormInput>
 
 export const Primary: Story = {
   render: function Render(args) {
+    const formSchema = z.object({
+      username: z.string().min(2, {
+        message: 'Username must be at least 2 characters.',
+      }),
+    })
+
+    // 1. Define your form.
+    const form = useForm<z.infer<typeof formSchema>>({
+      resolver: zodResolver(formSchema),
+      defaultValues: {
+        username: '',
+      },
+    })
+
+    // 2. Define a submit handler.
+    function onSubmit(values: z.infer<typeof formSchema>) {
+      // Do something with the form values.
+      // ✅ This will be type-safe and validated.
+      console.log(values)
+      // action('form form.handleSubmit(onSubmit)')(values)
+    }
     return (
-      <div className="w-80">
-        <InputWithLayout {...args} />
-      </div>
+      <Form_Shadcn_ {...form}>
+        <form className="w-96 flex flex-col gap-3" onSubmit={form.handleSubmit(onSubmit)}>
+          <FormInput {...args} name="username" control={form.control} />
+          <Button size="small" type="primary" htmlType="submit">
+            Submit
+          </Button>
+        </form>
+      </Form_Shadcn_>
     )
   },
   args: {
