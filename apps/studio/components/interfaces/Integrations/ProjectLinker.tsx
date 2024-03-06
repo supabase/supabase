@@ -57,6 +57,7 @@ export interface ProjectLinkerProps {
 
   defaultSupabaseProjectRef?: string
   defaultForeignProjectId?: string
+  mode: 'Vercel' | 'GitHub'
 }
 
 const ProjectLinker = ({
@@ -76,6 +77,7 @@ const ProjectLinker = ({
 
   defaultSupabaseProjectRef,
   defaultForeignProjectId,
+  mode,
 }: ProjectLinkerProps) => {
   const router = useRouter()
   const [supabaseProjectsComboBoxOpen, setSupabaseProjectsComboboxOpen] = useState(false)
@@ -160,8 +162,8 @@ const ProjectLinker = ({
 
   const noSupabaseProjects = supabaseProjects.length === 0
   const noForeignProjects = foreignProjects.length === 0
-  const missingEntity = noSupabaseProjects ? 'Supabase' : 'Vercel'
-  const oppositeMissingEntity = noSupabaseProjects ? 'Vercel' : 'Supabase'
+  const missingEntity = noSupabaseProjects ? 'Supabase' : mode
+  const oppositeMissingEntity = noSupabaseProjects ? mode : 'Supabase'
 
   return (
     <div className="flex flex-col gap-4">
@@ -349,20 +351,24 @@ const ProjectLinker = ({
                         })}
                         {foreignProjects.length === 0 && (
                           <p className="text-xs text-foreground-lighter px-2 py-2">
-                            No GitHub repositories found
+                            No results found
                           </p>
                         )}
                       </CommandGroup_Shadcn_>
-                      <CommandSeparator_Shadcn_ />
-                      <CommandGroup_Shadcn_>
-                        <CommandItem_Shadcn_
-                          className="flex gap-2 items-center cursor-pointer"
-                          onSelect={() => openInstallGitHubIntegrationWindow('install')}
-                        >
-                          <PlusIcon size={16} />
-                          <span>Add GitHub Repositories</span>
-                        </CommandItem_Shadcn_>
-                      </CommandGroup_Shadcn_>
+                      {mode === 'GitHub' && (
+                        <>
+                          <CommandSeparator_Shadcn_ />
+                          <CommandGroup_Shadcn_>
+                            <CommandItem_Shadcn_
+                              className="flex gap-2 items-center cursor-pointer"
+                              onSelect={() => openInstallGitHubIntegrationWindow('install')}
+                            >
+                              <PlusIcon size={16} />
+                              <span>Add GitHub Repositories</span>
+                            </CommandItem_Shadcn_>
+                          </CommandGroup_Shadcn_>
+                        </>
+                      )}
                     </CommandList_Shadcn_>
                   </Command_Shadcn_>
                 </PopoverContent_Shadcn_>
