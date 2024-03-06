@@ -26,9 +26,9 @@ Handle exceptions within your function and send them to Sentry.
 import * as Sentry from 'https://deno.land/x/sentry/index.mjs'
 
 Sentry.init({
+  // https://docs.sentry.io/product/sentry-basics/concepts/dsn-explainer/#where-to-find-your-dsn
   dsn: SENTRY_DSN,
-  integrations: [],
-  debug: true,
+  defaultIntegrations: false,
   // Performance Monitoring
   tracesSampleRate: 1.0,
   // Set sampling rate for profiling - this is relative to tracesSampleRate
@@ -42,6 +42,7 @@ Sentry.setTag('execution_id', Deno.env.get('SB_EXECUTION_ID'))
 Deno.serve(async (req) => {
   try {
     const { name } = await req.json()
+    // This will throw, as `name` in our example call will be `undefined`
     const data = {
       message: `Hello ${name}!`,
     }
