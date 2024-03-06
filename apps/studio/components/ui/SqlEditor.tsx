@@ -1,7 +1,7 @@
 import Editor, { OnChange, useMonaco } from '@monaco-editor/react'
 import { noop } from 'lodash'
 import { useEffect, useRef } from 'react'
-import { useTheme } from 'next-themes';
+import { useTheme } from 'next-themes'
 import { useStore } from 'hooks'
 
 // [Joshen] We should deprecate this and use CodeEditor instead
@@ -27,12 +27,10 @@ const SqlEditor = ({
   const { meta } = useStore()
   const editorRef = useRef<any>()
 
-
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme } = useTheme()
 
   useEffect(() => {
     if (monaco) {
-
       // Enable pgsql format
       const formatprovider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
         async provideDocumentFormattingEdits(model: any) {
@@ -46,19 +44,25 @@ const SqlEditor = ({
           ]
         },
       })
-      
-      const prefersDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const base = theme === 'dark' ? 'vs-dark' : (theme === 'light' ? 'vs' : (prefersDarkTheme ? 'vs-dark' : 'vs'));
+
+      const prefersDarkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+      const base =
+        theme === 'dark'
+          ? 'vs-dark'
+          : theme === 'light'
+            ? 'vs'
+            : prefersDarkTheme
+              ? 'vs-dark'
+              : 'vs'
       // create custom theme
       monaco?.editor.defineTheme('custom-theme', {
         base,
         inherit: true,
         rules: [],
-        colors: {
-        },
-    });
+        colors: {},
+      })
 
-    monaco.editor.setTheme('custom-theme');
+      monaco.editor.setTheme('custom-theme')
 
       return () => {
         formatprovider.dispose()
@@ -104,7 +108,6 @@ const SqlEditor = ({
   }
 
   const Loading = () => <h4 className="text-lg">Loading</h4>
-  
 
   return (
     <Editor
