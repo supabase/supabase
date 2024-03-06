@@ -2,7 +2,7 @@ import React, { ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
 import { FieldPath, FieldValues } from 'react-hook-form'
 import { FormField_Shadcn_ } from 'ui'
 import { FormItemProps, FormItemWrapper } from '../utils'
-import { InputWithLayout } from '../withLayout/InputWithLayout'
+import { InputWithLayout } from './InputWithLayout'
 
 const FormItemInput = forwardRef<
   ElementRef<typeof InputWithLayout>,

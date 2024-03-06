@@ -1,26 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { StoryObj, StoryContext } from '@storybook/react'
+import { StoryContext, StoryObj } from '@storybook/react'
 import { useForm } from 'react-hook-form'
 import {
   Button,
-  FormControl_Shadcn_,
-  FormDescription_Shadcn_,
-  FormField_Shadcn_,
-  FormItem_Shadcn_,
-  FormLabel_Shadcn_,
-  FormMessage_Shadcn_,
   Form_Shadcn_,
-  Input_Shadcn_,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
-  SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
 } from 'ui'
 import { z } from 'zod'
 import { transformSourceForm } from '../../lib/transformSource'
 import { FormSelect, FormSelectTrigger } from './FormSelect'
-import { FormInput } from '../Input/FormInput'
-import { InputWithLayout } from '../withLayout/InputWithLayout'
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 export default {
@@ -102,6 +92,5 @@ export const Primary: Story = {
     label: 'Email',
     description: 'this is the description',
     labelOptional: 'Optional text',
-    placeholder: 'shadcn',
   },
 }

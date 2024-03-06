@@ -2,7 +2,7 @@ import React, { ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
 import { FieldPath, FieldValues } from 'react-hook-form'
 import { FormField_Shadcn_ } from 'ui'
 import { FormItemProps, FormItemWrapper } from '../utils'
-import { CheckboxWithLayout } from '../withLayout/CheckboxWithLayout'
+import { CheckboxWithLayout } from './CheckboxWithLayout'
 
 const FormItemCheckbox = forwardRef<
   ElementRef<typeof CheckboxWithLayout>,
@@ -40,4 +40,4 @@ const FormFieldCheckbox = forwardRef<
 
 FormFieldCheckbox.displayName = 'FormFieldCheckbox'
 
-export { FormFieldCheckbox, FormItemCheckbox }
+export { CheckboxWithLayout, FormFieldCheckbox, FormItemCheckbox }

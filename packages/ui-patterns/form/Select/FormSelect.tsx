@@ -1,7 +1,7 @@
 import React, { ComponentProps, ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
 import { FormControl_Shadcn_, FormField_Shadcn_, SelectTrigger_Shadcn_, Select_Shadcn_ } from 'ui'
 import { FormItemProps, FormItemWrapper } from '../utils'
-import { SelectWithLayout } from '../withLayout/SelectWithLayout'
+import { SelectWithLayout } from './SelectWithLayout'
 
 const FormItemSelect = forwardRef<
   ElementRef<typeof SelectWithLayout>,
