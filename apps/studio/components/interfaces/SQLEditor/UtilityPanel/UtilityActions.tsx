@@ -28,6 +28,7 @@ import FavoriteButton from './FavoriteButton'
 import SavingIndicator from './SavingIndicator'
 import toast from 'react-hot-toast'
 import { FileCog, Keyboard, SlidersHorizontal } from 'lucide-react'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 
 export type UtilityActionsProps = {
   id: string
@@ -48,6 +49,7 @@ const UtilityActions = ({
 }: UtilityActionsProps) => {
   const os = detectOS()
   const project = useSelectedProject()
+  const snap = useSqlEditorStateSnapshot()
   const showReadReplicasUI = project?.is_read_replicas_enabled
 
   const [intellisenseEnabled, setIntellisenseEnabled] = useLocalStorageQuery(
@@ -97,7 +99,12 @@ const UtilityActions = ({
 
       <div className="flex items-center justify-between gap-x-2 mx-2">
         <div className="flex items-center">
-          {showReadReplicasUI && <DatabaseSelector variant="connected-on-right" />}
+          {showReadReplicasUI && (
+            <DatabaseSelector
+              variant="connected-on-right"
+              onSelectId={() => snap.resetResult(id)}
+            />
+          )}
           <RoleImpersonationPopover
             serviceRoleLabel="postgres"
             variant={showReadReplicasUI ? 'connected-on-both' : 'connected-on-right'}

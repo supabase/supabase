@@ -11,12 +11,16 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  IconHelpCircle,
   IconMoreVertical,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
 import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
-import { NODE_SEP, NODE_WIDTH, Region } from './InstanceConfiguration.constants'
+import { NODE_SEP, NODE_WIDTH, REPLICA_STATUS, Region } from './InstanceConfiguration.constants'
 
 interface NodeData {
   id: string
@@ -190,11 +194,25 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               <p className="text-sm truncate">
                 Replica {id.length > 0 && `(ID: ${formatDatabaseID(id)})`}
               </p>
-              {status === PROJECT_STATUS.ACTIVE_HEALTHY ? (
+              {status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
                 <Badge color="green">Healthy</Badge>
-              ) : status === PROJECT_STATUS.COMING_UP ? (
+              ) : status === REPLICA_STATUS.INIT_READ_REPLICA ? (
+                <Badge color="slate">Initializing</Badge>
+              ) : status === REPLICA_STATUS.INIT_READ_REPLICA_FAILED ? (
+                <>
+                  <Badge color="red">Init failed</Badge>
+                  <Tooltip_Shadcn_>
+                    <TooltipTrigger_Shadcn_>
+                      <IconHelpCircle />
+                    </TooltipTrigger_Shadcn_>
+                    <TooltipContent_Shadcn_ side="bottom" className="w-60 text-center">
+                      Replica failed to initialize. Please drop this replica, and spin up a new one.
+                    </TooltipContent_Shadcn_>
+                  </Tooltip_Shadcn_>
+                </>
+              ) : status === REPLICA_STATUS.COMING_UP ? (
                 <Badge color="slate">Coming up</Badge>
-              ) : status === PROJECT_STATUS.RESTORING ? (
+              ) : status === REPLICA_STATUS.RESTORING ? (
                 <Badge color="slate">Restoring</Badge>
               ) : (
                 <Badge color="amber">Unhealthy</Badge>

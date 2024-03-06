@@ -856,6 +856,10 @@ export interface paths {
     /** Reassigns object owner from temp to postgres */
     patch: operations['DatabaseOwnerController_finaliseOwnerReassign']
   }
+  '/system/database/{ref}/password': {
+    /** Updates the database password */
+    patch: operations['DatabasePasswordController_updatePassword']
+  }
   '/system/github-secret-alert': {
     /** Reset JWT if leaked keys found by GitHub secret scanning */
     post: operations['GithubSecretAlertController_resetJwt']
@@ -890,6 +894,10 @@ export interface paths {
     /** Refreshes secrets */
     post: operations['SecretsRefreshController_refreshSecrets']
   }
+  '/system/health': {
+    /** Get API health status */
+    get: operations['HealthController_getStatus']
+  }
   '/system/projects/{ref}/health-reporting': {
     /** Updates a project's health status. */
     put: operations['HealthReportingController_updateStatus']
@@ -922,11 +930,19 @@ export interface paths {
     /** Gets usage stats */
     get: operations['OrgUsageSystemController_getOrgUsage']
   }
+  '/system/organizations/{slug}/billing/partner/usage-and-costs': {
+    /** Gets the partner usage and costs */
+    get: operations['PartnerBillingSystemController_getPartnerUsageAndCosts']
+  }
   '/system/organizations/{slug}/billing/subscription': {
     /** Gets the current subscription */
     get: operations['OrgSubscriptionSystemController_getSubscription']
     /** Updates subscription */
     put: operations['OrgSubscriptionSystemController_updateSubscription']
+  }
+  '/system/organizations/{slug}/restrictions': {
+    /** Updates restriction status of an org */
+    put: operations['OrgRestrictionsSystemController_updateRestriction']
   }
   '/system/integrations/vercel/webhooks': {
     /** Processes Vercel event */
@@ -3548,6 +3564,8 @@ export interface components {
         | 'RESTORING'
         | 'UNKNOWN'
         | 'UPGRADING'
+        | 'INIT_READ_REPLICA'
+        | 'INIT_READ_REPLICA_FAILED'
       /** @enum {string} */
       cloud_provider: 'AWS' | 'FLY'
       db_port: number
@@ -3573,6 +3591,8 @@ export interface components {
         | 'RESTORING'
         | 'UNKNOWN'
         | 'UPGRADING'
+        | 'INIT_READ_REPLICA'
+        | 'INIT_READ_REPLICA_FAILED'
       identifier: string
     }
     UpdatePasswordBody: {
@@ -4282,6 +4302,11 @@ export interface components {
     DeleteVercelConnectionResponse: {
       id: string
     }
+    GitHubAuthorization: {
+      id: number
+      user_id: number
+      sender_id: number
+    }
     CreateGitHubAuthorizationBody: {
       code: string
     }
@@ -4308,7 +4333,6 @@ export interface components {
       repository: components['schemas']['ListGitHubConnectionsRepository']
       user: components['schemas']['ListGitHubConnectionsUser'] | null
       workdir: string
-      supabase_changes_only: boolean
     }
     ListGitHubConnectionsResponse: {
       connections: components['schemas']['ListGitHubConnectionsConnection'][]
@@ -4353,6 +4377,9 @@ export interface components {
       name: string
       value: string
     }
+    HealthResponse: {
+      healthy: boolean
+    }
     ReportStatusBody: {
       /** @enum {string} */
       status:
@@ -4365,6 +4392,8 @@ export interface components {
         | 'RESTORING'
         | 'UNKNOWN'
         | 'UPGRADING'
+        | 'INIT_READ_REPLICA'
+        | 'INIT_READ_REPLICA_FAILED'
       reportingToken: string
       databaseIdentifier: string
     }
@@ -4386,6 +4415,8 @@ export interface components {
     UpdateAddonAdminBody: {
       addon_variant: components['schemas']['AddonVariantId']
       addon_type: components['schemas']['ProjectAddonType']
+      /** @enum {string} */
+      proration_behaviour?: 'prorate_and_invoice_end_of_cycle' | 'prorate_and_invoice_now'
       price_id?: string
     }
     SystemCreateProjectBody: {
@@ -4458,6 +4489,35 @@ export interface components {
       /** @enum {string} */
       tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
       price_id?: string
+    }
+    RestrictionData: {
+      grace_period_end?: string
+      /** @enum {string} */
+      restrictions?: 'drop_requests_402'
+      violations?: (
+        | 'exceed_db_size_quota'
+        | 'exceed_egress_quota'
+        | 'exceed_edge_functions_count_quota'
+        | 'exceed_edge_functions_invocations_quota'
+        | 'exceed_monthly_active_users_quota'
+        | 'exceed_realtime_connection_count_quota'
+        | 'exceed_realtime_message_count_quota'
+        | 'exceed_storage_size_quota'
+        | 'overdue_payment'
+      )[]
+    }
+    UpdateRestrictionsBody: {
+      /** @enum {string} */
+      restriction_status: 'grace_period' | 'grace_period_over' | 'null' | 'restricted'
+      restriction_data?: components['schemas']['RestrictionData']
+      no_notification?: boolean
+    }
+    UpdateRestrictionsResponse: {
+      slug: string
+      /** @enum {string} */
+      restriction_status?: 'grace_period' | 'grace_period_over' | 'null' | 'restricted'
+      restriction_data?: components['schemas']['RestrictionData']
+      message?: string
     }
     GetMetricsBody: {
       /** @enum {string} */
@@ -5405,7 +5465,7 @@ export interface components {
        */
       itemName: string
       /** @enum {string} */
-      type: 'usage' | 'plan' | 'addon' | 'proration'
+      type: 'usage' | 'plan' | 'addon' | 'proration' | 'compute_credits'
       /**
        * @description In case of a usage item, the free usage included in the customers plan
        * @example 100
@@ -10591,6 +10651,10 @@ export interface operations {
   /** Gets the Vercel project with the given ID */
   VercelProjectsController_getVercelProject: {
     parameters: {
+      query: {
+        id: string
+        teamId: string
+      }
       header: {
         vercel_authorization: string
       }
@@ -10861,6 +10925,11 @@ export interface operations {
   /** Get GitHub authorization */
   GitHubAuthorizationsController_getGitHubAuthorization: {
     responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GitHubAuthorization']
+        }
+      }
       /** @description Failed to get GitHub authorization */
       500: {
         content: never
@@ -10876,9 +10945,7 @@ export interface operations {
     }
     responses: {
       201: {
-        content: {
-          'application/json': Record<string, never>
-        }
+        content: never
       }
       /** @description Failed to create GitHub authorization */
       500: {
@@ -11214,6 +11281,32 @@ export interface operations {
       }
     }
   }
+  /** Updates the database password */
+  DatabasePasswordController_updatePassword: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdatePasswordBody']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update database password */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Reset JWT if leaked keys found by GitHub secret scanning */
   GithubSecretAlertController_resetJwt: {
     parameters: {
@@ -11381,6 +11474,20 @@ export interface operations {
       }
     }
   }
+  /** Get API health status */
+  HealthController_getStatus: {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['HealthResponse']
+        }
+      }
+      /** @description Failed to retrieve API health status */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Updates a project's health status. */
   HealthReportingController_updateStatus: {
     parameters: {
@@ -11533,6 +11640,24 @@ export interface operations {
       }
     }
   }
+  /** Gets the partner usage and costs */
+  PartnerBillingSystemController_getPartnerUsageAndCosts: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to retrieve subscription */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets the current subscription */
   OrgSubscriptionSystemController_getSubscription: {
     parameters: {
@@ -11569,6 +11694,31 @@ export interface operations {
         content: never
       }
       /** @description Failed to update subscription */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates restriction status of an org */
+  OrgRestrictionsSystemController_updateRestriction: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateRestrictionsBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['UpdateRestrictionsResponse']
+        }
+      }
+      /** @description Failed to update restriction status */
       500: {
         content: never
       }
