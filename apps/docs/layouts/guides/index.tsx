@@ -178,12 +178,7 @@ const Layout: FC<Props> = (props) => {
                       <ExpandableVideo imgUrl={tocVideoPreview} videoId={props.meta.tocVideo} />
                     </div>
                   )}
-                  <div className="px-5 mb-6">
-                    <span className="block font-mono text-xs uppercase text-foreground mb-4">
-                      Is this helpful?
-                    </span>
-                    <Feedback />
-                  </div>
+                  <Feedback />
                   <span className="block font-mono text-xs uppercase text-foreground px-5 mb-6">
                     On this page
                   </span>

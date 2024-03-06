@@ -10,21 +10,22 @@ import { type FeedbackFields, FeedbackModal } from './FeedbackModal'
 
 type Response = 'yes' | 'no'
 
-type State =
-  | { type: 'unanswered' }
-  | { type: 'followup'; response: Response }
-  | { type: 'final'; response: Response }
+enum StateType {
+  Unanswered = 'unanswered',
+  Followup = 'followup',
+}
 
-type Action = { event: 'VOTED'; response: Response } | { event: 'FOLLOWUP_ANSWERED' }
+type State = { type: StateType.Unanswered } | { type: StateType.Followup; response: Response }
 
-const initialState = { type: 'unanswered' } satisfies State
+type Action = { event: 'VOTED'; response: Response }
+
+const initialState = { type: StateType.Unanswered } satisfies State
 
 function reducer(state: State, action: Action) {
   switch (action.event) {
     case 'VOTED':
-      if (state.type === 'unanswered') return { type: 'followup', response: action.response }
-    case 'FOLLOWUP_ANSWERED':
-      if (state.type === 'followup') return { type: 'final', response: state.response }
+      if (state.type === StateType.Unanswered)
+        return { type: StateType.Followup, response: action.response }
     default:
       return state
   }
@@ -60,8 +61,17 @@ function Feedback() {
     })
     sendFeedbackVote(response)
     dispatch({ event: 'VOTED', response })
+    // Focus so screen reader users are aware of the new element
     requestAnimationFrame(() => {
       feedbackButtonRef.current?.focus()
+    })
+  }
+
+  function refocusButton() {
+    // Save reference to button, because ref could be cleared by the time rAF runs
+    const button = feedbackButtonRef.current
+    requestAnimationFrame(() => {
+      button?.focus()
     })
   }
 
@@ -76,10 +86,14 @@ function Feedback() {
     })
     if (error) console.error(error)
     setModalOpen(false)
+    refocusButton()
   }
 
   return (
-    <>
+    <section className="px-5 mb-6" aria-labelledby="feedback-title">
+      <h3 id="feedback-title" className="block font-mono text-xs uppercase text-foreground mb-4">
+        Is this helpful?
+      </h3>
       <div
         style={{ [FLEX_GAP_VARIABLE]: '0.5rem' } as CSSProperties}
         className={`relative flex gap-[var(${FLEX_GAP_VARIABLE})] items-center mb-2`}
@@ -119,7 +133,7 @@ function Feedback() {
         className={cn(
           'flex items-center gap-2',
           'text-[0.8rem] text-foreground-lighter text-left',
-          unanswered && 'opacity-0 invisible',
+          state.type !== StateType.Followup && 'opacity-0 invisible',
           'transition-opacity',
           isNo && 'delay-100'
         )}
@@ -131,10 +145,13 @@ function Feedback() {
       <FeedbackModal
         visible={modalOpen}
         page={pathname}
-        onCancel={() => setModalOpen(false)}
+        onCancel={() => {
+          setModalOpen(false)
+          refocusButton()
+        }}
         onSubmit={handleSubmit}
       />
-    </>
+    </section>
   )
 }
 

@@ -16,9 +16,8 @@ function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps
   return (
     <Modal hideFooter header="Leave a comment" visible={visible}>
       <Form
-        onReset={onCancel}
-        validateOnBlur
         initialValues={{ page, comment: '' }}
+        validateOnBlur
         validate={(vals) => {
           const errors: Partial<FeedbackFields> = {}
 
@@ -28,6 +27,7 @@ function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps
 
           return errors
         }}
+        onReset={onCancel}
         onSubmit={onSubmit}
       >
         {({ isSubmitting }: { isSubmitting: boolean }) => (

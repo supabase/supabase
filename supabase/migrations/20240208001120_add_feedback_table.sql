@@ -4,7 +4,7 @@ create type feedback_vote as enum (
 );
 
 create table feedback (
-	id int primary key generated always as identity,
+	id bigint primary key generated always as identity,
 	date_created date not null default current_date,
 	vote feedback_vote not null,
 	page text not null

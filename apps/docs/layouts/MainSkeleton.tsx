@@ -1,7 +1,7 @@
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import { CSSProperties, PropsWithChildren, memo, useEffect } from 'react'
+import { type CSSProperties, type PropsWithChildren, memo, useEffect } from 'react'
 
 import { cn } from 'ui'
 
