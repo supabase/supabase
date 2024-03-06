@@ -49,13 +49,17 @@ const InstanceConfigurationUI = () => {
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<Database>()
   const [selectedReplicaToRestart, setSelectedReplicaToRestart] = useState<Database>()
 
-  const { data: loadBalancers, isSuccess: isSuccessLoadBalancers } = useLoadBalancersQuery({
+  const {
+    data: loadBalancers,
+    refetch: refetchLoadBalancers,
+    isSuccess: isSuccessLoadBalancers,
+  } = useLoadBalancersQuery({
     projectRef,
   })
   const {
     data,
     error,
-    refetch,
+    refetch: refetchReplicas,
     isLoading,
     isError,
     isSuccess: isSuccessReplicas,
@@ -79,7 +83,8 @@ const InstanceConfigurationUI = () => {
         // If any replica's status has changed, refetch databases
         if (numComingUp.current !== comingUpReplicas.length) {
           numComingUp.current = comingUpReplicas.length
-          await refetch()
+          await refetchReplicas()
+          setTimeout(() => refetchLoadBalancers(), 2000)
         }
 
         // If all replicas are active healthy, stop fetching statuses

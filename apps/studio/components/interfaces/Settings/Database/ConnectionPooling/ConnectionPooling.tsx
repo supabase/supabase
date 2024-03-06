@@ -273,7 +273,7 @@ export const ConnectionPooling = () => {
                             </AlertTitle_Shadcn_>
                             <AlertDescription_Shadcn_>
                               Session mode can be used concurrently with transaction mode by using
-                              5432 for session and 6543 for session. However, by configuring the
+                              5432 for session and 6543 for transaction. However, by configuring the
                               pooler mode to session here, you will not be able to use transaction
                               mode at the same time.
                             </AlertDescription_Shadcn_>
