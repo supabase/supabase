@@ -35,6 +35,9 @@ export interface Props extends Omit<React.InputHTMLAttributes<HTMLButtonElement>
   onChange?: (x: any) => void
 }
 
+/**
+ * @deprecated The component should not be used
+ */
 function Listbox({
   children,
   className,
