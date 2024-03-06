@@ -1,0 +1,117 @@
+---
+id: 'auth-anonymous'
+title: 'Anonymous Sign-Ins'
+subtitle: 'Create and use anonymous users to authenticate with Supabase'
+---
+
+Enabling anonymous sign-ins allows you to reduce the onboarding friction for your application. New users are able to try out your application before actually signing up for it. For example, you can use anonymous sign-ins to to build e-commerce websites to allow users to add items to their shopping cart without having to sign in and only prompt them to do so when they are about to checkout.
+
+<Admonition type="note" label="Difference between an anonymous user and the anon key">
+
+An anonymous user is defined as a user that is created through the `signInAnonymously()` method. The anonymous user will have an `is_anonymous: true` claim in the access token JWT. Like permanent users, an anonymous user will use the `authenticated` role in your database. This is different from the `anon` key in your project, which has no user ID and uses the `anonymous` role in your database.
+
+</Admonition>
+
+To get started, [enable anonymous sign-ins](/dashboard/project/_/auth/providers) for your Supabase Project.
+
+<Admonition type="note" label="Self hosting">
+
+For self-hosting, you can update your project configuration using the files and environment variables provided. See the [self-hosting docs](/docs/guides/self-hosting#configuration) for more details.
+
+</Admonition>
+
+## Sign in anonymously
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+Call the [`signInAnonymously()`](/docs/reference/javascript/auth-signinanonymously) method:
+
+```js
+const { data, error } = await supabase.auth.signInAnonymously()
+```
+
+</TabPanel>
+</Tabs>
+
+## Convert the anonymous user to a permanent user
+
+Converting an anonymous user to a permanent user requires linking an identity to the user.
+
+### Link an Email / Phone identity
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+You can use the [`updateUser()`](/docs/reference/javascript/auth-updateuser) method to link an email or phone identity to the anonymous user.
+
+```js
+const { data, error } = await supabase.auth.updateUser({ email: 'example@email.com' })
+```
+
+</TabPanel>
+</Tabs>
+
+### Link an OAuth identity
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+You can use the [`linkIdentity()`](/docs/reference/javascript/auth-linkidentity) method to link an oauth identity to the anonymous user.
+
+```js
+const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
+```
+
+</TabPanel>
+</Tabs>
+
+## Access control
+
+You can use row-level security (RLS) policies to differentiate between an anonymous user and a permanent user by checking for the `is_anonymous` claim in the JWT returned by `auth.jwt()`:
+
+```sql
+create policy "Only permanent users can post to the news feed"
+on news_feed for insert
+to authenticated
+with check ( auth.jwt()->>'is_anonymous' = false );
+
+create policy "Anonymous and permanent users can view the news feed"
+on news_feed for select
+to authenticated
+using ( true );
+
+```
+
+## Conflict Resolution
+
+Depending on your application requirements, data conflicts can arise when an anonymous user is converted to a permanent user. For example, in the context of an e-commerce application, an anonymous user would be allowed to add items to the shopping cart without signing up / signing in. When they decide to sign-in to an existing account, you will need to decide how you want to resolve data conflicts in the shopping cart:
+
+1. Overwrite the items in the cart with those in the existing account
+2. Overwrite the items in the cart with those from the anonymous user
+3. Merge the items in the cart together
+
+## Resources
+
+- [Supabase Account - Free Plan OK](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [Supabase Flutter Client](https://github.com/supabase/supabase-flutter)
+- [Supabase Kotlin Client](https://github.com/supabase-community/supabase-kt)
