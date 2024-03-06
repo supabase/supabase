@@ -506,6 +506,31 @@ functions:
           })
           ```
 
+  - id: sign-in-anonymously
+    title: 'signInAnonymously()'
+    $ref: '@supabase/gotrue-js.GoTrueClient.signInAnonymously'
+    notes: |
+      - Returns an anonymous user
+    examples:
+      - id: sign-in-anonymously
+        name: Create an anonymous user
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.signInAnonymously();
+          ```
+      - id: sign-in-anonymously-with-user-metadata
+        name: Create an anonymous user with custom user metadata
+        isSpotlight: false
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.signInAnonymously({
+            options: {
+              data
+            }
+          })
+          ```
+
   - id: sign-in-with-password
     title: 'signInWithPassword()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
