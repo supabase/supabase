@@ -1,5 +1,4 @@
 import React, { ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
-import { FieldPath, FieldValues } from 'react-hook-form'
 import { FormField_Shadcn_ } from 'ui'
 import { FormItemProps, FormItemWrapper } from '../utils'
 import { InputWithLayout } from './InputWithLayout'
@@ -15,18 +14,15 @@ const FormItemInput = forwardRef<
 
 FormItemInput.displayName = 'FormItemInput'
 
-export interface FormFieldInputProps<
-  TFieldValues extends FieldValues,
-  TName extends FieldPath<TFieldValues>,
-> {
-  name: TName
+export interface FormFieldInputProps {
+  name: (typeof FormItemInput)['name']
   control: any // { key: string }
   formField?: Omit<React.ComponentProps<typeof FormField_Shadcn_>, 'ref'>
 }
 
 const FormFieldInput = forwardRef<
   ElementRef<typeof FormItemInput>,
-  ComponentPropsWithoutRef<typeof FormItemInput> & FormFieldInputProps<any, any>
+  ComponentPropsWithoutRef<typeof FormItemInput> & FormFieldInputProps
 >(({ formField, name, control, ...props }, ref) => {
   return (
     <FormField_Shadcn_
@@ -38,4 +34,4 @@ const FormFieldInput = forwardRef<
   )
 })
 
-export { FormFieldInput, FormItemInput }
+export { FormItemInput, FormFieldInput }

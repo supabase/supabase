@@ -9,7 +9,7 @@ export interface FormItemProps<
   TFieldValues extends FieldValues,
   TName extends FieldPath<TFieldValues>,
 > {
-  field: ControllerRenderProps<TFieldValues, TName>
+  field?: ControllerRenderProps<TFieldValues, TName>
 }
 
 /**

@@ -9,8 +9,8 @@ const FormItemSelect = forwardRef<
 >(({ field, ...props }, ref) => (
   <FormItemWrapper>
     <SelectWithLayout
-      onValueChange={field.onChange}
-      defaultValue={field.value}
+      onValueChange={field && field.onChange}
+      defaultValue={field && field.value}
       {...field}
       {...props}
       isReactForm={true}
@@ -24,7 +24,7 @@ FormItemSelect.displayName = 'FormItemSelect'
 export interface FormFieldSelectProps extends Omit<ComponentProps<typeof SelectWithLayout>, 'ref'> {
   name: React.ComponentProps<typeof FormField_Shadcn_>['name']
   control: any // { key: string }
-  formField: Omit<React.ComponentProps<typeof FormField_Shadcn_>, 'ref'>
+  formField?: Omit<React.ComponentProps<typeof FormField_Shadcn_>, 'ref'>
 }
 
 const FormSelect = forwardRef<

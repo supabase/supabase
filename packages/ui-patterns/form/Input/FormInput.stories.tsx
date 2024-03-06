@@ -63,7 +63,7 @@ export const Primary: Story = {
     return (
       <Form_Shadcn_ {...form}>
         <form className="w-96 flex flex-col gap-3" onSubmit={form.handleSubmit(onSubmit)}>
-          <FormFieldInput {...args} name="username" control={form.control} />
+          <FormFieldInput name="username" control={form.control} />
           <Button size="small" type="primary" htmlType="submit">
             Submit
           </Button>

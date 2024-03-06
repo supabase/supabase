@@ -20,7 +20,7 @@ import {
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { FormInput } from './Input/FormInput'
+import { FormFieldInput } from './Input/FormInput'
 import { Box, User, User2 } from 'lucide-react'
 import { FormSelect, FormSelectTrigger } from './Select/FormSelect'
 
@@ -60,18 +60,18 @@ export const Page = () => {
           <p className="text-foreground-light">Please fill in the following</p>
         </div>
         <div role="separator" className="h-px bg-border w-full" />
-        <FormInput
-          layout="horizontal"
-          name="username"
+        <FormFieldInput
           control={form.control}
+          name="username"
           label="Username"
+          layout="horizontal"
           description="What we call you"
           labelOptional="Optional"
           icon={<User2 strokeWidth={1.5} size={16} className="text-foreground-muted" />}
         />
         <FormSelect
-          name="email"
           control={form.control}
+          name="email"
           layout="horizontal"
           label="Email"
           description="This is your email"
