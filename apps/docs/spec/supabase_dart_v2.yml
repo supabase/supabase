@@ -30,6 +30,14 @@ functions:
         isOptional: false
         type: string
         description: The unique Supabase Key which is supplied when you create a new project in your project dashboard.
+      - name: headers
+        isOptional: true
+        type: Map<String, String>?
+        description: Custom header to be passed to the Supabase client.
+      - name: httpClient
+        isOptional: true
+        type: Client?
+        description: Custom http client to be used by the Supabase client.
       - name: authOptions
         isOptional: true
         type: FlutterAuthClientOptions
@@ -47,6 +55,15 @@ functions:
             isOptional: true
             type: boolean
             description: Whether to automatically refresh the token when it expires. Defaults to `true`.
+      - name: postgrestOptions
+        isOptional: true
+        type: PostgrestClientOptions
+        description: Options to change the Postgrest behaviors.
+        subContent:
+          - name: schema
+            isOptional: true
+            type: String
+            description: Schema to query with the Supabase client. Defaults to `public`.
       - name: realtimeClientOptions
         isOptional: true
         type: RealtimeClientOptions
@@ -56,6 +73,15 @@ functions:
             isOptional: true
             type: RealtimeLogLevel
             description: Level of realtime server logs to to be logged.
+      - name: storageOptions
+        isOptional: true
+        type: StorageClientOptions
+        description: Options to change the Storage behaviors.
+        subContent:
+          - name: retryAttempts
+            isOptional: true
+            type: int
+            description: The number of times to retry a failed upload request. Defaults to `0`.
     examples:
       - id: flutter-initialize
         name: For Flutter
