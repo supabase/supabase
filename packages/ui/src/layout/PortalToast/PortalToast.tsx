@@ -10,11 +10,11 @@ const PortalRootWithNoSSR = dynamic(
 
 const PortalToast = () => (
   // @ts-ignore
-  <PortalRootWithNoSSR className="portal--toast" id="toast">
+  <PortalRootWithNoSSR className="portal--toast">
     <Toaster
       position="top-right"
       toastOptions={{
-        className: '!bg-overlay !text border !max-w-[600px]',
+        className: '!bg-overlay !text border !max-w-[600px] h-[auto] overflow-scroll',
         style: {
           padding: '8px',
           paddingLeft: '16px',
@@ -33,16 +33,21 @@ const PortalToast = () => (
             const isConsentToast = t.id === 'consent-toast'
             return (
               <>
-                {icon}
-                <div className="w-full flex items-center">
+                {/* {icon} */}
+                <div className="w-full flex flex-col-reverse items-end">
                   <div
                     className={`toast-message w-full ${
                       t.type === 'loading'
                         ? 'max-w-[380px]'
                         : isConsentToast
                         ? 'max-w-none sm:max-w-[800px]'
-                        : 'max-w-[260px]'
+                        : 'max-w-[600px]'
                     }`}
+                    style={{
+                      wordWrap: 'break-word',
+                      overflow: 'auto',
+                      maxHeight: "600px",
+                    }}
                   >
                     {message}
                   </div>
