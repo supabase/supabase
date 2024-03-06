@@ -1,6 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTelemetryProps } from 'common'
+import Telemetry from 'lib/telemetry'
 import { compact, last } from 'lodash'
 import { Loader2 } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -10,14 +13,13 @@ import {
   FormField_Shadcn_,
   FormItem_Shadcn_,
   Form_Shadcn_,
-  IconSettings,
   Input_Shadcn_,
+  cn,
 } from 'ui'
 import * as z from 'zod'
-import Telemetry from 'lib/telemetry'
-import { useTelemetryProps } from 'common'
-import { useRouter } from 'next/router'
 
+import { useLocalStorageQuery, useSelectedOrganization } from 'hooks'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import { MessageWithDebug } from './AIPolicyEditorPanel.utils'
@@ -40,11 +42,16 @@ export const AIPolicyChat = ({
   onDiff,
   onChange,
 }: AIPolicyChatProps) => {
+  const router = useRouter()
   const { profile } = useProfile()
   const snap = useAppStateSnapshot()
+  const organization = useSelectedOrganization()
   const bottomRef = useRef<HTMLDivElement>(null)
-  const router = useRouter()
   const telemetryProps = useTelemetryProps()
+
+  const isOptedInToAI = organization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
+  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
+  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
 
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
 
@@ -90,15 +97,21 @@ export const AIPolicyChat = ({
         Make sure to verify any generated code or suggestions, and share feedback so that we can
         learn and improve.`}
         >
-          <div>
-            <Button
-              type="default"
-              icon={<IconSettings strokeWidth={1.5} />}
-              onClick={() => snap.setShowAiSettingsModal(true)}
-            >
-              AI Settings
-            </Button>
-          </div>
+          <Button
+            type="default"
+            className="w-min"
+            icon={
+              <div
+                className={cn(
+                  'w-2 h-2 rounded-full',
+                  includeSchemaMetadata ? 'bg-brand' : 'border border-stronger'
+                )}
+              />
+            }
+            onClick={() => snap.setShowAiSettingsModal(true)}
+          >
+            {includeSchemaMetadata ? 'Include' : 'Exclude'} database metadata in queries
+          </Button>
         </Message>
 
         {messages.map((m) => (

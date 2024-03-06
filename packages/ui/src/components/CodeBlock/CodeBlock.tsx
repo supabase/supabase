@@ -19,7 +19,7 @@ import { useTheme } from 'next-themes'
 
 export interface CodeBlockProps {
   title?: string
-  language: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json' | 'csharp' | 'kotlin'
+  language?: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json' | 'csharp' | 'kotlin'
   linesToHighlight?: number[]
   hideCopy?: boolean
   hideLineNumbers?: boolean
@@ -98,7 +98,7 @@ export const CodeBlock = ({
             // @ts-ignore
             style={monokaiTheme}
             className={cn(
-              'code-block border border-surface p-4 w-full !my-0 bg-surface-100',
+              'code-block border border-surface p-4 w-full !my-0 !bg-surface-100',
               `${!title ? '!rounded-md' : '!rounded-t-none !rounded-b-md'}`,
               `${!showLineNumbers ? 'pl-6' : ''}`,
               className

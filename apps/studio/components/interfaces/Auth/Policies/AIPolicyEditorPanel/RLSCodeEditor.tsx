@@ -1,5 +1,5 @@
 import Editor, { OnChange, OnMount } from '@monaco-editor/react'
-import { editor } from 'monaco-editor'
+import type { editor } from 'monaco-editor'
 import { MutableRefObject, useRef } from 'react'
 import { cn } from 'ui'
 

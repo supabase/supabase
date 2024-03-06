@@ -1,4 +1,4 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
+import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useChat } from 'ai/react'
 import { useParams, useTelemetryProps } from 'common'
@@ -10,8 +10,6 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
   Button,
-  IconEdit,
-  IconGrid,
   IconLock,
   Modal,
   ScrollArea,
@@ -25,20 +23,22 @@ import {
   cn,
 } from 'ui'
 
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import {
   IStandaloneCodeEditor,
   IStandaloneDiffEditor,
 } from 'components/interfaces/SQLEditor/SQLEditor.types'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { BASE_PATH, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { useAppStateSnapshot } from 'state/app-state'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AIPolicyChat } from './AIPolicyChat'
 import {
   MessageWithDebug,
@@ -48,12 +48,10 @@ import {
 } from './AIPolicyEditorPanel.utils'
 import { AIPolicyHeader } from './AIPolicyHeader'
 import PolicyDetails from './PolicyDetails'
+import { PolicyDetailsV2 } from './PolicyDetailsV2'
+import { PolicyTemplates } from './PolicyTemplates'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
-import { PolicyTemplates } from './PolicyTemplates'
-import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { PolicyDetailsV2 } from './PolicyDetailsV2'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),

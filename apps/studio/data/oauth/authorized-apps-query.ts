@@ -2,7 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { oauthAppKeys } from './keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type AuthorizedAppsVariables = {
   slug?: string

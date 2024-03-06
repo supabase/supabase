@@ -20,7 +20,7 @@ import { AWS_REGIONS, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PROVIDERS } from 'lib/c
 import { passwordStrength } from 'lib/helpers'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
 
 const VercelIntegration: NextPageWithLayout = () => {

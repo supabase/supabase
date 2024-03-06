@@ -1,8 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { components } from 'data/api'
+import type { components } from 'data/api'
 import { get } from 'data/fetchers'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { configKeys } from './keys'
 
 export type ProjectSettingsVariables = {

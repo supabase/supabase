@@ -9,7 +9,7 @@ import { useKeywordsQuery } from 'data/database/keywords-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
 import { SQLEditorLayout } from 'components/layouts'
@@ -35,7 +35,7 @@ const SqlEditor: NextPageWithLayout = () => {
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
-    typeof window !== 'undefined' ? false : true
+    true
   )
 
   async function formatPgsql(value: string) {
@@ -150,7 +150,7 @@ const SqlEditor: NextPageWithLayout = () => {
   }, [isPgInfoReady])
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 overflow-auto">
       <SQLEditor />
     </div>
   )

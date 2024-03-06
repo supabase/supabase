@@ -20,9 +20,9 @@ import {
 } from 'ui'
 
 import { parseSupaTable } from 'components/grid'
-import { ItemRenderer } from 'components/ui/InfiniteList'
+import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { Entity } from 'data/entity-types/entity-type-query'
+import type { Entity } from 'data/entity-types/entity-type-query'
 import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
 import { getTable } from 'data/tables/table-query'
 import { useStore } from 'hooks'
