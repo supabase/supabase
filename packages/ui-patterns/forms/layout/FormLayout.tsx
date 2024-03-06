@@ -60,6 +60,7 @@ export const FormLayout = React.forwardRef<
       afterLabel,
       nonBoxInput = label ? false : true,
       hideMessage = false,
+      isReactForm,
       ...props
     },
     ref
@@ -113,12 +114,10 @@ export const FormLayout = React.forwardRef<
 
     const hasLabel = Boolean(label || beforeLabel || afterLabel)
 
-    const renderError = props.isReactForm && !hideMessage && (
-      <FormMessage_Shadcn_ className="mt-2" />
-    )
+    const renderError = isReactForm && !hideMessage && <FormMessage_Shadcn_ className="mt-2" />
 
     const renderDescription =
-      descriptionText && props.isReactForm ? (
+      descriptionText && isReactForm ? (
         <FormDescription_Shadcn_
           className={[__styles.description.base, __styles.description.size[size]].join(' ')}
           id={id + '-description'}
@@ -171,7 +170,7 @@ export const FormLayout = React.forwardRef<
             // }
             className={labelContainerClasses.join(' ')}
           >
-            {hasLabel && props.isReactForm ? (
+            {hasLabel && isReactForm ? (
               <FormLabel_Shadcn_>
                 <LabelContents />
               </FormLabel_Shadcn_>
