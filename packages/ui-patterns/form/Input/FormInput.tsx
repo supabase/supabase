@@ -38,4 +38,4 @@ const FormFieldInput = forwardRef<
   )
 })
 
-export { FormFieldInput }
+export { FormFieldInput, FormItemInput }
