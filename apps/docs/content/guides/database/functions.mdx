@@ -336,6 +336,7 @@ GRANT EXECUTE ON FUNCTION hello_world TO authenticated;
 GRANT EXECUTE ON FUNCTION hello_world TO service_role;
 ```
 
+### Debugging functions
 
 You can add logs to help you debug functions. This is especially recommended for complex functions.
 
@@ -346,7 +347,7 @@ Good targets to log include:
 
 #### General logging
 
-To create custom logs in the [Dashboard's Postgres Logs](/apps/docs/public/img/database/postgres-logs.png), you can use the `raise` keyword. There are 3 severity levels by default:
+To create custom logs in the [Dashboard's Postgres Logs](/apps/docs/public/img/database/postgres-logs.png), you can use the `raise` keyword. By default, there are 3 observed severity levels:
 
 - `log`
 - `warning`
@@ -380,17 +381,17 @@ You can create custom errors with the `raise exception` keywords.
 A common pattern is to throw an error when a variable doesn't meet a condition:
 
 ```sql
-create or replace function error_if_null(val text)
+create or replace function error_if_null(some_val text)
 returns text
 language plpgsql
 as $$
 begin
-  -- error if val is null
-  if val is null then
-    raise exception 'Value should not be NULL';
+  -- error if some_val is null
+  if some_val is null then
+    raise exception 'some_val should not be NULL';
   end if;
-  -- return val if it is not null
-  return val;
+  -- return some_val if it is not null
+  return some_val;
 end;
 $$;
 
@@ -467,7 +468,7 @@ declare
     var2 text;
 begin
     -- Logging start of function
-    raise log 'logging start of call to function: (%)', (select now());
+    raise log 'logging start of function call: (%)', (select now());
 
     -- Logging a variable from a SELECT query
     select
