@@ -336,6 +336,174 @@ GRANT EXECUTE ON FUNCTION hello_world TO authenticated;
 GRANT EXECUTE ON FUNCTION hello_world TO service_role;
 ```
 
+### Debugging functions
+
+You can add logs to help you debug functions. This is especially recommended for complex functions.
+
+Good targets to log include:
+
+- Values of (non-sensitive) variables
+- Returned results from queries
+
+#### General logging
+
+To create custom logs in the [Dashboard's Postgres Logs](/apps/docs/public/img/database/postgres-logs.png), you can use the `raise` keyword. By default, there are 3 observed severity levels:
+
+- `log`
+- `warning`
+- `exception` (error level)
+
+```sql
+create function logging_example(
+  log_message text,
+  warning_message text,
+  error_message text
+)
+returns void
+language plpgsql
+as $$
+begin
+  raise log 'logging message: %', log_message;
+  raise warning 'logging warning: %', warning_message;
+
+  -- immediately ends function and reverts transaction
+  raise exception 'logging error: %', error_message;
+end;
+$$;
+
+select logging_example('LOGGED MESSAGE', 'WARNING MESSAGE', 'ERROR MESSAGE');
+```
+
+#### Error handling
+
+You can create custom errors with the `raise exception` keywords.
+
+A common pattern is to throw an error when a variable doesn't meet a condition:
+
+```sql
+create or replace function error_if_null(some_val text)
+returns text
+language plpgsql
+as $$
+begin
+  -- error if some_val is null
+  if some_val is null then
+    raise exception 'some_val should not be NULL';
+  end if;
+  -- return some_val if it is not null
+  return some_val;
+end;
+$$;
+
+select error_if_null(null);
+```
+
+Value checking is common, so Postgres provides a shorthand: the `assert` keyword. It uses the following format:
+
+```sql
+-- throw error when condition is false
+assert <some condition>, 'message';
+```
+
+Below is an example
+
+```sql
+create function assert_example(name text)
+returns uuid
+language plpgsql
+as $$
+declare
+  student_id uuid;
+begin
+  -- save a user's id into the user_id variable
+  select
+    id into student_id
+  from attendance_table
+  where student = name;
+
+  -- throw an error if the student_id is null
+  assert student_id is not null, 'assert_example() ERROR: student not found';
+
+  -- otherwise, return the user's id
+  return student_id;
+end;
+$$;
+
+select assert_example('Harry Potter');
+```
+
+Error messages can also be captured and modified with the `exception` keyword:
+
+```sql
+create function error_example()
+returns void
+language plpgsql
+as $$
+begin
+  -- fails: cannot read from nonexistent table
+  select * from table_that_does_not_exist;
+
+  exception
+      when others then
+          raise exception 'An error occurred in function <function name>: %', sqlerrm;
+end;
+$$;
+```
+
+#### Advanced logging
+
+For more complex functions or complicated debugging, try logging:
+
+- Formatted variables
+- Individual rows
+- Start and end of function calls
+
+```sql
+create or replace function advanced_example(num int default 10)
+returns text
+language plpgsql
+as $$
+declare
+    var1 int := 20;
+    var2 text;
+begin
+    -- Logging start of function
+    raise log 'logging start of function call: (%)', (select now());
+
+    -- Logging a variable from a SELECT query
+    select
+      col_1 into var1
+    from some_table
+    limit 1;
+    raise log 'logging a variable (%)', var1;
+
+    -- It is also possible to avoid using variables, by returning the values of your query to the log
+    raise log 'logging a query with a single return value(%)', (select col_1 from some_table limit 1);
+
+    -- If necessary, you can even log an entire row as JSON
+    raise log 'logging an entire row as JSON (%)', (select to_jsonb(some_table.*) from some_table limit 1);
+
+    -- When using INSERT or UPDATE, the new value(s) can be returned
+    -- into a variable.
+    -- When using DELETE, the deleted value(s) can be returned.
+    -- All three operations use "RETURNING value(s) INTO variable(s)" syntax
+    insert into some_table (col_2)
+    values ('new val')
+    returning col_2 into var2;
+
+    raise log 'logging a value from an INSERT (%)', var2;
+
+    return var1 || ',' || var2;
+exception
+    -- Handle exceptions here if needed
+    when others then
+        raise exception 'An error occurred in function <advanced_example>: %', sqlerrm;
+end;
+$$;
+
+select advanced_example();
+```
+
 ## Resources
 
 - Official Client libraries: [JavaScript](../../reference/javascript/rpc) and [Flutter](../../reference/dart/rpc)
