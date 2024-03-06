@@ -31,7 +31,7 @@ import {
 } from 'ui'
 
 import { useParams } from 'common/hooks'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import Panel from 'components/ui/Panel'
 import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutation'
 import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
@@ -124,7 +124,7 @@ const JWTSettings = () => {
                 layout="horizontal"
               />
               <div className="space-y-3">
-                <div className="p-3 px-6 border rounded-md shadow-sm bg-background">
+                <div className="p-3 px-6 border rounded-md shadow-sm bg-studio">
                   {isUpdatingJwtSecret ? (
                     <div className="flex items-center space-x-2">
                       <IconLoader className="animate-spin" size={14} />

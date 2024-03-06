@@ -1,0 +1,58 @@
+---
+id: 'shared-responsibility-model'
+title: 'Shared Responsibility Model'
+description: 'Running databases is a shared responsibility between you and Supabase.'
+---
+
+Running databases is a shared responsibility between you and Supabase. There are some things that we can take care of for you, and some things that you are responsible for. This is by design: we to give you the freedom to use your database however you want. While we _could_ put many more restrictions in place to ensure that you can’t do anything wrong, you will eventually find those restrictions prohibitive.
+
+Generally, we aim reduce your burden of managing infrastructure and knowing about Postgres internals, minimizing configuration as much as we can. Here are a few things that you should know:
+
+## You share the security responsibility
+
+We give you full access to the database. If you share that access with other people (either people on your team, or the public in general) then it is your responsibility to ensure that the access levels you provide are correctly managed.
+
+If you have an inexperienced member on your team, then you probably shouldn’t give them access to Production. You should set internal workflows around what they should and should not be able to do, with restricted access to avoid anything that might be deemed dangerous.
+
+You are also responsible for ensuring that tables with sensitive data have the right level of access. You are also responsible for managing your database secrets and API keys, storing them safely in an encrypted store.
+
+## You decide your own workflow
+
+There are _many_ ways to work with Supabase.
+
+You can use our Dashboard, our client libraries, external tools like Prisma and Drizzle, or migration tools like our CLI, Flyway, Sqitch, and anything else that is Postgres-compatible. You can develop directly on your database while you're getting started, run migrations from [local to production](/docs/guides/getting-started/local-development), or you can use [multiple environments](/docs/guides/cli/managing-environments).
+
+None of these are right or wrong. It depends on the stage of your project. You _definitely_ shouldn’t be developing on your database directly when you’re in production - but that’s absolutely fine when you’re prototyping and don’t have users.
+
+## You are responsible for your application architecture
+
+Supabase isn't a silver-bullet for bad architectural decisions. A poorly designed database will run poorly, no matter where it’s hosted.
+
+You can get away with a poorly-designed database for a while by simply adding compute. After a while, things will start to break. The database schema is the area you want to spend _the most_ time thinking about. That’s the benefit of Supabase - you can spend more time designing a scalable database system and less time thinking about the mundane tasks like implementing CRUD APIs.
+
+If you don’t want to implement logic inside your database, that is 100% fine. You can use _any_ tools which work with Postgres.
+
+## You choose your level of comfort with Postgres
+
+Our goal at Supabase is to make _all_ of Postgres easy to use. That doesn’t mean you have to use all of it. If you’re a Postgres veteran, you’ll probably love the tools that we offer. If you’ve never used Postgres before, then start smaller and grow into it. If you just want to treat Postgres like a simple table-store, that’s perfectly fine.
+
+## You are in control of your database
+
+Supabase places very few guard-rails around your database. That gives you a lot of control, but it also means you can break things. ”Break” is used liberally here. It refers to any situation that affects your application because of the way you're using the database.
+
+You are responsible for using best-practices to optimize and manage your database: adding indexes, adding filters on large queries, using caching strategies, optimizing your database queries, and managing connections to the database.
+
+You are responsible of provisioning enough compute to run the workload that your application requires. The Supabase Dashboard provides [observability tooling](https://supabase.com/dashboard/project/_/reports/database) to help with this.
+
+## Managing healthcare data
+
+You can use Supabase to store and process Protected Health Information (PHI). You are responsible for the following
+
+- Signing a Business Associate Agreement (BAA) with Supabase. Submit a [HIPAA add-on request](https://forms.supabase.com/hipaa2) to get started. You will need to be at least on the [Team plan](https://supabase.com/pricing) to sign a BAA with us.
+- Enabling [Point in Time Recovery](/docs/guides/platform/backups#point-in-time-recovery) which requires at least a [small compute add-on](/docs/guides/platform/compute-add-ons).
+- Turning on [SSL Enforcement](/docs/guides/platform/ssl-enforcement).
+- Enabling [Network Restrictions](/docs/guides/platform/network-restrictions).
+- Disabling [Supabase AI editor](https://supabase.com/dashboard/org/_/general) in our dashboard.
+- Complying with encryption requirements in the HIPAA Security Rule. Data is encrypted at rest and in transit by Supabase. You can consider encrypting the data at your application layer.
+- Not using [Edge functions](/docs/guides/functions) to process PHI.
+- Not storing PHI in [public Storage buckets](/docs/guides/storage/buckets/fundamentals#public-buckets).

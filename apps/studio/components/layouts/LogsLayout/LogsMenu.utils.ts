@@ -1,5 +1,8 @@
-import { ProductMenuGroup, ProductMenuGroupItem } from 'components/ui/ProductMenu/ProductMenu.types'
-import { Project } from 'data/projects/project-detail-query'
+import type {
+  ProductMenuGroup,
+  ProductMenuGroupItem,
+} from 'components/ui/ProductMenu/ProductMenu.types'
+import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM } from 'lib/constants'
 
 export const generateLogsMenu = (

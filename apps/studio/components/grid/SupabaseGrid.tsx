@@ -18,12 +18,12 @@ import {
   saveStorageDebounced,
 } from './SupabaseGrid.utils'
 import { Shortcuts } from './components/common'
-import Footer from './components/footer'
+import Footer from './components/footer/Footer'
 import { Grid } from './components/grid'
-import Header from './components/header'
+import Header from './components/header/Header'
 import { RowContextMenu } from './components/menu'
 import { StoreProvider, useDispatch, useTrackedState } from './store'
-import { SupabaseGridProps } from './types'
+import type { SupabaseGridProps } from './types'
 
 /** Supabase Grid: React component to render database table */
 
@@ -204,7 +204,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
             onImportData={onImportData}
             onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
           />
-          <Footer isLoading={isLoading || isRefetching} />
+          <Footer isLoading={isLoading} isRefetching={isRefetching} />
           <Shortcuts gridRef={gridRef} />
         </>
       )}

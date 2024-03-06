@@ -1,9 +1,9 @@
 import type { PostgresColumn, PostgresTable } from '@supabase/postgres-meta'
 import { find, isEqual, isNull } from 'lodash'
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
-import { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
+import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { uuidv4 } from 'lib/helpers'
 import {
   ColumnField,
@@ -31,10 +31,12 @@ const isSQLExpression = (input: string) => {
 }
 
 export const generateColumnField = (field: any = {}): ColumnField => {
-  const { name, format } = field
+  const { name, table, schema, format } = field
   return {
     id: uuidv4(),
     name: name || '',
+    table: table || '',
+    schema: schema || '',
     comment: '',
     format: format || '',
     defaultValue: null,
@@ -63,6 +65,8 @@ export const generateColumnFieldFromPostgresColumn = (
   return {
     foreignKey,
     id: column?.id ?? uuidv4(),
+    table: column.table,
+    schema: column.schema,
     name: column.name,
     comment: column?.comment ?? '',
     format: isArray ? column.format.slice(1) : column.format,

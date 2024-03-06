@@ -1,4 +1,4 @@
-import { OAuthScope } from '@supabase/shared-types/out/constants'
+import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'

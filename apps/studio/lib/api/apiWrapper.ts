@@ -1,6 +1,6 @@
 import { withSentry } from '@sentry/nextjs'
 import { isResponseOk } from 'lib/common/fetch'
-import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import { IS_PLATFORM } from '../constants'
 import { apiAuthenticate } from './apiAuthenticate'
 

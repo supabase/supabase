@@ -647,7 +647,7 @@ curl -X POST '${endpoint}/auth/v1/invite' \\
     js: {
       language: 'js',
       code: `
-let { data, error } = await supabase.auth.api.inviteUserByEmail('someone@email.com')
+let { data, error } = await supabase.auth.admin.inviteUserByEmail('someone@email.com')
 `,
     },
   }),

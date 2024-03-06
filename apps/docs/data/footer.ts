@@ -1,4 +1,5 @@
-import { IconCheckCircle, IconLifeBuoy, PrivacySettings } from 'ui'
+import { IconCheckCircle, IconLifeBuoy } from 'ui'
+import { PrivacySettings } from 'ui-patterns/PrivacySettings'
 
 export const primaryLinks = [
   {

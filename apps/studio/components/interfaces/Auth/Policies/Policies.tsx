@@ -2,22 +2,23 @@ import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { useParams } from 'common/hooks'
 import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
 import { isEmpty } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useCallback, useState } from 'react'
 import toast from 'react-hot-toast'
 import { IconHelpCircle } from 'ui'
 
 import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import InformationBox from 'components/ui/InformationBox'
 import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 interface PoliciesProps {
   tables: PostgresTable[]
@@ -35,6 +36,7 @@ const Policies = ({
   const router = useRouter()
   const { ref } = useParams()
   const { project } = useProjectContext()
+  const snap = useTableEditorStateSnapshot()
 
   const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
@@ -167,57 +169,64 @@ const Policies = ({
     })
   }
 
+  if (tables.length === 0) {
+    return (
+      <div className="flex-grow flex items-center justify-center">
+        <ProductEmptyState
+          size="large"
+          title="Row-Level Security (RLS) Policies"
+          ctaButtonLabel="Create a table"
+          infoButtonLabel="What is RLS?"
+          infoButtonUrl="https://supabase.com/docs/guides/auth/row-level-security"
+          onClickCta={() => router.push(`/project/${ref}/editor`)}
+        >
+          <div className="space-y-4">
+            <InformationBox
+              title="What are policies?"
+              icon={<IconHelpCircle strokeWidth={2} />}
+              description={
+                <div className="space-y-2">
+                  <p className="text-sm">
+                    Policies restrict, on a per-user basis, which rows can be returned by normal
+                    queries, or inserted, updated, or deleted by data modification commands.
+                  </p>
+                  <p className="text-sm">
+                    This is also known as Row-Level Security (RLS). Each policy is attached to a
+                    table, and the policy is executed each time its accessed.
+                  </p>
+                </div>
+              }
+            />
+            <p className="text-sm text-foreground-light">
+              Create a table in this schema first before creating a policy.
+            </p>
+          </div>
+        </ProductEmptyState>
+      </div>
+    )
+  }
+
   return (
     <>
-      {tables.length > 0 ? (
-        tables.map((table: any) => (
-          <section key={table.id}>
-            <PolicyTableRow
-              table={table}
-              isLocked={isLocked}
-              onSelectToggleRLS={onSelectToggleRLS}
-              onSelectCreatePolicy={onSelectCreatePolicy}
-              onSelectEditPolicy={onSelectEditPolicy}
-              onSelectDeletePolicy={onSelectDeletePolicy}
-            />
-          </section>
-        ))
-      ) : hasTables ? (
-        <NoSearchResults />
-      ) : (
-        <div className="flex-grow">
-          <ProductEmptyState
-            size="large"
-            title="Row-Level Security (RLS) Policies"
-            ctaButtonLabel="Create a table"
-            infoButtonLabel="What is RLS?"
-            infoButtonUrl="https://supabase.com/docs/guides/auth/row-level-security"
-            onClickCta={() => router.push(`/project/${ref}/editor`)}
-          >
-            <div className="space-y-4">
-              <InformationBox
-                title="What are policies?"
-                icon={<IconHelpCircle strokeWidth={2} />}
-                description={
-                  <div className="space-y-2">
-                    <p className="text-sm">
-                      Policies restrict, on a per-user basis, which rows can be returned by normal
-                      queries, or inserted, updated, or deleted by data modification commands.
-                    </p>
-                    <p className="text-sm">
-                      This is also known as Row-Level Security (RLS). Each policy is attached to a
-                      table, and the policy is executed each time its accessed.
-                    </p>
-                  </div>
-                }
+      <div className="flex flex-col gap-y-4 pb-4">
+        {isLocked && <ProtectedSchemaWarning schema={snap.selectedSchemaName} entity="policies" />}
+        {tables.length > 0 ? (
+          tables.map((table: any) => (
+            <section key={table.id}>
+              <PolicyTableRow
+                table={table}
+                isLocked={isLocked}
+                onSelectToggleRLS={onSelectToggleRLS}
+                onSelectCreatePolicy={onSelectCreatePolicy}
+                onSelectEditPolicy={onSelectEditPolicy}
+                onSelectDeletePolicy={onSelectDeletePolicy}
               />
-              <p className="text-sm text-foreground-light">
-                Create a table in this schema first before creating a policy.
-              </p>
-            </div>
-          </ProductEmptyState>
-        </div>
-      )}
+            </section>
+          ))
+        ) : hasTables ? (
+          <NoSearchResults />
+        ) : null}
+      </div>
 
       <PolicyEditorModal
         showAssistantPreview
@@ -245,10 +254,12 @@ const Policies = ({
       <ConfirmModal
         danger={selectedTableToToggleRLS.rls_enabled}
         visible={!isEmpty(selectedTableToToggleRLS)}
-        title={`Confirm to ${selectedTableToToggleRLS.rls_enabled ? 'disable' : 'enable'} RLS`}
+        title={`Confirm to ${
+          selectedTableToToggleRLS.rls_enabled ? 'disable' : 'enable'
+        } Row Level Security`}
         description={`Are you sure you want to ${
           selectedTableToToggleRLS.rls_enabled ? 'disable' : 'enable'
-        } row level security for the table "${selectedTableToToggleRLS.name}"?`}
+        } Row Level Security for the table "${selectedTableToToggleRLS.name}"?`}
         buttonLabel="Confirm"
         buttonLoadingLabel="Saving"
         onSelectCancel={closeConfirmModal}
@@ -258,4 +269,4 @@ const Policies = ({
   )
 }
 
-export default observer(Policies)
+export default Policies

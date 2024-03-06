@@ -2,8 +2,8 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { patch } from 'data/fetchers'
-import { ResponseError } from 'types'
-import { UpdateConnectionPayload } from './integrations.types'
+import type { ResponseError } from 'types'
+import type { UpdateConnectionPayload } from './integrations.types'
 import { integrationKeys } from './keys'
 
 export async function updateVercelConnection({

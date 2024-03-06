@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.142.1
+  version: 1.148.6
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1013,32 +1013,17 @@ commands:
     summary: Create a project on Supabase
     tags: []
     links: []
-    usage: supabase projects create <project name> [flags]
+    usage: supabase projects create [project name] [flags]
     subcommands: []
     flags:
       - id: db-password
         name: --db-password <string>
         description: Database password of the project.
         default_value: ''
-      - id: interactive
-        name: -i, --interactive
-        description: Enables interactive mode.
-        default_value: 'false'
       - id: org-id
         name: --org-id <string>
         description: Organization ID to create the project in.
         default_value: ''
-      - id: plan
-        name: --plan <[ free | pro ]>
-        description: Select a plan that suits your needs.
-        default_value: free
-        accepted_values:
-          - id: free
-            name: free
-            type: '[ free | pro ]'
-          - id: pro
-            name: pro
-            type: '[ free | pro ]'
       - id: region
         name: --region <string>
         description: Select a region close to you for the best performance.
@@ -2364,8 +2349,6 @@ commands:
   - id: supabase-gen-types-typescript
     title: supabase gen types typescript
     summary: Generate types for TypeScript
-    description: |
-      Generate types for TypeScript. Must specify one of --local, --linked, --project-id, or --db-url
     tags: []
     links: []
     usage: supabase gen types typescript [flags]
@@ -2393,8 +2376,8 @@ commands:
         description: Generate types from a project ID.
         default_value: ''
       - id: schema
-        name: --schema <stringArray>
-        description: Schemas to generate types for.
+        name: -s, --schema <strings>
+        description: Comma separated list of schema to include.
         default_value: '[]'
   - id: supabase-gen-keys
     title: supabase gen keys
@@ -3103,6 +3086,10 @@ commands:
         name: --use-migra
         description: Use migra to generate schema diff.
         default_value: 'true'
+      - id: use-pg-schema
+        name: --use-pg-schema
+        description: Use pg-schema-diff to generate schema diff.
+        default_value: 'false'
       - id: use-pgadmin
         name: --use-pgadmin
         description: Use pgAdmin to generate schema diff.

@@ -9,10 +9,10 @@ import { Button, IconArchive, IconExternalLink } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
 import { CriticalIcon, WarningIcon } from 'components/ui/Icons'
-import { ItemRenderer } from 'components/ui/InfiniteList'
+import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { Notification, NotificationData } from 'data/notifications/notifications-v2-query'
 import { ProjectInfo } from 'data/projects/projects-query'
-import { Organization } from 'types'
+import type { Organization } from 'types'
 
 interface NotificationRowProps {
   setRowHeight: (idx: number, height: number) => void
@@ -67,8 +67,8 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
       ref={ref}
       className={clsx(
         `p-4 flex justify-between gap-x-3 group`,
-        index !== 0 ? 'border-t' : '',
-        status !== 'new' ? 'bg-background' : ''
+        index !== 0 ? 'border-t border-overlay' : '',
+        status === 'new' ? 'bg-surface-100/50' : 'bg-background'
       )}
     >
       <div ref={viewRef} className="flex flex-col gap-y-2.5 w-full py-0.5">
@@ -135,8 +135,9 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
                 return (
                   <Button
                     key={key}
-                    type="outline"
+                    type="default"
                     icon={<IconExternalLink strokeWidth={1.5} size={14} />}
+                    asChild
                   >
                     <Link href={url} target="_blank" rel="noreferrer">
                       {action.label}
@@ -147,7 +148,7 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
                 return (
                   <Button
                     key={key}
-                    type="outline"
+                    type="default"
                     onClick={() => onButtonAction(action.action_type)}
                   >
                     {action.label}

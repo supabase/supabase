@@ -1,17 +1,15 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
-import { components } from 'data/api'
+import type { components } from 'data/api'
 import { patch } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { authKeys } from './keys'
 
 export type AuthConfigUpdateVariables = {
   projectRef: string
   config: Partial<components['schemas']['UpdateGoTrueConfigBody']>
 }
-
-export type UpdateAuthConfigResponse = components['schemas']['GoTrueConfig']
 
 export async function updateAuthConfig({ projectRef, config }: AuthConfigUpdateVariables) {
   const { data, error } = await patch('/platform/auth/{ref}/config', {

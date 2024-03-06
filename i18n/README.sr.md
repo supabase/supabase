@@ -58,7 +58,7 @@ Supabase je kombinacija open source alata. Razvijamo funkcionalnosti Firebase-a 
 Supabase je [hostovana platforma](https://supabase.com/dashboard). Možete se prijaviti i početi sa korišćenjem Supabase-a bez instaliranja bilo čega.
 Takođe možete da [hostujete sami](https://supabase.com/docs/guides/hosting/overview) i da [razvijate u lokalu](https://supabase.com/docs/guides/local-development).
 
-![Arhitektura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Arhitektura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/) je sistem objektno-relacione baze sa preko 30 godina aktivnog razvoja čime je zaslužio jaku reputaciju za pouzdanost, robustnost funkcionalnosti i performanse.
 - [Realtime](https://github.com/supabase/realtime) je Elixir server koji vam omogućava da slušate PostgreSQL inserte, updateove, i brisanja koristeći websokete. Realtime polluje Postgres-ovu ugrađenu funkcionalnost replikacije za promene nad bazom, konvertuje promene u JSON, zatim broadcastuje taj JSON kroz websoket autorizovanim klijentima.

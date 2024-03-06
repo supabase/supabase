@@ -1,6 +1,6 @@
 import useDbQuery, { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import useLogsQuery, { LogsQueryHook } from 'hooks/analytics/useLogsQuery'
-import { BaseQueries, PresetConfig, ReportQuery } from './Reports.types'
+import type { BaseQueries, PresetConfig, ReportQuery } from './Reports.types'
 
 /**
  * Converts a query params string to an object

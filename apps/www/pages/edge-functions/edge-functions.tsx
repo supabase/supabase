@@ -1,4 +1,4 @@
-import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw, ThemeImage, cn } from 'ui'
+import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw, cn } from 'ui'
 import UseCaseExamples from 'data/products/functions/usecase-examples'
 import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
@@ -11,6 +11,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import ScrollableCodeBlock from '~/components/ScrollableCodeBlock'
 import FunctionsUsecases from '~/components/Sections/FunctionsUsecases'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import { ThemeImage } from 'ui-patterns/ThemeImage'
 
 const featureBlocks = [
   {

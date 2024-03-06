@@ -20,7 +20,7 @@ import { AWS_REGIONS, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PROVIDERS } from 'lib/c
 import { passwordStrength } from 'lib/helpers'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
 
 const VercelIntegration: NextPageWithLayout = () => {
@@ -57,6 +57,7 @@ const CreateProject = () => {
   const selectedOrganization = useSelectedOrganization()
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
+  const [instanceSize, setInstanceSize] = useState('micro')
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(-1)
   const [shouldRunMigrations, setShouldRunMigrations] = useState(true)
@@ -217,6 +218,7 @@ const CreateProject = () => {
             connection: {
               foreign_project_id: foreignProjectId,
               supabase_project_ref: newProjectRef,
+              integration_id: '0',
               metadata: {
                 ...projectDetails,
                 supabaseConfig: {

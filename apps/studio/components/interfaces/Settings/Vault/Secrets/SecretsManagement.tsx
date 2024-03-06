@@ -11,7 +11,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import Divider from 'components/ui/Divider'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { useCheckPermissions } from 'hooks'
-import { VaultSecret } from 'types'
+import type { VaultSecret } from 'types'
 import AddNewSecretModal from './AddNewSecretModal'
 import DeleteSecretModal from './DeleteSecretModal'
 import EditSecretModal from './EditSecretModal'

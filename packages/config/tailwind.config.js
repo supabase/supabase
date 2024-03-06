@@ -87,7 +87,7 @@ function kebabToNested(obj) {
  */
 const uiConfig = ui({
   mode: 'JIT',
-  darkMode: [ 'class', '[data-theme*="dark"]' ],
+  darkMode: ['class', '[data-theme*="dark"]'],
   theme: {
     /**
      * Spread all theme colors and custom generated colors into theme
@@ -99,6 +99,10 @@ const uiConfig = ui({
     backgroundColor: (theme) => ({
       ...theme('colors'),
       ...generateTwColorClasses('background', color),
+      /*
+       * custom background re-maps
+       */
+      studio: `hsl(var(--background-200)/ <alpha-value>)`,
     }),
     borderColor: (theme) => ({
       ...theme('colors'),
@@ -241,17 +245,18 @@ const uiConfig = ui({
             },
             a: {
               position: 'relative',
-              transition: 'color 0.3s ease-in-out',
+              transition: 'all 0.18s ease',
               paddingBottom: '2px',
               fontWeight: '400',
+              opacity: 1,
               color: 'hsl(var(--foreground-default))',
               textDecorationLine: 'underline',
-              textDecorationColor: 'hsl(var(--brand-500))',
+              textDecorationColor: 'hsl(var(--foreground-muted))',
               textDecorationThickness: '1px',
-              textUnderlineOffset: '4px',
+              textUnderlineOffset: '2px',
             },
             'a:hover': {
-              textDecorationColor: 'hsl(var(--colors-scale12))',
+              textDecorationColor: 'hsl(var(--foreground-default))',
             },
             figcaption: {
               color: 'hsl(var(--foreground-muted))',
@@ -356,8 +361,8 @@ const uiConfig = ui({
         xs: '480px',
       },
       fontFamily: {
-        sans: [ 'Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif' ],
-        mono: [ 'Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace' ],
+        sans: ['Circular', 'custom-font', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
+        mono: ['Office Code Pro', 'Source Code Pro', 'Menlo', 'monospace'],
       },
 
       // shadcn defaults START
@@ -370,6 +375,15 @@ const uiConfig = ui({
       animation: {
         'flash-code': 'flash-code 1s forwards',
         'flash-code-slow': 'flash-code 2s forwards',
+      },
+      borderRadius: {
+        // lg: `var(--radius)`,
+        // md: `calc(var(--radius) - 2px)`,
+        // sm: 'calc(var(--radius) - 4px)',
+        panel: '6px',
+      },
+      padding: {
+        content: '21px',
       },
       // borderRadius: {
       //   lg: `var(--radius)`,
@@ -392,8 +406,8 @@ const uiConfig = ui({
       // shadcn defaults END
     },
   },
-  plugins: [ require('@tailwindcss/typography'), require('tailwindcss-animate') ],
-});
+  plugins: [require('@tailwindcss/typography'), require('tailwindcss-animate')],
+})
 
 function arrayMergeFn(destinationArray, sourceArray) {
   return destinationArray.concat(sourceArray).reduce((acc, cur) => {

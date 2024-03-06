@@ -6,8 +6,6 @@ info:
   description: |
 
     Supabase Dart.
-
-  definition: spec/enrichments/tsdoc_v2/combined.json
   slugPrefix: '/'
   specUrl: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_dart_v2.yml
   libraries:
@@ -23,7 +21,41 @@ functions:
 
       The Supabase client is your entrypoint to the rest of the Supabase functionality
       and is the easiest way to interact with everything we offer within the Supabase ecosystem.
-
+    params:
+      - name: url
+        isOptional: false
+        type: string
+        description: The unique Supabase URL which is supplied when you create a new project in your project dashboard.
+      - name: anonKey
+        isOptional: false
+        type: string
+        description: The unique Supabase Key which is supplied when you create a new project in your project dashboard.
+      - name: authOptions
+        isOptional: true
+        type: FlutterAuthClientOptions
+        description: Options to change the Auth behaviors.
+        subContent:
+          - name: authFlowType
+            isOptional: true
+            type: AuthFlowType
+            description: Whether to use the `pkce` flow or the `implicit` flow. Defaults to `pkce`.
+          - name: localStorage
+            isOptional: true
+            type: LocalStorage
+            description: Parameter to override the local storage to store auth tokens.
+          - name: autoRefreshToken
+            isOptional: true
+            type: boolean
+            description: Whether to automatically refresh the token when it expires. Defaults to `true`.
+      - name: realtimeClientOptions
+        isOptional: true
+        type: RealtimeClientOptions
+        description: Options to change the Realtime behaviors.
+        subContent:
+          - name: logLevel
+            isOptional: true
+            type: RealtimeLogLevel
+            description: Level of realtime server logs to to be logged.
     examples:
       - id: flutter-initialize
         name: For Flutter
@@ -255,7 +287,7 @@ functions:
             );
           }
 
-          final response = await signInWithIdToken(
+          final response = await supabase.auth.signInWithIdToken(
             provider: OAuthProvider.apple,
             idToken: idToken,
             nonce: rawNonce,
@@ -274,7 +306,7 @@ functions:
         isSpotlight: true
         code: |
           ```dart
-          await supabase.auth.signInWithOAuth(Provider.github);
+          await supabase.auth.signInWithOAuth(OAuthProvider.github);
           ```
       - id: sign-in-using-a-third-party-provider-with-redirect
         name: With `redirectTo`
@@ -284,7 +316,7 @@ functions:
         code: |
           ```dart
           await supabase.auth.signInWithOAuth(
-            Provider.github,
+            OAuthProvider.github,
             redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
           );
           ```
@@ -296,7 +328,7 @@ functions:
         code: |
           ```dart
           await supabase.auth.signInWithOAuth(
-            Provider.github,
+            OAuthProvider.github,
             scopes: 'repo gist notifications'
           );
           ...
@@ -945,12 +977,13 @@ functions:
       - id: query-the-same-referenced-table-multiple-times
         name: Query the same referenced table multiple times
         description: |
-          Sometimes you will need to query the same referenced table twice.
-          In this case, you can use the name of the joined column to identify
-          which join you intend to use. For convenience, you can also give an
-          alias for each column. For example, if we had a shop of products,
-          and we wanted to get the supplier and the purchaser at the same time
-          (both in the users) table:
+          Sometimes you will need to query the same referenced table twice. In
+          this case, you can use the name of the joined column to identify which
+          join you intend to use. For convenience, you can also give an alias
+          for each column. This example queries a `messages` table that is
+          joined to a `users` table via `sender_id` and `receiver_id`. Since you
+          want the `name` for both sender and receiver, you can alias the
+          columns as `to` and `from`.
         code: |
           ```dart
           final data = await supabase
@@ -1178,27 +1211,126 @@ functions:
   - id: rpc
     title: 'Stored Procedures: rpc()'
     description: |
-      You can call stored procedures as a "Remote Procedure Call".
+      Perform a function call.
 
-      That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
-      It's especially useful when the logic rarely changes - like password resets and updates.
+      You can call Postgres functions as Remote Procedure Calls, logic in your database that you can execute from anywhere.
+      Functions are useful when the logic rarely changes—like for password resets and updates.
     examples:
-      - id: call-a-stored-procedure
-        name: Call a stored procedure
-        isSpotlight: true
-        description: This is an example invoking a stored procedure.
+      - id: call-a-postgres-function-without-arguments
+        name: Call a Postgres function without arguments
         code: |
           ```dart
           final data = await supabase
             .rpc('hello_world');
           ```
-      - id: with-parameters
-        name: With Parameters
+        data:
+          sql: |
+            ```sql
+            create function hello_world() returns text as $$
+              select 'Hello world';
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": "Hello world",
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: call-a-postgres-function-with-arguments
+        name: Call a Postgres function with arguments
         code: |
           ```dart
           final data = await supabase
-            .rpc('echo_city', params: { 'name': 'The Shire' });
+            .rpc('echo_city', params: { 'say': '👋' });
           ```
+        data:
+          sql: |
+            ```sql
+            create function echo(say text) returns text as $$
+              select say;
+            $$ language sql;
+            ```
+        response: |
+          ```json
+            {
+              "data": "👋",
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+        hideCodeBlock: true
+      - id: bulk-processing
+        name: Bulk processing
+        code: |
+          ```dart
+          final data = await supabase
+            .rpc('add_one_each', params: { arr: [1, 2, 3] });
+          ```
+        data:
+          sql: |
+            ```sql
+            create function add_one_each(arr int[]) returns int[] as $$
+              select array_agg(n + 1) from unnest(arr) as n;
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              2,
+              3,
+              4
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          You can process large payloads by passing in an array as an argument.
+        hideCodeBlock: true
+      - id: call-a-postgres-function-with-filters
+        name: Call a Postgres function with filters
+        code: |
+          ```dart
+          final data = await supabase
+            .rpc('list_stored_countries')
+            .eq('id', 1)
+            .single();
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'France'),
+              (2, 'United Kingdom');
+
+            create function list_stored_countries() returns setof countries as $$
+              select * from countries;
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": {
+              "id": 1,
+              "name": "France"
+            },
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          Postgres functions that return tables can also be combined with [Filters](/docs/reference/dart/using-filters) and [Modifiers](/docs/reference/dart/using-modifiers).
+        hideCodeBlock: true
 
   - id: subscribe
     description: |
@@ -1484,7 +1616,6 @@ functions:
     description: |
       Retrieves the details of all Storage buckets within an existing product.
     title: 'listBuckets()'
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select`
@@ -1504,7 +1635,6 @@ functions:
     description: |
       Retrieves the details of an existing Storage bucket.
     title: 'getBucket()'
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select`
@@ -1599,7 +1729,6 @@ functions:
     description: |
       Uploads a file to an existing bucket.
     title: 'from.upload()'
-    $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none
@@ -2484,7 +2613,6 @@ functions:
     title: like()
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case sensitive).
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
     examples:
       - id: with-select
         name: With `select()`
@@ -2653,6 +2781,8 @@ functions:
     examples:
       - id: on-array-columns
         name: On array columns
+        description: |
+          Only relevant for jsonb, array, and range columns. Match only rows where `column` contains every element appearing in `value`.
         isSpotlight: true
         code: |
           ```dart
@@ -2766,6 +2896,8 @@ functions:
 
   - id: contained-by
     title: containedBy()
+    description: |
+      Only relevant for jsonb, array, and range columns. Match only rows where every element appearing in `column` is contained by `value`.
     examples:
       - id: on-array-columns
         name: On array columns
@@ -2880,6 +3012,8 @@ functions:
 
   - id: range-lt
     title: rangeLt()
+    description: |
+      Only relevant for range columns. Match only rows where every element in `column` is less than any element in `range`.
     examples:
       - id: with-select
         name: With `select()`
@@ -2926,6 +3060,8 @@ functions:
 
   - id: range-gt
     title: rangeGt()
+    description: |
+      Only relevant for range columns. Match only rows where every element in `column` is greater than any element in `range`.
     examples:
       - id: with-select
         name: With `select()`
@@ -2972,6 +3108,8 @@ functions:
 
   - id: range-gte
     title: rangeGte()
+    description: |
+      Only relevant for range columns. Match only rows where every element in `column` is either contained in `range` or greater than any element in `range`.
     examples:
       - id: with-select
         name: With `select()`
@@ -3018,7 +3156,8 @@ functions:
 
   - id: range-lte
     title: rangeLte()
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
+    description: |
+      Only relevant for range columns. Match only rows where every element in `column` is either contained in `range` or less than any element in `range`.
     examples:
       - id: with-select
         name: With `select()`
@@ -3065,6 +3204,8 @@ functions:
 
   - id: range-adjacent
     title: rangeAdjacent()
+    description: |
+      Only relevant for range columns. Match only rows where `column` is mutually exclusive to `range` and there can be no element between the two ranges.
     examples:
       - id: with-select
         name: With `select()`
@@ -3111,6 +3252,8 @@ functions:
 
   - id: overlaps
     title: overlaps()
+    description: |
+      Only relevant for array and range columns. Match only rows where `column` and `value` have an element in common.
     examples:
       - id: on-array-columns
         name: On array columns

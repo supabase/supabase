@@ -1,9 +1,9 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { components } from 'data/api'
-import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { components } from 'data/api'
+import { handleError, post } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { tableKeys } from './keys'
 
 export type CreateTableBody = components['schemas']['CreateTableBody']
@@ -28,7 +28,7 @@ export async function createTable({ projectRef, connectionString, payload }: Tab
     headers,
   })
 
-  if (error) throw error
+  if (error) handleError(error)
   return data
 }
 

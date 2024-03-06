@@ -126,7 +126,7 @@ export default function MultiSelect({
       <div
         className={[
           'form-control form-control--multi-select',
-          'border border-strong bg-background',
+          'border border-strong bg-studio',
           'multi-select relative block w-full space-x-1 overflow-auto rounded',
           `${error !== undefined ? 'border-red-800 bg-red-100' : ''}`,
         ].join(' ')}

@@ -6,7 +6,7 @@ import { Button, IconChevronDown, IconList, Popover } from 'ui'
 
 import { DropdownControl } from 'components/grid/components/common'
 import { formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
-import { Sort, SupaTable } from 'components/grid/types'
+import type { Sort, SupaTable } from 'components/grid/types'
 import SortRow from './SortRow'
 
 export interface SortPopoverProps {
@@ -146,9 +146,11 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, setParams }: SortOverlayProps
         ) : (
           <p className="text-sm text-foreground-light">All columns have been added</p>
         )}
-        <Button disabled={isEqual(sorts, initialSorts)} type="default" onClick={onApplySort}>
-          Apply sorting
-        </Button>
+        <div className="flex items-center">
+          <Button disabled={isEqual(sorts, initialSorts)} type="default" onClick={onApplySort}>
+            Apply sorting
+          </Button>
+        </div>
       </div>
     </div>
   )

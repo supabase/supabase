@@ -27,7 +27,5 @@ export const useQueryPerformanceQuery = ({
 
   const sql = baseSQL.sql([], whereSql, orderBySql)
 
-  // console.log('DEBUG Using sql query: ', sql)
-
   return useDbQuery(sql, undefined, whereSql, orderBySql)
 }

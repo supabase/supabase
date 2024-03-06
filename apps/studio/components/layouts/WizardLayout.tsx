@@ -5,8 +5,8 @@ import { IconChevronRight } from 'ui'
 
 import { withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import { Organization, Project } from 'types'
-import FeedbackDropdown from './ProjectLayout/LayoutHeader/FeedbackDropdown'
+import type { Organization, Project } from 'types'
+import { FeedbackDropdown } from './ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from './ProjectLayout/LayoutHeader/HelpPopover'
 
 interface WizardLayoutProps {

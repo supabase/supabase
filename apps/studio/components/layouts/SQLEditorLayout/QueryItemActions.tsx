@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import clsx from 'clsx'
 import { IS_PLATFORM, useParams } from 'common'
+import { Copy, Download, Edit, MoreHorizontal, Share, Trash } from 'lucide-react'
 import { useRouter } from 'next/router'
 import {
   Button,
@@ -9,16 +9,10 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconCopy,
-  IconDownload,
-  IconEdit2,
-  IconShare,
-  IconTrash,
 } from 'ui'
 
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import { SqlSnippet } from 'data/content/sql-snippets-query'
+import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -26,7 +20,6 @@ import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 
 interface QueryItemActionsProps {
   tabInfo: SqlSnippet
-  activeId: string | undefined
   open: boolean
   setOpen: (value: boolean) => void
   onSelectRenameQuery: () => void
@@ -37,7 +30,6 @@ interface QueryItemActionsProps {
 
 export const QueryItemActions = ({
   tabInfo,
-  activeId,
   open,
   setOpen,
   onSelectRenameQuery,
@@ -106,49 +98,54 @@ export const QueryItemActions = ({
   }
 
   return (
-    <div className="group [div&>button[data-state='open']>span]:text-foreground-lighter flex items-center">
+    <>
       {IS_PLATFORM ? (
         <DropdownMenu open={open} onOpenChange={setOpen}>
-          <DropdownMenuTrigger asChild>
+          <DropdownMenuTrigger
+            className="opacity-0 group-hover:opacity-100 group-focus:opacity-100 focus:opacity-100 data-[state=open]:opacity-100"
+            asChild
+            name="Query actions"
+          >
             <Button
               type="text"
-              className="px-1 opacity-50 hover:opacity-100"
-              icon={<IconChevronDown size="tiny" strokeWidth={2} />}
+              className="px-1 text-lighter data-[state=open]:text-foreground"
+              icon={<MoreHorizontal size={14} strokeWidth={2} />}
+              onClick={(e) => e.preventDefault()}
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent side="bottom" align="end" className=" w-52 translate-x-2">
+          <DropdownMenuContent side="bottom" align="start" className="w-52">
             {isSnippetOwner && (
-              <DropdownMenuItem onClick={onClickRename} className="space-x-2">
-                <IconEdit2 size="tiny" />
-                <p>Rename query</p>
+              <DropdownMenuItem onClick={onClickRename} className="flex gap-2">
+                <Edit size={14} />
+                Rename query
               </DropdownMenuItem>
             )}
 
             {visibility === 'user' && canCreateSQLSnippet && (
-              <DropdownMenuItem onClick={onClickShare} className="space-x-2">
-                <IconShare size="tiny" />
-                <p>Share query</p>
+              <DropdownMenuItem onClick={onClickShare} className="flex gap-2">
+                <Share size={14} />
+                Share query
               </DropdownMenuItem>
             )}
             {visibility === 'project' && canCreateSQLSnippet && (
-              <DropdownMenuItem onClick={createPersonalCopy} className="space-x-2">
-                <IconCopy size="tiny" />
-                <p>Duplicate personal copy</p>
+              <DropdownMenuItem onClick={createPersonalCopy} className="flex gap-2">
+                <Copy size={14} />
+                Duplicate personal copy
               </DropdownMenuItem>
             )}
 
             {IS_PLATFORM && (
-              <DropdownMenuItem onClick={() => onSelectDownloadQuery()} className="space-x-2">
-                <IconDownload size="tiny" />
-                <p>Download as migration file</p>
+              <DropdownMenuItem onClick={() => onSelectDownloadQuery()} className="flex gap-2">
+                <Download size={14} />
+                Download as migration file
               </DropdownMenuItem>
             )}
             {isSnippetOwner && (
               <>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={onClickDelete} className="space-x-2">
-                  <IconTrash size="tiny" />
-                  <p>Delete query</p>
+                <DropdownMenuItem onClick={onClickDelete} className="flex gap-2">
+                  <Trash size={14} />
+                  Delete query
                 </DropdownMenuItem>
               </>
             )}
@@ -159,6 +156,6 @@ export const QueryItemActions = ({
           <span />
         </Button>
       )}
-    </div>
+    </>
   )
 }
