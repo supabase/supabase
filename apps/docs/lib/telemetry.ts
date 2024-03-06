@@ -1,22 +1,41 @@
-import { IS_PROD } from 'common'
+import { usePathname } from 'next/navigation'
+
+import { IS_PROD, useTelemetryProps } from 'common'
+import { useConsent } from 'ui-patterns/ConsentToast'
 
 import { DEBUG_TELEMETRY } from './constants'
 import { unauthedAllowedPost } from './fetch/fetchWrappers'
 
 type TelemetryEvent = {
-  category: string
   action: string
+  category: string
   label: string
-  page_location: string
 }
 
-function sendTelemetryEvent(event: TelemetryEvent) {
-  if (!IS_PROD && !DEBUG_TELEMETRY) return
+const noop = () => {}
 
-  return unauthedAllowedPost('/platform/telemetry/event', {
-    // @ts-ignore -- problem with the OpenAPI spec -- type of label is string | number
-    body: event,
+/**
+ * Sends a telemetry event to Logflare for tracking by the product team.
+ * 
+ * Checks for user consent to telemetry before sending.
+ */
+const useSendTelemetryEvent = () => {
+  const { hasAcceptedConsent } = useConsent()
+  const pathname = usePathname()
+  const telemetryProps = useTelemetryProps()
+
+  if (!IS_PROD && !DEBUG_TELEMETRY) return noop
+  if (!hasAcceptedConsent) return noop
+
+  return (event: TelemetryEvent) => unauthedAllowedPost('/platform/telemetry/event', {
+    body: {
+      ...event,
+      page_title: document?.title,
+      page_location: pathname,
+      // @ts-ignore -- fine to not send session_id
+      ga: telemetryProps
+    },
   })
 }
 
-export { sendTelemetryEvent }
+export { useSendTelemetryEvent }
