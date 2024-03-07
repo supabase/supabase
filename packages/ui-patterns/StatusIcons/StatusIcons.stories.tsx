@@ -30,7 +30,7 @@ type Story = StoryObj<typeof StatusIcon>
 
 export const Primary: Story = {
   args: {
-    variant: 'destructive',
+    variant: 'default',
   },
   /**
    * 👇 To avoid linting issues, it is recommended to use a function with a capitalized name.
@@ -41,10 +41,9 @@ export const Primary: Story = {
   },
 }
 
-export const withNoBackground: Story = {
+export const Destructive: Story = {
   args: {
     variant: 'destructive',
-    hideBackground: true,
   },
   /**
    * 👇 To avoid linting issues, it is recommended to use a function with a capitalized name.
@@ -58,6 +57,20 @@ export const withNoBackground: Story = {
 export const Warning: Story = {
   args: {
     variant: 'warning',
+  },
+  /**
+   * 👇 To avoid linting issues, it is recommended to use a function with a capitalized name.
+   * If you are not concerned with linting, you may use an arrow function.
+   */
+  render: function Render(args) {
+    return <StatusIcon {...args} />
+  },
+}
+
+export const withNoBackground: Story = {
+  args: {
+    variant: 'default',
+    hideBackground: true,
   },
   /**
    * 👇 To avoid linting issues, it is recommended to use a function with a capitalized name.
