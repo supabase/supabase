@@ -136,282 +136,276 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
   }
 
   return (
-    <>
-      <SidePanel
-        size="large"
-        visible={visible}
-        header={isEditing ? `Edit '${func.name}' function` : 'Add a new function'}
-        className="mr-0 transform transition-all duration-300 ease-in-out"
-        onCancel={() => isClosingSidePanel()}
-        customFooter={
-          <div className="flex justify-end gap-2 p-4 bg-overlay border-t border-overlay">
-            <div>
-              <Button
-                disabled={isCreating || isUpdating}
-                type="default"
-                onClick={isClosingSidePanel}
-              >
-                Cancel
-              </Button>
-            </div>
-            <div>
-              <Button
-                form={FORM_ID}
-                htmlType="submit"
-                disabled={isCreating || isUpdating}
-                loading={isCreating || isUpdating}
-              >
-                Confirm
-              </Button>
-            </div>
+    <SidePanel
+      size="large"
+      visible={visible}
+      header={isEditing ? `Edit '${func.name}' function` : 'Add a new function'}
+      className="mr-0 transform transition-all duration-300 ease-in-out"
+      onCancel={() => isClosingSidePanel()}
+      customFooter={
+        <div className="flex justify-end gap-2 p-4 bg-overlay border-t border-overlay">
+          <div>
+            <Button disabled={isCreating || isUpdating} type="default" onClick={isClosingSidePanel}>
+              Cancel
+            </Button>
           </div>
-        }
-      >
-        <Form_Shadcn_ {...form}>
-          <form id={FORM_ID} className="space-y-6 mt-4" onSubmit={form.handleSubmit(onSubmit)}>
-            <SidePanel.Content>
+          <div>
+            <Button
+              form={FORM_ID}
+              htmlType="submit"
+              disabled={isCreating || isUpdating}
+              loading={isCreating || isUpdating}
+            >
+              Confirm
+            </Button>
+          </div>
+        </div>
+      }
+    >
+      <Form_Shadcn_ {...form}>
+        <form id={FORM_ID} className="space-y-6 mt-4" onSubmit={form.handleSubmit(onSubmit)}>
+          <SidePanel.Content>
+            <FormField_Shadcn_
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+                  <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
+                    Name of function
+                  </FormLabel_Shadcn_>
+                  <FormControl_Shadcn_ className="col-span-8">
+                    <Input_Shadcn_ {...field} className="w-full" />
+                  </FormControl_Shadcn_>
+                  <FormDescription_Shadcn_ className="col-start-5 col-span-8">
+                    Name will also be used for the function name in postgres
+                  </FormDescription_Shadcn_>
+                  <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+                </FormItem_Shadcn_>
+              )}
+            />
+          </SidePanel.Content>
+          <SidePanel.Separator />
+          <SidePanel.Content className="space-y-4">
+            <FormField_Shadcn_
+              control={form.control}
+              name="schema"
+              render={({ field }) => (
+                <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+                  <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
+                    Schema
+                  </FormLabel_Shadcn_>
+                  <FormControl_Shadcn_ className="col-span-8">
+                    <SchemaSelector
+                      selectedSchemaName={field.value}
+                      excludedSchemas={EXCLUDED_SCHEMAS}
+                      size="small"
+                      onSelectSchema={(name) => field.onChange(name)}
+                    />
+                  </FormControl_Shadcn_>
+                  <FormDescription_Shadcn_ className="col-start-5 col-span-8">
+                    Tables made in the table editor will be in 'public'
+                  </FormDescription_Shadcn_>
+                  <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+                </FormItem_Shadcn_>
+              )}
+            />
+            {!isEditing && (
               <FormField_Shadcn_
                 control={form.control}
-                name="name"
+                name="return_type"
                 render={({ field }) => (
                   <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
                     <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-                      Name of function
+                      Return type
                     </FormLabel_Shadcn_>
                     <FormControl_Shadcn_ className="col-span-8">
-                      <Input_Shadcn_ {...field} className="w-full" />
+                      <Listbox
+                        size="small"
+                        value={field.value}
+                        onChange={(value) => field.onChange(value)}
+                      >
+                        <Listbox.Option value="void" label="void">
+                          void
+                        </Listbox.Option>
+                        <Listbox.Option value="record" label="record">
+                          record
+                        </Listbox.Option>
+                        <Listbox.Option value="trigger" label="trigger">
+                          trigger
+                        </Listbox.Option>
+                        <Listbox.Option value="integer" label="integer">
+                          integer
+                        </Listbox.Option>
+                        {POSTGRES_DATA_TYPES.map((x: string) => (
+                          <Listbox.Option key={x} value={x} label={x}>
+                            {x}
+                          </Listbox.Option>
+                        ))}
+                      </Listbox>
                     </FormControl_Shadcn_>
-                    <FormDescription_Shadcn_ className="col-start-5 col-span-8">
-                      Name will also be used for the function name in postgres
-                    </FormDescription_Shadcn_>
                     <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
                   </FormItem_Shadcn_>
                 )}
               />
-            </SidePanel.Content>
-            <SidePanel.Separator />
-            <SidePanel.Content className="space-y-4">
-              <FormField_Shadcn_
-                control={form.control}
-                name="schema"
-                render={({ field }) => (
-                  <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                    <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-                      Schema
+            )}
+          </SidePanel.Content>
+          <SidePanel.Separator />
+          <SidePanel.Content>
+            <FormFieldArgs readonly={isEditing} />
+          </SidePanel.Content>
+          <SidePanel.Separator />
+          <SidePanel.Content>
+            <FormField_Shadcn_
+              control={form.control}
+              name="definition"
+              render={({ field }) => (
+                <FormItem_Shadcn_ className="space-y-4">
+                  <div>
+                    <FormLabel_Shadcn_ className="text-base text-foreground">
+                      Definition
                     </FormLabel_Shadcn_>
-                    <FormControl_Shadcn_ className="col-span-8">
-                      <SchemaSelector
-                        selectedSchemaName={field.value}
-                        excludedSchemas={EXCLUDED_SCHEMAS}
-                        size="small"
-                        onSelectSchema={(name) => field.onChange(name)}
+                    <FormDescription_Shadcn_ className="text-sm text-foreground-light">
+                      <p>The language below should be written in `plpgsql`.</p>
+                      {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
+                    </FormDescription_Shadcn_>
+                  </div>
+
+                  <div className="h-60 resize-y border border-default">
+                    <FormControl_Shadcn_>
+                      <SqlEditor
+                        defaultValue={field.value}
+                        onInputChange={(value: string | undefined) => {
+                          field.onChange(value)
+                        }}
+                        contextmenu={false}
                       />
                     </FormControl_Shadcn_>
-                    <FormDescription_Shadcn_ className="col-start-5 col-span-8">
-                      Tables made in the table editor will be in 'public'
-                    </FormDescription_Shadcn_>
-                    <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
-                  </FormItem_Shadcn_>
-                )}
-              />
-              {!isEditing && (
-                <FormField_Shadcn_
-                  control={form.control}
-                  name="return_type"
-                  render={({ field }) => (
-                    <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                      <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-                        Return type
-                      </FormLabel_Shadcn_>
-                      <FormControl_Shadcn_ className="col-span-8">
-                        <Listbox
-                          size="small"
-                          value={field.value}
-                          onChange={(value) => field.onChange(value)}
-                        >
-                          <Listbox.Option value="void" label="void">
-                            void
-                          </Listbox.Option>
-                          <Listbox.Option value="record" label="record">
-                            record
-                          </Listbox.Option>
-                          <Listbox.Option value="trigger" label="trigger">
-                            trigger
-                          </Listbox.Option>
-                          <Listbox.Option value="integer" label="integer">
-                            integer
-                          </Listbox.Option>
-                          {POSTGRES_DATA_TYPES.map((x: string) => (
-                            <Listbox.Option key={x} value={x} label={x}>
-                              {x}
-                            </Listbox.Option>
-                          ))}
-                        </Listbox>
-                      </FormControl_Shadcn_>
-                      <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
-                    </FormItem_Shadcn_>
-                  )}
-                />
-              )}
-            </SidePanel.Content>
-            <SidePanel.Separator />
-            <SidePanel.Content>
-              <FormFieldArgs readonly={isEditing} />
-            </SidePanel.Content>
-            <SidePanel.Separator />
-            <SidePanel.Content>
-              <FormField_Shadcn_
-                control={form.control}
-                name="definition"
-                render={({ field }) => (
-                  <FormItem_Shadcn_ className="space-y-4">
-                    <div>
-                      <FormLabel_Shadcn_ className="text-base text-foreground">
-                        Definition
-                      </FormLabel_Shadcn_>
-                      <FormDescription_Shadcn_ className="text-sm text-foreground-light">
-                        <p>The language below should be written in `plpgsql`.</p>
-                        {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
-                      </FormDescription_Shadcn_>
-                    </div>
-
-                    <div className="h-60 resize-y border border-default">
-                      <FormControl_Shadcn_>
-                        <SqlEditor
-                          defaultValue={field.value}
-                          onInputChange={(value: string | undefined) => {
-                            field.onChange(value)
-                          }}
-                          contextmenu={false}
-                        />
-                      </FormControl_Shadcn_>
-                    </div>
-
-                    <FormMessage_Shadcn_ />
-                  </FormItem_Shadcn_>
-                )}
-              />
-            </SidePanel.Content>
-            <SidePanel.Separator />
-            {isEditing ? (
-              <></>
-            ) : (
-              <>
-                <SidePanel.Content>
-                  <div className="space-y-8 rounded bg-studio py-4 px-6 border border-overlay">
-                    <Toggle
-                      onChange={() => setAdvancedSettingsShown(!advancedSettingsShown)}
-                      label="Show advanced settings"
-                      checked={advancedSettingsShown}
-                      labelOptional="These are settings that might be familiar for postgres heavy users "
-                    />
                   </div>
-                </SidePanel.Content>
-                {advancedSettingsShown && (
-                  <>
-                    <SidePanel.Content>
-                      <div className="space-y-2">
-                        <FormFieldLanguage />
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="behavior"
-                          render={({ field }) => (
-                            <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                              <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-                                Behavior
-                              </FormLabel_Shadcn_>
-                              <FormControl_Shadcn_ className="col-span-8">
-                                <Listbox
-                                  size="small"
-                                  value={field.value}
-                                  onChange={(value) => field.onChange(value)}
-                                >
-                                  <Listbox.Option value="IMMUTABLE" label="immutable">
-                                    immutable
-                                  </Listbox.Option>
-                                  <Listbox.Option value="STABLE" label="stable">
-                                    stable
-                                  </Listbox.Option>
-                                  <Listbox.Option value="VOLATILE" label="volatile">
-                                    volatile
-                                  </Listbox.Option>
-                                </Listbox>
-                              </FormControl_Shadcn_>
-                              <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
-                            </FormItem_Shadcn_>
-                          )}
-                        />
-                      </div>
-                    </SidePanel.Content>
-                    <SidePanel.Separator />
-                    <SidePanel.Content>
-                      <FormFieldConfigParams readonly={isEditing} />
-                    </SidePanel.Content>
-                    <SidePanel.Separator />
-                    <SidePanel.Content>
-                      <div className="space-y-4">
-                        <FormField_Shadcn_
-                          control={form.control}
-                          name="security_definer"
-                          render={({ field }) => (
-                            <FormItem_Shadcn_>
-                              <FormControl_Shadcn_ className="col-span-8">
-                                <Radio.Group
-                                  type="cards"
-                                  label="Type of security"
-                                  layout="vertical"
-                                  onChange={(event) =>
-                                    field.onChange(event.target.value == 'SECURITY_DEFINER')
-                                  }
-                                  value={field.value ? 'SECURITY_DEFINER' : 'SECURITY_INVOKER'}
-                                >
-                                  <Radio
-                                    id="SECURITY_INVOKER"
-                                    label="SECURITY INVOKER"
-                                    value="SECURITY_INVOKER"
-                                    checked={!field.value}
-                                    description="Function is to be executed with the privileges of the user that calls it."
-                                  />
-                                  <Radio
-                                    id="SECURITY_DEFINER"
-                                    label="SECURITY DEFINER"
-                                    value="SECURITY_DEFINER"
-                                    checked={field.value}
-                                    description="Function is to be executed with the privileges of the user that created it."
-                                  />
-                                </Radio.Group>
-                              </FormControl_Shadcn_>
-                              <FormMessage_Shadcn_ />
-                            </FormItem_Shadcn_>
-                          )}
-                        />
-                      </div>
-                    </SidePanel.Content>
-                  </>
-                )}
-              </>
-            )}
-          </form>
-        </Form_Shadcn_>
-        <ConfirmationModal
-          visible={isClosingPanel}
-          header="Discard changes"
-          buttonLabel="Discard"
-          onSelectCancel={() => setIsClosingPanel(false)}
-          onSelectConfirm={() => {
-            setIsClosingPanel(false)
-            setVisible(!visible)
-          }}
-        >
-          <Modal.Content>
-            <p className="py-4 text-sm text-foreground-light">
-              There are unsaved changes. Are you sure you want to close the panel? Your changes will
-              be lost.
-            </p>
-          </Modal.Content>
-        </ConfirmationModal>
-      </SidePanel>
-    </>
+
+                  <FormMessage_Shadcn_ />
+                </FormItem_Shadcn_>
+              )}
+            />
+          </SidePanel.Content>
+          <SidePanel.Separator />
+          {isEditing ? (
+            <></>
+          ) : (
+            <>
+              <SidePanel.Content>
+                <div className="space-y-8 rounded bg-studio py-4 px-6 border border-overlay">
+                  <Toggle
+                    onChange={() => setAdvancedSettingsShown(!advancedSettingsShown)}
+                    label="Show advanced settings"
+                    checked={advancedSettingsShown}
+                    labelOptional="These are settings that might be familiar for postgres heavy users "
+                  />
+                </div>
+              </SidePanel.Content>
+              {advancedSettingsShown && (
+                <>
+                  <SidePanel.Content>
+                    <div className="space-y-2">
+                      <FormFieldLanguage />
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="behavior"
+                        render={({ field }) => (
+                          <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+                            <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
+                              Behavior
+                            </FormLabel_Shadcn_>
+                            <FormControl_Shadcn_ className="col-span-8">
+                              <Listbox
+                                size="small"
+                                value={field.value}
+                                onChange={(value) => field.onChange(value)}
+                              >
+                                <Listbox.Option value="IMMUTABLE" label="immutable">
+                                  immutable
+                                </Listbox.Option>
+                                <Listbox.Option value="STABLE" label="stable">
+                                  stable
+                                </Listbox.Option>
+                                <Listbox.Option value="VOLATILE" label="volatile">
+                                  volatile
+                                </Listbox.Option>
+                              </Listbox>
+                            </FormControl_Shadcn_>
+                            <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+                          </FormItem_Shadcn_>
+                        )}
+                      />
+                    </div>
+                  </SidePanel.Content>
+                  <SidePanel.Separator />
+                  <SidePanel.Content>
+                    <FormFieldConfigParams readonly={isEditing} />
+                  </SidePanel.Content>
+                  <SidePanel.Separator />
+                  <SidePanel.Content>
+                    <div className="space-y-4">
+                      <FormField_Shadcn_
+                        control={form.control}
+                        name="security_definer"
+                        render={({ field }) => (
+                          <FormItem_Shadcn_>
+                            <FormControl_Shadcn_ className="col-span-8">
+                              <Radio.Group
+                                type="cards"
+                                label="Type of security"
+                                layout="vertical"
+                                onChange={(event) =>
+                                  field.onChange(event.target.value == 'SECURITY_DEFINER')
+                                }
+                                value={field.value ? 'SECURITY_DEFINER' : 'SECURITY_INVOKER'}
+                              >
+                                <Radio
+                                  id="SECURITY_INVOKER"
+                                  label="SECURITY INVOKER"
+                                  value="SECURITY_INVOKER"
+                                  checked={!field.value}
+                                  description="Function is to be executed with the privileges of the user that calls it."
+                                />
+                                <Radio
+                                  id="SECURITY_DEFINER"
+                                  label="SECURITY DEFINER"
+                                  value="SECURITY_DEFINER"
+                                  checked={field.value}
+                                  description="Function is to be executed with the privileges of the user that created it."
+                                />
+                              </Radio.Group>
+                            </FormControl_Shadcn_>
+                            <FormMessage_Shadcn_ />
+                          </FormItem_Shadcn_>
+                        )}
+                      />
+                    </div>
+                  </SidePanel.Content>
+                </>
+              )}
+            </>
+          )}
+        </form>
+      </Form_Shadcn_>
+      <ConfirmationModal
+        visible={isClosingPanel}
+        header="Discard changes"
+        buttonLabel="Discard"
+        onSelectCancel={() => setIsClosingPanel(false)}
+        onSelectConfirm={() => {
+          setIsClosingPanel(false)
+          setVisible(!visible)
+        }}
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-foreground-light">
+            There are unsaved changes. Are you sure you want to close the panel? Your changes will
+            be lost.
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
+    </SidePanel>
   )
 }
 
@@ -595,42 +589,40 @@ const FormFieldLanguage = () => {
   const [enabledExtensions] = partition(data ?? [], (ext) => !isNull(ext.installed_version))
 
   return (
-    <>
-      <FormField_Shadcn_
-        name="language"
-        render={({ field }) => (
-          <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-            <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-              Language
-            </FormLabel_Shadcn_>
-            <FormControl_Shadcn_ className="col-span-8">
-              <Listbox
-                size="small"
-                value={field.value}
-                placeholder="Pick a language"
-                onChange={(value) => field.onChange(value)}
-              >
-                <Listbox.Option value="sql" label="sql">
-                  sql
-                </Listbox.Option>
-                {
-                  //map through all selected extensions that start with pl
-                  enabledExtensions
-                    .filter((ex) => {
-                      return ex.name.startsWith('pl')
-                    })
-                    .map((ex) => (
-                      <Listbox.Option key={ex.name} value={ex.name} label={ex.name}>
-                        {ex.name}
-                      </Listbox.Option>
-                    ))
-                }
-              </Listbox>
-            </FormControl_Shadcn_>
-            <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
-          </FormItem_Shadcn_>
-        )}
-      />
-    </>
+    <FormField_Shadcn_
+      name="language"
+      render={({ field }) => (
+        <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+          <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
+            Language
+          </FormLabel_Shadcn_>
+          <FormControl_Shadcn_ className="col-span-8">
+            <Listbox
+              size="small"
+              value={field.value}
+              placeholder="Pick a language"
+              onChange={(value) => field.onChange(value)}
+            >
+              <Listbox.Option value="sql" label="sql">
+                sql
+              </Listbox.Option>
+              {
+                //map through all selected extensions that start with pl
+                enabledExtensions
+                  .filter((ex) => {
+                    return ex.name.startsWith('pl')
+                  })
+                  .map((ex) => (
+                    <Listbox.Option key={ex.name} value={ex.name} label={ex.name}>
+                      {ex.name}
+                    </Listbox.Option>
+                  ))
+              }
+            </Listbox>
+          </FormControl_Shadcn_>
+          <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+        </FormItem_Shadcn_>
+      )}
+    />
   )
 }
