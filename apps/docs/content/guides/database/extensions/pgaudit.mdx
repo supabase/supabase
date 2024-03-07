@@ -329,7 +329,7 @@ SELECT cron.schedule(
 
 ### Monitoring access to the `auth.users` table
 
-In the worst case scenario, where a privileged roles' password ia exposed, you can use pgaudit to monitor if the `auth.user` table was targetted. It should be stated that API requests are already monitored in the [API Edge Network](https://supabase.com/dashboard/project/_/logs/edge-logs) and this is more about providing greater clarity about what is happening at the database level.
+In the worst case scenario, where a privileged roles' password ia exposed, you can use pgaudit to monitor if the `auth.user` table was targeted. It should be stated that API requests are already monitored in the [API Edge Network](https://supabase.com/dashboard/project/_/logs/edge-logs) and this is more about providing greater clarity about what is happening at the database level.
 
 Logging `auth.user` should be done in Object Mode and requires a custom role:
 
