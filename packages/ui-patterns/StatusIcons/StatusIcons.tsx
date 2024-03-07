@@ -18,7 +18,7 @@ export const StatusIcon = forwardRef<
     Icon = CriticalIcon
   }
 
-  return Icon ? <Icon ref={ref} size={12} {...props} /> : null
+  return Icon ? <Icon ref={ref} {...props} /> : null
 })
 
 const CriticalIcon: React.FC<SVGProps<SVGSVGElement> & StatusIconProps> = ({
