@@ -16,7 +16,6 @@ export default [
     vercel_deploy_url:
       'https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnextjs-subscription-payments&env=NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,STRIPE_SECRET_KEY&envDescription=Enter%20your%20Stripe%20API%20keys.&envLink=https%3A%2F%2Fdashboard.stripe.com%2Fapikeys&project-name=nextjs-subscription-payments&repository-name=nextjs-subscription-payments&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnextjs-subscription-payments%2Ftree%2Fmain',
     demo_url: 'https://subscription-payments.vercel.app/',
-    archive: false,
   },
   {
     type: 'example',
@@ -33,7 +32,6 @@ export default [
     vercel_deploy_url:
       'https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This%20starter%20configures%20Supabase%20Auth%20to%20use%20cookies%2C%20making%20the%20user%27s%20session%20available%20throughout%20the%20entire%20Next.js%20app%20-%20Client%20Components%2C%20Server%20Components%2C%20Route%20Handlers%2C%20Server%20Actions%20and%20Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6',
     demo_url: 'https://demo-nextjs-with-supabase.vercel.app/',
-    archive: false,
   },
   {
     type: 'example',
@@ -50,7 +48,6 @@ export default [
     vercel_deploy_url:
       'https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fsupabase-community%2Fvercel-ai-chatbot&env=OPENAI_API_KEY&envDescription=You%20must%20first%20activate%20a%20Billing%20Account%20here%3A%20https%3A%2F%2Fplatform.openai.com%2Faccount%2Fbilling%2Foverview&envLink=https%3A%2F%2Fplatform.openai.com%2Faccount%2Fapi-keys&project-name=vercel-ai-chatbot-with-supabase&repository-name=vercel-ai-chatbot-with-supabase&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6&external-id=https%3A%2F%2Fgithub.com%2Fsupabase-community%2Fvercel-ai-chatbot%2Ftree%2Fmain',
     demo_url: '',
-    archive: false,
   },
   {
     type: 'example',
@@ -67,7 +64,6 @@ export default [
     vercel_deploy_url:
       'https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Flangchain-ai%2Flangchain-nextjs-template',
     demo_url: 'https://langchain-nextjs-template.vercel.app/',
-    archive: false,
   },
   {
     type: 'example',
@@ -84,7 +80,6 @@ export default [
       'https://github.com/supabase/supabase/tree/master/examples/user-management/flutter-user-management',
     vercel_deploy_url: '',
     demo_url: '',
-    archive: false,
   },
   {
     type: 'example',
@@ -100,7 +95,6 @@ export default [
     repo_url: 'https://github.com/supabase-community/create-t3-turbo',
     vercel_deploy_url: '',
     demo_url: 'https://create-t3-turbo.vercel.app/',
-    archive: false,
   },
   {
     type: 'example',
@@ -115,7 +109,6 @@ export default [
     repo_url: 'https://github.com/joshnuss/supabase-kanban',
     vercel_deploy_url: '',
     demo_url: 'https://supabase-kanban.vercel.app/',
-    archive: false,
   },
   {
     type: 'example',
@@ -131,7 +124,6 @@ export default [
       'https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone',
     vercel_deploy_url: '',
     demo_url: '',
-    archive: false,
   },
   {
     type: 'example',
@@ -147,7 +139,6 @@ export default [
     vercel_deploy_url:
       'https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnextjs-subscription-payments&env=NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,STRIPE_SECRET_KEY&envDescription=Enter%20your%20Stripe%20API%20keys.&envLink=https%3A%2F%2Fdashboard.stripe.com%2Fapikeys&project-name=nextjs-subscription-payments&repository-name=nextjs-subscription-payments&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnextjs-subscription-payments%2Ftree%2Fmain',
     demo_url: 'https://subscription-payments.vercel.app/',
-    archive: false,
   },
   {
     type: 'example',
@@ -163,7 +154,6 @@ export default [
       'https://github.com/codingki/react-native-expo-template/tree/master/template-typescript-bottom-tabs-supabase-auth-flow',
     vercel_deploy_url: '',
     demo_url: '',
-    archive: false,
   },
   {
     type: 'example',
@@ -178,7 +168,6 @@ export default [
     repo_url: 'https://github.com/hiro1107/nestjs-supabase-auth',
     vercel_deploy_url: '',
     demo_url: '',
-    archive: false,
   },
   {
     type: 'example',
@@ -193,71 +182,6 @@ export default [
     repo_url: 'https://github.com/shwosner/realtime-chat-supabase-react',
     vercel_deploy_url: '',
     demo_url: 'https://random-chat.netlify.app/',
-    archive: false,
-  },
-  {
-    type: 'example',
-    tags: ['Javascript'],
-    products: [PRODUCT_NAMES.DATABASE, PRODUCT_NAMES.AUTHENTICATION],
-    title: 'Vanilla-js Auth app',
-    description:
-      'How to sign up and login using supabase and supabase-js using HTML and JavaScript only',
-    author: 'supabase',
-    author_url: 'https://github.com/supabase',
-    author_img: 'https://avatars.githubusercontent.com/u/54469796',
-    repo_name: 'javascript-auth',
-    repo_url: 'https://github.com/supabase/examples/tree/main/supabase-js-v1/auth/javascript-auth',
-    vercel_deploy_url: '',
-    demo_url: 'https://auth-vanilla-js.vercel.app/',
-    archive: true,
-  },
-  {
-    type: 'example',
-    tags: ['React'],
-    products: [PRODUCT_NAMES.DATABASE],
-    title: 'React Native todo list app',
-    description: 'React Native Todo List example with Expo',
-    author: 'supabase',
-    author_url: 'https://github.com/supabase',
-    author_img: 'https://avatars.githubusercontent.com/u/54469796',
-    repo_name: 'expo-todo-list',
-    repo_url:
-      'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/react-native-ts-todo-list',
-    vercel_deploy_url: '',
-    demo_url: '',
-    archive: true,
-  },
-  {
-    type: 'example',
-    tags: ['Next.js'],
-    products: [PRODUCT_NAMES.DATABASE],
-    title: 'Next.js todo list app',
-    description: 'Next.js todo list example',
-    author: 'supabase',
-    author_url: 'https://github.com/supabase',
-    author_img: 'https://avatars.githubusercontent.com/u/54469796',
-    repo_name: 'nextjs-todo-list',
-    repo_url:
-      'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/nextjs-todo-list',
-    vercel_deploy_url: '',
-    demo_url: 'https://supabase-nextjs-todo-list.vercel.app/',
-    archive: true,
-  },
-  {
-    type: 'example',
-    tags: ['React'],
-    products: [PRODUCT_NAMES.DATABASE],
-    title: 'React todo list app',
-    description: 'React todo List example',
-    author: 'supabase',
-    author_url: 'https://github.com/supabase',
-    author_img: 'https://avatars.githubusercontent.com/u/54469796',
-    repo_name: 'react-todo-list',
-    repo_url:
-      'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/react-todo-list',
-    vercel_deploy_url: '',
-    demo_url: '',
-    archive: true,
   },
   {
     type: 'example',
@@ -273,38 +197,5 @@ export default [
       'https://github.com/supabase/supabase/tree/master/examples/todo-list/sveltejs-todo-list',
     vercel_deploy_url: '',
     demo_url: '',
-    archive: false,
-  },
-  {
-    type: 'example',
-    tags: ['Vue'],
-    products: [PRODUCT_NAMES.DATABASE],
-    title: 'Vue.js todo list app',
-    description: 'Vue.js todo app using TypeScript',
-    author: 'supabase',
-    author_url: 'https://github.com/supabase',
-    author_img: 'https://avatars.githubusercontent.com/u/54469796',
-    repo_name: 'vue3-ts-todo-list',
-    repo_url:
-      'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/vue3-ts-todo-list',
-    vercel_deploy_url: '',
-    demo_url: '',
-    archive: true,
-  },
-  {
-    type: 'example',
-    tags: ['Angular'],
-    products: [PRODUCT_NAMES.DATABASE],
-    title: 'Angular todo list app',
-    description: 'Angular todo List example',
-    author: 'geromegrignon',
-    author_url: 'https://github.com/geromegrignon',
-    author_img: 'https://avatars.githubusercontent.com/u/32737308',
-    repo_name: 'angular-todo-list',
-    repo_url:
-      'https://github.com/supabase/examples/tree/main/supabase-js-v1/todo-list/angular-todo-list',
-    vercel_deploy_url: '',
-    demo_url: '',
-    archive: true,
   },
 ]
