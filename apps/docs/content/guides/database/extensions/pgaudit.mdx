@@ -399,7 +399,7 @@ pgaudit usually records queries, but not the returned rows. You can modify this 
 ALTER ROLE postgres SET pgaudit.log_rows TO 'on';
 
 -- disable
-ALTER ROLE postgres SET pgaudit.log_parameter TO 'off';
+ALTER ROLE postgres SET pgaudit.log_rows TO 'off';
 ```
 
 You should not do this unless you are _absolutely_ certain it is necessary for your use case. It can expose sensitive values to your logs that ideally should not be preserved. Furthermore, it will create redundant logs that will create noise. If done in excess, it can even noticeably impact database performance.
