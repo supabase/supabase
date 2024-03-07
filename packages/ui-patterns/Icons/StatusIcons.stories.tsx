@@ -81,7 +81,7 @@ export const withNoBackground: Story = {
   },
 }
 
-export const WithBadge: Story = {
+export const InsideBadge: Story = {
   args: {
     variant: 'destructive',
   },
