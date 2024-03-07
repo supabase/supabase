@@ -150,7 +150,7 @@ const SqlEditor: NextPageWithLayout = () => {
   }, [isPgInfoReady])
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 overflow-auto">
       <SQLEditor />
     </div>
   )

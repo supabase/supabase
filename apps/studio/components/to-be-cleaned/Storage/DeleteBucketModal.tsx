@@ -71,6 +71,7 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
 
   return (
     <TextConfirmModal
+      variant={'destructive'}
       visible={visible}
       title={`Confirm deletion of ${bucket?.name}`}
       confirmPlaceholder="Type in name of bucket"
@@ -80,11 +81,14 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
       loading={isDeleting}
       text={
         <>
-          Your bucket <span className="font-bold">{bucket?.name}</span> and all its contents will be
-          permanently deleted.
+          Your bucket <span className="font-bold text-foreground">{bucket?.name}</span> and all its
+          contents will be permanently deleted.
         </>
       }
-      alert="You cannot recover this bucket once it is deleted."
+      alert={{
+        title: 'You cannot recover this bucket once deleted.',
+        description: 'All bucket data will be lost.',
+      }}
       confirmLabel={`Delete bucket ${bucket?.name}`}
     />
   )

@@ -68,7 +68,25 @@ const BranchManagement = () => {
     isLoading: isLoadingBranches,
     isError: isErrorBranches,
     isSuccess: isSuccessBranches,
-  } = useBranchesQuery({ projectRef })
+  } = useBranchesQuery(
+    { projectRef },
+    {
+      refetchInterval(data) {
+        if (
+          data?.some(
+            (branch) =>
+              branch.status === 'CREATING_PROJECT' ||
+              branch.status === 'RUNNING_MIGRATIONS' ||
+              branch.status === 'MIGRATIONS_FAILED'
+          )
+        ) {
+          return 1000 * 3 // 3 seconds
+        }
+
+        return false
+      },
+    }
+  )
   const [[mainBranch], previewBranchesUnsorted] = partition(branches, (branch) => branch.is_default)
   const previewBranches = previewBranchesUnsorted.sort((a, b) =>
     new Date(a.updated_at) < new Date(b.updated_at) ? 1 : -1
@@ -349,7 +367,7 @@ const BranchManagement = () => {
       </ScaffoldContainer>
 
       <TextConfirmModal
-        size="medium"
+        variant={'warning'}
         visible={selectedBranchToDelete !== undefined}
         onCancel={() => setSelectedBranchToDelete(undefined)}
         onConfirm={() => onConfirmDeleteBranch()}
@@ -358,8 +376,13 @@ const BranchManagement = () => {
         confirmLabel="Delete branch"
         confirmPlaceholder="Type in name of branch"
         confirmString={selectedBranchToDelete?.name ?? ''}
-        text={`This will delete your database preview branch "${selectedBranchToDelete?.name}"`}
-        alert="You cannot recover this branch once it is deleted!"
+        alert={{ title: 'You cannot recover this branch once deleted' }}
+        text={
+          <>
+            This will delete your database preview branch
+            <span className="text-bold text-foreground">{selectedBranchToDelete?.name}</span>.
+          </>
+        }
       />
 
       <ConfirmationModal

@@ -11,14 +11,16 @@ function getAbsolutePath(value) {
 /** @type { import('@storybook/nextjs').StorybookConfig } */
 const config = {
   stories: [
+    // package based stories
+    '../../../packages/ui-patterns/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    // primitives
+    '../../../packages/ui/src/components/shadcn/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    //
     // local stories
     '../stories/**/*.mdx',
     '../stories/**/*.stories.@(js|jsx|mjs|ts|tsx)',
     // app based stories
     // -- add app based stories here
-    // package based stories
-    '../../../packages/ui/src/components/shadcn/**/*.stories.@(js|jsx|mjs|ts|tsx)',
-    '../../../packages/ui-patterns/**/*.stories.@(js|jsx|mjs|ts|tsx)',
   ],
   addons: [
     getAbsolutePath('@storybook/addon-links'),
