@@ -11,7 +11,7 @@ import {
   SidePanel,
 } from 'ui'
 
-import { WarningIcon } from 'components/ui/Icons'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { Region, useReadReplicaSetUpMutation } from 'data/read-replicas/replica-setup-mutation'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
