@@ -22,7 +22,7 @@ async function generateEmbeddings() {
   const requiredEnvVars = [
     'NEXT_PUBLIC_SUPABASE_URL',
     'SUPABASE_SERVICE_ROLE_KEY',
-    'OPENAI_KEY',
+    'OPENAI_API_KEY',
     'NEXT_PUBLIC_MISC_USE_URL',
     'NEXT_PUBLIC_MISC_USE_ANON_KEY',
     'SEARCH_GITHUB_APP_ID',
@@ -165,7 +165,7 @@ async function generateEmbeddings() {
         const input = content.replace(/\n/g, ' ')
 
         try {
-          const openai = new OpenAI({ apiKey: process.env.OPENAI_KEY })
+          const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
           const embeddingResponse = await openai.embeddings.create({
             model: 'text-embedding-ada-002',
