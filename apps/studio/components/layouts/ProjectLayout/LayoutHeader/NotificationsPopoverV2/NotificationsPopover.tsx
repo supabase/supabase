@@ -14,7 +14,7 @@ import {
 } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
-import { CriticalIcon, WarningIcon } from 'components/ui/Icons'
+import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useNotificationsArchiveAllMutation } from 'data/notifications/notifications-v2-archive-all-mutation'

@@ -4,7 +4,7 @@ import { Button, Input, Listbox, SidePanel } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { CodeEditor } from 'components/ui/CodeEditor'
-import MultiSelect, { MultiSelectOption } from 'components/ui/MultiSelect'
+import MultiSelect, { MultiSelectOption } from 'ui-patterns/MultiSelect'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useIndexesQuery } from 'data/database/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
