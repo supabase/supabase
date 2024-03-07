@@ -1,6 +1,6 @@
 // import { within, userEvent, expect } from '@storybook/test'
 import { TooltipProvider_Shadcn_ } from 'ui'
-import { Page } from './LayoutOnly'
+import { Page } from './FormLayout'
 
 export default {
   title: 'Form Examples/One',
