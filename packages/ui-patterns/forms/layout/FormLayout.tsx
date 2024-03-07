@@ -31,7 +31,7 @@ type Props = {
   // flex?: boolean
   responsive?: boolean
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
-  beforeLabel?: string
+  beforeLabel?: string | React.ReactNode
   afterLabel?: string | React.ReactNode
   nonBoxInput?: boolean
   labelLayout?: 'horizontal' | 'vertical'

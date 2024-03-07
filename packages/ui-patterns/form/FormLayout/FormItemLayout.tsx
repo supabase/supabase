@@ -1,41 +1,6 @@
-import { ComponentPropsWithoutRef, ElementRef, forwardRef } from 'react'
+import { forwardRef } from 'react'
 import { FormItem_Shadcn_ } from 'ui'
-import { FormLayout as FormLayoutPrimitive, FormLayoutProps } from './../../forms/layout/FormLayout'
-
-const FormLayout = forwardRef<
-  ElementRef<typeof FormLayoutPrimitive>,
-  ComponentPropsWithoutRef<typeof FormLayoutPrimitive> & FormLayoutProps // Use any as placeholder types
->(
-  (
-    {
-      afterLabel,
-      beforeLabel,
-      labelOptional,
-      layout,
-      label,
-      description,
-      isReactForm = true,
-      ...props
-    },
-    ref
-  ) => (
-    <FormLayoutPrimitive
-      ref={ref}
-      label={label}
-      afterLabel={afterLabel}
-      beforeLabel={beforeLabel}
-      labelOptional={labelOptional}
-      layout={layout}
-      descriptionText={description}
-      isReactForm={isReactForm}
-      {...props}
-    >
-      {props.children}
-    </FormLayoutPrimitive>
-  )
-)
-
-FormLayout.displayName = 'FormLayout'
+import { FormLayout } from '../../forms/layout/FormLayout'
 
 export type _FormLayoutProps = {
   description?: string | React.ReactNode | undefined
@@ -68,7 +33,7 @@ const FormItemLayout = forwardRef<
     console.log('flex layout', layout)
     return (
       <FormItem_Shadcn_>
-        <FormLayoutPrimitive
+        <FormLayout
           ref={ref}
           label={label}
           afterLabel={afterLabel}
@@ -80,7 +45,7 @@ const FormItemLayout = forwardRef<
           {...props}
         >
           {props.children}
-        </FormLayoutPrimitive>
+        </FormLayout>
       </FormItem_Shadcn_>
     )
   }
@@ -88,4 +53,4 @@ const FormItemLayout = forwardRef<
 
 FormItemLayout.displayName = 'FormItemLayout'
 
-export { FormItemLayout, FormLayout }
+export { FormItemLayout }

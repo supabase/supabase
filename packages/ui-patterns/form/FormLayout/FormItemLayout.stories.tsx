@@ -20,15 +20,15 @@ import {
 } from 'ui'
 import { z } from 'zod'
 import { transformSourceForm } from '../../lib/transformSource'
-import { FormLayout } from './FormLayout'
+import { FormItemLayout } from './FormItemLayout'
 import { Input } from '../../data-inputs/Input'
 import { Calendar as CalendarIcon } from 'lucide-react'
 import { format } from 'date-fns'
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 export default {
-  title: 'Form/FormLayout',
-  component: FormLayout,
+  title: 'Form/FormItemLayout',
+  component: FormItemLayout,
   decorators: [
     (Story: any) => {
       return <Story />
@@ -54,7 +54,7 @@ export default {
 
 // export default meta
 
-type Story = StoryObj<typeof FormLayout>
+type Story = StoryObj<typeof FormItemLayout>
 
 export const Primary: Story = {
   render: function Render(args) {
@@ -87,11 +87,11 @@ export const Primary: Story = {
             control={form.control}
             render={({ field }) => (
               <FormItem_Shadcn_>
-                <FormLayout {...args}>
+                <FormItemLayout {...args}>
                   <FormControl_Shadcn_>
                     <Input placeholder="mildtomato" {...field} />
                   </FormControl_Shadcn_>
-                </FormLayout>
+                </FormItemLayout>
               </FormItem_Shadcn_>
             )}
           />
@@ -139,7 +139,7 @@ export const withSelect: Story = {
             name="email"
             control={form.control}
             render={({ field }) => (
-              <FormLayout {...args}>
+              <FormItemLayout {...args}>
                 <FormItem_Shadcn_>
                   <FormControl_Shadcn_>
                     <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
@@ -156,7 +156,7 @@ export const withSelect: Story = {
                     </Select_Shadcn_>
                   </FormControl_Shadcn_>
                 </FormItem_Shadcn_>
-              </FormLayout>
+              </FormItemLayout>
             )}
           />
           <Button size="small" type="primary" htmlType="submit">
@@ -204,13 +204,13 @@ export const withLayoutChange: Story = {
             name="username"
             control={form.control}
             render={({ field }) => (
-              <FormLayout {...args}>
+              <FormItemLayout {...args}>
                 <FormItem_Shadcn_>
                   <FormControl_Shadcn_>
                     <Input placeholder="mildtomato" {...field} />
                   </FormControl_Shadcn_>
                 </FormItem_Shadcn_>
-              </FormLayout>
+              </FormItemLayout>
             )}
           />
           <Button size="small" type="primary" htmlType="submit">
@@ -254,7 +254,7 @@ export const withCalendar: Story = {
             name="dob"
             control={form.control}
             render={({ field }) => (
-              <FormLayout {...args}>
+              <FormItemLayout {...args}>
                 <FormItem_Shadcn_ className="flex flex-col">
                   <Popover_Shadcn_>
                     <PopoverTrigger_Shadcn_ asChild>
@@ -279,7 +279,7 @@ export const withCalendar: Story = {
                     </PopoverContent_Shadcn_>
                   </Popover_Shadcn_>
                 </FormItem_Shadcn_>
-              </FormLayout>
+              </FormItemLayout>
             )}
           />
           <Button size="small" type="primary" htmlType="submit">

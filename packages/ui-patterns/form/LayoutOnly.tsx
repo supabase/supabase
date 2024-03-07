@@ -26,7 +26,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { InfoTooltip } from '../InfoTooltip/InfoTooltip'
 import { Input } from '../data-inputs/Input'
-import { FormItemLayout } from './FormLayout/FormLayout'
+import { FormItemLayout } from './FormLayout/FormItemLayout'
 import { FormMessage } from 'ui/src/components/shadcn/ui/form'
 
 // import { Header } from './Header'
