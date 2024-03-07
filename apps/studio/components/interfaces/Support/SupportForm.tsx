@@ -22,7 +22,7 @@ import {
 
 import Divider from 'components/ui/Divider'
 import InformationBox from 'components/ui/InformationBox'
-import MultiSelect from 'components/ui/MultiSelect'
+import MultiSelect from 'ui-patterns/MultiSelect'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
