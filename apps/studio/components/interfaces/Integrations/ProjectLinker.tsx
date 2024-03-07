@@ -350,9 +350,7 @@ const ProjectLinker = ({
                           )
                         })}
                         {foreignProjects.length === 0 && (
-                          <p className="text-xs text-foreground-lighter px-2 py-2">
-                            No results found
-                          </p>
+                          <CommandEmpty_Shadcn_>No results found.</CommandEmpty_Shadcn_>
                         )}
                       </CommandGroup_Shadcn_>
                       {mode === 'GitHub' && (
