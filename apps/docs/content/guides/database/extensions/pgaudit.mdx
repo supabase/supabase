@@ -4,9 +4,14 @@ title: 'PGAudit: Postgres Auditing'
 description: 'Session and object auditing via PostgreSQL standard logging'
 ---
 
-[PGAudit](https://www.pgaudit.org) is a PostgreSQL extension for logging session and object auditing over the standard PostgreSQL logging utility.
+[PGAudit](https://www.pgaudit.org) is a PostgreSQL extension that extends PostgreSQL's built-in logging abilities.
+It can be used to selectively track activities within your database.
 
-PGAudit grants fine grain control over which statements and objects are emitted to logs.
+This aids in:
+
+- **Compliance**: Meeting audit requirements for regulations
+- **Security**: Detecting suspicious database activity
+- **Troubleshooting**: Identifying and fixing database issues
 
 ## Enable the extension
 
@@ -41,68 +46,389 @@ To disable an extension you can call `drop extension`.
 </TabPanel>
 </Tabs>
 
-## Settings
+## Extension Configuration
 
-The `pgaudit.log` setting controls which statements to log. Available values include:
+pgaudit can be configured to focus on multiple different levels of precision
 
-- `read`: `SELECT` and `COPY` when the source is a relation or a query.
-- `write`: `INSERT`, `UPDATE`, `DELETE`, `TRUNCATE`, and `COPY` when the destination is a relation.
-- `function`: Function calls and `DO` blocks.
-- `role`: Statements related to roles and privileges: `GRANT`, `REVOKE`, `CREATE/ALTER/DROP ROLE`.
-- `ddl`: All `DDL` that is not included in the `ROLE` class.
-- `misc`: Miscellaneous commands, for example, `DISCARD`, `FETCH`, `CHECKPOINT`, `VACUUM`, `SET`.
-- `misc_set`: Miscellaneous `SET` commands, for example, `SET ROLE`.
+**pgaudit Logging Precision:**
 
-- **all**: Include all of the above.
+- **[Session](#session-logging):** Logs activity within a connection, such as an [PSQL](https://supabase.com/docs/guides/database/connecting-to-postgres#connecting-with-psql) connection.
+- **[User](#user-logging):** Logs activity by a particular database user (e.g., anon or postgres).
+- **[Global](#global-logging):** Logs activity across the entire database.
+- **[Object](#object-mode-settings):** Logs events related to specific database objects (e.g., the auth.users table).
 
-For a full list of available settings see [settings docs](https://github.com/pgaudit/pgaudit/blob/master/README.md#settings). Be aware that the `all` setting will generate a very large volume of logs.
+Although Session, User, and Global modes differ in their precision, they are all considered variants of **Session Mode** and are configured with the same input categories.
 
-<Admonition type="note">
+### Session Mode Categories
 
-We don't currently support configuring `pgaudit.log_parameter` because it may log secrets in encrypted columns if you are using [`pgsodium`](/docs/guides/database/extensions/pgsodium) or [Vault](/docs/guides/database/vault).
+These modes can monitor predefined categories of database operations:
 
-You can upvote this [feature request](https://github.com/orgs/supabase/discussions/20183) if you'd like this restriction lifted.
+| Category | What it Logs                                                          | Description                                                                |
+| -------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| read     | Data retrieval (SELECT, COPY)                                         | Tracks what data is being accessed.                                        |
+| write    | Data modification (INSERT, DELETE, UPDATE, TRUNCATE, COPY)            | Tracks changes made to your database.                                      |
+| function | FUNCTION, PROCEDURE, and DO/END block executions                      | Tracks routine/function executions                                         |
+| role     | User management actions (CREATE, DROP, ALTER on users and privileges) | Tracks changes to user permissions and access.                             |
+| ddl      | Schema changes (CREATE, DROP, ALTER statements)                       | Monitors modifications to your database structure (tables, indexes, etc.). |
+| misc     | Less common commands (FETCH, CHECKPOINT)                              | Captures obscure actions for deeper analysis if needed.                    |
+| all      | Everything above                                                      | Comprehensive logging for complete audit trails.                           |
 
-</Admonition>
+Below is a limited example of how to assign pgaudit to monitor specific categories.
 
-## Example
-
-Given a `pgaudit` setting
-
-{/* prettier-ignore */}
 ```sql
-set pgaudit.log = 'read, ddl';
+-- log all CREATE, ALTER, and DROP events
+... pgaudit.log = 'ddl';
+
+-- log all CREATE, ALTER, DROP, and SELECT events
+... pgaudit.log = 'read, ddl';
+
+-- log nothing
+... pgaudit.log = 'none';
 ```
 
-The following create table, insert and select statements
+### Session Logging
 
-{/* prettier-ignore */}
+When you are connecting in a session environment, such as a PSQL connection, you can configure pgaudit to record events initiated within the session.
+
+<Admonition type="note">
+  The [Dashboard](https://supabase.com/dashboard/project/_) is a transactional environment and will
+  not sustain a session
+</Admonition>
+
+Inside a session, by default, pgaudit will log nothing:
+
+```sql
+--returns 'none'
+show pgaudit.log;
+```
+
+Inside the session, you can change the variable to log different events:
+
+```sql
+-- log CREATE, ALTER, and DROP events
+SET pgaudit.log = 'ddl';
+
+-- log all CREATE, ALTER, DROP, and SELECT events
+SET pgaudit.log = 'read, ddl';
+
+-- log nothing
+SET pgaudit.log = 'none';
+```
+
+### User Logging
+
+There are some cases where you may want to monitor a database user's actions. For instance, let's say you connected your database to [Zapier](https://supabase.com/partners/integrations/zapier) and created a custom role for it to use:
+
+```sql
+CREATE USER zapier WITH PASSWORD '<new password>';
+```
+
+To ensure reliability, you may want to log all actions initiated by `zapier`. That can be done with the following command:
+
+```sql
+ALTER ROLE zapier SET pgaudit.log TO 'all';
+```
+
+To remove the settings, execute the following code:
+
+```sql
+-- disables role's log
+ALTER ROLE zapier SET pgaudit.log TO 'none';
+
+-- check to make sure the changes are finalized:
+SELECT
+  rolname,
+  rolconfig
+FROM pg_roles
+WHERE rolname = 'zapier';
+```
+
+### Global Logging
+
+<Admonition type="caution">
+  Use global logging sparingly as it can generate millions of logs per hour. Consider alternatives
+  first.
+</Admonition>
+
+The below SQL configures pgaudit to record all events associated with the "postgres" role. Since postgres has extensive privileges, this effectively monitors all database activity.
+
+```sql
+ALTER ROLE postgres SET pgaudit.log TO 'all';
+```
+
+To check if the postgres role is auditing, execute the following command:
+
+```sql
+select
+  rolname,
+  rolconfig
+from pg_roles
+where rolname = 'postgres';
+-- should return a rolconfig path with "pgaudit.log=all" present
+```
+
+To remove the settings, execute the following code:
+
+```
+ALTER ROLE postgres SET pgaudit.log TO 'none';
+```
+
+## Object Mode Settings
+
+With object mode, you assign database users to the `pgaudit.role` variable. Whatever the users could hypothetically do, pgaudit will log.
+
+For re-emphasis: when you assign a role to pgaudit, it logs any actions that role is _capable_ of performing, regardless of who or what actually initiated the event.
+
+### Object Logging
+
+To fine-tune what pgaudit will record, you must create a custom database role with limited permissions:
+
+```sql
+-- can be named anything
+CREATE ROLE some_audit_role NOINHERIT;
+```
+
+The `ROLE` cannot be impersonated by any other user. It cannot be logged into or used. In this case, it solely exists to securely define what pgaudit will record.
+
+Once the role is created, you can direct pgaudit to log by assigning it to the `pgaudit.role` variable:
+
+```sql
+ALTER ROLE postgres SET pgaudit.role TO 'some_audit_role';
+```
+
+You can then assign the role to monitor only approved events, such as `SELECT` statements that include a specific table:
+
+```sql
+GRANT SELECT ON random_table TO some_audit_role;
+```
+
+With this privilege granted, pgaudit will record all select statements against the `random_table`. Note, that this does include joins that feature the table, too. All privileges can be viewed in the [PostgreSQL documentation](https://www.postgresql.org/docs/current/ddl-priv.html).
+
+If you would no longer like to use object logging, you need to modify the pgaudit.role variable:
+
+```sql
+-- change pgaudit.role to no longer reference some_audit_role
+ALTER ROLE postgres SET pgaudit.role to '';
+
+-- view if pgaudit.role changed with the following command:
+SELECT
+  rolname,
+  rolconfig
+FROM pg_roles
+WHERE rolname = 'postgres';
+```
+
+If you are no longer using a `ROLE`, it is best to [`DROP` it](https://stackoverflow.com/questions/51256454/cannot-drop-postgresql-role-error-cannot-be-dropped-because-some-objects-depe):
+
+```sql
+DROP ROLE some_audit_role;
+```
+
+## Interpreting Audit Logs
+
+pgaudit was designed for storing logs as CSV files with the following headers:
+
+> Copied from the [pgaudit official docs](https://github.com/pgaudit/pgaudit/blob/master/README.md#format)
+
+| header          | Description                                                                                                                               |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| AUDIT_TYPE      | SESSION or OBJECT                                                                                                                         |
+| STATEMENT_ID    | Unique statement ID for this session. Sequential even if some statements are not logged.                                                  |
+| SUBSTATEMENT_ID | Sequential ID for each sub-statement within the main statement. Continuous even if some are not logged.                                   |
+| CLASS           | e.g., READ, ROLE (see pgaudit.log).                                                                                                       |
+| COMMAND         | e.g., ALTER TABLE, SELECT.                                                                                                                |
+| OBJECT_TYPE     | TABLE, INDEX, VIEW, etc. Available for SELECT, DML, and most DDL statements.                                                              |
+| OBJECT_NAME     | The fully qualified object name (e.g., public.account). Available for SELECT, DML, and most DDL.                                          |
+| STATEMENT       | Statement executed on the backend.                                                                                                        |
+| PARAMETER       | If pgaudit.log_parameter is set, this field contains the statement parameters as quoted CSV, or \<none\>. Otherwise, it's \<not logged\>. |
+
+A log made from the following create statement:
+
 ```sql
 create table account (
   id int primary key,
   name text,
   description text
 );
-
-insert into account (id, name, description)
-values (1, 'Foo Barsworth', 'Customer account');
-
-select * from account;
 ```
 
-Results in the log output
+Generates the following log in the [Dashboard's Postgres Logs](https://supabase.com/dashboard/project/_/logs/explorer):
 
-```text
-AUDIT: SESSION,1,1,DDL,CREATE TABLE,TABLE,public.account,create table account(
+```sql
+ AUDIT: SESSION,1,1,DDL,CREATE TABLE,TABLE,public.account,create table account(
   id int,
   name text,
   description text
-);,<not logged>
-AUDIT: SESSION,2,1,READ,SELECT,,,select * from account,,<not logged>
+); <not logged>
 ```
 
-Note that the insert statement is not logged because we did not include the `write` option for `pgaudit.log`.
+## Finding and Filtering Audit Logs
+
+Logs generated by pgaudit can be found in [Postgres Logs](https://supabase.com/dashboard/project/_/logs/postgres-logs?s=AUDIT). To find a specific log, you can use the log explorer. Below is a basic example to extract logs referencing `CREATE TABLE` events
+
+```sql
+select
+  cast(t.timestamp as datetime) as timestamp,
+  event_message
+from
+  postgres_logs as t
+  cross join unnest(metadata) as m
+  cross join unnest(m.parsed) as p
+where event_message like 'AUDIT%CREATE TABLE%'
+order by timestamp desc
+limit 100;
+```
+
+## Practical Examples
+
+### Monitoring API events
+
+<Admonition type="note">
+  API requests are already recorded in the [API Edge
+  Network](https://supabase.com/dashboard/project/_/logs/edge-logs) logs.
+</Admonition>
+
+Some users may feel compelled to monitor all write initiated by the API roles:
+
+```sql
+ALTER ROLE authenticator SET pgaudit.log TO 'write';
+
+-- the above is the practical equivalent to:
+
+-- ALTER ROLE anon SET pgaudit.log TO 'write';
+-- ALTER ROLE authenticated SET pgaudit.log TO 'write';
+-- ALTER ROLE service_role SET pgaudit.log TO 'write';
+```
+
+### Recording pg_cron Executions
+
+Cron job executions are recorded by default in Supabase and do not require pgaudit to observe. pg_cron only logs start and completion events.
+
+When expanding the capacity of cron logging, pgaudit is not always the best solution. Instead, it's usually better to use function-level logging. Inside, PG_CRON, you can wrap your code in a [database function](https://supabase.com/docs/guides/database/functions#general-logging).
+
+This approach allows you to customize the log message and makes it easier to filter for cron events.
+
+```sql
+-- function executed in a cron job
+CREATE OR REPLACE FUNCTION first_cron_job_func()
+RETURNS VOID AS $$
+BEGIN
+    RAISE LOG 'cron job <first-cron-job> started: %', (SELECT NOW());
+    -- cron logic
+END;
+$$ LANGUAGE plpgsql;
+
+-- cron job
+SELECT cron.schedule(
+    'first-cron-job',
+    '* * * * *', -- every minute
+    $$
+      SELECT first_cron_job_func();
+    $$
+);
+```
+
+### Monitoring access to the `auth.users` table
+
+In the worst case scenario, where a privileged roles' password ia exposed, you can use pgaudit to monitor if the `auth.user` table was targetted. It should be stated that API requests are already monitored in the [API Edge Network](https://supabase.com/dashboard/project/_/logs/edge-logs) and this is more about providing greater clarity about what is happening at the database level.
+
+Logging `auth.user` should be done in Object Mode and requires a custom role:
+
+```sql
+-- create logging role
+CREATE ROLE auth_auditor NOINHERIT;
+
+-- give role permission to observe relevant table events
+GRANT SELECT ON auth.users TO auth_auditor;
+GRANT DELETE ON auth.users TO auth_auditor;
+
+-- assign auth_auditor to pgaudit.role
+ALTER ROLE postgres SET pgaudit.role TO 'auth_auditor';
+
+```
+
+With the above code, any query involving reading or deleting the auth.users email column will be logged.
+
+## Help! Too many logs
+
+pgaudit is infamous for creating log-blizzards. If not configured mindfully, you can accidentally log all database events, including background tasks. This can generate millions of logs in a few hours, making it too overwhelming and chaotic to find insight in the logs.
+
+The first step to solve this problem is to identify which database users pgaudit is observing:
+
+```sql
+-- find all users monitored by pgaudit
+select
+  rolname,
+  rolconfig
+from pg_roles
+where
+  exists (
+    select
+      1
+    from UNNEST(rolconfig) as c
+    where c like '%pgaudit.role%' or c like '%pgaudit.log%'
+  );
+```
+
+To prevent pgaudit from monitoring the problematic roles, you'll want to change their `pgaudit.log` values to `none` and `pgaudit.role` values to `empty quotes ''`
+
+```sql
+  -- Use to disable object level logging
+  ALTER ROLE <role name> SET pgaudit.role TO '';
+
+  -- Use to disable global and user level logging
+  ALTER ROLE <role name> SET pgaudit.log TO 'none';
+```
+
+## FAQ
+
+#### How can I use pgaudit to debug database functions?
+
+Technically yes, but it is not the best approach. It is better to check out our [function debugging guide](https://supabase.com/docs/guides/database/functions#general-logging) instead.
+
+#### How can I download database logs?
+
+In the [Logs Dashboard](https://supabase.com/dashboard/project/_/logs/postgres-logs) you can download logs as CSVs. Advanced log drain support is coming soon for Team and above plans.
+
+#### Can I log observed table rows?
+
+pgaudit usually records queries, but not the returned rows. You can modify this behavior with the `pgaudit.log_rows` variable:
+
+```sql
+--enable
+ALTER ROLE postgres SET pgaudit.log_rows TO 'on';
+
+-- disable
+ALTER ROLE postgres SET pgaudit.log_parameter TO 'off';
+```
+
+You should not do this unless you are _absolutely_ certain it is necessary for your use case. It can expose sensitive values to your logs that ideally should not be preserved. Furthermore, it will create redundant logs that will create noise. If done in excess, it can even noticeably impact database performance.
+
+#### Can I log function parameters?
+
+We don't currently support configuring pgaudit.log_parameter because it may log secrets in encrypted columns if you are using pgsodium or Vault.
+
+You can upvote this [feature request](https://github.com/orgs/supabase/discussions/20183) if you'd like this restriction lifted.
+
+#### Why do the official pgaudit docs differ from the Supabase one?
+
+pgaudit allows settings to be applied at 3 database levels:
+
+| Level    | Scope              | Configuration File/Command |
+| -------- | ------------------ | -------------------------- |
+| System   | Entire server      | ALTER SYSTEM commands      |
+| Database | Specific database  | ALTER DATABASE commands    |
+| Role     | Specific user/role | ALTER ROLE commands        |
+
+Supabase limits full privileges for file system and database variables, meaning pgaudit modifications can only occur at the ROLE level. Assigning pgaudit to the 'postgres' role provides it with the role's database visibility, allowing ROLE level adjustments a practical alternative to DATABASE/SYSTEM level configurations.
+
+pgaudit's [official documentation](<(https://www.pgaudit.org)>) focuses on system and database level configs, but its docs officially supports ROLE level configs, too:
+
+> Settings can be specified globally (in postgresql.conf or using ALTER SYSTEM ... SET), at the database level (using ALTER DATABASE ... SET), or at the role level (**using ALTER ROLE ... SET**).
 
 ## Resources
 
 - Official [`PGAudit` documentation](https://www.pgaudit.org)
+- [Database Function Logging](https://supabase.com/docs/guides/database/functions#general-logging)
+- [Supabase Logging](https://supabase.com/docs/guides/platform/logs)
+- [Self-Hosting Logs](https://supabase.com/docs/reference/self-hosting-analytics/introduction)
