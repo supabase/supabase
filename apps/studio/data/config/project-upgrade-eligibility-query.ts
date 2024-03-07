@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
+import { API_ADMIN_URL, IS_PLATFORM } from 'lib/constants'
 import { configKeys } from './keys'
 import type { ResponseError } from 'types'
 
@@ -44,5 +44,5 @@ export const useProjectUpgradeEligibilityQuery = <TData = ProjectUpgradeEligibil
   useQuery<ProjectUpgradeEligibilityData, ProjectUpgradeEligibilityError, TData>(
     configKeys.upgradeEligibility(projectRef),
     ({ signal }) => getProjectUpgradeEligibility({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    { enabled: enabled && typeof projectRef !== 'undefined' && IS_PLATFORM, ...options }
   )
