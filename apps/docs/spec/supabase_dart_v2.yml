@@ -30,6 +30,14 @@ functions:
         isOptional: false
         type: string
         description: The unique Supabase Key which is supplied when you create a new project in your project dashboard.
+      - name: headers
+        isOptional: true
+        type: Map<String, String>
+        description: Custom header to be passed to the Supabase client.
+      - name: httpClient
+        isOptional: true
+        type: Client
+        description: Custom http client to be used by the Supabase client.
       - name: authOptions
         isOptional: true
         type: FlutterAuthClientOptions
@@ -45,8 +53,17 @@ functions:
             description: Parameter to override the local storage to store auth tokens.
           - name: autoRefreshToken
             isOptional: true
-            type: boolean
+            type: bool
             description: Whether to automatically refresh the token when it expires. Defaults to `true`.
+      - name: postgrestOptions
+        isOptional: true
+        type: PostgrestClientOptions
+        description: Options to change the Postgrest behaviors.
+        subContent:
+          - name: schema
+            isOptional: true
+            type: String
+            description: Schema to query with the Supabase client. Defaults to `public`.
       - name: realtimeClientOptions
         isOptional: true
         type: RealtimeClientOptions
@@ -56,6 +73,15 @@ functions:
             isOptional: true
             type: RealtimeLogLevel
             description: Level of realtime server logs to to be logged.
+      - name: storageOptions
+        isOptional: true
+        type: StorageClientOptions
+        description: Options to change the Storage behaviors.
+        subContent:
+          - name: retryAttempts
+            isOptional: true
+            type: int
+            description: The number of times to retry a failed upload request. Defaults to `0`.
     examples:
       - id: flutter-initialize
         name: For Flutter
@@ -95,6 +121,35 @@ functions:
       - If signUp() is called for an existing confirmed user:
         - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
+    params:
+      - name: email
+        isOptional: true
+        type: String
+        description: User's email address to be used for email authentication.
+      - name: phone
+        isOptional: true
+        type: String
+        description: User's phone number to be used for phone authentication.
+      - name: password
+        isOptional: false
+        type: String
+        description: Password to be used for authentication.
+      - name: emailRedirectTo
+        isOptional: true
+        type: String
+        description: The URL to redirect the user to after they confirm their email address.
+      - name: data
+        isOptional: true
+        type: Map<String, dynamic>
+        description: The user's metadata to be stored in the user's object.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification.
+      - name: channel
+        isOptional: true
+        type: OtpChannel
+        description: Messaging channel to use (e.g. whatsapp or sms). Defaults to `OtpChannel.sms`.
     examples:
       - id: sign-up
         name: Sign up.
@@ -141,6 +196,23 @@ functions:
       Log in an existing user using email or phone number with password.
     notes: |
       - Requires either an email and password or a phone number and password.
+    params:
+      - name: email
+        isOptional: true
+        type: String
+        description: User's email address to be used for email authentication.
+      - name: phone
+        isOptional: true
+        type: String
+        description: User's phone number to be used for phone authentication.
+      - name: password
+        isOptional: false
+        type: String
+        description: Password to be used for authentication.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification.
     examples:
       - id: sign-in-with-email-and-password
         name: Sign in with email and password
@@ -173,6 +245,35 @@ functions:
       - If you're using an email, you can configure whether you want the user to receive a magiclink or an OTP.
       - If you're using phone, you can configure whether you want the user to receive an OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+    params:
+      - name: email
+        isOptional: true
+        type: String
+        description: Email address to send the magic link or OTP to.
+      - name: phone
+        isOptional: true
+        type: String
+        description: Phone number to send the OTP to.
+      - name: emailRedirectTo
+        isOptional: true
+        type: String
+        description: The URL to redirect the user to after they click on the magic link.
+      - name: shouldCreateUser
+        isOptional: true
+        type: bool
+        description: If set to false, this method will not create a new user. Defaults to true.
+      - name: data
+        isOptional: true
+        type: Map<String, dynamic>
+        description: The user's metadata to be stored in the user's object.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification.
+      - name: channel
+        isOptional: true
+        type: OtpChannel
+        description: Messaging channel to use (e.g. whatsapp or sms). Defaults to `OtpChannel.sms`.
     examples:
       - id: sign-in-with-email
         name: Sign in with email.
@@ -211,6 +312,27 @@ functions:
     title: 'signInWithIdToken()'
     description: |
       Allows you to perform native Google and Apple sign in by combining it with [google_sign_in](https://pub.dev/packages/google_sign_in) or [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple) packages.
+    params:
+      - name: provider
+        isOptional: false
+        type: OAuthProvider
+        description: The provider to perform the sign in with. Currently, `OAuthProvider.google` and `OAuthProvider.apple` are supported.
+      - name: idToken
+        isOptional: false
+        type: String
+        description: The identity token obtained from the third-party provider.
+      - name: accessToken
+        isOptional: true
+        type: String
+        description: Access token obtained from the third-party provider. Required for Google sign in.
+      - name: nonce
+        isOptional: true
+        type: String
+        description: Raw nonce value used to perform the third-party sign in. Required for Apple sign-in.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification.
     examples:
       - id: sign-in-with-google
         name: Native Google sign in
@@ -300,6 +422,27 @@ functions:
     notes: |
       - This method is used for signing in using a third-party provider.
       - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
+    params:
+      - name: provider
+        isOptional: false
+        type: OAuthProvider
+        description: The OAuth provider to use for signing in.
+      - name: redirectTo
+        isOptional: true
+        type: String
+        description: The URL to redirect the user to after they sign in with the third-party provider.
+      - name: scopes
+        isOptional: true
+        type: String
+        description: A list of scopes to request from the third-party provider.
+      - name: authScreenLaunchMode
+        isOptional: true
+        type: LaunchMode
+        description: The launch mode for the auth screen. Defaults to `LaunchMode.platformDefault`.
+      - name: queryParams
+        isOptional: true
+        type: Map<String, String>
+        description: Additional query parameters to be passed to the OAuth flow.
     examples:
       - id: sign-in-using-a-third-party-provider
         name: Sign in using a third-party provider
@@ -345,6 +488,27 @@ functions:
       - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `providerId` property. For example:
           - Mapping specific user email addresses with an identity provider.
           - Using different hints to identify the correct identity provider, like a company-specific page, IP address or other tracking information.
+    params:
+      - name: providerId
+        isOptional: true
+        type: String
+        description: The ID of the SSO provider to use for signing in.
+      - name: domain
+        isOptional: true
+        type: String
+        description: The email domain to use for signing in.
+      - name: redirectTo
+        isOptional: true
+        type: String
+        description: The URL to redirect the user to after they sign in with the third-party provider.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification.
+      - name: launchMode
+        isOptional: true
+        type: LaunchMode
+        description: The launch mode for the auth screen. Defaults to `LaunchMode.platformDefault`.
     examples:
       - id: sign-in-with-domain
         name: Sign in with email domain
@@ -370,6 +534,11 @@ functions:
       Signs out the current user, if there is a logged in user.
     notes: |
       - In order to use the `signOut()` method, the user needs to be signed in first.
+    params:
+      - name: scope
+        isOptional: true
+        type: SignOutScope
+        description: Whether to sign out from all devices or just the current device. Defaults to `SignOutScope.local`.
     examples:
       - id: sign-out
         name: Sign out
@@ -937,6 +1106,11 @@ functions:
       - `select()` can be combined with [Filters](/docs/reference/dart/using-filters)
       - `select()` can be combined with [Modifiers](/docs/reference/dart/using-modifiers)
       - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+    params:
+      - name: columns
+        isOptional: true
+        type: String
+        description: The columns to retrieve, separated by commas. Columns can be renamed when returned with `customName:columnName`
     examples:
       - id: getting-your-data
         name: Getting your data
@@ -1055,6 +1229,11 @@ functions:
     description: |
       Perform an INSERT into the table or view.
     title: 'Create data: insert()'
+    params:
+      - name: values
+        isOptional: false
+        type: Map<String, dynamic> or List<Map<String, dynamic>>
+        description: The values to insert. Pass an object to insert a single row or an array to insert multiple rows.
     examples:
       - id: create-a-record
         name: Create a record
@@ -1091,6 +1270,11 @@ functions:
     title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to update.
+    params:
+      - name: values
+        isOptional: false
+        type: Map<String, dynamic>
+        description: The values to update with.
     examples:
       - id: updating-your-data
         name: Update your data
@@ -1140,6 +1324,11 @@ functions:
     title: 'Upsert data: upsert()'
     notes: |
       - Primary keys must be included in `values` to use upsert.
+    params:
+      - name: values
+        isOptional: false
+        type: Map<String, dynamic> or List<Map<String, dynamic>>
+        description: The values to upsert with. Pass a Map to upsert a single row or an List to upsert multiple rows.
     examples:
       - id: upsert-your-data
         name: Upsert your data
@@ -1215,6 +1404,15 @@ functions:
 
       You can call Postgres functions as Remote Procedure Calls, logic in your database that you can execute from anywhere.
       Functions are useful when the logic rarely changes—like for password resets and updates.
+    params:
+      - name: fn
+        isOptional: false
+        type: String
+        description: The function name to call.
+      - name: params
+        isOptional: true
+        type: Map<String, dynamic>
+        description: The arguments to pass to the function call.
     examples:
       - id: call-a-postgres-function-without-arguments
         name: Call a Postgres function without arguments
