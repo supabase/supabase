@@ -1,29 +1,26 @@
-import {
-  Badge_Shadcn_,
-  Button,
-  Checkbox_Shadcn_ as Checkbox,
-  Form_Shadcn_ as Form,
-  FormControl_Shadcn_ as FormControl,
-  FormField_Shadcn_ as FormField,
-  RadioGroup_Shadcn_ as RadioGroup,
-  RadioGroupItem_Shadcn_ as RadioGroupItem,
-  Select_Shadcn_ as Select,
-  SelectContent_Shadcn_ as SelectContent,
-  SelectItem_Shadcn_ as SelectItem,
-  SelectTrigger_Shadcn_ as SelectTrigger,
-  SelectValue_Shadcn_ as SelectValue,
-  Switch,
-} from 'ui'
-
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Box, FileWarning } from 'lucide-react'
 import { useForm } from 'react-hook-form'
+import {
+  Badge_Shadcn_,
+  Button,
+  Checkbox_Shadcn_,
+  Form_Shadcn_,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  RadioGroup_Shadcn_,
+  RadioGroupItem_Shadcn_,
+  Select_Shadcn_,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  Switch,
+} from 'ui'
 import { z } from 'zod'
 import { Input } from '../DataInputs/Input'
 import { InfoTooltip } from '../InfoTooltip/InfoTooltip'
 import { FormItemLayout } from './FormItemLayout/FormItemLayout'
-
-// import { Header } from './Header'
 
 const items = [
   {
@@ -99,7 +96,7 @@ export const Page = () => {
   }
 
   return (
-    <Form {...form}>
+    <Form_Shadcn_ {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-[420px] flex flex-col gap-8">
         <div>
           <h1 className="text-foreground">Welcome</h1>
@@ -107,7 +104,7 @@ export const Page = () => {
         </div>
         <div role="separator" className="h-px bg-border-muted w-full" />
 
-        <FormField
+        <FormField_Shadcn_
           control={form.control}
           name="username"
           render={({ field }) => (
@@ -118,20 +115,20 @@ export const Page = () => {
               labelOptional="Optional"
               afterLabel={<InfoTooltip side="right">You can also rename this later.</InfoTooltip>}
             >
-              <FormControl>
+              <FormControl_Shadcn_>
                 <Input
                   icon={<Box strokeWidth={1.5} size={16} />}
                   placeholder="mildtomato"
                   {...field}
                 />
-              </FormControl>
+              </FormControl_Shadcn_>
             </FormItemLayout>
           )}
         />
 
         <div role="separator" className="h-px bg-border-muted w-full" />
 
-        <FormField
+        <FormField_Shadcn_
           control={form.control}
           name="switch_option"
           render={({ field }) => (
@@ -141,20 +138,20 @@ export const Page = () => {
               description="This is an explanation."
               layout="flex"
             >
-              <FormControl>
+              <FormControl_Shadcn_>
                 <Switch
                   placeholder="mildtomato"
                   checked={field.value}
                   onCheckedChange={field.onChange}
                 />
-              </FormControl>
+              </FormControl_Shadcn_>
             </FormItemLayout>
           )}
         />
 
         <div role="separator" className="h-px bg-border-muted w-full" />
 
-        <FormField
+        <FormField_Shadcn_
           control={form.control}
           name="email"
           render={({ field }) => (
@@ -163,40 +160,43 @@ export const Page = () => {
               description="This is your public display name."
               layout="horizontal"
             >
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl className="w-full">
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a verified email" className="flex gap-2" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="m@example.com">
+              <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
+                <FormControl_Shadcn_ className="w-full">
+                  <SelectTrigger_Shadcn_ className="w-full">
+                    <SelectValue_Shadcn_
+                      placeholder="Select a verified email"
+                      className="flex gap-2"
+                    />
+                  </SelectTrigger_Shadcn_>
+                </FormControl_Shadcn_>
+                <SelectContent_Shadcn_>
+                  <SelectItem_Shadcn_ value="m@example.com">
                     <div className="flex gap-2 items-center">
                       <UserIcon />
                       <span>m@example.com</span>
                     </div>
-                  </SelectItem>
-                  <SelectItem value="m@google.com" className="flex gap-2">
+                  </SelectItem_Shadcn_>
+                  <SelectItem_Shadcn_ value="m@google.com" className="flex gap-2">
                     <div className="flex gap-2 items-center">
                       <UserIcon />
                       UserIconm@google.com
                     </div>
-                  </SelectItem>
-                  <SelectItem value="m@support.com" className="flex gap-2">
+                  </SelectItem_Shadcn_>
+                  <SelectItem_Shadcn_ value="m@support.com" className="flex gap-2">
                     <div className="flex gap-2 items-center">
                       <UserIcon />
                       m@support.com
                     </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+                  </SelectItem_Shadcn_>
+                </SelectContent_Shadcn_>
+              </Select_Shadcn_>
             </FormItemLayout>
           )}
         />
 
         <div role="separator" className="h-px bg-border-muted w-full" />
 
-        <FormField
+        <FormField_Shadcn_
           control={form.control}
           name="kevins_input"
           render={({ field }) => (
@@ -207,20 +207,20 @@ export const Page = () => {
               layout="vertical"
               labelOptional="Optional"
             >
-              <FormControl>
+              <FormControl_Shadcn_>
                 <Input
                   icon={<Box strokeWidth={1.5} size={16} />}
                   placeholder="Needs to be 6 long"
                   {...field}
                 />
-              </FormControl>
+              </FormControl_Shadcn_>
             </FormItemLayout>
           )}
         />
 
         <div role="separator" className="h-px bg-border-muted w-full" />
 
-        <FormField
+        <FormField_Shadcn_
           control={form.control}
           name="consistent_settings"
           render={({ field }) => (
@@ -235,16 +235,16 @@ export const Page = () => {
               description="This is your public display name."
               layout="flex"
             >
-              <FormControl>
-                <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-              </FormControl>
+              <FormControl_Shadcn_>
+                <Checkbox_Shadcn_ checked={field.value} onCheckedChange={field.onChange} />
+              </FormControl_Shadcn_>
             </FormItemLayout>
           )}
         />
 
         <div role="separator" className="h-px bg-border-muted w-full" />
 
-        <FormField
+        <FormField_Shadcn_
           control={form.control}
           name="items"
           render={() => (
@@ -261,7 +261,7 @@ export const Page = () => {
                 </FormDescription>
               </div> */}
               {items.map((item) => (
-                <FormField
+                <FormField_Shadcn_
                   key={item.id}
                   control={form.control}
                   name="items"
@@ -274,8 +274,8 @@ export const Page = () => {
                         layout="flex"
                         hideMessage
                       >
-                        <FormControl>
-                          <Checkbox
+                        <FormControl_Shadcn_>
+                          <Checkbox_Shadcn_
                             checked={field.value?.includes(item.id)}
                             onCheckedChange={(checked) => {
                               return checked
@@ -283,7 +283,7 @@ export const Page = () => {
                                 : field.onChange(field.value?.filter((value) => value !== item.id))
                             }}
                           />
-                        </FormControl>
+                        </FormControl_Shadcn_>
                       </FormItemLayout>
                     )
                   }}
@@ -294,7 +294,7 @@ export const Page = () => {
           )}
         />
 
-        <FormField
+        <FormField_Shadcn_
           control={form.control}
           name="type"
           render={({ field }) => (
@@ -304,8 +304,8 @@ export const Page = () => {
               description="I am descript"
               layout="horizontal"
             >
-              <FormControl>
-                <RadioGroup
+              <FormControl_Shadcn_>
+                <RadioGroup_Shadcn_
                   onValueChange={field.onChange}
                   defaultValue={field.value}
                   className="flex flex-col space-y-1"
@@ -316,9 +316,9 @@ export const Page = () => {
                     layout="flex"
                     hideMessage
                   >
-                    <FormControl>
-                      <RadioGroupItem value="all" />
-                    </FormControl>
+                    <FormControl_Shadcn_>
+                      <RadioGroupItem_Shadcn_ value="all" />
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                   <FormItemLayout
                     className="flex items-center space-x-3 space-y-0"
@@ -326,9 +326,9 @@ export const Page = () => {
                     layout="flex"
                     hideMessage
                   >
-                    <FormControl>
-                      <RadioGroupItem value="mentions" />
-                    </FormControl>
+                    <FormControl_Shadcn_>
+                      <RadioGroupItem_Shadcn_ value="mentions" />
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
                   <FormItemLayout
                     className="flex items-center space-x-3 space-y-0"
@@ -336,12 +336,12 @@ export const Page = () => {
                     layout="flex"
                     hideMessage
                   >
-                    <FormControl>
-                      <RadioGroupItem value="none" />
-                    </FormControl>
+                    <FormControl_Shadcn_>
+                      <RadioGroupItem_Shadcn_ value="none" />
+                    </FormControl_Shadcn_>
                   </FormItemLayout>
-                </RadioGroup>
-              </FormControl>
+                </RadioGroup_Shadcn_>
+              </FormControl_Shadcn_>
             </FormItemLayout>
           )}
         />
@@ -351,6 +351,6 @@ export const Page = () => {
           <Button htmlType="submit">Submit</Button>
         </div>
       </form>
-    </Form>
+    </Form_Shadcn_>
   )
 }
