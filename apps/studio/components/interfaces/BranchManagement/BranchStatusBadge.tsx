@@ -1,4 +1,4 @@
-import { WarningIcon } from 'components/ui/Icons'
+import { WarningIcon } from 'ui-patterns/StatusIcons'
 import type { BranchData } from 'data/branches/branch-query'
 import type { Branch } from 'data/branches/branches-query'
 import { ClockIcon } from 'lucide-react'
