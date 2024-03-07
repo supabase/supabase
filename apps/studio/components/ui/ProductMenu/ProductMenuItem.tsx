@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { ReactNode } from 'react'
-import { Button, Menu } from 'ui'
+import { Badge, Button, Menu } from 'ui'
 
 interface ProductMenuItemProps {
   name: string | ReactNode
@@ -35,9 +35,7 @@ const ProductMenuItem = ({
           className={'flex items-center gap-2 truncate w-full ' + textClassName}
         >
           <span className="truncate">{name} </span>
-          {label !== undefined && (
-            <span className="text-orange-800 text-xs font-normal truncate">{label}</span>
-          )}
+          {label !== undefined && <Badge color="amber">{label}</Badge>}
         </div>
       </div>
     </Menu.Item>
