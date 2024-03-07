@@ -278,7 +278,13 @@ const Container = memo(function Container(props: PropsWithChildren) {
   )
 })
 
-const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) {
+const NavContainer = memo(function NavContainer({
+  menuId,
+  refId,
+}: {
+  menuId: MenuId
+  refId?: string
+}) {
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (
@@ -337,17 +343,21 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
             'lg:opacity-100 lg:visible',
           ].join(' ')}
         >
-          <NavigationMenu menuId={menuId} />
+          <NavigationMenu menuId={menuId} refId={refId} />
         </div>
       </div>
     </nav>
   )
 })
 
-function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }>) {
+function MainSkeleton({
+  children,
+  menuId,
+  menuRefId,
+}: PropsWithChildren<{ menuId: MenuId; menuRefId?: string }>) {
   return (
     <div className="flex flex-row h-full">
-      <NavContainer menuId={menuId} />
+      <NavContainer menuId={menuId} refId={menuRefId} />
       <Container>
         <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
           <TopNavBar />

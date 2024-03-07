@@ -239,13 +239,13 @@ function getMenuById(id: MenuId) {
   return menus.find((menu) => menu.id === id) ?? menus.find((menu) => menu.id === MenuId.Home)
 }
 
-function getMenuElement(menu: Menu) {
+function getMenuElement(menu: Menu, refId?: string) {
   const menuType = menu.type
   switch (menuType) {
     case 'home':
       return <NavigationMenuHome />
     case 'guide':
-      return <NavigationMenuGuideList id={menu.id} />
+      return <NavigationMenuGuideList id={menu.id} refId={refId} />
     case 'reference':
       return (
         <NavigationMenuRefList
@@ -260,11 +260,11 @@ function getMenuElement(menu: Menu) {
   }
 }
 
-const NavigationMenu = ({ menuId }: { menuId: MenuId }) => {
+const NavigationMenu = ({ menuId, refId }: { menuId: MenuId; refId?: string }) => {
   const level = menuId
   const menu = getMenuById(level)
 
-  return getMenuElement(menu)
+  return getMenuElement(menu, refId)
 }
 
 export { MenuId }

@@ -33,6 +33,7 @@ interface Props {
   currentPage?: string
   hideToc?: boolean
   menuId: MenuId
+  menuRefId?: string
 }
 
 const Layout: FC<Props> = (props) => {
@@ -113,7 +114,7 @@ const Layout: FC<Props> = (props) => {
           },
         }}
       />
-      <MainSkeleton menuId={menuId}>
+      <MainSkeleton menuId={menuId} menuRefId={props.menuRefId}>
         <LayoutMainContent className="pb-0">
           <div className={['grid grid-cols-12 relative gap-4'].join(' ')}>
             <div

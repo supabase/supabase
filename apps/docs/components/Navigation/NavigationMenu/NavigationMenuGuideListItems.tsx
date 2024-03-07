@@ -1,31 +1,9 @@
+import * as Accordion from '@radix-ui/react-accordion'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect, useRef } from 'react'
-import { IconChevronLeft } from '~/../../packages/ui'
-import * as Accordion from '@radix-ui/react-accordion'
-import HomeMenuIconPicker from './HomeMenuIconPicker'
-
-const HeaderLink = React.memo(function HeaderLink(props: {
-  title: string
-  id: string
-  url: string
-}) {
-  const router = useRouter()
-
-  return (
-    <span
-      className={[
-        ' ',
-        !props.title && 'capitalize',
-        props.url === router.asPath ? 'text-brand' : 'hover:text-brand text-foreground',
-      ].join(' ')}
-    >
-      {props.title ?? props.id}
-    </span>
-  )
-})
 
 const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any) {
   const router = useRouter()
@@ -142,28 +120,6 @@ const Content = (props) => {
 
   return (
     <ul className={['relative w-full flex flex-col gap-0 pb-5'].join(' ')}>
-      <Link
-        href={`${menu.parent ?? '/'}`}
-        className={[
-          'flex items-center gap-1 text-xs group mb-3',
-          'text-base transition-all duration-200 text-brand-link hover:text-brand-600 hover:cursor-pointer ',
-        ].join(' ')}
-      >
-        <div className="relative w-2">
-          <div className="transition-all ease-out ml-0 group-hover:-ml-1">
-            <IconChevronLeft size={10} strokeWidth={3} />
-          </div>
-        </div>
-        <span>Back to Home</span>
-      </Link>
-
-      <Link href={menu.url ?? ''}>
-        <div className="flex items-center gap-3 my-3 text-brand-link">
-          <HomeMenuIconPicker icon={menu.icon} />
-          <HeaderLink title={menu.title} url={menu.url} id={id} />
-        </div>
-      </Link>
-
       {menu.items.map((x) => {
         return (
           <div key={x.name}>

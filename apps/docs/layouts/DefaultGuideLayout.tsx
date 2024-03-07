@@ -18,6 +18,7 @@ interface Props {
   currentPage?: string
   editLink?: string
   menuId: MenuId
+  menuRefId?: string
 }
 
 const Layout: FC<Props> = (props) => {
