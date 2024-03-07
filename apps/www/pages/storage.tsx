@@ -17,8 +17,10 @@ import ProductIcon from '~/components/ProductIcon'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import { ThemeImage } from 'ui-patterns/ThemeImage'
+import { getStaticLatestPosts } from '~/lib/posts'
+import PostTypes from '~/types/post'
 
-function StoragePage() {
+function StoragePage({ latestPosts }: { latestPosts?: PostTypes[] }) {
   // base path for images
   const { basePath } = useRouter()
 
@@ -42,7 +44,7 @@ function StoragePage() {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={latestPosts}>
         <ProductHeader
           icon={Solutions['storage'].icon}
           title={Solutions['storage'].name}
@@ -262,5 +264,7 @@ function StoragePage() {
     </>
   )
 }
+
+export const getStaticProps = async () => getStaticLatestPosts()
 
 export default StoragePage

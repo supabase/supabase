@@ -1,4 +1,5 @@
 import React from 'react'
+import { NextPage } from 'next'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
@@ -13,8 +14,14 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
 
 import pageData from '~/data/partners'
+import PostTypes from '~/types/post'
+import { getStaticLatestPosts } from '~/lib/posts'
 
-const Partners = () => {
+interface Props {
+  latestPosts?: PostTypes[]
+}
+
+const Partners = ({ latestPosts }: NextPage & Props) => {
   const router = useRouter()
   const isSm = useBreakpoint()
 
@@ -34,7 +41,7 @@ const Partners = () => {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={latestPosts}>
         <div className="relative bg-alternative overflow-hidden">
           <SectionContainer className="overflow-hidden pt-8 pb-12 md:pt-12">
             <ProductHeaderCentered {...pageData.heroSection} />
@@ -245,5 +252,7 @@ const Partners = () => {
     </>
   )
 }
+
+export const getStaticProps = async () => getStaticLatestPosts()
 
 export default Partners

@@ -15,6 +15,7 @@ import classNames from 'classnames'
 import { SITE_ORIGIN } from '~/lib/constants'
 import { Accordion, Badge, IconExternalLink } from 'ui'
 import { WeekDayProps } from './types6'
+import { getStaticLatestPosts } from '~/lib/posts'
 
 import styleUtils from './styles/utils6.module.css'
 import styles from './styles/launchWeek6.module.css'
@@ -33,7 +34,7 @@ const constellation = [
   [55, 82],
 ]
 
-export default function launchweek() {
+export default function launchweek(props: any) {
   const { resolvedTheme } = useTheme()
   const title = 'Launch Week 6'
   const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
@@ -159,7 +160,7 @@ export default function launchweek() {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={props.latestPosts}>
         <SectionContainer className="flex flex-col !pb-1 items-center lg:pt-32 gap-24">
           <div
             className={classNames(
@@ -1117,3 +1118,5 @@ export default function launchweek() {
     </>
   )
 }
+
+export const getStaticProps = async () => getStaticLatestPosts()

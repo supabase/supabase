@@ -9,7 +9,7 @@ import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import { Badge, IconChevronLeft } from 'ui'
 
 import authors from 'lib/authors.json'
-import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
+import { getAllPostSlugs, getNavLatestPosts, getPostdata, getSortedPosts } from '~/lib/posts'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
 import { generateReadingTime, isNotNullOrUndefined } from '~/lib/helpers'
@@ -19,6 +19,7 @@ import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import LWXSummary from '~/components/LaunchWeek/X/LWXSummary'
 import ShareArticleActions from '~/components/Blog/ShareArticleActions'
+import PostTypes from '../../types/post'
 
 type Post = ReturnType<typeof getSortedPosts>[number]
 
@@ -114,11 +115,14 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
         content: mdxSource,
         toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
       },
+      latestPosts: getNavLatestPosts(),
     },
   }
 }
 
-function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
+function BlogPostPage(
+  props: InferGetStaticPropsType<typeof getStaticProps> & { latestPosts?: PostTypes[] }
+) {
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
   const isLaunchWeek7 = props.blog.launchweek === 7
@@ -230,7 +234,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={props.latestPosts}>
         <div
           className="
             container mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16

@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic'
 import { createClient } from '@supabase/supabase-js'
 
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
+import { getStaticLatestPosts } from '~/lib/posts'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -12,6 +13,7 @@ import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/7/LaunchSection/La
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LW7BgGraphic from '~/components/LaunchWeek/7/LW7BgGraphic'
 import { useTheme } from 'next-themes'
+import PostTypes from '../../../types/post'
 
 const LW7Releases = dynamic(() => import('~/components/LaunchWeek/7/Releases'))
 const LaunchWeekPrizeSection = dynamic(
@@ -24,6 +26,7 @@ const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
 interface Props {
   users: UserData[]
+  latestPosts: PostTypes[]
 }
 
 const supabaseAdmin = createClient(
@@ -31,7 +34,7 @@ const supabaseAdmin = createClient(
   // ANON KEY
   process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
-export default function TicketHome({ users }: Props) {
+export default function TicketHome({ users, latestPosts }: Props) {
   const { theme, setTheme } = useTheme()
 
   const TITLE = 'Supabase LaunchWeek 7'
@@ -54,7 +57,7 @@ export default function TicketHome({ users }: Props) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={latestPosts}>
         <div className="bg-[#1C1C1C] -mt-[65px]">
           <div className="relative bg-lw7 pt-16">
             <div className="relative z-10">
@@ -91,3 +94,5 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     },
   }
 }
+
+export const getStaticProps = async () => getStaticLatestPosts()

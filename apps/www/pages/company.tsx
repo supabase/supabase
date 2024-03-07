@@ -17,10 +17,12 @@ import Link from 'next/link'
 
 import { Button, Card, Space } from 'ui'
 import { NextSeo } from 'next-seo'
+import { getStaticLatestPosts } from '../lib/posts'
+import PostTypes from '../types/post'
 
-type Props = {}
+type Props = { latestPosts?: PostTypes[] }
 
-const Index = ({}: Props) => {
+const Index = ({ latestPosts }: Props) => {
   const router = useRouter()
 
   const meta_title = "One of the world's fastest-growing open source communities | Supabase"
@@ -43,7 +45,7 @@ const Index = ({}: Props) => {
           ],
         }}
       />
-      <Layout>
+      <Layout latestPosts={latestPosts}>
         <Header />
         <Community />
         <Investors />
@@ -336,3 +338,5 @@ const Press = () => {
     </SectionContainer>
   )
 }
+
+export const getStaticProps = async () => getStaticLatestPosts()

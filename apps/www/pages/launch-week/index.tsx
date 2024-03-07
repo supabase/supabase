@@ -15,6 +15,8 @@ import { Meetup } from '~/components/LaunchWeek/X/LWXMeetups'
 import LWXStickyNav from '~/components/LaunchWeek/X/Releases/LWXStickyNav'
 import LWXHeader from '~/components/LaunchWeek/X/Releases/LWXHeader'
 import MainStage from '~/components/LaunchWeek/X/Releases/MainStage'
+import { getNavLatestPosts } from '~/lib/posts'
+import PostTypes from '~/types/post'
 
 const BuildStage = dynamic(() => import('~/components/LaunchWeek/X/Releases/BuildStage'))
 const LWXMeetups = dynamic(() => import('~/components/LaunchWeek/X/LWXMeetups'))
@@ -24,9 +26,10 @@ const LaunchWeekPrizeSection = dynamic(
 
 interface Props {
   meetups?: Meetup[]
+  latestPosts?: PostTypes[]
 }
 
-export default function LaunchWeekIndex({ meetups }: Props) {
+export default function LaunchWeekIndex({ meetups, latestPosts }: Props) {
   const { query } = useRouter()
 
   const TITLE = 'Supabase Launch Week X | 11-15 December 2023'
@@ -112,7 +115,7 @@ export default function LaunchWeekIndex({ meetups }: Props) {
           setShowCustomizationForm,
         }}
       >
-        <DefaultLayout>
+        <DefaultLayout latestPosts={latestPosts}>
           <LWXStickyNav />
           <LWXHeader />
           <MainStage />
@@ -135,6 +138,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
   return {
     props: {
       meetups: meetups?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1)),
+      latestPosts: getNavLatestPosts(),
     },
   }
 }

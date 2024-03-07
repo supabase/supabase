@@ -12,6 +12,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import TicketContainer from '~/components/LaunchWeek/8/Ticket/TicketContainer'
 import { SITE_URL } from '~/lib/constants'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
+import PostTypes from '~/types/post'
 
 const LaunchWeekPrizeSection = dynamic(
   () => import('~/components/LaunchWeek/8/LaunchWeekPrizeSection')
@@ -23,6 +24,7 @@ interface Props {
   user: UserData
   users: UserData[]
   ogImageUrl: string
+  latestPosts?: PostTypes[]
 }
 
 const supabaseAdmin = createClient(
@@ -31,7 +33,7 @@ const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
 
-export default function UsernamePage({ user, users, ogImageUrl }: Props) {
+export default function UsernamePage({ user, users, ogImageUrl, latestPosts }: Props) {
   const { username, ticketNumber, name } = user
 
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
@@ -88,7 +90,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
           setTicketState,
         }}
       >
-        <DefaultLayout>
+        <DefaultLayout latestPosts={latestPosts}>
           <div className="-mt-[65px]">
             <div className="relative">
               <div className="relative z-10">

@@ -7,9 +7,11 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
+import TileGrid from '~/components/Partners/TileGrid'
 import supabase from '~/lib/supabaseMisc'
 import { Partner } from '~/types/partners'
-import TileGrid from '../../../components/Partners/TileGrid'
+import { getNavLatestPosts } from '~/lib/posts'
+import PostTypes from '~/types/post'
 
 export async function getStaticProps() {
   const { data: partners } = await supabase
@@ -23,6 +25,7 @@ export async function getStaticProps() {
   return {
     props: {
       partners,
+      latestPosts: getNavLatestPosts(),
     },
     // TODO: consider using Next.js' On-demand Revalidation with Supabase Database Webhooks instead
     revalidate: 1800, // 30 minutes
@@ -31,6 +34,7 @@ export async function getStaticProps() {
 
 interface Props {
   partners: Partner[]
+  latestPosts?: PostTypes[]
 }
 
 function IntegrationPartnersPage(props: Props) {
@@ -102,7 +106,7 @@ function IntegrationPartnersPage(props: Props) {
           ],
         }}
       />
-      <DefaultLayout className="bg-alternative">
+      <DefaultLayout className="bg-alternative" latestPosts={props.latestPosts}>
         <SectionContainer className="space-y-16">
           <div>
             <h1 className="h1">{meta_title}</h1>

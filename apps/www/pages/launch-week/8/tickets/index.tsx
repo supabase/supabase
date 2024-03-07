@@ -16,9 +16,11 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import CTABanner from '~/components/CTABanner'
 import TicketsGrid from '~/components/LaunchWeek/8/TicketsGrid'
+import PostTypes from '~/types/post'
 
 interface Props {
   users: UserData[]
+  latestPosts?: PostTypes[]
 }
 
 const supabaseAdmin = createClient(
@@ -35,7 +37,7 @@ const generateOgs = async (users: UserData[]) => {
   })
 }
 
-export default function TicketsPage({ users }: Props) {
+export default function TicketsPage({ users, latestPosts }: Props) {
   const ref = useRef(null)
   const PAGE_COUNT = 20
   const TITLE = '#SupaLaunchWeek Tickets'
@@ -115,7 +117,7 @@ export default function TicketsPage({ users }: Props) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={latestPosts}>
         <div>
           <SectionContainer className="z-10">
             <div className="text-center relative z-10 text-white mb-4 lg:mb-10">

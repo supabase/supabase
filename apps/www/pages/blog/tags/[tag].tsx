@@ -1,5 +1,5 @@
 import { NextSeo } from 'next-seo'
-import { getSortedPosts, getAllTags } from '~/lib/posts'
+import { getSortedPosts, getAllTags, getNavLatestPosts } from '~/lib/posts'
 import Link from 'next/link'
 import { startCase } from 'lodash'
 
@@ -13,6 +13,7 @@ export async function getStaticProps({ params }: any) {
     props: {
       tag: params.tag,
       blogs: posts,
+      latestPosts: getNavLatestPosts(),
     },
   }
 }
@@ -28,6 +29,7 @@ export async function getStaticPaths() {
 interface Props {
   tag: string
   blogs: PostTypes[]
+  latestPosts?: PostTypes[]
 }
 
 function TagBlogsPage(props: Props) {
@@ -40,7 +42,7 @@ function TagBlogsPage(props: Props) {
         title={`Blog | ${capitalizedTag}`}
         description="Latest news from the Supabase team."
       />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={props.latestPosts}>
         <div className="container mx-auto px-8 py-16 sm:px-16 xl:px-20">
           <div className="text-foreground-lighter flex space-x-1">
             <h1 className="cursor-pointer">

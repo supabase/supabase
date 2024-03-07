@@ -15,6 +15,7 @@ import TicketsGrid from '~/components/LaunchWeek/7/TicketsGrid'
 import { Button } from 'ui'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
+import { getNavLatestPosts } from '../../../../lib/posts'
 
 interface Props {
   users: UserData[]
@@ -166,6 +167,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   return {
     props: {
       users,
+      latestPosts: getNavLatestPosts(),
     },
   }
 }

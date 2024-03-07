@@ -10,8 +10,10 @@ import Panel from '~/components/Panel'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { questions } from 'shared-data'
 import data from '~/data/support'
+import PostTypes from '~/types/post'
+import { getStaticLatestPosts } from '~/lib/posts'
 
-const Index = () => {
+const Index = ({ latestPosts }: { latestPosts?: PostTypes[] }) => {
   const router = useRouter()
   const typerRef = useRef(null)
 
@@ -45,7 +47,7 @@ const Index = () => {
           ],
         }}
       />
-      <DefaultLayout className="!min-h-fit">
+      <DefaultLayout latestPosts={latestPosts} className="!min-h-fit">
         <div className="bg-alternative">
           <SectionContainer className="space-y-2 text-center">
             <h1 className="text-brand font-mono text-base uppercase tracking-widest">
@@ -150,5 +152,7 @@ const Index = () => {
     </>
   )
 }
+
+export const getStaticProps = async () => getStaticLatestPosts()
 
 export default Index

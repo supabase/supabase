@@ -1,5 +1,9 @@
+// Import Swiper styles if swiper used on page
+import 'swiper/swiper.min.css'
+
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
+import { NextPage } from 'next'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -9,12 +13,15 @@ import ProductHeaderCentered from '~/components/Sections/ProductHeaderCentered'
 import Repos from '~/components/OpenSource/Repos'
 import Sponsorships from '~/components/OpenSource/Sponsorships'
 
+import { getStaticLatestPosts } from '~/lib/posts'
+import PostTypes from '~/types/post'
 import pageData from '~/data/open-source'
 
-// Import Swiper styles if swiper used on page
-import 'swiper/swiper.min.css'
+interface Props {
+  latestPosts?: PostTypes[]
+}
 
-const OpenSource = () => {
+const OpenSource = ({ latestPosts }: NextPage & Props) => {
   const router = useRouter()
 
   const meta_title = pageData.metaTitle || 'Open Source | Supabase'
@@ -38,7 +45,7 @@ const OpenSource = () => {
           ],
         }}
       />
-      <DefaultLayout className="relative">
+      <DefaultLayout className="relative" latestPosts={latestPosts}>
         <SectionContainer className="overflow-hidden relative mx-auto !py-0 sm:!py-0 md:!py-4 lg:!pt-16 lg:!pb-12">
           <ProductHeaderCentered {...pageData.heroSection} />
         </SectionContainer>
@@ -57,5 +64,7 @@ const OpenSource = () => {
     </>
   )
 }
+
+export const getStaticProps = async () => getStaticLatestPosts()
 
 export default OpenSource

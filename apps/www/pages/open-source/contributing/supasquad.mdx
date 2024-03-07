@@ -1,5 +1,6 @@
 import Layout from '~/layouts/Layout'
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import { getStaticLatestPosts } from '~/lib/posts'
 
 export const meta = {
   title: 'SupaSquad | Supabase',
@@ -94,4 +95,5 @@ Apply to join the program using [this form](https://airtable.com/shr0FtLqLfhpuEy
 
 </SectionContainer>
 
+export const getStaticProps = async () => getStaticLatestPosts()
 export default (context) => <Layout meta={meta} children={context.children} context={context} />

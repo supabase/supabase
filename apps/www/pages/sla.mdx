@@ -1,5 +1,6 @@
 import Layout from '../layouts/Layout'
 import SectionContainer from '../components/Layouts/SectionContainer'
+import { getStaticLatestPosts } from '~/lib/posts'
 
 export const meta = {
   title: 'Service Level Agreement | Supabase',
@@ -147,4 +148,5 @@ Business hours are from 6am to 6pm (local time), except where otherwise stated.
 
 </SectionContainer>
 
+export const getStaticProps = async () => getStaticLatestPosts()
 export default (context) => <Layout meta={meta} children={context.children} context={context} />

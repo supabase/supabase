@@ -2,15 +2,16 @@ import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import DefaultLayout from '~/components/Layouts/Default'
 import MfaContactForm from '~/components/MfaContactForm'
+import { getStaticLatestPosts } from '~/lib/posts'
 
 const meta_title = 'MFA early access | Supabase'
 const meta_description = ''
 
-const EnterpriseContactPage = () => {
+const EnterpriseContactPage = (props: any) => {
   const router = useRouter()
 
   return (
-    <DefaultLayout>
+    <DefaultLayout latestPosts={props.latestPosts}>
       <NextSeo
         title={meta_title}
         description={meta_description}
@@ -34,5 +35,7 @@ const EnterpriseContactPage = () => {
     </DefaultLayout>
   )
 }
+
+export const getStaticProps = async () => getStaticLatestPosts()
 
 export default EnterpriseContactPage

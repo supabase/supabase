@@ -5,7 +5,7 @@ import Head from 'next/head'
 
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
-import { getSortedPosts } from '~/lib/posts'
+import { getNavLatestPosts, getSortedPosts } from '~/lib/posts'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import PostTypes from '~/types/post'
@@ -25,6 +25,7 @@ export async function getStaticProps() {
   return {
     props: {
       blogs: allPostsData,
+      latestPosts: getNavLatestPosts(),
     },
   }
 }
@@ -76,7 +77,7 @@ function CustomerStoriesPage(props: any) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={props.latestPosts}>
         <div className="relative z-0 bg-background overflow-hidden">
           <div className="container mx-auto mt-44 px-8 sm:px-4 xl:px-20">
             <div className="mx-auto relative z-10">

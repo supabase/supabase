@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import ReactMarkdown from 'react-markdown'
 import { Badge, Button, IconCheck } from 'ui'
+import { getNavLatestPosts } from '~/lib/posts'
 import Globe from '~/components/Globe'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -71,11 +72,12 @@ export async function getStaticProps() {
     props: {
       jobs: job_data.jobs,
       contributors: contributors,
+      latestPosts: getNavLatestPosts(),
     },
   }
 }
 
-const CareerPage: NextPage = ({ jobs, contributors }: any) => {
+const CareerPage: NextPage = ({ jobs, contributors, latestPosts }: any) => {
   const { resolvedTheme } = useTheme()
   const { basePath } = useRouter()
 
@@ -98,7 +100,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={latestPosts}>
         <div className="text-foreground">
           <div className="container relative mx-auto px-6 py-10 lg:pt-12 lg:px-16 xl:px-20 text-center space-y-4">
             <h1 className="text-sm text-brand md:text-base">

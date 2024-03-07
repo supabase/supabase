@@ -13,6 +13,7 @@ export async function getStaticProps({ params }: any) {
     props: {
       category: params.category,
       blogs: posts,
+      latestPosts: posts.slice(0, 2),
     },
   }
 }
@@ -28,6 +29,7 @@ export async function getStaticPaths() {
 interface Props {
   category: string
   blogs: PostTypes[]
+  latestPosts?: PostTypes[]
 }
 
 function CategoriesIndex(props: Props) {
@@ -40,7 +42,7 @@ function CategoriesIndex(props: Props) {
         title={`Blog | ${capitalizedCategory}`}
         description="Latest news from the Supabase team."
       />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={props.latestPosts}>
         <div className="container mx-auto px-8 py-16 sm:px-16 xl:px-20">
           <div className="text-foreground-lighter flex space-x-1">
             <h1 className="cursor-pointer">

@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { useTheme } from 'next-themes'
 import { useWindowSize } from 'react-use'
 
+import PostTypes from '~/types/post'
 import { Button, cn } from 'ui'
 import {
   NavigationMenu,
@@ -27,6 +28,7 @@ import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-w
 
 interface Props {
   hideNavbar: boolean
+  latestPosts?: PostTypes[]
 }
 
 const Nav = (props: Props) => {
@@ -61,6 +63,8 @@ const Nav = (props: Props) => {
   }
 
   const showDarkLogo = isLaunchWeekPage || resolvedTheme?.includes('dark')! || isHomePage
+
+  console.log('latestPosts Nav', props.latestPosts)
 
   return (
     <>
@@ -124,7 +128,7 @@ const Nav = (props: Props) => {
                   viewportClassName="rounded-xl bg-background"
                 >
                   <NavigationMenuList>
-                    {menu.primaryNav.map((menuItem) =>
+                    {menu.primaryNav.map(({ dropdown: Dropdown, ...menuItem }) =>
                       menuItem.hasDropdown ? (
                         <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
                           <NavigationMenuTrigger className="bg-transparent text-foreground hover:text-brand-link data-[state=open]:!text-brand-link data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground p-2 h-auto">
@@ -133,7 +137,13 @@ const Nav = (props: Props) => {
                           <NavigationMenuContent
                             className={cn('rounded-xl', menuItem.dropdownContainerClassName)}
                           >
-                            {menuItem.dropdown}
+                            {Dropdown && (
+                              <Dropdown
+                                {...(menuItem.title === 'Developers'
+                                  ? { latestPosts: props.latestPosts }
+                                  : undefined)}
+                              />
+                            )}
                           </NavigationMenuContent>
                         </NavigationMenuItem>
                       ) : (

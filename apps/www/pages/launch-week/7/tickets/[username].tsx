@@ -15,11 +15,14 @@ import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LW7BgGraphic from '~/components/LaunchWeek/7/LW7BgGraphic'
 import CTABanner from '~/components/CTABanner'
 import { useTheme } from 'next-themes'
+import PostTypes from '~/types/post'
+import { getNavLatestPosts } from '~/lib/posts'
 
 interface Props {
   user: UserData
   users: UserData[]
   ogImageUrl: string
+  latestPosts?: PostTypes[]
 }
 
 const supabaseAdmin = createClient(
@@ -27,7 +30,7 @@ const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
 
-export default function UsernamePage({ user, users, ogImageUrl }: Props) {
+export default function UsernamePage({ user, users, ogImageUrl, latestPosts }: Props) {
   const { resolvedTheme } = useTheme()
   const { username, ticketNumber, name, golden, referrals, bg_image_id } = user
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
@@ -67,7 +70,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={latestPosts}>
         <div className="bg-[#1C1C1C] -mt-[65px]">
           <div className="relative bg-lw7 pt-20">
             <div className="relative z-10">
@@ -151,6 +154,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       ogImageUrl,
       users,
       key: username,
+      latestPosts: getNavLatestPosts(),
     },
     revalidate: 5,
   }

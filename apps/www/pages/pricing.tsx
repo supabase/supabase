@@ -5,9 +5,12 @@ import { NextSeo } from 'next-seo'
 import { Button, IconArrowUpRight } from 'ui'
 import { ArrowDownIcon } from '@heroicons/react/outline'
 import ReactTooltip from 'react-tooltip'
+import PostTypes from '~/types/post'
 
+import { getStaticLatestPosts } from '~/lib/posts'
 import DefaultLayout from '~/components/Layouts/Default'
 import PricingPlans from '~/components/Pricing/PricingPlans'
+import { NextPage } from 'next'
 
 const PricingComputeSection = dynamic(() => import('~/components/Pricing/PricingComputeSection'))
 const PricingAddons = dynamic(() => import('~/components/Pricing/PricingAddons'))
@@ -15,7 +18,12 @@ const PricingComparisonTable = dynamic(() => import('~/components/Pricing/Pricin
 const PricingFAQs = dynamic(() => import('~/components/Pricing/PricingFAQs'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
-export default function IndexPage() {
+interface Props {
+  latestPosts: PostTypes[]
+}
+
+const PricingPage = (props: NextPage & Props) => {
+  console.log('props', props)
   const router = useRouter()
   const { asPath } = useRouter()
   const [mounted, setMounted] = useState(false)
@@ -52,7 +60,7 @@ export default function IndexPage() {
   }, [asPath])
 
   return (
-    <DefaultLayout>
+    <DefaultLayout latestPosts={props.latestPosts}>
       <NextSeo
         title={meta_title}
         description={meta_description}
@@ -138,3 +146,7 @@ export default function IndexPage() {
     </DefaultLayout>
   )
 }
+
+export const getStaticProps = async () => getStaticLatestPosts()
+
+export default PricingPage

@@ -21,6 +21,8 @@ import TableViewCarouselData from 'data/products/database/table-view-carousel.js
 import { ThemeImage } from 'ui-patterns/ThemeImage'
 import { TweetCard } from 'ui-patterns/TweetCard'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import { getStaticLatestPosts } from '../lib/posts'
+import PostTypes from '../types/post'
 
 const NewFeatureCard = dynamic(() => import('~/components/NewFeatureCard'))
 const ImageCarousel = dynamic(() => import('~/components/Carousels/ImageCarousel'))
@@ -34,7 +36,7 @@ const ProductIcon = dynamic(() => import('~/components/ProductIcon'))
 const APISection = dynamic(() => import('~/components/Sections/APISection'))
 const GithubExamples = dynamic(() => import('~/components/Sections/GithubExamples'))
 
-function Database() {
+function Database({ latestPosts }: { latestPosts?: PostTypes[] }) {
   // base path for images
   const { basePath } = useRouter()
 
@@ -67,7 +69,7 @@ function Database() {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={latestPosts}>
         <ProductHeader
           icon={Solutions['database'].icon}
           title={Solutions['database'].name}
@@ -318,5 +320,7 @@ function Database() {
     </>
   )
 }
+
+export const getStaticProps = async () => getStaticLatestPosts()
 
 export default Database

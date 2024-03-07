@@ -4,11 +4,12 @@ import { useState } from 'react'
 import { Button, Form, IconDownload, Input } from 'ui'
 
 import supabase from '~/lib/supabaseMisc'
+import { getStaticLatestPosts } from '~/lib/posts'
 import CTABanner from 'components/CTABanner/index'
 import Layout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 
-const DPA = () => {
+const DPA = ({ latestPosts }: any) => {
   const [email, setEmail] = useState<string>('')
   const [error, setError] = useState<string>()
   const [formSubmitted, setFormSubmitted] = useState<boolean>(false)
@@ -37,7 +38,7 @@ const DPA = () => {
   }
   return (
     <>
-      <Layout>
+      <Layout latestPosts={latestPosts}>
         <SectionContainer>
           <div className="mx-auto grid max-w-2xl grid-cols-12 rounded-lg">
             <div className="col-span-12 flex items-center lg:col-span-12">
@@ -111,4 +112,7 @@ const DPA = () => {
     </>
   )
 }
+
+export const getStaticProps = async () => getStaticLatestPosts()
+
 export default DPA

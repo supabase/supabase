@@ -6,6 +6,8 @@ import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import PostTypes from '~/types/post'
+import { getStaticLatestPosts } from '~/lib/posts'
 import AuthWidgetSection from '~/components/AuthWidget/AuthWidgetSection'
 import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
 import CTABanner from '~/components/CTABanner'
@@ -17,8 +19,13 @@ import GithubExamples from '~/components/Sections/GithubExamples'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import AuthProviders from '~/data/auth.json'
 import { ThemeImage } from 'ui-patterns/ThemeImage'
+import { NextPage } from 'next'
 
-function AuthPage() {
+interface Props {
+  latestPosts?: PostTypes[]
+}
+
+function AuthPage(props: NextPage & Props) {
   // base path for images
   const { basePath } = useRouter()
 
@@ -42,7 +49,7 @@ function AuthPage() {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={props.latestPosts}>
         <ProductHeader
           icon={Solutions['authentication'].icon}
           title={Solutions['authentication'].name}
@@ -228,5 +235,7 @@ function AuthPage() {
     </>
   )
 }
+
+export const getStaticProps = async () => getStaticLatestPosts()
 
 export default AuthPage

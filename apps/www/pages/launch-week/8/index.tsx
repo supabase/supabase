@@ -16,6 +16,8 @@ import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
 import LW8CalloutsSection from '~/components/LaunchWeek/8/LW8CalloutsSection'
 
 import 'swiper/swiper.min.css'
+import { getNavLatestPosts } from '../../../lib/posts'
+import PostTypes from '../../../types/post'
 
 const AnimatedParticles = dynamic(
   () => import('~/components/LaunchWeek/8/AnimatedParticles/ParticlesCanvas')
@@ -32,6 +34,7 @@ const CTABanner = dynamic(() => import('~/components/CTABanner'))
 interface Props {
   users?: UserData[]
   meetups?: Meetup[]
+  latestPosts?: PostTypes[]
 }
 
 const supabaseAdmin = createClient(
@@ -40,7 +43,7 @@ const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
 
-export default function TicketHome({ users, meetups }: Props) {
+export default function TicketHome({ users, meetups, latestPosts }: Props) {
   const { query } = useRouter()
 
   const TITLE = 'Supabase Launch Week 8'
@@ -132,7 +135,7 @@ export default function TicketHome({ users, meetups }: Props) {
           setTicketState,
         }}
       >
-        <DefaultLayout>
+        <DefaultLayout latestPosts={latestPosts}>
           <div className="-mt-[65px]">
             <div className="relative">
               <div className="relative z-10">
@@ -206,6 +209,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     props: {
       users,
       meetups,
+      latestPosts: getNavLatestPosts(),
     },
   }
 }

@@ -15,10 +15,13 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import CTABanner from '~/components/CTABanner'
 import TicketsGrid from '~/components/LaunchWeek/X/TicketsGrid'
-import supabase from '../../../lib/supabaseMisc'
+import supabase from '~/lib/supabaseMisc'
+import { getNavLatestPosts } from '~/lib/posts'
+import PostTypes from '~/types/post'
 
 interface Props {
   users: UserData[]
+  latestPosts?: PostTypes[]
 }
 
 const generateOgs = async (users: UserData[]) => {
@@ -30,7 +33,7 @@ const generateOgs = async (users: UserData[]) => {
   })
 }
 
-export default function TicketsPage({ users }: Props) {
+export default function TicketsPage({ users, latestPosts }: Props) {
   const ref = useRef(null)
   const PAGE_COUNT = 20
   const TITLE = '#SupaLaunchWeek X Tickets'
@@ -111,7 +114,7 @@ export default function TicketsPage({ users }: Props) {
         }}
       />
       <FaviconImports />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={latestPosts}>
         <div>
           <SectionContainer className="z-10">
             <div className="text-center relative z-10 text-white mb-4 lg:mb-10">
@@ -164,6 +167,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   return {
     props: {
       users: lwx_tickets,
+      latestPosts: getNavLatestPosts(),
     },
   }
 }
