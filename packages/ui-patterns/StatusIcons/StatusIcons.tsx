@@ -8,13 +8,13 @@ export interface StatusIconProps {
 export const StatusIcon = forwardRef<
   HTMLOrSVGElement,
   React.ComponentPropsWithoutRef<'svg'> & {
-    variant: 'success' | 'warning' | 'critical'
+    variant: 'success' | 'warning' | 'destructive'
   } & StatusIconProps
 >(({ variant, ...props }, ref) => {
   let Icon: React.ElementType | undefined
   if (variant === 'warning') {
     Icon = WarningIcon
-  } else if (variant === 'critical') {
+  } else if (variant === 'destructive') {
     Icon = CriticalIcon
   }
 
