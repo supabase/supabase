@@ -30,7 +30,7 @@ type Story = StoryObj<typeof StatusIcon>
 
 export const Primary: Story = {
   args: {
-    variant: 'critical',
+    variant: 'destructive',
   },
   /**
    * 👇 To avoid linting issues, it is recommended to use a function with a capitalized name.
@@ -43,7 +43,7 @@ export const Primary: Story = {
 
 export const withNoBackground: Story = {
   args: {
-    variant: 'critical',
+    variant: 'destructive',
     hideBackground: true,
   },
   /**
@@ -70,7 +70,7 @@ export const Warning: Story = {
 
 export const WithBadgeDestructive: Story = {
   args: {
-    variant: 'critical',
+    variant: 'destructive',
   },
   /**
    * 👇 To avoid linting issues, it is recommended to use a function with a capitalized name.
