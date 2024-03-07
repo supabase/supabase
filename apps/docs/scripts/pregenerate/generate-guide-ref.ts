@@ -12,7 +12,7 @@ import { flattenSections } from '../../lib/helpers'
 import commonSections from '../../spec/common-client-libs-sections.json'
 import { toRefNavMenu } from './generate-guide-ref-pipeline'
 
-const flatSections = flattenSections(commonSections)
+const REF_IDS = ['Database', 'Auth', 'Functions', 'Realtime', 'Storage']
 
 const isClientLibReferenceMenu = (menu: Menu): menu is ReferenceMenu =>
   'commonSectionsFile' in menu && menu.commonSectionsFile === 'common-client-libs-sections.json'
@@ -20,22 +20,29 @@ const isClientLibReferenceMenu = (menu: Menu): menu is ReferenceMenu =>
 const clientLibraries = menus.filter(isClientLibReferenceMenu)
 
 const main = async () => {
-  mkdirSync(join(process.cwd(), 'scripts/pregenerate/generated'), {
+  mkdirSync(join(__dirname, 'generated'), {
     recursive: true,
   })
 
-  const promises = [
-    writeFile(
-      join(process.cwd(), 'scripts/pregenerate/generated', 'commonClientLibFlat.json'),
-      JSON.stringify(flatSections, null, 2),
-      { encoding: 'utf-8' }
-    ),
-  ]
+  const promises = []
+
+  REF_IDS.forEach((refId) => {
+    const sections =
+      commonSections.find((section) => section.type === 'category' && section.title === refId)
+        ?.items ?? []
+
+    promises.push(
+      writeFile(
+        join(__dirname, 'generated', `commonClientLibFlat-${refId}.json`),
+        JSON.stringify(flattenSections(sections), null, 2),
+        { encoding: 'utf-8' }
+      )
+    )
+  })
 
   const pendingSpecs = clientLibraries.map(async (library) => ({
     ...library,
-    // TODO: Change this to be more robust with import meta URL
-    spec: parse(await readFile(join(process.cwd(), 'spec', library.specFile), 'utf-8')),
+    spec: parse(await readFile(join(__dirname, '../..', 'spec', library.specFile), 'utf-8')),
   }))
 
   const specs = await Promise.all(pendingSpecs)
@@ -56,7 +63,7 @@ const main = async () => {
     .forEach((navData) => {
       promises.push(
         writeFile(
-          join(process.cwd(), 'scripts/pregenerate/generated', `${navData.id}.json`),
+          join(__dirname, 'generated', `${navData.id}.json`),
           JSON.stringify(navData.navData, null, 2),
           { encoding: 'utf-8' }
         )

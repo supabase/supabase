@@ -22,7 +22,7 @@ export default function AuthGuide({
   const { hideToc, ...meta } = frontmatter
 
   return (
-    <Layout meta={meta} hideToc={hideToc} editLink={editLink} menuId={MenuId.Auth} menuRefId="auth">
+    <Layout meta={meta} hideToc={hideToc} editLink={editLink} menuId={MenuId.Auth} menuRefId="Auth">
       <MDXRemote {...mdxSource} components={components} />
     </Layout>
   )
