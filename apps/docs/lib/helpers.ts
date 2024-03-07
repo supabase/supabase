@@ -41,8 +41,10 @@ export function getPageType(asPath: string) {
  * `ICommonItem[]` until TypeScript supports JSON imports as const:
  * https://github.com/microsoft/TypeScript/issues/32063
  */
-export function flattenSections(sections: ICommonBase[]): ICommonSection[] {
-  return sections.reduce<ICommonSection[]>((acc, section: ICommonItem) => {
+export function flattenSections<ICommon extends ICommonBase & { items?: Array<ICommonBase> }>(
+  sections: ICommon[]
+) {
+  return sections.reduce((acc, section) => {
     // Flatten sub-items
     if ('items' in section) {
       let newSections = acc
