@@ -31,7 +31,7 @@ import {
 
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import { WarningIcon } from 'ui-patterns/StatusIcons'
+import { WarningIcon } from 'ui-patterns/StatusIcons/StatusIcons'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
