@@ -20,256 +20,23 @@ import {
   SidePanel,
   Toggle,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import z from 'zod'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PostgresFunction } from '@supabase/postgres-meta'
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
 import SchemaSelector from 'components/ui/SchemaSelector'
 import SqlEditor from 'components/ui/SqlEditor'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import type { Dictionary } from 'types'
 import { FormSchema } from 'types'
-import { convertArgumentTypes, convertConfigParams, hasWhitespace } from './Functions.utils'
+import { convertArgumentTypes, convertConfigParams } from './Functions.utils'
 
 const FORM_ID = 'create-function-sidepanel'
-
-// [Refactor] Remove local state, just use the Form component
-
-class CreateFunctionFormState {
-  id: number | undefined
-  originalName: string | undefined
-  // @ts-ignore
-  args: { value: { name: string; type: string; error?: string }[] }
-  // @ts-ignore
-  behavior: { value: string; error?: string }
-  // @ts-ignore
-  configParams: {
-    value: { name: string; value: string; error?: { name?: string; value?: string } }[]
-  }
-  // @ts-ignore
-  definition: { value: string; error?: string }
-  // @ts-ignore
-  language: { value: string; error?: string }
-  // @ts-ignore
-  name: { value: string; error?: string }
-  // @ts-ignore
-  returnType: { value: string; error?: string }
-  // @ts-ignore
-  schema: { value: string; error?: string }
-  // @ts-ignore
-  securityDefiner: { value: boolean; error?: string }
-
-  constructor() {
-    makeAutoObservable(this)
-    this.reset()
-  }
-
-  get requestBody() {
-    return {
-      id: this.id,
-      name: this.name.value,
-      schema: this.schema.value,
-      definition: this.definition.value,
-      return_type: this.returnType.value,
-      language: this.language.value,
-      behavior: this.behavior.value as 'VOLATILE' | 'STABLE' | 'IMMUTABLE',
-      security_definer: this.securityDefiner.value,
-      args: this.args.value.map((x: any) => `${x.name} ${x.type}`),
-      config_params: mapValues(keyBy(this.configParams.value, 'name'), 'value'),
-    }
-  }
-
-  reset(func?: Dictionary<any>) {
-    this.id = func?.id
-    this.originalName = func?.name
-    this.args = convertArgumentTypes(func?.argument_types)
-    this.behavior = { value: func?.behavior ?? 'VOLATILE' }
-    this.configParams = convertConfigParams(func?.config_params)
-    this.definition = { value: func?.definition ?? '' }
-    this.language = { value: func?.language ?? 'plpgsql' }
-    this.name = { value: func?.name ?? '' }
-    this.returnType = { value: func?.return_type ?? 'void' }
-    this.schema = { value: func?.schema ?? 'public' }
-    this.securityDefiner = { value: func?.security_definer ?? false }
-  }
-
-  update(state: Dictionary<any>) {
-    this.args = state.args
-    this.behavior = state.behavior
-    this.configParams = state.configParams
-    this.definition = state.definition
-    this.language = state.language
-    this.name = state.name
-    this.returnType = state.returnType
-    this.schema = state.schema
-    this.securityDefiner = state.securityDefiner
-  }
-}
-
-interface ICreateFunctionStore {
-  formState: CreateFunctionFormState
-  meta: any
-  schemas: Dictionary<any>[]
-  isEditing: boolean
-  onFormChange: (value: { key: string; value: any }) => void
-  onFormArrayChange: (value: {
-    operation: 'add' | 'delete' | 'update'
-    key: string
-    idx?: number
-    value?: any
-  }) => void
-  setSchemas: (value: Dictionary<any>[]) => void
-  validateForm: () => boolean
-}
-
-class CreateFunctionStore implements ICreateFunctionStore {
-  formState = new CreateFunctionFormState()
-  meta = null
-  schemas = []
-  advancedVisible = false
-  isDirty = false
-
-  constructor() {
-    makeAutoObservable(this)
-  }
-
-  get title() {
-    return this.formState.id
-      ? `Edit '${this.formState.originalName}' function`
-      : 'Add a new function'
-  }
-
-  get isEditing() {
-    return this.formState.id != undefined
-  }
-
-  toggleAdvancedVisible = () => {
-    this.advancedVisible = !this.advancedVisible
-  }
-
-  setSchemas = (value: Dictionary<any>[]) => {
-    this.schemas = value as any
-  }
-
-  setIsDirty = (value: boolean) => {
-    this.isDirty = value
-  }
-
-  onFormChange = ({ key, value }: { key: string; value: any }) => {
-    this.isDirty = true
-    if (has(this.formState, key)) {
-      const temp = (this.formState as any)[key] as any
-      ;(this.formState as any)[key] = { ...temp, value, error: undefined }
-    } else {
-      ;(this.formState as any)[key] = { value }
-    }
-  }
-
-  onFormArrayChange = ({
-    operation,
-    key,
-    idx,
-    value,
-  }: {
-    operation: 'add' | 'delete' | 'update'
-    key: string
-    idx?: number
-    value?: any
-  }) => {
-    switch (operation) {
-      case 'add': {
-        if (has(this.formState, key)) {
-          // @ts-ignore
-          this.formState[key].value.push(value)
-        } else {
-          const values = [value]
-          // @ts-ignore
-          this.formState[key] = { value: [value] }
-        }
-        break
-      }
-      case 'delete': {
-        if (has(this.formState, key)) {
-          const temp = filter(
-            // @ts-ignore
-            this.formState[key].value,
-            (_: any, index: number) => index != idx
-          ) as any
-          // @ts-ignore
-          this.formState[key].value = temp
-        }
-        break
-      }
-      default: {
-        if (has(this.formState, key) && !isUndefined(idx)) {
-          // @ts-ignore
-          this.formState[key].value[idx] = value
-        } else {
-          // @ts-ignore
-          this.formState[key] = { value: [value] }
-        }
-      }
-    }
-  }
-
-  validateForm = () => {
-    let isValidated = true
-    const _state = mapValues(this.formState, (x: { value: any }, key: string) => {
-      switch (key) {
-        case 'name': {
-          if (isEmpty(x.value) || hasWhitespace(x.value)) {
-            isValidated = false
-            return { ...x, error: 'Invalid function name' }
-          } else {
-            return x
-          }
-        }
-        case 'args': {
-          const temp = x.value?.map((i: Dictionary<any>) => {
-            if (isEmpty(i.name) || hasWhitespace(i.name)) {
-              isValidated = false
-              return { ...i, error: 'Invalid argument name' }
-            } else {
-              return i
-            }
-          })
-          x.value = temp
-          return x
-        }
-        case 'configParams': {
-          const temp = x.value?.map((i: Dictionary<any>) => {
-            const error: any = { name: undefined, value: undefined }
-            if (isEmpty(i.name) || hasWhitespace(i.name)) {
-              isValidated = false
-              error.name = 'Invalid config name'
-            }
-            if (isEmpty(i.value)) {
-              isValidated = false
-              error.value = 'Missing config value'
-            }
-            return { ...i, error }
-          })
-          x.value = temp
-          return x
-        }
-        default:
-          return x
-      }
-    })
-    if (!isValidated) {
-      this.formState.update(_state)
-    }
-    return isValidated
-  }
-}
-
-const CreateFunctionContext = createContext<ICreateFunctionStore | null>(null)
 
 interface CreateFunctionProps {
   func?: PostgresFunction
@@ -281,7 +48,7 @@ const FormSchema = z.object({
   name: z.string().trim().min(1),
   schema: z.string().trim().min(1),
   args: z.array(z.object({ name: z.string().trim().min(1), type: z.string().trim() })),
-  behavior: z.string().trim(),
+  behavior: z.enum(['IMMUTABLE', 'STABLE', 'VOLATILE']),
   definition: z.string().trim(),
   language: z.string().trim(),
   return_type: z.string().trim(),
@@ -328,49 +95,12 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
     form.formState.isDirty ? setIsClosingPanel(true) : setVisible(!visible)
   }
 
-  async function handleSubmit() {
-    if (!project) return console.error('Project is required')
-    if (_localState.validateForm()) {
-      const body = _localState.formState.requestBody
-      if (body.id) {
-        updateDatabaseFunction(
-          {
-            id: body.id,
-            projectRef: project.ref,
-            connectionString: project.connectionString,
-            payload: body as any,
-          },
-          {
-            onSuccess: () => {
-              toast.success(`Successfully updated function ${body.name}`)
-              setVisible(!visible)
-            },
-          }
-        )
-      } else {
-        createDatabaseFunction(
-          {
-            projectRef: project.ref,
-            connectionString: project.connectionString,
-            payload: body,
-          },
-          {
-            onSuccess: () => {
-              toast.success(`Successfully created function ${body.name}`)
-              setVisible(!visible)
-            },
-          }
-        )
-      }
-    }
-  }
-
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!project) return console.error('Project is required')
     const payload = {
       ...data,
       args: data.args.map((x) => `${x.name} ${x.type}`),
-      config_params: mapValues(keyBy(data.config_params, 'name'), 'value'),
+      config_params: mapValues(keyBy(data.config_params, 'name'), 'value') as Record<string, never>,
     }
 
     if (isEditing) {
@@ -568,7 +298,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
             ) : (
               <>
                 <SidePanel.Content>
-                  <div className="space-y-8 rounded bg-background py-4 px-6 border border-overlay">
+                  <div className="space-y-8 rounded bg-studio py-4 px-6 border border-overlay">
                     <Toggle
                       onChange={() => setAdvancedSettingsShown(!advancedSettingsShown)}
                       label="Show advanced settings"
