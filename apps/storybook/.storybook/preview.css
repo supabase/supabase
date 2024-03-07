@@ -106,14 +106,3 @@ body,
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
 }
-/* 
-.dark,
-.light,
-.light .docs-story,
-.dark .docs-story {
-  @apply bg text font-[400];
-  font-feature-settings:
-    'rlig' 1,
-    'calt' 1;
-  font-family: 'Circular std';
-} */
