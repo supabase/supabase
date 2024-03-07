@@ -349,7 +349,9 @@ ALTER ROLE postgres SET pgaudit.role TO 'auth_auditor';
 
 With the above code, any query involving reading or deleting the auth.users email column will be logged.
 
-## Help! Too many logs
+## Best Practices
+
+### Over-logging: Help! Too many logs!
 
 pgaudit is infamous for creating log-blizzards. If not configured mindfully, you can accidentally log all database events, including background tasks. This can generate millions of logs in a few hours, making it too overwhelming and chaotic to find insight in the logs.
 
