@@ -102,7 +102,7 @@ Inside a session, by default, pgaudit will log nothing:
 show pgaudit.log;
 ```
 
-Inside the session, you can change the variable to log different events:
+In the session, you can `SET` the `pgaudit.log` variable to record events:
 
 ```sql
 -- log CREATE, ALTER, and DROP events
@@ -146,8 +146,8 @@ WHERE rolname = 'zapier';
 ### Global Logging
 
 <Admonition type="caution">
-  Use global logging sparingly as it can generate millions of logs per hour. Consider alternatives
-  first.
+  Use global logging sparingly as it can generate millions of logs per hour. 
+  Consider alternatives first.
 </Admonition>
 
 The below SQL configures pgaudit to record all events associated with the "postgres" role. Since postgres has extensive privileges, this effectively monitors all database activity.
@@ -245,16 +245,16 @@ pgaudit was designed for storing logs as CSV files with the following headers:
 A log made from the following create statement:
 
 ```sql
-create table account (
-  id int primary key,
-  name text,
-  description text
+CREATE TABLE account (
+  id INT PRIMARY KEY,
+  name TEXT,
+  description TEXT
 );
 ```
 
 Generates the following log in the [Dashboard's Postgres Logs](https://supabase.com/dashboard/project/_/logs/explorer):
 
-```sql
+```
  AUDIT: SESSION,1,1,DDL,CREATE TABLE,TABLE,public.account,create table account(
   id int,
   name text,
@@ -284,8 +284,7 @@ limit 100;
 ### Monitoring API events
 
 <Admonition type="note">
-  API requests are already recorded in the [API Edge
-  Network](https://supabase.com/dashboard/project/_/logs/edge-logs) logs.
+  API requests are already recorded in the [API Edge Network](https://supabase.com/dashboard/project/_/logs/edge-logs) logs.
 </Admonition>
 
 Some users may feel compelled to monitor all write initiated by the API roles:
@@ -302,7 +301,7 @@ ALTER ROLE authenticator SET pgaudit.log TO 'write';
 
 ### Recording pg_cron Executions
 
-Cron job executions are recorded by default in Supabase and do not require pgaudit to observe. pg_cron only logs start and completion events.
+Cron job executions are recorded by default in Supabase and do not require pgaudit to observe. However, pg_cron only logs start and completion events.
 
 When expanding the capacity of cron logging, pgaudit is not always the best solution. Instead, it's usually better to use function-level logging. Inside, PG_CRON, you can wrap your code in a [database function](https://supabase.com/docs/guides/database/functions#general-logging).
 
