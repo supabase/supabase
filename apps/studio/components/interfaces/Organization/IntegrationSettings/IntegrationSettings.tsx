@@ -13,7 +13,7 @@ import {
 import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useSelectedOrganization, useStore } from 'hooks'
+import { useFlag, useSelectedOrganization, useStore } from 'hooks'
 import { BASE_PATH, OPT_IN_TAGS } from 'lib/constants'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationConnectionItem } from '../../Integrations/IntegrationConnection'
@@ -33,7 +33,9 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 const IntegrationSettings = () => {
   const { ui } = useStore()
   const org = useSelectedOrganization()
-  const hasAccessToBranching = org?.opt_in_tags?.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) ?? false
+  const isBranchingEnabledGlobally = useFlag<boolean>('branchManagement')
+  const hasAccessToBranching =
+    org?.opt_in_tags.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) || isBranchingEnabledGlobally
   const { data: connections } = useGitHubConnectionsQuery({ organizationId: org?.id })
 
   const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({

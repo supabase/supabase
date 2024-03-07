@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Button, IconExternalLink, IconGitBranch, IconGitPullRequest } from 'ui'
 
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import { useSelectedOrganization } from 'hooks'
+import { useFlag, useSelectedOrganization } from 'hooks'
 import { OPT_IN_TAGS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 
@@ -10,8 +10,9 @@ export const BranchingEmptyState = () => {
   const selectedOrg = useSelectedOrganization()
   const snap = useAppStateSnapshot()
 
+  const isBranchingEnabledGlobally = useFlag<boolean>('branchManagement')
   const hasAccessToBranching =
-    selectedOrg?.opt_in_tags?.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) ?? false
+    selectedOrg?.opt_in_tags.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) || isBranchingEnabledGlobally
 
   return (
     <ProductEmptyState title="Database Branching">
