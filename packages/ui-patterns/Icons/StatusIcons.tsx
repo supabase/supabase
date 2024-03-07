@@ -10,7 +10,7 @@ export const StatusIcon = forwardRef<
   React.ComponentPropsWithoutRef<'svg'> & {
     variant: 'success' | 'warning' | 'destructive' | 'default'
   } & StatusIconProps
->(({ variant, ...props }, ref) => {
+>(({ variant = 'default', ...props }, ref) => {
   let Icon: React.ElementType | undefined
   if (variant === 'warning') {
     Icon = WarningIcon
