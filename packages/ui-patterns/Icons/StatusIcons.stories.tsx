@@ -28,7 +28,7 @@ export default {
 
 type Story = StoryObj<typeof StatusIcon>
 
-export const Primary: Story = {
+export const Default: Story = {
   args: {
     variant: 'default',
   },
@@ -81,7 +81,7 @@ export const withNoBackground: Story = {
   },
 }
 
-export const WithBadgeDestructive: Story = {
+export const WithBadge: Story = {
   args: {
     variant: 'destructive',
   },
@@ -92,23 +92,6 @@ export const WithBadgeDestructive: Story = {
   render: function Render(args) {
     return (
       <Badge_Shadcn_ variant={'destructive'} className="flex gap-1">
-        <StatusIcon {...args} hideBackground />
-        Caution
-      </Badge_Shadcn_>
-    )
-  },
-}
-export const WithBadgeWarning: Story = {
-  args: {
-    variant: 'warning',
-  },
-  /**
-   * 👇 To avoid linting issues, it is recommended to use a function with a capitalized name.
-   * If you are not concerned with linting, you may use an arrow function.
-   */
-  render: function Render(args) {
-    return (
-      <Badge_Shadcn_ variant={'warning'} className="flex gap-1">
         <StatusIcon {...args} hideBackground />
         Caution
       </Badge_Shadcn_>
