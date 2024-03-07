@@ -16,12 +16,15 @@ const DisallowAllModal = ({ visible, onClose }: DisallowAllModalProps) => {
 
   const onSubmit = async () => {
     if (!ref) return console.error('Project ref is required')
-    await applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs: ['127.0.0.1/32'] })
+    await applyNetworkRestrictions({
+      projectRef: ref,
+      dbAllowedCidrs: ['127.0.0.1/32'],
+      dbAllowedCidrsV6: ['::1/128'],
+    })
   }
 
   return (
     <Modal
-      closable
       hideFooter
       size="medium"
       visible={visible}
@@ -38,7 +41,7 @@ const DisallowAllModal = ({ visible, onClose }: DisallowAllModalProps) => {
             defaultVisibility
             hideCollapse
             title="Note: Restrictions only apply to direct connections to your database and PgBouncer"
-            description="They do not currently apply to Supavisor and to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication"
+            description="They do not currently apply to APIs offered over HTTPS, such as PostgREST, Storage, or Authentication. Supavisor will start enforcing network restrictions from January 24th 2024."
           />
         </div>
       </Modal.Content>

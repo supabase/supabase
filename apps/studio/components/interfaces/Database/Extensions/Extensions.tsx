@@ -1,7 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { isNull, partition } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button, IconAlertCircle, IconExternalLink, IconSearch, Input } from 'ui'
@@ -131,4 +130,4 @@ const Extensions = () => {
   )
 }
 
-export default observer(Extensions)
+export default Extensions

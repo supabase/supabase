@@ -3,6 +3,7 @@
  */
 export const EXCLUDED_SCHEMAS = [
   'auth',
+  'cron',
   'extensions',
   'information_schema',
   'net',

@@ -125,7 +125,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
 
   return (
     <LazyMotion features={domAnimation}>
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence mode="wait">
         {open && (
           <m.div
             variants={container}
@@ -208,7 +208,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
           </m.div>
         )}
       </AnimatePresence>
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence mode="wait">
         {open && (
           <m.div
             variants={container}

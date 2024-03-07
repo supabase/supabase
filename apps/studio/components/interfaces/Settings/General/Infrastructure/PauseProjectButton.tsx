@@ -9,7 +9,7 @@ import {
   useIsProjectActive,
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -84,12 +84,12 @@ const PauseProjectButton = () => {
                   {isPaused
                     ? 'Your project is already paused'
                     : !canPauseProject
-                    ? 'You need additional permissions to pause this project'
-                    : !isProjectActive
-                    ? 'Unable to pause project as project is not active'
-                    : !isFreePlan
-                    ? 'Projects on a paid plan will always be running'
-                    : ''}
+                      ? 'You need additional permissions to pause this project'
+                      : !isProjectActive
+                        ? 'Unable to pause project as project is not active'
+                        : !isFreePlan
+                          ? 'Projects on a paid plan will always be running'
+                          : ''}
                 </span>
               </div>
             </Tooltip.Content>

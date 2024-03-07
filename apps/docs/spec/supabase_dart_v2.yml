@@ -6,8 +6,6 @@ info:
   description: |
 
     Supabase Dart.
-
-  definition: spec/enrichments/tsdoc_v2/combined.json
   slugPrefix: '/'
   specUrl: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_dart_v2.yml
   libraries:
@@ -23,7 +21,67 @@ functions:
 
       The Supabase client is your entrypoint to the rest of the Supabase functionality
       and is the easiest way to interact with everything we offer within the Supabase ecosystem.
-
+    params:
+      - name: url
+        isOptional: false
+        type: string
+        description: The unique Supabase URL which is supplied when you create a new project in your project dashboard.
+      - name: anonKey
+        isOptional: false
+        type: string
+        description: The unique Supabase Key which is supplied when you create a new project in your project dashboard.
+      - name: headers
+        isOptional: true
+        type: Map<String, String>
+        description: Custom header to be passed to the Supabase client.
+      - name: httpClient
+        isOptional: true
+        type: Client
+        description: Custom http client to be used by the Supabase client.
+      - name: authOptions
+        isOptional: true
+        type: FlutterAuthClientOptions
+        description: Options to change the Auth behaviors.
+        subContent:
+          - name: authFlowType
+            isOptional: true
+            type: AuthFlowType
+            description: Whether to use the `pkce` flow or the `implicit` flow. Defaults to `pkce`.
+          - name: localStorage
+            isOptional: true
+            type: LocalStorage
+            description: Parameter to override the local storage to store auth tokens.
+          - name: autoRefreshToken
+            isOptional: true
+            type: bool
+            description: Whether to automatically refresh the token when it expires. Defaults to `true`.
+      - name: postgrestOptions
+        isOptional: true
+        type: PostgrestClientOptions
+        description: Options to change the Postgrest behaviors.
+        subContent:
+          - name: schema
+            isOptional: true
+            type: String
+            description: Schema to query with the Supabase client. Defaults to `public`.
+      - name: realtimeClientOptions
+        isOptional: true
+        type: RealtimeClientOptions
+        description: Options to change the Realtime behaviors.
+        subContent:
+          - name: logLevel
+            isOptional: true
+            type: RealtimeLogLevel
+            description: Level of realtime server logs to to be logged.
+      - name: storageOptions
+        isOptional: true
+        type: StorageClientOptions
+        description: Options to change the Storage behaviors.
+        subContent:
+          - name: retryAttempts
+            isOptional: true
+            type: int
+            description: The number of times to retry a failed upload request. Defaults to `0`.
     examples:
       - id: flutter-initialize
         name: For Flutter
@@ -61,8 +119,37 @@ functions:
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
       - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
-          - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
-          - If **Confirm email** is disabled, the error message, `User already registered` is returned.
+        - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
+        - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
+    params:
+      - name: email
+        isOptional: true
+        type: String
+        description: User's email address to be used for email authentication.
+      - name: phone
+        isOptional: true
+        type: String
+        description: User's phone number to be used for phone authentication.
+      - name: password
+        isOptional: false
+        type: String
+        description: Password to be used for authentication.
+      - name: emailRedirectTo
+        isOptional: true
+        type: String
+        description: The URL to redirect the user to after they confirm their email address.
+      - name: data
+        isOptional: true
+        type: Map<String, dynamic>
+        description: The user's metadata to be stored in the user's object.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification.
+      - name: channel
+        isOptional: true
+        type: OtpChannel
+        description: Messaging channel to use (e.g. whatsapp or sms). Defaults to `OtpChannel.sms`.
     examples:
       - id: sign-up
         name: Sign up.
@@ -109,6 +196,23 @@ functions:
       Log in an existing user using email or phone number with password.
     notes: |
       - Requires either an email and password or a phone number and password.
+    params:
+      - name: email
+        isOptional: true
+        type: String
+        description: User's email address to be used for email authentication.
+      - name: phone
+        isOptional: true
+        type: String
+        description: User's phone number to be used for phone authentication.
+      - name: password
+        isOptional: false
+        type: String
+        description: Password to be used for authentication.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification.
     examples:
       - id: sign-in-with-email-and-password
         name: Sign in with email and password
@@ -141,6 +245,35 @@ functions:
       - If you're using an email, you can configure whether you want the user to receive a magiclink or an OTP.
       - If you're using phone, you can configure whether you want the user to receive an OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+    params:
+      - name: email
+        isOptional: true
+        type: String
+        description: Email address to send the magic link or OTP to.
+      - name: phone
+        isOptional: true
+        type: String
+        description: Phone number to send the OTP to.
+      - name: emailRedirectTo
+        isOptional: true
+        type: String
+        description: The URL to redirect the user to after they click on the magic link.
+      - name: shouldCreateUser
+        isOptional: true
+        type: bool
+        description: If set to false, this method will not create a new user. Defaults to true.
+      - name: data
+        isOptional: true
+        type: Map<String, dynamic>
+        description: The user's metadata to be stored in the user's object.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification.
+      - name: channel
+        isOptional: true
+        type: OtpChannel
+        description: Messaging channel to use (e.g. whatsapp or sms). Defaults to `OtpChannel.sms`.
     examples:
       - id: sign-in-with-email
         name: Sign in with email.
@@ -179,6 +312,27 @@ functions:
     title: 'signInWithIdToken()'
     description: |
       Allows you to perform native Google and Apple sign in by combining it with [google_sign_in](https://pub.dev/packages/google_sign_in) or [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple) packages.
+    params:
+      - name: provider
+        isOptional: false
+        type: OAuthProvider
+        description: The provider to perform the sign in with. Currently, `OAuthProvider.google` and `OAuthProvider.apple` are supported.
+      - name: idToken
+        isOptional: false
+        type: String
+        description: The identity token obtained from the third-party provider.
+      - name: accessToken
+        isOptional: true
+        type: String
+        description: Access token obtained from the third-party provider. Required for Google sign in.
+      - name: nonce
+        isOptional: true
+        type: String
+        description: Raw nonce value used to perform the third-party sign in. Required for Apple sign-in.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification.
     examples:
       - id: sign-in-with-google
         name: Native Google sign in
@@ -255,7 +409,7 @@ functions:
             );
           }
 
-          final response = await signInWithIdToken(
+          final response = await supabase.auth.signInWithIdToken(
             provider: OAuthProvider.apple,
             idToken: idToken,
             nonce: rawNonce,
@@ -268,13 +422,34 @@ functions:
     notes: |
       - This method is used for signing in using a third-party provider.
       - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
+    params:
+      - name: provider
+        isOptional: false
+        type: OAuthProvider
+        description: The OAuth provider to use for signing in.
+      - name: redirectTo
+        isOptional: true
+        type: String
+        description: The URL to redirect the user to after they sign in with the third-party provider.
+      - name: scopes
+        isOptional: true
+        type: String
+        description: A list of scopes to request from the third-party provider.
+      - name: authScreenLaunchMode
+        isOptional: true
+        type: LaunchMode
+        description: The launch mode for the auth screen. Defaults to `LaunchMode.platformDefault`.
+      - name: queryParams
+        isOptional: true
+        type: Map<String, String>
+        description: Additional query parameters to be passed to the OAuth flow.
     examples:
       - id: sign-in-using-a-third-party-provider
         name: Sign in using a third-party provider
         isSpotlight: true
         code: |
           ```dart
-          await supabase.auth.signInWithOAuth(Provider.github);
+          await supabase.auth.signInWithOAuth(OAuthProvider.github);
           ```
       - id: sign-in-using-a-third-party-provider-with-redirect
         name: With `redirectTo`
@@ -284,7 +459,7 @@ functions:
         code: |
           ```dart
           await supabase.auth.signInWithOAuth(
-            Provider.github,
+            OAuthProvider.github,
             redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
           );
           ```
@@ -296,7 +471,7 @@ functions:
         code: |
           ```dart
           await supabase.auth.signInWithOAuth(
-            Provider.github,
+            OAuthProvider.github,
             scopes: 'repo gist notifications'
           );
           ...
@@ -305,12 +480,65 @@ functions:
           final Session? session = supabase.auth.currentSession;
           final String? oAuthToken = session?.providerToken;
           ```
+  - id: sign-in-with-sso
+    title: 'signInWithSSO()'
+    notes: |
+      - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
+      - If you've associated an email domain to the identity provider, you can use the `domain` property to start a sign-in flow.
+      - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `providerId` property. For example:
+          - Mapping specific user email addresses with an identity provider.
+          - Using different hints to identify the correct identity provider, like a company-specific page, IP address or other tracking information.
+    params:
+      - name: providerId
+        isOptional: true
+        type: String
+        description: The ID of the SSO provider to use for signing in.
+      - name: domain
+        isOptional: true
+        type: String
+        description: The email domain to use for signing in.
+      - name: redirectTo
+        isOptional: true
+        type: String
+        description: The URL to redirect the user to after they sign in with the third-party provider.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification.
+      - name: launchMode
+        isOptional: true
+        type: LaunchMode
+        description: The launch mode for the auth screen. Defaults to `LaunchMode.platformDefault`.
+    examples:
+      - id: sign-in-with-domain
+        name: Sign in with email domain
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.signInWithSSO(
+            domain: 'company.com',
+          );
+          ```
+      - id: sign-in-with-provider-uuid
+        name: Sign in with provider UUID
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.signInWithSSO(
+            providerId: '21648a9d-8d5a-4555-a9d1-d6375dc14e92',
+          );
+          ```
   - id: sign-out
     title: 'signOut()'
     description: |
       Signs out the current user, if there is a logged in user.
     notes: |
       - In order to use the `signOut()` method, the user needs to be signed in first.
+    params:
+      - name: scope
+        isOptional: true
+        type: SignOutScope
+        description: Whether to sign out from all devices or just the current device. Defaults to `SignOutScope.local`.
     examples:
       - id: sign-out
         name: Sign out
@@ -450,7 +678,7 @@ functions:
     notes: |
       - Resends a signup confirmation, email change, or phone change email to the user.
       - Passwordless sign-ins can be resent by calling the `signInWithOtp()` method again.
-      - Password recovery emails can be resent by calling the `resetPassswordForEmail()` method again.
+      - Password recovery emails can be resent by calling the `resetPasswordForEmail()` method again.
       - This method only resend an email or phone OTP to the user if an initial signup, email change, or phone change request was made.
     examples:
       - id: resend-email-signup-confirmation
@@ -878,6 +1106,11 @@ functions:
       - `select()` can be combined with [Filters](/docs/reference/dart/using-filters)
       - `select()` can be combined with [Modifiers](/docs/reference/dart/using-modifiers)
       - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+    params:
+      - name: columns
+        isOptional: true
+        type: String
+        description: The columns to retrieve, separated by commas. Columns can be renamed when returned with `customName:columnName`
     examples:
       - id: getting-your-data
         name: Getting your data
@@ -918,12 +1151,13 @@ functions:
       - id: query-the-same-referenced-table-multiple-times
         name: Query the same referenced table multiple times
         description: |
-          Sometimes you will need to query the same referenced table twice.
-          In this case, you can use the name of the joined column to identify
-          which join you intend to use. For convenience, you can also give an
-          alias for each column. For example, if we had a shop of products,
-          and we wanted to get the supplier and the purchaser at the same time
-          (both in the users) table:
+          Sometimes you will need to query the same referenced table twice. In
+          this case, you can use the name of the joined column to identify which
+          join you intend to use. For convenience, you can also give an alias
+          for each column. This example queries a `messages` table that is
+          joined to a `users` table via `sender_id` and `receiver_id`. Since you
+          want the `name` for both sender and receiver, you can alias the
+          columns as `to` and `from`.
         code: |
           ```dart
           final data = await supabase
@@ -995,6 +1229,11 @@ functions:
     description: |
       Perform an INSERT into the table or view.
     title: 'Create data: insert()'
+    params:
+      - name: values
+        isOptional: false
+        type: Map<String, dynamic> or List<Map<String, dynamic>>
+        description: The values to insert. Pass an object to insert a single row or an array to insert multiple rows.
     examples:
       - id: create-a-record
         name: Create a record
@@ -1031,6 +1270,11 @@ functions:
     title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to update.
+    params:
+      - name: values
+        isOptional: false
+        type: Map<String, dynamic>
+        description: The values to update with.
     examples:
       - id: updating-your-data
         name: Update your data
@@ -1080,6 +1324,11 @@ functions:
     title: 'Upsert data: upsert()'
     notes: |
       - Primary keys must be included in `values` to use upsert.
+    params:
+      - name: values
+        isOptional: false
+        type: Map<String, dynamic> or List<Map<String, dynamic>>
+        description: The values to upsert with. Pass a Map to upsert a single row or an List to upsert multiple rows.
     examples:
       - id: upsert-your-data
         name: Upsert your data
@@ -1151,27 +1400,135 @@ functions:
   - id: rpc
     title: 'Stored Procedures: rpc()'
     description: |
-      You can call stored procedures as a "Remote Procedure Call".
+      Perform a function call.
 
-      That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
-      It's especially useful when the logic rarely changes - like password resets and updates.
+      You can call Postgres functions as Remote Procedure Calls, logic in your database that you can execute from anywhere.
+      Functions are useful when the logic rarely changes—like for password resets and updates.
+    params:
+      - name: fn
+        isOptional: false
+        type: String
+        description: The function name to call.
+      - name: params
+        isOptional: true
+        type: Map<String, dynamic>
+        description: The arguments to pass to the function call.
     examples:
-      - id: call-a-stored-procedure
-        name: Call a stored procedure
-        isSpotlight: true
-        description: This is an example invoking a stored procedure.
+      - id: call-a-postgres-function-without-arguments
+        name: Call a Postgres function without arguments
         code: |
           ```dart
           final data = await supabase
             .rpc('hello_world');
           ```
-      - id: with-parameters
-        name: With Parameters
+        data:
+          sql: |
+            ```sql
+            create function hello_world() returns text as $$
+              select 'Hello world';
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": "Hello world",
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: call-a-postgres-function-with-arguments
+        name: Call a Postgres function with arguments
         code: |
           ```dart
           final data = await supabase
-            .rpc('echo_city', params: { 'name': 'The Shire' });
+            .rpc('echo_city', params: { 'say': '👋' });
           ```
+        data:
+          sql: |
+            ```sql
+            create function echo(say text) returns text as $$
+              select say;
+            $$ language sql;
+            ```
+        response: |
+          ```json
+            {
+              "data": "👋",
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+        hideCodeBlock: true
+      - id: bulk-processing
+        name: Bulk processing
+        code: |
+          ```dart
+          final data = await supabase
+            .rpc('add_one_each', params: { arr: [1, 2, 3] });
+          ```
+        data:
+          sql: |
+            ```sql
+            create function add_one_each(arr int[]) returns int[] as $$
+              select array_agg(n + 1) from unnest(arr) as n;
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              2,
+              3,
+              4
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          You can process large payloads by passing in an array as an argument.
+        hideCodeBlock: true
+      - id: call-a-postgres-function-with-filters
+        name: Call a Postgres function with filters
+        code: |
+          ```dart
+          final data = await supabase
+            .rpc('list_stored_countries')
+            .eq('id', 1)
+            .single();
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'France'),
+              (2, 'United Kingdom');
+
+            create function list_stored_countries() returns setof countries as $$
+              select * from countries;
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": {
+              "id": 1,
+              "name": "France"
+            },
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          Postgres functions that return tables can also be combined with [Filters](/docs/reference/dart/using-filters) and [Modifiers](/docs/reference/dart/using-modifiers).
+        hideCodeBlock: true
 
   - id: subscribe
     description: |
@@ -1457,7 +1814,6 @@ functions:
     description: |
       Retrieves the details of all Storage buckets within an existing product.
     title: 'listBuckets()'
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select`
@@ -1477,7 +1833,6 @@ functions:
     description: |
       Retrieves the details of an existing Storage bucket.
     title: 'getBucket()'
-    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: `select`
@@ -1572,7 +1927,6 @@ functions:
     description: |
       Uploads a file to an existing bucket.
     title: 'from.upload()'
-    $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
     notes: |
       - Policy permissions required:
         - `buckets` permissions: none
@@ -1893,7 +2247,7 @@ functions:
     description: |
       Filters allow you to only return rows that match certain conditions.
 
-      Filters can be used on `select()`, `update()`, and `delete()` queries.
+      Filters can be used on `select()`, `update()`, `upsert()`, and `delete()` queries.
 
       If a Database function returns a table response, you can also apply filters.
     examples:
@@ -1918,9 +2272,7 @@ functions:
       - id: chaining-filters
         name: Chaining Filters
         description: |
-          Filters must be applied after any of `select()`, `update()`, `upsert()`,
-          `delete()`, and `rpc()` and before
-          [modifiers](/docs/reference/dart/using-modifiers).
+          Filters can be chained together to produce advanced queries as shown in the example code.
         code: |
           ```dart
           final data = await supabase
@@ -1943,16 +2295,14 @@ functions:
             .from('cities')
             .select('name, country_id');
 
-          if (filterByName != null)  { query = query.eq('name', filterByName); }
-          if (filterPopLow != null)  { query = query.gte('population', filterPopLow); }
-          if (filterPopHigh != null) { query = query.lt('population', filterPopHigh); }
+          if (filterByName != null) query = query.eq('name', filterByName);
+          if (filterPopLow != null) query = query.gte('population', filterPopLow);
+          if (filterPopHigh != null) query = query.lt('population', filterPopHigh);
 
           final data = await query;
           ```
       - id: filter-by-value-within-json-column
         name: Filter by values within a JSON column
-        description: |
-          Filters can be built up one step at a time and then executed. For example:
         data:
           sql: |
             ```sql
@@ -1971,19 +2321,15 @@ functions:
             ```
         response: |
           ```json
-          {
-            "data": [
-              {
-                "id": 1,
-                "name": "Michael",
-                "address": {
-                  "postcode": 90210
-                }
+          [
+            {
+              "id": 1,
+              "name": "Michael",
+              "address": {
+                "postcode": 90210
               }
-            ],
-            "status": 200,
-            "statusText": "OK"
-          }
+            }
+          ]
           ```
         code: |
           ```dart
@@ -2029,23 +2375,22 @@ functions:
               (1, 2, 'Bali'),
               (2, 1, 'Munich');
             ```
-          response: |
+        response: |
             ```json
-            {
-              "data": [
-                {
-                  "name": "Indonesia",
-                  "cities": [
-                    {
-                      "name": "Bali"
-                    }
-                  ]
-                }
-              ],
-              "status": 200,
-              "statusText": "OK"
-            }
+            [
+              {
+                "name": "Indonesia",
+                "cities": [
+                  {
+                    "name": "Bali"
+                  }
+                ]
+              }
+            ]
             ```
+        description: |
+          You can filter on referenced tables in your `select()` query using dot
+          notation.
   - id: or
     title: or()
     description: |
@@ -2078,6 +2423,52 @@ functions:
             .select('name, country_id')
             .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)');
           ```
+      - id: use-or-on-referenced-tables
+        name: Use `or` on referenced tables
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select('name, cities!inner(name)')
+            .or('country_id.eq.1,name.eq.Beijing', referencedTable: 'cities');
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "name": "Germany",
+              "cities": [
+                {
+                  "name": "Munich"
+                }
+              ]
+            }
+          ]
+          ```
+        hideCodeBlock: true
 
   - id: not
     title: not()
@@ -2139,84 +2530,75 @@ functions:
     examples:
       - id: with-select
         name: With `select()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select()
+            .match({ 'id': 2, 'name': 'Albania' });
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "name": "Albania"
+            }
+          ]
+          ```
+        hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .match({'name': 'Beijing', 'country_id': 156});
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .match({'name': 'Beijing', 'country_id': 156});
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .match({'name': 'Beijing', 'country_id': 156});
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .match({'name': 'Beijing', 'country_id': 156});
-          ```
 
   - id: eq
     title: eq()
     description: |
-      Finds all rows whose value on the stated `column` exactly matches the specified `value`.
+      Match only rows where `column` is equal to `value`.
     examples:
       - id: with-select
         name: With `select()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select()
+            .eq('name', 'Albania');
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": 2,
+              "name": "Albania"
+            }
+          ]
+          ```
+        hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .eq('name', 'The shire');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .eq('name', 'San Francisco');
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .eq('name', 'Mordor');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .eq('name', 'San Francisco');
-          ```
 
   - id: neq
     title: neq()
@@ -2225,41 +2607,41 @@ functions:
     examples:
       - id: with-select
         name: With `select()`
-        isSpotlight: true
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
+            .from('countries')
             .select('name, country_id')
-            .neq('name', 'The shire');
+            .neq('name', 'Albania');
           ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .neq('name', 'San Francisco');
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": 1,
+              "name": "Afghanistan"
+            },
+            {
+              "id": 3,
+              "name": "Algeria"
+            }
+          ]
           ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .neq('name', 'Mordor');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .neq('name', 'Lagos');
-          ```
+        hideCodeBlock: true
+        isSpotlight: true
 
   - id: gt
     title: gt()
@@ -2268,41 +2650,37 @@ functions:
     examples:
       - id: with-select
         name: With `select()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select()
+            .gt('id', 2);
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": 3,
+              "name": "Algeria"
+            }
+          ]
+          ```
+        hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .gt('country_id', 250);
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .gt('country_id', 250);
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .gt('country_id', 250);
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .gt('country_id', 250);
-          ```
 
   - id: gte
     title: gte()
@@ -2311,41 +2689,41 @@ functions:
     examples:
       - id: with-select
         name: With `select()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select()
+            .gte('id', 2);
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": 2,
+              "name": "Albania"
+            },
+            {
+              "id": 3,
+              "name": "Algeria"
+            }
+          ]
+          ```
+        hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .gte('country_id', 250);
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .gte('country_id', 250);
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .gte('country_id', 250);
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .gte('country_id', 250);
-          ```
 
   - id: lt
     title: lt()
@@ -2354,129 +2732,119 @@ functions:
     examples:
       - id: with-select
         name: With `select()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select()
+            .lt('id', 2);
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": 1,
+              "name": "Afghanistan"
+            }
+          ]
+          ```
+        hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .lt('country_id', 250);
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .lt('country_id', 250);
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .lt('country_id', 250);
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .lt('country_id', 250);
-          ```
 
   - id: lte
     title: lte()
     description: |
       Finds all rows whose value on the stated `column` is less than or equal to the specified `value`.
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
     examples:
       - id: with-select
         name: With `select()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select()
+            .lte('id', 2);
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": 1,
+              "name": "Afghanistan"
+            },
+            {
+              "id": 2,
+              "name": "Albania"
+            }
+          ]
+          ```
+        hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .lte('country_id', 250);
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .lte('country_id', 250);
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .lte('country_id', 250);
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .lte('country_id', 250);
-          ```
 
   - id: like
     title: like()
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case sensitive).
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
     examples:
       - id: with-select
         name: With `select()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select()
+            .like('name', '%Alba%');
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": 2,
+              "name": "Albania"
+            }
+          ]
+          ```
+        hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .like('name', '%la%');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .like('name', '%la%');
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .like('name', '%la%');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .like('name', '%la%');
-          ```
 
   - id: ilike
     title: ilike()
@@ -2485,84 +2853,81 @@ functions:
     examples:
       - id: with-select
         name: With `select()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select()
+            .ilike('name', '%alba%');
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+          response: |
+            ```json
+            [
+              {
+                "id": 2,
+                "name": "Albania"
+              }
+            ]
+            ```
+        hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .ilike('name', '%la%');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .ilike('name', '%la%');
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .ilike('name', '%la%');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .ilike('name', '%la%');
-          ```
 
   - id: is
     title: isFilter()
     description: |
       A check for exact equality (null, true, false), finds all rows whose value on the stated `column` exactly match the specified `value`.
     examples:
-      - id: with-select
-        name: With `select()`
+      - id: checking-nullness
+        name: Checking for nullness, true or false
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select()
+            .isFilter('name', null);
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'null'),
+              (2, null);
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": 1,
+              "name": "null"
+            }
+          ]
+          ```
+        description: |
+          Using the `eq()` filter doesn't work when filtering for `null`.
+
+          Instead, you need to use `isFilter()`.
+
+          `isFilter()` is equivalent to `is()` in SDKs for other languages. It's named `isFilter()` in Dart to avoid a conflict with the `is` keyword in Dart.
+        hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .isFilter('name', null);
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .isFilter('name', null);
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .isFilter('name', null);
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .isFilter('name', null);
-          ```
 
   - id: in
     title: inFilter()
@@ -2571,370 +2936,599 @@ functions:
     examples:
       - id: with-select
         name: With `select()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select()
+            .inFilter('name', ['Albania', 'Algeria']);
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": 2,
+              "name": "Albania"
+            },
+            {
+              "id": 3,
+              "name": "Algeria"
+            }
+          ]
+          ```
+        description: |
+          `inFilter()` is equivalent to `in()` in SDKs for other languages. It's named `inFilter()` in Dart to avoid a conflict with the `in` keyword in Dart.
+        hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .select('name, country_id')
-            .inFilter('name', ['Rio de Janeiro', 'San Francisco']);
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .update({ 'name': 'Mordor' })
-            .inFilter('name', ['Rio de Janeiro', 'San Francisco']);
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('cities')
-            .delete()
-            .inFilter('name', ['Rio de Janeiro', 'San Francisco']);
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_cities')
-            .inFilter('name', ['Rio de Janeiro', 'San Francisco']);
-          ```
 
   - id: contains
     title: contains()
     examples:
-      - id: with-select
-        name: With `select()`
+      - id: on-array-columns
+        name: On array columns
+        description: |
+          Only relevant for jsonb, array, and range columns. Match only rows where `column` contains every element appearing in `value`.
         isSpotlight: true
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
-            .select('name, id, main_exports')
-            .contains('main_exports', ['oil']);
+            .from('issues')
+            .select()
+            .contains('tags', ['is:open', 'priority:low']);
           ```
-      - id: with-update
-        name: With `update()`
+        data:
+          sql: |
+            ```sql
+            create table
+              issues (
+                id int8 primary key,
+                title text,
+                tags text[]
+              );
+
+            insert into
+              issues (id, title, tags)
+            values
+              (1, 'Cache invalidation is not working', array['is:open', 'severity:high', 'priority:low']),
+              (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": 1,
+              "title": "Cache invalidation is not working",
+              "tags": ["is:open", "severity:high", "priority:low"]
+            }
+          ]
+          ```
+        hideCodeBlock: true
+      - id: on-range-columns
+        name: On range columns
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
-            .update({ 'name': 'Mordor' })
-            .contains('main_exports', ['oil']);
+            .from('reservations')
+            .select()
+            .contains('during', '[2000-01-01 13:00, 2000-01-01 13:30)');
           ```
-      - id: with-delete
-        name: With `delete()`
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": 1,
+              "room_name": "Emerald",
+              "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+            }
+          ]
+          ```
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        hideCodeBlock: true
+      - id: on-jsonb-columns
+        name: On `jsonb` columns
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
-            .delete()
-            .contains('main_exports', ['oil']);
+            .from('users')
+            .select('name')
+            .contains('address', { 'street': 'Melrose Place' });
           ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_countries')
-            .contains('main_exports', ['oil']);
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Michael', '{ "postcode": 90210, "street": "Melrose Place" }'),
+              (2, 'Jane', '{"postcode": 90210}');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "name": "Michael"
+            }
+          ]
           ```
+        hideCodeBlock: true
 
   - id: contained-by
     title: containedBy()
+    description: |
+      Only relevant for jsonb, array, and range columns. Match only rows where every element appearing in `column` is contained by `value`.
     examples:
-      - id: with-select
-        name: With `select()`
+      - id: on-array-columns
+        name: On array columns
         isSpotlight: true
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
-            .select('name, id, main_exports')
-            .containedBy('main_exports', ['cars', 'food', 'machine']);
+            .from('classes')
+            .select('name')
+            .containedBy('days', ['monday', 'tuesday', 'wednesday', 'friday']);
           ```
-      - id: with-update
-        name: With `update()`
+        data:
+          sql: |
+            ```sql
+            create table
+              classes (
+                id int8 primary key,
+                name text,
+                days text[]
+              );
+
+            insert into
+              classes (id, name, days)
+            values
+              (1, 'Chemistry', array['monday', 'friday']),
+              (2, 'History', array['monday', 'wednesday', 'thursday']);
+            ```
+        response: |
+          ```json
+          [
+            {
+              "name": "Chemistry"
+            }
+          ]
+          ```
+        hideCodeBlock: true
+      - id: on-range-columns
+        name: On range columns
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
-            .update({ 'name': 'Mordor' })
-            .containedBy('main_exports', ['orks', 'surveillance', 'evil']);
+            .from('reservations')
+            .select()
+            .containedBy('during', '[2000-01-01 00:00, 2000-01-01 23:59)');
           ```
-      - id: with-delete
-        name: With `delete()`
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": 1,
+              "room_name": "Emerald",
+              "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+            }
+          ]
+          ```
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        hideCodeBlock: true
+      - id: on-jsonb-columns
+        name: On `jsonb` columns
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
-            .delete()
-            .containedBy('main_exports', ['cars', 'food', 'machine']);
+            .from('users')
+            .select('name')
+            .containedBy('address', {'postcode': 90210});
           ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_countries')
-            .containedBy('main_exports', ['cars', 'food', 'machine']);
-          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Michael', '{ "postcode": 90210, "street": "Melrose Place" }'),
+              (2, 'Jane', '{"postcode": 90210}');
+            ```
+        response: |
+          ```json
+            [
+              {
+                "name": "Jane"
+              }
+            ]
+            ```
+        hideCodeBlock: true
 
   - id: range-lt
     title: rangeLt()
+    description: |
+      Only relevant for range columns. Match only rows where every element in `column` is less than any element in `range`.
     examples:
       - id: with-select
         name: With `select()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('reservations')
+            .select()
+            .rangeLt('during', '[2000-01-01 15:00, 2000-01-01 16:00)');
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": 1,
+              "room_name": "Emerald",
+              "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+            }
+          ]
+          ```
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeLt('population_range_millions', '[150, 250]');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .update({ 'name': 'Mordor' })
-            .rangeLt('population_range_millions', '[150, 250]');
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .delete()
-            .rangeLt('population_range_millions', '[150, 250]');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_countries')
-            .rangeLt('population_range_millions', '[150, 250]');
-          ```
 
   - id: range-gt
     title: rangeGt()
+    description: |
+      Only relevant for range columns. Match only rows where every element in `column` is greater than any element in `range`.
     examples:
       - id: with-select
         name: With `select()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('reservations')
+            .select()
+            .rangeGt('during', '[2000-01-02 08:00, 2000-01-02 09:00)');
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+            [
+              {
+                "id": 2,
+                "room_name": "Topaz",
+                "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
+              }
+            ]
+            ```
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeGt('population_range_millions', '[150, 250]');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .update({ 'name': 'Mordor' })
-            .rangeGt('population_range_millions', '[150, 250]');
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .delete()
-            .rangeGt('population_range_millions', '[150, 250]');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_countries')
-            .rangeGt('population_range_millions', '[150, 250]');
-          ```
 
   - id: range-gte
     title: rangeGte()
+    description: |
+      Only relevant for range columns. Match only rows where every element in `column` is either contained in `range` or greater than any element in `range`.
     examples:
       - id: with-select
         name: With `select()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('reservations')
+            .select()
+            .rangeGte('during', '[2000-01-02 08:30, 2000-01-02 09:30)');
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+            [
+              {
+                "id": 2,
+                "room_name": "Topaz",
+                "during": "[\"2000-01-02 09:00:00\",\"2000-01-02 10:00:00\")"
+              }
+            ]
+            ```
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeGte('population_range_millions', '[150, 250]');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .update({ 'name': 'Mordor' })
-            .rangeGte('population_range_millions', '[150, 250]');
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .delete()
-            .rangeGte('population_range_millions', '[150, 250]');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_countries')
-            .rangeGte('population_range_millions', '[150, 250]');
-          ```
 
   - id: range-lte
     title: rangeLte()
-    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
+    description: |
+      Only relevant for range columns. Match only rows where every element in `column` is either contained in `range` or less than any element in `range`.
     examples:
       - id: with-select
         name: With `select()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('reservations')
+            .select()
+            .rangeLte('during', '[2000-01-01 15:00, 2000-01-01 16:00)');
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": 1,
+              "room_name": "Emerald",
+              "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+            }
+          ]
+          ```
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeLte('population_range_millions', '[150, 250]');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .update({ 'name': 'Mordor' })
-            .rangeLte('population_range_millions', '[150, 250]');
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .delete()
-            .rangeLte('population_range_millions', '[150, 250]');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_countries')
-            .rangeLte('population_range_millions', [150, 250]);
-          ```
 
   - id: range-adjacent
     title: rangeAdjacent()
+    description: |
+      Only relevant for range columns. Match only rows where `column` is mutually exclusive to `range` and there can be no element between the two ranges.
     examples:
       - id: with-select
         name: With `select()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('reservations')
+            .select()
+            .rangeAdjacent('during', '[2000-01-01 12:00, 2000-01-01 13:00)');
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": 1,
+              "room_name": "Emerald",
+              "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+            }
+          ]
+          ```
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        hideCodeBlock: true
         isSpotlight: true
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .select('name, id, population_range_millions')
-            .rangeAdjacent('population_range_millions', '[70, 185]');
-          ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .update({ 'name': 'Mordor' })
-            .rangeAdjacent('population_range_millions', '[70, 185]');
-          ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .delete()
-            .rangeAdjacent('population_range_millions', '[70, 185]');
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_countries')
-            .rangeAdjacent('population_range_millions', '[70, 185]');
-          ```
 
   - id: overlaps
     title: overlaps()
+    description: |
+      Only relevant for array and range columns. Match only rows where `column` and `value` have an element in common.
     examples:
-      - id: with-select
-        name: With `select()`
+      - id: on-array-columns
+        name: On array columns
+        code: |
+          ```dart
+          final data = await supabase
+            .from('issues')
+            .select('title')
+            .overlaps('tags', ['is:closed', 'severity:high']);
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              issues (
+                id int8 primary key,
+                title text,
+                tags text[]
+              );
+
+            insert into
+              issues (id, title, tags)
+            values
+              (1, 'Cache invalidation is not working', array['is:open', 'severity:high', 'priority:low']),
+              (2, 'Use better names', array['is:open', 'severity:low', 'priority:medium']);
+            ```
+        response: |
+          ```json
+          [
+            {
+              "title": "Cache invalidation is not working"
+            }
+          ]
+          ```
+        hideCodeBlock: true
         isSpotlight: true
+      - id: on-range-columns
+        name: On range columns
         code: |
           ```dart
           final data = await supabase
-            .from('countries')
-            .select('name, id, main_exports')
-            .overlaps('main_exports', ['computers', 'minerals']);
+            .from('reservations')
+            .select()
+            .overlaps('during', '[2000-01-01 12:45, 2000-01-01 13:15)');
           ```
-      - id: with-update
-        name: With `update()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .update({ 'name': 'Mordor' })
-            .overlaps('main_exports', ['computers', 'minerals']);
+        data:
+          sql: |
+            ```sql
+            create table
+              reservations (
+                id int8 primary key,
+                room_name text,
+                during tsrange
+              );
+
+            insert into
+              reservations (id, room_name, during)
+            values
+              (1, 'Emerald', '[2000-01-01 13:00, 2000-01-01 15:00)'),
+              (2, 'Topaz', '[2000-01-02 09:00, 2000-01-02 10:00)');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": 1,
+              "room_name": "Emerald",
+              "during": "[\"2000-01-01 13:00:00\",\"2000-01-01 15:00:00\")"
+            }
+          ]
           ```
-      - id: with-delete
-        name: With `delete()`
-        code: |
-          ```dart
-          final data = await supabase
-            .from('countries')
-            .delete()
-            .overlaps('main_exports', ['computers', 'minerals']);
-          ```
-      - id: with-rpc
-        name: With `rpc()`
-        code: |
-          ```dart
-          // Only valid if the Stored Procedure returns a table type.
-          final data = await supabase
-            .rpc('echo_all_countries')
-            .overlaps('main_exports', ['computers', 'minerals']);
-          ```
+        description: |
+          Postgres supports a number of [range
+          types](https://www.postgresql.org/docs/current/rangetypes.html). You
+          can filter on range columns using the string representation of range
+          values.
+        hideCodeBlock: true
 
   - id: text-search
     title: textSearch()
@@ -3051,12 +3645,49 @@ functions:
             .rpc('echo_all_cities')
             .filter('name', 'in', '("Paris","Tokyo")');
           ```
-      - id: filter-embedded-resources
-        name: Filter embedded resources
+      - id: on-a-referenced-table
+        name: On a referenced table
         code: |
           ```dart
           final data = await supabase
-            .from('cities')
-            .select('name, countries ( name )')
-            .filter('countries.name', 'in', '("France","Japan")');
+            .from('countries')
+            .select('name, countries!inner( name )')
+            .filter('cities.name', 'eq', 'Bali');
           ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```json
+          [
+            {
+              "name": "Indonesia",
+              "cities": [
+                {
+                  "name": "Bali"
+                }
+              ]
+            }
+          ]
+          ```
+        hideCodeBlock: true

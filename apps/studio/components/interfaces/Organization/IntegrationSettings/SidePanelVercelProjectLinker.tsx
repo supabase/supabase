@@ -128,7 +128,7 @@ const SidePanelVercelProjectLinker = () => {
       hideFooter
       onCancel={() => sidePanelStateSnapshot.setVercelConnectionsOpen(false)}
     >
-      <div className="py-10 flex flex-col gap-6 bg-background h-full">
+      <div className="py-10 flex flex-col gap-6 bg-studio h-full">
         <SidePanel.Content>
           <Markdown
             content={`
@@ -149,6 +149,7 @@ Check the details below before proceeding
             integrationIcon={VERCEL_ICON}
             getForeignProjectIcon={getForeignProjectIcon}
             choosePrompt="Choose Vercel Project"
+            mode="Vercel"
           />
           <Markdown
             content={`

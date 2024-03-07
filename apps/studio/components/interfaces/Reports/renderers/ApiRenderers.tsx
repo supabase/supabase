@@ -289,8 +289,8 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
               datum.status_code >= 400
                 ? 'bg-orange-500'
                 : datum.status_code >= 300
-                ? 'bg-yellow-500'
-                : 'bg-green-500'
+                  ? 'bg-yellow-500'
+                  : 'bg-green-500'
             }`}
             value={String(datum.status_code)}
           />

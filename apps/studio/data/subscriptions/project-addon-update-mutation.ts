@@ -2,9 +2,9 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { subscriptionKeys } from './keys'
-import { AddonVariantId, ProjectAddonType } from './types'
+import type { AddonVariantId, ProjectAddonType } from './types'
 
 export type ProjectAddonUpdateVariables = {
   projectRef: string
@@ -55,7 +55,7 @@ export const useProjectAddonUpdateMutation = ({
     {
       async onSuccess(data, variables, context) {
         const { projectRef } = variables
-        await Promise.all([queryClient.invalidateQueries(subscriptionKeys.addons(projectRef))])
+        await queryClient.invalidateQueries(subscriptionKeys.addons(projectRef))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

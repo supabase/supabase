@@ -17,7 +17,10 @@ import {
 import * as z from 'zod'
 
 import { ScaffoldDivider } from 'components/layouts/Scaffold'
-import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import type {
+  Integration,
+  IntegrationProjectConnection,
+} from 'data/integrations/integrations.types'
 import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-connection-update-mutate'
 import { useFlag, useStore } from 'hooks'
 

@@ -7,7 +7,7 @@ import { ReactNode, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useDispatch, useTrackedState } from 'components/grid/store'
-import { Filter, Sort, SupaTable } from 'components/grid/types'
+import type { Filter, Sort, SupaTable } from 'components/grid/types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { fetchAllTableRows, useTableRowsQuery } from 'data/table-rows/table-rows-query'
@@ -31,10 +31,9 @@ import {
   IconX,
   cn,
 } from 'ui'
-import RLSBannerWarning from './RLSBannerWarning'
-import RefreshButton from './RefreshButton'
-import FilterDropdown from './filter'
-import SortPopover from './sort'
+
+import { FilterPopover } from './filter'
+import { SortPopover } from './sort'
 
 // [Joshen] CSV exports require this guard as a fail-safe if the table is
 // just too large for a browser to keep all the rows in memory before
@@ -89,7 +88,6 @@ const Header = ({
         )}
         <div className="sb-grid-header__inner">{headerActions}</div>
       </div>
-      <RLSBannerWarning />
     </div>
   )
 }
@@ -122,8 +120,7 @@ const DefaultHeader = ({
   return (
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-2">
-        <RefreshButton table={table} isRefetching={isRefetching} />
-        <FilterDropdown table={table} filters={filters as string[]} setParams={setParams} />
+        <FilterPopover table={table} filters={filters as string[]} setParams={setParams} />
         <SortPopover table={table} sorts={sorts as string[]} setParams={setParams} />
       </div>
       {canAddNew && (
@@ -134,6 +131,7 @@ const DefaultHeader = ({
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button
+                    data-testid="table-editor-insert-new-row"
                     type="primary"
                     size="tiny"
                     icon={<IconChevronDown size={14} strokeWidth={1.5} />}
@@ -370,8 +368,8 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           {allRowsSelected
             ? `${totalRows} rows selected`
             : selectedRows.size > 1
-            ? `${selectedRows.size} rows selected`
-            : `${selectedRows.size} row selected`}
+              ? `${selectedRows.size} rows selected`
+              : `${selectedRows.size} row selected`}
         </span>
         {!allRowsSelected && totalRows > allRows.length && (
           <Button type="link" onClick={() => onSelectAllRows()}>
@@ -404,8 +402,8 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
                 {allRowsSelected
                   ? `Delete ${totalRows} rows`
                   : selectedRows.size > 1
-                  ? `Delete ${selectedRows.size} rows`
-                  : `Delete ${selectedRows.size} row`}
+                    ? `Delete ${selectedRows.size} rows`
+                    : `Delete ${selectedRows.size} row`}
               </Button>
             </Tooltip.Trigger>
 

@@ -60,8 +60,8 @@ functions:
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
       - By default, when the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - If sign_up() is called for an existing confirmed user:
-          - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
-          - If **Confirm email** is disabled, the error message, `User already registered` is returned.
+        - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
+        - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
       - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/python/auth-getuser).
     examples:
       - id: signup
@@ -144,7 +144,7 @@ functions:
         code: |
           ```
           data = supabase.auth.sign_in_with_otp({
-            phone: '+13334445555',
+            "phone": '+13334445555',
           })
           ```
   - id: sign-in-with-oauth
@@ -761,7 +761,7 @@ functions:
         code: |
           ```python
           data, count = supabase.table('countries')
-            .update({'name': 'Austrailia'})
+            .update({'name': 'Australia'})
             .eq('id', 1)
             .execute()
           ```
@@ -778,7 +778,7 @@ functions:
             ```
         response: |
           ```
-          APIResponse(data=[{'id': 1, 'name': 'Austrailia'}], count=None)
+          APIResponse(data=[{'id': 1, 'name': 'Australia'}], count=None)
           ```
         hideCodeBlock: true
         isSpotlight: true
@@ -792,7 +792,7 @@ functions:
         code: |
           ```python
           data, count = supabase.table('countries')
-            .upsert({'id': 1, 'name': 'Austrailia'})
+            .upsert({'id': 1, 'name': 'Australia'})
             .execute()
           ```
         data:
@@ -808,7 +808,7 @@ functions:
             ```
         response: |
           ```
-          APIResponse(data=[{'id': 1, 'name': 'Austrailia'}], count=None)
+          APIResponse(data=[{'id': 1, 'name': 'Australia'}], count=None)
           ```
         hideCodeBlock: true
         isSpotlight: true
@@ -1906,7 +1906,7 @@ functions:
         name: Error handling
         description: |
           Returns one of the following errors:
-          
+
           - `FunctionsHttpError`: if your function throws an error
           - `FunctionsRelayError`: if the Supabase Relay encounters an error processing your function
         isSpotlight: true
@@ -1933,7 +1933,7 @@ functions:
         name: Passing custom headers
         description: |
           The library accepts custom headers via the `headers` option. 
-          
+
           Note: `supabase-py` automatically populates the `Authorization` header if there is a signed in user.
         isSpotlight: true
         code: |

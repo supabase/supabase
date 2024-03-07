@@ -5,8 +5,8 @@ export default config({
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
     './app/**/*.{ts,tsx}',
-    './src/**/*.{ts,tsx}',
     '../../packages/ui/src/**/*.{tsx,ts,js}',
+    '../../packages/ui-patterns/**/*.{tsx,ts,js}',
   ],
   theme: {
     extend: {

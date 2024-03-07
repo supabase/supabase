@@ -14,9 +14,9 @@ import z from 'zod'
 import { FormActions } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
-import { Profile } from 'data/profile/types'
+import type { Profile } from 'data/profile/types'
 import { useStore } from 'hooks'
-import { FormSchema } from 'types'
+import type { FormSchema } from 'types'
 
 const FormSchema = z.object({
   first_name: z.string().optional(),
@@ -30,7 +30,7 @@ export const ProfileInformation = ({ profile }: { profile: Profile }) => {
 
   const form = useForm({
     resolver: zodResolver(FormSchema),
-    defaultValues: { first_name: profile.first_name, last_name: profile.last_name },
+    defaultValues: { first_name: profile.first_name ?? '', last_name: profile.last_name ?? '' },
   })
 
   const { mutateAsync: updateProfile, isLoading } = useProfileUpdateMutation({

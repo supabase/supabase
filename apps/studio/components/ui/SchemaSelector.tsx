@@ -1,3 +1,5 @@
+import { sortBy } from 'lodash'
+import { ChevronsUpDown } from 'lucide-react'
 import { useState } from 'react'
 import {
   AlertDescription_Shadcn_,
@@ -9,10 +11,9 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  CommandSeparator_Shadcn_,
   Command_Shadcn_,
   IconCheck,
-  IconCode,
-  IconLoader,
   IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
@@ -22,7 +23,6 @@ import {
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { sortBy } from 'lodash'
 
 interface SchemaSelectorProps {
   className?: string
@@ -70,16 +70,8 @@ const SchemaSelector = ({
   return (
     <div className={className}>
       {isSchemasLoading && (
-        <Button
-          type="outline"
-          className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
-          size={size}
-          icon={<IconLoader className="animate-spin" size={12} />}
-          disabled={!!disabled}
-        >
-          <div className="w-full flex space-x-3 py-0.5">
-            <p className="text-xs text-foreground-light">Loading schemas...</p>
-          </div>
+        <Button type="default" className="justify-start" block size={size} loading>
+          Loading schemas...
         </Button>
       )}
 
@@ -88,7 +80,7 @@ const SchemaSelector = ({
           <AlertTitle_Shadcn_ className="text-xs text-amber-900">
             Failed to load schemas
           </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_ className="text-xs mb-2">
+          <AlertDescription_Shadcn_ className="text-xs mb-2 break-words">
             Error: {schemasError?.message}
           </AlertDescription_Shadcn_>
           <Button type="default" size="tiny" onClick={() => refetchSchemas()}>
@@ -103,15 +95,16 @@ const SchemaSelector = ({
             <Button
               size={size}
               disabled={disabled}
-              type="outline"
-              className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
+              type="default"
+              // className="w-full justify-start"
+              className={`w-full [&>span]:w-full`}
               iconRight={
-                <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
+                <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
               }
             >
-              <div className="w-full flex space-x-3 py-0.5">
-                <p className="text-xs text-foreground-light">schema</p>
-                <p className="text-xs">
+              <div className="w-full flex gap-1">
+                <p className="text-foreground-lighter">schema:</p>
+                <p className="text-foreground">
                   {selectedSchemaName === '*' ? 'All schemas' : selectedSchemaName}
                 </p>
               </div>
@@ -165,22 +158,25 @@ const SchemaSelector = ({
                   </ScrollArea>
                 </CommandGroup_Shadcn_>
                 {onSelectCreateSchema !== undefined && (
-                  <CommandGroup_Shadcn_ className="border-t">
-                    <CommandItem_Shadcn_
-                      className="cursor-pointer flex items-center gap-x-2 w-full"
-                      onSelect={() => {
-                        onSelectCreateSchema()
-                        setOpen(false)
-                      }}
-                      onClick={() => {
-                        onSelectCreateSchema()
-                        setOpen(false)
-                      }}
-                    >
-                      <IconPlus />
-                      Create a new schema
-                    </CommandItem_Shadcn_>
-                  </CommandGroup_Shadcn_>
+                  <>
+                    <CommandSeparator_Shadcn_ />
+                    <CommandGroup_Shadcn_>
+                      <CommandItem_Shadcn_
+                        className="cursor-pointer flex items-center gap-x-2 w-full"
+                        onSelect={() => {
+                          onSelectCreateSchema()
+                          setOpen(false)
+                        }}
+                        onClick={() => {
+                          onSelectCreateSchema()
+                          setOpen(false)
+                        }}
+                      >
+                        <IconPlus />
+                        Create a new schema
+                      </CommandItem_Shadcn_>
+                    </CommandGroup_Shadcn_>
+                  </>
                 )}
               </CommandList_Shadcn_>
             </Command_Shadcn_>

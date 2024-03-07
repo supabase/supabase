@@ -1,7 +1,7 @@
 import { isEmpty, last } from 'lodash'
 import { useState } from 'react'
 
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 import DrilldownBreadCrumbs from './DrilldownBreadCrumbs'
 import DrilldownPane from './DrilldownPane'
 

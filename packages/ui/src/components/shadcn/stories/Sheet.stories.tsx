@@ -1,7 +1,7 @@
 import { Meta } from '@storybook/react'
-import { Button } from '@ui/components/shadcn/ui/button'
-import { Input } from '@ui/components/shadcn/ui/input'
-import { Label } from '@ui/components/shadcn/ui/label'
+import { Button } from '../ui/button'
+import { Input } from '../ui/input'
+import { Label } from '../ui/label'
 import {
   Sheet,
   SheetClose,
@@ -11,7 +11,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
-} from '@ui/components/shadcn/ui/sheet'
+} from '../ui/sheet'
 
 const meta: Meta = {
   title: 'shadcn/Sheet',

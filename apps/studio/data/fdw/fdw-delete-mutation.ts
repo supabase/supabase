@@ -1,14 +1,15 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
-import { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
+import type { WrapperMeta } from 'components/interfaces/Database/Wrappers/Wrappers.types'
 import { pgSodiumKeys } from 'data/pg-sodium-keys/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
 import { vaultSecretsKeys } from 'data/vault/keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { FDW } from './fdws-query'
+import { entityTypeKeys } from 'data/entity-types/keys'
 
 export type FDWDeleteVariables = {
   projectRef: string
@@ -72,6 +73,7 @@ export const useFDWDeleteMutation = ({
       const { projectRef } = variables
 
       await Promise.all([
+        queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
         queryClient.invalidateQueries(sqlKeys.query(projectRef, ['fdws'])),
         queryClient.invalidateQueries(pgSodiumKeys.list(projectRef)),
         queryClient.invalidateQueries(sqlKeys.query(projectRef, vaultSecretsKeys.list(projectRef))),

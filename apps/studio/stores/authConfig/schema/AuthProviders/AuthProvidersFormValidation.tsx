@@ -1016,46 +1016,6 @@ const EXTERNAL_PROVIDER_KEYCLOAK = {
   },
 }
 
-const EXTERNAL_PROVIDER_LINKEDIN = {
-  $schema: JSON_SCHEMA_VERSION,
-  type: 'object',
-  title: 'LinkedIn (Deprecated)',
-  properties: {
-    EXTERNAL_LINKEDIN_ENABLED: {
-      title: 'Linkedin (Deprecated) enabled',
-      type: 'boolean',
-    },
-    // [TODO] Update docs
-    EXTERNAL_LINKEDIN_CLIENT_ID: {
-      title: 'API Key',
-      type: 'string',
-    },
-    // [TODO] Update docs
-    EXTERNAL_LINKEDIN_SECRET: {
-      title: 'API Secret Key',
-      type: 'string',
-      isSecret: true,
-    },
-  },
-  validationSchema: object().shape({
-    EXTERNAL_LINKEDIN_ENABLED: boolean().required(),
-    EXTERNAL_LINKEDIN_CLIENT_ID: string().when('EXTERNAL_LINKEDIN_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('API Key is required'),
-      otherwise: (schema) => schema,
-    }),
-    EXTERNAL_LINKEDIN_SECRET: string().when('EXTERNAL_LINKEDIN_ENABLED', {
-      is: true,
-      then: (schema) => schema.required('API Secret Key is required'),
-      otherwise: (schema) => schema,
-    }),
-  }),
-  misc: {
-    iconKey: 'linkedin-icon',
-    requiresRedirect: true,
-  },
-}
-
 const EXTERNAL_PROVIDER_LINKEDIN_OIDC = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
@@ -1406,7 +1366,6 @@ export const PROVIDERS_SCHEMAS = [
   EXTERNAL_PROVIDER_GOOGLE,
   EXTERNAL_PROVIDER_KAKAO,
   EXTERNAL_PROVIDER_KEYCLOAK,
-  EXTERNAL_PROVIDER_LINKEDIN,
   EXTERNAL_PROVIDER_LINKEDIN_OIDC,
   EXTERNAL_PROVIDER_NOTION,
   EXTERNAL_PROVIDER_TWITCH,

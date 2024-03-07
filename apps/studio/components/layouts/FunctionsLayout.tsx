@@ -2,7 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
-import { PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 import { Button, IconCode, IconExternalLink } from 'ui'
 
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -12,7 +12,7 @@ import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useCheckPermissions, withAuth } from 'hooks'
 import FunctionsNav from '../interfaces/Functions/FunctionsNav'
-import ProjectLayout from './'
+import { ProjectLayout } from './'
 
 interface FunctionsLayoutProps {
   title?: string

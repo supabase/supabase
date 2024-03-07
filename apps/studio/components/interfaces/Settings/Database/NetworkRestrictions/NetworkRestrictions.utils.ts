@@ -1,32 +1,54 @@
 import { IPv4CidrRange, IPv6CidrRange, Validator, collapseIPv6Number } from 'ip-num'
 
-const privateIPRanges = [
+const privateIPv4Ranges = [
   IPv4CidrRange.fromCidr('10.0.0.0/8'),
   IPv4CidrRange.fromCidr('172.16.0.0/12'),
   IPv4CidrRange.fromCidr('192.168.0.0/16'),
 ]
 
+const privateIPv6Ranges = [IPv6CidrRange.fromCidr('fc00::/7')]
+
 export const isValidAddress = (address: string) => {
   // Only validating address, should not include cidr block size
   if (address.includes('/')) return false
   const [isIpv4] = Validator.isValidIPv4String(address)
-  return isIpv4
+  const [isIpv6] = Validator.isValidIPv6String(address)
+  return isIpv4 || isIpv6
 }
 
-export const checkIfPrivate = (cidr: string) => {
-  const address = IPv4CidrRange.fromCidr(`${cidr}/32`)
-  const res = privateIPRanges.map((range) => address.inside(range))
-  return res.includes(true)
+export const checkIfPrivate = (type: 'IPv4' | 'IPv6', cidr: string) => {
+  if (type === 'IPv4') {
+    const address = IPv4CidrRange.fromCidr(`${cidr}/32`)
+    const res = privateIPv4Ranges.map((range) => address.inside(range))
+    return res.includes(true)
+  } else {
+    const address = IPv6CidrRange.fromCidr(`${cidr}/128`)
+    const res = privateIPv6Ranges.map((range) => address.inside(range))
+    return res.includes(true)
+  }
 }
 
-export const getAddressEndRange = (address: string) => {
-  try {
-    const cidr = IPv4CidrRange.fromCidr(address)
-    const start = cidr.getFirst().octets.join('.')
-    const end = cidr.getLast().octets.join('.')
-    return { start, end }
-  } catch (error: any) {
-    return undefined
+const padHexadecimal = (str: string) => `${'0'.repeat(4 - str.length)}${str}`
+
+export const getAddressEndRange = (type: 'IPv4' | 'IPv6', address: string) => {
+  if (type === 'IPv4') {
+    try {
+      const cidr = IPv4CidrRange.fromCidr(address)
+      const start = cidr.getFirst().octets.join('.')
+      const end = cidr.getLast().octets.join('.')
+      return { start, end }
+    } catch (error: any) {
+      return undefined
+    }
+  } else {
+    try {
+      const cidr = IPv6CidrRange.fromCidr(address)
+      const start = cidr.getFirst().hexadecatet.toString().split(',').map(padHexadecimal).join(':')
+      const end = cidr.getLast().hexadecatet.toString().split(',').map(padHexadecimal).join(':')
+      return { start, end }
+    } catch (error: any) {
+      return undefined
+    }
   }
 }
 

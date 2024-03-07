@@ -4,7 +4,6 @@ import { IconBook, IconLifeBuoy, IconX, LoadingLine, cn } from 'ui'
 
 import { withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
-import { LayoutWrapper } from '../LayoutWrapper'
 import { ScaffoldContainer } from '../Scaffold'
 
 export type IntegrationWindowLayoutProps = {
@@ -22,11 +21,11 @@ const IntegrationWindowLayout = ({
   docsHref,
 }: PropsWithChildren<IntegrationWindowLayoutProps>) => {
   return (
-    <LayoutWrapper className="flex w-full flex-col">
+    <div className="flex w-full flex-col">
       <Header title={title} integrationIcon={integrationIcon} />
       <LoadingLine loading={loading} />
       <main className="overflow-auto flex flex-col h-full bg">{children}</main>
-      <ScaffoldContainer className="bg-background flex flex-row gap-6 py-6 border-t">
+      <ScaffoldContainer className="bg-studio flex flex-row gap-6 py-6 border-t">
         {docsHref && (
           <Link
             href={docsHref}
@@ -48,7 +47,7 @@ const IntegrationWindowLayout = ({
           Support
         </Link>
       </ScaffoldContainer>
-    </LayoutWrapper>
+    </div>
   )
 }
 

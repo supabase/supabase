@@ -1,4 +1,4 @@
-import { Button, IconArrowUpRight, IconShuffle, IconWifi, IconX, ThemeImage } from 'ui'
+import { Button, IconArrowUpRight, IconShuffle, IconWifi, IconX } from 'ui'
 import ApiExamples from 'data/products/storage/api-examples'
 import DashboardViewData from 'data/products/storage/dashboard-carousel.json'
 import StoragePermissionsData from 'data/products/storage/permissions-examples'
@@ -16,6 +16,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductIcon from '~/components/ProductIcon'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import { ThemeImage } from 'ui-patterns/ThemeImage'
 
 function StoragePage() {
   // base path for images
@@ -158,7 +159,7 @@ function StoragePage() {
           />
         </SectionContainer>
 
-        <SectionContainer className="-mb-48 pt-0">
+        <SectionContainer className="pt-0">
           <APISection
             title="Simple and convenient APIs"
             // @ts-ignore
@@ -214,12 +215,7 @@ function StoragePage() {
               <div className="section--bg border-t border-control"></div>
             </div>
             <div className="section-container pt-12 pb-0">
-              {/* <FloatingIcons /> */}
               <div className="overflow-x-hidden">
-                {/* <SectionContainer className="mb-0 pb-8">
-                <GithubExamples />
-              </SectionContainer> */}
-
                 <SectionContainer>
                   <div className="grid grid-cols-12 lg:gap-16">
                     <div className="col-span-12 mb-8 lg:col-span-5">

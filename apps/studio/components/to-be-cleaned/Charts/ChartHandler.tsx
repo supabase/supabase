@@ -1,4 +1,4 @@
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 import { isUndefined } from 'lodash'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
@@ -7,7 +7,7 @@ import { Button, IconActivity, IconAlertCircle, IconBarChart, IconLoader } from 
 import AreaChart from 'components/ui/Charts/AreaChart'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { ChartData } from './ChartHandler.types'
+import type { ChartData } from './ChartHandler.types'
 import { BarChart } from './ChartRenderer'
 
 interface ChartHandlerProps {
@@ -111,12 +111,12 @@ const ChartHandler = ({
   highlightedValue = highlightedValue
     ? highlightedValue
     : provider === 'daily-stats' && !attribute.includes('ingress') && !attribute.includes('egress')
-    ? chartData?.maximum
-    : provider === 'daily-stats'
-    ? chartData?.total
-    : provider === 'log-stats'
-    ? chartData?.totalGrouped?.[attribute]
-    : chartData?.data[chartData?.data.length - 1]?.[attribute]
+      ? chartData?.maximum
+      : provider === 'daily-stats'
+        ? chartData?.total
+        : provider === 'log-stats'
+          ? chartData?.totalGrouped?.[attribute]
+          : chartData?.data[chartData?.data.length - 1]?.[attribute]
 
   if (loading) {
     return (

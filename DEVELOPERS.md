@@ -71,7 +71,13 @@ To contribute code to [Supabase](https://supabase.com), you must fork the [Supab
    npm install # install dependencies
    ```
 
-2. After that you can run the apps simultaneously with the following.
+2. Copy the example `.env.local.example` to `.env.local`
+
+   ```sh
+   cp apps/www/.env.local.example apps/www/.env.local
+   ```
+
+3. After that you can run the apps simultaneously with the following.
    ```sh
    npm run dev # start all the applications
    ```
@@ -91,6 +97,8 @@ You can run any of the sites individually by using the scope name. For example:
 ```sh
 npm run dev:www
 ```
+
+Note: Particularly for `www` make sure you have copied `apps/www/.env.local.example` to `apps/www/.env.local`
 
 #### Shared components
 

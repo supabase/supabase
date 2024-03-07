@@ -4,8 +4,8 @@ import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 import { devtools, proxySet } from 'valtio/utils'
 
 import { upsertContent, UpsertContentPayload } from 'data/content/content-upsert-mutation'
-import { SqlSnippet } from 'data/content/sql-snippets-query'
-import { SqlSnippets } from 'types'
+import type { SqlSnippet } from 'data/content/sql-snippets-query'
+import type { SqlSnippets } from 'types'
 
 export type StateSnippet = {
   snippet: SqlSnippet
@@ -139,6 +139,11 @@ export const sqlEditorState = proxy({
   },
   addNeedsSaving: (id: string) => {
     sqlEditorState.needsSaving.add(id)
+  },
+  resetResult: (id: string) => {
+    if (sqlEditorState.results[id]) {
+      sqlEditorState.results[id] = []
+    }
   },
   addResult: (id: string, results: any[]) => {
     if (sqlEditorState.results[id]) {

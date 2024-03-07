@@ -3,22 +3,28 @@ import { Alert, Button, Modal } from 'ui'
 
 import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
 import { useStore } from 'hooks'
+import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
 
 interface RemoveRestrictionModalProps {
   visible: boolean
-  restrictedIps: string[]
   selectedRestriction?: string
   onClose: () => void
 }
 
 const RemoveRestrictionModal = ({
   visible,
-  restrictedIps,
   selectedRestriction,
   onClose,
 }: RemoveRestrictionModalProps) => {
   const { ui } = useStore()
   const { ref } = useParams()
+
+  const { data } = useNetworkRestrictionsQuery({ projectRef: ref })
+  const ipv4Restrictions = data?.config?.dbAllowedCidrs ?? []
+  // @ts-ignore [Joshen] API typing issue
+  const ipv6Restrictions: string[] = data?.config?.dbAllowedCidrsV6 ?? []
+  const restrictedIps = ipv4Restrictions.concat(ipv6Restrictions)
+
   const { mutate: applyNetworkRestrictions, isLoading: isApplying } =
     useNetworkRestrictionsApplyMutation({
       onSuccess: () => onClose(),
@@ -35,13 +41,23 @@ const RemoveRestrictionModal = ({
 
   const onSubmit = async () => {
     if (!ref) return console.error('Project ref is required')
+    if (!selectedRestriction) return console.error('Missing selected restriction')
 
-    const dbAllowedCidrs = restrictedIps.filter((ip) => ip !== selectedRestriction)
+    const dbAllowedCidrs = ipv4Restrictions.includes(selectedRestriction)
+      ? ipv4Restrictions.filter((ip) => ip !== selectedRestriction)
+      : ipv4Restrictions
+    const dbAllowedCidrsV6 = ipv6Restrictions.includes(selectedRestriction)
+      ? ipv6Restrictions.filter((ip) => ip !== selectedRestriction)
+      : ipv6Restrictions
 
-    if (dbAllowedCidrs.length === 0) {
-      applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs: ['0.0.0.0/0'] })
+    if (dbAllowedCidrs.length === 0 && dbAllowedCidrsV6.length === 0) {
+      applyNetworkRestrictions({
+        projectRef: ref,
+        dbAllowedCidrs: ['0.0.0.0/0'],
+        dbAllowedCidrsV6: ['::/0'],
+      })
     } else {
-      applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs })
+      applyNetworkRestrictions({ projectRef: ref, dbAllowedCidrs, dbAllowedCidrsV6 })
     }
   }
 

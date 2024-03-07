@@ -305,8 +305,8 @@ export default function LW7Releases() {
                                 i === 2 && isTablet
                                   ? aiImageMobileVariant
                                   : i !== 0
-                                  ? opacityVariant
-                                  : undefined
+                                    ? opacityVariant
+                                    : undefined
                               }
                             >
                               <Image

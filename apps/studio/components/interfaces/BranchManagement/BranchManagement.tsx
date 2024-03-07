@@ -1,5 +1,6 @@
 import { useParams } from 'common'
 import { partition } from 'lodash'
+import { MessageCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -11,20 +12,18 @@ import {
   IconAlertTriangle,
   IconExternalLink,
   IconGitHub,
-  IconSearch,
-  Input,
   Modal,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
 import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useGithubPullRequestsQuery } from 'data/integrations/integrations-github-pull-requests-query'
-import { useOrgIntegrationsQuery } from 'data/integrations/integrations-query-org-only'
+import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import { useGitHubPullRequestsQuery } from 'data/integrations/github-pull-requests-query'
 import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
 import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
 import CreateBranchModal from './CreateBranchModal'
@@ -54,12 +53,14 @@ const BranchManagement = () => {
   const [selectedBranchToDelete, setSelectedBranchToDelete] = useState<Branch>()
 
   const {
-    data: integrations,
-    error: integrationsError,
-    isLoading: isLoadingIntegrations,
-    isError: isErrorIntegrations,
-    isSuccess: isSuccessIntegrations,
-  } = useOrgIntegrationsQuery({ orgSlug: selectedOrg?.slug })
+    data: connections,
+    error: connectionsError,
+    isLoading: isLoadingConnections,
+    isSuccess: isSuccessConnections,
+    isError: isErrorConnections,
+  } = useGitHubConnectionsQuery({
+    organizationId: selectedOrg?.id,
+  })
 
   const {
     data: branches,
@@ -67,7 +68,25 @@ const BranchManagement = () => {
     isLoading: isLoadingBranches,
     isError: isErrorBranches,
     isSuccess: isSuccessBranches,
-  } = useBranchesQuery({ projectRef })
+  } = useBranchesQuery(
+    { projectRef },
+    {
+      refetchInterval(data) {
+        if (
+          data?.some(
+            (branch) =>
+              branch.status === 'CREATING_PROJECT' ||
+              branch.status === 'RUNNING_MIGRATIONS' ||
+              branch.status === 'MIGRATIONS_FAILED'
+          )
+        ) {
+          return 1000 * 3 // 3 seconds
+        }
+
+        return false
+      },
+    }
+  )
   const [[mainBranch], previewBranchesUnsorted] = partition(branches, (branch) => branch.is_default)
   const previewBranches = previewBranchesUnsorted.sort((a, b) =>
     new Date(a.updated_at) < new Date(b.updated_at) ? 1 : -1
@@ -78,16 +97,8 @@ const BranchManagement = () => {
       ? (branchesWithPRs.map((branch) => branch.pr_number).filter(Boolean) as number[])
       : undefined
 
-  const githubIntegration = integrations?.find(
-    (integration) =>
-      integration.integration.name === 'GitHub' &&
-      integration.organization.slug === selectedOrg?.slug
-  )
-  const githubConnection = githubIntegration?.connections?.find(
-    (connection) => connection.supabase_project_ref === projectRef
-  )
-  const repo = githubConnection?.metadata.name ?? ''
-  const [repoOwner, repoName] = githubConnection?.metadata.name.split('/') || []
+  const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
+  const repo = githubConnection?.repository.name ?? ''
 
   const {
     data: allPullRequests,
@@ -95,17 +106,15 @@ const BranchManagement = () => {
     isLoading: isLoadingPullRequests,
     isError: isErrorPullRequests,
     isSuccess: isSuccessPullRequests,
-  } = useGithubPullRequestsQuery({
-    organizationIntegrationId: githubIntegration?.id,
-    repoOwner,
-    repoName,
+  } = useGitHubPullRequestsQuery({
+    connectionId: githubConnection?.id,
     prNumbers,
   })
   const pullRequests = allPullRequests ?? []
 
-  const isError = isErrorIntegrations || isErrorBranches
-  const isLoading = isLoadingIntegrations || isLoadingBranches
-  const isSuccess = isSuccessIntegrations && isSuccessBranches
+  const isError = isErrorConnections || isErrorBranches
+  const isLoading = isLoadingConnections || isLoadingBranches
+  const isSuccess = isSuccessConnections && isSuccessBranches
 
   const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
     onSuccess: () => {
@@ -137,8 +146,8 @@ const BranchManagement = () => {
     if (githubConnection === undefined) return 'https://github.com'
 
     return branch !== undefined
-      ? `https://github.com/${githubConnection.metadata.name}/compare/${mainBranch?.git_branch}...${branch}`
-      : `https://github.com/${githubConnection.metadata.name}/compare`
+      ? `https://github.com/${githubConnection.repository.name}/compare/${mainBranch?.git_branch}...${branch}`
+      : `https://github.com/${githubConnection.repository.name}/compare`
   }
 
   const onConfirmDeleteBranch = () => {
@@ -164,44 +173,45 @@ const BranchManagement = () => {
 
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center">
-                    <Button
-                      type="default"
-                      className={`rounded-r-none transition hover:opacity-90 ${
-                        view === 'overview' ? 'opacity-100' : 'opacity-60'
-                      }`}
-                      onClick={() => setView('overview')}
-                    >
-                      Overview
-                    </Button>
-                    <Button
-                      type="default"
-                      className={`rounded-none transition hover:opacity-90 ${
-                        view === 'prs' ? 'opacity-100' : 'opacity-60'
-                      }`}
-                      onClick={() => setView('prs')}
-                    >
-                      Pull requests
-                    </Button>
-                    <Button
-                      type="default"
-                      className={`rounded-l-none transition hover:opacity-90 ${
-                        view === 'branches' ? 'opacity-100' : 'opacity-60'
-                      }`}
-                      onClick={() => setView('branches')}
-                    >
-                      All branches
-                    </Button>
-                  </div>
-                  <Input
-                    size="tiny"
-                    className="w-64"
-                    placeholder="Search"
-                    icon={<IconSearch size={14} strokeWidth={2} />}
-                  />
+                <div className="flex items-center -space-x-px">
+                  <Button
+                    type="default"
+                    className={`rounded-r-none transition hover:opacity-90 ${
+                      view === 'overview' ? 'opacity-100' : 'opacity-60'
+                    }`}
+                    onClick={() => setView('overview')}
+                  >
+                    Overview
+                  </Button>
+                  <Button
+                    type="default"
+                    className={`rounded-none transition hover:opacity-90 ${
+                      view === 'prs' ? 'opacity-100' : 'opacity-60'
+                    }`}
+                    onClick={() => setView('prs')}
+                  >
+                    Pull requests
+                  </Button>
+                  <Button
+                    type="default"
+                    className={`rounded-l-none transition hover:opacity-90 ${
+                      view === 'branches' ? 'opacity-100' : 'opacity-60'
+                    }`}
+                    onClick={() => setView('branches')}
+                  >
+                    All branches
+                  </Button>
                 </div>
                 <div className="flex items-center justify-between space-x-2">
+                  <Button
+                    type={'text'}
+                    icon={<MessageCircle className="text-muted" size={14} strokeWidth={1} />}
+                    asChild
+                  >
+                    <a href="https://github.com/orgs/supabase/discussions/18937" target="_blank">
+                      Branching Feedback
+                    </a>
+                  </Button>
                   <Button type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                     <Link
                       target="_blank"
@@ -217,14 +227,14 @@ const BranchManagement = () => {
                 </div>
               </div>
 
-              {isErrorIntegrations && (
+              {isErrorConnections && (
                 <AlertError
-                  error={integrationsError}
+                  error={connectionsError}
                   subject="Failed to retrieve GitHub integration connection"
                 />
               )}
 
-              {isSuccessIntegrations && (
+              {isSuccessConnections && (
                 <div className="border rounded-lg px-6 py-2 flex items-center justify-between">
                   <div className="flex items-center gap-x-4">
                     <div className="w-8 h-8 bg-scale-300 border rounded-md flex items-center justify-center">
@@ -357,7 +367,7 @@ const BranchManagement = () => {
       </ScaffoldContainer>
 
       <TextConfirmModal
-        size="medium"
+        variant={'warning'}
         visible={selectedBranchToDelete !== undefined}
         onCancel={() => setSelectedBranchToDelete(undefined)}
         onConfirm={() => onConfirmDeleteBranch()}
@@ -366,8 +376,13 @@ const BranchManagement = () => {
         confirmLabel="Delete branch"
         confirmPlaceholder="Type in name of branch"
         confirmString={selectedBranchToDelete?.name ?? ''}
-        text={`This will delete your database preview branch "${selectedBranchToDelete?.name}"`}
-        alert="You cannot recover this branch once it is deleted!"
+        alert={{ title: 'You cannot recover this branch once deleted' }}
+        text={
+          <>
+            This will delete your database preview branch
+            <span className="text-bold text-foreground">{selectedBranchToDelete?.name}</span>.
+          </>
+        }
       />
 
       <ConfirmationModal

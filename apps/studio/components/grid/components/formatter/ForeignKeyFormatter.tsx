@@ -1,13 +1,14 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import Link from 'next/link'
-import { PropsWithChildren } from 'react'
-import { RenderCellProps } from 'react-data-grid'
+import type { PropsWithChildren } from 'react'
+import type { RenderCellProps } from 'react-data-grid'
 import { Button, IconArrowRight } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableQuery } from 'data/tables/table-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { SupaRow } from '../../types'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import type { SupaRow } from '../../types'
 import { NullValue } from '../common'
 
 interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
@@ -17,6 +18,8 @@ interface Props extends PropsWithChildren<RenderCellProps<SupaRow, unknown>> {
 
 export const ForeignKeyFormatter = (props: Props) => {
   const { project } = useProjectContext()
+  const snap = useTableEditorStateSnapshot()
+
   const { projectRef, tableId, row, column } = props
   const id = tableId ? Number(tableId) : undefined
 
@@ -62,6 +65,7 @@ export const ForeignKeyFormatter = (props: Props) => {
             >
               <Link
                 href={`/project/${projectRef}/editor/${targetTable?.id}?filter=${relationship?.target_column_name}%3Aeq%3A${value}`}
+                onClick={() => snap.setSelectedSchemaName(relationship.target_table_schema)}
               >
                 <IconArrowRight size="tiny" />
               </Link>

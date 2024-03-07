@@ -1,6 +1,5 @@
 import React from 'react'
 import Link from 'next/link'
-import ReactTooltip from 'react-tooltip'
 import Telemetry from '~/lib/telemetry'
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import { useRouter } from 'next/router'
@@ -86,13 +85,6 @@ const HeroFrameworks = ({ className }: { className?: string }) => {
             </svg>
           </Link>
         ))}
-        <ReactTooltip
-          effect={'solid'}
-          place="bottom"
-          backgroundColor="#2e2e2e"
-          textColor="white"
-          className="!py-2 !px-4"
-        />
       </div>
     </div>
   )
