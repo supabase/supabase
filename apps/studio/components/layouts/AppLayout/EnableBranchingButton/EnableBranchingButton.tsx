@@ -1,10 +1,9 @@
 import { Button, IconGitBranch } from 'ui'
 
-import { useSelectedOrganization } from 'hooks'
-import BranchingWaitlistPopover from './BranchingWaitlistPopover'
-
+import { useFlag, useSelectedOrganization } from 'hooks'
 import { OPT_IN_TAGS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
+import BranchingWaitListPopover from './BranchingWaitListPopover'
 
 interface EnableBranchingButtonProps {
   isNewNav?: boolean
@@ -14,11 +13,10 @@ const EnableBranchingButton = ({ isNewNav = false }: EnableBranchingButtonProps)
   const snap = useAppStateSnapshot()
   const selectedOrg = useSelectedOrganization()
 
-  const hasAccessToBranching =
-    selectedOrg?.opt_in_tags?.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) ?? false
+  const hasAccessToBranching = useFlag<boolean>('branchManagement')
 
   if (!hasAccessToBranching) {
-    return <BranchingWaitlistPopover isNewNav={isNewNav} />
+    return <BranchingWaitListPopover isNewNav={isNewNav} />
   }
 
   return (

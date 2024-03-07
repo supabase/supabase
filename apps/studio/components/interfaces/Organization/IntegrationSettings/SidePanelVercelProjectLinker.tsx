@@ -149,6 +149,7 @@ Check the details below before proceeding
             integrationIcon={VERCEL_ICON}
             getForeignProjectIcon={getForeignProjectIcon}
             choosePrompt="Choose Vercel Project"
+            mode="Vercel"
           />
           <Markdown
             content={`

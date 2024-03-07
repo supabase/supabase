@@ -56,6 +56,20 @@ final supabase = Supabase.instance.client;
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val supabase = createSupabaseClient(
+    "https://<project>.supabase.co",
+    "<your-anon-key>"
+) {
+    install(Realtime) {
+        eventsPerSecond = 2
+    }
+}
+```
+
+</TabPanel>
 </Tabs>
 
 ## Default client throttling
