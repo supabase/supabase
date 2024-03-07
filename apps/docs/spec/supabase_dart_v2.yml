@@ -145,7 +145,7 @@ functions:
       - name: captchaToken
         isOptional: true
         type: String
-        description: The captcha token to be used for [captcha verification](/docs/guides/auth/auth-captcha).
+        description: The captcha token to be used for captcha verification.
       - name: channel
         isOptional: true
         type: OtpChannel
@@ -212,7 +212,7 @@ functions:
       - name: captchaToken
         isOptional: true
         type: String
-        description: The captcha token to be used for [captcha verification](/docs/guides/auth/auth-captcha).
+        description: The captcha token to be used for captcha verification.
     examples:
       - id: sign-in-with-email-and-password
         name: Sign in with email and password
@@ -269,8 +269,8 @@ functions:
       - name: captchaToken
         isOptional: true
         type: String
-        description: The captcha token to be used for [captcha verification](/docs/guides/auth/auth-captcha).
-      - name: captcchannelhaToken
+        description: The captcha token to be used for captcha verification.
+      - name: channel
         isOptional: true
         type: OtpChannel
         description: Messaging channel to use (e.g. whatsapp or sms). Defaults to `OtpChannel.sms`.
@@ -332,7 +332,7 @@ functions:
       - name: captchaToken
         isOptional: true
         type: String
-        description: The captcha token to be used for [captcha verification](/docs/guides/auth/auth-captcha).
+        description: The captcha token to be used for captcha verification.
     examples:
       - id: sign-in-with-google
         name: Native Google sign in
@@ -504,7 +504,7 @@ functions:
       - name: captchaToken
         isOptional: true
         type: String
-        description: The captcha token to be used for [captcha verification](/docs/guides/auth/auth-captcha).
+        description: The captcha token to be used for captcha verification.
       - name: launchMode
         isOptional: true
         type: LaunchMode
