@@ -7,37 +7,23 @@ import {
   Label_Shadcn_,
   cn,
 } from 'ui'
-import { FormItem } from 'ui/src/components/shadcn/ui/form'
 import { SIZE } from 'ui/src/lib/constants'
-
-export type FormLayoutProps = {
-  description?: string | React.ReactNode | undefined
-  label?: string | React.ReactNode
-  afterLabel?: string | React.ReactNode
-  beforeLabel?: string | React.ReactNode
-  labelOptional?: string | React.ReactNode
-  layout?: 'horizontal' | 'vertical' | 'flex'
-  isReactForm?: boolean
-  hideMessage?: boolean
-}
 
 type Props = {
   align?: 'left' | 'right'
-  descriptionText?: string | React.ReactNode
+  description?: string | React.ReactNode
   error?: string | React.ReactNode
   label?: string | React.ReactNode
   labelOptional?: string | React.ReactNode
   layout?: 'horizontal' | 'vertical' | 'flex'
-  // flex?: boolean
-  responsive?: boolean
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
   beforeLabel?: string | React.ReactNode
   afterLabel?: string | React.ReactNode
   nonBoxInput?: boolean
   labelLayout?: 'horizontal' | 'vertical'
   isReactForm?: boolean
-  name?: string
   hideMessage?: boolean
+  name?: string
 }
 
 const ContainerVariants = cva('grid gap-2', {
@@ -272,15 +258,13 @@ export const FormLayout = React.forwardRef<
     {
       align = 'left',
       className,
-      descriptionText,
+      description,
       id,
       label,
       labelOptional,
       layout = 'vertical',
       style,
-      // flex = false,
       labelLayout,
-      responsive = true,
       size = 'medium',
       beforeLabel,
       afterLabel,
@@ -300,20 +284,20 @@ export const FormLayout = React.forwardRef<
     console.log('layout', layout)
 
     const renderDescription =
-      descriptionText && isReactForm ? (
+      description && isReactForm ? (
         <FormDescription_Shadcn_
           className={cn(DescriptionVariants({ size, layout }))}
           data-formlayout-id={'description'}
           id={id + '-description'}
         >
-          {descriptionText}
+          {description}
         </FormDescription_Shadcn_>
       ) : (
         <p
           className={cn(DescriptionVariants({ size, layout }), 'text-sm text-foreground-light')}
           data-formlayout-id={'description'}
         >
-          {descriptionText}
+          {description}
         </p>
       )
 
