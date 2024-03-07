@@ -177,7 +177,7 @@ const TableEditor = ({
 
       if (isEmpty(errors)) {
         const payload = {
-          name: tableFields.name,
+          name: tableFields.name.trim(),
           schema: snap.selectedSchemaName,
           comment: tableFields.comment,
           ...(!isNewRecord && { rls_enabled: tableFields.isRLSEnabled }),
