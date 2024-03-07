@@ -1,8 +1,7 @@
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import type { BranchData } from 'data/branches/branch-query'
 import type { Branch } from 'data/branches/branches-query'
-import { ClockIcon } from 'lucide-react'
 import { Badge_Shadcn_ } from 'ui'
+import { StatusIcon } from 'ui-patterns/Icons/StatusIcons'
 
 type Status = Branch['status'] | BranchData['status']
 
@@ -53,8 +52,9 @@ const BranchStatusBadge = ({ status }: BranchStatusBadgeProps) => {
 
   return (
     <Badge_Shadcn_ variant={isUnhealthy ? 'destructive' : 'default'} className="gap-1.5">
-      {isUnhealthy && <WarningIcon className="w-3.5 h-3.5 rounded-full bg-destructive-600" />}
-      {isWaiting && <ClockIcon size={12} />}
+      {(isUnhealthy || isWaiting) && (
+        <StatusIcon variant={isUnhealthy ? 'destructive' : 'default'} hideBackground />
+      )}
       {STATUS_TO_LABEL[status]}
     </Badge_Shadcn_>
   )
