@@ -17,6 +17,7 @@ import type {
 import { flattenSections } from '../../lib/helpers'
 import commonSections from '../../spec/common-client-libs-sections.json'
 
+// Maps to 'products' within the common client library spec
 const REF_IDS = ['Database', 'Auth', 'Edge Functions', 'Realtime', 'Storage']
 
 const slugify = (s: string) => s.replace(/\s+/g, '_')
@@ -64,6 +65,10 @@ const mapRecursive = <RecKey extends string | number | symbol, Input extends obj
       : mapFn(elem)
   )
 
+/**
+ * Annotates the sections from the common client library spec with a `libraries` key,
+ * which contains an array of libraries that actually include the function.
+ */
 const annotateWithLibraries =
   (clientLibraries: Array<{ id: MenuId; spec: any }>) => (section: ICommonSection) => {
     const libraries = [] as Array<string>
@@ -79,6 +84,19 @@ const annotateWithLibraries =
     }
   }
 
+/**
+ * Pregenerates JSON files containing the API nav items, separated by product
+ * (Database, Auth, etc.)
+ *
+ * Many spec files need to be loaded to generate these nav items. Doing this
+ * prebuild decreases the amount of JSON that needs to be sent to the client.
+ * If/when we migrate to App Router, this can be done at build time again.
+ *
+ * Why doesn't putting this in getStaticProps work? Because it will be included
+ * in the page chunk for _every_ page, and we design our ref pages to be a
+ * collection of many pages masquerading as one page, so the same data is sent
+ * over and over and over.
+ */
 const main = async () => {
   mkdirSync(join(__dirname, 'generated'), {
     recursive: true,
