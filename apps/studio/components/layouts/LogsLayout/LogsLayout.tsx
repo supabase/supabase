@@ -1,10 +1,16 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import { PropsWithChildren, useEffect } from 'react'
 
 import NoPermission from 'components/ui/NoPermission'
 import { ProductMenu } from 'components/ui/ProductMenu'
-import { useCheckPermissions, useIsFeatureEnabled, useSelectedProject, withAuth } from 'hooks'
+import {
+  useCheckPermissions,
+  useFlag,
+  useIsFeatureEnabled,
+  useSelectedProject,
+  withAuth,
+} from 'hooks'
 import { ProjectLayout } from '../'
 import { generateLogsMenu } from './LogsMenu.utils'
 import { useCollectionsQuery } from 'data/collections/collections-query'
@@ -12,6 +18,9 @@ import { Menu } from 'ui'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { CreateDataWarehouseTableModal } from 'components/interfaces/DataWarehouse/CreateDataWarehouseTable'
 import { DatawarehouseMenuItem } from 'components/interfaces/DataWarehouse/DataWarehouseMenuItem'
+import { get } from 'data/fetchers'
+import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
+import { useWarehouseTenantQuery } from 'data/analytics/warehouse-tenant-query'
 interface LogsLayoutProps {
   title?: string
 }
@@ -27,12 +36,18 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
     realtimeAll: realtimeEnabled,
   } = useIsFeatureEnabled(['project_storage:all', 'project_auth:all', 'realtime:all'])
 
+  const showWarehouse = useFlag('warehouse')
   const project = useSelectedProject()
   const projectRef = project?.ref || 'default'
 
-  const { data: collections, isLoading: collectionsLoading } = useCollectionsQuery({
+  const { data: _collections, isLoading: _collectionsLoading } = useCollectionsQuery({
     projectRef,
   })
+
+  const { data: tenant } = useWarehouseTenantQuery({ projectRef })
+  const { data: collections, isLoading: collectionsLoading } = useWarehouseCollectionsQuery({
+    projectRef: !tenant ? 'undefined' : projectRef,
+  }, {enabled: !!tenant})
 
   const canUseLogsExplorer = useCheckPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
 
@@ -60,31 +75,34 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
               realtime: realtimeEnabled,
             })}
           />
-
-          <div className="h-px w-full bg-overlay"></div>
-          <div className="py-6">
-            <div className="px-6">
-              <Menu.Group title="Data Warehouse" />
-            </div>
-            <div className="px-3 flex flex-col  editor-product-menu">
-              <div className="space-y-1">
-                <CreateDataWarehouseTableModal />
-                <div className="py-3">
-                  {collectionsLoading ? (
-                    <div className="py-3 px-3 space-y-1.5">
-                      <ShimmeringLoader />
-                      <ShimmeringLoader className="w-3/4" />
-                      <ShimmeringLoader className="w-3/4" />
+          {showWarehouse && (
+            <>
+              <div className="h-px w-full bg-overlay"></div>
+              <div className="py-6">
+                <div className="px-6">
+                  <Menu.Group title="Data Warehouse" />
+                </div>
+                <div className="px-3 flex flex-col  editor-product-menu">
+                  <div className="space-y-1">
+                    <CreateDataWarehouseTableModal />
+                    <div className="py-3">
+                      {collectionsLoading ? (
+                        <div className="py-3 px-3 space-y-1.5">
+                          <ShimmeringLoader />
+                          <ShimmeringLoader className="w-3/4" />
+                          <ShimmeringLoader className="w-3/4" />
+                        </div>
+                      ) : (
+                        collections?.map((item) => (
+                          <DatawarehouseMenuItem item={item} key={item.id + '-collection-item'} />
+                        ))
+                      )}
                     </div>
-                  ) : (
-                    collections?.map((item) => (
-                      <DatawarehouseMenuItem item={item} key={item.id + '-collection-item'} />
-                    ))
-                  )}
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
+            </>
+          )}
         </>
       }
     >
