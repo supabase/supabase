@@ -8,7 +8,7 @@ import React, {
 } from 'react'
 import { Button, Input_Shadcn_, cn } from 'ui'
 import styleHandler from 'ui/src/lib/theme/styleHandler'
-import InputIconContainer from '../forms/layout/InputIconContainer'
+import InputIconContainer from '../form/Layout/InputIconContainer'
 
 export const HIDDEN_PLACEHOLDER = '**** **** **** ****'
 

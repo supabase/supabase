@@ -5,29 +5,23 @@ import {
   Form_Shadcn_ as Form,
   FormControl_Shadcn_ as FormControl,
   FormField_Shadcn_ as FormField,
+  RadioGroup_Shadcn_ as RadioGroup,
+  RadioGroupItem_Shadcn_ as RadioGroupItem,
   Select_Shadcn_ as Select,
-  // Input_Shadcn_ as Input,
   SelectContent_Shadcn_ as SelectContent,
   SelectItem_Shadcn_ as SelectItem,
   SelectTrigger_Shadcn_ as SelectTrigger,
   SelectValue_Shadcn_ as SelectValue,
-  FormItem_Shadcn_ as FormItem,
-  FormLabel_Shadcn_ as FormLabel,
-  FormDescription_Shadcn_ as FormDescription,
   Switch,
-  RadioGroup_Shadcn_ as RadioGroup,
-  RadioGroupItem_Shadcn_ as RadioGroupItem,
-  Tooltip_Shadcn_ as Tooltip,
 } from 'ui'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Box, FileWarning } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
+import { Input } from '../DataInputs/Input'
 import { InfoTooltip } from '../InfoTooltip/InfoTooltip'
-import { Input } from '../data-inputs/Input'
-import { FormItemLayout } from './FormLayout/FormItemLayout'
-import { FormMessage } from 'ui/src/components/shadcn/ui/form'
+import { FormItemLayout } from './FormItemLayout/FormItemLayout'
 
 // import { Header } from './Header'
 
@@ -352,16 +346,6 @@ export const Page = () => {
           )}
         />
 
-        {/* <FormFieldInput
-          control={form.control}
-          name="username"
-          label="Username"
-          layout="horizontal"
-          description="What we call you"
-          labelOptional="Optional"
-          icon={<User2 strokeWidth={1.5} size={16} className="text-foreground-muted" />}
-        /> */}
-
         <div role="separator" className="h-px bg-border-muted w-full" />
         <div className="flex flex-row w-full justify-end">
           <Button htmlType="submit">Submit</Button>
@@ -369,21 +353,4 @@ export const Page = () => {
       </form>
     </Form>
   )
-}
-
-{
-  /* <FormField
-          control={form.control}
-          name="username"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <FormControl>
-                <Input placeholder="mildtomato" {...field} />
-              </FormControl>
-              <FormDescription>This is your public display name.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        /> */
 }

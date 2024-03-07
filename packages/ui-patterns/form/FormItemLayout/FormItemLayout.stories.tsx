@@ -21,7 +21,7 @@ import {
 import { z } from 'zod'
 import { transformSourceForm } from '../../lib/transformSource'
 import { FormItemLayout } from './FormItemLayout'
-import { Input } from '../../data-inputs/Input'
+import { Input } from '../../DataInputs/Input'
 import { Calendar as CalendarIcon } from 'lucide-react'
 import { format } from 'date-fns'
 
@@ -51,8 +51,6 @@ export default {
   // More on argTypes: https://storybook.js.org/docs/api/argtypes
   // argTypes: {},
 }
-
-// export default meta
 
 type Story = StoryObj<typeof FormItemLayout>
 
