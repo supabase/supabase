@@ -146,8 +146,8 @@ WHERE rolname = 'zapier';
 ### Global Logging
 
 <Admonition type="caution">
-  Use global logging sparingly as it can generate millions of logs per hour. 
-  Consider alternatives first.
+  Use global logging sparingly as it can generate millions of logs per hour. Consider alternatives
+  first.
 </Admonition>
 
 The below SQL configures pgaudit to record all events associated with the "postgres" role. Since postgres has extensive privileges, this effectively monitors all database activity.
@@ -245,10 +245,10 @@ pgaudit was designed for storing logs as CSV files with the following headers:
 A log made from the following create statement:
 
 ```sql
-CREATE TABLE account (
-  id INT PRIMARY KEY,
-  name TEXT,
-  description TEXT
+create table account (
+  id int primary key,
+  name text,
+  description text
 );
 ```
 
@@ -284,7 +284,8 @@ limit 100;
 ### Monitoring API events
 
 <Admonition type="note">
-  API requests are already recorded in the [API Edge Network](https://supabase.com/dashboard/project/_/logs/edge-logs) logs.
+  API requests are already recorded in the [API Edge
+  Network](https://supabase.com/dashboard/project/_/logs/edge-logs) logs.
 </Admonition>
 
 Some users may feel compelled to monitor all write initiated by the API roles:
@@ -327,7 +328,7 @@ SELECT cron.schedule(
 );
 ```
 
-### Monitoring access to the `auth.users` table
+### Monitoring the `auth.users` Table
 
 In the worst case scenario, where a privileged roles' password ia exposed, you can use pgaudit to monitor if the `auth.user` table was targeted. It should be stated that API requests are already monitored in the [API Edge Network](https://supabase.com/dashboard/project/_/logs/edge-logs) and this is more about providing greater clarity about what is happening at the database level.
 
