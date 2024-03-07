@@ -123,7 +123,7 @@ There are some cases where you may want to monitor a database user's actions. Fo
 CREATE USER zapier WITH PASSWORD '<new password>';
 ```
 
-To ensure reliability, you may want to log all actions initiated by `zapier`. That can be done with the following command:
+You may want to log all actions initiated by `zapier`, which can be done with the following command:
 
 ```sql
 ALTER ROLE zapier SET pgaudit.log TO 'all';
