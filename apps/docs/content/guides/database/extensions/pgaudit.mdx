@@ -175,7 +175,7 @@ ALTER ROLE postgres SET pgaudit.log TO 'none';
 
 ## Object Mode Settings
 
-With object mode, you assign database users to the `pgaudit.role` variable. Whatever the users could hypothetically do, pgaudit will log.
+With object mode, you assign database users to the `pgaudit.role` variable to log out events that the users perform.
 
 For re-emphasis: when you assign a role to pgaudit, it logs any actions that role is _capable_ of performing, regardless of who or what actually initiated the event.
 
