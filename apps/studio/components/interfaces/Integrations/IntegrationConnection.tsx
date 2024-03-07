@@ -23,7 +23,7 @@ import {
   IntegrationConnection,
   IntegrationConnectionProps,
 } from 'components/interfaces/Integrations/IntegrationPanels'
-import { WarningIcon } from 'components/ui/Icons'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'

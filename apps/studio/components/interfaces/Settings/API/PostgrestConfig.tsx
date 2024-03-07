@@ -12,7 +12,7 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
-import MultiSelect from 'components/ui/MultiSelect'
+import MultiSelect from 'ui-patterns/MultiSelect'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'

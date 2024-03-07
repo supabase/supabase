@@ -18,7 +18,7 @@ import {
 } from 'ui'
 
 import { CommandGroup } from '@ui/components/shadcn/ui/command'
-import { CriticalIcon, WarningIcon } from 'components/ui/Icons'
+import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useNotificationsStateSnapshot } from 'state/notifications'

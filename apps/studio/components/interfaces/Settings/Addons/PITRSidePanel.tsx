@@ -14,7 +14,7 @@ import Telemetry from 'lib/telemetry'
 import { useTheme } from 'next-themes'
 
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { CriticalIcon, WarningIcon } from 'components/ui/Icons'
+import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
