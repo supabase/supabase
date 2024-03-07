@@ -91,7 +91,7 @@ const SqlEditor = ({
   return (
     <Editor
       className="monaco-editor"
-      theme="vs-dark"
+      theme="supabase"
       defaultLanguage={language}
       defaultValue={defaultValue}
       path={queryId}
