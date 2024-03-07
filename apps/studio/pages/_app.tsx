@@ -48,30 +48,19 @@ import { StoreProvider } from 'hooks'
 import { AuthProvider } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 
+import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { ProfileProvider } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import { RootStore } from 'stores'
+import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import type { AppPropsWithLayout } from 'types'
 import { Toaster } from 'ui'
-import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import dynamic from 'next/dynamic'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
-
-/**
- * FeaturePreviewModal is quite heavy with react-markdown and other dependencies, not needed on initial load,
- * so we will load it lazily.
- */
-const LazyFeaturePreviewModal = dynamic(
-  () =>
-    import('components/interfaces/App/FeaturePreview/FeaturePreviewModal').then(
-      (mod) => mod.default
-    ),
-  { ssr: false }
-)
 
 loader.config({
   // [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
@@ -178,7 +167,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                             <AppBannerWrapper>
                               <FeaturePreviewContextProvider>
                                 {getLayout(<Component {...pageProps} />)}
-                                <LazyFeaturePreviewModal />
+                                <FeaturePreviewModal />
                               </FeaturePreviewContextProvider>
                             </AppBannerWrapper>
                           </CommandMenuWrapper>
@@ -188,6 +177,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   </TooltipProvider>
                 </PageTelemetry>
 
+                <HCaptchaLoadedStore />
                 <Toaster />
                 <PortalToast />
                 {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}

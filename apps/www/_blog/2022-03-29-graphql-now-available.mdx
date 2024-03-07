@@ -140,9 +140,7 @@ Another nice side effect of making PostgreSQL do the heavy lifting is that Graph
 
 ## Performance
 
-Each [free plan database](https://supabase.com/pricing) on the Supabase platform runs on a dedicated AWS t4g.micro instance with 2 vCPUs and 1 GB of memory.
-
-To squeeze the most out of that limited hardware we had to make a few significant optimizations:
+To squeeze the most out of limited hardware we had to make a few significant optimizations:
 
 **GraphQL queries are always transpiled into exactly one SQL query**
 

@@ -3,7 +3,7 @@ const GITHUB_INTEGRATION_INSTALLATION_URL =
     ? `https://github.com/apps/supabase/installations/new`
     : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
       ? `https://github.com/apps/supabase-staging/installations/new`
-      : `https://github.com/apps/supabase-github-v2-migration-test/installations/new`
+      : `https://github.com/apps/supabase-local-testing/installations/new`
 
 const GITHUB_INTEGRATION_CLIENT_ID =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'

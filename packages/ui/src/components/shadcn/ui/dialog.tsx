@@ -5,9 +5,25 @@ import { X } from 'lucide-react'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
+import { VariantProps, cva } from 'class-variance-authority'
+
+export const DIALOG_PADDING_Y_SMALL = 'py-4'
+export const DIALOG_PADDING_X_SMALL = 'px-5'
 
 export const DIALOG_PADDING_Y = 'py-6'
 export const DIALOG_PADDING_X = 'px-7'
+
+const DialogPaddingVariants = cva('', {
+  variants: {
+    padding: {
+      default: `${DIALOG_PADDING_Y} ${DIALOG_PADDING_X}`,
+      small: `${DIALOG_PADDING_Y_SMALL} ${DIALOG_PADDING_X_SMALL}`,
+    },
+  },
+  defaultVariants: {
+    padding: 'default',
+  },
+})
 
 const Dialog = DialogPrimitive.Root
 
@@ -25,7 +41,10 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      'fixed inset-0 z-50 bg-background/90 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+      // 'z-50 fixed h-full w-full left-0 top-0',
+      // 'bg-alternative/90 backdrop-blur-sm data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+      'bg-alternative/90 backdrop-blur-sm',
+      'z-50 fixed inset-0 grid place-items-center overflow-y-auto data-open:animate-overlay-show data-closed:animate-overlay-hide',
       className
     )}
     {...props}
@@ -33,59 +52,103 @@ const DialogOverlay = React.forwardRef<
 ))
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
+const DialogContentVariants = cva(
+  cn(
+    'my-8',
+    'relative z-50 grid w-full gap-4 border shadow-md dark:shadow-sm duration-200',
+    'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+    'data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
+    'data-[state=closed]:slide-out-to-left-[0%] data-[state=closed]:slide-out-to-top-[0%',
+    'data-[state=open]:slide-in-from-left-[0%] data-[state=open]:slide-in-from-top-[0%]',
+    'sm:rounded-lg md:w-full',
+    'bg-overlay'
+  ),
+  {
+    variants: {
+      size: {
+        tiny: `sm:align-middle sm:w-full sm:max-w-xs`,
+        small: `sm:align-middle sm:w-full sm:max-w-sm`,
+        medium: `sm:align-middle sm:w-full sm:max-w-lg`,
+        large: `sm:align-middle sm:w-full max-w-xl`,
+        xlarge: `sm:align-middle sm:w-full max-w-3xl`,
+        xxlarge: `sm:align-middle sm:w-full max-w-6xl`,
+        xxxlarge: `sm:align-middle sm:w-full max-w-7xl`,
+      },
+    },
+    defaultVariants: {
+      size: 'medium',
+    },
+  }
+)
+
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
-  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content> &
+    VariantProps<typeof DialogContentVariants>
+>(({ className, children, size, ...props }, ref) => (
   <DialogPortal>
-    <DialogOverlay />
-    <DialogPrimitive.Content
-      ref={ref}
-      className={cn(
-        'fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg md:w-full',
-        'bg border-overlay',
-        className
-      )}
-      {...props}
-    >
-      {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted">
-        <X className="h-4 w-4" />
-        <span className="sr-only">Close</span>
-      </DialogPrimitive.Close>
-    </DialogPrimitive.Content>
+    <DialogOverlay>
+      <DialogPrimitive.Content
+        ref={ref}
+        className={cn(DialogContentVariants({ size }), className)}
+        {...props}
+      >
+        {children}
+        <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted">
+          <X className="h-4 w-4" />
+          <span className="sr-only">Close</span>
+        </DialogPrimitive.Close>
+      </DialogPrimitive.Content>
+    </DialogOverlay>
   </DialogPortal>
 ))
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
-const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+const DialogHeader = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof DialogPaddingVariants>
+>(({ className, padding = 'default', ...props }, ref) => (
   <div
+    ref={ref}
+    {...props}
     className={cn(
-      'flex flex-col space-y-1.5 text-center sm:text-left',
-      DIALOG_PADDING_X,
-      DIALOG_PADDING_Y,
+      'flex flex-col gap-1.5 text-center sm:text-left',
+      DialogPaddingVariants({ padding }),
       className
     )}
-    {...props}
   />
-)
+))
+
 DialogHeader.displayName = 'DialogHeader'
 
-const DialogFooter = ({ className, children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
+const DialogFooter = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof DialogPaddingVariants>
+>(({ className, children, padding, ...props }, ref) => (
   <div
-    className={cn('flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2', className)}
+    ref={ref}
+    className={cn(
+      'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2',
+      'border-t',
+      DialogPaddingVariants({ padding }),
+      className
+    )}
     {...props}
   >
     {children}
   </div>
-)
+))
 DialogFooter.displayName = 'DialogFooter'
 
 const DialogTitle = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
 >(({ className, ...props }, ref) => (
-  <DialogPrimitive.Title ref={ref} className={cn('text-lg leading-none', className)} {...props} />
+  <DialogPrimitive.Title
+    ref={ref}
+    className={cn('text-base leading-none font-normal', className)}
+    {...props}
+  />
 ))
 DialogTitle.displayName = DialogPrimitive.Title.displayName
 
@@ -118,14 +181,27 @@ const DialogClose = React.forwardRef<
 ))
 DialogClose.displayName = DialogPrimitive.Close.displayName
 
-const DialogSection = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
-  ({ className, children, ...props }, ref) => (
-    <div ref={ref} {...props} className={cn('px-5 py-3', className)}>
-      {children}
-    </div>
-  )
-)
+const DialogSection = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof DialogPaddingVariants>
+>(({ className, children, padding, ...props }, ref) => (
+  <div
+    ref={ref}
+    {...props}
+    className={cn('px-5 py-3', DialogPaddingVariants({ padding }), className)}
+  >
+    {children}
+  </div>
+))
 DialogSection.displayName = 'DialogSection'
+
+const DialogSectionSeparator = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement>
+>(({ className, children, ...props }, ref) => (
+  <div ref={ref} {...props} className={cn('w-full h-px bg-border-overlay', className)} />
+))
+DialogSectionSeparator.displayName = 'DialogSectionSeparator'
 
 export {
   Dialog,
@@ -137,4 +213,5 @@ export {
   DialogTitle,
   DialogTrigger,
   DialogSection,
+  DialogSectionSeparator,
 }
