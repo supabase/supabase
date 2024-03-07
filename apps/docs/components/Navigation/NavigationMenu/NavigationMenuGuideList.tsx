@@ -15,7 +15,7 @@ import HomeMenuIconPicker from './HomeMenuIconPicker'
 import { type MenuId } from './NavigationMenu'
 import * as NavItems from './NavigationMenu.constants'
 import NavigationMenuGuideListItems from './NavigationMenuGuideListItems'
-import { NavigationMenuGuideRef } from './NavigationMenuGuideRef'
+import { type GuideRefItem, NavigationMenuGuideRef } from './NavigationMenuGuideRef'
 
 const HeaderLink = memo(function HeaderLink(props: { id: MenuId; title: string; url: string }) {
   const pathname = usePathname()
@@ -36,13 +36,13 @@ const HeaderLink = memo(function HeaderLink(props: { id: MenuId; title: string; 
 interface Props {
   id: MenuId
   collapsible?: boolean
-  refId?: string
+  refData?: Array<GuideRefItem>
   value?: string[]
 }
 
 type MenuContents = 'guide' | 'ref'
 
-const NavigationMenuGuideList: React.FC<Props> = ({ id, refId, value }) => {
+const NavigationMenuGuideList: React.FC<Props> = ({ id, refData, value }) => {
   const url = usePathname()
   const [contents, setContents] = useState<MenuContents>('guide')
 
@@ -59,7 +59,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, refId, value }) => {
     firstLevelRoute = url?.split('/')?.slice(0, 4)?.join('/')
   }
 
-  if (!refId) {
+  if (!refData) {
     return (
       <div className="w-full flex flex-col">
         <Link
@@ -139,7 +139,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, refId, value }) => {
           </Accordion.Root>
         </TabsContent_Shadcn_>
         <TabsContent_Shadcn_ value="ref">
-          <NavigationMenuGuideRef refId={refId} />
+          <NavigationMenuGuideRef refData={refData} />
         </TabsContent_Shadcn_>
       </Tabs_Shadcn_>
     </div>

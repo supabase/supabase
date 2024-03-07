@@ -6,6 +6,7 @@ import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 
 import { PropsWithChildren, memo, useEffect } from 'react'
 import Footer from '~/components/Navigation/Footer'
+import { type GuideRefItem } from '~/components/Navigation/NavigationMenu/NavigationMenuGuideRef'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
 
 const levelsData = {
@@ -280,10 +281,10 @@ const Container = memo(function Container(props: PropsWithChildren) {
 
 const NavContainer = memo(function NavContainer({
   menuId,
-  refId,
+  refData,
 }: {
   menuId: MenuId
-  refId?: string
+  refData?: Array<GuideRefItem>
 }) {
   const mobileMenuOpen = useMenuMobileOpen()
 
@@ -343,7 +344,7 @@ const NavContainer = memo(function NavContainer({
             'lg:opacity-100 lg:visible',
           ].join(' ')}
         >
-          <NavigationMenu menuId={menuId} refId={refId} />
+          <NavigationMenu menuId={menuId} refData={refData} />
         </div>
       </div>
     </nav>
@@ -353,11 +354,11 @@ const NavContainer = memo(function NavContainer({
 function MainSkeleton({
   children,
   menuId,
-  menuRefId,
-}: PropsWithChildren<{ menuId: MenuId; menuRefId?: string }>) {
+  menuRefData,
+}: PropsWithChildren<{ menuId: MenuId; menuRefData?: Array<GuideRefItem> }>) {
   return (
     <div className="flex flex-row h-full">
-      <NavContainer menuId={menuId} refId={menuRefId} />
+      <NavContainer menuId={menuId} refData={menuRefData} />
       <Container>
         <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
           <TopNavBar />

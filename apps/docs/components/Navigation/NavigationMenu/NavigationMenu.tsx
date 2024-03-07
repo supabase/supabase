@@ -2,6 +2,7 @@ import { memo } from 'react'
 
 import NavigationMenuHome from './HomeMenu'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
+import { type GuideRefItem } from './NavigationMenuGuideRef'
 import NavigationMenuRefList from './NavigationMenuRefList'
 import { type Menu, MenuId, menus } from './menus'
 
@@ -9,13 +10,13 @@ function getMenuById(id: MenuId) {
   return menus.find((menu) => menu.id === id) ?? menus.find((menu) => menu.id === MenuId.Home)
 }
 
-function getMenuElement(menu: Menu, refId?: string) {
+function getMenuElement(menu: Menu, refData?: Array<GuideRefItem>) {
   const menuType = menu.type
   switch (menuType) {
     case 'home':
       return <NavigationMenuHome />
     case 'guide':
-      return <NavigationMenuGuideList id={menu.id} refId={refId} />
+      return <NavigationMenuGuideList id={menu.id} refData={refData} />
     case 'reference':
       return (
         <NavigationMenuRefList
@@ -30,11 +31,11 @@ function getMenuElement(menu: Menu, refId?: string) {
   }
 }
 
-const NavigationMenu = ({ menuId, refId }: { menuId: MenuId; refId?: string }) => {
+const NavigationMenu = ({ menuId, refData }: { menuId: MenuId; refData?: Array<GuideRefItem> }) => {
   const level = menuId
   const menu = getMenuById(level)
 
-  return getMenuElement(menu, refId)
+  return getMenuElement(menu, refData)
 }
 
 export { MenuId, menus }

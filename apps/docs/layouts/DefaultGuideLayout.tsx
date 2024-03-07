@@ -1,6 +1,7 @@
 import { FC } from 'react'
 import { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
 import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { type GuideRefItem } from '~/components/Navigation/NavigationMenu/NavigationMenuGuideRef'
 import GuideLayout from './guides'
 
 interface Props {
@@ -18,7 +19,7 @@ interface Props {
   currentPage?: string
   editLink?: string
   menuId: MenuId
-  menuRefId?: string
+  menuRefData?: Array<GuideRefItem>
 }
 
 const Layout: FC<Props> = (props) => {

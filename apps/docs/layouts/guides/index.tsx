@@ -11,6 +11,7 @@ import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/Custom
 import { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { type GuideRefItem } from '~/components/Navigation/NavigationMenu/NavigationMenuGuideRef'
 import useHash from '~/hooks/useHash'
 import { LayoutMainContent } from '../DefaultLayout'
 import { MainSkeleton } from '../MainSkeleton'
@@ -33,7 +34,7 @@ interface Props {
   currentPage?: string
   hideToc?: boolean
   menuId: MenuId
-  menuRefId?: string
+  menuRefData?: Array<GuideRefItem>
 }
 
 const Layout: FC<Props> = (props) => {
@@ -114,7 +115,7 @@ const Layout: FC<Props> = (props) => {
           },
         }}
       />
-      <MainSkeleton menuId={menuId} menuRefId={props.menuRefId}>
+      <MainSkeleton menuId={menuId} menuRefData={props.menuRefData}>
         <LayoutMainContent className="pb-0">
           <div className={['grid grid-cols-12 relative gap-4'].join(' ')}>
             <div
