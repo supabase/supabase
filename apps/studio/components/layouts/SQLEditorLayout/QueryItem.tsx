@@ -134,7 +134,7 @@ const QueryItem = ({
                   : visibility === 'user'
                     ? 'group-hover:ml-5'
                     : '',
-                'text-ellipsis'
+                'text-ellipsis truncate'
               )}
             >
               {name}

@@ -7,7 +7,7 @@ import { Badge, Button, IconExternalLink, IconLoader, IconMonitor, IconServer } 
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { setProjectPostgrestStatus } from 'data/projects/projects-query'
 import pingPostgrest from 'lib/pingPostgrest'
-import type { Project } from 'data/projects/project-detail-query'
+import { invalidateProjectDetailsQuery, type Project } from 'data/projects/project-detail-query'
 
 export interface ConnectingStateProps {
   project: Project
@@ -34,6 +34,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
     if (result) {
       clearInterval(checkProjectConnectionIntervalRef.current)
       setProjectPostgrestStatus(queryClient, project.ref, 'ONLINE')
+      await invalidateProjectDetailsQuery(queryClient, project.ref)
     }
   }
 

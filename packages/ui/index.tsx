@@ -85,6 +85,8 @@ export * from './src/components/shadcn/ui/use-toast'
 export * from './src/components/shadcn/ui/toast'
 export * from './src/components/shadcn/ui/toaster'
 
+export { Badge as Badge_Shadcn_ } from './src/components/shadcn/ui/badge'
+
 export {
   Command as Command_Shadcn_,
   CommandDialog as CommandDialog_Shadcn_,

@@ -24,6 +24,7 @@ export type SQLEditorContextValues = {
   setSqlDiff: Dispatch<SetStateAction<ContentDiff | undefined>>
   debugSolution?: string
   setDebugSolution: Dispatch<SetStateAction<string | undefined>>
+  setSelectedDiffType: Dispatch<SetStateAction<DiffType | undefined>>
 }
 
 export enum DiffType {

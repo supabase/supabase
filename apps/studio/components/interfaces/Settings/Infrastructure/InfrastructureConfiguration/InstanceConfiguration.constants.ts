@@ -1,4 +1,5 @@
-import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'lib/constants'
+import { components } from 'data/api'
+import { AWS_REGIONS, AWS_REGIONS_KEYS, PROJECT_STATUS } from 'lib/constants'
 
 export interface Region {
   key: AWS_REGIONS_KEYS
@@ -11,6 +12,14 @@ export interface Region {
 export const NODE_WIDTH = 660
 export const NODE_ROW_HEIGHT = 50
 export const NODE_SEP = 20
+
+export const REPLICA_STATUS: {
+  [key: string]: components['schemas']['DatabaseStatusResponse']['status']
+} = {
+  ...PROJECT_STATUS,
+  INIT_READ_REPLICA: 'INIT_READ_REPLICA',
+  INIT_READ_REPLICA_FAILED: 'INIT_READ_REPLICA_FAILED',
+}
 
 // [Joshen] Coordinates from https://github.com/jsonmaur/aws-regions/issues/11
 // In the format of [lon, lat]
