@@ -288,7 +288,7 @@ limit 100;
   Network](https://supabase.com/dashboard/project/_/logs/edge-logs) logs.
 </Admonition>
 
-Some users may feel compelled to monitor all write initiated by the API roles:
+To monitor all writes initiated by the Postgrest API roles:
 
 ```sql
 ALTER ROLE authenticator SET pgaudit.log TO 'write';
