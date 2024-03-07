@@ -364,7 +364,7 @@ const ProjectLinker = ({
                               onSelect={() => openInstallGitHubIntegrationWindow('install')}
                             >
                               <PlusIcon size={16} />
-                              <span>Add GitHub Repositories</span>
+                              Add GitHub Repositories
                             </CommandItem_Shadcn_>
                           </CommandGroup_Shadcn_>
                         </>
