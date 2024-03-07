@@ -68,7 +68,25 @@ const BranchManagement = () => {
     isLoading: isLoadingBranches,
     isError: isErrorBranches,
     isSuccess: isSuccessBranches,
-  } = useBranchesQuery({ projectRef })
+  } = useBranchesQuery(
+    { projectRef },
+    {
+      refetchInterval(data) {
+        if (
+          data?.some(
+            (branch) =>
+              branch.status === 'CREATING_PROJECT' ||
+              branch.status === 'RUNNING_MIGRATIONS' ||
+              branch.status === 'MIGRATIONS_FAILED'
+          )
+        ) {
+          return 1000 * 3 // 3 seconds
+        }
+
+        return false
+      },
+    }
+  )
   const [[mainBranch], previewBranchesUnsorted] = partition(branches, (branch) => branch.is_default)
   const previewBranches = previewBranchesUnsorted.sort((a, b) =>
     new Date(a.updated_at) < new Date(b.updated_at) ? 1 : -1
