@@ -16,12 +16,15 @@ const REF_IDS = ['Database', 'Auth', 'Edge Functions', 'Realtime', 'Storage']
 const isClientLibReferenceMenu = (menu: Menu): menu is ReferenceMenu =>
   'commonSectionsFile' in menu && menu.commonSectionsFile === 'common-client-libs-sections.json'
 
-const clientLibraries = menus.filter(isClientLibReferenceMenu)
-
 const main = async () => {
   mkdirSync(join(__dirname, 'generated'), {
     recursive: true,
   })
+
+  const clientLibraries = await Promise.all(menus.filter(isClientLibReferenceMenu).map(async (library) => ({
+    ...library,
+    spec: parse(await readFile(join(__dirname, '../..', 'spec', library.specFile), 'utf-8'))
+  })))
 
   const promises = []
 
@@ -36,8 +39,7 @@ const main = async () => {
       const libraries = [] as Array<string>
 
       await Promise.all(clientLibraries.map(async (library) => {
-        const specFile = parse(await readFile(join(__dirname, '../..', 'spec', library.specFile), 'utf-8'))
-        if (specFile.functions.some((fn) => fn.id === section.id)) {
+        if (library.spec.functions.some((fn) => fn.id === section.id)) {
           libraries.push(library.id)
         }
       }))
