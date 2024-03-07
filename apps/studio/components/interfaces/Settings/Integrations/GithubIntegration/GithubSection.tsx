@@ -59,10 +59,9 @@ const GitHubSection = () => {
 
   const { mutate: disableBranching } = useBranchesDisableMutation()
 
+  const hasAccessToBranching = useFlag<boolean>('branchManagement')
+
   const previewBranches = (branches ?? []).filter((branch) => !branch.is_default)
-  const isBranchingEnabledGlobally = useFlag<boolean>('branchManagement')
-  const hasAccessToBranching =
-    org?.opt_in_tags.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) || isBranchingEnabledGlobally
   const isBranch = project?.parent_project_ref !== undefined
   const isBranchingEnabled =
     project?.is_branch_enabled === true || project?.parent_project_ref !== undefined

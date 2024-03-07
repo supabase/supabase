@@ -13,9 +13,7 @@ const EnableBranchingButton = ({ isNewNav = false }: EnableBranchingButtonProps)
   const snap = useAppStateSnapshot()
   const selectedOrg = useSelectedOrganization()
 
-  const isBranchingEnabledGlobally = useFlag<boolean>('branchManagement')
-  const hasAccessToBranching =
-    selectedOrg?.opt_in_tags.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) || isBranchingEnabledGlobally
+  const hasAccessToBranching = useFlag<boolean>('branchManagement')
 
   if (!hasAccessToBranching) {
     return <BranchingWaitListPopover isNewNav={isNewNav} />
