@@ -1906,6 +1906,7 @@ export interface components {
       MAILER_TEMPLATES_MAGIC_LINK_CONTENT: string
       MFA_MAX_ENROLLED_FACTORS: number
       URI_ALLOW_LIST: string
+      EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean
       EXTERNAL_EMAIL_ENABLED: boolean
       EXTERNAL_PHONE_ENABLED: boolean
       SAML_ENABLED: boolean
@@ -1916,6 +1917,7 @@ export interface components {
       SESSIONS_INACTIVITY_TIMEOUT: number
       SESSIONS_SINGLE_PER_USER: boolean
       SESSIONS_TAGS: string
+      RATE_LIMIT_ANONYMOUS_USERS: number
       RATE_LIMIT_EMAIL_SENT: number
       RATE_LIMIT_SMS_SENT: number
       RATE_LIMIT_VERIFY: number
@@ -2047,6 +2049,7 @@ export interface components {
       MAILER_TEMPLATES_MAGIC_LINK_CONTENT?: string
       MFA_MAX_ENROLLED_FACTORS?: number
       URI_ALLOW_LIST?: string
+      EXTERNAL_ANONYMOUS_USERS_ENABLED?: boolean
       EXTERNAL_EMAIL_ENABLED?: boolean
       EXTERNAL_PHONE_ENABLED?: boolean
       SAML_ENABLED?: boolean
@@ -2057,6 +2060,7 @@ export interface components {
       SESSIONS_INACTIVITY_TIMEOUT?: number
       SESSIONS_SINGLE_PER_USER?: boolean
       SESSIONS_TAGS?: string
+      RATE_LIMIT_ANONYMOUS_USERS?: number
       RATE_LIMIT_EMAIL_SENT?: number
       RATE_LIMIT_SMS_SENT?: number
       RATE_LIMIT_VERIFY?: number
@@ -4838,6 +4842,7 @@ export interface components {
     }
     AuthConfigResponse: {
       disable_signup: boolean | null
+      external_anonymous_users_enabled: boolean | null
       external_apple_additional_client_ids: string | null
       external_apple_client_id: string | null
       external_apple_enabled: boolean | null
@@ -4929,6 +4934,7 @@ export interface components {
       password_hibp_enabled: boolean | null
       password_min_length: number | null
       password_required_characters: string | null
+      rate_limit_anonymous_users: number | null
       rate_limit_email_sent: number | null
       rate_limit_sms_sent: number | null
       rate_limit_token_refresh: number | null
@@ -5002,6 +5008,7 @@ export interface components {
       mailer_templates_magic_link_content?: string
       mfa_max_enrolled_factors?: number
       uri_allow_list?: string
+      external_anonymous_users_enabled?: boolean
       external_email_enabled?: boolean
       external_phone_enabled?: boolean
       saml_enabled?: boolean
@@ -5012,6 +5019,7 @@ export interface components {
       sessions_inactivity_timeout?: number
       sessions_single_per_user?: boolean
       sessions_tags?: string
+      rate_limit_anonymous_users?: number
       rate_limit_email_sent?: number
       rate_limit_sms_sent?: number
       rate_limit_verify?: number
@@ -5273,7 +5281,7 @@ export interface components {
     }
     V1OrganizationSlugResponse: {
       plan?: components['schemas']['BillingPlanId']
-      opt_in_tags: ('AI_SQL_GENERATOR_OPT_IN' | 'PREVIEW_BRANCHES_OPT_IN')[]
+      opt_in_tags: 'AI_SQL_GENERATOR_OPT_IN'[]
       id: string
       name: string
     }
