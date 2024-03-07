@@ -29,6 +29,7 @@ const RealtimeVisual = () => {
         src="/images/index/products/realtime-bg.svg"
         alt="Supabase Realtime"
         fill
+        sizes="100%"
         className="absolute object-cover xl:object-center inset-0"
       />
     </figure>

@@ -59,6 +59,7 @@ const VectorVisual = () => {
           src={`/images/index/products/vector.svg`}
           alt="Supabase Vector graph"
           fill
+          sizes="100%"
           className="absolute inset-0 object-contain object-center"
         />
         <svg

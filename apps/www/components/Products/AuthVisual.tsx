@@ -12,6 +12,7 @@ const AuthVisual = () => {
         src="/images/index/products/auth.svg"
         alt="Supabase Authentication user db rows"
         fill
+        sizes="100%"
         priority
         className="absolute inset-0 object-cover object-center xl:object-bottom"
       />
@@ -19,6 +20,7 @@ const AuthVisual = () => {
         src="/images/index/products/auth-active.svg"
         alt="Supabase Authentication user db rows"
         fill
+        sizes="100%"
         className="absolute inset-0 object-cover object-center xl:object-bottom opacity-0 group-hover:opacity-100 transition-opacity"
         aria-hidden
       />

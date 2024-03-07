@@ -56,8 +56,9 @@ const FunctionsVisual = () => {
         src="/images/index/products/edge-functions.svg"
         alt="Supabase Edge Functions globe"
         fill
-        className="absolute inset-0 object-cover object-center"
+        sizes="100%"
         priority
+        className="absolute inset-0 object-cover object-center"
       />
       <svg
         viewBox="0 0 289 430"

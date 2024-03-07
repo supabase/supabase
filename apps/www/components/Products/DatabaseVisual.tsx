@@ -60,6 +60,7 @@ const DatabaseVisual = () => {
           alt="Supabase Postgres database"
           fill
           priority
+          sizes="100%"
           className="absolute antialiased inset-0 object-contain object-center z-0 w-full lg:w-auto h-full transition-opacity group-hover:opacity-80"
         />
         <svg
