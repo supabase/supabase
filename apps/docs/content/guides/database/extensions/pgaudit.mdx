@@ -188,7 +188,7 @@ To fine-tune what pgaudit will record, you must create a custom database role wi
 CREATE ROLE some_audit_role NOINHERIT;
 ```
 
-The `ROLE` cannot be impersonated by any other user. It cannot be logged into or used. In this case, it solely exists to securely define what pgaudit will record.
+No other Postgres user can assume or login via this role. It solely exists to securely define what pgaudit will record.
 
 Once the role is created, you can direct pgaudit to log by assigning it to the `pgaudit.role` variable:
 
