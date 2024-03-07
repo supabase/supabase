@@ -10,7 +10,7 @@
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
     "codegen": "openapi-typescript http://localhost:8080/api-json -o types/api.d.ts && prettier --write types/api.d.ts",
-    "generate:nav": "echo \"pregenerate guide ref navs\"",
+    "generate:nav": "tsx scripts/pregenerate/generate-guide-ref.ts",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
