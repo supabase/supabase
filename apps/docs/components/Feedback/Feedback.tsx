@@ -4,7 +4,6 @@ import { type CSSProperties, useReducer, useRef, useState } from 'react'
 
 import { Button, IconCheck, IconDiscussions, IconX, cn } from 'ui'
 
-import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { type FeedbackFields, FeedbackModal } from './FeedbackModal'
 
@@ -30,8 +29,6 @@ function reducer(state: State, action: Action) {
       return state
   }
 }
-
-const FLEX_GAP_VARIABLE = '--container-flex-gap'
 
 function Feedback() {
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -76,15 +73,10 @@ function Feedback() {
   }
 
   async function handleSubmit({ page, comment }: FeedbackFields) {
-    const { error } = await unauthedAllowedPost('/platform/feedback/send', {
-      body: {
-        message: comment,
-        category: 'Feedback',
-        tags: ['docs-feedback'],
-        pathname: page,
-      },
-    })
-    if (error) console.error(error)
+    supabase
+      .from('feedback_comment')
+      .insert({ page, comment })
+      .then(({ error }) => console.error(error))
     setModalOpen(false)
     refocusButton()
   }
@@ -95,19 +87,20 @@ function Feedback() {
         Is this helpful?
       </h3>
       <div
-        style={{ [FLEX_GAP_VARIABLE]: '0.5rem' } as CSSProperties}
-        className={`relative flex gap-[var(${FLEX_GAP_VARIABLE})] items-center mb-2`}
+        style={{ '--container-flex-gap': '0.5rem' } as CSSProperties}
+        className={`relative flex gap-[var(--container-flex-gap)] items-center mb-2`}
       >
         <Button
           type="outline"
           className={cn(
             'px-1',
-            'hover:text-brand-600',
-            isYes && 'text-brand-600 border-stronger',
+            'hover:text-brand-600 hover:border-strong disabled:opacity-100',
+            isYes && 'text-brand-600',
             !showYes && 'opacity-0 invisible',
             'transition-opacity'
           )}
           onClick={() => handleVote('yes')}
+          disabled={state.type === StateType.Followup}
         >
           <IconCheck />
           <span className="sr-only">Yes</span>
@@ -116,13 +109,13 @@ function Feedback() {
           type="outline"
           className={cn(
             'px-1',
-            'hover:text-warning-600',
-            isNo &&
-              `text-warning-600 border-stronger -translate-x-[calc(100%+var(${FLEX_GAP_VARIABLE},0.5rem))]`,
+            'hover:text-warning-600 hover:border-strong disabled:opacity-100',
+            isNo && `text-warning-600 -translate-x-[calc(100%+var(--container-flex-gap,0.5rem))]`,
             !showNo && 'opacity-0 invisible',
             '[transition-property:opacity,transform] [transition-duration:150ms,300ms] [transition-delay:0,150ms]'
           )}
           onClick={() => handleVote('no')}
+          disabled={state.type === StateType.Followup}
         >
           <IconX />
           <span className="sr-only">No</span>
