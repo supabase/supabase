@@ -2,7 +2,7 @@ import { WarningIcon } from 'components/ui/Icons'
 import type { BranchData } from 'data/branches/branch-query'
 import type { Branch } from 'data/branches/branches-query'
 import { ClockIcon } from 'lucide-react'
-import { Badge } from 'ui'
+import { Badge_Shadcn_ } from 'ui'
 
 type Status = Branch['status'] | BranchData['status']
 
@@ -52,11 +52,11 @@ const BranchStatusBadge = ({ status }: BranchStatusBadgeProps) => {
   const isWaiting = WAITING_STATUSES.includes(status)
 
   return (
-    <Badge color={isUnhealthy ? 'red' : 'slate'} className="flex items-center gap-1.5">
-      {isUnhealthy && <WarningIcon className="w-3.5 h-3.5 rounded-full bg-red-1000" />}
+    <Badge_Shadcn_ variant={isUnhealthy ? 'destructive' : 'default'} className="gap-1.5">
+      {isUnhealthy && <WarningIcon className="w-3.5 h-3.5 rounded-full bg-destructive-600" />}
       {isWaiting && <ClockIcon size={12} />}
-      <span>{STATUS_TO_LABEL[status]}</span>
-    </Badge>
+      {STATUS_TO_LABEL[status]}
+    </Badge_Shadcn_>
   )
 }
 
