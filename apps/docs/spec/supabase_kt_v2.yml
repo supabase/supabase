@@ -3645,6 +3645,15 @@ functions:
     notes: |
       Retrieves a list of users.
       - Defaults to return 50 users per page.
+    params:
+      - name: page
+        isOptional: true
+        type: Int
+        description: The page number to retrieve.
+      - name: perPage
+        isOptional: true
+        type: Int
+        description: The number of users to retrieve per page.
     examples:
       - id: get-a-full-list-of-users
         name: Get a page of users
@@ -3669,6 +3678,32 @@ functions:
     notes: |
       Creates a new user.
       - To confirm the user's email address or phone number, set `autoConfirm` to true. Both arguments default to false.
+    params:
+      - name: builder
+        isOptional: false
+        type: AdminUserBuilder.Email.() -> Unit or AdminUserBuilder.Phone.() -> Unit
+        description: The builder to create a new user.
+        subContent:
+          - name: email/phone
+            isOptional: true
+            type: String
+            description: The new user's email or phone.
+          - name: password
+            isOptional: false
+            type: String
+            description: The user's password.
+          - name: autoConfirm
+            isOptional: true
+            type: Boolean
+            description: Whether to auto-confirm the user's email or phone number.
+          - name: userMetadata
+            isOptional: true
+            type: JsonObject?
+            description: Custom user metadata.
+          - name: appMetadata
+            isOptional: true
+            type: JsonObject?
+            description: Custom app metadata.
     examples:
       - id: create-a-new-user-with-email-custom-user-metadata
         name: Create user with email
@@ -3722,6 +3757,11 @@ functions:
     notes: |
       Deletes a user from the database.
       - The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
+    params:
+      - name: uid
+        isOptional: false
+        type: String
+        description: The id of the user you want to delete.
     examples:
       - id: removes-a-user
         name: Removes a user
@@ -3736,6 +3776,19 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.inviteUserByEmail'
     notes: |
       Sends an invite link to the user's email address.
+    params:
+      - name: email
+        isOptional: false
+        type: String
+        description: The email to send the invite to.
+      - name: redirectTo
+        isOptional: true
+        type: String
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: data
+        isOptional: true
+        type: JsonObject
+        description: Custom data to create the user with.
     examples:
       - id: invite-a-user
         name: Invite a user
@@ -3757,6 +3810,19 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
     notes: |
       Generates email links and OTPs to be sent via a custom email provider.
+    params:
+      - name: type
+        isOptional: false
+        type: LinkType<C>
+        description: The type of link to generate, e.g. `LinkType.Signup`.
+      - name: redirectTo
+        isOptional: true
+        type: String
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: config
+        isOptional: true
+        type: C.() -> Unit
+        description: The builder to create a new link.
     examples:
       - id: generate-a-signup-link
         name: Generate a signup link
@@ -3818,6 +3884,52 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.updateUserById'
     notes: |
       Updates the user data.
+    params:
+        - name: uid
+          isOptional: false
+          type: String
+          description: The id of the user you want to update.
+        - name: builder
+          isOptional: false
+          type: AdminUserUpdateBuilder.() -> Unit
+          description: The builder to update the user.
+          subContent:
+            - name: email
+              isOptional: true
+              type: String
+              description: The new email.
+            - name: phone
+              isOptional: true
+              type: String
+              description: The new phone number.
+            - name: password
+              isOptional: true
+              type: String
+              description: The new password.
+            - name: userMetadata
+              isOptional: true
+              type: JsonObject?
+              description: Custom user metadata.
+            - name: appMetadata
+              isOptional: true
+              type: JsonObject?
+              description: Custom app metadata.
+            - name: emailConfirm
+              isOptional: true
+              type: Boolean
+              description: Whether to confirm the user's email.
+            - name: phoneConfirm
+              isOptional: true
+              type: Boolean
+              description: Whether to confirm the user's phone number.
+            - name: banDuration
+              isOptional: true
+              type: String
+              description: The format for the ban duration follows a strict sequence of decimal numbers with a unit suffix. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+            - name: role
+              isOptional: true
+              type: String
+              description: The `role` claim set in the user's access token JWT. When a user signs up, this role is set to `authenticated` by default. You should only modify the `role` if you need to provision several levels of admin access that have different permissions on individual columns in your database.
     examples:
       - id: updates-a-users-email
         name: Updates a user's email
@@ -3881,7 +3993,11 @@ functions:
     title: 'mfa.listFactors()'
     notes: |
       Lists all factors associated to a user.
-    $ref: '@supabase/gotrue-js.GoTrueAdminMFAApi.listFactors'
+    params:
+        - name: uid
+          isOptional: false
+          type: String
+          description: The id of the user you want to list factors for.
     examples:
       - id: list-factors
         name: List all factors for a user
@@ -3892,9 +4008,17 @@ functions:
           ```
   - id: mfa-delete-factor
     title: 'mfa.deleteFactor()'
-    $ref: '@supabase/gotrue-js.GoTrueAdminMFAApi.deleteFactor'
     notes: |
       Deletes a factor on a user. This will log the user out of all active sessions if the deleted factor was verified.
+    params:
+        - name: uid
+          isOptional: false
+          type: String
+          description: The id of the user you want to delete a factor for.
+        - name: factorId
+          isOptional: false
+          type: String
+          description: The id of the factor you want to delete.
     examples:
       - id: delete-factor
         name: Delete a factor for a user
@@ -3910,6 +4034,19 @@ functions:
       - When invoking a function with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
     notes: |
       - Requires an Authorization header.
+    params:
+        - name: function
+          isOptional: false
+          type: String
+          description: The name of the function to invoke.
+        - name: body
+          isOptional: true
+          type: T
+          description: The body to send with the request. T can be any serializable type.
+        - name: headers
+          isOptional: true
+          type: Headers
+          description: The headers to send with the request.
     examples:
       - id: basic-invocation
         name: Basic invocation
