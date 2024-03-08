@@ -2174,6 +2174,15 @@ functions:
     title: limit()
     description: |
       Limits the result with the specified count.
+    params:
+      - name: count
+        isOptional: false
+        type: int
+        description: The maximum number of rows to return.
+      - name: referencedTable
+        isOptional: true
+        type: int
+        description: Set this to limit rows of referenced tables instead of the parent table.
     examples:
       - id: with-select
         name: With `select()`
@@ -2200,6 +2209,23 @@ functions:
     title: order()
     description: |
       Orders the result with the specified column.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to order by.
+      - name: ascending
+        isOptional: true
+        type: bool
+        description: Whether to order in ascending order. Default is `false`.
+      - name: nullsFirst
+        isOptional: true
+        type: bool
+        description: Whether to order nulls first. Default is `false`.
+      - name: referencedTable
+        isOptional: true
+        type: String
+        description: Specify the referenced table when ordering by a column in an embedded resource.
     examples:
       - id: with-select
         name: With `select()`
@@ -2226,6 +2252,19 @@ functions:
     title: range()
     description: |
       Limits the result to rows within the specified range, inclusive.
+    params:
+      - name: from
+        isOptional: false
+        type: int
+        description: The starting index from which to limit the result.
+      - name: to
+        isOptional: false
+        type: int
+        description: The last index to which to limit the result.
+      - name: referencedTable
+        isOptional: true
+        type: String
+        description: Set this to limit rows of referenced tables instead of the parent table.
     examples:
       - id: with-select
         name: With `select()`
@@ -2253,7 +2292,141 @@ functions:
             .select('name, country_id')
             .single();
           ```
+  - id: maybe-single
+    title: maybeSingle()
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select()
+            .eq('name', 'Singapore')
+            .maybeSingle();
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
 
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          null
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: explain
+    title: Using Explain
+    description: |
+      For debugging slow queries, you can get the [Postgres `EXPLAIN` execution plan](https://www.postgresql.org/docs/current/sql-explain.html) of a query
+      using the `explain()` method. This works on any query, even for `rpc()` or writes.
+
+      Explain is not enabled by default as it can reveal sensitive information about your database.
+      It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
+
+      Follow the [Performance Debugging Guide](/docs/guides/database/debugging-performance) to enable the functionality on your project.
+    params:
+      - name: analyze
+        isOptional: true
+        type: bool
+        description: If `true`, the query will be executed and the actual run time will be returned.
+      - name: verbose
+        isOptional: true
+        type: bool
+        description: If `true`, the query identifier will be returned and `data` will include the output columns of the query.
+      - name: settings
+        isOptional: true
+        type: bool
+        description: If `true`, include information on configuration parameters that affect query planning.
+      - name: buffers
+        isOptional: true
+        type: bool
+        description: If `true`, include information on buffer usage.
+      - name: wal
+        isOptional: true
+        type: bool
+        description: If `true`, include information on WAL record generation.
+    examples:
+      - id: get-execution-plan
+        name: Get the execution plan
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select()
+            .explain();
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          Aggregate  (cost=33.34..33.36 rows=1 width=112)
+            ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
+                  ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
+          ```
+        description: |
+          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
+        hideCodeBlock: true
+        isSpotlight: true
+
+      - id: get-execution-plan-with-analyze-and-verbose
+        name: Get the execution plan with analyze and verbose
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select()
+            .explain(analyze:true, verbose:true);
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          Aggregate  (cost=33.34..33.36 rows=1 width=112) (actual time=0.041..0.041 rows=1 loops=1)
+            Output: NULL::bigint, count(ROW(countries.id, countries.name)), COALESCE(json_agg(ROW(countries.id, countries.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
+            ->  Limit  (cost=0.00..18.33 rows=1000 width=40) (actual time=0.005..0.006 rows=3 loops=1)
+                  Output: countries.id, countries.name
+                  ->  Seq Scan on public.countries  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
+                        Output: countries.id, countries.name
+          Query Identifier: -4730654291623321173
+          Planning Time: 0.407 ms
+          Execution Time: 0.119 ms
+          ```
+        description: |
+          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
+        hideCodeBlock: true
+        isSpotlight: false
   - id: using-filters
     title: Using Filters
     description: |
