@@ -380,8 +380,8 @@ services:
       - ./volumes/db/data:/var/lib/postgresql/data:Z
       # Changes required for Analytics support
       - ./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
-      # pgsodium decryption key: https://github.com/supabase/vault/issues/27
-      - ./volumes/db/pgsodium:/etc/postgresql-custom/pgsodium
+      # Use named volume to persist pgsodium decryption key between restarts
+      - db-config:/etc/postgresql-custom
 
   vector:
     container_name: supabase-vector
