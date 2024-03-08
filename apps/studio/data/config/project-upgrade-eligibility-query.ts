@@ -1,8 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { IS_PLATFORM } from 'common'
+import { get } from 'data/fetchers'
 import { useProjectByRef } from 'hooks'
-import { get } from 'lib/common/fetch'
 import { PROJECT_STATUS } from 'lib/constants/infrastructure'
 import type { ResponseError } from 'types'
 import { configKeys } from './keys'
