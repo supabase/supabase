@@ -7,7 +7,6 @@ import { Button, IconPlus, IconTrash, Input, Listbox, Modal, Radio, SidePanel, T
 
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import Panel from 'components/ui/Panel'
 import SqlEditor from 'components/ui/SqlEditor'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
@@ -16,6 +15,7 @@ import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/datab
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import type { Dictionary } from 'types'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { convertArgumentTypes, convertConfigParams, hasWhitespace } from './Functions.utils'
 
 // [Refactor] Remove local state, just use the Form component
@@ -257,8 +257,8 @@ interface CreateFunctionProps {
 }
 
 const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
-  const { project } = useProjectContext()
   const _localState = useLocalObservable(() => new CreateFunctionStore())
+  const { project } = useProjectContext()
 
   const [isClosingPanel, setIsClosingPanel] = useState<boolean>(false)
 
