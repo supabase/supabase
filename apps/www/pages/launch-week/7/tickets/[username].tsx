@@ -14,14 +14,12 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import TicketContainer from '~/components/LaunchWeek/7/Ticket/TicketContainer'
 import LaunchWeekPrizeSection from '~/components/LaunchWeek/7/LaunchWeekPrizeSection'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/7/LaunchSection/LaunchWeekLogoHeader'
-import TicketBrickWall from '~/components/LaunchWeek/7/LaunchSection/TicketBrickWall'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LW7BgGraphic from '~/components/LaunchWeek/7/LW7BgGraphic'
 import CTABanner from '~/components/CTABanner'
 
 interface Props {
   user: UserData
-  users: UserData[]
   ogImageUrl: string
   latestPosts?: PostTypes[]
 }
@@ -31,7 +29,7 @@ const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
 
-export default function UsernamePage({ user, users, ogImageUrl, latestPosts }: Props) {
+export default function UsernamePage({ user, ogImageUrl, latestPosts }: Props) {
   const { resolvedTheme } = useTheme()
   const { username, ticketNumber, name, golden, referrals, bg_image_id } = user
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
@@ -104,7 +102,6 @@ export default function UsernamePage({ user, users, ogImageUrl, latestPosts }: P
             <div className={['bg-lw7-gradient absolute inset-0 z-0', golden && 'gold'].join(' ')} />
           </div>
           <LaunchWeekPrizeSection className="-mt-20 md:-mt-60" />
-          <TicketBrickWall users={users} />
         </div>
         <CTABanner />
       </DefaultLayout>
@@ -117,12 +114,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   let name: string | null | undefined
   let ticketNumber: number | null | undefined
   let golden = false
-  let referrals = 0
   let bg_image_id
   let ogImageUrl
-
-  // fetch users for the TicketBrickWall
-  const { data: users } = await supabaseAdmin!.from('lw7_tickets_golden').select().limit(17)
 
   // fetch a specific user
   if (username) {
@@ -135,7 +128,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     ticketNumber = user?.ticketNumber
     golden = user?.golden ?? false
     bg_image_id = user?.bg_image_id ?? 1
-    referrals = user?.referrals ?? 0
     ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw7-ticket-og?username=${encodeURIComponent(
       username ?? ''
     )}${golden ? '&golden=true' : ''}`
@@ -149,15 +141,12 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         name: ticketNumber ? name || username || null : null,
         ticketNumber: ticketNumber || SAMPLE_TICKET_NUMBER,
         golden,
-        referrals,
         bg_image_id,
       },
       ogImageUrl,
-      users,
       key: username,
       latestPosts: getNavLatestPosts(),
     },
-    revalidate: 5,
   }
 }
 
