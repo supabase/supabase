@@ -14,6 +14,7 @@ const AuthVisual = () => {
         fill
         sizes="100%"
         priority
+        quality={100}
         className="absolute inset-0 object-cover object-center xl:object-bottom"
       />
       <Image
@@ -21,6 +22,7 @@ const AuthVisual = () => {
         alt="Supabase Authentication user db rows"
         fill
         sizes="100%"
+        quality={100}
         className="absolute inset-0 object-cover object-center xl:object-bottom opacity-0 group-hover:opacity-100 transition-opacity"
         aria-hidden
       />

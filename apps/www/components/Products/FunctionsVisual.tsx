@@ -57,6 +57,7 @@ const FunctionsVisual = () => {
         alt="Supabase Edge Functions globe"
         fill
         sizes="100%"
+        quality={100}
         priority
         className="absolute inset-0 object-cover object-center"
       />

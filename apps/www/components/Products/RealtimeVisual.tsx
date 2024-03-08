@@ -30,6 +30,7 @@ const RealtimeVisual = () => {
         alt="Supabase Realtime"
         fill
         sizes="100%"
+        quality={100}
         className="absolute object-cover xl:object-center inset-0"
       />
     </figure>
