@@ -5,9 +5,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
 import supabase from '~/lib/supabaseMisc'
 import { Partner } from '~/types/partners'
-import TileGrid from '~/components/Partners/TileGrid'
-import { getNavLatestPosts } from '~/lib/posts'
-import PostTypes from '~/types/post'
+import TileGrid from '../../../components/Partners/TileGrid'
 
 export async function getStaticProps() {
   const { data: partners } = await supabase
@@ -21,7 +19,6 @@ export async function getStaticProps() {
   return {
     props: {
       partners,
-      latestPosts: getNavLatestPosts(),
     },
     revalidate: 1800, // 30 minutes
   }
@@ -29,7 +26,6 @@ export async function getStaticProps() {
 
 interface Props {
   partners: Partner[]
-  latestPosts?: PostTypes[]
 }
 
 function ExpertPartnersPage(props: Props) {
@@ -55,7 +51,7 @@ function ExpertPartnersPage(props: Props) {
           ],
         }}
       />
-      <DefaultLayout latestPosts={props.latestPosts} className="bg-alternative">
+      <DefaultLayout className="bg-alternative">
         <SectionContainer className="space-y-12">
           <div>
             <h1 className="h1">{meta_title}</h1>
