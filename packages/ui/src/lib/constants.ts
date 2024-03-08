@@ -58,11 +58,11 @@ export const SIZE = {
     xlarge: 'px-6 py-3',
   },
   height: {
-    tiny: 'h-7',
-    small: 'h-8',
-    medium: 'h-9',
-    large: 'h-10',
-    xlarge: 'h-11',
+    tiny: 'h-[26px]',
+    small: 'h-[34px]',
+    medium: 'h-[38px]',
+    large: 'h-[42px]',
+    xlarge: 'h-[50px]',
   },
 }
 
