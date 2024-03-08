@@ -13,6 +13,7 @@
     "generate:nav": "tsx scripts/pregenerate/generate-guide-ref.ts",
     "start": "next start",
     "lint": "next lint",
+    "pretypecheck": "npm run generate:nav",
     "typecheck": "tsc --noEmit",
     "test": "jest",
     "build:sitemap": "node ./internals/generate-sitemap.mjs",
