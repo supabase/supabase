@@ -1,8 +1,9 @@
 import { useParams } from 'common'
+import toast from 'react-hot-toast'
+import { Alert, Button, Modal } from 'ui'
+
 import { useOrganizationPaymentMethodDeleteMutation } from 'data/organizations/organization-payment-method-delete-mutation'
 import type { OrganizationPaymentMethod } from 'data/organizations/organization-payment-methods-query'
-import { useStore } from 'hooks'
-import { Alert, Button, Modal } from 'ui'
 
 export interface DeletePaymentMethodModalProps {
   selectedPaymentMethod?: OrganizationPaymentMethod
@@ -13,18 +14,14 @@ const DeletePaymentMethodModal = ({
   selectedPaymentMethod,
   onClose,
 }: DeletePaymentMethodModalProps) => {
-  const { ui } = useStore()
   const { slug } = useParams()
 
   const { mutate: deletePayment, isLoading: isDeleting } =
     useOrganizationPaymentMethodDeleteMutation({
       onSuccess: () => {
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully removed payment method ending with ${
-            selectedPaymentMethod!.card.last4
-          }`,
-        })
+        toast.success(
+          `Successfully removed payment method ending with ${selectedPaymentMethod!.card.last4}`
+        )
         onClose()
       },
     })

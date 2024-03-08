@@ -1,25 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import {
-  FormActions,
-  FormHeader,
-  FormPanel,
-  FormSection,
-  FormSectionContent,
-  FormSectionLabel,
-} from 'components/ui/Forms'
-import Panel from 'components/ui/Panel'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
-import {
-  useCheckPermissions,
-  useFlag,
-  useProjectByRef,
-  useSelectedOrganization,
-  useStore,
-} from 'hooks'
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -33,11 +15,24 @@ import {
   IconBarChart2,
   Input,
 } from 'ui'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  FormActions,
+  FormHeader,
+  FormPanel,
+  FormSection,
+  FormSectionContent,
+  FormSectionLabel,
+} from 'components/ui/Forms'
+import Panel from 'components/ui/Panel'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
+import { useCheckPermissions, useFlag, useProjectByRef, useSelectedOrganization } from 'hooks'
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
 
 const General = () => {
-  const { ui } = useStore()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
 
@@ -70,7 +65,7 @@ const General = () => {
     try {
       const { name } = await updateProject({ ref: project.ref, name: values.name.trim() })
       resetForm({ values: { name }, initialValues: { name } })
-      ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+      toast.success('Successfully saved settings')
     } catch (error) {}
   }
 
