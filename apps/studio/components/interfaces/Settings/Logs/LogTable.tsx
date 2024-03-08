@@ -1,7 +1,10 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { IS_PLATFORM } from 'common'
 import { isEqual } from 'lodash'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
+import toast from 'react-hot-toast'
 import {
   Alert,
   Button,
@@ -18,8 +21,9 @@ import {
 } from 'ui'
 
 import CSVButton from 'components/ui/CSVButton'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import { LogQueryError, isDefaultLogPreviewFormat } from '.'
 import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
@@ -31,10 +35,6 @@ import LogSelection, { LogSelectionProps } from './LogSelection'
 import type { LogData, QueryType } from './Logs.types'
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
-import { CSVLink } from 'react-csv'
-import { IS_PLATFORM } from 'common'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useProfile } from 'lib/profile'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -71,7 +71,6 @@ const LogTable = ({
   onSave,
   hasEditorValue,
 }: Props) => {
-  const { ui } = useStore()
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
   const { profile } = useProfile()
@@ -91,7 +90,6 @@ const LogTable = ({
   const columnNames = Object.keys(getFirstRow() || {})
   const hasId = columnNames.includes('id')
   const hasTimestamp = columnNames.includes('timestamp')
-  const csvRef = useRef<CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement }>(null)
 
   const DEFAULT_COLUMNS = columnNames.map((v: keyof LogData, idx) => {
     const result: Column<LogData> = {
@@ -197,7 +195,7 @@ const LogTable = ({
 
   const copyResultsToClipboard = () => {
     copyToClipboard(stringData, () => {
-      ui.setNotification({ category: 'success', message: 'Results copied to clipboard.' })
+      toast.success('Results copied to clipboard')
     })
   }
 

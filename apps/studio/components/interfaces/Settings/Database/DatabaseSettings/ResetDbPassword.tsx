@@ -4,6 +4,7 @@ import { useParams } from 'common'
 import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, Input, Modal } from 'ui'
 
 import {
@@ -13,14 +14,12 @@ import {
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useDatabasePasswordResetMutation } from 'data/database/database-password-reset-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
 
 const ResetDbPassword = ({ disabled = false }) => {
   const { ref } = useParams()
-  const { ui } = useStore()
-
   const isProjectActive = useIsProjectActive()
   const { project } = useProjectContext()
   const canResetDbPassword = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
@@ -39,10 +38,7 @@ const ResetDbPassword = ({ disabled = false }) => {
   const { mutate: resetDatabasePassword, isLoading: isUpdatingPassword } =
     useDatabasePasswordResetMutation({
       onSuccess: async () => {
-        ui.setNotification({
-          category: 'success',
-          message: 'Successfully updated database password',
-        })
+        toast.success('Successfully updated database password')
         setShowResetDbPass(false)
       },
     })

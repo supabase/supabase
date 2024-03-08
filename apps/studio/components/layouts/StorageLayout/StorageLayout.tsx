@@ -1,8 +1,9 @@
+import { useParams } from 'common'
 import { ReactNode, useEffect } from 'react'
+import toast from 'react-hot-toast'
 
-import { useParams } from 'common/hooks'
 import { AutoApiService, useProjectApiQuery } from 'data/config/project-api-query'
-import { useSelectedProject, useStore, withAuth } from 'hooks'
+import { useSelectedProject, withAuth } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { ProjectLayout } from '../'
@@ -14,7 +15,6 @@ export interface StorageLayoutProps {
 }
 
 const StorageLayout = ({ title, children }: StorageLayoutProps) => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const project = useSelectedProject()
   const storageExplorerStore = useStorageStore()
@@ -39,11 +39,9 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
         apiService.protocol
       )
     } else {
-      ui.setNotification({
-        category: 'error',
-        message:
-          'Failed to fetch project configuration. Try refreshing your browser, or reach out to us at support@supabase.io',
-      })
+      toast.error(
+        'Failed to fetch project configuration. Try refreshing your browser, or reach out to us at support@supabase.io'
+      )
     }
     storageExplorerStore.setLoaded(true)
   }
