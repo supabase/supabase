@@ -11,18 +11,14 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabaseMisc'
 import { Partner } from '~/types/partners'
-import Error404 from '~/pages/404'
-import PostTypes from '~/types/post'
-import { getNavLatestPosts } from '~/lib/posts'
+import Error404 from '../../404'
 
 function Partner({
   partner,
   overview,
-  latestPosts,
 }: {
   partner: Partner
   overview: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>
-  latestPosts?: PostTypes[]
 }) {
   if (!partner) return <Error404 />
   return (
@@ -42,7 +38,7 @@ function Partner({
         }}
       />
 
-      <DefaultLayout latestPosts={latestPosts}>
+      <DefaultLayout>
         <SectionContainer>
           <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-12 lg:col-span-2">
             {/* Back button */}
@@ -253,7 +249,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const overview = await serialize(partner.overview)
 
   return {
-    props: { partner, overview, latestPosts: getNavLatestPosts() },
+    props: { partner, overview },
     revalidate: 1800, // 30 minutes
   }
 }
