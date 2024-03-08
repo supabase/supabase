@@ -281,8 +281,6 @@ export const FormLayout = React.forwardRef<
       <FormMessage_Shadcn_ className="mt-2" data-formlayout-id={'message'} />
     )
 
-    console.log('layout', layout)
-
     const renderDescription =
       description && isReactForm ? (
         <FormDescription_Shadcn_
