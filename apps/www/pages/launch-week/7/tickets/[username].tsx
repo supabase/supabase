@@ -145,7 +145,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       },
       ogImageUrl,
       key: username,
-      latestPosts: getNavLatestPosts(),
+      // latestPosts: getNavLatestPosts(),
     },
   }
 }
