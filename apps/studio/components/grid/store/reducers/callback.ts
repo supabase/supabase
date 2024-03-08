@@ -7,7 +7,6 @@ export interface CallbackInitialState {
   onEditRow: ((row: SupaRow) => void) | null
   onEditColumn: ((columnName: string) => void) | null
   onDeleteColumn: ((columnName: string) => void) | null
-  onSqlQuery: ((query: string) => Promise<{ data?: any; error?: any }>) | null
 }
 
 export const callbackInitialState: CallbackInitialState = {
@@ -17,7 +16,6 @@ export const callbackInitialState: CallbackInitialState = {
   onEditRow: null,
   onEditColumn: null,
   onDeleteColumn: null,
-  onSqlQuery: null,
 }
 
 type CALLBACK_ACTIONTYPE = {
@@ -29,7 +27,6 @@ type CALLBACK_ACTIONTYPE = {
     onEditRow: ((row: SupaRow) => void) | null
     onEditColumn: ((columnName: string) => void) | null
     onDeleteColumn: ((columnName: string) => void) | null
-    onSqlQuery: ((query: string) => Promise<{ data?: any; error?: any }>) | null
   }
 }
 
@@ -44,7 +41,6 @@ const CallbackReducer = (state: CallbackInitialState, action: CALLBACK_ACTIONTYP
         onEditRow: action.payload.onEditRow,
         onEditColumn: action.payload.onEditColumn,
         onDeleteColumn: action.payload.onDeleteColumn,
-        onSqlQuery: action.payload.onSqlQuery,
       }
     }
 

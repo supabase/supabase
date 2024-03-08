@@ -1,21 +1,21 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useParams, useTelemetryProps } from 'common'
 import { partition } from 'lodash'
 import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
+import toast from 'react-hot-toast'
 
-import { useParams, useTelemetryProps } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedProject } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
-import { useRouter } from 'next/router'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
 
 const SQLQuickstarts = observer(() => {
-  const { ui } = useStore()
   const { ref } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
@@ -32,10 +32,7 @@ const SQLQuickstarts = observer(() => {
   const handleNewQuery = async (sql: string, name: string) => {
     if (!ref) return console.error('Project ref is required')
     if (!canCreateSQLSnippet) {
-      return ui.setNotification({
-        category: 'info',
-        message: 'Your queries will not be saved as you do not have sufficient permissions',
-      })
+      return toast('Your queries will not be saved as you do not have sufficient permissions')
     }
 
     try {
@@ -50,10 +47,7 @@ const SQLQuickstarts = observer(() => {
       snap.addNeedsSaving(snippet.id!)
       router.push(`/project/${ref}/sql/${snippet.id}`)
     } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create new query: ${error.message}`,
-      })
+      toast.error(`Failed to create new query: ${error.message}`)
     }
   }
 

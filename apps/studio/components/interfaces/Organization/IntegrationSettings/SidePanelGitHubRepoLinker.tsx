@@ -157,6 +157,7 @@ Check the details below before proceeding
               integrationIcon={GITHUB_ICON}
               choosePrompt="Choose GitHub Repo"
               showNoEntitiesState={false}
+              mode="GitHub"
             />
           )}
         </SidePanel.Content>

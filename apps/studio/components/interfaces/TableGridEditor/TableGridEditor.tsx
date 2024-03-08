@@ -16,6 +16,7 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { useCheckPermissions, useLatest, useStore, useUrlState } from 'hooks'
@@ -46,7 +47,7 @@ const TableGridEditor = ({
   selectedTable,
 }: TableGridEditorProps) => {
   const router = useRouter()
-  const { meta, ui } = useStore()
+  const { ui } = useStore()
   const { ref: projectRef, id } = useParams()
 
   const { project } = useProjectContext()
@@ -187,15 +188,6 @@ const TableGridEditor = ({
     router.push(`/project/${projectRef}/editor/${table.id}`)
   }
 
-  const onSqlQuery = async (query: string) => {
-    const res = await meta.query(query)
-    if (res.error) {
-      return { error: res.error }
-    } else {
-      return { data: res }
-    }
-  }
-
   // columns must be accessed via columnsRef.current as these two functions immediately become
   // stale as they are accessed via some react-tracked madness
   // [TODO]: refactor out all of react-tracked
@@ -299,7 +291,6 @@ const TableGridEditor = ({
         onEditRow={snap.onEditRow}
         onImportData={snap.onImportData}
         onError={onError}
-        onSqlQuery={onSqlQuery}
         onExpandJSONEditor={(column, row) => {
           snap.onExpandJSONEditor({ column, row, jsonString: JSON.stringify(row[column]) || '' })
         }}

@@ -1,5 +1,10 @@
-import Link from 'next/link'
 import { useParams } from 'common'
+import Link from 'next/link'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+import { Button, IconDownload, Modal } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -7,16 +12,11 @@ import {
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { Button, IconDownload, Modal } from 'ui'
-import { useState } from 'react'
-import { useStore } from 'hooks'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { getDocument } from 'data/documents/document-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const SOC2 = () => {
   const { slug } = useParams()
-  const { ui } = useStore()
   const {
     data: subscription,
     error,
@@ -33,10 +33,7 @@ const SOC2 = () => {
       if (soc2Link?.fileUrl) window.open(soc2Link.fileUrl, '_blank')
       setIsOpen(false)
     } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to download SOC2 report: ${error.message}`,
-      })
+      toast.error(`Failed to download SOC2 report: ${error.message}`)
     }
   }
 

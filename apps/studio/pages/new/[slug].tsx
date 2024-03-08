@@ -5,15 +5,19 @@ import { debounce } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
+import { Badge, Button, IconExternalLink, IconUsers, Input, Listbox } from 'ui'
 
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
 } from 'components/interfaces/Organization/NewProject'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
+import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import type { components } from 'data/api'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import {
@@ -22,7 +26,7 @@ import {
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useFlag, useStore, withAuth } from 'hooks'
+import { useCheckPermissions, useFlag, withAuth } from 'hooks'
 import {
   AWS_REGIONS,
   CloudProvider,
@@ -34,16 +38,12 @@ import {
 } from 'lib/constants'
 import { passwordStrength, pluckObjectFields } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
-import { Badge, Button, IconExternalLink, IconUsers, Input, Listbox } from 'ui'
-import type { components } from 'data/api'
-import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug } = useParams()
-  const { ui } = useStore()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
@@ -128,9 +128,9 @@ const Wizard: NextPageWithLayout = () => {
   useEffect(() => {
     // User added a new payment method
     if (router.query.setup_intent && router.query.redirect_status) {
-      ui.setNotification({ category: 'success', message: 'Successfully added new payment method' })
+      toast.success('Successfully added new payment method')
     }
-  }, [router.query.redirect_status, router.query.setup_intent, ui])
+  }, [router.query.redirect_status, router.query.setup_intent])
 
   function onProjectNameChange(e: any) {
     e.target.value = e.target.value.replace(/\./g, '')
@@ -179,10 +179,9 @@ const Wizard: NextPageWithLayout = () => {
     }
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {
-        return ui.setNotification({
-          category: 'error',
-          message: `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`,
-        })
+        toast.error(
+          `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
+        )
       }
 
       data['customSupabaseRequest'] = {

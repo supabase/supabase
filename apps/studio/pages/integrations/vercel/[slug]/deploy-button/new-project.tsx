@@ -1,9 +1,11 @@
+import { useParams } from 'common'
 import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
+import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
 
-import { useParams } from 'common'
 import { Markdown } from 'components/interfaces/Markdown'
 import VercelIntegrationWindowLayout from 'components/layouts/IntegrationsLayout/VercelIntegrationWindowLayout'
 import { ScaffoldColumn, ScaffoldContainer } from 'components/layouts/Scaffold'
@@ -15,13 +17,12 @@ import { useIntegrationVercelConnectionsCreateMutation } from 'data/integrations
 import { useVercelProjectsQuery } from 'data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectCreateMutation } from 'data/projects/project-create-mutation'
-import { useSelectedOrganization, useStore } from 'hooks'
+import { useSelectedOrganization } from 'hooks'
 import { AWS_REGIONS, DEFAULT_MINIMUM_PASSWORD_STRENGTH, PROVIDERS } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 import type { NextPageWithLayout } from 'types'
-import { Alert, Button, Checkbox, Input, Listbox } from 'ui'
 
 const VercelIntegration: NextPageWithLayout = () => {
   return (
@@ -53,11 +54,9 @@ VercelIntegration.getLayout = (page) => (
 
 const CreateProject = () => {
   const router = useRouter()
-  const { ui } = useStore()
   const selectedOrganization = useSelectedOrganization()
   const [projectName, setProjectName] = useState('')
   const [dbPass, setDbPass] = useState('')
-  const [instanceSize, setInstanceSize] = useState('micro')
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(-1)
   const [shouldRunMigrations, setShouldRunMigrations] = useState(true)
@@ -145,7 +144,7 @@ const CreateProject = () => {
       setNewProjectRef(res.ref)
     },
     onError: (error) => {
-      ui.setNotification({ error, category: 'error', message: error.message })
+      toast.error(error.message)
       snapshot.setLoading(false)
     },
   })
@@ -162,18 +161,9 @@ const CreateProject = () => {
 
     let dbSql: string | undefined
     if (shouldRunMigrations) {
-      const id = ui.setNotification({
-        category: 'info',
-        message: `Fetching initial migrations from GitHub repo`,
-      })
-
+      const id = toast(`Fetching initial migrations from GitHub repo`)
       dbSql = (await getInitialMigrationSQLFromGitHubRepo(externalId)) ?? undefined
-
-      ui.setNotification({
-        id,
-        category: 'success',
-        message: `Done fetching initial migrations`,
-      })
+      toast.success(`Done fetching initial migrations`, { id })
     }
 
     createProject({

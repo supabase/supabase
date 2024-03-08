@@ -1,17 +1,17 @@
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
+import toast from 'react-hot-toast'
 
 import { useIsLoggedIn, useParams } from 'common'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useFlag, useStore, useLatest } from 'hooks'
+import { useFlag, useLatest } from 'hooks'
 import { DEFAULT_HOME, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 
 // Ideally these could all be within a _middleware when we use Next 12
 const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
-  const { ui } = useStore()
   const router = useRouter()
   const { ref, slug, id } = useParams()
   const navLayoutV2 = useFlag('navigationLayoutV2')
@@ -55,7 +55,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
       const isValidOrg = organizations.some((org) => org.slug === slug)
 
       if (!isValidOrg) {
-        ui.setNotification({ category: 'error', message: 'This organization does not exist' })
+        toast.error('This organization does not exist')
         router.push(navLayoutV2 ? `/org/${organizations[0].slug}` : DEFAULT_HOME)
         return
       }
@@ -80,7 +80,7 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
         : true
 
       if (!isValidProject && !isValidBranch) {
-        ui.setNotification({ category: 'error', message: 'This project does not exist' })
+        toast.error('This project does not exist')
         router.push(navLayoutV2 ? `/org/${organizations?.[0].slug}` : DEFAULT_HOME)
         return
       }

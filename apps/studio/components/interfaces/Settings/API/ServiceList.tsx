@@ -1,9 +1,9 @@
 import { JwtSecretUpdateError, JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
 import { useEffect, useRef } from 'react'
-import { Badge, IconAlertCircle, Input } from 'ui'
+import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import Panel from 'components/ui/Panel'
@@ -15,15 +15,14 @@ import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useStore } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { Badge, IconAlertCircle, Input } from 'ui'
 import { JWT_SECRET_UPDATE_ERROR_MESSAGES } from './API.constants'
 import JWTSettings from './JWTSettings'
 import PostgrestConfig from './PostgrestConfig'
 
 const ServiceList = () => {
-  const { ui } = useStore()
   const client = useQueryClient()
   const { project, isLoading } = useProjectContext()
   const { ref: projectRef, source } = useParams()
@@ -74,14 +73,10 @@ const ServiceList = () => {
           client.invalidateQueries(configKeys.api(projectRef))
           client.invalidateQueries(configKeys.settings(projectRef))
           client.invalidateQueries(configKeys.postgrest(projectRef))
-
-          ui.setNotification({ category: 'success', message: 'Successfully updated JWT secret' })
+          toast.success('Successfully updated JWT secret')
           break
         case Failed:
-          ui.setNotification({
-            category: 'error',
-            message: `JWT secret update failed: ${jwtSecretUpdateErrorMessage}`,
-          })
+          toast.error(`JWT secret update failed: ${jwtSecretUpdateErrorMessage}`)
           break
       }
     }

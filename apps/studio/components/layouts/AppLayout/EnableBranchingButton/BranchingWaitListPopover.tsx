@@ -1,6 +1,5 @@
-import { useSelectedOrganization } from 'hooks'
-import Link from 'next/link'
 import { useState } from 'react'
+
 import {
   Badge,
   Button,
@@ -11,11 +10,11 @@ import {
   Popover_Shadcn_,
 } from 'ui'
 
-interface BranchingWaitlistPopoverProps {
+interface BranchingWaitListPopoverProps {
   isNewNav?: boolean
 }
 
-const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopoverProps) => {
+const BranchingWaitListPopover = ({ isNewNav = false }: BranchingWaitListPopoverProps) => {
   const [open, setOpen] = useState(false)
 
   return (
@@ -52,4 +51,4 @@ const BranchingWaitlistPopover = ({ isNewNav = false }: BranchingWaitlistPopover
   )
 }
 
-export default BranchingWaitlistPopover
+export default BranchingWaitListPopover

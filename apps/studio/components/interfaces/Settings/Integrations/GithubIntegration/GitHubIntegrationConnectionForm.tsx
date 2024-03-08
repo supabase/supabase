@@ -123,6 +123,16 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
             All other branches will be treated as Preview branches
           </p>
 
+          <Alert_Shadcn_ className="mb-4 w-96">
+            <AlertTitle_Shadcn_ className="text-sm">
+              Changing Git branch for Production Branch coming soon
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_ className="text-xs">
+              If you wish to change the Git branch that is used for the Production Branch you will
+              need to disable Branching and opt back in.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+
           {/* <pre>! This should only work if branching is turned on !</pre> */}
 
           <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>

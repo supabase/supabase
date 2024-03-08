@@ -44,7 +44,7 @@ const Favicons = () => {
       {/* misc */}
       <link
         rel="manifest"
-        href={`${basePath}/favicon/site.webmanifest`}
+        href={`${basePath}/favicon/manifest.json`}
         crossOrigin="use-credentials"
       />
       <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
