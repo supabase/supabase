@@ -1,3 +1,5 @@
+import 'swiper/swiper.min.css'
+
 import { useState, useEffect } from 'react'
 import { GetServerSideProps } from 'next'
 import dynamic from 'next/dynamic'
@@ -7,6 +9,8 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
+import { getNavLatestPosts } from '~/lib/posts'
+import PostTypes from '~/types/post'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
@@ -14,10 +18,6 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHeader'
 import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
 import LW8CalloutsSection from '~/components/LaunchWeek/8/LW8CalloutsSection'
-
-import 'swiper/swiper.min.css'
-import { getNavLatestPosts } from '../../../lib/posts'
-import PostTypes from '../../../types/post'
 
 const AnimatedParticles = dynamic(
   () => import('~/components/LaunchWeek/8/AnimatedParticles/ParticlesCanvas')

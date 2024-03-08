@@ -15,8 +15,8 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LWXBackground from '~/components/LaunchWeek/X/LWXBackground'
-import { getNavLatestPosts } from '../../../lib/posts'
-import PostTypes from '../../../types/post'
+import { getNavLatestPosts } from '~/lib/posts'
+import PostTypes from '~/types/post'
 
 const LWXTicketContainer = dynamic(() => import('~/components/LaunchWeek/X/Ticket/TicketContainer'))
 const LaunchWeekPrizeSection = dynamic(

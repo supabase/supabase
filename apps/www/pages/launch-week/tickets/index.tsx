@@ -3,11 +3,14 @@ import { GetServerSideProps } from 'next'
 import { NextSeo } from 'next-seo'
 import { Button } from 'ui'
 import Link from 'next/link'
+import { useTheme } from 'next-themes'
 import { motion } from 'framer-motion'
 import { debounce } from 'lodash'
 
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
-import { useTheme } from 'next-themes'
+import supabase from '~/lib/supabaseMisc'
+import { getNavLatestPosts } from '~/lib/posts'
+import PostTypes from '~/types/post'
 
 import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -15,9 +18,6 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import CTABanner from '~/components/CTABanner'
 import TicketsGrid from '~/components/LaunchWeek/X/TicketsGrid'
-import supabase from '~/lib/supabaseMisc'
-import { getNavLatestPosts } from '~/lib/posts'
-import PostTypes from '~/types/post'
 
 interface Props {
   users: UserData[]

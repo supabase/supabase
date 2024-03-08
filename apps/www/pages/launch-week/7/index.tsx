@@ -1,19 +1,18 @@
 import { GetServerSideProps } from 'next'
 import { NextSeo } from 'next-seo'
-import { useEffect } from 'react'
 import dynamic from 'next/dynamic'
+import { useTheme } from 'next-themes'
 import { createClient } from '@supabase/supabase-js'
 
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
-import { getStaticLatestPosts } from '~/lib/posts'
+import { getNavLatestPosts } from '~/lib/posts'
+import PostTypes from '~/types/post'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/7/LaunchSection/LaunchWeekLogoHeader'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LW7BgGraphic from '~/components/LaunchWeek/7/LW7BgGraphic'
-import { useTheme } from 'next-themes'
-import PostTypes from '../../../types/post'
 
 const LW7Releases = dynamic(() => import('~/components/LaunchWeek/7/Releases'))
 const LaunchWeekPrizeSection = dynamic(
@@ -26,7 +25,7 @@ const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
 interface Props {
   users: UserData[]
-  latestPosts: PostTypes[]
+  latestPosts?: PostTypes[]
 }
 
 const supabaseAdmin = createClient(
@@ -91,8 +90,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   return {
     props: {
       users,
+      latestPosts: getNavLatestPosts(),
     },
   }
 }
-
-export const getStaticProps = async () => getStaticLatestPosts()

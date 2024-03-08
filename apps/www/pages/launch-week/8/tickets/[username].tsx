@@ -3,16 +3,17 @@ import { NextSeo } from 'next-seo'
 import { GetStaticProps, GetStaticPaths } from 'next'
 import Image from 'next/image'
 import Error from 'next/error'
+import { useTheme } from 'next-themes'
 import dynamic from 'next/dynamic'
 import { Session, SupabaseClient, createClient } from '@supabase/supabase-js'
-import { useTheme } from 'next-themes'
+import { SITE_URL } from '~/lib/constants'
+import PostTypes from '~/types/post'
+import { getNavLatestPosts } from '~/lib/posts'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import TicketContainer from '~/components/LaunchWeek/8/Ticket/TicketContainer'
-import { SITE_URL } from '~/lib/constants'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
-import PostTypes from '~/types/post'
 
 const LaunchWeekPrizeSection = dynamic(
   () => import('~/components/LaunchWeek/8/LaunchWeekPrizeSection')
@@ -169,6 +170,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       ogImageUrl,
       users,
       key: username,
+      latestPosts: getNavLatestPosts(),
     },
     revalidate: 5,
   }

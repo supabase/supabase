@@ -4,19 +4,20 @@ import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import { Button } from 'ui'
 import Link from 'next/link'
+import { useTheme } from 'next-themes'
 import { motion } from 'framer-motion'
 import { createClient } from '@supabase/supabase-js'
 import { debounce } from 'lodash'
 
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
-import { useTheme } from 'next-themes'
+import PostTypes from '~/types/post'
+import { getNavLatestPosts } from '~/lib/posts'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import CTABanner from '~/components/CTABanner'
 import TicketsGrid from '~/components/LaunchWeek/8/TicketsGrid'
-import PostTypes from '~/types/post'
 
 interface Props {
   users: UserData[]
@@ -180,6 +181,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   return {
     props: {
       users,
+      latestPosts: getNavLatestPosts(),
     },
   }
 }
