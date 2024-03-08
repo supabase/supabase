@@ -1,17 +1,19 @@
 import { memo } from 'react'
 
 import NavigationMenuHome from './HomeMenu'
-import { useNavMenu } from './NavigationMenuContext'
+import { isNavMenuWithId, useNavMenu } from './NavigationMenuContext'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
-import { type GuideRefItem } from './NavigationMenuGuideRef'
+import { NavigationMenuGuideRef, type GuideRefItem } from './NavigationMenuGuideRef'
 import NavigationMenuRefList from './NavigationMenuRefList'
 import { type Menu, MenuId, menus } from './menus'
 
-function getMenuById(id: MenuId) {
+function getMenuById(id: MenuId | null) {
   return menus.find((menu) => menu.id === id) ?? menus.find((menu) => menu.id === MenuId.Home)
 }
 
 function getMenuElement(menu: Menu, refData?: Array<GuideRefItem>) {
+  if (refData) return <NavigationMenuGuideRef refData={refData} />
+
   const menuType = menu.type
   switch (menuType) {
     case 'home':
@@ -33,7 +35,10 @@ function getMenuElement(menu: Menu, refData?: Array<GuideRefItem>) {
 }
 
 const NavigationMenu = () => {
-  const { menuId: level, refData } = useNavMenu()
+  const navMenuConfig = useNavMenu()
+  const level = isNavMenuWithId(navMenuConfig) ? navMenuConfig.menuId : null
+  const refData = isNavMenuWithId(navMenuConfig) ? null : navMenuConfig.refData
+
   const menu = getMenuById(level)
 
   return getMenuElement(menu, refData)

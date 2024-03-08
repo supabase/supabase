@@ -18,7 +18,6 @@ interface Props {
   }
   children: any
   toc?: any
-  menuItems: any
 }
 
 const Layout: FC<Props> = (props: Props) => {

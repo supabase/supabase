@@ -1,10 +1,14 @@
+import { NavMenuProvider } from '~/components/Navigation/NavigationMenu/NavigationMenuContext'
+import Layout from '~/layouts/DefaultGuideLayout'
 import refItems from '~/scripts/pregenerate/generated/commonClientLibFlat-Auth.json' assert { type: 'json' }
+
+const meta = { title: 'Auth Functions: JavaScript Reference' }
 
 const AuthJSReference = () => {
   return (
-    <>
-      <h1>AUTTTTTHHHH</h1>
-    </>
+    <NavMenuProvider refData={refItems}>
+      <Layout meta={meta}>AAAAHHH</Layout>
+    </NavMenuProvider>
   )
 }
 

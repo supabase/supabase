@@ -8,6 +8,7 @@ import { IconChevronLeft, cn } from 'ui'
 import HomeMenuIconPicker from './HomeMenuIconPicker'
 import { type MenuId } from './NavigationMenu'
 import * as NavItems from './NavigationMenu.constants'
+import { useNavMenu } from './NavigationMenuContext'
 import NavigationMenuGuideListItems from './NavigationMenuGuideListItems'
 import { type GuideRefItem } from './NavigationMenuGuideRef'
 
@@ -37,6 +38,7 @@ interface Props {
 type MenuContents = 'guide' | 'ref'
 
 const NavigationMenuGuideList: React.FC<Props> = ({ id, refData, value }) => {
+  const { dualMenu } = useNavMenu()
   const url = usePathname()
 
   const menu = NavItems[id]
@@ -52,7 +54,7 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, refData, value }) => {
     firstLevelRoute = url?.split('/')?.slice(0, 4)?.join('/')
   }
 
-  if (!refData) {
+  if (!dualMenu) {
     return (
       <div className="w-full flex flex-col">
         <Link
