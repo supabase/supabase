@@ -1,10 +1,18 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import clsx from 'clsx'
-import { IS_PLATFORM } from 'common'
 import saveAs from 'file-saver'
 import { Eye, MoreHorizontal, Table2, Unlock } from 'lucide-react'
 import Link from 'next/link'
 import Papa from 'papaparse'
+import toast from 'react-hot-toast'
+
+import { IS_PLATFORM } from 'common'
+import { parseSupaTable } from 'components/grid'
+import type { ItemRenderer } from 'components/ui/InfiniteList'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import type { Entity } from 'data/entity-types/entity-type-query'
+import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
+import { getTable } from 'data/tables/table-query'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,17 +26,7 @@ import {
   IconTrash,
   cn,
 } from 'ui'
-
-import { parseSupaTable } from 'components/grid'
-import type { ItemRenderer } from 'components/ui/InfiniteList'
-import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import type { Entity } from 'data/entity-types/entity-type-query'
-import { fetchAllTableRows } from 'data/table-rows/table-rows-query'
-import { getTable } from 'data/tables/table-query'
-import { useStore } from 'hooks'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
-import toast from 'react-hot-toast'
 
 export interface EntityListItemProps {
   id: number
@@ -42,7 +40,6 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   item: entity,
   isLocked,
 }) => {
-  const { ui } = useStore()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
@@ -57,12 +54,10 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   }
 
   const exportTableAsCSV = async () => {
-    if (IS_PLATFORM && !project?.connectionString)
+    if (IS_PLATFORM && !project?.connectionString) {
       return console.error('Connection string is required')
-    const toastId = ui.setNotification({
-      category: 'loading',
-      message: `Exporting ${entity.name} as CSV...`,
-    })
+    }
+    const toastId = toast.loading(`Exporting ${entity.name} as CSV...`)
 
     try {
       const table = await getTable({
@@ -135,7 +130,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
             <Eye size={15} strokeWidth={1.5} className="text-foreground-lighter" />
           ) : (
             <div
-              className={clsx(
+              className={cn(
                 'flex items-center justify-center text-xs h-4 w-4 rounded-[2px] font-bold',
                 entity.type === ENTITY_TYPE.FOREIGN_TABLE && 'text-yellow-900 bg-yellow-500',
                 entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1000 bg-purple-500',

@@ -794,10 +794,7 @@ class StorageExplorerStore {
 
   downloadFolder = async (folder) => {
     let progress = 0
-    const toastId = this.ui.setNotification({
-      category: 'loading',
-      message: 'Retrieving files from folder...',
-    })
+    const toastId = toast.loading('Retrieving files from folder...')
 
     const files = await this.getAllItemsAlongFolder(folder)
 
@@ -893,10 +890,7 @@ class StorageExplorerStore {
     let progress = 0
     const returnBlob = true
     const showIndividualToast = false
-    const toastId = this.ui.setNotification({
-      category: 'loading',
-      message: `Downloading ${files.length} files...`,
-    })
+    const toastId = toast.loading(`Downloading ${files.length} files...`)
 
     const promises = formattedFilesWithPrefix.map((file) => {
       return () => {
@@ -936,20 +930,14 @@ class StorageExplorerStore {
     link.click()
     link.parentNode.removeChild(link)
 
-    this.ui.setNotification({
-      id: toastId,
-      category: 'success',
-      message: `Successfully downloaded ${downloadedFiles.length} files`,
-    })
+    toast.success(`Successfully downloaded ${downloadedFiles.length} files`, { id: toastId })
   }
 
   downloadFile = async (file, showToast = true, returnBlob = false) => {
     const fileName = file.name
     const fileMimeType = file?.metadata?.mimetype ?? null
 
-    const toastId = showToast
-      ? this.ui.setNotification({ category: 'loading', message: `Retrieving ${fileName}...` })
-      : undefined
+    const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
 
     const pathToFile = this.openedFolders
       .slice(0, file.columnIndex)

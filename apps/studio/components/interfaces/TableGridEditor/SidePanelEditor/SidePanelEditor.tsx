@@ -495,10 +495,9 @@ const SidePanelEditor = ({
     }
 
     const { file, rowCount, selectedHeaders, resolve } = importContent
-    const toastId = ui.setNotification({
-      category: 'loading',
-      message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
-    })
+    const toastId = toast.loading(
+      `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`
+    )
 
     if (file && rowCount > 0) {
       // CSV file upload
