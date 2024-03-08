@@ -74,7 +74,6 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
       y: row[config.yKey],
     }))
     const downsampledResults = LTTB(resultsToDownsample, 100) as { x: string; y: number }[]
-    console.log('DEBUG downsampled', downsampledResults)
 
     resultToRender = downsampledResults.map((row: { x: any; y: any }) => ({
       [config.xKey]: resultToRender[row.x][config.xKey],
@@ -192,7 +191,6 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
                 name="cumulative"
                 checked={config.cumulative}
                 onClick={(e) => {
-                  console.log(e)
                   onConfigChange({ ...config, cumulative: !config.cumulative })
                 }}
               />
