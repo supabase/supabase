@@ -199,8 +199,8 @@ const getDatesFromFileName = (filename: string) => {
   }
 }
 
-export const getNavLatestPosts = () =>
-  getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **', limit: 2 })
+export const getNavLatestPosts = (limit?: number) =>
+  getSortedPosts({ directory: '_blog', runner: '** BLOG PAGE **', limit: limit ?? 2 })
 
 export const getStaticLatestPosts = () => {
   return {
