@@ -1,9 +1,10 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { get } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
-import { configKeys } from './keys'
+import { get } from 'data/fetchers'
 import type { ResponseError } from 'types'
+import { configKeys } from './keys'
+import { useProjectByRef } from 'hooks'
+import { PROJECT_STATUS } from 'lib/constants'
 
 export type ProjectUpgradeEligibilityVariables = { projectRef?: string }
 export type ProjectUpgradeEligibilityResponse = {
@@ -24,11 +25,12 @@ export async function getProjectUpgradeEligibility(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const response = await get(`${API_ADMIN_URL}/projects/${projectRef}/upgrade/eligibility`, {
-    signal,
+  const { data, error } = await get('/v1/projects/{ref}/upgrade/eligibility', {
+    params: { path: { ref: projectRef } },
   })
-  if (response.error) throw response.error
-  return response as ProjectUpgradeEligibilityResponse
+
+  if (error) throw error
+  return data as ProjectUpgradeEligibilityResponse
 }
 
 export type ProjectUpgradeEligibilityData = Awaited<ReturnType<typeof getProjectUpgradeEligibility>>
@@ -40,9 +42,18 @@ export const useProjectUpgradeEligibilityQuery = <TData = ProjectUpgradeEligibil
     enabled = true,
     ...options
   }: UseQueryOptions<ProjectUpgradeEligibilityData, ProjectUpgradeEligibilityError, TData> = {}
-) =>
-  useQuery<ProjectUpgradeEligibilityData, ProjectUpgradeEligibilityError, TData>(
+) => {
+  const project = useProjectByRef(projectRef)
+  return useQuery<ProjectUpgradeEligibilityData, ProjectUpgradeEligibilityError, TData>(
     configKeys.upgradeEligibility(projectRef),
     ({ signal }) => getProjectUpgradeEligibility({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    {
+      enabled:
+        enabled &&
+        project !== undefined &&
+        project.status !== PROJECT_STATUS.INACTIVE &&
+        typeof projectRef !== 'undefined',
+      ...options,
+    }
   )
+}
