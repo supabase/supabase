@@ -1329,6 +1329,18 @@ functions:
         isOptional: false
         type: Map<String, dynamic> or List<Map<String, dynamic>>
         description: The values to upsert with. Pass a Map to upsert a single row or an List to upsert multiple rows.
+      - name: onConflict
+        isOptional: true
+        type: String
+        description: Comma-separated UNIQUE column(s) to specify how duplicate rows are determined. Two rows are duplicates if all the `onConflict` columns are equal.
+      - name: ignoreDuplicates
+        isOptional: true
+        type: bool
+        description: If `true`, duplicate rows are ignored. If `false`, duplicate rows are merged with existing rows.
+      - name: defaultToNull
+        isOptional: true
+        type: bool
+        description: Make missing fields default to `null`. Otherwise, use the default value for the column. This only applies when inserting new rows, not when merging with existing rows where ignoreDuplicates is set to false. This also only applies when doing bulk upserts.
     examples:
       - id: upsert-your-data
         name: Upsert your data
@@ -2395,6 +2407,15 @@ functions:
     title: or()
     description: |
       Finds all rows satisfying at least one of the filters.
+    params:
+      - name: filters
+        isOptional: false
+        type: String
+        description: The filters to use, following PostgREST syntax
+      - name: referencedTable
+        isOptional: true
+        type: String
+        description: Set this to filter on referenced tables instead of the parent table
     notes: |
       - `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
 
@@ -2484,10 +2505,23 @@ functions:
         .not('id','in','(6,7)')  // Use Postgres list () and 'in' instead of `inFilter`.
         .not('id','in','(${mylist.join(',')})')  // You can insert a Dart list array.
         ```
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: operator
+        isOptional: false
+        type: String
+        description: The operator to be negated to filter with, following PostgREST syntax.
+      - name: value
+        isOptional: true
+        type: Object
+        description: The value to filter with, following PostgREST syntax.
     examples:
       - id: with-select
         name: With `select()`
-        isSpotlight: true
+        isSpotlight: false
         code: |
           ```dart
           final data = await supabase
@@ -2527,6 +2561,11 @@ functions:
     title: match()
     description: |
       Finds all rows whose columns match the specified `query` object.
+    params:
+      - name: query
+        isOptional: false
+        type: Map<String, dynamic>
+        description: The object to filter with, with column names as keys mapped to their filter values
     examples:
       - id: with-select
         name: With `select()`
@@ -2565,6 +2604,15 @@ functions:
     title: eq()
     description: |
       Match only rows where `column` is equal to `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2604,6 +2652,15 @@ functions:
     title: neq()
     description: |
       Finds all rows whose value on the stated `column` doesn't match the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2647,6 +2704,15 @@ functions:
     title: gt()
     description: |
       Finds all rows whose value on the stated `column` is greater than the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2686,6 +2752,15 @@ functions:
     title: gte()
     description: |
       Finds all rows whose value on the stated `column` is greater than or equal to the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2729,6 +2804,15 @@ functions:
     title: lt()
     description: |
       Finds all rows whose value on the stated `column` is less than the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2768,6 +2852,15 @@ functions:
     title: lte()
     description: |
       Finds all rows whose value on the stated `column` is less than or equal to the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2811,6 +2904,15 @@ functions:
     title: like()
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case sensitive).
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: pattern
+        isOptional: false
+        type: String
+        description: The pattern to match with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2850,6 +2952,15 @@ functions:
     title: ilike()
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case insensitive).
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: pattern
+        isOptional: false
+        type: String
+        description: The pattern to match with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2889,6 +3000,15 @@ functions:
     title: isFilter()
     description: |
       A check for exact equality (null, true, false), finds all rows whose value on the stated `column` exactly match the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Object?
+        description: The value to filter with.
     examples:
       - id: checking-nullness
         name: Checking for nullness, true or false
@@ -2933,6 +3053,15 @@ functions:
     title: inFilter()
     description: |
       Finds all rows whose value on the stated `column` is found on the specified `values`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: values
+        isOptional: false
+        type: List
+        description: The List to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2976,6 +3105,16 @@ functions:
 
   - id: contains
     title: contains()
+    description: Only relevant for jsonb, array, and range columns. Match only rows where `column` contains every element appearing in `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The jsonb, array, or range column to filter on.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The jsonb, array, or range value to filter with.
     examples:
       - id: on-array-columns
         name: On array columns
@@ -3096,6 +3235,15 @@ functions:
     title: containedBy()
     description: |
       Only relevant for jsonb, array, and range columns. Match only rows where every element appearing in `column` is contained by `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The jsonb, array, or range column to filter on.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The jsonb, array, or range value to filter with.
     examples:
       - id: on-array-columns
         name: On array columns
@@ -3212,6 +3360,15 @@ functions:
     title: rangeLt()
     description: |
       Only relevant for range columns. Match only rows where every element in `column` is less than any element in `range`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The range column to filter on.
+      - name: range
+        isOptional: false
+        type: String
+        description: The range to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -3260,6 +3417,15 @@ functions:
     title: rangeGt()
     description: |
       Only relevant for range columns. Match only rows where every element in `column` is greater than any element in `range`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The range column to filter on.
+      - name: range
+        isOptional: false
+        type: String
+        description: The range to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -3308,6 +3474,15 @@ functions:
     title: rangeGte()
     description: |
       Only relevant for range columns. Match only rows where every element in `column` is either contained in `range` or greater than any element in `range`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The range column to filter on.
+      - name: range
+        isOptional: false
+        type: String
+        description: The range to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -3356,6 +3531,15 @@ functions:
     title: rangeLte()
     description: |
       Only relevant for range columns. Match only rows where every element in `column` is either contained in `range` or less than any element in `range`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The range column to filter on.
+      - name: range
+        isOptional: false
+        type: String
+        description: The range to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -3404,6 +3588,15 @@ functions:
     title: rangeAdjacent()
     description: |
       Only relevant for range columns. Match only rows where `column` is mutually exclusive to `range` and there can be no element between the two ranges.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The range column to filter on.
+      - name: range
+        isOptional: false
+        type: String
+        description: The range to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -3452,6 +3645,15 @@ functions:
     title: overlaps()
     description: |
       Only relevant for array and range columns. Match only rows where `column` and `value` have an element in common.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The array or range column to filter on.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The array or range value to filter with.
     examples:
       - id: on-array-columns
         name: On array columns
@@ -3534,6 +3736,23 @@ functions:
     title: textSearch()
     description: |
       Finds all rows whose tsvector value on the stated `column` matches to_tsquery(query).
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The text or tsvector column to filter on.
+      - name: query
+        isOptional: false
+        type: String
+        description: The query text to match with.
+      - name: config
+        isOptional: true
+        type: String
+        description: The text search configuration to use.
+      - name: type
+        isOptional: true
+        type: TextSearchType
+        description: Change how the `query` text is interpreted.
     examples:
       - id: text-search
         name: Text search
@@ -3598,15 +3817,28 @@ functions:
   - id: filter
     title: filter()
     description: |
-      Finds all rows whose `column` satisfies the filter.
+      Match only rows which satisfy the filter. This is an escape hatch - you should use the specific filter methods wherever possible.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: operator
+        isOptional: false
+        type: String
+        description: The operator to filter with, following PostgREST syntax.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The value to filter with, following PostgREST syntax.
     notes: |
-      - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
-        ```dart
-          .filter('arraycol','cs','{"a","b"}') // Use Postgres array {} and 'cs' for contains.
-          .filter('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
-          .filter('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
-          .filter('id','cs','{${mylist.join(',')}}')  // You can insert a Dart array list.
-        ```
+      `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
+      ```dart
+      .filter('arraycol','cs','{"a","b"}') // Use Postgres array {} and 'cs' for contains.
+      .filter('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+      .filter('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
+      .filter('id','cs','{${mylist.join(',')}}')  // You can insert a Dart array list.
+      ```
     examples:
       - id: with-select
         name: With `select()`
