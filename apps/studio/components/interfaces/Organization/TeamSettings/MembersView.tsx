@@ -1,8 +1,22 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import Image from 'next/legacy/image'
 import { Fragment, useState } from 'react'
+import toast from 'react-hot-toast'
+
+import { useParams } from 'common'
+import Table from 'components/to-be-cleaned/Table'
+import AlertError from 'components/ui/AlertError'
+import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
+import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
+import {
+  OrganizationMember,
+  useOrganizationMembersQuery,
+} from 'data/organizations/organization-members-query'
+import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useSelectedOrganization } from 'hooks'
+import { useProfile } from 'lib/profile'
 import {
   Badge,
   Button,
@@ -15,19 +29,6 @@ import {
   Loading,
   Modal,
 } from 'ui'
-
-import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
-import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useOrganizationMemberUpdateMutation } from 'data/organizations/organization-member-update-mutation'
-import {
-  OrganizationMember,
-  useOrganizationMembersQuery,
-} from 'data/organizations/organization-members-query'
-import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useSelectedOrganization, useStore } from 'hooks'
-import { useProfile } from 'lib/profile'
 import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
 import MemberActions from './MemberActions'
 import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
@@ -43,7 +44,6 @@ export interface MembersViewProps {
 }
 
 const MembersView = ({ searchString }: MembersViewProps) => {
-  const { ui } = useStore()
   const { slug } = useParams()
   const selectedOrganization = useSelectedOrganization()
 
@@ -65,18 +65,12 @@ const MembersView = ({ searchString }: MembersViewProps) => {
   const { mutate: updateOrganizationMember, isLoading } = useOrganizationMemberUpdateMutation({
     onSuccess() {
       setUserRoleChangeModalVisible(false)
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated role for ${getUserDisplayName(selectedMember)}`,
-      })
+      toast.success(`Successfully updated role for ${getUserDisplayName(selectedMember)}`)
     },
     onError(error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to update role for ${getUserDisplayName(selectedMember)}: ${
-          error.message
-        }`,
-      })
+      toast.error(
+        `Failed to update role for ${getUserDisplayName(selectedMember)}: ${error.message}`
+      )
     },
   })
 
@@ -173,13 +167,11 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                     const canAddRole = rolesAddable.includes(selectedRole?.id ?? -1)
 
                     if (!canAddRole) {
-                      return ui.setNotification({
-                        category: 'error',
-                        duration: 4000,
-                        message: `You do not have permission to update this team member to ${
+                      return toast.error(
+                        `You do not have permission to update this team member to ${
                           selectedRole!.name
-                        }`,
-                      })
+                        }`
+                      )
                     }
 
                     setUserRoleChangeModalVisible(true)

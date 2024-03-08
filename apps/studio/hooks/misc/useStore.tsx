@@ -3,33 +3,28 @@ import { createContext, PropsWithChildren, useContext, useEffect } from 'react'
 import toast from 'react-hot-toast'
 
 import SparkBar from 'components/ui/SparkBar'
-import type { IRootStore } from 'stores'
-import { useSelectedProject } from './useSelectedProject'
+import { IUiStore } from 'stores/UiStore'
 
-const StoreContext = createContext<IRootStore>(undefined!)
+const StoreContext = createContext<{ ui: IUiStore }>(undefined!)
 
+/**
+ * @deprecated use the toast.success/loading/error functions, imported from 'react-hot-toast'
+ */
 export function useStore() {
   const context = useContext(StoreContext)
   if (context === undefined) {
     throw new Error('useStore must be used within StoreProvider')
   }
 
+  // returning in this way so that it's backwards compatible.
   return context
 }
 
 interface StoreProvider {
-  rootStore: IRootStore
+  rootStore: { ui: IUiStore }
 }
 export const StoreProvider = ({ children, rootStore }: PropsWithChildren<StoreProvider>) => {
   const { ui } = rootStore
-
-  const selectedProject = useSelectedProject()
-  useEffect(() => {
-    if (selectedProject) {
-      rootStore.setProject(selectedProject)
-    }
-  }, [selectedProject])
-
   useEffect(() => {
     autorun(() => {
       if (ui.notification) {

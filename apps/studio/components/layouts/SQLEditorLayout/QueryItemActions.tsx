@@ -2,6 +2,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { Copy, Download, Edit, MoreHorizontal, Share, Trash } from 'lucide-react'
 import { useRouter } from 'next/router'
+import toast from 'react-hot-toast'
 import {
   Button,
   DropdownMenu,
@@ -13,7 +14,7 @@ import {
 
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedProject } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
@@ -37,7 +38,6 @@ export const QueryItemActions = ({
   onSelectShareQuery,
   onSelectDownloadQuery,
 }: QueryItemActionsProps) => {
-  const { ui } = useStore()
   const { ref } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
@@ -90,10 +90,7 @@ export const QueryItemActions = ({
       snap.addNeedsSaving(snippet.id!)
       router.push(`/project/${ref}/sql/${snippet.id}`)
     } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create a personal copy of this query: ${error.message}`,
-      })
+      toast.error(`Failed to create a personal copy of this query: ${error.message}`)
     }
   }
 

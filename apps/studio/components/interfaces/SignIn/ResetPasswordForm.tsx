@@ -1,7 +1,9 @@
+import { useRouter } from 'next/router'
+import toast from 'react-hot-toast'
+
 import { useStore } from 'hooks'
 import { auth } from 'lib/gotrue'
 import { passwordSchema } from 'lib/schemas'
-import { useRouter } from 'next/router'
 import { Button, Form, Input } from 'ui'
 
 const ResetPasswordForm = () => {
@@ -17,22 +19,13 @@ const ResetPasswordForm = () => {
     const { error } = await auth.updateUser({ password })
 
     if (!error) {
-      ui.setNotification({
-        id: toastId,
-        category: 'success',
-        message: `Password saved successfully!`,
-      })
+      toast.success('Password saved successfully!', { id: toastId })
 
       // logout all other sessions after changing password
       await auth.signOut({ scope: 'others' })
-
       await router.push('/projects')
     } else {
-      ui.setNotification({
-        id: toastId,
-        category: 'error',
-        message: error.message,
-      })
+      toast.error(error.message, { id: toastId })
     }
   }
 

@@ -6,7 +6,7 @@ import { Command, FileText, FlaskConical, Search, Settings } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { MouseEvent, useState } from 'react'
+import { useState } from 'react'
 import {
   Button,
   DropdownMenu,
@@ -26,6 +26,7 @@ import {
 } from 'ui'
 
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useSignOut } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import { detectOS } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -39,7 +40,6 @@ import {
 } from './NavigationBar.utils'
 import { NavigationIconButton } from './NavigationIconButton'
 import NavigationIconLink from './NavigationIconLink'
-import { useSignOut } from 'lib/auth'
 
 export const ICON_SIZE = 20
 export const ICON_STROKE_WIDTH = 1.5
@@ -333,17 +333,21 @@ const NavigationBar = () => {
                     ))}
                 </DropdownMenuRadioGroup>
               </DropdownMenuGroup>
-              <DropdownMenuSeparator />
-              <DropdownMenuGroup>
-                <DropdownMenuItem
-                  onSelect={async () => {
-                    await signOut()
-                    await router.push('/sign-in')
-                  }}
-                >
-                  Log out
-                </DropdownMenuItem>
-              </DropdownMenuGroup>
+              {IS_PLATFORM && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuGroup>
+                    <DropdownMenuItem
+                      onSelect={async () => {
+                        await signOut()
+                        await router.push('/sign-in')
+                      }}
+                    >
+                      Log out
+                    </DropdownMenuItem>
+                  </DropdownMenuGroup>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </ul>
