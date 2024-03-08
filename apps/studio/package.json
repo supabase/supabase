@@ -48,6 +48,7 @@
     "config": "*",
     "configcat-js": "^7.0.0",
     "dayjs": "^1.11.10",
+    "downsample": "^1.4.0",
     "file-saver": "^2.0.5",
     "framer-motion": "^11.0.3",
     "generate-password-browser": "^1.1.0",

@@ -1,6 +1,7 @@
 import BarChart from 'components/ui/Charts/BarChart'
 import NoDataPlaceholder from 'components/ui/Charts/NoDataPlaceholder'
 import dayjs from 'dayjs'
+import { createLTTB } from 'downsample'
 import { ArrowUpDown } from 'lucide-react'
 import { useMemo } from 'react'
 import {
@@ -20,7 +21,7 @@ import {
 type Results = { rows: readonly any[] }
 
 export type ChartConfig = {
-  type: 'bar' | 'line'
+  type: 'bar'
   cumulative: boolean
   xKey: string
   yKey: string
@@ -42,6 +43,7 @@ const getCumulativeResults = (results: Results, config: ChartConfig) => {
   return cumulativeResults
 }
 const VALID_RESULT_KEY_TYPES = ['number', 'string', 'date']
+const MAX_DATA_POINTS = 300
 
 type ChartConfigProps = {
   results: Results
@@ -57,10 +59,28 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
     })
   }, [results])
 
-  // Compute cumulative results only if necessary
   const cumulativeResults = useMemo(() => getCumulativeResults(results, config), [results, config])
 
-  const resultToRender = config.cumulative ? cumulativeResults : results.rows
+  let resultToRender = config.cumulative ? cumulativeResults : results.rows
+
+  // With too many data points, the chart becomes unreadable and slow.
+  if (resultToRender.length > MAX_DATA_POINTS) {
+    const LTTB = createLTTB({
+      x: 'x',
+      y: 'y',
+    })
+    const resultsToDownsample = resultToRender.map((row: any, idx: any) => ({
+      x: idx,
+      y: row[config.yKey],
+    }))
+    const downsampledResults = LTTB(resultsToDownsample, 100) as { x: string; y: number }[]
+    console.log('DEBUG downsampled', downsampledResults)
+
+    resultToRender = downsampledResults.map((row: { x: any; y: any }) => ({
+      [config.xKey]: resultToRender[row.x][config.xKey],
+      [config.yKey]: row.y,
+    }))
+  }
 
   if (!resultKeys.length) {
     return (
@@ -98,6 +118,13 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
               yAxisKey={config.yKey}
               emptyStateMessage="Execute a query and configure the chart options"
             />
+          )}
+          {results.rows.length > MAX_DATA_POINTS && (
+            <>
+              <div className="text-foreground-light text-xs text-center mt-2">
+                Chart has been downsampled to 100 points for performance and readability.
+              </div>
+            </>
           )}
         </ResizablePanel>
         <ResizableHandle withHandle />
