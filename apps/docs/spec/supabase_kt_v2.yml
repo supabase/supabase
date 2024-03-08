@@ -78,6 +78,45 @@ functions:
       }
       ```
       That's it! If you already implemented deeplinks to handle OTPs and OAuth you don't have to change anything!
+    params:
+      - name: supabaseUrl
+        isOptional: false
+        type: String
+        description: The unique Supabase URL which is supplied when you create a new project in your project dashboard.
+      - name: supabaseKey
+        isOptional: false
+        type: String
+        description: The unique Supabase Key which is supplied when you create a new project in your project dashboard.
+      - name: builder
+        isOptional: true
+        type: SupabaseClientBuilder.() -> Unit
+        description: Apply additional configuration and install plugins.
+        subContent:
+          - name: useHTTPS
+            isOptional: true
+            type: Boolean
+            description: Whether to use HTTPS for network requests. Will be set automatically depending on your Supabase url, but can be changed manually.
+          - name: httpEngine
+            isOptional: true
+            type: HttpClientEngine?
+            description: Custom Ktor Client engine. Shouldn't be set manually as Ktor uses an engine from your dependencies, but can be set it to a MockEngine for tests.
+          - name: ignoreModulesInUrl
+            isOptional: true
+            type: Boolean
+            description: Whether to ignore if [supabaseUrl] contains modules like 'realtime' or 'auth'. If false, an exception will be thrown. Defaults to false.
+          - name: requestTimeout
+            isOptional: true
+            type: Duration
+            description: Timeout after network requests throw a `HttpRequestTimeoutException`. Defaults to 10 seconds.
+          - name: defaultLogLevel
+            isOptional: true
+            type: LogLevel
+            description: The default log level used for plugins. Can be overriden per plugin. Defaults to `LogLevel.INFO`.
+          - name: defaultSerializer
+            isOptional: true
+            type: SupabaseSerializer
+            description: The default serializer used to serialize and deserialize custom data types. Defaults to `KotlinXSerializer`.
+
     examples:
       - id: initialize-client
         name: Initialize Client
@@ -273,6 +312,19 @@ functions:
       - When calling a `decode` method, you have to provide a [serializable class](/docs/reference/kotlin/installing#serialization) as the type parameter.
       - You can provide a `Columns` object to select specific columns.
       - You can provide a [filter](/docs/reference/kotlin/using-filters) block to filter the results
+    params:
+      - name: columns
+        isOptional: true
+        type: Columns
+        description: The columns to retrieve, defaults to `Columns.ALL`. You can also use `Columns.list`, `Columns.type` or `Columns.raw` to specify the columns.
+      - name: head
+        isOptional: true
+        type: Boolean
+        description: If true, select will delete the selected data.
+      - name: request
+        isOptional: true
+        type: PostgrestRequestBuilder.() -> Unit
+        description: Additional configuration & filtering for the request.
     examples:
       - id: getting-your-data
         name: Getting your data
@@ -369,6 +421,16 @@ functions:
       - When calling an `insert` method, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization).
       - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
       This is convenient, but it can also cause problems if your policies are not configured to allow the `select` operation.
+    params:
+      - name: value # This function has two signatures: "value: T" and "values: List<T>"
+        isOptional: false
+        type: T or List<T>
+        description: The value(s) you want to insert. `T` can be any serializable type.
+      - name: request
+        isOptional: true
+        type: PostgrestRequestBuilder.() -> Unit
+        description: Additional configuration & filtering for the request.
+
     examples:
       - id: create-a-record
         name: Create a record
@@ -405,6 +467,15 @@ functions:
     notes: |
       - `update()` should always be combined with a [filter](/docs/reference/kotlin/using-filters) block to avoid updating all records.
       - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
+    params:
+      - name: value
+        type: T or PostgrestUpdate.() -> Unit = {}
+        isOptional: false
+        description: The new value, can be either a serializable value or PostgrestUpdate DSL where you can set new values per column.
+      - name: request
+        isOptional: true
+        type: PostgrestRequestBuilder.() -> Unit
+        description: Additional configuration & filtering for the request.
     examples:
       - id: updating-your-data
         name: Updating your data
@@ -498,6 +569,27 @@ functions:
       - Primary keys  must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
       - If you need to insert new data and update existing data at the same time, use [Postgres triggers](https://github.com/supabase/postgrest-js/issues/173#issuecomment-825124550).
       - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
+    params:
+      - name: value # This function has two signatures: "value: T" and "values: List<T>"
+        isOptional: false
+        type: T or List<T>
+        description: The value(s) you want to insert. `T` can be any serializable type.
+      - name: onConflict
+        isOptional: true
+        type: String?
+        description: Comma-separated UNIQUE column(s) to specify how duplicate rows are determined. Two rows are duplicates if all the `onConflict` columns are equal.
+      - name: defaultToNull
+        isOptional: true
+        type: Boolean
+        description: Make missing fields default to `null`. Otherwise, use the default value for the column. This only applies when inserting new rows, not when merging with existing rows under
+      - name: ignoreDuplicates
+        isOptional: true
+        type: Boolean
+        description: If `true`, duplicate rows are ignored. If `false`, duplicate rows are merged with existing rows.
+      - name: request
+        isOptional: true
+        type: PostgrestRequestBuilder.() -> Unit
+        description: Additional configuration & filtering for the request.
     examples:
       - id: upsert-your-data
         name: Upsert your data
@@ -540,6 +632,11 @@ functions:
         rows visible through `SELECT` policies are deleted. Note that by default
         no rows are visible, so you need at least one `SELECT`/`ALL` policy that
         makes the rows visible.
+    params:
+      - name: request
+        isOptional: true
+        type: PostgrestRequestBuilder.() -> Unit
+        description: Additional configuration & filtering for the request.
     examples:
       - id: delete-records
         name: Delete records
@@ -576,6 +673,23 @@ functions:
       It's especially useful when the logic rarely changes - like password resets and updates.
 
       - When calling `rpc` with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
+    params:
+      - name: function
+        isOptional: false
+        type: String
+        description: The name of the function
+      - name: parameters
+        isOptional: true # Not directly `optional`, as there are two overloads one with and one without `parameters`.
+        type: T
+        description: Parameters to pass to the function. T can be any serializable type.
+      - name: head
+        isOptional: true
+        type: Boolean
+        description: If true, delete will delete the selected data.
+      - name: request
+        isOptional: true
+        type: PostgrestRequestBuilder.() -> Unit
+        description: Additional configuration & filtering for the request.
     examples:
       - id: call-a-stored-procedure
         name: Call a stored procedure
@@ -2429,6 +2543,36 @@ functions:
       - If signUpWith() is called for an existing confirmed user:
         - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
+    params:
+      - name: provider
+        isOptional: false
+        type: AuthProvider<C, R>
+        description: The provider to use for the user's authentication. In this case `Email` or `Phone`.
+      - name: redirectUrl
+        isOptional: true
+        type: String?
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: config
+        isOptional: true
+        type: C.() -> Unit
+        description: The configuration for signing in with `Email` or `Phone`.
+        subContent:
+          - name: password
+            isOptional: false
+            type: String
+            description: The user's password
+          - name: email/phone
+            isOptional: false
+            type: String
+            description: The user's email or phone.
+          - name: captchaToken
+            isOptional: true
+            type: String?
+            description: The captcha token when having captcha enabled.
+          - name: data
+            isOptional: true
+            type: JsonObject?
+            description: Extra user data to pass in.
     examples:
       - id: sign-up-email
         name: Sign up with email
@@ -2440,8 +2584,19 @@ functions:
               password = "example-password"
           }
           ```
-      - id: sign-up-phone
-        name: Sign up with a phone number
+      - id: sign-up-phone-whatsapp
+        name: Sign up with a phone number and password (whatsapp)
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val user = supabase.auth.signUpWith(Phone) {
+              phone = "+4912345679"
+              password = "example-password"
+              channel = Phone.Channel.WHATSAPP
+          }
+          ```
+      - id: sign-up-phone-sms
+        name: Sign up with a phone number and password (sms)
         isSpotlight: true
         code: |
           ```kotlin
@@ -2481,6 +2636,32 @@ functions:
     notes: |
       Logs in an existing user.
       - Requires either an email and password or a phone number and password.
+    params:
+      - name: provider
+        isOptional: false
+        type: DefaultAuthProvider<C, R>
+        description: The provider to use for the user's authentication, in this case `Email` or `Phone`.
+      - name: redirectUrl
+        isOptional: true
+        type: String?
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: config
+        isOptional: true
+        type: C.() -> Unit
+        description: The configuration for signing in with `Email` or `Phone`.
+        subContent:
+          - name: password
+            isOptional: false
+            type: String
+            description: The user's password
+          - name: email/phone
+            isOptional: false
+            type: String
+            description: The user's email or phone.
+          - name: captchaToken
+            isOptional: true
+            type: String?
+            description: The captcha token when having captcha enabled.
     examples:
       - id: sign-in-with-email-and-password
         name: Sign in with email and password
@@ -2502,9 +2683,46 @@ functions:
               password = "example-password"
           }
           ```
+  - id: sign-in-with-id-token
+    title: 'signInWithIdToken'
+    params:
+      - name: provider
+        isOptional: false
+        type: IDToken
+        description: The provider to use for the user's authentication. For this method it will be `IDToken`.
+      - name: redirectUrl
+        isOptional: true
+        type: String?
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: config
+        isOptional: true
+        type: IDToken.Config.() -> Unit
+        description: The configuration for signing in with an id token.
+        subContent:
+          - name: idToken
+            isOptional: false
+            type: String
+            description: OIDC ID token issued by the specified provider. The `iss` claim in the ID token must match the supplied provider. Some ID tokens contain an `at_hash` which require that you provide an `access_token` value to be accepted properly. If the token contains a `nonce` claim you must supply the nonce used to obtain the ID token.
+          - name: provider
+            isOptional: false
+            type: IDTokenProvider
+            description: The provider of the id token. Only `Apple`, `Google`, `Facebook` and `Azure` are supported.
+          - name: accessToken
+            isOptional: true
+            type: String?
+            description: If the ID token contains an `at_hash` claim, then the hash of this value is compared to the value in the ID token.
+          - name: nonce
+            isOptional: true
+            type: String?
+            description: If the ID token contains a `nonce` claim, then the hash of this value is compared to the value in the ID token.
+          - name: captchaToken
+            isOptional: true
+            type: String?
+            description: The captcha token when having captcha enabled.
+
+    examples:
       - id: sign-in-with-id-token
-        name: Sign in with id token
-        isSpotlight: false
+        name: 'Sign In using ID Token'
         code: |
           ```kotlin
           supabase.auth.signInWith(IDToken) {
@@ -2517,7 +2735,6 @@ functions:
               }
           }
           ```
-
   - id: sign-in-with-otp
     title: 'signInWith(OTP)'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
@@ -2533,6 +2750,28 @@ functions:
       - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
+    params:
+      - name: provider
+        isOptional: false
+        type: OTP
+        description: The provider to use for the user's authentication, in this case `OTP`.
+      - name: redirectUrl
+        isOptional: true
+        type: String?
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: config
+        isOptional: true
+        type: OTP.Config.() -> Unit
+        description: The configuration for signing in with `OTP`.
+        subContent:
+          - name: email/phone
+            isOptional: false
+            type: String
+            description: The user's email or phone.
+          - name: captchaToken
+            isOptional: true
+            type: String?
+            description: The captcha token when having captcha enabled.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -2561,6 +2800,28 @@ functions:
       - This method is used for signing in using a third-party provider.
       - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
+    params:
+      - name: provider
+        isOptional: false
+        type: OAuthProvider
+        description: The OAuth provider to use for the user's authentication, for example `Google` or `Github`.
+      - name: redirectUrl
+        isOptional: true
+        type: String?
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: config
+        isOptional: true
+        type: ExternalAuthConfig.() -> Unit
+        description: The configuration for signing in with an OAuth provider.
+        subContent:
+          - name: scopes
+            isOptional: true
+            type: MutableList<String>
+            description: The scopes to request from the OAuth provider.
+          - name: queryParams
+            isOptional: true
+            type: MutableMap<String, String>
+            description: Additional query parameters to use.
     examples:
       - id: sign-in-using-a-third-party-provider
         name: Sign in using a third-party provider
@@ -2614,7 +2875,28 @@ functions:
           - Mapping specific user email addresses with an identity provider.
           - Using different hints to identity the identity provider to be used by the user, like a company-specific page, IP address or other tracking information.
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
-
+    params:
+      - name: provider
+        isOptional: false
+        type: SSO
+        description: The OAuth provider to use for the user's authentication, in this case `SSO`.
+      - name: redirectUrl
+        isOptional: true
+        type: String?
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: config
+        isOptional: true
+        type: ExternalAuthConfig.() -> Unit
+        description: The configuration for signing in with an OAuth provider.
+        subContent:
+          - name: providerId/domain
+            isOptional: false
+            type: String
+            description: The providerId or domain.
+          - name: captchaToken
+            isOptional: true
+            type: String?
+            description: The captcha token when having captcha enabled.
     examples:
       - id: sign-in-with-domain
         name: Sign in with email domain
@@ -2638,7 +2920,7 @@ functions:
             // Useful when you need to map a user's sign in request according
             // to different rules that can't use email domains.
 
-            supabase.auth.signInWith(SSO){
+            supabase.auth.signInWith(SSO) {
                 providerId = "21648a9d-8d5a-4555-a9d1-d6375dc14e92"
             }
 
@@ -2650,6 +2932,11 @@ functions:
     notes: |
       Logs out the current user.
       - In order to use the `signOut()` method, the user needs to be signed in first.
+    params:
+      - name: scope
+        isOptional: true
+        type: SignOutScope
+        description: The scope of the sign-out.
     examples:
       - id: sign-out
         name: Sign out
@@ -2678,6 +2965,23 @@ functions:
     notes: |
       - Verifying an OTP is done through either `verifyPhoneOtp` or `verifyEmailOtp`.     
       - The verification type used should be determined based on the corresponding auth method called before using `verifyPhoneOtp`/`verifyEmailOtp` to sign up / sign-in a user.
+    params:
+      - name: type
+        isOptional: false
+        type: OtpType.Email or OtpType.Phone
+        description: The OTP type. Depending on the type, an email or phone has to be specified as parameter.
+      - name: email/phone
+        isOptional: false
+        type: String
+        description: The email or phone number, depending on which type you specified.
+      - name: token
+        isOptional: false
+        type: String
+        description: The token to verify.
+      - name: captchaToken
+        isOptional: true
+        type: String?
+        description: The captcha token when having captcha enabled.
     examples:
       - id: verify-email-otp(otp)
         name: Verify an Email OTP
@@ -2728,6 +3032,19 @@ functions:
       - Passwordless sign-ins can be resent by calling the `signInWith(OTP)` method again.
       - Password recovery emails can be resent by calling the `resetPasswordForEmail()` method again.
       - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
+    params:
+      - name: type
+        isOptional: false
+        type: OtpType.Email or OtpType.Phone
+        description: The OTP type. Depending on the type, an email or phone has to be specified as parameter.
+      - name: email/phone
+        isOptional: false
+        type: String
+        description: The email or phone number, depending on which type you specified.
+      - name: captchaToken
+        isOptional: true
+        type: String?
+        description: The captcha token when having captcha enabled.
     examples:
       - id: resend-email-signup-confirmation
         name: Resend an email signup confirmation
@@ -2803,6 +3120,39 @@ functions:
       - In order to use the `modifyUser()` method, the user needs to be signed in first.
       - By default, email updates sends a confirmation link to both the user's current and new email.
       To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
+    params:
+      - name: updateCurrentUser
+        isOptional: true
+        type: Boolean
+        description: Whether to update the local session with the new user.
+      - name: redirectUrl
+        isOptional: true
+        type: String?
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: config
+        isOptional: false
+        type: UserUpdateBuilder.() -> Unit
+        subContent:
+          - name: email
+            isOptional: true
+            type: String?
+            description: The new email.
+          - name: password
+            isOptional: true
+            type: String?
+            description: The new password.
+          - name: phone
+            isOptional: true
+            type: String?
+            description: The new phone number.
+          - name: nonce
+            isOptional: true
+            type: String?
+            description: The nonce sent for reauthentication if the user's password is to be updated.
+          - name: data
+            isOptional: true
+            type: JsonObject
+            description: The new user data.
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
@@ -2858,6 +3208,28 @@ functions:
       - The user needs to be signed in to call `linkIdentity()`.
       - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
       - This method works similarly to `signInWith()` using an OAuthProvider. To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
+    params:
+      - name: provider
+        isOptional: false
+        type: OAuthProvider
+        description: The OAuth provider you want to link the user with.
+      - name: redirectUrl
+        isOptional: true
+        type: String?
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: config
+        isOptional: true
+        type: ExternalAuthConfigDefaults.() -> Unit
+        description: Extra configuration.
+        subContent:
+          - name: scopes
+            isOptional: true
+            type: MutableList<String>
+            description: The scopes to request from the OAuth provider.
+          - name: queryParams
+            isOptional: true
+            type: MutableMap<String, String>
+            description: Additional query parameters to use.
     examples:
       - id: link-identity
         name: Link an identity to a user
@@ -2877,6 +3249,15 @@ functions:
       - The user needs to be signed in to call `unlinkIdentity()`.
       - The user must have at least 2 identities in order to unlink an identity.
       - The identity to be unlinked must belong to the user.
+    params:
+      - name: identityId
+        isOptional: false
+        type: String
+        description: The id of the OAuth identity
+      - name: updateLocalUser
+        isOptional: true
+        type: Boolean
+        description: Whether to delete the identity from the local user or not.
     examples:
       - id: unlink-identity
         name: Unlink an identity
@@ -2971,6 +3352,19 @@ functions:
             password = "1234567"
         }
         ```
+    params:
+      - name: email
+        isOptional: false
+        type: String
+        description: The email to send the password reset email to.
+      - name: redirectUrl
+        isOptional: true
+        type: String?
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: captchaToken
+        isOptional: true
+        type: String?
+        description: The captcha token when having captcha enabled.
     examples:
       - id: send-password-reset-email
         name: Send password reset email
@@ -2984,6 +3378,15 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.exchangeCodeForSession'
     notes: |
       - Used when `flowType` is set to `FlowType.PKCE` in the Auth configuration.
+    params:
+      - name: code
+        isOptional: false
+        type: String
+        description: The code to exchange.
+      - name: saveSession
+        isOptional: true
+        type: Boolean
+        description: Whether to save the session. Defaults to true.
     examples:
       - id: exchange-auth-code
         name: Exchange Auth Code
@@ -3009,6 +3412,19 @@ functions:
       - To create a challenge, see [`mfa.createChallenge()`](/docs/reference/kotlin/auth-mfa-challenge).
       - To verify a challenge, see [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify).
       - To create and verify a challenge in a single step, see [`mfa.createChallengeAndVerify()`](/docs/reference/kotlin/auth-mfa-challengeandverify).
+    params:
+      - name: factorType
+        isOptional: false
+        type: FactorType<R>
+        description: The type of MFA factor to enroll. Currently only supports `FactorType.TOTP`.
+      - name: issuer
+        isOptional: true
+        type: String?
+        description: Domain which the user is enrolling with.
+      - name: friendlyName
+        isOptional: true
+        type: String?
+        description: Human readable name assigned to a device.
     examples:
       - id: enroll-totp-factor
         name: Enroll a time-based, one-time password (TOTP) factor
@@ -3044,6 +3460,11 @@ functions:
       Creates a challenge for a factor.
       - An [enrolled factor](/docs/reference/kotlin/auth-mfa-enroll) is required before creating a challenge.
       - To verify a challenge, see [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify).
+    params:
+      - name: factorId
+        isOptional: false
+        type: String
+        description: The id of the MFA factor you want to create a challenge for.
     examples:
       - id: create-mfa-challenge
         name: Create a challenge for a factor
@@ -3058,6 +3479,23 @@ functions:
     notes: |
       Verifies a challenge for a factor.
       - To verify a challenge, please [create a challenge](/docs/reference/kotlin/auth-mfa-challenge) first.
+    params:
+      - name: factorId
+        isOptional: false
+        type: String
+        description: The id of the MFA factor to verify.
+      - name: challengeId
+        isOptional: false
+        type: String
+        description: The id of the challenge to verify.
+      - name: code
+        isOptional: false
+        type: String
+        description: The code used to verify.
+      - name: saveSession
+        isOptional: true
+        type: Boolean
+        description: Whether to save the session. Defaults to true.
     examples:
       - id: verify-challenge
         name: Verify a challenge for a factor
@@ -3078,6 +3516,19 @@ functions:
       Creates and verifies a challenge for a factor.
       - An [enrolled factor](/docs/reference/kotlin/auth-mfa-enroll) is required before invoking `createChallengeAndVerify()`.
       - Executes [`mfa.createChallenge()`](/docs/reference/kotlin/auth-mfa-challenge) and [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify) in a single step.
+    params:
+      - name: factorId
+        isOptional: false
+        type: String
+        description: The id of the MFA factor to verify.
+      - name: code
+        isOptional: false
+        type: String
+        description: The code used to verify.
+      - name: saveSession
+        isOptional: true
+        type: Boolean
+        description: Whether to save the session. Defaults to true.
     examples:
       - id: challenge-and-verify
         name: Create and verify a challenge for a factor
@@ -3095,6 +3546,11 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.unenroll'
     notes: |
       Unenroll removes a MFA factor. A user has to have an `AAL2` authentication level in order to unenroll a verified factor.
+    params:
+      - name: factorId
+        isOptional: false
+        type: String
+        description: The id of the factor you want to unenroll.
     examples:
       - id: unenroll-a-factor
         name: Unenroll a factor
@@ -3169,6 +3625,11 @@ functions:
     notes: |
       Fetches the user object from the database based on the user's id.
       - The `retrieveUserById()` method requires the user's id which maps to the `auth.users.id` column.
+    params:
+      - name: uid
+        isOptional: false
+        type: String
+        description: The id of the user you want to retrieve.
     examples:
       - id: fetch-the-user-object-using-the-access-token-jwt
         name: Fetch the user object using the access_token jwt
