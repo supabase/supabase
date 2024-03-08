@@ -234,7 +234,7 @@ const SidePanelEditor = ({
         })
 
     if (response?.error) {
-      ui.setNotification({ category: 'error', message: response.error.message })
+      toast.error(response.error.message)
     } else {
       if (
         !isNewRecord &&
@@ -495,10 +495,9 @@ const SidePanelEditor = ({
     }
 
     const { file, rowCount, selectedHeaders, resolve } = importContent
-    const toastId = ui.setNotification({
-      category: 'loading',
-      message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
-    })
+    const toastId = toast.loading(
+      `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`
+    )
 
     if (file && rowCount > 0) {
       // CSV file upload
@@ -551,10 +550,8 @@ const SidePanelEditor = ({
         sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
       ),
     ])
-    ui.setNotification({
+    toast.success(`Successfully imported ${rowCount} rows of data into ${selectedTable.name}`, {
       id: toastId,
-      category: 'success',
-      message: `Successfully imported ${rowCount} rows of data into ${selectedTable.name}`,
     })
     resolve()
     snap.closeSidePanel()

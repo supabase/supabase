@@ -5,6 +5,7 @@ import { useParams } from 'common'
 import { find, isUndefined } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
+import toast from 'react-hot-toast'
 
 import { parseSupaTable, SupabaseGrid, SupaTable } from 'components/grid'
 import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
@@ -16,10 +17,9 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
-import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
-import { useCheckPermissions, useLatest, useStore, useUrlState } from 'hooks'
+import { useCheckPermissions, useLatest, useUrlState } from 'hooks'
 import useEntityType from 'hooks/misc/useEntityType'
 import type { TableLike } from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
@@ -47,7 +47,6 @@ const TableGridEditor = ({
   selectedTable,
 }: TableGridEditorProps) => {
   const router = useRouter()
-  const { ui } = useStore()
   const { ref: projectRef, id } = useParams()
 
   const { project } = useProjectContext()
@@ -196,10 +195,7 @@ const TableGridEditor = ({
     if (column) {
       snap.onEditColumn(column)
     } else {
-      ui.setNotification({
-        category: 'error',
-        message: `Unable to find column ${name} in ${selectedTable?.name}`,
-      })
+      toast.error(`Unable to find column ${name} in ${selectedTable?.name}`)
     }
   }
 
@@ -208,18 +204,12 @@ const TableGridEditor = ({
     if (column) {
       snap.onDeleteColumn(column)
     } else {
-      ui.setNotification({
-        category: 'error',
-        message: `Unable to find column ${name} in ${selectedTable?.name}`,
-      })
+      toast.error(`Unable to find column ${name} in ${selectedTable?.name}`)
     }
   }
 
   const onError = (error: any) => {
-    ui.setNotification({
-      category: 'error',
-      message: error?.details ?? error?.message ?? error,
-    })
+    toast.error(error?.details ?? error?.message ?? error)
   }
 
   const updateTableRow = (previousRow: any, updatedData: any) => {
@@ -241,10 +231,7 @@ const TableGridEditor = ({
 
     const configuration = { identifiers }
     if (Object.keys(identifiers).length === 0) {
-      return ui.setNotification({
-        category: 'error',
-        message: ERROR_PRIMARY_KEY_NOTFOUND,
-      })
+      toast.error(ERROR_PRIMARY_KEY_NOTFOUND)
     }
 
     mutateUpdateTableRow({

@@ -1,11 +1,19 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { sortBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { Fragment, useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+
+import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import Divider from 'components/ui/Divider'
+import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
+import { usePgSodiumKeyDeleteMutation } from 'data/pg-sodium-keys/pg-sodium-key-delete-mutation'
+import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
+import { useCheckPermissions } from 'hooks'
 import {
   Alert,
   Button,
@@ -21,17 +29,9 @@ import {
   Modal,
 } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Divider from 'components/ui/Divider'
-import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
-import { usePgSodiumKeyDeleteMutation } from 'data/pg-sodium-keys/pg-sodium-key-delete-mutation'
-import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
-import { useCheckPermissions, useStore } from 'hooks'
-
 const DEFAULT_KEY_NAME = 'No description provided'
 
 const EncryptionKeysManagement = () => {
-  const { ui } = useStore()
   const { id } = useParams()
   const { project } = useProjectContext()
 
@@ -82,14 +82,10 @@ const EncryptionKeysManagement = () => {
       name: values.name,
     })
     if (!res.error) {
-      ui.setNotification({ category: 'success', message: 'Successfully added new key' })
+      toast.success('Successfully added new key')
       setShowAddKeyModal(false)
     } else {
-      ui.setNotification({
-        error: res.error,
-        category: 'error',
-        message: `Failed to add new key: ${res.error.message}`,
-      })
+      toast.error(`Failed to add new key: ${res.error.message}`)
     }
     setSubmitting(false)
   }
@@ -105,14 +101,10 @@ const EncryptionKeysManagement = () => {
       id: selectedKeyToRemove.id,
     })
     if (!res.error) {
-      ui.setNotification({ category: 'success', message: `Successfully deleted encryption key` })
+      toast.success(`Successfully deleted encryption key`)
       setSelectedKeyToRemove(undefined)
     } else {
-      ui.setNotification({
-        error: res.error,
-        category: 'error',
-        message: `Failed to delete encryption key: ${res.error.message}`,
-      })
+      toast.error(`Failed to delete encryption key: ${res.error.message}`)
     }
     setIsDeletingKey(false)
   }
