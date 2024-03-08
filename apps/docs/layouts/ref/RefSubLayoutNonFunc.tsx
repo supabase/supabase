@@ -1,8 +1,7 @@
 import { useInView } from 'react-intersection-observer'
 import { FC, PropsWithChildren } from 'react'
+
 import { highlightSelectedNavItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
-import { useRouter } from 'next/router'
-import { useNavigationMenuContext } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
 import { menuState } from '~/hooks/useMenuState'
 
 interface ISectionContainer {
@@ -54,9 +53,6 @@ const Section: FC<PropsWithChildren<ISectionContainer>> = (props) => {
 }
 
 const StickyHeader: FC<StickyHeader> = (props) => {
-  const router = useRouter()
-  const { setActiveRefItem } = useNavigationMenuContext()
-
   const { ref } = useInView({
     threshold: 1,
     rootMargin: '30% 0% -35% 0px',

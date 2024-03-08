@@ -2,7 +2,6 @@ import { useInView } from 'react-intersection-observer'
 import { FC, PropsWithChildren } from 'react'
 import { highlightSelectedNavItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { useRouter } from 'next/router'
-import { useNavigationMenuContext } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
 import { menuState } from '~/hooks/useMenuState'
 import Image from 'next/legacy/image'
 
@@ -83,8 +82,6 @@ const Section: FC<PropsWithChildren<ISectionContainer>> = (props) => {
 
 const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
   const router = useRouter()
-
-  const { setActiveRefItem } = useNavigationMenuContext()
 
   // we're serving search bots a different file (/crawlers/[...slug])
   // and need to modify content to suit that
