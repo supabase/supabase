@@ -10,6 +10,10 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Badge, Button, IconArrowUpRight, IconX, Tabs } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
+import { ThemeImage } from 'ui-patterns/ThemeImage'
+import { TweetCard } from 'ui-patterns/TweetCard'
+import { getStaticLatestPosts } from '~/lib/posts'
+import PostTypes from '~/types/post'
 
 // data
 import Solutions from 'data/Solutions'
@@ -19,11 +23,7 @@ import ExtensionsExamplesData from 'data/products/database/extensions-examples'
 import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
 import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
 
-import { ThemeImage } from 'ui-patterns/ThemeImage'
-import { TweetCard } from 'ui-patterns/TweetCard'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import { getStaticLatestPosts } from '~/lib/posts'
-import PostTypes from '~/types/post'
 
 const NewFeatureCard = dynamic(() => import('~/components/NewFeatureCard'))
 const ImageCarousel = dynamic(() => import('~/components/Carousels/ImageCarousel'))
