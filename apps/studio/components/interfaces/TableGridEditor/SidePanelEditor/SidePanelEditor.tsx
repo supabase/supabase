@@ -39,6 +39,7 @@ import {
 } from './SidePanelEditor.utils'
 import type { ImportContent } from './TableEditor/TableEditor.types'
 import type { Constraint } from 'data/database/constraints-query'
+import { ToastLoader } from 'components/ui/ToastLoader'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -508,12 +509,13 @@ const SidePanelEditor = ({
         selectedTable,
         selectedHeaders,
         (progress: number) => {
-          ui.setNotification({
-            id: toastId,
-            progress,
-            category: 'loading',
-            message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
-          })
+          toast.loading(
+            <ToastLoader
+              progress={progress}
+              message={`Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`}
+            />,
+            { id: toastId }
+          )
         }
       )
       if (res.error) {
@@ -529,14 +531,15 @@ const SidePanelEditor = ({
         importContent.rows,
         selectedHeaders,
         (progress: number) => {
-          ui.setNotification({
-            id: toastId,
-            progress,
-            category: 'loading',
-            message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${
-              selectedTable.name
-            }`,
-          })
+          toast.loading(
+            <ToastLoader
+              progress={progress}
+              message={`Adding ${importContent.rows.length.toLocaleString()} rows to ${
+                selectedTable.name
+              }`}
+            />,
+            { id: toastId }
+          )
         }
       )
       if (res.error) {
