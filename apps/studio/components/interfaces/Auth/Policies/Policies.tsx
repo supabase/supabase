@@ -1,5 +1,4 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
-import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common/hooks'
 import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
 import { isEmpty } from 'lodash'
@@ -19,7 +18,6 @@ import { useDatabasePolicyCreateMutation } from 'data/database-policies/database
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
-import { useStore } from 'hooks'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 interface PoliciesProps {
@@ -39,9 +37,6 @@ const Policies = ({
   const { ref } = useParams()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
-
-  const { ui } = useStore()
-  const queryClient = useQueryClient()
   const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
   const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})
