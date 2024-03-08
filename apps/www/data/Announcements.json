@@ -1,30 +1,30 @@
 [
   {
     "type": "Announcement",
-    "title": "Edge Functions: Node and native npm compatibility",
-    "description": "We're adding Node and native npm compatibility for Edge Functions",
-    "imgUrl": "launch-week-x/day-2/edge-runtime-thumb.png",
-    "logoUrl": "launch-week-x/day-2/edge-runtime-thumb.png",
+    "title": "pgvector 0.6.0: 30x faster with parallel index builds",
+    "description": "pgvector 0.6.0 brings a significant improvement: parallel index builds for HNSW. Building an HNSW index is now up to 30x faster for unlogged tables.",
+    "imgUrl": "2024-01-30-pgvector-fast-builds/pgvector6.png",
+    "logoUrl": "2024-01-30-pgvector-fast-builds/pgvector6.png",
     "organization": "Supabase",
-    "url": "/blog/edge-functions-node-npm",
+    "url": "/blog/pgvector-fast-builds",
     "postMeta": {
-      "name": "laktek",
-      "publishDate": "Dec 12, 2023",
+      "name": "egor_romanov",
+      "publishDate": "Jan 30, 2024",
       "readLength": 5
     },
     "ctaText": "Learn more"
   },
   {
     "type": "Announcement",
-    "title": "Supabase Launch Week X Hackathon",
-    "description": "Build an Open Source Project over 10 days. 5 prize categories",
-    "imgUrl": "/images/blog/lwx-hackathon/ogimage.png",
-    "logoUrl": "/images/blog/lwx-hackathon/ogimage.png",
+    "title": "Matryoshka embeddings: faster OpenAI vector search using Adaptive Retrieval",
+    "description": "Use Adaptive Retrieval to improve query performance with OpenAI's new embedding models",
+    "imgUrl": "2024-02-13-matryoshka-embeddings/matryoshka-embeddings-og.png",
+    "logoUrl": "2024-02-13-matryoshka-embeddings/matryoshka-embeddings-og.png",
     "organization": "Supabase",
-    "url": "/blog/supabase-hackathon-lwx",
+    "url": "/blog/matryoshka-embeddings",
     "postMeta": {
-      "name": "ant_wilson",
-      "publishDate": "Dec 05, 2023",
+      "name": "gregnr",
+      "publishDate": "Feb 13, 2024",
       "readLength": 3
     },
     "ctaText": "Learn more"

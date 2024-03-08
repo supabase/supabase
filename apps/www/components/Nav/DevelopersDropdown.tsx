@@ -19,7 +19,6 @@ type LinkProps = {
 }
 
 const DevelopersDropdown = (props: Props) => {
-  console.log('props DevelopersDropdown', props)
   const posts = props.latestPosts ?? Announcements
 
   return (
