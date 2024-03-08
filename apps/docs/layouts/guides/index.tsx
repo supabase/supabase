@@ -178,7 +178,7 @@ const Layout: FC<Props> = (props) => {
                       <ExpandableVideo imgUrl={tocVideoPreview} videoId={props.meta.tocVideo} />
                     </div>
                   )}
-                  <Feedback />
+                  <Feedback key={pathname} />
                   <span className="block font-mono text-xs uppercase text-foreground px-5 mb-6">
                     On this page
                   </span>
