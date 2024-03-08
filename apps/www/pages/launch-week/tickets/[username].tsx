@@ -15,8 +15,6 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LWXBackground from '~/components/LaunchWeek/X/LWXBackground'
-import { getNavLatestPosts } from '~/lib/posts'
-import PostTypes from '~/types/post'
 
 const LWXTicketContainer = dynamic(() => import('~/components/LaunchWeek/X/Ticket/TicketContainer'))
 const LaunchWeekPrizeSection = dynamic(
@@ -28,10 +26,9 @@ interface Props {
   user: UserData
   users: UserData[]
   ogImageUrl: string
-  latestPosts?: PostTypes[]
 }
 
-export default function UsernamePage({ user, ogImageUrl, latestPosts }: Props) {
+export default function UsernamePage({ user, ogImageUrl }: Props) {
   const { username, ticketNumber, name } = user
 
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
@@ -86,7 +83,7 @@ export default function UsernamePage({ user, ogImageUrl, latestPosts }: Props) {
           setTicketState,
         }}
       >
-        <DefaultLayout latestPosts={latestPosts}>
+        <DefaultLayout>
           <div className="-mt-[65px]">
             <SectionContainer className="relative z-10 flex flex-col justify-around items-center gap-2 md:gap-10 !px-2 !mx-auto md:min-h-[auto]">
               <div className="w-full min-h-[400px] pt-24 flex items-center">
@@ -162,7 +159,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       },
       ogImageUrl,
       key: username,
-      latestPosts: getNavLatestPosts(),
     },
     revalidate: 5,
   }
