@@ -97,7 +97,7 @@ const SpreadsheetImport = ({
     }
 
     if (!file || !includes(UPLOAD_FILE_TYPES, file?.type) || !acceptedFileExtension(file)) {
-      toast('Sorry! We only accept CSV or TSV file types, please upload another file.')
+      toast.error('Sorry! We only accept CSV or TSV file types, please upload another file.')
     } else {
       updateEditorDirty(true)
       setUploadedFile(file)
