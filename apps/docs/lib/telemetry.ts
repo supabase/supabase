@@ -1,9 +1,7 @@
 import { usePathname } from 'next/navigation'
 
-import { IS_PROD, useTelemetryProps } from 'common'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
-import { DEBUG_TELEMETRY } from './constants'
 import { unauthedAllowedPost } from './fetch/fetchWrappers'
 
 type TelemetryEvent = {
@@ -22,19 +20,16 @@ const noop = () => {}
 const useSendTelemetryEvent = () => {
   const { hasAcceptedConsent } = useConsent()
   const pathname = usePathname()
-  const telemetryProps = useTelemetryProps()
 
-  if (!IS_PROD && !DEBUG_TELEMETRY) return noop
   if (!hasAcceptedConsent) return noop
 
   return (event: TelemetryEvent) =>
     unauthedAllowedPost('/platform/telemetry/event', {
+      // @ts-ignore - endpoint will accept this just fine
       body: {
         ...event,
         page_title: document?.title,
         page_location: pathname,
-        // @ts-ignore -- fine to not send session_id
-        ga: telemetryProps,
       },
     })
 }
