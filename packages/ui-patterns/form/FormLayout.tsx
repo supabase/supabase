@@ -15,6 +15,7 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
+  Separator,
   Switch,
 } from 'ui'
 import { z } from 'zod'
@@ -102,7 +103,8 @@ export const Page = () => {
           <h1 className="text-foreground">Welcome</h1>
           <p className="text-foreground-light">Please fill in the following</p>
         </div>
-        <div role="separator" className="h-px bg-border-muted w-full" />
+
+        <Separator />
 
         <FormField_Shadcn_
           control={form.control}
@@ -126,7 +128,7 @@ export const Page = () => {
           )}
         />
 
-        <div role="separator" className="h-px bg-border-muted w-full" />
+        <Separator />
 
         <FormField_Shadcn_
           control={form.control}
@@ -149,7 +151,7 @@ export const Page = () => {
           )}
         />
 
-        <div role="separator" className="h-px bg-border-muted w-full" />
+        <Separator />
 
         <FormField_Shadcn_
           control={form.control}
@@ -194,7 +196,7 @@ export const Page = () => {
           )}
         />
 
-        <div role="separator" className="h-px bg-border-muted w-full" />
+        <Separator />
 
         <FormField_Shadcn_
           control={form.control}
@@ -218,7 +220,7 @@ export const Page = () => {
           )}
         />
 
-        <div role="separator" className="h-px bg-border-muted w-full" />
+        <Separator />
 
         <FormField_Shadcn_
           control={form.control}
@@ -242,7 +244,7 @@ export const Page = () => {
           )}
         />
 
-        <div role="separator" className="h-px bg-border-muted w-full" />
+        <Separator />
 
         <FormField_Shadcn_
           control={form.control}
@@ -346,7 +348,7 @@ export const Page = () => {
           )}
         />
 
-        <div role="separator" className="h-px bg-border-muted w-full" />
+        <Separator />
         <div className="flex flex-row w-full justify-end">
           <Button htmlType="submit">Submit</Button>
         </div>
