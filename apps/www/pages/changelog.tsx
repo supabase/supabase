@@ -13,7 +13,6 @@ import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
 import { deletedDiscussions } from '~/lib/changelog.utils'
-import PostTypes from '~/types/post'
 
 export type Discussion = {
   id: string
@@ -111,7 +110,7 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
     const query = `
       query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
         repository(owner: $owner, name: $repo) {
-          discussions(first: 30, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
+          discussions(first: 50, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
             totalCount
             pageInfo {
               hasPreviousPage
@@ -228,10 +227,9 @@ interface ChangelogPageProps {
   changelog: Entry[]
   pageInfo: any
   restPage: number
-  latestPosts?: PostTypes[]
 }
 
-function ChangelogPage({ changelog, pageInfo, restPage, latestPosts }: ChangelogPageProps) {
+function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
   const { endCursor: end, hasNextPage, hasPreviousPage } = pageInfo
 
   const TITLE = 'Changelog'
@@ -247,7 +245,7 @@ function ChangelogPage({ changelog, pageInfo, restPage, latestPosts }: Changelog
           type: 'article',
         }}
       />
-      <DefaultLayout latestPosts={latestPosts}>
+      <DefaultLayout>
         <div
           className="
             container mx-auto flex flex-col
