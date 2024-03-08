@@ -2,8 +2,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { indexOf } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
+import toast from 'react-hot-toast'
 
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   FormActions,
@@ -12,17 +13,15 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
-import MultiSelect from 'ui-patterns/MultiSelect'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { Form, IconAlertCircle, Input, InputNumber } from 'ui'
+import MultiSelect from 'ui-patterns/MultiSelect'
 
 const PostgrestConfig = () => {
   const { ref: projectRef } = useParams()
-  const { ui } = useStore()
-
   const { project } = useProjectContext()
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
@@ -33,7 +32,7 @@ const PostgrestConfig = () => {
   const { mutate: updatePostgrestConfig, isLoading: isUpdating } =
     useProjectPostgrestConfigUpdateMutation({
       onSuccess: () => {
-        ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+        toast.success('Successfully saved settings')
       },
     })
   const canUpdatePostgrestConfig = useCheckPermissions(
