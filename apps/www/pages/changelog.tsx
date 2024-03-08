@@ -13,7 +13,6 @@ import { GetServerSideProps } from 'next'
 import Link from 'next/link'
 import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
 import { deletedDiscussions } from '~/lib/changelog.utils'
-import { getNavLatestPosts, getStaticLatestPosts } from '~/lib/posts'
 import PostTypes from '~/types/post'
 
 export type Discussion = {
@@ -221,7 +220,6 @@ export const getServerSideProps: GetServerSideProps = async ({ res, query }) => 
       changelog: sortedCombinedEntries,
       pageInfo: pageInfo,
       restPage: Number(restPage),
-      latestPosts: getNavLatestPosts(),
     },
   }
 }
