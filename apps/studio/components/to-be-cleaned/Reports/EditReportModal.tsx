@@ -2,17 +2,14 @@ import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Input, Modal } from 'ui'
 
-import { useStore } from 'hooks'
 import { useProjectContentStore } from 'stores/projectContentStore'
 
 const EditModal = () => {
   const router = useRouter()
   const { id, ref } = router.query
-
-  const { ui } = useStore()
-
   const [visible, setVisible] = useState<boolean>(false)
   const [loading, setLoading] = useState<boolean>(false)
   const [name, setName] = useState<string>()
@@ -57,7 +54,7 @@ const EditModal = () => {
       setVisible(!visible)
       return data
     } catch (error: any) {
-      ui.setNotification({ category: 'error', message: error.message })
+      toast.error(error.message)
       setLoading(false)
     }
   }

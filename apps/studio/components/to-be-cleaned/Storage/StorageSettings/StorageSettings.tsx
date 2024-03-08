@@ -10,13 +10,12 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, StorageSizeUnits } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
 
 const StorageSettings = () => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
   const organizationSlug = organization?.slug
@@ -44,10 +43,7 @@ const StorageSettings = () => {
           fileSizeLimit: updatedValue.value,
           unformattedFileSizeLimit: res.fileSizeLimit,
         }
-        ui.setNotification({
-          category: 'success',
-          message: 'Successfully updated storage settings',
-        })
+        toast.success('Successfully updated storage settings')
       },
     })
 
