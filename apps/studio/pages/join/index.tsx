@@ -2,6 +2,7 @@ import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, IconCheckSquare, Loading } from 'ui'
 
 import { useOrganizationJoinDeclineMutation } from 'data/organizations/organization-join-decline-mutation'
@@ -10,14 +11,12 @@ import {
   TokenInfo,
   validateTokenInformation,
 } from 'data/organizations/organization-join-token-validation-query'
-import { useStore } from 'hooks'
 import { useSignOut } from 'lib/auth'
 import { useProfile } from 'lib/profile'
 
 const JoinOrganizationPage = () => {
   const router = useRouter()
   const { slug, token, name } = useParams()
-  const { ui } = useStore()
   const { profile } = useProfile()
   const signOut = useSignOut()
 
@@ -36,11 +35,7 @@ const JoinOrganizationPage = () => {
       router.push('/')
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to join organization: ${error.message}`,
-      })
+      toast.error(`Failed to join organization: ${error.message}`)
       setIsSubmitting(false)
     },
   })
@@ -51,11 +46,7 @@ const JoinOrganizationPage = () => {
       router.push('/')
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to decline invitation: ${error.message}`,
-      })
+      toast.error(`Failed to decline invitation: ${error.message}`)
       setIsSubmitting(false)
     },
   })

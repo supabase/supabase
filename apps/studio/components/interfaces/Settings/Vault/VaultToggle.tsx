@@ -11,12 +11,13 @@ import { Button, IconExternalLink } from 'ui'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 
 const VaultToggle = () => {
   const { ref } = useParams()
-  const { meta, ui } = useStore()
+  const { ui } = useStore()
   const { resolvedTheme } = useTheme()
   const { project } = useProjectContext()
   const [isEnabling, setIsEnabling] = useState(false)
@@ -45,10 +46,13 @@ const VaultToggle = () => {
 
     setIsEnabling(true)
 
-    const { error: createSchemaError } = await meta.query(
-      `create schema if not exists ${vaultExtension.schema ?? 'vault'};`
-    )
-    if (createSchemaError) {
+    try {
+      await executeSql({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        sql: `create schema if not exists ${vaultExtension.schema ?? 'vault'};`,
+      })
+    } catch (createSchemaError: any) {
       setIsEnabling(false)
       return ui.setNotification({
         error: createSchemaError,
