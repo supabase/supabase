@@ -8,7 +8,7 @@ const FormItemLayout = forwardRef<
 >(({ ...props }, ref) => {
   return (
     <FormItem_Shadcn_>
-      <FormLayout ref={ref} {...props}>
+      <FormLayout ref={ref} isReactForm {...props}>
         {props.children}
       </FormLayout>
     </FormItem_Shadcn_>

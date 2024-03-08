@@ -139,20 +139,18 @@ export const withSelect: Story = {
             render={({ field }) => (
               <FormItemLayout {...args}>
                 <FormItem_Shadcn_>
-                  <FormControl_Shadcn_>
-                    <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl_Shadcn_>
-                        <SelectTrigger_Shadcn_>
-                          <SelectValue_Shadcn_ placeholder="Select a verified email to display" />
-                        </SelectTrigger_Shadcn_>
-                      </FormControl_Shadcn_>
-                      <SelectContent_Shadcn_>
-                        <SelectItem_Shadcn_ value="m@example.com">m@example.com</SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="m@google.com">m@google.com</SelectItem_Shadcn_>
-                        <SelectItem_Shadcn_ value="m@support.com">m@support.com</SelectItem_Shadcn_>
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
-                  </FormControl_Shadcn_>
+                  <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl_Shadcn_>
+                      <SelectTrigger_Shadcn_>
+                        <SelectValue_Shadcn_ placeholder="Select a verified email to display" />
+                      </SelectTrigger_Shadcn_>
+                    </FormControl_Shadcn_>
+                    <SelectContent_Shadcn_>
+                      <SelectItem_Shadcn_ value="m@example.com">m@example.com</SelectItem_Shadcn_>
+                      <SelectItem_Shadcn_ value="m@google.com">m@google.com</SelectItem_Shadcn_>
+                      <SelectItem_Shadcn_ value="m@support.com">m@support.com</SelectItem_Shadcn_>
+                    </SelectContent_Shadcn_>
+                  </Select_Shadcn_>
                 </FormItem_Shadcn_>
               </FormItemLayout>
             )}
