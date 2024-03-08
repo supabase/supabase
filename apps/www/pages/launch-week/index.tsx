@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
-import { GetServerSideProps } from 'next'
+import { GetStaticProps } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { Session } from '@supabase/supabase-js'
@@ -132,7 +132,7 @@ export default function LaunchWeekIndex({ meetups, latestPosts }: Props) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   const { data: meetups } = await supabase!.from('lwx_meetups').select('*')
 
   return {

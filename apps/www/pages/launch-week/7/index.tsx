@@ -1,4 +1,4 @@
-import { GetServerSideProps } from 'next'
+import { GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
 import { useTheme } from 'next-themes'
@@ -79,7 +79,7 @@ export default function TicketHome({ users, latestPosts }: Props) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getStaticProps: GetStaticProps = async () => {
   // fetch users for the TicketBrickWall
   const { data: users } = await supabaseAdmin!
     .from('lw7_tickets_golden')

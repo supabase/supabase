@@ -1,5 +1,5 @@
 import { NextSeo } from 'next-seo'
-import { GetServerSideProps } from 'next'
+import { GetStaticProps } from 'next'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
@@ -154,7 +154,7 @@ export default function TicketsPage({ users }: Props) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getStaticProps: GetStaticProps = async () => {
   const { data: users } = await supabaseAdmin!
     .from('lw7_tickets_golden')
     .select('*')

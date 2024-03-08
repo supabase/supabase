@@ -14,11 +14,11 @@ import InvestorData from 'data/Investors'
 
 import Image from 'next/image'
 import Link from 'next/link'
-
 import { Button, Card, Space } from 'ui'
 import { NextSeo } from 'next-seo'
-import { getStaticLatestPosts } from '../lib/posts'
-import PostTypes from '../types/post'
+import { getStaticLatestPosts } from '~/lib/posts'
+import PostTypes from '~/types/post'
+import { GetStaticProps } from 'next'
 
 type Props = { latestPosts?: PostTypes[] }
 
@@ -339,4 +339,4 @@ const Press = () => {
   )
 }
 
-export const getStaticProps = async () => getStaticLatestPosts()
+export const getStaticProps: GetStaticProps = async () => getStaticLatestPosts()

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { GetServerSideProps } from 'next'
+import { GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'
 import { Button } from 'ui'
 import Link from 'next/link'
@@ -153,7 +153,7 @@ export default function TicketsPage({ users, latestPosts }: Props) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getStaticProps: GetStaticProps = async () => {
   let { data: lwx_tickets, error } = await supabase
     .from('lwx_tickets_golden')
     .select('*')

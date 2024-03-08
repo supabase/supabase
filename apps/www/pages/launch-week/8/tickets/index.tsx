@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { GetServerSideProps } from 'next'
+import { GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import { Button } from 'ui'
@@ -168,7 +168,7 @@ export default function TicketsPage({ users, latestPosts }: Props) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getStaticProps: GetStaticProps = async () => {
   const { data: users } = await supabaseAdmin!
     .from('lw8_tickets_golden')
     .select('*')

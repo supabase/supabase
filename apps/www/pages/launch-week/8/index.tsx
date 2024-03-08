@@ -1,7 +1,7 @@
 import 'swiper/swiper.min.css'
 
 import { useState, useEffect } from 'react'
-import { GetServerSideProps } from 'next'
+import { GetStaticProps } from 'next'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -196,7 +196,7 @@ export default function TicketHome({ users, meetups, latestPosts }: Props) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   // fetch users for the TicketBrickWall
   const { data: users } = await supabaseAdmin!
     .from('lw8_tickets_golden')

@@ -1,6 +1,7 @@
 // Import Swiper styles
 import 'swiper/swiper.min.css'
 
+import { GetStaticProps } from 'next'
 import dynamic from 'next/dynamic'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
@@ -21,8 +22,8 @@ import TableViewCarouselData from 'data/products/database/table-view-carousel.js
 import { ThemeImage } from 'ui-patterns/ThemeImage'
 import { TweetCard } from 'ui-patterns/TweetCard'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import { getStaticLatestPosts } from '../lib/posts'
-import PostTypes from '../types/post'
+import { getStaticLatestPosts } from '~/lib/posts'
+import PostTypes from '~/types/post'
 
 const NewFeatureCard = dynamic(() => import('~/components/NewFeatureCard'))
 const ImageCarousel = dynamic(() => import('~/components/Carousels/ImageCarousel'))
@@ -321,6 +322,6 @@ function Database({ latestPosts }: { latestPosts?: PostTypes[] }) {
   )
 }
 
-export const getStaticProps = async () => getStaticLatestPosts()
+export const getStaticProps: GetStaticProps = async () => getStaticLatestPosts()
 
 export default Database
