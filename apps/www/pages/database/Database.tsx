@@ -21,6 +21,8 @@ import TableViewCarouselData from 'data/products/database/table-view-carousel.js
 import { ThemeImage } from 'ui-patterns/ThemeImage'
 import { TweetCard } from 'ui-patterns/TweetCard'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import ProductsNav from '~/components/Products/ProductsNav'
+import { PRODUCT_NAMES } from 'shared-data/products'
 
 const NewFeatureCard = dynamic(() => import('~/components/NewFeatureCard'))
 const ImageCarousel = dynamic(() => import('~/components/Carousels/ImageCarousel'))
@@ -68,6 +70,7 @@ function Database() {
         }}
       />
       <DefaultLayout>
+        <ProductsNav activePage={PRODUCT_NAMES.DATABASE} />
         <ProductHeader
           icon={Solutions['database'].icon}
           title={Solutions['database'].name}

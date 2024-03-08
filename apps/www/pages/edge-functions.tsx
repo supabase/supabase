@@ -1,17 +1,20 @@
-import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw, cn } from 'ui'
-import UseCaseExamples from 'data/products/functions/usecase-examples'
-import Solutions from 'data/Solutions'
-import { NextSeo } from 'next-seo'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
-import 'swiper/swiper.min.css'
+import dynamic from 'next/dynamic'
+import { useRouter } from 'next/router'
+import { NextSeo } from 'next-seo'
+import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw, cn } from 'ui'
+import Solutions from 'data/Solutions'
+import UseCaseExamples from 'data/products/functions/usecase-examples'
+
+import { ThemeImage } from 'ui-patterns/ThemeImage'
 import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import ScrollableCodeBlock from '~/components/ScrollableCodeBlock'
 import FunctionsUsecases from '~/components/Sections/FunctionsUsecases'
 import ProductHeader from '~/components/Sections/ProductHeader'
-import { ThemeImage } from 'ui-patterns/ThemeImage'
+import ProductsNav from '../components/Products/ProductsNav'
+import { PRODUCT_NAMES } from 'shared-data/products'
 
 const featureBlocks = [
   {
@@ -103,6 +106,7 @@ function Database() {
         }}
       />
       <DefaultLayout>
+        <ProductsNav activePage={PRODUCT_NAMES.FUNCTIONS} />
         <ProductHeader
           icon={Solutions['functions'].icon}
           title={Solutions['functions'].name}
