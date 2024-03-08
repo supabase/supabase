@@ -3,7 +3,9 @@ import { noop } from 'lodash'
 import { useState } from 'react'
 import { Button, IconLoader } from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { useCheckPermissions, useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
 
@@ -28,11 +30,12 @@ interface DescrptionProps {
 }
 
 const Description = ({ content, metadata, onChange = noop }: DescrptionProps) => {
-  const { meta, ui } = useStore()
+  const { ui } = useStore()
 
   const contentText = temp_removePostgrestText(content || '').trim()
   const [value, setValue] = useState(contentText)
   const [isUpdating, setIsUpdating] = useState(false)
+  const { project } = useProjectContext()
 
   const { table, column, rpc } = metadata
 
@@ -53,21 +56,25 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
     if (rpc) query = `comment on function "${rpc}" is '${description}';`
 
     if (query) {
-      const res = await meta.query(query)
-
-      // [Joshen] Temp fix, immediately refreshing the docs fetches stale state
-      await timeout(500)
-
-      if (res.error) {
-        ui.setNotification({
-          error: res.error,
-          category: 'error',
-          message: `Failed to update description: ${res.error.message}`,
+      try {
+        await executeSql({
+          projectRef: project?.ref,
+          connectionString: project?.connectionString,
+          sql: query,
         })
-      } else {
+
+        // [Joshen] Temp fix, immediately refreshing the docs fetches stale state
+        await timeout(500)
+
         ui.setNotification({
           category: 'success',
           message: `Successfully updated description`,
+        })
+      } catch (error: any) {
+        ui.setNotification({
+          error: error,
+          category: 'error',
+          message: `Failed to update description: ${error.message}`,
         })
       }
     }

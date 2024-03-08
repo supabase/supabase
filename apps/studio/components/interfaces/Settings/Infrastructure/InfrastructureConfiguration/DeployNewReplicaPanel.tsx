@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
@@ -10,16 +11,14 @@ import {
   SidePanel,
 } from 'ui'
 
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { Region, useReadReplicaSetUpMutation } from 'data/read-replicas/replica-setup-mutation'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { AWS_REGIONS, AWS_REGIONS_DEFAULT, AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
 import { AVAILABLE_REPLICA_REGIONS, AWS_REGIONS_VALUES } from './InstanceConfiguration.constants'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import Link from 'next/link'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { WarningIcon } from 'components/ui/Icons'
-import { getSemanticVersion } from 'lib/helpers'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
 
@@ -81,7 +80,7 @@ const DeployNewReplicaPanel = ({
   // Will be following the primary's instance size for the time being
   const defaultCompute =
     addons?.selected_addons.find((addon) => addon.type === 'compute_instance')?.variant
-      .identifier ?? 'ci_small'
+      .identifier ?? 'ci_micro'
 
   const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
   const [selectedCompute, setSelectedCompute] = useState(defaultCompute)
@@ -161,6 +160,7 @@ const DeployNewReplicaPanel = ({
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
+
         {reachedMaxReplicas && (
           <Alert_Shadcn_>
             <WarningIcon />
@@ -172,6 +172,7 @@ const DeployNewReplicaPanel = ({
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
+
         {/* [Joshen] Not particular about this warning as all users on prod are on AWS */}
         {project?.cloud_provider !== 'AWS' && (
           <Alert_Shadcn_>
@@ -185,6 +186,7 @@ const DeployNewReplicaPanel = ({
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
+
         {currentPgVersion < 15 && (
           <Alert_Shadcn_>
             <WarningIcon />
@@ -207,6 +209,7 @@ const DeployNewReplicaPanel = ({
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
+
         <Listbox
           size="small"
           id="region"
@@ -234,26 +237,27 @@ const DeployNewReplicaPanel = ({
           ))}
         </Listbox>
 
-        <Listbox
-          disabled
-          size="small"
-          id="compute"
-          name="compute"
-          value={selectedCompute}
-          onChange={setSelectedCompute}
-          label="Select the instance size for your read replica"
-          descriptionText="Read replicas will be on the same instance size as your primary"
-        >
-          {computeAddons.map((option) => (
-            <Listbox.Option key={option.identifier} label={option.name} value={option.identifier}>
-              {option.name}
-            </Listbox.Option>
-          ))}
-        </Listbox>
+        <div className="flex flex-col gap-y-2">
+          <p className="text-foreground-light text-sm">
+            Read replicas will be on the same compute size as your primary database. Deploying a
+            read replica incurs additional{' '}
+            <span className="text-foreground">{selectedComputeMeta?.name}</span> compute hours.
+            Pricing is still in early access and is subject to change.
+          </p>
 
-        {/* <p className="text-xs text-foreground-light">
-          Show some preview info on cost for deploying this replica here
-        </p> */}
+          <p className="text-foreground-light text-sm">
+            Read more about{' '}
+            <Link
+              href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+              target="_blank"
+              rel="noreferrer"
+              className="underline"
+            >
+              Usage-based billing
+            </Link>{' '}
+            for compute.
+          </p>
+        </div>
       </SidePanel.Content>
     </SidePanel>
   )

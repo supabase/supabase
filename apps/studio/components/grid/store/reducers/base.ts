@@ -25,7 +25,6 @@ export type INIT_ACTIONTYPE =
         gridProps?: GridProps
         savedState?: SavedState
         editable?: boolean
-        onSqlQuery: (query: string) => Promise<{ data?: any; error?: any }>
         onError: (error: any) => void
       }
     }
