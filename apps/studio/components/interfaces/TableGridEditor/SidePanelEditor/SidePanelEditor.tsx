@@ -234,7 +234,7 @@ const SidePanelEditor = ({
         })
 
     if (response?.error) {
-      ui.setNotification({ category: 'error', message: response.error.message })
+      toast.error(response.error.message)
     } else {
       if (
         !isNewRecord &&
@@ -551,10 +551,8 @@ const SidePanelEditor = ({
         sqlKeys.query(project?.ref, [selectedTable!.schema, selectedTable!.name])
       ),
     ])
-    ui.setNotification({
+    toast.success(`Successfully imported ${rowCount} rows of data into ${selectedTable.name}`, {
       id: toastId,
-      category: 'success',
-      message: `Successfully imported ${rowCount} rows of data into ${selectedTable.name}`,
     })
     resolve()
     snap.closeSidePanel()

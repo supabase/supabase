@@ -10,6 +10,7 @@ import { getMfaAuthenticatorAssuranceLevel } from 'data/profile/mfa-authenticato
 import { useStore } from 'hooks'
 import { auth, buildPathWithParams, getReturnToPath } from 'lib/gotrue'
 import { Button, Form, Input } from 'ui'
+import toast from 'react-hot-toast'
 
 const signInSchema = object({
   email: string().email('Must be a valid email').required('Email is required'),
@@ -47,50 +48,32 @@ const SignInForm = () => {
         const data = await getMfaAuthenticatorAssuranceLevel()
         if (data) {
           if (data.currentLevel !== data.nextLevel) {
-            ui.setNotification({
-              id: toastId,
-              category: 'success',
-              message: `You need to provide your second factor authentication.`,
-            })
+            toast.success(`You need to provide your second factor authentication`, { id: toastId })
             const url = buildPathWithParams('/sign-in-mfa')
             router.replace(url)
             return
           }
         }
 
-        ui.setNotification({
-          id: toastId,
-          category: 'success',
-          message: `Signed in successfully!`,
-        })
-
+        toast.success(`Signed in successfully!`, { id: toastId })
         await queryClient.resetQueries()
 
         router.push(getReturnToPath())
       } catch (error) {
-        ui.setNotification({
-          id: toastId,
-          category: 'error',
-          message: (error as AuthError).message,
-        })
+        toast.error((error as AuthError).message, { id: toastId })
       }
     } else {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
 
       if (error.message.toLowerCase() === 'email not confirmed') {
-        return ui.setNotification({
-          id: toastId,
-          category: 'error',
-          message: 'Account has not been verified, please check the link sent to your email',
-        })
+        return toast.error(
+          'Account has not been verified, please check the link sent to your email',
+          { id: toastId }
+        )
       }
 
-      ui.setNotification({
-        id: toastId,
-        category: 'error',
-        message: error.message,
-      })
+      toast.error(error.message, { id: toastId })
     }
   }
 

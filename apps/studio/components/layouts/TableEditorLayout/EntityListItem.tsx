@@ -28,6 +28,7 @@ import { getTable } from 'data/tables/table-query'
 import { useStore } from 'hooks'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import toast from 'react-hot-toast'
 
 export interface EntityListItemProps {
   id: number
@@ -103,17 +104,9 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         saveAs(csvData, `${entity!.name}_rows.csv`)
       }
 
-      ui.setNotification({
-        id: toastId,
-        category: 'success',
-        message: `Successfully exported ${entity.name} as CSV`,
-      })
+      toast.success(`Successfully exported ${entity.name} as CSV`, { id: toastId })
     } catch (error: any) {
-      ui.setNotification({
-        id: toastId,
-        category: 'error',
-        message: `Failed to export table: ${error.message}`,
-      })
+      toast.error(`Failed to export table: ${error.message}`, { id: toastId })
     }
   }
 
