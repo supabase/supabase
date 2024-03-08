@@ -1,8 +1,8 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { useParams } from 'common'
 import { useState } from 'react'
-import { Button, IconSearch, Input, Modal } from 'ui'
+import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import {
   ScaffoldActionsContainer,
   ScaffoldActionsGroup,
@@ -10,19 +10,19 @@ import {
   ScaffoldFilterAndContent,
   ScaffoldSectionContent,
 } from 'components/layouts/Scaffold'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
 import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useIsFeatureEnabled, useSelectedOrganization, useStore } from 'hooks'
+import { useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
 import { useProfile } from 'lib/profile'
+import { Button, IconSearch, Input, Modal } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import InviteMemberButton from './InviteMemberButton'
 import MembersView from './MembersView'
 import { hasMultipleOwners, useGetRolesManagementPermissions } from './TeamSettings.utils'
 
 const TeamSettings = () => {
-  const { ui } = useStore()
   const { slug } = useParams()
 
   const {
@@ -64,10 +64,7 @@ const TeamSettings = () => {
       setIsLeaveTeamModalOpen(false)
       window?.location.replace('/') // Force reload to clear Store
     } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to leave organization: ${error?.message}`,
-      })
+      toast.error(`Failed to leave organization: ${error?.message}`)
     } finally {
       setIsLeaving(false)
     }

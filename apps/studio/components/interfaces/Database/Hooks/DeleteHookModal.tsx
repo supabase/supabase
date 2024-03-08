@@ -1,9 +1,9 @@
 import type { PostgresTrigger } from '@supabase/postgres-meta'
+import toast from 'react-hot-toast'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
 import { useDatabaseTriggerDeleteMutation } from 'data/database-triggers/database-trigger-delete-mutation'
-import { useStore } from 'hooks'
 
 interface DeleteHookModalProps {
   visible: boolean
@@ -12,14 +12,13 @@ interface DeleteHookModalProps {
 }
 
 const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProps) => {
-  const { ui } = useStore()
   const { id, name, schema } = selectedHook ?? {}
 
   const { project } = useProjectContext()
   const { mutate: deleteDatabaseTrigger, isLoading: isDeleting } = useDatabaseTriggerDeleteMutation(
     {
       onSuccess: () => {
-        ui.setNotification({ category: 'success', message: `Successfully deleted ${name}` })
+        toast.success(`Successfully deleted ${name}`)
         onClose()
       },
     }
@@ -30,7 +29,7 @@ const DeleteHookModal = ({ selectedHook, visible, onClose }: DeleteHookModalProp
       return console.error('Project ref is required')
     }
     if (!id) {
-      return ui.setNotification({ category: 'error', message: 'Unable find selected hook' })
+      return toast.error('Unable find selected hook')
     }
 
     deleteDatabaseTrigger({

@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { Button, Form, IconLock, Input } from 'ui'
+import toast from 'react-hot-toast'
 import { object, string } from 'yup'
 
 import { useTelemetryProps } from 'common'
@@ -16,6 +16,7 @@ import { useStore } from 'hooks'
 import { useSignOut } from 'lib/auth'
 import { getReturnToPath } from 'lib/gotrue'
 import Telemetry from 'lib/telemetry'
+import { Button, Form, IconLock, Input } from 'ui'
 
 const signInSchema = object({
   code: string().required('MFA Code is required'),
@@ -69,27 +70,17 @@ const SignInMfaForm = () => {
         { factorId: selectedFactor.id, code, refreshFactors: false },
         {
           onSuccess: async () => {
-            ui.setNotification({
-              id: toastId,
-              category: 'success',
-              message: `Signed in successfully!`,
-            })
-
+            toast.success('Signed in successfully!', { id: toastId })
             Telemetry.sendEvent(
               { category: 'account', action: 'sign_in', label: '' },
               telemetryProps,
               router
             )
             await queryClient.resetQueries()
-
             router.push(getReturnToPath())
           },
           onError: (error) => {
-            ui.setNotification({
-              id: toastId,
-              category: 'error',
-              message: (error as AuthError).message,
-            })
+            toast.error((error as AuthError).message, { id: toastId })
           },
         }
       )
@@ -172,9 +163,8 @@ const SignInMfaForm = () => {
                 onClick={() =>
                   setSelectedFactor(factors.totp.find((f) => f.id !== selectedFactor?.id)!)
                 }
-              >{`Authenticate using ${
-                factors.totp.find((f) => f.id !== selectedFactor?.id)?.friendly_name
-              }?`}</a>
+              >{`Authenticate using ${factors.totp.find((f) => f.id !== selectedFactor?.id)
+                ?.friendly_name}?`}</a>
             </li>
           )}
           <li>

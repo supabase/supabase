@@ -4,6 +4,7 @@ import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { auth, buildPathWithParams } from 'lib/gotrue'
 import { useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, Form, Input } from 'ui'
 import { object, string } from 'yup'
 
@@ -57,12 +58,7 @@ const SignInSSOForm = () => {
     } else {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
-
-      ui.setNotification({
-        id: toastId,
-        category: 'error',
-        message: error.message,
-      })
+      toast.error(error.message, { id: toastId })
     }
   }
 

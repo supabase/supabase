@@ -1,13 +1,14 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import { useState } from 'react'
-import { Button, IconLoader } from 'ui'
+import toast from 'react-hot-toast'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AutoTextArea from 'components/to-be-cleaned/forms/AutoTextArea'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { timeout } from 'lib/helpers'
+import { Button, IconLoader } from 'ui'
 
 // Removes some auto-generated Postgrest text
 // Ideally PostgREST wouldn't add this if there is already a comment
@@ -30,8 +31,6 @@ interface DescrptionProps {
 }
 
 const Description = ({ content, metadata, onChange = noop }: DescrptionProps) => {
-  const { ui } = useStore()
-
   const contentText = temp_removePostgrestText(content || '').trim()
   const [value, setValue] = useState(contentText)
   const [isUpdating, setIsUpdating] = useState(false)
@@ -62,20 +61,11 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
           connectionString: project?.connectionString,
           sql: query,
         })
-
         // [Joshen] Temp fix, immediately refreshing the docs fetches stale state
         await timeout(500)
-
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully updated description`,
-        })
+        toast.success(`Successfully updated description`)
       } catch (error: any) {
-        ui.setNotification({
-          error: error,
-          category: 'error',
-          message: `Failed to update description: ${error.message}`,
-        })
+        toast.error(`Failed to update description: ${error.message}`)
       }
     }
 
