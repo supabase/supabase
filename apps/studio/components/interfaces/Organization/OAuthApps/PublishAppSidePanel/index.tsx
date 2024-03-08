@@ -1,7 +1,8 @@
-import clsx from 'clsx'
-import { ChangeEvent, useEffect, useRef, useState } from 'react'
-
 import type { OAuthScope } from '@supabase/shared-types/out/constants'
+import Link from 'next/link'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
+
 import { useParams } from 'common'
 import {
   OAuthAppCreateResponse,
@@ -9,7 +10,6 @@ import {
 } from 'data/oauth/oauth-app-create-mutation'
 import { useOAuthAppUpdateMutation } from 'data/oauth/oauth-app-update-mutation'
 import type { OAuthApp } from 'data/oauth/oauth-apps-query'
-import { useStore } from 'hooks'
 import { isValidHttpUrl, uuidv4 } from 'lib/helpers'
 import { uploadAttachment } from 'lib/upload'
 import {
@@ -26,10 +26,10 @@ import {
   Input,
   Modal,
   SidePanel,
+  cn,
 } from 'ui'
 import AuthorizeRequesterDetails from '../AuthorizeRequesterDetails'
 import { ScopesPanel } from './Scopes'
-import Link from 'next/link'
 
 export interface PublishAppSidePanelProps {
   visible: boolean
@@ -44,43 +44,28 @@ const PublishAppSidePanel = ({
   onClose,
   onCreateSuccess,
 }: PublishAppSidePanelProps) => {
-  const { ui } = useStore()
   const { slug } = useParams()
   const uploadButtonRef = useRef<any>()
   const { mutate: createOAuthApp } = useOAuthAppCreateMutation({
     onSuccess: (res, variables) => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully created OAuth app "${variables.name}"!`,
-      })
+      toast.success(`Successfully created OAuth app "${variables.name}"!`)
       onClose()
       onCreateSuccess(res)
       setIsSubmitting(false)
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to create OAuth application: ${error.message}`,
-      })
+      toast.error(`Failed to create OAuth application: ${error.message}`)
       setIsSubmitting(false)
     },
   })
   const { mutate: updateOAuthApp } = useOAuthAppUpdateMutation({
     onSuccess: (res, variables) => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated OAuth app "${variables.name}"!`,
-      })
+      toast.success(`Successfully updated OAuth app "${variables.name}"!`)
       onClose()
       setIsSubmitting(false)
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to update OAuth application: ${error.message}`,
-      })
+      toast.error(`Failed to update OAuth application: ${error.message}`)
       setIsSubmitting(false)
     },
   })
@@ -239,7 +224,7 @@ const PublishAppSidePanel = ({
                         <div>
                           {iconUrl !== undefined ? (
                             <div
-                              className={clsx(
+                              className={cn(
                                 'shadow transition group relative',
                                 'bg-center bg-cover bg-no-repeat',
                                 'mt-4 mr-4 space-y-2 rounded-full h-[120px] w-[120px] flex flex-col items-center justify-center'
@@ -280,7 +265,7 @@ const PublishAppSidePanel = ({
                             </div>
                           ) : (
                             <div
-                              className={clsx(
+                              className={cn(
                                 'border border-strong transition opacity-75 hover:opacity-100',
                                 'mt-4 mr-4 space-y-2 rounded-full h-[120px] w-[120px] flex flex-col items-center justify-center cursor-pointer'
                               )}

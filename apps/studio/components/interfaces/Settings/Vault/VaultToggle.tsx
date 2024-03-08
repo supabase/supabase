@@ -1,23 +1,22 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { observer } from 'mobx-react-lite'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, IconExternalLink } from 'ui'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import { Button, IconExternalLink } from 'ui'
 
 const VaultToggle = () => {
   const { ref } = useParams()
-  const { ui } = useStore()
   const { resolvedTheme } = useTheme()
   const { project } = useProjectContext()
   const [isEnabling, setIsEnabling] = useState(false)
@@ -54,11 +53,7 @@ const VaultToggle = () => {
       })
     } catch (createSchemaError: any) {
       setIsEnabling(false)
-      return ui.setNotification({
-        error: createSchemaError,
-        category: 'error',
-        message: `Failed to create schema: ${createSchemaError.message}`,
-      })
+      return toast.error(`Failed to create schema: ${createSchemaError.message}`)
     }
 
     enableExtension({
