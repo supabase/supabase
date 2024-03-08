@@ -188,19 +188,6 @@ const TableGridEditor = ({
     router.push(`/project/${projectRef}/editor/${table.id}`)
   }
 
-  const onSqlQuery = async (query: string) => {
-    try {
-      const res = await executeSql({
-        projectRef,
-        connectionString: project?.connectionString,
-        sql: query,
-      })
-      return { data: res }
-    } catch (error) {
-      return { error }
-    }
-  }
-
   // columns must be accessed via columnsRef.current as these two functions immediately become
   // stale as they are accessed via some react-tracked madness
   // [TODO]: refactor out all of react-tracked
@@ -304,7 +291,6 @@ const TableGridEditor = ({
         onEditRow={snap.onEditRow}
         onImportData={snap.onImportData}
         onError={onError}
-        onSqlQuery={onSqlQuery}
         onExpandJSONEditor={(column, row) => {
           snap.onExpandJSONEditor({ column, row, jsonString: JSON.stringify(row[column]) || '' })
         }}
