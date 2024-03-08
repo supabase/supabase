@@ -123,14 +123,13 @@ Realtime sends a message with the following structure
    "topic": string,
    "payload": {
       "data": {
-         "columns": Array<{name: string, type: string}>,
-         "commit_timestamp": string,
-         "errors": null | string,
-         "old_record": {"id": number | string},
-         "record": {[key: string]: boolean | number | string | null},
-         "type": "*" | "INSERT" | "UPDATE" | "DELETE",
-         "schema": string,
-         "table": string
+         schema: string,
+         table: string,
+         commit_timestamp: string,
+         eventType: "*" | "INSERT" | "UPDATE" | "DELETE",
+         new: {[key: string]: boolean | number | string | null},
+         old: {[key:string]: number | string},
+         errors: string | null
       },
       "ids": Array<number>
    },
