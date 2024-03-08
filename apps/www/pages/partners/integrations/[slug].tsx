@@ -17,10 +17,8 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabaseMisc'
 import { Partner } from '~/types/partners'
-import Error404 from '~/pages/404'
+import Error404 from '../../404'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
-import PostTypes from '~/types/post'
-import { getNavLatestPosts } from '~/lib/posts'
 
 /**
  * Returns custom components so that the markdown converts to a nice looking html.
@@ -45,11 +43,9 @@ function mdxComponents(callback: Dispatch<SetStateAction<string | null>>) {
 function Partner({
   partner,
   overview,
-  latestPosts,
 }: {
   partner: Partner
   overview: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>
-  latestPosts?: PostTypes[]
 }) {
   const [focusedImage, setFocusedImage] = useState<string | null>(null)
 
@@ -93,7 +89,7 @@ function Partner({
           />
         </ImageModal>
       ) : null}
-      <DefaultLayout latestPosts={latestPosts}>
+      <DefaultLayout>
         <SectionContainer>
           <div className="col-span-12 mx-auto mb-2 max-w-5xl space-y-10 lg:col-span-2">
             {/* Back button */}
@@ -339,7 +335,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   })
 
   return {
-    props: { partner, overview, latestPosts: getNavLatestPosts() },
+    props: { partner, overview },
     revalidate: 1800, // 30 minutes
   }
 }
