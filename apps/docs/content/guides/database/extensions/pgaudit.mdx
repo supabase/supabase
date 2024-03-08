@@ -145,8 +145,9 @@ WHERE rolname = 'zapier';
 ### Global Logging
 
 <Admonition type="caution">
-  Use global logging sparingly as it can generate a large amount of logs and make it difficult to find specific events of importance. Consider limiting the scope of what is logged and/or defer to user logging where possible.
-  first.
+
+Use global logging sparingly as it can generate many logs and make it difficult to find important events. Consider limiting the scope of what is logged or using user logging where possible.
+ 
 </Admonition>
 
 The below SQL configures pgaudit to record all events associated with the "postgres" role. Since postgres has extensive privileges, this effectively monitors all database activity.
