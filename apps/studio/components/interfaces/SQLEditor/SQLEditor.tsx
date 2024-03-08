@@ -1,26 +1,13 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useChat } from 'ai/react'
-import { useParams, useTelemetryProps } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { format } from 'sql-formatter'
-import {
-  AiIconAnimation,
-  IconCornerDownLeft,
-  IconSettings,
-  IconX,
-  Input_Shadcn_,
-  Loading,
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-  cn,
-} from 'ui'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
+import { useParams, useTelemetryProps } from 'common'
 import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
 import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
@@ -47,6 +34,19 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import {
+  AiIconAnimation,
+  IconCornerDownLeft,
+  IconSettings,
+  IconX,
+  Input_Shadcn_,
+  Loading,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+  cn,
+} from 'ui'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { useIsSQLEditorAiAssistantEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
@@ -395,10 +395,7 @@ const SQLEditor = () => {
         snap.addNeedsSaving(snippet.id!)
         router.push(`/project/${ref}/sql/${snippet.id}`)
       } catch (error: any) {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to create new query: ${error.message}`,
-        })
+        toast.error(`Failed to create new query: ${error.message}`)
       }
     },
     [profile?.id, project?.id, ref, router, snap, ui]
@@ -742,11 +739,9 @@ const SQLEditor = () => {
 
                                     // If this was an edit and AI returned the same SQL as before
                                     if (currentSql && formattedSql.trim() === currentSql.trim()) {
-                                      ui.setNotification({
-                                        category: 'error',
-                                        message:
-                                          'Unable to edit SQL. Try adding more details to your prompt.',
-                                      })
+                                      toast.error(
+                                        'Unable to edit SQL. Try adding more details to your prompt.'
+                                      )
                                       return
                                     }
 
@@ -756,16 +751,9 @@ const SQLEditor = () => {
                                     })
                                     setSelectedDiffType(DiffType.Modification)
 
-                                    if (title) {
-                                      setPendingTitle(title)
-                                    }
+                                    if (title) setPendingTitle(title)
                                   } catch (error: unknown) {
-                                    if (isError(error)) {
-                                      ui.setNotification({
-                                        category: 'error',
-                                        message: error.message,
-                                      })
-                                    }
+                                    if (isError(error)) toast.error(error.message)
                                   }
                                 }
                               }}

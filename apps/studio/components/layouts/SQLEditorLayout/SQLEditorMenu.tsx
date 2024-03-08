@@ -31,18 +31,17 @@ import {
 
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import { WarningIcon } from 'components/ui/Icons'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedProject } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import QueryItem from './QueryItem'
 import { selectItemsInRange } from './SQLEditorLayout.utils'
 
 const SideBarContent = observer(() => {
-  const { ui } = useStore()
   const { ref, id: activeId } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
@@ -179,10 +178,7 @@ const SideBarContent = observer(() => {
     if (!ref) return console.error('Project is required')
     if (!profile) return console.error('Profile is required')
     if (!canCreateSQLSnippet) {
-      return ui.setNotification({
-        category: 'info',
-        message: 'Your queries will not be saved as you do not have sufficient permissions',
-      })
+      return toast('Your queries will not be saved as you do not have sufficient permissions')
     }
 
     try {
@@ -198,10 +194,7 @@ const SideBarContent = observer(() => {
       router.push(`/project/${ref}/sql/${snippet.id}`)
       setSearchText('')
     } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create new query: ${error.message}`,
-      })
+      toast.error(`Failed to create new query: ${error.message}`)
     }
   }
 

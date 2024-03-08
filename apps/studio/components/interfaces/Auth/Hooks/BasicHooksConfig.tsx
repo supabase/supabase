@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect } from 'react'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -21,7 +22,7 @@ import {
 } from 'components/ui/Forms'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import SchemaFunctionSelector from './SchemaFunctionSelector'
 
 const schema = object({
@@ -32,7 +33,6 @@ const schema = object({
 const formId = 'auth-basic-hooks-form'
 
 const BasicHooksConfig = () => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -60,17 +60,9 @@ const BasicHooksConfig = () => {
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
       {
-        onError: () => {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to update settings`,
-          })
-        },
+        onError: () => toast.error(`Failed to update settings`),
         onSuccess: () => {
-          ui.setNotification({
-            category: 'success',
-            message: `Successfully updated settings`,
-          })
+          toast.success(`Successfully updated settings`)
           resetForm({ values: values, initialValues: values })
         },
       }

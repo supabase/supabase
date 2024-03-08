@@ -40,11 +40,11 @@ where auth.uid() = todos.user_id;
 -- Policy is implicitly added.
 ```
 
-## Authenticated and anonymous roles
+## Authenticated and unauthenticated roles
 
 Supabase Auth maps every request to one of the roles:
 
-- `anon`: an anonymous request (the user is not logged in)
+- `anon`: an unauthenticated request (the user is not logged in)
 - `authenticated`: an authenticated request (the user is logged in)
 
 These are actually [Postgres Roles](/docs/guides/database/postgres/roles), and so they have significant value for the [performance](/docs/guides/database/postgres/row-level-security#specify-roles-in-your-policies) of your RLS Policies. You can use these roles within your Policies using the `TO` clause:

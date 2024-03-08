@@ -1,9 +1,10 @@
+import toast from 'react-hot-toast'
+
 import { useParams } from 'common'
 import type { OrganizationPaymentMethod } from 'data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import type { SubscriptionTier } from 'data/subscriptions/types'
-import { useStore } from 'hooks'
 import { Button, Modal } from 'ui'
 
 export interface ChangePaymentMethodModalProps {
@@ -15,25 +16,20 @@ const ChangePaymentMethodModal = ({
   selectedPaymentMethod,
   onClose,
 }: ChangePaymentMethodModalProps) => {
-  const { ui } = useStore()
   const { slug } = useParams()
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
   const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
       onSuccess: () => {
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully changed payment method to the card ending with ${
+        toast.success(
+          `Successfully changed payment method to the card ending with ${
             selectedPaymentMethod!.card.last4
-          }`,
-        })
+          }`
+        )
         onClose()
       },
       onError: (error) => {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to change payment method: ${error.message}`,
-        })
+        toast.error(`Failed to change payment method: ${error.message}`)
       },
     }
   )

@@ -1,13 +1,13 @@
 import { Dispatch, SetStateAction, useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Input, Modal } from 'ui'
-
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
 import InformationBox from 'components/ui/InformationBox'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaEnrollMutation } from 'data/profile/mfa-enroll-mutation'
 import { useMfaUnenrollMutation } from 'data/profile/mfa-unenroll-mutation'
-import { useStore } from 'hooks'
 
 interface AddNewFactorModalProps {
   visible: boolean
@@ -116,23 +116,15 @@ const SecondStep = ({
   onSuccess,
   onClose,
 }: SecondStepProps) => {
-  const { ui } = useStore()
   const [code, setCode] = useState('')
 
   const { mutate: unenroll } = useMfaUnenrollMutation({ onSuccess: () => onClose() })
-
   const { mutate: challengeAndVerify, isLoading: isVerifying } = useMfaChallengeAndVerifyMutation({
     onError: (error) => {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to add a second factor authentication:  ${error?.message}`,
-      })
+      toast.error(`Failed to add a second factor authentication:  ${error?.message}`)
     },
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully added a second factor authentication`,
-      })
+      toast.success(`Successfully added a second factor authentication`)
       onSuccess()
     },
   })

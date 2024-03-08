@@ -1,4 +1,3 @@
-import * as React from 'react'
 import * as Tooltip from '@radix-ui/react-tooltip'
 import {
   CalculatedColumn,
@@ -12,6 +11,7 @@ import { Button, IconMaximize2 } from 'ui'
 import { SELECT_COLUMN_KEY } from '../../constants'
 import { useTrackedState } from '../../store'
 import type { SupaRow } from '../../types'
+import { ChangeEvent, InputHTMLAttributes, SyntheticEvent } from 'react'
 
 export const SelectColumn: CalculatedColumn<any, any> = {
   key: SELECT_COLUMN_KEY,
@@ -85,12 +85,12 @@ export const SelectColumn: CalculatedColumn<any, any> = {
   draggable: false,
 }
 
-function stopPropagation(event: React.SyntheticEvent) {
+function stopPropagation(event: SyntheticEvent) {
   event.stopPropagation()
 }
 
 type SharedInputProps = Pick<
-  React.InputHTMLAttributes<HTMLInputElement>,
+  InputHTMLAttributes<HTMLInputElement>,
   'disabled' | 'tabIndex' | 'onClick' | 'aria-label' | 'aria-labelledby'
 >
 
@@ -113,11 +113,11 @@ function SelectCellFormatter({
   const state = useTrackedState()
   const { onEditRow } = state
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleChange(e: ChangeEvent<HTMLInputElement>) {
     onChange(e.target.checked, (e.nativeEvent as MouseEvent).shiftKey)
   }
 
-  function onEditClick(e: React.MouseEvent) {
+  function onEditClick(e: any) {
     e.stopPropagation()
     if (onEditRow && row) {
       onEditRow(row)
@@ -182,7 +182,7 @@ function SelectCellHeader({
   'aria-label': ariaLabel,
   'aria-labelledby': ariaLabelledBy,
 }: SelectCellHeaderProps) {
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleChange(e: ChangeEvent<HTMLInputElement>) {
     onChange(e.target.checked, (e.nativeEvent as MouseEvent).shiftKey)
   }
 

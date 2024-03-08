@@ -1,9 +1,9 @@
 import { useRouter } from 'next/router'
 import { ComponentType, useEffect } from 'react'
+import toast from 'react-hot-toast'
 
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useAuthenticatorAssuranceLevelQuery } from 'data/profile/mfa-authenticator-assurance-level-query'
-import { useStore } from 'hooks'
 import { useAuth } from 'lib/auth'
 import { IS_PLATFORM } from 'lib/constants'
 import { NextPageWithLayout, isNextPageWithLayout } from 'types'
@@ -29,27 +29,20 @@ export function withAuth<T>(
 
   const WithAuthHOC: ComponentType<T> = (props) => {
     const router = useRouter()
-    const rootStore = useStore()
-    const { ui } = rootStore
-
     const { isLoading, session } = useAuth()
     const { isLoading: isAALLoading, data: aalData } = useAuthenticatorAssuranceLevelQuery({
       onError(error) {
-        ui.setNotification({
-          error,
-          category: 'error',
-          message: `Failed to fetch authenticator assurance level: ${error.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`,
-        })
+        toast.error(
+          `Failed to fetch authenticator assurance level: ${error.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
+        )
       },
     })
 
     usePermissionsQuery({
       onError(error: any) {
-        ui.setNotification({
-          error,
-          category: 'error',
-          message: `Failed to fetch permissions: ${error.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`,
-        })
+        toast.error(
+          `Failed to fetch permissions: ${error.message}. Try refreshing your browser, or reach out to us via a support ticket if the issue persists`
+        )
       },
     })
 
