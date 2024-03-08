@@ -3,16 +3,14 @@ import { NextSeo } from 'next-seo'
 import { GetStaticProps, GetStaticPaths } from 'next'
 import Image from 'next/image'
 import Error from 'next/error'
-import { useTheme } from 'next-themes'
 import dynamic from 'next/dynamic'
 import { Session, SupabaseClient, createClient } from '@supabase/supabase-js'
-import { SITE_URL } from '~/lib/constants'
-import PostTypes from '~/types/post'
-import { getNavLatestPosts } from '~/lib/posts'
+import { useTheme } from 'next-themes'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import TicketContainer from '~/components/LaunchWeek/8/Ticket/TicketContainer'
+import { SITE_URL } from '~/lib/constants'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 
 const LaunchWeekPrizeSection = dynamic(
@@ -25,7 +23,6 @@ interface Props {
   user: UserData
   users: UserData[]
   ogImageUrl: string
-  latestPosts?: PostTypes[]
 }
 
 const supabaseAdmin = createClient(
@@ -34,7 +31,7 @@ const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
 
-export default function UsernamePage({ user, users, ogImageUrl, latestPosts }: Props) {
+export default function UsernamePage({ user, users, ogImageUrl }: Props) {
   const { username, ticketNumber, name } = user
 
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
@@ -91,7 +88,7 @@ export default function UsernamePage({ user, users, ogImageUrl, latestPosts }: P
           setTicketState,
         }}
       >
-        <DefaultLayout latestPosts={latestPosts}>
+        <DefaultLayout>
           <div className="-mt-[65px]">
             <div className="relative">
               <div className="relative z-10">
@@ -170,7 +167,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       ogImageUrl,
       users,
       key: username,
-      latestPosts: getNavLatestPosts(),
     },
     revalidate: 5,
   }
