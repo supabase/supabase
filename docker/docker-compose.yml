@@ -6,8 +6,8 @@
 
 name: supabase
 version: "3.8"
-services:
 
+services:
   studio:
     container_name: supabase-studio
     image: supabase/studio:20240301-0942bfe
@@ -405,3 +405,6 @@ services:
       - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro
 
     command: [ "--config", "etc/vector/vector.yml" ]
+
+volumes:
+  db-config:
