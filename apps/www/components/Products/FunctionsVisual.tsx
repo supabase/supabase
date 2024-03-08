@@ -53,7 +53,7 @@ const FunctionsVisual = () => {
       aria-label="Supabase Edge Functions visual composition"
     >
       <Image
-        src="/images/index/products/edge-functions.svg"
+        src="/images/index/products/edge-functions.png"
         alt="Supabase Edge Functions globe"
         fill
         sizes="100%"

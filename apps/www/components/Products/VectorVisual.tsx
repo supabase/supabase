@@ -61,7 +61,7 @@ const VectorVisual = () => {
           fill
           sizes="100%"
           quality={100}
-          className="absolute inset-0 object-contain object-center"
+          className="absolute inset-0 z-0 object-contain object-center"
         />
         <svg
           ref={ref}
@@ -81,7 +81,7 @@ const VectorVisual = () => {
               id="paint0_radial_484_53266"
               cx="0"
               cy="0"
-              r="2"
+              r={isSafari ? '10' : '2'}
               gradientUnits="userSpaceOnUse"
               gradientTransform={gradientTransform}
             >
