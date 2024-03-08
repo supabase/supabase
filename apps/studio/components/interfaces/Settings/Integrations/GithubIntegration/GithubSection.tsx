@@ -1,6 +1,7 @@
-import { useCallback } from 'react'
-
 import { useParams } from 'common'
+import { useCallback } from 'react'
+import toast from 'react-hot-toast'
+
 import { IntegrationConnectionItem } from 'components/interfaces/Integrations/IntegrationConnection'
 import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -18,8 +19,7 @@ import type {
   IntegrationName,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
-import { useFlag, useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
-import { OPT_IN_TAGS } from 'lib/constants'
+import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import GitHubIntegrationConnectionForm from './GitHubIntegrationConnectionForm'
@@ -39,7 +39,6 @@ The GitHub app will watch for changes in your repository such as file changes, b
 `
 
 const GitHubSection = () => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const project = useSelectedProject()
   const org = useSelectedOrganization()
@@ -50,10 +49,7 @@ const GitHubSection = () => {
 
   const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: 'Successfully deleted Github connection',
-      })
+      toast.success('Successfully deleted Github connection')
     },
   })
 

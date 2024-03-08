@@ -1,8 +1,5 @@
-// Import Swiper styles if swiper used on page
-import 'swiper/swiper.min.css'
-
-import { NextPage } from 'next'
 import dynamic from 'next/dynamic'
+import { NextPage } from 'next'
 import content from '~/data/home/content'
 import { getStaticLatestPosts } from '~/lib/posts'
 import PostTypes from '~/types/post'

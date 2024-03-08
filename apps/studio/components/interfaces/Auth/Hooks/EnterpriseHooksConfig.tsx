@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect } from 'react'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -23,7 +24,7 @@ import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import SchemaFunctionSelector from './SchemaFunctionSelector'
 
 const schema = object({
@@ -36,7 +37,6 @@ const schema = object({
 const FORM_ID = 'enterprise-hooks-config'
 
 const EnterpriseHooksConfig = () => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -79,16 +79,10 @@ const EnterpriseHooksConfig = () => {
       { projectRef: projectRef!, config: payload },
       {
         onError: () => {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to update settings`,
-          })
+          toast.error(`Failed to update settings`)
         },
         onSuccess: () => {
-          ui.setNotification({
-            category: 'success',
-            message: `Successfully updated settings`,
-          })
+          toast.success(`Successfully updated settings`)
           resetForm({ values: values, initialValues: values })
         },
       }

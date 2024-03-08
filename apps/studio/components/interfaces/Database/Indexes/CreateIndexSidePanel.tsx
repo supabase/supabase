@@ -1,17 +1,17 @@
 import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Input, Listbox, SidePanel } from 'ui'
+import toast from 'react-hot-toast'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { CodeEditor } from 'components/ui/CodeEditor'
-import MultiSelect, { MultiSelectOption } from 'ui-patterns/MultiSelect'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useIndexesQuery } from 'data/database/indexes-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useStore } from 'hooks'
+import { Button, Input, Listbox, SidePanel } from 'ui'
+import MultiSelect, { MultiSelectOption } from 'ui-patterns/MultiSelect'
 import { INDEX_TYPES } from './Indexes.constants'
 
 interface CreateIndexSidePanelProps {
@@ -20,7 +20,6 @@ interface CreateIndexSidePanelProps {
 }
 
 const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) => {
-  const { ui } = useStore()
   const { project } = useProjectContext()
   const [selectedSchema, setSelectedSchema] = useState('public')
   const [selectedEntity, setSelectedEntity] = useState('---')
@@ -58,14 +57,10 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     onSuccess: async () => {
       await refetchIndexes()
       onClose()
-      ui.setNotification({ category: 'success', message: `Successfully created index` })
+      toast.success(`Successfully created index`)
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to create index: ${error.message}`,
-      })
+      toast.error(`Failed to create index: ${error.message}`)
     },
   })
 

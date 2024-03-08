@@ -4,6 +4,16 @@ import { MessageCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
+
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
+import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
+import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
+import { Branch, useBranchesQuery } from 'data/branches/branches-query'
+import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import { useGitHubPullRequestsQuery } from 'data/integrations/github-pull-requests-query'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -16,15 +26,6 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
-
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
-import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
-import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useGitHubPullRequestsQuery } from 'data/integrations/github-pull-requests-query'
-import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
 import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
 import CreateBranchModal from './CreateBranchModal'
 import {
@@ -35,7 +36,6 @@ import {
 import Overview from './Overview'
 
 const BranchManagement = () => {
-  const { ui } = useStore()
   const router = useRouter()
   const { ref } = useParams()
   const project = useSelectedProject()
@@ -119,14 +119,12 @@ const BranchManagement = () => {
   const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
     onSuccess: () => {
       if (selectedBranchToDelete?.project_ref === ref) {
-        ui.setNotification({
-          category: 'success',
-          message:
-            'Successfully deleted branch. You are now currently on the main branch of your project.',
-        })
+        toast.success(
+          'Successfully deleted branch. You are now currently on the main branch of your project.'
+        )
         router.push(`/project/${projectRef}/branches`)
       } else {
-        ui.setNotification({ category: 'success', message: 'Successfully deleted branch' })
+        toast.success('Successfully deleted branch')
       }
       setSelectedBranchToDelete(undefined)
     },
@@ -134,10 +132,7 @@ const BranchManagement = () => {
 
   const { mutate: disableBranching, isLoading: isDisabling } = useBranchesDisableMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: 'Successfully disabled branching for project',
-      })
+      toast.success('Successfully disabled branching for project')
       setShowDisableBranching(false)
     },
   })

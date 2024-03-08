@@ -58,7 +58,7 @@ const projectsStore = proxy({
   selectedProject: null as Project | null,
   setSelectedOrgProject: (org: Org | null, project: Project | null) => {
     projectsStore.selectedOrg = org
-    storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_ORG, org?.id)
+    storeOrRemoveNull('local', LOCAL_STORAGE_KEYS.SAVED_ORG, org?.id.toString())
 
     projectsStore.selectedProject = project
     // @ts-ignore -- problem in OpenAPI spec -- project has ref property

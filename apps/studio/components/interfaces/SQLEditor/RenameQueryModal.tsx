@@ -1,14 +1,15 @@
-import { useParams } from 'common'
+import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { isError } from 'data/utils/error-check'
-import { useSelectedOrganization, useStore } from 'hooks'
-import { useEffect, useState } from 'react'
+import { useSelectedOrganization } from 'hooks'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { AiIconAnimation, Button, Form, Input, Modal } from 'ui'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 export interface RenameQueryModalProps {
   snippet: SqlSnippet
@@ -18,7 +19,6 @@ export interface RenameQueryModalProps {
 }
 
 const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQueryModalProps) => {
-  const { ui } = useStore()
   const { ref } = useParams()
   const organization = useSelectedOrganization()
   const snap = useSqlEditorStateSnapshot()
@@ -52,11 +52,7 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
       if (onComplete) onComplete()
       return Promise.resolve()
     } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to rename query: ${error.message}`,
-      })
+      toast.error(`Failed to rename query: ${error.message}`)
     }
   }
 
@@ -105,10 +101,7 @@ const RenameQueryModal = ({ snippet, visible, onCancel, onComplete }: RenameQuer
                         }
                       } catch (error: unknown) {
                         if (isError(error)) {
-                          ui.setNotification({
-                            category: 'error',
-                            message: `Failed to rename query: ${error.message}`,
-                          })
+                          toast.error(`Failed to rename query: ${error.message}`)
                         }
                       }
                     }}
