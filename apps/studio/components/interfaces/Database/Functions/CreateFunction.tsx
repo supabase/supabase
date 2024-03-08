@@ -7,7 +7,6 @@ import { Button, IconPlus, IconTrash, Input, Listbox, Modal, Radio, SidePanel, T
 
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import Panel from 'components/ui/Panel'
 import SqlEditor from 'components/ui/SqlEditor'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
@@ -16,21 +15,12 @@ import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/datab
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { Dictionary } from 'types'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { convertArgumentTypes, convertConfigParams, hasWhitespace } from './Functions.utils'
 
 // [Refactor] Remove local state, just use the Form component
 
 class CreateFunctionFormState {
-  id: number | undefined
-  originalName: string | undefined
-  // @ts-ignore
-  args: { value: { name: string; type: string; error?: string }[] }
-  // @ts-ignore
-  behavior: { value: string; error?: string }
-  // @ts-ignore
-  configParams: {
-    value: { name: string; value: string; error?: { name?: string; value?: string } }[]
-  }
   // @ts-ignore
   definition: { value: string; error?: string }
   // @ts-ignore
@@ -43,6 +33,16 @@ class CreateFunctionFormState {
   schema: { value: string; error?: string }
   // @ts-ignore
   securityDefiner: { value: boolean; error?: string }
+  id: number | undefined
+  originalName: string | undefined
+  // @ts-ignore
+  args: { value: { name: string; type: string; error?: string }[] }
+  // @ts-ignore
+  behavior: { value: string; error?: string }
+  // @ts-ignore
+  configParams: {
+    value: { name: string; value: string; error?: { name?: string; value?: string } }[]
+  }
 
   constructor() {
     makeAutoObservable(this)
