@@ -59,9 +59,9 @@ We'll create a database table called `todos` for storing tasks. This creates a c
 
   <StepHikeCompact.Step step={2}>
 
-    <StepHikeCompact.Details title="Allow anonymous access">
+    <StepHikeCompact.Details title="Allow public access">
 
-    Let's turn on Row Level Security for this table and allow anonymous access.
+    Let's turn on Row Level Security for this table and allow public access.
 
     </StepHikeCompact.Details>
 
@@ -73,7 +73,7 @@ We'll create a database table called `todos` for storing tasks. This creates a c
       enable row level security;
 
       -- Allow anonymous access
-      create policy "Allow anonymous access"
+      create policy "Allow public access"
         on todos
         for select
         to anon

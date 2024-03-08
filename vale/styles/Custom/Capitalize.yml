@@ -7,5 +7,5 @@ action:
   name: replace
 swap:
   auth hooks?: Auth Hooks?
-  edge functions?: Edge Functions? 
-  'role[- ]?based access control: Role-Based Access Control
+  edge functions?: Edge Functions?
+  'role[- ]?based access control': Role-Based Access Control
