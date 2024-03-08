@@ -20,7 +20,6 @@ interface RefSectionHandlerProps {
   pageProps: { docs: IRefStaticDoc[] }
   type: 'client-lib' | 'cli' | 'api'
   isOldVersion?: boolean
-  menuId: MenuId
 }
 
 const RefSectionHandler = (props: RefSectionHandlerProps) => {
@@ -78,7 +77,7 @@ const RefSectionHandler = (props: RefSectionHandlerProps) => {
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link rel="canonical" href={`https://supabase.com${router.basePath}${path}`} />
       </Head>
-      <MainSkeleton menuId={props.menuId}>
+      <MainSkeleton>
         {props.isOldVersion && <OldVersionAlert sections={props.sections} />}
         <RefSubLayout>
           {props.sections.map((section, i) => {

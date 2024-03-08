@@ -1,6 +1,7 @@
 import { memo } from 'react'
 
 import NavigationMenuHome from './HomeMenu'
+import { useNavMenu } from './NavigationMenuContext'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import { type GuideRefItem } from './NavigationMenuGuideRef'
 import NavigationMenuRefList from './NavigationMenuRefList'
@@ -31,8 +32,8 @@ function getMenuElement(menu: Menu, refData?: Array<GuideRefItem>) {
   }
 }
 
-const NavigationMenu = ({ menuId, refData }: { menuId: MenuId; refData?: Array<GuideRefItem> }) => {
-  const level = menuId
+const NavigationMenu = () => {
+  const { menuId: level, refData } = useNavMenu()
   const menu = getMenuById(level)
 
   return getMenuElement(menu, refData)

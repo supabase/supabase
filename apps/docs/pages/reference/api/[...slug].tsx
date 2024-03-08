@@ -1,10 +1,10 @@
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { NavMenuProvider } from '~/components/Navigation/NavigationMenu/NavigationMenuContext'
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 import { gen_v3 } from '~/lib/refGenerator/helpers'
-
 import apiCommonSections from '~/spec/common-api-sections.json' assert { type: 'json' }
 import specFile from '~/spec/transforms/api_v0_openapi_deparsed.json' assert { type: 'json' }
 
@@ -15,13 +15,9 @@ const libraryPath = '/api'
 
 export default function Config(props) {
   return (
-    <RefSectionHandler
-      menuId={MenuId.RefApi}
-      sections={sections}
-      spec={generatedSpec}
-      pageProps={props}
-      type="api"
-    />
+    <NavMenuProvider menuId={MenuId.RefApi}>
+      <RefSectionHandler sections={sections} spec={generatedSpec} pageProps={props} type="api" />
+    </NavMenuProvider>
   )
 }
 

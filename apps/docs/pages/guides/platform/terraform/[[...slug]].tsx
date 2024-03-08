@@ -1,4 +1,5 @@
 import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 import matter from 'gray-matter'
 import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from 'next'
 import { MDXRemote } from 'next-mdx-remote'
@@ -6,10 +7,9 @@ import { serialize } from 'next-mdx-remote/serialize'
 import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
 
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
-
 import components from '~/components'
-import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { MenuId } from '~/components/Navigation/NavigationMenu/menus'
+import { NavMenuProvider } from '~/components/Navigation/NavigationMenu/NavigationMenuContext'
 import Layout from '~/layouts/DefaultGuideLayout'
 import { isValidGuideFrontmatter } from '~/lib/docs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
@@ -47,9 +47,11 @@ export default function TerraformDocs({
   editLink,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
-    <Layout menuId={MenuId.Platform} meta={meta} editLink={editLink}>
-      <MDXRemote {...source} components={components} />
-    </Layout>
+    <NavMenuProvider menuId={MenuId.Platform}>
+      <Layout meta={meta} editLink={editLink}>
+        <MDXRemote {...source} components={components} />
+      </Layout>
+    </NavMenuProvider>
   )
 }
 

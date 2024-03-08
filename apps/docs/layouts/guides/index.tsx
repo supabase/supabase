@@ -10,8 +10,6 @@ import components from '~/components'
 import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
-import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
-import { type GuideRefItem } from '~/components/Navigation/NavigationMenu/NavigationMenuGuideRef'
 import useHash from '~/hooks/useHash'
 import { LayoutMainContent } from '../DefaultLayout'
 import { MainSkeleton } from '../MainSkeleton'
@@ -33,8 +31,6 @@ interface Props {
   toc?: any
   currentPage?: string
   hideToc?: boolean
-  menuId: MenuId
-  menuRefData?: Array<GuideRefItem>
 }
 
 const Layout: FC<Props> = (props) => {
@@ -46,8 +42,6 @@ const Layout: FC<Props> = (props) => {
 
   const { asPath } = useRouter()
   const router = useRouter()
-
-  const menuId = props.menuId
 
   const EDIT_BUTTON_EXCLUDE_LIST = ['/404']
 
@@ -115,7 +109,7 @@ const Layout: FC<Props> = (props) => {
           },
         }}
       />
-      <MainSkeleton menuId={menuId} menuRefData={props.menuRefData}>
+      <MainSkeleton>
         <LayoutMainContent className="pb-0">
           <div className={['grid grid-cols-12 relative gap-4'].join(' ')}>
             <div

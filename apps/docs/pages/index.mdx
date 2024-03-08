@@ -1,8 +1,12 @@
-import HomeLayout from '~/layouts/HomeLayout'
 import Link from 'next/link'
+
 import { Button, IconBackground, IconChevronRight, IconPlay, TextLink } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
+
+import { NavMenuProvider } from '~/components/Navigation/NavigationMenu/NavigationMenuContext'
+import { MenuId } from '~/components/Navigation/NavigationMenu/menus'
+import HomeLayout from '~/layouts/HomeLayout'
 
 import HomeMenuIconPicker from '~/components/Navigation/NavigationMenu/HomeMenuIconPicker'
 
@@ -361,6 +365,10 @@ export const additionalResources = [
   },
 ]
 
-export const Page = ({ children }) => <HomeLayout meta={meta} children={children} />
+export const Page = ({ children }) => (
+  <NavMenuProvider menuId={MenuId.Home}>
+    <HomeLayout meta={meta} children={children} />
+  </NavMenuProvider>
+)
 
 export default Page

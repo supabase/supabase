@@ -11,6 +11,7 @@ import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
 import components from '~/components'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { NavMenuProvider } from '~/components/Navigation/NavigationMenu/NavigationMenuContext'
 import Layout from '~/layouts/DefaultGuideLayout'
 import { getGuidesStaticPaths, getGuidesStaticProps } from '~/lib/docs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
@@ -84,9 +85,11 @@ export default function WrappersDocs({
   editLink,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
-    <Layout meta={meta} editLink={editLink} menuId={MenuId.Database}>
-      <MDXRemote {...source} components={components} />
-    </Layout>
+    <NavMenuProvider menuId={MenuId.Database}>
+      <Layout meta={meta} editLink={editLink}>
+        <MDXRemote {...source} components={components} />
+      </Layout>
+    </NavMenuProvider>
   )
 }
 

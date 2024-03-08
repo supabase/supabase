@@ -18,8 +18,6 @@ interface Props {
   hideToc?: boolean
   currentPage?: string
   editLink?: string
-  menuId: MenuId
-  menuRefData?: Array<GuideRefItem>
 }
 
 const Layout: FC<Props> = (props) => {

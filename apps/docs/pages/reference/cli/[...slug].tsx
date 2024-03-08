@@ -1,4 +1,5 @@
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { NavMenuProvider } from '~/components/Navigation/NavigationMenu/NavigationMenuContext'
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
@@ -12,13 +13,9 @@ const libraryPath = '/cli'
 
 export default function CliRef(props) {
   return (
-    <RefSectionHandler
-      menuId={MenuId.RefCli}
-      sections={sections}
-      spec={spec}
-      pageProps={props}
-      type="cli"
-    />
+    <NavMenuProvider menuId={MenuId.RefCli}>
+      <RefSectionHandler sections={sections} spec={spec} pageProps={props} type="cli" />
+    </NavMenuProvider>
   )
 }
 

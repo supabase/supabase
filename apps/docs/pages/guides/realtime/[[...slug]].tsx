@@ -3,6 +3,7 @@ import { MDXRemote } from 'next-mdx-remote'
 
 import components from '~/components'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { NavMenuProvider } from '~/components/Navigation/NavigationMenu/NavigationMenuContext'
 import Layout from '~/layouts/DefaultGuideLayout'
 import { getGuidesStaticPaths, getGuidesStaticProps } from '~/lib/docs'
 
@@ -22,8 +23,10 @@ export default function RealtimeGuide({
   const { hideToc, ...meta } = frontmatter
 
   return (
-    <Layout meta={meta} hideToc={hideToc} editLink={editLink} menuId={MenuId.Realtime}>
-      <MDXRemote {...mdxSource} components={components} />
-    </Layout>
+    <NavMenuProvider menuId={MenuId.Realtime}>
+      <Layout meta={meta} hideToc={hideToc} editLink={editLink}>
+        <MDXRemote {...mdxSource} components={components} />
+      </Layout>
+    </NavMenuProvider>
   )
 }

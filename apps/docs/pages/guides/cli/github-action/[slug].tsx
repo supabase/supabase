@@ -1,18 +1,20 @@
 import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
-import { relative } from 'path'
+import { relative } from 'node:path'
 import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+
 import components from '~/components'
+import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { NavMenuProvider } from '~/components/Navigation/NavigationMenu/NavigationMenuContext'
 import Layout from '~/layouts/DefaultGuideLayout'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
-import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -63,9 +65,11 @@ interface ActionDocsProps {
 
 export default function ActionDocs({ source, meta }: ActionDocsProps) {
   return (
-    <Layout meta={meta} menuId={MenuId.Cli}>
-      <MDXRemote {...source} components={components} />
-    </Layout>
+    <NavMenuProvider menuId={MenuId.Cli}>
+      <Layout meta={meta}>
+        <MDXRemote {...source} components={components} />
+      </Layout>
+    </NavMenuProvider>
   )
 }
 

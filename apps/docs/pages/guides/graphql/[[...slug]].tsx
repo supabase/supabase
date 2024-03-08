@@ -1,4 +1,5 @@
 import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
@@ -8,13 +9,12 @@ import remarkGfm from 'remark-gfm'
 
 import components from '~/components'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { NavMenuProvider } from '~/components/Navigation/NavigationMenu/NavigationMenuContext'
 import Layout from '~/layouts/DefaultGuideLayout'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
-
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -117,9 +117,11 @@ interface PGGraphQLDocsProps {
 
 export default function PGGraphQLDocs({ source, meta }: PGGraphQLDocsProps) {
   return (
-    <Layout meta={meta} menuId={MenuId.Graphql}>
-      <MDXRemote {...source} components={components} />
-    </Layout>
+    <NavMenuProvider menuId={MenuId.Graphql}>
+      <Layout meta={meta}>
+        <MDXRemote {...source} components={components} />
+      </Layout>
+    </NavMenuProvider>
   )
 }
 

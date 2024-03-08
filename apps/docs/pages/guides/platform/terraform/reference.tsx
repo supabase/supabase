@@ -15,6 +15,7 @@ import {
 } from 'ui'
 
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { NavMenuProvider } from '~/components/Navigation/NavigationMenu/NavigationMenuContext'
 import Layout from '~/layouts/DefaultGuideLayout'
 import { org, repo, branch, docsDir } from './[[...slug]]'
 
@@ -343,35 +344,40 @@ export default function PGGraphQLDocs({
   schema,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
-    <Layout menuId={MenuId.Platform} meta={meta}>
-      The Terraform Provider provices access to{' '}
-      <Link
-        href="https://developer.hashicorp.com/terraform/language/resources"
-        rel="noopener noreferrer"
-      >
-        resources
-      </Link>{' '}
-      and{' '}
-      <Link
-        href="https://developer.hashicorp.com/terraform/language/data-sources"
-        rel="noreferrer noopener"
-      >
-        data sources
-      </Link>
-      . Resources are infrastructure objects, such as a Supabase project, that you can declaratively
-      configure. Data sources are sources of information about your Supabase instances.
-      <ProviderSettings
-        schema={schema.provider_schemas['registry.terraform.io/supabase/supabase'].provider}
-      />
-      <Resources
-        schema={schema.provider_schemas['registry.terraform.io/supabase/supabase'].resource_schemas}
-      />
-      <DataSources
-        schema={
-          schema.provider_schemas['registry.terraform.io/supabase/supabase'].data_source_schemas
-        }
-      />
-    </Layout>
+    <NavMenuProvider menuId={MenuId.Platform}>
+      <Layout meta={meta}>
+        The Terraform Provider provices access to{' '}
+        <Link
+          href="https://developer.hashicorp.com/terraform/language/resources"
+          rel="noopener noreferrer"
+        >
+          resources
+        </Link>{' '}
+        and{' '}
+        <Link
+          href="https://developer.hashicorp.com/terraform/language/data-sources"
+          rel="noreferrer noopener"
+        >
+          data sources
+        </Link>
+        . Resources are infrastructure objects, such as a Supabase project, that you can
+        declaratively configure. Data sources are sources of information about your Supabase
+        instances.
+        <ProviderSettings
+          schema={schema.provider_schemas['registry.terraform.io/supabase/supabase'].provider}
+        />
+        <Resources
+          schema={
+            schema.provider_schemas['registry.terraform.io/supabase/supabase'].resource_schemas
+          }
+        />
+        <DataSources
+          schema={
+            schema.provider_schemas['registry.terraform.io/supabase/supabase'].data_source_schemas
+          }
+        />
+      </Layout>
+    </NavMenuProvider>
   )
 }
 

@@ -1,21 +1,15 @@
 import * as Accordion from '@radix-ui/react-accordion'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { memo, useState } from 'react'
+import { type PropsWithChildren, memo } from 'react'
 
-import {
-  IconChevronLeft,
-  TabsContent_Shadcn_,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
-} from 'ui'
+import { IconChevronLeft, cn } from 'ui'
 
 import HomeMenuIconPicker from './HomeMenuIconPicker'
 import { type MenuId } from './NavigationMenu'
 import * as NavItems from './NavigationMenu.constants'
 import NavigationMenuGuideListItems from './NavigationMenuGuideListItems'
-import { type GuideRefItem, NavigationMenuGuideRef } from './NavigationMenuGuideRef'
+import { type GuideRefItem } from './NavigationMenuGuideRef'
 
 const HeaderLink = memo(function HeaderLink(props: { id: MenuId; title: string; url: string }) {
   const pathname = usePathname()
@@ -44,7 +38,6 @@ type MenuContents = 'guide' | 'ref'
 
 const NavigationMenuGuideList: React.FC<Props> = ({ id, refData, value }) => {
   const url = usePathname()
-  const [contents, setContents] = useState<MenuContents>('guide')
 
   const menu = NavItems[id]
 
@@ -120,30 +113,45 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, refData, value }) => {
           <HeaderLink title={menu.title} url={menu.url} id={id} />
         </div>
       </Link>
-      <Tabs_Shadcn_ className="grow" defaultValue="guide">
-        <TabsList_Shadcn_ className="mt-2 mb-6 border-brand-200">
-          <TabsTrigger_Shadcn_ value="guide" className="data-[state=active]:border-brand">
-            Guides
-          </TabsTrigger_Shadcn_>
-          <TabsTrigger_Shadcn_ value="ref">API</TabsTrigger_Shadcn_>
-        </TabsList_Shadcn_>
-        <TabsContent_Shadcn_ value="guide">
-          <Accordion.Root
-            collapsible={true}
-            key={id}
-            type={value ? 'multiple' : 'single'}
-            value={value ?? firstLevelRoute}
-            className="transition-all duration-150 ease-out opacity-100 ml-0 delay-150"
-          >
-            <NavigationMenuGuideListItems menu={menu} id={id} />
-          </Accordion.Root>
-        </TabsContent_Shadcn_>
-        <TabsContent_Shadcn_ value="ref">
-          <NavigationMenuGuideRef refData={refData} />
-        </TabsContent_Shadcn_>
-      </Tabs_Shadcn_>
+      <div className="flex gap-4 mt-4 mb-6 border-b border-brand-200">
+        <TabLink href="#" active>
+          Guides
+        </TabLink>
+        <TabLink href="/reference/auth/javascript">API</TabLink>
+      </div>
+      <Accordion.Root
+        collapsible={true}
+        key={id}
+        type={value ? 'multiple' : 'single'}
+        value={value ?? firstLevelRoute}
+        className="transition-all duration-150 ease-out opacity-100 ml-0 delay-150"
+      >
+        <NavigationMenuGuideListItems menu={menu} id={id} />
+      </Accordion.Root>
     </div>
   )
 }
+
+const TabLink = ({
+  children,
+  href,
+  active = false,
+  className,
+}: PropsWithChildren<{ href: string; active?: boolean; className?: string }>) => (
+  <Link
+    href={href}
+    className={cn(
+      'relative',
+      'pb-2',
+      active && 'text-brand',
+      active &&
+        'after:absolute after:bottom-[-1px] after:left-0 after:h-1 after:w-full after:bg-brand-200',
+      className
+    )}
+    aria-current={active ? 'page' : undefined}
+  >
+    {children}
+  </Link>
+)
 
 export default NavigationMenuGuideList

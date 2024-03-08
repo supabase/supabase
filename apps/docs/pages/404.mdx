@@ -1,3 +1,5 @@
+import { NavMenuProvider } from '~/components/Navigation/NavigationMenu/NavigationMenuContext'
+import { MenuId } from '~/components/Navigation/NavigationMenu/menus'
 import Layout from '~/layouts/DefaultGuideLayout'
 
 export const meta = {
@@ -8,6 +10,10 @@ export const meta = {
 
 404 not found
 
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
+export const Page = ({ children }) => (
+  <NavMenuProvider menuId={MenuId.Home}>
+    <Layout meta={meta} children={children} />
+  </NavMenuProvider>
+)
 
 export default Page

@@ -1,13 +1,16 @@
-import clientLibsCommonSections from '~/spec/common-client-libs-sections.json'
-import typeSpec from '~/spec/enrichments/tsdoc_v2/combined.json'
-import spec from '~/spec/supabase_py_v2.yml' assert { type: 'yml' }
+import { useRouter } from 'next/router'
+
+import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { NavMenuProvider } from '~/components/Navigation/NavigationMenu/NavigationMenuContext'
+import RefSEO from '~/components/reference/RefSEO'
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
+import type { TypeSpec } from '~/components/reference/Reference.types'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
-import { useRouter } from 'next/router'
-import RefSEO from '~/components/reference/RefSEO'
-import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import clientLibsCommonSections from '~/spec/common-client-libs-sections.json'
+import typeSpec from '~/spec/enrichments/tsdoc_v2/combined.json'
+import spec from '~/spec/supabase_py_v2.yml' assert { type: 'yml' }
 
 const sections = flattenSections(clientLibsCommonSections)
 const libraryPath = '/python'
@@ -24,15 +27,15 @@ export default function PyReference(props) {
   return (
     <>
       <RefSEO title={pageTitle} />
-
-      <RefSectionHandler
-        menuId={MenuId.RefPythonV2}
-        sections={filteredSection}
-        spec={spec}
-        typeSpec={typeSpec}
-        pageProps={props}
-        type="client-lib"
-      />
+      <NavMenuProvider menuId={MenuId.RefPythonV2}>
+        <RefSectionHandler
+          sections={filteredSection}
+          spec={spec}
+          typeSpec={typeSpec as TypeSpec}
+          pageProps={props}
+          type="client-lib"
+        />
+      </NavMenuProvider>
     </>
   )
 }
