@@ -1,4 +1,3 @@
-import { Info } from 'lucide-react'
 import { ElementRef, forwardRef } from 'react'
 import { TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 
