@@ -15,6 +15,7 @@ const config = {
     '../../../packages/ui-patterns/**/*.stories.@(js|jsx|mjs|ts|tsx)',
     // primitives
     '../../../packages/ui/src/components/shadcn/**/*.stories.@(js|jsx|mjs|ts|tsx)',
+    '../../../packages/ui/src/components/TreeView/**/*.stories.@(js|jsx|mjs|ts|tsx)',
     //
     // local stories
     '../stories/**/*.mdx',

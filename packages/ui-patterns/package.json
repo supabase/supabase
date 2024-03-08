@@ -12,13 +12,13 @@
     "lodash": "*",
     "lucide-react": "*",
     "next-themes": "*",
+    "react-accessible-treeview": "^2.8.3",
     "react-hot-toast": "*",
     "react-tooltip": "*",
     "reactflow": "*",
     "tsconfig": "*",
     "ui": "*"
   },
-  "devDependencies": {},
   "peerDependencies": {
     "next": "*",
     "react": "*",
