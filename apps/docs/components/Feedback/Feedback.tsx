@@ -122,22 +122,39 @@ function Feedback() {
           <X size={14} strokeWidth={3} />
           <span className="sr-only">No</span>
         </Button>
+        <div
+          className={cn(
+            'absolute',
+            'flex flex-col gap-1',
+            'left-6',
+            'transition-all',
+            'transform',
+            'text-xs',
+            'opacity-0 invisible',
+            'delay-500',
+            state.type === StateType.Followup && 'left-9 opacity-100 visible'
+          )}
+        >
+          <span className="text-foreground-light">Thanks for your feedback!</span>
+          <button
+            ref={feedbackButtonRef}
+            className={cn(
+              'mt-0',
+              'transition-all',
+              'flex items-center gap-2',
+              'text-xs text-foreground-lighter',
+              'hover:text-foreground',
+              state.type !== StateType.Followup && 'opacity-0 invisible',
+              '[transition-property:opacity,color]',
+              'delay-1000'
+            )}
+            onClick={() => setModalOpen(true)}
+          >
+            {isYes ? <>What went well?</> : <>How can we improve?</>}
+            <MessageSquareQuote size={14} strokeWidth={1.5} />
+          </button>
+        </div>
       </div>
-      <button
-        ref={feedbackButtonRef}
-        className={cn(
-          'flex items-center gap-2',
-          'text-[0.8rem] text-foreground-lighter text-left',
-          'hover:text-foreground',
-          state.type !== StateType.Followup && 'opacity-0 invisible',
-          '[transition-property:opacity,color]',
-          isNo && 'delay-100'
-        )}
-        onClick={() => setModalOpen(true)}
-      >
-        {isYes ? <>What went well?</> : <>How can we improve?</>}
-        <MessageSquareQuote size={14} strokeWidth={1.5} />
-      </button>
       <FeedbackModal
         visible={modalOpen}
         page={pathname}
