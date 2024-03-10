@@ -4411,13 +4411,31 @@ functions:
         - `buckets` table permissions: `insert`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: String
+        description: The id of the bucket you want to create.
+      - name: builder
+        isOptional: true
+        type: BucketBuilder.() -> Unit
+        description: The builder to create a new bucket.
+        subContent:
+          - name: public
+            isOptional: true
+            type: Boolean
+            description: Whether the bucket is public or not.
+          - name: fileSizeLimit
+            isOptional: true
+            type: FileSizeLimit
+            description: The maximum file size.
     examples:
       - id: create-bucket
         name: Create bucket
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.storage.createBucket(name = "icons", id = "icons") {
+          supabase.storage.createBucket(id = "icons") {
               public = true
               fileSizeLimit = 5.megabytes
           }
@@ -4430,6 +4448,24 @@ functions:
         - `buckets` table permissions: `select` and `update`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: String
+        description: The id of the bucket you want to create.
+      - name: builder
+        isOptional: true
+        type: BucketBuilder.() -> Unit
+        description: The builder to create a new bucket.
+        subContent:
+          - name: public
+            isOptional: true
+            type: Boolean
+            description: Whether the bucket is public or not.
+          - name: fileSizeLimit
+            isOptional: true
+            type: FileSizeLimit
+            description: The maximum file size.
     examples:
       - id: update-bucket
         name: Update bucket
@@ -4451,6 +4487,11 @@ functions:
         - `buckets` table permissions: `select`
         - `objects` table permissions: `select` and `delete`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+        - name: bucketId
+          isOptional: false
+          type: String
+          description: The id of the bucket you want to empty.
     examples:
       - id: empty-bucket
         name: Empty bucket
@@ -4467,6 +4508,11 @@ functions:
         - `buckets` table permissions: `select` and `delete`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+        - name: bucketId
+          isOptional: false
+          type: String
+          description: The id of the bucket you want to delete.
     examples:
       - id: delete-bucket
         name: Delete bucket
@@ -4485,6 +4531,19 @@ functions:
         - `objects` table permissions: `insert`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
       - Resumable uploads use a `Disk` cache by default to store the upload urls. You can customize that in the Auth config by changing the `resumable.cache` property.
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The path of the file you want to upload.
+      - name: data
+        isOptional: false
+        type: ByteArray
+        description: The data of the file you want to upload.
+      - name: upsert
+        isOptional: true
+        type: Boolean
+        description: Whether to overwrite the file if it already exists.
     examples:
       - id: upload-file
         name: Upload file
@@ -4589,6 +4648,19 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The path of the file you want to upload.
+      - name: data
+        isOptional: false
+        type: ByteArray
+        description: The data of the file you want to upload.
+      - name: upsert
+        isOptional: true
+        type: Boolean
+        description: Whether to overwrite the file if it already exists.
     examples:
       - id: update-file
         name: Update file
@@ -4609,6 +4681,15 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: from
+        isOptional: false
+        type: String
+        description: The path of the file you want to move.
+      - name: to
+        isOptional: false
+        type: String
+        description: The new path of the file.
     examples:
       - id: move-file
         name: Move file
@@ -4626,6 +4707,15 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert` and `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: from
+        isOptional: false
+        type: String
+        description: The path of the file you want to copy.
+      - name: to
+        isOptional: false
+        type: String
+        description: The new path of the file.
     examples:
       - id: copy-file
         name: Copy file
@@ -4642,6 +4732,40 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The path of the file you want to create a signed url for.
+      - name: expiresIn
+        isOptional: false
+        type: Duration
+        description: The duration the signed url should be valid for.
+      - name: builder
+        isOptional: true
+        type: ImageTransformation.() -> Unit
+        description: The transformation to apply to the image.
+        subContent:
+          - name: width
+            isOptional: true
+            type: Int
+            description: The width of the image.
+          - name: height
+            isOptional: true
+            type: Int
+            description: The height of the image.
+          - name: resize
+            isOptional: true
+            type: Resize
+            description: The resize mode of the image.
+          - name: quality
+            isOptional: true
+            type: Int
+            description: The quality of the image. (Percentage 1-100, defaults to 80)
+          - name: format
+            isOptional: true
+            type: String
+            description: Specify in which format you want the image to receive. (Defaults to 'origin', which means the original format)
     examples:
       - id: create-signed-url
         name: Create Signed URL
@@ -4669,6 +4793,15 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: expiresIn
+        isOptional: false
+        type: Duration
+        description: The duration the signed url should be valid for.
+      - name: paths
+        isOptional: false
+        type: vararg String
+        description: The paths of the files you want to create signed urls for.
     examples:
       - id: create-signed-urls
         name: Create Signed URLs
@@ -4685,6 +4818,11 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The path of the file you want to upload.
     examples:
       - id: create-signed-upload-url
         name: Create Signed Upload URL
@@ -4701,6 +4839,19 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The path of the file you want to upload.
+      - name: token
+        isOptional: false
+        type: String
+        description: The token you received from `createSignedUploadUrl`.
+      - name: data
+        isOptional: true
+        type: ByteArray
+        description: The data of the file you want to upload.
     examples:
       - id: upload-to-signed-url
         name: Upload to a signed URL
@@ -4720,6 +4871,11 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The path of the file you want to get the public url for.
     examples:
       - id: returns-the-url-for-an-asset-in-a-public-bucket
         name: Returns the URL for an asset in a public bucket
@@ -4746,6 +4902,11 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The path of the file you want to download.
     examples:
       - id: download-file-authenticated
         name: Download file from non-public bucket
@@ -4813,6 +4974,11 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `delete` and `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: paths
+        isOptional: false
+        type: vararg String
+        description: The paths of the files you want to remove.
     examples:
       - id: delete-file
         name: Delete file
