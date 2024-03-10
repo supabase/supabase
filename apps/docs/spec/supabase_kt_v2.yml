@@ -872,7 +872,15 @@ functions:
     title: or()
     description: |
       Finds all rows satisfying at least one of the filters.
-    notes: |
+    params:
+      - name: negate
+        isOptional: true
+        type: Boolean
+        description: If true, negate the entire block.
+      - name: block
+        isOptional: false
+        type: PostgrestFilterBuilder.() -> Unit
+        description: The block to apply the `or` filter to.
     examples:
       - id: with-select
         name: With `select()`
@@ -914,6 +922,19 @@ functions:
       Finds all rows that don't satisfy the filter.
     notes: |
       - `.filterNot()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: operator
+        isOptional: false
+        type: FilterOperator
+        description: The operator to use for the filter.
+      - name: value
+        isOptional: false
+        type: Any
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -931,6 +952,15 @@ functions:
     title: eq()
     description: |
       Finds all rows whose value on the stated `column` exactly matches the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Any
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -987,6 +1017,15 @@ functions:
     title: neq()
     description: |
       Finds all rows whose value on the stated `column` doesn't match the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Any
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1041,6 +1080,15 @@ functions:
     title: gt()
     description: |
       Finds all rows whose value on the stated `column` is greater than the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Any
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1097,6 +1145,15 @@ functions:
     title: gte()
     description: |
       Finds all rows whose value on the stated `column` is greater than or equal to the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Any
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1153,6 +1210,15 @@ functions:
     title: lt()
     description: |
       Finds all rows whose value on the stated `column` is less than the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Any
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1209,6 +1275,15 @@ functions:
     title: lte()
     description: |
       Finds all rows whose value on the stated `column` is less than or equal to the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Any
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1265,6 +1340,15 @@ functions:
     title: like()
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case sensitive).
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: pattern
+        isOptional: false
+        type: String
+        description: The pattern to match with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1321,6 +1405,15 @@ functions:
     title: ilike()
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case insensitive).
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: pattern
+        isOptional: false
+        type: String
+        description: The pattern to match with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1379,6 +1472,15 @@ functions:
       A check for exact equality (null, true, false), finds all rows whose value on the stated `column` exactly match the specified `value`.
 
       `is_` and `in_` filter methods are suffixed with `_` to avoid collisions with reserved keywords.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Boolean?
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1435,6 +1537,15 @@ functions:
     title: in_()
     description: |
       Finds all rows whose value on the stated `column` is found on the specified `values`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: values
+        isOptional: false
+        type: List<Any>
+        description: The values to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1489,6 +1600,17 @@ functions:
 
   - id: contains
     title: contains()
+    description: |
+      Only relevant for jsonb, array, and range columns. Match only rows where `column` contains every element appearing in `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The jsonb, array, or range column to filter on
+      - name: value
+        isOptional: false
+        type: List<Any>
+        description: The jsonb, array, or range value to filter with
     examples:
       - id: with-select
         name: With `select()`
@@ -1545,6 +1667,15 @@ functions:
     title: rangeLt()
     description: |
       Only relevant for range columns. Match only rows where every element in column is less than any element in range.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: values
+        isOptional: false
+        type: Pair<Any, Any>
+        description: The values to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1600,7 +1731,15 @@ functions:
     title: rangeGt()
     description: |
       Only relevant for range columns. Match only rows where every element in column is greater than any element in range.
-
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: values
+        isOptional: false
+        type: Pair<Any, Any>
+        description: The values to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1656,6 +1795,15 @@ functions:
     title: rangeGte()
     description: |
       Only relevant for range columns. Match only rows where every element in column is either contained in range or greater than any element in range.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: values
+        isOptional: false
+        type: Pair<Any, Any>
+        description: The values to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1711,7 +1859,15 @@ functions:
     title: rangeLte()
     description: |
       Only relevant for range columns. Match only rows where every element in column is either contained in range or less than any element in range.
-
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: values
+        isOptional: false
+        type: Pair<Any, Any>
+        description: The values to filter with.
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
     examples:
       - id: with-select
@@ -1768,7 +1924,15 @@ functions:
     title: rangeAdjacent()
     description: |
       Only relevant for range columns. Match only rows where column is mutually exclusive to range and there can be no element between the two ranges.
-
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: values
+        isOptional: false
+        type: Pair<Any, Any>
+        description: The values to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1821,7 +1985,15 @@ functions:
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.overlaps'
     description: |
       Only relevant for array and range columns. Match only rows where column and value have an element in common.
-
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: values
+        isOptional: false
+        type: List<Any>
+        description: The values to filter with.
     examples:
       - id: on-array-columns
         name: On array columns
@@ -1920,6 +2092,23 @@ functions:
       Only relevant for text and tsvector columns. Match only rows where `column` matches the query string in `query`.
 
       For more information, see [Postgres full text search](https://supabase.com/docs/guides/database/full-text-search).
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The text or tsvector column to filter on
+      - name: query
+        isOptional: false
+        type: String
+        description: The query text to match with
+      - name: textSearchType
+        isOptional: true
+        type: TextSearchType
+        description: The type of text search to use. Defaults to `TextSearchType.NONE`.
+      - name: config
+        isOptional: true
+        type: String
+        description: The text search configuration to use.
     examples:
       - id: text-search
         name: Text search
@@ -1992,6 +2181,19 @@ functions:
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.filter'
     notes: |
       filter() expects you to use the raw PostgREST syntax for the filter values.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: operator
+        isOptional: false
+        type: FilterOperator
+        description: The operator to use for the filter.
+      - name: value
+        isOptional: false
+        type: Any
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2145,6 +2347,23 @@ functions:
     description: |
       Order the query result by column.
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.order'
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to order by.
+      - name: order
+        isOptional: false
+        type: Order
+        description: The order to use.
+      - name: nullsFirst
+        isOptional: true
+        type: Boolean
+        description: Whether to order nulls first.
+      - name: referencedTable
+        isOptional: true
+        type: String
+        description: The foreign table to order by.
     examples:
       - id: with-select
         name: With `select()`
@@ -2263,6 +2482,15 @@ functions:
     description: |
       Limit the query result by count.
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.limit'
+    params:
+      - name: count
+        isOptional: false
+        type: Long
+        description: The number of rows to limit the result to.
+      - name: referencedTable
+        isOptional: true
+        type: String
+        description: The foreign table to limit by.
     examples:
       - id: with-select
         name: With `select()`
@@ -2359,6 +2587,19 @@ functions:
     title: range()
     description: |
       Limit the query result by from and to inclusively.
+    params:
+      - name: from
+        isOptional: false
+        type: Long
+        description: The start of the range.
+      - name: to
+        isOptional: false
+        type: Long
+        description: The end of the range.
+      - name: referencedTable
+        isOptional: true
+        type: String
+        description: The foreign table to limit by.
     examples:
       - id: with-select
         name: With `select()`
@@ -2486,6 +2727,31 @@ functions:
       It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
 
       Follow the [Performance Debugging Guide](/docs/guides/api/rest/debugging-performance) to enable the functionality on your project.
+    params:
+      - name: analyze
+        isOptional: true
+        type: Boolean
+        description: If `true`, the query will be executed and the actual run time will be returned
+      - name: verbose
+        isOptional: true
+        type: Boolean
+        description: If `true`, the query identifier will be returned and `data` will include the output columns of the query
+      - name: settings
+        isOptional: true
+        type: Boolean
+        description: If `true`, include information on configuration parameters that affect query planning
+      - name: buffers
+        isOptional: true
+        type: Boolean
+        description: If `true`, include information on buffer usage
+      - name: wal
+        isOptional: true
+        type: Boolean
+        description: If `true`, include information on WAL record generation
+      - name: format
+        isOptional: true
+        type: String
+        description: The format of the output, can be `"text"` (default) or `"json"`
     examples:
       - id: get-execution-plan
         name: Get the execution plan
