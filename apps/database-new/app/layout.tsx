@@ -5,6 +5,7 @@ import Footer from '@/components/Footer'
 import Header from '@/components/Header/Header'
 import { ThemeProvider } from '@/components/providers'
 import type { Metadata } from 'next'
+import MainTagWrapper from '@/components/MainTagWrapper'
 import { LoadingLine } from './LoadingLine'
 
 const defaultUrl = process.env.VERCEL_URL
@@ -26,9 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
           <Header />
           <LoadingLine />
-          <main role="main" className="h-full w-full flex flex-col grow">
-            {children}
-          </main>
+          <MainTagWrapper>{children}</MainTagWrapper>
           <Footer />
         </ThemeProvider>
       </body>
