@@ -2,11 +2,11 @@ import { useParams } from 'common'
 import { compact, get, isEmpty, uniqBy } from 'lodash'
 import { observer } from 'mobx-react-lite'
 import { useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import type { Bucket } from 'data/storage/buckets-query'
-import { useStore } from 'hooks'
 import { DEFAULT_PROJECT_API_SERVICE_ID } from 'lib/constants'
 import { copyToClipboard } from 'lib/helpers'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
@@ -55,7 +55,6 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
 
   const storageExplorerRef = useRef(null)
 
-  const { ui } = useStore()
   const { ref } = useParams()
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef: ref })
   const { data: projectSettings } = useProjectSettingsQuery({ projectRef: ref })
@@ -191,11 +190,7 @@ const StorageExplorer = ({ bucket }: StorageExplorerProps) => {
         ? url.replace(apiUrl, `https://${customDomainData.customDomain.hostname}`)
         : url
     copyToClipboard(formattedUrl, () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Copied URL for ${name} to clipboard.`,
-        duration: 4000,
-      })
+      toast.success(`Copied URL for ${name} to clipboard.`)
     })
   }
 

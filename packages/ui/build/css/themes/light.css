@@ -53,7 +53,7 @@
   --border-muted: var(--colors-gray-light-400);
   --background-button-default: var(--colors-gray-light-100);
   --background-overlay-hover: var(--colors-gray-light-300);
-  --background-overlay-default: var(--colors-gray-light-200);
+  --background-overlay-default: var(--colors-gray-light-100);
   --background-control: var(--colors-gray-light-300);
   --background-selection: var(--colors-gray-light-400);
   --background-default: var(--colors-gray-light-100);

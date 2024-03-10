@@ -4,22 +4,22 @@ import { useParams } from 'common'
 import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, Input, Modal } from 'ui'
 
-import { useIsProjectActive } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  useIsProjectActive,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
 import { useDatabasePasswordResetMutation } from 'data/database/database-password-reset-mutation'
-import { getProjectDetail } from 'data/projects/project-detail-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from 'lib/constants'
 import { passwordStrength } from 'lib/helpers'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const ResetDbPassword = ({ disabled = false }) => {
   const { ref } = useParams()
-  const { ui, meta } = useStore()
-
   const isProjectActive = useIsProjectActive()
   const { project } = useProjectContext()
   const canResetDbPassword = useCheckPermissions(PermissionAction.UPDATE, 'projects', {
@@ -38,13 +38,7 @@ const ResetDbPassword = ({ disabled = false }) => {
   const { mutate: resetDatabasePassword, isLoading: isUpdatingPassword } =
     useDatabasePasswordResetMutation({
       onSuccess: async () => {
-        const project = await getProjectDetail({ ref })
-        if (project) meta.setProjectDetails(project)
-
-        ui.setNotification({
-          category: 'success',
-          message: 'Successfully updated database password',
-        })
+        toast.success('Successfully updated database password')
         setShowResetDbPass(false)
       },
     })

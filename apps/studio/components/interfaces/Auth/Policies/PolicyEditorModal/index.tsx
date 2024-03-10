@@ -1,11 +1,11 @@
 import { isEmpty, noop } from 'lodash'
 import { useEffect, useState } from 'react'
-import { Modal } from 'ui'
+import toast from 'react-hot-toast'
 
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useStore } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
+import { Modal } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 import {
   PolicyFormField,
@@ -48,7 +48,6 @@ const PolicyEditorModal = ({
   onUpdatePolicy,
   onSaveSuccess = noop,
 }: PolicyEditorModalProps) => {
-  const { ui } = useStore()
   const snap = useAppStateSnapshot()
 
   const newPolicyTemplate: PolicyFormField = {
@@ -124,36 +123,21 @@ const PolicyEditorModal = ({
     const { name, definition, check, command } = policyFormFields
 
     if (name.length === 0) {
-      return ui.setNotification({ category: 'error', message: 'Do give your policy a name' })
+      return toast.error('Please provide a name for your policy')
     }
     if (!command) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'You will need to allow at one operation in your policy',
-        duration: 4000,
-      })
+      return toast.error('Please select an operation for your policy')
     }
     if (['SELECT', 'DELETE'].includes(command) && !definition) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'Did you forget to provide a USING expression for your policy?',
-        duration: 4000,
-      })
+      return toast.error('Please provide a USING expression for your policy')
     }
     if (command === 'INSERT' && !check) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'Did you forget to provide a WITH CHECK expression for your policy?',
-        duration: 4000,
-      })
+      return toast.error('Please provide a WITH CHECK expression for your policy')
     }
     if (command === 'UPDATE' && !definition && !check) {
-      return ui.setNotification({
-        category: 'error',
-        message:
-          'You will need to provide either a USING, or WITH CHECK expression, or both for your policy',
-        duration: 4000,
-      })
+      return toast.error(
+        'Please provide either a USING, or WITH CHECK expression, or both for your policy'
+      )
     }
     const policySQLStatement = createSQLPolicy(policyFormFields, selectedPolicyToEdit)
     setPolicyStatementForReview(policySQLStatement)

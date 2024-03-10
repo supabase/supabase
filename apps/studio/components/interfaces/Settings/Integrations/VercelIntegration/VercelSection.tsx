@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
-import { Button, IconExternalLink } from 'ui'
+import toast from 'react-hot-toast'
+import { Button, IconExternalLink, cn } from 'ui'
 
 import { IntegrationConnectionItem } from 'components/interfaces/Integrations/IntegrationConnection'
 import {
@@ -22,16 +23,14 @@ import type {
   IntegrationName,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
-import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { pluralize } from 'lib/helpers'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import VercelIntegrationConnectionForm from './VercelIntegrationConnectionForm'
-import clsx from 'clsx'
 
 const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
-  const { ui } = useStore()
   const project = useSelectedProject()
   const org = useSelectedOrganization()
   const { data } = useOrgIntegrationsQuery({ orgSlug: org?.slug })
@@ -42,10 +41,7 @@ const VercelSection = ({ isProjectScoped }: { isProjectScoped: boolean }) => {
   const { mutate: deleteVercelConnection } = useIntegrationsVercelInstalledConnectionDeleteMutation(
     {
       onSuccess: () => {
-        ui.setNotification({
-          category: 'success',
-          message: 'Successfully deleted Vercel connection',
-        })
+        toast.success('Successfully deleted Vercel connection')
       },
     }
   )
@@ -163,7 +159,7 @@ You can change the scope of the access for Supabase by configuring
                     {connections.map((connection) => (
                       <div
                         key={connection.id}
-                        className={clsx(
+                        className={cn(
                           isProjectScoped && 'relative flex flex-col -gap-[1px] [&>li]:pb-0'
                         )}
                       >
@@ -171,7 +167,7 @@ You can change the scope of the access for Supabase by configuring
                           connection={connection}
                           type={'Vercel' as IntegrationName}
                           onDeleteConnection={onDeleteVercelConnection}
-                          className={clsx(isProjectScoped && '!rounded-b-none !mb-0')}
+                          className={cn(isProjectScoped && '!rounded-b-none !mb-0')}
                         />
                         {isProjectScoped ? (
                           <div className="relative pl-8 ml-6 border-l border-muted pb-6">

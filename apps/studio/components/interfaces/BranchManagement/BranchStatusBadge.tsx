@@ -1,16 +1,28 @@
-import { WarningIcon } from 'components/ui/Icons'
 import type { BranchData } from 'data/branches/branch-query'
-import { ClockIcon } from 'lucide-react'
-import { Badge } from 'ui'
+import type { Branch } from 'data/branches/branches-query'
+import { Badge_Shadcn_ } from 'ui'
+import { StatusIcon } from 'ui-patterns/Icons/StatusIcons'
 
-type Status = BranchData['status']
+type Status = Branch['status'] | BranchData['status']
 
 export interface BranchStatusBadgeProps {
   status: Status
 }
 
-const UNHEALTHY_STATUES: Status[] = ['ACTIVE_UNHEALTHY', 'INIT_FAILED', 'UNKNOWN']
-const WAITING_STATUSES: Status[] = ['COMING_UP', 'GOING_DOWN', 'PAUSING', 'RESTORING', 'UPGRADING']
+const UNHEALTHY_STATUES: Status[] = [
+  'ACTIVE_UNHEALTHY',
+  'INIT_FAILED',
+  'UNKNOWN',
+  'MIGRATIONS_FAILED',
+]
+const WAITING_STATUSES: Status[] = [
+  'COMING_UP',
+  'GOING_DOWN',
+  'PAUSING',
+  'RESTORING',
+  'UPGRADING',
+  'RUNNING_MIGRATIONS',
+]
 
 const STATUS_TO_LABEL: Record<Status, string> = {
   ACTIVE_HEALTHY: 'Healthy',
@@ -24,10 +36,14 @@ const STATUS_TO_LABEL: Record<Status, string> = {
   REMOVED: 'Removed',
   RESTORING: 'Restoring',
   UPGRADING: 'Upgrading',
+  CREATING_PROJECT: 'Creating project',
+  RUNNING_MIGRATIONS: 'Running migrations',
+  MIGRATIONS_FAILED: 'Migrations failed',
+  MIGRATIONS_PASSED: 'Migrations applied successfully',
 }
 
 const BranchStatusBadge = ({ status }: BranchStatusBadgeProps) => {
-  if (status === 'ACTIVE_HEALTHY') {
+  if (status === 'ACTIVE_HEALTHY' || status === 'MIGRATIONS_PASSED') {
     return null
   }
 
@@ -35,11 +51,12 @@ const BranchStatusBadge = ({ status }: BranchStatusBadgeProps) => {
   const isWaiting = WAITING_STATUSES.includes(status)
 
   return (
-    <Badge color={isUnhealthy ? 'red' : 'slate'} className="flex items-center gap-1.5">
-      {isUnhealthy && <WarningIcon className="w-3 h-3" />}
-      {isWaiting && <ClockIcon size={12} />}
-      <span>{STATUS_TO_LABEL[status]}</span>
-    </Badge>
+    <Badge_Shadcn_ variant={isUnhealthy ? 'destructive' : 'default'} className="gap-1.5">
+      {(isUnhealthy || isWaiting) && (
+        <StatusIcon variant={isUnhealthy ? 'destructive' : 'default'} hideBackground />
+      )}
+      {STATUS_TO_LABEL[status]}
+    </Badge_Shadcn_>
   )
 }
 

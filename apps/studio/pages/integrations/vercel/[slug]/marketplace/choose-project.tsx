@@ -176,6 +176,7 @@ This Supabase integration manages your environment variables automatically to pr
             }}
             loadingForeignProjects={isLoadingVercelProjectsData}
             loadingSupabaseProjects={isLoadingSupabaseProjectsData}
+            mode="Vercel"
           />
           <Markdown
             content={`

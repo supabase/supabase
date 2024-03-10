@@ -1,17 +1,14 @@
 import Link from 'next/link'
-import { Button, IconExternalLink, IconGitBranch, IconGitPullRequest } from 'ui'
 
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import { useSelectedOrganization } from 'hooks'
-import { OPT_IN_TAGS } from 'lib/constants'
+import { useFlag } from 'hooks'
 import { useAppStateSnapshot } from 'state/app-state'
+import { Button, IconExternalLink, IconGitBranch, IconGitPullRequest } from 'ui'
 
 export const BranchingEmptyState = () => {
-  const selectedOrg = useSelectedOrganization()
   const snap = useAppStateSnapshot()
 
-  const hasAccessToBranching =
-    selectedOrg?.opt_in_tags?.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) ?? false
+  const hasAccessToBranching = useFlag<boolean>('branchManagement')
 
   return (
     <ProductEmptyState title="Database Branching">

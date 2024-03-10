@@ -1,0 +1,80 @@
+---
+title: 'Monitoring with Sentry'
+description: 'Monitor Edge Functions with the Sentry Deno SDK.'
+---
+
+Add the [Sentry Deno SDK](https://docs.sentry.io/platforms/javascript/guides/deno/) to your Supabase Edge Functions to easily track exceptions and get notified of errors or performance issues.
+
+### Prerequisites
+
+- [Create a Sentry account](https://sentry.io/signup/).
+- Make sure you have the latest version of the [Supabase CLI](https://supabase.com/docs/guides/cli#installation) installed.
+
+### 1. Create Supabase function
+
+Create a new function locally:
+
+```bash
+supabase functions new sentryfied
+```
+
+### 2. Add the Sentry Deno SDK
+
+Handle exceptions within your function and send them to Sentry.
+
+```tsx
+import * as Sentry from 'https://deno.land/x/sentry/index.mjs'
+
+Sentry.init({
+  // https://docs.sentry.io/product/sentry-basics/concepts/dsn-explainer/#where-to-find-your-dsn
+  dsn: SENTRY_DSN,
+  defaultIntegrations: false,
+  // Performance Monitoring
+  tracesSampleRate: 1.0,
+  // Set sampling rate for profiling - this is relative to tracesSampleRate
+  profilesSampleRate: 1.0,
+})
+
+// Set region and execution_id as custom tags
+Sentry.setTag('region', Deno.env.get('SB_REGION'))
+Sentry.setTag('execution_id', Deno.env.get('SB_EXECUTION_ID'))
+
+Deno.serve(async (req) => {
+  try {
+    const { name } = await req.json()
+    // This will throw, as `name` in our example call will be `undefined`
+    const data = {
+      message: `Hello ${name}!`,
+    }
+
+    return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } })
+  } catch (e) {
+    Sentry.captureException(e)
+    return new Response(JSON.stringify({ msg: 'error' }), {
+      status: 500,
+      headers: { 'Content-Type': 'application/json' },
+    })
+  }
+})
+```
+
+### 3. Deploy and test
+
+Run function locally:
+
+```bash
+supabase start
+supabase functions serve --no-verify-jwt
+```
+
+Test it: http://localhost:54321/functions/v1/sentryfied
+
+Deploy function to Supabase:
+
+```bash
+supabase functions deploy sentryfied --no-verify-jwt
+```
+
+### 4. Try it yourself
+
+Find the complete example on [GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/sentryfied/index.ts).

@@ -1,40 +1,33 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
-import { Button, Form, Input } from 'ui'
+import toast from 'react-hot-toast'
 import { object, string } from 'yup'
 
 import { useResetPasswordMutation } from 'data/misc/reset-password-mutation'
-import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import { Button, Form, Input } from 'ui'
 
 const forgotPasswordSchema = object({
   email: string().email('Must be a valid email').required('Email is required'),
 })
 
 const ForgotPasswordForm = () => {
-  const { ui } = useStore()
   const router = useRouter()
-
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null)
 
   const { mutate: resetPassword, isLoading } = useResetPasswordMutation({
     onSuccess: async () => {
-      ui.setNotification({
-        category: 'success',
-        message: `If you registered using your email and password, you will receive a password reset email.`,
-      })
+      toast.success(
+        `If you registered using your email and password, you will receive a password reset email.`
+      )
       await router.push('/sign-in')
     },
     onError: (error) => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
-
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to send reset email: ${error.message}`,
-      })
+      toast.error(`Failed to send reset email: ${error.message}`)
     },
   })
 

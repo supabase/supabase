@@ -8,7 +8,7 @@ import { useInView } from 'react-intersection-observer'
 import { Button, IconArchive, IconExternalLink } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import { CriticalIcon, WarningIcon } from 'components/ui/Icons'
+import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import type { ItemRenderer } from 'components/ui/InfiniteList'
 import { Notification, NotificationData } from 'data/notifications/notifications-v2-query'
 import { ProjectInfo } from 'data/projects/projects-query'
