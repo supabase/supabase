@@ -10,6 +10,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
   Button,
+  Checkbox_Shadcn_,
   IconLock,
   Modal,
   ScrollArea,
@@ -52,6 +53,8 @@ import { PolicyDetailsV2 } from './PolicyDetailsV2'
 import { PolicyTemplates } from './PolicyTemplates'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { Monaco } from '@monaco-editor/react'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -78,11 +81,24 @@ export const AIPolicyEditorPanel = memo(function ({
   const selectedOrganization = useSelectedOrganization()
   const router = useRouter()
   const snap = useAppStateSnapshot()
+  const state = useTableEditorStateSnapshot()
   const telemetryProps = useTelemetryProps()
 
+  // [Joshen] Hyrid form fields, just spit balling to get a decent POC out
+  const [name, setName] = useState('')
+  const [table, setTable] = useState('')
+  const [behaviour, setBehaviour] = useState('Permissive')
+  const [command, setCommand] = useState('SELECT')
+  const [roles, setRoles] = useState<string[]>([])
+  const [using, setUsing] = useState('')
+  const [check, setCheck] = useState('')
+  const [showCheckBlock, setShowCheckBlock] = useState(false)
+
   // use chat id because useChat doesn't have a reset function to clear all messages
+  const [editorId, setEditorId] = useState('rls-policy-editor')
   const [chatId, setChatId] = useState(uuidv4())
 
+  const monacoRef = useRef<Monaco | null>(null)
   const editorRef = useRef<IStandaloneCodeEditor | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
   const isTogglingPreviewRef = useRef<boolean>(false)
@@ -263,6 +279,34 @@ export const AIPolicyEditorPanel = memo(function ({
     }
   }
 
+  const onUpdateField = (
+    value: string | string[],
+    field: 'name' | 'table' | 'behaviour' | 'command' | 'roles'
+  ) => {
+    // [Joshen] This is dumb but its just to POC
+    switch (field) {
+      case 'name':
+        setName(value as string)
+        break
+      case 'table':
+        setTable(value as string)
+        break
+      case 'behaviour':
+        setBehaviour(value as string)
+        break
+      case 'command':
+        setCommand(value as string)
+        if (!['INSERT', 'UPDATE', 'ALL'].includes(value as string)) {
+          setShowCheckBlock(false)
+        }
+        break
+      case 'roles':
+        setRoles(value as string[])
+        break
+    }
+    setEditorId(uuidv4())
+  }
+
   // when the panel is closed, reset all values
   useEffect(() => {
     if (!visible) {
@@ -275,6 +319,15 @@ export const AIPolicyEditorPanel = memo(function ({
       setChatId(uuidv4())
       setShowDetails(false)
       setSelectedDiff(undefined)
+
+      setName('')
+      setTable('')
+      setCommand('SELECT')
+      setBehaviour('Permissive')
+      setRoles([])
+      setUsing('')
+      setCheck('')
+      setShowCheckBlock(false)
     } else {
       setAssistantPanel(true)
     }
@@ -288,6 +341,15 @@ export const AIPolicyEditorPanel = memo(function ({
       editorRef.current?.layout()
     })
   }, [showDetails, error, errorPanelOpen])
+
+  const SQL_QUERY = `CREATE POLICY "${name.length > 0 ? name : 'policy_name'}"
+ON "${state.selectedSchemaName}"."${table}"
+AS ${behaviour.toUpperCase()} FOR ${command.toUpperCase()}
+TO ${roles.length === 0 ? 'public' : roles.join(', ')}
+${command === 'INSERT' ? 'WITH CHECK' : 'USING'} (
+  ${command === 'INSERT' ? check : using}
+)${showCheckBlock ? ' WITH CHECK (\n\n);' : ';'}`
+  const supportWithCheck = ['UPDATE', 'ALL'].includes(command)
 
   return (
     <>
@@ -385,16 +447,43 @@ export const AIPolicyEditorPanel = memo(function ({
                 />
               ) : null}
 
-              <PolicyDetailsV2 />
+              <PolicyDetailsV2
+                field={{ name, table, behaviour, command, roles }}
+                onUpdateField={onUpdateField}
+              />
 
-              {/* <div className={`relative h-full ${incomingChange ? 'hidden' : 'block'}`}>
+              <div className="bg-surface-300 pt-2 pb-1">
+                <div className="flex items-center gap-x-2 px-5">
+                  <IconLock size={14} className="text-foreground-light" />
+                  <p className="text-xs text-foreground-light font-mono uppercase">
+                    Use options above to edit
+                  </p>
+                </div>
+              </div>
+
+              <div className={`relative h-full ${incomingChange ? 'hidden' : 'block'}`}>
                 <RLSCodeEditor
-                  id="rls-sql-policy"
-                  defaultValue={''}
+                  id={editorId}
+                  defaultValue={SQL_QUERY}
+                  value={SQL_QUERY}
                   editorRef={editorRef}
-                  placeholder={placeholder}
+                  monacoRef={monacoRef as any}
+                  // placeholder={placeholder}
                 />
-              </div> */}
+              </div>
+
+              <div className="px-5 py-3 flex items-center gap-x-2">
+                <Checkbox_Shadcn_
+                  disabled={!supportWithCheck}
+                  checked={showCheckBlock}
+                  onCheckedChange={() => setShowCheckBlock(!showCheckBlock)}
+                />
+                <p
+                  className={`text-xs transition ${!supportWithCheck ? 'text-foreground-lighter' : ''}`}
+                >
+                  Use check expression
+                </p>
+              </div>
 
               <div className="flex flex-col">
                 {error !== undefined && (
@@ -463,7 +552,15 @@ export const AIPolicyEditorPanel = memo(function ({
                   <ScrollArea className="h-full w-full">
                     <PolicyTemplates
                       selectedTemplate={selectedDiff}
-                      onSelectTemplate={updateEditorWithCheckForDiff}
+                      onSelectTemplate={(value) => {
+                        setName(value.name)
+                        setBehaviour('Permissive')
+                        setCommand(value.command)
+                        setRoles(value.roles ?? [])
+                        setUsing(value.definition)
+                        setCheck(value.check)
+                        setEditorId(uuidv4())
+                      }}
                     />
                   </ScrollArea>
                 </TabsContent_Shadcn_>

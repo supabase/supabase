@@ -1,10 +1,12 @@
-import Editor, { OnChange, OnMount } from '@monaco-editor/react'
+import Editor, { Monaco, OnChange, OnMount } from '@monaco-editor/react'
 import type { editor } from 'monaco-editor'
-import { MutableRefObject, useRef } from 'react'
+import { MutableRefObject, useEffect, useRef } from 'react'
 import { cn } from 'ui'
+// @ts-ignore [Joshen] Odd error that it can't find the module
+import { constrainedEditor } from 'constrained-editor-plugin'
 
-import { alignEditor } from 'components/ui/CodeEditor'
 import { Markdown } from 'components/interfaces/Markdown'
+import { IStandaloneCodeEditor } from 'components/interfaces/SQLEditor/SQLEditor.types'
 
 // [Joshen] Is there a way we can just have one single MonacoEditor component that's shared across the dashboard?
 // Feels like we're creating multiple copies of Editor
@@ -17,8 +19,9 @@ interface RLSCodeEditorProps {
   className?: string
   value?: string
   placeholder?: string
-  editorRef: MutableRefObject<editor.IStandaloneCodeEditor | null>
   readOnly?: boolean
+  editorRef: MutableRefObject<editor.IStandaloneCodeEditor | null>
+  monacoRef: MutableRefObject<Monaco>
 }
 
 const RLSCodeEditor = ({
@@ -28,19 +31,63 @@ const RLSCodeEditor = ({
   className,
   value,
   placeholder,
-  editorRef,
   readOnly = false,
+
+  editorRef,
+  monacoRef,
 }: RLSCodeEditorProps) => {
   const hasValue = useRef<any>()
 
+  const setBackgroundColorForLockedAreas = (editor?: IStandaloneCodeEditor, monaco?: Monaco) => {
+    const e = editor || editorRef.current
+    const m = monaco || monacoRef.current
+
+    if (e === null || !m) return
+
+    e.deltaDecorations(
+      [],
+      [
+        {
+          range: new m.Range(1, 1, 5, 20),
+          options: {
+            isWholeLine: true,
+            className: 'bg-surface-300',
+            marginClassName: 'bg-surface-300',
+            linesDecorationsClassName: 'bg-surface-300',
+          },
+        },
+        {
+          range: new m.Range(7, 1, 7, 20),
+          options: {
+            isWholeLine: true,
+            className: 'bg-surface-300',
+            marginClassName: 'bg-surface-300',
+            linesDecorationsClassName: 'bg-surface-300',
+          },
+        },
+      ]
+    )
+  }
+
   const onMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
-    alignEditor(editor)
+    monacoRef.current = monaco
+
+    const constrainedInstance = constrainedEditor(monaco)
+    const model = editor.getModel()
+    constrainedInstance.addRestrictionsTo(model, [
+      {
+        range: [6, 1, 7, 1],
+        allowMultiline: true,
+        label: 'expression',
+      },
+    ])
+
+    setTimeout(() => setBackgroundColorForLockedAreas(editor, monaco), 100)
 
     hasValue.current = editor.createContextKey('hasValue', false)
-
-    const placeholderEl = document.querySelector('.monaco-placeholder') as HTMLElement | null
-    if (placeholderEl) placeholderEl.style.display = 'block'
+    // const placeholderEl = document.querySelector('.monaco-placeholder') as HTMLElement | null
+    // if (placeholderEl) placeholderEl.style.display = 'block'
 
     editor.addCommand(
       monaco.KeyCode.Tab,
@@ -65,16 +112,17 @@ const RLSCodeEditor = ({
   }
 
   const onChange: OnChange = (value) => {
-    hasValue.current.set((value ?? '').length > 0)
+    console.log('onChange')
+    // hasValue.current.set((value ?? '').length > 0)
 
-    const placeholderEl = document.querySelector('.monaco-placeholder') as HTMLElement | null
-    if (placeholderEl) {
-      if (!value) {
-        placeholderEl.style.display = 'block'
-      } else {
-        placeholderEl.style.display = 'none'
-      }
-    }
+    // const placeholderEl = document.querySelector('.monaco-placeholder') as HTMLElement | null
+    // if (placeholderEl) {
+    //   if (!value) {
+    //     placeholderEl.style.display = 'block'
+    //   } else {
+    //     placeholderEl.style.display = 'none'
+    //   }
+    // }
   }
 
   const options = {
@@ -90,6 +138,11 @@ const RLSCodeEditor = ({
     folding: undefined,
     scrollBeyondLastLine: false,
   }
+
+  useEffect(() => {
+    console.log('id changed')
+    setBackgroundColorForLockedAreas()
+  }, [id])
 
   return (
     <>

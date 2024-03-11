@@ -18,20 +18,24 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import MultiSelect from 'components/ui/MultiSelect'
+import MultiSelect from 'ui-patterns/MultiSelect'
 import { CodeEditor } from 'components/ui/CodeEditor'
 
 // [Joshen] Just for demo, will use proper form components later and proper loading states
 
-export const PolicyDetailsV2 = () => {
+interface PolicyDetailsV2Props {
+  field: { name: string; table: string; behaviour: string; command: string; roles: string[] }
+  onUpdateField: (
+    value: string | string[],
+    field: 'name' | 'table' | 'behaviour' | 'command' | 'roles'
+  ) => void
+}
+
+export const PolicyDetailsV2 = ({ field, onUpdateField }: PolicyDetailsV2Props) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
-  const [name, setName] = useState('')
-  const [table, setTable] = useState('')
-  const [behaviour, setBehaviour] = useState('Permissive')
-  const [command, setCommand] = useState('SELECT')
-  const [roles, setRoles] = useState<string[]>([])
+  const { name, table, behaviour, command, roles } = field
 
   const { data: tables, isSuccess: isSuccessTables } = useTablesQuery({
     projectRef: project?.ref,
@@ -58,7 +62,7 @@ export const PolicyDetailsV2 = () => {
   const supportWithCheck = ['INSERT', 'UPDATE', 'ALL'].includes(command)
 
   useEffect(() => {
-    if (isSuccessTables && tables.length > 0) setTable(tables[0].name)
+    if (isSuccessTables && tables.length > 0) onUpdateField(tables[0].name, 'table')
   }, [isSuccessTables, tables])
 
   return (
@@ -67,12 +71,16 @@ export const PolicyDetailsV2 = () => {
         <div className="flex items-center justify-between gap-4 grid grid-cols-12">
           <div className="col-span-6 flex flex-col gap-y-1">
             <p className="text-foreground-light text-sm">Policy Name</p>
-            <Input_Shadcn_ value={name} onChange={(event) => setName(event.target.value)} />
+            <Input_Shadcn_
+              value={name}
+              className="bg-control border-control"
+              onChange={(event) => onUpdateField(event.target.value, 'name')}
+            />
           </div>
 
           <div className="col-span-6 flex flex-col gap-y-1">
             <p className="text-foreground-light text-sm">Table</p>
-            <Select_Shadcn_ value={table} onValueChange={(value) => setTable(value)}>
+            <Select_Shadcn_ value={table} onValueChange={(value) => onUpdateField(value, 'table')}>
               <SelectTrigger_Shadcn_ className="text-sm h-10">
                 {snap.selectedSchemaName}.{table}
               </SelectTrigger_Shadcn_>
@@ -90,7 +98,10 @@ export const PolicyDetailsV2 = () => {
 
           <div className="col-span-6 flex flex-col gap-y-1">
             <p className="text-foreground-light text-sm">Policy Behaviour</p>
-            <Select_Shadcn_ value={behaviour} onValueChange={(value) => setBehaviour(value)}>
+            <Select_Shadcn_
+              value={behaviour}
+              onValueChange={(value) => onUpdateField(value, 'behaviour')}
+            >
               <SelectTrigger_Shadcn_ className="text-sm h-10">{behaviour}</SelectTrigger_Shadcn_>
               <SelectContent_Shadcn_>
                 <SelectGroup_Shadcn_>
@@ -110,7 +121,7 @@ export const PolicyDetailsV2 = () => {
             <RadioGroup_Shadcn_
               value={command}
               defaultValue={command}
-              onValueChange={setCommand}
+              onValueChange={(value) => onUpdateField(value, 'command')}
               aria-label="Choose a theme"
               className="grid grid-cols-10 gap-3"
             >
@@ -145,112 +156,11 @@ export const PolicyDetailsV2 = () => {
               value={roles}
               placeholder="Defaults to all (public) roles if none selected"
               searchPlaceholder="Search for a role"
-              onChange={setRoles}
+              onChange={(roles) => onUpdateField(roles, 'roles')}
             />
           </div>
         </div>
       </div>
-
-      <div className="bg-surface-300 py-2">
-        <div className="flex items-center gap-x-2 px-5">
-          <IconLock size={14} className="text-foreground-light" />
-          <p className="text-xs text-foreground-light font-mono uppercase">
-            Use options above to edit
-          </p>
-        </div>
-
-        <div className="py-1 flex flex-col">
-          <div className="flex items-center">
-            <p className="w-[57px] flex items-center justify-center text-sm font-mono text-foreground-light">
-              1
-            </p>
-            <p className="text-sm font-mono tracking-tight">
-              <span className="text-blue-900">CREATE POLICY</span>{' '}
-              <span className={cn(name.length === 0 ? 'text-foreground-light italic' : '')}>
-                "{name.length === 0 ? 'policy name' : name}"{' '}
-              </span>
-              <span className="text-blue-900">ON</span> "{snap.selectedSchemaName}"."{table}"
-            </p>
-          </div>
-          <div className="flex items-center">
-            <p className="w-[57px] flex items-center justify-center text-sm font-mono text-foreground-light">
-              2
-            </p>
-            <p className="text-sm font-mono tracking-tight">
-              <span className="text-blue-900">AS</span>{' '}
-              <span className="uppercase">{behaviour}</span>
-            </p>
-          </div>
-          <div className="flex items-center">
-            <p className="w-[57px] flex items-center justify-center text-sm font-mono text-foreground-light">
-              3
-            </p>
-            <p className="text-sm font-mono tracking-tight">
-              <span className="text-blue-900">FOR</span> {command}
-            </p>
-          </div>
-          <div className="flex items-start">
-            <p className="w-[57px] flex items-center justify-center text-sm font-mono text-foreground-light">
-              4
-            </p>
-            <p className="text-sm font-mono tracking-tight">
-              <span className="text-blue-900">TO</span>{' '}
-              {roles.length === 0 ? 'public' : roles.join(', ')}
-            </p>
-          </div>
-          <div className="flex items-center">
-            <p className="w-[57px] flex items-center justify-center text-sm font-mono text-foreground-light">
-              5
-            </p>
-            <p className="text-sm font-mono tracking-tight">
-              <span className="text-blue-900">{supportUsing ? 'USING' : 'WITH CHECK'}</span> (
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <div className={`relative ${supportWithCheck && command !== 'INSERT' ? 'h-32' : 'h-full'}`}>
-        <CodeEditor id={'using'} language={'pgsql'} />
-      </div>
-
-      <div className="bg-surface-300 py-2">
-        <div className="py-1 flex flex-col">
-          <div className="flex items-center">
-            <p className="w-[57px] flex items-center justify-center text-sm font-mono text-foreground-light">
-              7
-            </p>
-            <p className="text-sm font-mono tracking-tight">
-              )
-              {supportWithCheck && command !== 'INSERT' ? (
-                <>
-                  {' '}
-                  <span className="text-blue-900">WITH CHECK</span> (
-                </>
-              ) : (
-                ';'
-              )}
-            </p>
-          </div>
-        </div>
-      </div>
-
-      {supportWithCheck && command !== 'INSERT' && (
-        <>
-          <div className={`relative h-32`}>
-            <CodeEditor id={'with-check'} language={'pgsql'} />
-          </div>
-          <div className="bg-surface-300 py-2">
-            <div className="py-1 flex flex-col">
-              <div className="flex items-center">
-                <p className="w-[57px] flex items-center justify-center text-sm font-mono text-foreground-light">
-                  9
-                </p>
-                <p className="text-sm font-mono tracking-tight">);</p>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
     </>
   )
 }

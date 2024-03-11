@@ -11,7 +11,7 @@ import { getGeneralPolicyTemplates } from '../PolicyEditorModal/PolicyEditorModa
 
 interface PolicyTemplatesProps {
   selectedTemplate?: string
-  onSelectTemplate: (template: { id: string; content: string }) => void
+  onSelectTemplate: (template: any) => void
 }
 
 export const PolicyTemplates = ({ selectedTemplate, onSelectTemplate }: PolicyTemplatesProps) => {
@@ -59,7 +59,7 @@ export const PolicyTemplates = ({ selectedTemplate, onSelectTemplate }: PolicyTe
                       : ''
                   )}
                   key={template.id}
-                  onClick={() => onSelectTemplate({ id: template.id, content: template.statement })}
+                  onClick={() => onSelectTemplate(template)}
                   hideChevron
                   fixedHeight={false}
                   icon={
