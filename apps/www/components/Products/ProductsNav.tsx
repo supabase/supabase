@@ -11,8 +11,8 @@ interface Props {
 
 function ProductsNav({ activePage }: Props) {
   return (
-    <nav className="hidden md:flex items-center bg-background gap-2 w-full border-b">
-      <SectionContainer className="!py-0 flex gap-2 items-center">
+    <nav className="hidden md:flex items-center bg-background w-full border-b">
+      <SectionContainer className="!py-0 flex gap-3 items-center">
         {Object.entries(products).map((obj: any) => {
           const product = obj[1]
           const isAuth = product.name === PRODUCT_NAMES.AUTHENTICATION
@@ -21,7 +21,7 @@ function ProductsNav({ activePage }: Props) {
             <Link
               key={product.name}
               className={cn(
-                'flex items-center gap-1 px-2 first:-ml-2 py-4 border-b border-transparent text-sm text-foreground-lighter hover:text-foreground',
+                'flex items-center gap-1.5 px-2 first:-ml-2 py-4 border-b border-transparent text-sm text-foreground-lighter hover:text-foreground',
                 'focus-visible:ring-2 focus-visible:ring-foreground-lighter focus-visible:text-foreground focus-visible:outline-brand-600',
                 product.name === activePage && 'border-foreground-light text-foreground'
               )}
