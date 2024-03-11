@@ -1,16 +1,16 @@
 import { Command as CommandPrimitive } from 'cmdk'
 import * as React from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
-import { IconAlertTriangle } from 'ui'
 
-import { cn } from './../../lib/utils'
+import { cn } from 'ui/src/lib/utils'
 
 import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
-import { LoadingLine } from '../LoadingLine/LoadingLine'
-import { Modal } from '../Modal'
-import { ModalProps } from '../Modal/Modal'
+import { LoadingLine } from 'ui/src/components/LoadingLine/LoadingLine'
+import { Modal } from 'ui/src/components/Modal'
+import { ModalProps } from 'ui/src/components/Modal/Modal'
 import { useCommandMenu } from './CommandMenuProvider'
-import { Button } from '../Button'
+import { Button } from 'ui/src/components/Button'
+import { AlertTriangle } from 'lucide-react'
 
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>
 type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>
@@ -44,7 +44,7 @@ export function CommandError({ resetErrorBoundary }: { resetErrorBoundary: () =>
   return (
     <div className={cn('min-h-64', 'flex items-center justify-center')}>
       <div className="p-10 flex flex-col items-center gap-6 mt-4">
-        <IconAlertTriangle strokeWidth={1.5} size={40} />
+        <AlertTriangle strokeWidth={1.5} size={40} />
         <p className="text-lg text-center">
           Sorry, looks like we&apos;re having some issues with the command menu!
         </p>
