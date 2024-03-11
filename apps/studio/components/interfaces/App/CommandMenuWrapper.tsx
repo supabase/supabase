@@ -3,7 +3,7 @@ import { useParams } from 'common'
 import { codeBlock } from 'common-tags'
 import { PropsWithChildren, useMemo } from 'react'
 import toast from 'react-hot-toast'
-import { CommandMenuProvider } from 'ui'
+import { CommandMenuProvider } from 'ui-patterns/Cmdk'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useProjectApiQuery } from 'data/config/project-api-query'

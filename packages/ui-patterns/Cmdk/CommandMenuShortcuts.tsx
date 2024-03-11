@@ -1,4 +1,4 @@
-import { IconArrowLeft } from '../Icon/icons/IconArrowLeft'
+import { IconArrowLeft } from 'ui/src/components/Icon/icons/IconArrowLeft'
 
 import { BadgeExperimental } from './Command.Badges'
 import { COMMAND_ROUTES } from './Command.constants'
