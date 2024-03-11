@@ -3,6 +3,6 @@
   "compilerOptions": {
     "resolveJsonModule": true
   },
-  "include": [".", "../ui-patterns/Command"],
+  "include": ["."],
   "exclude": ["dist", "build", "node_modules", "**/*.stories.tsx"]
 }
