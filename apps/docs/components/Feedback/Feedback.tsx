@@ -1,11 +1,10 @@
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { Check, MessageSquareQuote, X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
-import { type CSSProperties, useReducer, useRef, useState } from 'react'
-
-import { Button, IconCheck, IconDiscussions, IconX, cn } from 'ui'
-
+import { useReducer, useRef, useState, type CSSProperties } from 'react'
+import { Button, cn } from 'ui'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { type FeedbackFields, FeedbackModal } from './FeedbackModal'
+import { FeedbackModal, type FeedbackFields } from './FeedbackModal'
 
 type Response = 'yes' | 'no'
 
@@ -92,49 +91,70 @@ function Feedback() {
       >
         <Button
           type="outline"
+          rounded
           className={cn(
             'px-1',
-            'hover:text-brand-600 hover:border-strong disabled:opacity-100',
-            isYes && 'text-brand-600',
+            !isYes && 'hover:text-brand-600 hover:border-brand-500',
+            isYes && 'bg-brand text-brand-200 !border-brand disabled:opacity-100',
             !showYes && 'opacity-0 invisible',
-            'transition-opacity'
+            '[transition-property:opacity,transform,color] [transition-duration:150ms,300ms,300ms,300ms]'
           )}
           onClick={() => handleVote('yes')}
           disabled={state.type === StateType.Followup}
         >
-          <IconCheck />
+          <Check size={14} strokeWidth={3} />
           <span className="sr-only">Yes</span>
         </Button>
         <Button
           type="outline"
+          rounded
           className={cn(
             'px-1',
-            'hover:text-warning-600 hover:border-strong disabled:opacity-100',
-            isNo && `text-warning-600 -translate-x-[calc(100%+var(--container-flex-gap,0.5rem))]`,
+            !isNo && 'hover:text-warning-600 hover:border-warning-500',
+            isNo &&
+              `bg-warning text-warning-200 !border-warning -translate-x-[calc(100%+var(--container-flex-gap,0.5rem))] disabled:opacity-100`,
             !showNo && 'opacity-0 invisible',
-            '[transition-property:opacity,transform] [transition-duration:150ms,300ms] [transition-delay:0,150ms]'
+            '[transition-property:opacity,transform,color] [transition-duration:150ms,300ms,300ms,300ms]'
           )}
           onClick={() => handleVote('no')}
           disabled={state.type === StateType.Followup}
         >
-          <IconX />
+          <X size={14} strokeWidth={3} />
           <span className="sr-only">No</span>
         </Button>
+        <div
+          className={cn(
+            'absolute',
+            'flex flex-col gap-1',
+            'left-6',
+            'transition-all',
+            'transform',
+            'text-xs',
+            'opacity-0 invisible',
+            'delay-500',
+            state.type === StateType.Followup && 'left-9 opacity-100 visible'
+          )}
+        >
+          <span className="text-foreground-light">Thanks for your feedback!</span>
+          <button
+            ref={feedbackButtonRef}
+            className={cn(
+              'mt-0',
+              'transition-all',
+              'flex items-center gap-2',
+              'text-xs text-foreground-lighter',
+              'hover:text-foreground',
+              state.type !== StateType.Followup && 'opacity-0 invisible',
+              '[transition-property:opacity,color]',
+              'delay-1000'
+            )}
+            onClick={() => setModalOpen(true)}
+          >
+            {isYes ? <>What went well?</> : <>How can we improve?</>}
+            <MessageSquareQuote size={14} strokeWidth={1.5} />
+          </button>
+        </div>
       </div>
-      <button
-        ref={feedbackButtonRef}
-        className={cn(
-          'flex items-center gap-2',
-          'text-[0.8rem] text-foreground-lighter text-left',
-          state.type !== StateType.Followup && 'opacity-0 invisible',
-          'transition-opacity',
-          isNo && 'delay-100'
-        )}
-        onClick={() => setModalOpen(true)}
-      >
-        {isYes ? <>What went well?</> : <>How can we improve?</>}
-        <IconDiscussions size="tiny" />
-      </button>
       <FeedbackModal
         visible={modalOpen}
         page={pathname}
