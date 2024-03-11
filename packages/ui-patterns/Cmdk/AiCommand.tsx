@@ -28,7 +28,7 @@ import { useCommandMenu } from './CommandMenuProvider'
 
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { cn } from './../../lib/utils'
+import { cn } from 'ui/src/lib/utils'
 
 const questions = [
   'How do I get started with Supabase?',

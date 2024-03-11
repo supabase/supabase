@@ -8,7 +8,6 @@ import { useInView } from 'react-intersection-observer'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBranchQuery } from 'data/branches/branch-query'
 import type { Branch } from 'data/branches/branches-query'
-import type { GitHubPullRequest } from 'data/integrations/github-pull-requests-query'
 import {
   Badge,
   Button,
@@ -76,7 +75,6 @@ interface BranchRowProps {
   repo: string
   branch: Branch
   isMain?: boolean
-  pullRequest?: GitHubPullRequest
   generateCreatePullRequestURL?: (branchName?: string) => string
   onSelectDeleteBranch: () => void
 }
@@ -85,7 +83,6 @@ export const BranchRow = ({
   branch,
   isMain = false,
   repo,
-  pullRequest,
   generateCreatePullRequestURL,
   onSelectDeleteBranch,
 }: BranchRowProps) => {
@@ -138,10 +135,10 @@ export const BranchRow = ({
         </p>
       </div>
       <div className="flex items-center gap-x-8">
-        {pullRequest !== undefined && (
+        {branch.pr_number !== undefined && (
           <div className="flex items-center">
             <Link
-              href={pullRequest.url}
+              href={`https://github.com/${repo}/pull/${branch.pr_number}`}
               target="_blank"
               rel="noreferrer"
               className="text-xs transition text-foreground-lighter mr-4 hover:text-foreground"
@@ -158,9 +155,9 @@ export const BranchRow = ({
                 passHref
                 target="_blank"
                 rel="noreferer"
-                href={`http://github.com/${pullRequest.target.repo}/tree/${pullRequest.target.branch}`}
+                href={`http://github.com/${repo}/tree/${branch.git_branch}`}
               >
-                {pullRequest.target.branch}
+                {branch.git_branch}
               </Link>
             </Button>
           </div>
@@ -193,7 +190,11 @@ export const BranchRow = ({
                 passHref
                 target="_blank"
                 rel="noreferrer"
-                href={pullRequest?.url ?? createPullRequestURL}
+                href={
+                  branch.pr_number !== undefined
+                    ? `https://github.com/${repo}/pull/${branch.pr_number}`
+                    : createPullRequestURL
+                }
               >
                 {branch.pr_number !== undefined ? 'View Pull Request' : 'Create Pull Request'}
               </Link>

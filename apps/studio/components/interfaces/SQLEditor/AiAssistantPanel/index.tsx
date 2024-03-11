@@ -8,7 +8,6 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import {
-  AiIcon,
   Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -17,6 +16,7 @@ import {
   Input_Shadcn_,
   cn,
 } from 'ui'
+import { AiIcon } from 'ui-patterns/Cmdk'
 import * as z from 'zod'
 
 import { useLocalStorageQuery, useSelectedOrganization } from 'hooks'

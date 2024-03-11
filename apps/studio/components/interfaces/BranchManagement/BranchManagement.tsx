@@ -12,7 +12,6 @@ import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useGitHubPullRequestsQuery } from 'data/integrations/github-pull-requests-query'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import {
   AlertDescription_Shadcn_,
@@ -92,25 +91,9 @@ const BranchManagement = () => {
     new Date(a.updated_at) < new Date(b.updated_at) ? 1 : -1
   )
   const branchesWithPRs = previewBranches.filter((branch) => branch.pr_number !== undefined)
-  const prNumbers =
-    branches !== undefined
-      ? (branchesWithPRs.map((branch) => branch.pr_number).filter(Boolean) as number[])
-      : undefined
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
   const repo = githubConnection?.repository.name ?? ''
-
-  const {
-    data: allPullRequests,
-    error: pullRequestsError,
-    isLoading: isLoadingPullRequests,
-    isError: isErrorPullRequests,
-    isSuccess: isSuccessPullRequests,
-  } = useGitHubPullRequestsQuery({
-    connectionId: githubConnection?.id,
-    prNumbers,
-  })
-  const pullRequests = allPullRequests ?? []
 
   const isError = isErrorConnections || isErrorBranches
   const isLoading = isLoadingConnections || isLoadingBranches
@@ -276,7 +259,6 @@ const BranchManagement = () => {
                       repo={repo}
                       mainBranch={mainBranch}
                       previewBranches={previewBranches}
-                      pullRequests={pullRequests}
                       onViewAllBranches={() => setView('branches')}
                       onSelectCreateBranch={() => setShowCreateBranch(true)}
                       onSelectDeleteBranch={setSelectedBranchToDelete}
@@ -287,38 +269,23 @@ const BranchManagement = () => {
                     <BranchManagementSection
                       header={`${branchesWithPRs.length} branches with pull requests found`}
                     >
-                      {isLoadingPullRequests && <BranchLoader />}
-                      {isErrorPullRequests && (
-                        <AlertError
-                          error={pullRequestsError}
-                          subject="Failed to retrieve GitHub pull requests"
-                        />
-                      )}
-                      {isSuccessPullRequests && (
-                        <>
-                          {branchesWithPRs.length > 0 ? (
-                            branchesWithPRs.map((branch) => {
-                              const pullRequest = pullRequests?.find(
-                                (pr) => pr.branch === branch.git_branch && pr.repo === repo
-                              )
-                              return (
-                                <BranchRow
-                                  key={branch.id}
-                                  repo={repo}
-                                  branch={branch}
-                                  pullRequest={pullRequest}
-                                  generateCreatePullRequestURL={generateCreatePullRequestURL}
-                                  onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
-                                />
-                              )
-                            })
-                          ) : (
-                            <PullRequestsEmptyState
-                              url={generateCreatePullRequestURL()}
-                              hasBranches={previewBranches.length > 0}
+                      {branchesWithPRs.length > 0 ? (
+                        branchesWithPRs.map((branch) => {
+                          return (
+                            <BranchRow
+                              key={branch.id}
+                              repo={repo}
+                              branch={branch}
+                              generateCreatePullRequestURL={generateCreatePullRequestURL}
+                              onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
                             />
-                          )}
-                        </>
+                          )
+                        })
+                      ) : (
+                        <PullRequestsEmptyState
+                          url={generateCreatePullRequestURL()}
+                          hasBranches={previewBranches.length > 0}
+                        />
                       )}
                     </BranchManagementSection>
                   )}
@@ -338,15 +305,11 @@ const BranchManagement = () => {
                       )}
                       {isSuccessBranches &&
                         previewBranches.map((branch) => {
-                          const pullRequest = pullRequests?.find(
-                            (pr) => pr.branch === branch.git_branch && pr.repo === repo
-                          )
                           return (
                             <BranchRow
                               key={branch.id}
                               repo={repo}
                               branch={branch}
-                              pullRequest={pullRequest}
                               generateCreatePullRequestURL={generateCreatePullRequestURL}
                               onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
                             />
