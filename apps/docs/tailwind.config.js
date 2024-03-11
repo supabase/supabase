@@ -20,6 +20,6 @@ module.exports = config({
         },
       })
     },
-    require('@tailwindcss/container-queries')
+    require('@tailwindcss/container-queries'),
   ],
 })
