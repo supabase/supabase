@@ -3,14 +3,14 @@ import * as React from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { IconAlertTriangle } from 'ui'
 
-import { cn } from './../../lib/utils'
+import { cn } from 'ui/src/lib/utils'
 
 import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
-import { LoadingLine } from '../LoadingLine/LoadingLine'
-import { Modal } from '../Modal'
-import { ModalProps } from '../Modal/Modal'
+import { LoadingLine } from 'ui/src/components/LoadingLine/LoadingLine'
+import { Modal } from 'ui/src/components/Modal'
+import { ModalProps } from 'ui/src/components/Modal/Modal'
 import { useCommandMenu } from './CommandMenuProvider'
-import { Button } from '../Button'
+import { Button } from 'ui/src/components/Button'
 
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>
 type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>
