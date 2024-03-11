@@ -217,7 +217,6 @@ To utilize Role-Based Access Control (RBAC) in Row Level Security (RLS) policies
 ```sql supabase/migrations/init.sql
 create function public.authorize(
   requested_permission app_permission,
-  user_id uuid
 )
 returns boolean as $$
 declare
