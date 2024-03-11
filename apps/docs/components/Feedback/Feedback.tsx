@@ -26,7 +26,7 @@ const FeedbackButton = forwardRef<
   const isUserLoading = useIsUserLoading()
   const isLoggedIn = useIsLoggedIn()
 
-  if (!isUserLoading && !isLoggedIn) return null
+  if (isUserLoading || !isLoggedIn) return null
 
   return (
     <button
