@@ -163,6 +163,15 @@ const BranchManagement = () => {
                   </Button>
                   <Button
                     type="default"
+                    className={`rounded-none transition hover:opacity-90 ${
+                      view === 'prs' ? 'opacity-100' : 'opacity-60'
+                    }`}
+                    onClick={() => setView('prs')}
+                  >
+                    Pull requests
+                  </Button>
+                  <Button
+                    type="default"
                     className={`rounded-l-none transition hover:opacity-90 ${
                       view === 'branches' ? 'opacity-100' : 'opacity-60'
                     }`}
