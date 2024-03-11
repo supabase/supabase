@@ -214,7 +214,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     },
     ref
   ) => {
-    console.log('icon', icon)
     const Comp = asChild ? Slot : 'button'
     const { className, disabled } = props
     const showIcon = loading || icon
