@@ -87,7 +87,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
         onSuccess: () => {
           resetForm({ values: { ...values }, initialValues: { ...values } })
           setOpen(false)
-          toast.error('Successfully updated settings')
+          toast.success('Successfully updated settings')
         },
       }
     )

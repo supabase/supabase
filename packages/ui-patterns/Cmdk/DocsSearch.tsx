@@ -12,7 +12,6 @@ import {
   IconHash,
   IconMessageSquare,
   IconSearch,
-  useCommandMenu,
 } from 'ui'
 import {
   CommandGroup,
@@ -22,6 +21,7 @@ import {
   escapeDoubleQuotes,
 } from './Command.utils'
 import { useRouter } from 'next/router'
+import { useCommandMenu } from './CommandMenuProvider'
 
 const NUMBER_SOURCES = 2
 
