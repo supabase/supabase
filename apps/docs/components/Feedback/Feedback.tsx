@@ -17,8 +17,6 @@ import { useSendFeedbackMutation } from '~/lib/fetch/feedback'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { FeedbackModal, type FeedbackFields } from './FeedbackModal'
 
-type Response = 'yes' | 'no'
-
 const FeedbackButton = forwardRef<
   HTMLButtonElement,
   { isYes: boolean; onClick: MouseEventHandler; visible: boolean }
@@ -49,6 +47,8 @@ const FeedbackButton = forwardRef<
   )
 })
 FeedbackButton.displayName = 'FeedbackButton'
+
+type Response = 'yes' | 'no'
 
 enum StateType {
   Unanswered = 'unanswered',
