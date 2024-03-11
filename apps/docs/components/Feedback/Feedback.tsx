@@ -10,7 +10,7 @@ import {
   useState,
 } from 'react'
 
-import { useIsLoggedIn, useIsUserLoading } from 'common'
+import { useIsLoggedIn } from 'common'
 import { Button, cn } from 'ui'
 
 import { useSendFeedbackMutation } from '~/lib/fetch/feedback'
@@ -21,15 +21,12 @@ const FeedbackButton = forwardRef<
   HTMLButtonElement,
   { isYes: boolean; onClick: MouseEventHandler; visible: boolean }
 >(({ isYes, onClick, visible }, ref) => {
-  const isUserLoading = useIsUserLoading()
   const isLoggedIn = useIsLoggedIn()
-
-  if (isUserLoading || !isLoggedIn) return null
+  if (!isLoggedIn) return null
 
   return (
     <button
       ref={ref}
-      tabIndex={0}
       className={cn(
         'mt-0',
         'flex items-center gap-2',
@@ -176,7 +173,8 @@ function Feedback() {
             '[transition-property:opacity,transform] [transition-duration:150ms,300ms]',
             'motion-reduce:[transition-duration:150ms,1ms]',
             'delay-300',
-            state.type === StateType.Followup && 'opacity-100 visible @[12rem]:-translate-x-[1rem]'
+            state.type === StateType.Followup &&
+              'opacity-100 visible -translate-x-0 @[12rem]:-translate-x-[1rem]'
           )}
         >
           <span className="text-foreground-light">Thanks for your feedback!</span>
