@@ -1,12 +1,54 @@
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { Check, MessageSquareQuote, X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
-import { useReducer, useRef, useState, type CSSProperties, useEffect, useCallback } from 'react'
+import {
+  type CSSProperties,
+  type MouseEventHandler,
+  forwardRef,
+  useReducer,
+  useRef,
+  useState,
+} from 'react'
+
+import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { Button, cn } from 'ui'
+
+import { useSendFeedbackMutation } from '~/lib/fetch/feedback'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { FeedbackModal, type FeedbackFields } from './FeedbackModal'
 
 type Response = 'yes' | 'no'
+
+const FeedbackButton = forwardRef<
+  HTMLButtonElement,
+  { isYes: boolean; onClick: MouseEventHandler; visible: boolean }
+>(({ isYes, onClick, visible }, ref) => {
+  const isUserLoading = useIsUserLoading()
+  const isLoggedIn = useIsLoggedIn()
+
+  if (!isUserLoading && !isLoggedIn) return null
+
+  return (
+    <button
+      ref={ref}
+      tabIndex={0}
+      className={cn(
+        'mt-0',
+        'flex items-center gap-2',
+        'text-xs text-foreground-lighter',
+        'hover:text-foreground',
+        !visible && 'opacity-0 invisible',
+        '[transition-property:opacity,color]',
+        '[transition-delay:700ms,0ms]'
+      )}
+      onClick={onClick}
+    >
+      {isYes ? <>What went well?</> : <>How can we improve?</>}
+      <MessageSquareQuote size={14} strokeWidth={1.5} />
+    </button>
+  )
+})
+FeedbackButton.displayName = 'FeedbackButton'
 
 enum StateType {
   Unanswered = 'unanswered',
@@ -36,6 +78,7 @@ function Feedback() {
 
   const pathname = usePathname()
   const sendTelemetryEvent = useSendTelemetryEvent()
+  const { mutate: sendFeedbackComment } = useSendFeedbackMutation()
   const supabase = useSupabaseClient()
 
   const unanswered = state.type === 'unanswered'
@@ -72,10 +115,7 @@ function Feedback() {
   }
 
   async function handleSubmit({ page, comment }: FeedbackFields) {
-    supabase
-      .from('feedback_comment')
-      .insert({ page, comment })
-      .then((error) => console.error(error))
+    sendFeedbackComment({ message: comment, pathname: page })
     setModalOpen(false)
     refocusButton()
   }
@@ -131,6 +171,7 @@ function Feedback() {
             'flex flex-col gap-1',
             'text-xs',
             'opacity-0 invisible',
+            'text-left',
             '-translate-x-[0.25rem] @[12rem]:-translate-x-[1.25rem]',
             '[transition-property:opacity,transform] [transition-duration:150ms,300ms]',
             'motion-reduce:[transition-duration:150ms,1ms]',
@@ -139,23 +180,12 @@ function Feedback() {
           )}
         >
           <span className="text-foreground-light">Thanks for your feedback!</span>
-          <button
+          <FeedbackButton
             ref={feedbackButtonRef}
-            tabIndex={0}
-            className={cn(
-              'mt-0',
-              'flex items-center gap-2',
-              'text-xs text-foreground-lighter',
-              'hover:text-foreground',
-              state.type !== StateType.Followup && 'opacity-0 invisible',
-              '[transition-property:opacity,color]',
-              '[transition-delay:700ms,0ms]'
-            )}
             onClick={() => setModalOpen(true)}
-          >
-            {isYes ? <>What went well?</> : <>How can we improve?</>}
-            <MessageSquareQuote size={14} strokeWidth={1.5} />
-          </button>
+            isYes={isYes}
+            visible={!unanswered}
+          />
         </div>
       </div>
       <FeedbackModal
