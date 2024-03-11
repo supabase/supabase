@@ -5,7 +5,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 
 import { ButtonProps } from './../Button'
 
-import { IconAirplay } from '../Icon/icons/IconAirplay'
+import { IconActivity } from '../Icon/icons/IconActivity'
 
 const meta: Meta<typeof Button> = {
   /* 👇 The title prop is optional.
@@ -140,7 +140,7 @@ export const LeftIcon = {
   args: {
     children: 'Change the size below',
     type: 'default',
-    icon: <IconAirplay />,
+    icon: <IconActivity />,
   },
   render: ({ children, type, icon }: ButtonProps) => (
     <Button icon={icon} type={type}>
@@ -153,7 +153,7 @@ export const RightIcon = {
   args: {
     children: 'Change the size below',
     type: 'primary',
-    iconRight: <IconAirplay />,
+    iconRight: <IconActivity />,
   },
   render: ({ children, type, iconRight }: ButtonProps) => (
     <Button iconRight={iconRight} type={type}>
