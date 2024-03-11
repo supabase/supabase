@@ -93,9 +93,9 @@ import { redirect } from '@remix-run/node'
 import { createServerClient } from '@supabase/auth-helpers-remix'
 
 import type { Database } from 'db_types'
-import type { LoaderArgs } from '@remix-run/node'
+import type { LoaderFunctionArgs } from '@remix-run/node'
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const response = new Response()
   const url = new URL(request.url)
   const code = url.searchParams.get('code')
@@ -174,9 +174,9 @@ export const loader = async ({ request }) => {
 import { json } from '@remix-run/node' // change this import to whatever runtime you are using
 import { createServerClient } from '@supabase/auth-helpers-remix'
 
-import type { LoaderArgs } from '@remix-run/node' // change this import to whatever runtime you are using
+import type { LoaderFunctionArgs } from '@remix-run/node' // change this import to whatever runtime you are using
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const response = new Response()
   const supabaseClient = createServerClient(
     process.env.SUPABASE_URL!,
@@ -246,9 +246,9 @@ export const action = async ({ request }) => {
 import { json } from '@remix-run/node' // change this import to whatever runtime you are using
 import { createServerClient } from '@supabase/auth-helpers-remix'
 
-import type { ActionArgs } from '@remix-run/node' // change this import to whatever runtime you are using
+import type { ActionFunctionArgs } from '@remix-run/node' // change this import to whatever runtime you are using
 
-export const action = async ({ request }: ActionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const response = new Response()
 
   const supabaseClient = createServerClient(
@@ -351,7 +351,7 @@ And then we can share this instance across our application with Outlet Context.
 <TabPanel id="ts" label="TypeScript">
 
 ```tsx app/root.tsx
-export const loader = ({}: LoaderArgs) => {
+export const loader = ({}: LoaderFunctionArgs) => {
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
@@ -441,7 +441,7 @@ export const loader = async ({ request }) => {
 <TabPanel id="ts" label="TypeScript">
 
 ```tsx app/root.tsx
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const env = {
     SUPABASE_URL: process.env.SUPABASE_URL!,
     SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
@@ -707,9 +707,9 @@ import type { Database } from 'db_types'
 
 type Post = Database['public']['Tables']['posts']['Row']
 
-import type { LoaderArgs } from '@remix-run/node'
+import type { LoaderFunctionArgs } from '@remix-run/node'
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const response = new Response()
   const supabase = createServerClient<Database>(
     process.env.SUPABASE_URL!,
