@@ -8,17 +8,17 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "cmdk": "^0.2.1",
     "common": "*",
     "lodash": "*",
     "lucide-react": "*",
     "next-themes": "*",
+    "react-error-boundary": "^4.0.12",
     "react-hot-toast": "*",
     "react-tooltip": "*",
     "reactflow": "*",
     "tsconfig": "*",
-    "ui": "*",
-    "cmdk": "^0.2.1",
-    "react-error-boundary": "^4.0.12"
+    "ui": "*"
   },
   "devDependencies": {},
   "peerDependencies": {
