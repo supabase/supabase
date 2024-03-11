@@ -9,14 +9,11 @@ import {
   IconUser,
   Input,
   Toggle,
-  MessageRole,
-  MessageStatus,
-  useAiChat,
   Tabs,
-  UseAiChatOptions,
 } from 'ui'
+import { MessageRole, MessageStatus, useAiChat, UseAiChatOptions } from './../AiCommand'
 
-import { cn } from './../../../lib/utils'
+import { cn } from 'ui/src/lib/utils'
 import { AiIcon, AiIconChat } from '../Command.icons'
 import { CommandItem, useAutoInputFocus, useHistoryKeys } from '../Command.utils'
 import { useCommandMenu } from '../CommandMenuProvider'

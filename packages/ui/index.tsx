@@ -62,9 +62,6 @@ export * from './src/components/Toggle'
 export * from './src/components/Upload'
 export * from './src/components/Form'
 
-// CMD+K
-export * from './src/components/Command'
-
 // layout
 export * from './src/components/LoadingLine'
 

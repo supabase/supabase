@@ -1,18 +1,10 @@
 import { useState, useEffect } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
-import {
-  Button,
-  IconCheck,
-  IconClipboard,
-  IconSave,
-  Message,
-  MessageRole,
-  MessageStatus,
-  queryAi,
-} from 'ui'
+import { Button, IconCheck, IconClipboard, IconSave } from 'ui'
 import { useCommandMenu } from '../CommandMenuProvider'
 import { stripIndent } from 'common-tags'
 import { formatTitle } from './GenerateSQL.utils'
+import { Message, MessageRole, MessageStatus, queryAi } from './../AiCommand'
 
 export interface SQLOutputActionsProps {
   answer: string
