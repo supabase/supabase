@@ -33,7 +33,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
     <button
       onClick={onClick}
       className={cn(
-        'w-full text-left text-lg flex flex-col group transition-all',
+        'hover:text-foreground w-full text-left text-lg flex flex-col group transition-all',
         isActive ? 'text-foreground' : 'text-foreground-light'
       )}
       aria-selected={isActive}
@@ -144,7 +144,7 @@ const TimedAccordionSection = ({
 
   return (
     <div className="flex flex-col lg:flex-row gap-8 xl:gap-32 justify-between">
-      <div className="lg:w-1/2 gap-1 flex flex-col items-start" role="tablist">
+      <div className="lg:w-1/3 gap-1 flex flex-col items-start" role="tablist">
         {tabs.map((tab, index) => (
           <Tab
             key={index}
@@ -182,25 +182,5 @@ const TimedAccordionSection = ({
     </div>
   )
 }
-
-const OpenInColab = ({ colabUrl, className }: { colabUrl: string; className?: string }) => (
-  <Link
-    href={colabUrl}
-    target="_blank"
-    className={[
-      'flex items-center z-10 h-10 bg-surface-100 hover:bg-surface-200 hover:text-foreground-lighter text-sm text-foreground-lighter shadow-lg hover:shadow-md rounded-full py-1 px-3 gap-2',
-      className,
-    ].join(' ')}
-  >
-    <Image
-      className="opacity-100 hover:opacity-80 transition-opacity contrast-[.2] filter"
-      src="/images/logos/google-colaboratory.svg"
-      alt="Google Colaboratory logo"
-      width={30}
-      height={30}
-    />
-    <span>Open in Colab</span>
-  </Link>
-)
 
 export default TimedAccordionSection

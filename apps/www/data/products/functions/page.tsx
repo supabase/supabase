@@ -1,11 +1,8 @@
 import Link from 'next/link'
-import OpenAIImage from '~/components/Products/VectorAI/OpenAIImage'
-import SecureAndScalableImg from '~/components/Products/VectorAI/SecureAndScalableImg'
-import PGvectorImg from '~/components/Products/VectorAI/PGvectorImg'
-import DeployGlobally from '~/components/Products/VectorAI/DeployGlobally'
 import solutions from '../../Solutions'
-import { IconCode, IconGlobe } from 'ui'
-import { Code, ScaleUp } from 'icons'
+import { IconGlobe } from 'ui'
+import Examples from '../../Examples'
+import { PRODUCT_NAMES } from 'shared-data/products'
 
 export default (isMobile?: boolean) => ({
   metaTitle: 'Supabase Edge Functions - Deploy JavaScript globally in seconds',
@@ -168,5 +165,132 @@ export default (isMobile?: boolean) => ({
         panel: <div>lorem</div>,
       },
     ],
+  },
+  localDXsection: {
+    title: <>Delightful DX from local to production</>,
+    paragraph: (
+      <>
+        Deno comes bundled in with a linter, test runner, format, benchmarking tool and a compiler.
+        Spend less time configuring tools and more time writing business logic.
+      </>
+    ),
+    cards: [
+      {
+        id: 'localDX',
+        label: 'First-class local development experience',
+        paragraph:
+          'Write code with hot code reloading, a fast Language server for autocompletion, type checking and linting.',
+        className: '',
+        image: <div className="w-full h-full flex items-center justify-center">lorem</div>,
+      },
+      {
+        id: 'parity',
+        label: 'Dev and Prod parity',
+        paragraph: (
+          <>
+            The open source{' '}
+            <Link href="/" className="underline hover:text-foreground-light">
+              Edge runtime
+            </Link>{' '}
+            runs your functions locally during development and the same runtime powers functions in
+            production
+          </>
+        ),
+        className: '',
+        image: <div className="w-full h-full flex items-center justify-center">lorem</div>,
+      },
+      {
+        id: 'ecosystem',
+        label: 'Robust ecosystem',
+        paragraph: 'Tap into the 2+ million modules in the Deno and NPM ecosystem.',
+        className: '',
+        image: <div className="w-full h-full flex items-center justify-center">lorem</div>,
+      },
+      {
+        id: 'ci',
+        label: 'Continuous Integration',
+        paragraph:
+          'Use the Supabase CLI with Github actions to preview and deploy your functions along with the rest of your application',
+        className: '',
+        image: <div className="w-full h-full flex items-center justify-center">lorem</div>,
+      },
+    ],
+  },
+  globalPresenceSection: {
+    title: (
+      <>
+        Edge Functions run{' '}
+        <span className="text-foreground">server-side logic geographically close to users</span>,
+        offering low latency and great performance.
+      </>
+    ),
+    features: [
+      {
+        label: 'Global presence',
+        paragraph: "Edge functions run globally or can be pinned to your database's proximity.",
+      },
+      {
+        label: 'Automatic scaling',
+        paragraph: 'Seamlessly scale with usage without any manual tuning. ',
+      },
+      {
+        label: 'Secure',
+        paragraph: 'Scale with confidence with SSL, Firewall and DDOS protection built in.',
+      },
+    ],
+  },
+  o11y: {
+    title: 'Built-in observability',
+    useCases: [
+      {
+        label: '',
+        paragraph: '',
+        panel: <div>lorem</div>,
+      },
+      {
+        label: '',
+        paragraph: '',
+        panel: <div>lorem</div>,
+      },
+      {
+        label: '',
+        paragraph: '',
+        panel: <div>lorem</div>,
+      },
+    ],
+  },
+  integratesWithSupabase: {
+    title: 'Integrates perfectly with the Supabase ecosystem',
+    useCases: [
+      {
+        label: 'Zero configuration',
+        paragraph: 'Pre-populated environment variables required to access your supabase project',
+        panel: <div>lorem</div>,
+      },
+      {
+        label: 'Connect to your database',
+        paragraph: '',
+        panel: <div>lorem</div>,
+      },
+      {
+        label: 'Trigger via webhook',
+        paragraph: '',
+        panel: <div>lorem</div>,
+      },
+      {
+        label: 'Works with Supabase Auth',
+        paragraph: '',
+        panel: <div>lorem</div>,
+      },
+      {
+        label: 'Works with Supabase Storage',
+        paragraph: '',
+        panel: <div>lorem</div>,
+      },
+    ],
+  },
+  examplesSection: {
+    title: 'Examples',
+    examples: Examples.filter((example) => example.products.includes(PRODUCT_NAMES.FUNCTIONS)),
   },
 })

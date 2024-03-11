@@ -6,7 +6,7 @@ import { PRODUCT_SHORTNAMES } from '~/lib/constants'
 export type Products = PRODUCT_SHORTNAMES
 
 interface Props {
-  currentProduct?: Products
+  currentProduct: Products | string
 }
 
 function ProductsCta(props: Props) {
