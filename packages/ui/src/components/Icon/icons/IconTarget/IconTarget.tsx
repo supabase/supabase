@@ -9,5 +9,12 @@
     return <IconBase icon={Target} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { target } from 'lucide-react'
+  */
   export default IconTarget
   

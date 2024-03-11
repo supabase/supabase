@@ -9,5 +9,12 @@
     return <IconBase icon={MousePointer} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { mousePointer } from 'lucide-react'
+  */
   export default IconMousePointer
   

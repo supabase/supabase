@@ -9,5 +9,12 @@
     return <IconBase icon={Link2} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { link2 } from 'lucide-react'
+  */
   export default IconLink2
   

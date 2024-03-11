@@ -9,5 +9,12 @@
     return <IconBase icon={Square} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { square } from 'lucide-react'
+  */
   export default IconSquare
   

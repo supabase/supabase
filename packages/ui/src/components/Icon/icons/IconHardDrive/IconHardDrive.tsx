@@ -9,5 +9,12 @@
     return <IconBase icon={HardDrive} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { hardDrive } from 'lucide-react'
+  */
   export default IconHardDrive
   

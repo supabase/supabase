@@ -9,5 +9,12 @@
     return <IconBase icon={Tv} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { tv } from 'lucide-react'
+  */
   export default IconTv
   

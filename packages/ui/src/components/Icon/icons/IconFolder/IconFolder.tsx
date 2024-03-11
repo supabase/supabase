@@ -9,5 +9,12 @@
     return <IconBase icon={Folder} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { folder } from 'lucide-react'
+  */
   export default IconFolder
   

@@ -9,5 +9,12 @@
     return <IconBase icon={ChevronsLeft} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { chevronsLeft } from 'lucide-react'
+  */
   export default IconChevronsLeft
   

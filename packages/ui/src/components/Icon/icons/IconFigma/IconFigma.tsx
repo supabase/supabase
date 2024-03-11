@@ -9,5 +9,12 @@
     return <IconBase icon={Figma} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { figma } from 'lucide-react'
+  */
   export default IconFigma
   

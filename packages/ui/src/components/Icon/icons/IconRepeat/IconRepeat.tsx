@@ -9,5 +9,12 @@
     return <IconBase icon={Repeat} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { repeat } from 'lucide-react'
+  */
   export default IconRepeat
   

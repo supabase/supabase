@@ -9,5 +9,12 @@
     return <IconBase icon={Trello} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { trello } from 'lucide-react'
+  */
   export default IconTrello
   

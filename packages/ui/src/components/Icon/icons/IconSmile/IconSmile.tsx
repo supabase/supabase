@@ -9,5 +9,12 @@
     return <IconBase icon={Smile} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { smile } from 'lucide-react'
+  */
   export default IconSmile
   

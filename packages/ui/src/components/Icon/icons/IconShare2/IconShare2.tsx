@@ -9,5 +9,12 @@
     return <IconBase icon={Share2} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { share2 } from 'lucide-react'
+  */
   export default IconShare2
   

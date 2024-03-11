@@ -9,5 +9,12 @@
     return <IconBase icon={Sunrise} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { sunrise } from 'lucide-react'
+  */
   export default IconSunrise
   

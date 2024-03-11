@@ -9,5 +9,12 @@
     return <IconBase icon={Send} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { send } from 'lucide-react'
+  */
   export default IconSend
   

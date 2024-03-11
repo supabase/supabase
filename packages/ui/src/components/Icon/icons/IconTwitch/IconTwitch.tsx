@@ -9,5 +9,12 @@
     return <IconBase icon={Twitch} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { twitch } from 'lucide-react'
+  */
   export default IconTwitch
   

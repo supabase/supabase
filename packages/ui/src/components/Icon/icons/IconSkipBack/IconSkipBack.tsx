@@ -9,5 +9,12 @@
     return <IconBase icon={SkipBack} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { skipBack } from 'lucide-react'
+  */
   export default IconSkipBack
   

@@ -9,5 +9,12 @@
     return <IconBase icon={Scissors} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { scissors } from 'lucide-react'
+  */
   export default IconScissors
   

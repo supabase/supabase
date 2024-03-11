@@ -9,5 +9,12 @@
     return <IconBase icon={Bluetooth} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { bluetooth } from 'lucide-react'
+  */
   export default IconBluetooth
   

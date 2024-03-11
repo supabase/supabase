@@ -9,5 +9,12 @@
     return <IconBase icon={Wind} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { wind } from 'lucide-react'
+  */
   export default IconWind
   

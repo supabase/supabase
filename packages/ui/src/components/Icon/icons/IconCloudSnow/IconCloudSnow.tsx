@@ -9,5 +9,12 @@
     return <IconBase icon={CloudSnow} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { cloudSnow } from 'lucide-react'
+  */
   export default IconCloudSnow
   

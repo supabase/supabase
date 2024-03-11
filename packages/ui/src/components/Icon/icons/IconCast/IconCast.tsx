@@ -9,5 +9,12 @@
     return <IconBase icon={Cast} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { cast } from 'lucide-react'
+  */
   export default IconCast
   

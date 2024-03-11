@@ -9,5 +9,12 @@
     return <IconBase icon={Rss} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { rss } from 'lucide-react'
+  */
   export default IconRss
   

@@ -9,5 +9,12 @@
     return <IconBase icon={GitMerge} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { gitMerge } from 'lucide-react'
+  */
   export default IconGitMerge
   

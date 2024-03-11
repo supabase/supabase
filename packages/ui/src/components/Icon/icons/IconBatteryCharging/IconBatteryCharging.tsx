@@ -9,5 +9,12 @@
     return <IconBase icon={BatteryCharging} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { batteryCharging } from 'lucide-react'
+  */
   export default IconBatteryCharging
   

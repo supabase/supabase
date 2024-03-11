@@ -9,5 +9,12 @@
     return <IconBase icon={MicOff} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { micOff } from 'lucide-react'
+  */
   export default IconMicOff
   

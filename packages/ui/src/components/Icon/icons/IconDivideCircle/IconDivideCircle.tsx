@@ -9,5 +9,12 @@
     return <IconBase icon={DivideCircle} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { divideCircle } from 'lucide-react'
+  */
   export default IconDivideCircle
   

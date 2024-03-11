@@ -9,5 +9,12 @@
     return <IconBase icon={Mic} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { mic } from 'lucide-react'
+  */
   export default IconMic
   

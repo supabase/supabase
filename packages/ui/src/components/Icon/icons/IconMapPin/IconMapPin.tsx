@@ -9,5 +9,12 @@
     return <IconBase icon={MapPin} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { mapPin } from 'lucide-react'
+  */
   export default IconMapPin
   

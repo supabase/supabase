@@ -9,5 +9,12 @@
     return <IconBase icon={Youtube} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { youtube } from 'lucide-react'
+  */
   export default IconYoutube
   

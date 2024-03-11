@@ -9,5 +9,12 @@
     return <IconBase icon={Radio} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { radio } from 'lucide-react'
+  */
   export default IconRadio
   

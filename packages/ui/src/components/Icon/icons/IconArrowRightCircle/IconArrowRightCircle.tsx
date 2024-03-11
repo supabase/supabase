@@ -9,5 +9,12 @@
     return <IconBase icon={ArrowRightCircle} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { arrowRightCircle } from 'lucide-react'
+  */
   export default IconArrowRightCircle
   

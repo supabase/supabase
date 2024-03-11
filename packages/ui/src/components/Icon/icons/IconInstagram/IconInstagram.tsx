@@ -9,5 +9,12 @@
     return <IconBase icon={Instagram} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { instagram } from 'lucide-react'
+  */
   export default IconInstagram
   

@@ -9,5 +9,12 @@
     return <IconBase icon={Octagon} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { octagon } from 'lucide-react'
+  */
   export default IconOctagon
   

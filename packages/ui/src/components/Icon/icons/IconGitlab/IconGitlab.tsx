@@ -9,5 +9,12 @@
     return <IconBase icon={Gitlab} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { gitlab } from 'lucide-react'
+  */
   export default IconGitlab
   

@@ -9,5 +9,12 @@
     return <IconBase icon={ArrowDownRight} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { arrowDownRight } from 'lucide-react'
+  */
   export default IconArrowDownRight
   

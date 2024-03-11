@@ -9,5 +9,12 @@
     return <IconBase icon={Bold} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { bold } from 'lucide-react'
+  */
   export default IconBold
   

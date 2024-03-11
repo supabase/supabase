@@ -9,5 +9,12 @@
     return <IconBase icon={Bell} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { bell } from 'lucide-react'
+  */
   export default IconBell
   

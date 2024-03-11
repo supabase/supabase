@@ -9,5 +9,12 @@
     return <IconBase icon={RotateCw} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { rotateCw } from 'lucide-react'
+  */
   export default IconRotateCw
   

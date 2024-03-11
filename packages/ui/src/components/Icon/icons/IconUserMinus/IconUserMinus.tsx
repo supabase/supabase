@@ -9,5 +9,12 @@
     return <IconBase icon={UserMinus} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { userMinus } from 'lucide-react'
+  */
   export default IconUserMinus
   

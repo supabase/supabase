@@ -9,5 +9,12 @@
     return <IconBase icon={Linkedin} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { linkedin } from 'lucide-react'
+  */
   export default IconLinkedin
   

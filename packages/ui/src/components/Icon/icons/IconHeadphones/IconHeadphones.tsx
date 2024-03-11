@@ -9,5 +9,12 @@
     return <IconBase icon={Headphones} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { headphones } from 'lucide-react'
+  */
   export default IconHeadphones
   

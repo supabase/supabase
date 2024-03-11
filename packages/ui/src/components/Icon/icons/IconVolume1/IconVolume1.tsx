@@ -9,5 +9,12 @@
     return <IconBase icon={Volume1} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { volume1 } from 'lucide-react'
+  */
   export default IconVolume1
   

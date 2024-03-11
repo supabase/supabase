@@ -9,5 +9,12 @@
     return <IconBase icon={Printer} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { printer } from 'lucide-react'
+  */
   export default IconPrinter
   

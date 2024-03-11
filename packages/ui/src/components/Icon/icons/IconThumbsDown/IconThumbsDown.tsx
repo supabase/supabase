@@ -9,5 +9,12 @@
     return <IconBase icon={ThumbsDown} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { thumbsDown } from 'lucide-react'
+  */
   export default IconThumbsDown
   

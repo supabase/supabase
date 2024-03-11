@@ -9,5 +9,12 @@
     return <IconBase icon={Coffee} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { coffee } from 'lucide-react'
+  */
   export default IconCoffee
   

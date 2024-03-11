@@ -9,5 +9,12 @@
     return <IconBase icon={Italic} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { italic } from 'lucide-react'
+  */
   export default IconItalic
   

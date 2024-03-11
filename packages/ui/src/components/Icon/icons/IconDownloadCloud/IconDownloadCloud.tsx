@@ -9,5 +9,12 @@
     return <IconBase icon={DownloadCloud} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { downloadCloud } from 'lucide-react'
+  */
   export default IconDownloadCloud
   

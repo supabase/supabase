@@ -9,5 +9,12 @@
     return <IconBase icon={Paperclip} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { paperclip } from 'lucide-react'
+  */
   export default IconPaperclip
   

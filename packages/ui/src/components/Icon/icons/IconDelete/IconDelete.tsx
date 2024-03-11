@@ -9,5 +9,12 @@
     return <IconBase icon={Delete} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { delete } from 'lucide-react'
+  */
   export default IconDelete
   

@@ -9,5 +9,12 @@
     return <IconBase icon={Navigation2} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { navigation2 } from 'lucide-react'
+  */
   export default IconNavigation2
   

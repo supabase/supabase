@@ -9,5 +9,12 @@
     return <IconBase icon={Facebook} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { facebook } from 'lucide-react'
+  */
   export default IconFacebook
   

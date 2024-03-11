@@ -9,5 +9,12 @@
     return <IconBase icon={Thermometer} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { thermometer } from 'lucide-react'
+  */
   export default IconThermometer
   
