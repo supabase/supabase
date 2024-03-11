@@ -6,20 +6,18 @@ import { IconLoader } from 'ui'
 
 import { PolicyEditorModal } from 'components/interfaces/Auth/Policies'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { useBucketsQuery } from 'data/storage/buckets-query'
-import { useStore } from 'hooks'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { formatPoliciesForStorage } from '../Storage.utils'
 import StoragePoliciesBucketRow from './StoragePoliciesBucketRow'
 import StoragePoliciesEditPolicyModal from './StoragePoliciesEditPolicyModal'
 import StoragePoliciesPlaceholder from './StoragePoliciesPlaceholder'
 
 const StoragePolicies = () => {
-  const { ui } = useStore()
   const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
 
@@ -93,7 +91,7 @@ const StoragePolicies = () => {
   const onCancelPolicyDelete = () => setSelectedPolicyToDelete({})
 
   const onSavePolicySuccess = async () => {
-    ui.setNotification({ category: 'success', message: 'Successfully saved policy!' })
+    toast.success('Successfully saved policy!')
     await refetch()
     onCancelPolicyEdit()
   }

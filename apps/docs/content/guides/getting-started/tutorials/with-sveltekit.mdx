@@ -120,7 +120,9 @@ Create a new `src/routes/+layout.server.ts` file to handle the session on the se
 
 ```ts src/routes/+layout.server.ts
 // src/routes/+layout.server.ts
-export const load = async ({ locals: { getSession } }) => {
+import type { LayoutServerLoad } from './$types'
+
+export const load: LayoutServerLoad = async ({ locals: { getSession } }) => {
   return {
     session: await getSession(),
   }
@@ -135,8 +137,9 @@ Create a new `src/routes/+layout.ts` file to handle the session and the supabase
 // src/routes/+layout.ts
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
+import type { LayoutLoad } from './$types'
 
-export const load = async ({ fetch, data, depends }) => {
+export const load: LayoutLoad = async ({ fetch, data, depends }) => {
   depends('supabase:auth')
 
   const supabase = createSupabaseLoadClient({
@@ -393,8 +396,9 @@ and handle all our form actions through the `actions` object.
 
 ```ts
 import { fail, redirect } from '@sveltejs/kit'
+import type { Actions, PageServerLoad } from './$types'
 
-export const load = async ({ locals: { supabase, getSession } }) => {
+export const load: PageServerLoad = async ({ locals: { supabase, getSession } }) => {
   const session = await getSession()
 
   if (!session) {
@@ -410,7 +414,7 @@ export const load = async ({ locals: { supabase, getSession } }) => {
   return { session, profile }
 }
 
-export const actions = {
+export const actions: Actions = {
   update: async ({ request, locals: { supabase, getSession } }) => {
     const formData = await request.formData()
     const fullName = formData.get('fullName') as string
