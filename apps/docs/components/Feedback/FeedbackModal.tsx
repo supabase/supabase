@@ -39,7 +39,9 @@ function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps
                 id="comment"
                 name="comment"
                 size="medium"
+                className="mb-2"
                 textAreaClassName="resize-none"
+                afterLabel=" (not anonymous)"
               />
             </Modal.Content>
             <Modal.Separator />
