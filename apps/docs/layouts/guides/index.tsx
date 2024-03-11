@@ -14,6 +14,7 @@ import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMe
 import useHash from '~/hooks/useHash'
 import { LayoutMainContent } from '../DefaultLayout'
 import { MainSkeleton } from '../MainSkeleton'
+import 'katex/dist/katex.min.css'
 
 interface Props {
   meta: {
