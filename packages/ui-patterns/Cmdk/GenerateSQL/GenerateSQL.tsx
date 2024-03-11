@@ -9,12 +9,9 @@ import {
   IconUser,
   Input,
   Toggle,
-  MessageRole,
-  MessageStatus,
-  useAiChat,
   Tabs,
-  UseAiChatOptions,
 } from 'ui'
+import { MessageRole, MessageStatus, useAiChat, UseAiChatOptions } from './../AiCommand'
 
 import { cn } from 'ui/src/lib/utils'
 import { AiIcon, AiIconChat } from '../Command.icons'
