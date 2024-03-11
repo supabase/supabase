@@ -2,7 +2,6 @@ import { noop } from 'lodash'
 import { Button, IconChevronRight } from 'ui'
 
 import type { Branch } from 'data/branches/branches-query'
-import type { GitHubPullRequest } from 'data/integrations/github-pull-requests-query'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { PreviewBranchesEmptyState } from './EmptyStates'
 
@@ -14,7 +13,6 @@ interface OverviewProps {
   repo: string
   mainBranch: Branch
   previewBranches: Branch[]
-  pullRequests: GitHubPullRequest[]
   onViewAllBranches: () => void
   onSelectCreateBranch: () => void
   onSelectDeleteBranch: (branch: Branch) => void
@@ -27,7 +25,6 @@ const Overview = ({
   repo,
   mainBranch,
   previewBranches,
-  pullRequests,
   onViewAllBranches,
   onSelectCreateBranch,
   onSelectDeleteBranch,
@@ -64,15 +61,11 @@ const Overview = ({
         )}
         {isSuccess &&
           previewBranches.slice(0, MAX_BRANCHES_OVERVIEW).map((branch) => {
-            const pullRequest = pullRequests?.find(
-              (pr) => pr.branch === branch.git_branch && pr.repo === repo
-            )
             return (
               <BranchRow
                 key={branch.id}
                 repo={repo}
                 branch={branch}
-                pullRequest={pullRequest}
                 generateCreatePullRequestURL={generateCreatePullRequestURL}
                 onSelectDeleteBranch={() => onSelectDeleteBranch(branch)}
               />
