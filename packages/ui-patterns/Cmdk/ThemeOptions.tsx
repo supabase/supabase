@@ -2,7 +2,7 @@ import { CommandGroup } from 'cmdk'
 import { useCommandMenu } from './CommandMenuProvider'
 import ChildItem from './ChildItem'
 import { useTheme } from 'next-themes'
-import { Theme, themes } from '../ThemeProvider/themes'
+import { Theme, themes } from 'ui/src/components/ThemeProvider/themes'
 
 const ThemeOptions = ({ isSubItem = false }) => {
   const { setIsOpen } = useCommandMenu()
