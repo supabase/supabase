@@ -2098,7 +2098,7 @@ functions:
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, the return value is the user and you won't be logged in automatically.
         - If **Confirm email** is disabled, the return value is null and you will be logged in instead.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/guides/auth/concepts/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
       - If signUpWith() is called for an existing confirmed user:
         - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
@@ -2202,7 +2202,7 @@ functions:
       - If the user doesn't exist, `sendOtpTo()` will signup the user instead. To restrict this behavior, you can set `createUser` to `false`.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
+      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls).
       - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
@@ -2256,7 +2256,7 @@ functions:
         name: Create a custom url
         isSpotlight: false
         description: |
-          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectUrl` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
+          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectUrl` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls). It does not redirect the user immediately after invoking this method.
           - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
           - oAuthUrl() provides the URL which needs to be opened in a browser.
           - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs.
