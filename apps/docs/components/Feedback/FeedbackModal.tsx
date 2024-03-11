@@ -14,7 +14,7 @@ type FeedbackModalProps = {
 
 function FeedbackModal({ visible, page, onCancel, onSubmit }: FeedbackModalProps) {
   return (
-    <Modal hideFooter header="Leave a comment" visible={visible}>
+    <Modal hideFooter header="Leave a comment" visible={visible} onEscapeKeyDown={onCancel}>
       <Form
         initialValues={{ page, comment: '' }}
         validateOnBlur

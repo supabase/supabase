@@ -1,7 +1,7 @@
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
 import { Check, MessageSquareQuote, X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
-import { useReducer, useRef, useState, type CSSProperties } from 'react'
+import { useReducer, useRef, useState, type CSSProperties, useEffect, useCallback } from 'react'
 import { Button, cn } from 'ui'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { FeedbackModal, type FeedbackFields } from './FeedbackModal'
@@ -58,95 +58,98 @@ function Feedback() {
     sendFeedbackVote(response)
     dispatch({ event: 'VOTED', response })
     // Focus so screen reader users are aware of the new element
-    requestAnimationFrame(() => {
+    setTimeout(() => {
       feedbackButtonRef.current?.focus()
-    })
+      // Wait for element to show up first
+    }, 700)
   }
 
   function refocusButton() {
-    // Save reference to button, because ref could be cleared by the time rAF runs
-    const button = feedbackButtonRef.current
-    requestAnimationFrame(() => {
-      button?.focus()
-    })
+    setTimeout(() => {
+      feedbackButtonRef.current?.focus()
+      // Wait for modal to disappear and button to become focusable again
+    }, 100)
   }
 
   async function handleSubmit({ page, comment }: FeedbackFields) {
     supabase
       .from('feedback_comment')
       .insert({ page, comment })
-      .then(({ error }) => console.error(error))
+      .then((error) => console.error(error))
     setModalOpen(false)
     refocusButton()
   }
 
   return (
-    <section className="px-5 mb-6" aria-labelledby="feedback-title">
+    <section className="@container px-5 mb-6" aria-labelledby="feedback-title">
       <h3 id="feedback-title" className="block font-mono text-xs uppercase text-foreground mb-4">
         Is this helpful?
       </h3>
-      <div
-        style={{ '--container-flex-gap': '0.5rem' } as CSSProperties}
-        className={`relative flex gap-[var(--container-flex-gap)] items-center mb-2`}
-      >
-        <Button
-          type="outline"
-          rounded
-          className={cn(
-            'px-1',
-            !isYes && 'hover:text-brand-600 hover:border-brand-500',
-            isYes && 'bg-brand text-brand-200 !border-brand disabled:opacity-100',
-            !showYes && 'opacity-0 invisible',
-            '[transition-property:opacity,transform,color] [transition-duration:150ms,300ms,300ms,300ms]'
-          )}
-          onClick={() => handleVote('yes')}
-          disabled={state.type === StateType.Followup}
+      <div className="relative flex flex-col gap-y-4 mb-2 @[12rem]:flex-row @[12rem]:items-center">
+        <div
+          style={{ '--container-flex-gap': '0.5rem' } as CSSProperties}
+          className={`relative flex gap-[var(--container-flex-gap)] items-center`}
         >
-          <Check size={14} strokeWidth={3} />
-          <span className="sr-only">Yes</span>
-        </Button>
-        <Button
-          type="outline"
-          rounded
-          className={cn(
-            'px-1',
-            !isNo && 'hover:text-warning-600 hover:border-warning-500',
-            isNo &&
-              `bg-warning text-warning-200 !border-warning -translate-x-[calc(100%+var(--container-flex-gap,0.5rem))] disabled:opacity-100`,
-            !showNo && 'opacity-0 invisible',
-            '[transition-property:opacity,transform,color] [transition-duration:150ms,300ms,300ms,300ms]'
-          )}
-          onClick={() => handleVote('no')}
-          disabled={state.type === StateType.Followup}
-        >
-          <X size={14} strokeWidth={3} />
-          <span className="sr-only">No</span>
-        </Button>
+          <Button
+            type="outline"
+            rounded
+            className={cn(
+              'px-1',
+              !isYes && 'hover:text-brand-600 hover:border-brand-500',
+              isYes && 'bg-brand text-brand-200 !border-brand disabled:opacity-100',
+              !showYes && 'opacity-0 invisible',
+              '[transition-property:opacity,transform,color] [transition-duration:150ms,300ms,300ms]',
+              'motion-reduce:[transition-duration:150ms,1ms,300ms]'
+            )}
+            onClick={() => handleVote('yes')}
+            disabled={state.type === StateType.Followup}
+          >
+            <Check size={14} strokeWidth={3} />
+            <span className="sr-only">Yes</span>
+          </Button>
+          <Button
+            type="outline"
+            rounded
+            className={cn(
+              'px-1',
+              !isNo && 'hover:text-warning-600 hover:border-warning-500',
+              isNo &&
+                `bg-warning text-warning-200 !border-warning -translate-x-[calc(100%+var(--container-flex-gap,0.5rem))] disabled:opacity-100`,
+              !showNo && 'opacity-0 invisible',
+              '[transition-property:opacity,transform,color] [transition-duration:150ms,300ms,300ms]',
+              'motion-reduce:[transition-duration:150ms,1ms,300ms]'
+            )}
+            onClick={() => handleVote('no')}
+            disabled={state.type === StateType.Followup}
+          >
+            <X size={14} strokeWidth={3} />
+            <span className="sr-only">No</span>
+          </Button>
+        </div>
         <div
           className={cn(
-            'absolute',
             'flex flex-col gap-1',
-            'left-6',
-            'transition-all',
-            'transform',
             'text-xs',
             'opacity-0 invisible',
-            'delay-500',
-            state.type === StateType.Followup && 'left-9 opacity-100 visible'
+            '-translate-x-[0.25rem] @[12rem]:-translate-x-[1.25rem]',
+            '[transition-property:opacity,transform] [transition-duration:150ms,300ms]',
+            'motion-reduce:[transition-duration:150ms,1ms]',
+            'delay-300',
+            state.type === StateType.Followup && 'opacity-100 visible @[12rem]:-translate-x-[1rem]'
           )}
         >
           <span className="text-foreground-light">Thanks for your feedback!</span>
           <button
             ref={feedbackButtonRef}
+            tabIndex={0}
             className={cn(
               'mt-0',
-              'transition-all',
               'flex items-center gap-2',
               'text-xs text-foreground-lighter',
               'hover:text-foreground',
               state.type !== StateType.Followup && 'opacity-0 invisible',
               '[transition-property:opacity,color]',
-              'delay-1000'
+              '[transition-delay:700ms,0ms]'
             )}
             onClick={() => setModalOpen(true)}
           >
