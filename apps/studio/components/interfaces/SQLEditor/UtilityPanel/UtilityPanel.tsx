@@ -54,7 +54,7 @@ const UtilityPanel = ({
           )}
         </div>
         <div className="flex gap-1 h-full">
-          {result && result.rows && <ResultsDropdown id={id} isExecuting={isExecuting} />}
+          {result && result.rows && <ResultsDropdown id={id} />}
           <UtilityActions
             id={id}
             isExecuting={isExecuting}

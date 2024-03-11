@@ -62,9 +62,6 @@ export * from './src/components/Toggle'
 export * from './src/components/Upload'
 export * from './src/components/Form'
 
-// CMD+K
-export * from './src/components/Command'
-
 // layout
 export * from './src/components/LoadingLine'
 
@@ -86,6 +83,8 @@ export * from './src/components/shadcn/ui/toast'
 export * from './src/components/shadcn/ui/toaster'
 
 export { Badge as Badge_Shadcn_ } from './src/components/shadcn/ui/badge'
+
+export * from './src/components/shadcn/ui/separator'
 
 export {
   Command as Command_Shadcn_,
@@ -215,6 +214,8 @@ export {
   HoverCardTrigger as HoverCardTrigger_Shadcn_,
   HoverCardContent as HoverCardContent_Shadcn_,
 } from './src/components/shadcn/ui/hover-card'
+
+export * from './src/components/shadcn/ui/calendar'
 
 export { Toggle as Toggle_Shadcn } from './src/components/shadcn/ui/toggle'
 

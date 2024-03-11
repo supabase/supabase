@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -15,7 +16,6 @@ import { FormActions } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { useProfileUpdateMutation } from 'data/profile/profile-update-mutation'
 import type { Profile } from 'data/profile/types'
-import { useStore } from 'hooks'
 import type { FormSchema } from 'types'
 
 const FormSchema = z.object({
@@ -26,8 +26,6 @@ const FormSchema = z.object({
 const formId = 'profile-information-form'
 
 export const ProfileInformation = ({ profile }: { profile: Profile }) => {
-  const { ui } = useStore()
-
   const form = useForm({
     resolver: zodResolver(FormSchema),
     defaultValues: { first_name: profile.first_name ?? '', last_name: profile.last_name ?? '' },
@@ -35,14 +33,10 @@ export const ProfileInformation = ({ profile }: { profile: Profile }) => {
 
   const { mutateAsync: updateProfile, isLoading } = useProfileUpdateMutation({
     onSuccess: () => {
-      ui.setNotification({ category: 'success', message: 'Successfully saved profile' })
+      toast.success('Successfully saved profile')
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: "Couldn't update profile. Please try again later.",
-      })
+      toast.error("Couldn't update profile. Please try again later.")
     },
   })
 

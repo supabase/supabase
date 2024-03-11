@@ -1,24 +1,24 @@
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
-import { useParams } from 'common/hooks'
-import { useStore } from 'hooks'
+import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { useParams } from 'common'
 import { FormHeader, FormPanel } from 'components/ui/Forms'
+import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'
+import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
+import { BASE_PATH } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
+  Badge,
   Button,
   IconAlertTriangle,
   IconExternalLink,
   IconGlobe,
   Modal,
-  Badge,
 } from 'ui'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-
-import { useBannedIPsQuery } from 'data/banned-ips/banned-ips-query'
-import { useBannedIPsDeleteMutation } from 'data/banned-ips/banned-ips-delete-mutations'
-import { BASE_PATH } from 'lib/constants'
 
 const BannedIPs = () => {
   const { ref } = useParams()
@@ -27,24 +27,17 @@ const BannedIPs = () => {
     projectRef: ref,
   })
 
-  const { ui } = useStore()
   const [showUnban, setShowUnban] = useState(false)
   const [confirmingIP, setConfirmingIP] = useState<string | null>(null) // Track the IP being confirmed for unban
 
   const { mutate: unbanIPs, isLoading: isUnbanning } = useBannedIPsDeleteMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: 'IP address successfully unbanned',
-      })
+      toast.success('IP address successfully unbanned')
       setSelectedIPToUnban(null) // Reset the selected IP for unban
       setShowUnban(false)
     },
     onError: (error) => {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to unban IP: ${error?.message}`,
-      })
+      toast.error(`Failed to unban IP: ${error?.message}`)
     },
   })
 
