@@ -1,8 +1,12 @@
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
+
+import Panel from 'components/ui/Panel'
+import type { ProjectApiResponse } from 'data/config/project-api-query'
+import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
+import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
+import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
 import {
-  Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -12,12 +16,7 @@ import {
   IconHelpCircle,
   IconRefreshCw,
 } from 'ui'
-
-import Panel from 'components/ui/Panel'
-import type { ProjectApiResponse } from 'data/config/project-api-query'
-import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
-import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
-import { useCustomDomainReverifyMutation } from 'data/custom-domains/custom-domains-reverify-mutation'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import DNSRecord from './DNSRecord'
 
 export type CustomDomainVerifyProps = {
@@ -120,21 +119,27 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
         </div>
 
         {hasCAAErrors && (
-          <Alert
-            withIcon
-            variant="warning"
-            title="Certificate Authority Authentication (CAA) error"
-          >
-            Please add a CAA record allowing "digicert.com" to issue certificates for{' '}
-            <code className="text-xs">{customDomain.hostname}</code>. For example:{' '}
-            <code className="text-xs">0 issue "digicert.com"</code>
-          </Alert>
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              Certificate Authority Authentication (CAA) error
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Please add a CAA record allowing "digicert.com" to issue certificates for{' '}
+              <code className="text-xs">{customDomain.hostname}</code>. For example:{' '}
+              <code className="text-xs">0 issue "digicert.com"</code>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
         )}
 
         {customDomain.ssl.status === 'validation_timed_out' ? (
-          <Alert withIcon variant="warning" title="Validation timed out">
-            Please click "Verify" again to retry the validation of the records
-          </Alert>
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>Validation timed out</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Please click "Verify" again to retry the validation of the records
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
         ) : (
           <div className="space-y-2">
             <div className="flex gap-4">
@@ -242,4 +247,4 @@ const CustomDomainVerify = ({ projectRef, customDomain, settings }: CustomDomain
   )
 }
 
-export default observer(CustomDomainVerify)
+export default CustomDomainVerify

@@ -9,11 +9,11 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  DialogContent_Shadcn_,
-  DialogSectionSeparator_Shadcn_,
-  DialogSection_Shadcn_,
-  DialogTitle_Shadcn_,
-  Dialog_Shadcn_,
+  DialogContent,
+  DialogSectionSeparator,
+  DialogSection,
+  DialogTitle,
+  Dialog,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
@@ -36,7 +36,7 @@ export interface TextConfirmModalProps {
   loading: boolean
   visible: boolean
   title: string
-  size?: React.ComponentProps<typeof DialogContent_Shadcn_>['size']
+  size?: React.ComponentProps<typeof DialogContent>['size']
   cancelLabel?: string
   confirmLabel?: string
   confirmPlaceholder: string
@@ -58,8 +58,8 @@ export interface TextConfirmModalProps {
 }
 
 const TextConfirmModal = forwardRef<
-  React.ElementRef<typeof DialogContent_Shadcn_>,
-  React.ComponentPropsWithoutRef<typeof Dialog_Shadcn_> & TextConfirmModalProps
+  React.ElementRef<typeof DialogContent>,
+  React.ComponentPropsWithoutRef<typeof Dialog> & TextConfirmModalProps
 >(
   (
     {
@@ -108,7 +108,7 @@ const TextConfirmModal = forwardRef<
     }
 
     return (
-      <Dialog_Shadcn_
+      <Dialog
         open={visible}
         {...props}
         onOpenChange={() => {
@@ -117,9 +117,9 @@ const TextConfirmModal = forwardRef<
           }
         }}
       >
-        <DialogContent_Shadcn_ ref={ref} className="p-0 gap-0 pb-5" size={size}>
+        <DialogContent ref={ref} className="p-0 gap-0 pb-5" size={size}>
           <DialogHeader className={cn('border-b')} padding={'small'}>
-            <DialogTitle_Shadcn_ className="">{title}</DialogTitle_Shadcn_>
+            <DialogTitle className="">{title}</DialogTitle>
           </DialogHeader>
           {alert && (
             <Admonition
@@ -132,17 +132,17 @@ const TextConfirmModal = forwardRef<
           )}
           {children && (
             <>
-              <DialogSection_Shadcn_ padding={'small'}>{children}</DialogSection_Shadcn_>
-              <DialogSectionSeparator_Shadcn_ />
+              <DialogSection padding={'small'}>{children}</DialogSection>
+              <DialogSectionSeparator />
             </>
           )}
           {/* // older prop from before refactor */}
           {text !== undefined && (
             <>
-              <DialogSection_Shadcn_ className="p-5" padding={'small'}>
+              <DialogSection className="p-5" padding={'small'}>
                 <p className="text-foreground-light text-sm">{text}</p>
-              </DialogSection_Shadcn_>
-              <DialogSectionSeparator_Shadcn_ />
+              </DialogSection>
+              <DialogSectionSeparator />
             </>
           )}
           <Form_Shadcn_ {...form}>
@@ -189,8 +189,8 @@ const TextConfirmModal = forwardRef<
               </div>
             </form>
           </Form_Shadcn_>
-        </DialogContent_Shadcn_>
-      </Dialog_Shadcn_>
+        </DialogContent>
+      </Dialog>
     )
   }
 )

@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
-import { observer } from 'mobx-react-lite'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -14,7 +14,6 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useRouter } from 'next/router'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   Button,
@@ -361,4 +360,4 @@ const TableList = ({
   )
 }
 
-export default observer(TableList)
+export default TableList

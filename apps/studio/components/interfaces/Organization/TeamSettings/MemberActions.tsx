@@ -1,6 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -208,4 +207,4 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
   )
 }
 
-export default observer(MemberActions)
+export default MemberActions
