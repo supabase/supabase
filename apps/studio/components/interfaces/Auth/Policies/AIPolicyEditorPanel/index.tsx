@@ -500,8 +500,27 @@ export const AIPolicyEditorPanel = memo(function ({
                             Use options above to edit
                           </p>
                         </div>
-                        <Button asChild type="default">
-                          <Link href={`/project/${ref}/sql/new?content=`}>Open in SQL Editor</Link>
+                        <Button
+                          type="default"
+                          onClick={() =>
+                            router.push(
+                              `/project/${ref}/sql/new?content=${generateQuery({
+                                name,
+                                schema: state.selectedSchemaName,
+                                table,
+                                behaviour,
+                                command,
+                                roles: roles.length === 0 ? 'public' : roles,
+                                using: (editorOneRef.current?.getValue() ?? undefined)?.trim(),
+                                check:
+                                  command === 'insert'
+                                    ? (editorOneRef.current?.getValue() ?? undefined)?.trim()
+                                    : (editorTwoRef.current?.getValue() ?? undefined)?.trim(),
+                              })}`
+                            )
+                          }
+                        >
+                          Open in SQL Editor
                         </Button>
                       </div>
                       <div className="flex items-center" style={{ fontSize: '14px' }}>
