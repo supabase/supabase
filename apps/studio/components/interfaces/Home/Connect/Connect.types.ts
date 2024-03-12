@@ -12,8 +12,5 @@ export interface ContentFileProps {
     transaction: string
     session: string
   }
-  connectionStringDirect: {
-    transaction: string
-    session: string
-  }
+  connectionStringDirect: string
 }

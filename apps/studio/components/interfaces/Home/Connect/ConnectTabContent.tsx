@@ -15,10 +15,7 @@ interface ConnectContentTabProps {
     transaction: string
     session: string
   }
-  connectionStringDirect?: {
-    transaction: string
-    session: string
-  }
+  connectionStringDirect?: string
 }
 
 const ConnectTabContentNew = ({ projectKeys, filePath }: ConnectContentTabProps) => {
@@ -49,9 +46,6 @@ const ConnectTabContentNew = ({ projectKeys, filePath }: ConnectContentTabProps)
   const connectionStringPoolerTransaction = connectionStringsPooler.uri
   const connectionStringPoolerSession = connectionStringsPooler.uri.replace('6543', '5432')
 
-  const connectionStringDirectTransaction = connectionStringsDirect.uri
-  const connectionStringDirectSession = connectionStringsDirect.uri.replace('6543', '5432')
-
   const ContentFile = dynamic<ConnectContentTabProps>(
     () => import(`./content/${filePath}/content`),
     {
@@ -72,10 +66,7 @@ const ConnectTabContentNew = ({ projectKeys, filePath }: ConnectContentTabProps)
           transaction: connectionStringPoolerTransaction,
           session: connectionStringPoolerSession,
         }}
-        connectionStringDirect={{
-          transaction: connectionStringDirectTransaction,
-          session: connectionStringDirectSession,
-        }}
+        connectionStringDirect={connectionStringsDirect.uri}
       />
     </div>
   )
