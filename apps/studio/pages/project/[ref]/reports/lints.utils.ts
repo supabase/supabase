@@ -1,3 +1,23 @@
+import { Lint } from './lints'
+
+export function getHumanReadableTitle(title: string) {
+  switch (title) {
+    case 'unindexed_foreign_keys':
+      return 'Unindexed foreign keys'
+    case 'auth_users_exposed':
+      return 'Exposed Auth Users'
+    case 'auth_rls_initplan':
+      return 'Auth RLS Initialization Plan'
+    case 'no_primary_key':
+      return 'No Primary Key'
+    case 'unused_index':
+      return 'Unused Index'
+    case 'multiple_permissive_policies':
+      return 'Multiple Permissive Policies'
+    default:
+      return 'Unknown Lint Title'
+  }
+}
 export const lint_sql = `
 (
 with foreign_keys as (
@@ -310,3 +330,51 @@ group by
 having
     count(1) > 1)
 	`
+
+export const fakeLints: Lint[] = [
+  {
+    name: 'unindexed_foreign_keys',
+    level: 'INFO',
+    facing: 'EXTERNAL',
+    description:
+      'Identifies foreign key constraints without a covering index, which can impact database performance.',
+    detail:
+      'Table "cities" has a foreign key "cities_country_id_fkey" without a covering index. This can lead to suboptimal query performance.',
+    remediation: null,
+    metadata: {
+      table: 'cities',
+      fkey_name: 'cities_country_id_fkey',
+      fkey_columns: [3],
+    },
+    cache_key: '0001_unindexed_foreign_keys_cities_cities_country_id_fkey',
+  },
+  {
+    name: 'unindexed_foreign_keys',
+    level: 'ERROR',
+    facing: 'EXTERNAL',
+    description:
+      'Identifies foreign key constraints without a covering index, which can impact database performance.',
+    detail:
+      'Table "towns" has a foreign key "cities_country_id_fkey" without a covering index. This can lead to suboptimal query performance.',
+    remediation:
+      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent in ipsum fermentum, ultrices libero sed, ornare erat. Fusce feugiat rhoncus tristique. Aliquam mi sem, malesuada non nisi nec, interdum ultricies sem. Donec ut lacus sem. Vestibulum elementum viverra felis vel euismod. Ut faucibus mi nulla, eget porta mauris scelerisque eget. Morbi nibh nibh, posuere sagittis tincidunt rhoncus, gravida sed massa.',
+    metadata: {
+      table: 'towns',
+      fkey_name: 'cities_country_id_fkey',
+      fkey_columns: [3],
+    },
+    cache_key: '0001_unindexed_foreign_keys_towns_towns_country_id_fkey',
+  },
+  {
+    name: 'no_primary_key',
+    level: 'WARN',
+    facing: 'EXTERNAL',
+    description:
+      'Detects if a table does not have a primary key. Tables without a primary key can be inefficient to interact with at scale.',
+    detail: 'Table "public.lakes" does not have a primary key',
+
+    remediation: null,
+    metadata: null,
+    cache_key: 'no_primary_key_public_lakes',
+  },
+]
