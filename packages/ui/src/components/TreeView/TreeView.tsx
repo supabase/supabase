@@ -168,7 +168,7 @@ const TreeViewItem = forwardRef<
               setLocalValueState(e.target.value)
             }}
             onKeyDownCapture={(e) => {
-              // stop keybaord down bubbling up to TreeView.root
+              // stop keyboard down bubbling up to TreeView.root
               // on enter key, send onEditSubmit callback
               if (e.key === 'Enter') {
                 onEditSubmit?.(localValueState)
