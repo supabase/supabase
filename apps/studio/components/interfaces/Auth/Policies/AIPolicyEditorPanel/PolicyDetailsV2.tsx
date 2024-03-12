@@ -1,8 +1,15 @@
-import { IStandaloneCodeEditor } from 'components/interfaces/SQLEditor/SQLEditor.types'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect } from 'react'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
-  IconLock,
-  Input,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
   Input_Shadcn_,
   RadioGroupLargeItem_Shadcn_,
   RadioGroup_Shadcn_,
@@ -11,31 +18,16 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   Select_Shadcn_,
-  cn,
 } from 'ui'
-import RLSCodeEditor from './RLSCodeEditor'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import MultiSelect from 'ui-patterns/MultiSelect'
-import { CodeEditor } from 'components/ui/CodeEditor'
-
-// [Joshen] Just for demo, will use proper form components later and proper loading states
 
 interface PolicyDetailsV2Props {
-  field: { name: string; table: string; behaviour: string; command: string; roles: string[] }
-  onUpdateField: (
-    value: string | string[],
-    field: 'name' | 'table' | 'behaviour' | 'command' | 'roles'
-  ) => void
+  form: any
 }
 
-export const PolicyDetailsV2 = ({ field, onUpdateField }: PolicyDetailsV2Props) => {
+export const PolicyDetailsV2 = ({ form }: PolicyDetailsV2Props) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
-
-  const { name, table, behaviour, command, roles } = field
 
   const { data: tables, isSuccess: isSuccessTables } = useTablesQuery({
     projectRef: project?.ref,
@@ -49,116 +41,197 @@ export const PolicyDetailsV2 = ({ field, onUpdateField }: PolicyDetailsV2Props) 
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const formattedRoles = (dbRoles ?? []).map((role) => {
-    return {
-      id: role.id,
-      name: role.name,
-      value: role.name,
-      disabled: false,
-    }
-  })
+  const formattedRoles = (dbRoles ?? [])
+    .map((role) => {
+      return {
+        id: role.id,
+        name: role.name,
+        value: role.name,
+        disabled: false,
+      }
+    })
+    .sort((a, b) => a.name.localeCompare(b.name))
 
-  const supportUsing = ['SELECT', 'UPDATE', 'DELETE', 'ALL'].includes(command)
-  const supportWithCheck = ['INSERT', 'UPDATE', 'ALL'].includes(command)
+  // const supportUsing = ['SELECT', 'UPDATE', 'DELETE', 'ALL'].includes(command)
+  // const supportWithCheck = ['INSERT', 'UPDATE', 'ALL'].includes(command)
 
   useEffect(() => {
-    if (isSuccessTables && tables.length > 0) onUpdateField(tables[0].name, 'table')
+    if (isSuccessTables && tables.length > 0) form.setValue('table', tables[0].name)
   }, [isSuccessTables, tables])
 
   return (
     <>
       <div className="px-5 py-5 flex flex-col gap-y-4 border-b">
         <div className="flex items-center justify-between gap-4 grid grid-cols-12">
-          <div className="col-span-6 flex flex-col gap-y-1">
-            <p className="text-foreground-light text-sm">Policy Name</p>
-            <Input_Shadcn_
-              value={name}
-              className="bg-control border-control"
-              onChange={(event) => onUpdateField(event.target.value, 'name')}
-            />
-          </div>
+          <FormField_Shadcn_
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem_Shadcn_ className="col-span-6 flex flex-col gap-y-1">
+                <FormLabel_Shadcn_>Policy Name</FormLabel_Shadcn_>
+                <FormControl_Shadcn_>
+                  <Input_Shadcn_
+                    {...field}
+                    className="bg-control border-control"
+                    placeholder="Provide a name for your policy"
+                  />
+                </FormControl_Shadcn_>
+                <FormMessage_Shadcn_ />
+              </FormItem_Shadcn_>
+            )}
+          />
 
-          <div className="col-span-6 flex flex-col gap-y-1">
-            <p className="text-foreground-light text-sm">Table</p>
-            <Select_Shadcn_ value={table} onValueChange={(value) => onUpdateField(value, 'table')}>
-              <SelectTrigger_Shadcn_ className="text-sm h-10">
-                {snap.selectedSchemaName}.{table}
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                <SelectGroup_Shadcn_>
-                  {(tables ?? []).map((table) => (
-                    <SelectItem_Shadcn_ key={table.id} value={table.name} className="text-sm">
-                      {table.name}
-                    </SelectItem_Shadcn_>
-                  ))}
-                </SelectGroup_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
-          </div>
+          <FormField_Shadcn_
+            control={form.control}
+            name="table"
+            render={({ field }) => (
+              <FormItem_Shadcn_ className="col-span-6 flex flex-col gap-y-1">
+                <FormLabel_Shadcn_ className="flex items-center gap-x-4">
+                  <p className="text-foreground-light text-sm">Table</p>
+                  <p className="text-foreground-light text-sm">
+                    <code className="text-xs">on</code> clause
+                  </p>
+                </FormLabel_Shadcn_>
+                <FormControl_Shadcn_>
+                  <Select_Shadcn_
+                    value={field.value}
+                    onValueChange={(value) => form.setValue('table', value)}
+                  >
+                    <SelectTrigger_Shadcn_ className="text-sm h-10">
+                      {snap.selectedSchemaName}.{field.value}
+                    </SelectTrigger_Shadcn_>
+                    <SelectContent_Shadcn_>
+                      <SelectGroup_Shadcn_>
+                        {(tables ?? []).map((table) => (
+                          <SelectItem_Shadcn_ key={table.id} value={table.name} className="text-sm">
+                            {table.name}
+                          </SelectItem_Shadcn_>
+                        ))}
+                      </SelectGroup_Shadcn_>
+                    </SelectContent_Shadcn_>
+                  </Select_Shadcn_>
+                </FormControl_Shadcn_>
+                <FormMessage_Shadcn_ />
+              </FormItem_Shadcn_>
+            )}
+          />
 
-          <div className="col-span-6 flex flex-col gap-y-1">
-            <p className="text-foreground-light text-sm">Policy Behaviour</p>
-            <Select_Shadcn_
-              value={behaviour}
-              onValueChange={(value) => onUpdateField(value, 'behaviour')}
-            >
-              <SelectTrigger_Shadcn_ className="text-sm h-10">{behaviour}</SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                <SelectGroup_Shadcn_>
-                  <SelectItem_Shadcn_ value="Permissive" className="text-sm">
-                    Permissive
-                  </SelectItem_Shadcn_>
-                  <SelectItem_Shadcn_ value="Restrictive" className="text-sm">
-                    Restrictive
-                  </SelectItem_Shadcn_>
-                </SelectGroup_Shadcn_>
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
-          </div>
+          <FormField_Shadcn_
+            control={form.control}
+            name="behaviour"
+            render={({ field }) => (
+              <FormItem_Shadcn_ className="col-span-6 flex flex-col gap-y-1">
+                <FormLabel_Shadcn_ className="flex items-center gap-x-4">
+                  <p className="text-foreground-light text-sm">Policy Behaviour</p>
+                  <p className="text-foreground-light text-sm">
+                    <code className="text-xs">as</code> clause
+                  </p>
+                </FormLabel_Shadcn_>
+                <FormControl_Shadcn_>
+                  <Select_Shadcn_
+                    value={field.value}
+                    onValueChange={(value) => form.setValue('behaviour', value)}
+                  >
+                    <SelectTrigger_Shadcn_ className="text-sm h-10 capitalize">
+                      {field.value}
+                    </SelectTrigger_Shadcn_>
+                    <SelectContent_Shadcn_>
+                      <SelectGroup_Shadcn_>
+                        <SelectItem_Shadcn_ value="permissive" className="text-sm">
+                          <p>Permissive</p>
+                          <p className="text-foreground-light text-xs">
+                            Policies are combined using the "OR" Boolean operator
+                          </p>
+                        </SelectItem_Shadcn_>
+                        <SelectItem_Shadcn_ value="restrictive" className="text-sm">
+                          <p>Restrictive</p>
+                          <p className="text-foreground-light text-xs">
+                            Policies are combined using the "AND" Boolean operator
+                          </p>
+                        </SelectItem_Shadcn_>
+                      </SelectGroup_Shadcn_>
+                    </SelectContent_Shadcn_>
+                  </Select_Shadcn_>
+                </FormControl_Shadcn_>
+                <FormMessage_Shadcn_ />
+              </FormItem_Shadcn_>
+            )}
+          />
 
-          <div className="col-span-12 flex flex-col gap-y-2">
-            <label className="block text-foreground-light text-sm leading-4">Policy Command</label>
-            <RadioGroup_Shadcn_
-              value={command}
-              defaultValue={command}
-              onValueChange={(value) => onUpdateField(value, 'command')}
-              aria-label="Choose a theme"
-              className="grid grid-cols-10 gap-3"
-            >
-              <RadioGroupLargeItem_Shadcn_
-                value="SELECT"
-                label="SELECT"
-                className="col-span-2 w-auto"
-              />
-              <RadioGroupLargeItem_Shadcn_
-                value="INSERT"
-                label="INSERT"
-                className="col-span-2 w-auto"
-              />
-              <RadioGroupLargeItem_Shadcn_
-                value="UPDATE"
-                label="UPDATE"
-                className="col-span-2 w-auto"
-              />
-              <RadioGroupLargeItem_Shadcn_
-                value="DELETE"
-                label="DELETE"
-                className="col-span-2 w-auto"
-              />
-              <RadioGroupLargeItem_Shadcn_ value="ALL" label="ALL" className="col-span-2 w-auto" />
-            </RadioGroup_Shadcn_>
-          </div>
+          <FormField_Shadcn_
+            control={form.control}
+            name="command"
+            render={({ field }) => (
+              <FormItem_Shadcn_ className="col-span-12 flex flex-col gap-y-1">
+                <FormLabel_Shadcn_ className="flex items-center gap-x-4">
+                  <p className="text-foreground-light text-sm">Policy Command</p>
+                  <p className="text-foreground-light text-sm">
+                    <code className="text-xs">for</code> clause
+                  </p>
+                </FormLabel_Shadcn_>
+                <FormControl_Shadcn_>
+                  <RadioGroup_Shadcn_
+                    value={field.value}
+                    defaultValue={field.value}
+                    onValueChange={(value) => form.setValue('command', value)}
+                    className="grid grid-cols-10 gap-3"
+                  >
+                    <RadioGroupLargeItem_Shadcn_
+                      value="select"
+                      label="SELECT"
+                      className="col-span-2 w-auto"
+                    />
+                    <RadioGroupLargeItem_Shadcn_
+                      value="insert"
+                      label="INSERT"
+                      className="col-span-2 w-auto"
+                    />
+                    <RadioGroupLargeItem_Shadcn_
+                      value="update"
+                      label="UPDATE"
+                      className="col-span-2 w-auto"
+                    />
+                    <RadioGroupLargeItem_Shadcn_
+                      value="delete"
+                      label="DELETE"
+                      className="col-span-2 w-auto"
+                    />
+                    <RadioGroupLargeItem_Shadcn_
+                      value="all"
+                      label="ALL"
+                      className="col-span-2 w-auto"
+                    />
+                  </RadioGroup_Shadcn_>
+                </FormControl_Shadcn_>
+                <FormMessage_Shadcn_ />
+              </FormItem_Shadcn_>
+            )}
+          />
 
-          <div className="col-span-12 flex flex-col gap-y-1">
-            <p className="text-foreground-light text-sm">Target Roles</p>
-            <MultiSelect
-              options={formattedRoles}
-              value={roles}
-              placeholder="Defaults to all (public) roles if none selected"
-              searchPlaceholder="Search for a role"
-              onChange={(roles) => onUpdateField(roles, 'roles')}
-            />
-          </div>
+          <FormField_Shadcn_
+            control={form.control}
+            name="roles"
+            render={({ field }) => (
+              <FormItem_Shadcn_ className="col-span-12 flex flex-col gap-y-1">
+                <FormLabel_Shadcn_ className="flex items-center gap-x-4">
+                  <p className="text-foreground-light text-sm">Target Roles</p>
+                  <p className="text-foreground-light text-sm">
+                    <code className="text-xs">to</code> clause
+                  </p>
+                </FormLabel_Shadcn_>
+                <FormControl_Shadcn_>
+                  <MultiSelect
+                    options={formattedRoles}
+                    value={field.value.length === 0 ? [] : field.value?.split(', ')}
+                    placeholder="Defaults to all (public) roles if none selected"
+                    searchPlaceholder="Search for a role"
+                    onChange={(roles) => form.setValue('roles', roles.join(', '))}
+                  />
+                </FormControl_Shadcn_>
+                <FormMessage_Shadcn_ />
+              </FormItem_Shadcn_>
+            )}
+          />
         </div>
       </div>
     </>
