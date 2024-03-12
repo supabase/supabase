@@ -5,7 +5,11 @@ import toast from 'react-hot-toast'
 import {
   Button,
   FormControl_Shadcn_,
+  FormDescription_Shadcn_,
   FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  FormMessage_Shadcn_,
   Form_Shadcn_,
   IconPlus,
   IconTrash,
@@ -17,7 +21,6 @@ import {
   Toggle,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -166,15 +169,18 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItemLayout
-                  label="Name of function"
-                  description="Name will also be used for the function name in postgres"
-                  layout="horizontal"
-                >
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} />
+                <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+                  <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
+                    Name of function
+                  </FormLabel_Shadcn_>
+                  <FormControl_Shadcn_ className="col-span-8">
+                    <Input_Shadcn_ {...field} className="w-full" />
                   </FormControl_Shadcn_>
-                </FormItemLayout>
+                  <FormDescription_Shadcn_ className="col-start-5 col-span-8">
+                    Name will also be used for the function name in postgres
+                  </FormDescription_Shadcn_>
+                  <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+                </FormItem_Shadcn_>
               )}
             />
           </SidePanel.Content>
@@ -184,12 +190,11 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
               control={form.control}
               name="schema"
               render={({ field }) => (
-                <FormItemLayout
-                  label="Schema"
-                  description="Tables made in the table editor will be in 'public'"
-                  layout="horizontal"
-                >
-                  <FormControl_Shadcn_>
+                <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+                  <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
+                    Schema
+                  </FormLabel_Shadcn_>
+                  <FormControl_Shadcn_ className="col-span-8">
                     <SchemaSelector
                       selectedSchemaName={field.value}
                       excludedSchemas={EXCLUDED_SCHEMAS}
@@ -197,7 +202,11 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                       onSelectSchema={(name) => field.onChange(name)}
                     />
                   </FormControl_Shadcn_>
-                </FormItemLayout>
+                  <FormDescription_Shadcn_ className="col-start-5 col-span-8">
+                    Tables made in the table editor will be in 'public'
+                  </FormDescription_Shadcn_>
+                  <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+                </FormItem_Shadcn_>
               )}
             />
             {!isEditing && (
@@ -205,12 +214,11 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                 control={form.control}
                 name="return_type"
                 render={({ field }) => (
-                  <FormItemLayout
-                    label="Return type"
-                    description="Tables made in the table editor will be in 'public'"
-                    layout="horizontal"
-                  >
-                    <FormControl_Shadcn_>
+                  <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+                    <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
+                      Return type
+                    </FormLabel_Shadcn_>
+                    <FormControl_Shadcn_ className="col-span-8">
                       <Listbox
                         size="small"
                         value={field.value}
@@ -235,7 +243,8 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                         ))}
                       </Listbox>
                     </FormControl_Shadcn_>
-                  </FormItemLayout>
+                    <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+                  </FormItem_Shadcn_>
                 )}
               />
             )}
@@ -250,17 +259,17 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
               control={form.control}
               name="definition"
               render={({ field }) => (
-                <FormItemLayout
-                  label={<h5 className="text-base text-foreground">Definition</h5>}
-                  description={
-                    <>
-                      <p>The language should be written in `plpgsql`.</p>
-                      {!isEditing && (
-                        <p>You can change the language in the Advanced Settings below.</p>
-                      )}
-                    </>
-                  }
-                >
+                <FormItem_Shadcn_ className="space-y-4">
+                  <div>
+                    <FormLabel_Shadcn_ className="text-base text-foreground">
+                      Definition
+                    </FormLabel_Shadcn_>
+                    <FormDescription_Shadcn_ className="text-sm text-foreground-light">
+                      <p>The language below should be written in `plpgsql`.</p>
+                      {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
+                    </FormDescription_Shadcn_>
+                  </div>
+
                   <div className="h-60 resize-y border border-default">
                     <FormControl_Shadcn_>
                       <SqlEditor
@@ -272,7 +281,9 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                       />
                     </FormControl_Shadcn_>
                   </div>
-                </FormItemLayout>
+
+                  <FormMessage_Shadcn_ />
+                </FormItem_Shadcn_>
               )}
             />
           </SidePanel.Content>
@@ -300,8 +311,11 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                         control={form.control}
                         name="behavior"
                         render={({ field }) => (
-                          <FormItemLayout label="Behavior" layout="horizontal">
-                            <FormControl_Shadcn_>
+                          <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+                            <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
+                              Behavior
+                            </FormLabel_Shadcn_>
+                            <FormControl_Shadcn_ className="col-span-8">
                               <Listbox
                                 size="small"
                                 value={field.value}
@@ -318,7 +332,8 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                                 </Listbox.Option>
                               </Listbox>
                             </FormControl_Shadcn_>
-                          </FormItemLayout>
+                            <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+                          </FormItem_Shadcn_>
                         )}
                       />
                     </div>
@@ -334,8 +349,8 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                         control={form.control}
                         name="security_definer"
                         render={({ field }) => (
-                          <FormItemLayout>
-                            <FormControl_Shadcn_>
+                          <FormItem_Shadcn_>
+                            <FormControl_Shadcn_ className="col-span-8">
                               <Radio.Group
                                 type="cards"
                                 label="Type of security"
@@ -361,7 +376,8 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                                 />
                               </Radio.Group>
                             </FormControl_Shadcn_>
-                          </FormItemLayout>
+                            <FormMessage_Shadcn_ />
+                          </FormItem_Shadcn_>
                         )}
                       />
                     </div>
@@ -422,17 +438,18 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
               <FormField_Shadcn_
                 name={`args.${index}.name`}
                 render={({ field }) => (
-                  <FormItemLayout className="flex-1">
+                  <FormItem_Shadcn_ className="flex-1">
                     <FormControl_Shadcn_>
                       <Input_Shadcn_ {...field} readOnly disabled={readonly} />
                     </FormControl_Shadcn_>
-                  </FormItemLayout>
+                    <FormMessage_Shadcn_ />
+                  </FormItem_Shadcn_>
                 )}
               />
               <FormField_Shadcn_
                 name={`args.${index}.type`}
                 render={({ field }) => (
-                  <FormItemLayout className="flex-1">
+                  <FormItem_Shadcn_ className="flex-1">
                     <FormControl_Shadcn_>
                       {readonly ? (
                         <Input_Shadcn_ value={field.value} disabled readOnly className="h-auto" />
@@ -454,7 +471,8 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                         </Listbox>
                       )}
                     </FormControl_Shadcn_>
-                  </FormItemLayout>
+                    <FormMessage_Shadcn_ />
+                  </FormItem_Shadcn_>
                 )}
               />
 
@@ -512,21 +530,23 @@ const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
               <FormField_Shadcn_
                 name={`config_params.${index}.name`}
                 render={({ field }) => (
-                  <FormItemLayout className="flex-1">
+                  <FormItem_Shadcn_ className="flex-1">
                     <FormControl_Shadcn_>
                       <Input_Shadcn_ {...field} placeholder="Name of config" />
                     </FormControl_Shadcn_>
-                  </FormItemLayout>
+                    <FormMessage_Shadcn_ />
+                  </FormItem_Shadcn_>
                 )}
               />
               <FormField_Shadcn_
                 name={`config_params.${index}.value`}
                 render={({ field }) => (
-                  <FormItemLayout className="flex-1">
+                  <FormItem_Shadcn_ className="flex-1">
                     <FormControl_Shadcn_>
                       <Input_Shadcn_ {...field} placeholder="Value of config" />
                     </FormControl_Shadcn_>
-                  </FormItemLayout>
+                    <FormMessage_Shadcn_ />
+                  </FormItem_Shadcn_>
                 )}
               />
 
@@ -572,8 +592,11 @@ const FormFieldLanguage = () => {
     <FormField_Shadcn_
       name="language"
       render={({ field }) => (
-        <FormItemLayout label="Language" layout="horizontal">
-          <FormControl_Shadcn_>
+        <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
+          <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
+            Language
+          </FormLabel_Shadcn_>
+          <FormControl_Shadcn_ className="col-span-8">
             <Listbox
               size="small"
               value={field.value}
@@ -597,7 +620,8 @@ const FormFieldLanguage = () => {
               }
             </Listbox>
           </FormControl_Shadcn_>
-        </FormItemLayout>
+          <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
+        </FormItem_Shadcn_>
       )}
     />
   )
