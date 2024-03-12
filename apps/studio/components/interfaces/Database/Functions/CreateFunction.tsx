@@ -14,9 +14,13 @@ import {
   IconPlus,
   IconTrash,
   Input_Shadcn_,
-  Listbox,
   Modal,
   Radio,
+  SelectContent_Shadcn_,
+  SelectItem_Shadcn_,
+  SelectTrigger_Shadcn_,
+  SelectValue_Shadcn_,
+  Select_Shadcn_,
   SidePanel,
   Toggle,
 } from 'ui'
@@ -218,31 +222,21 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                     <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
                       Return type
                     </FormLabel_Shadcn_>
-                    <FormControl_Shadcn_ className="col-span-8">
-                      <Listbox
-                        size="small"
-                        value={field.value}
-                        onChange={(value) => field.onChange(value)}
-                      >
-                        <Listbox.Option value="void" label="void">
-                          void
-                        </Listbox.Option>
-                        <Listbox.Option value="record" label="record">
-                          record
-                        </Listbox.Option>
-                        <Listbox.Option value="trigger" label="trigger">
-                          trigger
-                        </Listbox.Option>
-                        <Listbox.Option value="integer" label="integer">
-                          integer
-                        </Listbox.Option>
-                        {POSTGRES_DATA_TYPES.map((x: string) => (
-                          <Listbox.Option key={x} value={x} label={x}>
-                            {x}
-                          </Listbox.Option>
-                        ))}
-                      </Listbox>
-                    </FormControl_Shadcn_>
+                    {/* Form selects don't need form controls, otherwise the CSS get's weird */}
+                    <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
+                      <SelectTrigger_Shadcn_ className="col-span-8">
+                        <SelectValue_Shadcn_ />
+                      </SelectTrigger_Shadcn_>
+                      <SelectContent_Shadcn_>
+                        {['void', 'record', 'trigger', 'integer', ...POSTGRES_DATA_TYPES].map(
+                          (option) => (
+                            <SelectItem_Shadcn_ value={option} key={option}>
+                              {option}
+                            </SelectItem_Shadcn_>
+                          )
+                        )}
+                      </SelectContent_Shadcn_>
+                    </Select_Shadcn_>
                     <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
                   </FormItem_Shadcn_>
                 )}
@@ -315,23 +309,26 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                             <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
                               Behavior
                             </FormLabel_Shadcn_>
-                            <FormControl_Shadcn_ className="col-span-8">
-                              <Listbox
-                                size="small"
-                                value={field.value}
-                                onChange={(value) => field.onChange(value)}
-                              >
-                                <Listbox.Option value="IMMUTABLE" label="immutable">
+                            {/* Form selects don't need form controls, otherwise the CSS get's weird */}
+                            <Select_Shadcn_
+                              defaultValue={field.value}
+                              onValueChange={field.onChange}
+                            >
+                              <SelectTrigger_Shadcn_ className="col-span-8">
+                                <SelectValue_Shadcn_ />
+                              </SelectTrigger_Shadcn_>
+                              <SelectContent_Shadcn_>
+                                <SelectItem_Shadcn_ value="IMMUTABLE" key="IMMUTABLE">
                                   immutable
-                                </Listbox.Option>
-                                <Listbox.Option value="STABLE" label="stable">
+                                </SelectItem_Shadcn_>
+                                <SelectItem_Shadcn_ value="STABLE" key="STABLE">
                                   stable
-                                </Listbox.Option>
-                                <Listbox.Option value="VOLATILE" label="volatile">
+                                </SelectItem_Shadcn_>
+                                <SelectItem_Shadcn_ value="VOLATILE" key="VOLATILE">
                                   volatile
-                                </Listbox.Option>
-                              </Listbox>
-                            </FormControl_Shadcn_>
+                                </SelectItem_Shadcn_>
+                              </SelectContent_Shadcn_>
+                            </Select_Shadcn_>
                             <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
                           </FormItem_Shadcn_>
                         )}
@@ -440,7 +437,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                 render={({ field }) => (
                   <FormItem_Shadcn_ className="flex-1">
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} readOnly disabled={readonly} />
+                      <Input_Shadcn_ {...field} disabled={readonly} />
                     </FormControl_Shadcn_>
                     <FormMessage_Shadcn_ />
                   </FormItem_Shadcn_>
@@ -454,21 +451,24 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                       {readonly ? (
                         <Input_Shadcn_ value={field.value} disabled readOnly className="h-auto" />
                       ) : (
-                        <Listbox
-                          size="medium"
-                          disabled={readonly}
-                          value={field.value}
-                          onChange={(value) => field.onChange(value)}
-                        >
-                          <Listbox.Option value="integer" label="integer">
-                            integer
-                          </Listbox.Option>
-                          {POSTGRES_DATA_TYPES.map((x) => (
-                            <Listbox.Option key={x} value={x} label={x}>
-                              {x}
-                            </Listbox.Option>
-                          ))}
-                        </Listbox>
+                        <>
+                          <Select_Shadcn_
+                            disabled={readonly}
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <SelectTrigger_Shadcn_ className="h-[38px]">
+                              <SelectValue_Shadcn_ />
+                            </SelectTrigger_Shadcn_>
+                            <SelectContent_Shadcn_>
+                              {['integer', ...POSTGRES_DATA_TYPES].map((option) => (
+                                <SelectItem_Shadcn_ value={option} key={option}>
+                                  {option}
+                                </SelectItem_Shadcn_>
+                              ))}
+                            </SelectContent_Shadcn_>
+                          </Select_Shadcn_>
+                        </>
                       )}
                     </FormControl_Shadcn_>
                     <FormMessage_Shadcn_ />
@@ -596,30 +596,23 @@ const FormFieldLanguage = () => {
           <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
             Language
           </FormLabel_Shadcn_>
-          <FormControl_Shadcn_ className="col-span-8">
-            <Listbox
-              size="small"
-              value={field.value}
-              placeholder="Pick a language"
-              onChange={(value) => field.onChange(value)}
-            >
-              <Listbox.Option value="sql" label="sql">
-                sql
-              </Listbox.Option>
-              {
-                //map through all selected extensions that start with pl
-                enabledExtensions
-                  .filter((ex) => {
-                    return ex.name.startsWith('pl')
-                  })
-                  .map((ex) => (
-                    <Listbox.Option key={ex.name} value={ex.name} label={ex.name}>
-                      {ex.name}
-                    </Listbox.Option>
-                  ))
-              }
-            </Listbox>
-          </FormControl_Shadcn_>
+          {/* Form selects don't need form controls, otherwise the CSS get's weird */}
+          <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
+            <SelectTrigger_Shadcn_ className="col-span-8">
+              <SelectValue_Shadcn_ />
+            </SelectTrigger_Shadcn_>
+            <SelectContent_Shadcn_>
+              {enabledExtensions
+                .filter((ex) => {
+                  return ex.name.startsWith('pl')
+                })
+                .map((option) => (
+                  <SelectItem_Shadcn_ value={option.name} key={option.name}>
+                    {option.name}
+                  </SelectItem_Shadcn_>
+                ))}
+            </SelectContent_Shadcn_>
+          </Select_Shadcn_>
           <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
         </FormItem_Shadcn_>
       )}
