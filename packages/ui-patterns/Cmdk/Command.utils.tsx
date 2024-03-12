@@ -60,9 +60,16 @@ interface CommandDialogProps extends React.ComponentProps<typeof Dialog_Shadcn_>
   onKeyDown?: KeyboardEventHandler<HTMLDivElement>
   page?: number | string
   visible: boolean
+  setIsOpen: (open: boolean) => void
 }
 
-export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDialogProps) => {
+export const CommandDialog = ({
+  children,
+  onKeyDown,
+  page,
+  setIsOpen,
+  ...props
+}: CommandDialogProps) => {
   const [animateBounce, setAnimateBounce] = React.useState(false)
 
   React.useEffect(() => {
@@ -73,6 +80,13 @@ export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDi
   return (
     <Dialog_Shadcn_ {...props} open={props.visible || props.open}>
       <DialogContent_Shadcn_
+        onInteractOutside={(e) => {
+          // Only hide menu when clicking outside, not focusing outside
+          // Prevents Firefox dropdown issue that immediately closes menu after opening
+          if (e.type === 'dismissableLayer.pointerDownOutside') {
+            setIsOpen(!open)
+          }
+        }}
         hideClose
         size={'xlarge'}
         className={cn(
