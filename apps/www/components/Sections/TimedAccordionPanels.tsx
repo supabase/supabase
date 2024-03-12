@@ -145,7 +145,7 @@ const TimedAccordionPanels = ({ panels, intervalDuration = 25, updateFrequency =
   }
 
   return (
-    <div className="flex flex-col gap-8 xl:gap-32 justify-between">
+    <div className="flex flex-col gap-8 xl:gap-32 justify-between overflow-hidden">
       <div className="hidden md:flex gap-4" role="tablist">
         {panels.map((panel, index) => (
           <TimedPanel

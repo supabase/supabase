@@ -23,7 +23,7 @@ function MagnifiedProducts({ currentProduct }: { currentProduct: Products | stri
       onMouseLeave={() => mouseX.set(Infinity)}
       className="relative mx-auto w-full max-w-md grid grid-cols-3 md:flex items-center justify-center gap-y-8 md:gap-4 px-4"
     >
-      <div className="absolute w-[125%] h-24 border rounded-3xl bg-surface-100" />
+      <div className="absolute w-full h-72 md:w-[125%] md:h-24 border rounded-3xl bg-surface-100" />
       {Object.entries(products).map(([key, product], i) => (
         <Product
           mouseX={mouseX}

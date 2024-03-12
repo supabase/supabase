@@ -16,9 +16,9 @@ interface Props {
 }
 
 const ProductHeader = (props: Props) => (
-  <div className="w-full relative mx-auto py-16 pb-0 lg:py-24 border-b bg-alternative">
+  <div className="w-full max-w-full relative mx-auto py-16 pb-0 lg:py-24 border-b bg-alternative overflow-hidden">
     <SectionContainer className="!py-0 grid grid-cols-12">
-      <div className="col-span-12 gap-8 lg:col-span-5">
+      <div className="relative z-10 col-span-12 gap-8 lg:col-span-5">
         <div>
           {(props.icon || props.title) && (
             <div className="mb-4 flex items-center gap-3">
@@ -33,7 +33,7 @@ const ProductHeader = (props: Props) => (
               )}
             </div>
           )}
-          <h1 className="h1 text-3xl md:!text-4xl lg:!text-5xl 2xl:!text-6xl tracking-[-.15px]">
+          <h1 className="h1 text-3xl md:!text-4xl lg:!text-4xl 2xl:!text-6xl tracking-[-.15px]">
             {props.h1}
           </h1>
         </div>
@@ -62,11 +62,15 @@ const ProductHeader = (props: Props) => (
         </div>
       </div>
       {props.image && (
-        <div className="col-span-12 mt-8 lg:col-span-7 lg:mt-0 xl:col-span-6 xl:col-start-7">
+        <div className="relative min-h-[200px] md:min-h-[300px] col-span-12 mt-8 lg:col-span-7 lg:mt-0 xl:col-span-6 xl:col-start-7">
           {props.image}
         </div>
       )}
-      {props.footer && <div className="mt-4 md:mt-8 lg:mt-32 col-span-12">{props.footer}</div>}
+      {props.footer && (
+        <div className="relative z-10 mt-4 md:mt-8 lg:mt-20 xl:mt-32 col-span-12">
+          {props.footer}
+        </div>
+      )}
     </SectionContainer>
   </div>
 )
