@@ -6,10 +6,11 @@ import { toast } from 'react-hot-toast'
 import { Modal } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { ToastLoader } from 'components/ui/ToastLoader'
 import { useDatabasePublicationCreateMutation } from 'data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
+import type { Constraint } from 'data/database/constraints-query'
 import type { ForeignKeyConstraint } from 'data/database/foreign-key-constraints-query'
 import { entityTypeKeys } from 'data/entity-types/keys'
 import { sqlKeys } from 'data/sql/keys'
@@ -17,10 +18,11 @@ import { useTableRowCreateMutation } from 'data/table-rows/table-row-create-muta
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
 import { tableKeys } from 'data/tables/keys'
 import { getTables } from 'data/tables/tables-query'
-import { useStore, useUrlState } from 'hooks'
+import { useUrlState } from 'hooks'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { Dictionary } from 'types'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { ColumnEditor, RowEditor, SpreadsheetImport, TableEditor } from '.'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
 import ForeignRowSelector from './RowEditor/ForeignRowSelector/ForeignRowSelector'
@@ -38,7 +40,6 @@ import {
   updateTable,
 } from './SidePanelEditor.utils'
 import type { ImportContent } from './TableEditor/TableEditor.types'
-import type { Constraint } from 'data/database/constraints-query'
 
 export interface SidePanelEditorProps {
   editable?: boolean
@@ -59,7 +60,6 @@ const SidePanelEditor = ({
   const snap = useTableEditorStateSnapshot()
   const [_, setParams] = useUrlState({ arrayKeys: ['filter', 'sort'] })
 
-  const { ui } = useStore()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
 
@@ -508,12 +508,13 @@ const SidePanelEditor = ({
         selectedTable,
         selectedHeaders,
         (progress: number) => {
-          ui.setNotification({
-            id: toastId,
-            progress,
-            category: 'loading',
-            message: `Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`,
-          })
+          toast.loading(
+            <ToastLoader
+              progress={progress}
+              message={`Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`}
+            />,
+            { id: toastId }
+          )
         }
       )
       if (res.error) {
@@ -529,14 +530,15 @@ const SidePanelEditor = ({
         importContent.rows,
         selectedHeaders,
         (progress: number) => {
-          ui.setNotification({
-            id: toastId,
-            progress,
-            category: 'loading',
-            message: `Adding ${importContent.rows.length.toLocaleString()} rows to ${
-              selectedTable.name
-            }`,
-          })
+          toast.loading(
+            <ToastLoader
+              progress={progress}
+              message={`Adding ${importContent.rows.length.toLocaleString()} rows to ${
+                selectedTable.name
+              }`}
+            />,
+            { id: toastId }
+          )
         }
       )
       if (res.error) {

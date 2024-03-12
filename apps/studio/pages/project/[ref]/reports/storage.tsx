@@ -1,30 +1,28 @@
-import { observer } from 'mobx-react-lite'
-import type { NextPageWithLayout } from 'types'
-import { ReportsLayout } from 'components/layouts'
+import { useParams } from 'common'
+import ReportHeader from 'components/interfaces/Reports/ReportHeader'
+import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import {
   PRESET_CONFIG,
   REPORTS_DATEPICKER_HELPERS,
 } from 'components/interfaces/Reports/Reports.constants'
-import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import {
   CacheHitRateChartRenderer,
   TopCacheMissesRenderer,
 } from 'components/interfaces/Reports/renderers/StorageRenderers'
-import { useEffect, useMemo } from 'react'
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import { DatePickerToFrom, LogsEndpointParams } from 'components/interfaces/Settings/Logs'
-import { useParams } from 'common'
-import ShimmerLine from 'components/ui/ShimmerLine'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import DatePickers from 'components/interfaces/Settings/Logs/Logs.DatePickers'
+import { ReportsLayout } from 'components/layouts'
+import ShimmerLine from 'components/ui/ShimmerLine'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks'
+import { useEffect, useMemo } from 'react'
+import type { NextPageWithLayout } from 'types'
 
 export const StorageReport: NextPageWithLayout = () => {
-  const { ref: projectRef } = useParams()
-  const organization = useSelectedOrganization()
   const report = useStorageReport()
+  const organization = useSelectedOrganization()
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const plan = subscription?.plan
@@ -123,4 +121,4 @@ const useStorageReport = () => {
 
 StorageReport.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
 
-export default observer(StorageReport)
+export default StorageReport

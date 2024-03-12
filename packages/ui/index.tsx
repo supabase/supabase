@@ -89,7 +89,7 @@ export * from './src/components/shadcn/ui/context-menu'
 
 export {
   Command as Command_Shadcn_,
-  CommandDialog as CommandDialog_Shadcn_,
+  CommandDialog as CommandDialog,
   CommandInput as CommandInput_Shadcn_,
   CommandList as CommandList_Shadcn_,
   CommandEmpty as CommandEmpty_Shadcn_,
@@ -99,20 +99,7 @@ export {
   CommandSeparator as CommandSeparator_Shadcn_,
 } from './src/components/shadcn/ui/command'
 
-export {
-  Dialog as Dialog_Shadcn_,
-  DialogTrigger as DialogTrigger_Shadcn_,
-  DialogContent as DialogContent_Shadcn_,
-  DialogHeader as DialogHeader_Shadcn_,
-  DialogFooter as DialogFooter_Shadcn_,
-  DialogClose as DialogClose_Shadcn_,
-  DialogTitle as DialogTitle_Shadcn_,
-  DialogDescription as DialogDescription_Shadcn_,
-  DialogSection as DialogSection_Shadcn_,
-  DialogSectionSeparator as DialogSectionSeparator_Shadcn_,
-  DIALOG_PADDING_X as DIALOG_PADDING_X_Shadcn_,
-  DIALOG_PADDING_Y as DIALOG_PADDING_Y_Shadcn_,
-} from './src/components/shadcn/ui/dialog'
+export * from './src/components/shadcn/ui/dialog'
 
 export {
   Alert as Alert_Shadcn_,

@@ -3,7 +3,7 @@ import { object, string } from 'yup'
 
 const JSON_SCHEMA_VERSION = 'http://json-schema.org/draft-07/schema#'
 
-export const CONFIRMATION: FormSchema = {
+const CONFIRMATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'CONFIRMATION',
   type: 'object',
@@ -37,7 +37,7 @@ export const CONFIRMATION: FormSchema = {
   },
 }
 
-export const INVITE: FormSchema = {
+const INVITE: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'INVITE',
   type: 'object',
@@ -71,7 +71,7 @@ export const INVITE: FormSchema = {
   },
 }
 
-export const MAGIC_LINK: FormSchema = {
+const MAGIC_LINK: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'MAGIC_LINK',
   type: 'object',
@@ -105,7 +105,7 @@ export const MAGIC_LINK: FormSchema = {
   },
 }
 
-export const EMAIL_CHANGE: FormSchema = {
+const EMAIL_CHANGE: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'EMAIL_CHANGE',
   type: 'object',
@@ -140,7 +140,7 @@ export const EMAIL_CHANGE: FormSchema = {
   },
 }
 
-export const RECOVERY: FormSchema = {
+const RECOVERY: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'RECOVERY',
   type: 'object',

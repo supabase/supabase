@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 import toast from 'react-hot-toast'
@@ -125,4 +124,4 @@ const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
   return <>{children}</>
 }
 
-export default observer(RouteValidationWrapper)
+export default RouteValidationWrapper
