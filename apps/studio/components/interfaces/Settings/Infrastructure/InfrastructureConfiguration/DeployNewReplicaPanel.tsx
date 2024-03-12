@@ -19,6 +19,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { AWS_REGIONS, AWS_REGIONS_DEFAULT, AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
 import { AVAILABLE_REPLICA_REGIONS, AWS_REGIONS_VALUES } from './InstanceConfiguration.constants'
+import { useBackupsQuery } from 'data/database/backups-query'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
 
@@ -40,6 +41,7 @@ const DeployNewReplicaPanel = ({
   const org = useSelectedOrganization()
 
   const { data } = useReadReplicasQuery({ projectRef })
+  const { data: backups } = useBackupsQuery({ projectRef })
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
 
@@ -58,17 +60,17 @@ const DeployNewReplicaPanel = ({
 
   const reachedMaxReplicas = (data ?? []).filter((db) => db.identifier !== projectRef).length >= 2
   const isFreePlan = subscription?.plan.id === 'free'
+  const isWalgEnabled = backups?.walg_enabled
   const currentComputeAddon = addons?.selected_addons.find(
     (addon) => addon.type === 'compute_instance'
   )
-  const currentPitrAddon = addons?.selected_addons.find((addon) => addon.type === 'pitr')
   const canDeployReplica =
     !reachedMaxReplicas &&
     currentPgVersion >= 15 &&
     project?.cloud_provider === 'AWS' &&
     !isFreePlan &&
-    currentComputeAddon !== undefined &&
-    currentPitrAddon !== undefined
+    isWalgEnabled &&
+    currentComputeAddon !== undefined
 
   const computeAddons =
     addons?.available_addons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
@@ -122,7 +124,7 @@ const DeployNewReplicaPanel = ({
       header="Deploy a new read replica"
     >
       <SidePanel.Content className="flex flex-col py-4 gap-y-8">
-        {currentPitrAddon === undefined && (
+        {!isWalgEnabled && (
           <Alert_Shadcn_>
             <WarningIcon />
             <AlertTitle_Shadcn_>
