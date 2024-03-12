@@ -40,10 +40,9 @@ const ConnectTabContentNew = ({ projectKeys, filePath }: ConnectContentTabProps)
           usePoolerConnection: false,
         })
       : { uri: '' }
-  const connectionStringPooler =
-    filePath !== 'drizzle'
-      ? connectionStringsPooler.uri.replace('6543', '5432')
-      : connectionStringsPooler.uri
+  const connectionStringPooler = !['drizzle', 'prisma'].includes(filePath)
+    ? connectionStringsPooler.uri.replace('6543', '5432')
+    : connectionStringsPooler.uri
   const connectionStringDirect =
     filePath !== 'drizzle'
       ? connectionStringsDirect.uri.replace('6543', '5432')
