@@ -123,6 +123,7 @@ function Select({
         <select
           id={id}
           name={name}
+          data-size={size}
           defaultValue={defaultValue}
           autoComplete={autoComplete}
           autoFocus={autofocus}
@@ -138,7 +139,7 @@ function Select({
         >
           {children}
         </select>
-        {icon && <InputIconContainer icon={icon} />}
+        {icon && <InputIconContainer size={size} icon={icon} />}
         {error && (
           <div className={__styles.actions_container}>
             {error && <InputErrorIcon size={size} />}

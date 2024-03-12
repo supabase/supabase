@@ -146,6 +146,7 @@ function InputNumber({
       >
         <div className={__styles.container}>
           <input
+            data-size={size}
             id={id}
             name={name}
             onChange={onInputChange}
@@ -172,7 +173,7 @@ function InputNumber({
               }}
             />
           </div> */}
-          {icon && <InputIconContainer icon={icon} />}
+          {icon && <InputIconContainer size={size} icon={icon} />}
           {error || actions ? (
             <div className={__styles.actions_container}>
               {error && <InputErrorIcon size={size} />}

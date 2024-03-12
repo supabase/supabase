@@ -3,15 +3,14 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common/hooks'
+import { CreateReportModal } from 'components/interfaces/Reports/Reports.CreateReportModal'
 import { ReportsLayout } from 'components/layouts'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import { createReport } from 'components/to-be-cleaned/Reports/Reports.utils'
 import { Loading } from 'components/ui/Loading'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { useProfile } from 'lib/profile'
 import { useProjectContentStore } from 'stores/projectContentStore'
 import type { NextPageWithLayout } from 'types'
-import { CreateReportModal } from 'components/interfaces/Reports/Reports.CreateReportModal'
 
 export const UserReportPage: NextPageWithLayout = () => {
   const [loading, setLoading] = useState(true)
@@ -20,7 +19,6 @@ export const UserReportPage: NextPageWithLayout = () => {
   const { ref } = useParams()
 
   const { profile } = useProfile()
-  const { ui } = useStore()
   const [showCreateReportModal, setShowCreateReportModal] = useState(false)
 
   const contentStore = useProjectContentStore(ref)

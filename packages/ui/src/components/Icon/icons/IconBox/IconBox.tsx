@@ -9,5 +9,12 @@
     return <IconBase icon={Box} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { box } from 'lucide-react'
+  */
   export default IconBox
   

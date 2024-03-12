@@ -1,11 +1,8 @@
-import { fireEvent, getByText, screen } from '@testing-library/react'
+import { fireEvent, getByText, screen, render as originalRender } from '@testing-library/react'
 import React, { useState } from 'react'
-
 import { TooltipProvider } from '@radix-ui/react-tooltip'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { render as originalRender } from '@testing-library/react'
-import { StoreProvider } from 'hooks'
-import UiStore from 'stores/UiStore'
+
 interface SelectorOptions {
   container?: HTMLElement
 }
@@ -48,8 +45,6 @@ export const clickDropdown = (elem: HTMLElement) => {
  * https://testing-library.com/docs/react-testing-library/setup/#custom-render
  */
 const ReactQueryTestConfig: React.FC<React.PropsWithChildren> = ({ children }) => {
-  const [rootStore] = useState(() => ({ ui: new UiStore() }))
-
   const [queryClient] = useState(
     () =>
       new QueryClient({
@@ -68,11 +63,9 @@ const ReactQueryTestConfig: React.FC<React.PropsWithChildren> = ({ children }) =
   )
 
   return (
-    <StoreProvider rootStore={rootStore}>
-      <TooltipProvider>
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      </TooltipProvider>
-    </StoreProvider>
+    <TooltipProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </TooltipProvider>
   )
 }
 type renderParams = Parameters<typeof originalRender>

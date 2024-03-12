@@ -1,10 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams, useTelemetryProps } from 'common'
 import { partition } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
 
+import { useParams, useTelemetryProps } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useCheckPermissions, useSelectedProject } from 'hooks'
@@ -15,7 +14,7 @@ import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
 
-const SQLQuickstarts = observer(() => {
+const SQLQuickstarts = () => {
   const { ref } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
@@ -90,6 +89,6 @@ const SQLQuickstarts = observer(() => {
       </div>
     </div>
   )
-})
+}
 
 export default SQLQuickstarts
