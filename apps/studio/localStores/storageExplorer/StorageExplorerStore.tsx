@@ -1,5 +1,4 @@
 // @ts-nocheck
-
 import { createClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { chunk, compact, find, findIndex, has, isEqual, some, uniq, uniqBy } from 'lodash'
@@ -13,7 +12,7 @@ import {
   STORAGE_SORT_BY,
   STORAGE_VIEWS,
 } from 'components/to-be-cleaned/Storage/Storage.constants'
-import { useStore } from 'hooks'
+import { ToastLoader } from 'components/ui/ToastLoader'
 import { delete_, post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
@@ -59,9 +58,6 @@ class StorageExplorerStore {
     sortBy: { column: this.sortBy, order: this.sortByOrder },
   }
 
-  /* UI store */
-  ui = null
-
   /* Supabase client */
   supabaseClient = null
   /* [Joshen] Move towards using API */
@@ -79,8 +75,6 @@ class StorageExplorerStore {
   constructor(projectRef) {
     makeAutoObservable(this, { supabaseClient: false })
     this.projectRef = projectRef
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    this.ui = useStore().ui
 
     // ignore when in a non-browser environment
     if (typeof window !== 'undefined') {
@@ -509,14 +503,15 @@ class StorageExplorerStore {
       .map((folder) => folder.name)
       .join('/')
 
-    const toastId = this.ui.setNotification({
-      category: 'loading',
-      message: `Uploading ${formattedFilesToUpload.length} file${
-        formattedFilesToUpload.length > 1 ? 's' : ''
-      }...`,
-      description: STORAGE_PROGRESS_INFO_TEXT,
-      progress: 0,
-    })
+    const toastId = toast.loading(
+      <ToastLoader
+        progress={0}
+        message={`Uploading ${formattedFilesToUpload.length} file${
+          formattedFilesToUpload.length > 1 ? 's' : ''
+        }...`}
+        description={STORAGE_PROGRESS_INFO_TEXT}
+      />
+    )
 
     // Upload files in batches
     const promises = formattedFilesToUpload.map((file) => {
@@ -582,15 +577,16 @@ class StorageExplorerStore {
       await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         await previousPromise
         await Promise.allSettled(nextBatch.map((batch) => batch()))
-        this.ui.setNotification({
-          id: toastId,
-          category: 'loading',
-          message: `Uploading ${formattedFilesToUpload.length} file${
-            formattedFilesToUpload.length > 1 ? 's' : ''
-          }...`,
-          description: STORAGE_PROGRESS_INFO_TEXT,
-          progress: this.uploadProgress * 100,
-        })
+        toast.loading(
+          <ToastLoader
+            progress={this.uploadProgress * 100}
+            message={`Uploading ${formattedFilesToUpload.length} file${
+              formattedFilesToUpload.length > 1 ? 's' : ''
+            }...`}
+            description={STORAGE_PROGRESS_INFO_TEXT}
+          />,
+          { id: toastId }
+        )
       }, Promise.resolve())
 
       if (numberOfFilesUploadedSuccess > 0) {
@@ -738,12 +734,13 @@ class StorageExplorerStore {
 
     this.clearSelectedItems()
 
-    const toastId = this.ui.setNotification({
-      category: 'loading',
-      message: `Deleting ${prefixes.length} file(s)...`,
-      description: STORAGE_PROGRESS_INFO_TEXT,
-      progress: 0,
-    })
+    const toastId = toast.loading(
+      <ToastLoader
+        progress={0}
+        message={`Deleting ${prefixes.length} file(s)...`}
+        description={STORAGE_PROGRESS_INFO_TEXT}
+      />
+    )
 
     // batch BATCH_SIZE prefixes per request
     const batches = chunk(prefixes, BATCH_SIZE).map((batch) => () => {
@@ -757,13 +754,14 @@ class StorageExplorerStore {
     await chunk(batches, BATCH_SIZE).reduce(async (previousPromise, nextBatch) => {
       await previousPromise
       await Promise.all(nextBatch.map((batch) => batch()))
-      this.ui.setNotification({
-        id: toastId,
-        category: 'loading',
-        message: `Deleting ${prefixes.length} file(s)...`,
-        description: STORAGE_PROGRESS_INFO_TEXT,
-        progress: progress * 100,
-      })
+      toast.loading(
+        <ToastLoader
+          progress={progress * 100}
+          message={`Deleting ${prefixes.length} file(s)...`}
+          description={STORAGE_PROGRESS_INFO_TEXT}
+        />,
+        { id: toastId }
+      )
     }, Promise.resolve())
 
     // Clear file preview cache if deleted files exist in cache
@@ -798,13 +796,14 @@ class StorageExplorerStore {
 
     const files = await this.getAllItemsAlongFolder(folder)
 
-    this.ui.setNotification({
-      id: toastId,
-      category: 'loading',
-      message: `Downloading ${files.length} files...`,
-      description: STORAGE_PROGRESS_INFO_TEXT,
-      progress: 0,
-    })
+    toast.loading(
+      <ToastLoader
+        progress={0}
+        message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
+        desription={STORAGE_PROGRESS_INFO_TEXT}
+      />,
+      { id: toastId }
+    )
 
     const promises = files.map((file) => {
       const fileMimeType = file.metadata?.mimetype ?? null
@@ -835,13 +834,14 @@ class StorageExplorerStore {
     const downloadedFiles = await batchedPromises.reduce(async (previousPromise, nextBatch) => {
       const previousResults = await previousPromise
       const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
-      this.ui.setNotification({
-        id: toastId,
-        category: 'loading',
-        message: `Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`,
-        description: STORAGE_PROGRESS_INFO_TEXT,
-        progress: progress * 100,
-      })
+      toast.loading(
+        <ToastLoader
+          progress={progress * 100}
+          message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
+          desription={STORAGE_PROGRESS_INFO_TEXT}
+        />,
+        { id: toastId }
+      )
       return (previousResults ?? []).concat(batchResults.map((x) => x.value).filter(Boolean))
     }, Promise.resolve())
 
@@ -890,7 +890,9 @@ class StorageExplorerStore {
     let progress = 0
     const returnBlob = true
     const showIndividualToast = false
-    const toastId = toast.loading(`Downloading ${files.length} files...`)
+    const toastId = toast.loading(
+      `Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`
+    )
 
     const promises = formattedFilesWithPrefix.map((file) => {
       return () => {
@@ -906,13 +908,14 @@ class StorageExplorerStore {
     const downloadedFiles = await batchedPromises.reduce(async (previousPromise, nextBatch) => {
       const previousResults = await previousPromise
       const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
-      this.ui.setNotification({
-        id: toastId,
-        category: 'loading',
-        message: `Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`,
-        description: STORAGE_PROGRESS_INFO_TEXT,
-        progress: progress * 100,
-      })
+      toast.loading(
+        <ToastLoader
+          progress={progress * 100}
+          message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
+          description={STORAGE_PROGRESS_INFO_TEXT}
+        />,
+        { id: toastId }
+      )
       return (previousResults ?? []).concat(batchResults.map((x) => x.value).filter(Boolean))
     }, Promise.resolve())
 
@@ -1208,12 +1211,13 @@ class StorageExplorerStore {
       return this.updateRowStatus(originalName, STORAGE_ROW_STATUS.READY, columnIndex)
     }
 
-    const toastId = this.ui.setNotification({
-      category: 'loading',
-      message: `Renaming folder to ${newName}`,
-      description: STORAGE_PROGRESS_INFO_TEXT,
-      progress: 0,
-    })
+    const toastId = toast.loading(
+      <ToastLoader
+        progress={0}
+        message={`Renaming folder to ${newName}`}
+        description={STORAGE_PROGRESS_INFO_TEXT}
+      />
+    )
 
     /**
      * Catch any folder names that contain slash or backslash
@@ -1268,13 +1272,14 @@ class StorageExplorerStore {
       await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         await previousPromise
         await Promise.all(nextBatch.map((batch) => batch()))
-        this.ui.setNotification({
-          id: toastId,
-          category: 'loading',
-          message: `Renaming folder to ${newName}`,
-          description: STORAGE_PROGRESS_INFO_TEXT,
-          progress: progress * 100,
-        })
+        toast.loader(
+          <ToastLoader
+            progress={progress * 100}
+            message={`Renaming folder to ${newName}`}
+            description={STORAGE_PROGRESS_INFO_TEXT}
+          />,
+          { id: toastId }
+        )
       }, Promise.resolve())
 
       if (!hasErrors) {

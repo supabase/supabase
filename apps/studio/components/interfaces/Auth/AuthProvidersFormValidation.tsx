@@ -1331,7 +1331,7 @@ const EXTERNAL_PROVIDER_ZOOM = {
   },
 }
 
-export const PROVIDER_SAML = {
+const PROVIDER_SAML = {
   $schema: JSON_SCHEMA_VERSION,
   type: 'object',
   title: 'SAML 2.0',
