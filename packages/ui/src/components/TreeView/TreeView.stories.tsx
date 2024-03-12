@@ -3,41 +3,94 @@ import { StoryObj } from '@storybook/react'
 import React from 'react'
 import { flattenTree } from 'react-accessible-treeview'
 import { TreeView, TreeViewItem } from './TreeView'
+import { SingleItem } from './TreeViewItem.stories'
 
 // More on how to set up stories at: https://storybook.js.org/docs/writing-stories#default-export
 export default {
   title: 'Primitives/TreeView',
   component: TreeView,
+  subcomponents: { TreeViewItem },
   parameters: {
     // Optional parameter to center the component in the Canvas. More info: https://storybook.js.org/docs/configure/story-layout
     layout: 'centered',
   },
+  decorators: [
+    (Story: any) => {
+      return (
+        <div className="bg-studio border-l border-r">
+          <Story />
+        </div>
+      )
+    },
+  ],
   // This component will have an automatically generated Autodocs entry: https://storybook.js.org/docs/writing-docs/autodocs
   tags: ['autodocs'],
   // More on argTypes: https://storybook.js.org/docs/api/argtypes
-  argTypes: {},
+  argTypes: {
+    data: {},
+  },
 }
 
-// export default meta
+type Story = StoryObj<
+  // Omit data so raw data can be passed to the story
+  Omit<typeof TreeView, 'data'> & { data: any; className?: string }
+>
 
-// More on writing stories with args: https://storybook.js.org/docs/writing-stories/args
-// export const Primary = {
-//   args: {
-//     size: 'small',
-//     // visible: true,
-//   },
-// }
-
-type Story = StoryObj<typeof TreeView>
-
-export const Primary: Story = {
-  args: {},
+export const DefaultFlatTree: Story = {
+  args: {
+    className: 'w-[420px] h-[520px]',
+    data: {
+      name: '',
+      children: [
+        {
+          name: 'Current batch',
+        },
+        {
+          name: 'Older queries',
+        },
+        {
+          name: 'query all users',
+        },
+        {
+          name: 'users in last day',
+        },
+        {
+          name: 'new users over time',
+        },
+      ],
+    },
+  },
   /**
    * 👇 To avoid linting issues, it is recommended to use a function with a capitalized name.
    * If you are not concerned with linting, you may use an arrow function.
    */
   render: function Render(args) {
-    const folder = {
+    return (
+      <TreeView
+        {...args}
+        data={flattenTree(args.data)}
+        aria-label="directory tree"
+        nodeRenderer={({ element, isBranch, isExpanded, getNodeProps, level, isSelected }) => (
+          <TreeViewItem
+            isExpanded={isExpanded}
+            isBranch={isBranch}
+            isSelected={isSelected}
+            level={level}
+            xPadding={16}
+            {...getNodeProps()}
+          >
+            {element.name}
+          </TreeViewItem>
+        )}
+      />
+    )
+  },
+}
+
+export const WithDirectories: Story = {
+  args: {
+    className: 'w-[420px] h-[520px]',
+    data: {
       name: '',
       children: [
         {
@@ -71,32 +124,31 @@ export const Primary: Story = {
           name: 'new users over time',
         },
       ],
-    }
-
-    const data = flattenTree(folder)
-
+    },
+  },
+  /**
+   * 👇 To avoid linting issues, it is recommended to use a function with a capitalized name.
+   * If you are not concerned with linting, you may use an arrow function.
+   */
+  render: function Render(args) {
     return (
-      <div className="bg-studio border-l border-r">
-        <div className="directory">
-          <TreeView
-            className="w-[420px] h-[520px]"
-            data={data}
-            aria-label="directory tree"
-            nodeRenderer={({ element, isBranch, isExpanded, getNodeProps, level, isSelected }) => (
-              <TreeViewItem
-                isExpanded={isExpanded}
-                isBranch={isBranch}
-                isSelected={isSelected}
-                level={level}
-                xPadding={16}
-                {...getNodeProps()}
-              >
-                {element.name}
-              </TreeViewItem>
-            )}
-          />
-        </div>
-      </div>
+      <TreeView
+        {...args}
+        data={flattenTree(args.data)}
+        aria-label="directory tree"
+        nodeRenderer={({ element, isBranch, isExpanded, getNodeProps, level, isSelected }) => (
+          <TreeViewItem
+            isExpanded={isExpanded}
+            isBranch={isBranch}
+            isSelected={isSelected}
+            level={level}
+            xPadding={16}
+            {...getNodeProps()}
+          >
+            {element.name}
+          </TreeViewItem>
+        )}
+      />
     )
   },
 }

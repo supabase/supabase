@@ -8,97 +8,118 @@ const TreeView = TreeViewPrimitive
 const TreeViewItem = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<'div'> & {
+    /** The level of the item in the tree */
     level: number
+    /** Specifies if the item is expanded */
     isExpanded?: boolean
+    /** Specifies if the item is a branch */
     isBranch?: boolean
+    /** The padding for each level of the item */
     levelPadding?: number
+    /** Specifies if the item is selected */
     isSelected?: boolean
+    /** The horizontal padding of the item */
     xPadding: number
   }
->(({ level, isExpanded, isBranch, levelPadding = 56, isSelected, xPadding, ...props }, ref) => {
-  return (
-    <div
-      aria-selected={isSelected}
-      aria-expanded={isExpanded}
-      ref={ref}
-      {...props}
-      className={cn(
-        'relative',
-        'transition-colors',
-        'flex items-center gap-3',
-        'text-sm',
-        'cursor-pointer',
-        'select-none',
-        'text-foreground-light',
-        'aria-selected:text-foreground',
-        'aria-expanded:bg-control',
-        'aria-selected:!bg-selection',
-        'group',
-        'h-[28px]',
-        'hover:bg-control'
-      )}
-      style={{
-        paddingLeft:
-          level === 1 && !isBranch
-            ? xPadding + levelPadding / 2 - 2
-            : level
-              ? levelPadding * (level - 1) + xPadding + (!isBranch ? 0 : 0)
-              : levelPadding,
-        ...props.style,
-      }}
-      data-treeview-is-branch={isBranch}
-      data-treeview-level={level}
-    >
-      {level && level > 1 && (
-        <div
-          style={{
-            left: (levelPadding / 2 + 4) * (level - 1) + xPadding,
-          }}
-          className={'absolute h-full w-px group-data-[treeview-is-branch=false]:bg-border-strong'}
-        ></div>
-      )}
-      <div className="absolute left-0 h-full w-px group-aria-selected:bg-foreground"></div>
-      {isBranch ? (
-        <>
-          <ChevronRight
-            className={cn(
-              'text-foreground-muted',
-              'group-aria-selected:text-foreground-light',
-              'group-aria-expanded:text-foreground-light',
-              'transition-transform duration-200',
-              'group-aria-expanded:rotate-90'
-            )}
-            size={14}
-          />
-          <TreeViewFolderIcon
+>(
+  (
+    {
+      level = 1,
+      isExpanded = false,
+      isBranch = false,
+      levelPadding = 56,
+      isSelected = false,
+      xPadding = 16,
+      ...props
+    },
+    ref
+  ) => {
+    return (
+      <div
+        aria-selected={isSelected}
+        aria-expanded={isExpanded}
+        ref={ref}
+        {...props}
+        className={cn(
+          'relative',
+          'transition-colors',
+          'flex items-center gap-3',
+          'text-sm',
+          'cursor-pointer',
+          'select-none',
+          'text-foreground-light',
+          'aria-selected:text-foreground',
+          'aria-expanded:bg-control',
+          'aria-selected:!bg-selection',
+          'group',
+          'h-[28px]',
+          'hover:bg-control'
+        )}
+        style={{
+          paddingLeft:
+            level === 1 && !isBranch
+              ? xPadding + levelPadding / 2 - 2
+              : level
+                ? levelPadding * (level - 1) + xPadding + (!isBranch ? 0 : 0)
+                : levelPadding,
+          ...props.style,
+        }}
+        data-treeview-is-branch={isBranch}
+        data-treeview-level={level}
+      >
+        {level && level > 1 && (
+          <div
+            style={{
+              left: (levelPadding / 2 + 4) * (level - 1) + xPadding,
+            }}
+            className={
+              'absolute h-full w-px group-data-[treeview-is-branch=false]:bg-border-strong'
+            }
+          ></div>
+        )}
+        <div className="absolute left-0 h-full w-0.5 group-aria-selected:bg-foreground"></div>
+        {isBranch ? (
+          <>
+            <ChevronRight
+              className={cn(
+                'text-foreground-muted',
+                'group-aria-selected:text-foreground-light',
+                'group-aria-expanded:text-foreground-light',
+                'transition-transform duration-200',
+                'group-aria-expanded:rotate-90'
+              )}
+              size={14}
+            />
+            <TreeViewFolderIcon
+              className={cn(
+                'transition-colors',
+                ' text-foreground-muted',
+                'group-aria-selected:text-foreground-light',
+                'group-aria-expanded:text-foreground-light'
+              )}
+              isOpen={isExpanded}
+              size={16}
+              strokeWidth={1.5}
+            />
+          </>
+        ) : (
+          <SQL_ICON
             className={cn(
               'transition-colors',
-              ' text-foreground-muted',
-              'group-aria-selected:text-foreground-light',
-              'group-aria-expanded:text-foreground-light'
+              'fill-foreground-muted',
+              'group-aria-selected:fill-foreground',
+              'w-5 h-5',
+              '-ml-0.5'
             )}
-            isOpen={isExpanded}
             size={16}
             strokeWidth={1.5}
           />
-        </>
-      ) : (
-        <SQL_ICON
-          className={cn(
-            'transition-colors',
-            'fill-foreground-muted',
-            'group-aria-selected:fill-foreground',
-            'w-5 h-5',
-            '-ml-0.5'
-          )}
-          size={16}
-          strokeWidth={1.5}
-        />
-      )}
-      {props.children}
-    </div>
-  )
-})
+        )}
+        {props.children}
+      </div>
+    )
+  }
+)
 
 const SQL_ICON = forwardRef<SVGSVGElement, LucideSVGProps>((props, ref) => (
   <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>
