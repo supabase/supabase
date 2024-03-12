@@ -69,11 +69,6 @@ article h1 {
   }
 }
 
-.table-of-contents-height {
-  max-height: calc(100vh - 3.75rem - 2rem);
-  top: calc(4rem + 60px); // padding height + navbar height
-}
-
 .width-full {
   width: 100% !important;
 }
