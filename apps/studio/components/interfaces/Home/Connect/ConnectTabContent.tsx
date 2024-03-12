@@ -11,8 +11,14 @@ import type { projectKeys } from './Connect.types'
 interface ConnectContentTabProps {
   projectKeys: projectKeys
   filePath: string
-  connectionStringPooler?: string
-  connectionStringDirect?: string
+  connectionStringPooler?: {
+    transaction: string
+    session: string
+  }
+  connectionStringDirect?: {
+    transaction: string
+    session: string
+  }
 }
 
 const ConnectTabContentNew = ({ projectKeys, filePath }: ConnectContentTabProps) => {
@@ -40,13 +46,11 @@ const ConnectTabContentNew = ({ projectKeys, filePath }: ConnectContentTabProps)
           usePoolerConnection: false,
         })
       : { uri: '' }
-  const connectionStringPooler = !['drizzle', 'prisma'].includes(filePath)
-    ? connectionStringsPooler.uri.replace('6543', '5432')
-    : connectionStringsPooler.uri
-  const connectionStringDirect =
-    filePath !== 'drizzle'
-      ? connectionStringsDirect.uri.replace('6543', '5432')
-      : connectionStringsDirect.uri
+  const connectionStringPoolerTransaction = connectionStringsPooler.uri
+  const connectionStringPoolerSession = connectionStringsPooler.uri.replace('6543', '5432')
+
+  const connectionStringDirectTransaction = connectionStringsDirect.uri
+  const connectionStringDirectSession = connectionStringsDirect.uri.replace('6543', '5432')
 
   const ContentFile = dynamic<ConnectContentTabProps>(
     () => import(`./content/${filePath}/content`),
@@ -64,8 +68,14 @@ const ConnectTabContentNew = ({ projectKeys, filePath }: ConnectContentTabProps)
       <ContentFile
         projectKeys={projectKeys}
         filePath={filePath}
-        connectionStringPooler={connectionStringPooler}
-        connectionStringDirect={connectionStringDirect}
+        connectionStringPooler={{
+          transaction: connectionStringPoolerTransaction,
+          session: connectionStringPoolerSession,
+        }}
+        connectionStringDirect={{
+          transaction: connectionStringDirectTransaction,
+          session: connectionStringDirectSession,
+        }}
       />
     </div>
   )

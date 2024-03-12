@@ -8,6 +8,12 @@ export interface ContentFileProps {
     apiUrl: string
     anonKey: string
   }
-  connectionStringPooler: string
-  connectionStringDirect: string
+  connectionStringPooler: {
+    transaction: string
+    session: string
+  }
+  connectionStringDirect: {
+    transaction: string
+    session: string
+  }
 }

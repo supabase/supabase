@@ -20,10 +20,10 @@ const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 # Connect to Supabase via connection pooling with Supavisor.
-DATABASE_URL="${connectionStringPooler}"
+DATABASE_URL="${connectionStringPooler.transaction}"
 
 # Direct connection to the database. Used for migrations.
-DIRECT_URL="${connectionStringPooler.replace('6543', '5432')}"
+DIRECT_URL="${connectionStringPooler.session}"
         `}
         </SimpleCodeBlock>
       </ConnectTabContent>
