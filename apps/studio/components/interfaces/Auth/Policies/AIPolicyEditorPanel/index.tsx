@@ -162,6 +162,9 @@ export const AIPolicyEditorPanel = memo(function ({
         sql: policy,
         projectRef: selectedProject?.ref,
         connectionString: selectedProject?.connectionString,
+        handleError: (error) => {
+          throw error
+        },
       })
     }
   }, [executeMutation, selectedProject?.connectionString, selectedProject?.ref])
