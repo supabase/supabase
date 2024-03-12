@@ -6,7 +6,7 @@ import { cn } from 'ui/src/lib/utils'
 
 import { AlertTriangle } from 'lucide-react'
 import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
-import { DialogContent_Shadcn_, Dialog_Shadcn_ } from 'ui'
+import { DialogContent, Dialog } from 'ui'
 import { Button } from 'ui/src/components/Button'
 import { LoadingLine } from 'ui/src/components/LoadingLine/LoadingLine'
 import { useCommandMenu } from './CommandMenuProvider'
@@ -56,7 +56,7 @@ export function CommandError({ resetErrorBoundary }: { resetErrorBoundary: () =>
   )
 }
 
-interface CommandDialogProps extends React.ComponentProps<typeof Dialog_Shadcn_> {
+interface CommandDialogProps extends React.ComponentProps<typeof Dialog> {
   onKeyDown?: KeyboardEventHandler<HTMLDivElement>
   page?: number | string
   visible: boolean
@@ -78,8 +78,8 @@ export const CommandDialog = ({
   }, [page])
 
   return (
-    <Dialog_Shadcn_ {...props} open={props.visible || props.open}>
-      <DialogContent_Shadcn_
+    <Dialog {...props} open={props.visible || props.open}>
+      <DialogContent
         onInteractOutside={(e) => {
           // Only hide menu when clicking outside, not focusing outside
           // Prevents Firefox dropdown issue that immediately closes menu after opening
@@ -112,8 +112,8 @@ export const CommandDialog = ({
             {children}
           </Command>
         </ErrorBoundary>
-      </DialogContent_Shadcn_>
-    </Dialog_Shadcn_>
+      </DialogContent>
+    </Dialog>
   )
 }
 
