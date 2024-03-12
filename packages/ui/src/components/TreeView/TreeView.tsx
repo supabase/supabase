@@ -1,16 +1,6 @@
-import {
-  ChevronRight,
-  Code,
-  Database,
-  File,
-  FileCode,
-  Folder,
-  FolderClosed,
-  FolderOpen,
-} from 'lucide-react'
-import { ComponentPropsWithoutRef, SVGProps, forwardRef } from 'react'
+import { ChevronRight, FolderClosed, FolderOpen } from 'lucide-react'
+import { ComponentPropsWithoutRef, forwardRef } from 'react'
 import TreeViewPrimitive from 'react-accessible-treeview'
-import { flattenTree } from 'react-accessible-treeview'
 import { cn } from '../../lib/utils'
 
 const TreeView = TreeViewPrimitive
@@ -18,14 +8,14 @@ const TreeView = TreeViewPrimitive
 const TreeViewItem = forwardRef<
   HTMLDivElement,
   ComponentPropsWithoutRef<'div'> & {
-    level?: number
+    level: number
     isExpanded?: boolean
     isBranch?: boolean
     levelPadding?: number
     isSelected?: boolean
     xPadding: number
   }
->(({ level, isExpanded, isBranch, levelPadding = 20, isSelected, xPadding, ...props }, ref) => {
+>(({ level, isExpanded, isBranch, levelPadding = 56, isSelected, xPadding, ...props }, ref) => {
   return (
     <div
       aria-selected={isSelected}
@@ -35,7 +25,7 @@ const TreeViewItem = forwardRef<
       className={cn(
         'relative',
         'transition-colors',
-        'flex items-center gap-3.5',
+        'flex items-center gap-3',
         'text-sm',
         'cursor-pointer',
         'select-none',
@@ -48,12 +38,25 @@ const TreeViewItem = forwardRef<
         'hover:bg-control'
       )}
       style={{
-        paddingLeft: level
-          ? levelPadding * (level - 1) + xPadding + (!isBranch ? 0 : 0)
-          : levelPadding,
+        paddingLeft:
+          level === 1 && !isBranch
+            ? xPadding + levelPadding / 2 - 2
+            : level
+              ? levelPadding * (level - 1) + xPadding + (!isBranch ? 0 : 0)
+              : levelPadding,
         ...props.style,
       }}
+      data-treeview-is-branch={isBranch}
+      data-treeview-level={level}
     >
+      {level && level > 1 && (
+        <div
+          style={{
+            left: (levelPadding / 2 + 4) * (level - 1) + xPadding,
+          }}
+          className={'absolute h-full w-px group-data-[treeview-is-branch=false]:bg-border-strong'}
+        ></div>
+      )}
       <div className="absolute left-0 h-full w-px group-aria-selected:bg-foreground"></div>
       {isBranch ? (
         <>
@@ -91,18 +94,6 @@ const TreeViewItem = forwardRef<
           size={16}
           strokeWidth={1.5}
         />
-        // <span className="font-mono text-[10px] uppercase text-yellow-800 group-aria-selected:text-yellow-900">
-        //   SQL
-        // </span>
-        // <FileCode
-        //   className={cn(
-        //     'transition-colors',
-        //     ' text-foreground-muted',
-        //     'group-aria-selected:text-foreground-light'
-        //   )}
-        //   size={16}
-        //   strokeWidth={1.5}
-        // />
       )}
       {props.children}
     </div>
@@ -154,4 +145,4 @@ const TreeViewFolderIcon = forwardRef<SVGSVGElement, LucideSVGProps & { isOpen?:
   }
 )
 
-export { TreeView, TreeViewItem, TreeViewFolderIcon }
+export { TreeView, TreeViewFolderIcon, TreeViewItem }

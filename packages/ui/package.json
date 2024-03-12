@@ -82,7 +82,8 @@
     "tailwindcss-animate": "^1.0.6",
     "tailwindcss-radix": "^2.0.0",
     "yup": "^0.32.11",
-    "zod": "^3.22.3"
+    "zod": "^3.22.3",
+    "react-accessible-treeview": "^2.8.3"
   },
   "devDependencies": {
     "@babel/plugin-syntax-flow": "^7.21.4",

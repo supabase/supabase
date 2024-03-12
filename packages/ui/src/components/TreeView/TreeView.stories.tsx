@@ -88,8 +88,7 @@ export const Primary: Story = {
                 isBranch={isBranch}
                 isSelected={isSelected}
                 level={level}
-                xPadding={21}
-                levelPadding={28}
+                xPadding={16}
                 {...getNodeProps()}
               >
                 {element.name}
