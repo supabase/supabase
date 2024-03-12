@@ -8,7 +8,7 @@ import {
 } from 'components/interfaces/Home/Connect/ConnectTabs'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 
-const ContentFile = ({ connectionStringPooler, connectionStringDirect }: ContentFileProps) => {
+const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
   return (
     <ConnectTabs>
       <ConnectTabTriggers>
@@ -23,7 +23,7 @@ const ContentFile = ({ connectionStringPooler, connectionStringDirect }: Content
 DATABASE_URL="${connectionStringPooler}"
 
 # Direct connection to the database. Used for migrations.
-DIRECT_URL="${connectionStringDirect}"
+DIRECT_URL="${connectionStringPooler.replace('6543', '5432')}"
         `}
         </SimpleCodeBlock>
       </ConnectTabContent>
