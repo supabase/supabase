@@ -106,7 +106,7 @@ with full_text as (
     -- Note: this is not indexable but will only rank matches of the where clause
     -- which shouldn't be too big
     ts_rank_cd(fts, websearch_to_tsquery(query_text)) desc
-  limit match_count * 2
+  limit least(match_count, 30) * 2
 ),
 semantic as (
   select
@@ -116,7 +116,7 @@ semantic as (
     documents
   order by
     doc_vector <#> query_embedding
-  limit match_count * 2
+  limit least(match_count, 30) * 2
 )
 select
   documents.*
@@ -131,7 +131,7 @@ order by
   coalesce(1.0 / (rrf_k + semantic.rank_ix), 0.0) * semantic_weight
   desc
 limit
-  match_count
+  least(match_count, 30)
 $$;
 ```
 
