@@ -4,14 +4,12 @@ import { ErrorBoundary } from 'react-error-boundary'
 
 import { cn } from 'ui/src/lib/utils'
 
-import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
-import { LoadingLine } from 'ui/src/components/LoadingLine/LoadingLine'
-import { ModalProps } from 'ui/src/components/Modal/Modal'
-import { useCommandMenu } from './CommandMenuProvider'
-import { Button } from 'ui/src/components/Button'
 import { AlertTriangle } from 'lucide-react'
-import { Dialog } from 'ui/src/components/shadcn/ui/dialog'
+import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
 import { DialogContent_Shadcn_, Dialog_Shadcn_ } from 'ui'
+import { Button } from 'ui/src/components/Button'
+import { LoadingLine } from 'ui/src/components/LoadingLine/LoadingLine'
+import { useCommandMenu } from './CommandMenuProvider'
 
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>
 type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>
