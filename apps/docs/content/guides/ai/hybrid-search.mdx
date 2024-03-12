@@ -88,7 +88,7 @@ create or replace function hybrid_search(
   query_embedding vector(512),
   match_count int,
   full_text_weight float = 1,
-	semantic_weight float = 1,
+  semantic_weight float = 1,
   rrf_k int = 50
 )
 returns setof documents
@@ -128,8 +128,8 @@ from
     on coalesce(full_text.id, semantic.id) = documents.id
 order by
   coalesce(1.0 / (rrf_k + full_text.rank_ix), 0.0) * full_text_weight +
-	coalesce(1.0 / (rrf_k + semantic.rank_ix), 0.0) * semantic_weight
-	desc
+  coalesce(1.0 / (rrf_k + semantic.rank_ix), 0.0) * semantic_weight
+  desc
 limit
   match_count
 $$;
@@ -157,7 +157,7 @@ select
   *
 from
   hybrid_search(
-		'Italian recipes with tomato sauce', -- user query
+    'Italian recipes with tomato sauce', -- user query
     '[...]'::vector(512), -- embedding generated from user query
     10
   );
@@ -212,7 +212,7 @@ To test this, make a `POST` request to the function's endpoint while passing in 
 
 ```tsx
 curl -i --location --request POST \
-	'http://127.0.0.1:54321/functions/v1/hybrid-search' \
+  'http://127.0.0.1:54321/functions/v1/hybrid-search' \
   --header 'Authorization: Bearer <anonymous key>' \
   --header 'Content-Type: application/json' \
   --data '{"query":"Italian recipes with tomato sauce"}'
