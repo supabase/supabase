@@ -95,7 +95,11 @@ export async function getGuidesStaticProps(
   const mdxOptions: SerializeOptions = {
     mdxOptions: {
       useDynamicImport: true,
-      remarkPlugins: [remarkMath, remarkGfm, [remarkCodeHike, codeHikeOptions]],
+      remarkPlugins: [
+        [remarkMath, { singleDollarTextMath: false }],
+        remarkGfm,
+        [remarkCodeHike, codeHikeOptions],
+      ],
       rehypePlugins: [rehypeKatex as any],
     },
   }
