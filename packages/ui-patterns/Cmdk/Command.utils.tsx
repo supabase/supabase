@@ -6,11 +6,12 @@ import { cn } from 'ui/src/lib/utils'
 
 import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
 import { LoadingLine } from 'ui/src/components/LoadingLine/LoadingLine'
-import { Modal } from 'ui/src/components/Modal'
 import { ModalProps } from 'ui/src/components/Modal/Modal'
 import { useCommandMenu } from './CommandMenuProvider'
 import { Button } from 'ui/src/components/Button'
 import { AlertTriangle } from 'lucide-react'
+import { Dialog } from 'ui/src/components/shadcn/ui/dialog'
+import { DialogContent_Shadcn_, Dialog_Shadcn_ } from 'ui'
 
 type CommandPrimitiveElement = React.ElementRef<typeof CommandPrimitive>
 type CommandPrimitiveProps = React.ComponentPropsWithoutRef<typeof CommandPrimitive>
@@ -57,9 +58,10 @@ export function CommandError({ resetErrorBoundary }: { resetErrorBoundary: () =>
   )
 }
 
-export interface CommandDialogProps extends ModalProps {
+interface CommandDialogProps extends React.ComponentProps<typeof Dialog_Shadcn_> {
   onKeyDown?: KeyboardEventHandler<HTMLDivElement>
   page?: number | string
+  visible: boolean
 }
 
 export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDialogProps) => {
@@ -71,34 +73,35 @@ export const CommandDialog = ({ children, onKeyDown, page, ...props }: CommandDi
   }, [page])
 
   return (
-    <Modal
-      {...props}
-      hideFooter
-      className={cn(
-        '!bg-overlay/90 backdrop-filter backdrop-blur-sm',
-        '!border-overlay/90',
-        'transition ease-out',
-        'place-self-start mx-auto top-24',
-        'max-w-[calc(100vw-60px)] xs:max-w-[50%]',
-        animateBounce ? 'scale-[101.5%]' : 'scale-100'
-      )}
-    >
-      <ErrorBoundary FallbackComponent={CommandError}>
-        <Command
-          className={[
-            '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
-            '[&_[cmdk-item]_svg]:h-5',
-            '[&_[cmdk-item]_svg]:w-5',
-            '[&_[cmdk-input-wrapper]_svg]:h-5',
-            '[&_[cmdk-input-wrapper]_svg]:w-5',
+    <Dialog_Shadcn_ {...props} open={props.visible || props.open}>
+      <DialogContent_Shadcn_
+        hideClose
+        size={'xlarge'}
+        className={cn(
+          '!bg-overlay/90 backdrop-filter backdrop-blur-sm',
+          '!border-overlay/90',
+          'transition ease-out',
+          'place-self-start mx-auto top-24',
+          animateBounce ? 'scale-[101.5%]' : 'scale-100'
+        )}
+      >
+        <ErrorBoundary FallbackComponent={CommandError}>
+          <Command
+            className={[
+              '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
+              '[&_[cmdk-item]_svg]:h-5',
+              '[&_[cmdk-item]_svg]:w-5',
+              '[&_[cmdk-input-wrapper]_svg]:h-5',
+              '[&_[cmdk-input-wrapper]_svg]:w-5',
 
-            '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0',
-          ].join(' ')}
-        >
-          {children}
-        </Command>
-      </ErrorBoundary>
-    </Modal>
+              '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0',
+            ].join(' ')}
+          >
+            {children}
+          </Command>
+        </ErrorBoundary>
+      </DialogContent_Shadcn_>
+    </Dialog_Shadcn_>
   )
 }
 
