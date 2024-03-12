@@ -138,12 +138,16 @@ $$;
 Let's break this down:
 
 - **Parameters:** The function accepts quite a few parameters, but the main (required) ones are `query_text`, `query_embedding`, and `match_count`.
+
   - `query_text` is the user's query text (more on this shortly)
   - `query_embedding` is the vector representation of the user's query produced by the embedding model. We chose 512 dimensions for this example, but adjust this to match the size of the embedding vectors generated from your preferred model. This must match the size of the `embedding` vector on the `documents` table (and use the same model).
   - `match_count` is the number of records returned in the `limit` clause.
-    The other parameters are optional, but give more control over the fusion process.
+
+  The other parameters are optional, but give more control over the fusion process.
+
   - `full_text_weight` and `semantic_weight` decide how much weight each search method gets in the final score. These are both 1 by default which means they both equally contribute towards the final rank. A `full_text_weight` of 2 and `semantic_weight` of 1 would give full-text search twice as much weight as semantic search.
   - `rrf_k` is the `k` [smoothing constant](#smoothing-constant-k) added to the reciprocal rank. The default is 50.
+
 - **Return type:** The function returns a set of records from our `documents` table.
 - **CTE:** We create two [common table expressions (CTE)](https://www.postgresql.org/docs/current/queries-with.html), one for full-text search and one for semantic search. These perform each query individually prior to joining them.
 - **RRF:** The final query combines the results from the two CTEs using [reciprocal rank fusion (RRF)](#reciprocal-ranked-fusion-rrf).
