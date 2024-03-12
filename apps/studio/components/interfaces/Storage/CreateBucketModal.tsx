@@ -1,7 +1,17 @@
-import clsx from 'clsx'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+
+import { useParams } from 'common'
+import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
+import {
+  convertFromBytes,
+  convertToBytes,
+} from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
+import { IS_PLATFORM } from 'lib/constants'
 import {
   Alert,
   Button,
@@ -12,18 +22,8 @@ import {
   Listbox,
   Modal,
   Toggle,
+  cn,
 } from 'ui'
-
-import { useParams } from 'common'
-import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
-import {
-  convertFromBytes,
-  convertToBytes,
-} from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useBucketCreateMutation } from 'data/storage/bucket-create-mutation'
-import { useStore } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
 
 export interface CreateBucketModalProps {
   visible: boolean
@@ -31,16 +31,12 @@ export interface CreateBucketModalProps {
 }
 
 const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
-  const { ui } = useStore()
   const { ref } = useParams()
   const router = useRouter()
 
   const { mutate: createBucket, isLoading: isCreating } = useBucketCreateMutation({
     onSuccess: (res) => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully created bucket ${res.name}`,
-      })
+      toast.success(`Successfully created bucket ${res.name}`)
       router.push(`/project/${ref}/storage/buckets/${res.name}`)
       onClose()
     },
@@ -163,7 +159,7 @@ const CreateBucketModal = ({ visible, onClose }: CreateBucketModalProps) => {
                     <IconChevronDown
                       size={18}
                       strokeWidth={2}
-                      className={clsx('text-foreground-light', showConfiguration && 'rotate-180')}
+                      className={cn('text-foreground-light', showConfiguration && 'rotate-180')}
                     />
                   </div>
                 </Collapsible.Trigger>

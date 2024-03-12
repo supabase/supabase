@@ -1,4 +1,4 @@
-import { Badge, Button, IconArrowUpRight, IconMail } from 'ui'
+import { Badge } from 'ui'
 import APISection from '../Sections/APISection'
 import SectionContainer from '../Layouts/SectionContainer'
 import FeatureColumn from '../FeatureColumn'

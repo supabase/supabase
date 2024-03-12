@@ -1,11 +1,25 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
+
+import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { setProjectStatus } from 'data/projects/projects-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
+import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import type { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
+import { useCheckPermissions, useFlag, useSelectedOrganization } from 'hooks'
+import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
+import { INSTANCE_MICRO_SPECS, PROJECT_STATUS } from 'lib/constants'
+import Telemetry from 'lib/telemetry'
+import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
   Alert,
   AlertDescription_Shadcn_,
@@ -20,25 +34,10 @@ import {
   Radio,
   SidePanel,
 } from 'ui'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
-import { setProjectStatus } from 'data/projects/projects-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
-import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import type { AddonVariantId, ProjectAddonVariantMeta } from 'data/subscriptions/types'
-import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
-import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import { INSTANCE_MICRO_SPECS, PROJECT_STATUS } from 'lib/constants'
-import Telemetry from 'lib/telemetry'
-import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 
 const ComputeInstanceSidePanel = () => {
   const queryClient = useQueryClient()
-  const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const { project: selectedProject } = useProjectContext()
@@ -67,40 +66,30 @@ const ComputeInstanceSidePanel = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
-      ui.setNotification({
-        duration: 8000,
-        category: 'success',
-        message: `Successfully updated compute instance to ${selectedCompute?.name}. Your project is currently being restarted to update its instance`,
-      })
+      toast.success(
+        `Successfully updated compute instance to ${selectedCompute?.name}. Your project is currently being restarted to update its instance`,
+        { duration: 8000 }
+      )
       setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESTORING)
       onClose()
       router.push(`/project/${projectRef}`)
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to update compute instance: ${error.message}`,
-      })
+      toast.error(`Unable to update compute instance: ${error.message}`)
     },
   })
   const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
-      ui.setNotification({
-        duration: 8000,
-        category: 'success',
-        message: `Successfully updated compute instance. Your project is currently being restarted to update its instance`,
-      })
+      toast.success(
+        `Successfully updated compute instance. Your project is currently being restarted to update its instance`,
+        { duration: 8000 }
+      )
       setProjectStatus(queryClient, projectRef!, PROJECT_STATUS.RESTORING)
       onClose()
       router.push(`/project/${projectRef}`)
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to update compute instance: ${error.message}`,
-      })
+      toast.error(`Unable to update compute instance: ${error.message}`)
     },
   })
 

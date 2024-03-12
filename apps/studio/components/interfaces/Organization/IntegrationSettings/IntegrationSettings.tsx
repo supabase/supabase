@@ -1,4 +1,5 @@
 import { useCallback } from 'react'
+import toast from 'react-hot-toast'
 
 import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -13,8 +14,8 @@ import {
 import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useSelectedOrganization, useStore } from 'hooks'
-import { BASE_PATH, OPT_IN_TAGS } from 'lib/constants'
+import { useFlag, useSelectedOrganization } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationConnectionItem } from '../../Integrations/IntegrationConnection'
 import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
@@ -31,17 +32,13 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 }
 
 const IntegrationSettings = () => {
-  const { ui } = useStore()
   const org = useSelectedOrganization()
-  const hasAccessToBranching = org?.opt_in_tags?.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) ?? false
+  const hasAccessToBranching = useFlag<boolean>('branchManagement')
   const { data: connections } = useGitHubConnectionsQuery({ organizationId: org?.id })
 
   const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: 'Successfully deleted Github connection',
-      })
+      toast.success('Successfully deleted Github connection')
     },
   })
 

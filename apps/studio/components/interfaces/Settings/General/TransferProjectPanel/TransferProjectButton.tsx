@@ -2,6 +2,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import {
   Alert,
   Button,
@@ -18,12 +19,10 @@ import {
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useProjectTransferMutation } from 'data/projects/project-transfer-mutation'
 import { useProjectTransferPreviewQuery } from 'data/projects/project-transfer-preview-query'
-import { useCheckPermissions, useFlag, useSelectedProject, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useSelectedProject } from 'hooks'
 import { formatCurrency } from 'lib/helpers'
 
 const TransferProjectButton = () => {
-  const { ui } = useStore()
-
   const project = useSelectedProject()
   const projectRef = project?.ref
   const projectOrgId = project?.organization_id
@@ -41,11 +40,7 @@ const TransferProjectButton = () => {
     isLoading: isTransferring,
   } = useProjectTransferMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        duration: 5000,
-        message: `Successfully transferred project ${project?.name}.`,
-      })
+      toast.success(`Successfully transferred project ${project?.name}.`)
       setIsOpen(false)
     },
   })

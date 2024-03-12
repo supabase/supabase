@@ -30,7 +30,7 @@ const FeaturePreviewModal = () => {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
       name: 'Supabase Assistant for RLS policies',
       content: <RLSAIAssistantPreview />,
-      discussionsUrl: 'https://github.com/orgs/supabase/discussions/19594',
+      discussionsUrl: 'https://github.com/orgs/supabase/discussions/21882',
     },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
@@ -43,7 +43,7 @@ const FeaturePreviewModal = () => {
       ? [
           {
             key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_AI_ASSISTANT,
-            name: 'Supabase Assistant for SQL editor',
+            name: 'SQL Editor Conversational Assistant ',
             content: <SQLEditorAIAssistantPreview />,
             discussionsUrl: undefined,
           },

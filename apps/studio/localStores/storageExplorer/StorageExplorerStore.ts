@@ -563,10 +563,7 @@ class StorageExplorerStore {
 
           if (error) {
             numberOfFilesUploadedFail += 1
-            this.ui.setNotification({
-              message: `Failed to upload ${file.name}: ${error.message}`,
-              category: 'error',
-            })
+            toast.error(`Failed to upload ${file.name}: ${error.message}`)
             resolve()
           } else {
             numberOfFilesUploadedSuccess += 1
@@ -607,37 +604,27 @@ class StorageExplorerStore {
       if (numberOfFilesToUpload === 0) {
         toast.dismiss(toastId)
       } else if (numberOfFilesUploadedFail === numberOfFilesToUpload) {
-        this.ui.setNotification({
-          id: toastId,
-          category: 'error',
-          message: `Failed to upload ${numberOfFilesToUpload} file${
-            numberOfFilesToUpload > 1 ? 's' : ''
-          }!`,
-        })
+        toast.error(
+          `Failed to upload ${numberOfFilesToUpload} file${numberOfFilesToUpload > 1 ? 's' : ''}!`,
+          { id: toastId }
+        )
       } else if (numberOfFilesUploadedSuccess === numberOfFilesToUpload) {
-        this.ui.setNotification({
-          id: toastId,
-          category: 'success',
-          message: `Successfully uploaded ${numberOfFilesToUpload} file${
+        toast.success(
+          `Successfully uploaded ${numberOfFilesToUpload} file${
             numberOfFilesToUpload > 1 ? 's' : ''
           }!`,
-        })
+          { id: toastId }
+        )
       } else {
-        this.ui.setNotification({
-          id: toastId,
-          category: 'success',
-          message: `Successfully uploaded ${numberOfFilesUploadedSuccess} out of ${numberOfFilesToUpload} file${
+        toast.success(
+          `Successfully uploaded ${numberOfFilesUploadedSuccess} out of ${numberOfFilesToUpload} file${
             numberOfFilesToUpload > 1 ? 's' : ''
           }!`,
-        })
+          { id: toastId }
+        )
       }
     } catch (e) {
-      this.ui.setNotification({
-        id: toastId,
-        error: e,
-        message: 'Failed to upload files',
-        category: 'error',
-      })
+      toast.error('Failed to upload files', { id: toastId })
     }
 
     const t2 = new Date()
@@ -674,7 +661,7 @@ class StorageExplorerStore {
         })
         if (res.error) {
           numberOfFilesMovedFail += 1
-          this.ui.setNotification({ category: 'error', message: res.error.message })
+          toast.error(res.error.message)
         }
       })
     )
@@ -715,10 +702,7 @@ class StorageExplorerStore {
       if (!res.error) {
         return res.publicUrl
       } else {
-        this.ui.setNotification({
-          category: 'error',
-          message: `Failed to fetch public file preview: ${res.error.message}`,
-        })
+        toast.error(`Failed to fetch public file preview: ${res.error.message}`)
       }
     } else {
       const res = await post(`${this.endpoint}/buckets/${this.selectedBucket.id}/objects/sign`, {
@@ -728,10 +712,7 @@ class StorageExplorerStore {
       if (!res.error) {
         return res.signedUrl
       } else {
-        this.ui.setNotification({
-          category: 'error',
-          message: `Failed to fetch signed url preview: ${res.error.message}`,
-        })
+        toast.error(`Failed to fetch signed url preview: ${res.error.message}`)
       }
     }
     return null
@@ -803,11 +784,7 @@ class StorageExplorerStore {
       await Promise.all(
         parentFolderPrefixes.map((prefix) => this.validateParentFolderEmpty(prefix))
       )
-      this.ui.setNotification({
-        id: toastId,
-        category: 'success',
-        message: `Successfully deleted ${prefixes.length} file(s)`,
-      })
+      toast.success(`Successfully deleted ${prefixes.length} file(s)`, { id: toastId })
       await this.refetchAllOpenedFolders()
       this.clearSelectedItemsToDelete()
     } else {
@@ -817,10 +794,7 @@ class StorageExplorerStore {
 
   downloadFolder = async (folder) => {
     let progress = 0
-    const toastId = this.ui.setNotification({
-      category: 'loading',
-      message: 'Retrieving files from folder...',
-    })
+    const toastId = toast.loading('Retrieving files from folder...')
 
     const files = await this.getAllItemsAlongFolder(folder)
 
@@ -875,11 +849,7 @@ class StorageExplorerStore {
     const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
 
     if (downloadedFiles.length === 0) {
-      return this.ui.setNotification({
-        id: toastId,
-        category: 'error',
-        message: `Failed to download files from "${folder.name}"`,
-      })
+      toast.error(`Failed to download files from "${folder.name}"`, { id: toastId })
     }
 
     downloadedFiles.forEach((file) => {
@@ -894,16 +864,14 @@ class StorageExplorerStore {
     link.click()
     link.parentNode.removeChild(link)
 
-    this.ui.setNotification({
-      id: toastId,
-      category: 'success',
-      message:
-        downloadedFiles.length === files.length
-          ? `Successfully downloaded folder "${folder.name}"`
-          : `Downloaded folder "${folder.name}". However, ${
-              files.length - downloadedFiles.length
-            } files did not download successfully.`,
-    })
+    toast.success(
+      downloadedFiles.length === files.length
+        ? `Successfully downloaded folder "${folder.name}"`
+        : `Downloaded folder "${folder.name}". However, ${
+            files.length - downloadedFiles.length
+          } files did not download successfully.`,
+      { id: toastId }
+    )
   }
 
   downloadSelectedFiles = async (files) => {
@@ -922,10 +890,7 @@ class StorageExplorerStore {
     let progress = 0
     const returnBlob = true
     const showIndividualToast = false
-    const toastId = this.ui.setNotification({
-      category: 'loading',
-      message: `Downloading ${files.length} files...`,
-    })
+    const toastId = toast.loading(`Downloading ${files.length} files...`)
 
     const promises = formattedFilesWithPrefix.map((file) => {
       return () => {
@@ -965,20 +930,14 @@ class StorageExplorerStore {
     link.click()
     link.parentNode.removeChild(link)
 
-    this.ui.setNotification({
-      id: toastId,
-      category: 'success',
-      message: `Successfully downloaded ${downloadedFiles.length} files`,
-    })
+    toast.success(`Successfully downloaded ${downloadedFiles.length} files`, { id: toastId })
   }
 
   downloadFile = async (file, showToast = true, returnBlob = false) => {
     const fileName = file.name
     const fileMimeType = file?.metadata?.mimetype ?? null
 
-    const toastId = showToast
-      ? this.ui.setNotification({ category: 'loading', message: `Retrieving ${fileName}...` })
-      : undefined
+    const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
 
     const pathToFile = this.openedFolders
       .slice(0, file.columnIndex)
@@ -1004,21 +963,12 @@ class StorageExplorerStore {
       link.parentNode.removeChild(link)
       window.URL.revokeObjectURL(blob)
       if (toastId) {
-        this.ui.setNotification({
-          id: toastId,
-          category: 'success',
-          message: `Downloading ${fileName}`,
-        })
+        toast.success(`Downloading ${fileName}`, { id: toastId })
       }
       return true
     } else {
       if (toastId) {
-        this.ui.setNotification({
-          error: res.error,
-          id: toastId,
-          category: 'error',
-          message: `Failed to download ${fileName}`,
-        })
+        toast.error(`Failed to download ${fileName}`, { id: toastId })
       }
       return false
     }
@@ -1042,15 +992,9 @@ class StorageExplorerStore {
       })
 
       if (res.error) {
-        this.ui.setNotification({
-          category: 'error',
-          message: `Failed to rename file: ${res.error.message}`,
-        })
+        toast.error(`Failed to rename file: ${res.error.message}`)
       } else {
-        this.ui.setNotification({
-          category: 'success',
-          message: `Successfully renamed "${originalName}" to "${newName}"`,
-        })
+        toast.success(`Successfully renamed "${originalName}" to "${newName}"`)
 
         // Clear file preview cache if the renamed file exists in the cache
         const updatedFilePreviewCache = this.filePreviewCache.filter(
@@ -1112,11 +1056,7 @@ class StorageExplorerStore {
         index
       )
     } else if (!res.error.message.includes('aborted')) {
-      this.ui.setNotification({
-        error: res.error,
-        category: 'error',
-        message: `Failed to retrieve folder contents from "${folderName}": ${res.error.message}`,
-      })
+      toast.error(`Failed to retrieve folder contents from "${folderName}": ${res.error.message}`)
     }
   }
 
@@ -1152,11 +1092,7 @@ class StorageExplorerStore {
         return col
       })
     } else if (!res.error.message.includes('aborted')) {
-      this.ui.setNotification({
-        error: res.error,
-        category: 'error',
-        message: `Failed to retrieve folder contents from "${folderName}": ${res.error.message}`,
-      })
+      toast.error(`Failed to retrieve folder contents from "${folderName}": ${res.error.message}`)
     }
   }
 
@@ -1191,11 +1127,7 @@ class StorageExplorerStore {
           options,
         })
         if (res.error) {
-          this.ui.setNotification({
-            error: res.error,
-            category: 'error',
-            message: `Failed to fetch folders: ${res.error.message}`,
-          })
+          toast.error(`Failed to fetch folders: ${res.error.message}`)
           return []
         }
         return res
@@ -1267,10 +1199,7 @@ class StorageExplorerStore {
     await this.refetchAllOpenedFolders()
     this.clearSelectedItemsToDelete()
 
-    this.ui.setNotification({
-      category: 'success',
-      message: `Successfully deleted ${folder.name}`,
-    })
+    toast.success(`Successfully deleted ${folder.name}`)
   }
 
   renameFolder = async (folder, newName, columnIndex) => {
@@ -1295,10 +1224,7 @@ class StorageExplorerStore {
      * todo: move this to a util file, as createFolder() uses same logic
      */
     if (newName.includes('/') || newName.includes('\\')) {
-      return this.ui.setNotification({
-        message: `Folder name cannot contain forward or back slashes.`,
-        type: 'error',
-      })
+      return toast.error(`Folder name cannot contain forward or back slashes.`)
     }
 
     this.updateRowStatus(originalName, STORAGE_ROW_STATUS.LOADING, columnIndex, newName)
@@ -1328,10 +1254,7 @@ class StorageExplorerStore {
           )
           if (res.error) {
             hasErrors = true
-            this.ui.setNotification({
-              category: 'error',
-              message: `Failed to move ${fromPath} to the new folder`,
-            })
+            toast.error(`Failed to move ${fromPath} to the new folder`)
           }
           resolve()
         })
@@ -1355,17 +1278,9 @@ class StorageExplorerStore {
       }, Promise.resolve())
 
       if (!hasErrors) {
-        this.ui.setNotification({
-          id: toastId,
-          message: `Successfully renamed folder to ${newName}`,
-          category: 'success',
-        })
+        toast.success(`Successfully renamed folder to ${newName}`, { id: toastId })
       } else {
-        this.ui.setNotification({
-          id: toastId,
-          message: `Renamed folder to ${newName} with some errors`,
-          category: 'error',
-        })
+        toast.error(`Renamed folder to ${newName} with some errors`, { id: toastId })
       }
       await this.refetchAllOpenedFolders()
 
@@ -1376,11 +1291,7 @@ class StorageExplorerStore {
       )
       this.filePreviewCache = updatedFilePreviewCache
     } catch (e) {
-      this.ui.setNotification({
-        id: toastId,
-        message: `Failed to rename folder to ${newName}`,
-        category: 'error',
-      })
+      toast.error(`Failed to rename folder to ${newName}`, { id: toastId })
     }
   }
 
@@ -1471,11 +1382,9 @@ class StorageExplorerStore {
         const updatedFileName = fileName + ` (${itemsWithSameNameInColumn.length + 1})`
         return fileExt ? `${updatedFileName}.${fileExt}` : updatedFileName
       } else {
-        this.ui.setNotification({
-          message: `The name ${name} already exists in the current directory. Please use a different name.`,
-          category: 'error',
-          duration: 4000,
-        })
+        toast.error(
+          `The name ${name} already exists in the current directory. Please use a different name.`
+        )
         return null
       }
     }

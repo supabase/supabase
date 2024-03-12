@@ -1,8 +1,10 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+import { Alert, Button, Listbox } from 'ui'
 
-import { useParams } from 'common'
 import AuthorizeRequesterDetails from 'components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
 import APIAuthorizationLayout from 'components/layouts/APIAuthorizationLayout'
 import { FormPanel } from 'components/ui/Forms'
@@ -11,15 +13,13 @@ import { useApiAuthorizationApproveMutation } from 'data/api-authorization/api-a
 import { useApiAuthorizationDeclineMutation } from 'data/api-authorization/api-authorization-decline-mutation'
 import { useApiAuthorizationQuery } from 'data/api-authorization/api-authorization-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useStore, withAuth } from 'hooks'
+import { withAuth } from 'hooks'
 import type { NextPageWithLayout } from 'types'
-import { Alert, Button, Listbox } from 'ui'
 
 // Need to handle if no organizations in account
 // Need to handle if not logged in yet state
 
 const APIAuthorizationPage: NextPageWithLayout = () => {
-  const { ui } = useStore()
   const router = useRouter()
   const { auth_id } = useParams()
   const [selectedOrg, setSelectedOrg] = useState<string>()
@@ -36,7 +36,7 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
   })
   const { mutate: declineRequest, isLoading: isDeclining } = useApiAuthorizationDeclineMutation({
     onSuccess: () => {
-      ui.setNotification({ category: 'success', message: 'Declined API authorization request' })
+      toast.success('Declined API authorization request')
       router.push('/projects')
     },
   })
@@ -50,28 +50,19 @@ const APIAuthorizationPage: NextPageWithLayout = () => {
 
   const onApproveRequest = async () => {
     if (!auth_id) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'Unable to approve request: auth_id is missing ',
-      })
+      return toast.error('Unable to approve request: auth_id is missing ')
     }
     if (!selectedOrg) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'Unable to approve request: No organization selected',
-      })
+      return toast.error('Unable to approve request: No organization selected')
     }
 
     approveRequest({ id: auth_id, organization_id: selectedOrg })
   }
 
   const onDeclineRequest = async () => {
-    if (!auth_id)
-      return ui.setNotification({
-        category: 'error',
-        message: 'Unable to decline request: auth_id is missing ',
-      })
-
+    if (!auth_id) {
+      return toast.error('Unable to decline request: auth_id is missing ')
+    }
     declineRequest({ id: auth_id })
   }
 

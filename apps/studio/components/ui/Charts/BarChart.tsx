@@ -47,12 +47,22 @@ const BarChart = ({
     return <ChartNoData message={emptyStateMessage} size={size} className={className} />
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
-  const resolvedHighlightedLabel =
-    (focusDataIndex !== null &&
-      data &&
-      data[focusDataIndex] !== undefined &&
-      day(data[focusDataIndex][xAxisKey]).format(customDateFormat)) ||
-    highlightedLabel
+
+  function getHeaderLabel() {
+    if (!xAxisIsDate) {
+      if (!focusDataIndex) return highlightedLabel
+      return data[focusDataIndex]?.[xAxisKey]
+    }
+    return (
+      (focusDataIndex !== null &&
+        data &&
+        data[focusDataIndex] !== undefined &&
+        day(data[focusDataIndex][xAxisKey]).format(customDateFormat)) ||
+      highlightedLabel
+    )
+  }
+
+  const resolvedHighlightedLabel = getHeaderLabel()
 
   const resolvedHighlightedValue =
     focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue

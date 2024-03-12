@@ -1,8 +1,24 @@
-import { useParams } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
+import { HelpCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
+
+import { useParams } from 'common'
+import Divider from 'components/ui/Divider'
+import InformationBox from 'components/ui/InformationBox'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { getProjectAuthConfig } from 'data/auth/auth-config-query'
+import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
+import { useOrganizationsQuery } from 'data/organizations/organizations-query'
+import type { Project } from 'data/projects/project-detail-query'
+import { useProjectsQuery } from 'data/projects/projects-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useFlag } from 'hooks'
+import useLatest from 'hooks/misc/useLatest'
+import { detectBrowser } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -19,22 +35,7 @@ import {
   Input,
   Listbox,
 } from 'ui'
-
-import Divider from 'components/ui/Divider'
-import InformationBox from 'components/ui/InformationBox'
 import MultiSelect from 'ui-patterns/MultiSelect'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { getProjectAuthConfig } from 'data/auth/auth-config-query'
-import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import type { Project } from 'data/projects/project-detail-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useFlag, useStore } from 'hooks'
-import useLatest from 'hooks/misc/useLatest'
-import { detectBrowser } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { HelpCircle } from 'lucide-react'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
@@ -47,7 +48,6 @@ export interface SupportFormProps {
 }
 
 const SupportForm = ({ setSentCategory }: SupportFormProps) => {
-  const { ui } = useStore()
   const { isReady } = useRouter()
   const { ref, slug, subject, category, message } = useParams()
 
@@ -77,15 +77,11 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
   const { mutate: submitSupportTicket } = useSendSupportTicketMutation({
     onSuccess: (res, variables) => {
-      ui.setNotification({ category: 'success', message: 'Support request sent. Thank you!' })
+      toast.success('Support request sent. Thank you!')
       setSentCategory(variables.category)
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to submit support ticket: ${error.message}`,
-      })
+      toast.error(`Failed to submit support ticket: ${error.message}`)
       setIsSubmitting(false)
     },
   })
@@ -146,10 +142,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 
     setUploadedFiles(uploadedFiles.concat(itemsToBeUploaded))
     if (items.length + uploadedFiles.length > MAX_ATTACHMENTS) {
-      ui.setNotification({
-        category: 'info',
-        message: `Only up to ${MAX_ATTACHMENTS} attachments are allowed`,
-      })
+      toast(`Only up to ${MAX_ATTACHMENTS} attachments are allowed`)
     }
 
     event.target.value = ''

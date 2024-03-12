@@ -4,6 +4,15 @@ import { MessageCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
+
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
+import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
+import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
+import { Branch, useBranchesQuery } from 'data/branches/branches-query'
+import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -16,15 +25,6 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
-
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
-import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
-import { Branch, useBranchesQuery } from 'data/branches/branches-query'
-import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useGitHubPullRequestsQuery } from 'data/integrations/github-pull-requests-query'
-import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
 import { BranchLoader, BranchManagementSection, BranchRow } from './BranchPanels'
 import CreateBranchModal from './CreateBranchModal'
 import {
@@ -35,7 +35,6 @@ import {
 import Overview from './Overview'
 
 const BranchManagement = () => {
-  const { ui } = useStore()
   const router = useRouter()
   const { ref } = useParams()
   const project = useSelectedProject()
@@ -92,25 +91,9 @@ const BranchManagement = () => {
     new Date(a.updated_at) < new Date(b.updated_at) ? 1 : -1
   )
   const branchesWithPRs = previewBranches.filter((branch) => branch.pr_number !== undefined)
-  const prNumbers =
-    branches !== undefined
-      ? (branchesWithPRs.map((branch) => branch.pr_number).filter(Boolean) as number[])
-      : undefined
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
   const repo = githubConnection?.repository.name ?? ''
-
-  const {
-    data: allPullRequests,
-    error: pullRequestsError,
-    isLoading: isLoadingPullRequests,
-    isError: isErrorPullRequests,
-    isSuccess: isSuccessPullRequests,
-  } = useGitHubPullRequestsQuery({
-    connectionId: githubConnection?.id,
-    prNumbers,
-  })
-  const pullRequests = allPullRequests ?? []
 
   const isError = isErrorConnections || isErrorBranches
   const isLoading = isLoadingConnections || isLoadingBranches
@@ -119,14 +102,12 @@ const BranchManagement = () => {
   const { mutate: deleteBranch, isLoading: isDeleting } = useBranchDeleteMutation({
     onSuccess: () => {
       if (selectedBranchToDelete?.project_ref === ref) {
-        ui.setNotification({
-          category: 'success',
-          message:
-            'Successfully deleted branch. You are now currently on the main branch of your project.',
-        })
+        toast.success(
+          'Successfully deleted branch. You are now currently on the main branch of your project.'
+        )
         router.push(`/project/${projectRef}/branches`)
       } else {
-        ui.setNotification({ category: 'success', message: 'Successfully deleted branch' })
+        toast.success('Successfully deleted branch')
       }
       setSelectedBranchToDelete(undefined)
     },
@@ -134,10 +115,7 @@ const BranchManagement = () => {
 
   const { mutate: disableBranching, isLoading: isDisabling } = useBranchesDisableMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: 'Successfully disabled branching for project',
-      })
+      toast.success('Successfully disabled branching for project')
       setShowDisableBranching(false)
     },
   })
@@ -281,7 +259,6 @@ const BranchManagement = () => {
                       repo={repo}
                       mainBranch={mainBranch}
                       previewBranches={previewBranches}
-                      pullRequests={pullRequests}
                       onViewAllBranches={() => setView('branches')}
                       onSelectCreateBranch={() => setShowCreateBranch(true)}
                       onSelectDeleteBranch={setSelectedBranchToDelete}
@@ -292,38 +269,23 @@ const BranchManagement = () => {
                     <BranchManagementSection
                       header={`${branchesWithPRs.length} branches with pull requests found`}
                     >
-                      {isLoadingPullRequests && <BranchLoader />}
-                      {isErrorPullRequests && (
-                        <AlertError
-                          error={pullRequestsError}
-                          subject="Failed to retrieve GitHub pull requests"
-                        />
-                      )}
-                      {isSuccessPullRequests && (
-                        <>
-                          {branchesWithPRs.length > 0 ? (
-                            branchesWithPRs.map((branch) => {
-                              const pullRequest = pullRequests?.find(
-                                (pr) => pr.branch === branch.git_branch && pr.repo === repo
-                              )
-                              return (
-                                <BranchRow
-                                  key={branch.id}
-                                  repo={repo}
-                                  branch={branch}
-                                  pullRequest={pullRequest}
-                                  generateCreatePullRequestURL={generateCreatePullRequestURL}
-                                  onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
-                                />
-                              )
-                            })
-                          ) : (
-                            <PullRequestsEmptyState
-                              url={generateCreatePullRequestURL()}
-                              hasBranches={previewBranches.length > 0}
+                      {branchesWithPRs.length > 0 ? (
+                        branchesWithPRs.map((branch) => {
+                          return (
+                            <BranchRow
+                              key={branch.id}
+                              repo={repo}
+                              branch={branch}
+                              generateCreatePullRequestURL={generateCreatePullRequestURL}
+                              onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
                             />
-                          )}
-                        </>
+                          )
+                        })
+                      ) : (
+                        <PullRequestsEmptyState
+                          url={generateCreatePullRequestURL()}
+                          hasBranches={previewBranches.length > 0}
+                        />
                       )}
                     </BranchManagementSection>
                   )}
@@ -343,15 +305,11 @@ const BranchManagement = () => {
                       )}
                       {isSuccessBranches &&
                         previewBranches.map((branch) => {
-                          const pullRequest = pullRequests?.find(
-                            (pr) => pr.branch === branch.git_branch && pr.repo === repo
-                          )
                           return (
                             <BranchRow
                               key={branch.id}
                               repo={repo}
                               branch={branch}
-                              pullRequest={pullRequest}
                               generateCreatePullRequestURL={generateCreatePullRequestURL}
                               onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
                             />
