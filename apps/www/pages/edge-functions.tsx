@@ -17,6 +17,7 @@ import ProductsCta from '../components/Sections/ProductsCta'
 
 const HighlightColumns = dynamic(() => import('~/components/Sections/HighlightColumns'))
 const TimedAccordionSection = dynamic(() => import('~/components/Sections/TimedAccordionSection'))
+const TimedAccordionPanels = dynamic(() => import('~/components/Sections/TimedAccordionPanels'))
 const LocalDXGrid = dynamic(() => import('~/components/Products/Functions/LocalDXGrid'))
 const GlobalPresenceSection = dynamic(
   () => import('~/components/Products/Functions/GlobalPresenceSection')
@@ -46,6 +47,7 @@ function Database() {
       />
       <DefaultLayout>
         <ProductsNav activePage={PRODUCT_NAMES.FUNCTIONS} />
+        {/* @ts-ignore */}
         <ProductHeader
           {...pageData.heroSection}
           footer={<HighlightColumns highlights={pageData.highlightsSection.highlights} />}
@@ -67,6 +69,12 @@ function Database() {
         </SectionContainer>
         <SectionContainer className="flex flex-col gap-4 lg:gap-8">
           <GlobalPresenceSection {...pageData.globalPresenceSection} />
+        </SectionContainer>
+        <SectionContainer className="flex flex-col gap-4 lg:gap-8">
+          <h2 className="text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-[360px]">
+            {pageData.o11y.title}
+          </h2>
+          <TimedAccordionPanels {...pageData.o11y} />
         </SectionContainer>
         <SectionContainer className="flex flex-col gap-4 lg:gap-8">
           <h2 className="text-3xl xl:text-4xl max-w-[380px] xl:max-w-[420px]">

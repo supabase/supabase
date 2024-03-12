@@ -4,6 +4,7 @@ module.exports = config({
   content: [
     './_blog/*.mdx',
     './components/**/*.tsx',
+    './data/**/*.tsx',
     './layouts/**/*.tsx',
     './lib/mdx/mdxComponents.tsx',
     './pages/**/*.{tsx,mdx}',

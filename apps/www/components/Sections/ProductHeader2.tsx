@@ -1,21 +1,21 @@
 import React from 'react'
-import { Button, IconBookOpen } from 'ui'
+import { Button } from 'ui'
 import Link from 'next/link'
 import ProductIcon from '../ProductIcon'
 import SectionContainer from '../Layouts/SectionContainer'
+import { CTA } from '~/types/common'
 
-type subheader = string
-interface Types {
+interface Props {
   h1: string | React.ReactNode
   subheader?: string[] | React.ReactNode[]
   icon?: string
   title?: string
   image?: React.ReactNode
   footer?: React.ReactNode
-  documentation_url?: string
+  ctas?: CTA[]
 }
 
-const ProductHeader = (props: Types) => (
+const ProductHeader = (props: Props) => (
   <div className="w-full relative mx-auto py-16 pb-0 lg:py-24 border-b bg-alternative">
     <SectionContainer className="!py-0 grid grid-cols-12">
       <div className="col-span-12 gap-8 lg:col-span-5">
@@ -24,7 +24,10 @@ const ProductHeader = (props: Types) => (
             <div className="mb-4 flex items-center gap-3">
               {props.icon && <ProductIcon icon={props.icon} />}
               {props.title && (
-                <span className="text-brand" key={`product-name-${props.title}`}>
+                <span
+                  className="text-brand font-mono uppercase"
+                  key={`product-name-${props.title}`}
+                >
                   {props.title}
                 </span>
               )}
@@ -44,19 +47,18 @@ const ProductHeader = (props: Types) => (
               )
             })}
         </div>
-        <div className="flex flex-row md:flex-row md:items-center">
-          <Button asChild size="medium" className="text-white">
-            <Link href="https://supabase.com/dashboard" as="https://supabase.com/dashboard">
-              Start a project
-            </Link>
-          </Button>
-          {props.documentation_url && (
-            <Button asChild type="default" size="medium" icon={<IconBookOpen />}>
-              <Link href={props.documentation_url} as={props.documentation_url} className="ml-2">
-                See documentation
-              </Link>
+        <div className="flex flex-row md:flex-row md:items-center gap-2">
+          {props.ctas?.map((cta) => (
+            <Button
+              key={cta.href}
+              size="medium"
+              type={cta.type ?? 'default'}
+              className="text-white"
+              asChild
+            >
+              <Link href={cta.href}>{cta.label ?? 'Start for free'}</Link>
             </Button>
-          )}
+          ))}
         </div>
       </div>
       {props.image && (
@@ -64,7 +66,7 @@ const ProductHeader = (props: Types) => (
           {props.image}
         </div>
       )}
-      {props.footer && <div className="mt-4 md:mt-8 lg:mt-12 col-span-12">{props.footer}</div>}
+      {props.footer && <div className="mt-4 md:mt-8 lg:mt-32 col-span-12">{props.footer}</div>}
     </SectionContainer>
   </div>
 )

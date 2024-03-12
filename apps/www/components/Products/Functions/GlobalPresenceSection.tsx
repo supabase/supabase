@@ -13,7 +13,7 @@ function GlobalPresenceSection({ title, features }: Props) {
         {features.map((feature) => (
           <div
             key={feature.label}
-            className="flex flex-col gap-1 md:gap-2 pt-3 md:pt-0 border-t md:border-t-0 md:pl-3 md:border-l text-sm mb-1"
+            className="w-full flex flex-col gap-1 md:gap-2 pt-3 md:pt-0 border-t md:border-t-0 md:pl-3 md:border-l text-sm mb-1"
           >
             <p className="font-mono uppercase tracking-wide text-foreground">{feature.label}</p>
             <p className="text-foreground-lighter p-0 m-0">{feature.paragraph}</p>

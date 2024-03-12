@@ -1,8 +1,11 @@
 import Link from 'next/link'
 import solutions from '../../Solutions'
-import { IconGlobe } from 'ui'
+import { ButtonProps, IconCheck, IconCopy, IconGlobe } from 'ui'
 import Examples from '../../Examples'
 import { PRODUCT_NAMES } from 'shared-data/products'
+import CopyToClipboard from 'react-copy-to-clipboard'
+import { useState } from 'react'
+import CodeBlock from '../../../components/CodeBlock/CodeBlock'
 
 export default (isMobile?: boolean) => ({
   metaTitle: 'Supabase Edge Functions - Deploy JavaScript globally in seconds',
@@ -23,14 +26,18 @@ export default (isMobile?: boolean) => ({
       </>,
     ],
     image: '/images/product/vector/vector-hero.svg',
-    cta: {
-      label: 'Launch a free database',
-      link: '/dashboard',
-    },
-    secondaryCta: {
-      label: 'Read documentation',
-      link: '/docs/guides/functions',
-    },
+    ctas: [
+      {
+        label: 'Launch a free database',
+        href: '/dashboard',
+        type: 'primary' as ButtonProps,
+      },
+      {
+        label: 'Read documentation',
+        href: '/docs/guides/functions',
+        type: 'default' as ButtonProps,
+      },
+    ],
   },
   highlightsSection: {
     highlights: [
@@ -41,7 +48,7 @@ export default (isMobile?: boolean) => ({
         svg: (
           <div className="w-12 h-12 p-2 bg-alternative rounded-lg border flex justify-center items-center">
             <svg
-              className="w-6 h-6"
+              className="w-7 h-7"
               width="24"
               height="24"
               viewBox="0 0 24 24"
@@ -75,7 +82,7 @@ export default (isMobile?: boolean) => ({
         paragraph: 'Deploy worldwide for maximum resiliency and low latency',
         svg: (
           <div className="w-12 h-12 p-2 bg-alternative rounded-lg border flex justify-center items-center">
-            <IconGlobe className="w-6 h-6" />
+            <IconGlobe className="w-7 h-7" />
           </div>
         ),
       },
@@ -85,7 +92,7 @@ export default (isMobile?: boolean) => ({
         svg: (
           <div className="w-12 h-12 p-2 bg-alternative rounded-lg border flex justify-center items-center">
             <svg
-              className="w-6 h-6"
+              className="w-7 h-7"
               width="24"
               height="24"
               viewBox="0 0 24 24"
@@ -126,7 +133,7 @@ export default (isMobile?: boolean) => ({
           'Easily migrate existing workloads, with support for Node and more than 1 million NPM modules',
         svg: (
           <div className="w-12 h-12 p-2 bg-alternative rounded-lg border flex justify-center items-center">
-            <IconGlobe className="w-6 h-6" />
+            <IconGlobe className="w-7 h-7" />
           </div>
         ),
       },
@@ -181,7 +188,7 @@ export default (isMobile?: boolean) => ({
         paragraph:
           'Write code with hot code reloading, a fast Language server for autocompletion, type checking and linting.',
         className: '',
-        image: <div className="w-full h-full flex items-center justify-center">lorem</div>,
+        image: <LocalDXImage />,
       },
       {
         id: 'parity',
@@ -197,14 +204,14 @@ export default (isMobile?: boolean) => ({
           </>
         ),
         className: '',
-        image: <div className="w-full h-full flex items-center justify-center">lorem</div>,
+        image: <ParityImage />,
       },
       {
         id: 'ecosystem',
         label: 'Robust ecosystem',
         paragraph: 'Tap into the 2+ million modules in the Deno and NPM ecosystem.',
         className: '',
-        image: <div className="w-full h-full flex items-center justify-center">lorem</div>,
+        image: <NpmEcosystem />,
       },
       {
         id: 'ci',
@@ -212,7 +219,7 @@ export default (isMobile?: boolean) => ({
         paragraph:
           'Use the Supabase CLI with Github actions to preview and deploy your functions along with the rest of your application',
         className: '',
-        image: <div className="w-full h-full flex items-center justify-center">lorem</div>,
+        image: <CI />,
       },
     ],
   },
@@ -241,21 +248,29 @@ export default (isMobile?: boolean) => ({
   },
   o11y: {
     title: 'Built-in observability',
-    useCases: [
+    panels: [
       {
-        label: '',
-        paragraph: '',
-        panel: <div>lorem</div>,
+        id: 'realtime-logs',
+        label: 'Realtime logs',
+        icon: '',
+        paragraph:
+          'Stream logs to the dashboard in realtime. Logs are populated with rich metadata to help debugging. ',
+        image: <div>lorem</div>,
       },
       {
-        label: '',
-        paragraph: '',
-        panel: <div>lorem</div>,
+        id: 'log-explorer',
+        label: 'Query Logs via Log explorer',
+        icon: '',
+        paragraph:
+          'Get deeper insights into how your functions are behaving by writing SQL queries on function logs. ',
+        image: <div>lorem</div>,
       },
       {
-        label: '',
-        paragraph: '',
-        panel: <div>lorem</div>,
+        id: 'metrics',
+        label: 'Metrics',
+        icon: '',
+        paragraph: 'Dashboards show the health of your functions at all times.',
+        image: <div>lorem</div>,
       },
     ],
   },
@@ -294,3 +309,219 @@ export default (isMobile?: boolean) => ({
     examples: Examples.filter((example) => example.products.includes(PRODUCT_NAMES.FUNCTIONS)),
   },
 })
+
+const LocalDXImage = () => {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = () => {
+    setCopied(true)
+    setTimeout(() => {
+      setCopied(false)
+    }, 1000)
+  }
+
+  return (
+    <div className="w-full h-full flex-1 flex items-center justify-center">
+      <CopyToClipboard text="deno test hello">
+        <button
+          onClick={handleCopy}
+          className="p-3 group hover:border-strong flex gap-4 items-center bg-alternative-200 rounded-xl border"
+        >
+          <div className="text-foreground-muted text-sm font-mono">$</div>
+          <div className="text-foreground text-sm font-mono">deno test hello</div>
+          <div className="text-foreground rounded p-1.5 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            {copied ? (
+              <span className="text-brand">
+                <IconCheck className="w-3.5 h-3.5" />
+              </span>
+            ) : (
+              <IconCopy className="w-3.5 h-3.5" />
+            )}
+          </div>
+        </button>
+      </CopyToClipboard>
+    </div>
+  )
+}
+
+const ParityImage = () => (
+  <div className="w-full h-full flex items-center justify-center text-sm">
+    <div className="p-4 bg-surface-200 bg-opacity-30 border-2 border-dashed rounded-2xl justify-center items-center gap-1 flex">
+      <div className="py-2 px-4 bg-alternative rounded-lg shadow border flex-col justify-center items-center">
+        <div className="text-foreground uppercase tracking-wide">Dev</div>
+      </div>
+      <svg width="32" height="7" viewBox="0 0 32 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path
+          d="M27 5.74425C27 6.0204 27.3382 6.21566 27.5774 6.07759L31.4226 3.8575C31.6618 3.71943 31.6618 3.32891 31.4226 3.19084L27.5774 0.970752C27.3382 0.832681 27 1.02794 27 1.30409V5.74425ZM5 1.30409C5 1.02794 4.6618 0.832681 4.42265 0.970752L0.57735 3.19084C0.338204 3.32891 0.338204 3.71943 0.57735 3.8575L4.42265 6.07759C4.6618 6.21566 5 6.0204 5 5.74425V1.30409ZM27.5 3.02417H4.5V4.02417H27.5V3.02417Z"
+          fill="#EDEDED"
+        />
+        <path
+          d="M5 1.30409C5 1.02794 4.6618 0.832681 4.42265 0.970752L0.57735 3.19084C0.338204 3.32891 0.338204 3.71943 0.57735 3.8575L4.42265 6.07759C4.6618 6.21566 5 6.0204 5 5.74425V1.30409ZM27 5.74425C27 6.0204 27.3382 6.21566 27.5774 6.07759L31.4226 3.8575C31.6618 3.71943 31.6618 3.32891 31.4226 3.19084L27.5774 0.970752C27.3382 0.832681 27 1.02794 27 1.30409V5.74425ZM4.5 4.02417H27.5V3.02417H4.5V4.02417Z"
+          fill="#EDEDED"
+        />
+      </svg>
+
+      <div className="py-2 px-4 bg-alternative rounded-lg shadow border flex-col justify-center items-center">
+        <div className="text-foreground uppercase tracking-wide">Prod</div>
+      </div>
+    </div>
+  </div>
+)
+
+const ciCode = `jobs:
+ deploy:
+  runs-on: ubuntu-latest
+ 
+  steps:
+   - uses: actions/checkout@v3
+   - uses: supabase/setup-cli@v1
+   with:
+    version: latest
+   - run: supabase functions deploy
+`
+
+const CI = () => (
+  <div className="w-full h-full relative pl-4 mb-4 lg:-mb-0 pt-4 sm:pt-4 border-b lg:border-none overflow-hidden">
+    <div
+      className="relative pl-2 lg:pl-3 w-full transform h-full bg-alternative-200 border-l border-t flex flex-col"
+      style={{ borderTopLeftRadius: '12px' }}
+    >
+      <div className="w-full py-2 lg:py-3 relative flex items-center gap-1.5 lg:gap-2">
+        <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-foreground-muted rounded-full" />
+        <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-foreground-muted rounded-full" />
+        <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-foreground-muted rounded-full" />
+      </div>
+      <div className="md:-mb-4 h-full [&_div]:h-full flex-1 bottom-0 [&_.synthax-highlighter]:!p-4 [&_.synthax-highlighter]:!h-full [&_.synthax-highlighter]:md:!p-2 [&_.synthax-highlighter]:lg:!p-4 [&_.synthax-highlighter]:!text-[13px] [&_.synthax-highlighter]:lg:!text-sm [&_.synthax-highlighter]:!leading-4">
+        <CodeBlock lang="js" size="small">
+          {ciCode}
+        </CodeBlock>
+      </div>
+    </div>
+  </div>
+)
+
+const npmList = [
+  'Worker',
+  'MessageEvent',
+  'WritableStreamDefaultController',
+  'structuredClone',
+  'DecompressionStream',
+  'CompressionStream',
+  'setInterval',
+  'PromiseRejectionEvent',
+  'clearInterval',
+  'Blob',
+  'fetch',
+  'btoa',
+  'localStorage',
+  'Navigator',
+  'clearTimeout',
+  'ReadableStreamDefaultController',
+  'Response.json()',
+  'EventTarget',
+  'caches',
+  'CacheStorage',
+  'MessagePort',
+  'Location',
+  'DedicatedWorkerGlobalScope',
+  'WebSocket',
+  'queueMicrotask',
+  'CryptoKey',
+  'ErrorEvent',
+  'PerformanceMark',
+  'WorkerNavigator',
+  'ReadableStreamBYOBRequest',
+  'TextDecoder',
+  'WorkerLocation',
+  'TextEncoderStream',
+  'ReadableByteStreamController',
+  'TransformStream',
+  'File',
+  'CustomEvent',
+  'Event',
+  'performance',
+  'DOMException',
+  'ReadableStreamBYOBReader',
+  'crypto',
+  'CloseEvent',
+  'Nodemon',
+  'URLPattern',
+  'PerformanceEntry',
+  'console',
+  '@supabase/supabase-js',
+  'window.close()',
+  'Crypto',
+  'Request',
+  'ReadableStream',
+  'Storage',
+  'WebAssembly',
+  'TextDecoderStream',
+  'URLSearchParams',
+  'ProgressEvent',
+  'BroadcastChannel',
+  'FileReader',
+  'ByteLengthQueuingStrategy',
+  'ESLint',
+  'BeforeUnloadEvent',
+  'TextEncoder',
+  'atob',
+  'window.alert()',
+  'Performance',
+  'Headers',
+  'WorkerGlobalScope',
+  'AbortSignal',
+  'FormData',
+  'Response',
+  'MessageChannel',
+  'URL',
+  // 'setTimeout',
+  // 'Window',
+  // 'TransformStreamDefaultController',
+  // 'Moment',
+  // 'SubtleCrypto',
+  // 'Cache',
+  // 'WritableStream',
+  // 'AbortController',
+  // 'ReadableStreamDefaultReader',
+  // 'PerformanceMeasure',
+  // 'WritableStreamDefaultWriter',
+  // 'openai',
+  // 'jwt',
+  // 'react',
+  // 'Async',
+  // 'Mocha',
+  // 'Passport',
+  // 'Socket.IO',
+  // 'Lodash',
+]
+
+const NpmEcosystem = () => {
+  return (
+    <div className="relative w-full h-full overflow-hidden group">
+      <div
+        className="absolute flex flex-wrap items-start gap-2 opacity-80 dark:opacity-50"
+        style={{ left: -50, right: -250 }}
+      >
+        {npmList.map((module) => (
+          <span key={module} className="py-1 px-2 rounded bg-surface-300 text-foreground-muted">
+            {module}
+          </span>
+        ))}
+      </div>
+      <div
+        className="absolute inset-0"
+        style={{
+          background: `radial-gradient(70% 50% at 50% 50%, transparent, hsl(var(--background-surface-100))`,
+        }}
+      />
+      <div className="absolute z-10 inset-0 flex flex-col items-center justify-center font-bold text-7xl uppercase">
+        <span className="text-foreground/10 bg-clip-text bg-gradient-to-b from-foreground to-foreground-lighter">
+          2M+
+        </span>
+        <span className="text-foreground/10 bg-clip-text bg-gradient-to-b from-foreground to-foreground-lighter text-3xl -mt-2">
+          Modules
+        </span>
+      </div>
+    </div>
+  )
+}

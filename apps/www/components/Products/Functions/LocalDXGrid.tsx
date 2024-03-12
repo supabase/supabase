@@ -29,17 +29,22 @@ const Content = ({ card }: { card: any }) => {
   return (
     <Panel
       key={card.label}
-      outerClassName="w-full"
+      outerClassName="w-full group"
       innerClassName={cn(
-        'flex flex-col gap-4 min-h-[300px] lg:min-h-[300px]',
-        isHoriz && 'flex-row items-end'
+        'relative flex flex-col min-h-[300px] lg:min-h-[300px]',
+        isHoriz && 'lg:flex-row lg:items-end'
       )}
       style={{ gridArea: card.id }}
     >
-      <div className={cn('flex-1 bg-default', isHoriz && 'order-last flex-1 h-full')}>
+      <div
+        className={cn(
+          'relative flex-1 h-full w-full flex items-center',
+          isHoriz && 'lg:order-last flex-1 h-full'
+        )}
+      >
         {card.image}
       </div>
-      <div className={cn('flex flex-col gap-1 p-4 md:p-6', isHoriz && 'lg:w-1/3')}>
+      <div className={cn('flex flex-col gap-1 p-4 lg:p-6 !pt-0', isHoriz && 'lg:w-1/3')}>
         <h3 className="text-xl text-foreground">{card.label}</h3>
         <div className={cn('flex-1 flex flex-col justify-between gap-2', isHoriz && 'flex-auto')}>
           <p className="text-sm text-foreground-lighter">{card.paragraph}</p>

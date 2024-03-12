@@ -94,7 +94,7 @@ function CodeBlock(props: CodeBlockProps) {
         <SyntaxHighlighter
           language={lang}
           style={monokaiCustomTheme}
-          className={[!filename && 'rounded-t-lg', 'rounded-b-lg'].join(' ')}
+          className={[!filename && 'synthax-highlighter rounded-t-lg', 'rounded-b-lg'].join(' ')}
           customStyle={{
             padding: '21px 24px',
             fontSize: large ? 18 : '0.875rem',
