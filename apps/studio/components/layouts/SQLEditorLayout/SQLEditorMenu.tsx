@@ -273,6 +273,7 @@ const SideBarContent = () => {
                         <QueryItem
                           key={tabInfo.id}
                           tabInfo={tabInfo}
+                          onDeleteQuery={postDeleteCleanup}
                           hasQueriesSelected={selectedQueries.length > 0}
                         />
                       ))}
