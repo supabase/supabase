@@ -222,7 +222,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                     <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
                       Return type
                     </FormLabel_Shadcn_>
-                    {/* Form selects don't need form controls, otherwise the CSS get's weird */}
+                    {/* Form selects don't need form controls, otherwise the CSS gets weird */}
                     <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
                       <SelectTrigger_Shadcn_ className="col-span-8">
                         <SelectValue_Shadcn_ />
@@ -309,7 +309,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                             <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
                               Behavior
                             </FormLabel_Shadcn_>
-                            {/* Form selects don't need form controls, otherwise the CSS get's weird */}
+                            {/* Form selects don't need form controls, otherwise the CSS gets weird */}
                             <Select_Shadcn_
                               defaultValue={field.value}
                               onValueChange={field.onChange}
@@ -348,6 +348,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                         render={({ field }) => (
                           <FormItem_Shadcn_>
                             <FormControl_Shadcn_ className="col-span-8">
+                              {/* TODO: This RadioGroup imports Formik state, replace it with a clean component */}
                               <Radio.Group
                                 type="cards"
                                 label="Type of security"
@@ -596,7 +597,7 @@ const FormFieldLanguage = () => {
           <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
             Language
           </FormLabel_Shadcn_>
-          {/* Form selects don't need form controls, otherwise the CSS get's weird */}
+          {/* Form selects don't need form controls, otherwise the CSS gets weird */}
           <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
             <SelectTrigger_Shadcn_ className="col-span-8">
               <SelectValue_Shadcn_ />
