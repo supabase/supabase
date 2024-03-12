@@ -59,7 +59,7 @@ export function CommandError({ resetErrorBoundary }: { resetErrorBoundary: () =>
 interface CommandDialogProps extends React.ComponentProps<typeof Dialog> {
   onKeyDown?: KeyboardEventHandler<HTMLDivElement>
   page?: number | string
-  visible: boolean
+  visible?: boolean
   setIsOpen: (open: boolean) => void
 }
 
