@@ -43,7 +43,7 @@ const FeaturePreviewModal = () => {
       ? [
           {
             key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_AI_ASSISTANT,
-            name: 'Supabase Assistant for SQL editor',
+            name: 'SQL Editor Conversational Assistant ',
             content: <SQLEditorAIAssistantPreview />,
             discussionsUrl: undefined,
           },

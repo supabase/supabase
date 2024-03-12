@@ -1,13 +1,12 @@
 import React from 'react'
 // import { AutoForm } from 'uniforms'
 
-import { Input } from '.'
-import { IconPackage } from './../../index'
+import { Input } from './../Input'
+import { Package } from 'lucide-react'
 import { Button } from '../Button'
-import { Space } from '../Space'
 
 export default {
-  title: 'Data Input/Input',
+  title: 'Old primitives/Input',
   component: Input,
 }
 
@@ -41,7 +40,7 @@ export const borderless = (args: any) => <Input {...args} />
 
 export const date = (args: any) => <Input {...args} step="12" />
 
-const icon: any = <IconPackage />
+const icon: any = <Package />
 
 Default.args = {
   placeholder: 'Type text here ...',
@@ -124,9 +123,7 @@ withCustomActions.args = {
   value: 'Value of input',
   actions: [
     <Button type="secondary">Copy text</Button>,
-    <Button type="outline" danger>
-      Delete this
-    </Button>,
+    <Button type="outline">Delete this</Button>,
   ],
 }
 
