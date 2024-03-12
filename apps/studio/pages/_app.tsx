@@ -46,12 +46,10 @@ import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/Featur
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
-import { StoreProvider } from 'hooks'
 import { AuthProvider } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
-import UiStore from 'stores/UiStore'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
 
@@ -81,9 +79,7 @@ loader.config({
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const snap = useAppStateSnapshot()
   const queryClient = useRootQueryClient()
-
   const consentToastId = useRef<string>()
-  const [rootStore] = useState(() => ({ ui: new UiStore() }))
 
   // [Joshen] Some issues with using createBrowserSupabaseClient
   const [supabase] = useState(() =>
@@ -146,43 +142,41 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <QueryClientProvider client={queryClient}>
       <Hydrate state={pageProps.dehydratedState}>
-        <StoreProvider rootStore={rootStore}>
-          <AuthContainer>
-            <ProfileProvider>
-              <FlagProvider>
-                <Head>
-                  <title>Supabase</title>
-                  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-                </Head>
-                <Favicons />
+        <AuthContainer>
+          <ProfileProvider>
+            <FlagProvider>
+              <Head>
+                <title>Supabase</title>
+                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+              </Head>
+              <Favicons />
 
-                <PageTelemetry>
-                  <TooltipProvider>
-                    <RouteValidationWrapper>
-                      <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-                        <AppBannerContextProvider>
-                          <CommandMenuWrapper>
-                            <AppBannerWrapper>
-                              <FeaturePreviewContextProvider>
-                                {getLayout(<Component {...pageProps} />)}
-                                <FeaturePreviewModal />
-                              </FeaturePreviewContextProvider>
-                            </AppBannerWrapper>
-                          </CommandMenuWrapper>
-                        </AppBannerContextProvider>
-                      </ThemeProvider>
-                    </RouteValidationWrapper>
-                  </TooltipProvider>
-                </PageTelemetry>
+              <PageTelemetry>
+                <TooltipProvider>
+                  <RouteValidationWrapper>
+                    <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+                      <AppBannerContextProvider>
+                        <CommandMenuWrapper>
+                          <AppBannerWrapper>
+                            <FeaturePreviewContextProvider>
+                              {getLayout(<Component {...pageProps} />)}
+                              <FeaturePreviewModal />
+                            </FeaturePreviewContextProvider>
+                          </AppBannerWrapper>
+                        </CommandMenuWrapper>
+                      </AppBannerContextProvider>
+                    </ThemeProvider>
+                  </RouteValidationWrapper>
+                </TooltipProvider>
+              </PageTelemetry>
 
-                <HCaptchaLoadedStore />
-                <Toaster />
-                <PortalToast />
-                {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
-              </FlagProvider>
-            </ProfileProvider>
-          </AuthContainer>
-        </StoreProvider>
+              <HCaptchaLoadedStore />
+              <Toaster />
+              <PortalToast />
+              {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
+            </FlagProvider>
+          </ProfileProvider>
+        </AuthContainer>
       </Hydrate>
     </QueryClientProvider>
   )

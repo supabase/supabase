@@ -18,13 +18,7 @@ import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { isError } from 'data/utils/error-check'
-import {
-  useFlag,
-  useLocalStorageQuery,
-  useSelectedOrganization,
-  useSelectedProject,
-  useStore,
-} from 'hooks'
+import { useFlag, useLocalStorageQuery, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
@@ -89,7 +83,6 @@ export function useSqlEditor() {
 }
 
 const SQLEditor = () => {
-  const { ui } = useStore()
   const { ref, id: urlId } = useParams()
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
@@ -398,7 +391,7 @@ const SQLEditor = () => {
         toast.error(`Failed to create new query: ${error.message}`)
       }
     },
-    [profile?.id, project?.id, ref, router, snap, ui]
+    [profile?.id, project?.id, ref, router, snap]
   )
 
   const updateEditorWithCheckForDiff = ({

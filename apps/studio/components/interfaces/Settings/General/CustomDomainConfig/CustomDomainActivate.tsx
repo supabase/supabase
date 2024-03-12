@@ -1,7 +1,13 @@
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+
+import Panel from 'components/ui/Panel'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
+import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-domains-activate-mutation'
+import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
+import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -12,13 +18,6 @@ import {
   Modal,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-
-import Panel from 'components/ui/Panel'
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
-import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-domains-activate-mutation'
-import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
-import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 
 export type CustomDomainActivateProps = {
   projectRef?: string
@@ -167,4 +166,4 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
   )
 }
 
-export default observer(CustomDomainActivate)
+export default CustomDomainActivate
