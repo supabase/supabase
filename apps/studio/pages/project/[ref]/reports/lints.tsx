@@ -14,6 +14,8 @@ import ReportLintsTableRow from 'components/interfaces/Reports/ReportLintsTableR
 import Table from 'components/to-be-cleaned/Table'
 import { useLocalStorageQuery } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { Accordion, Button, cn } from 'ui'
+import { ArrowDown, ChevronDown, ChevronLast } from 'lucide-react'
 
 export type Lint = {
   name: string
@@ -38,6 +40,11 @@ const ProjectLints: NextPageWithLayout = () => {
 
   const [lints, setLints] = useState<Lint[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [ignoreListExpanded, setIgnoreListExpanded] = useState(false)
+
+  const ignoredLints = fakeLints.filter((lint: Lint) =>
+    lintIgnoreList.split(',').includes(lint.cache_key)
+  )
 
   useEffect(() => {
     let cancel = false
@@ -127,6 +134,49 @@ const ProjectLints: NextPageWithLayout = () => {
               />
             )}
           </div>
+
+          {ignoredLints.length > 0 && (
+            <div className="mt-4">
+              <Accordion
+                openBehaviour="multiple"
+                chevronAlign="right"
+                className="border p-2 bg-surface-100 rounded"
+              >
+                <Accordion.Item
+                  header={
+                    <div className="flex flex-row gap-2 items-center p-2">
+                      Ignored lints ({ignoredLints.length})
+                    </div>
+                  }
+                  id="1"
+                  className="flex flex-row gap-8"
+                >
+                  <Table
+                    className="border-t mt-4"
+                    body={
+                      fakeLints.length === 0 ? (
+                        <Table.tr>
+                          <Table.td colSpan={6} className="p-3 py-12 text-center">
+                            <p className="text-foreground-light">
+                              {isLoading
+                                ? 'Checking for project lints'
+                                : 'No lints have been found for this project'}
+                            </p>
+                          </Table.td>
+                        </Table.tr>
+                      ) : (
+                        <>
+                          {ignoredLints.map((lint: Lint) => {
+                            return <ReportLintsTableRow key={lint.cache_key} lint={lint} />
+                          })}
+                        </>
+                      )
+                    }
+                  />
+                </Accordion.Item>
+              </Accordion>
+            </div>
+          )}
         </div>
       </div>
     </div>

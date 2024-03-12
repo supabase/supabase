@@ -22,24 +22,30 @@ type ReportLintsTableRowProps = {
 
 const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
   const [expanded, setExpanded] = useState(false)
-  const [selectedLintToIgnore, setSelectedLintToIgnore] = useState<Lint | null>(null)
+  const [seletectdLint, setSelectedLint] = useState<Lint | null>(null)
+
   const [lintIgnoreList, setLintIgnoreList] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.PROJECT_LINT_IGNORE_LIST,
     ''
   )
 
-  function ignoreLint(lint: Lint) {
-    console.log({ lintIgnoreList })
+  function toggleLintIgnore(lint: Lint) {
     const currentIgnoreList = lintIgnoreList ? lintIgnoreList.split(',') : [] // Split only if lintIgnoreList is not empty
     const cacheKey = lint.cache_key
 
-    // Check if the cacheKey already exists in the array
-    if (!currentIgnoreList.includes(cacheKey)) {
+    // Check if the cacheKey exists in the array
+    const index = currentIgnoreList.indexOf(cacheKey)
+    if (index !== -1) {
+      // If lint is ignored, unignore it
+      currentIgnoreList.splice(index, 1) // Remove the cacheKey from the array
+    } else {
+      // If lint is not ignored, ignore it
       currentIgnoreList.push(cacheKey)
-      const ignoreString = currentIgnoreList.join(',')
-      console.log({ ignoreString })
-      setLintIgnoreList(ignoreString) // Store the updated string back to localStorage
     }
+
+    const ignoreString = currentIgnoreList.join(',')
+    console.log({ ignoreString })
+    setLintIgnoreList(ignoreString) // Store the updated string back to localStorage
   }
 
   return (
@@ -76,22 +82,22 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
                   <MoreVertical size={14} />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" className="w-[140px]">
+              <DropdownMenuContent side="bottom" className="w-[150px]">
                 <DropdownMenuItem
                   className="flex items-center gap-2"
                   onClick={(event) => {
                     event.stopPropagation()
-                    setSelectedLintToIgnore(lint)
+                    setSelectedLint(lint)
                   }}
                 >
                   <EyeOff size={16} strokeWidth={1} />
-                  <p>Ignore this lint</p>
+                  <p>
+                    {lintIgnoreList.split(',').includes(lint.cache_key) ? 'Unignore' : 'Ignore'}{' '}
+                    this lint
+                  </p>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            {/* <Button type="text" onClick={() => setExpanded(!expanded)} className="ml-auto">
-              eeee
-            </Button> */}
           </div>
         </Table.td>
       </Table.tr>
@@ -114,11 +120,10 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
       <Modal
         size="small"
         alignFooter="right"
-        visible={selectedLintToIgnore !== null}
-        onCancel={() => setSelectedLintToIgnore(null)}
-        onConfirm={() => ignoreLint(lint)}
+        visible={seletectdLint !== null}
+        onCancel={() => setSelectedLint(null)}
+        onConfirm={() => toggleLintIgnore(lint)}
         header={<h3>Confirm to ignore this lint</h3>}
-        //loading={isDeleting}
       >
         <div className="py-4">
           <Modal.Content>
