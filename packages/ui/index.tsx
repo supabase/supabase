@@ -33,7 +33,7 @@ export * from './src/components/NavMenu'
 
 export * from './src/components/Modal'
 export * from './src/components/SidePanel'
-export * from './src/components/ContextMenu'
+// export * from './src/components/ContextMenu'
 export * from './src/components/PromoToast'
 export * from './src/components/Popover'
 export * from './src/layout/PortalToast'
@@ -85,6 +85,7 @@ export * from './src/components/shadcn/ui/toaster'
 export { Badge as Badge_Shadcn_ } from './src/components/shadcn/ui/badge'
 
 export * from './src/components/shadcn/ui/separator'
+export * from './src/components/shadcn/ui/context-menu'
 
 export {
   Command as Command_Shadcn_,

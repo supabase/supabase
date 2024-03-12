@@ -26,6 +26,7 @@ export const SingleItem: Story = {
     isBranch: false,
     isExpanded: false,
     levelPadding: 16,
+    name: 'Element name',
   },
   /**
    * 👇 To avoid linting issues, it is recommended to use a function with a capitalized name.
