@@ -9,5 +9,12 @@
     return <IconBase icon={Calendar} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { calendar } from 'lucide-react'
+  */
   export default IconCalendar
   

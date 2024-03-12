@@ -156,6 +156,20 @@ const buttonVariants = cva(
   }
 )
 
+const IconContainerVariants = cva('', {
+  variants: {
+    size: {
+      tiny: '[&_svg]:h-[14px] [&_svg]:w-[14px]',
+      small: '[&_svg]:h-[18px] [&_svg]:w-[18px]',
+      medium: '[&_svg]:h-[20px] [&_svg]:w-[20px]',
+      large: '[&_svg]:h-[20px] [&_svg]:w-[20px]',
+      xlarge: '[&_svg]:h-[24px] [&_svg]:w-[24px]',
+      xxlarge: '[&_svg]:h-[30px] [&_svg]:w-[30px]',
+      xxxlarge: '[&_svg]:h-[42px] [&_svg]:w-[42px]',
+    },
+  },
+})
+
 export type LoadingVariantProps = VariantProps<typeof loadingVariants>
 const loadingVariants = cva('', {
   variants: {
@@ -211,6 +225,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Comp
         ref={ref}
+        data-size={size}
         type={htmlType}
         {...props}
         className={cn(buttonVariants({ type, size, disabled, block, rounded }), className)}
@@ -224,17 +239,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 (loading ? (
                   <IconLoader size={size} className={cn(loadingVariants({ loading }))} />
                 ) : _iconLeft ? (
-                  <IconContext.Provider value={{ contextSize: size }}>
-                    {_iconLeft}
-                  </IconContext.Provider>
+                  <div className={cn(IconContainerVariants({ size }))}>{_iconLeft}</div>
                 ) : null),
               children.props.children && (
                 <span className={'truncate'}>{children.props.children}</span>
               ),
               iconRight && !loading && (
-                <IconContext.Provider value={{ contextSize: size }}>
-                  {iconRight}
-                </IconContext.Provider>
+                <div className={cn(IconContainerVariants({ size }))}>{iconRight}</div>
               )
             )
           ) : null

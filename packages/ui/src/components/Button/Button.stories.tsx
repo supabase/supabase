@@ -1,32 +1,21 @@
-import { Button } from '.'
-// Button.stories.ts|tsx
+import React from 'react'
+import { Button } from './../Button'
 
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { ButtonProps } from './Button'
+import { ButtonProps } from './../Button'
 
-import { IconAirplay } from '../Icon/icons/IconAirplay'
+import { IconActivity } from '../Icon/icons/IconActivity'
 
 const meta: Meta<typeof Button> = {
   /* 👇 The title prop is optional.
    * See https://storybook.js.org/docs/react/configure/overview#configure-story-loading
    * to learn how to generate automatic titles
    */
-  title: 'General/Button',
+  title: 'Old Primitives/Button',
   component: Button,
 }
 
-export const Neutral = (args: any) => <Button {...args}>Button text</Button>
-export const Success = (args: any) => <Button {...args}>Button text</Button>
-export const withStyles = (args: any) => <Button {...args}>Button text</Button>
-export const withIcon = (args: any) => <Button {...args}>Button text</Button>
-export const withIconRight = (args: any) => <Button {...args}>Button text</Button>
-export const withBlock = (args: any) => <Button {...args}>Button text</Button>
-export const withOnlyIcon = (args: any) => <Button {...args} />
-export const withOnlyLoading = (args: any) => <Button {...args} />
-export const withLoadingCentered = (args: any) => (
-  <Button {...args}>Loading icon is centered</Button>
-)
 export default meta
 
 type Story = StoryObj<typeof Button>
@@ -150,11 +139,11 @@ export const Sizes = {
 export const LeftIcon = {
   args: {
     children: 'Change the size below',
-    type: 'primary',
-    iconLeft: <IconAirplay />,
+    type: 'default',
+    icon: <IconActivity />,
   },
-  render: ({ children, type, iconLeft }: ButtonProps) => (
-    <Button iconLeft={iconLeft} type={type}>
+  render: ({ children, type, icon }: ButtonProps) => (
+    <Button icon={icon} type={type}>
       {children}
     </Button>
   ),
@@ -164,7 +153,7 @@ export const RightIcon = {
   args: {
     children: 'Change the size below',
     type: 'primary',
-    iconRight: <IconAirplay />,
+    iconRight: <IconActivity />,
   },
   render: ({ children, type, iconRight }: ButtonProps) => (
     <Button iconRight={iconRight} type={type}>
