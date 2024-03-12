@@ -4,16 +4,19 @@ import Head from 'next/head'
 import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/router'
 import { FC, useEffect, useRef, useState } from 'react'
-import { IconExternalLink } from 'ui'
+
+import { IconExternalLink, cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+
 import components from '~/components'
 import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import useHash from '~/hooks/useHash'
-import { LayoutMainContent } from '../DefaultLayout'
-import { MainSkeleton } from '../MainSkeleton'
+import { Feedback } from '~/components/Feedback'
+import { LayoutMainContent } from '~/layouts/DefaultLayout'
+import { MainSkeleton } from '~/layouts/MainSkeleton'
 
 interface Props {
   meta: {
@@ -69,7 +72,7 @@ const Layout: FC<Props> = (props) => {
         return { text, link, level }
       })
     setTocList(newHeadings)
-  }, [pathname]) // Needed to recalculate the ToC when the page changes
+  }, [pathname]) // needed to recalculate the toc when path changes
 
   const hasTableOfContents = tocList.length > 0
   const tocVideoPreview = `http://img.youtube.com/vi/${props.meta?.tocVideo}/0.jpg`
@@ -162,13 +165,12 @@ const Layout: FC<Props> = (props) => {
             </div>
             {!props.hideToc && hasTableOfContents && !props.meta?.hide_table_of_contents && (
               <div
-                className={[
-                  'col-span-3',
-                  'border-overlay bg-background table-of-contents-height',
-                  'thin-scrollbar overflow-y-auto sticky hidden md:block md:col-span-3 px-2',
-                  'transition-all ease-out',
-                  'duration-100',
-                ].join(' ')}
+                className={cn(
+                  'col-span-3 self-start',
+                  'border-overlay bg-background',
+                  'thin-scrollbar overflow-y-auto hidden md:block md:col-span-3 px-2',
+                  'sticky top-[calc(var(--mobile-header-height,40px)+2rem)] lg:top-[calc(var(--desktop-header-height,60px)+2rem)]'
+                )}
               >
                 <div className="border-l">
                   {props.meta?.tocVideo && !!tocVideoPreview && (
@@ -176,6 +178,7 @@ const Layout: FC<Props> = (props) => {
                       <ExpandableVideo imgUrl={tocVideoPreview} videoId={props.meta.tocVideo} />
                     </div>
                   )}
+                  <Feedback key={pathname} />
                   <span className="block font-mono text-xs uppercase text-foreground px-5 mb-6">
                     On this page
                   </span>
