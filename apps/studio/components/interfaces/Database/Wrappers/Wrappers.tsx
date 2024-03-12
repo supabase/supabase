@@ -1,13 +1,12 @@
 import { groupBy } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, IconExternalLink } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { FDW, useFDWsQuery } from 'data/fdw/fdws-query'
+import { Button, IconExternalLink } from 'ui'
 import DeleteWrapperModal from './DeleteWrapperModal'
 import WrapperRow from './WrapperRow'
 import { WRAPPERS } from './Wrappers.constants'
@@ -117,4 +116,4 @@ const Wrappers = () => {
   )
 }
 
-export default observer(Wrappers)
+export default Wrappers

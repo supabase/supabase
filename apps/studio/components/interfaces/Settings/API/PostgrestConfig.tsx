@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { indexOf } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import { useEffect } from 'react'
 import toast from 'react-hot-toast'
 
@@ -188,4 +187,4 @@ const PostgrestConfig = () => {
   )
 }
 
-export default observer(PostgrestConfig)
+export default PostgrestConfig

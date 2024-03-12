@@ -1,15 +1,14 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
 import SVG from 'react-inlinesvg'
-import { Button, IconLoader, IconTool } from 'ui'
 
 import Success from 'components/interfaces/Support/Success'
 import SupportForm from 'components/interfaces/Support/SupportForm'
 import { usePlatformStatusQuery } from 'data/platform/platform-status-query'
 import { withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import { Button, IconLoader, IconTool } from 'ui'
 
 const SupportPage = () => {
   const [sentCategory, setSentCategory] = useState<string>()
@@ -94,4 +93,4 @@ const SupportPage = () => {
   )
 }
 
-export default withAuth(observer(SupportPage), { useHighestAAL: false })
+export default withAuth(SupportPage, { useHighestAAL: false })

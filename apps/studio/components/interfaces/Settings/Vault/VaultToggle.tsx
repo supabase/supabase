@@ -1,6 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -161,4 +160,4 @@ const VaultToggle = () => {
   )
 }
 
-export default observer(VaultToggle)
+export default VaultToggle

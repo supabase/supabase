@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
@@ -46,4 +45,4 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
   )
 }
 
-export default withAuth(observer(DatabaseLayout))
+export default withAuth(DatabaseLayout)
