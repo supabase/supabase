@@ -2,9 +2,9 @@ import type { PostgresPolicy } from '@supabase/postgres-meta'
 import clsx from 'clsx'
 import { PanelLeftClose, PanelRightClose, X } from 'lucide-react'
 import {
-  SheetClose_Shadcn_,
-  SheetHeader_Shadcn_,
-  SheetTitle_Shadcn_,
+  SheetClose,
+  SheetHeader,
+  SheetTitle,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
@@ -21,14 +21,14 @@ export const AIPolicyHeader = ({
   setAssistantVisible: (v: boolean) => void
 }) => {
   return (
-    <SheetHeader_Shadcn_
+    <SheetHeader
       className={cn(
         selectedPolicy !== undefined ? 'pt-3 pb-0' : 'py-3',
         'flex flex-row justify-between items-center'
       )}
     >
       <div className="flex flex-row gap-3 items-center max-w-[75%]">
-        <SheetClose_Shadcn_
+        <SheetClose
           className={clsx(
             'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
             'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
@@ -38,13 +38,13 @@ export const AIPolicyHeader = ({
         >
           <X className="h-3 w-3" />
           <span className="sr-only">Close</span>
-        </SheetClose_Shadcn_>
+        </SheetClose>
         <div className="h-[24px] w-[1px] bg-border-overlay" />
-        <SheetTitle_Shadcn_ className="truncate">
+        <SheetTitle className="truncate">
           {selectedPolicy !== undefined
             ? `Update policy: ${selectedPolicy.name}`
             : 'Create a new Row Level Security policy'}
-        </SheetTitle_Shadcn_>
+        </SheetTitle>
       </div>
       <Tooltip_Shadcn_>
         <TooltipTrigger_Shadcn_ asChild>
@@ -69,6 +69,6 @@ export const AIPolicyHeader = ({
           {assistantVisible ? 'Hide' : 'Show'} tools
         </TooltipContent_Shadcn_>
       </Tooltip_Shadcn_>
-    </SheetHeader_Shadcn_>
+    </SheetHeader>
   )
 }
