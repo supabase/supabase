@@ -1,12 +1,14 @@
-import Link from 'next/link'
-import solutions from '../../Solutions'
-import { ButtonProps, IconCheck, IconCopy, IconGlobe } from 'ui'
-import Examples from '../../Examples'
-import { PRODUCT_NAMES } from 'shared-data/products'
-import CopyToClipboard from 'react-copy-to-clipboard'
 import { useState } from 'react'
-import CodeBlock from '../../../components/CodeBlock/CodeBlock'
-import Image from 'next/image'
+import Link from 'next/link'
+import CopyToClipboard from 'react-copy-to-clipboard'
+import { ButtonProps, IconCheck, IconCopy, IconGlobe } from 'ui'
+
+import CodeBlock from '~/components/CodeBlock/CodeBlock'
+import FunctionsHero from '~/components/Products/Functions/FunctionsHero'
+
+import solutions from '~/data/Solutions'
+import Examples from '~/data/Examples'
+import { PRODUCT_NAMES } from 'shared-data/products'
 
 export default (isMobile?: boolean) => ({
   metaTitle: 'Supabase Edge Functions - Deploy JavaScript globally in seconds',
@@ -26,7 +28,7 @@ export default (isMobile?: boolean) => ({
         close to your users.
       </>,
     ],
-    image: <HeroVisual />,
+    image: <FunctionsHero />,
     ctas: [
       {
         label: 'Launch a free database',
@@ -310,22 +312,6 @@ export default (isMobile?: boolean) => ({
     examples: Examples.filter((example) => example.products.includes(PRODUCT_NAMES.FUNCTIONS)),
   },
 })
-
-const HeroVisual = () => {
-  return (
-    <div className="absolute -left-20 sm:-left-32 md:-left-44 lg:-left-10 xl:-left-32 lg:-top-10 w-[150%] md:w-[150%] lg:w-[130%] xl:w-[130%] aspect-[978/678] inset-0">
-      <Image
-        src="/images/product/functions/globe.svg"
-        alt="globe wireframe"
-        width={400}
-        height={400}
-        className="w-full h-full"
-        quality={100}
-        priority
-      />
-    </div>
-  )
-}
 
 const LocalDXImage = () => {
   const [copied, setCopied] = useState(false)

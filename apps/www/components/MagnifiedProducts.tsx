@@ -87,11 +87,11 @@ function Product({
         >
           <Image
             src={product.icon}
+            alt={product.name}
+            className="object-contain"
+            sizes="100%"
             priority
-            layout="fill"
-            objectFit="contain"
-            lazyBoundary="100px"
-            alt=""
+            fill
           />
         </motion.div>
         <div className="text-brand-600 flex justify-center relative opacity-70 md:absolute md:bottom-0 md:opacity-0 group-hover:opacity-100 transition-opacity md:translate-y-8 md:-left-20 md:md:-right-20 font-mono uppercase text-center text-xs mt-2">

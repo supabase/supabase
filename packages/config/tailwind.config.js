@@ -1,15 +1,15 @@
-const ui = require('./ui.config.js');
-const deepMerge = require('deepmerge');
+const ui = require('./ui.config.js')
+const deepMerge = require('deepmerge')
 
-const color = require('./../ui/build/css/tw-extend/color');
+const color = require('./../ui/build/css/tw-extend/color')
 
 /**
  *
  */
-let colorExtend = {};
+let colorExtend = {}
 Object.values(color).map((x, i) => {
-  colorExtend[ Object.keys(color)[ i ] ] = `hsl(${x.cssVariable} / <alpha-value>)`; // x.cssVariable
-});
+  colorExtend[Object.keys(color)[i]] = `hsl(${x.cssVariable} / <alpha-value>)` // x.cssVariable
+})
 
 // console.log('colorExtend', colorExtend)
 // console.log('colorExtend kebabToNested', kebabToNested(colorExtend))
@@ -21,16 +21,16 @@ Object.values(color).map((x, i) => {
  * adds <alpha-value> as part of the hsl value
  */
 function generateTwColorClasses(globalKey, twAttributes) {
-  let classes = {};
+  let classes = {}
   Object.values(twAttributes).map((attr, i) => {
-    const attrKey = Object.keys(twAttributes)[ i ];
+    const attrKey = Object.keys(twAttributes)[i]
 
     if (attrKey.includes(globalKey)) {
-      const keySplit = attrKey.split('-').splice(1).join('-');
+      const keySplit = attrKey.split('-').splice(1).join('-')
 
       let payload = {
-        [ keySplit ]: `hsl(${attr.cssVariable} / <alpha-value>)`,
-      };
+        [keySplit]: `hsl(${attr.cssVariable} / <alpha-value>)`,
+      }
 
       if (keySplit == 'DEFAULT') {
         // includes a 'default' duplicate
@@ -38,48 +38,48 @@ function generateTwColorClasses(globalKey, twAttributes) {
         payload = {
           ...payload,
           default: `hsl(${attr.cssVariable} / <alpha-value>)`,
-        };
+        }
       }
 
       classes = {
         ...classes,
         ...payload,
-      };
+      }
     }
-  });
+  })
   /**
    * mutate object into nested object for tailwind theme structure
    */
-  const nestedClasses = kebabToNested(classes);
+  const nestedClasses = kebabToNested(classes)
   // return, but nest the keys if they are kebab case named
-  return nestedClasses;
+  return nestedClasses
 }
 
 /**
  * Helper to convert kebab named keys in object to nested nodes
  */
 function kebabToNested(obj) {
-  const result = {};
-  for (const [ key, value ] of Object.entries(obj)) {
-    const parts = key.split('-');
-    let currentObj = result;
+  const result = {}
+  for (const [key, value] of Object.entries(obj)) {
+    const parts = key.split('-')
+    let currentObj = result
     for (let i = 0; i < parts.length; i++) {
-      const part = parts[ i ] === 'DEFAULT' ? parts[ i ] : parts[ i ].toLowerCase(); // convert key to lowercase
-      if (!currentObj[ part ]) {
-        currentObj[ part ] = {};
+      const part = parts[i] === 'DEFAULT' ? parts[i] : parts[i].toLowerCase() // convert key to lowercase
+      if (!currentObj[part]) {
+        currentObj[part] = {}
       }
       if (i === parts.length - 1) {
         if (typeof value === 'object') {
-          currentObj[ part ] = kebabToNested(value); // recursively convert nested objects
+          currentObj[part] = kebabToNested(value) // recursively convert nested objects
         } else {
-          currentObj[ part ] = value.toString().toLowerCase(); // convert value to lowercase
+          currentObj[part] = value.toString().toLowerCase() // convert value to lowercase
         }
       } else {
-        currentObj = currentObj[ part ];
+        currentObj = currentObj[part]
       }
     }
   }
-  return result;
+  return result
 }
 
 /**
@@ -241,7 +241,7 @@ const uiConfig = ui({
               backgroundColor: 'hsl(var(--background-surface-200))',
               border: '1px solid ' + 'hsl(var(--background-surface-300))',
               borderRadius: theme('borderRadius.lg'),
-              wordBreak: 'break-all',
+              // wordBreak: 'break-all',
             },
             a: {
               position: 'relative',
@@ -411,9 +411,9 @@ const uiConfig = ui({
 
 function arrayMergeFn(destinationArray, sourceArray) {
   return destinationArray.concat(sourceArray).reduce((acc, cur) => {
-    if (acc.includes(cur)) return acc;
-    return [ ...acc, cur ];
-  }, []);
+    if (acc.includes(cur)) return acc
+    return [...acc, cur]
+  }, [])
 }
 
 /**
@@ -424,7 +424,7 @@ function arrayMergeFn(destinationArray, sourceArray) {
 function wrapper(tailwindConfig) {
   return deepMerge({ ...tailwindConfig }, uiConfig, {
     arrayMerge: arrayMergeFn,
-  });
+  })
 }
 
-module.exports = wrapper;
+module.exports = wrapper
