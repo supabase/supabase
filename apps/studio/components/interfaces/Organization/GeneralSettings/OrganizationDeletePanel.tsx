@@ -1,10 +1,9 @@
-import { observer } from 'mobx-react-lite'
-import { Alert } from 'ui'
-
 import Panel from 'components/ui/Panel'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_ } from 'ui'
+import { CriticalIcon } from 'ui-patterns/Icons/StatusIcons'
 import DeleteOrganizationButton from './DeleteOrganizationButton'
 
-const OrganizationDeletePanel = observer(() => {
+const OrganizationDeletePanel = () => {
   return (
     <Panel
       title={
@@ -14,24 +13,19 @@ const OrganizationDeletePanel = observer(() => {
       }
     >
       <Panel.Content>
-        <Alert
-          withIcon
-          variant="danger"
-          // @ts-ignore
-          title={
-            <span className="text-red-900">
-              Deleting this organization will also remove its projects
-            </span>
-          }
-        >
-          <p className="text-red-900">
+        <Alert_Shadcn_ variant="destructive">
+          <CriticalIcon />
+          <AlertTitle_Shadcn_>
+            Deleting this organization will also remove its projects
+          </AlertTitle_Shadcn_>
+          <AlertDescription_Shadcn_>
             Make sure you have made a backup if you want to keep your data
-          </p>
+          </AlertDescription_Shadcn_>
           <DeleteOrganizationButton />
-        </Alert>
+        </Alert_Shadcn_>
       </Panel.Content>
     </Panel>
   )
-})
+}
 
 export default OrganizationDeletePanel

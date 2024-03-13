@@ -1,5 +1,4 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { observer } from 'mobx-react-lite'
 import Image from 'next/legacy/image'
 import { Fragment, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -408,4 +407,4 @@ const MembersView = ({ searchString }: MembersViewProps) => {
   )
 }
 
-export default observer(MembersView)
+export default MembersView

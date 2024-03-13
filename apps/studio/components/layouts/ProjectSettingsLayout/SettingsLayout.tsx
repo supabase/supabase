@@ -1,5 +1,4 @@
 import { useIsFeatureEnabled, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 import { generateSettingsMenu } from './SettingsMenu.utils'
@@ -57,4 +56,4 @@ const SettingsLayout = ({ title, children }: PropsWithChildren<SettingsLayoutPro
   )
 }
 
-export default withAuth(observer(SettingsLayout))
+export default withAuth(SettingsLayout)

@@ -5,13 +5,13 @@ import {
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  DialogClose_Shadcn_,
-  DialogContent_Shadcn_,
-  DialogDescription_Shadcn_,
-  DialogFooter_Shadcn_,
-  DialogHeader_Shadcn_,
-  DialogTitle_Shadcn_,
-  Dialog_Shadcn_,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Dialog,
   IconExternalLink,
 } from 'ui'
 
@@ -39,10 +39,10 @@ export const PoolingModesModal = () => {
   }
 
   return (
-    <Dialog_Shadcn_ open={snap.showPoolingModeHelper} onOpenChange={snap.setShowPoolingModeHelper}>
-      <DialogContent_Shadcn_ className="sm:max-w-4xl">
-        <DialogHeader_Shadcn_ className="pr-8">
-          <DialogTitle_Shadcn_ className="mb-4">
+    <Dialog open={snap.showPoolingModeHelper} onOpenChange={snap.setShowPoolingModeHelper}>
+      <DialogContent className="sm:max-w-4xl">
+        <DialogHeader className="pr-8">
+          <DialogTitle className="mb-4">
             <div className="w-full flex items-center justify-between">
               <p className="text-lg max-w-2xl">Which pooling mode should I use?</p>
               <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
@@ -55,14 +55,14 @@ export const PoolingModesModal = () => {
                 </a>
               </Button>
             </div>
-          </DialogTitle_Shadcn_>
-          <DialogDescription_Shadcn_ className="border-b pb-4 ">
+          </DialogTitle>
+          <DialogDescription className="border-b pb-4 ">
             <p className="text-lg max-w-2xl">
               A connection pooler is a system (external to Postgres) which manages Postgres
               connections by allocating connections whenever clients make requests.
             </p>
-          </DialogDescription_Shadcn_>
-        </DialogHeader_Shadcn_>
+          </DialogDescription>
+        </DialogHeader>
         <Markdown
           className="px-6 max-w-full [&>h3]:text-sm"
           content={`
@@ -105,12 +105,12 @@ This mode is similar to connecting to your database directly. There is full supp
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
-        <DialogFooter_Shadcn_>
-          <DialogClose_Shadcn_ onClick={() => snap.setShowPoolingModeHelper(false)}>
+        <DialogFooter>
+          <DialogClose onClick={() => snap.setShowPoolingModeHelper(false)}>
             <Button type="secondary">Close</Button>
-          </DialogClose_Shadcn_>
-        </DialogFooter_Shadcn_>
-      </DialogContent_Shadcn_>
-    </Dialog_Shadcn_>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
