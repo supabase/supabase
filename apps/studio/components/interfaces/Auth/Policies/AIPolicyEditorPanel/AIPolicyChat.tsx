@@ -1,16 +1,26 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTelemetryProps } from 'common'
-import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
 import { compact, last } from 'lodash'
+import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { createRef, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
-import { AssistantChatForm, Button, cn } from 'ui'
+import {
+  Button,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  Form_Shadcn_,
+  Input_Shadcn_,
+  cn,
+} from 'ui'
+import { AiIcon } from 'ui-patterns/Cmdk'
 import * as z from 'zod'
 
 import { useLocalStorageQuery, useSelectedOrganization } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { useProfile } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import { MessageWithDebug } from './AIPolicyEditorPanel.utils'
 import Message from './Message'
@@ -75,10 +85,6 @@ export const AIPolicyChat = ({
     onChange(formChatValue.length === 0)
   }, [formChatValue])
 
-  const [commandsOpen, setCommandsOpen] = useState<boolean>(false)
-  const textAreaRef = createRef<HTMLTextAreaElement>()
-  const [value, setValue] = useState('')
-
   return (
     <div id={'ai-chat-assistant'} className="flex flex-col h-full max-w-full">
       <div className="overflow-auto flex-1 divide-y divide-border">
@@ -125,13 +131,11 @@ export const AIPolicyChat = ({
 
         <div ref={bottomRef} className="h-1" />
       </div>
-      <div className="sticky p-5 flex-0 border-t">
-        <AssistantChatForm
-          textAreaRef={textAreaRef}
-          key={'new-thread-form'}
-          id={'new-thread-form'}
-          commandsOpen={commandsOpen}
-          setCommandsOpen={setCommandsOpen}
+
+      <Form_Shadcn_ {...form}>
+        <form
+          id="rls-chat"
+          className="sticky p-5 flex-0 border-t"
           onSubmit={form.handleSubmit((data: z.infer<typeof FormSchema>) => {
             onSubmit(data.chat)
             Telemetry.sendEvent(
@@ -144,13 +148,33 @@ export const AIPolicyChat = ({
               router
             )
           })}
-          value={value}
-          placeholder="e.g Create a Telegram-like chat application"
-          disabled={loading}
-          loading={loading}
-          onValueChange={(e) => setValue(e.target.value)}
-        />
-      </div>
+        >
+          <FormField_Shadcn_
+            control={form.control}
+            name="chat"
+            render={({ field }) => (
+              <FormItem_Shadcn_>
+                <FormControl_Shadcn_>
+                  <div className="relative">
+                    <AiIcon className="absolute top-2 left-3 [&>div>div]:border-black dark:[&>div>div]:border-white" />
+                    <Input_Shadcn_
+                      {...field}
+                      autoComplete="off"
+                      disabled={loading}
+                      autoFocus
+                      className={`bg-surface-300 dark:bg-black rounded-full pl-10 ${
+                        loading ? 'pr-10' : ''
+                      }`}
+                      placeholder="Ask for some changes to your policy"
+                    />
+                    {loading && <Loader2 className="absolute top-2 right-3 animate-spin" />}
+                  </div>
+                </FormControl_Shadcn_>
+              </FormItem_Shadcn_>
+            )}
+          />
+        </form>
+      </Form_Shadcn_>
     </div>
   )
 }
