@@ -123,11 +123,11 @@ npm update supabase --save-dev
 </TabPanel>
 </Tabs>
 
-If you have any Supabase containers running locally, you want to stop them and delete their data volumes before proceeding with the upgrade. This ensures that new migrations of Supabase managed services can be run against a clean state of the local database.
+If you have any Supabase containers running locally, stop them and delete their data volumes before proceeding with the upgrade. This ensures that Supabase managed services can apply new migrations on a clean state of the local database.
 
 <Admonition type="tip" label="Logical backup">
 
-Remember to save any local schema and data changes before stopping as they will be deleted by `--no-backup` flag.
+Remember to save any local schema and data changes before stopping because the `--no-backup` flag will delete them.
 
 ```sh
 supabase db diff my_schema
