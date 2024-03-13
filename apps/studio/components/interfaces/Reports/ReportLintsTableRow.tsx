@@ -23,11 +23,13 @@ type ReportLintsTableRowProps = {
 const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
   const [expanded, setExpanded] = useState(false)
   const [seletectdLint, setSelectedLint] = useState<Lint | null>(null)
+  const [lintAction, setLintAction] = useState<'ignore' | 'unignore'>('ignore')
 
   const [lintIgnoreList, setLintIgnoreList] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.PROJECT_LINT_IGNORE_LIST,
     ''
   )
+  const selectedLintIsIgnored = lintIgnoreList.split(',').includes(lint.cache_key)
 
   function toggleLintIgnore(lint: Lint) {
     const currentIgnoreList = lintIgnoreList ? lintIgnoreList.split(',') : [] // Split only if lintIgnoreList is not empty
@@ -123,13 +125,14 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
         visible={seletectdLint !== null}
         onCancel={() => setSelectedLint(null)}
         onConfirm={() => toggleLintIgnore(lint)}
-        header={<h3>Confirm to ignore this lint</h3>}
+        header={<h3>Confirm to {selectedLintIsIgnored ? 'unignore' : 'ignore'} this lint</h3>}
       >
         <div className="py-4">
           <Modal.Content>
             <p className="text-sm">
-              Ignoring this lint will remove it from the main list. It will still be visible in the
-              Ignored Lints list below.
+              {selectedLintIsIgnored
+                ? 'Unignoring this lint will remove it from the Ignored Issues list. It will move it back to the main list above.'
+                : 'Ignoring this lint will remove it from the main list. It will still be visible in the Ignored Issues list below.'}
             </p>
           </Modal.Content>
         </div>
