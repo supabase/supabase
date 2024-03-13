@@ -109,7 +109,7 @@ const ReportsMenu = () => {
           url: `/project/${ref}/reports/query-performance`,
         },
         {
-          name: 'Project Lints', // TODO: rename these
+          name: 'Project Lints', // TODO: rename this ... "Project Issues" ?
           key: 'lints',
           url: `/project/${ref}/reports/lints`,
         },

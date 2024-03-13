@@ -1,21 +1,16 @@
-import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import { ReportsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { NextPageWithLayout } from 'types'
-import { GenericSkeletonLoader } from 'ui-patterns'
-import { fakeLints, lint_sql } from './lints.utils'
+import { lint_sql } from './lints.utils'
 
 import ReportLintsTableRow from 'components/interfaces/Reports/ReportLintsTableRow'
 import Table from 'components/to-be-cleaned/Table'
 import { useLocalStorageQuery } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { Accordion, LoadingLine } from 'ui'
 import { Check, Loader } from 'lucide-react'
+import { Accordion, LoadingLine } from 'ui'
 
 export type Lint = {
   name: string
@@ -39,7 +34,7 @@ const ProjectLints: NextPageWithLayout = () => {
   const [lints, setLints] = useState<Lint[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
-  const ignoredLints = fakeLints.filter((lint: Lint) =>
+  const ignoredLints = lints.filter((lint: Lint) =>
     lintIgnoreList.split(',').includes(lint.cache_key)
   )
 
@@ -59,7 +54,7 @@ const ProjectLints: NextPageWithLayout = () => {
       } catch (error) {
         console.error(error)
       } finally {
-        setIsLoading(false) // Set loading to false after fetching data, regardless of success or failure
+        setIsLoading(false)
       }
     }
     loadLints()
@@ -91,58 +86,56 @@ const ProjectLints: NextPageWithLayout = () => {
             <div className="flex flex-col">
               <div className={panelClassNames}>
                 <div className="grid gap-4">
-                  {/* isloading ( */}
-                  {2 < 1 ? (
+                  {/* {isLoading ? (
                     <div className="mt-4">
                       <GenericSkeletonLoader />
                     </div>
-                  ) : (
-                    <>
-                      <LoadingLine loading={isLoading} />
-                      <Table
-                        head={[
-                          <Table.th key="header-level">Level</Table.th>,
-                          <Table.th key="header-type">Type</Table.th>,
-                          <Table.th key="header-amount">Description</Table.th>,
-                          <Table.th key="header-expand" className="text-right"></Table.th>,
-                        ]}
-                        body={
-                          fakeLints.filter(
-                            (lint: Lint) => !lintIgnoreList.split(',').includes(lint.cache_key)
-                          ).length === 0 ? (
-                            <Table.tr>
-                              <Table.td colSpan={6} className="p-3 py-12 text-center">
-                                <p className="text-foreground-light">
-                                  {isLoading ? (
-                                    <div className="flex items-center gap-2 justify-center">
-                                      <Loader className="animate-spin" size={12} />
-                                      Checking project for issues...
-                                    </div>
-                                  ) : (
-                                    <div className="flex items-center gap-2 justify-center">
-                                      <Check size={12} />
-                                      No issues have been found for this project
-                                    </div>
-                                  )}
-                                </p>
-                              </Table.td>
-                            </Table.tr>
-                          ) : (
-                            <>
-                              {fakeLints
-                                .filter(
-                                  (lint: Lint) =>
-                                    !lintIgnoreList.split(',').includes(lint.cache_key)
-                                )
-                                .map((lint: Lint) => {
-                                  return <ReportLintsTableRow key={lint.cache_key} lint={lint} />
-                                })}
-                            </>
-                          )
-                        }
-                      />
-                    </>
-                  )}
+                  ) : ( */}
+                  <>
+                    <LoadingLine loading={isLoading} />
+                    <Table
+                      head={[
+                        <Table.th key="header-level">Level</Table.th>,
+                        <Table.th key="header-type">Type</Table.th>,
+                        <Table.th key="header-amount">Description</Table.th>,
+                        <Table.th key="header-expand" className="text-right"></Table.th>,
+                      ]}
+                      body={
+                        lints.filter(
+                          (lint: Lint) => !lintIgnoreList.split(',').includes(lint.cache_key)
+                        ).length === 0 ? (
+                          <Table.tr>
+                            <Table.td colSpan={6} className="p-3 py-12 text-center">
+                              <p className="text-foreground-light">
+                                {isLoading ? (
+                                  <div className="flex items-center gap-2 justify-center">
+                                    <Loader className="animate-spin" size={12} />
+                                    Checking project for issues...
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-2 justify-center">
+                                    <Check size={12} />
+                                    No issues have been found for this project
+                                  </div>
+                                )}
+                              </p>
+                            </Table.td>
+                          </Table.tr>
+                        ) : (
+                          <>
+                            {lints
+                              .filter(
+                                (lint: Lint) => !lintIgnoreList.split(',').includes(lint.cache_key)
+                              )
+                              .map((lint: Lint) => {
+                                return <ReportLintsTableRow key={lint.cache_key} lint={lint} />
+                              })}
+                          </>
+                        )
+                      }
+                    />
+                  </>
+                  {/* )} */}
                 </div>
 
                 {ignoredLints.length > 0 && (
@@ -164,7 +157,7 @@ const ProjectLints: NextPageWithLayout = () => {
                         <Table
                           className="border-t mt-4"
                           body={
-                            fakeLints.length === 0 ? (
+                            lints.length === 0 ? (
                               <Table.tr>
                                 <Table.td colSpan={6} className="p-3 py-12 text-center">
                                   <p className="text-foreground-light">

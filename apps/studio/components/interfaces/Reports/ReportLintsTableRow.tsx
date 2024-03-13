@@ -1,7 +1,7 @@
 import Table from 'components/to-be-cleaned/Table'
 import { useLocalStorageQuery } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { EyeOff, Maximize2, MoreHorizontal, MoreVertical } from 'lucide-react'
+import { EyeOff, Maximize2, MoreVertical } from 'lucide-react'
 import { Lint } from 'pages/project/[ref]/reports/lints'
 import { getHumanReadableTitle } from 'pages/project/[ref]/reports/lints.utils'
 import { useState } from 'react'
@@ -23,7 +23,6 @@ type ReportLintsTableRowProps = {
 const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
   const [expanded, setExpanded] = useState(false)
   const [seletectdLint, setSelectedLint] = useState<Lint | null>(null)
-  const [lintAction, setLintAction] = useState<'ignore' | 'unignore'>('ignore')
 
   const [lintIgnoreList, setLintIgnoreList] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.PROJECT_LINT_IGNORE_LIST,
@@ -32,22 +31,18 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
   const selectedLintIsIgnored = lintIgnoreList.split(',').includes(lint.cache_key)
 
   function toggleLintIgnore(lint: Lint) {
-    const currentIgnoreList = lintIgnoreList ? lintIgnoreList.split(',') : [] // Split only if lintIgnoreList is not empty
+    const currentIgnoreList = lintIgnoreList ? lintIgnoreList.split(',') : []
     const cacheKey = lint.cache_key
 
-    // Check if the cacheKey exists in the array
+    // Check if the cacheKey exists in the array and ignore or unignore it
     const index = currentIgnoreList.indexOf(cacheKey)
     if (index !== -1) {
-      // If lint is ignored, unignore it
-      currentIgnoreList.splice(index, 1) // Remove the cacheKey from the array
+      currentIgnoreList.splice(index, 1)
     } else {
-      // If lint is not ignored, ignore it
       currentIgnoreList.push(cacheKey)
     }
-
     const ignoreString = currentIgnoreList.join(',')
-    console.log({ ignoreString })
-    setLintIgnoreList(ignoreString) // Store the updated string back to localStorage
+    setLintIgnoreList(ignoreString)
   }
 
   return (
