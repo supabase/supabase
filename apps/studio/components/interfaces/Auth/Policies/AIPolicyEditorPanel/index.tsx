@@ -14,9 +14,9 @@ import {
   IconGrid,
   Modal,
   ScrollArea,
-  SheetContent_Shadcn_,
-  SheetFooter_Shadcn_,
-  Sheet_Shadcn_,
+  SheetContent,
+  SheetFooter,
+  Sheet,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
@@ -290,8 +290,8 @@ export const AIPolicyEditorPanel = memo(function ({
 
   return (
     <>
-      <Sheet_Shadcn_ open={visible} onOpenChange={() => onClosingPanel()}>
-        <SheetContent_Shadcn_
+      <Sheet open={visible} onOpenChange={() => onClosingPanel()}>
+        <SheetContent
           size={assistantVisible ? 'lg' : 'default'}
           className={cn(
             'bg-surface-200',
@@ -399,7 +399,7 @@ export const AIPolicyEditorPanel = memo(function ({
                     setOpen={setErrorPanelOpen}
                   />
                 )}
-                <SheetFooter_Shadcn_ className="flex items-center !justify-between px-5 py-4 w-full">
+                <SheetFooter className="flex items-center !justify-between px-5 py-4 w-full">
                   <Button type="text" onClick={toggleFeaturePreviewModal}>
                     Toggle feature preview
                   </Button>
@@ -416,7 +416,7 @@ export const AIPolicyEditorPanel = memo(function ({
                       Save policy
                     </Button>
                   </div>
-                </SheetFooter_Shadcn_>
+                </SheetFooter>
               </div>
             </div>
           </div>
@@ -509,8 +509,8 @@ export const AIPolicyEditorPanel = memo(function ({
               </p>
             </Modal.Content>
           </ConfirmationModal>
-        </SheetContent_Shadcn_>
-      </Sheet_Shadcn_>
+        </SheetContent>
+      </Sheet>
     </>
   )
 })
