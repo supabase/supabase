@@ -127,16 +127,16 @@ If you have any Supabase containers running locally, you want to stop them and d
 
 <Admonition type="tip" label="Logical backup">
 
-Remember to save any local schema and data changes you've made before stopping, as they will be deleted by `--no-backup` flag.
+Remember to save any local schema and data changes before stopping as they will be deleted by `--no-backup` flag.
 
-```bash
+```sh
 supabase db diff my_schema
 supabase db dump --local --data-only > supabase/seed.sql
 ```
 
 </Admonition>
 
-```bash 
+```sh
 supabase stop --no-backup
 supabase start
 ```
