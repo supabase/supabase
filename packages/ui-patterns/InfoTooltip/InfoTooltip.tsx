@@ -23,7 +23,11 @@ const InfoTooltip = forwardRef<
 >(({ ...props }, ref) => {
   return (
     <Tooltip_Shadcn_>
-      <TooltipTrigger_Shadcn_ className="flex [&_svg]:data-[state=delayed-open]:fill-foreground-lighter [&_svg]:data-[state=instant-open]:fill-foreground-lighter">
+      <TooltipTrigger_Shadcn_
+        type="button"
+        role="button"
+        className="flex [&_svg]:data-[state=delayed-open]:fill-foreground-lighter [&_svg]:data-[state=instant-open]:fill-foreground-lighter"
+      >
         <SVG strokeWidth={2} className="transition-colors fill-foreground-muted w-4 h-4" />
       </TooltipTrigger_Shadcn_>
       <TooltipContent_Shadcn_ {...props} />

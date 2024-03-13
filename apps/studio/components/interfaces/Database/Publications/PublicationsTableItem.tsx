@@ -1,13 +1,12 @@
 import type { PostgresPublication, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { Badge, Toggle } from 'ui'
 
-import Table from 'components/to-be-cleaned/Table'
-import { useCheckPermissions } from 'hooks'
-import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import Table from 'components/to-be-cleaned/Table'
+import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
+import { useCheckPermissions } from 'hooks'
 import toast from 'react-hot-toast'
 
 interface PublicationsTableItemProps {
@@ -100,4 +99,4 @@ const PublicationsTableItem = ({ table, selectedPublication }: PublicationsTable
   )
 }
 
-export default observer(PublicationsTableItem)
+export default PublicationsTableItem
