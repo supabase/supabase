@@ -8,9 +8,12 @@ import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn
 import { ChartConfig } from './ChartConfig'
 import { useFlag } from 'hooks'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { useRouter } from 'next/router'
 import { useContentQuery } from 'data/content/content-query'
 import { useParams } from 'common'
+import { useQueryClient } from '@tanstack/react-query'
+import toast from 'react-hot-toast'
+import { contentKeys } from 'data/content/keys'
+import { SqlSnippets } from 'types'
 
 export type UtilityPanelProps = {
   id: string
@@ -38,9 +41,47 @@ const UtilityPanel = ({
 }: UtilityPanelProps) => {
   const snap = useSqlEditorStateSnapshot()
   const { ref } = useParams()
-  const { data, isLoading } = useContentQuery(ref)
-  const upsertContent = useContentUpsertMutation()
+  const { data } = useContentQuery(ref)
+  const queryKeys = contentKeys.list(ref)
+
+  const upsertContent = useContentUpsertMutation({
+    // Optimistic update to the cache
+    onMutate: async (newContentSnippet) => {
+      // No need to update the cache for non-SQL content
+      const payload = newContentSnippet.payload
+      if (payload.type !== 'sql') return
+      if (!('chart' in payload.content)) return
+
+      await queryClient.cancelQueries(queryKeys)
+
+      const newContent = {
+        ...data,
+        content: data?.content.map((i) => {
+          if (i.id === id) {
+            return {
+              ...i,
+              content: {
+                ...i.content,
+                chart: (newContentSnippet.payload.content as SqlSnippets.Content).chart,
+              },
+            }
+          }
+          return i
+        }),
+      }
+
+      queryClient.setQueryData(queryKeys, () => {
+        return newContent
+      })
+
+      return { newContent }
+    },
+    onError: async (err, newContent, context) => {
+      toast.error(`Failed to update chart. Please try again.`)
+    },
+  })
   const snippet = snap.snippets[id]?.snippet
+  const queryClient = useQueryClient()
 
   const chartConfig = useMemo(() => {
     const contentItem = data?.content.find((i) => i.id === id)
@@ -54,12 +95,12 @@ const UtilityPanel = ({
 
   const showCharts = useFlag('showSQLEditorCharts')
 
-  async function onConfigChange(config: ChartConfig) {
+  function onConfigChange(config: ChartConfig) {
     if (!ref) {
       return
     }
 
-    await upsertContent.mutateAsync({
+    upsertContent.mutateAsync({
       projectRef: ref,
       payload: {
         ...snippet,
