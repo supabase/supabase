@@ -25,6 +25,7 @@ import {
   Toggle,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -173,18 +174,15 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                  <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-                    Name of function
-                  </FormLabel_Shadcn_>
-                  <FormControl_Shadcn_ className="col-span-8">
-                    <Input_Shadcn_ {...field} className="w-full" />
+                <FormItemLayout
+                  label="Name of function"
+                  description="Name will also be used for the function name in postgres"
+                  layout="horizontal"
+                >
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_ {...field} />
                   </FormControl_Shadcn_>
-                  <FormDescription_Shadcn_ className="col-start-5 col-span-8">
-                    Name will also be used for the function name in postgres
-                  </FormDescription_Shadcn_>
-                  <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
-                </FormItem_Shadcn_>
+                </FormItemLayout>
               )}
             />
           </SidePanel.Content>
@@ -194,11 +192,12 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
               control={form.control}
               name="schema"
               render={({ field }) => (
-                <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                  <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-                    Schema
-                  </FormLabel_Shadcn_>
-                  <FormControl_Shadcn_ className="col-span-8">
+                <FormItemLayout
+                  label="Schema"
+                  description="Tables made in the table editor will be in 'public'"
+                  layout="horizontal"
+                >
+                  <FormControl_Shadcn_>
                     <SchemaSelector
                       selectedSchemaName={field.value}
                       excludedSchemas={EXCLUDED_SCHEMAS}
@@ -206,11 +205,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                       onSelectSchema={(name) => field.onChange(name)}
                     />
                   </FormControl_Shadcn_>
-                  <FormDescription_Shadcn_ className="col-start-5 col-span-8">
-                    Tables made in the table editor will be in 'public'
-                  </FormDescription_Shadcn_>
-                  <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
-                </FormItem_Shadcn_>
+                </FormItemLayout>
               )}
             />
             {!isEditing && (
@@ -218,10 +213,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                 control={form.control}
                 name="return_type"
                 render={({ field }) => (
-                  <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                    <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-                      Return type
-                    </FormLabel_Shadcn_>
+                  <FormItemLayout label="Return type" layout="horizontal">
                     {/* Form selects don't need form controls, otherwise the CSS gets weird */}
                     <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
                       <SelectTrigger_Shadcn_ className="col-span-8">
@@ -237,8 +229,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                         )}
                       </SelectContent_Shadcn_>
                     </Select_Shadcn_>
-                    <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
-                  </FormItem_Shadcn_>
+                  </FormItemLayout>
                 )}
               />
             )}
@@ -305,11 +296,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                         control={form.control}
                         name="behavior"
                         render={({ field }) => (
-                          <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                            <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-                              Behavior
-                            </FormLabel_Shadcn_>
-                            {/* Form selects don't need form controls, otherwise the CSS gets weird */}
+                          <FormItemLayout label="Behavior" layout="horizontal">
                             <Select_Shadcn_
                               defaultValue={field.value}
                               onValueChange={field.onChange}
@@ -329,8 +316,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                                 </SelectItem_Shadcn_>
                               </SelectContent_Shadcn_>
                             </Select_Shadcn_>
-                            <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
-                          </FormItem_Shadcn_>
+                          </FormItemLayout>
                         )}
                       />
                     </div>
@@ -593,10 +579,7 @@ const FormFieldLanguage = () => {
     <FormField_Shadcn_
       name="language"
       render={({ field }) => (
-        <FormItem_Shadcn_ className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-          <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
-            Language
-          </FormLabel_Shadcn_>
+        <FormItemLayout label="Language" layout="horizontal">
           {/* Form selects don't need form controls, otherwise the CSS gets weird */}
           <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
             <SelectTrigger_Shadcn_ className="col-span-8">
@@ -614,8 +597,7 @@ const FormFieldLanguage = () => {
                 ))}
             </SelectContent_Shadcn_>
           </Select_Shadcn_>
-          <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
-        </FormItem_Shadcn_>
+        </FormItemLayout>
       )}
     />
   )
