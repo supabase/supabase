@@ -59,6 +59,11 @@ export const appState = proxy({
     appState.showAiSettingsModal = value
   },
 
+  navigationPanelOpenSticky: false,
+  setNavigationPanelOpenSticky: (value: boolean) => {
+    appState.navigationPanelOpenSticky = value
+  },
+
   navigationPanelOpen: false,
   navigationPanelJustClosed: false,
   setNavigationPanelOpen: (value: boolean, trackJustClosed: boolean = false) => {

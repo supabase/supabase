@@ -2,7 +2,15 @@ import { useParams } from 'common'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { Home, User } from 'icons'
 import { isUndefined } from 'lodash'
-import { Command, FileText, FlaskConical, Search, Settings } from 'lucide-react'
+import {
+  ArrowBigLeft,
+  ChevronRight,
+  Command,
+  FileText,
+  FlaskConical,
+  Search,
+  Settings,
+} from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -18,8 +26,12 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  ScrollArea,
   Separator,
   Theme,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   cn,
   themes,
 } from 'ui'
@@ -92,265 +104,323 @@ const NavigationBar = () => {
   }
 
   return (
-    <div className="w-14 h-full flex flex-col">
+    <div
+      className={cn(
+        snap.navigationPanelOpenSticky ? 'w-[13rem]' : 'w-14',
+        'h-full flex flex-col',
+        'overflow-visible'
+      )}
+    >
       <nav
-        data-state={snap.navigationPanelOpen ? 'expanded' : 'collapsed'}
+        data-state={
+          snap.navigationPanelOpen || snap.navigationPanelOpenSticky ? 'expanded' : 'collapsed'
+        }
         className={cn(
+          'relative',
           'group py-2 z-10 h-full w-14 data-[state=expanded]:w-[13rem]',
-          'border-r bg-studio border-default data-[state=expanded]:shadow-xl',
-          'transition-width duration-200',
-          'hide-scrollbar flex flex-col justify-between overflow-y-auto'
+          'border-r bg-studio border-default',
+          !snap.navigationPanelOpenSticky && 'data-[state=expanded]:shadow-xl',
+          'transition-width duration-200'
         )}
         onMouseEnter={() => snap.setNavigationPanelOpen(true)}
         onMouseLeave={() => {
           if (!userDropdownOpen) snap.setNavigationPanelOpen(false)
         }}
       >
-        <ul className="flex flex-col gap-y-1 justify-start px-2">
-          {(!navLayoutV2 || !IS_PLATFORM) && (
-            <Link
-              href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
-              className="mx-2 flex items-center h-[40px]"
-            >
-              <img
-                alt="Supabase"
-                src={`${router.basePath}/img/supabase-logo.svg`}
-                className="absolute h-[40px] w-6 cursor-pointer rounded"
-              />
-            </Link>
-          )}
-          <NavigationIconLink
-            isActive={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
-            route={{
-              key: 'HOME',
-              label: 'Home',
-              icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-              link: `/project/${projectRef}`,
-            }}
-            onClick={onCloseNavigationIconLink}
-          />
-          <Separator className="my-1 bg-border-muted" />
-          {toolRoutes.map((route) => (
-            <NavigationIconLink
-              key={route.key}
-              route={route}
-              isActive={activeRoute === route.key}
-              onClick={onCloseNavigationIconLink}
-            />
-          ))}
-          <Separator className="my-1 bg-border-muted" />
-          {productRoutes.map((route) => (
-            <NavigationIconLink
-              key={route.key}
-              route={route}
-              isActive={activeRoute === route.key}
-              onClick={onCloseNavigationIconLink}
-            />
-          ))}
-          <Separator className="my-1 bg-border-muted" />
-          {otherRoutes.map((route) => {
-            if (route.key === 'api' && isNewAPIDocsEnabled) {
-              return (
-                <NavigationIconButton
-                  key={route.key}
-                  onClick={() => {
-                    snap.setShowProjectApiDocs(true)
-                    snap.setNavigationPanelOpen(false)
-                  }}
-                  icon={<FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
-                >
-                  Project API
-                </NavigationIconButton>
-              )
-            } else {
-              return (
-                <NavigationIconLink
-                  key={route.key}
-                  route={route}
-                  isActive={activeRoute === route.key}
-                  onClick={onCloseNavigationIconLink}
-                />
-              )
-            }
-          })}
-        </ul>
-
-        <ul className="flex flex-col px-2 gap-y-1">
-          {settingsRoutes.map((route) => (
-            <NavigationIconLink
-              key={route.key}
-              route={route}
-              isActive={activeRoute === route.key}
-              onClick={onCloseNavigationIconLink}
-            />
-          ))}
-
-          {IS_PLATFORM && (
-            <NavigationIconButton
-              size="tiny"
-              onClick={() => {
-                setIsOpen(true)
-                snap.setNavigationPanelOpen(false)
-              }}
-              type="text"
-              icon={<Search size={ICON_SIZE} strokeWidth={2} />}
-              rightText={
-                <div
-                  className={cn(
-                    'flex items-center gap-1',
-                    'h-6 py-1.5 px-2 leading-none',
-                    'bg-surface-100 text-foreground-lighter',
-                    'border border-default rounded-md',
-                    'shadow-xs shadow-background-surface-100'
-                  )}
-                >
-                  {os === 'macos' || true ? ( // todo: issue with `os` and hydration fail
-                    <Command size={11.5} strokeWidth={1.5} />
-                  ) : (
-                    <p className="text-xs">CTRL</p>
-                  )}
-                  <p className="text-xs">K</p>
-                </div>
-              }
-            >
-              Search
-            </NavigationIconButton>
-          )}
-
-          <DropdownMenu
-            open={userDropdownOpen}
-            onOpenChange={(open: boolean) => {
-              setUserDropdownOpenState(open)
-              if (open === false) snap.setNavigationPanelOpen(false)
-            }}
-          >
-            <DropdownMenuTrigger asChild>
-              <Button
-                type="text"
-                size="tiny"
-                className={cn(
-                  'mt-3 h-10 [&>span]:relative [&>span]:flex [&>span]:w-full [&>span]:h-full p-0'
-                )}
-                block
+        <ScrollArea
+          className="h-full"
+          Viewport={{
+            className:
+              'h-full [&>div]:justify-between [&>div]:h-full [&>div]:!flex [&>div]:!flex-col',
+          }}
+        >
+          <ul className="flex flex-col gap-y-1 justify-start px-2">
+            {(!navLayoutV2 || !IS_PLATFORM) && (
+              <Link
+                href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
+                className="mx-2 flex items-center h-[40px]"
               >
-                <div className="relative w-full h-full flex items-center justify-center">
-                  <figure className="absolute left-1.5 min-h-6 min-w-6 bg-foreground rounded-full flex items-center justify-center">
-                    <User
-                      size={ICON_SIZE - 2}
-                      strokeWidth={ICON_STROKE_WIDTH}
-                      className="text-background"
-                    />
-                  </figure>
-                  <span
+                <img
+                  alt="Supabase"
+                  src={`${router.basePath}/img/supabase-logo.svg`}
+                  className="absolute h-[40px] w-6 cursor-pointer rounded"
+                />
+              </Link>
+            )}
+            <NavigationIconLink
+              isActive={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
+              route={{
+                key: 'HOME',
+                label: 'Home',
+                icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+                link: `/project/${projectRef}`,
+              }}
+              onClick={onCloseNavigationIconLink}
+            />
+            <Separator className="my-1 bg-border-muted" />
+            {toolRoutes.map((route) => (
+              <NavigationIconLink
+                key={route.key}
+                route={route}
+                isActive={activeRoute === route.key}
+                onClick={onCloseNavigationIconLink}
+              />
+            ))}
+            <Separator className="my-1 bg-border-muted" />
+            {productRoutes.map((route) => (
+              <NavigationIconLink
+                key={route.key}
+                route={route}
+                isActive={activeRoute === route.key}
+                onClick={onCloseNavigationIconLink}
+              />
+            ))}
+            <Separator className="my-1 bg-border-muted" />
+            {otherRoutes.map((route) => {
+              if (route.key === 'api' && isNewAPIDocsEnabled) {
+                return (
+                  <NavigationIconButton
+                    key={route.key}
+                    onClick={() => {
+                      snap.setShowProjectApiDocs(true)
+                      snap.setNavigationPanelOpen(false)
+                    }}
+                    icon={<FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+                  >
+                    Project API
+                  </NavigationIconButton>
+                )
+              } else {
+                return (
+                  <NavigationIconLink
+                    key={route.key}
+                    route={route}
+                    isActive={activeRoute === route.key}
+                    onClick={onCloseNavigationIconLink}
+                  />
+                )
+              }
+            })}
+          </ul>
+
+          <ul className="flex flex-col px-2 gap-y-1">
+            {settingsRoutes.map((route) => (
+              <NavigationIconLink
+                key={route.key}
+                route={route}
+                isActive={activeRoute === route.key}
+                onClick={onCloseNavigationIconLink}
+              />
+            ))}
+
+            {IS_PLATFORM && (
+              <NavigationIconButton
+                size="tiny"
+                onClick={() => {
+                  setIsOpen(true)
+                  snap.setNavigationPanelOpen(false)
+                }}
+                type="text"
+                icon={<Search size={ICON_SIZE} strokeWidth={2} />}
+                rightText={
+                  <div
                     className={cn(
-                      'w-[8rem] flex flex-col items-start text-sm truncate',
-                      'absolute left-7 group-data-[state=expanded]:left-10',
-                      'group-data-[state=collapsed]:opacity-0 group-data-[state=expanded]:opacity-100',
-                      'transition-all'
+                      'flex items-center gap-1',
+                      'h-6 py-1.5 px-2 leading-none',
+                      'bg-surface-100 text-foreground-lighter',
+                      'border border-default rounded-md',
+                      'shadow-xs shadow-background-surface-100'
                     )}
                   >
-                    {profile && IS_PLATFORM && (
-                      <>
-                        <span
-                          title={profile.username}
-                          className="w-full text-left text-foreground truncate"
-                        >
-                          {profile.username}
-                        </span>
-                        {profile.primary_email !== profile.username && (
-                          <span
-                            title={profile.primary_email}
-                            className="w-full text-left text-foreground-light text-xs truncate"
-                          >
-                            {profile.primary_email}
-                          </span>
-                        )}
-                      </>
+                    {os === 'macos' || true ? ( // todo: issue with `os` and hydration fail
+                      <Command size={11.5} strokeWidth={1.5} />
+                    ) : (
+                      <p className="text-xs">CTRL</p>
                     )}
-                  </span>
-                </div>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent side="top" align="start">
-              {IS_PLATFORM && (
-                <>
-                  <div className="px-2 py-1 flex flex-col gap-0 text-sm">
-                    {profile && (
-                      <>
-                        <span
-                          title={profile.username}
-                          className="w-full text-left text-foreground truncate"
-                        >
-                          {profile.username}
-                        </span>
-                        {profile.primary_email !== profile.username && (
-                          <span
-                            title={profile.primary_email}
-                            className="w-full text-left text-foreground-light text-xs truncate"
-                          >
-                            {profile.primary_email}
-                          </span>
-                        )}
-                      </>
-                    )}
+                    <p className="text-xs">K</p>
                   </div>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem className="flex gap-2" asChild>
-                      <Link href="/account/me">
-                        <Settings size={14} strokeWidth={1.5} className="text-foreground-muted" />
-                        Account preferences
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                      className="flex gap-2"
-                      onClick={() => snap.setShowFeaturePreviewModal(true)}
-                      onSelect={() => snap.setShowFeaturePreviewModal(true)}
-                    >
-                      <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-muted" />
-                      Feature previews
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </DropdownMenuGroup>
-                </>
-              )}
-              <DropdownMenuGroup>
-                <DropdownMenuLabel>Theme</DropdownMenuLabel>
-                <DropdownMenuRadioGroup
-                  value={theme}
-                  onValueChange={(value) => {
-                    setTheme(value)
-                  }}
+                }
+              >
+                Search
+              </NavigationIconButton>
+            )}
+
+            <DropdownMenu
+              open={userDropdownOpen}
+              onOpenChange={(open: boolean) => {
+                setUserDropdownOpenState(open)
+                if (open === false) snap.setNavigationPanelOpen(false)
+              }}
+            >
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="text"
+                  size="tiny"
+                  className={cn(
+                    'mt-3 h-10 [&>span]:relative [&>span]:flex [&>span]:w-full [&>span]:h-full p-0'
+                  )}
+                  block
                 >
-                  {themes
-                    .filter(
-                      (x) => x.value === 'light' || x.value === 'dark' || x.value === 'system'
-                    )
-                    .map((theme: Theme) => (
-                      <DropdownMenuRadioItem key={theme.value} value={theme.value}>
-                        {theme.name}
-                      </DropdownMenuRadioItem>
-                    ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuGroup>
-              {IS_PLATFORM && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem
-                      onSelect={async () => {
-                        await signOut()
-                        await router.push('/sign-in')
-                      }}
+                  <div className="relative w-full h-full flex items-center justify-center">
+                    <figure className="absolute left-1.5 min-h-6 min-w-6 bg-foreground rounded-full flex items-center justify-center">
+                      <User
+                        size={ICON_SIZE - 2}
+                        strokeWidth={ICON_STROKE_WIDTH}
+                        className="text-background"
+                      />
+                    </figure>
+                    <span
+                      className={cn(
+                        'w-[8rem] flex flex-col items-start text-sm truncate',
+                        'absolute left-7 group-data-[state=expanded]:left-10',
+                        'group-data-[state=collapsed]:opacity-0 group-data-[state=expanded]:opacity-100',
+                        'transition-all'
+                      )}
                     >
-                      Log out
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                </>
+                      {profile && IS_PLATFORM && (
+                        <>
+                          <span
+                            title={profile.username}
+                            className="w-full text-left text-foreground truncate"
+                          >
+                            {profile.username}
+                          </span>
+                          {profile.primary_email !== profile.username && (
+                            <span
+                              title={profile.primary_email}
+                              className="w-full text-left text-foreground-light text-xs truncate"
+                            >
+                              {profile.primary_email}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </span>
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent side="top" align="start">
+                {IS_PLATFORM && (
+                  <>
+                    <div className="px-2 py-1 flex flex-col gap-0 text-sm">
+                      {profile && (
+                        <>
+                          <span
+                            title={profile.username}
+                            className="w-full text-left text-foreground truncate"
+                          >
+                            {profile.username}
+                          </span>
+                          {profile.primary_email !== profile.username && (
+                            <span
+                              title={profile.primary_email}
+                              className="w-full text-left text-foreground-light text-xs truncate"
+                            >
+                              {profile.primary_email}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem className="flex gap-2" asChild>
+                        <Link href="/account/me">
+                          <Settings size={14} strokeWidth={1.5} className="text-foreground-muted" />
+                          Account preferences
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        className="flex gap-2"
+                        onClick={() => snap.setShowFeaturePreviewModal(true)}
+                        onSelect={() => snap.setShowFeaturePreviewModal(true)}
+                      >
+                        <FlaskConical
+                          size={14}
+                          strokeWidth={1.5}
+                          className="text-foreground-muted"
+                        />
+                        Feature previews
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                    </DropdownMenuGroup>
+                  </>
+                )}
+                <DropdownMenuGroup>
+                  <DropdownMenuLabel>Theme</DropdownMenuLabel>
+                  <DropdownMenuRadioGroup
+                    value={theme}
+                    onValueChange={(value) => {
+                      setTheme(value)
+                    }}
+                  >
+                    {themes
+                      .filter(
+                        (x) => x.value === 'light' || x.value === 'dark' || x.value === 'system'
+                      )
+                      .map((theme: Theme) => (
+                        <DropdownMenuRadioItem key={theme.value} value={theme.value}>
+                          {theme.name}
+                        </DropdownMenuRadioItem>
+                      ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuGroup>
+                {IS_PLATFORM && (
+                  <>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                      <DropdownMenuItem
+                        onSelect={async () => {
+                          await signOut()
+                          await router.push('/sign-in')
+                        }}
+                      >
+                        Log out
+                      </DropdownMenuItem>
+                    </DropdownMenuGroup>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </ul>
+        </ScrollArea>
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_ asChild>
+            <button
+              onClick={() => {
+                if (snap.navigationPanelOpenSticky) {
+                  snap.setNavigationPanelOpen(false)
+                }
+                snap.setNavigationPanelOpenSticky(!snap.navigationPanelOpenSticky)
+              }}
+              className={cn(
+                snap.navigationPanelOpen || snap.navigationPanelOpenSticky
+                  ? 'opacity-100'
+                  : 'invisible opacity-0',
+                'w-4 h-4',
+                'absolute',
+                'flex items-center justify-center',
+                '-right-2 bottom-[12rem]',
+                'text-foreground-muted',
+                'bg-surface-200',
+                'border rounded-full',
+                'hover:bg-surface-300',
+                'hover:border-strong',
+                'hover:text-foreground-light',
+                'z-50'
               )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </ul>
+            >
+              <ChevronRight
+                size={12}
+                strokeWidth={2}
+                className={cn('transition-all', snap.navigationPanelOpenSticky ? 'rotate-180' : '')}
+              />
+            </button>
+          </TooltipTrigger_Shadcn_>
+          <TooltipContent_Shadcn_ side="right">
+            {snap.navigationPanelOpenSticky ? 'Close the nav bar' : 'Keep side bar open'}
+          </TooltipContent_Shadcn_>
+        </Tooltip_Shadcn_>
       </nav>
     </div>
   )
