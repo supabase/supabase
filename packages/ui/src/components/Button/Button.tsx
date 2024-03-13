@@ -3,8 +3,7 @@
 import { Slot } from '@radix-ui/react-slot'
 import { VariantProps, cva } from 'class-variance-authority'
 import { cloneElement, forwardRef, isValidElement } from 'react'
-
-import { sizes } from '../../lib/commonCva'
+import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../lib/constants'
 import { cn } from '../../lib/utils/cn'
 import { IconContext } from '../Icon/IconContext'
 import { IconLoader } from '../Icon/icons/IconLoader'
@@ -136,7 +135,7 @@ const buttonVariants = cva(
         true: 'w-full flex items-center justify-center',
       },
       size: {
-        ...sizes,
+        ...SIZE_VARIANTS,
       },
       overlay: {
         base: `absolute inset-0 bg-background opacity-50`,
@@ -151,6 +150,9 @@ const buttonVariants = cva(
       defaultVariants: {
         //   variant: 'default',
         //   size: 'default',
+        size: {
+          SIZE_VARIANTS_DEFAULT,
+        },
       },
     },
   }
