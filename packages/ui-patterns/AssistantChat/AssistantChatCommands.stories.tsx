@@ -65,7 +65,6 @@ export const CommandsPopover: Story = {
           <AssistantChatForm
             {...args}
             textAreaRef={textAreaRef}
-            // icon={<Box strokeWidth={1.5} size={24} className="text-foreground-muted" />}
             value={value}
             loading={loading}
             disabled={loading}

@@ -4,53 +4,70 @@ import { TextArea } from 'ui/src/components/shadcn/ui/text-area'
 import { cn } from 'ui/src/lib/utils'
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
+  /* The ref for the textarea */
   textAreaRef: React.RefObject<HTMLTextAreaElement>
+  /* The loading state of the form */
   loading: boolean
+  /* The disabled state of the form */
   disabled?: boolean
+  /* The value of the textarea */
   value?: string
+  /* The function to handle the value change */
   onValueChange: (value: ChangeEvent<HTMLTextAreaElement>) => void
+  /* Used to stop onSubmit event when Command popover is open. Use with AssistantCommandsPopover */
   commandsOpen?: boolean
+  /* Used to close Command popover when onSubmit event happens. Use with AssistantCommandsPopover */
   setCommandsOpen?: (value: boolean) => void
+  /* The icon to display on the left of the textarea */
   icon?: React.ReactNode
-  usingCommandPopover?: boolean
+  /* The function to handle the form submission */
   onSubmit: React.FormHTMLAttributes<HTMLFormElement>['onSubmit']
 }
 
 const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
   (
     {
-      loading,
-      disabled,
-      value,
-      onValueChange,
+      loading = false,
+      disabled = false,
+      value = '',
       textAreaRef,
-      commandsOpen,
-      setCommandsOpen,
+      commandsOpen = false,
       icon = null,
-      usingCommandPopover = false,
+      onValueChange,
+      setCommandsOpen,
       onSubmit,
       ...props
     },
     ref
   ) => {
+    const formRef = createRef<HTMLFormElement>()
+    const submitRef = createRef<HTMLButtonElement>()
+
+    /**
+     * This effect is used to resize the textarea based on the content
+     */
     useEffect(() => {
       if (textAreaRef) {
         console.log('needs to resize')
         if (!value && textAreaRef && textAreaRef.current) {
           textAreaRef.current.style.height = '40px'
         } else if (textAreaRef && textAreaRef.current) {
-          // console.log('textAreaRef.current.scrollHeight', textAreaRef.current.scrollHeight)
           const newHeight = textAreaRef.current.scrollHeight + 'px'
-          // console.log('new height', newHeight)
           textAreaRef.current.style.height = newHeight
         }
       }
     }, [value, textAreaRef])
 
+    /**
+     * This effect is used to focus the textarea when the component mounts
+     */
     useEffect(() => {
       textAreaRef?.current?.focus()
     }, [value, textAreaRef])
 
+    /**
+     * This function is used to handle the "Enter" key press
+     */
     const handleKeyDown = (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
       // Check if the pressed key is "Enter" (key code 13) without the "Shift" key
       // also checks if the commands popover is open
@@ -66,9 +83,6 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
         if (setCommandsOpen) setCommandsOpen(false)
       }
     }
-
-    const formRef = createRef<HTMLFormElement>()
-    const submitRef = createRef<HTMLButtonElement>()
 
     return (
       <form ref={formRef} className="relative" {...props} onSubmit={onSubmit}>
@@ -86,7 +100,6 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
           aria-expanded={false}
           className={cn(
             icon && 'pl-12',
-            usingCommandPopover && 'bg-transparent',
             'transition-all text-sm pr-10 rounded-[18px] resize-none box-border leading-6'
           )}
           placeholder={props.placeholder}
