@@ -34,7 +34,7 @@ One of the most common fusion methods is Reciprocal Ranked Fusion (RRF). The key
 
 In RRF, we iterate over each record and assign a score (noting that each record could exist in one or both lists). The score is calculated as 1 divided by that record's rank in each list, summed together between both lists. For example, if a record with an ID of `123` was ranked third in the keyword search and ninth in semantic search, it would receive a score of $$\dfrac{1}{3} + \dfrac{1}{9} = 0.444$$. If the record was found in only one list and not the other, it would receive a score of 0 for the other list. The records are then sorted by this score to create the final list. The items with the highest scores are ranked first, and lowest scores ranked last.
 
-This method ensures that items that are ranked high in multiple lists are given a high rank in the final list. It also ensures that items that are ranked high in only a few lists but low in others are not given a high rank in the final list. Placing the rank in the denominator when calculating score (ie. reciprocal rank) helps penalize the low ranking records.
+This method ensures that items that are ranked high in multiple lists are given a high rank in the final list. It also ensures that items that are ranked high in only a few lists but low in others are not given a high rank in the final list. Placing the rank in the denominator when calculating score helps penalize the low ranking records.
 
 ### Smoothing constant `k`
 
