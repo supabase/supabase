@@ -392,10 +392,10 @@ functions:
         code: |
           ```kotlin
           val count = supabase.from("countries")
-                      .select(head = true) {
-                          count(Count.EXACT)
-                      }
-                      .count()!!
+              .select {
+                  count(Count.EXACT)
+              }
+              .count()!!
           ```
       - id: querying-json-data
         name: Querying JSON data
@@ -2306,6 +2306,11 @@ functions:
   - id: db-modifiers-select
     title: select()
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.select'
+    params:
+      - name: columns
+        isOptional: true
+        type: Columns
+        description: The columns to select.
     examples:
       - id: with-upsert
         name: With `upsert()`
@@ -2422,7 +2427,7 @@ functions:
           supabase.from("countries").select(
               columns = columns
           ) {
-              order(column = "id", order = Order.ASCENDING, foreignTable = "cities")
+              order(column = "id", order = Order.ASCENDING, referencedTable = "cities")
           }
           ```
         data:
@@ -2540,7 +2545,7 @@ functions:
           supabase.from("countries").select(
               columns = columns
           ) {
-              limit(count = 1, foreignTable = "cities")
+              limit(count = 1, referencedTable = "cities")
           }
           ```
         data:
@@ -2814,7 +2819,7 @@ functions:
     params:
       - name: provider
         isOptional: false
-        type: AuthProvider<C, R>
+        type: Email or Phone
         description: The provider to use for the user's authentication. In this case `Email` or `Phone`.
       - name: redirectUrl
         isOptional: true
@@ -2822,7 +2827,7 @@ functions:
         description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
       - name: config
         isOptional: true
-        type: C.() -> Unit
+        type: Email.Config.() -> Unit or Phone.Config.() -> Unit
         description: The configuration for signing in with `Email` or `Phone`.
         subContent:
           - name: password
@@ -2907,7 +2912,7 @@ functions:
     params:
       - name: provider
         isOptional: false
-        type: DefaultAuthProvider<C, R>
+        type: Email or Phone
         description: The provider to use for the user's authentication, in this case `Email` or `Phone`.
       - name: redirectUrl
         isOptional: true
@@ -2915,7 +2920,7 @@ functions:
         description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
       - name: config
         isOptional: true
-        type: C.() -> Unit
+        type: Email.Config.() -> Unit or Phone.Config.() -> Unit
         description: The configuration for signing in with `Email` or `Phone`.
         subContent:
           - name: password
@@ -3363,6 +3368,11 @@ functions:
       - This method gets the user object from the current session.
       - Fetches the user object from the database instead of local session.
       - Should be used only when you require the most current user data. For faster results, `getCurrentSessionOrNull()?.user` is recommended.
+    params:
+      - name: jwt
+        isOptional: false
+        type: String
+        description: The JWT token.
     examples:
       - id: get-the-logged-in-user-with-the-current-existing-session
         name: Get the logged in user with the current session
@@ -3392,7 +3402,7 @@ functions:
       - name: updateCurrentUser
         isOptional: true
         type: Boolean
-        description: Whether to update the local session with the new user.
+        description: Whether to update the local session with the new user. Defaults to `true`.
       - name: redirectUrl
         isOptional: true
         type: String?
@@ -3525,7 +3535,7 @@ functions:
       - name: updateLocalUser
         isOptional: true
         type: Boolean
-        description: Whether to delete the identity from the local user or not.
+        description: Whether to delete the identity from the local user or not. Defaults to `true`.
     examples:
       - id: unlink-identity
         name: Unlink an identity
@@ -3549,6 +3559,11 @@ functions:
       - `importSession()` takes in a UserSession.
       - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
       - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+    params:
+      - name: session
+        isOptional: false
+        type: UserSession
+        description: The session to set.
     examples:
       - id: refresh-the-session
         name: Set local session
@@ -3565,6 +3580,11 @@ functions:
       This method will refresh the session whether the current one is expired or not.
 
       - This is done automatically, but can be disabled in the Auth config.
+    params:
+      - name: refreshToken
+        isOptional: false
+        type: String
+        description: The refresh token to use.
     examples:
       - id: refresh-current-session
         name: Refresh current session
@@ -3902,7 +3922,7 @@ functions:
           supabase.auth.importAuthToken("service_role")
 
           // Access auth admin api
-          val adminGoTrueClient = supabase.auth.admin
+          val adminAuthClient = supabase.auth.admin
           ```
 
   - id: get-user-by-id
