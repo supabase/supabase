@@ -7,6 +7,8 @@ import { readdir, readFile } from 'node:fs/promises'
 import { dirname, join, extname, sep } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import remarkGfm from 'remark-gfm'
+import rehypeKatex from 'rehype-katex'
+import remarkMath from 'remark-math'
 
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
@@ -93,7 +95,12 @@ export async function getGuidesStaticProps(
   const mdxOptions: SerializeOptions = {
     mdxOptions: {
       useDynamicImport: true,
-      remarkPlugins: [remarkGfm, [remarkCodeHike, codeHikeOptions]],
+      remarkPlugins: [
+        [remarkMath, { singleDollarTextMath: false }],
+        remarkGfm,
+        [remarkCodeHike, codeHikeOptions],
+      ],
+      rehypePlugins: [rehypeKatex as any],
     },
   }
   const mdxSource = await serialize(content, mdxOptions)
