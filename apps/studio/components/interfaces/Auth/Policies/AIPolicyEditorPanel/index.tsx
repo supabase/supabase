@@ -193,7 +193,6 @@ export const AIPolicyEditorPanel = memo(function ({
   //   // clean up the sql before sending
   //   const policy = editorOneRef.current?.getValue().replaceAll('  ', ' ')
 
-<<<<<<< HEAD
   //   if (policy) {
   //     setError(undefined)
   //     executeMutation({
@@ -203,20 +202,6 @@ export const AIPolicyEditorPanel = memo(function ({
   //     })
   //   }
   // }, [executeMutation, selectedProject?.connectionString, selectedProject?.ref])
-=======
-    if (policy) {
-      setError(undefined)
-      executeMutation({
-        sql: policy,
-        projectRef: selectedProject?.ref,
-        connectionString: selectedProject?.connectionString,
-        handleError: (error) => {
-          throw error
-        },
-      })
-    }
-  }, [executeMutation, selectedProject?.connectionString, selectedProject?.ref])
->>>>>>> master
 
   const acceptChange = useCallback(async () => {
     if (!incomingChange) {
