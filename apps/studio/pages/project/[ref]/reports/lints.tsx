@@ -3,7 +3,6 @@ import { ReportsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { NextPageWithLayout } from 'types'
-import { lint_sql } from './lints.utils'
 
 import ReportLintsTableRow from 'components/interfaces/Reports/ReportLintsTableRow'
 import Table from 'components/to-be-cleaned/Table'
@@ -11,6 +10,7 @@ import { useLocalStorageQuery } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { Check, Loader } from 'lucide-react'
 import { Accordion, LoadingLine } from 'ui'
+import { lint_sql } from 'components/interfaces/Reports/ReportLints.utils'
 
 export type Lint = {
   name: string
