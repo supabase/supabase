@@ -1,11 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { partition } from 'lodash'
 import { Plus } from 'lucide-react'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
+
+import { useParams } from 'common'
+import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
+import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
+import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
+import { useCheckPermissions, useSelectedProject } from 'hooks'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -17,6 +25,7 @@ import {
   Tooltip_Shadcn_,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import {
   InnerSideBarEmptyPanel,
   InnerSideBarFilterSearchInput,
@@ -28,20 +37,10 @@ import {
   InnerSideMenuItem,
   InnerSideMenuSeparator,
 } from 'ui-patterns/InnerSideMenu'
-
-import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
-import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useSelectedProject } from 'hooks'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import QueryItem from './QueryItem'
 import { selectItemsInRange } from './SQLEditorLayout.utils'
 
-const SideBarContent = observer(() => {
+const SideBarContent = () => {
   const { ref, id: activeId } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
@@ -381,6 +380,6 @@ const SideBarContent = observer(() => {
       </ConfirmationModal>
     </>
   )
-})
+}
 
 export default SideBarContent

@@ -1,17 +1,16 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { sortBy } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { Fragment, useEffect, useState } from 'react'
-import { Button, IconExternalLink, IconLoader, IconSearch, IconX, Input, Listbox } from 'ui'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Divider from 'components/ui/Divider'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { useCheckPermissions } from 'hooks'
 import type { VaultSecret } from 'types'
+import { Button, IconExternalLink, IconLoader, IconSearch, IconX, Input, Listbox } from 'ui'
 import AddNewSecretModal from './AddNewSecretModal'
 import DeleteSecretModal from './DeleteSecretModal'
 import EditSecretModal from './EditSecretModal'
@@ -217,4 +216,4 @@ const SecretsManagement = () => {
   )
 }
 
-export default observer(SecretsManagement)
+export default SecretsManagement
