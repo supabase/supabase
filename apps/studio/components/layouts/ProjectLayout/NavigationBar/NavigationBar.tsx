@@ -4,10 +4,14 @@ import { Home, User } from 'icons'
 import { isUndefined } from 'lodash'
 import {
   ArrowBigLeft,
+  ChevronLeft,
   ChevronRight,
   Command,
   FileText,
   FlaskConical,
+  Lock,
+  Pin,
+  PinOff,
   Search,
   Settings,
 } from 'lucide-react'
@@ -390,6 +394,7 @@ const NavigationBar = () => {
               onClick={() => {
                 if (snap.navigationPanelOpenSticky) {
                   snap.setNavigationPanelOpen(false)
+                  snap.setNavigationPanelJustClosed(true)
                 }
                 snap.setNavigationPanelOpenSticky(!snap.navigationPanelOpenSticky)
               }}
@@ -397,10 +402,10 @@ const NavigationBar = () => {
                 snap.navigationPanelOpen || snap.navigationPanelOpenSticky
                   ? 'opacity-100'
                   : 'invisible opacity-0',
-                'w-4 h-4',
+                'w-[1.2rem] h-[1.2rem]',
                 'absolute',
                 'flex items-center justify-center',
-                '-right-2 bottom-[12rem]',
+                '-right-[0.6rem] bottom-[2.9rem]',
                 'text-foreground-muted',
                 'bg-surface-200',
                 'border rounded-full',
@@ -410,15 +415,15 @@ const NavigationBar = () => {
                 'z-50'
               )}
             >
-              <ChevronRight
-                size={12}
-                strokeWidth={2}
-                className={cn('transition-all', snap.navigationPanelOpenSticky ? 'rotate-180' : '')}
-              />
+              {!snap.navigationPanelOpenSticky ? (
+                <Pin size={10} strokeWidth={2} />
+              ) : (
+                <PinOff size={10} strokeWidth={2} />
+              )}
             </button>
           </TooltipTrigger_Shadcn_>
           <TooltipContent_Shadcn_ side="right">
-            {snap.navigationPanelOpenSticky ? 'Close the nav bar' : 'Keep side bar open'}
+            {!snap.navigationPanelOpenSticky ? 'Pin nav bar' : 'Un-pin nav bar'}
           </TooltipContent_Shadcn_>
         </Tooltip_Shadcn_>
       </nav>
