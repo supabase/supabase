@@ -66,7 +66,6 @@ const QueryItem = ({
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess: (data) => {
-      console.log('Success delete', data)
       onDeleteQuery(data)
     },
     onError: (error, data) => {
