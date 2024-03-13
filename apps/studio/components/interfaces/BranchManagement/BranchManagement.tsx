@@ -337,7 +337,7 @@ const BranchManagement = () => {
         alert={{ title: 'You cannot recover this branch once deleted' }}
         text={
           <>
-            This will delete your database preview branch
+            This will delete your database preview branch{' '}
             <span className="text-bold text-foreground">{selectedBranchToDelete?.name}</span>.
           </>
         }
