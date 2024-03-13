@@ -21,8 +21,13 @@ import {
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Select_Shadcn_,
-  SidePanel,
+  Separator,
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetSection,
   Toggle,
+  cn,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -39,7 +44,8 @@ import { useDatabaseFunctionCreateMutation } from 'data/database-functions/datab
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { FormSchema } from 'types'
-import { convertArgumentTypes, convertConfigParams } from './Functions.utils'
+import { convertArgumentTypes, convertConfigParams } from '../Functions.utils'
+import { CreateFunctionHeader } from './CreateFunctionHeader'
 
 const FORM_ID = 'create-function-sidepanel'
 
@@ -66,6 +72,8 @@ const FormSchema = z.object({
 const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
   const { project } = useProjectContext()
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
+  // For now, there's no AI assistant for functions
+  const [assistantVisible, setAssistantVisible] = useState(false)
 
   const isEditing = !!func?.id
 
@@ -141,20 +149,232 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
   }
 
   return (
-    <SidePanel
-      size="large"
-      visible={visible}
-      header={isEditing ? `Edit '${func.name}' function` : 'Add a new function'}
-      className="mr-0 transform transition-all duration-300 ease-in-out"
-      onCancel={() => isClosingSidePanel()}
-      customFooter={
-        <div className="flex justify-end gap-2 p-4 bg-overlay border-t border-overlay">
-          <div>
+    <Sheet open={visible} onOpenChange={() => isClosingSidePanel()}>
+      <SheetContent
+        size={assistantVisible ? 'lg' : 'default'}
+        className={cn(
+          // 'bg-surface-200',
+          'p-0 flex flex-row gap-0',
+          assistantVisible ? '!min-w-[1200px]' : '!min-w-[600px]'
+        )}
+      >
+        <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
+          <CreateFunctionHeader
+            selectedFunction={func?.name}
+            assistantVisible={assistantVisible}
+            setAssistantVisible={setAssistantVisible}
+          />
+          <Separator />
+          <Form_Shadcn_ {...form}>
+            <form
+              id={FORM_ID}
+              className="flex-grow overflow-auto"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <SheetSection>
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Name of function"
+                      description="Name will also be used for the function name in postgres"
+                      layout="horizontal"
+                    >
+                      <FormControl_Shadcn_>
+                        <Input_Shadcn_ {...field} />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+              </SheetSection>
+              <Separator />
+              <SheetSection className="space-y-4">
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="schema"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Schema"
+                      description="Tables made in the table editor will be in 'public'"
+                      layout="horizontal"
+                    >
+                      <FormControl_Shadcn_>
+                        <SchemaSelector
+                          selectedSchemaName={field.value}
+                          excludedSchemas={EXCLUDED_SCHEMAS}
+                          size="small"
+                          onSelectSchema={(name) => field.onChange(name)}
+                        />
+                      </FormControl_Shadcn_>
+                    </FormItemLayout>
+                  )}
+                />
+                {!isEditing && (
+                  <FormField_Shadcn_
+                    control={form.control}
+                    name="return_type"
+                    render={({ field }) => (
+                      <FormItemLayout label="Return type" layout="horizontal">
+                        {/* Form selects don't need form controls, otherwise the CSS gets weird */}
+                        <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
+                          <SelectTrigger_Shadcn_ className="col-span-8">
+                            <SelectValue_Shadcn_ />
+                          </SelectTrigger_Shadcn_>
+                          <SelectContent_Shadcn_>
+                            {['void', 'record', 'trigger', 'integer', ...POSTGRES_DATA_TYPES].map(
+                              (option) => (
+                                <SelectItem_Shadcn_ value={option} key={option}>
+                                  {option}
+                                </SelectItem_Shadcn_>
+                              )
+                            )}
+                          </SelectContent_Shadcn_>
+                        </Select_Shadcn_>
+                      </FormItemLayout>
+                    )}
+                  />
+                )}
+              </SheetSection>
+              <Separator />
+              <SheetSection>
+                <FormFieldArgs readonly={isEditing} />
+              </SheetSection>
+              <Separator />
+              <SheetSection>
+                <FormField_Shadcn_
+                  control={form.control}
+                  name="definition"
+                  render={({ field }) => (
+                    <FormItem_Shadcn_ className="space-y-4">
+                      <div>
+                        <FormLabel_Shadcn_ className="text-base text-foreground">
+                          Definition
+                        </FormLabel_Shadcn_>
+                        <FormDescription_Shadcn_ className="text-sm text-foreground-light">
+                          <p>The language below should be written in `plpgsql`.</p>
+                          {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
+                        </FormDescription_Shadcn_>
+                      </div>
+
+                      <div className="h-60 resize-y border border-default">
+                        <FormControl_Shadcn_>
+                          <SqlEditor
+                            defaultValue={field.value}
+                            onInputChange={(value: string | undefined) => {
+                              field.onChange(value)
+                            }}
+                            contextmenu={false}
+                          />
+                        </FormControl_Shadcn_>
+                      </div>
+
+                      <FormMessage_Shadcn_ />
+                    </FormItem_Shadcn_>
+                  )}
+                />
+              </SheetSection>
+              <Separator />
+              {isEditing ? (
+                <></>
+              ) : (
+                <>
+                  <SheetSection>
+                    <div className="space-y-8 rounded bg-studio py-4 px-6 border border-overlay">
+                      <Toggle
+                        onChange={() => setAdvancedSettingsShown(!advancedSettingsShown)}
+                        label="Show advanced settings"
+                        checked={advancedSettingsShown}
+                        labelOptional="These are settings that might be familiar for postgres heavy users "
+                      />
+                    </div>
+                  </SheetSection>
+                  {advancedSettingsShown && (
+                    <>
+                      <SheetSection className="space-y-2">
+                        <FormFieldLanguage />
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="behavior"
+                          render={({ field }) => (
+                            <FormItemLayout label="Behavior" layout="horizontal">
+                              {/* Form selects don't need form controls, otherwise the CSS gets weird */}
+                              <Select_Shadcn_
+                                defaultValue={field.value}
+                                onValueChange={field.onChange}
+                              >
+                                <SelectTrigger_Shadcn_ className="col-span-8">
+                                  <SelectValue_Shadcn_ />
+                                </SelectTrigger_Shadcn_>
+                                <SelectContent_Shadcn_>
+                                  <SelectItem_Shadcn_ value="IMMUTABLE" key="IMMUTABLE">
+                                    immutable
+                                  </SelectItem_Shadcn_>
+                                  <SelectItem_Shadcn_ value="STABLE" key="STABLE">
+                                    stable
+                                  </SelectItem_Shadcn_>
+                                  <SelectItem_Shadcn_ value="VOLATILE" key="VOLATILE">
+                                    volatile
+                                  </SelectItem_Shadcn_>
+                                </SelectContent_Shadcn_>
+                              </Select_Shadcn_>
+                            </FormItemLayout>
+                          )}
+                        />
+                      </SheetSection>
+                      <Separator />
+                      <SheetSection>
+                        <FormFieldConfigParams readonly={isEditing} />
+                      </SheetSection>
+                      <Separator />
+                      <SheetSection>
+                        <FormField_Shadcn_
+                          control={form.control}
+                          name="security_definer"
+                          render={({ field }) => (
+                            <FormItem_Shadcn_>
+                              <FormControl_Shadcn_ className="col-span-8">
+                                {/* TODO: This RadioGroup imports Formik state, replace it with a clean component */}
+                                <Radio.Group
+                                  type="cards"
+                                  label="Type of security"
+                                  layout="vertical"
+                                  onChange={(event) =>
+                                    field.onChange(event.target.value == 'SECURITY_DEFINER')
+                                  }
+                                  value={field.value ? 'SECURITY_DEFINER' : 'SECURITY_INVOKER'}
+                                >
+                                  <Radio
+                                    id="SECURITY_INVOKER"
+                                    label="SECURITY INVOKER"
+                                    value="SECURITY_INVOKER"
+                                    checked={!field.value}
+                                    description="Function is to be executed with the privileges of the user that calls it."
+                                  />
+                                  <Radio
+                                    id="SECURITY_DEFINER"
+                                    label="SECURITY DEFINER"
+                                    value="SECURITY_DEFINER"
+                                    checked={field.value}
+                                    description="Function is to be executed with the privileges of the user that created it."
+                                  />
+                                </Radio.Group>
+                              </FormControl_Shadcn_>
+                              <FormMessage_Shadcn_ />
+                            </FormItem_Shadcn_>
+                          )}
+                        />
+                      </SheetSection>
+                    </>
+                  )}
+                </>
+              )}
+            </form>
+          </Form_Shadcn_>
+          <SheetFooter>
             <Button disabled={isCreating || isUpdating} type="default" onClick={isClosingSidePanel}>
               Cancel
             </Button>
-          </div>
-          <div>
             <Button
               form={FORM_ID}
               htmlType="submit"
@@ -163,233 +383,32 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
             >
               Confirm
             </Button>
-          </div>
+          </SheetFooter>
         </div>
-      }
-    >
-      <Form_Shadcn_ {...form}>
-        <form id={FORM_ID} className="space-y-6 mt-4" onSubmit={form.handleSubmit(onSubmit)}>
-          <SidePanel.Content>
-            <FormField_Shadcn_
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItemLayout
-                  label="Name of function"
-                  description="Name will also be used for the function name in postgres"
-                  layout="horizontal"
-                >
-                  <FormControl_Shadcn_>
-                    <Input_Shadcn_ {...field} />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-          </SidePanel.Content>
-          <SidePanel.Separator />
-          <SidePanel.Content className="space-y-4">
-            <FormField_Shadcn_
-              control={form.control}
-              name="schema"
-              render={({ field }) => (
-                <FormItemLayout
-                  label="Schema"
-                  description="Tables made in the table editor will be in 'public'"
-                  layout="horizontal"
-                >
-                  <FormControl_Shadcn_>
-                    <SchemaSelector
-                      selectedSchemaName={field.value}
-                      excludedSchemas={EXCLUDED_SCHEMAS}
-                      size="small"
-                      onSelectSchema={(name) => field.onChange(name)}
-                    />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              )}
-            />
-            {!isEditing && (
-              <FormField_Shadcn_
-                control={form.control}
-                name="return_type"
-                render={({ field }) => (
-                  <FormItemLayout label="Return type" layout="horizontal">
-                    {/* Form selects don't need form controls, otherwise the CSS gets weird */}
-                    <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
-                      <SelectTrigger_Shadcn_ className="col-span-8">
-                        <SelectValue_Shadcn_ />
-                      </SelectTrigger_Shadcn_>
-                      <SelectContent_Shadcn_>
-                        {['void', 'record', 'trigger', 'integer', ...POSTGRES_DATA_TYPES].map(
-                          (option) => (
-                            <SelectItem_Shadcn_ value={option} key={option}>
-                              {option}
-                            </SelectItem_Shadcn_>
-                          )
-                        )}
-                      </SelectContent_Shadcn_>
-                    </Select_Shadcn_>
-                  </FormItemLayout>
-                )}
-              />
-            )}
-          </SidePanel.Content>
-          <SidePanel.Separator />
-          <SidePanel.Content>
-            <FormFieldArgs readonly={isEditing} />
-          </SidePanel.Content>
-          <SidePanel.Separator />
-          <SidePanel.Content>
-            <FormField_Shadcn_
-              control={form.control}
-              name="definition"
-              render={({ field }) => (
-                <FormItem_Shadcn_ className="space-y-4">
-                  <div>
-                    <FormLabel_Shadcn_ className="text-base text-foreground">
-                      Definition
-                    </FormLabel_Shadcn_>
-                    <FormDescription_Shadcn_ className="text-sm text-foreground-light">
-                      <p>The language below should be written in `plpgsql`.</p>
-                      {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
-                    </FormDescription_Shadcn_>
-                  </div>
-
-                  <div className="h-60 resize-y border border-default">
-                    <FormControl_Shadcn_>
-                      <SqlEditor
-                        defaultValue={field.value}
-                        onInputChange={(value: string | undefined) => {
-                          field.onChange(value)
-                        }}
-                        contextmenu={false}
-                      />
-                    </FormControl_Shadcn_>
-                  </div>
-
-                  <FormMessage_Shadcn_ />
-                </FormItem_Shadcn_>
-              )}
-            />
-          </SidePanel.Content>
-          <SidePanel.Separator />
-          {isEditing ? (
-            <></>
-          ) : (
-            <>
-              <SidePanel.Content>
-                <div className="space-y-8 rounded bg-studio py-4 px-6 border border-overlay">
-                  <Toggle
-                    onChange={() => setAdvancedSettingsShown(!advancedSettingsShown)}
-                    label="Show advanced settings"
-                    checked={advancedSettingsShown}
-                    labelOptional="These are settings that might be familiar for postgres heavy users "
-                  />
-                </div>
-              </SidePanel.Content>
-              {advancedSettingsShown && (
-                <>
-                  <SidePanel.Content>
-                    <div className="space-y-2">
-                      <FormFieldLanguage />
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="behavior"
-                        render={({ field }) => (
-                          <FormItemLayout label="Behavior" layout="horizontal">
-                            <Select_Shadcn_
-                              defaultValue={field.value}
-                              onValueChange={field.onChange}
-                            >
-                              <SelectTrigger_Shadcn_ className="col-span-8">
-                                <SelectValue_Shadcn_ />
-                              </SelectTrigger_Shadcn_>
-                              <SelectContent_Shadcn_>
-                                <SelectItem_Shadcn_ value="IMMUTABLE" key="IMMUTABLE">
-                                  immutable
-                                </SelectItem_Shadcn_>
-                                <SelectItem_Shadcn_ value="STABLE" key="STABLE">
-                                  stable
-                                </SelectItem_Shadcn_>
-                                <SelectItem_Shadcn_ value="VOLATILE" key="VOLATILE">
-                                  volatile
-                                </SelectItem_Shadcn_>
-                              </SelectContent_Shadcn_>
-                            </Select_Shadcn_>
-                          </FormItemLayout>
-                        )}
-                      />
-                    </div>
-                  </SidePanel.Content>
-                  <SidePanel.Separator />
-                  <SidePanel.Content>
-                    <FormFieldConfigParams readonly={isEditing} />
-                  </SidePanel.Content>
-                  <SidePanel.Separator />
-                  <SidePanel.Content>
-                    <div className="space-y-4">
-                      <FormField_Shadcn_
-                        control={form.control}
-                        name="security_definer"
-                        render={({ field }) => (
-                          <FormItem_Shadcn_>
-                            <FormControl_Shadcn_ className="col-span-8">
-                              {/* TODO: This RadioGroup imports Formik state, replace it with a clean component */}
-                              <Radio.Group
-                                type="cards"
-                                label="Type of security"
-                                layout="vertical"
-                                onChange={(event) =>
-                                  field.onChange(event.target.value == 'SECURITY_DEFINER')
-                                }
-                                value={field.value ? 'SECURITY_DEFINER' : 'SECURITY_INVOKER'}
-                              >
-                                <Radio
-                                  id="SECURITY_INVOKER"
-                                  label="SECURITY INVOKER"
-                                  value="SECURITY_INVOKER"
-                                  checked={!field.value}
-                                  description="Function is to be executed with the privileges of the user that calls it."
-                                />
-                                <Radio
-                                  id="SECURITY_DEFINER"
-                                  label="SECURITY DEFINER"
-                                  value="SECURITY_DEFINER"
-                                  checked={field.value}
-                                  description="Function is to be executed with the privileges of the user that created it."
-                                />
-                              </Radio.Group>
-                            </FormControl_Shadcn_>
-                            <FormMessage_Shadcn_ />
-                          </FormItem_Shadcn_>
-                        )}
-                      />
-                    </div>
-                  </SidePanel.Content>
-                </>
-              )}
-            </>
-          )}
-        </form>
-      </Form_Shadcn_>
-      <ConfirmationModal
-        visible={isClosingPanel}
-        header="Discard changes"
-        buttonLabel="Discard"
-        onSelectCancel={() => setIsClosingPanel(false)}
-        onSelectConfirm={() => {
-          setIsClosingPanel(false)
-          setVisible(!visible)
-        }}
-      >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            There are unsaved changes. Are you sure you want to close the panel? Your changes will
-            be lost.
-          </p>
-        </Modal.Content>
-      </ConfirmationModal>
-    </SidePanel>
+        {assistantVisible ? (
+          <div className="border-l shadow-[rgba(0,0,0,0.13)_-4px_0px_6px_0px] z-10 w-[50%] bg-studio">
+            {/* This is where the AI assistant would be added */}
+          </div>
+        ) : null}
+        <ConfirmationModal
+          visible={isClosingPanel}
+          header="Discard changes"
+          buttonLabel="Discard"
+          onSelectCancel={() => setIsClosingPanel(false)}
+          onSelectConfirm={() => {
+            setIsClosingPanel(false)
+            setVisible(!visible)
+          }}
+        >
+          <Modal.Content>
+            <p className="py-4 text-sm text-foreground-light">
+              There are unsaved changes. Are you sure you want to close the panel? Your changes will
+              be lost.
+            </p>
+          </Modal.Content>
+        </ConfirmationModal>
+      </SheetContent>
+    </Sheet>
   )
 }
 
