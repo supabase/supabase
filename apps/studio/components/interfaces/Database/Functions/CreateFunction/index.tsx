@@ -38,7 +38,6 @@ import { PostgresFunction } from '@supabase/postgres-meta'
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import SchemaSelector from 'components/ui/SchemaSelector'
-import SqlEditor from 'components/ui/SqlEditor'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
@@ -46,6 +45,7 @@ import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { FormSchema } from 'types'
 import { convertArgumentTypes, convertConfigParams } from '../Functions.utils'
 import { CreateFunctionHeader } from './CreateFunctionHeader'
+import { FunctionEditor } from './FunctionEditor'
 
 const FORM_ID = 'create-function-sidepanel'
 
@@ -74,6 +74,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
   // For now, there's no AI assistant for functions
   const [assistantVisible, setAssistantVisible] = useState(false)
+  const [focusedEditor, setFocusedEditor] = useState(false)
 
   const isEditing = !!func?.id
 
@@ -172,7 +173,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
               className="flex-grow overflow-auto"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <SheetSection>
+              <SheetSection className={focusedEditor ? 'hidden' : ''}>
                 <FormField_Shadcn_
                   control={form.control}
                   name="name"
@@ -189,8 +190,8 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                   )}
                 />
               </SheetSection>
-              <Separator />
-              <SheetSection className="space-y-4">
+              <Separator className={focusedEditor ? 'hidden' : ''} />
+              <SheetSection className={focusedEditor ? 'hidden' : 'space-y-4'}>
                 <FormField_Shadcn_
                   control={form.control}
                   name="schema"
@@ -237,17 +238,17 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                   />
                 )}
               </SheetSection>
-              <Separator />
-              <SheetSection>
+              <Separator className={focusedEditor ? 'hidden' : ''} />
+              <SheetSection className={focusedEditor ? 'hidden' : ''}>
                 <FormFieldArgs readonly={isEditing} />
               </SheetSection>
-              <Separator />
-              <SheetSection>
+              <Separator className={focusedEditor ? 'hidden' : ''} />
+              <SheetSection className={focusedEditor ? 'h-full' : ''}>
                 <FormField_Shadcn_
                   control={form.control}
                   name="definition"
                   render={({ field }) => (
-                    <FormItem_Shadcn_ className="space-y-4">
+                    <FormItem_Shadcn_ className="space-y-4 flex flex-col h-full">
                       <div>
                         <FormLabel_Shadcn_ className="text-base text-foreground">
                           Definition
@@ -257,17 +258,17 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                           {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
                         </FormDescription_Shadcn_>
                       </div>
-
-                      <div className="h-60 resize-y border border-default">
-                        <FormControl_Shadcn_>
-                          <SqlEditor
-                            defaultValue={field.value}
-                            onInputChange={(value: string | undefined) => {
-                              field.onChange(value)
-                            }}
-                            contextmenu={false}
-                          />
-                        </FormControl_Shadcn_>
+                      <div
+                        className={cn(
+                          'border border-default flex',
+                          focusedEditor ? 'flex-grow ' : 'h-60'
+                        )}
+                      >
+                        <FunctionEditor
+                          field={field}
+                          focused={focusedEditor}
+                          setFocused={setFocusedEditor}
+                        />
                       </div>
 
                       <FormMessage_Shadcn_ />
@@ -275,12 +276,12 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                   )}
                 />
               </SheetSection>
-              <Separator />
+              <Separator className={focusedEditor ? 'hidden' : ''} />
               {isEditing ? (
                 <></>
               ) : (
                 <>
-                  <SheetSection>
+                  <SheetSection className={focusedEditor ? 'hidden' : ''}>
                     <div className="space-y-8 rounded bg-studio py-4 px-6 border border-overlay">
                       <Toggle
                         onChange={() => setAdvancedSettingsShown(!advancedSettingsShown)}
@@ -292,7 +293,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                   </SheetSection>
                   {advancedSettingsShown && (
                     <>
-                      <SheetSection className="space-y-2">
+                      <SheetSection className={focusedEditor ? 'hidden' : '"space-y-2"'}>
                         <FormFieldLanguage />
                         <FormField_Shadcn_
                           control={form.control}
@@ -323,12 +324,12 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                           )}
                         />
                       </SheetSection>
-                      <Separator />
-                      <SheetSection>
+                      <Separator className={focusedEditor ? 'hidden' : ''} />
+                      <SheetSection className={focusedEditor ? 'hidden' : ''}>
                         <FormFieldConfigParams readonly={isEditing} />
                       </SheetSection>
-                      <Separator />
-                      <SheetSection>
+                      <Separator className={focusedEditor ? 'hidden' : ''} />
+                      <SheetSection className={focusedEditor ? 'hidden' : ''}>
                         <FormField_Shadcn_
                           control={form.control}
                           name="security_definer"
