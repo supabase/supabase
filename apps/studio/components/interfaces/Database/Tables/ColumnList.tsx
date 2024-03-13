@@ -2,7 +2,6 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import {
   Button,
@@ -245,4 +244,4 @@ const ColumnList = ({
   )
 }
 
-export default observer(ColumnList)
+export default ColumnList

@@ -2,7 +2,6 @@ import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import { useTheme } from 'next-themes'
-import { observer } from 'mobx-react-lite'
 import { useCallback, useEffect, useState } from 'react'
 
 import { NewOrgForm } from 'components/interfaces/Organization'
@@ -110,4 +109,4 @@ Wizard.getLayout = (page) => (
   </WizardLayout>
 )
 
-export default observer(Wizard)
+export default Wizard

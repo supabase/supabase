@@ -1,10 +1,10 @@
 import type { PostgresTable, PostgresTrigger } from '@supabase/postgres-meta'
 import Image from 'next/legacy/image'
 import { MutableRefObject, useEffect, useMemo, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormSection, FormSectionContent, FormSectionLabel } from 'components/ui/Forms'
 import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-transaction-mutation'
@@ -14,11 +14,11 @@ import {
 } from 'data/edge-functions/edge-functions-query'
 import { getTable } from 'data/tables/table-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useStore } from 'hooks'
 import { isValidHttpUrl, tryParseJson, uuidv4 } from 'lib/helpers'
 import { Button, Checkbox, Form, Input, Listbox, Modal, Radio, SidePanel } from 'ui'
-import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import HTTPRequestFields from './HTTPRequestFields'
+import { AVAILABLE_WEBHOOK_TYPES, HOOK_EVENTS } from './Hooks.constants'
 
 export interface EditHookPanelProps {
   visible: boolean
@@ -30,7 +30,6 @@ export type HTTPArgument = { id: string; name: string; value: string }
 
 const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) => {
   const { ref } = useParams()
-  const { ui } = useStore()
   const submitRef = useRef<any>(null)
   const [isEdited, setIsEdited] = useState(false)
   const [isClosingPanel, setIsClosingPanel] = useState(false)
@@ -53,38 +52,24 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
   const [isSubmitting, setIsSubmitting] = useState(false)
   const { mutate: createDatabaseTrigger } = useDatabaseTriggerCreateMutation({
     onSuccess: (res) => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully created new webhook "${res.name}"`,
-      })
+      toast.success(`Successfully created new webhook "${res.name}"`)
       setIsSubmitting(false)
       onClose()
     },
     onError: (error) => {
       setIsSubmitting(false)
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to create webhook: ${error.message}`,
-      })
+      toast.error(`Failed to create webhook: ${error.message}`)
     },
   })
   const { mutate: updateDatabaseTrigger } = useDatabaseTriggerUpdateMutation({
     onSuccess: (res) => {
       setIsSubmitting(false)
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated webhook "${res.name}"`,
-      })
+      toast.success(`Successfully updated webhook "${res.name}"`)
       onClose()
     },
     onError: (error) => {
       setIsSubmitting(false)
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to update webhook: ${error.message}`,
-      })
+      toast.error(`Failed to update webhook: ${error.message}`)
     },
   })
 
@@ -204,7 +189,7 @@ const EditHookPanel = ({ visible, selectedHook, onClose }: EditHookPanelProps) =
     })
     if (!selectedTable) {
       setIsSubmitting(false)
-      return ui.setNotification({ category: 'error', message: 'Unable to find selected table' })
+      return toast.error('Unable to find selected table')
     }
 
     const headers = httpHeaders
