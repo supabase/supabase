@@ -19,8 +19,7 @@ export function UserDropdown() {
 }
 
 async function Dropdowns() {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = createClient()
 
   const {
     data: { user },
@@ -31,6 +30,7 @@ async function Dropdowns() {
       <DropdownMenuTrigger asChild className="flex">
         {user ? (
           <button
+            title="User dropdown menu"
             className="border border-foreground-lighter rounded-full w-[30px] h-[30px] bg-no-repeat bg-center bg-cover"
             style={{ backgroundImage: `url('${user.user_metadata.avatar_url}')` }}
           />

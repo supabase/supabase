@@ -21,8 +21,9 @@ export interface UsageBarChartProps {
   data: DataPoint[]
   name: string // Used within the tooltip
   attributes: Attribute[]
-  unit: 'bytes' | 'absolute' | 'percentage'
+  unit: 'bytes' | 'absolute' | 'percentage' | 'hours'
   yLimit?: number
+  yMin?: number
   yLeftMargin?: number
   yFormatter?: (value: number | string) => string
   tooltipFormatter?: (value: number | string) => string
@@ -36,10 +37,10 @@ const UsageBarChart = ({
   yLimit,
   yLeftMargin = 10,
   yFormatter,
+  yMin,
   tooltipFormatter,
 }: UsageBarChartProps) => {
-  const yMin = 0 // We can consider passing this as a prop if there's a use case in the future
-  const yDomain = [yMin, yLimit ?? 0]
+  const yDomain = [yMin ?? 0, Math.max(yMin ?? 0, yLimit ?? 0)]
 
   return (
     <div className="w-full h-[200px]">
@@ -77,6 +78,7 @@ const UsageBarChart = ({
                         values={payload}
                         isAfterToday={isAfterToday}
                         tooltipFormatter={tooltipFormatter}
+                        unit={unit}
                       />
                     ) : (
                       <SingleAttributeTooltipContent

@@ -12,12 +12,14 @@ import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks'
-import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants'
+import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import Link from 'next/link'
 import { Alert, Button, IconExternalLink, IconInfo, Listbox } from 'ui'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
 import SizeAndCounts from './SizeAndCounts'
+import Compute from './Compute'
+import TotalUsage from './TotalUsage'
 
 const Usage = () => {
   const { slug, projectRef } = useParams()
@@ -101,7 +103,7 @@ const Usage = () => {
 
   return (
     <>
-      <ScaffoldContainer className="sticky top-0 border-b bg-background z-10 overflow-hidden">
+      <ScaffoldContainer className="sticky top-0 border-b bg-studio z-10 overflow-hidden">
         <div className="py-4 flex items-center space-x-4">
           {isLoadingSubscription && <ShimmeringLoader className="w-[250px]" />}
 
@@ -186,7 +188,7 @@ const Usage = () => {
               </Button>,
             ]}
           >
-            Your projects can become unresponsive or enter read only mode.{' '}
+            Your projects can become unresponsive or enter read-only mode.{' '}
             {subscription.plan.id === 'free'
               ? 'Please upgrade to the Pro plan to ensure that your projects remain available.'
               : 'Please disable spend cap to ensure that your projects remain available.'}
@@ -227,6 +229,23 @@ const Usage = () => {
           />
         </ScaffoldContainer>
       )}
+
+      <TotalUsage
+        orgSlug={slug as string}
+        projectRef={selectedProjectRef}
+        subscription={subscription}
+        startDate={startDate}
+        endDate={endDate}
+        currentBillingCycleSelected={currentBillingCycleSelected}
+      />
+
+      <Compute
+        orgSlug={slug as string}
+        projectRef={selectedProjectRef}
+        subscription={subscription}
+        startDate={startDate}
+        endDate={endDate}
+      />
 
       <Bandwidth
         orgSlug={slug as string}

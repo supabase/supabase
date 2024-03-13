@@ -12,6 +12,9 @@ export interface Organization {
   subscription_id?: string | null
 }
 
+/**
+ * @deprecated Please use type from projects-query OR project-details-query.ts instead
+ */
 export interface ProjectBase {
   id: number
   ref: string
@@ -25,6 +28,9 @@ export interface ProjectBase {
   preview_branch_refs: string[]
 }
 
+/**
+ * @deprecated Please use type from project-details-query.ts instead
+ */
 export interface Project extends ProjectBase {
   // available after projects.fetchDetail
   connectionString?: string
@@ -85,4 +91,7 @@ export interface ResponseError {
   code?: number
   message: string
   requestId?: string
+}
+export interface Dictionary<T> {
+  [Key: string]: T
 }

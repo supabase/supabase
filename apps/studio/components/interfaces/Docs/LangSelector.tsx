@@ -9,7 +9,7 @@ import {
   IconKey,
 } from 'ui'
 
-import { showApiKey } from 'components/interfaces/Docs/Docs.types'
+import type { showApiKey } from 'components/interfaces/Docs/Docs.types'
 
 const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
@@ -67,7 +67,7 @@ const LangSelector = ({
               <span>Project API key :</span>
             </div>
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger asChild>
                 <Button type="default">{showApiKey.name}</Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" side="bottom">

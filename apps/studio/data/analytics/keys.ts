@@ -57,31 +57,29 @@ export const analyticsKeys = {
       },
     ] as const,
 
-  dailyStats: (
-    projectRef: string | undefined,
+  orgDailyComputeStats: (
+    orgSlug: string | undefined,
     {
-      attribute,
       startDate,
       endDate,
-      interval,
+      projectRef,
     }: {
-      attribute?: string
       startDate?: string
       endDate?: string
-      interval?: string
+      projectRef?: string
     }
   ) =>
     [
-      'projects',
-      projectRef,
-      'daily-stats',
+      'organizations',
+      orgSlug,
+      'daily-stats-compute',
       {
-        attribute,
         startDate: isoDateStringToDate(startDate),
         endDate: isoDateStringToDate(endDate),
-        interval,
+        projectRef,
       },
     ] as const,
+
   orgDailyStats: (
     orgSlug: string | undefined,
     {

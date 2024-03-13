@@ -7,9 +7,9 @@ import TemplatePreview from './TemplatePreview'
 import TemplatesList from './TemplatesList'
 
 interface PolicyTemplatesProps {
-  templates: PolicyTemplate[]
-  templatesNote: string
-  onUseTemplate: (template: PolicyTemplate) => void
+  templates?: PolicyTemplate[]
+  templatesNote?: string
+  onUseTemplate?: (template: PolicyTemplate) => void
 }
 
 const PolicyTemplates = ({
@@ -17,7 +17,7 @@ const PolicyTemplates = ({
   templatesNote = '',
   onUseTemplate = noop,
 }: PolicyTemplatesProps) => {
-  const [selectedTemplate, setSelectedTemplate] = useState(templates[0])
+  const [selectedTemplate, setSelectedTemplate] = useState<PolicyTemplate>(templates[0])
   return (
     <div>
       <div className="flex justify-between border-t border-default">

@@ -2,12 +2,11 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Badge, IconCircle, IconLoader } from 'ui'
 
-import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
+import { Project, invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { useProjectStatusQuery } from 'data/projects/project-status-query'
 import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { PROJECT_STATUS } from 'lib/constants'
 import { useEffect, useState } from 'react'
-import { Project } from 'types'
 
 export interface PausingStateProps {
   project: Project

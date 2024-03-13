@@ -31,17 +31,29 @@ import {
   useTheme,
 } from '@graphiql/react'
 import { Fetcher } from '@graphiql/toolkit'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import clsx from 'clsx'
 import { MouseEventHandler, useCallback, useEffect, useState } from 'react'
+
+import { useCheckPermissions, useLocalStorage } from 'hooks'
+import { XIcon } from 'lucide-react'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  IconAlertTriangle,
+} from 'ui'
+import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
 import styles from './graphiql.module.css'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export interface GraphiQLProps {
   fetcher: Fetcher
   theme?: 'dark' | 'light'
-  accessToken?: string
 }
 
-export default function GraphiQL({ fetcher, theme = 'dark', accessToken }: GraphiQLProps) {
+export default function GraphiQL({ fetcher, theme = 'dark' }: GraphiQLProps) {
   // Ensure props are correct
   if (typeof fetcher !== 'function') {
     throw new TypeError(
@@ -50,14 +62,7 @@ export default function GraphiQL({ fetcher, theme = 'dark', accessToken }: Graph
   }
 
   return (
-    <GraphiQLProvider
-      fetcher={fetcher}
-      defaultHeaders={
-        accessToken !== undefined
-          ? JSON.stringify({ Authorization: `Bearer ${accessToken}` })
-          : undefined
-      }
-    >
+    <GraphiQLProvider fetcher={fetcher}>
       <GraphiQLInterface theme={theme} />
     </GraphiQLProvider>
   )
@@ -67,7 +72,7 @@ interface GraphiQLInterfaceProps {
   theme: 'dark' | 'light'
 }
 
-export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
+const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const editorContext = useEditorContext({ nonNull: true })
   const executionContext = useExecutionContext({ nonNull: true })
   const schemaContext = useSchemaContext({ nonNull: true })
@@ -76,6 +81,13 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const copy = useCopyQuery()
   const merge = useMergeQuery()
   const prettify = usePrettifyEditors()
+
+  const canReadJWTSecret = useCheckPermissions(PermissionAction.READ, 'field.jwt_secret')
+
+  const [rlsBypassedWarningDismissed, setRlsBypassedWarningDismissed] = useLocalStorage(
+    LOCAL_STORAGE_KEYS.GRAPHIQL_RLS_BYPASS_WARNING,
+    false
+  )
 
   const { setTheme } = useTheme()
   useEffect(() => {
@@ -89,7 +101,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
     direction: 'horizontal',
     initiallyHidden: pluginContext?.visiblePlugin ? undefined : 'second',
     onHiddenElementChange: (resizableElement) => {
-      if (resizableElement === 'first') {
+      if (resizableElement === 'second') {
         pluginContext?.setVisiblePlugin(null)
       }
     },
@@ -110,13 +122,11 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
     storageKey: 'secondaryEditorFlex',
   })
 
-  const [activeSecondaryEditor, setActiveSecondaryEditor] = useState<'variables' | 'headers'>(
-    () => {
-      return !editorContext.initialVariables && editorContext.initialHeaders
-        ? 'headers'
-        : 'variables'
-    }
-  )
+  const [activeSecondaryEditor, setActiveSecondaryEditor] = useState<
+    'variables' | 'headers' | 'role-impersonation'
+  >(() => {
+    return !editorContext.initialVariables && editorContext.initialHeaders ? 'headers' : 'variables'
+  })
 
   const toolbar = (
     <>
@@ -164,7 +174,9 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
       if (editorToolsResize.hiddenElement === 'second') {
         editorToolsResize.setHiddenElement(null)
       }
-      setActiveSecondaryEditor(event.currentTarget.dataset.name as 'variables' | 'headers')
+      setActiveSecondaryEditor(
+        event.currentTarget.dataset.name as 'variables' | 'headers' | 'role-impersonation'
+      )
     },
     [editorToolsResize]
   )
@@ -179,7 +191,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
     <Tooltip label="Add tab">
       <UnStyledButton
         type="button"
-        className="graphiql-tab-add"
+        className="graphiql-tab-add text-sm"
         onClick={handleAddTab}
         aria-label="Add tab"
       >
@@ -196,7 +208,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
         <div className="graphiql-main">
           <div
             ref={pluginResize.firstRef}
-            style={{ minWidth: 0 }}
+            style={{ minWidth: '750px' }}
             className={clsx('graphiql-sessions', styles.graphiqlSessions)}
           >
             <div
@@ -280,8 +292,8 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                         className={
                           activeSecondaryEditor === 'variables' &&
                           editorToolsResize.hiddenElement !== 'second'
-                            ? 'active'
-                            : ''
+                            ? 'active text-sm'
+                            : 'text-sm'
                         }
                         onClick={handleToolsTabClick}
                         data-name="variables"
@@ -294,14 +306,30 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                         className={
                           activeSecondaryEditor === 'headers' &&
                           editorToolsResize.hiddenElement !== 'second'
-                            ? 'active'
-                            : ''
+                            ? 'active text-sm'
+                            : 'text-sm'
                         }
                         onClick={handleToolsTabClick}
                         data-name="headers"
                       >
                         Headers
                       </UnStyledButton>
+
+                      {canReadJWTSecret && (
+                        <UnStyledButton
+                          type="button"
+                          className={
+                            activeSecondaryEditor === 'role-impersonation' &&
+                            editorToolsResize.hiddenElement !== 'second'
+                              ? 'active text-sm'
+                              : 'text-sm'
+                          }
+                          onClick={handleToolsTabClick}
+                          data-name="role-impersonation"
+                        >
+                          Role Impersonation
+                        </UnStyledButton>
+                      )}
 
                       <Tooltip
                         label={
@@ -318,7 +346,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                               ? 'Show editor tools'
                               : 'Hide editor tools'
                           }
-                          className="graphiql-toggle-editor-tools"
+                          className="graphiql-toggle-editor-tools text-sm"
                         >
                           {editorToolsResize.hiddenElement === 'second' ? (
                             <ChevronUpIcon className="graphiql-chevron-icon" aria-hidden="true" />
@@ -341,6 +369,17 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                       />
 
                       <HeaderEditor isHidden={activeSecondaryEditor !== 'headers'} />
+
+                      {canReadJWTSecret && (
+                        <div
+                          className={clsx(
+                            'graphiql-editor px-1',
+                            activeSecondaryEditor !== 'role-impersonation' && 'hidden'
+                          )}
+                        >
+                          <RoleImpersonationSelector padded={false} />
+                        </div>
+                      )}
                     </section>
                   </div>
                 </div>
@@ -354,7 +393,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
               <div ref={editorResize.secondRef}>
                 <div
                   className={clsx(
-                    'graphiql-response text-sm',
+                    'graphiql-response text-sm relative',
                     hasSingleTab
                       ? styles.graphiqlResponseSingleTab
                       : styles.graphiqlResponseMultiTab
@@ -362,6 +401,32 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                 >
                   {executionContext.isFetching ? <Spinner /> : null}
                   <ResponseEditor />
+
+                  {!rlsBypassedWarningDismissed && (
+                    <Alert_Shadcn_ variant="warning" className="absolute bottom-[5px] right-[5px]">
+                      <IconAlertTriangle strokeWidth={2} />
+                      <AlertTitle_Shadcn_ className="leading-5 text-foreground">
+                        Please note that queries and mutations run in GraphiQL now use the service
+                        role key by default.
+                        <br />
+                        <span className="text-amber-900">RLS will be bypassed.</span>
+                      </AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        You can send queries as a specific role/user by using the role impersonation
+                        tab.
+                      </AlertDescription_Shadcn_>
+                      <Button
+                        type="outline"
+                        aria-label="Dismiss"
+                        className="absolute top-2 right-2 p-1 !pl-1"
+                        onClick={() => {
+                          setRlsBypassedWarningDismissed(true)
+                        }}
+                      >
+                        <XIcon width={14} height={14} />
+                      </Button>
+                    </Alert_Shadcn_>
+                  )}
                 </div>
               </div>
             </div>
@@ -390,7 +455,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
                 <Tooltip key={plugin.title} label={label}>
                   <UnStyledButton
                     type="button"
-                    className={isVisible ? 'active' : ''}
+                    className={isVisible ? 'active text-sm' : 'text-sm'}
                     onClick={handlePluginClick}
                     data-index={index}
                     aria-label={label}
@@ -405,6 +470,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
             <Tooltip label="Re-fetch GraphQL schema">
               <UnStyledButton
                 type="button"
+                className="text-sm"
                 disabled={schemaContext.isFetching}
                 onClick={handleRefetchSchema}
                 aria-label="Re-fetch GraphQL schema"

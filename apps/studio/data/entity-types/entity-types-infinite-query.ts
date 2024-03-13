@@ -1,6 +1,6 @@
 import { useInfiniteQuery, UseInfiniteQueryOptions } from '@tanstack/react-query'
 import { executeSql, ExecuteSqlVariables } from 'data/sql/execute-sql-query'
-import { Entity } from './entity-type-query'
+import type { Entity } from './entity-type-query'
 import { entityTypeKeys } from './keys'
 
 export type EntityTypesVariables = {
@@ -49,7 +49,8 @@ export async function getEntityTypes(
           when 'p' then 5
         end as "type_sort",
         obj_description(c.oid) as "comment",
-        count(*) over() as "count"
+        count(*) over() as "count",
+        c.relrowsecurity as "rls_enabled"
       from
         pg_namespace nc
         join pg_class c on nc.oid = c.relnamespace
@@ -78,7 +79,8 @@ export async function getEntityTypes(
             'schema', r.schema,
             'name', r.name,
             'type', r.type,
-            'comment', r.comment
+            'comment', r.comment,
+            'rls_enabled', r.rls_enabled
           )
           order by ${outerOrderBy}
         ), '[]'::jsonb),
@@ -125,8 +127,8 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
         signal
       ),
     {
-      enabled:
-        enabled && typeof projectRef !== 'undefined' && typeof connectionString !== 'undefined',
+      enabled: enabled && typeof projectRef !== 'undefined',
+      staleTime: 0,
       getNextPageParam(lastPage, pages) {
         const page = pages.length
         const currentTotalCount = page * limit

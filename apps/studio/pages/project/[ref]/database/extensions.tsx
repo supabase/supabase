@@ -1,19 +1,20 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
 
 import { Extensions } from 'components/interfaces/Database'
 import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import type { NextPageWithLayout } from 'types'
 
 const DatabaseExtensions: NextPageWithLayout = () => {
   const canReadExtensions = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_READ,
     'extensions'
   )
-  if (!canReadExtensions) {
+  const isPermissionsLoaded = usePermissionsLoaded()
+
+  if (isPermissionsLoaded && !canReadExtensions) {
     return <NoPermission isFullPage resourceText="view database extensions" />
   }
 
@@ -31,4 +32,4 @@ const DatabaseExtensions: NextPageWithLayout = () => {
 
 DatabaseExtensions.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
 
-export default observer(DatabaseExtensions)
+export default DatabaseExtensions

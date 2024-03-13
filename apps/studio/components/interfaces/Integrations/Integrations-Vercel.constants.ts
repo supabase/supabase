@@ -1,4 +1,4 @@
-export const ENV_VAR_KEYS = {
+const ENV_VAR_KEYS = {
   POSTGRES_URL: {
     key: 'POSTGRES_URL',
     type: 'encrypted',

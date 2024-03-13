@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { del } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
 
 export type BranchDeleteVariables = {

@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { enumeratedTypesKeys } from './keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 
@@ -18,7 +18,7 @@ export async function deleteEnumeratedType({
   name,
   schema,
 }: EnumeratedTypeDeleteVariables) {
-  const sql = `drop type if exists ${schema}.${name}`
+  const sql = `drop type if exists ${schema}."${name}"`
   const { result } = await executeSql({ projectRef, connectionString, sql })
   return result
 }

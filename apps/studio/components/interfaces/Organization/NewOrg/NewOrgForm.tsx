@@ -1,29 +1,18 @@
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import type { PaymentMethod } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
-import {
-  Button,
-  IconEdit2,
-  IconExternalLink,
-  IconHelpCircle,
-  IconInfo,
-  Input,
-  Listbox,
-  Toggle,
-} from 'ui'
+import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
-import InformationBox from 'components/ui/InformationBox'
 import Panel from 'components/ui/Panel'
 import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useStore } from 'hooks'
 import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
+import { Button, IconEdit2, IconHelpCircle, Input, Listbox, Toggle } from 'ui'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -52,17 +41,17 @@ interface NewOrgFormProps {
  * No org selected yet, create a new one
  */
 const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
-  const queryClient = useQueryClient()
-  const { ui } = useStore()
   const router = useRouter()
   const stripe = useStripe()
   const elements = useElements()
+  const queryClient = useQueryClient()
+  const { plan, name, kind, size, spend_cap } = useParams()
 
-  const { plan } = useParams()
-
-  const [orgName, setOrgName] = useState('')
-  const [orgKind, setOrgKind] = useState(ORG_KIND_DEFAULT)
-  const [orgSize, setOrgSize] = useState(ORG_SIZE_DEFAULT)
+  const [orgName, setOrgName] = useState(name || '')
+  const [orgKind, setOrgKind] = useState(
+    kind && Object.keys(ORG_KIND_TYPES).includes(kind) ? kind : ORG_KIND_DEFAULT
+  )
+  const [orgSize, setOrgSize] = useState(size || ORG_SIZE_DEFAULT)
   // [Joshen] Separate loading state here as there's 2 async processes
   const [newOrgLoading, setNewOrgLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>()
@@ -73,7 +62,18 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
   )
 
   const [showSpendCapHelperModal, setShowSpendCapHelperModal] = useState(false)
-  const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(true)
+  const [isSpendCapEnabled, setIsSpendCapEnabled] = useState(spend_cap ? Boolean(spend_cap) : true)
+
+  useEffect(() => {
+    const query: Record<string, string> = {}
+    query.plan = dbPricingTierKey.toLowerCase()
+    if (orgName) query.name = orgName
+    if (orgKind) query.kind = orgKind
+    if (orgSize) query.size = orgSize
+    if (isSpendCapEnabled) query.spend_cap = isSpendCapEnabled.toString()
+
+    router.push({ query })
+  }, [dbPricingTierKey, orgName, orgKind, orgSize, isSpendCapEnabled])
 
   const { mutateAsync: createOrganization } = useOrganizationCreateMutation({
     onSuccess: async (org: any) => {
@@ -119,6 +119,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
         payment_method: paymentMethodId,
       })
     } catch (error) {
+      resetPaymentMethod()
       setNewOrgLoading(false)
     }
   }
@@ -128,7 +129,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
 
     const isOrgNameValid = validateOrgName(orgName)
     if (!isOrgNameValid) {
-      return ui.setNotification({ category: 'error', message: 'Organization name is empty' })
+      return toast.error('Organization name is empty')
     }
 
     if (!stripe || !elements) {
@@ -149,10 +150,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
       })
 
       if (error || !setupIntent.payment_method) {
-        ui.setNotification({
-          category: 'error',
-          message: error?.message ?? ' Failed to save card details',
-        })
+        toast.error(error?.message ?? ' Failed to save card details')
         setNewOrgLoading(false)
         return
       }
@@ -183,7 +181,11 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
           }
           footer={
             <div key="panel-footer" className="flex w-full items-center justify-between">
-              <Button type="default" onClick={() => router.push('/projects')}>
+              <Button
+                type="default"
+                disabled={newOrgLoading}
+                onClick={() => router.push('/projects')}
+              >
                 Cancel
               </Button>
               <div className="flex items-center space-x-3">
@@ -202,7 +204,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
             </div>
           }
         >
-          <Panel.Content className="pt-0">
+          <Panel.Content>
             <p className="text-sm">This is your organization within Supabase.</p>
             <p className="text-sm text-foreground-light">
               For example, you can use the name of your company or department.
@@ -368,35 +370,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
               )}
             </Panel.Content>
           )}
-
-          <Panel.Content>
-            <InformationBox
-              icon={<IconInfo size="large" strokeWidth={1.5} />}
-              defaultVisibility={true}
-              hideCollapse
-              title="Billed via organization"
-              description={
-                <div className="space-y-3">
-                  <p className="text-sm leading-normal">
-                    This organization will use the new organization-based billing, which gives you a
-                    single subscription for your entire organization, instead of having individual
-                    subscriptions per project.{' '}
-                  </p>
-                  <div>
-                    <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                      <Link
-                        href="https://supabase.com/docs/guides/platform/org-based-billing"
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Documentation
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              }
-            />
-          </Panel.Content>
         </Panel>
       </form>
     </>

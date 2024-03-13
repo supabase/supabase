@@ -1,6 +1,5 @@
-import { useCallback } from 'react'
 import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 export type DatabaseKeyword = { word: string }
 
@@ -39,20 +38,5 @@ export const useKeywordsQuery = <TData extends KeywordsData = KeywordsData>(
       },
       ...options,
     }
-  )
-}
-
-export const useKeywordsPrefetch = () => {
-  const prefetch = useExecuteSqlPrefetch()
-
-  return useCallback(
-    ({ projectRef, connectionString }: KeywordsVariables) =>
-      prefetch({
-        projectRef,
-        connectionString,
-        sql: getKeywordsQuery(),
-        queryKey: ['keywords'],
-      }),
-    [prefetch]
   )
 }

@@ -1,24 +1,36 @@
+import dayjs from 'dayjs'
 import { Badge } from 'ui'
 
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import Table from 'components/to-be-cleaned/Table'
-import { User } from 'data/auth/users-query'
+import type { User } from 'data/auth/users-query'
 import UserDropdown from './UserDropdown'
-import { getDateFromIsoString } from './Users.utils'
+import { getDisplayName } from './UserListItem.utils'
 
 interface UserListItemProps {
   user: User
   canRemoveUser: boolean
   canRemoveMFAFactors: boolean
+  setSelectedUser: (user: User) => void
+  setUserSidePanelOpen: (open: boolean) => void
 }
 
-const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItemProps) => {
+const UserListItem = ({
+  user,
+  canRemoveUser,
+  canRemoveMFAFactors,
+  setSelectedUser,
+  setUserSidePanelOpen,
+}: UserListItemProps) => {
   const isUserConfirmed = user.email_confirmed_at || user.phone_confirmed_at
-  const createdAt = getDateFromIsoString(user.created_at)
-  const lastSignedIn = getDateFromIsoString(user.last_sign_in_at)
+  const createdAt = dayjs(user.created_at)
+  const lastSignedIn = dayjs(user.last_sign_in_at)
 
   return (
     <Table.tr className="relative" key={user.id}>
+      <Table.td className="whitespace-nowrap">
+        <span className="text-foreground">{getDisplayName(user)}</span>
+      </Table.td>
       <Table.td className="whitespace-nowrap">
         <div className="flex items-center gap-2">
           <span className="text-sm text-foreground">{!user.email ? '-' : user.email}</span>
@@ -44,9 +56,7 @@ const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItem
       </Table.td>
       <Table.td className="table-cell">
         <div className="flex max-w-[72px] items-baseline">
-          <SimpleCodeBlock metastring="" className="font-xs bash">
-            {user.id}
-          </SimpleCodeBlock>
+          <SimpleCodeBlock className="font-xs bash">{user.id}</SimpleCodeBlock>
           <div>...</div>
         </div>
       </Table.td>
@@ -55,6 +65,8 @@ const UserListItem = ({ user, canRemoveUser, canRemoveMFAFactors }: UserListItem
           user={user}
           canRemoveUser={canRemoveUser}
           canRemoveMFAFactors={canRemoveMFAFactors}
+          setSelectedUser={setSelectedUser}
+          setUserSidePanelOpen={setUserSidePanelOpen}
         />
       </Table.td>
     </Table.tr>

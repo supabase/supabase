@@ -1,7 +1,6 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { docsKeys } from './keys'
 
 export type ProjectJsonSchemaVariables = {
@@ -42,15 +41,3 @@ export const useProjectJsonSchemaQuery = <TData = ProjectJsonSchemaData>(
       ...options,
     }
   )
-
-export const useProjectJsonSchemaPrefetch = ({ projectRef }: ProjectJsonSchemaVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(docsKeys.jsonSchema(projectRef), ({ signal }) =>
-        getProjectJsonSchema({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

@@ -4,7 +4,7 @@ import utc from 'dayjs/plugin/utc'
 import { useState } from 'react'
 import { Area, AreaChart as RechartAreaChart, Tooltip, XAxis } from 'recharts'
 import ChartHeader from './ChartHeader'
-import { CommonChartProps, Datum } from './Charts.types'
+import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import ChartNoData from './NoDataPlaceholder'
 dayjs.extend(utc)
@@ -107,7 +107,7 @@ const AreaChart = ({
         </RechartAreaChart>
       </Container>
       {data && (
-        <div className="text-foreground-lighter -mt-2 flex items-center justify-between text-xs">
+        <div className="text-foreground-lighter -mt-8 flex items-center justify-between text-xs">
           <span>{dayjs(data[0][xAxisKey]).format(customDateFormat)}</span>
           <span>{dayjs(data[data?.length - 1]?.[xAxisKey]).format(customDateFormat)}</span>
         </div>

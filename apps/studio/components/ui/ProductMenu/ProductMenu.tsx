@@ -1,6 +1,6 @@
 import { Badge, Menu } from 'ui'
 
-import { ProductMenuGroup } from './ProductMenu.types'
+import type { ProductMenuGroup } from './ProductMenu.types'
 import ProductMenuItem from './ProductMenuItem'
 
 interface ProductMenuProps {
@@ -13,7 +13,7 @@ const ProductMenu = ({ page, menu }: ProductMenuProps) => {
     <div className="flex flex-col space-y-8 overflow-y-auto">
       <Menu type="pills">
         {menu.map((group, idx) => (
-          <div key={group.title}>
+          <div key={group.key || group.title}>
             <div className="my-6 space-y-8">
               <div className="mx-3">
                 <Menu.Group

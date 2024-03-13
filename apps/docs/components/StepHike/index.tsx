@@ -24,7 +24,7 @@ const StepHike = ({ children, title }) => {
     throw 'StepHike component needs at least 1 <StepHike.Step> child'
 
   return (
-    <div className="">
+    <div>
       <StepHikeContext.Provider value={{ activeStep, steps }}>{children}</StepHikeContext.Provider>
     </div>
   )

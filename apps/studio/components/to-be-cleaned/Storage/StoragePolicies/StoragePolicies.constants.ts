@@ -37,7 +37,7 @@ ON storage.objects FOR {operation} {USING | WITH CHECK} (
   },
   {
     id: 'policy-2',
-    templateName: 'Give users access to only their own a top level folder named as uid',
+    templateName: 'Give users access to only their own top level folder named as uid',
     description:
       'For example a user with id d7bed83c-44a0-4a4f-925f-efc384ea1e50 will be able to access anything under the folder d7bed83c-44a0-4a4f-925f-efc384ea1e50/',
     name: 'Give users access to own folder',

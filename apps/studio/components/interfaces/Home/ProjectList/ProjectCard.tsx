@@ -1,14 +1,15 @@
-import CardButton from 'components/ui/CardButton'
-import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { ResourceWarning } from 'data/usage/resource-warnings-query'
-import { BASE_PATH } from 'lib/constants'
 import { GitBranch, Github } from 'lucide-react'
-import { Project } from 'types'
+
+import CardButton from 'components/ui/CardButton'
+import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import type { ProjectInfo } from 'data/projects/projects-query'
+import type { ResourceWarning } from 'data/usage/resource-warnings-query'
+import { BASE_PATH } from 'lib/constants'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
 
 export interface ProjectCardProps {
-  project: Project
+  project: ProjectInfo
   rewriteHref?: string
   githubIntegration?: IntegrationProjectConnection
   vercelIntegration?: IntegrationProjectConnection

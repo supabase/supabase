@@ -1,14 +1,5 @@
-import { AWS_REGIONS, AWS_REGIONS_KEYS } from 'lib/constants'
-
-export interface DatabaseConfiguration {
-  id: number
-  type: 'PRIMARY' | 'READ_REPLICA'
-  cloud_provider: 'AWS' | 'FLY'
-  region: string
-  size: string
-  status: string
-  inserted_at: string
-}
+import { components } from 'data/api'
+import { AWS_REGIONS, AWS_REGIONS_KEYS, PROJECT_STATUS } from 'lib/constants'
 
 export interface Region {
   key: AWS_REGIONS_KEYS
@@ -18,87 +9,21 @@ export interface Region {
 }
 
 // ReactFlow is scaling everything by the factor of 2
-export const NODE_WIDTH = 560
+export const NODE_WIDTH = 660
 export const NODE_ROW_HEIGHT = 50
 export const NODE_SEP = 20
 
-export const MOCK_DATABASES: DatabaseConfiguration[] = [
-  {
-    id: 1,
-    type: 'PRIMARY',
-    cloud_provider: 'AWS',
-    region: 'ap-southeast-1b',
-    size: 't4g.micro',
-    status: 'ACTIVE_HEALTHY',
-    inserted_at: '2023-11-01 06:47:46.837002',
-  },
-  {
-    id: 2,
-    type: 'READ_REPLICA',
-    cloud_provider: 'AWS',
-    region: 'ap-northeast-1',
-    size: 't4g.micro',
-    status: 'ACTIVE_HEALTHY',
-    inserted_at: '2023-11-01 06:47:46.837002',
-  },
-  {
-    id: 3,
-    type: 'READ_REPLICA',
-    cloud_provider: 'AWS',
-    region: 'ap-southeast-1b',
-    size: 't4g.micro',
-    status: 'ACTIVE_HEALTHY',
-    inserted_at: '2023-11-01 06:47:46.837002',
-  },
-  {
-    id: 4,
-    type: 'READ_REPLICA',
-    cloud_provider: 'AWS',
-    region: 'ap-northeast-2',
-    size: 't4g.micro',
-    status: 'ACTIVE_HEALTHY',
-    inserted_at: '2023-11-01 06:47:46.837002',
-  },
-  {
-    id: 5,
-    type: 'READ_REPLICA',
-    cloud_provider: 'AWS',
-    region: 'eu-central-1',
-    size: 't4g.micro',
-    status: 'ACTIVE_HEALTHY',
-    inserted_at: '2023-11-01 06:47:46.837002',
-  },
-  {
-    id: 6,
-    type: 'READ_REPLICA',
-    cloud_provider: 'AWS',
-    region: 'eu-central-1',
-    size: 't4g.micro',
-    status: 'ACTIVE_HEALTHY',
-    inserted_at: '2023-11-01 06:47:46.837002',
-  },
-  {
-    id: 7,
-    type: 'READ_REPLICA',
-    cloud_provider: 'AWS',
-    region: 'ap-southeast-1',
-    size: 't4g.micro',
-    status: 'ACTIVE_HEALTHY',
-    inserted_at: '2023-11-01 06:47:46.837002',
-  },
-  {
-    id: 8,
-    type: 'READ_REPLICA',
-    cloud_provider: 'AWS',
-    region: 'ap-southeast-1',
-    size: 't4g.micro',
-    status: 'ACTIVE_HEALTHY',
-    inserted_at: '2023-11-01 06:47:46.837002',
-  },
-]
+export const REPLICA_STATUS: {
+  [key: string]: components['schemas']['DatabaseStatusResponse']['status']
+} = {
+  ...PROJECT_STATUS,
+  INIT_READ_REPLICA: 'INIT_READ_REPLICA',
+  INIT_READ_REPLICA_FAILED: 'INIT_READ_REPLICA_FAILED',
+}
 
 // [Joshen] Coordinates from https://github.com/jsonmaur/aws-regions/issues/11
-const AWS_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
+// In the format of [lon, lat]
+export const AWS_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
   SOUTHEAST_ASIA: [103.8, 1.37],
   NORTHEAST_ASIA: [139.42, 35.41],
   NORTHEAST_ASIA_2: [126.98, 37.56],
@@ -113,13 +38,17 @@ const AWS_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
   SOUTH_AMERICA: [-46.38, -23.34],
 }
 
-const AWS_REGIONS_VALUES: { [key: string]: string } = {
+export const FLY_REGIONS_COORDINATES: { [key: string]: [number, number] } = {
+  SOUTHEAST_ASIA: [103.8, 1.37],
+}
+
+export const AWS_REGIONS_VALUES: { [key: string]: string } = {
   SOUTHEAST_ASIA: 'ap-southeast-1',
   NORTHEAST_ASIA: 'ap-northeast-1',
   NORTHEAST_ASIA_2: 'ap-northeast-2',
   CENTRAL_CANADA: 'ca-central-1',
   WEST_US: 'us-west-1',
-  EAST_US: 'es-east-1',
+  EAST_US: 'us-east-1',
   WEST_EU: 'eu-west-1',
   WEST_EU_2: 'eu-west-2',
   CENTRAL_EU: 'eu-central-1',
@@ -128,13 +57,17 @@ const AWS_REGIONS_VALUES: { [key: string]: string } = {
   SOUTH_AMERICA: 'sa-east-1',
 }
 
+export const FLY_REGIONS_VALUES: { [key: string]: string } = {
+  SOUTHEAST_ASIA: 'sin',
+}
+
 // [Joshen] Just to make sure that we just depend on AWS_REGIONS to determine available
 // regions for replicas. Just FYI - might need to update this if we support Fly in future
 export const AVAILABLE_REPLICA_REGIONS: Region[] = Object.keys(AWS_REGIONS)
   .map((key) => {
     return {
       key: key as AWS_REGIONS_KEYS,
-      name: AWS_REGIONS[key as AWS_REGIONS_KEYS],
+      name: AWS_REGIONS?.[key as AWS_REGIONS_KEYS],
       region: AWS_REGIONS_VALUES[key],
       coordinates: AWS_REGIONS_COORDINATES[key],
     }

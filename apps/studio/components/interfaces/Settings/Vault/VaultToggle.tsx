@@ -1,66 +1,74 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { useTheme } from 'next-themes'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
+
+import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { useCheckPermissions } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 import { Button, IconExternalLink } from 'ui'
 
-import { useCheckPermissions, useStore } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-
 const VaultToggle = () => {
-  const { meta, ui } = useStore()
   const { ref } = useParams()
   const { resolvedTheme } = useTheme()
+  const { project } = useProjectContext()
   const [isEnabling, setIsEnabling] = useState(false)
   const canToggleVault = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'extensions')
 
-  const vaultExtension = meta.extensions.byId('supabase_vault')
+  const { data } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const vaultExtension = (data ?? []).find((ext) => ext.name === 'supabase_vault')
   const isNotAvailable = vaultExtension === undefined
+
+  const { mutate: enableExtension } = useDatabaseExtensionEnableMutation({
+    onSuccess: () => {
+      toast.success(`Vault is now enabled for your project!`)
+    },
+    onError: (error) => {
+      toast.error(`Failed to enable Vault for your project: ${error.message}`)
+      setIsEnabling(false)
+    },
+  })
 
   const onEnableVault = async () => {
     if (vaultExtension === undefined) return
+    if (project === undefined) return console.error('Project is required')
+
     setIsEnabling(true)
 
-    const { error: createSchemaError } = await meta.query(
-      `create schema if not exists ${vaultExtension.schema ?? 'vault'};`
-    )
-    if (createSchemaError) {
-      setIsEnabling(false)
-      return ui.setNotification({
-        error: createSchemaError,
-        category: 'error',
-        message: `Failed to create schema: ${createSchemaError.message}`,
+    try {
+      await executeSql({
+        projectRef: project.ref,
+        connectionString: project.connectionString,
+        sql: `create schema if not exists ${vaultExtension.schema ?? 'vault'};`,
       })
+    } catch (createSchemaError: any) {
+      setIsEnabling(false)
+      return toast.error(`Failed to create schema: ${createSchemaError.message}`)
     }
 
-    const { error: createExtensionError } = await meta.extensions.create({
+    enableExtension({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
       schema: vaultExtension.schema ?? 'vault',
       name: vaultExtension.name,
       version: vaultExtension.default_version,
       cascade: true,
     })
-    if (createExtensionError) {
-      ui.setNotification({
-        error: createExtensionError,
-        category: 'error',
-        message: `Failed to enable Vault for your project: ${createExtensionError.message}`,
-      })
-      setIsEnabling(false)
-    } else {
-      ui.setNotification({
-        category: 'success',
-        message: 'Vault is now enabled for your project!',
-      })
-    }
   }
 
   return (
     <div>
       <div
-        className="px-12 py-12 w-full bg-background border rounded bg-no-repeat"
+        className="px-12 py-12 w-full bg-studio border rounded bg-no-repeat"
         style={{
           backgroundSize: isNotAvailable ? '50%' : '40%',
           backgroundPosition: '100% 24%',
@@ -116,7 +124,7 @@ const VaultToggle = () => {
                 </Link>
               </Button>
               <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger>
+                <Tooltip.Trigger asChild>
                   <Button
                     type="primary"
                     loading={isEnabling}
@@ -152,4 +160,4 @@ const VaultToggle = () => {
   )
 }
 
-export default observer(VaultToggle)
+export default VaultToggle

@@ -82,8 +82,10 @@ typings/
 .env
 # excempt the apps/www .env
 !apps/www/.env
+.env.tmp
 .env.test
 .env.local
+.env.staging
 .env.production
 
 # parcel-bundler cache (https://parceljs.org/)

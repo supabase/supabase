@@ -1,12 +1,14 @@
-import { QueryKey, UseQueryOptions } from '@tanstack/react-query'
+import type { QueryKey, UseQueryOptions } from '@tanstack/react-query'
+
+import { IS_PLATFORM } from 'common'
 import { Filter, Query, Sort, SupaRow, SupaTable } from 'components/grid'
-import { useCallback } from 'react'
 import {
-  ExecuteSqlData,
-  executeSql,
-  useExecuteSqlPrefetch,
-  useExecuteSqlQuery,
-} from '../sql/execute-sql-query'
+  ImpersonationRole,
+  ROLE_IMPERSONATION_NO_RESULTS,
+  wrapWithRoleImpersonation,
+} from 'lib/role-impersonation'
+import { useIsRoleImpersonationEnabled } from 'state/role-impersonation-state'
+import { ExecuteSqlData, executeSql, useExecuteSqlQuery } from '../sql/execute-sql-query'
 import { getPagination } from '../utils/pagination'
 import { formatFilterValue } from './utils'
 
@@ -16,23 +18,25 @@ type GetTableRowsArgs = {
   sorts?: Sort[]
   limit?: number
   page?: number
+  impersonatedRole?: ImpersonationRole
 }
 
-// [Joshen] From components/grid/services/row/SqlRowService.ts, we should remove the logic from SqlRowService eventually
 export const fetchAllTableRows = async ({
   projectRef,
   connectionString,
   table,
   filters = [],
   sorts = [],
+  impersonatedRole,
 }: {
   projectRef: string
   connectionString?: string
   table: SupaTable
   filters?: Filter[]
   sorts?: Sort[]
+  impersonatedRole?: ImpersonationRole
 }) => {
-  if (!connectionString) {
+  if (IS_PLATFORM && !connectionString) {
     console.error('Connection string is required')
     return []
   }
@@ -63,7 +67,10 @@ export const fetchAllTableRows = async ({
       page += 1
       from = page * rowsPerPage
       to = (page + 1) * rowsPerPage - 1
-      const query = queryChains.range(from, to).toSql()
+      const query = wrapWithRoleImpersonation(queryChains.range(from, to).toSql(), {
+        projectRef,
+        role: impersonatedRole,
+      })
 
       try {
         const { result } = await executeSql({ projectRef, connectionString, sql: query })
@@ -75,7 +82,7 @@ export const fetchAllTableRows = async ({
     } while (pageData.length === rowsPerPage)
   })()
 
-  return rows
+  return rows.filter((row) => row[ROLE_IMPERSONATION_NO_RESULTS] !== 1)
 }
 
 export const getTableRowsSqlQuery = ({
@@ -135,18 +142,28 @@ export type TableRowsData = TableRows
 export type TableRowsError = unknown
 
 export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
-  { projectRef, connectionString, queryKey, table, ...args }: TableRowsVariables,
+  { projectRef, connectionString, queryKey, table, impersonatedRole, ...args }: TableRowsVariables,
   options: UseQueryOptions<ExecuteSqlData, TableRowsError, TData> = {}
-) =>
-  useExecuteSqlQuery(
+) => {
+  const isRoleImpersonationEnabled = useIsRoleImpersonationEnabled()
+
+  return useExecuteSqlQuery(
     {
       projectRef,
       connectionString,
-      sql: getTableRowsSqlQuery({ table, ...args }),
+      sql: wrapWithRoleImpersonation(getTableRowsSqlQuery({ table, ...args }), {
+        projectRef: projectRef ?? 'ref',
+        role: impersonatedRole,
+      }),
       queryKey: [
         ...(queryKey ?? []),
-        { table: { name: table?.name, schema: table?.schema }, ...args },
+        {
+          table: { name: table?.name, schema: table?.schema },
+          impersonatedRole,
+          ...args,
+        },
       ],
+      isRoleImpersonationEnabled,
     },
     {
       select(data) {
@@ -161,34 +178,5 @@ export const useTableRowsQuery = <TData extends TableRowsData = TableRowsData>(
       enabled: typeof projectRef !== 'undefined' && typeof table !== 'undefined',
       ...options,
     }
-  )
-
-/**
- * useTableRowsPrefetch is used for prefetching table rows. For example, starting a query loading before a page is navigated to.
- *
- * @example
- * const prefetch = useTableRowsPrefetch({ projectRef })
- *
- * return (
- *   <Link onMouseEnter={() => prefetch()}>
- *     Start loading on hover
- *   </Link>
- * )
- */
-export const useTableRowsPrefetch = () => {
-  const prefetch = useExecuteSqlPrefetch()
-
-  return useCallback(
-    ({ projectRef, connectionString, queryKey, table, ...args }: TableRowsVariables) =>
-      prefetch({
-        projectRef,
-        connectionString,
-        sql: getTableRowsSqlQuery({ table, ...args }),
-        queryKey: [
-          ...(queryKey ?? []),
-          { table: { name: table?.name, schema: table?.schema }, ...args },
-        ],
-      }),
-    [prefetch]
   )
 }

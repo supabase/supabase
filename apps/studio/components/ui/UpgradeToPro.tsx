@@ -10,10 +10,12 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 interface UpgradeToProProps {
   icon?: ReactNode
   primaryText: string
-  projectRef: string
-  organizationSlug: string
+  projectRef?: string
+  organizationSlug?: string
   secondaryText: string
   addon?: 'pitr' | 'customDomain' | 'computeInstance'
+  buttonText?: string
+  disabled?: boolean
 }
 
 const UpgradeToPro = ({
@@ -23,6 +25,8 @@ const UpgradeToPro = ({
   organizationSlug,
   secondaryText,
   addon,
+  buttonText,
+  disabled = false,
 }: UpgradeToProProps) => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organizationSlug })
   const plan = subscription?.plan?.id
@@ -50,48 +54,51 @@ const UpgradeToPro = ({
             </div>
           </div>
           <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
-              <Button type="primary" disabled={!canUpdateSubscription || projectUpdateDisabled}>
+            <Tooltip.Trigger asChild>
+              <Button
+                type="primary"
+                disabled={!canUpdateSubscription || projectUpdateDisabled || disabled}
+                asChild
+              >
                 <Link
                   href={
                     plan === 'free'
-                      ? `/org/${organizationSlug}/billing?panel=subscriptionPlan`
-                      : `/project/${projectRef}/settings/addons?panel=${addon}`
+                      ? `/org/${organizationSlug ?? '_'}/billing?panel=subscriptionPlan`
+                      : `/project/${projectRef ?? '_'}/settings/addons?panel=${addon}`
                   }
                 >
-                  {plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon'}
+                  {buttonText || (plan === 'free' ? 'Upgrade to Pro' : 'Enable Addon')}
                 </Link>
               </Button>
             </Tooltip.Trigger>
-            {!canUpdateSubscription || projectUpdateDisabled ? (
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'border border-background text-center', //border
-                      'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      {projectUpdateDisabled ? (
-                        <>
-                          Subscription changes are currently disabled.
-                          <br />
-                          Our engineers are working on a fix.
-                        </>
-                      ) : !canUpdateSubscription ? (
-                        'You need additional permissions to amend subscriptions'
-                      ) : (
-                        ''
-                      )}
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            ) : (
-              <></>
-            )}
+            {!canUpdateSubscription ||
+              (projectUpdateDisabled && (
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'border border-background text-center', //border
+                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-foreground">
+                        {projectUpdateDisabled ? (
+                          <>
+                            Subscription changes are currently disabled.
+                            <br />
+                            Our engineers are working on a fix.
+                          </>
+                        ) : !canUpdateSubscription ? (
+                          'You need additional permissions to amend subscriptions'
+                        ) : (
+                          ''
+                        )}
+                      </span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              ))}
           </Tooltip.Root>
         </div>
       </div>

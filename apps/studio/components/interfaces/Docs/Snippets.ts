@@ -366,8 +366,8 @@ let { data: ${resourceId}, error } = await supabase
   .in('column', ['Array', 'Values'])
   .neq('column', 'Not equal to')
   // Arrays
-  .cs('array_column', ['array', 'contains'])
-  .cd('array_column', ['contained', 'by'])
+  .contains('array_column', ['array', 'contains'])
+  .containedBy('array_column', ['contained', 'by'])
 `,
     },
   }),
@@ -647,7 +647,7 @@ curl -X POST '${endpoint}/auth/v1/invite' \\
     js: {
       language: 'js',
       code: `
-let { data, error } = await supabase.auth.api.inviteUserByEmail('someone@email.com')
+let { data, error } = await supabase.auth.admin.inviteUserByEmail('someone@email.com')
 `,
     },
   }),

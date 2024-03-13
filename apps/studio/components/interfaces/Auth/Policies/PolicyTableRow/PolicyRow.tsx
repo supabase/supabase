@@ -77,7 +77,7 @@ const PolicyRow = ({
       <div>
         {canUpdatePolicies ? (
           <DropdownMenu>
-            <DropdownMenuTrigger>
+            <DropdownMenuTrigger asChild>
               <Button
                 type="default"
                 style={{ paddingLeft: 4, paddingRight: 4 }}
@@ -98,7 +98,7 @@ const PolicyRow = ({
           </DropdownMenu>
         ) : (
           <Tooltip.Root delayDuration={0}>
-            <Tooltip.Trigger>
+            <Tooltip.Trigger asChild>
               <Button
                 disabled
                 type="default"

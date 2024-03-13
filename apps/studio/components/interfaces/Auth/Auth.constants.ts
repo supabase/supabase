@@ -20,8 +20,11 @@ const localhostRegex = /^(?:^|\s)((https?:\/\/)?(?:localhost|[\w-]+(?:\.[\w-]+)+
 // "chrome-extension://<extension-id>"
 const chromeExtensionRegex = /chrome-extension:\/\/([a-zA-Z]*)/gm
 
+// New regex for custom scheme URLs
+const customSchemeRegex = /^([a-zA-Z][a-zA-Z0-9+.-]*):(?:\/{1,3})?([a-zA-Z0-9_.-]*)$/
+
 // combine the above regexes
 export const urlRegex = new RegExp(
-  `(${baseUrlRegex.source})|(${localhostRegex.source})|(${appRegex.source})|(${chromeExtensionRegex.source})`,
+  `(${baseUrlRegex.source})|(${localhostRegex.source})|(${appRegex.source})|(${chromeExtensionRegex.source})|(${customSchemeRegex.source})`,
   'i'
 )

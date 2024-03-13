@@ -1,13 +1,10 @@
+import { QueryClient, QueryKey, useQuery, UseQueryOptions } from '@tanstack/react-query'
+
+import { post, handleError as handleErrorFetchers } from 'data/fetchers'
 import {
-  QueryClient,
-  QueryKey,
-  useQuery,
-  useQueryClient,
-  UseQueryOptions,
-} from '@tanstack/react-query'
-import md5 from 'blueimp-md5'
-import { post } from 'data/fetchers'
-import { useCallback } from 'react'
+  ROLE_IMPERSONATION_NO_RESULTS,
+  ROLE_IMPERSONATION_SQL_LINE_COUNT,
+} from 'lib/role-impersonation'
 import { sqlKeys } from './keys'
 
 export type Error = { code: number; message: string; requestId: string }
@@ -18,6 +15,7 @@ export type ExecuteSqlVariables = {
   sql: string
   queryKey?: QueryKey
   handleError?: (error: { code: number; message: string; requestId: string }) => any
+  isRoleImpersonationEnabled?: boolean
 }
 
 export async function executeSql(
@@ -27,18 +25,24 @@ export async function executeSql(
     sql,
     queryKey,
     handleError,
+    isRoleImpersonationEnabled = false,
   }: Pick<
     ExecuteSqlVariables,
-    'projectRef' | 'connectionString' | 'sql' | 'queryKey' | 'handleError'
+    | 'projectRef'
+    | 'connectionString'
+    | 'sql'
+    | 'queryKey'
+    | 'handleError'
+    | 'isRoleImpersonationEnabled'
   >,
   signal?: AbortSignal
-) {
+): Promise<{ result: any }> {
   if (!projectRef) throw new Error('projectRef is required')
 
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
 
-  const { data, error } = await post('/platform/pg-meta/{ref}/query', {
+  let { data, error } = await post('/platform/pg-meta/{ref}/query', {
     signal,
     params: {
       header: { 'x-connection-encrypted': connectionString ?? '' },
@@ -51,9 +55,47 @@ export async function executeSql(
   })
 
   if (error) {
-    if (handleError !== undefined) return handleError(error)
-    else throw error
+    if (
+      isRoleImpersonationEnabled &&
+      typeof error === 'object' &&
+      error !== null &&
+      'error' in error &&
+      'formattedError' in error
+    ) {
+      let updatedError = error as { error: string; formattedError: string }
+
+      const regex = /LINE (\d+):/im
+      const [, lineNumberStr] = regex.exec(updatedError.error) ?? []
+      const lineNumber = Number(lineNumberStr)
+      if (!isNaN(lineNumber)) {
+        updatedError = {
+          ...updatedError,
+          error: updatedError.error.replace(
+            regex,
+            `LINE ${lineNumber - ROLE_IMPERSONATION_SQL_LINE_COUNT}:`
+          ),
+          formattedError: updatedError.formattedError.replace(
+            regex,
+            `LINE ${lineNumber - ROLE_IMPERSONATION_SQL_LINE_COUNT}:`
+          ),
+        }
+      }
+
+      error = updatedError as any
+    }
+
+    if (handleError !== undefined) return handleError(error as any)
+    else handleErrorFetchers(error as any)
   }
+
+  if (
+    isRoleImpersonationEnabled &&
+    Array.isArray(data) &&
+    data?.[0]?.[ROLE_IMPERSONATION_NO_RESULTS] === 1
+  ) {
+    return { result: [] }
+  }
+
   return { result: data }
 }
 
@@ -61,54 +103,31 @@ export type ExecuteSqlData = Awaited<ReturnType<typeof executeSql>>
 export type ExecuteSqlError = unknown
 
 export const useExecuteSqlQuery = <TData = ExecuteSqlData>(
-  { projectRef, connectionString, sql, queryKey, handleError }: ExecuteSqlVariables,
+  {
+    projectRef,
+    connectionString,
+    sql,
+    queryKey,
+    handleError,
+    isRoleImpersonationEnabled,
+  }: ExecuteSqlVariables,
   { enabled = true, ...options }: UseQueryOptions<ExecuteSqlData, ExecuteSqlError, TData> = {}
 ) =>
   useQuery<ExecuteSqlData, ExecuteSqlError, TData>(
-    sqlKeys.query(projectRef, queryKey ?? [md5(sql)]),
+    sqlKeys.query(projectRef, queryKey ?? [btoa(sql)]),
     ({ signal }) =>
-      executeSql({ projectRef, connectionString, sql, queryKey, handleError }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+      executeSql(
+        { projectRef, connectionString, sql, queryKey, handleError, isRoleImpersonationEnabled },
+        signal
+      ),
+    { enabled: enabled && typeof projectRef !== 'undefined', staleTime: 0, ...options }
   )
 
 export const prefetchExecuteSql = (
   client: QueryClient,
   { projectRef, connectionString, sql, queryKey, handleError }: ExecuteSqlVariables
 ) => {
-  return client.prefetchQuery(sqlKeys.query(projectRef, queryKey ?? [md5(sql)]), ({ signal }) =>
+  return client.prefetchQuery(sqlKeys.query(projectRef, queryKey ?? [btoa(sql)]), ({ signal }) =>
     executeSql({ projectRef, connectionString, sql, queryKey, handleError }, signal)
-  )
-}
-
-/**
- * useExecuteSqlPrefetch is used for prefetching a SQL query. For example, starting a query loading before a page is navigated to.
- *
- * @example
- * const prefetch = useExecuteSqlPrefetch()
- *
- * return (
- *   <Link onMouseEnter={() => prefetch({ ...args })}>
- *     Start loading on hover
- *   </Link>
- * )
- */
-export const useExecuteSqlPrefetch = () => {
-  const client = useQueryClient()
-
-  return useCallback(
-    ({ projectRef, connectionString, sql, queryKey, handleError }: ExecuteSqlVariables) => {
-      if (projectRef) {
-        return prefetchExecuteSql(client, {
-          projectRef,
-          connectionString,
-          sql,
-          queryKey,
-          handleError,
-        })
-      }
-
-      return Promise.resolve()
-    },
-    [client]
   )
 }

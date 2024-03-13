@@ -1,6 +1,13 @@
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
+
+import Panel from 'components/ui/Panel'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
+import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-domains-activate-mutation'
+import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
+import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -10,15 +17,7 @@ import {
   IconExternalLink,
   Modal,
 } from 'ui'
-
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import Panel from 'components/ui/Panel'
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
-import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-domains-activate-mutation'
-import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
-import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
-import { useStore } from 'hooks'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 export type CustomDomainActivateProps = {
   projectRef?: string
@@ -26,7 +25,6 @@ export type CustomDomainActivateProps = {
 }
 
 const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivateProps) => {
-  const { ui } = useStore()
   const [isActivateConfirmModalVisible, setIsActivateConfirmModalVisible] = useState(false)
 
   const { data: settings } = useProjectApiQuery({ projectRef })
@@ -34,7 +32,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
   const { mutate: activateCustomDomain, isLoading: isActivating } = useCustomDomainActivateMutation(
     {
       onSuccess: () => {
-        ui.setNotification({ category: 'success', message: `Successfully activated custom domain` })
+        toast.success(`Successfully activated custom domain`)
         setIsActivateConfirmModalVisible(false)
       },
     }
@@ -75,8 +73,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
             <Alert_Shadcn_>
               <IconAlertCircle className="text-foreground-light" strokeWidth={1.5} />
               <AlertTitle_Shadcn_>
-                Do remember to restore the original CNAME record from the first step before
-                activating
+                Remember to restore the original CNAME record from the first step before activating
               </AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
                 <p className="col-span-12 text-sm lg:col-span-7 leading-6">
@@ -88,7 +85,7 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
                     "your project's API URL"
                   )}
                   , with as low a TTL as possible. If you're using Cloudflare as your DNS provider,
-                  do disable the proxy option.
+                  disable the proxy option.
                 </p>
               </AlertDescription_Shadcn_>
             </Alert_Shadcn_>
@@ -169,4 +166,4 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
   )
 }
 
-export default observer(CustomDomainActivate)
+export default CustomDomainActivate

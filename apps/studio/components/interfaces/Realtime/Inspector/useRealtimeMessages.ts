@@ -1,4 +1,4 @@
-import { createClient, RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
+import { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
 import { sortBy, take } from 'lodash'
 import { useCallback, useEffect, useReducer, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { uuidv4 } from 'lib/helpers'
 import { EMPTY_ARR } from 'lib/void'
-import { LogData } from './Messages.types'
+import type { LogData } from './Messages.types'
 
 function reducer(
   state: LogData[],
@@ -64,16 +64,12 @@ export const useRealtimeMessages = ({
   enableDbChanges,
   enableBroadcast,
 }: RealtimeConfig) => {
+  const { data } = useProjectApiQuery({ projectRef: projectRef })
+
   // the default host is prod until the correct one comes through an API call.
-  const [host, setHost] = useState(`https://${projectRef}.supabase.co`)
-  useProjectApiQuery(
-    { projectRef: projectRef },
-    {
-      onSuccess: (data) => {
-        setHost(`${data.autoApiService.protocol}://${data.autoApiService.endpoint}`)
-      },
-    }
-  )
+  const host = data
+    ? `${data.autoApiService.protocol}://${data.autoApiService.endpoint}`
+    : `https://${projectRef}.supabase.co`
 
   const [logData, dispatch] = useReducer(reducer, [] as LogData[])
   const pushMessage = (messageType: string, metadata: any) => {
@@ -89,13 +85,18 @@ export const useRealtimeMessages = ({
       return
     }
     const opts = {
+      global: {
+        headers: {
+          'User-Agent': `supabase-api/${process.env.VERCEL_GIT_COMMIT_SHA || 'unknown-sha'}`,
+        },
+      },
       realtime: {
         params: {
           log_level: logLevel,
         },
       },
     }
-    const newClient = createClient(host, token, opts)
+    const newClient = new SupabaseClient(host, token, opts)
     if (bearer != '') {
       newClient.realtime.setAuth(bearer)
     }
@@ -118,9 +119,6 @@ export const useRealtimeMessages = ({
     // Hack to confirm Postgres is subscribed
     // Need to add 'extension' key in the 'payload'
     newChannel.on('system' as any, {} as any, (payload: any) => {
-      // if (payload.extension === 'postgres_changes' && payload.status === 'ok') {
-      //   pushMessageTo('#conn_info', 'postgres_subscribed', {})
-      // }
       pushMessage('SYSTEM', payload)
     })
 
@@ -196,14 +194,19 @@ export const useRealtimeMessages = ({
   ])
 
   const sendMessage = useCallback(
-    (message: string, payload: any) => {
+    async (message: string, payload: any, callback: () => void) => {
       if (channel) {
-        channel.send({
+        const res = await channel.send({
           type: 'broadcast',
           event: message,
           payload,
         })
-        toast.success('Successfully broadcasted message')
+        if (res === 'error') {
+          toast.error('Failed to broadcast message')
+        } else {
+          toast.success('Successfully broadcasted message')
+          callback()
+        }
       } else {
         toast.error('Failed to broadcast message: channel has not been set')
       }

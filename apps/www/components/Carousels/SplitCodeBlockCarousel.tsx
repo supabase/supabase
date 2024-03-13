@@ -43,7 +43,7 @@ function SplitCodeBlockCarousel(props: SplitCodeBlockCarousel) {
   }
 
   const details = (
-    <div className="">
+    <div>
       <p>
         <span className="mb-8 block text-white">Allow fetch something</span>
       </p>

@@ -6,15 +6,15 @@ import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuRadioGroup,
-  DropdownMenuSeparator,
   DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  IconCheck,
   IconChevronLeft,
   IconChevronRight,
-  IconChevronsDown,
-  IconChevronsUp,
-  IconCode,
   IconColumns,
   IconEdit2,
   IconFolderPlus,
@@ -25,20 +25,14 @@ import {
   IconUpload,
   IconX,
   Input,
-  IconCheck,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
-  DropdownMenuRadioItem,
 } from 'ui'
 
+import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import APIDocsButton from 'components/ui/APIDocsButton'
 import { useCheckPermissions } from 'hooks'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { useStorageExplorerStateSnapshot } from 'state/storage-explorer'
 import { STORAGE_SORT_BY, STORAGE_SORT_BY_ORDER, STORAGE_VIEWS } from '../Storage.constants'
-import { useAppStateSnapshot } from 'state/app-state'
-import APIDocsButton from 'components/ui/APIDocsButton'
-import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const VIEW_OPTIONS = [
   { key: STORAGE_VIEWS.COLUMNS, name: 'As columns' },

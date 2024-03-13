@@ -4,7 +4,7 @@ import sumBy from 'lodash/sumBy'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { ChartIntervals } from 'types'
+import type { ChartIntervals } from 'types'
 import {
   Button,
   DropdownMenu,
@@ -89,8 +89,8 @@ const ProjectUsage = () => {
     <div className="space-y-6">
       <div className="flex flex-row items-center gap-2">
         <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button asChild type="default" iconRight={<IconChevronDown />}>
+          <DropdownMenuTrigger asChild>
+            <Button type="default" iconRight={<IconChevronDown />}>
               <span>{selectedInterval.label}</span>
             </Button>
           </DropdownMenuTrigger>

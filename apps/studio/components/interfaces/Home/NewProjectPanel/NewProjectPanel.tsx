@@ -4,14 +4,13 @@ import SVG from 'react-inlinesvg'
 import { Button, IconActivity, IconArchive, IconCode, IconExternalLink, IconKey } from 'ui'
 
 import Panel from 'components/ui/Panel'
-import { useFlag, useIsFeatureEnabled } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks'
 import APIKeys from './APIKeys'
 import GetStartedHero from './GetStartedHero'
 
 const NewProjectPanel = () => {
   const router = useRouter()
   const { ref } = router.query
-  const supabaseAIEnabled = useFlag('sqlEditorSupabaseAI')
 
   const {
     projectAuthAll: authEnabled,
@@ -74,15 +73,7 @@ const NewProjectPanel = () => {
                     />
                   }
                 >
-                  <Link
-                    href={
-                      supabaseAIEnabled
-                        ? `/project/${ref}/sql/new`
-                        : `/project/${ref}/sql/templates`
-                    }
-                  >
-                    SQL editor
-                  </Link>
+                  <Link href={`/project/${ref}/sql/new`}>SQL editor</Link>
                 </Button>
                 <Button asChild type="default" icon={<IconExternalLink size={14} />}>
                   <Link

@@ -1,6 +1,5 @@
-import { useCallback } from 'react'
 import { UseQueryOptions } from '@tanstack/react-query'
-import { ExecuteSqlData, useExecuteSqlPrefetch, useExecuteSqlQuery } from '../sql/execute-sql-query'
+import { ExecuteSqlData, useExecuteSqlQuery } from '../sql/execute-sql-query'
 
 export type DatabaseFunction = {
   schema: string
@@ -68,20 +67,5 @@ export const useFunctionsQuery = <TData extends FunctionsData = FunctionsData>(
       },
       ...options,
     }
-  )
-}
-
-export const useFunctionsPrefetch = () => {
-  const prefetch = useExecuteSqlPrefetch()
-
-  return useCallback(
-    ({ projectRef, connectionString }: FunctionsVariables) =>
-      prefetch({
-        projectRef,
-        connectionString,
-        sql: getFunctionsQuery(),
-        queryKey: ['functions'],
-      }),
-    [prefetch]
   )
 }

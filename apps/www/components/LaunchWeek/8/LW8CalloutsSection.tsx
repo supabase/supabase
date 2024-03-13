@@ -17,7 +17,7 @@ const LW8CalloutsSection = () => {
             <div className="relative flex-shrink flex items-center p-2 w-2/3 lg:w-1/2 md:w-auto">
               <div className="flex flex-col gap-1 sm:pl-4">
                 <span className="text-white">Twitter Spaces</span>
-                <span className="">Replay recordings</span>
+                <span>Replay recordings</span>
               </div>
             </div>
             <div className="relative flex !aspect-video h-[80px] md:h-[100px] gap-2 z-10 rounded overflow-hidden">
@@ -40,7 +40,7 @@ const LW8CalloutsSection = () => {
                 <div className="flex items-center gap-3">
                   <span className="text-white">LW8 Hackathon Aug 4 – Aug 13</span>
                 </div>
-                <span className="">Finished</span>
+                <span>Finished</span>
               </div>
             </div>
             <div className="relative flex !aspect-video h-[80px] md:h-[100px] gap-2 z-10 rounded overflow-hidden">

@@ -1,4 +1,4 @@
-import { Dictionary } from 'components/grid'
+import type { Dictionary } from 'types'
 import { isEmpty } from 'lodash'
 
 /**

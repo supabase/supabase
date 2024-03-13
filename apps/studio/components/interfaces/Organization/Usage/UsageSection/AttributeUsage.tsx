@@ -6,11 +6,11 @@ import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import SparkBar from 'components/ui/SparkBar'
-import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
-import { OrgUsageResponse, UsageMetric } from 'data/usage/org-usage-query'
+import type { OrgSubscription } from 'data/subscriptions/types'
+import type { OrgMetricsUsage, OrgUsageResponse } from 'data/usage/org-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from 'lib/constants'
 import { useMemo } from 'react'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { Button, IconAlertTriangle, IconBarChart2 } from 'ui'
 import SectionContent from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
@@ -27,7 +27,7 @@ export interface AttributeUsageProps {
   projectRef?: string
   attribute: CategoryAttribute
   usage?: OrgUsageResponse
-  usageMeta?: UsageMetric
+  usageMeta?: OrgMetricsUsage
   chartMeta: ChartMeta
   subscription?: OrgSubscription
 
@@ -79,7 +79,7 @@ const AttributeUsage = ({
   }, [attribute.attributes, chartData])
 
   return (
-    <div id={attribute.anchor}>
+    <div id={attribute.anchor} className="scroll-my-12">
       <SectionContent section={attribute}>
         {isLoading && (
           <div className="space-y-2">
@@ -148,16 +148,6 @@ const AttributeUsage = ({
                           </Tooltip.Root>
                         )}
                       </div>
-
-                      {showUsageWarning && (
-                        <Button type="default" size="tiny" asChild>
-                          <Link href={upgradeUrl} className="pb-1">
-                            {subscription?.plan?.id === 'free'
-                              ? 'Upgrade plan'
-                              : 'Change spend cap'}
-                          </Link>
-                        </Button>
-                      )}
                     </div>
 
                     {currentBillingCycleSelected && !usageMeta.unlimited && (
@@ -169,9 +159,9 @@ const AttributeUsage = ({
                               ? 'bg-foreground-light'
                               : 'bg-red-900'
                             : usageBasedBilling === false &&
-                              usageRatio >= USAGE_APPROACHING_THRESHOLD
-                            ? 'bg-amber-900'
-                            : 'bg-foreground-light'
+                                usageRatio >= USAGE_APPROACHING_THRESHOLD
+                              ? 'bg-amber-900'
+                              : 'bg-foreground-light'
                         )}
                         bgClass="bg-surface-300"
                         value={usageMeta?.usage ?? 0}
@@ -215,8 +205,8 @@ const AttributeUsage = ({
                                 {(usageMeta?.pricing_free_units ?? 0) === -1 || usageExcess < 0
                                   ? `0${attribute.unit === 'bytes' ? ' GB' : ''}`
                                   : attribute.unit === 'bytes'
-                                  ? `${usageExcess.toFixed(2)} GB`
-                                  : usageExcess.toLocaleString()}
+                                    ? `${usageExcess.toFixed(2)} GB`
+                                    : usageExcess.toLocaleString()}
                               </p>
                             </div>
                           )}

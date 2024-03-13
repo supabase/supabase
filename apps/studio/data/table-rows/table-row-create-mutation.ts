@@ -2,9 +2,11 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { Query, SupaTable } from 'components/grid'
-import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
-import { ResponseError } from 'types'
+import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
+import type { ResponseError } from 'types'
+import { executeSql } from 'data/sql/execute-sql-query'
 
 export type TableRowCreateVariables = {
   projectRef: string
@@ -12,16 +14,19 @@ export type TableRowCreateVariables = {
   table: SupaTable
   payload: any
   enumArrayColumns: string[]
+  returning?: boolean
+  impersonatedRole?: ImpersonationRole
 }
 
 export function getTableRowCreateSql({
   table,
   payload,
+  returning = false,
   enumArrayColumns,
-}: Pick<TableRowCreateVariables, 'table' | 'payload' | 'enumArrayColumns'>) {
+}: Pick<TableRowCreateVariables, 'table' | 'payload' | 'enumArrayColumns' | 'returning'>) {
   return new Query()
     .from(table.name, table.schema ?? undefined)
-    .insert([payload], { returning: true, enumArrayColumns })
+    .insert([payload], { returning, enumArrayColumns })
     .toSql()
 }
 
@@ -31,9 +36,24 @@ export async function createTableRow({
   table,
   payload,
   enumArrayColumns,
+  returning,
+  impersonatedRole,
 }: TableRowCreateVariables) {
-  const sql = getTableRowCreateSql({ table, payload, enumArrayColumns })
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const sql = wrapWithRoleImpersonation(
+    getTableRowCreateSql({ table, payload, enumArrayColumns, returning }),
+    {
+      projectRef,
+      role: impersonatedRole,
+    }
+  )
+
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRole),
+  })
+
   return result
 }
 

@@ -2,11 +2,15 @@ import CardButton from 'components/ui/CardButton'
 
 const ShimmeringCard = () => {
   return (
-    <CardButton title="" footer={<div className="shimmering-loader rounded py-3 mx-1 w-1/3" />}>
-      <div className="flex flex-col justify-between space-y-2">
-        <div className="shimmering-loader rounded py-3 mx-1 w-2/3" />
-      </div>
-    </CardButton>
+    <CardButton
+      className="h-44 !px-0 pt-5 pb-0"
+      title={
+        <div className="w-full justify-between space-y-1.5 px-5">
+          <p className="flex-shrink truncate text-sm pr-4 shimmering-loader h-5 w-20" />
+          <p className="text-sm lowercase text-foreground-light h-4 w-40 shimmering-loader" />
+        </div>
+      }
+    />
   )
 }
 

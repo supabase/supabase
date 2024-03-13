@@ -2,11 +2,12 @@
 
 import { Slot } from '@radix-ui/react-slot'
 import { VariantProps, cva } from 'class-variance-authority'
-import React from 'react'
-import { IconContext } from '@ui/components/Icon/IconContext'
-import { IconLoader } from '@ui/components/Icon/icons/IconLoader'
-import { sizes } from '@ui/lib/commonCva'
-import { cn } from '@ui/lib/utils'
+import { cloneElement, forwardRef, isValidElement } from 'react'
+
+import { sizes } from '../../lib/commonCva'
+import { cn } from '../../lib/utils/cn'
+import { IconContext } from '../Icon/IconContext'
+import { IconLoader } from '../Icon/icons/IconLoader'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
@@ -36,32 +37,46 @@ const buttonVariants = cva(
             text-white
             border-brand
             focus-visible:outline-brand-600
-            shadow-sm`,
+            shadow-sm
+            data-[state=open]:bg-brand-button/80
+            data-[state=open]:outline-brand-600
+            `,
         secondary: `
             bg-foreground
             text-background hover:text-border-stronger
             focus-visible:text-border-control
             border-foreground-light hover:border-foreground-lighter
             focus-visible:outline-border-strong
+            data-[state=open]:border-foreground-lighter
+            data-[state=open]:outline-border-strong
             shadow-sm`,
         default: `
             text-foreground
             bg-button hover:bg-selection
             border-button hover:border-button-hover
             focus-visible:outline-brand-600
+            data-[state=open]:bg-selection
+            data-[state=open]:outline-brand-600
+            data-[state=open]:border-button-hover
             shadow-sm`,
         alternative: `
-            text-brand-600
-            bg-brand-200 hover:bg-brand-400
-            border-brand-600
-            focus-visible:border-brand-300
+            text-foreground
+            bg-brand-400 hover:bg-brand-500
+            border-brand-500
+            focus-visible:border-brand-500
             focus-visible:outline-brand-600
+            data-[state=open]:bg-brand-500
+            data-[state=open]:border-brand-500
+            data-[state=open]:outline-brand-600
             shadow-sm`,
         outline: `
             text-foreground
             bg-transparent
             border-strong hover:border-stronger
-            focus-visible:outline-border-strong`,
+            focus-visible:outline-border-strong
+            data-[state=open]:border-stronger
+            data-[state=open]:outline-border-strong
+            `,
         dashed: `
             text-foreground
             border
@@ -69,6 +84,8 @@ const buttonVariants = cva(
             border-strong hover:border-stronger
             bg-transparent
             focus-visible:outline-border-strong
+            data-[state=open]:border-stronger
+            data-[state=open]:outline-border-strong
             shadow-sm`,
         link: `
             text-brand-600
@@ -78,12 +95,17 @@ const buttonVariants = cva(
             border-opacity-0
             bg-opacity-0
             shadow-none
-            focus-visible:outline-border-strong`,
+            focus-visible:outline-border-strong
+            data-[state=open]:bg-brand-400
+            data-[state=open]:outline-border-strong
+            `,
         text: `
             text-foreground
             hover:bg-surface-300
             shadow-none
             focus-visible:outline-border-strong
+            data-[state=open]:bg-surface-300
+            data-[state=open]:outline-border-strong
             border-transparent`,
         danger: `
             text-red-1100
@@ -92,6 +114,10 @@ const buttonVariants = cva(
             hover:bg-red-900
             hover:text-lo-contrast
             focus-visible:outline-red-700
+            data-[state=open]:border-red-900
+            data-[state=open]:bg-red-900
+            data-[state=open]:text-lo-contrast
+            data-[state=open]:outline-red-700
             shadow-sm`,
         warning: `
             text-amber-1100
@@ -100,6 +126,10 @@ const buttonVariants = cva(
             hover:bg-amber-900
             hover:text-hi-contrast
             focus-visible:outline-amber-700
+            data-[state=open]:border-amber-900
+            data-[state=open]:bg-amber-900
+            data-[state=open]:text-hi-contrast
+            data-[state=open]:outline-amber-700
             shadow-sm`,
       },
       block: {
@@ -125,6 +155,20 @@ const buttonVariants = cva(
     },
   }
 )
+
+const IconContainerVariants = cva('', {
+  variants: {
+    size: {
+      tiny: '[&_svg]:h-[14px] [&_svg]:w-[14px]',
+      small: '[&_svg]:h-[18px] [&_svg]:w-[18px]',
+      medium: '[&_svg]:h-[20px] [&_svg]:w-[20px]',
+      large: '[&_svg]:h-[20px] [&_svg]:w-[20px]',
+      xlarge: '[&_svg]:h-[24px] [&_svg]:w-[24px]',
+      xxlarge: '[&_svg]:h-[30px] [&_svg]:w-[30px]',
+      xxxlarge: '[&_svg]:h-[42px] [&_svg]:w-[42px]',
+    },
+  },
+})
 
 export type LoadingVariantProps = VariantProps<typeof loadingVariants>
 const loadingVariants = cva('', {
@@ -152,7 +196,7 @@ export interface ButtonProps
   rounded?: boolean
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   (
     {
       asChild = false,
@@ -181,30 +225,27 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Comp
         ref={ref}
+        data-size={size}
         type={htmlType}
         {...props}
         className={cn(buttonVariants({ type, size, disabled, block, rounded }), className)}
       >
         {asChild ? (
-          React.isValidElement(children) ? (
-            React.cloneElement(
+          isValidElement(children) ? (
+            cloneElement(
               children,
               undefined,
               showIcon &&
                 (loading ? (
                   <IconLoader size={size} className={cn(loadingVariants({ loading }))} />
                 ) : _iconLeft ? (
-                  <IconContext.Provider value={{ contextSize: size }}>
-                    {_iconLeft}
-                  </IconContext.Provider>
+                  <div className={cn(IconContainerVariants({ size }))}>{_iconLeft}</div>
                 ) : null),
               children.props.children && (
                 <span className={'truncate'}>{children.props.children}</span>
               ),
               iconRight && !loading && (
-                <IconContext.Provider value={{ contextSize: size }}>
-                  {iconRight}
-                </IconContext.Provider>
+                <div className={cn(IconContainerVariants({ size }))}>{iconRight}</div>
               )
             )
           ) : null

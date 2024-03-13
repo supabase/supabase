@@ -1,32 +1,25 @@
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
-import ProjectList from 'components/interfaces/Home/ProjectList'
+import { ProjectList } from 'components/interfaces/Home/ProjectList'
+import HomePageActions from 'components/interfaces/HomePageActions'
 import { AccountLayout } from 'components/layouts'
-import OrganizationDropdown from 'components/to-be-cleaned/Dropdown/OrganizationDropdown'
 import AlertError from 'components/ui/AlertError'
-import Connecting from 'components/ui/Loading/Loading'
+import { Loading } from 'components/ui/Loading'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { useAutoProjectsPrefetch } from 'data/projects/projects-query'
 import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { useProfile } from 'lib/profile'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const ProjectsPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const {
-    data: organizations,
-    isLoading: isOrganizationLoading,
-    isError,
-    isSuccess,
-  } = useOrganizationsQuery()
+  const [search, setSearch] = useState('')
+  const { data: organizations, isError, isSuccess } = useOrganizationsQuery()
   useAutoProjectsPrefetch()
 
   const projectCreationEnabled = useIsFeatureEnabled('projects:create')
 
-  const { isLoading: isProfileLoading } = useProfile()
-  const isLoading = isOrganizationLoading || isProfileLoading
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const hasWindowLoaded = typeof window !== 'undefined'
 
@@ -45,12 +38,6 @@ const ProjectsPage: NextPageWithLayout = () => {
 
   return (
     <>
-      {(navLayoutV2 || isLoading) && (
-        <div className={`flex items-center justify-center h-full`}>
-          <Connecting />
-        </div>
-      )}
-
       {isError && (
         <div
           className={`py-4 px-5 ${navLayoutV2 ? 'h-full flex items-center justify-center' : ''}`}
@@ -59,19 +46,18 @@ const ProjectsPage: NextPageWithLayout = () => {
         </div>
       )}
 
-      {!navLayoutV2 && isSuccess && (
-        <div className="py-4 px-5">
-          {IS_PLATFORM && projectCreationEnabled && organizations.length !== 0 && (
-            <div className="my-2">
-              <div className="flex">
-                <div className="">
-                  <OrganizationDropdown organizations={organizations} />
-                </div>
-              </div>
-            </div>
+      {navLayoutV2 && (
+        <div className={`flex items-center justify-center h-full`}>
+          <Loading />
+        </div>
+      )}
+      {!navLayoutV2 && (
+        <div className="p-5">
+          {IS_PLATFORM && projectCreationEnabled && isSuccess && (
+            <HomePageActions search={search} setSearch={setSearch} organizations={organizations} />
           )}
-          <div className="my-8 space-y-8">
-            <ProjectList />
+          <div className="my-6 space-y-8">
+            <ProjectList search={search} />
           </div>
         </div>
       )}

@@ -6,24 +6,72 @@ import '../styles/prism-okaidia.scss'
 
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
+import { QueryClientProvider, useQueryClient } from '@tanstack/react-query'
 import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
 import { useRouter } from 'next/router'
-import { useCallback, useEffect, useState } from 'react'
-import { AppPropsWithLayout } from 'types'
-import { CommandMenuProvider, PortalToast, PromoToast, useConsent } from 'ui'
-import { TabsProvider } from 'ui/src/components/Tabs'
+import { useCallback, useEffect, useState, type PropsWithChildren } from 'react'
+import { PortalToast, TabsProvider } from 'ui'
+import { CommandMenuProvider } from 'ui-patterns/Cmdk'
+import { useConsent } from 'ui-patterns/ConsentToast'
+
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
-import { API_URL, IS_PLATFORM } from '~/lib/constants'
-import { post } from '~/lib/fetchWrappers'
+import { IS_PLATFORM, IS_PREVIEW } from '~/lib/constants'
+import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
+import { useRootQueryClient } from '~/lib/fetch/queryClient'
+import { LOCAL_STORAGE_KEYS, remove } from '~/lib/storage'
+import { useOnLogout } from '~/lib/userAuth'
+import { AppPropsWithLayout } from '~/types'
 
-function MyApp({ Component, pageProps }: AppPropsWithLayout) {
-  const router = useRouter()
-  const telemetryProps = useTelemetryProps()
-  const { consentValue, hasAcceptedConsent } = useConsent()
+/**
+ * Preview builds don't need to be statically generated to optimize performance.
+ * This (somewhat hacky) way of shortcutting preview builds cuts their build
+ * time and speeds up the feedback loop for previewing docs changes in Vercel.
+ *
+ * This technically breaks the Rules of Hooks to avoid an unnecessary full-app
+ * rerender in prod, but this is fine because IS_PREVIEW will never change on
+ * you within a single build.
+ */
+function ShortcutPreviewBuild({ children }: PropsWithChildren) {
+  if (IS_PREVIEW) {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [isMounted, setIsMounted] = useState(false)
 
-  useThemeSandbox()
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    useEffect(() => {
+      setIsMounted(true)
+    }, [])
 
+    return isMounted ? children : null
+  }
+
+  return children
+}
+
+/**
+ *
+ * !!! IMPORTANT !!!
+ * Ensure data is cleared on sign out.
+ *
+ * **/
+function SignOutHandler({ children }: PropsWithChildren) {
+  const queryClient = useQueryClient()
+
+  const cleanUp = useCallback(() => {
+    queryClient.cancelQueries()
+    queryClient.clear()
+
+    Object.keys(LOCAL_STORAGE_KEYS).forEach((key) => {
+      remove('local', LOCAL_STORAGE_KEYS[key])
+    })
+  }, [queryClient])
+
+  useOnLogout(cleanUp)
+
+  return <>{children}</>
+}
+
+function AuthContainer({ children }: PropsWithChildren) {
   const [supabase] = useState(() =>
     IS_PLATFORM
       ? createClient(
@@ -33,17 +81,41 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       : undefined
   )
 
+  return IS_PLATFORM ? (
+    <SessionContextProvider supabaseClient={supabase}>
+      <AuthProvider>{children}</AuthProvider>
+    </SessionContextProvider>
+  ) : (
+    <AuthProvider>{children}</AuthProvider>
+  )
+}
+
+function MyApp({ Component, pageProps }: AppPropsWithLayout) {
+  const router = useRouter()
+  const telemetryProps = useTelemetryProps()
+  const { consentValue, hasAcceptedConsent } = useConsent()
+  const queryClient = useRootQueryClient()
+
+  useThemeSandbox()
+
   const handlePageTelemetry = useCallback(
     (route: string) => {
-      return post(`${API_URL}/telemetry/page`, {
-        referrer: document.referrer,
-        title: document.title,
-        route,
-        ga: {
-          screen_resolution: telemetryProps?.screenResolution,
-          language: telemetryProps?.language,
-        },
-      })
+      if (IS_PLATFORM) {
+        unauthedAllowedPost('/platform/telemetry/page', {
+          body: {
+            referrer: document.referrer,
+            title: document.title,
+            route,
+            ga: {
+              screen_resolution: telemetryProps?.screenResolution,
+              language: telemetryProps?.language,
+              session_id: '',
+            },
+          },
+        }).catch((e) => {
+          console.error('Problem sending telemetry:', e)
+        })
+      }
     },
     [telemetryProps]
   )
@@ -73,7 +145,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router, handlePageTelemetry, consentValue])
+  }, [router, handlePageTelemetry, consentValue, hasAcceptedConsent])
 
   /**
    * Save/restore scroll position when reloading or navigating back/forward.
@@ -120,7 +192,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     if (router.isReady) {
       handlePageTelemetry(router.basePath + router.asPath)
     }
-  }, [router, handlePageTelemetry, consentValue])
+  }, [router, handlePageTelemetry, consentValue, hasAcceptedConsent])
 
   /**
    * Reference docs use `history.pushState()` to jump to
@@ -141,35 +213,28 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     }
   }, [router])
 
-  const SITE_TITLE = 'Supabase Documentation'
-
-  const AuthContainer = (props) => {
-    return IS_PLATFORM ? (
-      <SessionContextProvider supabaseClient={supabase}>
-        <AuthProvider>{props.children}</AuthProvider>
-      </SessionContextProvider>
-    ) : (
-      <AuthProvider>{props.children}</AuthProvider>
-    )
-  }
-
   return (
-    <>
-      <Favicons />
-      <AuthContainer>
-        <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-          <CommandMenuProvider site="docs">
-            <TabsProvider>
-              <SiteLayout>
-                <PortalToast />
-                <PromoToast />
-                <Component {...pageProps} />
-              </SiteLayout>
-            </TabsProvider>
-          </CommandMenuProvider>
-        </ThemeProvider>
-      </AuthContainer>
-    </>
+    <ShortcutPreviewBuild>
+      <QueryClientProvider client={queryClient}>
+        <Favicons />
+        <AuthContainer>
+          <SignOutHandler>
+            <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+              <CommandMenuProvider site="docs">
+                <TabsProvider>
+                  <div className="h-screen flex flex-col">
+                    <SiteLayout>
+                      <PortalToast />
+                      <Component {...pageProps} />
+                    </SiteLayout>
+                  </div>
+                </TabsProvider>
+              </CommandMenuProvider>
+            </ThemeProvider>
+          </SignOutHandler>
+        </AuthContainer>
+      </QueryClientProvider>
+    </ShortcutPreviewBuild>
   )
 }
 

@@ -1,3 +1,5 @@
+import type { components } from 'data/api'
+
 export type CloudProvider = 'FLY' | 'AWS'
 export type Region = typeof AWS_REGIONS | typeof FLY_REGIONS
 
@@ -32,7 +34,7 @@ export const AWS_REGIONS_DEFAULT =
   process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? AWS_REGIONS.SOUTHEAST_ASIA : AWS_REGIONS.WEST_US
 
 // TO DO, change default to US region for prod
-export const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
+const FLY_REGIONS_DEFAULT = FLY_REGIONS.SOUTHEAST_ASIA
 
 export const PRICING_TIER_LABELS_ORG = {
   FREE: 'Free - $0/month',
@@ -64,61 +66,12 @@ export const PROVIDERS = {
     DEFAULT_SSH_KEY: 'supabase-app-instance',
     default_region: AWS_REGIONS_DEFAULT,
     regions: { ...AWS_REGIONS },
-    // regions: {
-    //   EAST_US: 'us-east-1', // North Virginia
-    //   // 'North EU': 'eu-north-1', // Stockholm
-    //   WEST_US: 'us-west-1', // North California
-    //   SOUTHEAST_ASIA: 'ap-southeast-1', // Singapore
-    //   NORTHEAST_ASIA: 'ap-northeast-1', // Tokyo
-    //   NORTHEAST_ASIA_2: 'ap-northeast-2', //Seoul
-    //   OCEANIA: 'ap-southeast-2', // Sydney
-    //   WEST_EU: 'eu-west-1', // Ireland
-    //   WEST_EU_2: 'eu-west-2', // London
-    //   CENTRAL_EU: 'eu-central-1', // Frankfurt
-    //   CENTRAL_CANADA: 'ca-central-1', // Central Canada
-    //   SOUTH_ASIA: 'ap-south-1', // Mumbai
-    //   SOUTH_AMERICA: 'sa-east-1', // Sao Paulo
-    //   // SOUTH_AFRICA: 'af-south-1', // Cape Town
-    // },
-    sizes: {
-      nano: {
-        x86_64: 't3.nano',
-        arm64: 't4g.nano',
-        description: '512mb RAM',
-      },
-      micro: {
-        x86_64: 't3.micro',
-        arm64: 't4g.micro',
-        description: '1gb RAM',
-      },
-      medium: {
-        x86_64: 'm5a.large',
-        arm64: 'm6g.medium',
-        description: '4gb RAM',
-      },
-    },
   },
 } as const
 
-// @todo ini update for prod
-export const AWS_SUPPORTED_AZ = {
-  EAST_US: ['us-east-1a', 'us-east-1b', 'us-east-1c', 'us-east-1d', 'us-east-1e', 'us-east-1f'],
-  SOUTHEAST_ASIA: ['ap-southeast-1a', 'ap-southeast-1b', 'ap-southeast-1c'],
-  WEST_EU: ['eu-west-1a', 'eu-west-1b', 'eu-west-1c'],
-}
-
-export const SERVICE_STATUS = {
-  INACTIVE: 'INACTIVE',
-  ACTIVE_HEALTHY: 'ACTIVE_HEALTHY',
-  ACTIVE_UNHEALTHY: 'ACTIVE_UNHEALTHY',
-  COMING_UP: 'COMING_UP',
-  UNKNOWN: 'UNKNOWN',
-  GOING_DOWN: 'GOING_DOWN',
-  INIT_FAILED: 'INIT_FAILED',
-  REMOVED: 'REMOVED',
-}
-
-export const PROJECT_STATUS = {
+export const PROJECT_STATUS: {
+  [key: string]: components['schemas']['ProjectDetailResponse']['status']
+} = {
   INACTIVE: 'INACTIVE',
   ACTIVE_HEALTHY: 'ACTIVE_HEALTHY',
   ACTIVE_UNHEALTHY: 'ACTIVE_UNHEALTHY',
@@ -128,9 +81,11 @@ export const PROJECT_STATUS = {
   INIT_FAILED: 'INIT_FAILED',
   REMOVED: 'REMOVED',
   RESTORING: 'RESTORING',
-  RESTORATION_FAILED: 'RESTORATION_FAILED',
   UPGRADING: 'UPGRADING',
+  // @ts-ignore [Joshen] API codegen seems to be wrong here, pausing is still a valid status
   PAUSING: 'PAUSING',
+  // @ts-ignore [Joshen] This is no longer part of the project status enum, but leaving here for now just in case
+  RESTORATION_FAILED: 'RESTORATION_FAILED',
 }
 
 export const DEFAULT_MINIMUM_PASSWORD_STRENGTH = 4
@@ -159,6 +114,34 @@ export const PASSWORD_STRENGTH_PERCENTAGE = {
   4: '100%',
 }
 
-export const DEFAULT_FREE_PROJECTS_LIMIT = 2
-
 export const DEFAULT_PROJECT_API_SERVICE_ID = 1
+
+type InstanceSpecs = {
+  baseline_disk_io_mbs: number
+  connections_direct: number
+  connections_pooler: number
+  cpu_cores: number
+  cpu_dedicated: boolean
+  max_disk_io_mbs: number
+  memory_gb: number
+}
+
+export const INSTANCE_NANO_SPECS: InstanceSpecs = {
+  baseline_disk_io_mbs: 43,
+  connections_direct: 30,
+  connections_pooler: 200,
+  cpu_cores: 2,
+  cpu_dedicated: false,
+  max_disk_io_mbs: 2085,
+  memory_gb: 0.5,
+}
+
+export const INSTANCE_MICRO_SPECS: InstanceSpecs = {
+  baseline_disk_io_mbs: 87,
+  connections_direct: 60,
+  connections_pooler: 200,
+  cpu_cores: 2,
+  cpu_dedicated: false,
+  max_disk_io_mbs: 2085,
+  memory_gb: 1,
+}

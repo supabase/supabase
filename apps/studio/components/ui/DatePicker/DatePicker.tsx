@@ -181,7 +181,7 @@ function _DatePicker({
               <div className="flex items-stretch justify-between py-2">
                 {!selectsRange ? null : (
                   <>
-                    <div className="flex grow flex-col gap-1">
+                    <div className="flex grow flex-col gap-1 pl-2">
                       <TimeSplitInput
                         type="start"
                         startTime={startTime}
@@ -207,7 +207,7 @@ function _DatePicker({
                     </div>
                   </>
                 )}
-                <div className="flex grow flex-col gap-1">
+                <div className="flex grow flex-col gap-1 pr-2">
                   <TimeSplitInput
                     type="end"
                     startTime={startTime}
@@ -223,7 +223,7 @@ function _DatePicker({
               </div>
             </>
           )}
-          <div className="px-3 py-4">
+          <div className="p-2">
             <DatePicker
               inline
               selectsRange={selectsRange}
@@ -244,7 +244,7 @@ function _DatePicker({
                 prevMonthButtonDisabled,
                 nextMonthButtonDisabled,
               }) => (
-                <div className="flex items-center justify-between px-2 py-2">
+                <div className="flex items-center justify-between">
                   <div className="flex w-full items-center justify-between">
                     <button
                       onClick={decreaseMonth}
@@ -252,7 +252,7 @@ function _DatePicker({
                       type="button"
                       className={`
                         ${prevMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                        text-foreground-light hover:text-foreground focus:outline-none
+                        text-foreground-light hover:text-foreground focus:outline-none p-2
                     `}
                     >
                       <IconChevronLeft size={16} strokeWidth={2} />
@@ -266,7 +266,7 @@ function _DatePicker({
                       type="button"
                       className={`
                         ${nextMonthButtonDisabled && 'cursor-not-allowed opacity-50'}
-                        text-foreground-light hover:text-foreground focus:outline-none
+                        text-foreground-light p-2 hover:text-foreground focus:outline-none
                     `}
                     >
                       <IconChevronRight size={16} strokeWidth={2} />

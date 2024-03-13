@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import {
@@ -16,14 +17,13 @@ import {
   TaxIdValue,
   useOrganizationTaxIDsUpdateMutation,
 } from 'data/organizations/organization-tax-ids-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { Button, Form, IconPlus, IconX, Input, Listbox } from 'ui'
 import { TAX_IDS } from './TaxID.constants'
 import { checkTaxIdsEqual, sanitizeTaxID } from './TaxID.utilts'
 
 const TaxID = () => {
-  const { ui } = useStore()
   const { slug } = useParams()
   const {
     data: taxIds,
@@ -52,10 +52,10 @@ const TaxID = () => {
 
       if (errors !== undefined && errors.length > 0) {
         errors.forEach((taxId: any) => {
-          ui.setNotification({ category: 'error', message: taxId.result.error.message })
+          toast.error(taxId.result.error.message)
         })
       } else {
-        ui.setNotification({ category: 'success', message: 'Successfully updated tax IDs' })
+        toast.success('Successfully updated tax IDs')
       }
     },
   })

@@ -11,8 +11,5 @@ export const invoicesKeys = {
     ['invoices', projectRef, offset] as const,
   projectInvoicesCount: (projectRef: string | undefined) =>
     ['invoices', projectRef, 'count'] as const,
-  upcomingPreview: (projectRef: string | undefined) =>
-    ['invoices', projectRef, 'upcoming-preview'] as const,
-  orgUpcomingPreview: (projectRef: string | undefined) =>
-    ['invoices', projectRef, 'upcoming-preview'] as const,
+  orgUpcomingPreview: (slug: string | undefined) => ['invoices', slug, 'upcoming-preview'] as const,
 }

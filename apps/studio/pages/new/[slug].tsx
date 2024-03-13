@@ -1,29 +1,32 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import generator from 'generate-password'
+import generator from 'generate-password-browser'
 import { debounce } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
+import { Badge, Button, IconExternalLink, IconUsers, Input, Listbox } from 'ui'
 
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
 } from 'components/interfaces/Organization/NewProject'
-import { WizardLayoutWithoutAuth } from 'components/layouts'
+import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
+import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
-import InformationBox from 'components/ui/InformationBox'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import type { components } from 'data/api'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import {
+  DbInstanceSize,
   ProjectCreateVariables,
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
-import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useFlag, useStore, withAuth } from 'hooks'
+import { useCheckPermissions, useFlag, withAuth } from 'hooks'
 import {
   AWS_REGIONS,
   CloudProvider,
@@ -34,13 +37,13 @@ import {
   Region,
 } from 'lib/constants'
 import { passwordStrength, pluckObjectFields } from 'lib/helpers'
-import { NextPageWithLayout } from 'types'
-import { Button, IconExternalLink, IconInfo, IconUsers, Input, Listbox } from 'ui'
+import type { NextPageWithLayout } from 'types'
+
+type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug } = useParams()
-  const { ui } = useStore()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
@@ -52,17 +55,24 @@ const Wizard: NextPageWithLayout = () => {
   const [cloudProvider, setCloudProvider] = useState<CloudProvider>(PROVIDERS[DEFAULT_PROVIDER].id)
 
   const [dbPass, setDbPass] = useState('')
-  const [dbRegion, setDbRegion] = useState(PROVIDERS[cloudProvider].default_region)
+  // Auto select region on staging/local for convenience as there's only one supported
+  const [dbRegion, setDbRegion] = useState(
+    ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT ?? '')
+      ? PROVIDERS[cloudProvider].default_region
+      : ''
+  )
   const [passwordStrengthMessage, setPasswordStrengthMessage] = useState('')
   const [passwordStrengthWarning, setPasswordStrengthWarning] = useState('')
   const [passwordStrengthScore, setPasswordStrengthScore] = useState(0)
 
+  const [instanceSize, setInstanceSize] = useState<DbInstanceSize>('micro')
+
   const { data: organizations, isSuccess: isOrganizationsSuccess } = useOrganizationsQuery()
   const currentOrg = organizations?.find((o: any) => o.slug === slug)
 
-  const { data: orgSubscription } = useOrgSubscriptionQuery({ orgSlug: slug })
-
-  const { data: allProjects } = useProjectsQuery({})
+  const { data: orgSubscription } = useOrgSubscriptionQuery({
+    orgSlug: slug,
+  })
 
   const {
     mutate: createProject,
@@ -73,14 +83,6 @@ const Wizard: NextPageWithLayout = () => {
       router.push(`/project/${res.ref}/building`)
     },
   })
-
-  const orgProjectCount = (allProjects || []).filter(
-    (proj) => proj.organization_id === currentOrg?.id
-  ).length
-
-  const [availableRegions, setAvailableRegions] = useState(
-    getAvailableRegions(PROVIDERS[cloudProvider].id)
-  )
 
   const isAdmin = useCheckPermissions(PermissionAction.CREATE, 'projects')
   const isInvalidSlug = isOrganizationsSuccess && currentOrg === undefined
@@ -126,9 +128,9 @@ const Wizard: NextPageWithLayout = () => {
   useEffect(() => {
     // User added a new payment method
     if (router.query.setup_intent && router.query.redirect_status) {
-      ui.setNotification({ category: 'success', message: 'Successfully added new payment method' })
+      toast.success('Successfully added new payment method')
     }
-  }, [router.query.redirect_status, router.query.setup_intent, ui])
+  }, [router.query.redirect_status, router.query.setup_intent])
 
   function onProjectNameChange(e: any) {
     e.target.value = e.target.value.replace(/\./g, '')
@@ -146,13 +148,12 @@ const Wizard: NextPageWithLayout = () => {
 
   function onCloudProviderChange(cloudProviderId: CloudProvider) {
     setCloudProvider(cloudProviderId)
-    if (cloudProviderId === PROVIDERS.AWS.id) {
-      setAvailableRegions(getAvailableRegions(PROVIDERS['AWS'].id))
-      setDbRegion(PROVIDERS['AWS'].default_region)
-    } else {
-      setAvailableRegions(getAvailableRegions(PROVIDERS['FLY'].id))
-      setDbRegion(PROVIDERS['FLY'].default_region)
-    }
+    // on local/staging quick-select the default region, don't wait for the cloudflare location
+    setDbRegion(
+      ['staging', 'local'].includes(process.env.NEXT_PUBLIC_ENVIRONMENT ?? '')
+        ? PROVIDERS[cloudProviderId].default_region
+        : ''
+    )
   }
 
   async function checkPasswordStrength(value: any) {
@@ -171,14 +172,16 @@ const Wizard: NextPageWithLayout = () => {
       name: projectName.trim(),
       dbPass: dbPass,
       dbRegion: dbRegion,
-      dbPricingTierId: 'tier_free', // gets ignored due to org billing subscription anyway
+      // gets ignored due to org billing subscription anyway
+      dbPricingTierId: 'tier_free',
+      // only set the instance size on pro+ plans. Free plans always use micro (nano in the future) size.
+      dbInstanceSize: orgSubscription?.plan.id === 'free' ? undefined : instanceSize,
     }
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {
-        return ui.setNotification({
-          category: 'error',
-          message: `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`,
-        })
+        toast.error(
+          `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
+        )
       }
 
       data['customSupabaseRequest'] = {
@@ -214,6 +217,85 @@ const Wizard: NextPageWithLayout = () => {
     }
 
     throw new Error('Invalid cloud provider')
+  }
+
+  const sizes: DesiredInstanceSize[] = [
+    'micro',
+    'small',
+    'medium',
+    'large',
+    'xlarge',
+    '2xlarge',
+    '4xlarge',
+    '8xlarge',
+    '12xlarge',
+    '16xlarge',
+  ]
+
+  const instanceSizeSpecs: Record<
+    DesiredInstanceSize,
+    { label: string; ram: string; cpu: string; price: string }
+  > = {
+    micro: {
+      label: 'Micro',
+      ram: '1 GB',
+      cpu: '2-core ARM',
+      price: '$0.01344/hour (~$10/month)',
+    },
+    small: {
+      label: 'Small',
+      ram: '2 GB',
+      cpu: '2-core ARM',
+      price: '$0.0206/hour (~$15/month)',
+    },
+    medium: {
+      label: 'Medium',
+      ram: '4 GB',
+      cpu: '2-core ARM',
+      price: '$0.0822/hour (~$60/month)',
+    },
+    large: {
+      label: 'Large',
+      ram: '8 GB',
+      cpu: '2-core ARM',
+      price: '$0.1517/hour (~$110/month)',
+    },
+    xlarge: {
+      label: 'XL',
+      ram: '16 GB',
+      cpu: '4-core ARM',
+      price: '$0.2877/hour (~$210/month)',
+    },
+    '2xlarge': {
+      label: '2XL',
+      ram: '32 GB',
+      cpu: '8-core ARM',
+      price: '$0.562/hour (~$410/month)',
+    },
+    '4xlarge': {
+      label: '4XL',
+      ram: '64 GB',
+      cpu: '16-core ARM',
+      price: '$1.32/hour (~$960/month)',
+    },
+    '8xlarge': {
+      label: '8XL',
+      ram: '128 GB',
+      cpu: '32-core ARM',
+      price: '$2.562/hour (~$1,870/month)',
+    },
+    '12xlarge': {
+      label: '12XL',
+      ram: '192 GB',
+      cpu: '48-core ARM',
+      price: '$3.836/hour (~$2,800/month)',
+    },
+    '16xlarge': {
+      label: '16XL',
+      ram: '256 GB',
+      cpu: '64-core ARM',
+      price: '$5.12/hour (~$3,730/month)',
+    },
   }
 
   return (
@@ -370,6 +452,91 @@ const Wizard: NextPageWithLayout = () => {
                   </Panel.Content>
                 )}
 
+                {orgSubscription?.plan.id !== 'free' && (
+                  <Panel.Content
+                    className={[
+                      'border-b',
+                      'border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark',
+                    ].join(' ')}
+                  >
+                    <Listbox
+                      layout="horizontal"
+                      label={
+                        <div className="space-y-4">
+                          <span>Instance Size</span>
+
+                          <div className="flex flex-col space-y-2">
+                            <Link
+                              href="https://supabase.com/docs/guides/platform/compute-add-ons"
+                              target="_blank"
+                            >
+                              <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
+                                <p className="text-sm m-0">Compute Add-Ons</p>
+                                <IconExternalLink size={16} strokeWidth={1.5} />
+                              </div>
+                            </Link>
+
+                            <Link
+                              href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+                              target="_blank"
+                            >
+                              <div className="flex items-center space-x-2 opacity-75 hover:opacity-100 transition">
+                                <p className="text-sm m-0">Compute Billing</p>
+                                <IconExternalLink size={16} strokeWidth={1.5} />
+                              </div>
+                            </Link>
+                          </div>
+                        </div>
+                      }
+                      type="select"
+                      value={instanceSize}
+                      onChange={(value) => setInstanceSize(value)}
+                      descriptionText={
+                        <>
+                          <p>
+                            Select the size for your dedicated database. You can always change this
+                            later.
+                          </p>
+                          <p className="mt-1">
+                            Your organization has $10/month in Compute Credits to cover one instance
+                            on Micro Compute or parts of any other instance size.
+                          </p>
+                        </>
+                      }
+                    >
+                      {sizes.map((option) => {
+                        return (
+                          <Listbox.Option
+                            key={option}
+                            label={`${instanceSizeSpecs[option].ram} RAM / ${instanceSizeSpecs[option].cpu} CPU (${instanceSizeSpecs[option].label})`}
+                            value={option}
+                          >
+                            <div className="flex space-x-2">
+                              <div className="text-center w-[80px]">
+                                <Badge
+                                  color={option === 'micro' ? 'gray' : 'brand'}
+                                  className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
+                                >
+                                  {instanceSizeSpecs[option].label}
+                                </Badge>
+                              </div>
+                              <div className="text-sm">
+                                <span className="text-foreground">
+                                  {instanceSizeSpecs[option].ram} RAM /{' '}
+                                  {instanceSizeSpecs[option].cpu} CPU
+                                </span>
+                                <p className="text-xs text-muted">
+                                  {instanceSizeSpecs[option].price}
+                                </p>
+                              </div>
+                            </div>
+                          </Listbox.Option>
+                        )
+                      })}
+                    </Listbox>
+                  </Panel.Content>
+                )}
+
                 <Panel.Content className="border-b border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
                   <Input
                     id="password"
@@ -393,99 +560,14 @@ const Wizard: NextPageWithLayout = () => {
                 </Panel.Content>
 
                 <Panel.Content className="border-b border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
-                  <Listbox
-                    layout="horizontal"
-                    label="Region"
-                    type="select"
-                    value={dbRegion}
-                    onChange={(value) => setDbRegion(value)}
-                    descriptionText="Select a region close to your users for the best performance."
-                  >
-                    {Object.keys(availableRegions).map((option: string, i) => {
-                      const label = Object.values(availableRegions)[i] as string
-                      return (
-                        <Listbox.Option
-                          key={option}
-                          label={label}
-                          value={label}
-                          addOnBefore={() => (
-                            <img
-                              alt="region icon"
-                              className="w-5 rounded-sm"
-                              src={`${router.basePath}/img/regions/${
-                                Object.keys(availableRegions)[i]
-                              }.svg`}
-                            />
-                          )}
-                        >
-                          <span className="text-foreground">{label}</span>
-                        </Listbox.Option>
-                      )
-                    })}
-                  </Listbox>
+                  <RegionSelector
+                    cloudProvider={cloudProvider}
+                    selectedRegion={dbRegion}
+                    onSelectRegion={setDbRegion}
+                  />
                 </Panel.Content>
               </>
             )}
-
-            <Panel.Content>
-              <InformationBox
-                icon={<IconInfo size="large" strokeWidth={1.5} />}
-                defaultVisibility={true}
-                hideCollapse
-                title="Billed via organization"
-                description={
-                  <div className="space-y-3">
-                    <p className="text-sm leading-normal">
-                      This organization uses the new organization-based billing and is on the{' '}
-                      <span className="text-brand">{orgSubscription?.plan?.name} plan</span>.
-                    </p>
-
-                    {/* Show info when launching a new project in a paid org that has no project yet */}
-                    {orgSubscription?.plan?.id !== 'free' && orgProjectCount === 0 && (
-                      <div>
-                        <p>
-                          As this is the first project you're launching in this organization, it
-                          comes with no additional compute costs.
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Show info when launching a new project in a paid org that already has at least one project */}
-                    {orgSubscription?.plan?.id !== 'free' && orgProjectCount > 0 && (
-                      <div>
-                        <p>
-                          Launching another project incurs additional compute costs, starting at
-                          $0.01344 per hour (~$10/month). You can also create a new organization
-                          under the free plan in case you have not exceeded your 2 free project
-                          limit.
-                        </p>
-                      </div>
-                    )}
-
-                    <div className="space-x-3">
-                      <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                        <Link
-                          href="https://supabase.com/blog/organization-based-billing"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Announcement
-                        </Link>
-                      </Button>
-                      <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
-                        <Link
-                          href="https://supabase.com/docs/guides/platform/org-based-billing"
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Documentation
-                        </Link>
-                      </Button>
-                    </div>
-                  </div>
-                }
-              />
-            </Panel.Content>
 
             {isAdmin && (
               <Panel.Content>

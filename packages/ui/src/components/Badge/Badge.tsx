@@ -1,5 +1,6 @@
 import { AvailableColors } from '../../lib/constants'
 import styleHandler from '../../lib/theme/styleHandler'
+import { cn } from '../../lib/utils'
 
 interface Props {
   color?: AvailableColors
@@ -24,7 +25,7 @@ function Badge({ color = 'brand', children, size, dot, className }: Props) {
   }
 
   return (
-    <span className={classes.join(' ')}>
+    <span className={cn(classes)}>
       {dot && (
         <svg
           className={`${__styles.dot} ${__styles.color[color]}`}

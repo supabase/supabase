@@ -1,37 +1,49 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useTelemetryProps } from 'common'
 import { useProfile } from 'lib/profile'
-import { compact, last, sortBy } from 'lodash'
-import OpenAI from 'openai'
-import { createRef, useEffect, useMemo, useRef, useState } from 'react'
+import Telemetry from 'lib/telemetry'
+import { compact, last } from 'lodash'
+import { useRouter } from 'next/router'
+import { createRef, useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { AssistantChatForm } from 'ui'
+import { AssistantChatForm, Button, cn } from 'ui'
 import * as z from 'zod'
+
+import { useLocalStorageQuery, useSelectedOrganization } from 'hooks'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
+import { MessageWithDebug } from './AIPolicyEditorPanel.utils'
 import Message from './Message'
+
+interface AIPolicyChatProps {
+  messages: MessageWithDebug[]
+  selectedMessage?: string
+  loading: boolean
+  onSubmit: (s: string) => void
+  onDiff: (message: { id: string; content: string }) => void
+  onChange: (value: boolean) => void
+}
 
 export const AIPolicyChat = ({
   messages,
+  selectedMessage,
   loading,
   onSubmit,
   onDiff,
   onChange,
-}: {
-  messages: OpenAI.Beta.Threads.Messages.ThreadMessage[]
-  loading: boolean
-  onSubmit: (s: string) => void
-  onDiff: (s: string) => void
-  onChange: (value: boolean) => void
-}) => {
+}: AIPolicyChatProps) => {
+  const router = useRouter()
   const { profile } = useProfile()
+  const snap = useAppStateSnapshot()
+  const organization = useSelectedOrganization()
   const bottomRef = useRef<HTMLDivElement>(null)
+  const telemetryProps = useTelemetryProps()
+
+  const isOptedInToAI = organization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
+  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
+  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
+
   const name = compact([profile?.first_name, profile?.last_name]).join(' ')
-  const sorted = useMemo(() => {
-    return sortBy(messages, (m) => m.created_at).filter((m) => {
-      if (m.content[0].type === 'text') {
-        return !m.content[0].text.value.startsWith('Here is my database schema for reference:')
-      }
-      return false
-    })
-  }, [messages])
 
   const FormSchema = z.object({ chat: z.string() })
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -41,16 +53,16 @@ export const AIPolicyChat = ({
     defaultValues: { chat: '' },
   })
   const formChatValue = form.getValues().chat
-  const pendingReply = loading && last(sorted)?.role === 'user'
+  const pendingReply = loading && last(messages)?.role === 'user'
 
+  // try to scroll on each rerender to the bottom
   useEffect(() => {
-    // 👇️ scroll to bottom every time messages change
-    if (bottomRef.current) {
+    if (loading && bottomRef.current) {
       setTimeout(() => {
         bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
       }, 500)
     }
-  }, [messages.length])
+  })
 
   useEffect(() => {
     if (!loading) {
@@ -68,32 +80,48 @@ export const AIPolicyChat = ({
   const [value, setValue] = useState('')
 
   return (
-    <div id={'ai-chat-assistant'} className="flex flex-col h-full">
-      <div className="overflow-auto flex-1">
+    <div id={'ai-chat-assistant'} className="flex flex-col h-full max-w-full">
+      <div className="overflow-auto flex-1 divide-y divide-border">
         <Message
+          key="zero"
           role="assistant"
           content={`Hi${
             name ? ' ' + name : ''
-          }, how can I help you? I'm powered by AI, so surprises and mistakes are possible.
+          }, I can help you to write RLS policies. I'm powered by AI, so surprises and mistakes are possible.
         Make sure to verify any generated code or suggestions, and share feedback so that we can
         learn and improve.`}
-        />
-
-        {sorted.map((m, idx) => (
-          <Message
-            key={`message-${idx}`}
-            name={name}
-            role={m.role}
-            content={
-              m.content[0] && m.content[0].type === 'text' ? m.content[0].text.value : undefined
+        >
+          <Button
+            type="default"
+            className="w-min"
+            icon={
+              <div
+                className={cn(
+                  'w-2 h-2 rounded-full',
+                  includeSchemaMetadata ? 'bg-brand' : 'border border-stronger'
+                )}
+              />
             }
-            createdAt={m.created_at}
-            isDebug={(m.metadata as any).type === 'debug'}
-            onDiff={onDiff}
+            onClick={() => snap.setShowAiSettingsModal(true)}
+          >
+            {includeSchemaMetadata ? 'Include' : 'Exclude'} database metadata in queries
+          </Button>
+        </Message>
+
+        {messages.map((m) => (
+          <Message
+            key={`message-${m.id}`}
+            name={m.name}
+            role={m.role}
+            content={m.content}
+            createdAt={new Date(m.createdAt || new Date()).getTime()}
+            isDebug={m.isDebug}
+            isSelected={m.id === selectedMessage}
+            onDiff={(content) => onDiff({ id: m.id, content })}
           />
         ))}
 
-        {pendingReply && <Message role="assistant" content="Thinking..." />}
+        {pendingReply && <Message key="thinking" role="assistant" content="Thinking..." />}
 
         <div ref={bottomRef} className="h-1" />
       </div>
@@ -106,6 +134,15 @@ export const AIPolicyChat = ({
           setCommandsOpen={setCommandsOpen}
           onSubmit={form.handleSubmit((data: z.infer<typeof FormSchema>) => {
             onSubmit(data.chat)
+            Telemetry.sendEvent(
+              {
+                category: 'rls_editor',
+                action: 'ai_suggestion_asked',
+                label: 'rls-ai-assistant',
+              },
+              telemetryProps,
+              router
+            )
           })}
           value={value}
           placeholder="e.g Create a Telegram-like chat application"

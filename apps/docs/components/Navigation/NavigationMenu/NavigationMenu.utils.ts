@@ -51,7 +51,7 @@ export function useCommonSections(commonSectionsFile: string) {
       const commonSections = await import(
         /* webpackInclude: /common-.*\.json$/ */
         /* webpackMode: "lazy" */
-        `~/../../spec/${commonSectionsFile}`
+        `~/spec/${commonSectionsFile}`
       )
       setCommonSections(commonSections.default)
     }
@@ -80,7 +80,7 @@ export function useSpec(specFile?: string) {
       const spec = await import(
         /* webpackInclude: /supabase_.*\.ya?ml$/ */
         /* webpackMode: "lazy" */
-        `~/../../spec/${specFile}`
+        `~/spec/${specFile}`
       )
       setSpec(spec.default)
     }

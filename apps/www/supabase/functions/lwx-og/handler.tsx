@@ -20,13 +20,19 @@ const LW_TABLE = 'lwx_tickets'
 const LW_MATERIALIZED_VIEW = 'lwx_tickets_golden'
 
 const STYLING_CONGIF = {
-  REG: {
+  regular: {
     BACKGROUND: '#303030',
     FOREGROUND: '#F8F9FA',
     FOREGROUND_LIGHT: '#8B9092',
     BORDER: '#303030',
   },
-  PLATINUM: {
+  platinum: {
+    BACKGROUND: '#f1f1f1',
+    FOREGROUND: '#11181C',
+    FOREGROUND_LIGHT: '#6c7277',
+    BORDER: '#CFCFCF',
+  },
+  secret: {
     BACKGROUND: '#f1f1f1',
     FOREGROUND: '#11181C',
     FOREGROUND_LIGHT: '#6c7277',
@@ -78,18 +84,25 @@ export async function handler(req: Request) {
 
     const platinum = (!!data?.sharedOnTwitter && !!data?.sharedOnLinkedIn) ?? false
     if (assumePlatinum && !platinum) return await fetch(`${STORAGE_URL}/assets/golden_no_meme.png`)
+    const ticketType = data.metadata?.hasSecretTicket ? 'secret' : platinum ? 'platinum' : 'regular'
 
     // Else, generate image and upload to storage.
     const BACKGROUND = {
-      REG: {
+      regular: {
         OG: `${STORAGE_URL}/assets/og_bg_regular.png?t=2023-11-27T22%3A32%3A21.973Z`,
         BG: `${STORAGE_URL}/assets/lwx_ticket_bg_regular.png`,
         LOGO: `${STORAGE_URL}/assets/logos/supabase_logo_reg.png`,
         // LOGO: `${STORAGE_URL}/assets/logos/supabase_lwx_logo_dark.png`,
       },
-      PLATINUM: {
+      platinum: {
         OG: `${STORAGE_URL}/assets/og_bg_platinum.png?t=2023-11-27T22%3A31%3A58.719Z`,
         BG: `${STORAGE_URL}/assets/lwx_ticket_bg_platinum.png`,
+        LOGO: `${STORAGE_URL}/assets/logos/supabase_logo_platinum.png`,
+        // LOGO: `${STORAGE_URL}/assets/logos/supabase_lwx_logo_light.png`,
+      },
+      secret: {
+        OG: `${STORAGE_URL}/assets/og_bg_secret.png?t=2023-11-27T22%3A31%3A58.719Z`,
+        BG: `${STORAGE_URL}/assets/lwx_ticket_bg_secret.png`,
         LOGO: `${STORAGE_URL}/assets/logos/supabase_logo_platinum.png`,
         // LOGO: `${STORAGE_URL}/assets/logos/supabase_lwx_logo_light.png`,
       },
@@ -121,7 +134,7 @@ export async function handler(req: Request) {
               height: '628px',
               position: 'relative',
               fontFamily: '"Circular"',
-              color: STYLING_CONGIF[platinum ? 'PLATINUM' : 'REG'].FOREGROUND,
+              color: STYLING_CONGIF[ticketType].FOREGROUND,
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
@@ -141,7 +154,7 @@ export async function handler(req: Request) {
                 right: '-1px',
                 zIndex: '0',
               }}
-              src={platinum ? BACKGROUND.PLATINUM.OG : BACKGROUND.REG.OG}
+              src={BACKGROUND[ticketType].OG}
             />
             {/* Ticket  */}
             <img
@@ -156,10 +169,10 @@ export async function handler(req: Request) {
                 zIndex: '1',
                 margin: 'auto',
                 borderRadius: '20px',
-                border: `1px solid ${STYLING_CONGIF[platinum ? 'PLATINUM' : 'REG'].BORDER}`,
+                border: `1px solid ${STYLING_CONGIF[ticketType].BORDER}`,
                 boxShadow: '0px 4px 45px rgba(0, 0, 0, 0.3)',
               }}
-              src={platinum ? BACKGROUND.PLATINUM.BG : BACKGROUND.REG.BG}
+              src={BACKGROUND[ticketType].BG}
             />
 
             {/* Name & username */}
@@ -182,7 +195,7 @@ export async function handler(req: Request) {
             >
               <p
                 style={{
-                  color: STYLING_CONGIF[platinum ? 'PLATINUM' : 'REG'].FOREGROUND,
+                  color: STYLING_CONGIF[ticketType].FOREGROUND,
                   margin: '0',
                   padding: '0',
                   fontSize: '36',
@@ -196,7 +209,7 @@ export async function handler(req: Request) {
 
               <div
                 style={{
-                  color: STYLING_CONGIF[platinum ? 'PLATINUM' : 'REG'].FOREGROUND_LIGHT,
+                  color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
                   opacity: 0.8,
                   display: 'flex',
                   fontSize: '32',
@@ -226,16 +239,12 @@ export async function handler(req: Request) {
               }}
             >
               <div style={{ display: 'flex', marginBottom: '10', marginLeft: '-10' }}>
-                <img
-                  src={platinum ? BACKGROUND['PLATINUM']['LOGO'] : BACKGROUND['REG']['LOGO']}
-                  width={65}
-                  height={65}
-                />
+                <img src={BACKGROUND[ticketType].LOGO} width={65} height={65} />
               </div>
               {/* Ticket No  */}
               <p
                 style={{
-                  color: STYLING_CONGIF[platinum ? 'PLATINUM' : 'REG'].FOREGROUND_LIGHT,
+                  color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
                   margin: '0',
                   marginBottom: '5',
                   display: 'flex',
@@ -289,17 +298,13 @@ export async function handler(req: Request) {
     // Upload image to storage.
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
-      .upload(
-        `lwx/og/${platinum ? 'platinum' : 'regular'}/${username}.png`,
-        generatedTicketImage.body!,
-        {
-          contentType: 'image/png',
-          // cacheControl: `${60 * 60 * 24 * 7}`,
-          cacheControl: `0`,
-          // Update cached og image, people might need to update info
-          upsert: true,
-        }
-      )
+      .upload(`lwx/og/${ticketType}/${username}.png`, generatedTicketImage.body!, {
+        contentType: 'image/png',
+        // cacheControl: `${60 * 60 * 24 * 7}`,
+        cacheControl: `0`,
+        // Update cached og image, people might need to update info
+        upsert: true,
+      })
 
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
 
@@ -319,9 +324,7 @@ export async function handler(req: Request) {
 
     const NEW_TIMESTAMP = new Date()
 
-    return await fetch(
-      `${STORAGE_URL}/og/${platinum ? 'platinum' : 'regular'}/${username}.png?t=${NEW_TIMESTAMP}`
-    )
+    return await fetch(`${STORAGE_URL}/og/${ticketType}/${username}.png?t=${NEW_TIMESTAMP}`)
   } catch (error) {
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

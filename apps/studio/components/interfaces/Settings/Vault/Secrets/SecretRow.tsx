@@ -20,38 +20,36 @@ import {
   Input,
 } from 'ui'
 
-import { useCheckPermissions, useStore } from 'hooks'
-import { VaultSecret } from 'types'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
+import { useCheckPermissions } from 'hooks'
+import type { VaultSecret } from 'types'
 
 interface SecretRowProps {
   secret: VaultSecret
-  onSelectEdit: (secret: any) => void
-  onSelectRemove: (secret: any) => void
+  onSelectEdit: (secret: VaultSecret) => void
+  onSelectRemove: (secret: VaultSecret) => void
 }
 
 const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => {
-  const { vault } = useStore()
   const { ref } = useParams()
+  const { project } = useProjectContext()
 
-  const [isLoading, setIsLoading] = useState(false)
-  const [revealedValue, setRevealedValue] = useState<string>()
+  const [revealSecret, setRevealSecret] = useState(false)
   const name = secret?.name ?? 'No name provided'
 
   const canManageSecrets = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
-  const revealSecret = async () => {
-    setIsLoading(true)
-    if (revealedValue === undefined) {
-      setRevealedValue(
-        secret.decryptedSecret !== undefined
-          ? secret.decryptedSecret
-          : await vault.fetchSecretValue(secret.id)
-      )
-    } else {
-      setRevealedValue(undefined)
+  const { data: revealedValue, isFetching } = useVaultSecretDecryptedValueQuery(
+    {
+      projectRef: ref!,
+      connectionString: project?.connectionString,
+      id: secret.id,
+    },
+    {
+      enabled: !!(ref! && secret.id) && revealSecret,
     }
-    setIsLoading(false)
-  }
+  )
 
   return (
     <div className="px-6 py-4 flex items-center space-x-4">
@@ -86,21 +84,21 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           type="text"
           className="px-1.5"
           icon={
-            isLoading ? (
+            isFetching && revealedValue === undefined ? (
               <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
-            ) : revealedValue === undefined ? (
+            ) : !revealSecret ? (
               <IconEye size={16} strokeWidth={1.5} />
             ) : (
               <IconEyeOff size={16} strokeWidth={1.5} />
             )
           }
-          onClick={() => revealSecret()}
+          onClick={() => setRevealSecret(!revealSecret)}
         />
         <div className="flex-grow">
-          {revealedValue === undefined ? (
-            <p className="text-sm font-mono">••••••••••••••••••</p>
-          ) : (
+          {revealSecret && revealedValue ? (
             <Input copy size="small" className="font-mono" value={revealedValue} />
+          ) : (
+            <p className="text-sm font-mono">••••••••••••••••••</p>
           )}
         </div>
       </div>
@@ -110,9 +108,9 @@ const SecretRow = ({ secret, onSelectEdit, onSelectRemove }: SecretRowProps) => 
           {dayjs(secret.updated_at).format('MMM D, YYYY')}
         </p>
         <DropdownMenu>
-          <DropdownMenuTrigger>
-            <Button asChild type="text" className="px-1" icon={<IconMoreVertical />}>
-              <span></span>
+          <DropdownMenuTrigger asChild>
+            <Button type="text" className="px-1">
+              <IconMoreVertical />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom">

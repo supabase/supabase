@@ -1,0 +1,56 @@
+---
+id: 'using-custom-schemas'
+title: 'Using Custom Schemas'
+description: 'You need additional steps to use custom database schemas with data APIs.'
+---
+
+By default, your database has a `public` schema which is automatically exposed on data APIs. You can also expose custom database schemas - to do so you need to follow these steps:
+
+1. Go to [API settings](https://supabase.com/dashboard/project/_/settings/api) and add your custom schema to "Exposed schemas".
+2. Run the following SQL, substituting `myschema` with your schema name:
+
+```sql
+GRANT USAGE ON SCHEMA myschema TO anon, authenticated, service_role;
+GRANT ALL ON ALL TABLES IN SCHEMA myschema TO anon, authenticated, service_role;
+GRANT ALL ON ALL ROUTINES IN SCHEMA myschema TO anon, authenticated, service_role;
+GRANT ALL ON ALL SEQUENCES IN SCHEMA myschema TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA myschema GRANT ALL ON TABLES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA myschema GRANT ALL ON ROUTINES TO anon, authenticated, service_role;
+ALTER DEFAULT PRIVILEGES FOR ROLE postgres IN SCHEMA myschema GRANT ALL ON SEQUENCES TO anon, authenticated, service_role;
+```
+
+Now you can access these schemas from data APIs:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
+
+```js
+// Initialize the JS client
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, { db: { schema: 'myschema' } })
+
+// Make a request
+const { data: todos, error } = await supabase.from('todos').select('*')
+```
+
+</TabPanel>
+<TabPanel id="curl" label="cURL">
+
+```bash
+# Append /rest/v1/ to your URL, and then use the table name as the route.
+# Use Accept-Profile header for GET and HEAD.
+# Use Content-Profile header for POST, PATCH, PUT and DELETE.
+curl '<SUPABASE_URL>/rest/v1/todos' \
+  -H "apikey: <SUPABASE_ANON_KEY>" \
+  -H "Authorization: Bearer <SUPABASE_ANON_KEY>" \
+  -H "Accept-Profile: myschema"
+```
+
+</TabPanel>
+</Tabs>

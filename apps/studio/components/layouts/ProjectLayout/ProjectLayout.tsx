@@ -1,15 +1,20 @@
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import { Fragment, PropsWithChildren, ReactNode, useEffect } from 'react'
+
+import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
+import AISettingsModal from 'components/ui/AISettingsModal'
+import { Loading } from 'components/ui/Loading'
 import ResourceExhaustionWarningBanner from 'components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner'
 import { useFlag, useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { Fragment, PropsWithChildren, ReactNode } from 'react'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import AppLayout from '../AppLayout/AppLayout'
 import EnableBranchingModal from '../AppLayout/EnableBranchingButton/EnableBranchingModal'
 import BuildingState from './BuildingState'
 import ConnectingState from './ConnectingState'
-import LayoutHeader from './LayoutHeader'
+import { LayoutHeader } from './LayoutHeader'
 import LoadingState from './LoadingState'
 import NavigationBar from './NavigationBar/NavigationBar'
 import PausingState from './PausingState'
@@ -17,9 +22,8 @@ import ProductMenuBar from './ProductMenuBar'
 import { ProjectContextProvider } from './ProjectContext'
 import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
-import UpgradingState from './UpgradingState'
-import Connecting from 'components/ui/Loading/Loading'
-import ProjectAPIDocs from 'components/interfaces/ProjectAPIDocs/ProjectAPIDocs'
+import { UpgradingState } from './UpgradingState'
+import { ResizableHandle, ResizablePanelGroup, ResizablePanel, cn } from 'ui'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul
@@ -28,11 +32,13 @@ const routesToIgnoreProjectDetailsRequest = [
   '/project/[ref]/settings/database',
   '/project/[ref]/settings/storage',
   '/project/[ref]/settings/infrastructure',
+  '/project/[ref]/settings/addons',
 ]
 
 const routesToIgnoreDBConnection = [
   '/project/[ref]/branches',
   '/project/[ref]/database/backups/scheduled',
+  '/project/[ref]/settings/addons',
 ]
 
 const routesToIgnorePostgrestConnection = [
@@ -40,27 +46,32 @@ const routesToIgnorePostgrestConnection = [
   '/project/[ref]/settings/general',
   '/project/[ref]/settings/database',
   '/project/[ref]/settings/infrastructure',
+  '/project/[ref]/settings/addons',
 ]
 
 export interface ProjectLayoutProps {
   title?: string
   isLoading?: boolean
+  isBlocking?: boolean
   product?: string
   productMenu?: ReactNode
   hideHeader?: boolean
   hideIconBar?: boolean
   selectedTable?: string
+  resizableSidebar?: boolean
 }
 
 const ProjectLayout = ({
   title,
   isLoading = false,
+  isBlocking = true,
   product = '',
   productMenu,
   children,
   hideHeader = false,
   hideIconBar = false,
   selectedTable,
+  resizableSidebar = false,
 }: PropsWithChildren<ProjectLayoutProps>) => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
@@ -84,12 +95,12 @@ const ProjectLayout = ({
             {title
               ? `${title} | Supabase`
               : selectedTable
-              ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
-              : projectName
-              ? `${projectName} | ${organizationName} | Supabase`
-              : organizationName
-              ? `${organizationName} | Supabase`
-              : 'Supabase'}
+                ? `${selectedTable} | ${projectName} | ${organizationName} | Supabase`
+                : projectName
+                  ? `${projectName} | ${organizationName} | Supabase`
+                  : organizationName
+                    ? `${organizationName} | Supabase`
+                    : 'Supabase'}
           </title>
           <meta name="description" content="Supabase Studio" />
         </Head>
@@ -97,29 +108,50 @@ const ProjectLayout = ({
           {/* Left-most navigation side bar to access products */}
           {!hideIconBar && <NavigationBar />}
           {/* Product menu bar */}
-          {!showPausedState && (
-            <MenuBarWrapper isLoading={isLoading} productMenu={productMenu}>
-              <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-            </MenuBarWrapper>
-          )}
-          <main className="flex flex-col flex-1 w-full overflow-x-hidden">
-            {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
-            {showPausedState ? (
-              <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
-                <div className="w-full">
-                  <ProjectPausedState product={product} />
-                </div>
-              </div>
-            ) : (
-              <ContentWrapper isLoading={isLoading}>
-                <ResourceExhaustionWarningBanner />
-                {children}
-              </ContentWrapper>
+          <ResizablePanelGroup
+            className="flex h-full"
+            direction="horizontal"
+            autoSaveId="project-layout"
+          >
+            {!showPausedState && productMenu && (
+              <>
+                <ResizablePanel
+                  className={cn(resizableSidebar ? 'min-w-64 max-w-[32rem]' : 'min-w-64 max-w-64')}
+                  defaultSize={1} // forces panel to smallest width possible, at w-64
+                >
+                  <MenuBarWrapper
+                    isLoading={isLoading}
+                    isBlocking={isBlocking}
+                    productMenu={productMenu}
+                  >
+                    <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
+                  </MenuBarWrapper>
+                </ResizablePanel>
+                <ResizableHandle withHandle disabled={resizableSidebar ? false : true} />
+              </>
             )}
-          </main>
+            <ResizablePanel className="h-full">
+              <main className="h-full flex flex-col flex-1 w-full overflow-x-hidden">
+                {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
+                {showPausedState ? (
+                  <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
+                    <div className="w-full">
+                      <ProjectPausedState product={product} />
+                    </div>
+                  </div>
+                ) : (
+                  <ContentWrapper isLoading={isLoading} isBlocking={isBlocking}>
+                    <ResourceExhaustionWarningBanner />
+                    {children}
+                  </ContentWrapper>
+                )}
+              </main>
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </div>
 
         <EnableBranchingModal />
+        <AISettingsModal />
         <ProjectAPIDocs />
       </ProjectContextProvider>
     </AppLayout>
@@ -132,23 +164,34 @@ export default ProjectLayout
 
 interface MenuBarWrapperProps {
   isLoading: boolean
+  isBlocking?: boolean
   productMenu?: ReactNode
   children: ReactNode
 }
 
-const MenuBarWrapper = ({ isLoading, productMenu, children }: MenuBarWrapperProps) => {
+const MenuBarWrapper = ({
+  isLoading,
+  isBlocking = true,
+  productMenu,
+  children,
+}: MenuBarWrapperProps) => {
   const router = useRouter()
   const selectedProject = useSelectedProject()
   const requiresProjectDetails = !routesToIgnoreProjectDetailsRequest.includes(router.pathname)
 
+  if (!isBlocking) {
+    return children
+  }
+
   const showMenuBar =
     !requiresProjectDetails || (requiresProjectDetails && selectedProject !== undefined)
 
-  return <>{!isLoading && productMenu && showMenuBar ? children : null}</>
+  return !isLoading && productMenu && showMenuBar ? children : null
 }
 
 interface ContentWrapperProps {
   isLoading: boolean
+  isBlocking?: boolean
   children: ReactNode
 }
 
@@ -164,8 +207,10 @@ interface ContentWrapperProps {
  *
  * [TODO] Next iteration should scrape long polling and just listen to the project's status
  */
-const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
+const ContentWrapper = ({ isLoading, isBlocking = true, children }: ContentWrapperProps) => {
   const router = useRouter()
+  const { ref } = useParams()
+  const state = useDatabaseSelectorStateSnapshot()
   const selectedProject = useSelectedProject()
 
   const isSettingsPages = router.pathname.includes('/project/[ref]/settings')
@@ -186,91 +231,33 @@ const ContentWrapper = ({ isLoading, children }: ContentWrapperProps) => {
     selectedProject?.status === PROJECT_STATUS.PAUSING
   const isProjectOffline = selectedProject?.postgrestStatus === 'OFFLINE'
 
-  return (
-    <>
-      {isLoading || (requiresProjectDetails && selectedProject === undefined) ? (
-        router.pathname.endsWith('[ref]') ? (
-          <LoadingState />
-        ) : (
-          <Connecting />
-        )
-      ) : isProjectUpgrading ? (
-        <UpgradingState />
-      ) : isProjectPausing ? (
-        <PausingState project={selectedProject} />
-      ) : requiresPostgrestConnection && isProjectOffline ? (
-        <ConnectingState project={selectedProject} />
-      ) : requiresDbConnection && isProjectRestoring ? (
-        <RestoringState />
-      ) : requiresDbConnection && isProjectBuilding ? (
-        <BuildingState />
-      ) : (
-        <Fragment key={selectedProject?.ref}>{children}</Fragment>
-      )}
-    </>
-  )
-}
+  useEffect(() => {
+    if (ref) state.setSelectedDatabaseId(ref)
+  }, [ref])
 
-/**
- * Shows the children irregardless of whether the selected project has loaded or not
- * We'll eventually want to use this instead of the current ProjectLayout to prevent
- * a catch-all spinner on the dashboard
- */
-export const ProjectLayoutNonBlocking = ({
-  title,
-  product = '',
-  productMenu,
-  children,
-  hideHeader = false,
-  hideIconBar = false,
-}: PropsWithChildren<ProjectLayoutProps>) => {
-  const selectedProject = useSelectedProject()
-  const router = useRouter()
-  const { ref: projectRef } = useParams()
-  const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
-  const ignorePausedState =
-    router.pathname === '/project/[ref]' || router.pathname.includes('/project/[ref]/settings')
-  const showPausedState = isPaused && !ignorePausedState
+  if (isBlocking && (isLoading || (requiresProjectDetails && selectedProject === undefined))) {
+    return router.pathname.endsWith('[ref]') ? <LoadingState /> : <Loading />
+  }
 
-  const navLayoutV2 = useFlag('navigationLayoutV2')
+  if (isProjectUpgrading) {
+    return <UpgradingState />
+  }
 
-  return (
-    <AppLayout>
-      <ProjectContextProvider projectRef={projectRef}>
-        <Head>
-          <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
-          <meta name="description" content="Supabase Studio" />
-          <link rel="icon" href="/favicon.ico" />
-        </Head>
-        <div className="flex h-full">
-          {/* Left-most navigation side bar to access products */}
-          {!hideIconBar && <NavigationBar />}
+  if (isProjectPausing) {
+    return <PausingState project={selectedProject} />
+  }
 
-          {/* Product menu bar */}
-          {productMenu && !showPausedState && (
-            <ProductMenuBar title={product}>{productMenu}</ProductMenuBar>
-          )}
+  if (requiresPostgrestConnection && isProjectOffline) {
+    return <ConnectingState project={selectedProject} />
+  }
 
-          <main className="flex w-full flex-1 flex-col overflow-x-hidden">
-            {!navLayoutV2 && !hideHeader && IS_PLATFORM && <LayoutHeader />}
-            {showPausedState ? (
-              <div className="mx-auto my-16 w-full h-full max-w-7xl flex items-center">
-                <div className="w-full">
-                  <ProjectPausedState product={product} />
-                </div>
-              </div>
-            ) : (
-              <>
-                <ResourceExhaustionWarningBanner />
-                {children}
-              </>
-            )}
-          </main>
-        </div>
+  if (requiresDbConnection && isProjectRestoring) {
+    return <RestoringState />
+  }
 
-        <EnableBranchingModal />
-        <ProjectAPIDocs />
-      </ProjectContextProvider>
-    </AppLayout>
-  )
+  if (requiresDbConnection && isProjectBuilding) {
+    return <BuildingState />
+  }
+
+  return <Fragment key={selectedProject?.ref}>{children}</Fragment>
 }

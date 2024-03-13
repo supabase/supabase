@@ -1,7 +1,8 @@
-import LoginForm from '@/components/Auth/LoginForm'
+// import LoginForm from '@/components/Auth/LoginForm'
 import type { Metadata } from 'next'
 import { LoginDialog } from './LoginDialog'
 import NewThreadInput from './NewThreadInput'
+import LoginForm from '@/components/Auth/LoginForm'
 
 export const metadata: Metadata = {
   title: 'database.design | Create',

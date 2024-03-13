@@ -1,28 +1,28 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, IconPauseCircle, Modal } from 'ui'
+import toast from 'react-hot-toast'
 
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
+import { useParams } from 'common'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useProjectRestoreMutation } from 'data/projects/project-restore-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
-import { PROJECT_STATUS } from 'lib/constants'
-import { useProjectContext } from './ProjectContext'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { PROJECT_STATUS } from 'lib/constants'
+import { Button, IconPauseCircle, Modal } from 'ui'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import { useProjectContext } from './ProjectContext'
 
 export interface ProjectPausedStateProps {
   product?: string
 }
 
 const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
-  const queryClient = useQueryClient()
-  const { ui } = useStore()
   const { ref } = useParams()
+  const queryClient = useQueryClient()
   const selectedOrganization = useSelectedOrganization()
   const { project } = useProjectContext()
   const orgSlug = selectedOrganization?.slug
@@ -30,7 +30,10 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   const isFreePlan = subscription?.plan?.id === 'free'
 
-  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug: orgSlug })
+  const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery(
+    { slug: orgSlug },
+    { enabled: isFreePlan }
+  )
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
 
   const [showConfirmRestore, setShowConfirmRestore] = useState(false)
@@ -39,7 +42,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   const { mutate: restoreProject } = useProjectRestoreMutation({
     onSuccess: (res, variables) => {
       setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.RESTORING)
-      ui.setNotification({ category: 'success', message: 'Restoring project' })
+      toast.success('Restoring project')
     },
   })
 
@@ -50,21 +53,14 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
   const onSelectRestore = () => {
     if (!canResumeProject) {
-      ui.setNotification({
-        category: 'error',
-        message: 'You do not have the required permissions to restore this project',
-      })
+      toast.error('You do not have the required permissions to restore this project')
     } else if (hasMembersExceedingFreeTierLimit) setShowFreeProjectLimitWarning(true)
     else setShowConfirmRestore(true)
   }
 
   const onConfirmRestore = () => {
     if (!project) {
-      return ui.setNotification({
-        error: 'Project is required',
-        category: 'error',
-        message: 'Unable to restore: project is required',
-      })
+      return toast.error('Unable to restore: project is required')
     }
     restoreProject({ ref: project.ref })
   }
@@ -119,7 +115,7 @@ const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
 
               <div className="flex items-center justify-center gap-4">
                 <Tooltip.Root delayDuration={0}>
-                  <Tooltip.Trigger>
+                  <Tooltip.Trigger asChild>
                     <Button
                       size="tiny"
                       type="primary"

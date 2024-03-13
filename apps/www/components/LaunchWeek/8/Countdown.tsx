@@ -1,6 +1,6 @@
 import React from 'react'
 import Countdown from 'react-countdown'
-import { CountdownWidget } from 'ui'
+import { CountdownWidget } from 'ui-patterns/CountdownWidget'
 
 const CountdownComponent = ({
   date,

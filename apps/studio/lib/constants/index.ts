@@ -1,5 +1,4 @@
 export * from './infrastructure'
-export * from './metrics'
 
 export const IS_PLATFORM = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'
 export const DEFAULT_HOME = IS_PLATFORM ? '/projects' : '/project/default'
@@ -18,72 +17,6 @@ export const DATE_FORMAT = 'YYYY-MM-DDTHH:mm:ssZ'
 // should be used for all dayjs formattings shown to the user. Includes timezone info.
 export const DATETIME_FORMAT = 'DD MMM YYYY, HH:mm:ss (ZZ)'
 
-// Keyboard Shortcuts Related
-export const SHORTCUT_KEYS = {
-  VIEW_ALL_SHORTCUTS: 'VIEW_ALL_SHORTCUTS',
-  TOGGLE_FILTER_MENU: 'TOGGLE_FILTER_MENU',
-  TOGGLE_SORT_MENU: 'TOGGLE_SORT_MENU',
-  CLOSE_SIDE_PANEL: 'CLOSE_SIDE_PANEL',
-  EDIT_CELL: 'EDIT_CELL',
-  COPY_CELL: 'COPY_CELL',
-  PASTE_CELL: 'PASTE_CELL',
-  CREATE_ROW: 'CREATE_ROW',
-  EDIT_ROW: 'EDIT_ROW',
-  DELETE_ROW: 'DELETE_ROW',
-  SCROLL_EDGES: 'SCROLL_EDGES',
-}
-
-export const GENERAL_SHORTCUTS = [
-  {
-    key: SHORTCUT_KEYS.VIEW_ALL_SHORTCUTS,
-    name: 'View all shortcuts',
-    keys: ['Shift+/'],
-  },
-  {
-    key: SHORTCUT_KEYS.CLOSE_SIDE_PANEL,
-    name: 'Close side panel',
-    keys: ['Esc'],
-  },
-]
-
-export const generateEditorShortcuts = (clientOS: string) => {
-  const metaKey = clientOS === 'windows' ? 'Ctrl' : '⌘'
-  return [
-    {
-      key: SHORTCUT_KEYS.EDIT_CELL,
-      name: 'Edit current cell',
-      keys: ['Enter'],
-    },
-    {
-      key: SHORTCUT_KEYS.COPY_CELL,
-      name: 'Copy value of current cell',
-      keys: [`${metaKey}+C`],
-    },
-    {
-      key: SHORTCUT_KEYS.PASTE_CELL,
-      name: 'Paste value into current cell',
-      keys: [`${metaKey}+V`],
-    },
-    {
-      key: SHORTCUT_KEYS.CREATE_ROW,
-      name: 'Create a new row',
-      keys: ['Shift+Enter'],
-    },
-    {
-      key: SHORTCUT_KEYS.SCROLL_EDGES,
-      name: 'Scroll to edges of the table',
-      keys: [`${metaKey}+↑`, `${metaKey}+→`, `${metaKey}+↓`, `${metaKey}+←`],
-    },
-  ]
-}
-
-export const POLICY_MODAL_VIEWS = {
-  SELECTION: 'SELECTION',
-  TEMPLATES: 'TEMPLATES',
-  EDITOR: 'EDITOR',
-  REVIEW: 'REVIEW',
-}
-
 export const GOTRUE_ERRORS = {
   UNVERIFIED_GITHUB_USER: 'Error sending confirmation mail',
 }
@@ -96,14 +29,29 @@ export const USAGE_APPROACHING_THRESHOLD = 0.75
 export const LOCAL_STORAGE_KEYS = {
   RECENTLY_VISITED_ORGANIZATION: 'supabase-organization',
   TELEMETRY_CONSENT: 'supabase-consent',
+
   UI_PREVIEW_NAVIGATION_LAYOUT: 'supabase-ui-preview-nav-layout',
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
+  UI_PREVIEW_RLS_AI_ASSISTANT: 'supabase-ui-rls-ai-assistant',
+  UI_PREVIEW_CLS: 'supabase-ui-cls',
+  UI_PREVIEW_SQL_EDITOR_AI_ASSISTANT: 'supabase-ui-sql-editor-ai-assistant',
+
   DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
+
+  SQL_EDITOR_INTELLISENSE: 'supabase_sql-editor-intellisense-enabled',
+  SQL_EDITOR_SPLIT_SIZE: 'supabase_sql-editor-split-size',
+  SQL_EDITOR_AI_SCHEMA: 'supabase_sql-editor-ai-schema-enabled',
+  LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
+  GRAPHIQL_RLS_BYPASS_WARNING: 'graphiql-rls-bypass-warning-dismissed',
+  CLS_DIFF_WARNING: 'cls-diff-warning-dismissed',
+  CLS_SELECT_STAR_WARNING: 'cls-select-star-warning-dismissed',
+  PGBOUNCER_IPV6_DEPRECATION_WARNING: 'pgbouncer-ipv6-deprecation-warning-dismissed',
+  VERCEL_IPV6_DEPRECATION_WARNING: 'vercel-ipv6-deprecation-warning-dismissed',
+  PGBOUNCER_DEPRECATION_WARNING: 'pgbouncer-deprecation-warning-dismissed',
 }
 
 export const OPT_IN_TAGS = {
   AI_SQL: 'AI_SQL_GENERATOR_OPT_IN',
-  PREVIEW_BRANCHES: 'PREVIEW_BRANCHES_OPT_IN',
 }
 
 export const GB = 1024 * 1024 * 1024

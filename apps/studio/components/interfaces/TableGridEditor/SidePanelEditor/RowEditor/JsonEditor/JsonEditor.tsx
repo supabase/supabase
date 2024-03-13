@@ -1,12 +1,13 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { useEffect, useState } from 'react'
-import { SidePanel } from 'ui'
+import { Button, IconAlignLeft, SidePanel } from 'ui'
 
 import TwoOptionToggle from 'components/ui/TwoOptionToggle'
-import { useStore } from 'hooks'
-import { minifyJSON, prettifyJSON, tryParseJson } from 'lib/helpers'
+import { minifyJSON, prettifyJSON, tryParseJson, removeJSONTrailingComma } from 'lib/helpers'
+import toast from 'react-hot-toast'
 import ActionBar from '../../ActionBar'
-import DrilldownViewer from './DrilldownViewer'
-import JsonEditor from './JsonCodeEditor'
+import { DrilldownViewer } from './DrilldownViewer'
+import JsonCodeEditor from './JsonCodeEditor'
 
 interface JsonEditProps {
   column: string
@@ -16,7 +17,7 @@ interface JsonEditProps {
   applyButtonLabel?: string
   readOnly?: boolean
   closePanel: () => void
-  onSaveJSON: (value: string | number | null) => void
+  onSaveJSON: (value: string | number | null, resolve: () => void) => void
 }
 
 const JsonEdit = ({
@@ -29,7 +30,6 @@ const JsonEdit = ({
   closePanel,
   onSaveJSON,
 }: JsonEditProps) => {
-  const { ui } = useStore()
   const [view, setView] = useState<'edit' | 'view'>('edit')
   const [jsonStr, setJsonStr] = useState('')
 
@@ -42,24 +42,18 @@ const JsonEdit = ({
 
   const validateJSON = async (resolve: () => void) => {
     try {
-      const minifiedJSON = minifyJSON(jsonStr)
-      if (onSaveJSON) onSaveJSON(minifiedJSON)
+      const newJsonStr = removeJSONTrailingComma(jsonStr)
+      const minifiedJSON = minifyJSON(newJsonStr)
+      if (onSaveJSON) onSaveJSON(minifiedJSON, resolve)
     } catch (error: any) {
-      const message = error.message
-        ? `Error: ${error.message}`
-        : 'JSON seems to have an invalid structure.'
-      ui.setNotification({ category: 'error', message, duration: 4000 })
-    } finally {
       resolve()
+      toast.error('JSON seems to have an invalid structure.')
     }
   }
 
-  function onInputChange(value: string | undefined) {
-    setJsonStr(value ?? '')
-  }
-
-  function onToggleClick(option: 'edit' | 'view') {
-    setView(option)
+  function prettify() {
+    const res = prettifyJSON(jsonStr)
+    setJsonStr(res)
   }
 
   return (
@@ -76,12 +70,39 @@ const JsonEdit = ({
               Viewing JSON Field: <code>{column}</code>
             </p>
           )}
-          <TwoOptionToggle
-            options={['view', 'edit']}
-            activeOption={view}
-            borderOverride="border-gray-500"
-            onClickOption={onToggleClick}
-          />
+          <div className="flex items-center gap-x-2">
+            {view === 'edit' && (
+              <Tooltip.Root delayDuration={0}>
+                <Tooltip.Trigger asChild>
+                  <Button
+                    type="default"
+                    icon={<IconAlignLeft />}
+                    className="px-1"
+                    onClick={() => prettify()}
+                  />
+                </Tooltip.Trigger>
+                <Tooltip.Portal>
+                  <Tooltip.Content side="bottom">
+                    <Tooltip.Arrow className="radix-tooltip-arrow" />
+                    <div
+                      className={[
+                        'rounded bg-alternative py-1 px-2 leading-none shadow',
+                        'border border-background',
+                      ].join(' ')}
+                    >
+                      <span className="text-xs text-foreground">Prettify JSON</span>
+                    </div>
+                  </Tooltip.Content>
+                </Tooltip.Portal>
+              </Tooltip.Root>
+            )}
+            <TwoOptionToggle
+              options={['view', 'edit']}
+              activeOption={view}
+              borderOverride="border-gray-500"
+              onClickOption={setView}
+            />
+          </div>
         </div>
       }
       visible={visible}
@@ -96,23 +117,19 @@ const JsonEdit = ({
         />
       }
     >
-      <div className="py-4">
-        <SidePanel.Content>
-          <div className="mt-4 flex flex-auto flex-col space-y-4">
-            {view === 'edit' ? (
-              <div className="h-[500px] w-full flex-grow border border-default">
-                <JsonEditor
-                  key={jsonString}
-                  readOnly={readOnly}
-                  onInputChange={onInputChange}
-                  value={jsonStr.toString()}
-                />
-              </div>
-            ) : (
-              <DrilldownViewer jsonData={tryParseJson(jsonStr)} />
-            )}
+      <div className="flex flex-auto h-full flex-col space-y-4">
+        {view === 'edit' ? (
+          <div className="w-full h-full flex-grow">
+            <JsonCodeEditor
+              key={jsonString}
+              readOnly={readOnly}
+              onInputChange={(val) => setJsonStr(val ?? '')}
+              value={jsonStr.toString()}
+            />
           </div>
-        </SidePanel.Content>
+        ) : (
+          <DrilldownViewer jsonData={tryParseJson(jsonStr)} />
+        )}
       </div>
     </SidePanel>
   )

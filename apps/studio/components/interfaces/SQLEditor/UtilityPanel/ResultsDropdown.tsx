@@ -1,12 +1,15 @@
-import { useTelemetryProps } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useStore } from 'hooks'
-import { copyToClipboard } from 'lib/helpers'
-import Telemetry from 'lib/telemetry'
 import { compact, isObject, isString, map } from 'lodash'
+// @ts-ignore
+import MarkdownTable from 'markdown-table'
 import { useRouter } from 'next/router'
 import { useMemo, useRef } from 'react'
 import { CSVLink } from 'react-csv'
+import toast from 'react-hot-toast'
+
+import { useTelemetryProps } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { copyToClipboard } from 'lib/helpers'
+import Telemetry from 'lib/telemetry'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import {
   Button,
@@ -18,20 +21,16 @@ import {
   IconClipboard,
   IconDownload,
 } from 'ui'
-// @ts-ignore
-import MarkdownTable from 'markdown-table'
 
 export type ResultsDropdownProps = {
   id: string
-  isExecuting?: boolean
 }
 
-const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
+const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
   const { project } = useProjectContext()
   const snap = useSqlEditorStateSnapshot()
   const telemetryProps = useTelemetryProps()
   const result = snap.results?.[id]?.[0] ?? undefined
-  const { ui } = useStore()
   const csvRef = useRef<CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement }>(null)
   const router = useRouter()
 
@@ -94,7 +93,7 @@ const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
       const markdownData = MarkdownTable(table)
 
       copyToClipboard(markdownData, () => {
-        ui.setNotification({ category: 'success', message: 'Copied results to clipboard' })
+        toast.success('Copied results to clipboard')
         Telemetry.sendEvent(
           { category: 'sql_editor', action: 'sql_copy_as_markdown', label: '' },
           telemetryProps,
@@ -104,26 +103,39 @@ const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
     }
   }
 
+  function onCopyAsJSON() {
+    if (navigator) {
+      if (!result || !result.rows) return 'results is empty'
+      if (result.rows.constructor !== Array && !!result.error) return result.error
+      if (result.rows.length == 0) return 'results is empty'
+
+      copyToClipboard(JSON.stringify(result.rows, null, 2), () => {
+        toast.success('Copied results to clipboard')
+        Telemetry.sendEvent(
+          { category: 'sql_editor', action: 'sql_copy_as_json', label: '' },
+          telemetryProps,
+          router
+        )
+      })
+    }
+  }
+
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger>
-        <Button asChild type="text" iconRight={<IconChevronDown />}>
-          <span>
-            Results
-            {!isExecuting &&
-              result &&
-              result.rows.length > 0 &&
-              ` (${result.rows.length.toLocaleString()})`}
-          </span>
+      <DropdownMenuTrigger asChild>
+        <Button type="text" iconRight={<IconChevronDown />}>
+          Export
         </Button>
-        <CSVLink
-          ref={csvRef}
-          className="hidden"
-          headers={headers}
-          data={csvData}
-          filename={`supabase_${project?.ref}_${snap.snippets[id]?.snippet.name}`}
-        />
       </DropdownMenuTrigger>
+
+      <CSVLink
+        ref={csvRef}
+        className="hidden"
+        headers={headers}
+        data={csvData}
+        filename={`supabase_${project?.ref}_${snap.snippets[id]?.snippet.name}.csv`}
+      />
+
       <DropdownMenuContent side="bottom" align="start">
         <>
           <DropdownMenuItem onClick={onDownloadCSV} className="space-x-2">
@@ -133,6 +145,10 @@ const ResultsDropdown = ({ id, isExecuting }: ResultsDropdownProps) => {
           <DropdownMenuItem onClick={onCopyAsMarkdown} className="space-x-2">
             <IconClipboard size="tiny" />
             <p>Copy as markdown</p>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={onCopyAsJSON} className="space-x-2">
+            <IconClipboard size="tiny" />
+            <p>Copy as JSON</p>
           </DropdownMenuItem>
         </>
       </DropdownMenuContent>

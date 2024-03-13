@@ -4,7 +4,7 @@ import { toast } from 'react-hot-toast'
 import { Query, SupaTable } from 'components/grid'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type TableRowTruncateVariables = {
   projectRef: string
@@ -25,7 +25,11 @@ export async function truncateTableRow({
 }: TableRowTruncateVariables) {
   const sql = getTableRowTruncateSql({ table })
 
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+  })
 
   return result
 }

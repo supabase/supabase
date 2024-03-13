@@ -2,13 +2,13 @@ const config = require('config/tailwind.config')
 
 module.exports = config({
   content: [
-    '../../packages/ui/src/**/*.{tsx,ts,js}',
-    './pages/**/*.{tsx,mdx}',
-    './lib/mdx/mdxComponents.tsx',
+    './_blog/*.mdx',
     './components/**/*.tsx',
     './layouts/**/*.tsx',
-    './src/**/*.{ts,tsx,mdx}',
-    './_blog/*.mdx',
+    './lib/mdx/mdxComponents.tsx',
+    './pages/**/*.{tsx,mdx}',
+    './../../packages/ui/src/**/*.{tsx,ts,js}',
+    './../../packages/ui-patterns/**/*.{tsx,ts,js}',
   ],
   theme: {
     extend: {

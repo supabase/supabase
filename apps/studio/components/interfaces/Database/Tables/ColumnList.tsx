@@ -2,7 +2,6 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import {
   Button,
@@ -84,7 +83,7 @@ const ColumnList = ({
         {!isLocked && (
           <div>
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+              <Tooltip.Trigger asChild>
                 <Button
                   disabled={!canUpdateColumns}
                   icon={<IconPlus />}
@@ -167,14 +166,9 @@ const ColumnList = ({
                     <Table.td className="text-right">
                       {!isLocked && (
                         <DropdownMenu>
-                          <DropdownMenuTrigger>
-                            <Button
-                              asChild
-                              type="default"
-                              icon={<IconMoreVertical />}
-                              className="px-1"
-                            >
-                              <span />
+                          <DropdownMenuTrigger asChild>
+                            <Button type="default" className="px-1">
+                              <IconMoreVertical />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent side="bottom" align="end" className="w-32">
@@ -250,4 +244,4 @@ const ColumnList = ({
   )
 }
 
-export default observer(ColumnList)
+export default ColumnList

@@ -1,10 +1,18 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { observer } from 'mobx-react-lite'
+import { sortBy } from 'lodash'
 import Link from 'next/link'
 import { Fragment, useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+
+import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import Divider from 'components/ui/Divider'
+import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
+import { usePgSodiumKeyDeleteMutation } from 'data/pg-sodium-keys/pg-sodium-key-delete-mutation'
+import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
+import { useCheckPermissions } from 'hooks'
 import {
   Alert,
   Button,
@@ -20,14 +28,11 @@ import {
   Modal,
 } from 'ui'
 
-import Divider from 'components/ui/Divider'
-import { useCheckPermissions, useStore } from 'hooks'
-
 const DEFAULT_KEY_NAME = 'No description provided'
 
 const EncryptionKeysManagement = () => {
-  const { vault, ui } = useStore()
   const { id } = useParams()
+  const { project } = useProjectContext()
 
   const [searchValue, setSearchValue] = useState<string>('')
   const [selectedSort, setSelectedSort] = useState<'name' | 'created'>('created')
@@ -41,52 +46,64 @@ const EncryptionKeysManagement = () => {
     if (id !== undefined) setSearchValue(id)
   }, [id])
 
-  const keys = (
+  const { data, isLoading } = usePgSodiumKeysQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  const { mutateAsync: addKeyMutation } = usePgSodiumKeyCreateMutation()
+  const { mutateAsync: deleteKeyMutation } = usePgSodiumKeyDeleteMutation()
+
+  const allKeys = data || []
+  const keys = sortBy(
     searchValue
-      ? vault.listKeys(
-          (key: any) =>
+      ? allKeys.filter(
+          (key) =>
             (key?.name ?? '').toLowerCase().includes(searchValue.toLowerCase()) ||
             key.id.toLowerCase().includes(searchValue.toLowerCase())
         )
-      : vault.listKeys()
-  ).sort((a: any, b: any) => {
-    if (selectedSort === 'created') {
-      return Number(new Date(a.created)) - Number(new Date(b.created))
-    } else {
-      return a[selectedSort] > b[selectedSort] ? 1 : -1
+      : allKeys,
+    (k) => {
+      if (selectedSort === 'created') {
+        return Number(new Date(k.created))
+      } else {
+        return k[selectedSort]
+      }
     }
-  })
+  )
 
   const addKey = async (values: any, { setSubmitting }: any) => {
+    if (!project) return console.error('Project is required')
+
     setSubmitting(true)
-    const res = await vault.addKey(values.name)
+    const res = await addKeyMutation({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      name: values.name,
+    })
     if (!res.error) {
-      ui.setNotification({ category: 'success', message: 'Successfully added new key' })
+      toast.success('Successfully added new key')
       setShowAddKeyModal(false)
     } else {
-      ui.setNotification({
-        error: res.error,
-        category: 'error',
-        message: `Failed to add new key: ${res.error.message}`,
-      })
+      toast.error(`Failed to add new key: ${res.error.message}`)
     }
     setSubmitting(false)
   }
 
   const confirmDeleteKey = async () => {
     if (!selectedKeyToRemove) return
+    if (!project) return console.error('Project is required')
 
     setIsDeletingKey(true)
-    const res = await vault.deleteKey(selectedKeyToRemove.id)
+    const res = await deleteKeyMutation({
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+      id: selectedKeyToRemove.id,
+    })
     if (!res.error) {
-      ui.setNotification({ category: 'success', message: `Successfully deleted encryption key` })
+      toast.success(`Successfully deleted encryption key`)
       setSelectedKeyToRemove(undefined)
     } else {
-      ui.setNotification({
-        error: res.error,
-        category: 'error',
-        message: `Failed to delete encryption key: ${res.error.message}`,
-      })
+      toast.error(`Failed to delete encryption key: ${res.error.message}`)
     }
     setIsDeletingKey(false)
   }
@@ -118,7 +135,7 @@ const EncryptionKeysManagement = () => {
                   : []
               }
             />
-            <div className="w-32">
+            <div className="w-44">
               <Listbox size="small" value={selectedSort} onChange={setSelectedSort}>
                 <Listbox.Option
                   id="created"
@@ -150,7 +167,7 @@ const EncryptionKeysManagement = () => {
               </Link>
             </Button>
             <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+              <Tooltip.Trigger asChild>
                 <Button
                   type="primary"
                   disabled={!canManageKeys}
@@ -182,7 +199,7 @@ const EncryptionKeysManagement = () => {
 
         {/* Table of keys */}
         <div className="border rounded">
-          {!vault.isLoaded ? (
+          {isLoading ? (
             <div className="px-6 py-6 space-x-2 flex items-center justify-center">
               <IconLoader
                 className="animate-spin text-foreground-light"
@@ -217,7 +234,7 @@ const EncryptionKeysManagement = () => {
                           Added on {dayjs(key.created).format('MMM D, YYYY')}
                         </p>
                         <Tooltip.Root delayDuration={0}>
-                          <Tooltip.Trigger>
+                          <Tooltip.Trigger asChild>
                             <Button
                               type="default"
                               className="py-2"
@@ -365,4 +382,4 @@ const EncryptionKeysManagement = () => {
   )
 }
 
-export default observer(EncryptionKeysManagement)
+export default EncryptionKeysManagement

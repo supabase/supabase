@@ -1,0 +1,96 @@
+---
+id: 'pgsodium'
+title: 'pgsodium: Encryption Features'
+description: 'Encryption library for PostgreSQL'
+---
+
+[`pgsodium`](https://github.com/michelp/pgsodium) is a PostgreSQL extension which provides SQL access to [`libsodium`'s](https://doc.libsodium.org/) high-level cryptographic algorithms.
+
+`libsodium` is a modern, easy-to-use software library for encryption, decryption, signatures, password hashing, and more. It is a portable, cross-compilable, installable, and packageable fork of the [NaCl](http://nacl.cr.yp.to/) library, with a compatible but extended API to improve usability even further.
+
+The design choices emphasize security and ease of use. But despite the emphasis on high security, primitives are faster across-the-board than most implementations.
+
+`pgsodium` exposes the following `libsodium` APIs to SQL:
+
+- [Generating Random Data](https://github.com/michelp/pgsodium/#generating-random-data)
+- [Secret key cryptography](https://github.com/michelp/pgsodium/#secret-key-cryptography)
+  - [Authenticated encryption](https://github.com/michelp/pgsodium/#authenticated-encryption)
+  - [Authentication](https://github.com/michelp/pgsodium/#authentication)
+- [Public key cryptography](https://github.com/michelp/pgsodium/#public-key-cryptography)
+  - [Authenticated encryption](https://github.com/michelp/pgsodium/#authenticated-encryption-1)
+  - [Public key signatures](https://github.com/michelp/pgsodium/#public-key-signatures)
+  - [Sealed boxes](https://github.com/michelp/pgsodium/#sealed-boxes)
+- [Hashing](https://github.com/michelp/pgsodium/#hashing)
+- [Password hashing](https://github.com/michelp/pgsodium/#password-hashing)
+- [Key Derivation](https://github.com/michelp/pgsodium/#key-derivation)
+- [Key Exchange](https://github.com/michelp/pgsodium/#key-exchange)
+- [HMAC512](https://github.com/michelp/pgsodium/#hmac512)
+- [Advanced Stream API](https://github.com/michelp/pgsodium/#advanced-stream-api)
+- [XChaCha20-SIV](https://github.com/michelp/pgsodium/#xchacha20-siv)
+- [Signcryption](https://github.com/michelp/pgsodium/#signcryption)
+
+It also enables some Postgres specific features including:
+
+- [Server Key Management](https://github.com/michelp/pgsodium#server-key-management)
+
+- [Transparent Column Encryption](https://github.com/michelp/pgsodium#transparent-column-encryption)
+
+Note that column encryption should only be used in highly sensitive scenarios as it has a meaningful impact on statement performance and flexibility.
+
+Specifically:
+
+    - Encryption and decryption both take time. Inserting and selecting encrypted data takes more time than a "plain" column of data.
+
+    - Encrypted columns should never be indexed. This is because the index will store the encrypted value of a column, which would not be useful.
+
+    - Encrypted columns can be queried in a `WHERE` clause, but this can also have some negative performance consequences, since the value must be decrypted in order to matched to any `WHERE` qualifiers.
+
+    - While you can encrypt multiple columns in the same table, each column must go through a full encryption cycle, so two columns will take twice the time as one etc.
+
+In general, it is a bad idea to over-use column encryption for mundane data or data that you need to search against such as names, user or account types, addresses, country codes, etc. Column encryption is intended to be used for very sensitive data that would cause serious issues if it were to leak, such as API keys, payment keys, highly sensitive personal information, etc.
+
+Note that Supabase projects are already encrypted at rest by default.
+
+## Get the root encryption key for your Supabase project
+
+Encryption requires keys. Keeping the keys in the same database as the encrypted data would be unsafe. For more information about managing the `pgsodium` root encryption key on your Supabase project see **[encryption key location](/docs/guides/database/vault#encryption-key-location)**. This key is required to decrypt values stored in [Supabase Vault](/docs/guides/database/vault) and data encrypted with Transparent Column Encryption.
+
+## Enable the extension
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+  queryGroup="database-method"
+>
+<TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+2. Click on **Extensions** in the sidebar.
+3. Search for `pgsodium` and enable the extension.
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
+
+{/* prettier-ignore */}
+```sql
+-- Enable the "pgsodium" extension
+create extension pgsodium;
+
+-- Disable the "pgsodium" extension
+drop extension if exists pgsodium;
+```
+
+</TabPanel>
+</Tabs>
+
+## Resources
+
+- [Supabase Vault](/docs/guides/database/vault)
+- Read more about Supabase Vault in the [blog post](https://supabase.com/blog/vault-now-in-beta)
+- [Supabase Vault on GitHub](https://github.com/supabase/vault)
+
+## Resources
+
+- Official [`pgsodium` documentation](https://github.com/michelp/pgsodium)

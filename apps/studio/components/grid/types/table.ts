@@ -1,4 +1,5 @@
-import { Dictionary, GridForeignKey } from './base'
+import { GridForeignKey } from './base'
+import type { Dictionary } from 'types'
 
 export interface SupaColumn {
   readonly dataType: string

@@ -1,4 +1,5 @@
-import { Dictionary, QueryTable } from '../types'
+import type { QueryTable } from '../types'
+import type { Dictionary } from 'types'
 import { IQueryFilter, QueryFilter } from './QueryFilter'
 
 export interface IQueryAction {

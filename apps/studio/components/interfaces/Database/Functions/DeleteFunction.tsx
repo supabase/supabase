@@ -1,9 +1,8 @@
-import { observer } from 'mobx-react-lite'
-import { useState } from 'react'
+import toast from 'react-hot-toast'
 
-import TextConfirmModal from 'components/ui/Modals/TextConfirmModal'
-import { useStore } from 'hooks'
-import { isResponseOk } from 'lib/common/fetch'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import TextConfirmModal from 'ui-patterns/Dialogs/TextConfirmModal'
+import { useDatabaseFunctionDeleteMutation } from 'data/database-functions/database-functions-delete-mutation'
 
 interface DeleteFunctionProps {
   func?: any
@@ -12,52 +11,50 @@ interface DeleteFunctionProps {
 }
 
 const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
-  const { ui, meta } = useStore()
-  const [loading, setLoading] = useState(false)
+  const { project } = useProjectContext()
   const { id, name, schema } = func ?? {}
 
+  const { mutate: deleteDatabaseFunction, isLoading } = useDatabaseFunctionDeleteMutation({
+    onSuccess: () => {
+      toast.success(`Successfully removed function ${name}`)
+      setVisible(false)
+    },
+  })
+
   async function handleDelete() {
-    try {
-      setLoading(true)
-      if (!id) {
-        throw Error('Invalid function info')
-      }
-      const response = await meta.functions.del(id)
-      if (!isResponseOk(response)) {
-        throw response.error
-      } else {
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully removed ${name}`,
-        })
-        setVisible(false)
-      }
-    } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to delete ${name}: ${error.message}`,
-      })
-    } finally {
-      setLoading(false)
-    }
+    if (!id) return console.error('Function ID is require')
+    if (!project) return console.error('Project is required')
+
+    deleteDatabaseFunction({
+      id,
+      projectRef: project.ref,
+      connectionString: project.connectionString,
+    })
   }
 
   return (
     <>
       <TextConfirmModal
+        variant={'warning'}
         visible={visible}
         onCancel={() => setVisible(!visible)}
         onConfirm={handleDelete}
         title="Delete this function"
-        loading={loading}
+        loading={isLoading}
         confirmLabel={`Delete function ${name}`}
         confirmPlaceholder="Type in name of function"
         confirmString={name}
-        text={`This will delete your function called ${name} of schema ${schema}.`}
-        alert="You cannot recover this function once it is deleted!"
+        text={
+          <>
+            This will delete the function
+            <span className="text-bold text-foreground">{name}</span> from the schema
+            <span className="text-bold text-foreground">{schema}</span>
+          </>
+        }
+        alert={{ title: 'You cannot recover this function once deleted.' }}
       />
     </>
   )
 }
 
-export default observer(DeleteFunction)
+export default DeleteFunction

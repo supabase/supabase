@@ -123,6 +123,11 @@ const AuthorizeRequesterDetails = ({
             hasReadScope={scopes.includes(OAuthScope.SECRETS_READ)}
             hasWriteScope={scopes.includes(OAuthScope.SECRETS_WRITE)}
           />
+          <ScopeSection
+            description="access to storage buckets and files."
+            hasReadScope={scopes.includes(OAuthScope.STORAGE_READ)}
+            hasWriteScope={scopes.includes(OAuthScope.STORAGE_WRITE)}
+          />
         </div>
       </div>
     </div>

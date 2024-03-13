@@ -11,6 +11,7 @@ export const FilterSchema = ({
     <div className="flex flex-row gap-4 items-center">
       <p className="w-[60px] flex justify-end text-sm">WHERE</p>
       <SchemaSelector
+        disabled
         supportSelectAll
         size="small"
         selectedSchemaName={value}

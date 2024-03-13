@@ -47,8 +47,8 @@ const SignInFlyTos = () => {
     fly_extension_id
       ? getProjectByFlyExtensionId({ flyExtensionId: fly_extension_id as string })
       : fly_organization_id
-      ? getOrgByFlyOrgId({ flyOrganizationId: fly_organization_id as string })
-      : setLoading(false)
+        ? getOrgByFlyOrgId({ flyOrganizationId: fly_organization_id as string })
+        : setLoading(false)
   }, [isReady])
 
   const onSignInWithFly = async () => {

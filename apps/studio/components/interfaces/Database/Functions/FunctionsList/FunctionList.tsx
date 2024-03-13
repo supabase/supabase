@@ -1,7 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { includes, noop } from 'lodash'
-import { observer } from 'mobx-react-lite'
+import { includes, noop, sortBy } from 'lodash'
 import { useRouter } from 'next/router'
 import {
   Button,
@@ -9,7 +8,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconCheck,
   IconEdit3,
   IconFileText,
   IconMoreVertical,
@@ -18,7 +16,8 @@ import {
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
+import { useCheckPermissions } from 'hooks'
 
 interface FunctionListProps {
   schema: string
@@ -36,16 +35,21 @@ const FunctionList = ({
   deleteFunction = noop,
 }: FunctionListProps) => {
   const router = useRouter()
-  const { meta } = useStore()
   const { project: selectedProject } = useProjectContext()
 
-  const functions = meta.functions.list()
-  const filteredFunctions = functions.filter((x: any) =>
+  const { data: functions } = useDatabaseFunctionsQuery({
+    projectRef: selectedProject?.ref,
+    connectionString: selectedProject?.connectionString,
+  })
+
+  const filteredFunctions = (functions ?? []).filter((x) =>
     includes(x.name.toLowerCase(), filterString.toLowerCase())
   )
-  const _functions = filteredFunctions.filter((x) => x.schema == schema)
+  const _functions = sortBy(
+    filteredFunctions.filter((x) => x.schema == schema),
+    (func) => func.name.toLocaleLowerCase()
+  )
   const projectRef = selectedProject?.ref
-
   const canUpdateFunctions = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
     'functions'
@@ -88,7 +92,9 @@ const FunctionList = ({
               <p title={x.name}>{x.name}</p>
             </Table.td>
             <Table.td className="hidden md:table-cell md:overflow-auto">
-              <p title={x.argument_types}>{x.argument_types || '-'}</p>
+              <p title={x.argument_types} className="truncate">
+                {x.argument_types || '-'}
+              </p>
             </Table.td>
             <Table.td className="hidden lg:table-cell">
               <p title={x.return_type}>{x.return_type}</p>
@@ -101,9 +107,9 @@ const FunctionList = ({
                 <div className="flex items-center justify-end">
                   {canUpdateFunctions ? (
                     <DropdownMenu>
-                      <DropdownMenuTrigger>
-                        <Button asChild type="default" icon={<IconMoreVertical />} className="px-1">
-                          <span></span>
+                      <DropdownMenuTrigger asChild>
+                        <Button type="default" className="px-1">
+                          <IconMoreVertical />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent side="left">
@@ -163,4 +169,4 @@ const FunctionList = ({
   )
 }
 
-export default observer(FunctionList)
+export default FunctionList
