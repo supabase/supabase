@@ -1,6 +1,6 @@
 'use client'
 
-import { AiIcon } from '@ui/components/Command'
+// import { AiIcon } from 'ui/components/Command'
 import {
   Command,
   CommandEmpty,
@@ -9,9 +9,9 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from '@ui/components/shadcn/ui/command'
-import { Popover, PopoverAnchor, PopoverContent } from '@ui/components/shadcn/ui/popover'
-import { cn } from '@ui/lib/utils'
+} from './../../ui/src/components/shadcn/ui/command'
+import { Popover, PopoverAnchor, PopoverContent } from './../../ui/src/components/shadcn/ui/popover'
+import { cn } from './../../ui/src/lib/utils/cn'
 import { createRef, useEffect, useRef, useState } from 'react'
 
 const AssistantCommandsPopover = ({

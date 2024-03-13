@@ -3,6 +3,6 @@
   "compilerOptions": {
     "resolveJsonModule": true
   },
-  "include": ["."],
+  "include": [".", "../ui-patterns/AssistantChat/AssistantChatForm.tsx"],
   "exclude": ["dist", "build", "node_modules", "**/*.stories.tsx"]
 }

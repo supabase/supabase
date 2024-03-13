@@ -1,7 +1,7 @@
 import { Loader2 } from 'lucide-react'
 import React, { ChangeEvent, createRef, useEffect } from 'react'
-import { TextArea } from '../components/shadcn/ui/text-area'
-import { cn } from '../lib/utils'
+import { TextArea } from 'ui/src/components/shadcn/ui/text-area'
+import { cn } from 'ui/src/lib/utils'
 
 export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   textAreaRef: React.RefObject<HTMLTextAreaElement>
@@ -13,6 +13,7 @@ export interface FormProps extends React.FormHTMLAttributes<HTMLFormElement> {
   setCommandsOpen?: (value: boolean) => void
   icon?: React.ReactNode
   usingCommandPopover?: boolean
+  onSubmit: React.FormHTMLAttributes<HTMLFormElement>['onSubmit']
 }
 
 const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
@@ -27,6 +28,7 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
       setCommandsOpen,
       icon = null,
       usingCommandPopover = false,
+      onSubmit,
       ...props
     },
     ref
@@ -69,11 +71,11 @@ const AssistantChatForm = React.forwardRef<HTMLFormElement, FormProps>(
     const submitRef = createRef<HTMLButtonElement>()
 
     return (
-      <form ref={formRef} className="relative" {...props}>
+      <form ref={formRef} className="relative" {...props} onSubmit={onSubmit}>
         {icon && (
-          <div
-            className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}
-          ></div>
+          <div className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}>
+            {icon}
+          </div>
         )}
         <TextArea
           ref={textAreaRef}
