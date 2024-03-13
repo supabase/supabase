@@ -7,6 +7,7 @@ import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../lib/constants'
 import { cn } from '../../lib/utils/cn'
 import { IconContext } from '../Icon/IconContext'
 import { IconLoader } from '../Icon/icons/IconLoader'
+import { Loader } from 'lucide-react'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
@@ -239,7 +240,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               undefined,
               showIcon &&
                 (loading ? (
-                  <IconLoader size={size} className={cn(loadingVariants({ loading }))} />
+                  <div className={cn(IconContainerVariants({ size }))}>
+                    <Loader className={cn(loadingVariants({ loading }))} />
+                  </div>
                 ) : _iconLeft ? (
                   <div className={cn(IconContainerVariants({ size }))}>{_iconLeft}</div>
                 ) : null),
@@ -255,11 +258,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           <>
             {showIcon &&
               (loading ? (
-                <IconLoader size={size} className={cn(loadingVariants({ loading }))} />
+                <div className={cn(IconContainerVariants({ size }))}>
+                  <Loader className={cn(loadingVariants({ loading }))} />
+                </div>
               ) : _iconLeft ? (
-                <IconContext.Provider value={{ contextSize: size }}>
-                  {_iconLeft}
-                </IconContext.Provider>
+                <div className={cn(IconContainerVariants({ size }))}>{_iconLeft}</div>
               ) : null)}{' '}
             {children && <span className={'truncate'}>{children}</span>}{' '}
             {iconRight && !loading && (
