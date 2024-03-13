@@ -3,7 +3,6 @@ import { useLocalStorageQuery } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { EyeOff, Maximize2, MoreVertical } from 'lucide-react'
 import { Lint } from 'pages/project/[ref]/reports/lints'
-import { getHumanReadableTitle } from 'pages/project/[ref]/reports/lints.utils'
 import { useState } from 'react'
 import {
   Badge,
@@ -15,6 +14,7 @@ import {
   Modal,
   cn,
 } from 'ui'
+import { getHumanReadableTitle } from './ReportLints.utils'
 
 type ReportLintsTableRowProps = {
   lint: Lint
