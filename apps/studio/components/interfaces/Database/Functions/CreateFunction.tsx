@@ -148,21 +148,18 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
       onCancel={() => isClosingSidePanel()}
       customFooter={
         <div className="flex justify-end gap-2 p-4 bg-overlay border-t border-overlay">
-          <div>
-            <Button disabled={isCreating || isUpdating} type="default" onClick={isClosingSidePanel}>
-              Cancel
-            </Button>
-          </div>
-          <div>
-            <Button
-              form={FORM_ID}
-              htmlType="submit"
-              disabled={isCreating || isUpdating}
-              loading={isCreating || isUpdating}
-            >
-              Confirm
-            </Button>
-          </div>
+          <Button disabled={isCreating || isUpdating} type="default" onClick={isClosingSidePanel}>
+            Cancel
+          </Button>
+
+          <Button
+            form={FORM_ID}
+            htmlType="submit"
+            disabled={isCreating || isUpdating}
+            loading={isCreating || isUpdating}
+          >
+            Confirm
+          </Button>
         </div>
       }
     >
@@ -413,7 +410,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
   })
 
   return (
-    <div>
+    <>
       <div className="flex flex-col">
         <h5 className="text-base text-foreground">Arguments</h5>
         <p className="text-sm text-foreground-light">
@@ -495,7 +492,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
           </Button>
         )}
       </div>
-    </div>
+    </>
   )
 }
 
