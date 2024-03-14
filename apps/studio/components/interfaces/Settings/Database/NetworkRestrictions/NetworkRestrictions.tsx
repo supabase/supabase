@@ -112,10 +112,7 @@ const NetworkRestrictions = () => {
   const hasApplyError = restrictionStatus === 'stored'
   const isUninitialized = restrictedIps.length === 0 && restrictionStatus.length === 0
   const isAllowedAll = restrictedIps.includes('0.0.0.0/0') && restrictedIps.includes('::/0')
-  const isDisallowedAll =
-    restrictedIps.length === 2 &&
-    restrictedIps.includes('127.0.0.1/32') &&
-    restrictedIps.includes('::1/128')
+  const isDisallowedAll = restrictedIps.length === 0
 
   if (!hasAccessToRestrictions) return <></>
 
