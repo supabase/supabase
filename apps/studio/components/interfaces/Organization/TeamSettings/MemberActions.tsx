@@ -10,6 +10,7 @@ import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/or
 import type { OrganizationMember } from 'data/organizations/organization-members-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
+import { Trash } from 'lucide-react'
 import type { Role } from 'types'
 import {
   Button,
@@ -19,7 +20,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   IconMoreHorizontal,
-  IconTrash,
   Modal,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -178,7 +178,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
                       setIsDeleteModalOpen(true)
                     }}
                   >
-                    <IconTrash size={16} />
+                    <Trash size={15} className="text-foreground-lighter" />
                     <p>Remove member</p>
                   </DropdownMenuItem>
                 )

@@ -158,7 +158,7 @@ export interface paths {
   }
   '/platform/organizations/{slug}/roles': {
     /** Gets the given organization's roles */
-    get: operations['RolesController_addMember']
+    get: operations['RolesController_getAllRolesV2']
   }
   '/platform/organizations/{slug}/tax-ids': {
     /** Gets the given organization's tax IDs */
@@ -210,14 +210,6 @@ export interface paths {
     /** Joins organization */
     post: operations['JoinController_joinOrganization']
   }
-  '/platform/organizations/{slug}/members/leave': {
-    /** Leaves the given organization */
-    post: operations['MembersDeprecatedController_leaveOrganization']
-  }
-  '/platform/organizations/{slug}/members/remove': {
-    /** Leaves the given organization */
-    delete: operations['MembersDeprecatedController_removeMember']
-  }
   '/platform/organizations/{slug}/members': {
     /** Gets organization's members */
     get: operations['MembersController_getMembers']
@@ -225,12 +217,28 @@ export interface paths {
   '/platform/organizations/{slug}/members/{gotrue_id}': {
     /** Removes organization member */
     delete: operations['MembersController_deleteMember']
-    /** Updates organization member */
-    patch: operations['MembersController_updateMember']
+    /** Updates organization member role */
+    patch: operations['MembersController_updateMemberRoleV2']
   }
   '/platform/organizations/{slug}/members/reached-free-project-limit': {
     /** Gets organization members who have reached their free project limit */
     get: operations['ReachedFreeProjectLimitController_getMembersWhoReachedFreeProjectLimit']
+  }
+  '/platform/organizations/{slug}/members/invitations': {
+    /** Gets organization invitations */
+    get: operations['InvitationsController_getAllInvitations']
+    /** Creates organization invitation */
+    post: operations['InvitationsController_createInvitation']
+  }
+  '/platform/organizations/{slug}/members/invitations/{token}': {
+    /** Gets organization invitation by token */
+    get: operations['InvitationsController_getInvitationByToken']
+    /** Accepts organization invitation by token */
+    post: operations['InvitationsController_acceptInvitationByToken']
+  }
+  '/platform/organizations/{slug}/members/invitations/{id}': {
+    /** Deletes organization invitation with given id */
+    delete: operations['InvitationsController_deleteInvitation']
   }
   '/platform/organizations/{slug}/payments': {
     /** Gets Stripe payment methods for the given organization */
@@ -822,14 +830,6 @@ export interface paths {
     /** Get GitHub connection branch */
     get: operations['GitHubBranchesController_getConnectionBranch']
   }
-  '/platform/integrations/github/pull-requests/{connectionId}': {
-    /** List GitHub connection pull requests */
-    get: operations['GitHubPullRequestsController_getConnectionPullRequests']
-  }
-  '/platform/integrations/github/pull-requests/{connectionId}/{branchName}': {
-    /** List GitHub pull requests for a specific branch */
-    get: operations['GitHubPullRequestsController_validateConnectionBranch']
-  }
   '/platform/integrations/github/repositories': {
     /** Gets GitHub repositories for user */
     get: operations['GitHubRepositoriesController_listRepositories']
@@ -1062,7 +1062,7 @@ export interface paths {
   }
   '/v0/organizations/{slug}/roles': {
     /** Gets the given organization's roles */
-    get: operations['RolesController_addMember']
+    get: operations['RolesController_getAllRolesV2']
   }
   '/v0/organizations/{slug}/members/invite': {
     /** Gets invited users */
@@ -1085,8 +1085,8 @@ export interface paths {
   '/v0/organizations/{slug}/members/{gotrue_id}': {
     /** Removes organization member */
     delete: operations['MembersController_deleteMember']
-    /** Updates organization member */
-    patch: operations['MembersController_updateMember']
+    /** Updates organization member role */
+    patch: operations['MembersController_updateMemberRoleV2']
   }
   '/v0/pg-meta/{ref}/column-privileges': {
     /** Retrieve column privileges */
@@ -2207,6 +2207,7 @@ export interface components {
       updated_at?: string
       is_sso_user?: boolean
       deleted_at?: string
+      is_anonymous?: boolean
     }
     UsersResponse: {
       total: number
@@ -2263,14 +2264,17 @@ export interface components {
       migrated_at: string | null
     }
     OrganizationResponse: {
+      /** @enum {string|null} */
+      restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
       id: number
       slug: string
       name: string
-      billing_email: string
+      billing_email: string | null
       is_owner: boolean
-      stripe_customer_id: string
-      subscription_id?: string
+      stripe_customer_id: string | null
+      subscription_id: string | null
       opt_in_tags: string[]
+      restriction_data: Record<string, never>
     }
     GetOrganizationByFlyOrganizationIdResponse: {
       slug: string
@@ -2346,6 +2350,11 @@ export interface components {
     Role: {
       id: number
       name: string
+      description: string
+    }
+    RoleResponseV2: {
+      org_scoped_roles: components['schemas']['Role'][]
+      project_scoped_roles: components['schemas']['Role'][]
     }
     TaxId: {
       id: string
@@ -2504,9 +2513,6 @@ export interface components {
       slug: string
       stripe_customer_id: string
     }
-    RemoveMemberBody: {
-      member_id: number
-    }
     Member: {
       gotrue_id: string
       primary_email: string | null
@@ -2517,10 +2523,37 @@ export interface components {
     UpdateMemberBody: {
       role_id: number
     }
+    UpdateMemberRoleBodyV2: {
+      assign_role_id?: number
+      assign_role_scoped_projects?: string[]
+      unassign_role_id?: number
+    }
     MemberWithFreeProjectLimit: {
       free_project_limit: number
       primary_email: string
       username: string
+    }
+    Invitation: {
+      id: number
+      invited_at: string
+      invited_email: string
+      role_id: number
+    }
+    InvitationResponse: {
+      invitations: components['schemas']['Invitation'][]
+    }
+    InvitationByTokenResponse: {
+      organization_name: string
+      invite_id?: number
+      token_does_not_exist: boolean
+      email_match: boolean
+      authorized_user: boolean
+      expired_token: boolean
+    }
+    CreateInvitationBody: {
+      email: string
+      role_id: number
+      role_scoped_projects?: string[]
     }
     Payment: {
       id: string
@@ -6371,7 +6404,7 @@ export interface operations {
     }
   }
   /** Gets the given organization's roles */
-  RolesController_addMember: {
+  RolesController_getAllRolesV2: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -6381,7 +6414,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['Role'][]
+          'application/json': components['schemas']['RoleResponseV2']
         }
       }
       /** @description Failed to retrieve the organization's roles */
@@ -6752,51 +6785,6 @@ export interface operations {
       }
     }
   }
-  /** Leaves the given organization */
-  MembersDeprecatedController_leaveOrganization: {
-    parameters: {
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-    }
-    responses: {
-      201: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
-      /** @description Failed to leave organization */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Leaves the given organization */
-  MembersDeprecatedController_removeMember: {
-    parameters: {
-      path: {
-        /** @description Organization slug */
-        slug: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['RemoveMemberBody']
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
-      /** @description Failed to leave organization */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Gets organization's members */
   MembersController_getMembers: {
     parameters: {
@@ -6836,8 +6824,8 @@ export interface operations {
       }
     }
   }
-  /** Updates organization member */
-  MembersController_updateMember: {
+  /** Updates organization member role */
+  MembersController_updateMemberRoleV2: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -6847,14 +6835,14 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpdateMemberBody']
+        'application/json': components['schemas']['UpdateMemberRoleBodyV2']
       }
     }
     responses: {
       200: {
         content: never
       }
-      /** @description Failed to update organization member */
+      /** @description Failed to update organization member role */
       500: {
         content: never
       }
@@ -6875,6 +6863,108 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve organization members who have reached their free project limit */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets organization invitations */
+  InvitationsController_getAllInvitations: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['InvitationResponse']
+        }
+      }
+      /** @description Failed to get organization invitations */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates organization invitation */
+  InvitationsController_createInvitation: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateInvitationBody']
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to create organization invitation */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets organization invitation by token */
+  InvitationsController_getInvitationByToken: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+        token: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['InvitationByTokenResponse']
+        }
+      }
+      /** @description Failed to get organization invitation by token */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Accepts organization invitation by token */
+  InvitationsController_acceptInvitationByToken: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+        token: string
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to accept organization invitation by token */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Deletes organization invitation with given id */
+  InvitationsController_deleteInvitation: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+        id: number
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to delete organization invitation with given id */
       500: {
         content: never
       }
@@ -11074,52 +11164,6 @@ export interface operations {
         }
       }
       /** @description Failed to get GitHub connection branch */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** List GitHub connection pull requests */
-  GitHubPullRequestsController_getConnectionPullRequests: {
-    parameters: {
-      query: {
-        pr_number: number[]
-      }
-      path: {
-        connectionId: number
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>[]
-        }
-      }
-      /** @description Failed to list GitHub connection pull requests */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** List GitHub pull requests for a specific branch */
-  GitHubPullRequestsController_validateConnectionBranch: {
-    parameters: {
-      query?: {
-        per_page?: number
-        page?: number
-      }
-      path: {
-        connectionId: number
-        branchName: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>[]
-        }
-      }
-      /** @description Failed to validate GitHub connection branch */
       500: {
         content: never
       }

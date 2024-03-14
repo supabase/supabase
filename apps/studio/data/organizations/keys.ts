@@ -3,6 +3,7 @@ export const organizationKeys = {
   members: (slug?: string) => ['organizations', slug, 'members'] as const,
   paymentMethods: (slug: string | undefined) => ['organizations', slug, 'payment-methods'] as const,
   roles: (slug: string | undefined) => ['organizations', slug, 'roles'] as const,
+  rolesV2: (slug: string | undefined) => ['organizations', slug, 'roles-v2'] as const,
   freeProjectLimitCheck: (slug: string | undefined) =>
     ['organizations', slug, 'free-project-limit-check'] as const,
   customerProfile: (slug: string | undefined) =>

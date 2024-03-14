@@ -1,32 +1,33 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
-import type { ResponseError, Role } from 'types'
+
+import { components } from 'data/api'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationRolesVariables = {
   slug?: string
 }
 
+export type OrganizationRole = components['schemas']['Role']
+
 export type OrganizationRolesResponse = {
-  roles: Role[]
+  roles: OrganizationRole[]
 }
 
 export async function getOrganizationRoles(
   { slug }: OrganizationRolesVariables,
   signal?: AbortSignal
 ) {
-  if (!slug) {
-    throw new Error('slug is required')
-  }
+  if (!slug) throw new Error('slug is required')
 
-  const data = await get(`${API_URL}/organizations/${slug}/roles`, {
+  const { data, error } = await get('/platform/organizations/{slug}/roles', {
+    params: { path: { slug } },
     signal,
   })
-  if (data.error) {
-    throw data.error
-  }
 
+  if (error) return handleError(error)
+  // @ts-ignore API codegen being weird here, data is typed as the V2 response rather than v1
   return { roles: data } as OrganizationRolesResponse
 }
 

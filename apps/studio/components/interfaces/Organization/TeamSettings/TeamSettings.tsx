@@ -12,7 +12,7 @@ import {
 } from 'components/layouts/Scaffold'
 import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
 import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useOrganizationRolesQuery } from 'data/organizations/organization-roles-query'
+import { useOrganizationRolesV2Query } from 'data/organizations/organization-roles-v2-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
 import { useProfile } from 'lib/profile'
@@ -35,10 +35,11 @@ const TeamSettings = () => {
   const isOwner = selectedOrganization?.is_owner
 
   const { data: permissions } = usePermissionsQuery()
-  const { data: rolesData } = useOrganizationRolesQuery({ slug })
+  const { data: rolesData } = useOrganizationRolesV2Query({ slug })
   const { data: members } = useOrganizationMembersQuery({ slug })
 
-  const roles = rolesData?.roles ?? []
+  const roles = rolesData?.org_scoped_roles ?? []
+  console.log(rolesData)
 
   const { rolesAddable } = useGetRolesManagementPermissions(
     selectedOrganization?.id,

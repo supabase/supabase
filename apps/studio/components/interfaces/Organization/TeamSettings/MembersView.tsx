@@ -1,4 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
+import { Check, User, X } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { Fragment, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -16,18 +17,7 @@ import { useOrganizationRolesQuery } from 'data/organizations/organization-roles
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useSelectedOrganization } from 'hooks'
 import { useProfile } from 'lib/profile'
-import {
-  Badge,
-  Button,
-  IconAlertCircle,
-  IconCheck,
-  IconLoader,
-  IconUser,
-  IconX,
-  Listbox,
-  Loading,
-  Modal,
-} from 'ui'
+import { Badge, Button, IconAlertCircle, IconLoader, Listbox, Loading, Modal } from 'ui'
 import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
 import MemberActions from './MemberActions'
 import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
@@ -147,6 +137,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                   <span>Role</span>
                   <RolesHelperModal />
                 </Table.th>,
+                <Table.th key="scopes">Scope</Table.th>,
                 <Table.th key="header-action"></Table.th>,
               ]}
               body={[
@@ -185,11 +176,11 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                             <div>
                               {x.invited_id ? (
                                 <span className="flex p-2 border-2 rounded-full border-strong">
-                                  <IconUser size={20} strokeWidth={2} />
+                                  <User strokeWidth={2} size={18} />
                                 </span>
                               ) : isEmailUser ? (
                                 <div className="w-[40px] h-[40px] bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center">
-                                  <IconUser strokeWidth={1.5} />
+                                  <User strokeWidth={2} size={18} />
                                 </div>
                               ) : (
                                 <Image
@@ -222,9 +213,9 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                           <Table.td>
                             <div className="flex items-center justify-center">
                               {x.mfa_enabled ? (
-                                <IconCheck className="text-brand" strokeWidth={2} />
+                                <Check className="text-brand" strokeWidth={2} size={18} />
                               ) : (
-                                <IconX className="text-foreground-light" strokeWidth={1.5} />
+                                <X className="text-foreground-light" strokeWidth={1.5} size={18} />
                               )}
                             </div>
                           </Table.td>
@@ -323,6 +314,9 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                             </div>
                           )}
                         </Table.td>
+
+                        <Table.td>Scope</Table.td>
+
                         <Table.td>
                           {!memberIsUser && <MemberActions member={x} roles={roles} />}
                         </Table.td>
