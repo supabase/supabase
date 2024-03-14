@@ -45,6 +45,7 @@ const UtilityPanel = ({
   const queryKeys = contentKeys.list(ref)
 
   const upsertContent = useContentUpsertMutation({
+    invalidateQueriesOnSuccess: false,
     // Optimistic update to the cache
     onMutate: async (newContentSnippet) => {
       // No need to update the cache for non-SQL content
