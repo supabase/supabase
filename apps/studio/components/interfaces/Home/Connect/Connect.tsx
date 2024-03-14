@@ -4,14 +4,14 @@ import { Plug } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
-  DIALOG_PADDING_X_Shadcn_,
-  DIALOG_PADDING_Y_Shadcn_,
-  DialogContent_Shadcn_,
-  DialogDescription_Shadcn_,
-  DialogHeader_Shadcn_,
-  DialogTitle_Shadcn_,
-  DialogTrigger_Shadcn_,
-  Dialog_Shadcn_,
+  DIALOG_PADDING_X,
+  DIALOG_PADDING_Y,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  Dialog,
   IconExternalLink,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
@@ -157,27 +157,27 @@ const Connect = () => {
 
   return (
     <>
-      <Dialog_Shadcn_>
-        <DialogTrigger_Shadcn_ asChild>
+      <Dialog>
+        <DialogTrigger asChild>
           <Button type="primary">
             <span className="flex items-center gap-2 px-3">
               <Plug size={14} className="rotate-90" /> <span>Connect</span>
             </span>
           </Button>
-        </DialogTrigger_Shadcn_>
-        <DialogContent_Shadcn_ className={cn('sm:max-w-5xl p-0')}>
-          <DialogHeader_Shadcn_ className="pb-0">
-            <DialogTitle_Shadcn_>Connect to your project</DialogTitle_Shadcn_>
-            <DialogDescription_Shadcn_>
+        </DialogTrigger>
+        <DialogContent className={cn('sm:max-w-5xl p-0')}>
+          <DialogHeader className="pb-0">
+            <DialogTitle>Connect to your project</DialogTitle>
+            <DialogDescription>
               Get the connection strings and environment variables for your app
-            </DialogDescription_Shadcn_>
-          </DialogHeader_Shadcn_>
+            </DialogDescription>
+          </DialogHeader>
 
           <Tabs_Shadcn_
             defaultValue="direct"
             onValueChange={(value) => handleConnectionType(value)}
           >
-            <TabsList_Shadcn_ className={cn('flex gap-4', DIALOG_PADDING_X_Shadcn_)}>
+            <TabsList_Shadcn_ className={cn('flex gap-4', DIALOG_PADDING_X)}>
               <TabsTrigger_Shadcn_ key="direct" value="direct" className="px-0">
                 Connection String
               </TabsTrigger_Shadcn_>
@@ -201,7 +201,7 @@ const Connect = () => {
                 <TabsContent_Shadcn_
                   key={`content-${type.key}`}
                   value={type.key}
-                  className={cn(DIALOG_PADDING_X_Shadcn_, DIALOG_PADDING_Y_Shadcn_, '!mt-0')}
+                  className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
                 >
                   <div className="flex justify-between">
                     <div className="flex items-center gap-5">
@@ -258,13 +258,13 @@ const Connect = () => {
             <TabsContent_Shadcn_
               key="direct"
               value="direct"
-              className={cn(DIALOG_PADDING_X_Shadcn_, DIALOG_PADDING_Y_Shadcn_, '!mt-0')}
+              className={cn(DIALOG_PADDING_X, DIALOG_PADDING_Y, '!mt-0')}
             >
               <DatabaseConnectionString appearance="minimal" />
             </TabsContent_Shadcn_>
           </Tabs_Shadcn_>
-        </DialogContent_Shadcn_>
-      </Dialog_Shadcn_>
+        </DialogContent>
+      </Dialog>
       <PoolingModesModal />
     </>
   )

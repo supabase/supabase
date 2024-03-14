@@ -96,7 +96,8 @@
 html,
 body,
 #__next,
-.main {
+.main,
+.docs-story {
   @apply bg-studio;
   @apply text-foreground;
   height: 100%;

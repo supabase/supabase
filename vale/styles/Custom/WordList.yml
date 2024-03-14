@@ -17,7 +17,6 @@ swap:
   '(?:ok|Okay)': OK|okay
   '(?:WiFi|wifi)': Wi-Fi
   '(?i)postgresql': Postgres
-  '(?i)repository': repo
   '[\.]+apk': APK
   '3\-D': 3D
   'Google (?:I\-O|IO)': Google I/O

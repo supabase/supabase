@@ -20,10 +20,10 @@ The keys are both long-lived JWTs. If you decode these keys, you will see that t
 
 ## The `anon` key
 
-The `anon` key has very few privileges. You can use it in your [RLS policies](/docs/guides/auth/row-level-security) for "anonymous" access. For example, this policy will allow access to the `profiles` table:
+The `anon` key has very few privileges. You can use it in your [RLS policies](/docs/guides/auth/row-level-security) to allow unauthenticated access. For example, this policy will allow unauthenticated access to the `profiles` table:
 
 ```sql
-create policy "Allow anonymous access" on profiles to anon for
+create policy "Allow public access" on profiles to anon for
 select
   using (true);
 ```
@@ -31,7 +31,7 @@ select
 And similarity for disallowing access:
 
 ```sql
-create policy "Disallow anonymous access" on profiles to anon for
+create policy "Disallow public access" on profiles to anon for
 select
   using (false);
 ```

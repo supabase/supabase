@@ -104,10 +104,10 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="">
               {formattedError.length > 0 ? (
                 formattedError.map((x: string, i: number) => (
-                  <pre key={`error-${i}`} className="font-mono text-sm">
+                  <pre key={`error-${i}`} className="font-mono text-sm text-wrap">
                     {x}
                   </pre>
                 ))

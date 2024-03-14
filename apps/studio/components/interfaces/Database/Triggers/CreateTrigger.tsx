@@ -4,22 +4,6 @@ import { observer, useLocalObservable } from 'mobx-react-lite'
 import { createContext, useContext, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import SVG from 'react-inlinesvg'
-
-import type { Dictionary } from 'types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import FormEmptyBox from 'components/ui/FormBoxEmpty'
-import NoTableState from 'components/ui/States/NoTableState'
-import {
-  DatabaseFunction,
-  useDatabaseFunctionsQuery,
-} from 'data/database-functions/database-functions-query'
-import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
-import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useStore } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Badge,
   Button,
@@ -32,6 +16,21 @@ import {
   Modal,
   SidePanel,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import FormEmptyBox from 'components/ui/FormBoxEmpty'
+import NoTableState from 'components/ui/States/NoTableState'
+import {
+  DatabaseFunction,
+  useDatabaseFunctionsQuery,
+} from 'data/database-functions/database-functions-query'
+import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
+import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { BASE_PATH } from 'lib/constants'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import type { Dictionary } from 'types'
 import ChooseFunctionForm from './ChooseFunctionForm'
 
 class CreateTriggerFormState {
@@ -237,7 +236,6 @@ interface CreateTriggerProps {
 
 const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => {
   const { project } = useProjectContext()
-  const { ui, meta } = useStore()
   const [isClosingPanel, setIsClosingPanel] = useState(false)
   const _localState = useLocalObservable(() => new CreateTriggerStore())
 

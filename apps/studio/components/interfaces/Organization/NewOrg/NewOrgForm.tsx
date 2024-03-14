@@ -1,29 +1,18 @@
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import type { PaymentMethod } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import {
-  Button,
-  IconEdit2,
-  IconExternalLink,
-  IconHelpCircle,
-  IconInfo,
-  Input,
-  Listbox,
-  Toggle,
-} from 'ui'
+import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import SpendCapModal from 'components/interfaces/Billing/SpendCapModal'
-import InformationBox from 'components/ui/InformationBox'
 import Panel from 'components/ui/Panel'
 import { useOrganizationCreateMutation } from 'data/organizations/organization-create-mutation'
 import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useStore } from 'hooks'
 import { BASE_PATH, PRICING_TIER_LABELS_ORG } from 'lib/constants'
 import { getURL } from 'lib/helpers'
+import { Button, IconEdit2, IconHelpCircle, Input, Listbox, Toggle } from 'ui'
 
 const ORG_KIND_TYPES = {
   PERSONAL: 'Personal',
@@ -52,12 +41,10 @@ interface NewOrgFormProps {
  * No org selected yet, create a new one
  */
 const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
-  const queryClient = useQueryClient()
-  const { ui } = useStore()
   const router = useRouter()
   const stripe = useStripe()
   const elements = useElements()
-
+  const queryClient = useQueryClient()
   const { plan, name, kind, size, spend_cap } = useParams()
 
   const [orgName, setOrgName] = useState(name || '')
@@ -142,7 +129,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
 
     const isOrgNameValid = validateOrgName(orgName)
     if (!isOrgNameValid) {
-      return ui.setNotification({ category: 'error', message: 'Organization name is empty' })
+      return toast.error('Organization name is empty')
     }
 
     if (!stripe || !elements) {
@@ -163,10 +150,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
       })
 
       if (error || !setupIntent.payment_method) {
-        ui.setNotification({
-          category: 'error',
-          message: error?.message ?? ' Failed to save card details',
-        })
+        toast.error(error?.message ?? ' Failed to save card details')
         setNewOrgLoading(false)
         return
       }
