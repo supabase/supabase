@@ -20,6 +20,11 @@ import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationConnectionItem } from '../../Integrations/IntegrationConnection'
 import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
+import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
+import {
+  GITHUB_INTEGRATION_INSTALLATION_URL,
+  GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL,
+} from 'lib/github'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -34,6 +39,8 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 const IntegrationSettings = () => {
   const org = useSelectedOrganization()
   const hasAccessToBranching = useFlag<boolean>('branchManagement')
+  const { data: gitHubAuthorization, isLoading: isLoadingGitHubAuthorization } =
+    useGitHubAuthorizationQuery()
   const { data: connections } = useGitHubConnectionsQuery({ organizationId: org?.id })
 
   const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
@@ -79,6 +86,10 @@ Connect any of your GitHub repositories to a project.
 You will be able to connect a GitHub repository to a Supabase project.
 The GitHub app will watch for changes in your repository such as file changes, branch changes as well as pull request activity.
 `
+
+  const GitHubContentSectionBottom = gitHubAuthorization
+    ? `You are authorized with Supabase GitHub App. You can configure your GitHub App installations and repository access [here](${GITHUB_INTEGRATION_INSTALLATION_URL}). You can revoke your authorization [here](${GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL}).`
+    : ''
 
   const GitHubSection = () => (
     <ScaffoldContainer>
@@ -136,6 +147,9 @@ The GitHub app will watch for changes in your repository such as file changes, b
               </a>{' '}
               is required to add GitHub connections.
             </p>
+          )}
+          {GitHubContentSectionBottom && (
+            <Markdown content={GitHubContentSectionBottom} className="text-foreground-lighter" />
           )}
         </ScaffoldSectionContent>
       </ScaffoldSection>
