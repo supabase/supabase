@@ -24,6 +24,7 @@ const CONFIRMATION: FormSchema = {
 - \`{{ .SiteURL }}\` : The URL of the site
 - \`{{ .Email }}\` : The user's email address
 - \`{{ .Data }}\` : The user's \`user_metadata\`
+- \`{{ .MailType }}\`: The type of email being sent.
 `,
     },
   },
@@ -58,6 +59,7 @@ const INVITE: FormSchema = {
 - \`{{ .SiteURL }}\` : The URL of the site
 - \`{{ .Email }}\` : The user's email address
 - \`{{ .Data }}\` : The user's \`user_metadata\`
+- \`{{ .MailType }}\`: The type of email being sent.
 `,
     },
   },
@@ -92,6 +94,7 @@ const MAGIC_LINK: FormSchema = {
 - \`{{ .SiteURL }}\` : The URL of the site
 - \`{{ .Email }}\` : The user's email address
 - \`{{ .Data }}\` : The user's \`user_metadata\`
+- \`{{ .MailType }}\`: The type of email being sent.
 `,
     },
   },
@@ -127,6 +130,7 @@ const EMAIL_CHANGE: FormSchema = {
 - \`{{ .Email }}\` : The original user's email address
 - \`{{ .NewEmail }}\` : The user's new email address
 - \`{{ .Data }}\` : The user's \`user_metadata\`
+- \`{{ .MailType }}\`: The type of email being sent.
 `,
     },
   },
@@ -161,6 +165,7 @@ const RECOVERY: FormSchema = {
 - \`{{ .SiteURL }}\` : The URL of the site
 - \`{{ .Email }}\` : The user's email address
 - \`{{ .Data }}\` : The user's \`user_metadata\`
+- \`{{ .MailType }}\`: The type of email being sent.
 `,
     },
   },
