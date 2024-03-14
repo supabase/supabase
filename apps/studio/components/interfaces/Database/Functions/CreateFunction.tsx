@@ -250,7 +250,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                     </FormLabel_Shadcn_>
                     <FormDescription_Shadcn_ className="text-sm text-foreground-light">
                       <p>The language below should be written in `plpgsql`.</p>
-                      {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
+                      {!isEditing && <p>Change the language in the advanced settings below.</p>}
                     </FormDescription_Shadcn_>
                   </div>
 
@@ -325,6 +325,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                   <SidePanel.Separator />
                   <SidePanel.Content className="!m-0 py-6">
                     <div className="space-y-4">
+                      <h5 className="text-base text-foreground">Type of security</h5>
                       <FormField_Shadcn_
                         control={form.control}
                         name="security_definer"
@@ -334,7 +335,6 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                               {/* TODO: This RadioGroup imports Formik state, replace it with a clean component */}
                               <Radio.Group
                                 type="cards"
-                                label="Type of security"
                                 layout="vertical"
                                 onChange={(event) =>
                                   field.onChange(event.target.value == 'SECURITY_DEFINER')
@@ -509,10 +509,8 @@ const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
   })
 
   return (
-    <div>
-      <div className="flex flex-col">
-        <h5 className="text-base text-foreground">Configuration parameters</h5>
-      </div>
+    <>
+      <h5 className="text-base text-foreground">Configuration parameters</h5>
       <div className="space-y-2 pt-4">
         {readonly && isEmpty(fields) && (
           <span className="text-foreground-lighter">No argument for this function</span>
@@ -525,7 +523,7 @@ const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
                 render={({ field }) => (
                   <FormItem_Shadcn_ className="flex-1">
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="Name of config" />
+                      <Input_Shadcn_ {...field} placeholder="parameter_name" />
                     </FormControl_Shadcn_>
                     <FormMessage_Shadcn_ />
                   </FormItem_Shadcn_>
@@ -536,7 +534,7 @@ const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
                 render={({ field }) => (
                   <FormItem_Shadcn_ className="flex-1">
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} placeholder="Value of config" />
+                      <Input_Shadcn_ {...field} placeholder="parameter_value" />
                     </FormControl_Shadcn_>
                     <FormMessage_Shadcn_ />
                   </FormItem_Shadcn_>
@@ -567,7 +565,7 @@ const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
           </Button>
         )}
       </div>
-    </div>
+    </>
   )
 }
 
