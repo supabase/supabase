@@ -309,7 +309,13 @@ export default (isMobile?: boolean) => ({
   },
   examplesSection: {
     title: 'Examples',
-    examples: Examples.filter((example) => example.products.includes(PRODUCT_NAMES.FUNCTIONS)),
+    cta: {
+      label: 'View all examples',
+      href: '/dashboard/docs/guides/functions#examples',
+      type: 'default' as any,
+    },
+    // examples: Examples.filter((example) => example.products.includes(PRODUCT_NAMES.FUNCTIONS)),
+    examples: Examples,
   },
 })
 

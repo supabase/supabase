@@ -13,15 +13,16 @@ import ProductHeader from '~/components/Sections/ProductHeader2'
 import ProductsNav from '~/components/Products/ProductsNav'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import ProductsCta from '../components/Sections/ProductsCta'
 
 const HighlightColumns = dynamic(() => import('~/components/Sections/HighlightColumns'))
 const TimedAccordionSection = dynamic(() => import('~/components/Sections/TimedAccordionSection'))
 const TimedAccordionPanels = dynamic(() => import('~/components/Sections/TimedAccordionPanels'))
+const ProductsCta = dynamic(() => import('~/components/Sections/ProductsCta2'))
 const LocalDXGrid = dynamic(() => import('~/components/Products/Functions/LocalDXGrid'))
 const GlobalPresenceSection = dynamic(
   () => import('~/components/Products/Functions/GlobalPresenceSection')
 )
+const ExamplesThreeCols = dynamic(() => import('~/components/Examples/ExamplesThreeCols'))
 
 function Database() {
   // base path for images
@@ -81,6 +82,9 @@ function Database() {
             {pageData.integratesWithSupabase.title}
           </h2>
           <TimedAccordionSection tabs={pageData.integratesWithSupabase.useCases} />
+        </SectionContainer>
+        <SectionContainer className="flex flex-col gap-4 lg:gap-8">
+          <ExamplesThreeCols {...pageData.examplesSection} />
         </SectionContainer>
         <div className="bg-background">
           <div className="w-full h-[1px] bg-gradient-to-r from-background-alternative via-border to-background-alternative" />
