@@ -1,9 +1,9 @@
-const GITHUB_INTEGRATION_INSTALLATION_URL =
+const GITHUB_INTEGRATION_APP_NAME =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
-    ? `https://github.com/apps/supabase/installations/new`
+    ? `supabase`
     : process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? `https://github.com/apps/supabase-staging/installations/new`
-      : `https://github.com/apps/supabase-local-testing/installations/new`
+      ? `supabase-staging`
+      : `supabase-local-testing`
 
 const GITHUB_INTEGRATION_CLIENT_ID =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
@@ -13,6 +13,8 @@ const GITHUB_INTEGRATION_CLIENT_ID =
       : `Iv1.5022a3b44d150fbf`
 
 const GITHUB_INTEGRATION_AUTHORIZATION_URL = `https://github.com/login/oauth/authorize?client_id=${GITHUB_INTEGRATION_CLIENT_ID}`
+export const GITHUB_INTEGRATION_INSTALLATION_URL = `https://github.com/apps/${GITHUB_INTEGRATION_APP_NAME}/installations/new`
+export const GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL = `https://github.com/settings/connections/applications/${GITHUB_INTEGRATION_CLIENT_ID}`
 
 export function openInstallGitHubIntegrationWindow(type: 'install' | 'authorize') {
   const w = 600
