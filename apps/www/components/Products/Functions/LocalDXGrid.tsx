@@ -3,7 +3,7 @@ import React from 'react'
 import { cn } from 'ui'
 import { useBreakpoint } from 'common'
 import page from '~/data/products/functions/page'
-import Panel from '../../Panel'
+import Panel from '~/components/Panel'
 
 export default function LocalDXGrid() {
   const isXs = useBreakpoint(640)

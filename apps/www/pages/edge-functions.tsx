@@ -22,7 +22,7 @@ const LocalDXGrid = dynamic(() => import('~/components/Products/Functions/LocalD
 const GlobalPresenceSection = dynamic(
   () => import('~/components/Products/Functions/GlobalPresenceSection')
 )
-const ExamplesThreeCols = dynamic(() => import('~/components/Examples/ExamplesThreeCols'))
+const ExamplesCarousel = dynamic(() => import('~/components/Examples/ExamplesCarousel'))
 
 function Database() {
   // base path for images
@@ -53,16 +53,17 @@ function Database() {
           {...pageData.heroSection}
           footer={<HighlightColumns highlights={pageData.highlightsSection.highlights} />}
         />
-        <SectionContainer className="flex flex-col gap-4 lg:gap-8">
-          <h2 className="text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-[360px]">
+        {/* <SectionContainer className="flex flex-col gap-4 lg:gap-8">
+          <h2 className="text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs lg:max-w-none">
             {pageData.useCasesSection.title}
           </h2>
           <TimedAccordionSection tabs={pageData.useCasesSection.useCases} />
+        </SectionContainer> */}
+        <SectionContainer className="flex flex-col gap-4 lg:gap-8 !pb-0">
+          <ExamplesCarousel {...pageData.examplesSection} />
         </SectionContainer>
         <SectionContainer className="flex flex-col gap-4">
-          <h2 className="text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-[360px]">
-            {pageData.localDXsection.title}
-          </h2>
+          <h2 className="h2">{pageData.localDXsection.title}</h2>
           <p className="text-foreground-lighter lg:w-1/2">{pageData.localDXsection.paragraph}</p>
           <div className="mt-4 md:mt-8">
             <LocalDXGrid />
@@ -72,20 +73,16 @@ function Database() {
           <GlobalPresenceSection {...pageData.globalPresenceSection} />
         </SectionContainer>
         <SectionContainer className="flex flex-col gap-4 lg:gap-8">
-          <h2 className="text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-[360px]">
-            {pageData.o11y.title}
-          </h2>
+          <h2 className="h2">{pageData.o11y.title}</h2>
           <TimedAccordionPanels {...pageData.o11y} />
         </SectionContainer>
         <SectionContainer className="flex flex-col gap-4 lg:gap-8">
-          <h2 className="text-3xl xl:text-4xl max-w-[380px] xl:max-w-[420px]">
-            {pageData.integratesWithSupabase.title}
-          </h2>
+          <h2 className="h2">{pageData.integratesWithSupabase.title}</h2>
           <TimedAccordionSection tabs={pageData.integratesWithSupabase.useCases} />
         </SectionContainer>
-        <SectionContainer className="flex flex-col gap-4 lg:gap-8">
-          <ExamplesThreeCols {...pageData.examplesSection} />
-        </SectionContainer>
+        {/* <SectionContainer className="flex flex-col gap-4 lg:gap-8">
+          <ExamplesCarousel {...pageData.examplesSection} />
+        </SectionContainer> */}
         <div className="bg-background">
           <div className="w-full h-[1px] bg-gradient-to-r from-background-alternative via-border to-background-alternative" />
           <ProductsCta currentProduct={PRODUCT_SHORTNAMES.FUNCTIONS} />

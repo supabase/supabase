@@ -152,17 +152,18 @@ export default (isMobile?: boolean) => ({
       },
       {
         label: 'OpenAI proxying',
-        paragraph: '',
+        paragraph:
+          'Proxy API requests from clients to OpenAI so they won’t expose their openAI secret to their users',
         panel: <div>lorem</div>,
       },
       {
         label: 'Stripe',
-        paragraph: '',
+        paragraph: 'Handling signed Stripe Webhooks with Edge Functions',
         panel: <div>lorem</div>,
       },
       {
         label: 'Connecting directly to DB',
-        paragraph: '',
+        paragraph: 'To connect directly to DB without using Postgrest',
         panel: <div>lorem</div>,
       },
       {
@@ -287,35 +288,53 @@ export default (isMobile?: boolean) => ({
       },
       {
         label: 'Connect to your database',
-        paragraph: '',
+        paragraph:
+          'Connect to your Postgres database from an Edge Function by using the supabase-js client',
         panel: <div>lorem</div>,
       },
       {
         label: 'Trigger via webhook',
-        paragraph: '',
+        paragraph:
+          'Database Webhooks allow you to send real-time data from your database to another system whenever a table event occurs',
         panel: <div>lorem</div>,
       },
       {
         label: 'Works with Supabase Auth',
-        paragraph: '',
+        paragraph: (
+          <>
+            Edge Functions is designed to work seamlessly with{' '}
+            <Link href="https://supabase.com/docs/guides/functions/auth" className="underline">
+              Supabase Auth
+            </Link>
+          </>
+        ),
         panel: <div>lorem</div>,
       },
       {
         label: 'Works with Supabase Storage',
-        paragraph: '',
+        paragraph: (
+          <>
+            Edge Functions is designed to work seamlessly with{' '}
+            <Link
+              href="https://supabase.com/docs/guides/functions/storage-caching"
+              className="underline"
+            >
+              Supabase Storage
+            </Link>
+          </>
+        ),
         panel: <div>lorem</div>,
       },
     ],
   },
   examplesSection: {
-    title: 'Examples',
+    title: 'What you can build with Edge Functions',
     cta: {
       label: 'View all examples',
-      href: '/dashboard/docs/guides/functions#examples',
+      href: '/docs/guides/functions#examples',
       type: 'default' as any,
     },
-    // examples: Examples.filter((example) => example.products.includes(PRODUCT_NAMES.FUNCTIONS)),
-    examples: Examples,
+    examples: Examples.filter((example) => example.products.includes(PRODUCT_NAMES.FUNCTIONS)),
   },
 })
 

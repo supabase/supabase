@@ -44,17 +44,14 @@ const TimedPanel = ({
     >
       <Panel outerClassName="w-full h-full mb-4" innerClassName="p-4">
         <div className="relative z-10 flex flex-col h-full justify-between">
-          <motion.p
-            className={cn('font-mono text-sm uppercase')}
-            animate={
-              isActive
-                ? { fontSize: '1.125rem', transition: { delay: 0.05 } }
-                : { fontSize: '0.875rem' }
-            }
-            transition={{ duration: 0.1 }}
+          <p
+            className={cn(
+              'font-mono text-sm uppercase transition-colors',
+              isActive && 'text-foreground'
+            )}
           >
             {label}
-          </motion.p>
+          </p>
           <p
             className={cn(
               'pt-2 text-foreground-lighter text-sm max-w-[220px] md:opacity-0 transition-opacity lg:opacity-100',

@@ -9,7 +9,7 @@ import Image from 'next/image'
 
 interface TabProps {
   label: string | React.ReactNode
-  paragraph?: string
+  paragraph?: string | React.ReactNode
   isActive: boolean
   onClick: VoidFunction
   progress: number | undefined
@@ -71,7 +71,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
 
 interface Tab {
   label: string | React.ReactNode
-  paragraph?: string
+  paragraph?: string | React.ReactNode
   panel?: JSX.Element
   code?: string
 }

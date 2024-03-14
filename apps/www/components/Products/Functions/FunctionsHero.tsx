@@ -61,8 +61,8 @@ const FunctionsHero = () => {
         initial: '0',
         frames: ['0', '130%'],
       },
-      duration: 500,
-      delay: 1000,
+      duration: 750,
+      delay: 3000,
       offset: '+=30',
       easing: 'linear',
     },
@@ -86,7 +86,7 @@ const FunctionsHero = () => {
         frames: ['0', '130%'],
       },
       duration: 800,
-      delay: 3000,
+      delay: 6000,
       offset: '+=3000',
       easing: 'linear',
     },
@@ -121,32 +121,30 @@ const FunctionsHero = () => {
   }, [])
 
   const animate = () => {
-    console.log('yo')
-    const tl = anime.timeline({
-      loop: true,
-      autoplay: true,
-    })
+    // const tl = anime.timeline({
+    //   loop: true,
+    //   autoplay: true,
+    // })
 
     svgs.forEach((svg: any) => {
-      tl.add(
-        {
-          targets: `#functions-hero #${svg.id} linearGradient`,
-          y1: svg.y1.frames,
-          y2: svg.y2.frames,
-          easing: svg.easing,
-          duration: svg.duration,
-          // delay: svg.delay,
-          // delay: (el) => parseInt(el.dataset.delay!),
-          delay: (el) => {
-            console.log(parseInt(el.dataset.delay!))
-            return parseInt(el.dataset.delay!)
-          },
-        },
-        svg.offset
-      )
+      anime({
+        loop: true,
+        autoplay: true,
+        targets: `#functions-hero #${svg.id} linearGradient`,
+        y1: svg.y1.frames,
+        y2: svg.y2.frames,
+        easing: svg.easing,
+        duration: svg.duration,
+        delay: svg.delay,
+        // delay: (el) => parseInt(el.dataset.delay!),
+        // delay: (el) => {
+        //   console.log(parseInt(el.dataset.delay!))
+        //   return parseInt(el.dataset.delay!)
+        // },
+      })
     })
 
-    tl.play()
+    // tl.play()
   }
 
   useEffect(() => {
@@ -157,6 +155,13 @@ const FunctionsHero = () => {
       showCursor: true,
       loop: false,
     })
+
+    typed.stop()
+    typed.reset()
+
+    setTimeout(() => {
+      typed.start()
+    }, 1000)
 
     return () => {
       // Destroy Typed instance during cleanup to stop animation
@@ -183,7 +188,8 @@ const FunctionsHero = () => {
           w-[50%] left-[27%] top-[2%]
           md:left-[33.5%] md:w-[35%] md:top-[6%]
           lg:left-[26%] lg:w-[52%] lg:top-[3%]
-          xl:left-[32%] xl:w-[40%] xl:top-[3%]
+          xl:left-[28%] xl:w-[48%] xl:top-[3%]
+          2xl:left-[32%] 2xl:w-[40%] 2xl:top-[3%]
         "
       >
         <CopyToClipboard text="supabase functions deploy hello">
@@ -192,9 +198,10 @@ const FunctionsHero = () => {
             className="w-full px-3 py-2 group hover:border-strong flex gap-2 items-center bg-alternative rounded-xl border"
           >
             <div className="text-foreground-muted text-sm font-mono">$</div>
-            <div ref={typerRef} className="text-foreground text-xs md:text-sm font-mono">
-              supabase functions deploy hello
-            </div>
+            <div
+              ref={typerRef}
+              className="opacity-0 animate-fade-in text-foreground text-xs md:text-sm font-mono"
+            ></div>
             <div className="text-foreground rounded p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
               {copied ? (
                 <span className="text-brand">
