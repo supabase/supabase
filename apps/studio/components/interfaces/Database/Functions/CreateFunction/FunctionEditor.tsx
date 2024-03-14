@@ -46,9 +46,8 @@ export const FunctionEditor = ({
                 'transition z-50'
               )}
               onClick={() => setFocused(!focused)}
-            >
-              {focused ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
-            </Button>
+              icon={focused ? <Minimize2 /> : <Maximize2 />}
+            ></Button>
           </TooltipTrigger_Shadcn_>
           <TooltipContent_Shadcn_ side="bottom">
             {focused ? 'Minimize editor' : 'Maximize editor'}
