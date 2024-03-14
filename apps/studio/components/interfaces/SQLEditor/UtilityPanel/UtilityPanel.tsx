@@ -48,7 +48,7 @@ const UtilityPanel = ({
     // Optimistic update to the cache
     onMutate: async (newContentSnippet) => {
       // No need to update the cache for non-SQL content
-      const payload = newContentSnippet.payload
+      const { payload } = newContentSnippet
       if (payload.type !== 'sql') return
       if (!('chart' in payload.content)) return
 
@@ -57,7 +57,7 @@ const UtilityPanel = ({
       const newContent = {
         ...data,
         content: data?.content.map((i) => {
-          if (i.id === id) {
+          if (i.id === payload.id) {
             return {
               ...i,
               content: {
