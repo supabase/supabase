@@ -441,3 +441,8 @@
     @apply stroke-foreground-lighter;
   }
 }
+
+// Used on radix popover contents so that the width matches the trigger
+.popover-trigger-width {
+  width: var(--radix-popover-trigger-width);
+}

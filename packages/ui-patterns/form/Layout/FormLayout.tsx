@@ -41,7 +41,7 @@ const ContainerVariants = cva('grid gap-2', {
       false: '',
     },
     layout: {
-      horizontal: 'flex flex-row gap-6 justify-between',
+      horizontal: 'grid grid-cols-12',
       vertical: 'flex flex-col gap-3',
       flex: 'flex flex-row gap-3',
     },
@@ -71,7 +71,7 @@ const LabelContainerVariants = cva('', {
       right: '',
     },
     layout: {
-      horizontal: 'flex flex-col gap-2',
+      horizontal: 'flex flex-col gap-2 col-span-4',
       vertical: 'flex flex-row gap-2 justify-between',
       flex: 'flex flex-col gap-0',
     },

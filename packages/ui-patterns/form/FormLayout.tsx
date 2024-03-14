@@ -23,6 +23,9 @@ import { Input } from '../DataInputs/Input'
 import { InfoTooltip } from '../InfoTooltip/InfoTooltip'
 import { FormItemLayout } from './FormItemLayout/FormItemLayout'
 
+/**
+ * This is helper file for the FormLayout stories.
+ */
 const items = [
   {
     id: 'recents',
