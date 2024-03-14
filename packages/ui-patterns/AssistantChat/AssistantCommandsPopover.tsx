@@ -7,7 +7,6 @@ import {
   forwardRef,
   useEffect,
   useRef,
-  useState,
 } from 'react'
 import {
   Command,
@@ -56,8 +55,6 @@ const AssistantCommandsPopover = forwardRef<
     },
     ref
   ) => {
-    const [command, setCommand] = useState<string>('')
-
     const popoverContentRef = createRef<HTMLDivElement>()
     const commandWidth = popoverContentRef.current?.clientWidth
 
@@ -118,8 +115,6 @@ const AssistantCommandsPopover = forwardRef<
       }
     }
 
-    useEffect(() => {}, [command, popoverContentRef])
-
     const resultArray = value.split(/(\s+)/).filter(Boolean)
 
     const commands = ['fix', 'improve', 'explain', 'help']
@@ -140,10 +135,9 @@ const AssistantCommandsPopover = forwardRef<
                 style={{
                   left: '0px',
                   top: '10px',
-                  marginLeft:
-                    command && commandWidth
-                      ? `${(usingIcon ? 48 : 12) + commandWidth + 12}px`
-                      : `${usingIcon ? 48 : 12}px`,
+                  marginLeft: commandWidth
+                    ? `${(usingIcon ? 48 : 12) + commandWidth + 12}px`
+                    : `${usingIcon ? 48 : 12}px`,
                 }}
                 className={cn('z-0 absolute flex items-center text-sm text-transparent')}
               >
@@ -172,7 +166,6 @@ const AssistantCommandsPopover = forwardRef<
             align="start"
             onOpenAutoFocus={(event) => {
               event.preventDefault()
-              // if (textAreaRef) textAreaRef?.current?.focus()
             }}
           >
             <Command>
