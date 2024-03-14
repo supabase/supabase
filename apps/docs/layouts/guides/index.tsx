@@ -17,6 +17,7 @@ import useHash from '~/hooks/useHash'
 import { Feedback } from '~/components/Feedback'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { MainSkeleton } from '~/layouts/MainSkeleton'
+import 'katex/dist/katex.min.css'
 
 interface Props {
   meta: {

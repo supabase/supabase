@@ -1,6 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import SqlEditor from 'components/ui/SqlEditor'
 import { Maximize2, Minimize2 } from 'lucide-react'
+
+import SqlEditor from 'components/ui/SqlEditor'
 import { Button, FormControl_Shadcn_, cn } from 'ui'
 
 export const FunctionEditor = ({
@@ -13,10 +14,7 @@ export const FunctionEditor = ({
   setFocused: (b: boolean) => void
 }) => {
   return (
-    <div
-      className={cn('rounded-md relative group flex-grow')}
-      // style={{ height: focused ? 'calc(100% - 100px)' : '240px' }}
-    >
+    <div className={cn('rounded-md relative group flex-grow')}>
       <FormControl_Shadcn_>
         <SqlEditor
           defaultValue={field.value}
@@ -37,10 +35,13 @@ export const FunctionEditor = ({
             <Button
               type="text"
               size="tiny"
-              className={cn('text-foreground-lighter hover:text-foreground', 'transition z-50')}
+              className={cn(
+                'px-2 text-foreground-lighter hover:text-foreground',
+                'transition z-50'
+              )}
               onClick={() => setFocused(!focused)}
             >
-              {focused ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+              {focused ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
             </Button>
           </Tooltip.Trigger>
           <Tooltip.Portal>
@@ -53,7 +54,7 @@ export const FunctionEditor = ({
                 ].join(' ')}
               >
                 <span className="text-xs text-foreground">
-                  {focused ? 'Minimize' : 'Maximize2'}
+                  {focused ? 'Minimize editor' : 'Maximize editor'}
                 </span>
               </div>
             </Tooltip.Content>

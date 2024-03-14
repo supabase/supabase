@@ -1,7 +1,7 @@
+import { PostgresFunction } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 
-import { PostgresFunction } from '@supabase/postgres-meta'
 import { CreateFunction, DeleteFunction } from 'components/interfaces/Database'
 import FunctionsList from 'components/interfaces/Database/Functions/FunctionsList/FunctionsList'
 import { DatabaseLayout } from 'components/layouts'

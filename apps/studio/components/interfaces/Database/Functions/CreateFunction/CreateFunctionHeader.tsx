@@ -1,5 +1,5 @@
-import clsx from 'clsx'
 import { X } from 'lucide-react'
+
 import { SheetClose, SheetHeader, SheetTitle, cn } from 'ui'
 
 export const CreateFunctionHeader = ({
@@ -15,12 +15,12 @@ export const CreateFunctionHeader = ({
     <SheetHeader
       className={cn(
         selectedFunction !== undefined ? 'pt-3 pb-0' : 'py-3',
-        'flex flex-row justify-between items-center'
+        'flex flex-row justify-between items-center border-b-0'
       )}
     >
       <div className="flex flex-row gap-3 items-center max-w-[75%]">
         <SheetClose
-          className={clsx(
+          className={cn(
             'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
             'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
             'disabled:pointer-events-none data-[state=open]:bg-secondary',

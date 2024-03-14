@@ -1,6 +1,6 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
-import clsx from 'clsx'
 import { PanelLeftClose, PanelRightClose, X } from 'lucide-react'
+
 import {
   SheetClose,
   SheetHeader,
@@ -29,7 +29,7 @@ export const AIPolicyHeader = ({
     >
       <div className="flex flex-row gap-3 items-center max-w-[75%]">
         <SheetClose
-          className={clsx(
+          className={cn(
             'text-muted hover:text ring-offset-background transition-opacity hover:opacity-100',
             'focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
             'disabled:pointer-events-none data-[state=open]:bg-secondary',

@@ -3,11 +3,11 @@
 import { Slot } from '@radix-ui/react-slot'
 import { VariantProps, cva } from 'class-variance-authority'
 import { cloneElement, forwardRef, isValidElement } from 'react'
-
-import { sizes } from '../../lib/commonCva'
+import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../lib/constants'
 import { cn } from '../../lib/utils/cn'
 import { IconContext } from '../Icon/IconContext'
 import { IconLoader } from '../Icon/icons/IconLoader'
+import { Loader } from 'lucide-react'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
@@ -136,7 +136,7 @@ const buttonVariants = cva(
         true: 'w-full flex items-center justify-center',
       },
       size: {
-        ...sizes,
+        ...SIZE_VARIANTS,
       },
       overlay: {
         base: `absolute inset-0 bg-background opacity-50`,
@@ -151,6 +151,9 @@ const buttonVariants = cva(
       defaultVariants: {
         //   variant: 'default',
         //   size: 'default',
+        size: {
+          SIZE_VARIANTS_DEFAULT,
+        },
       },
     },
   }
@@ -237,7 +240,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               undefined,
               showIcon &&
                 (loading ? (
-                  <IconLoader size={size} className={cn(loadingVariants({ loading }))} />
+                  <div className={cn(IconContainerVariants({ size }))}>
+                    <Loader className={cn(loadingVariants({ loading }))} />
+                  </div>
                 ) : _iconLeft ? (
                   <div className={cn(IconContainerVariants({ size }))}>{_iconLeft}</div>
                 ) : null),
@@ -253,11 +258,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           <>
             {showIcon &&
               (loading ? (
-                <IconLoader size={size} className={cn(loadingVariants({ loading }))} />
+                <div className={cn(IconContainerVariants({ size }))}>
+                  <Loader className={cn(loadingVariants({ loading }))} />
+                </div>
               ) : _iconLeft ? (
-                <IconContext.Provider value={{ contextSize: size }}>
-                  {_iconLeft}
-                </IconContext.Provider>
+                <div className={cn(IconContainerVariants({ size }))}>{_iconLeft}</div>
               ) : null)}{' '}
             {children && <span className={'truncate'}>{children}</span>}{' '}
             {iconRight && !loading && (
