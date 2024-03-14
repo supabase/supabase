@@ -1,7 +1,21 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { PostgresFunction } from '@supabase/postgres-meta'
 import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import z from 'zod'
+import { Plus, Trash } from 'lucide-react'
+
+import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import SchemaSelector from 'components/ui/SchemaSelector'
+import SqlEditor from 'components/ui/SqlEditor'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
+import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { FormSchema } from 'types'
 import {
   Button,
   FormControl_Shadcn_,
@@ -11,11 +25,10 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
-  IconPlus,
-  IconTrash,
   Input_Shadcn_,
   Modal,
   Radio,
+  ScrollArea,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
@@ -26,19 +39,6 @@ import {
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import z from 'zod'
-
-import { zodResolver } from '@hookform/resolvers/zod'
-import { PostgresFunction } from '@supabase/postgres-meta'
-import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import SchemaSelector from 'components/ui/SchemaSelector'
-import SqlEditor from 'components/ui/SqlEditor'
-import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
-import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { FormSchema } from 'types'
 import { convertArgumentTypes, convertConfigParams } from './Functions.utils'
 
 const FORM_ID = 'create-function-sidepanel'
@@ -65,6 +65,7 @@ const FormSchema = z.object({
 
 const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
   const { project } = useProjectContext()
+  const [isClosingPanel, setIsClosingPanel] = useState(false)
   const [advancedSettingsShown, setAdvancedSettingsShown] = useState(false)
 
   const isEditing = !!func?.id
@@ -73,28 +74,10 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
     resolver: zodResolver(FormSchema),
   })
 
-  const [isClosingPanel, setIsClosingPanel] = useState(false)
-
   const { mutate: createDatabaseFunction, isLoading: isCreating } =
     useDatabaseFunctionCreateMutation()
   const { mutate: updateDatabaseFunction, isLoading: isUpdating } =
     useDatabaseFunctionUpdateMutation()
-
-  useEffect(() => {
-    if (visible) {
-      form.reset({
-        name: func?.name ?? '',
-        schema: func?.schema ?? 'public',
-        args: convertArgumentTypes(func?.argument_types || '').value,
-        behavior: func?.behavior ?? 'VOLATILE',
-        definition: func?.definition ?? '',
-        language: func?.language ?? 'plpgsql',
-        return_type: func?.return_type ?? 'void',
-        security_definer: func?.security_definer ?? false,
-        config_params: convertConfigParams(func?.config_params).value,
-      })
-    }
-  }, [visible, func])
 
   function isClosingSidePanel() {
     form.formState.isDirty ? setIsClosingPanel(true) : setVisible(!visible)
@@ -139,6 +122,22 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
       )
     }
   }
+
+  useEffect(() => {
+    if (visible) {
+      form.reset({
+        name: func?.name ?? '',
+        schema: func?.schema ?? 'public',
+        args: convertArgumentTypes(func?.argument_types || '').value,
+        behavior: func?.behavior ?? 'VOLATILE',
+        definition: func?.definition ?? '',
+        language: func?.language ?? 'plpgsql',
+        return_type: func?.return_type ?? 'void',
+        security_definer: func?.security_definer ?? false,
+        config_params: convertConfigParams(func?.config_params).value,
+      })
+    }
+  }, [visible, func])
 
   return (
     <SidePanel
@@ -273,23 +272,21 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
             />
           </SidePanel.Content>
           <SidePanel.Separator />
-          {isEditing ? (
-            <></>
-          ) : (
+          {isEditing ? null : (
             <>
-              <SidePanel.Content>
+              <SidePanel.Content className="!m-0 py-6">
                 <div className="space-y-8 rounded bg-studio py-4 px-6 border border-overlay">
                   <Toggle
                     onChange={() => setAdvancedSettingsShown(!advancedSettingsShown)}
                     label="Show advanced settings"
                     checked={advancedSettingsShown}
-                    labelOptional="These are settings that might be familiar for postgres heavy users "
+                    labelOptional="These are settings that might be familiar for Postgres developers"
                   />
                 </div>
               </SidePanel.Content>
               {advancedSettingsShown && (
                 <>
-                  <SidePanel.Content>
+                  <SidePanel.Content className="!m-0">
                     <div className="space-y-2">
                       <FormFieldLanguage />
                       <FormField_Shadcn_
@@ -326,7 +323,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                     <FormFieldConfigParams readonly={isEditing} />
                   </SidePanel.Content>
                   <SidePanel.Separator />
-                  <SidePanel.Content>
+                  <SidePanel.Content className="!m-0 py-6">
                     <div className="space-y-4">
                       <FormField_Shadcn_
                         control={form.control}
@@ -349,14 +346,24 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                                   label="SECURITY INVOKER"
                                   value="SECURITY_INVOKER"
                                   checked={!field.value}
-                                  description="Function is to be executed with the privileges of the user that calls it."
+                                  description={
+                                    <>
+                                      Function is to be executed with the privileges of the user
+                                      that <span className="text-foreground">calls it</span>.
+                                    </>
+                                  }
                                 />
                                 <Radio
                                   id="SECURITY_DEFINER"
                                   label="SECURITY DEFINER"
                                   value="SECURITY_DEFINER"
                                   checked={field.value}
-                                  description="Function is to be executed with the privileges of the user that created it."
+                                  description={
+                                    <>
+                                      Function is to be executed with the privileges of the user
+                                      that <span className="text-foreground">created it</span>.
+                                    </>
+                                  }
                                 />
                               </Radio.Group>
                             </FormControl_Shadcn_>
@@ -372,6 +379,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
           )}
         </form>
       </Form_Shadcn_>
+
       <ConfirmationModal
         visible={isClosingPanel}
         header="Discard changes"
@@ -424,7 +432,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                 render={({ field }) => (
                   <FormItem_Shadcn_ className="flex-1">
                     <FormControl_Shadcn_>
-                      <Input_Shadcn_ {...field} disabled={readonly} />
+                      <Input_Shadcn_ {...field} disabled={readonly} placeholder="argument_name" />
                     </FormControl_Shadcn_>
                     <FormMessage_Shadcn_ />
                   </FormItem_Shadcn_>
@@ -438,24 +446,24 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                       {readonly ? (
                         <Input_Shadcn_ value={field.value} disabled readOnly className="h-auto" />
                       ) : (
-                        <>
-                          <Select_Shadcn_
-                            disabled={readonly}
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <SelectTrigger_Shadcn_ className="h-[38px]">
-                              <SelectValue_Shadcn_ />
-                            </SelectTrigger_Shadcn_>
-                            <SelectContent_Shadcn_>
+                        <Select_Shadcn_
+                          disabled={readonly}
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                        >
+                          <SelectTrigger_Shadcn_ className="h-[38px]">
+                            <SelectValue_Shadcn_ />
+                          </SelectTrigger_Shadcn_>
+                          <SelectContent_Shadcn_>
+                            <ScrollArea className="h-52">
                               {['integer', ...POSTGRES_DATA_TYPES].map((option) => (
                                 <SelectItem_Shadcn_ value={option} key={option}>
                                   {option}
                                 </SelectItem_Shadcn_>
                               ))}
-                            </SelectContent_Shadcn_>
-                          </Select_Shadcn_>
-                        </>
+                            </ScrollArea>
+                          </SelectContent_Shadcn_>
+                        </Select_Shadcn_>
                       )}
                     </FormControl_Shadcn_>
                     <FormMessage_Shadcn_ />
@@ -466,7 +474,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
               {!readonly && (
                 <Button
                   type="danger"
-                  icon={<IconTrash size="tiny" />}
+                  icon={<Trash size={12} />}
                   onClick={() => remove(index)}
                   size="small"
                   className="h-[38px]"
@@ -477,16 +485,14 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
         })}
 
         {!readonly && (
-          <div>
-            <Button
-              type="default"
-              icon={<IconPlus />}
-              onClick={() => append({ name: '', type: 'integer' })}
-              disabled={readonly}
-            >
-              Add a new argument
-            </Button>
-          </div>
+          <Button
+            type="default"
+            icon={<Plus size={12} />}
+            onClick={() => append({ name: '', type: 'integer' })}
+            disabled={readonly}
+          >
+            Add a new argument
+          </Button>
         )}
       </div>
     </div>
@@ -505,7 +511,7 @@ const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
   return (
     <div>
       <div className="flex flex-col">
-        <h5 className="text-base text-foreground">Config params</h5>
+        <h5 className="text-base text-foreground">Configuration parameters</h5>
       </div>
       <div className="space-y-2 pt-4">
         {readonly && isEmpty(fields) && (
@@ -540,7 +546,7 @@ const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
               {!readonly && (
                 <Button
                   type="danger"
-                  icon={<IconTrash size="tiny" />}
+                  icon={<Trash size={12} />}
                   onClick={() => remove(index)}
                   size="small"
                   className="h-[38px]"
@@ -553,7 +559,7 @@ const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
         {!readonly && (
           <Button
             type="default"
-            icon={<IconPlus />}
+            icon={<Plus size={12} />}
             onClick={() => append({ name: '', type: '' })}
             disabled={readonly}
           >

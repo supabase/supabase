@@ -1,6 +1,8 @@
-import { sortBy } from 'lodash'
-import { ChevronsUpDown } from 'lucide-react'
+import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import { useState } from 'react'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useSchemasQuery } from 'data/database/schemas-query'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -13,16 +15,11 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   Command_Shadcn_,
-  IconCheck,
-  IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useSchemasQuery } from 'data/database/schemas-query'
 
 interface SchemaSelectorProps {
   className?: string
@@ -62,10 +59,9 @@ const SchemaSelector = ({
     connectionString: project?.connectionString,
   })
 
-  const schemas = sortBy(
-    (data || []).filter((schema) => !excludedSchemas.includes(schema.name)),
-    (s) => s.name
-  )
+  const schemas = (data || [])
+    .filter((schema) => !excludedSchemas.includes(schema.name))
+    .sort((a, b) => a.name.localeCompare(b.name))
 
   return (
     <div className={className}>
@@ -132,7 +128,7 @@ const SchemaSelector = ({
                       >
                         <span>All schemas</span>
                         {selectedSchemaName === '*' && (
-                          <IconCheck className="text-brand" strokeWidth={2} />
+                          <Check className="text-brand" strokeWidth={2} size={16} />
                         )}
                       </CommandItem_Shadcn_>
                     )}
@@ -151,7 +147,7 @@ const SchemaSelector = ({
                       >
                         <span>{schema.name}</span>
                         {selectedSchemaName === schema.name && (
-                          <IconCheck className="text-brand" strokeWidth={2} />
+                          <Check className="text-brand" strokeWidth={2} size={16} />
                         )}
                       </CommandItem_Shadcn_>
                     ))}
@@ -172,7 +168,7 @@ const SchemaSelector = ({
                           setOpen(false)
                         }}
                       >
-                        <IconPlus />
+                        <Plus size={12} />
                         Create a new schema
                       </CommandItem_Shadcn_>
                     </CommandGroup_Shadcn_>
