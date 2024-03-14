@@ -1,8 +1,14 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { Maximize2, Minimize2 } from 'lucide-react'
 
 import SqlEditor from 'components/ui/SqlEditor'
-import { Button, FormControl_Shadcn_, cn } from 'ui'
+import {
+  Button,
+  FormControl_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  cn,
+} from 'ui'
 
 export const FunctionEditor = ({
   field,
@@ -30,8 +36,8 @@ export const FunctionEditor = ({
           'opacity-0 group-hover:opacity-100 group-hover:top-2 transition-all'
         )}
       >
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger asChild>
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_ asChild>
             <Button
               type="text"
               size="tiny"
@@ -43,23 +49,11 @@ export const FunctionEditor = ({
             >
               {focused ? <Minimize2 size={12} /> : <Maximize2 size={12} />}
             </Button>
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow',
-                  'border border-background',
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">
-                  {focused ? 'Minimize editor' : 'Maximize editor'}
-                </span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+          </TooltipTrigger_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom">
+            {focused ? 'Minimize editor' : 'Maximize editor'}
+          </TooltipContent_Shadcn_>
+        </Tooltip_Shadcn_>
       </div>
     </div>
   )

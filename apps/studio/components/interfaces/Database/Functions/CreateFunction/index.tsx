@@ -151,13 +151,13 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
   return (
     <Sheet open={visible} onOpenChange={() => isClosingSidePanel()}>
       <SheetContent
+        showClose={false}
         size={assistantVisible ? 'lg' : 'default'}
         className={cn(
           // 'bg-surface-200',
           'p-0 flex flex-row gap-0',
           assistantVisible ? '!min-w-[1200px]' : '!min-w-[600px]'
         )}
-        showClose={false}
       >
         <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
           <CreateFunctionHeader

@@ -30,7 +30,6 @@ export const CreateFunctionHeader = ({
           <X className="h-3 w-3" />
           <span className="sr-only">Close</span>
         </SheetClose>
-        <div className="h-[24px] w-[1px] bg-border-overlay" />
         <SheetTitle className="truncate">
           {selectedFunction !== undefined
             ? `Edit '${selectedFunction}' function`
