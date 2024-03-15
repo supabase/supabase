@@ -3,9 +3,9 @@ import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Input, Modal } from 'ui'
 
 import { useProjectContentStore } from 'stores/projectContentStore'
+import { Input, Modal } from 'ui'
 
 const EditModal = () => {
   const router = useRouter()

@@ -1,14 +1,13 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
-import { observer } from 'mobx-react-lite'
-import toast from 'react-hot-toast'
-import { useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
+import toast from 'react-hot-toast'
 
+import { useTelemetryProps } from 'common'
 import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import Telemetry from 'lib/telemetry'
@@ -16,7 +15,7 @@ import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { createSqlSnippetSkeleton } from '../SQLEditor.utils'
 import SQLCard from './SQLCard'
 
-const SQLTemplates = observer(() => {
+const SQLTemplates = () => {
   const router = useRouter()
   const { profile } = useProfile()
   const { project } = useProjectContext()
@@ -89,6 +88,6 @@ const SQLTemplates = observer(() => {
       </div>
     </div>
   )
-})
+}
 
 export default SQLTemplates

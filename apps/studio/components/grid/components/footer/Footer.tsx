@@ -26,10 +26,10 @@ const Footer = ({ isLoading, isRefetching }: FooterProps) => {
   }
 
   return (
-    <div className="flex min-h-9 overflow-hidden items-center px-2 w-full border-t">
+    <div className="flex min-h-9 overflow-hidden items-center px-5 w-full border-t">
       {selectedView === 'data' && <Pagination isLoading={isLoading} />}
 
-      <div className="ml-auto flex items-center gap-4">
+      <div className="ml-auto flex items-center gap-2">
         {selectedTable && selectedView === 'data' && (
           <RefreshButton table={selectedTable} isRefetching={isRefetching} />
         )}
