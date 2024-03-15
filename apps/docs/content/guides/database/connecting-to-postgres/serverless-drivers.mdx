@@ -7,7 +7,7 @@ subtitle: 'Explore the options for connecting to your Postgres database in serve
 
 Supabase provides several options for connecting to your Postgres database from serverless environments.
 
-[supabase-js](/reference/javascript/introduction) is an isomorphic Javascript client that uses the [auto-generated REST API](/guides/api) and therefore works in any environment that supports HTTPS connecions. This API has a built-in [connection pooler](/guides/database/connecting-to-postgres#connection-pooler) and can serve thousands of simultaneous requests, and therefore is ideal for Serverless workloads.
+[supabase-js](/reference/javascript/introduction) is an isomorphic JavaScript client that uses the [auto-generated REST API](/guides/api) and therefore works in any environment that supports HTTPS connections. This API has a built-in [connection pooler](/guides/database/connecting-to-postgres#connection-pooler) and can serve thousands of simultaneous requests, and therefore is ideal for Serverless workloads.
 
 ## Vercel Edge Functions
 
@@ -15,7 +15,7 @@ Vercel's [Edge runtime](https://vercel.com/docs/functions/runtimes/edge-runtime)
 
 ### Quickstart
 
-Choose one of these Vercel Deploy Templates which use our [Vercel Deploy Integration](https://vercel.com/integrations/supabase) to automatically configure your connection strings as enviroment variables on your Vercel project!
+Choose one of these Vercel Deploy Templates which use our [Vercel Deploy Integration](https://vercel.com/integrations/supabase) to automatically configure your connection strings as environment variables on your Vercel project!
 
 <div>
   <div className="grid grid-cols-12 gap-6 not-prose">
@@ -150,7 +150,7 @@ Cloudflare's Workers runtime also uses the [V8 engine](https://v8.dev/) but prov
 
 ## Supabase Edge Functions
 
-Supabase Edge Functions uses the [Deno runtime](https://deno.com/) which has native support for TCP connections allowing you to choose your favourite client:
+Supabase Edge Functions uses the [Deno runtime](https://deno.com/) which has native support for TCP connections allowing you to choose your favorite client:
 
 - [supabase-js](/guides/functions/connect-to-postgres#using-supabase-js)
 - [Deno Postgres driver](/guides/functions/connect-to-postgres#using-a-postgres-client)

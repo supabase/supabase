@@ -117,9 +117,7 @@ Deno.serve(async (_req) => {
   const db = drizzle(client)
   const allCountries = await db.select().from(countries)
 
-  return new Response(JSON.stringify(allCountries), {
-    headers: { 'Content-Type': 'application/json' },
-  })
+  return Response.json(allCountries)
 })
 ```
 
