@@ -76,7 +76,6 @@ const AssistantCommandsPopover = forwardRef<
     }, []) // Empty dependency array means this effect runs once when the component mounts
 
     const handleKeyPress = (event: KeyboardEvent) => {
-      // console.log('event.key', event.key)
       if (event.key === '/' && !value) {
         // Add your action here
         setOpen(true)
