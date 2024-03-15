@@ -106,7 +106,7 @@ const SchemaSelector = ({
               </div>
             </Button>
           </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+          <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start" sameWidthAsTrigger>
             <Command_Shadcn_>
               <CommandInput_Shadcn_ placeholder="Find schema..." />
               <CommandList_Shadcn_>
