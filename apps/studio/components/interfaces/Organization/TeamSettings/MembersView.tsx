@@ -212,7 +212,9 @@ const MembersView = ({ searchString }: MembersViewProps) => {
 
                         <Table.td>
                           {x.invited_id && x.invited_at && (
-                            <Badge color={isInviteExpired(x.invited_at) ? 'red' : 'yellow'}>
+                            <Badge
+                              variant={isInviteExpired(x.invited_at) ? 'destructive' : 'warning'}
+                            >
                               {isInviteExpired(x.invited_at) ? 'Expired' : 'Invited'}
                             </Badge>
                           )}

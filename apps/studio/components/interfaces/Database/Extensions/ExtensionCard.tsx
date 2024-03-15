@@ -85,12 +85,12 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
                     .find((item: any) => item.name === extension.name)
                     ?.link.startsWith('/guides')
                     ? siteUrl === 'http://localhost:8082'
-                      ? `http://localhost:3001/docs${
-                          extensions.find((item: any) => item.name === extension.name)?.link
-                        }`
-                      : `https://supabase.com/docs${
-                          extensions.find((item: any) => item.name === extension.name)?.link
-                        }`
+                      ? `http://localhost:3001/docs${extensions.find(
+                          (item: any) => item.name === extension.name
+                        )?.link}`
+                      : `https://supabase.com/docs${extensions.find(
+                          (item: any) => item.name === extension.name
+                        )?.link}`
                     : extensions.find((item: any) => item.name === extension.name)?.link ?? ''
                 }
                 className="max-w-[85%] cursor-default zans"
@@ -125,7 +125,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
             <div className="py-3 px-4">
               <div className="flex items-center flex-grow space-x-2 text-sm text-foreground-light">
                 <span>Schema:</span>
-                <Badge color="scale">{`${extension.schema}`}</Badge>
+                <Badge>{`${extension.schema}`}</Badge>
               </div>
             </div>
           )}

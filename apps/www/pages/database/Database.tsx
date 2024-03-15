@@ -248,22 +248,22 @@ function Database() {
                   <p className="text-foreground-light m-0">Available libraries:</p>
                   <div className="flex gap-1">
                     <Link href="/docs/reference/javascript/introduction" target="_blank">
-                      <Badge dot={false}>Javascript</Badge>
+                      <Badge>Javascript</Badge>
                     </Link>
                     <Link href="/docs/reference/dart/introduction" target="_blank">
-                      <Badge dot={false}>Flutter</Badge>
+                      <Badge>Flutter</Badge>
                     </Link>
                     <Link href="/docs/reference/python/introduction" target="_blank">
-                      <Badge dot={false}>Python</Badge>
+                      <Badge>Python</Badge>
                     </Link>
                     <Link href="/docs/reference/csharp/introduction" target="_blank">
-                      <Badge dot={false}>C#</Badge>
+                      <Badge>C#</Badge>
                     </Link>
                     <Link href="/docs/reference/kotlin/introduction" target="_blank">
-                      <Badge dot={false}>Kotlin</Badge>
+                      <Badge>Kotlin</Badge>
                     </Link>
                     <Link href="/docs/reference/swift/introduction" target="_blank">
-                      <Badge dot={false}>Swift</Badge>
+                      <Badge>Swift</Badge>
                     </Link>
                   </div>
                 </div>
