@@ -2,13 +2,17 @@ import { useState } from 'react'
 import Link from 'next/link'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { ButtonProps, IconCheck, IconCopy, IconGlobe } from 'ui'
-
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
-import FunctionsHero from '~/components/Products/Functions/FunctionsHero'
+import Image from 'next/image'
 
 import solutions from '~/data/Solutions'
 import Examples from '~/data/Examples'
 import { PRODUCT_NAMES } from 'shared-data/products'
+
+import CodeBlock from '~/components/CodeBlock/CodeBlock'
+import FunctionsHero from '~/components/Products/Functions/FunctionsHero'
+import RealtimeLogs from '~/components/Products/Functions/RealtimeLogs'
+import Metrics from '~/components/Products/Functions/Metrics'
+import QueryLogs from '~/components/Products/Functions/QueryLogs'
 
 export default (isMobile?: boolean) => ({
   metaTitle: 'Supabase Edge Functions - Deploy JavaScript globally in seconds',
@@ -33,12 +37,12 @@ export default (isMobile?: boolean) => ({
       {
         label: 'Launch a free database',
         href: '/dashboard',
-        type: 'primary' as ButtonProps,
+        type: 'primary' as any,
       },
       {
         label: 'Read documentation',
         href: '/docs/guides/functions',
-        type: 'default' as ButtonProps,
+        type: 'default' as any,
       },
     ],
   },
@@ -85,7 +89,7 @@ export default (isMobile?: boolean) => ({
         paragraph: 'Deploy worldwide for maximum resiliency and low latency',
         svg: (
           <div className="w-12 h-12 p-2 bg-alternative rounded-lg border flex justify-center items-center">
-            <IconGlobe className="w-7 h-7" />
+            <IconGlobe className="w-7 h-7 stroke-[1.4px]" />
           </div>
         ),
       },
@@ -96,8 +100,8 @@ export default (isMobile?: boolean) => ({
           <div className="w-12 h-12 p-2 bg-alternative rounded-lg border flex justify-center items-center">
             <svg
               className="w-7 h-7"
-              width="24"
-              height="24"
+              width="100%"
+              height="100%"
               viewBox="0 0 24 24"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
@@ -136,7 +140,23 @@ export default (isMobile?: boolean) => ({
           'Easily migrate existing workloads, with support for Node and more than 1 million NPM modules',
         svg: (
           <div className="w-12 h-12 p-2 bg-alternative rounded-lg border flex justify-center items-center">
-            <IconGlobe className="w-7 h-7" />
+            <svg
+              className="w-7 h-7"
+              width="100%"
+              height="100&"
+              viewBox="0 0 26 28"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M11.9233 0.444469C12.6102 0.0512999 13.5049 0.049524 14.1912 0.444469C17.6439 2.39542 21.0976 4.3433 24.5497 6.29543C25.199 6.66117 25.6333 7.38378 25.6267 8.13193V19.8696C25.6315 20.6487 25.1543 21.3886 24.4693 21.746C21.028 23.6862 17.5884 25.6288 14.1477 27.569C13.4466 27.9698 12.5339 27.939 11.8547 27.5052C10.823 26.9072 9.78955 26.312 8.75774 25.7145C8.5469 25.5888 8.30922 25.4888 8.16034 25.2844C8.29195 25.107 8.52726 25.0849 8.71847 25.0074C9.14913 24.8705 9.54467 24.6507 9.9403 24.4373C10.0403 24.3689 10.1625 24.3951 10.2584 24.4564C11.1406 24.9622 12.0151 25.4828 12.9003 25.9838C13.0891 26.0928 13.2803 25.9481 13.4417 25.8581C16.8187 23.9495 20.1999 22.048 23.5763 20.1388C23.7014 20.0786 23.7706 19.9458 23.7604 19.8088C23.7628 15.9368 23.761 12.0641 23.7616 8.19212C23.7759 8.03662 23.6859 7.89366 23.5453 7.83003C20.1159 5.89871 16.6883 3.96444 13.2595 2.03263C13.2001 1.99179 13.1297 1.96988 13.0576 1.96977C12.9855 1.96967 12.9151 1.99138 12.8556 2.03204C9.42677 3.96444 5.99974 5.90049 2.57093 7.8317C2.43083 7.89544 2.3368 8.03603 2.35348 8.19212C2.35407 12.0641 2.35348 15.9368 2.35348 19.8094C2.34753 19.8763 2.36222 19.9433 2.39556 20.0016C2.4289 20.0599 2.47929 20.1065 2.53995 20.1353C3.45494 20.6541 4.37112 21.1694 5.2867 21.6864C5.80251 21.9641 6.43582 22.129 7.00412 21.9163C7.50562 21.7365 7.85715 21.2247 7.84758 20.6922C7.85232 16.8428 7.84521 12.9928 7.85113 9.14401C7.8386 8.97313 8.0007 8.83194 8.16685 8.84802C8.60649 8.84506 9.04672 8.8421 9.48636 8.84921C9.66987 8.84506 9.79616 9.02907 9.77347 9.20123C9.77169 13.075 9.7782 16.9489 9.77051 20.8227C9.77169 21.8551 9.34754 22.9784 8.39259 23.4836C7.21614 24.093 5.76206 23.9638 4.59982 23.3794C3.59366 22.8772 2.63348 22.2845 1.64518 21.7465C0.958393 21.391 0.483532 20.6482 0.488366 19.8697V8.13193C0.481164 7.36829 0.932741 6.63256 1.60226 6.27215C5.04301 4.33038 8.48316 2.38713 11.9233 0.444469Z"
+                fill="currentColor"
+              />
+              <path
+                d="M14.9242 8.57537C16.4248 8.47878 18.0313 8.51814 19.3817 9.25742C20.4272 9.82394 21.0069 11.0129 21.0253 12.1745C20.9961 12.3311 20.8323 12.4176 20.6828 12.4068C20.2474 12.4062 19.8119 12.4127 19.3765 12.4039C19.1918 12.411 19.0844 12.2407 19.0613 12.0774C18.9362 11.5216 18.6331 10.9712 18.11 10.7031C17.3069 10.3011 16.3759 10.3213 15.5002 10.3297C14.861 10.3636 14.1736 10.419 13.6321 10.7949C13.2163 11.0796 13.09 11.6544 13.2384 12.1173C13.3783 12.4497 13.762 12.557 14.076 12.6558C15.8844 13.1288 17.8008 13.0818 19.5748 13.7042C20.3092 13.958 21.0277 14.4513 21.2791 15.2203C21.6079 16.2509 21.4638 17.4828 20.7305 18.3102C20.1359 18.991 19.2698 19.3616 18.406 19.5629C17.2569 19.8191 16.0644 19.8256 14.8974 19.7119C13.8001 19.5868 12.6582 19.2985 11.8111 18.5508C11.0867 17.9218 10.7329 16.9418 10.768 15.996C10.7764 15.8362 10.9354 15.7248 11.0885 15.7379C11.5269 15.7344 11.9654 15.7332 12.4038 15.7385C12.579 15.726 12.7088 15.8774 12.7178 16.0424C12.7987 16.5719 12.9977 17.1277 13.4594 17.4416C14.3505 18.0166 15.4687 17.9772 16.489 17.9933C17.3344 17.9558 18.2833 17.9444 18.9732 17.3857C19.3371 17.067 19.445 16.5339 19.3466 16.0752C19.24 15.6879 18.8349 15.5075 18.487 15.3895C16.7017 14.8247 14.7639 15.0297 12.9959 14.391C12.2781 14.1374 11.584 13.6578 11.3083 12.9204C10.9235 11.8767 11.0998 10.5858 11.9099 9.78635C12.6998 8.99113 13.8401 8.68498 14.9242 8.57537Z"
+                fill="currentColor"
+              />
+            </svg>
           </div>
         ),
       },
@@ -212,7 +232,7 @@ export default (isMobile?: boolean) => ({
       },
       {
         id: 'ecosystem',
-        label: 'Robust ecosystem',
+        label: 'Use any NPM module',
         paragraph: 'Tap into the 2+ million modules in the Deno and NPM ecosystem.',
         className: '',
         image: <NpmEcosystem />,
@@ -259,7 +279,7 @@ export default (isMobile?: boolean) => ({
         icon: '',
         paragraph:
           'Stream logs to the dashboard in realtime. Logs are populated with rich metadata to help debugging. ',
-        image: <div>lorem</div>,
+        image: <RealtimeLogs />,
       },
       {
         id: 'log-explorer',
@@ -267,14 +287,14 @@ export default (isMobile?: boolean) => ({
         icon: '',
         paragraph:
           'Get deeper insights into how your functions are behaving by writing SQL queries on function logs. ',
-        image: <div>lorem</div>,
+        image: <QueryLogs />,
       },
       {
         id: 'metrics',
         label: 'Metrics',
         icon: '',
         paragraph: 'Dashboards show the health of your functions at all times.',
-        image: <div>lorem</div>,
+        image: <Metrics />,
       },
     ],
   },
@@ -350,10 +370,24 @@ const LocalDXImage = () => {
 
   return (
     <div className="w-full h-full flex-1 flex items-center justify-center">
+      <Image
+        src="/images/product/functions/grid-gradient-dark.svg"
+        alt=""
+        fill
+        aria-hidden
+        className="object-cover absolute z-0 inset-0 hidden dark:block"
+      />
+      <Image
+        src="/images/product/functions/grid-gradient-light.svg"
+        alt=""
+        fill
+        aria-hidden
+        className="object-cover absolute z-0 inset-0 dark:hidden block"
+      />
       <CopyToClipboard text="deno test hello">
         <button
           onClick={handleCopy}
-          className="p-3 group hover:border-strong flex gap-4 items-center bg-alternative-200 rounded-xl border"
+          className="p-3 relative z-10 group hover:border-strong flex gap-4 items-center bg-alternative-200 rounded-xl border"
         >
           <div className="text-foreground-muted text-sm font-mono">$</div>
           <div className="text-foreground text-sm font-mono">deno test hello</div>
@@ -373,9 +407,23 @@ const LocalDXImage = () => {
 }
 
 const ParityImage = () => (
-  <div className="w-full h-full flex items-center justify-center text-sm">
+  <div className="relative w-full h-full flex items-center justify-center text-sm">
+    <Image
+      src="/images/product/functions/lines-gradient-light.svg"
+      alt=""
+      fill
+      aria-hidden
+      className="object-cover absolute z-0 inset-0 dark:hidden block"
+    />
+    <Image
+      src="/images/product/functions/lines-gradient-dark.svg"
+      alt=""
+      fill
+      aria-hidden
+      className="object-cover absolute z-0 inset-0 hidden dark:block"
+    />
     <div className="p-4 bg-surface-200 bg-opacity-30 border-2 border-dashed rounded-2xl justify-center items-center gap-1 flex">
-      <div className="py-2 px-4 bg-alternative rounded-lg shadow border flex-col justify-center items-center">
+      <div className="py-2 px-4 bg-alternative-200 rounded-lg shadow border flex-col justify-center items-center">
         <div className="text-foreground uppercase tracking-wide">Dev</div>
       </div>
       <svg width="32" height="7" viewBox="0 0 32 7" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -389,7 +437,7 @@ const ParityImage = () => (
         />
       </svg>
 
-      <div className="py-2 px-4 bg-alternative rounded-lg shadow border flex-col justify-center items-center">
+      <div className="py-2 px-4 bg-alternative-200 rounded-lg shadow border flex-col justify-center items-center">
         <div className="text-foreground uppercase tracking-wide">Prod</div>
       </div>
     </div>
@@ -429,83 +477,82 @@ const CI = () => (
 )
 
 const npmList = [
-  'Worker',
-  'MessageEvent',
-  'WritableStreamDefaultController',
-  'structuredClone',
-  'DecompressionStream',
-  'CompressionStream',
-  'setInterval',
-  'PromiseRejectionEvent',
-  'clearInterval',
-  'Blob',
+  // 'Worker',
+  // 'MessageEvent',
+  // 'WritableStreamDefaultController',
+  // 'structuredClone',
+  // 'DecompressionStream',
+  // 'CompressionStream',
+  // 'setInterval',
+  // 'PromiseRejectionEvent',
+  // 'clearInterval',
+  // 'Blob',
   'fetch',
-  'btoa',
-  'localStorage',
-  'Navigator',
-  'clearTimeout',
-  'ReadableStreamDefaultController',
-  'Response.json()',
-  'EventTarget',
-  'caches',
-  'CacheStorage',
-  'MessagePort',
-  'Location',
-  'DedicatedWorkerGlobalScope',
-  'WebSocket',
-  'queueMicrotask',
-  'CryptoKey',
-  'ErrorEvent',
-  'PerformanceMark',
-  'WorkerNavigator',
-  'ReadableStreamBYOBRequest',
-  'TextDecoder',
-  'WorkerLocation',
-  'TextEncoderStream',
-  'ReadableByteStreamController',
-  'TransformStream',
-  'File',
-  'CustomEvent',
-  'Event',
-  'performance',
-  'DOMException',
-  'ReadableStreamBYOBReader',
+  // 'btoa',
+  // 'localStorage',
+  // 'Navigator',
+  // 'clearTimeout',
+  // 'ReadableStreamDefaultController',
+  // 'Response.json()',
+  // 'EventTarget',
+  // 'caches',
+  // 'CacheStorage',
+  // 'MessagePort',
+  // 'Location',
+  // 'DedicatedWorkerGlobalScope',
+  // 'WebSocket',
+  // 'queueMicrotask',
+  // 'CryptoKey',
+  // 'ErrorEvent',
+  // 'PerformanceMark',
+  // 'WorkerNavigator',
+  // 'ReadableStreamBYOBRequest',
+  // 'TextDecoder',
+  // 'WorkerLocation',
+  // 'TextEncoderStream',
+  // 'ReadableByteStreamController',
+  // 'TransformStream',
+  // 'File',
+  // 'CustomEvent',
+  // 'Event',
+  // 'performance',
+  // 'DOMException',
+  // 'ReadableStreamBYOBReader',
   'crypto',
-  'CloseEvent',
-  'Nodemon',
-  'URLPattern',
-  'PerformanceEntry',
-  'console',
-  '@supabase/supabase-js',
-  'window.close()',
-  'Crypto',
-  'Request',
-  'ReadableStream',
-  'Storage',
-  'WebAssembly',
-  'TextDecoderStream',
-  'URLSearchParams',
-  'ProgressEvent',
-  'BroadcastChannel',
-  'FileReader',
-  'ByteLengthQueuingStrategy',
+  // 'CloseEvent',
+  // 'Nodemon',
+  // 'URLPattern',
+  // 'PerformanceEntry',
+  // 'console',
+  // 'window.close()',
+  // 'Crypto',
+  // 'Request',
+  // 'ReadableStream',
+  // 'Storage',
+  // 'WebAssembly',
+  // 'TextDecoderStream',
+  // 'URLSearchParams',
+  // 'ProgressEvent',
+  // 'BroadcastChannel',
+  // 'FileReader',
+  // 'ByteLengthQueuingStrategy',
   'ESLint',
-  'BeforeUnloadEvent',
-  'TextEncoder',
+  // 'BeforeUnloadEvent',
+  // 'TextEncoder',
   'atob',
-  'window.alert()',
-  'Performance',
-  'Headers',
-  'WorkerGlobalScope',
-  'AbortSignal',
-  'FormData',
-  'Response',
-  'MessageChannel',
-  'URL',
+  // 'window.alert()',
+  // 'Performance',
+  // 'Headers',
+  // 'WorkerGlobalScope',
+  // 'AbortSignal',
+  // 'FormData',
+  // 'Response',
+  // 'MessageChannel',
+  // 'URL',
   // 'setTimeout',
   // 'Window',
   // 'TransformStreamDefaultController',
-  // 'Moment',
+  'moment',
   // 'SubtleCrypto',
   // 'Cache',
   // 'WritableStream',
@@ -513,14 +560,130 @@ const npmList = [
   // 'ReadableStreamDefaultReader',
   // 'PerformanceMeasure',
   // 'WritableStreamDefaultWriter',
-  // 'openai',
-  // 'jwt',
-  // 'react',
-  // 'Async',
-  // 'Mocha',
-  // 'Passport',
-  // 'Socket.IO',
-  // 'Lodash',
+  'express',
+  'fastify',
+  'socket.io',
+  'async',
+  'lodash',
+  'underscore',
+  'ramda',
+  'validator',
+  'yup',
+  'day.js',
+  'date-fns',
+  'jsonwebtoken',
+  'bcrypt',
+  'uuid',
+  'fs-extra',
+  'rimraf',
+  'mkdirp',
+  'glob',
+  'shelljs',
+  '@supabase/supabase-js',
+  'js-yaml',
+  'typescript',
+  'jest',
+  'winston',
+  'debug',
+  'eslint',
+  'nodemon',
+  'dotenv',
+  '@octokit/rest',
+  'cross-env',
+  'commander',
+  '@supabase/auth-helpers-react',
+  'yargs',
+  'minimist',
+  'chalk',
+  'colors',
+  'ora',
+  '@aws-sdk',
+  'axios',
+  'passport',
+  'nodemailer',
+  'mongoose',
+  'openai',
+  'jwt',
+  '@supabase/auth-ui-react',
+  'react',
+  'mocha',
+  'autoprefixer',
+  'gray-matter',
+  'request',
+  'prop-types',
+  'react-dom',
+  'bluebird',
+  'vue',
+  'tslib',
+  'inquirer',
+  'webpack',
+  'classnames',
+  'body-parser',
+  'rxjs',
+  'babel-runtime',
+  'jquery',
+  // 'yeoman-generator',
+  // 'through2',
+  // 'babel-core',
+  // 'core-js',
+  // 'semver',
+  // 'babel-loader',
+  // 'cheerio',
+  // 'rimraf',
+  // 'q',
+  // 'eslint',
+  // 'css-loader',
+  // 'shelljs',
+  // 'dotenv',
+  // 'typescript',
+  // '@types/node',
+  // '@angular/core',
+  // 'js-yaml',
+  // 'style-loader',
+  // 'winston',
+  // '@angular/common',
+  // 'redux',
+  // 'object-assign',
+  // 'zone.js',
+  // 'babel-eslint',
+  // 'gulp',
+  // 'gulp-util',
+  // 'file-loader',
+  // 'ora',
+  // 'node-fetch',
+  // '@angular/platform-browser',
+  // '@babel/runtime',
+  // 'handlebars',
+  // 'eslint-plugin-import',
+  // '@angular/compiler',
+  // 'eslint-plugin-react',
+  // 'aws-sdk',
+  // 'yosay',
+  // 'url-loader',
+  // '@angular/forms',
+  // 'webpack-dev-server',
+  // '@angular/platform-browser-dynamic',
+  // 'mocha',
+  // 'html-webpack-plugin',
+  // 'socket.io',
+  // 'ws',
+  // 'babel-preset-es2015',
+  // 'postcss-loader',
+  // 'node-sass',
+  // 'ember-cli-babel',
+  // 'babel-polyfill',
+  // '@angular/router',
+  // 'ramda',
+  // 'react-redux',
+  // '@babel/core',
+  // '@angular/http',
+  // 'ejs',
+  // 'coffee-script',
+  // 'superagent',
+  // 'request-promise',
+  // 'autoprefixer',
+  // 'path',
+  // 'mongodb',
 ]
 
 const NpmEcosystem = () => {
@@ -528,10 +691,13 @@ const NpmEcosystem = () => {
     <div className="relative w-full h-full overflow-hidden group">
       <div
         className="absolute flex flex-wrap items-start gap-2 opacity-80 dark:opacity-50"
-        style={{ left: -50, right: -250 }}
+        style={{ left: -50, right: -150 }}
       >
         {npmList.map((module) => (
-          <span key={module} className="py-1 px-2 rounded bg-surface-300 text-foreground-muted">
+          <span
+            key={module}
+            className="py-1 px-2 rounded-md bg-surface-75 border text-foreground-muted"
+          >
             {module}
           </span>
         ))}
@@ -542,13 +708,23 @@ const NpmEcosystem = () => {
           background: `radial-gradient(70% 50% at 50% 50%, transparent, hsl(var(--background-surface-100))`,
         }}
       />
-      <div className="absolute z-10 inset-0 flex flex-col items-center justify-center font-bold text-7xl uppercase">
-        <span className="text-foreground/10 bg-clip-text bg-gradient-to-b from-foreground to-foreground-lighter">
+      <div className="absolute z-10 inset-0 flex flex-col items-center justify-center font-bold text-7xl uppercase text-foreground-light group-hover:text-foreground transition-colors">
+        <svg
+          width="111"
+          height="42"
+          viewBox="0 0 111 42"
+          fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M36.1763 37.4452H49.2591V30.8616H62.342V4.52698H36.1763V37.4452ZM49.2591 11.1106H55.8006V24.2779H49.2591V11.1106ZM67.5752 4.52698V30.8616H80.6581V11.1106H87.1995V30.8616H93.7409V11.1106H100.282V30.8616H106.824V4.52698H67.5752ZM4.77734 30.8616H17.8602V11.1106H24.4017V30.8616H30.9431V4.52698H4.77734V30.8616Z" />
+        </svg>
+
+        {/* <span className="text-foreground/10 bg-clip-text bg-gradient-to-b from-foreground to-foreground-lighter">
           2M+
         </span>
         <span className="text-foreground/10 bg-clip-text bg-gradient-to-b from-foreground to-foreground-lighter text-3xl -mt-2">
           Modules
-        </span>
+        </span> */}
       </div>
     </div>
   )

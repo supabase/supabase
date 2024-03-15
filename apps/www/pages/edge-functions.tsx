@@ -48,7 +48,6 @@ function Database() {
       />
       <DefaultLayout>
         <ProductsNav activePage={PRODUCT_NAMES.FUNCTIONS} />
-        {/* @ts-ignore */}
         <ProductHeader
           {...pageData.heroSection}
           footer={<HighlightColumns highlights={pageData.highlightsSection.highlights} />}
@@ -80,9 +79,6 @@ function Database() {
           <h2 className="h2">{pageData.integratesWithSupabase.title}</h2>
           <TimedAccordionSection tabs={pageData.integratesWithSupabase.useCases} />
         </SectionContainer>
-        {/* <SectionContainer className="flex flex-col gap-4 lg:gap-8">
-          <ExamplesCarousel {...pageData.examplesSection} />
-        </SectionContainer> */}
         <div className="bg-background">
           <div className="w-full h-[1px] bg-gradient-to-r from-background-alternative via-border to-background-alternative" />
           <ProductsCta currentProduct={PRODUCT_SHORTNAMES.FUNCTIONS} />

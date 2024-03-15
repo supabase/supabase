@@ -1,10 +1,9 @@
 import 'swiper/swiper.min.css'
 
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect } from 'react'
 import { AnimatePresence, motion, useAnimation } from 'framer-motion'
 import { cn } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import Image from 'next/image'
 import Panel from '../Panel'
 import { useBreakpoint } from 'common'
 
@@ -31,6 +30,7 @@ const TimedPanel = ({
 }: PanelProps) => {
   const isSm = useBreakpoint()
 
+  // const isActive = label === 'Realtime logs'
   return (
     <button
       onMouseEnter={() => !isSm && onClick && onClick()}
@@ -61,16 +61,20 @@ const TimedPanel = ({
             {paragraph}
           </p>
         </div>
-        {image && (
-          <div
-            className={cn(
-              'absolute opacity-0 h-[calc(100%-150px)] mt-14 inset-0 m-auto flex items-center justify-center transition-opacity',
-              isActive && 'opacity-100'
-            )}
-          >
-            {image}
-          </div>
-        )}
+        <AnimatePresence>
+          {image && isActive && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={isActive && { opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className={cn(
+                'absolute h-[calc(100%-150px)] mt-14 inset-0 m-auto flex items-center justify-center'
+              )}
+            >
+              {image}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </Panel>
       {!isSm && isActive && (
         <div className="opacity-0 animate-fade-in absolute bottom-0 w-full h-[1px] bg-border-strong group-hover:opacity-100 rounded-full overflow-hidden">
@@ -142,7 +146,7 @@ const TimedAccordionPanels = ({ panels, intervalDuration = 25, updateFrequency =
   }
 
   return (
-    <div className="flex flex-col gap-8 xl:gap-32 justify-between overflow-hidden">
+    <div className="flex flex-col gap-8 xl:gap-32 justify-between">
       <div className="hidden md:flex gap-4" role="tablist">
         {panels.map((panel, index) => (
           <TimedPanel
@@ -155,7 +159,7 @@ const TimedAccordionPanels = ({ panels, intervalDuration = 25, updateFrequency =
           />
         ))}
       </div>
-      <div className="md:hidden relative w-full lg:w-1/2 min-h-[300px]">
+      <div className="md:hidden relative w-full lg:w-1/2 min-h-[300px] overflow-visible">
         <Swiper
           // @ts-ignore
           onSwiper={setApiSwiper}
