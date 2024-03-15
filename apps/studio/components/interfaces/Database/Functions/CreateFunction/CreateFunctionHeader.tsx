@@ -1,30 +1,21 @@
-import type { PostgresPolicy } from '@supabase/postgres-meta'
-import { PanelLeftClose, PanelRightClose, X } from 'lucide-react'
+import { X } from 'lucide-react'
 
-import {
-  SheetClose,
-  SheetHeader,
-  SheetTitle,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-  cn,
-} from 'ui'
+import { SheetClose, SheetHeader, SheetTitle, cn } from 'ui'
 
-export const AIPolicyHeader = ({
-  selectedPolicy,
+export const CreateFunctionHeader = ({
+  selectedFunction,
   assistantVisible,
   setAssistantVisible,
 }: {
-  selectedPolicy?: PostgresPolicy
+  selectedFunction?: string
   assistantVisible: boolean
   setAssistantVisible: (v: boolean) => void
 }) => {
   return (
     <SheetHeader
       className={cn(
-        selectedPolicy !== undefined ? 'pt-3 pb-0' : 'py-3',
-        'flex flex-row justify-between items-center'
+        selectedFunction !== undefined ? 'pt-3 pb-0' : 'py-3',
+        'flex flex-row justify-between items-center border-b-0'
       )}
     >
       <div className="flex flex-row gap-3 items-center max-w-[75%]">
@@ -39,14 +30,13 @@ export const AIPolicyHeader = ({
           <X className="h-3 w-3" />
           <span className="sr-only">Close</span>
         </SheetClose>
-        <div className="h-[24px] w-[1px] bg-border-overlay" />
         <SheetTitle className="truncate">
-          {selectedPolicy !== undefined
-            ? `Update policy: ${selectedPolicy.name}`
-            : 'Create a new Row Level Security policy'}
+          {selectedFunction !== undefined
+            ? `Edit '${selectedFunction}' function`
+            : 'Add a new function'}
         </SheetTitle>
       </div>
-      <Tooltip_Shadcn_>
+      {/* <Tooltip_Shadcn_>
         <TooltipTrigger_Shadcn_ asChild>
           <button
             aria-expanded={assistantVisible}
@@ -68,7 +58,7 @@ export const AIPolicyHeader = ({
         <TooltipContent_Shadcn_ side="left">
           {assistantVisible ? 'Hide' : 'Show'} tools
         </TooltipContent_Shadcn_>
-      </Tooltip_Shadcn_>
+      </Tooltip_Shadcn_> */}
     </SheetHeader>
   )
 }
