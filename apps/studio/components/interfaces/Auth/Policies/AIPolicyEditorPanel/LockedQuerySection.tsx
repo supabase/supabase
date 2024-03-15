@@ -1,20 +1,21 @@
+import { PostgresPolicy } from '@supabase/postgres-meta'
 import { Lock } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { Button } from 'ui'
-import { generateQuery } from './AIPolicyEditorPanel.utils'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { Button } from 'ui'
+import { generateAlterPolicyQuery, generateCreatePolicyQuery } from './AIPolicyEditorPanel.utils'
 
 interface LockedCreateQuerySection {
-  isEditing: boolean
+  selectedPolicy?: PostgresPolicy
   formFields: { name: string; table: string; behaviour: string; command: string; roles: string }
   editorOneRef: any
   editorTwoRef: any
 }
 
 export const LockedCreateQuerySection = ({
-  isEditing,
+  selectedPolicy,
   formFields,
   editorOneRef,
   editorTwoRef,
@@ -23,6 +24,7 @@ export const LockedCreateQuerySection = ({
   const { ref } = useParams()
   const state = useTableEditorStateSnapshot()
 
+  const isEditing = selectedPolicy !== undefined
   const { name, table, behaviour, command, roles } = formFields
 
   return (
@@ -38,23 +40,36 @@ export const LockedCreateQuerySection = ({
         </div>
         <Button
           type="default"
-          onClick={() =>
-            router.push(
-              `/project/${ref}/sql/new?content=${generateQuery({
-                name,
-                schema: state.selectedSchemaName,
-                table,
-                behaviour,
-                command,
-                roles: roles.length === 0 ? 'public' : roles,
-                using: (editorOneRef.current?.getValue() ?? undefined)?.trim(),
-                check:
-                  command === 'insert'
-                    ? (editorOneRef.current?.getValue() ?? undefined)?.trim()
-                    : (editorTwoRef.current?.getValue() ?? undefined)?.trim(),
-              })}`
-            )
-          }
+          onClick={() => {
+            const query = isEditing
+              ? generateCreatePolicyQuery({
+                  name,
+                  schema: state.selectedSchemaName,
+                  table,
+                  behaviour,
+                  command,
+                  roles: roles.length === 0 ? 'public' : roles,
+                  using: (editorOneRef.current?.getValue() ?? undefined)?.trim(),
+                  check:
+                    command === 'insert'
+                      ? (editorOneRef.current?.getValue() ?? undefined)?.trim()
+                      : (editorTwoRef.current?.getValue() ?? undefined)?.trim(),
+                })
+              : generateAlterPolicyQuery({
+                  name: '',
+                  newName: name,
+                  schema: state.selectedSchemaName,
+                  table,
+                  command,
+                  roles: roles.length === 0 ? 'public' : roles,
+                  using: (editorOneRef.current?.getValue() ?? undefined)?.trim(),
+                  check:
+                    command === 'insert'
+                      ? (editorOneRef.current?.getValue() ?? undefined)?.trim()
+                      : (editorTwoRef.current?.getValue() ?? undefined)?.trim(),
+                })
+            router.push(`/project/${ref}/sql/new?content=${query}`)
+          }}
         >
           Open in SQL Editor
         </Button>

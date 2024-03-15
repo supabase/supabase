@@ -78,7 +78,7 @@ ${policy.check ? `WITH CHECK (${policy.check})` : ''}
 `.trim()
 }
 
-export const generateQuery = ({
+export const generateCreatePolicyQuery = ({
   name,
   schema,
   table,
@@ -103,4 +103,32 @@ export const generateQuery = ({
       ? `${querySkeleton} with check (${check});`
       : `${querySkeleton} using (${using})${(check ?? '').length > 0 ? `with check (${check});` : ';'}`
   return query
+}
+
+export const generateAlterPolicyQuery = ({
+  name,
+  newName,
+  schema,
+  table,
+  command,
+  roles,
+  using,
+  check,
+}: {
+  name: string
+  newName: string
+  schema: string
+  table: string
+  command: string
+  roles: string
+  using: string
+  check: string
+}) => {
+  const querySkeleton = `alter policy "${name}" on "${schema}"."${table}" to ${roles}`
+  const query =
+    command === 'insert'
+      ? `${querySkeleton} with check (${check});`
+      : `${querySkeleton} using (${using})${(check ?? '').length > 0 ? `with check (${check});` : ';'}`
+  if (newName === name) return query
+  else return `${query}\n${querySkeleton} rename to "${newName}"`
 }

@@ -51,7 +51,7 @@ import { AIPolicyChat } from './AIPolicyChat'
 import {
   MessageWithDebug,
   generatePolicyDefinition,
-  generateQuery,
+  generateCreatePolicyQuery,
   generateThreadMessage,
 } from './AIPolicyEditorPanel.utils'
 import { AIPolicyHeader } from './AIPolicyHeader'
@@ -298,7 +298,7 @@ export const AIPolicyEditorPanel = memo(function ({
     const check = editorTwoRef.current?.getValue().trim() ?? undefined
 
     if (selectedPolicy === undefined) {
-      const sql = generateQuery({
+      const sql = generateCreatePolicyQuery({
         name: name,
         schema: state.selectedSchemaName,
         table,
@@ -494,7 +494,7 @@ export const AIPolicyEditorPanel = memo(function ({
 
                   <div className="h-full">
                     <LockedCreateQuerySection
-                      isEditing={selectedPolicy !== undefined}
+                      selectedPolicy={selectedPolicy}
                       editorOneRef={editorOneRef}
                       editorTwoRef={editorTwoRef}
                       formFields={{ name, table, behaviour, command, roles }}
