@@ -65,9 +65,9 @@ const RealtimeLogs = () => {
               key={log.id}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0, transition: { delay: 0.15 } }}
-              className="px-2 py-2 pointer-events-auto border-b hover:bg-selection first:border-t w-full font-mono text-xs flex gap-4 items-center"
+              className="px-2 py-2 pointer-events-auto border-b hover:bg-selection/20 first:border-t w-full font-mono text-xs flex gap-4 items-center"
             >
-              <span className="shrink-0">{dayjs(log.timestamp).format('D MMM HH:MM:ss')}</span>
+              <span className="shrink-0">{dayjs(log.timestamp).format('D MMM HH:mm:ss')}</span>
               <span className="">
                 <Badge color={log.status === 200 ? 'slate' : 'amber'} className="rounded">
                   {log.status}
