@@ -27,7 +27,7 @@ const RealtimeLogs = () => {
     t.setSeconds(t.getSeconds() - (offset ?? 0))
 
     return {
-      status: Math.random() > 0.99 ? 500 : 200,
+      status: Math.random() > 0.995 ? 500 : 200,
       method: Math.random() > 0.5 ? 'GET' : 'POST',
       id: crypto.randomUUID(),
       timestamp: t,
@@ -57,15 +57,25 @@ const RealtimeLogs = () => {
             'linear-gradient(to top, hsl(var(--background-surface-100)) 0%, transparent 100%)',
         }}
       />
-      <motion.ul layout className="relative z-10 w-full h-auto flex flex-col px-4 overflow-y-auto">
+      <motion.ul
+        transition={{
+          staggerChildren: 0.5,
+        }}
+        layout
+        className="relative z-10 w-full h-auto flex flex-col px-4 overflow-y-auto"
+      >
         <AnimatePresence>
           {activeLogs.map((log, i) => (
             <motion.li
               layout
               key={log.id}
               initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0, transition: { delay: 0.15 } }}
-              className="px-2 py-2 pointer-events-auto border-b hover:bg-selection/20 first:border-t w-full font-mono text-xs flex gap-4 items-center"
+              animate={{
+                opacity: 1,
+                x: 0,
+                transition: { delay: i * 0.05, duration: 0.2 },
+              }}
+              className="py-2 md:px-4 pointer-events-auto border-b hover:bg-selection/20 first:border-t w-full font-mono text-xs flex gap-4 items-center"
             >
               <span className="shrink-0">{dayjs(log.timestamp).format('D MMM HH:mm:ss')}</span>
               <span className="">

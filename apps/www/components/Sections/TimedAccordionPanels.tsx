@@ -30,7 +30,6 @@ const TimedPanel = ({
 }: PanelProps) => {
   const isSm = useBreakpoint()
 
-  // const isActive = label === 'Realtime logs'
   return (
     <button
       onMouseEnter={() => !isSm && onClick && onClick()}
@@ -168,7 +167,6 @@ const TimedAccordionPanels = ({ panels, intervalDuration = 25, updateFrequency =
           spaceBetween={10}
           slidesPerView={1.1}
           speed={300}
-          // allowTouchMove={false}
         >
           {panels.map((panel, index) => (
             <SwiperSlide key={index}>

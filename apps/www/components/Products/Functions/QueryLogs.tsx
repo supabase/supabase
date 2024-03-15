@@ -60,7 +60,7 @@ const QueryLogs = () => {
     const t = new Date()
     t.setSeconds(t.getSeconds() - (offset ?? 0))
     const randomStatus = Math.random()
-    const s = randomStatus > 0.9 ? STATUS.ERROR : randomStatus > 0.5 ? STATUS.INFO : STATUS.LOG
+    const s = randomStatus > 0.99 ? STATUS.ERROR : randomStatus > 0.5 ? STATUS.INFO : STATUS.LOG
 
     const randomMessage = messages[s][getRandomNumber(0, messages[s].length - 1)]
 
@@ -102,8 +102,12 @@ const QueryLogs = () => {
               layout
               key={log.id}
               initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0, transition: { delay: 0.15 } }}
-              className="px-2 py-2 pointer-events-auto border-b hover:bg-selection/20 first:border-t w-full font-mono text-xs flex gap-4 lg:gap-5 items-center"
+              animate={{
+                opacity: 1,
+                x: 0,
+                transition: { delay: i * 0.05, duration: 0.2 },
+              }}
+              className="py-2 md:px-4 pointer-events-auto border-b hover:bg-selection/20 first:border-t w-full font-mono text-xs flex gap-4 lg:gap-5 items-center"
             >
               <span className="shrink-0">{dayjs(log.timestamp).format('D MMM HH:mm:ss')}</span>
               <span
