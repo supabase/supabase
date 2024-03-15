@@ -41,7 +41,6 @@ import ProjectSetup from './MDX/project_setup.mdx'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
 import SocialProviderSetup from './MDX/social_provider_setup.mdx'
-import StorageManagement from './MDX/storage_management.mdx'
 
 // Icons
 import {
@@ -153,7 +152,6 @@ const components = {
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
   StepHikeCompact,
-  StorageManagement,
   TabPanel: (props: any) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
   Tabs: (props: any) => <Tabs wrappable {...props} />,
 }
