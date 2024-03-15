@@ -175,6 +175,27 @@ const OrganizationProjects = ({
             </Button>
           </div>
         )}
+        {organization?.restriction_status === 'grace_period' && (
+          <div>
+            <Button asChild type="warning">
+              <Link href={`/org/${slug}/invoices`}>Grace Period</Link>
+            </Button>
+          </div>
+        )}
+        {organization?.restriction_status === 'grace_period_over' && (
+          <div>
+            <Button asChild type="warning">
+              <Link href={`/org/${slug}/invoices`}>Grace Period Over</Link>
+            </Button>
+          </div>
+        )}
+        {organization?.restriction_status === 'restricted' && (
+          <div>
+            <Button asChild type="danger">
+              <Link href={`/org/${slug}/invoices`}>Restricted</Link>
+            </Button>
+          </div>
+        )}
       </div>
 
       {isLoadingPermissions || isLoadingProjects ? (
