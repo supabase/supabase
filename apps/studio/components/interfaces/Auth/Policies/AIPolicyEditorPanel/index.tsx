@@ -6,7 +6,6 @@ import { useParams, useTelemetryProps } from 'common'
 import { uniqBy } from 'lodash'
 import { FileDiff } from 'lucide-react'
 import dynamic from 'next/dynamic'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -18,9 +17,9 @@ import {
   IconLock,
   Modal,
   ScrollArea,
-  SheetContent_Shadcn_,
-  SheetFooter_Shadcn_,
-  Sheet_Shadcn_,
+  Sheet,
+  SheetContent,
+  SheetFooter,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
@@ -392,8 +391,8 @@ export const AIPolicyEditorPanel = memo(function ({
     <>
       <Form_Shadcn_ {...form}>
         <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
-          <Sheet_Shadcn_ open={visible} onOpenChange={() => onClosingPanel()}>
-            <SheetContent_Shadcn_
+          <Sheet open={visible} onOpenChange={() => onClosingPanel()}>
+            <SheetContent
               size={assistantVisible ? 'lg' : 'default'}
               className={cn(
                 'bg-surface-200',
@@ -678,7 +677,7 @@ export const AIPolicyEditorPanel = memo(function ({
                         setOpen={setErrorPanelOpen}
                       />
                     )}
-                    <SheetFooter_Shadcn_ className="flex items-center !justify-between px-5 py-4 w-full border-t">
+                    <SheetFooter className="flex items-center !justify-between px-5 py-4 w-full border-t">
                       <Button type="text" onClick={toggleFeaturePreviewModal}>
                         Toggle feature preview
                       </Button>
@@ -700,7 +699,7 @@ export const AIPolicyEditorPanel = memo(function ({
                           Save policy
                         </Button>
                       </div>
-                    </SheetFooter_Shadcn_>
+                    </SheetFooter>
                   </div>
                 </div>
               </div>
@@ -785,8 +784,8 @@ export const AIPolicyEditorPanel = memo(function ({
                   </Tabs_Shadcn_>
                 </div>
               )}
-            </SheetContent_Shadcn_>
-          </Sheet_Shadcn_>
+            </SheetContent>
+          </Sheet>
         </form>
       </Form_Shadcn_>
 

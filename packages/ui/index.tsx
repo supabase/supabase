@@ -85,6 +85,7 @@ export * from './src/components/shadcn/ui/toaster'
 export { Badge as Badge_Shadcn_ } from './src/components/shadcn/ui/badge'
 
 export * from './src/components/shadcn/ui/separator'
+export * from './src/components/shadcn/ui/sheet'
 
 export {
   Command as Command_Shadcn_,
@@ -170,17 +171,6 @@ export {
   CollapsibleTrigger as CollapsibleTrigger_Shadcn_,
   CollapsibleContent as CollapsibleContent_Shadcn_,
 } from './src/components/shadcn/ui/collapsible'
-
-export {
-  Sheet as Sheet_Shadcn_,
-  SheetTrigger as SheetTrigger_Shadcn_,
-  SheetClose as SheetClose_Shadcn_,
-  SheetContent as SheetContent_Shadcn_,
-  SheetHeader as SheetHeader_Shadcn_,
-  SheetFooter as SheetFooter_Shadcn_,
-  SheetTitle as SheetTitle_Shadcn_,
-  SheetDescription as SheetDescription_Shadcn_,
-} from './src/components/shadcn/ui/sheet'
 
 export {
   Tabs as Tabs_Shadcn_,
