@@ -10,6 +10,12 @@ interface Props {
   className?: string
 }
 
+/**
+ * @deprecated This icon component should not be used.
+ *
+ * Replace with:
+ * import { Badge_shadcn_ } from 'ui'
+ */
 function Badge({ color = 'brand', children, size, dot, className }: Props) {
   const __styles = styleHandler('badge')
 
