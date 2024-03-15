@@ -22,10 +22,11 @@ import {
 import MultiSelect from 'ui-patterns/MultiSelect'
 
 interface PolicyDetailsV2Props {
+  isEditing: boolean
   form: any
 }
 
-export const PolicyDetailsV2 = ({ form }: PolicyDetailsV2Props) => {
+export const PolicyDetailsV2 = ({ isEditing, form }: PolicyDetailsV2Props) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
@@ -51,9 +52,6 @@ export const PolicyDetailsV2 = ({ form }: PolicyDetailsV2Props) => {
       }
     })
     .sort((a, b) => a.name.localeCompare(b.name))
-
-  // const supportUsing = ['SELECT', 'UPDATE', 'DELETE', 'ALL'].includes(command)
-  // const supportWithCheck = ['INSERT', 'UPDATE', 'ALL'].includes(command)
 
   useEffect(() => {
     if (isSuccessTables && tables.length > 0) form.setValue('table', tables[0].name)
@@ -94,6 +92,7 @@ export const PolicyDetailsV2 = ({ form }: PolicyDetailsV2Props) => {
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
                   <Select_Shadcn_
+                    disabled={isEditing}
                     value={field.value}
                     onValueChange={(value) => form.setValue('table', value)}
                   >
@@ -129,6 +128,7 @@ export const PolicyDetailsV2 = ({ form }: PolicyDetailsV2Props) => {
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
                   <Select_Shadcn_
+                    disabled={isEditing}
                     value={field.value}
                     onValueChange={(value) => form.setValue('behaviour', value)}
                   >
@@ -171,36 +171,20 @@ export const PolicyDetailsV2 = ({ form }: PolicyDetailsV2Props) => {
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
                   <RadioGroup_Shadcn_
+                    disabled={isEditing}
                     value={field.value}
                     defaultValue={field.value}
                     onValueChange={(value) => form.setValue('command', value)}
-                    className="grid grid-cols-10 gap-3"
+                    className={`grid grid-cols-10 gap-3 ${isEditing ? 'opacity-50' : ''}`}
                   >
-                    <RadioGroupLargeItem_Shadcn_
-                      value="select"
-                      label="SELECT"
-                      className="col-span-2 w-auto"
-                    />
-                    <RadioGroupLargeItem_Shadcn_
-                      value="insert"
-                      label="INSERT"
-                      className="col-span-2 w-auto"
-                    />
-                    <RadioGroupLargeItem_Shadcn_
-                      value="update"
-                      label="UPDATE"
-                      className="col-span-2 w-auto"
-                    />
-                    <RadioGroupLargeItem_Shadcn_
-                      value="delete"
-                      label="DELETE"
-                      className="col-span-2 w-auto"
-                    />
-                    <RadioGroupLargeItem_Shadcn_
-                      value="all"
-                      label="ALL"
-                      className="col-span-2 w-auto"
-                    />
+                    {['select', 'insert', 'update', 'delete', 'all'].map((x) => (
+                      <RadioGroupLargeItem_Shadcn_
+                        key={x}
+                        value={x}
+                        label={x.toLocaleUpperCase()}
+                        className={`col-span-2 w-auto ${isEditing ? 'cursor-not-allowed' : ''}`}
+                      />
+                    ))}
                   </RadioGroup_Shadcn_>
                 </FormControl_Shadcn_>
                 <FormMessage_Shadcn_ />

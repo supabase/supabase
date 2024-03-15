@@ -78,25 +78,29 @@ ${policy.check ? `WITH CHECK (${policy.check})` : ''}
 `.trim()
 }
 
-// [Joshen] Experimenting hybrid layout for RLS
-export const generatePartialPolicyDefinition = ({
+export const generateQuery = ({
   name,
   schema,
   table,
-  action,
+  behaviour,
   command,
   roles,
+  using,
+  check,
 }: {
   name: string
   schema: string
   table: string
-  action: string
+  behaviour: string
   command: string
-  roles: string[]
+  roles: string
+  using?: string
+  check?: string
 }) => {
-  return `
-CREATE POLICY "${name}" on "${schema}"."${table}"
-AS ${action} FOR ${command}
-TO ${roles.join(', ')}
-  `
+  const querySkeleton = `create policy "${name}" on "${schema}"."${table}" as ${behaviour} for ${command} to ${roles}`
+  const query =
+    command === 'insert'
+      ? `${querySkeleton} with check (${check});`
+      : `${querySkeleton} using (${using})${(check ?? '').length > 0 ? `with check (${check});` : ';'}`
+  return query
 }

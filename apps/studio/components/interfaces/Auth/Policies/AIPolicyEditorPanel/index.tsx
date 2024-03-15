@@ -3,8 +3,8 @@ import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useChat } from 'ai/react'
 import { useParams, useTelemetryProps } from 'common'
-import { uniqBy } from 'lodash'
-import { FileDiff } from 'lucide-react'
+import { isEqual, uniqBy } from 'lodash'
+import { FileDiff, Lock } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -29,6 +29,7 @@ import {
 import * as z from 'zod'
 
 import { Monaco } from '@monaco-editor/react'
+import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import {
   IStandaloneCodeEditor,
@@ -50,6 +51,7 @@ import { AIPolicyChat } from './AIPolicyChat'
 import {
   MessageWithDebug,
   generatePolicyDefinition,
+  generateQuery,
   generateThreadMessage,
 } from './AIPolicyEditorPanel.utils'
 import { AIPolicyHeader } from './AIPolicyHeader'
@@ -58,6 +60,8 @@ import { PolicyDetailsV2 } from './PolicyDetailsV2'
 import { PolicyTemplates } from './PolicyTemplates'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
+import { LockedCreateQuerySection, LockedRenameQuerySection } from './LockedQuerySection'
+import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -78,14 +82,16 @@ export const AIPolicyEditorPanel = memo(function ({
   selectedPolicy,
   onSelectCancel,
 }: AIPolicyEditorPanelProps) {
+  const router = useRouter()
   const { ref } = useParams()
   const queryClient = useQueryClient()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
-  const router = useRouter()
+
+  const telemetryProps = useTelemetryProps()
   const snap = useAppStateSnapshot()
   const state = useTableEditorStateSnapshot()
-  const telemetryProps = useTelemetryProps()
+  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
   // [Joshen] Hyrid form fields, just spit balling to get a decent POC out
   const [using, setUsing] = useState('')
@@ -128,11 +134,18 @@ export const AIPolicyEditorPanel = memo(function ({
     command: z.string(),
     roles: z.string(),
   })
+  const defaultValues = {
+    name: '',
+    table: '',
+    behaviour: 'permissive',
+    command: 'select',
+    roles: '',
+  }
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onBlur',
     reValidateMode: 'onBlur',
     resolver: zodResolver(FormSchema),
-    defaultValues: { name: '', table: '', behaviour: 'permissive', command: 'select', roles: '' },
+    defaultValues,
   })
 
   // Customers on HIPAA plans should not have access to Supabase AI
@@ -146,8 +159,11 @@ export const AIPolicyEditorPanel = memo(function ({
     },
     { enabled: true, refetchOnWindowFocus: false }
   )
-
   const entityDefinitions = entities?.map((def) => def.sql.trim())
+
+  const { name, table, behaviour, command, roles } = form.watch()
+  const supportWithCheck = ['update', 'all'].includes(command)
+  const isRenamingPolicy = selectedPolicy !== undefined && name !== selectedPolicy.name
 
   const {
     messages: chatMessages,
@@ -180,52 +196,30 @@ export const AIPolicyEditorPanel = memo(function ({
       toast.success('Successfully created new policy')
       onSelectCancel()
     },
-    onError: (error) => {
-      console.log({ error })
-      setError(error)
+    onError: (error) => setError(error),
+  })
+
+  const { mutate: updatePolicy, isLoading: isUpdating } = useDatabasePolicyUpdateMutation({
+    onSuccess: () => {
+      toast.success('Successfully created updated policy')
+      onSelectCancel()
     },
   })
 
   const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
 
-  // const onExecuteSQL = useCallback(() => {
-  //   // clean up the sql before sending
-  //   const policy = editorOneRef.current?.getValue().replaceAll('  ', ' ')
-
-  //   if (policy) {
-  //     setError(undefined)
-  //     executeMutation({
-  //       sql: policy,
-  //       projectRef: selectedProject?.ref,
-  //       connectionString: selectedProject?.connectionString,
-  //     })
-  //   }
-  // }, [executeMutation, selectedProject?.connectionString, selectedProject?.ref])
-
   const acceptChange = useCallback(async () => {
-    if (!incomingChange) {
-      return
-    }
-
-    if (!editorOneRef.current || !diffEditorRef.current) {
-      return
-    }
+    if (!incomingChange || !editorOneRef.current || !diffEditorRef.current) return
 
     const editorModel = editorOneRef.current.getModel()
     const diffModel = diffEditorRef.current.getModel()
-
-    if (!editorModel || !diffModel) {
-      return
-    }
+    if (!editorModel || !diffModel) return
 
     const sql = diffModel.modified.getValue()
 
     // apply the incoming change in the editor directly so that Undo/Redo work properly
     editorOneRef.current.executeEdits('apply-ai-edit', [
-      {
-        text: sql,
-        range: editorModel.getFullModelRange(),
-      },
+      { text: sql, range: editorModel.getFullModelRange() },
     ])
 
     // remove the incoming change to revert to the original editor
@@ -300,55 +294,54 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     const { name, table, behaviour, command, roles } = data
-    const using = editorOneRef.current?.getValue() ?? undefined
-    const check = editorTwoRef.current?.getValue() ?? undefined
-    const sql = generateQuery({
-      name: name,
-      schema: state.selectedSchemaName,
-      table,
-      behaviour,
-      command,
-      roles: roles.length === 0 ? 'public' : roles,
-      using: using?.trim(),
-      check: command === 'insert' ? using?.trim() : check?.trim(),
-    })
+    const using = editorOneRef.current?.getValue().trim() ?? undefined
+    const check = editorTwoRef.current?.getValue().trim() ?? undefined
 
-    setError(undefined)
-    executeMutation({
-      sql,
-      projectRef: selectedProject?.ref,
-      connectionString: selectedProject?.connectionString,
-      handleError: (error) => {
-        throw error
-      },
-    })
-  }
+    if (selectedPolicy === undefined) {
+      const sql = generateQuery({
+        name: name,
+        schema: state.selectedSchemaName,
+        table,
+        behaviour,
+        command,
+        roles: roles.length === 0 ? 'public' : roles,
+        using: using ?? '',
+        check: command === 'insert' ? using ?? '' : check ?? '',
+      })
 
-  const generateQuery = ({
-    name,
-    schema,
-    table,
-    behaviour,
-    command,
-    roles,
-    using,
-    check,
-  }: {
-    name: string
-    schema: string
-    table: string
-    behaviour: string
-    command: string
-    roles: string
-    using?: string
-    check?: string
-  }) => {
-    const querySkeleton = `create policy "${name}" on "${schema}"."${table}" as ${behaviour} for ${command} to ${roles}`
-    const query =
-      command === 'insert'
-        ? `${querySkeleton} with check (${check});`
-        : `${querySkeleton} using (${using})${(check ?? '').length > 0 ? `with check (${check});` : ';'}`
-    return query
+      setError(undefined)
+      executeMutation({
+        sql,
+        projectRef: selectedProject?.ref,
+        connectionString: selectedProject?.connectionString,
+        handleError: (error) => {
+          throw error
+        },
+      })
+    } else if (selectedProject !== undefined) {
+      const payload: {
+        name?: string
+        definition?: string
+        check?: string
+        roles?: string[]
+      } = {}
+      const updatedRoles = roles.length === 0 ? ['public'] : roles.split(', ')
+
+      if (name !== selectedPolicy.name) payload.name = name
+      if (!isEqual(selectedPolicy.roles, updatedRoles)) payload.roles = updatedRoles
+      if (selectedPolicy.definition !== null && selectedPolicy.definition !== using)
+        payload.definition = using
+      if (selectedPolicy.check !== null && selectedPolicy.check !== check) payload.check = check
+
+      if (Object.keys(payload).length === 0) return onSelectCancel()
+
+      updatePolicy({
+        id: selectedPolicy.id,
+        projectRef: selectedProject.ref,
+        connectionString: selectedProject?.connectionString,
+        payload,
+      })
+    }
   }
 
   // when the panel is closed, reset all values
@@ -369,9 +362,24 @@ export const AIPolicyEditorPanel = memo(function ({
       setCheck('')
       setShowCheckBlock(false)
 
-      form.reset()
+      form.reset(defaultValues)
     } else {
       setAssistantPanel(true)
+      if (selectedPolicy !== undefined) {
+        const { name, action, table, command, roles } = selectedPolicy
+        form.reset({
+          name,
+          table,
+          behaviour: action.toLowerCase(),
+          command: command.toLowerCase(),
+          roles: roles.length === 1 && roles[0] === 'public' ? '' : roles.join(', '),
+        })
+        if (selectedPolicy.definition) setUsing(`  ${selectedPolicy.definition}`)
+        if (selectedPolicy.check) setCheck(`  ${selectedPolicy.check}`)
+        if (selectedPolicy.check && selectedPolicy.command !== 'INSERT') {
+          setShowCheckBlock(true)
+        }
+      }
     }
   }, [visible])
 
@@ -383,9 +391,6 @@ export const AIPolicyEditorPanel = memo(function ({
       editorOneRef.current?.layout()
     })
   }, [showDetails, error, errorPanelOpen])
-
-  const { name, table, behaviour, command, roles } = form.watch()
-  const supportWithCheck = ['update', 'all'].includes(command)
 
   return (
     <>
@@ -407,11 +412,11 @@ export const AIPolicyEditorPanel = memo(function ({
                   setAssistantVisible={setAssistantPanel}
                 />
 
-                <PolicyDetails
+                {/* <PolicyDetails
                   policy={selectedPolicy}
                   showDetails={showDetails}
                   toggleShowDetails={() => setShowDetails(!showDetails)}
-                />
+                /> */}
 
                 <div className="flex flex-col h-full w-full justify-between">
                   {incomingChange ? (
@@ -485,98 +490,15 @@ export const AIPolicyEditorPanel = memo(function ({
                     />
                   ) : null}
 
-                  <PolicyDetailsV2 form={form} />
+                  <PolicyDetailsV2 isEditing={selectedPolicy !== undefined} form={form} />
 
-                  {/* [Joshen] Opting for this way to prevent forced re-rendering of monaco whenever field input changes  */}
                   <div className="h-full">
-                    <div className="bg-surface-300 pt-2 pb-1">
-                      <div className="flex items-center justify-between px-5 mb-1">
-                        <div className="flex items-center">
-                          <div className="pl-0.5 pr-5 flex items-center justify-center">
-                            <IconLock size={14} className="text-foreground-lighter" />
-                          </div>
-                          <p className="text-xs text-foreground-lighter font-mono uppercase">
-                            Use options above to edit
-                          </p>
-                        </div>
-                        <Button
-                          type="default"
-                          onClick={() =>
-                            router.push(
-                              `/project/${ref}/sql/new?content=${generateQuery({
-                                name,
-                                schema: state.selectedSchemaName,
-                                table,
-                                behaviour,
-                                command,
-                                roles: roles.length === 0 ? 'public' : roles,
-                                using: (editorOneRef.current?.getValue() ?? undefined)?.trim(),
-                                check:
-                                  command === 'insert'
-                                    ? (editorOneRef.current?.getValue() ?? undefined)?.trim()
-                                    : (editorTwoRef.current?.getValue() ?? undefined)?.trim(),
-                              })}`
-                            )
-                          }
-                        >
-                          Open in SQL Editor
-                        </Button>
-                      </div>
-                      <div className="flex items-center" style={{ fontSize: '14px' }}>
-                        <p className="px-6 font-mono text-sm text-foreground-light select-none">
-                          1
-                        </p>
-                        <p className="font-mono tracking-tighter">
-                          <span className="text-[#569cd6]">CREATE</span> POLICY "
-                          {name.length === 0 ? 'policy_name' : name}"
-                        </p>
-                      </div>
-                      <div className="flex items-center" style={{ fontSize: '14px' }}>
-                        <p className="px-6 font-mono text-sm text-foreground-light select-none">
-                          2
-                        </p>
-                        <p className="font-mono tracking-tighter">
-                          <span className="text-[#569cd6]">ON</span> "{state.selectedSchemaName}"."
-                          {table}"
-                        </p>
-                      </div>
-                      <div className="flex items-center" style={{ fontSize: '14px' }}>
-                        <p className="px-6 font-mono text-sm text-foreground-light select-none">
-                          3
-                        </p>
-                        <p className="font-mono tracking-tighter">
-                          <span className="text-[#569cd6]">AS</span> {behaviour.toLocaleUpperCase()}
-                        </p>
-                      </div>
-                      <div className="flex items-center" style={{ fontSize: '14px' }}>
-                        <p className="px-6 font-mono text-sm text-foreground-light select-none">
-                          4
-                        </p>
-                        <p className="font-mono tracking-tighter">
-                          <span className="text-[#569cd6]">FOR</span> {command.toLocaleUpperCase()}
-                        </p>
-                      </div>
-                      <div className="flex items-center" style={{ fontSize: '14px' }}>
-                        <p className="px-6 font-mono text-sm text-foreground-light select-none">
-                          5
-                        </p>
-                        <p className="font-mono tracking-tighter">
-                          <span className="text-[#569cd6]">TO</span>{' '}
-                          {roles.length === 0 ? 'public' : roles}
-                        </p>
-                      </div>
-                      <div className="flex items-center" style={{ fontSize: '14px' }}>
-                        <p className="px-6 font-mono text-sm text-foreground-light select-none">
-                          6
-                        </p>
-                        <p className="font-mono tracking-tighter">
-                          <span className="text-[#569cd6]">
-                            {command === 'insert' ? 'WITH CHECK' : 'USING'}
-                          </span>{' '}
-                          <span className="text-[#ffd700]">(</span>
-                        </p>
-                      </div>
-                    </div>
+                    <LockedCreateQuerySection
+                      isEditing={selectedPolicy !== undefined}
+                      editorOneRef={editorOneRef}
+                      editorTwoRef={editorTwoRef}
+                      formFields={{ name, table, behaviour, command, roles }}
+                    />
 
                     <div
                       className={`py-1 relative ${incomingChange ? 'hidden' : 'block'}`}
@@ -657,6 +579,15 @@ export const AIPolicyEditorPanel = memo(function ({
                       </>
                     )}
 
+                    {isRenamingPolicy && (
+                      <LockedRenameQuerySection
+                        oldName={selectedPolicy.name}
+                        newName={name}
+                        table={table}
+                        lineNumber={8 + expOneLineCount + (showCheckBlock ? expTwoLineCount : 0)}
+                      />
+                    )}
+
                     {supportWithCheck && (
                       <div className="px-5 py-3 flex items-center gap-x-2">
                         <Checkbox_Shadcn_
@@ -684,7 +615,7 @@ export const AIPolicyEditorPanel = memo(function ({
                       <div className="flex items-center gap-x-2">
                         <Button
                           type="default"
-                          disabled={isExecuting}
+                          disabled={isExecuting || isUpdating}
                           onClick={() => onSelectCancel()}
                         >
                           Cancel
@@ -692,8 +623,8 @@ export const AIPolicyEditorPanel = memo(function ({
                         <Button
                           form={formId}
                           htmlType="submit"
-                          loading={isExecuting}
-                          disabled={isExecuting || incomingChange !== undefined}
+                          loading={isExecuting || isUpdating}
+                          disabled={isExecuting || isUpdating || incomingChange !== undefined}
                           // onClick={() => onExecuteSQL()}
                         >
                           Save policy
