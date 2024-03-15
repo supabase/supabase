@@ -25,7 +25,7 @@ const PopoverContent = React.forwardRef<
       align = 'center',
       sideOffset = 4,
       portal = false,
-      sameWidthAsTrigger = true,
+      sameWidthAsTrigger = false,
       ...props
     },
     ref
