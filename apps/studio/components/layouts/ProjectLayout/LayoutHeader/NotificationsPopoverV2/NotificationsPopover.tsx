@@ -108,9 +108,9 @@ const NotificationsPopoverV2 = () => {
           )}
           icon={
             hasCritical ? (
-              <CriticalIcon className="!w-3.5 !h-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
+              <CriticalIcon className="!w-3.5 !h-3.5 transition-all -mr-1 group-hover:-mr-1 z-10" />
             ) : hasWarning ? (
-              <WarningIcon className="!w-3.5 !h-3.5 transition-all -mr-3.5 group-hover:-mr-1 z-10" />
+              <WarningIcon className="!w-3.5 !h-3.5 transition-all -mr-1 group-hover:-mr-1 z-10" />
             ) : hasNewNotifications ? (
               <div
                 className={clsx(
