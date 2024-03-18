@@ -6,6 +6,15 @@ import {
   JwtSecretUpdateStatus,
 } from '@supabase/shared-types/out/events'
 import { Dispatch, SetStateAction, useState } from 'react'
+import toast from 'react-hot-toast'
+
+import { useParams } from 'common'
+import Panel from 'components/ui/Panel'
+import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutation'
+import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { useCheckPermissions } from 'hooks'
+import { uuidv4 } from 'lib/helpers'
 import {
   Alert,
   AlertDescription_Shadcn_,
@@ -29,22 +38,13 @@ import {
   Input,
   Modal,
 } from 'ui'
-
-import { useParams } from 'common/hooks'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import Panel from 'components/ui/Panel'
-import { useJwtSecretUpdateMutation } from 'data/config/jwt-secret-update-mutation'
-import { useJwtSecretUpdatingStatusQuery } from 'data/config/jwt-secret-updating-status-query'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useCheckPermissions, useStore } from 'hooks'
-import { uuidv4 } from 'lib/helpers'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
 } from './API.constants'
 
 const JWTSettings = () => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
 
   const [customToken, setCustomToken] = useState<string>('')
@@ -83,11 +83,9 @@ const JWTSettings = () => {
     try {
       await updateJwt({ projectRef, jwtSecret: jwt_secret, changeTrackingId: trackingId })
       setModalVisibility(false)
-      ui.setNotification({
-        category: 'info',
-        message:
-          'Successfully submitted JWT secret update request. Please wait while your project is updated.',
-      })
+      toast(
+        'Successfully submitted JWT secret update request. Please wait while your project is updated.'
+      )
     } catch (error) {}
   }
 
@@ -124,7 +122,7 @@ const JWTSettings = () => {
                 layout="horizontal"
               />
               <div className="space-y-3">
-                <div className="p-3 px-6 border rounded-md shadow-sm bg-background">
+                <div className="p-3 px-6 border rounded-md shadow-sm bg-studio">
                   {isUpdatingJwtSecret ? (
                     <div className="flex items-center space-x-2">
                       <IconLoader className="animate-spin" size={14} />

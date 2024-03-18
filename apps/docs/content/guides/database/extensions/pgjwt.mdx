@@ -1,0 +1,108 @@
+---
+id: 'pgjwt'
+title: 'pgjwt: JSON Web Tokens'
+description: 'Encode and decode JWTs in PostgreSQL'
+---
+
+The [`pgjwt`](https://github.com/michelp/pgjwt) (PostgreSQL JSON Web Token) extension allows you to create and parse [JSON Web Tokens (JWTs)](https://en.wikipedia.org/wiki/JSON_Web_Token) within a PostgreSQL database. JWTs are commonly used for authentication and authorization in web applications and services.
+
+## Enable the extension
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+  queryGroup="database-method"
+>
+<TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+2. Click on **Extensions** in the sidebar.
+3. Search for `pgjwt` and enable the extension.
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
+
+{/* prettier-ignore */}
+```sql
+-- Enable the "pgjwt" extension
+create extension pgjwt schema extensions;
+
+-- Disable the "pgjwt" extension
+drop extension if exists pgjwt;
+```
+
+Even though the SQL code is `create extension`, this is the equivalent of enabling the extension.
+To disable an extension you can call `drop extension`.
+
+It's good practice to create the extension within a separate schema (like `extensions`) to keep the `public` schema clean.
+
+</TabPanel>
+</Tabs>
+
+## API
+
+- [`sign(payload json, secret text, algorithm text default 'HSA256')`](https://github.com/michelp/pgjwt#usage): Signs a JWT containing _payload_ with _secret_ using _algorithm_.
+- [`verify(token text, secret text, algorithm text default 'HSA256')`](https://github.com/michelp/pgjwt#usage): Decodes a JWT _token_ that was signed with _secret_ using _algorithm_.
+
+Where:
+
+- `payload` is an encrypted JWT represented as a string.
+- `secret` is the private/secret passcode which is used to sign the JWT and verify its integrity.
+- `algorithm` is the method used to sign the JWT using the secret.
+- `token` is an encrypted JWT represented as a string.
+
+## Usage
+
+Once the extension is installed, you can use its functions to create and parse JWTs. Here's an example of how you can use the `sign` function to create a JWT:
+
+{/* prettier-ignore */}
+```sql
+select
+  extensions.sign(
+    payload   := '{"sub":"1234567890","name":"John Doe","iat":1516239022}',
+    secret    := 'secret',
+    algorithm := 'HS256'
+  );
+```
+
+The `pgjwt_encode` function returns a string that represents the JWT, which can then be safely transmitted between parties.
+
+{/* prettier-ignore */}
+```
+              sign
+---------------------------------
+ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpX
+ VCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiw
+ ibmFtZSI6IkpvaG4gRG9lIiwiaWF0Ijo
+ xNTE2MjM5MDIyfQ.XbPfbIHMI6arZ3Y9
+ 22BhjWgQzWXcXNrz0ogtVhfEd2o
+(1 row)
+```
+
+To parse a JWT and extract its claims, you can use the `verify` function. Here's an example:
+
+{/* prettier-ignore */}
+```sql
+select
+  extensions.verify(
+    token := 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJuYW1lIjoiRm9vIn0.Q8hKjuadCEhnCPuqIj9bfLhTh_9QSxshTRsA5Aq4IuM',
+    secret    := 'secret',
+    algorithm := 'HS256'
+  );
+```
+
+Which returns the decoded contents and some associated metadata.
+
+{/* prettier-ignore */}
+```sql
+           header            |    payload     | valid
+-----------------------------+----------------+-------
+ {"alg":"HS256","typ":"JWT"} | {"name":"Foo"} | t
+(1 row)
+```
+
+## Resources
+
+- Official [`pgjwt` documentation](https://github.com/michelp/pgjwt)

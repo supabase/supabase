@@ -1,6 +1,6 @@
 import { Badge, Menu } from 'ui'
 
-import { ProductMenuGroup } from './ProductMenu.types'
+import type { ProductMenuGroup } from './ProductMenu.types'
 import ProductMenuItem from './ProductMenuItem'
 
 interface ProductMenuProps {

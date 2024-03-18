@@ -1,4 +1,4 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
+import type { PostgresPolicy } from '@supabase/postgres-meta'
 import {
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,

@@ -2,8 +2,8 @@ import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
-import FeedbackDropdown from '../ProjectLayout/LayoutHeader/FeedbackDropdown'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
+import { FeedbackDropdown } from '../ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from '../ProjectLayout/LayoutHeader/HelpPopover'
 import NotificationsPopoverV2 from '../ProjectLayout/LayoutHeader/NotificationsPopoverV2/NotificationsPopover'
 import BranchDropdown from './BranchDropdown'
@@ -21,13 +21,12 @@ const AppHeader = () => {
   const { ref } = useParams()
   const project = useSelectedProject()
   const organization = useSelectedOrganization()
-  const enableBranchManagement = useFlag('branchManagement')
 
   const isBranchingEnabled =
     project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
 
   return (
-    <div className="flex items-center justify-between px-4 py-1 bg-background border-b">
+    <div className="flex items-center justify-between px-4 py-1 bg-studio border-b">
       <div className="flex items-center space-x-1">
         <Link
           href={organization !== undefined ? `/org/${organization?.slug}` : '/'}
@@ -41,7 +40,7 @@ const AppHeader = () => {
         </Link>
         <OrganizationDropdown isNewNav />
         {ref !== undefined && <ProjectDropdown isNewNav />}
-        {ref !== undefined && enableBranchManagement && (
+        {ref !== undefined && (
           <>
             {isBranchingEnabled ? <BranchDropdown isNewNav /> : <EnableBranchingButton isNewNav />}
           </>

@@ -1,0 +1,265 @@
+---
+title: 'Sentry integration'
+subtitle: 'Integrate Sentry to monitor errors from a Supabase client'
+---
+
+You can use [Sentry](https://sentry.io/welcome/) to monitor errors thrown from a Supabase JavaScript client. Install the [Supabase Sentry integration](https://github.com/supabase-community/sentry-integration-js) to get started.
+
+The Sentry integration supports browser, Node, and edge environments.
+
+## Installation
+
+Install the Sentry integration using your package manager:
+
+<Tabs scrollable queryGroup="package-manager" defaultActiveId="npm" type="underlined" size="small" >
+
+<TabPanel id="npm" label="npm">
+
+```sh
+npm install @supabase/sentry-js-integration
+```
+
+</TabPanel>
+
+<TabPanel id="yarn" label="yarn">
+
+```sh
+yarn add @supabase/sentry-js-integration
+```
+
+</TabPanel>
+
+<TabPanel id="pnpm" label="pnpm">
+
+```sh
+pnpm add @supabase/sentry-js-integration
+```
+
+</TabPanel>
+
+</Tabs>
+
+## Use
+
+To use the Supabase Sentry integration, add it to your `integrations` list when initializing your Sentry client.
+
+You can supply either the Supabase Client constructor or an already-initiated instance of a Supabase Client.
+
+<Tabs scrollable defaultActiveId="constructor" type="underlined" size="small">
+
+<TabPanel id="constructor" label="With constructor">
+
+```ts
+import * as Sentry from '@sentry/browser'
+import { SupabaseClient } from '@supabase/supabase-js'
+import { SupabaseIntegration } from '@supabase/sentry-js-integration'
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  integrations: [
+    new SupabaseIntegration(SupabaseClient, {
+      tracing: true,
+      breadcrumbs: true,
+      errors: true,
+    }),
+  ],
+})
+```
+
+</TabPanel>
+
+<TabPanel id="instance" label="With instance">
+
+```ts
+import * as Sentry from '@sentry/browser'
+import { createClient } from '@supabase/supabase-js'
+import { SupabaseIntegration } from '@supabase/sentry-js-integration'
+
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY)
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  integrations: [
+    new SupabaseIntegration(supabaseClient, {
+      tracing: true,
+      breadcrumbs: true,
+      errors: true,
+    }),
+  ],
+})
+```
+
+</TabPanel>
+
+</Tabs>
+
+## Deduplicating spans
+
+If you're already monitoring HTTP errors in Sentry, for example with the Http, Fetch, or Undici integrations, you will get duplicate spans for Supabase calls. You can deduplicate the spans by skipping them in your other integration:
+
+```ts
+import * as Sentry from '@sentry/browser'
+import { SupabaseClient } from '@supabase/supabase-js'
+import { SupabaseIntegration } from '@supabase/sentry-js-integration'
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  integrations: [
+    new SupabaseIntegration(SupabaseClient, {
+      tracing: true,
+      breadcrumbs: true,
+      errors: true,
+    }),
+
+    // @sentry/browser
+    new Sentry.BrowserTracing({
+      shouldCreateSpanForRequest: (url) => {
+        return !url.startsWith(`${SUPABASE_URL}/rest`)
+      },
+    }),
+
+    // or @sentry/node
+    new Sentry.Integrations.Http({
+      tracing: {
+        shouldCreateSpanForRequest: (url) => {
+          return !url.startsWith(`${SUPABASE_URL}/rest`)
+        },
+      },
+    }),
+
+    // or @sentry/node with Fetch support
+    new Sentry.Integrations.Undici({
+      shouldCreateSpanForRequest: (url) => {
+        return !url.startsWith(`${SUPABASE_URL}/rest`)
+      },
+    }),
+
+    // or @sentry/WinterCGFetch for Next.js Middleware & Edge Functions
+    new Sentry.Integrations.WinterCGFetch({
+      breadcrumbs: true,
+      shouldCreateSpanForRequest: (url) => {
+        return !url.startsWith(`${SUPABASE_URL}/rest`)
+      },
+    }),
+  ],
+})
+```
+
+## Example Next.js configuration
+
+See this example for a setup with Next.js to cover browser, server, and edge environments. First, run through the [Sentry Next.js wizard](https://docs.sentry.io/platforms/javascript/guides/nextjs/#install) to generate the base Next.js configuration. Then add the Supabase Sentry Integration to all your `Sentry.init` calls with the appropriate filters.
+
+<Tabs scrollable defaultActiveId="browser" type="underlined" size="small">
+
+<TabPanel id="browser" label="Browser">
+
+```ts sentry.client.config.ts
+import * as Sentry from '@sentry/nextjs'
+import { SupabaseClient } from '@supabase/supabase-js'
+import { SupabaseIntegration } from '@supabase/sentry-js-integration'
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  // Adjust this value in production, or use tracesSampler for greater control
+  tracesSampleRate: 1,
+
+  // Setting this option to true will print useful information to the console while you're setting up Sentry.
+  debug: true,
+
+  replaysOnErrorSampleRate: 1.0,
+
+  // This sets the sample rate to be 10%. You may want this to be 100% while
+  // in development and sample at a lower rate in production
+  replaysSessionSampleRate: 0.1,
+
+  // You can remove this option if you're not planning to use the Sentry Session Replay feature:
+  integrations: [
+    Sentry.replayIntegration({
+      // Additional Replay configuration goes in here, for example:
+      maskAllText: true,
+      blockAllMedia: true,
+    }),
+    new SupabaseIntegration(SupabaseClient, {
+      tracing: true,
+      breadcrumbs: true,
+      errors: true,
+    }),
+    Sentry.browserTracingIntegration({
+      shouldCreateSpanForRequest: (url) => {
+        return !url.startsWith(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest`)
+      },
+    }),
+  ],
+})
+```
+
+</TabPanel>
+
+<TabPanel id="server" label="Server">
+
+```ts sentry.server.config.ts
+import * as Sentry from '@sentry/nextjs'
+import { SupabaseClient } from '@supabase/supabase-js'
+import { SupabaseIntegration } from '@supabase/sentry-js-integration'
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  integrations: [
+    new SupabaseIntegration(SupabaseClient, {
+      tracing: true,
+      breadcrumbs: true,
+      errors: true,
+    }),
+    new Sentry.Integrations.Undici({
+      shouldCreateSpanForRequest: (url) => {
+        console.log('server', `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest`, url)
+        return !url.startsWith(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest`)
+      },
+    }),
+  ],
+
+  // Adjust this value in production, or use tracesSampler for greater control
+  tracesSampleRate: 1,
+
+  // Setting this option to true will print useful information to the console while you're setting up Sentry.
+  debug: true,
+})
+```
+
+</TabPanel>
+
+<TabPanel id="edge" label="Middleware & Edge">
+
+```js sentry.edge.config.ts
+import * as Sentry from '@sentry/nextjs'
+import { SupabaseClient } from '@supabase/supabase-js'
+import { SupabaseIntegration } from '@supabase/sentry-js-integration'
+
+Sentry.init({
+  dsn: SENTRY_DSN,
+  integrations: [
+    new SupabaseIntegration(SupabaseClient, {
+      tracing: true,
+      breadcrumbs: true,
+      errors: true,
+    }),
+    new Sentry.Integrations.WinterCGFetch({
+      breadcrumbs: true,
+      shouldCreateSpanForRequest: (url) => {
+        return !url.startsWith(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest`)
+      },
+    }),
+  ],
+  // Adjust this value in production, or use tracesSampler for greater control
+  tracesSampleRate: 1,
+
+  // Setting this option to true will print useful information to the console while you're setting up Sentry.
+  debug: true,
+})
+```
+
+</TabPanel>
+
+</Tabs>
+
+Afterward build your application (`npm run build`) and start it locally (`npm run start`). You will now see the transactions being logged in the terminal when making supabase-js requests.

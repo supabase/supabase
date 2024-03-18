@@ -1,7 +1,7 @@
-import { Filter, ServiceError, SupaTable } from 'components/grid'
+import type { Filter, ServiceError, SupaTable } from 'components/grid'
 import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 import { isNumericalColumn } from 'components/grid/utils'
-import { Table } from 'data/tables/table-query'
+import type { Table } from 'data/tables/table-query'
 
 /**
  * temporary fix until we implement a better filter UI

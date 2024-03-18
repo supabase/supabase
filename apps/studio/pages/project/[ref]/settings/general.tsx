@@ -7,7 +7,7 @@ import {
 import { SettingsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useIsFeatureEnabled } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const ProjectSettings: NextPageWithLayout = () => {
   const { project } = useProjectContext()

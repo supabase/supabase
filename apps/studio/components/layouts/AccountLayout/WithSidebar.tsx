@@ -4,8 +4,8 @@ import { ReactNode } from 'react'
 import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
 
 import { useFlag } from 'hooks'
-import LayoutHeader from '../ProjectLayout/LayoutHeader'
-import { SidebarLink, SidebarSection } from './AccountLayout.types'
+import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
+import type { SidebarLink, SidebarSection } from './AccountLayout.types'
 
 interface WithSidebarProps {
   title: string
@@ -39,7 +39,7 @@ const WithSidebar = ({
         <div
           id="with-sidebar"
           className={[
-            'h-full bg-background',
+            'h-full bg-studio',
             'hide-scrollbar w-64 overflow-auto border-r border-default',
           ].join(' ')}
         >
@@ -174,7 +174,7 @@ const SidebarLinkItem = ({
       icon = <IconArrowUpRight size={'tiny'} />
     }
 
-    if (label === 'Logout') {
+    if (label === 'Log out') {
       icon = <IconLogOut size={'tiny'} />
     }
 

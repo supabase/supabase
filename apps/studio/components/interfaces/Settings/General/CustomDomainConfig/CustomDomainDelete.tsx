@@ -1,13 +1,12 @@
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, IconExternalLink, IconTrash } from 'ui'
+import toast from 'react-hot-toast'
 
-import ConfirmModal from 'components/ui/Dialogs/ConfirmDialog'
 import Panel from 'components/ui/Panel'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
-import { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
-import { useStore } from 'hooks'
+import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
+import { Button, IconExternalLink, IconTrash } from 'ui'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 export type CustomDomainDeleteProps = {
   projectRef?: string
@@ -15,11 +14,10 @@ export type CustomDomainDeleteProps = {
 }
 
 const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProps) => {
-  const { ui } = useStore()
   const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false)
   const { mutate: deleteCustomDomain } = useCustomDomainDeleteMutation({
     onSuccess: () => {
-      ui.setNotification({ category: 'success', message: `Successfully deleted custom domain` })
+      toast.success(`Successfully deleted custom domain`)
       setIsDeleteConfirmModalVisible(false)
     },
   })
@@ -89,4 +87,4 @@ const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProp
   )
 }
 
-export default observer(CustomDomainDelete)
+export default CustomDomainDelete

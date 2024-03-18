@@ -62,7 +62,7 @@
       'vs/editor/common/tokenizationRegistry',
       'vs/editor/common/languages',
       'vs/editor/common/services/editorBaseApi',
-      'vs/nls!vs/base/common/worker/simpleWorker',
+      'vs/nls!monaco-editor/base/common/worker/simpleWorker',
       'vs/base/common/worker/simpleWorker',
       'vs/editor/common/services/editorSimpleWorker',
     ],

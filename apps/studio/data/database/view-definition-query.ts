@@ -7,10 +7,8 @@ type GetViewDefinition = {
 }
 
 export const getViewDefinitionQuery = ({ schema, name }: GetViewDefinition) => {
-  const fullName = [schema, name].filter(Boolean).join('.')
-
   const sql = /* SQL */ `
-    select pg_get_viewdef('${fullName}', true) as definition
+    select pg_get_viewdef(to_regclass('"${schema}"."${name}"'), true) as definition
   `.trim()
 
   return sql
@@ -39,6 +37,7 @@ export const useViewDefinitionQuery = <TData extends ViewDefinitionData = ViewDe
       select(data) {
         return data.result[0].definition.trim()
       },
+      enabled: typeof schema !== 'undefined' && typeof name !== 'undefined',
       ...options,
     }
   )

@@ -1,7 +1,10 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { IS_PLATFORM } from 'common'
 import { isEqual } from 'lodash'
 import { Key, ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import * as Tooltip from '@radix-ui/react-tooltip'
 import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
+import toast from 'react-hot-toast'
 import {
   Alert,
   Button,
@@ -18,8 +21,9 @@ import {
 } from 'ui'
 
 import CSVButton from 'components/ui/CSVButton'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
 import { LogQueryError, isDefaultLogPreviewFormat } from '.'
 import AuthColumnRenderer from './LogColumnRenderers/AuthColumnRenderer'
 import DatabaseApiColumnRender from './LogColumnRenderers/DatabaseApiColumnRender'
@@ -28,13 +32,9 @@ import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewCol
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
 import LogSelection, { LogSelectionProps } from './LogSelection'
-import { LogData, QueryType } from './Logs.types'
+import type { LogData, QueryType } from './Logs.types'
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
-import { CSVLink } from 'react-csv'
-import { IS_PLATFORM } from 'common'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useProfile } from 'lib/profile'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -71,7 +71,6 @@ const LogTable = ({
   onSave,
   hasEditorValue,
 }: Props) => {
-  const { ui } = useStore()
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
   const { profile } = useProfile()
@@ -91,7 +90,6 @@ const LogTable = ({
   const columnNames = Object.keys(getFirstRow() || {})
   const hasId = columnNames.includes('id')
   const hasTimestamp = columnNames.includes('timestamp')
-  const csvRef = useRef<CSVLink & HTMLAnchorElement & { link: HTMLAnchorElement }>(null)
 
   const DEFAULT_COLUMNS = columnNames.map((v: keyof LogData, idx) => {
     const result: Column<LogData> = {
@@ -190,14 +188,14 @@ const LogTable = ({
 
   const RowRenderer = useCallback<(key: Key, props: RenderRowProps<LogData, unknown>) => ReactNode>(
     (key, props) => {
-      return <Row {...props} isRowSelected={false} selectedCellIdx={undefined} />
+      return <Row key={key} {...props} isRowSelected={false} selectedCellIdx={undefined} />
     },
     []
   )
 
   const copyResultsToClipboard = () => {
     copyToClipboard(stringData, () => {
-      ui.setNotification({ category: 'success', message: 'Results copied to clipboard.' })
+      toast.success('Results copied to clipboard')
     })
   }
 
@@ -317,31 +315,12 @@ const LogTable = ({
   const renderNoResultAlert = () => (
     <div className="flex scale-100 flex-col items-center justify-center gap-6 text-center opacity-100">
       <div className="flex flex-col gap-1">
-        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2"></div>
-        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2">
-          <div className="absolute right-1 -bottom-4 text-foreground-light">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-        </div>
+        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
+        <div className="relative flex h-4 w-32 items-center rounded border border-dashed border-stronger px-2" />
       </div>
       <div className="flex flex-col gap-1 px-5">
-        <h3 className="text-lg text-foreground">No results</h3>
-        <p className="text-sm text-foreground-lighter">
-          Try another search, or adjusting the filters
-        </p>
+        <h3 className="text-lg text-foreground">No results found</h3>
+        <p className="text-sm text-foreground-lighter">Try another search or adjust the filters</p>
       </div>
     </div>
   )
@@ -372,7 +351,7 @@ const LogTable = ({
                 'font-mono tracking-tight',
                 isEqual(row, focusedLog)
                   ? '!bg-border-stronger rdg-row--focused'
-                  : ' !bg-background hover:!bg-surface-100 cursor-pointer',
+                  : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
               ].join(' ')
             }
             rows={logDataRows}
