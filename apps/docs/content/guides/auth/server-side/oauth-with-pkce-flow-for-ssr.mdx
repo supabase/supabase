@@ -207,12 +207,6 @@ app.get("/auth/callback", async function (req, res) {
 
 Let's point our `.signInWithOAuth` method's redirect to the callback route we create above:
 
-<Admonition type="caution">
-
-The `.signInWithOAuth` method uses the `window` object for the automatic redirect. For automatic redirect to work, it should be called from a Client component. If the method is used server-side, you need to handle the redirect yourself.
-
-</Admonition>
-
 ```js
 await supabase.auth.signInWithOAuth({
   provider,
@@ -221,6 +215,12 @@ await supabase.auth.signInWithOAuth({
   },
 })
 ```
+
+<Admonition type="caution">
+
+The `.signInWithOAuth` method uses the `window` object for the automatic redirect. For automatic redirect to work, it should be called from a Client component. If the method is used server-side, you need to handle the redirect yourself and set `skipBrowserRedirect` option to `true`.
+
+</Admonition>
 
 <Tabs
   scrollable
@@ -244,6 +244,7 @@ export function SignInWithProvider({ provider }: { provider: Provider }) {
       provider,
       options: {
         redirectTo: '/auth/callback',
+	skipBrowserRedirect: true,
       },
     })
 
