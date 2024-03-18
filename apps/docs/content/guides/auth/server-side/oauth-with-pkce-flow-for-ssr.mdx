@@ -207,6 +207,12 @@ app.get("/auth/callback", async function (req, res) {
 
 Let's point our `.signInWithOAuth` method's redirect to the callback route we create above:
 
+<Admonition type="caution">
+
+For the automatic redirect to work, this function should be called from a Client component.
+
+</Admonition>
+
 ```js
 await supabase.auth.signInWithOAuth({
   provider,
