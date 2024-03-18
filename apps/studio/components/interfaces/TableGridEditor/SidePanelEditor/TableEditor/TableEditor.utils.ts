@@ -21,6 +21,9 @@ export const validateFields = (field: TableField) => {
   if (some(field.columns, (column: ColumnField) => column.name.length === 0)) {
     errors['columns'] = 'Ensure that all your columns are named'
   }
+  if (some(field.columns, (column: ColumnField) => /^\s|\s$/.test(column.name))) {
+    errors['columns'] = 'Ensure that all your columns dont have starting or ending whitespace'
+  }
   return errors
 }
 
