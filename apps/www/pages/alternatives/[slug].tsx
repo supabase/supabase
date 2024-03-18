@@ -3,7 +3,7 @@ import authors from 'lib/authors.json'
 import LayoutComparison from '~/layouts/comparison'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
-import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
+import { getAllPostSlugs, getNavLatestPosts, getPostdata, getSortedPosts } from '~/lib/posts'
 
 // import all components used in blog articles here
 // for instance, if you use a button, you must add `Button` in the components object below.
@@ -55,6 +55,7 @@ export async function getStaticProps({ params }: any) {
         ...data,
         toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
       },
+      latestPosts: getNavLatestPosts(),
     },
   }
 }

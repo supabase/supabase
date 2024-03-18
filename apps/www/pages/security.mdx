@@ -10,6 +10,7 @@ import {
 import { Button, IconGitHub, IconActivity } from 'ui'
 import Layout from '../layouts/Layout'
 import Link from 'next/link'
+import { getStaticLatestPosts } from '~/lib/posts'
 
 export const meta = {
   type: 'lp',
@@ -138,4 +139,5 @@ In addition to protection at the CDN level via Cloudflare, we employ [fail2ban](
 
 </div>
 
+export const getStaticProps = async () => getStaticLatestPosts()
 export default (context) => <Layout meta={meta} children={context.children} context={context} />

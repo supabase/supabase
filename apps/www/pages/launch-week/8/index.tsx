@@ -1,5 +1,7 @@
+import 'swiper/swiper.min.css'
+
 import { useState, useEffect } from 'react'
-import { GetServerSideProps } from 'next'
+import { GetStaticProps } from 'next'
 import dynamic from 'next/dynamic'
 import Head from 'next/head'
 import Image from 'next/image'
@@ -7,6 +9,8 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { createClient, Session, SupabaseClient } from '@supabase/supabase-js'
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
+import { getNavLatestPosts } from '~/lib/posts'
+import PostTypes from '~/types/post'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
@@ -14,8 +18,6 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHeader'
 import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
 import LW8CalloutsSection from '~/components/LaunchWeek/8/LW8CalloutsSection'
-
-import 'swiper/swiper.min.css'
 
 const AnimatedParticles = dynamic(
   () => import('~/components/LaunchWeek/8/AnimatedParticles/ParticlesCanvas')
@@ -32,6 +34,7 @@ const CTABanner = dynamic(() => import('~/components/CTABanner'))
 interface Props {
   users?: UserData[]
   meetups?: Meetup[]
+  latestPosts?: PostTypes[]
 }
 
 const supabaseAdmin = createClient(
@@ -40,7 +43,7 @@ const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
 
-export default function TicketHome({ users, meetups }: Props) {
+export default function TicketHome({ users, meetups, latestPosts }: Props) {
   const { query } = useRouter()
 
   const TITLE = 'Supabase Launch Week 8'
@@ -132,7 +135,7 @@ export default function TicketHome({ users, meetups }: Props) {
           setTicketState,
         }}
       >
-        <DefaultLayout>
+        <DefaultLayout latestPosts={latestPosts}>
           <div className="-mt-[65px]">
             <div className="relative">
               <div className="relative z-10">
@@ -193,7 +196,7 @@ export default function TicketHome({ users, meetups }: Props) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getStaticProps: GetStaticProps = async () => {
   // fetch users for the TicketBrickWall
   const { data: users } = await supabaseAdmin!
     .from('lw8_tickets_golden')
@@ -206,6 +209,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     props: {
       users,
       meetups,
+      latestPosts: getNavLatestPosts(),
     },
   }
 }

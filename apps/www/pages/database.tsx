@@ -1,6 +1,7 @@
 // Import Swiper styles
 import 'swiper/swiper.min.css'
 
+import { GetStaticProps } from 'next'
 import dynamic from 'next/dynamic'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
@@ -9,6 +10,10 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Badge, Button, IconArrowUpRight, IconX, Tabs } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
+import { ThemeImage } from 'ui-patterns/ThemeImage'
+import { TweetCard } from 'ui-patterns/TweetCard'
+import { getStaticLatestPosts } from '~/lib/posts'
+import PostTypes from '~/types/post'
 
 // data
 import Solutions from 'data/Solutions'
@@ -18,8 +23,6 @@ import ExtensionsExamplesData from 'data/products/database/extensions-examples'
 import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
 import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
 
-import { ThemeImage } from 'ui-patterns/ThemeImage'
-import { TweetCard } from 'ui-patterns/TweetCard'
 import ProductHeader from '~/components/Sections/ProductHeader'
 
 const NewFeatureCard = dynamic(() => import('~/components/NewFeatureCard'))
@@ -34,7 +37,7 @@ const ProductIcon = dynamic(() => import('~/components/ProductIcon'))
 const APISection = dynamic(() => import('~/components/Sections/APISection'))
 const GithubExamples = dynamic(() => import('~/components/Sections/GithubExamples'))
 
-function Database() {
+function Database({ latestPosts }: { latestPosts?: PostTypes[] }) {
   // base path for images
   const { basePath } = useRouter()
 
@@ -67,7 +70,7 @@ function Database() {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={latestPosts}>
         <ProductHeader
           icon={Solutions['database'].icon}
           title={Solutions['database'].name}
@@ -318,5 +321,7 @@ function Database() {
     </>
   )
 }
+
+export const getStaticProps: GetStaticProps = async () => getStaticLatestPosts()
 
 export default Database

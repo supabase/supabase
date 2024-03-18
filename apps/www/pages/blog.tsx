@@ -1,5 +1,6 @@
 import fs from 'fs'
 import { useState } from 'react'
+import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { generateRss } from '~/lib/rss'
@@ -16,7 +17,12 @@ import { LOCAL_STORAGE_KEYS, isBrowser } from 'common'
 
 export type BlogView = 'list' | 'grid'
 
-function Blog(props: any) {
+interface Props {
+  blogs: PostTypes[]
+  latestPosts?: PostTypes[]
+}
+
+function Blog(props: NextPage & Props) {
   const { BLOG_VIEW } = LOCAL_STORAGE_KEYS
   const localView = isBrowser ? (localStorage?.getItem(BLOG_VIEW) as BlogView) : undefined
   const [blogs, setBlogs] = useState(props.blogs)
@@ -50,7 +56,7 @@ function Blog(props: any) {
           },
         ]}
       />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={props.latestPosts}>
         <h1 className="sr-only">Supabase blog</h1>
         <div className="md:container mx-auto py-4 lg:py-10 px-4 sm:px-12 xl:px-16">
           {props.blogs.slice(0, 1).map((blog: any, i: number) => (
@@ -123,6 +129,7 @@ export async function getStaticProps() {
   return {
     props: {
       blogs: allPostsData,
+      latestPosts: allPostsData.slice(0, 2),
     },
   }
 }

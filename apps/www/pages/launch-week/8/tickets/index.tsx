@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
-import { GetServerSideProps } from 'next'
+import { GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import { Button } from 'ui'
 import Link from 'next/link'
+import { useTheme } from 'next-themes'
 import { motion } from 'framer-motion'
 import { createClient } from '@supabase/supabase-js'
 import { debounce } from 'lodash'
 
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
-import { useTheme } from 'next-themes'
+import PostTypes from '~/types/post'
+import { getNavLatestPosts } from '~/lib/posts'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -19,6 +21,7 @@ import TicketsGrid from '~/components/LaunchWeek/8/TicketsGrid'
 
 interface Props {
   users: UserData[]
+  latestPosts?: PostTypes[]
 }
 
 const supabaseAdmin = createClient(
@@ -35,7 +38,7 @@ const generateOgs = async (users: UserData[]) => {
   })
 }
 
-export default function TicketsPage({ users }: Props) {
+export default function TicketsPage({ users, latestPosts }: Props) {
   const ref = useRef(null)
   const PAGE_COUNT = 20
   const TITLE = '#SupaLaunchWeek Tickets'
@@ -115,7 +118,7 @@ export default function TicketsPage({ users }: Props) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={latestPosts}>
         <div>
           <SectionContainer className="z-10">
             <div className="text-center relative z-10 text-white mb-4 lg:mb-10">
@@ -165,7 +168,7 @@ export default function TicketsPage({ users }: Props) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getStaticProps: GetStaticProps = async () => {
   const { data: users } = await supabaseAdmin!
     .from('lw8_tickets_golden')
     .select('*')
@@ -178,6 +181,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   return {
     props: {
       users,
+      latestPosts: getNavLatestPosts(),
     },
   }
 }

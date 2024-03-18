@@ -1,13 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
-import { GetServerSideProps } from 'next'
+import { GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'
 import { Button } from 'ui'
 import Link from 'next/link'
+import { useTheme } from 'next-themes'
 import { motion } from 'framer-motion'
 import { debounce } from 'lodash'
 
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
-import { useTheme } from 'next-themes'
+import supabase from '~/lib/supabaseMisc'
+import { getNavLatestPosts } from '~/lib/posts'
+import PostTypes from '~/types/post'
 
 import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -15,10 +18,10 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import CTABanner from '~/components/CTABanner'
 import TicketsGrid from '~/components/LaunchWeek/X/TicketsGrid'
-import supabase from '../../../lib/supabaseMisc'
 
 interface Props {
   users: UserData[]
+  latestPosts?: PostTypes[]
 }
 
 const generateOgs = async (users: UserData[]) => {
@@ -30,7 +33,7 @@ const generateOgs = async (users: UserData[]) => {
   })
 }
 
-export default function TicketsPage({ users }: Props) {
+export default function TicketsPage({ users, latestPosts }: Props) {
   const ref = useRef(null)
   const PAGE_COUNT = 20
   const TITLE = '#SupaLaunchWeek X Tickets'
@@ -111,7 +114,7 @@ export default function TicketsPage({ users }: Props) {
         }}
       />
       <FaviconImports />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={latestPosts}>
         <div>
           <SectionContainer className="z-10">
             <div className="text-center relative z-10 text-white mb-4 lg:mb-10">
@@ -150,7 +153,7 @@ export default function TicketsPage({ users }: Props) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+export const getStaticProps: GetStaticProps = async () => {
   let { data: lwx_tickets, error } = await supabase
     .from('lwx_tickets_golden')
     .select('*')
@@ -164,6 +167,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
   return {
     props: {
       users: lwx_tickets,
+      latestPosts: getNavLatestPosts(),
     },
   }
 }

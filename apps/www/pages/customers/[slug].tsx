@@ -9,7 +9,7 @@ import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
-import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
+import { getAllPostSlugs, getNavLatestPosts, getPostdata, getSortedPosts } from '~/lib/posts'
 import { SITE_ORIGIN } from '~/lib/constants'
 
 // table of contents extractor
@@ -56,6 +56,7 @@ export async function getStaticProps({ params }: any) {
         ...data,
         toc: toc(content, { maxdepth: data.toc_depth ? data.toc_depth : 2 }),
       },
+      latestPosts: getNavLatestPosts(),
     },
   }
   return payload
@@ -96,7 +97,7 @@ function CaseStudyPage(props: any) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={props.latestPosts}>
         <div
           className="
             container mx-auto px-8 py-16 sm:px-16

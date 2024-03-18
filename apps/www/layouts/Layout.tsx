@@ -5,7 +5,7 @@ import mdxComponents from '~/lib/mdx/mdxComponents'
 
 export default function ContentsLayout({ context, meta }: any) {
   return (
-    <DefaultLayout>
+    <DefaultLayout latestPosts={context.latestPosts}>
       <NextSeo {...meta} />
       <MDXProvider components={mdxComponents()}>
         <div className="prose max-w-none">{context.children}</div>

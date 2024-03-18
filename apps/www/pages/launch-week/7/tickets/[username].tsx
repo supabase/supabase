@@ -1,25 +1,27 @@
+import { useEffect, useState } from 'react'
 import { NextSeo } from 'next-seo'
 import { GetStaticProps, GetStaticPaths } from 'next'
 import Error from 'next/error'
+import { createClient } from '@supabase/supabase-js'
+import { IconArrowDown } from 'ui'
+import { useTheme } from 'next-themes'
+import PostTypes from '~/types/post'
+import { getNavLatestPosts } from '~/lib/posts'
+import { SITE_URL, SAMPLE_TICKET_NUMBER } from '~/lib/constants'
+
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import TicketContainer from '~/components/LaunchWeek/7/Ticket/TicketContainer'
-import { SITE_URL, SAMPLE_TICKET_NUMBER } from '~/lib/constants'
-import { createClient } from '@supabase/supabase-js'
-import { useEffect, useState } from 'react'
-import { IconArrowDown } from 'ui'
 import LaunchWeekPrizeSection from '~/components/LaunchWeek/7/LaunchWeekPrizeSection'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/7/LaunchSection/LaunchWeekLogoHeader'
-import TicketBrickWall from '~/components/LaunchWeek/7/LaunchSection/TicketBrickWall'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LW7BgGraphic from '~/components/LaunchWeek/7/LW7BgGraphic'
 import CTABanner from '~/components/CTABanner'
-import { useTheme } from 'next-themes'
 
 interface Props {
   user: UserData
-  users: UserData[]
   ogImageUrl: string
+  latestPosts?: PostTypes[]
 }
 
 const supabaseAdmin = createClient(
@@ -27,7 +29,7 @@ const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_MISC_USE_ANON_KEY!
 )
 
-export default function UsernamePage({ user, users, ogImageUrl }: Props) {
+export default function UsernamePage({ user, ogImageUrl, latestPosts }: Props) {
   const { resolvedTheme } = useTheme()
   const { username, ticketNumber, name, golden, referrals, bg_image_id } = user
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
@@ -67,7 +69,7 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout latestPosts={latestPosts}>
         <div className="bg-[#1C1C1C] -mt-[65px]">
           <div className="relative bg-lw7 pt-20">
             <div className="relative z-10">
@@ -100,7 +102,6 @@ export default function UsernamePage({ user, users, ogImageUrl }: Props) {
             <div className={['bg-lw7-gradient absolute inset-0 z-0', golden && 'gold'].join(' ')} />
           </div>
           <LaunchWeekPrizeSection className="-mt-20 md:-mt-60" />
-          <TicketBrickWall users={users} />
         </div>
         <CTABanner />
       </DefaultLayout>
@@ -113,12 +114,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   let name: string | null | undefined
   let ticketNumber: number | null | undefined
   let golden = false
-  let referrals = 0
   let bg_image_id
   let ogImageUrl
-
-  // fetch users for the TicketBrickWall
-  const { data: users } = await supabaseAdmin!.from('lw7_tickets_golden').select().limit(17)
 
   // fetch a specific user
   if (username) {
@@ -131,7 +128,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     ticketNumber = user?.ticketNumber
     golden = user?.golden ?? false
     bg_image_id = user?.bg_image_id ?? 1
-    referrals = user?.referrals ?? 0
     ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw7-ticket-og?username=${encodeURIComponent(
       username ?? ''
     )}${golden ? '&golden=true' : ''}`
@@ -145,14 +141,12 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
         name: ticketNumber ? name || username || null : null,
         ticketNumber: ticketNumber || SAMPLE_TICKET_NUMBER,
         golden,
-        referrals,
         bg_image_id,
       },
       ogImageUrl,
-      users,
       key: username,
+      // latestPosts: getNavLatestPosts(),
     },
-    revalidate: 5,
   }
 }
 

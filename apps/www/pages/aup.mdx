@@ -1,5 +1,6 @@
 import Layout from '../layouts/Layout'
 import SectionContainer from '../components/Layouts/SectionContainer'
+import { getStaticLatestPosts } from '~/lib/posts'
 
 export const meta = {
   title: 'Acceptable Use Policy | Supabase',
@@ -60,4 +61,5 @@ If you become aware of any violation of this Policy, you will immediately notify
 
 </SectionContainer>
 
+export const getStaticProps = async () => getStaticLatestPosts()
 export default (context) => <Layout meta={meta} children={context.children} context={context} />
