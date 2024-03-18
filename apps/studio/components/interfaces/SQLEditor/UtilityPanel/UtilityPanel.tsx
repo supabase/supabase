@@ -28,8 +28,6 @@ const UtilityPanel = ({
   const snap = useSqlEditorStateSnapshot()
   const result = snap.results[id]?.[0]
 
-  const showCharts = useFlag('showSQLEditorCharts')
-
   const [config, setConfig] = useState<ChartConfig>({
     type: 'bar',
     cumulative: false,
@@ -47,11 +45,10 @@ const UtilityPanel = ({
               (result?.rows ?? []).length > 0 &&
               `(${result.rows.length.toLocaleString()})`}
           </TabsTrigger_Shadcn_>
-          {showCharts && (
-            <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
-              Chart
-            </TabsTrigger_Shadcn_>
-          )}
+
+          <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
+            Chart
+          </TabsTrigger_Shadcn_>
         </div>
         <div className="flex gap-1 h-full">
           {result && result.rows && <ResultsDropdown id={id} />}
@@ -68,11 +65,10 @@ const UtilityPanel = ({
       <TabsContent_Shadcn_ className="mt-0 h-full" value="results">
         <UtilityTabResults id={id} isExecuting={isExecuting} />
       </TabsContent_Shadcn_>
-      {showCharts && (
-        <TabsContent_Shadcn_ className="mt-0 h-full" value="chart">
-          <ChartConfig results={result} config={config} onConfigChange={setConfig} />
-        </TabsContent_Shadcn_>
-      )}
+
+      <TabsContent_Shadcn_ className="mt-0 h-full" value="chart">
+        <ChartConfig results={result} config={config} onConfigChange={setConfig} />
+      </TabsContent_Shadcn_>
     </Tabs_Shadcn_>
   )
 }
