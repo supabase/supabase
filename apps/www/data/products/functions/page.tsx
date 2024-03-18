@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import CopyToClipboard from 'react-copy-to-clipboard'
-import { ButtonProps, IconCheck, IconCopy, IconGlobe } from 'ui'
+import { IconCheck, IconCopy, IconGlobe } from 'ui'
 import Image from 'next/image'
 
 import solutions from '~/data/Solutions'

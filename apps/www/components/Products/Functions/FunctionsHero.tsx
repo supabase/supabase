@@ -22,22 +22,22 @@ const FunctionsHero = () => {
       id: 'dot1',
       type: 'dot',
       left: '50%',
-      top: '29.5%',
-      delay: 100,
+      top: '29.9%',
+      delay: 1,
     },
     {
       id: 'dot2',
       type: 'dot',
-      left: '24%',
-      top: '50%',
-      delay: 200,
+      left: '24.3%',
+      top: '50.2%',
+      delay: 1,
     },
     {
       id: 'dot3',
       type: 'dot',
-      left: '77.4%',
+      left: '77.8%',
       top: '63.4%',
-      delay: 400,
+      delay: 1,
     },
   ]
 
@@ -46,48 +46,52 @@ const FunctionsHero = () => {
       id: 'svg1',
       type: 'svg',
       viewbox: '0 0 155 284',
-      width: '15.544%',
-      height: '41.64%',
-      left: '38.6%',
-      top: '31.1%',
+      width: '15.244%',
+      height: '41.24%',
+      left: '38.8%',
+      top: '31.2%',
       path: 'M.797 283.216c14.605-22.693 64.498-78.738 87.739-104.396-22.406-17.823-47.852-46.354-57.983-58.555 36.536-29.153 96.735-65.699 122.267-80.327-6.727-8.041-21.226-27.282-26.518-39.053',
       x1: '100%',
       x2: '100%',
-      y1: {
+      y1: '-20%',
+      y1config: {
         initial: '-20%',
         frames: ['-20%', '100%'],
       },
-      y2: {
+      y2: '0',
+      y2config: {
         initial: '0',
         frames: ['0', '130%'],
       },
-      duration: 750,
-      delay: 3000,
-      offset: '+=30',
+      duration: 350,
+      delay: 1250,
+      offset: 0,
       easing: 'linear',
     },
     {
       id: 'svg2',
       type: 'svg',
       viewbox: '0 0 272 235',
-      width: '27.658%',
-      height: '34.345%',
-      left: '51%',
-      top: '31%',
+      width: '27.458%',
+      height: '34.045%',
+      left: '50.8%',
+      top: '31.4%',
       path: 'M271.749 233.614C215.075 230.474 159.599 210.964 138.945 201.602C144.38 186.681 156.517 152.612 161.587 135.71C126.058 122.39 44.25 76.75 1.25 0.75',
       x1: '100%',
       x2: '100%',
-      y1: {
+      y1: '-20%',
+      y1config: {
         initial: '-20%',
         frames: ['-20%', '100%'],
       },
-      y2: {
+      y2: '0',
+      y2config: {
         initial: '0',
         frames: ['0', '130%'],
       },
-      duration: 800,
-      delay: 6000,
-      offset: '+=3000',
+      duration: 300,
+      delay: 1250,
+      offset: 0,
       easing: 'linear',
     },
     {
@@ -95,23 +99,25 @@ const FunctionsHero = () => {
       type: 'svg',
       viewbox: '0 0 261 144',
       width: '26.687%',
-      height: '20.89%',
+      height: '20.49%',
       left: '25.1%',
-      top: '31%',
+      top: '31.4%',
       path: 'M260.5 1.5C157.75 30.75 67.75 89 1.13281 143.202',
       x1: '100%',
       x2: '100%',
-      y1: {
+      y1: '-20%',
+      y1config: {
         initial: '-20%',
         frames: ['-20%', '100%'],
       },
-      y2: {
+      y2: '0',
+      y2config: {
         initial: '0',
         frames: ['0', '130%'],
       },
-      duration: 2000,
-      delay: 0,
-      offset: '+=1000',
+      duration: 200,
+      delay: 1250,
+      offset: 0,
       easing: 'linear',
     },
   ]
@@ -121,53 +127,44 @@ const FunctionsHero = () => {
   }, [])
 
   const animate = () => {
-    // const tl = anime.timeline({
-    //   loop: true,
-    //   autoplay: true,
-    // })
-
-    svgs.forEach((svg: any) => {
-      anime({
-        loop: true,
-        autoplay: true,
-        targets: `#functions-hero #${svg.id} linearGradient`,
-        y1: svg.y1.frames,
-        y2: svg.y2.frames,
-        easing: svg.easing,
-        duration: svg.duration,
-        delay: svg.delay,
-        // delay: (el) => parseInt(el.dataset.delay!),
-        // delay: (el) => {
-        //   console.log(parseInt(el.dataset.delay!))
-        //   return parseInt(el.dataset.delay!)
-        // },
-      })
+    const tl = anime.timeline({
+      loop: false,
+      autoplay: true,
     })
 
-    // tl.play()
-  }
+    svgs.forEach((s: any) => {
+      tl.add(
+        {
+          loop: false,
+          autoplay: true,
+          targets: `#functions-hero #${s.id} linearGradient`,
+          // y1: s.y1config.frames,
+          y2: s.y2config.frames,
+          easing: s?.easing,
+          duration: s?.duration,
+          delay: s?.delay,
+        },
+        s?.offset
+      )
+    })
 
-  useEffect(() => {
     const typed = new Typed(typerRef.current, {
-      strings: ['supabase functions deploy hello'],
+      strings: ['supabase functions new hello && supabase functions deploy hello'],
       typeSpeed: 10,
-      startDelay: 400,
-      showCursor: true,
+      startDelay: 300,
+      showCursor: false,
       loop: false,
     })
 
-    typed.stop()
-    typed.reset()
-
     setTimeout(() => {
       typed.start()
-    }, 1000)
+      tl.play()
+    }, 100)
 
     return () => {
-      // Destroy Typed instance during cleanup to stop animation
       typed.destroy()
     }
-  }, [])
+  }
 
   return (
     <div
@@ -175,8 +172,8 @@ const FunctionsHero = () => {
       id="functions-hero"
       className="
         absolute inset-0
-        -left-20 w-[150%] md:w-[150%] aspect-[978/678]
-        sm:-left-32
+        -left-28 top-4 w-[150%] md:w-[150%] aspect-[978/678]
+        sm:-left-32 sm:-top-2
         md:-left-44
         lg:-left-10 lg:-top-10 lg:w-[130%]
         xl:-left-32 xl:w-[130%]
@@ -184,7 +181,7 @@ const FunctionsHero = () => {
     >
       <div
         className="
-          opacity-0 animate-fade-in absolute flex-1 flex items-center justify-center h-auto
+          opacity-0 animate-fade-in absolute z-20 flex-1 flex items-center justify-center h-auto
           w-[50%] left-[27%] top-[2%]
           md:left-[33.5%] md:w-[35%] md:top-[6%]
           lg:left-[26%] lg:w-[52%] lg:top-[3%]
@@ -200,8 +197,8 @@ const FunctionsHero = () => {
             <div className="text-foreground-muted text-sm font-mono">$</div>
             <div
               ref={typerRef}
-              className="opacity-0 animate-fade-in text-foreground text-xs md:text-sm font-mono"
-            ></div>
+              className="opacity-0 flex-1 text-left animate-fade-in text-foreground text-xs md:text-sm font-mono"
+            />
             <div className="text-foreground rounded p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
               {copied ? (
                 <span className="text-brand">
@@ -218,7 +215,6 @@ const FunctionsHero = () => {
         <svg
           key={s.id}
           id={s.id}
-          data-delay={s.delay}
           xmlns="http://www.w3.org/2000/svg"
           width="100%"
           height="100%"
@@ -232,15 +228,14 @@ const FunctionsHero = () => {
             top: s.top,
           }}
         >
-          <path stroke="url(#a)" strokeWidth="1.396" d={s.path} />
+          <path stroke={`url(#lg-${s.id})`} strokeWidth="1.396" d={s.path} />
           <defs>
             <linearGradient
-              id="a"
-              data-delay={s.delay}
-              x1={s.x1}
-              x2={s.x2}
-              y1={s.y1.initial}
-              y2={s.y2.initial}
+              id={`lg-${s.id}`}
+              x1={s?.x1}
+              x2={s?.x2}
+              y1={s?.y1}
+              y2={s?.y2}
               gradientUnits="userSpaceOnUse"
             >
               <stop offset="0" stopColor="hsl(var(--foreground-default))" stopOpacity="0" />
@@ -250,23 +245,36 @@ const FunctionsHero = () => {
           </defs>
         </svg>
       ))}
+
       {dots.map((dot) => (
         <div
           key={dot.id}
           id={dot.id}
           style={{ left: dot.left, top: dot.top }}
-          className="absolute animate-pulse origin-center w-5 h-5 flex items-center justify-center"
+          className="absolute origin-center w-[2.5%] h-[3.6%] flex items-center justify-center opacity-0 transition-opacity animate-fade-in delay-75"
         >
           <span className="absolute inset-0 w-full h-full rounded-full bg-foreground bg-opacity-20" />
           <span className="absolute w-4/5 h-4/5 rounded-full bg-foreground bg-opacity-90" />
         </div>
       ))}
+      <div className="absolute left-[51.15%] top-[10%] w-px h-[20%] overflow-hidden">
+        <span className="absolute inset-0 w-full bg-gradient-to-t from-current to-transparent h-full delay-1200 animate-slide-in" />
+      </div>
+      <Image
+        src="/images/product/functions/globe-light.svg"
+        alt="globe wireframe"
+        width={400}
+        height={400}
+        className="w-full h-full dark:hidden block"
+        quality={100}
+        priority
+      />
       <Image
         src="/images/product/functions/globe.svg"
         alt="globe wireframe"
         width={400}
         height={400}
-        className="w-full h-full"
+        className="w-full h-full hidden dark:block"
         quality={100}
         priority
       />

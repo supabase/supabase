@@ -16,7 +16,7 @@ interface Props {
 }
 
 const ProductHeader = (props: Props) => (
-  <div className="w-full max-w-full relative mx-auto py-16 pb-0 lg:py-24 border-b bg-alternative overflow-hidden">
+  <div className="w-full max-w-full relative mx-auto py-16 lg:py-24 border-b bg-alternative overflow-hidden">
     <SectionContainer className="!py-0 grid grid-cols-12">
       <div className="relative z-10 col-span-12 gap-8 lg:col-span-5">
         <div>
@@ -62,7 +62,7 @@ const ProductHeader = (props: Props) => (
         </div>
       </div>
       {props.image && (
-        <div className="relative min-h-[200px] md:min-h-[300px] col-span-12 mt-8 lg:col-span-7 lg:mt-0 xl:col-span-6 xl:col-start-7">
+        <div className="relative min-h-[300px] col-span-12 mt-8 lg:col-span-7 lg:mt-0 xl:col-span-6 xl:col-start-7">
           {props.image}
         </div>
       )}
