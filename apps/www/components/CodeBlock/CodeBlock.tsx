@@ -99,7 +99,7 @@ function CodeBlock(props: CodeBlockProps) {
             padding: '21px 24px',
             fontSize: large ? 18 : '0.875rem',
             lineHeight: large ? 1.6 : 1.4,
-            // background: props.background ?? '#1A1A1A',
+            background: props.background ?? '#1A1A1A',
           }}
           showLineNumbers={props.showLineNumbers}
           lineNumberStyle={{
