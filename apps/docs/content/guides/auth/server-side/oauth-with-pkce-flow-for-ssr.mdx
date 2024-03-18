@@ -209,7 +209,7 @@ Let's point our `.signInWithOAuth` method's redirect to the callback route we cr
 
 <Admonition type="caution">
 
-For the automatic redirect to work, this function should be called from a Client component.
+The `.signInWithOAuth` method uses the `window` object for the automatic redirect. For automatic redirect to work, it should be called from a Client component. If the method is used server-side, you need to handle the redirect yourself.
 
 </Admonition>
 
@@ -221,3 +221,71 @@ await supabase.auth.signInWithOAuth({
   },
 })
 ```
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="client-side"
+  queryGroup="sign-in-with-oauth-ssr"
+>
+<TabPanel id="server-side" label="Server Action">
+
+```ts /sign-in.ts
+import { createClient } from '@/utils/supabase/server'
+import { Provider } from '@supabase/supabase-js'
+import { redirect } from 'next/navigation'
+
+export function SignInWithProvider({ provider }: { provider: Provider }) {
+  const signIn = async () => {
+    'use server'
+    const supabase = createClient()
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: '/auth/callback',
+      },
+    })
+
+    if (data.url) {
+      redirect(data.url)
+    }
+  }
+
+  return (
+    <form action={signIn}>
+      <button>Sign In with OAuth Provider</button>
+    </form>
+  )
+}
+```
+
+</TabPanel>
+
+<TabPanel id="client-side" label="Client Component">
+
+```ts /sign-in.ts
+"use client";
+
+import { createClient } from '@/utils/supabase/client'
+import { Provider } from '@supabase/supabase-js'
+
+export function SignInWithProvider({ provider }: { provider: Provider }) {
+
+  const signIn = async () => {
+    const supabase = createClient()
+    await supabase.auth.signInWithOAuth({
+      provider,
+      options: {
+        redirectTo: '/auth/callback'
+      }
+    })
+  }
+
+  return (<button onClick={signIn}>Sign In with OAuth Provider</button>)
+}
+```
+
+</TabPanel>
+
+</Tabs>
