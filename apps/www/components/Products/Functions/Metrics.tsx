@@ -19,14 +19,14 @@ const Metrics = () => {
       name: '1',
       timestamp: new Date(),
       uv: 4000,
-      pv: 1099.2,
+      pv: 537.47,
       amt: 2400,
     },
     {
       name: '2',
       timestamp: new Date(),
       uv: 3000,
-      pv: 1334.11,
+      pv: 334.11,
       amt: 2210,
     },
     {
@@ -40,14 +40,14 @@ const Metrics = () => {
       name: '4',
       timestamp: new Date(),
       uv: 2780,
-      pv: 1459.2,
+      pv: 459.2,
       amt: 2000,
     },
     {
       name: '5',
       timestamp: new Date(),
       uv: 1890,
-      pv: 4800,
+      pv: 802,
       amt: 2181,
     },
     {
@@ -61,7 +61,7 @@ const Metrics = () => {
       name: '7',
       timestamp: new Date(),
       uv: 3490,
-      pv: 4300,
+      pv: 310.08,
       amt: 2100,
     },
   ]

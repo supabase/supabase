@@ -14,13 +14,11 @@ interface Props {
 function ProductsCta(props: Props) {
   return (
     <SectionContainer className="overflow-hidden flex flex-col xl:grid xl:grid-cols-2 gap-4 md:gap-8 xl:gap-10">
-      <div className="w-full py-12 md:h-[200px] flex items-center justify-center text-center col-span-1">
+      <div className="w-full pb-6 md:h-[120px] flex items-center justify-center text-center col-span-1">
         <MagnifiedProducts currentProduct={props.currentProduct} />
       </div>
-      <div className="flex flex-col gap-4 col-span-1 text-center xl:text-left xl:justify-center items-center xl:items-start">
-        <h2 className="heading-gradient text-2xl sm:text-3xl xl:text-4xl">
-          Ready to start building?
-        </h2>
+      <div className="flex flex-col col-span-1 text-center xl:text-left xl:justify-center items-center xl:items-start">
+        <h2 className="h2">Ready to start building?</h2>
         <p className="mx-auto text-foreground-lighter">
           Supabase products are built to work both in isolation and seamlessly together to ensure
           the most flexible and scalable developer experience.

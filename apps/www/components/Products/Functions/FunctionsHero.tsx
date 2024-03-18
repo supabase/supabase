@@ -149,7 +149,7 @@ const FunctionsHero = () => {
     })
 
     const typed = new Typed(typerRef.current, {
-      strings: ['supabase functions new hello && supabase functions deploy hello'],
+      strings: ['supabase functions deploy hello'],
       typeSpeed: 10,
       startDelay: 300,
       showCursor: false,
@@ -189,7 +189,7 @@ const FunctionsHero = () => {
           2xl:left-[32%] 2xl:w-[40%] 2xl:top-[3%]
         "
       >
-        <CopyToClipboard text="supabase functions deploy hello">
+        <CopyToClipboard text="supabase functions new hello && supabase functions deploy hello">
           <button
             onClick={handleCopy}
             className="w-full px-3 py-2 group hover:border-strong flex gap-2 items-center bg-alternative rounded-xl border"

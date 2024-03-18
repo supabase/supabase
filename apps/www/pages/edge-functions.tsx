@@ -52,12 +52,6 @@ function Database() {
           {...pageData.heroSection}
           footer={<HighlightColumns highlights={pageData.highlightsSection.highlights} />}
         />
-        {/* <SectionContainer className="flex flex-col gap-4 lg:gap-8">
-          <h2 className="text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs lg:max-w-none">
-            {pageData.useCasesSection.title}
-          </h2>
-          <TimedAccordionSection tabs={pageData.useCasesSection.useCases} />
-        </SectionContainer> */}
         <SectionContainer className="flex flex-col gap-4 lg:gap-8 !pb-0">
           <ExamplesCarousel {...pageData.examplesSection} />
         </SectionContainer>
@@ -83,7 +77,6 @@ function Database() {
           <div className="w-full h-[1px] bg-gradient-to-r from-background-alternative via-border to-background-alternative" />
           <ProductsCta currentProduct={PRODUCT_SHORTNAMES.FUNCTIONS} />
         </div>
-        <CTABanner />
       </DefaultLayout>
     </>
   )

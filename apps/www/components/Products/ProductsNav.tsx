@@ -11,7 +11,7 @@ interface Props {
 
 function ProductsNav({ activePage }: Props) {
   return (
-    <nav className="hidden md:flex items-center bg-background w-full border-b">
+    <nav className="relative z-30 hidden md:flex items-center bg-background w-full border-b">
       <SectionContainer className="!py-0 flex gap-3 items-center">
         {Object.entries(products).map((obj: any) => {
           const product = obj[1]

@@ -12,7 +12,8 @@ import {
 import { useBreakpoint } from 'common'
 import { DEFAULT_TRANSITION } from '~/lib/animations'
 import { Products } from './Sections/ProductsCta'
-import { PRODUCT_NAMES, PRODUCT_SHORTNAMES } from '~/lib/constants'
+import { PRODUCT_NAMES, PRODUCT_SHORTNAMES, products as PRODUCTS } from 'shared-data/products'
+import { cn } from 'ui'
 
 function MagnifiedProducts({ currentProduct }: { currentProduct: Products | string }) {
   let mouseX = useMotionValue(Infinity)
@@ -21,9 +22,9 @@ function MagnifiedProducts({ currentProduct }: { currentProduct: Products | stri
     <motion.div
       onMouseMove={(e) => mouseX.set(e.pageX)}
       onMouseLeave={() => mouseX.set(Infinity)}
-      className="relative mx-auto w-full max-w-md grid grid-cols-3 md:flex items-center justify-center gap-y-8 md:gap-4 px-4"
+      className="relative mx-auto w-full max-w-md grid grid-cols-3 md:flex items-center justify-center gap-y-8 md:gap-2 px-4"
     >
-      <div className="absolute w-full h-72 md:w-[125%] md:h-24 border rounded-3xl bg-surface-100" />
+      {/* <div className="absolute w-full h-72 md:w-[125%] md:h-24 border rounded-xl bg-surface-100" /> */}
       {Object.entries(products).map(([key, product], i) => (
         <Product
           mouseX={mouseX}
@@ -58,7 +59,7 @@ function Product({
     return val - bounds.x - bounds.width / 2
   })
 
-  let widthSync = useTransform(distance, [-150, 0, 150], [75, 110, 75])
+  let widthSync = useTransform(distance, [-150, 0, 150], [75, 100, 75])
   let width = useSpring(widthSync, { mass: 0.1, stiffness: 150, damping: 12 })
 
   const xDelta = 91
@@ -73,29 +74,32 @@ function Product({
   return (
     <motion.div
       ref={ref}
-      className={[
+      className={cn(
         'relative mx-auto md:w-[150px] bg-transparent group',
-        isCurrentProduct ? 'z-10' : 'z-0',
-      ].join(' ')}
+        isCurrentProduct ? 'z-10' : 'z-0'
+      )}
       initial={initial}
       animate={isInView ? animate : initial}
     >
-      <Link href={product.url} className="flex w-full flex-col items-center text-center">
+      <Link href={product.url} className="flex w-full flex-col items-center text-center group">
         <motion.div
           style={isMobile ? (undefined as any) : { width, willChange: 'width' }}
-          className="relative w-[50px] aspect-square will-change-transform"
+          className="relative w-[50px] aspect-square will-change-transform bg-background rounded-xl border p-3 text-foreground-lighter group-hover:text-foreground"
         >
-          <Image
-            src={product.icon}
-            alt={product.name}
-            className="object-contain"
-            sizes="100%"
-            priority
-            fill
-          />
+          <svg
+            width="100%"
+            height="100%"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            fillRule="evenodd"
+            clipRule="evenodd"
+          >
+            <path d={product.icon} stroke="currentColor" strokeWidth={1.5} strokeLinejoin="bevel" />
+          </svg>
         </motion.div>
-        <div className="text-brand-600 flex justify-center relative opacity-70 md:absolute md:bottom-0 md:opacity-0 group-hover:opacity-100 transition-opacity md:translate-y-8 md:-left-20 md:md:-right-20 font-mono uppercase text-center text-xs mt-2">
-          <span>{product.name}</span>
+        <div className="text-foreground flex justify-center relative opacity-70 md:absolute md:bottom-0 md:opacity-0 group-hover:opacity-100 transition-opacity md:translate-y-8 md:-left-20 md:md:-right-20 font-mono uppercase text-center text-xs mt-2">
+          {product.name}
         </div>
       </Link>
     </motion.div>
@@ -106,7 +110,7 @@ const products = {
   database: {
     shortname: PRODUCT_SHORTNAMES.DATABASE,
     name: PRODUCT_NAMES.DATABASE,
-    icon: '/images/product/database/database-v2.png',
+    icon: PRODUCTS.database.icon[24],
     description:
       "Every project is a full Postgres database, the world's most trusted relational database.",
     description_short: '',
@@ -114,9 +118,9 @@ const products = {
     url: '/database',
   },
   authentication: {
-    shortname: PRODUCT_SHORTNAMES.AUTH,
-    name: PRODUCT_NAMES.AUTH,
-    icon: '/images/product/auth/auth-v2.png',
+    shortname: PRODUCT_SHORTNAMES.AUTHENTICATION,
+    name: PRODUCT_NAMES.AUTHENTICATION,
+    icon: PRODUCTS.authentication.icon[24],
     description: 'Add user sign ups and logins, securing your data with Row Level Security.',
     description_short: '',
     label: '',
@@ -125,7 +129,7 @@ const products = {
   storage: {
     shortname: PRODUCT_SHORTNAMES.STORAGE,
     name: PRODUCT_NAMES.STORAGE,
-    icon: '/images/product/storage/storage-v2.png',
+    icon: PRODUCTS.storage.icon[24],
     description: 'Store, organize, and serve large files. Any media, including videos and images.',
     description_short: '',
     label: '',
@@ -134,7 +138,7 @@ const products = {
   'edge-functions': {
     shortname: PRODUCT_SHORTNAMES.FUNCTIONS,
     name: PRODUCT_NAMES.FUNCTIONS,
-    icon: '/images/product/functions/functions-v2.png',
+    icon: PRODUCTS.functions.icon[24],
     description: 'Write custom code without deploying or scaling servers.',
     description_short: '',
     label: '',
@@ -143,7 +147,7 @@ const products = {
   realtime: {
     shortname: PRODUCT_SHORTNAMES.REALTIME,
     name: PRODUCT_NAMES.REALTIME,
-    icon: '/images/product/realtime/realtime-v2.png',
+    icon: PRODUCTS.realtime.icon[24],
     description:
       'Create multiplayer experiences by sharing, broadcasting, and listening to changes from other clients or the Database.',
     description_short: '',
@@ -153,7 +157,7 @@ const products = {
   vector: {
     shortname: PRODUCT_SHORTNAMES.VECTOR,
     name: PRODUCT_NAMES.VECTOR,
-    icon: '/images/product/vector/vector-v2.png',
+    icon: PRODUCTS.vector.icon[24],
     description: 'Integrate your favorite ML-models to store, index and search vector embeddings.',
     description_short: '',
     label: '',
