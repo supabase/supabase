@@ -75,8 +75,8 @@ const Metrics = () => {
   if (!mounted) return null
 
   return (
-    <div className="absolute inset-0 bottom-4 overflow-hidden px-4">
-      <div className="relative rounded-md w-full h-full border border-overlay shadow-lg p-4">
+    <div className="absolute inset-0 bottom-4 px-4">
+      <div className="relative rounded-md w-full h-full border border-overlay shadow p-4">
         <p className="text-foreground text-sm mb-2">Execution time</p>
         <p className="text-foreground text-base mb-4">
           {displayValue ? data[displayValue]?.pv : highlightedValue}ms {!displayValue ?? '(Avg)'}

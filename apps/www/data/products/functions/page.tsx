@@ -1,18 +1,19 @@
-import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
-import CopyToClipboard from 'react-copy-to-clipboard'
-import { IconCheck, IconCopy, IconGlobe } from 'ui'
-import Image from 'next/image'
+import { IconGlobe } from 'ui'
 
 import solutions from '~/data/Solutions'
 import Examples from '~/data/Examples'
 import { PRODUCT_NAMES } from 'shared-data/products'
 
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
-import FunctionsHero from '~/components/Products/Functions/FunctionsHero'
-import RealtimeLogs from '~/components/Products/Functions/RealtimeLogs'
-import Metrics from '~/components/Products/Functions/Metrics'
-import QueryLogs from '~/components/Products/Functions/QueryLogs'
+const FunctionsHero = dynamic(() => import('~/components/Products/Functions/FunctionsHero'))
+const RealtimeLogs = dynamic(() => import('~/components/Products/Functions/RealtimeLogs'))
+const Metrics = dynamic(() => import('~/components/Products/Functions/Metrics'))
+const QueryLogs = dynamic(() => import('~/components/Products/Functions/QueryLogs'))
+const LocalDXImage = dynamic(() => import('~/components/Products/Functions/LocalDXImage'))
+const ParityImage = dynamic(() => import('~/components/Products/Functions/ParityImage'))
+const NpmEcosystem = dynamic(() => import('~/components/Products/Functions/NpmEcosystem'))
+const CI = dynamic(() => import('~/components/Products/Functions/CI'))
 
 export default (isMobile?: boolean) => ({
   metaTitle: 'Supabase Edge Functions - Deploy JavaScript globally in seconds',
@@ -27,10 +28,7 @@ export default (isMobile?: boolean) => ({
       </>
     ),
     subheader: [
-      <>
-        Easily author, deploy and monitor serverless functions distributed globally at the edge,
-        close to your users.
-      </>,
+      'Easily author, deploy and monitor serverless functions distributed globally at the edge,close to your users.',
     ],
     image: <FunctionsHero />,
     ctas: [
@@ -357,228 +355,3 @@ export default (isMobile?: boolean) => ({
     examples: Examples.filter((example) => example.products.includes(PRODUCT_NAMES.FUNCTIONS)),
   },
 })
-
-const LocalDXImage = () => {
-  const [copied, setCopied] = useState(false)
-
-  const handleCopy = () => {
-    setCopied(true)
-    setTimeout(() => {
-      setCopied(false)
-    }, 1000)
-  }
-
-  return (
-    <div className="w-full h-full flex-1 flex items-center justify-center">
-      <Image
-        src="/images/product/functions/grid-gradient-dark.svg"
-        alt=""
-        fill
-        aria-hidden
-        className="object-cover absolute z-0 inset-0 hidden dark:block"
-      />
-      <Image
-        src="/images/product/functions/grid-gradient-light.svg"
-        alt=""
-        fill
-        aria-hidden
-        className="object-cover absolute z-0 inset-0 dark:hidden block"
-      />
-      <CopyToClipboard text="deno test hello">
-        <button
-          onClick={handleCopy}
-          className="p-3 relative z-10 group hover:border-strong flex gap-4 items-center bg-alternative-200 rounded-xl border"
-        >
-          <div className="text-foreground-muted text-sm font-mono">$</div>
-          <div className="text-foreground text-sm font-mono">deno test hello</div>
-          <div className="text-foreground rounded p-1.5 ml-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            {copied ? (
-              <span className="text-brand">
-                <IconCheck className="w-3.5 h-3.5" />
-              </span>
-            ) : (
-              <IconCopy className="w-3.5 h-3.5" />
-            )}
-          </div>
-        </button>
-      </CopyToClipboard>
-    </div>
-  )
-}
-
-const ParityImage = () => (
-  <div className="relative w-full h-full flex items-center justify-center text-sm">
-    <Image
-      src="/images/product/functions/lines-gradient-light.svg"
-      alt=""
-      fill
-      aria-hidden
-      className="object-cover absolute z-0 inset-0 dark:hidden block"
-    />
-    <Image
-      src="/images/product/functions/lines-gradient-dark.svg"
-      alt=""
-      fill
-      aria-hidden
-      className="object-cover absolute z-0 inset-0 hidden dark:block"
-    />
-    <div className="p-4 bg-surface-200 bg-opacity-30 border-2 border-dashed rounded-2xl justify-center items-center gap-1 flex">
-      <div className="py-2 px-4 bg-alternative-200 rounded-lg shadow border flex-col justify-center items-center">
-        <div className="text-foreground uppercase tracking-wide">Dev</div>
-      </div>
-      <svg width="32" height="7" viewBox="0 0 32 7" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path
-          d="M27 5.74425C27 6.0204 27.3382 6.21566 27.5774 6.07759L31.4226 3.8575C31.6618 3.71943 31.6618 3.32891 31.4226 3.19084L27.5774 0.970752C27.3382 0.832681 27 1.02794 27 1.30409V5.74425ZM5 1.30409C5 1.02794 4.6618 0.832681 4.42265 0.970752L0.57735 3.19084C0.338204 3.32891 0.338204 3.71943 0.57735 3.8575L4.42265 6.07759C4.6618 6.21566 5 6.0204 5 5.74425V1.30409ZM27.5 3.02417H4.5V4.02417H27.5V3.02417Z"
-          fill="#EDEDED"
-        />
-        <path
-          d="M5 1.30409C5 1.02794 4.6618 0.832681 4.42265 0.970752L0.57735 3.19084C0.338204 3.32891 0.338204 3.71943 0.57735 3.8575L4.42265 6.07759C4.6618 6.21566 5 6.0204 5 5.74425V1.30409ZM27 5.74425C27 6.0204 27.3382 6.21566 27.5774 6.07759L31.4226 3.8575C31.6618 3.71943 31.6618 3.32891 31.4226 3.19084L27.5774 0.970752C27.3382 0.832681 27 1.02794 27 1.30409V5.74425ZM4.5 4.02417H27.5V3.02417H4.5V4.02417Z"
-          fill="#EDEDED"
-        />
-      </svg>
-
-      <div className="py-2 px-4 bg-alternative-200 rounded-lg shadow border flex-col justify-center items-center">
-        <div className="text-foreground uppercase tracking-wide">Prod</div>
-      </div>
-    </div>
-  </div>
-)
-
-const ciCode = `jobs:
- deploy:
-  runs-on: ubuntu-latest
- 
-  steps:
-   - uses: actions/checkout@v3
-   - uses: supabase/setup-cli@v1
-   with:
-    version: latest
-   - run: supabase functions deploy
-`
-
-const CI = () => (
-  <div className="w-full h-full relative pl-4 mb-4 lg:-mb-0 pt-4 sm:pt-4 border-b lg:border-none overflow-hidden">
-    <div
-      className="relative pl-2 lg:pl-3 w-full transform h-full bg-alternative-200 border-l border-t flex flex-col"
-      style={{ borderTopLeftRadius: '12px' }}
-    >
-      <div className="w-full py-2 lg:py-3 relative flex items-center gap-1.5 lg:gap-2">
-        <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-foreground-muted rounded-full" />
-        <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-foreground-muted rounded-full" />
-        <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-foreground-muted rounded-full" />
-      </div>
-      <div className="md:-mb-4 h-full [&_div]:h-full flex-1 bottom-0 [&_.synthax-highlighter]:!p-4 [&_.synthax-highlighter]:!h-full [&_.synthax-highlighter]:md:!p-2 [&_.synthax-highlighter]:lg:!p-4 [&_.synthax-highlighter]:!text-[13px] [&_.synthax-highlighter]:lg:!text-sm [&_.synthax-highlighter]:!leading-4">
-        <CodeBlock lang="js" size="small">
-          {ciCode}
-        </CodeBlock>
-      </div>
-    </div>
-  </div>
-)
-
-const npmList = [
-  'fetch',
-  'crypto',
-  'ESLint',
-  'atob',
-  'moment',
-  'express',
-  'fastify',
-  'socket.io',
-  'async',
-  'lodash',
-  'underscore',
-  'ramda',
-  'validator',
-  'yup',
-  'day.js',
-  'date-fns',
-  'jsonwebtoken',
-  'bcrypt',
-  'uuid',
-  'fs-extra',
-  'rimraf',
-  'mkdirp',
-  'glob',
-  'shelljs',
-  '@supabase/supabase-js',
-  'js-yaml',
-  'typescript',
-  'jest',
-  'winston',
-  'debug',
-  'eslint',
-  'nodemon',
-  'dotenv',
-  '@octokit/rest',
-  'cross-env',
-  'commander',
-  '@supabase/auth-helpers-react',
-  'yargs',
-  'minimist',
-  'chalk',
-  'colors',
-  'ora',
-  '@aws-sdk',
-  'axios',
-  'passport',
-  'nodemailer',
-  'mongoose',
-  'openai',
-  'jwt',
-  '@supabase/auth-ui-react',
-  'react',
-  'mocha',
-  'autoprefixer',
-  'gray-matter',
-  'request',
-  'prop-types',
-  'react-dom',
-  'bluebird',
-  'vue',
-  'tslib',
-  'inquirer',
-  'webpack',
-  'classnames',
-  'body-parser',
-  'rxjs',
-  'babel-runtime',
-  'jquery',
-]
-
-const NpmEcosystem = () => {
-  return (
-    <div className="relative w-full h-full overflow-hidden group">
-      <div
-        className="absolute flex flex-wrap items-start gap-2 opacity-80 dark:opacity-50"
-        style={{ left: -50, right: -150 }}
-      >
-        {npmList.map((module) => (
-          <span
-            key={module}
-            className="py-1 px-2 rounded-md bg-surface-75 border text-foreground-muted"
-          >
-            {module}
-          </span>
-        ))}
-      </div>
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `radial-gradient(70% 50% at 50% 50%, transparent, hsl(var(--background-surface-100))`,
-        }}
-      />
-      <div className="absolute z-10 inset-0 flex flex-col items-center justify-center font-bold text-7xl uppercase text-foreground-light group-hover:text-foreground transition-colors">
-        <svg
-          width="111"
-          height="42"
-          viewBox="0 0 111 42"
-          fill="currentColor"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M36.1763 37.4452H49.2591V30.8616H62.342V4.52698H36.1763V37.4452ZM49.2591 11.1106H55.8006V24.2779H49.2591V11.1106ZM67.5752 4.52698V30.8616H80.6581V11.1106H87.1995V30.8616H93.7409V11.1106H100.282V30.8616H106.824V4.52698H67.5752ZM4.77734 30.8616H17.8602V11.1106H24.4017V30.8616H30.9431V4.52698H4.77734V30.8616Z" />
-        </svg>
-      </div>
-    </div>
-  )
-}

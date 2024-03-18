@@ -1,5 +1,4 @@
 import { useRef } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import {
   MotionValue,
@@ -10,10 +9,11 @@ import {
   useTransform,
 } from 'framer-motion'
 import { useBreakpoint } from 'common'
-import { DEFAULT_TRANSITION } from '~/lib/animations'
 import { Products } from './Sections/ProductsCta'
-import { PRODUCT_NAMES, PRODUCT_SHORTNAMES, products as PRODUCTS } from 'shared-data/products'
 import { cn } from 'ui'
+
+import { DEFAULT_TRANSITION } from '~/lib/animations'
+import { PRODUCT_NAMES, PRODUCT_SHORTNAMES, products as PRODUCTS } from 'shared-data/products'
 
 function MagnifiedProducts({ currentProduct }: { currentProduct: Products | string }) {
   let mouseX = useMotionValue(Infinity)
@@ -24,7 +24,6 @@ function MagnifiedProducts({ currentProduct }: { currentProduct: Products | stri
       onMouseLeave={() => mouseX.set(Infinity)}
       className="relative mx-auto w-full max-w-md grid grid-cols-3 md:flex items-center justify-center gap-y-8 md:gap-2 px-4"
     >
-      {/* <div className="absolute w-full h-72 md:w-[125%] md:h-24 border rounded-xl bg-surface-100" /> */}
       {Object.entries(products).map(([key, product], i) => (
         <Product
           mouseX={mouseX}

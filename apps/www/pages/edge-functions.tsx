@@ -73,10 +73,7 @@ function Database() {
           <h2 className="h2">{pageData.integratesWithSupabase.title}</h2>
           <TimedAccordionSection tabs={pageData.integratesWithSupabase.useCases} />
         </SectionContainer>
-        <div className="bg-background">
-          <div className="w-full h-[1px] bg-gradient-to-r from-background-alternative via-border to-background-alternative" />
-          <ProductsCta currentProduct={PRODUCT_SHORTNAMES.FUNCTIONS} />
-        </div>
+        <ProductsCta currentProduct={PRODUCT_SHORTNAMES.FUNCTIONS} />
       </DefaultLayout>
     </>
   )

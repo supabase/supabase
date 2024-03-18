@@ -53,7 +53,7 @@ const ProductHeader = (props: Props) => (
               key={cta.href}
               size="medium"
               type={cta.type ?? 'default'}
-              className="text-white"
+              // className="text-white"
               asChild
             >
               <Link href={cta.href}>{cta.label ?? 'Start for free'}</Link>
