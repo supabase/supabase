@@ -61,7 +61,7 @@ const Products = (props: any) => {
   }
 
   return (
-    <SectionContainer className="!pt-0 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 lg:gap-6 md:grid-cols-12">
+    <SectionContainer className="!pt-0 grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-4 xl:gap-3 2xl:gap-6 md:grid-cols-12">
       <ProductCard
         className="col-span-6 lg:col-span-12 xl:col-span-6"
         alignLeft

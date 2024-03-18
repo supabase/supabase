@@ -1,7 +1,7 @@
 import { USAGE_APPROACHING_THRESHOLD } from 'components/interfaces/Billing/Billing.constants'
 import { EgressType, PricingMetric } from 'data/analytics/org-daily-stats-query'
-import { OrgSubscription } from 'data/subscriptions/org-subscription-query'
-import { OrgUsageResponse } from 'data/usage/org-usage-query'
+import type { OrgSubscription } from 'data/subscriptions/types'
+import type { OrgUsageResponse } from 'data/usage/org-usage-query'
 import { Alert } from 'ui'
 
 export const COLOR_MAP = {
@@ -17,8 +17,6 @@ export const COLOR_MAP = {
   'dark-red': { bar: 'fill-red-1000', marker: 'bg-red-1000' },
   purple: { bar: 'fill-purple-900', marker: 'bg-purple-900' },
 }
-
-export const Y_DOMAIN_CEILING_MULTIPLIER = 4 / 3
 
 export const USAGE_STATUS = {
   NORMAL: 'NORMAL',
@@ -272,7 +270,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
         name: 'Realtime Messages',
         unit: 'absolute',
         description:
-          "Count of messages going through Realtime.\nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
+          "Count of messages going through Realtime. Includes database changes, broadcast and presence. \nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
         chartDescription: 'The data refreshes every 24 hours.',
         links: [
           {

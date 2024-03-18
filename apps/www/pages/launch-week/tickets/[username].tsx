@@ -146,8 +146,8 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const ticketType = user?.metadata?.hasSecretTicket
     ? 'secret'
     : user?.golden
-    ? 'platinum'
-    : 'regular'
+      ? 'platinum'
+      : 'regular'
 
   const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx/og/${ticketType}/${username}.png`
 

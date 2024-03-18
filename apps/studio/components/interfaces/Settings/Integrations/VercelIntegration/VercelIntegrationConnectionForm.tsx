@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
-  cn,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
@@ -13,13 +13,17 @@ import {
   Form_Shadcn_,
   IconClock,
   Switch,
+  cn,
 } from 'ui'
 import * as z from 'zod'
 
 import { ScaffoldDivider } from 'components/layouts/Scaffold'
-import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import type {
+  Integration,
+  IntegrationProjectConnection,
+} from 'data/integrations/integrations.types'
 import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-connection-update-mutate'
-import { useFlag, useStore } from 'hooks'
+import { useFlag } from 'hooks'
 
 const VercelIntegrationConnectionForm = ({
   connection,
@@ -29,8 +33,6 @@ const VercelIntegrationConnectionForm = ({
   integration: Integration
 }) => {
   const enableVercelConnectionsConfig = useFlag('enableVercelConnectionsConfig')
-
-  const { ui } = useStore()
   const config = connection.metadata.supabaseConfig
 
   const FormSchema = z.object({
@@ -52,15 +54,11 @@ const VercelIntegrationConnectionForm = ({
     },
   })
 
-  const { mutate: updateVercelConnection, isLoading: isUpdatingVercelConnection } =
-    useVercelConnectionUpdateMutation({
-      onSuccess: (data) => {
-        ui.setNotification({
-          category: 'success',
-          message: `Updated Supabase directory`,
-        })
-      },
-    })
+  const { mutate: updateVercelConnection } = useVercelConnectionUpdateMutation({
+    onSuccess: (data) => {
+      toast.success(`Updated Supabase directory`)
+    },
+  })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
     /**
@@ -93,7 +91,7 @@ const VercelIntegrationConnectionForm = ({
   return (
     <Form_Shadcn_ {...form}>
       <div className="py-4 px-8">
-        <Alert_Shadcn_ variant="default" className="">
+        <Alert_Shadcn_ variant="default">
           <IconClock className="h-4 w-4" strokeWidth={2} />
           <AlertTitle_Shadcn_>Vercel Connection configuration coming soon</AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
@@ -116,7 +114,7 @@ const VercelIntegrationConnectionForm = ({
               name="environmentVariablesProduction"
               render={({ field }) => (
                 <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
-                  <div className="">
+                  <div>
                     <FormLabel_Shadcn_ className="!text">
                       Sync environment variables for Vercel Production deployments
                     </FormLabel_Shadcn_>
@@ -143,7 +141,7 @@ const VercelIntegrationConnectionForm = ({
               name="authRedirectUrisProduction"
               render={({ field }) => (
                 <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
-                  <div className="">
+                  <div>
                     <FormLabel_Shadcn_ className="!text">
                       Auto update Auth Redirect URIs for Vercel Production Deployments
                     </FormLabel_Shadcn_>
@@ -173,7 +171,7 @@ const VercelIntegrationConnectionForm = ({
               name="environmentVariablesPreview"
               render={({ field }) => (
                 <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
-                  <div className="">
+                  <div>
                     <FormLabel_Shadcn_ className="!text">
                       Sync environment variables for Vercel Preview Deployments
                     </FormLabel_Shadcn_>
@@ -200,7 +198,7 @@ const VercelIntegrationConnectionForm = ({
               name="authRedirectUrisPreview"
               render={({ field }) => (
                 <FormItem_Shadcn_ className="flex flex-row items-center justify-between">
-                  <div className="">
+                  <div>
                     <FormLabel_Shadcn_ className="!text">
                       Auto update Auth Redirect URIs for Vercel Preview Deployments
                     </FormLabel_Shadcn_>

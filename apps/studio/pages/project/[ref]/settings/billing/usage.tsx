@@ -1,5 +1,5 @@
 import { SettingsLayout } from 'components/layouts'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useSelectedOrganization } from 'hooks'

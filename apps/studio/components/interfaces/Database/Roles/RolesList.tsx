@@ -128,10 +128,10 @@ const RolesList = () => {
                       maxConnectionLimit === 0 || maxConnectionLimit === undefined
                         ? 'bg-control'
                         : totalActiveConnections > 0.9 * maxConnectionLimit
-                        ? 'bg-red-800'
-                        : totalActiveConnections > 0.75 * maxConnectionLimit
-                        ? 'bg-amber-900'
-                        : 'bg-green-800'
+                          ? 'bg-red-800'
+                          : totalActiveConnections > 0.75 * maxConnectionLimit
+                            ? 'bg-amber-900'
+                            : 'bg-green-800'
                     }
                     labelTop={
                       Number.isInteger(maxConnectionLimit)

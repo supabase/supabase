@@ -1,20 +1,18 @@
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
+import { PropsWithChildren } from 'react'
 
-import ProductMenu from 'components/ui/ProductMenu'
+import { ProductMenu } from 'components/ui/ProductMenu'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useSelectedProject, useStore, withAuth } from 'hooks'
-import ProjectLayout from '../'
-import { generateDatabaseMenu } from './DatabaseMenu.utils'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useSelectedProject, withAuth } from 'hooks'
+import { ProjectLayout } from '../'
+import { generateDatabaseMenu } from './DatabaseMenu.utils'
 
 export interface DatabaseLayoutProps {
   title?: string
 }
 
 const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
-  const { ui, vault } = useStore()
   const project = useSelectedProject()
 
   const router = useRouter()
@@ -26,16 +24,8 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
   })
   const { data: addons } = useProjectAddonsQuery({ projectRef: project?.ref })
 
-  const vaultExtension = (data ?? []).find((ext) => ext.name === 'supabase_vault')
-  const isVaultEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
   const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
   const pitrEnabled = addons?.selected_addons.find((addon) => addon.type === 'pitr') !== undefined
-
-  useEffect(() => {
-    if (isVaultEnabled) {
-      vault.load()
-    }
-  }, [ui.selectedProjectRef, isVaultEnabled])
 
   return (
     <ProjectLayout
@@ -55,4 +45,4 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
   )
 }
 
-export default withAuth(observer(DatabaseLayout))
+export default withAuth(DatabaseLayout)

@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast'
 
 import { patch } from 'lib/common/fetch'
 import { API_ADMIN_URL } from 'lib/constants'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { edgeFunctionsKeys } from './keys'
 
 export type EdgeFunctionsUpdateVariables = {

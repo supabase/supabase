@@ -2,13 +2,11 @@ import { useParams } from 'common'
 import Link from 'next/link'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 
-import { useSelectedOrganization } from 'hooks'
 import { useAppStateSnapshot } from 'state/app-state'
 
 const BranchingPITRNotice = () => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
-  const org = useSelectedOrganization()
 
   return (
     <Alert_Shadcn_ className="rounded-none px-7 py-6 [&>svg]:top-6 [&>svg]:left-6 !border-t-0 !border-l-0 !border-r-0">

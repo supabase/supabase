@@ -4,7 +4,7 @@ import components from '~/components/index'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 
-import specFile from '~/../../spec/realtime_v0_config.yaml' assert { type: 'yml' }
+import specFile from '~/spec/realtime_v0_config.yaml' assert { type: 'yml' }
 import { Parameter } from '~/lib/refGenerator/refTypes'
 
 import ReactMarkdown from 'react-markdown'

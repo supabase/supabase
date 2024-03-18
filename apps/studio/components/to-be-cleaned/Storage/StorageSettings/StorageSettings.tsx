@@ -1,52 +1,40 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useState } from 'react'
+import { useParams } from 'common'
+import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, Form, IconClock, Input, Listbox } from 'ui'
 
+import AlertError from 'components/ui/AlertError'
+import { FormHeader } from 'components/ui/Forms'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
 import { useProjectStorageConfigUpdateUpdateMutation } from 'data/config/project-storage-config-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import { StorageSizeUnits, STORAGE_FILE_SIZE_LIMIT_MAX_BYTES } from './StorageSettings.constants'
+import { STORAGE_FILE_SIZE_LIMIT_MAX_BYTES, StorageSizeUnits } from './StorageSettings.constants'
 import { convertFromBytes, convertToBytes } from './StorageSettings.utils'
 
-export type StorageSettingsProps = {
-  projectRef: string | undefined
-  organizationSlug: string | undefined
-}
+const StorageSettings = () => {
+  const { ref: projectRef } = useParams()
+  const organization = useSelectedOrganization()
+  const organizationSlug = organization?.slug
 
-const StorageSettings = ({ projectRef, organizationSlug }: StorageSettingsProps) => {
-  const { data, error } = useProjectStorageConfigQuery({ projectRef }, { enabled: IS_PLATFORM })
+  const canUpdateStorageSettings = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
-  if (error || data?.error) {
-    return (
-      <div className="p-6 mx-auto text-center sm:w-full md:w-3/4">
-        <p className="text-sm">Error loading storage settings</p>
-      </div>
-    )
-  }
-
-  if (!data) {
-    return (
-      <div className="w-full">
-        <GenericSkeletonLoader />
-      </div>
-    )
-  }
-
-  return <StorageConfig config={data} projectRef={projectRef} organizationSlug={organizationSlug} />
-}
-
-const StorageConfig = ({ config, projectRef, organizationSlug }: any) => {
-  const { fileSizeLimit, isFreeTier } = config
+  const {
+    data: config,
+    error,
+    isLoading,
+    isSuccess,
+    isError,
+  } = useProjectStorageConfigQuery({ projectRef }, { enabled: IS_PLATFORM })
+  const { fileSizeLimit, isFreeTier } = config || {}
   const { value, unit } = convertFromBytes(fileSizeLimit)
 
-  const { ui } = useStore()
   const [selectedUnit, setSelectedUnit] = useState(unit)
   let initialValues = { fileSizeLimit: value, unformattedFileSizeLimit: fileSizeLimit }
 
-  const canUpdateStorageSettings = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
   const { mutate: updateStorageConfig, isLoading: isUpdating } =
     useProjectStorageConfigUpdateUpdateMutation({
       onSuccess: (res) => {
@@ -55,10 +43,7 @@ const StorageConfig = ({ config, projectRef, organizationSlug }: any) => {
           fileSizeLimit: updatedValue.value,
           unformattedFileSizeLimit: res.fileSizeLimit,
         }
-        ui.setNotification({
-          category: 'success',
-          message: 'Successfully updated storage settings',
-        })
+        toast.success('Successfully updated storage settings')
       },
     })
 
@@ -74,21 +59,19 @@ const StorageConfig = ({ config, projectRef, organizationSlug }: any) => {
   const onValidate = (values: any) => {
     const errors = {} as any
     if (values.fileSizeLimit > formattedMaxLimit) {
-      errors[
-        'fileSizeLimit'
-      ] = `Maximum limit is up to ${formattedMaxLimit.toLocaleString()} ${selectedUnit}.`
+      errors['fileSizeLimit'] =
+        `Maximum limit is up to ${formattedMaxLimit.toLocaleString()} ${selectedUnit}.`
     }
     return errors
   }
 
   const onSubmit = async (values: any) => {
+    if (!projectRef) return console.error('Project ref is required')
+
     const errors = onValidate(values)
 
     if (errors.fileSizeLimit) {
-      return ui.setNotification({
-        category: 'error',
-        message: `Upload file size limit must be up to 5GB (${formattedMaxSizeBytes})`,
-      })
+      return toast.error(`Upload file size limit must be up to 50GB (${formattedMaxSizeBytes})`)
     }
 
     updateStorageConfig({
@@ -97,24 +80,42 @@ const StorageConfig = ({ config, projectRef, organizationSlug }: any) => {
     })
   }
 
-  // [Joshen] To be refactored using FormContainer, FormPanel, FormContent etc once
-  // Jonny's auth config refactor PR goes in
   return (
     <div>
       <Form validateOnBlur initialValues={initialValues} validate={onValidate} onSubmit={onSubmit}>
-        {({ values, handleReset }: { values: any; handleReset: () => void }) => {
+        {({
+          values,
+          resetForm,
+          handleReset,
+        }: {
+          values: any
+          resetForm: any
+          handleReset: () => void
+        }) => {
           const hasChanges =
             initialValues.unformattedFileSizeLimit !==
             convertToBytes(values.fileSizeLimit, selectedUnit)
+
+          // eslint-disable-next-line react-hooks/rules-of-hooks
+          useEffect(() => {
+            resetForm({ values: initialValues, initialValues })
+          }, [isSuccess])
+
           return (
             <>
-              <div className="mb-6">
-                <h3 className="mb-2 text-xl text-foreground">Storage Settings</h3>
-                <div className="text-sm text-foreground-lighter">
-                  Configure your project's storage settings
-                </div>
-              </div>
-              <div className="space-y-20">
+              <FormHeader
+                title="Storage Settings"
+                description="Configure your project's storage settings."
+              />
+
+              {isLoading && <GenericSkeletonLoader />}
+              {isError && (
+                <AlertError
+                  error={error}
+                  subject="Failed to retrieve project's storage configuration"
+                />
+              )}
+              {isSuccess && (
                 <div
                   className={[
                     'bg-surface-100',
@@ -178,9 +179,9 @@ const StorageConfig = ({ config, projectRef, organizationSlug }: any) => {
                     <div className="px-6 pb-6">
                       <UpgradeToPro
                         icon={<IconClock size="large" />}
-                        organizationSlug={organizationSlug}
+                        organizationSlug={organizationSlug ?? ''}
                         primaryText="Free Plan has a fixed upload file size limit of 50 MB."
-                        projectRef={projectRef}
+                        projectRef={projectRef ?? ''}
                         secondaryText="Upgrade to the Pro plan for a configurable upload file size limit of up to 5 GB."
                       />
                     </div>
@@ -220,7 +221,7 @@ const StorageConfig = ({ config, projectRef, organizationSlug }: any) => {
                     </div>
                   </div>
                 </div>
-              </div>
+              )}
             </>
           )
         }}

@@ -1,3 +1,5 @@
+import type { components } from 'data/api'
+
 export type VercelFramework =
   | (
       | 'blitzjs'
@@ -137,6 +139,7 @@ export type Imetadata = {
       preview: boolean
     }
     supabaseDirectory?: string
+    supabaseChangesOnly?: boolean
   }
   link?: VercelGitLink
   name: string
@@ -245,9 +248,20 @@ export type IntegrationConnectionsCreateVariables = {
   connection: {
     foreign_project_id: string
     supabase_project_ref: string
+    integration_id: string
     metadata: any
   }
   orgSlug: string | undefined
+  new?: {
+    installation_id: number
+    project_ref: string
+    repository_id: number
+  }
+}
+
+export type GitHubConnectionCreateVariables = {
+  organizationId: number
+  connection: components['schemas']['CreateGitHubConnectionsBody']
 }
 
 export type UpdateConnectionPayload = {

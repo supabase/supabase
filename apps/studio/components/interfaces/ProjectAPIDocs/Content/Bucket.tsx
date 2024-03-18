@@ -6,7 +6,7 @@ import { formatBytes } from 'lib/helpers'
 import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
-import { ContentProps } from './Content.types'
+import type { ContentProps } from './Content.types'
 
 const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
   const { ref } = useParams()
@@ -35,10 +35,10 @@ const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
           {allowedMimeTypes === null
             ? 'All types are allowed'
             : (allowedMimeTypes ?? []).length === 0
-            ? 'No types are allowed'
-            : (allowedMimeTypes ?? []).length > 1
-            ? (allowedMimeTypes ?? []).join(', ')
-            : 'Unknown'}
+              ? 'No types are allowed'
+              : (allowedMimeTypes ?? []).length > 1
+                ? (allowedMimeTypes ?? []).join(', ')
+                : 'Unknown'}
         </p>
         <p className="text-sm text-foreground-light">
           Max file size limit:{' '}

@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
+import { useParams } from 'common'
 import { useEffect, useState } from 'react'
-
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -18,7 +18,7 @@ import {
 } from 'ui'
 import { number, object, string } from 'yup'
 
-import { useParams } from 'common'
+import { Markdown } from 'components/interfaces/Markdown'
 import {
   FormActions,
   FormHeader,
@@ -29,14 +29,13 @@ import {
 } from 'components/ui/Forms'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
 
 const SmtpForm = () => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -134,13 +133,13 @@ const SmtpForm = () => {
       { projectRef: projectRef!, config: payload },
       {
         onError: (error) => {
-          ui.setNotification({ category: 'error', message: 'Failed to update settings', error })
+          toast.error(`Failed to update settings: ${error.message}`)
         },
         onSuccess: () => {
           setHidden(true)
+          toast.success('Successfully updated settings')
           const updatedFormValues = generateFormValues(payload)
           resetForm({ values: updatedFormValues, initialValues: updatedFormValues })
-          ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
         },
       }
     )
@@ -202,39 +201,43 @@ const SmtpForm = () => {
               }
             >
               <FormSection>
-                <FormSectionContent loading={isLoading}>
+                <FormSectionContent className="!col-span-12 !gap-y-2" loading={isLoading}>
                   <Toggle
-                    name="ENABLE_SMTP"
                     size="small"
-                    label="Enable Custom SMTP"
                     layout="flex"
+                    name="ENABLE_SMTP"
+                    label="Enable Custom SMTP"
                     checked={enableSmtp}
                     disabled={!canUpdateConfig}
                     // @ts-ignore
                     onChange={(value: boolean) => setEnableSmtp(value)}
-                    descriptionText="Emails will be sent using your custom SMTP provider"
+                    descriptionText={
+                      <Markdown
+                        className="max-w-full [&>p]:text-foreground-lighter"
+                        content={`Emails will be sent using your custom SMTP provider. Email rate limits can be adjusted [here](/dashboard/project/${projectRef}/auth/rate-limits).`}
+                      />
+                    }
                   />
+                  {enableSmtp ? (
+                    !isValidSmtpConfig && (
+                      <div className="">
+                        <Alert_Shadcn_ variant="warning">
+                          <IconAlertTriangle strokeWidth={2} />
+                          <AlertTitle_Shadcn_>All fields below must be filled</AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_>
+                            The following fields must be filled before custom SMTP can be properly
+                            enabled
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
+                      </div>
+                    )
+                  ) : (
+                    <div className="">
+                      <EmailRateLimitsAlert />
+                    </div>
+                  )}
                 </FormSectionContent>
               </FormSection>
-
-              {enableSmtp ? (
-                !isValidSmtpConfig && (
-                  <div className="mx-8 mb-8 -mt-4">
-                    <Alert_Shadcn_ variant="warning">
-                      <IconAlertTriangle strokeWidth={2} />
-                      <AlertTitle_Shadcn_>All fields below must be filled</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        The following fields must be filled before custom SMTP can be properly
-                        enabled
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  </div>
-                )
-              ) : (
-                <div className="mx-8 mb-8 -mt-4">
-                  <EmailRateLimitsAlert />
-                </div>
-              )}
 
               <FormSection
                 visible={enableSmtp}
@@ -341,4 +344,4 @@ const SmtpForm = () => {
   )
 }
 
-export default observer(SmtpForm)
+export default SmtpForm

@@ -1,6 +1,7 @@
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useMemo } from 'react'
+import { Badge } from 'ui'
 
 import BranchDropdown from 'components/layouts/AppLayout/BranchDropdown'
 import EnableBranchingButton from 'components/layouts/AppLayout/EnableBranchingButton/EnableBranchingButton'
@@ -9,23 +10,18 @@ import ProjectDropdown from 'components/layouts/AppLayout/ProjectDropdown'
 import { getResourcesExceededLimitsOrg } from 'components/ui/OveragesBanner/OveragesBanner.utils'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgUsageQuery } from 'data/usage/org-usage-query'
-import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import { Badge } from 'ui'
 import BreadcrumbsView from './BreadcrumbsView'
-import FeedbackDropdown from './FeedbackDropdown'
+import { FeedbackDropdown } from './FeedbackDropdown'
 import HelpPopover from './HelpPopover'
-import NotificationsPopover from './NotificationsPopover'
+import NotificationsPopoverV2 from './NotificationsPopoverV2/NotificationsPopover'
 
 const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder = true }: any) => {
   const { ref: projectRef } = useParams()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
-
-  const enableBranchManagement = useFlag('branchManagement')
-
-  const isBranchingEnabled =
-    selectedProject?.is_branch_enabled === true || selectedProject?.parent_project_ref !== undefined
+  const isBranchingEnabled = selectedProject?.is_branch_enabled === true
 
   const { data: orgUsage } = useOrgUsageQuery({ orgSlug: selectedOrganization?.slug })
 
@@ -42,9 +38,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
   const projectHasNoLimits = subscription?.usage_billing_enabled === true
 
   const showOverUsageBadge =
-    useFlag('overusageBadge') &&
-    subscription !== undefined &&
-    (subscription.plan.id === 'free' || subscription.plan.id === 'pro') &&
+    (subscription?.plan.id === 'free' || subscription?.plan.id === 'pro') &&
     !projectHasNoLimits &&
     exceedingLimits
 
@@ -90,7 +84,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
               </>
             )}
 
-            {selectedProject && enableBranchManagement && (
+            {selectedProject && (
               <>
                 <span className="text-border-stronger">
                   <svg
@@ -116,11 +110,15 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
         {/* Additional breadcrumbs are supplied */}
         <BreadcrumbsView defaultValue={breadcrumbs} />
       </div>
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center gap-x-2">
         {customHeaderComponents && customHeaderComponents}
-        {IS_PLATFORM && <HelpPopover />}
-        {IS_PLATFORM && <FeedbackDropdown />}
-        {IS_PLATFORM && <NotificationsPopover />}
+        {IS_PLATFORM && (
+          <>
+            <FeedbackDropdown />
+            <NotificationsPopoverV2 />
+            <HelpPopover />
+          </>
+        )}
       </div>
     </div>
   )

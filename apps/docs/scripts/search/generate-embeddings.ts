@@ -23,6 +23,8 @@ async function generateEmbeddings() {
     'NEXT_PUBLIC_SUPABASE_URL',
     'SUPABASE_SERVICE_ROLE_KEY',
     'OPENAI_KEY',
+    'NEXT_PUBLIC_MISC_USE_URL',
+    'NEXT_PUBLIC_MISC_USE_ANON_KEY',
     'SEARCH_GITHUB_APP_ID',
     'SEARCH_GITHUB_APP_INSTALLATION_ID',
     'SEARCH_GITHUB_APP_PRIVATE_KEY',
@@ -71,7 +73,13 @@ async function generateEmbeddings() {
         checksum,
         sections,
         meta = {},
-      }: { checksum: string; sections: Section[]; meta?: Json } = embeddingSource.process()
+        ragIgnore = false,
+      }: {
+        checksum: string
+        sections: Section[]
+        ragIgnore?: boolean
+        meta?: Json
+      } = embeddingSource.process()
 
       // Check for existing page in DB and compare checksums
       const { error: fetchPageError, data: existingPage } = await supabaseClient
@@ -175,6 +183,7 @@ async function generateEmbeddings() {
               content,
               token_count: embeddingResponse.usage.total_tokens,
               embedding: responseData.embedding,
+              rag_ignore: ragIgnore,
             })
             .select()
             .limit(1)

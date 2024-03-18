@@ -44,8 +44,8 @@ function CodeBlock(props: CodeBlockProps) {
   let lang = props.lang
     ? props.lang
     : props.className
-    ? props.className.replace('language-', '')
-    : 'js'
+      ? props.className.replace('language-', '')
+      : 'js'
   // force jsx to be js highlighted
   if (lang === 'jsx') lang = 'js'
 

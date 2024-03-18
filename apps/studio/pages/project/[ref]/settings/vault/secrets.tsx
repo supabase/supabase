@@ -1,8 +1,4 @@
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-import { Tabs } from 'ui'
-
 import { useParams } from 'common/hooks'
 import { SecretsManagement, VaultToggle } from 'components/interfaces/Settings/Vault'
 import { SettingsLayout } from 'components/layouts'
@@ -10,12 +6,11 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { FormHeader } from 'components/ui/Forms'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useStore } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
+import VaultNavTabs from 'components/interfaces/Settings/Vault/VaultNavTabs'
 
 const VaultSettingsSecrets: NextPageWithLayout = () => {
   const router = useRouter()
-  const { vault } = useStore()
   const { ref } = useParams()
   const { project } = useProjectContext()
 
@@ -26,12 +21,6 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
 
   const vaultExtension = (data ?? []).find((ext) => ext.name === 'supabase_vault')
   const isEnabled = vaultExtension !== undefined && vaultExtension.installed_version !== null
-
-  useEffect(() => {
-    if (isEnabled) {
-      vault.load()
-    }
-  }, [isEnabled])
 
   return (
     <div className="1xl:px-28 mx-auto flex flex-col px-5 py-6 lg:px-16 xl:px-24 2xl:px-32 ">
@@ -45,23 +34,14 @@ const VaultSettingsSecrets: NextPageWithLayout = () => {
       ) : !isEnabled ? (
         <VaultToggle />
       ) : (
-        <Tabs
-          size="small"
-          type="underlined"
-          activeId="secrets"
-          onChange={(id: any) => {
-            if (id === 'keys') router.push(`/project/${ref}/settings/vault/keys`)
-          }}
-        >
-          <Tabs.Panel id="secrets" label="Secrets Management">
-            <SecretsManagement />
-          </Tabs.Panel>
-          <Tabs.Panel id="keys" label="Encryption Keys" />
-        </Tabs>
+        <>
+          <VaultNavTabs projRef={ref || ''} activeTab="secrets" />
+          <SecretsManagement />
+        </>
       )}
     </div>
   )
 }
 
 VaultSettingsSecrets.getLayout = (page) => <SettingsLayout title="Vault">{page}</SettingsLayout>
-export default observer(VaultSettingsSecrets)
+export default VaultSettingsSecrets

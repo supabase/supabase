@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { useEffect, useRef, useState } from 'react'
 import { DataGridHandle } from 'react-data-grid'
 import { DndProvider } from 'react-dnd'
@@ -17,12 +18,12 @@ import {
   saveStorageDebounced,
 } from './SupabaseGrid.utils'
 import { Shortcuts } from './components/common'
-import Footer from './components/footer'
+import Footer from './components/footer/Footer'
 import { Grid } from './components/grid'
-import Header from './components/header'
+import Header from './components/header/Header'
 import { RowContextMenu } from './components/menu'
 import { StoreProvider, useDispatch, useTrackedState } from './store'
-import { SupabaseGridProps } from './types'
+import type { SupabaseGridProps } from './types'
 
 /** Supabase Grid: React component to render database table */
 
@@ -41,7 +42,7 @@ export const SupabaseGrid = (props: SupabaseGridProps) => {
 const SupabaseGridLayout = (props: SupabaseGridProps) => {
   const {
     editable,
-    storageRef,
+    projectRef,
     gridProps,
     headerActions,
     showCustomChildren,
@@ -53,6 +54,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
     onEditForeignKeyColumnValue,
     onImportData,
   } = props
+  const { id: tableId } = useParams()
   const dispatch = useDispatch()
   const state = useTrackedState()
   const snap = useTableEditorStateSnapshot()
@@ -123,8 +125,8 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
   }, [JSON.stringify(sorts)])
 
   useEffect(() => {
-    if (state.isInitialComplete && storageRef && state.table) {
-      saveStorageDebounced(state, storageRef, sort as string[], filter as string[])
+    if (state.isInitialComplete && projectRef && state.table) {
+      saveStorageDebounced(state, projectRef, sort as string[], filter as string[])
     }
   }, [
     state.table,
@@ -132,7 +134,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
     state.gridColumns,
     JSON.stringify(sorts),
     JSON.stringify(filters),
-    storageRef,
+    projectRef,
   ])
 
   useEffect(() => {
@@ -145,7 +147,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
   useEffect(() => {
     const initializeData = async () => {
       const { savedState } = await initTable(
-        props,
+        { ...props, tableId },
         state,
         dispatch,
         sort as string[],
@@ -202,7 +204,7 @@ const SupabaseGridLayout = (props: SupabaseGridProps) => {
             onImportData={onImportData}
             onEditForeignKeyColumnValue={onEditForeignKeyColumnValue}
           />
-          <Footer isLoading={isLoading || isRefetching} />
+          <Footer isLoading={isLoading} isRefetching={isRefetching} />
           <Shortcuts gridRef={gridRef} />
         </>
       )}

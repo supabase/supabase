@@ -8,8 +8,8 @@ const ProductMenuBar = ({ title, children }: PropsWithChildren<ProductMenuBarPro
   return (
     <div
       className={[
-        'hide-scrollbar flex w-64 flex-col border-r', // Layout
-        'bg-background',
+        'hide-scrollbar flex flex-col w-full h-full', // Layout
+        'bg-studio',
         'border-default ',
       ].join(' ')}
     >
@@ -19,9 +19,7 @@ const ProductMenuBar = ({ title, children }: PropsWithChildren<ProductMenuBarPro
       >
         <h4 className="text-lg">{title}</h4>
       </div>
-      <div className="flex-grow overflow-y-auto" style={{ maxHeight: 'calc(100vh - 96px)' }}>
-        {children}
-      </div>
+      <div className="flex-grow overflow-y-auto">{children}</div>
     </div>
   )
 }

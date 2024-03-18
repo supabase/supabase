@@ -1,11 +1,11 @@
-import { CSSProperties, memo } from 'react'
 import memoize from 'memoize-one'
-import { areEqual, VariableSizeList } from 'react-window'
+import { CSSProperties, ComponentType, MutableRefObject, ReactNode, memo, useRef } from 'react'
 import AutoSizer from 'react-virtualized-auto-sizer'
+import { VariableSizeList, areEqual } from 'react-window'
 import InfiniteLoader from 'react-window-infinite-loader'
 
-import { propsAreEqual } from 'lib/helpers'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { propsAreEqual } from 'lib/helpers'
 
 /**
  * Note that the loading more logic of this component works best with a cursor-based
@@ -15,20 +15,47 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 
 const createItemData = memoize((items, itemProps) => ({ items, ...itemProps }))
 
-export interface ItemProps {
-  data: any
+export type ItemRenderer<T, P> = ComponentType<
+  {
+    item: T
+    listRef: MutableRefObject<VariableSizeList<any> | null | undefined>
+    index: number
+  } & P
+>
+
+export interface ItemProps<T, P> {
+  data: {
+    items: T[]
+    itemProps: P
+    ItemComponent: ItemRenderer<T, P>
+    listRef: MutableRefObject<VariableSizeList<any> | null | undefined>
+    LoaderComponent?: ReactNode
+  }
   index: number
   style: CSSProperties
 }
 
-const Item = memo(({ data, index, style }: ItemProps) => {
-  const { items, itemProps, ItemComponent } = data
+export interface InfiniteListProps<T, P> {
+  items?: T[]
+  itemProps?: P
+  hasNextPage?: boolean
+  isLoadingNextPage?: boolean
+  getItemSize?: (index: number) => number
+  onLoadNextPage?: () => void
+  ItemComponent?: ItemRenderer<T, P>
+  LoaderComponent?: ReactNode
+}
+
+const Item = memo(<T, P>({ data, index, style }: ItemProps<T, P>) => {
+  const { items, itemProps, ItemComponent, listRef, LoaderComponent } = data
   const item = index < items.length ? items[index] : undefined
 
   return item ? (
     <div style={style}>
-      <ItemComponent index={index} item={item} {...itemProps} />
+      <ItemComponent index={index} item={item} listRef={listRef} {...itemProps} />
     </div>
+  ) : LoaderComponent !== undefined ? (
+    <div style={style}>{LoaderComponent}</div>
   ) : (
     <div className="space-y-1 my-1" style={style}>
       <ShimmeringLoader />
@@ -38,25 +65,20 @@ const Item = memo(({ data, index, style }: ItemProps) => {
   )
 }, areEqual)
 
-export interface InfiniteListProps<T> {
-  items?: T[]
-  itemProps?: any
-  hasNextPage?: boolean
-  isLoadingNextPage?: boolean
-  getItemSize?: (index: number) => number
-  onLoadNextPage?: () => void
-  ItemComponent?: any
-}
+Item.displayName = 'Item'
 
-function InfiniteList<T>({
+function InfiniteList<T, P>({
   items = [],
-  itemProps = {},
+  itemProps,
   hasNextPage = false,
   isLoadingNextPage = false,
   getItemSize = () => 40,
   onLoadNextPage = () => {},
   ItemComponent = () => null,
-}: InfiniteListProps<T>) {
+  LoaderComponent,
+}: InfiniteListProps<T, P>) {
+  const listRef = useRef<VariableSizeList<any> | null>()
+
   // Only load 1 page of items at a time
   // Pass an empty callback to InfiniteLoader in case it asks to load more than once
   const loadMoreItems = isLoadingNextPage ? () => {} : onLoadNextPage
@@ -67,7 +89,7 @@ function InfiniteList<T>({
   }
 
   const itemCount = hasNextPage ? items.length + 1 : items.length
-  const itemData = createItemData(items, { itemProps, ItemComponent })
+  const itemData = createItemData(items, { itemProps, ItemComponent, LoaderComponent, listRef })
 
   return (
     <div className="relative flex flex-col flex-grow">
@@ -81,7 +103,10 @@ function InfiniteList<T>({
             >
               {({ onItemsRendered, ref }) => (
                 <VariableSizeList
-                  ref={ref}
+                  ref={(refy) => {
+                    ref(refy)
+                    listRef.current = refy
+                  }}
                   height={height ?? 0}
                   width={width ?? 0}
                   itemCount={itemCount}
@@ -110,4 +135,5 @@ function InfiniteList<T>({
   )
 }
 
-export default memo(InfiniteList, propsAreEqual)
+// memo erases generics so this magic is needed
+export default memo(InfiniteList, propsAreEqual) as typeof InfiniteList

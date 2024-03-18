@@ -7,18 +7,7 @@ export default {
 }
 
 export const Functions = (args: any) => (
-  <div
-  // style={{
-  //   height: '600px',
-  //   display: 'flex',
-  //   flexDirection: 'column',
-  //   flexGrow: 1,
-  //   position: 'relative',
-  // }}
-  // className="
-  // flex flex-col flex-grow relative pt-4 flex h-full flex-grow transition-opacity
-  // "
-  >
+  <div>
     <LogTable
       params={{}}
       queryType="functions"

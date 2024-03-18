@@ -1,9 +1,8 @@
-import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
+import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
-import { useCallback } from 'react'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { databaseFunctionsKeys } from './keys'
-import { components } from 'data/api'
+import type { components } from 'data/api'
 
 export type DatabaseFunctionsVariables = {
   projectRef?: string
@@ -50,15 +49,3 @@ export const useDatabaseFunctionsQuery = <TData = DatabaseFunctionsData>(
       ...options,
     }
   )
-
-export const useDatabaseFunctionsPrefetch = ({ projectRef }: DatabaseFunctionsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(databaseFunctionsKeys.list(projectRef), ({ signal }) =>
-        getDatabaseFunctions({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

@@ -1,7 +1,7 @@
-import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
-import { Project } from 'data/projects/project-detail-query'
+import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
+import type { Project } from 'data/projects/project-detail-query'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
-import { Organization } from 'types'
+import type { Organization } from 'types'
 
 export const generateSettingsMenu = (
   ref?: string,
@@ -65,7 +65,7 @@ export const generateSettingsMenu = (
       ],
     },
     {
-      title: '',
+      title: 'Configuration',
       items: [
         {
           name: 'Database',

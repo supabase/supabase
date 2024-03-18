@@ -5,11 +5,13 @@ import {
   AvailableColumn,
   WrapperMeta,
 } from 'components/interfaces/Database/Wrappers/Wrappers.types'
+import { pgSodiumKeys } from 'data/pg-sodium-keys/keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { wrapWithTransaction } from 'data/sql/utils/transaction'
-import { useStore } from 'hooks'
-import { ResponseError } from 'types'
+import { vaultSecretsKeys } from 'data/vault/keys'
+import type { ResponseError } from 'types'
+import { entityTypeKeys } from 'data/entity-types/keys'
 
 export type FDWCreateVariables = {
   projectRef?: string
@@ -154,15 +156,16 @@ export const useFDWCreateMutation = ({
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  const { vault } = useStore()
 
   return useMutation<FDWCreateData, ResponseError, FDWCreateVariables>((vars) => createFDW(vars), {
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
       await Promise.all([
+        queryClient.invalidateQueries(entityTypeKeys.list(projectRef)),
         queryClient.invalidateQueries(sqlKeys.query(projectRef, ['fdws']), { refetchType: 'all' }),
-        vault.load(),
+        queryClient.invalidateQueries(pgSodiumKeys.list(projectRef)),
+        queryClient.invalidateQueries(sqlKeys.query(projectRef, vaultSecretsKeys.list(projectRef))),
       ])
 
       await onSuccess?.(data, variables, context)

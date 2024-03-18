@@ -1,5 +1,3 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
-
 interface HeaderTitleProps {
   schema: string
   table?: { name: string }

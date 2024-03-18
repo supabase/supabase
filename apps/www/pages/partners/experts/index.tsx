@@ -20,7 +20,7 @@ export async function getStaticProps() {
     props: {
       partners,
     },
-    revalidate: 18000, // In seconds - refresh every 5 hours
+    revalidate: 1800, // 30 minutes
   }
 }
 

@@ -1,0 +1,63 @@
+---
+id: 'auth-textlocal'
+title: 'Phone Auth with Textlocal'
+subtitle: 'How to set up and use Mobile OTP with Textlocal and Supabase.'
+description: 'How to set up and use Mobile OTP with Textlocal and Supabase.'
+---
+
+<Admonition type="tip">
+
+To manage costs related to SMS authentication, consider setting project rate limits and configuring CAPTCHA. For additional cost-control strategies, visit the Production Checklist.
+
+Also check country-specific regulations around sending SMS messages, for example, India's TRAI DLT
+regulations.
+
+</Admonition>
+
+## Prerequisites
+
+Before you begin, ensure you have the following:
+
+- **A Textlocal account**: Sign up for [TextLocal](https://www.textlocal.com/signup) to start sending SMS messages.
+- **A Supabase project**: Necessary for SMS authentication integration. Create your project in the [Supabase Dashboard](https://supabase.com/dashboard).
+- **A mobile phone**: To receive SMS messages and test your setup.
+
+## Setting up Textlocal as your SMS provider
+
+To integrate Textlocal with Supabase:
+
+1. [Get a Textlocal API key](#get-a-textlocal-api-key)
+2. [Customize your sender name](#customize-your-sender-name-optional)
+3. [Configure your Supabase project](#configure-supabase)
+
+### Get a Textlocal API key
+
+1. Log into your Textlocal account and go to `Settings` > `API Keys`.
+2. Generate a new API Key. Save your new API key in a safe location.
+
+### Customize your sender name (Optional)
+
+Textlocal defaults to `TXTLCL` as the sender name for all messages. You can customize this to better reflect your brand:
+
+1. In your Textlocal dashboard, go to `Settings` > `All Settings` > `Sender Names`.
+2. Change your sender name.
+
+### Configure Supabase
+
+To set up Textlocal as your SMS provider in Supabase, follow these steps:
+
+1. In your Supabase Dashboard, go to the [Auth Providers section](https://supabase.com/dashboard/project/_/auth/providers).
+2. From the list of available authentication providers, select `Phone`.
+3. Toggle `Enable Phone Provider`.
+4. Under `SMS Provider`, select `Textlocal.`
+5. Enter your Textlocal API Key and Sender Name.
+6. Customize your SMS Message (optional).
+
+## Next steps
+
+To implement Phone Login, see the docs on [using Phone Login](/docs/guides/auth/phone-login#using-phone-login).
+
+## Resources
+
+- [Textlocal Signup](https://www.textlocal.com/sign-up)
+- [Supabase Dashboard](https://supabase.com/dashboard)

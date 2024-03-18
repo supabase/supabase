@@ -291,7 +291,7 @@ const CareerPage: NextPage = ({ jobs, contributors }: any) => {
                               />
                             </div>
                           </div>
-                          <div className="">
+                          <div>
                             <h2 className="text-base">{human.title}</h2>
                             <p className="text-foreground-light text-xs lg:text-sm">{human.text}</p>
                           </div>

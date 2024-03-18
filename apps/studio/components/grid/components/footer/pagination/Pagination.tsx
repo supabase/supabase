@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 
-import AwesomeDebouncePromise from 'awesome-debounce-promise'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useTableRowsCountQuery } from 'data/table-rows/table-rows-count-query'
 import { useUrlState } from 'hooks'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
@@ -188,7 +187,6 @@ const Pagination = ({ isLoading: isLoadingRows = false }: PaginationProps) => {
           <p className="text-sm text-foreground-light">{`${data.count.toLocaleString()} ${
             data.count === 0 || data.count > 1 ? `records` : 'record'
           }`}</p>
-          {isLoadingRows && <IconLoader size={14} className="animate-spin" />}
 
           <ConfirmationModal
             visible={isConfirmPreviousModalOpen}

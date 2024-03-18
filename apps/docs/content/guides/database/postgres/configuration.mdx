@@ -1,0 +1,107 @@
+---
+id: 'postgres-configuration'
+title: 'Database configuration'
+slug: 'postgres-configuration'
+description: 'Updating the default configuration for your Postgres database.'
+subtitle: 'Updating the default configuration for your Postgres database.'
+---
+
+Postgres provides a set of sensible defaults for you database size. In some cases, these defaults can be updated. We do not recommend changing these defaults unless you know what you're doing.
+
+## Timeouts
+
+By default, Supabase limits the maximum statement execution time to _8 seconds_ for users accessing the API. Additionally, all users are subject to a global limit of _2 minutes_. This serves as a backstop against resource exhaustion due to either poorly written queries, or abusive usage. This can be overridden using [Custom Postgres configuration](https://supabase.com/docs/guides/platform/custom-postgres-config#supported-parameters).
+
+### Changing the default timeout
+
+The timeout values were picked as a reasonable default for the majority of use-cases, but can be modified using the [`alter role`](https://www.postgresql.org/docs/current/sql-alterrole.html) statement:
+
+```sql
+-- For API users
+alter role authenticator set statement_timeout = '15s';
+```
+
+You can also update the statement timeout for a session:
+
+```sql
+set statement_timeout to 60000; -- 1 minute in milliseconds
+```
+
+### Statement optimization
+
+All Supabase projects come with the [`pg_stat_statements`](https://www.postgresql.org/docs/current/pgstatstatements.html) extension installed, which tracks planning and execution statistics for all statements executed against it. These statistics can be used in order to diagnose the performance of your project.
+
+This data can further be used in conjunction with the [`explain`](https://www.postgresql.org/docs/current/using-explain.html) functionality of Postgres to optimize your usage.
+
+## Managing timezones
+
+Every Supabase database is set to UTC timezone by default. We strongly recommend keeping it this way, even if your users are in a different location.
+This is because it makes it much easier to calculate differences between timezones if you adopt the mental model that "everything in my database is in UTC time."
+
+### Change timezone
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="database-method"
+>
+<TabPanel id="sql" label="SQL">
+
+```sql
+alter database postgres
+set timezone to 'America/New_York';
+```
+
+</TabPanel>
+</Tabs>
+
+### Full list of timezones
+
+Get a full list of timezones supported by your database. This will return the following columns:
+
+- `name`: Time zone name
+- `abbrev`: Time zone abbreviation
+- `utc_offset`: Offset from UTC (positive means east of Greenwich)
+- `is_dst`: True if currently observing daylight savings
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="database-method"
+>
+<TabPanel id="sql" label="SQL">
+
+```sql
+select name, abbrev, utc_offset, is_dst
+from pg_timezone_names()
+order by name;
+```
+
+</TabPanel>
+</Tabs>
+
+### Search for a specific timezone
+
+Use `ilike` (case insensitive search) to find specific timezones.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="database-method"
+>
+<TabPanel id="sql" label="SQL">
+
+```sql
+select *
+from pg_timezone_names()
+where name ilike '%york%';
+```
+
+</TabPanel>
+</Tabs>

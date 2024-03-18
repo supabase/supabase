@@ -1,9 +1,9 @@
-import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
+import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import { IS_PLATFORM } from 'lib/constants'
 
 export const generateAuthMenu = (
   ref: string,
-  options: { hooksReleased?: boolean } = {}
+  options: { columnLevelPrivileges?: boolean } = {}
 ): ProductMenuGroup[] => {
   return [
     {
@@ -19,6 +19,17 @@ export const generateAuthMenu = (
           url: `/project/${ref}/auth/policies`,
           items: [],
         },
+        ...(options?.columnLevelPrivileges
+          ? [
+              {
+                name: 'Column Privileges',
+                key: 'column-privileges',
+                url: `/project/${ref}/auth/column-privileges`,
+                items: [],
+                label: 'ALPHA',
+              },
+            ]
+          : []),
         ...(IS_PLATFORM
           ? [
               {
@@ -45,17 +56,13 @@ export const generateAuthMenu = (
                 url: `/project/${ref}/auth/url-configuration`,
                 items: [],
               },
-              ...(options?.hooksReleased
-                ? [
-                    {
-                      name: 'Hooks',
-                      key: 'hooks',
-                      url: `/project/${ref}/auth/hooks`,
-                      items: [],
-                      label: 'BETA',
-                    },
-                  ]
-                : []),
+              {
+                name: 'Hooks',
+                key: 'hooks',
+                url: `/project/${ref}/auth/hooks`,
+                items: [],
+                label: 'BETA',
+              },
             ]
           : []),
       ],

@@ -1,7 +1,6 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get, isResponseOk } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { accessTokenKeys } from './keys'
 
 export type AccessToken = {
@@ -37,11 +36,3 @@ export const useAccessTokensQuery = <TData = AccessTokensData>({
     ({ signal }) => getAccessTokens(signal),
     options
   )
-
-export const useAccessTokensPrefetch = () => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    client.prefetchQuery(accessTokenKeys.list(), ({ signal }) => getAccessTokens(signal))
-  }, [])
-}

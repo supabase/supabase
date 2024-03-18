@@ -7,7 +7,7 @@ interface InvoiceStatusBadgeProps {
   status: InvoiceStatus
 }
 
-export const invoiceStatusMapping: Record<InvoiceStatus, { label: string; badgeColor: string }> = {
+const invoiceStatusMapping: Record<InvoiceStatus, { label: string; badgeColor: string }> = {
   [InvoiceStatus.DRAFT]: {
     label: 'Upcoming',
     badgeColor: 'yellow',

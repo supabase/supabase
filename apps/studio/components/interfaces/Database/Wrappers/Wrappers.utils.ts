@@ -1,5 +1,5 @@
-import { WRAPPERS, WRAPPER_HANDLERS } from './Wrappers.constants'
-import { WrapperMeta } from './Wrappers.types'
+import { WRAPPER_HANDLERS } from './Wrappers.constants'
+import type { WrapperMeta } from './Wrappers.types'
 
 export const makeValidateRequired = (options: { name: string; required: boolean }[]) => {
   const requiredOptionsSet = new Set(

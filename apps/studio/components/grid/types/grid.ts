@@ -17,10 +17,9 @@ export interface SupabaseGridProps {
    */
   table: SupaTable
   /**
-   *
-   * run sql query
+   * database table id
    */
-  onSqlQuery: (query: string) => Promise<{ data?: any; error?: any }>
+  tableId?: string
 
   /**
    * Optional react node to display in grid header
@@ -36,9 +35,9 @@ export interface SupabaseGridProps {
    */
   schema?: string
   /**
-   * storageRef is used to save state on localstorage
+   * projectRef is used to save state on localstorage
    */
-  storageRef?: string
+  projectRef?: string
   /**
    * Optional grid theme
    */
@@ -65,6 +64,7 @@ export interface SupabaseGridProps {
   onEditRow?: (row: SupaRow) => void
   onError?: (error: any) => void
   onExpandJSONEditor: (column: string, row: SupaRow) => void
+  onExpandTextEditor: (column: string, row: SupaRow) => void
   updateTableRow: (previousRow: any, updatedData: any) => void
   onEditForeignKeyColumnValue: (args: {
     foreignKey: NonNullable<ForeignRowSelectorProps['foreignKey']>

@@ -1,4 +1,4 @@
-import Editor, { OnChange, OnMount } from '@monaco-editor/react'
+import Editor, { OnChange } from '@monaco-editor/react'
 import { noop } from 'lodash'
 
 // [Joshen] Should just use CodeEditor instead of declaring Editor here so that all the mount logic is consistent
@@ -10,25 +10,13 @@ interface JsonEditorProps {
 }
 
 const JsonEditor = ({ value = '', readOnly = false, onInputChange = noop }: JsonEditorProps) => {
-  const onMount: OnMount = (editor) => {
-    editor.changeViewZones((accessor) => {
-      accessor.addZone({
-        afterLineNumber: 0,
-        heightInPx: 4,
-        domNode: document.createElement('div'),
-      })
-    })
-  }
-
-  const Loading = () => <h4>Loading</h4>
-
   return (
     <Editor
       className="monaco-editor"
       theme="supabase"
       defaultLanguage="json"
       value={value}
-      loading={<Loading />}
+      loading={<h4>Loading</h4>}
       options={{
         readOnly,
         tabSize: 2,
@@ -40,7 +28,16 @@ const JsonEditor = ({ value = '', readOnly = false, onInputChange = noop }: Json
         fixedOverflowWidgets: true,
         lineNumbersMinChars: 4,
       }}
-      onMount={onMount}
+      onMount={(editor) => {
+        editor.changeViewZones((accessor) => {
+          accessor.addZone({
+            afterLineNumber: 0,
+            heightInPx: 4,
+            domNode: document.createElement('div'),
+          })
+        })
+        editor.focus()
+      }}
       onChange={onInputChange}
     />
   )

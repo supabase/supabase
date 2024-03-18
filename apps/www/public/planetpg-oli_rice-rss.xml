@@ -50,13 +50,6 @@
   <pubDate>Thu, 15 Dec 2022 23:00:00 GMT</pubDate>
 </item>
 <item>
-  <guid>https://supabase.com/blog/postgres-foreign-data-wrappers-rust</guid>
-  <title>Supabase Wrappers, a Postgres FDW framework written in Rust</title>
-  <link>https://supabase.com/blog/postgres-foreign-data-wrappers-rust</link>
-  <description>A framework for building Postgres Foreign Data Wrappers which connects to Stripe, Firebase, Clickhouse, and more.</description>
-  <pubDate>Wed, 14 Dec 2022 23:00:00 GMT</pubDate>
-</item>
-<item>
   <guid>https://supabase.com/blog/pg-jsonschema-a-postgres-extension-for-json-validation</guid>
   <title>pg_jsonschema: JSON Schema support for Postgres</title>
   <link>https://supabase.com/blog/pg-jsonschema-a-postgres-extension-for-json-validation</link>

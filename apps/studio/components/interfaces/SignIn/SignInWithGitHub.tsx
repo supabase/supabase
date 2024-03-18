@@ -1,7 +1,6 @@
 import * as Sentry from '@sentry/nextjs'
 import { BASE_PATH } from 'lib/constants'
 import { auth, buildPathWithParams } from 'lib/gotrue'
-import { incrementSignInClicks } from 'lib/local-storage'
 import { useState } from 'react'
 import { Button, IconGitHub } from 'ui'
 
@@ -12,11 +11,6 @@ const SignInWithGitHub = () => {
     setLoading(true)
 
     try {
-      const signInClicks = incrementSignInClicks()
-      if (signInClicks > 1) {
-        Sentry.captureMessage('Sign in without previous sign out detected')
-      }
-
       // redirects to /sign-in to check if the user has MFA setup (handled in SignInLayout.tsx)
       const redirectTo = buildPathWithParams(
         `${

@@ -3,7 +3,7 @@ import Panel from 'components/ui/Panel'
 import { NextRouter, useRouter } from 'next/router'
 import { Button, IconExternalLink, IconHelpCircle, Loading } from 'ui'
 import { LogsEndpointParams } from '../Settings/Logs'
-import { BaseReportParams, ReportQueryType } from './Reports.types'
+import type { BaseReportParams, ReportQueryType } from './Reports.types'
 
 export interface ReportWidgetProps<T = any> {
   data: T[]

@@ -1,9 +1,8 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
-import { useCallback } from 'react'
+import { API_URL } from 'lib/constants'
 import { oauthAppKeys } from './keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type AuthorizedAppsVariables = {
   slug?: string
@@ -20,7 +19,7 @@ export type AuthorizedApp = {
 export async function getAuthorizedApps({ slug }: AuthorizedAppsVariables, signal?: AbortSignal) {
   if (!slug) throw new Error('Organization slug is required')
 
-  const response = await get(`${API_ADMIN_URL}/organizations/${slug}/oauth/apps?type=authorized`, {
+  const response = await get(`${API_URL}/organizations/${slug}/oauth/apps?type=authorized`, {
     signal,
   })
   if (response.error) throw response.error
@@ -45,15 +44,3 @@ export const useAuthorizedAppsQuery = <TData = AuthorizedAppsData>(
       ...options,
     }
   )
-
-export const useAuthorizedAppsPrefetch = ({ slug }: AuthorizedAppsVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (slug) {
-      client.prefetchQuery(oauthAppKeys.authorizedApps(slug), ({ signal }) =>
-        getAuthorizedApps({ slug }, signal)
-      )
-    }
-  }, [slug])
-}

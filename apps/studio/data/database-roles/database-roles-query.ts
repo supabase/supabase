@@ -1,9 +1,8 @@
-import { UseQueryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useCallback } from 'react'
-import { PostgresRole } from '@supabase/postgres-meta'
+import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+import type { PostgresRole } from '@supabase/postgres-meta'
 
 import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { databaseRolesKeys } from './keys'
 
 export type DatabaseRolesVariables = {
@@ -48,15 +47,3 @@ export const useDatabaseRolesQuery = <TData = DatabaseRolesData>(
       ...options,
     }
   )
-
-export const useDatabaseRolesPrefetch = ({ projectRef }: DatabaseRolesVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(databaseRolesKeys.list(projectRef), ({ signal }) =>
-        getDatabaseRoles({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
-}

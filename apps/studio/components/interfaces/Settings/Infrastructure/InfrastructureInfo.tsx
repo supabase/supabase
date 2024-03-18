@@ -1,7 +1,16 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import Link from 'next/link'
-
 import { useParams } from 'common'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Badge,
+  Button,
+  Input,
+} from 'ui'
+
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   ScaffoldContainer,
@@ -14,20 +23,18 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useFlag, useIsFeatureEnabled } from 'hooks'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Badge,
-  Button,
-  Input,
-} from 'ui'
-import ProjectUpgradeAlert from '../General/Infrastructure/ProjectUpgradeAlert'
+import { useIsFeatureEnabled } from 'hooks'
+import { AWS_REGIONS, FLY_REGIONS } from 'lib/constants'
+import { ProjectUpgradeAlert } from '../General/Infrastructure/ProjectUpgradeAlert'
 import InstanceConfiguration from './InfrastructureConfiguration/InstanceConfiguration'
+import {
+  AWS_REGIONS_VALUES,
+  FLY_REGIONS_VALUES,
+} from './InfrastructureConfiguration/InstanceConfiguration.constants'
 
 const InfrastructureInfo = () => {
   const { ref } = useParams()
+  const router = useRouter()
   const { project, isLoading } = useProjectContext()
 
   const authEnabled = useIsFeatureEnabled('project_auth:all')
@@ -47,12 +54,20 @@ const InfrastructureInfo = () => {
   const currentPgVersion = (current_app_version ?? '').split('supabase-postgres-')[1]
   const latestPgVersion = (latest_app_version ?? '').split('supabase-postgres-')[1]
 
-  const showDbUpgrades = useFlag('databaseUpgrades')
-  const readReplicasEnabled = useFlag('readReplicas')
-  const showReadReplicasUI = readReplicasEnabled && project?.is_read_replicas_enabled
+  const isInactive = project?.status === 'INACTIVE'
+  const showReadReplicasUI = project?.is_read_replicas_enabled
   const hasReadReplicas = (databases ?? []).length > 1
   const subject = 'Request%20for%20Postgres%20upgrade%20for%20project'
   const message = `Upgrade information:%0A• Manual intervention reason: ${requires_manual_intervention}`
+
+  const [regionKey] =
+    project?.cloud_provider === 'AWS'
+      ? Object.entries(AWS_REGIONS_VALUES).find(([key, region]) => region === project?.region) ?? []
+      : Object.entries(FLY_REGIONS_VALUES).find(([key, region]) => region === project?.region) ?? []
+  const region =
+    project?.cloud_provider === 'AWS'
+      ? AWS_REGIONS[regionKey as keyof typeof AWS_REGIONS]
+      : FLY_REGIONS[regionKey as keyof typeof FLY_REGIONS]
 
   return (
     <>
@@ -89,7 +104,23 @@ const InfrastructureInfo = () => {
               ) : (
                 <>
                   <Input readOnly disabled value={project?.cloud_provider} label="Cloud provider" />
-                  <Input readOnly disabled value={project?.region} label="Region" />
+                  <Input
+                    readOnly
+                    disabled
+                    icon={
+                      regionKey !== undefined ? (
+                        <img
+                          alt="region icon"
+                          className="w-5 rounded-sm"
+                          src={`${router.basePath}/img/regions/${regionKey}.svg`}
+                        />
+                      ) : null
+                    }
+                    value={
+                      region !== undefined ? `${region} (${project?.region})` : project?.region
+                    }
+                    label="Region"
+                  />
                 </>
               )}
             </ScaffoldSectionContent>
@@ -103,134 +134,147 @@ const InfrastructureInfo = () => {
             </p>
           </ScaffoldSectionDetail>
           <ScaffoldSectionContent>
-            {isLoadingUpgradeEligibility && <GenericSkeletonLoader />}
-            {isErrorUpgradeEligibility && (
-              <AlertError error={error} subject="Failed to retrieve Postgres version" />
-            )}
-            {isSuccessUpgradeEligibility && (
+            {isInactive ? (
+              <Alert_Shadcn_>
+                <AlertTitle_Shadcn_>
+                  Service versions cannot be retrieved while project is paused
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  Restoring the project will update Postgres to the newest version
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            ) : (
               <>
-                {authEnabled && (
-                  <Input
-                    readOnly
-                    disabled
-                    label="GoTrue version"
-                    value={project?.serviceVersions?.gotrue ?? ''}
-                  />
+                {isLoadingUpgradeEligibility && <GenericSkeletonLoader />}
+                {isErrorUpgradeEligibility && (
+                  <AlertError error={error} subject="Failed to retrieve Postgres version" />
                 )}
-                <Input
-                  readOnly
-                  disabled
-                  label="PostgREST version"
-                  value={project?.serviceVersions?.postgrest ?? ''}
-                />
-                <Input
-                  readOnly
-                  disabled
-                  value={currentPgVersion}
-                  label="Postgres version"
-                  actions={[
-                    isOnLatestVersion && (
-                      <Tooltip.Root key="tooltip-latest" delayDuration={0}>
-                        <Tooltip.Trigger>
-                          <Badge color="green" className="mr-1">
-                            Latest
-                          </Badge>
-                        </Tooltip.Trigger>
-                        <Tooltip.Portal>
-                          <Tooltip.Content side="bottom">
-                            <Tooltip.Arrow className="radix-tooltip-arrow" />
-                            <div
-                              className={[
-                                'rounded bg-alternative py-1 px-2 leading-none shadow',
-                                'border border-background w-[200px]',
-                              ].join(' ')}
-                            >
-                              <span className="text-xs text-foreground">
-                                Project is on the latest version of Postgres that Supabase supports
-                              </span>
-                            </div>
-                          </Tooltip.Content>
-                        </Tooltip.Portal>
-                      </Tooltip.Root>
-                    ),
-                  ]}
-                />
-                {showDbUpgrades && data?.eligible && !hasReadReplicas && <ProjectUpgradeAlert />}
-                {showDbUpgrades && data.eligible && hasReadReplicas && (
-                  <Alert_Shadcn_>
-                    <AlertTitle_Shadcn_>
-                      A new version of Postgres is available for your project
-                    </AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      You will need to remove all read replicas first prior to upgrading your
-                      Postgrest version to the latest available ({latestPgVersion}).
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                )}
-                {showDbUpgrades && !data?.eligible && data?.requires_manual_intervention && (
-                  <Alert_Shadcn_ title="A new version of Postgres is available for your project">
-                    <AlertTitle_Shadcn_>
-                      A new version of Postgres is available for your project
-                    </AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_>
-                      <p className="mb-3">
-                        Please reach out to us via our support form if you are keen to upgrade your
-                        Postgres version to the latest available ({latestPgVersion}).
-                      </p>
-                      <Button size="tiny" type="default" asChild>
-                        <Link
-                          href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          Contact support
-                        </Link>
-                      </Button>
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                )}
-                {showDbUpgrades &&
-                  !data?.eligible &&
-                  (data?.extension_dependent_objects || []).length > 0 && (
-                    <Alert_Shadcn_
-                      variant="warning"
-                      title="A new version of Postgres is available for your project"
-                    >
-                      <AlertTitle_Shadcn_>New version of Postgres available</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                        <div>
-                          <p className="mb-1">
-                            This project cannot be upgraded due to the following extension dependent
-                            objects:
+                {isSuccessUpgradeEligibility && (
+                  <>
+                    {authEnabled && (
+                      <Input
+                        readOnly
+                        disabled
+                        label="GoTrue version"
+                        value={project?.serviceVersions?.gotrue ?? ''}
+                      />
+                    )}
+                    <Input
+                      readOnly
+                      disabled
+                      label="PostgREST version"
+                      value={project?.serviceVersions?.postgrest ?? ''}
+                    />
+                    <Input
+                      readOnly
+                      disabled
+                      value={currentPgVersion}
+                      label="Postgres version"
+                      actions={[
+                        isOnLatestVersion && (
+                          <Tooltip.Root key="tooltip-latest" delayDuration={0}>
+                            <Tooltip.Trigger>
+                              <Badge color="green" className="mr-1">
+                                Latest
+                              </Badge>
+                            </Tooltip.Trigger>
+                            <Tooltip.Portal>
+                              <Tooltip.Content side="bottom">
+                                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                                <div
+                                  className={[
+                                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                                    'border border-background w-[200px]',
+                                  ].join(' ')}
+                                >
+                                  <span className="text-xs text-foreground">
+                                    Project is on the latest version of Postgres that Supabase
+                                    supports
+                                  </span>
+                                </div>
+                              </Tooltip.Content>
+                            </Tooltip.Portal>
+                          </Tooltip.Root>
+                        ),
+                      ]}
+                    />
+                    {data?.eligible && !hasReadReplicas && <ProjectUpgradeAlert />}
+                    {data.eligible && hasReadReplicas && (
+                      <Alert_Shadcn_>
+                        <AlertTitle_Shadcn_>
+                          A new version of Postgres is available for your project
+                        </AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_>
+                          You will need to remove all read replicas first prior to upgrading your
+                          Postgrest version to the latest available ({latestPgVersion}).
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
+                    )}
+                    {!data?.eligible && data?.requires_manual_intervention && (
+                      <Alert_Shadcn_ title="A new version of Postgres is available for your project">
+                        <AlertTitle_Shadcn_>
+                          A new version of Postgres is available for your project
+                        </AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_>
+                          <p className="mb-3">
+                            Please reach out to us via our support form if you are keen to upgrade
+                            your Postgres version to the latest available ({latestPgVersion}).
                           </p>
-
-                          <ul className="pl-4">
-                            {(data?.extension_dependent_objects || []).map((obj) => (
-                              <li className="list-disc" key={obj}>
-                                {obj}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        <p>
-                          Once the above objects are exported and removed, you can proceed to
-                          upgrade your project, and re-import the objects after the upgrade
-                          operation is complete.
-                        </p>
-                        <div>
                           <Button size="tiny" type="default" asChild>
                             <Link
-                              href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
+                              href={`/support/new?category=Database_unresponsive&ref=${ref}&subject=${subject}&message=${message}`}
                               target="_blank"
                               rel="noreferrer"
                             >
-                              View docs
+                              Contact support
                             </Link>
                           </Button>
-                        </div>
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  )}
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
+                    )}
+                    {!data?.eligible && (data?.extension_dependent_objects || []).length > 0 && (
+                      <Alert_Shadcn_
+                        variant="warning"
+                        title="A new version of Postgres is available for your project"
+                      >
+                        <AlertTitle_Shadcn_>New version of Postgres available</AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                          <div>
+                            <p className="mb-1">
+                              This project cannot be upgraded due to the following extension
+                              dependent objects:
+                            </p>
+
+                            <ul className="pl-4">
+                              {(data?.extension_dependent_objects || []).map((obj) => (
+                                <li className="list-disc" key={obj}>
+                                  {obj}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                          <p>
+                            Once the above objects are exported and removed, you can proceed to
+                            upgrade your project, and re-import the objects after the upgrade
+                            operation is complete. Please refer to the docs on additional extensions
+                            that might also need to be dropped.
+                          </p>
+                          <div>
+                            <Button size="tiny" type="default" asChild>
+                              <Link
+                                href="https://supabase.com/docs/guides/platform/migrating-and-upgrading-projects#caveats"
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                View docs
+                              </Link>
+                            </Button>
+                          </div>
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
+                    )}
+                  </>
+                )}
               </>
             )}
           </ScaffoldSectionContent>

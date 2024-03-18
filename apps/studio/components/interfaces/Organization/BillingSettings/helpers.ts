@@ -1,6 +1,6 @@
 import { PricingMetric } from 'data/analytics/org-daily-stats-query'
 
-export const pricingMetricBytes = [
+const pricingMetricBytes = [
   PricingMetric.DATABASE_SIZE,
   PricingMetric.EGRESS,
   PricingMetric.STORAGE_SIZE,

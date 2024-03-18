@@ -1,38 +1,26 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useState } from 'react'
-import ReactMarkdown from 'react-markdown'
-import {
-  Alert,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Collapsible,
-  Form,
-  IconAlertTriangle,
-  IconCheck,
-  IconChevronUp,
-  Input,
-} from 'ui'
-
 import { useParams } from 'common'
-import { components } from 'data/api'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
+import ReactMarkdown from 'react-markdown'
+import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from 'ui'
+
+import type { components } from 'data/api'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
-import { Provider } from './AuthProvidersForm.types'
+import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
 
 export interface ProviderFormProps {
-  config: components['schemas']['GetGoTrueConfigResponse']
+  config: components['schemas']['GoTrueConfigResponse']
   provider: Provider
 }
 
 const ProviderForm = ({ config, provider }: ProviderFormProps) => {
-  const { ui } = useStore()
   const [open, setOpen] = useState(false)
   const { ref: projectRef } = useParams()
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
@@ -59,8 +47,8 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
           initialValues[key] = configValue
             ? configValue
             : provider.properties[key].type === 'boolean'
-            ? false
-            : ''
+              ? false
+              : ''
         }
       }
     })
@@ -99,7 +87,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
         onSuccess: () => {
           resetForm({ values: { ...values }, initialValues: { ...values } })
           setOpen(false)
-          ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
+          toast.success('Successfully updated settings')
         },
       }
     )
@@ -162,37 +150,13 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
             "
               >
                 <div className="mx-auto my-6 max-w-lg space-y-6">
-                  {provider.title === 'LinkedIn (Deprecated)' && (
-                    <Alert_Shadcn_ variant="warning">
-                      <IconAlertTriangle strokeWidth={2} />
-                      <AlertTitle_Shadcn_>LinkedIn (Deprecated) Provider</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        As of 1st August, LinkedIn has updated their OAuth API scopes. Please use
-                        the new LinkedIn provider below. Developers using this provider should move
-                        over to the new provider. Please refer to our{' '}
-                        <a
-                          href="https://supabase.com/docs/guides/auth/social-login/auth-linkedin"
-                          className="underline"
-                          target="_blank"
-                        >
-                          documentation
-                        </a>{' '}
-                        for more details.
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  )}
-
                   {Object.keys(provider.properties).map((x: string) => (
                     <FormField
                       key={x}
                       name={x}
                       properties={provider.properties[x]}
                       formValues={values}
-                      // TODO (Joel): Remove after 30th November when we disable the provider
-                      disabled={
-                        ['EXTERNAL_LINKEDIN_CLIENT_ID', 'EXTERNAL_LINKEDIN_SECRET'].includes(x) ||
-                        !canUpdateConfig
-                      }
+                      disabled={!canUpdateConfig}
                     />
                   ))}
 

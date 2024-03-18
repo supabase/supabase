@@ -10,7 +10,6 @@ import { Fragment, useState } from 'react'
 import { Button, Collapsible, IconChevronRight } from 'ui'
 import { queryParamsToObject } from '../Reports.utils'
 import { ReportWidgetProps, ReportWidgetRendererProps } from '../ReportWidget'
-import Link from 'next/link'
 import { useParams } from 'common/hooks'
 
 export const NetworkTrafficRenderer = (
@@ -290,8 +289,8 @@ const RouteTdContent = (datum: RouteTdContentProps) => (
               datum.status_code >= 400
                 ? 'bg-orange-500'
                 : datum.status_code >= 300
-                ? 'bg-yellow-500'
-                : 'bg-green-500'
+                  ? 'bg-yellow-500'
+                  : 'bg-green-500'
             }`}
             value={String(datum.status_code)}
           />

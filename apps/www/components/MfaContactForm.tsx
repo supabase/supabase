@@ -145,7 +145,7 @@ const MfaContactForm = () => {
               </Select>
             </div>
 
-            <div className="">
+            <div>
               <Input.TextArea
                 id="details"
                 name="details"
