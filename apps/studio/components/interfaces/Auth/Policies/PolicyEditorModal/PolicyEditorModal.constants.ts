@@ -100,7 +100,7 @@ for insert using (
   auth.uid() = user_id
 );`.trim(),
     name: 'Enable insert for users based on user_id',
-    definition: 'auth.uid() = user_id',
+    definition: '',
     check: 'auth.uid() = user_id',
     command: 'INSERT',
     roles: [],
