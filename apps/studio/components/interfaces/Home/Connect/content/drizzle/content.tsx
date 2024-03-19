@@ -8,7 +8,7 @@ import {
 } from 'components/interfaces/Home/Connect/ConnectTabs'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 
-const ContentFile = ({ connectionStringPooler, connectionStringDirect }: ContentFileProps) => {
+const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
   return (
     <ConnectTabs>
       <ConnectTabTriggers>
@@ -20,7 +20,7 @@ const ContentFile = ({ connectionStringPooler, connectionStringDirect }: Content
       <ConnectTabContent value=".env">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
-DATABASE_URL="${connectionStringPooler}"
+DATABASE_URL="${connectionStringPooler.transaction}"
         `}
         </SimpleCodeBlock>
       </ConnectTabContent>

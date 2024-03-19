@@ -125,7 +125,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
             <div className="py-3 px-4">
               <div className="flex items-center flex-grow space-x-2 text-sm text-foreground-light">
                 <span>Schema:</span>
-                <Badge color="scale">{`${extension.schema}`}</Badge>
+                <Badge>{`${extension.schema}`}</Badge>
               </div>
             </div>
           )}

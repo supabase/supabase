@@ -47,7 +47,7 @@ const UserListItem = ({
       </Table.td>
       <Table.td className="table-cell">
         {!isUserConfirmed ? (
-          <Badge color="yellow">Waiting for verification..</Badge>
+          <Badge variant="warning">Waiting for verification..</Badge>
         ) : user.last_sign_in_at ? (
           lastSignedIn?.format('DD MMM, YYYY HH:mm')
         ) : (

@@ -207,6 +207,17 @@ app.get("/auth/callback", async function (req, res) {
 
 Let's point our `.signInWithOAuth` method's redirect to the callback route we create above:
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="client"
+  queryGroup="environment"
+>
+<TabPanel id="client" label="Client">
+
+In the browser, `signInWithOAuth` automatically redirects to the SSO provider's authentication endpoint, which then redirects to your endpoint.
+
 ```js
 await supabase.auth.signInWithOAuth({
   provider,
@@ -215,3 +226,26 @@ await supabase.auth.signInWithOAuth({
   },
 })
 ```
+
+</TabPanel>
+
+<TabPanel id="server" label="Server">
+
+In the server, you need to handle the redirect to the SSO provider's authentication endpoint. The `signInWithOAuth` method returns the endpoint URL, which you can redirect to.
+
+```js
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider,
+  options: {
+    redirectTo: '/auth/callback',
+  },
+})
+
+if (data.url) {
+  redirect(data.url) // use the redirect API for your server framework
+}
+```
+
+</TabPanel>
+
+</Tabs>

@@ -61,7 +61,7 @@ const BucketRow = ({
           >
             {bucket.name}
           </p>
-          {bucket.public && <Badge color="yellow">Public</Badge>}
+          {bucket.public && <Badge variant="warning">Public</Badge>}
         </div>
       </Link>
       {/* [JOSHEN TODO] need to change this */}
