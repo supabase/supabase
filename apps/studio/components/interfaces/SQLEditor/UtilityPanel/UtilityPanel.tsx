@@ -1,12 +1,12 @@
 import { useState } from 'react'
+
+import { useFlag } from 'hooks'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
+import { ChartConfig } from './ChartConfig'
 import ResultsDropdown from './ResultsDropdown'
 import UtilityActions from './UtilityActions'
 import UtilityTabResults from './UtilityTabResults'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-
-import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
-import { ChartConfig } from './ChartConfig'
-import { useFlag } from 'hooks'
 
 export type UtilityPanelProps = {
   id: string
@@ -38,7 +38,7 @@ const UtilityPanel = ({
   })
 
   return (
-    <Tabs_Shadcn_ defaultValue="results" className="w-full h-full">
+    <Tabs_Shadcn_ defaultValue="results" className="w-full h-full flex flex-col">
       <TabsList_Shadcn_ className="flex justify-between px-2">
         <div>
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
@@ -53,7 +53,7 @@ const UtilityPanel = ({
             </TabsTrigger_Shadcn_>
           )}
         </div>
-        <div className="flex gap-1 h-full">
+        <div className="flex gap-1 h-full items-center">
           {result && result.rows && <ResultsDropdown id={id} />}
           <UtilityActions
             id={id}
