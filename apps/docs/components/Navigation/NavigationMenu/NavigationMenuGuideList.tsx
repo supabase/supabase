@@ -10,8 +10,6 @@ const NavigationMenuGuideList = ({ id }: { id: string }) => {
   const url = getPathWithoutHash(path)
   const firstLevelRoute = url?.split('/')?.slice(0, 4)?.join('/')
 
-  console.log('url', url, 'firstLevelRoute', firstLevelRoute)
-
   const menu = NavItems[id]
 
   return (
