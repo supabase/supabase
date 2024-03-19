@@ -14,9 +14,9 @@ import {
   IconGrid,
   Modal,
   ScrollArea,
+  Sheet,
   SheetContent,
   SheetFooter,
-  Sheet,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
@@ -301,6 +301,7 @@ export const AIPolicyEditorPanel = memo(function ({
             'p-0 flex flex-row gap-0',
             assistantVisible ? '!min-w-[1200px]' : '!min-w-[600px]'
           )}
+          showClose={false}
         >
           <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
             <AIPolicyHeader
