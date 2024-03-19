@@ -45,31 +45,43 @@ PUBLIC_SUPABASE_ANON_KEY="YOUR_SUPABASE_KEY"
 
 Optionally, add `src/styles.css` with the [CSS from the example](https://raw.githubusercontent.com/supabase/supabase/master/examples/user-management/sveltekit-user-management/src/styles.css).
 
-### Supabase Auth Helpers
+### Creating a Supabase client for SSR:
 
-SvelteKit is a highly versatile framework offering pre-rendering at build time (SSG), server-side rendering at request time (SSR), API routes, and more.
+The ssr package configures Supabase to use Cookies, which is required for server-side languages and frameworks.
 
-It can be challenging to authenticate your users in all these different environments, that's why we've created the Supabase Auth Helpers to make user management and data fetching within SvelteKit as easy as possible.
-
-Install the auth helpers for SvelteKit:
+Install the Supabase packages:
 
 ```bash
-npm install @supabase/auth-helpers-sveltekit @supabase/supabase-js
+npm install @supabase/ssr @supabase/supabase-js
 ```
+
+Creating a Supabase client with the ssr package automatically configures it to use Cookies. This means your user's session is available throughout the entire SvelteKit stack - page, layout, server, hooks.
 
 Add the code below to your `src/hooks.server.ts` to initialize the client on the server:
 
 ```ts src/hooks.server.ts
 // src/hooks.server.ts
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
-import { createSupabaseServerClient } from '@supabase/auth-helpers-sveltekit'
+import { createServerClient } from '@supabase/ssr'
 import type { Handle } from '@sveltejs/kit'
 
 export const handle: Handle = async ({ event, resolve }) => {
-  event.locals.supabase = createSupabaseServerClient({
-    supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
-    event,
+  event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+    cookies: {
+      get: (key) => event.cookies.get(key),
+      /**
+       * Note: You have to add the `path` variable to the
+       * set and remove method due to sveltekit's cookie API
+       * requiring this to be set, setting the path to `/`
+       * will replicate previous/standard behaviour (https://kit.svelte.dev/docs/types#public-types-cookies)
+       */
+      set: (key, value, options) => {
+        event.cookies.set(key, value, { ...options, path: '/' })
+      },
+      remove: (key, options) => {
+        event.cookies.delete(key, { ...options, path: '/' })
+      },
+    },
   })
 
   /**
@@ -136,17 +148,26 @@ Create a new `src/routes/+layout.ts` file to handle the session and the supabase
 ```ts src/routes/+layout.ts
 // src/routes/+layout.ts
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
-import { createSupabaseLoadClient } from '@supabase/auth-helpers-sveltekit'
 import type { LayoutLoad } from './$types'
+import { createBrowserClient, isBrowser, parse } from '@supabase/ssr'
 
 export const load: LayoutLoad = async ({ fetch, data, depends }) => {
   depends('supabase:auth')
 
-  const supabase = createSupabaseLoadClient({
-    supabaseUrl: PUBLIC_SUPABASE_URL,
-    supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
-    event: { fetch },
-    serverSession: data.session,
+  const supabase = createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+    global: {
+      fetch,
+    },
+    cookies: {
+      get(key) {
+        if (!isBrowser()) {
+          return JSON.stringify(data.session)
+        }
+
+        const cookie = parse(document.cookie)
+        return cookie[key]
+      },
+    },
   })
 
   const {
