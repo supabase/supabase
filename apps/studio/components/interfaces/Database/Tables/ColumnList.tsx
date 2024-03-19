@@ -20,7 +20,6 @@ import {
 } from 'ui'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -32,14 +31,12 @@ import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 
 interface ColumnListProps {
-  // table: PostgresTable
   onAddColumn: () => void
   onEditColumn: (column: any) => void
   onDeleteColumn: (column: any) => void
 }
 
 const ColumnList = ({
-  // table,
   onAddColumn = noop,
   onEditColumn = noop,
   onDeleteColumn = noop,

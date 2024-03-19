@@ -33,7 +33,8 @@ const DatabaseTables: NextPageWithLayout = () => {
           </div>
         </ScaffoldSection>
       </ScaffoldContainer>
-      <DeleteConfirmationDialogs includeColumns selectedTable={selectedTableToEdit} />
+
+      <DeleteConfirmationDialogs selectedTable={selectedTableToEdit} />
       <SidePanelEditor includeColumns selectedTable={selectedTableToEdit} />
     </>
   )

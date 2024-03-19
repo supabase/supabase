@@ -20,13 +20,11 @@ import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export type DeleteConfirmationDialogsProps = {
   selectedTable?: TableLike
-  includeColumns?: boolean
   onAfterDeleteTable?: (tables: TableLike[]) => void
 }
 
 const DeleteConfirmationDialogs = ({
   selectedTable,
-  includeColumns = false,
   onAfterDeleteTable = noop,
 }: DeleteConfirmationDialogsProps) => {
   const { project } = useProjectContext()

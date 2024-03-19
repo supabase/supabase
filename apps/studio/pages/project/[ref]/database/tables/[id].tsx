@@ -29,7 +29,7 @@ const DatabaseTables: NextPageWithLayout = () => {
         </ScaffoldSection>
       </ScaffoldContainer>
 
-      <DeleteConfirmationDialogs includeColumns selectedTable={selectedTable} />
+      <DeleteConfirmationDialogs selectedTable={selectedTable} />
       <SidePanelEditor includeColumns selectedTable={selectedTable as PostgresTable} />
     </>
   )
