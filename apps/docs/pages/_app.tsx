@@ -8,6 +8,7 @@ import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
 import { QueryClientProvider, useQueryClient } from '@tanstack/react-query'
 import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
+import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState, type PropsWithChildren } from 'react'
 import { PortalToast, TabsProvider } from 'ui'
@@ -217,6 +218,9 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     <ShortcutPreviewBuild>
       <QueryClientProvider client={queryClient}>
         <Favicons />
+        <Head>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        </Head>
         <AuthContainer>
           <SignOutHandler>
             <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
