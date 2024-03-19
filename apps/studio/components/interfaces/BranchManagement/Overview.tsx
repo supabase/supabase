@@ -16,6 +16,7 @@ interface OverviewProps {
   onViewAllBranches: () => void
   onSelectCreateBranch: () => void
   onSelectDeleteBranch: (branch: Branch) => void
+  onSelectPersistentMode: (branch: Branch) => void
   generateCreatePullRequestURL: (branchName?: string) => string
 }
 
@@ -28,6 +29,7 @@ const Overview = ({
   onViewAllBranches,
   onSelectCreateBranch,
   onSelectDeleteBranch,
+  onSelectPersistentMode,
   generateCreatePullRequestURL,
 }: OverviewProps) => {
   return (
@@ -35,7 +37,13 @@ const Overview = ({
       <BranchManagementSection header="Production branch">
         {isLoading && <BranchRowLoader />}
         {isSuccess && mainBranch !== undefined && (
-          <BranchRow isMain branch={mainBranch} repo={repo} onSelectDeleteBranch={noop} />
+          <BranchRow
+            isMain
+            branch={mainBranch}
+            repo={repo}
+            onSelectDeleteBranch={noop}
+            onSelectPersistentMode={noop}
+          />
         )}
       </BranchManagementSection>
 
@@ -68,6 +76,7 @@ const Overview = ({
                 branch={branch}
                 generateCreatePullRequestURL={generateCreatePullRequestURL}
                 onSelectDeleteBranch={() => onSelectDeleteBranch(branch)}
+                onSelectPersistentMode={() => onSelectPersistentMode(branch)}
               />
             )
           })}

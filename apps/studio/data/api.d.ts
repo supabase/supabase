@@ -4565,6 +4565,7 @@ export interface components {
       branch_name?: string
       git_branch?: string
       reset_on_push?: boolean
+      persistent?: boolean
     }
     BranchResponse: {
       id: string
@@ -4575,6 +4576,7 @@ export interface components {
       git_branch?: string
       pr_number?: number
       reset_on_push: boolean
+      persistent: boolean
       /** @enum {string} */
       status: 'CREATING_PROJECT' | 'RUNNING_MIGRATIONS' | 'MIGRATIONS_PASSED' | 'MIGRATIONS_FAILED'
       created_at: string

@@ -16,6 +16,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   IconArrowRight,
+  IconClock,
   IconExternalLink,
   IconMoreVertical,
   IconShield,
@@ -77,6 +78,7 @@ interface BranchRowProps {
   isMain?: boolean
   generateCreatePullRequestURL?: (branchName?: string) => string
   onSelectDeleteBranch: () => void
+  onSelectPersistentMode: () => void
 }
 
 export const BranchRow = ({
@@ -85,6 +87,7 @@ export const BranchRow = ({
   repo,
   generateCreatePullRequestURL,
   onSelectDeleteBranch,
+  onSelectPersistentMode,
 }: BranchRowProps) => {
   const { ref: projectRef } = useParams()
   const isActive = projectRef === branch?.project_ref
@@ -185,6 +188,8 @@ export const BranchRow = ({
           </div>
         ) : (
           <div className="flex items-center gap-x-2">
+            <p className="text-lg text-bold">{branch.persistent ? '∞' : '⏵'}</p>
+
             <Button asChild type="default" iconRight={<IconExternalLink />}>
               <Link
                 passHref
@@ -204,6 +209,10 @@ export const BranchRow = ({
                 <Button type="text" icon={<IconMoreVertical />} className="px-1" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="p-0 w-56" side="bottom" align="end">
+                <DropdownMenuItem className="gap-x-2" onClick={() => onSelectPersistentMode?.()}>
+                  <IconClock size="tiny" />
+                  <p>{branch.persistent ? 'Change to ephemeral' : 'Change to persistent'}</p>
+                </DropdownMenuItem>
                 <DropdownMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectDeleteBranch?.()}
