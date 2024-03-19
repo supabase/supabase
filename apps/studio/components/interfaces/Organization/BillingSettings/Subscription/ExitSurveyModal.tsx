@@ -1,15 +1,16 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { includes, without } from 'lodash'
 import { useReducer, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import { useSendDowngradeFeedbackMutation } from 'data/feedback/exit-survey-send'
-import type { OrgSubscription } from 'data/subscriptions/types'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
-import { useFlag, useStore } from 'hooks'
+import type { OrgSubscription } from 'data/subscriptions/types'
+import { useFlag } from 'hooks'
 import { Alert, Button, Input, Modal } from 'ui'
-import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 import { CANCELLATION_REASONS } from '../BillingSettings.constants'
+import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 
 export interface ExitSurveyModalProps {
   visible: boolean
@@ -19,7 +20,6 @@ export interface ExitSurveyModalProps {
 
 // [Joshen] For context - Exit survey is only when going to free plan from a paid plan
 const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProps) => {
-  const { ui } = useStore()
   const { slug } = useParams()
   const captchaRef = useRef<HCaptcha>(null)
 
@@ -33,10 +33,7 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
   const { mutateAsync: updateOrgSubscription, isLoading: isUpdating } =
     useOrgSubscriptionUpdateMutation({
       onError: (error) => {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to downgrade project: ${error.message}`,
-        })
+        toast.error(`Failed to downgrade project: ${error.message}`)
       },
     })
   const isSubmitting = isUpdating || isSubmittingFeedback
@@ -62,10 +59,7 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
 
   const onSubmit = async () => {
     if (selectedReasons.length === 0) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'Please select at least one reason for canceling your subscription',
-      })
+      return toast.error('Please select at least one reason for canceling your subscription')
     }
 
     let token = captchaToken
@@ -98,13 +92,13 @@ const ExitSurveyModal = ({ visible, subscription, onClose }: ExitSurveyModalProp
     } finally {
     }
 
-    ui.setNotification({
-      category: 'success',
-      duration: hasComputeInstance ? 8000 : 4000,
-      message: hasComputeInstance
+    toast.success(
+      hasComputeInstance
         ? 'Your organization has been downgraded and your projects are currently restarting to update their compute instances'
         : 'Successfully downgraded organization to the free plan',
-    })
+      { duration: hasComputeInstance ? 8000 : 4000 }
+    )
+
     onClose(true)
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
   }

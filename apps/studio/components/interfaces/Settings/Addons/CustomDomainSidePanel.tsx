@@ -1,14 +1,17 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import clsx from 'clsx'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import type { AddonVariantId } from 'data/subscriptions/types'
+import { useCheckPermissions, useFlag, useSelectedOrganization } from 'hooks'
+import { formatCurrency } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import {
@@ -22,14 +25,10 @@ import {
   IconExternalLink,
   Radio,
   SidePanel,
+  cn,
 } from 'ui'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import type { AddonVariantId } from 'data/subscriptions/types'
-import { formatCurrency } from 'lib/helpers'
-import { useFlag } from 'hooks'
 
 const CustomDomainSidePanel = () => {
-  const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
@@ -56,34 +55,20 @@ const CustomDomainSidePanel = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully enabled custom domain`,
-      })
+      toast.success(`Successfully enabled custom domain`)
       onClose()
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to enable custom domain: ${error.message}`,
-      })
+      toast.error(`Unable to enable custom domain: ${error.message}`)
     },
   })
   const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully disabled custom domain`,
-      })
+      toast.success(`Successfully disabled custom domain`)
       onClose()
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to disable custom domain: ${error.message}`,
-      })
+      toast.error(`Unable to disable custom domain: ${error.message}`)
     },
   })
   const isSubmitting = isUpdating || isRemoving
@@ -194,7 +179,7 @@ const CustomDomainSidePanel = () => {
             page after enabling the add-on.
           </p>
 
-          <div className={clsx('!mt-8 pb-4', isFreePlan && 'opacity-75')}>
+          <div className={cn('!mt-8 pb-4', isFreePlan && 'opacity-75')}>
             <Radio.Group
               type="large-cards"
               size="tiny"

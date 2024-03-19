@@ -14,7 +14,7 @@ import {
 } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
-import { CriticalIcon, WarningIcon } from 'components/ui/Icons'
+import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import InfiniteList from 'components/ui/InfiniteList'
 import ShimmeringLoader, { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useNotificationsArchiveAllMutation } from 'data/notifications/notifications-v2-archive-all-mutation'
@@ -206,7 +206,10 @@ const NotificationsPopoverV2 = () => {
                       }
                     },
                     getProject: (ref: string) => projects?.find((project) => project.ref === ref)!,
-                    getOrganization: (id: number) => organizations?.find((org) => org.id === id)!,
+                    getOrganizationById: (id: number) =>
+                      organizations?.find((org) => org.id === id)!,
+                    getOrganizationBySlug: (slug: string) =>
+                      organizations?.find((org) => org.slug === slug)!,
                     onUpdateNotificationStatus: (id: string, status: 'archived' | 'seen') => {
                       updateNotifications({ ids: [id], status })
                     },

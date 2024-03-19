@@ -260,3 +260,60 @@ GET https://[REF].supabase.co/rest/v1/teams?select=id,team_name,users(id,name)
 
 </TabPanel>
 </Tabs>
+
+## Specifying the `ON` clause for joins with multiple foreign keys
+
+For example, if you have a project that tracks when employees check in and out of work shifts:
+
+```sql
+-- Employees
+create table users (
+  "id" serial primary key,
+  "name" text
+);
+
+-- Badge scans
+create table scans (
+  "id" serial primary key,
+  "user_id" int references users,
+  "badge_scan_time" timestamp
+);
+
+-- Work shifts
+create table shifts (
+  "id" serial primary key,
+  "user_id" int references users,
+  "scan_id_start" int references scans, -- clocking in
+  "scan_id_end" int references scans, -- clocking out
+  "attendance_status" text
+);
+```
+
+In this case, you need to explicitly define the join because the joining column on `shifts` is ambiguous.
+
+To fetch all the `shifts` with `scan_id_start` related to a specific `scan`, use the following syntax:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.from('shifts').select(
+  `
+    *,
+    scans:scan_id_start (
+      id,
+      user_id,
+      badge_scan_time
+    )
+  `
+)
+```
+
+</TabPanel>
+</Tabs>

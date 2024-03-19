@@ -22,11 +22,6 @@ export const integrationKeys = {
   githubAuthorization: () => ['github-authorization'] as const,
   githubRepositoriesList: () => ['github-repositories'] as const,
   githubBranchesList: (connectionId: number | undefined) => ['github-branches', connectionId],
-  githubPullRequestsList: (connectionId: number | undefined, prNumbers: number[] | undefined) => [
-    'github-pull-requests',
-    connectionId,
-    { prNumbers },
-  ],
   githubConnectionsList: (organizationId: number | undefined) =>
     ['organizations', organizationId, 'github-connections'] as const,
 }

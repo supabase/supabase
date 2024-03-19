@@ -1,3 +1,4 @@
+import { PostgresFunction } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 
@@ -10,9 +11,9 @@ import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import type { NextPageWithLayout } from 'types'
 
 const FunctionsPage: NextPageWithLayout = () => {
-  const [selectedFunction, setSelectedFunction] = useState<any>()
-  const [showCreateFunctionForm, setShowCreateFunctionForm] = useState<boolean>(false)
-  const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState<boolean>(false)
+  const [selectedFunction, setSelectedFunction] = useState<PostgresFunction | undefined>()
+  const [showCreateFunctionForm, setShowCreateFunctionForm] = useState(false)
+  const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState(false)
 
   const canReadFunctions = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
   const isPermissionsLoaded = usePermissionsLoaded()

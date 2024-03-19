@@ -1,8 +1,8 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import clsx from 'clsx'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
@@ -10,14 +10,13 @@ import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import type { AddonVariantId } from 'data/subscriptions/types'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { formatCurrency } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
+import { Alert, Button, IconExternalLink, Radio, SidePanel, cn } from 'ui'
 
 const IPv4SidePanel = () => {
-  const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
@@ -40,34 +39,20 @@ const IPv4SidePanel = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully enabled IPv4`,
-      })
+      toast.success(`Successfully enabled IPv4`)
       onClose()
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to enable IPv4: ${error.message}`,
-      })
+      toast.error(`Unable to enable IPv4: ${error.message}`)
     },
   })
   const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully disabled IPv4.`,
-      })
+      toast.success(`Successfully disabled IPv4.`)
       onClose()
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to disable IPv4: ${error.message}`,
-      })
+      toast.error(`Unable to disable IPv4: ${error.message}`)
     },
   })
   const isSubmitting = isUpdating || isRemoving
@@ -159,7 +144,7 @@ const IPv4SidePanel = () => {
             .
           </p>
 
-          <div className={clsx('!mt-8 pb-4', isFreePlan && 'opacity-75')}>
+          <div className={cn('!mt-8 pb-4', isFreePlan && 'opacity-75')}>
             <Radio.Group
               type="large-cards"
               size="tiny"

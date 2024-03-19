@@ -1,8 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
+import { capitalize } from 'lodash'
 import { Fragment, useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -33,7 +35,7 @@ import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
@@ -61,21 +63,23 @@ const FormSchema = z.object({
 })
 
 export const ConnectionPooling = () => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const snap = useDatabaseSettingsStateSnapshot()
 
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const computeInstance = addons?.selected_addons.find((addon) => addon.type === 'compute_instance')
-  const defaultPoolSize =
-    POOLING_OPTIMIZATIONS?.[
-      computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS
-    ]?.poolSize ?? 15 // [TODO] 15 is for micro, need to change to 10 for nano
-  const defaultMaxClientConn =
-    POOLING_OPTIMIZATIONS?.[
-      computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS
-    ]?.maxClientConn ?? 200
+  const poolingOptimizations =
+    POOLING_OPTIMIZATIONS[
+      (computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS) ??
+      project?.infra_compute_size === 'nano'
+        ? 'ci_nano'
+        : 'ci_micro'
+    ]
+  const defaultPoolSize = poolingOptimizations.poolSize ?? 15
+  const defaultMaxClientConn = poolingOptimizations.maxClientConn ?? 200
+  const computeSize =
+    computeInstance?.variant.name ?? capitalize(project?.infra_compute_size) ?? 'Micro'
 
   const {
     data: poolingInfo,
@@ -122,8 +126,7 @@ export const ConnectionPooling = () => {
             max_client_conn: poolingConfiguration?.max_client_conn,
           })
         }
-
-        ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+        toast.success('Successfully saved settings')
       },
     })
 
@@ -269,7 +272,7 @@ export const ConnectionPooling = () => {
                             </AlertTitle_Shadcn_>
                             <AlertDescription_Shadcn_>
                               Session mode can be used concurrently with transaction mode by using
-                              5432 for session and 6543 for session. However, by configuring the
+                              5432 for session and 6543 for transaction. However, by configuring the
                               pooler mode to session here, you will not be able to use transaction
                               mode at the same time.
                             </AlertDescription_Shadcn_>
@@ -317,7 +320,7 @@ export const ConnectionPooling = () => {
                       <FormDescription_Shadcn_ className="col-start-5 col-span-8">
                         The maximum number of connections made to the underlying Postgres cluster,
                         per user+db combination. Pool size has a default of {defaultPoolSize} based
-                        on your compute size of {computeInstance?.variant.name ?? 'Micro'}.
+                        on your compute size of {computeSize}.
                       </FormDescription_Shadcn_>
                       <FormDescription_Shadcn_ className="col-start-5 col-span-8">
                         Please refer to our{' '}
@@ -354,8 +357,8 @@ export const ConnectionPooling = () => {
                       </FormControl_Shadcn_>
                       <FormDescription_Shadcn_ className="col-start-5 col-span-8">
                         The maximum number of concurrent client connections allowed. This value is
-                        fixed at {defaultMaxClientConn} based on your compute size of{' '}
-                        {computeInstance?.variant.name ?? 'Micro'} and cannot be changed.
+                        fixed at {defaultMaxClientConn} based on your compute size of {computeSize}{' '}
+                        and cannot be changed.
                       </FormDescription_Shadcn_>
                       <FormDescription_Shadcn_ className="col-start-5 col-span-8">
                         Please refer to our{' '}

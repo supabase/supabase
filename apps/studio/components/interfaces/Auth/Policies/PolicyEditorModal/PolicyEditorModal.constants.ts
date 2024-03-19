@@ -94,14 +94,12 @@ for delete using (
     statement: `
 create policy "Enable insert for users based on user_id"
 on ${schema}.${table}
-for insert using (
-  auth.uid() = user_id
-) with check (
+for insert with check (
   auth.uid() = user_id
 );`.trim(),
     name: 'Enable insert for users based on user_id',
-    definition: 'auth.uid() = user_id',
-    check: 'true',
+    definition: '',
+    check: 'auth.uid() = user_id',
     command: 'INSERT',
     roles: [],
   },

@@ -1,24 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
-
 import { useParams } from 'common'
-import {
-  ScaffoldSection,
-  ScaffoldSectionContent,
-  ScaffoldSectionDetail,
-} from 'components/layouts/Scaffold'
-import AlertError from 'components/ui/AlertError'
-import { FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
-import NoPermission from 'components/ui/NoPermission'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { organizationKeys } from 'data/organizations/keys'
-import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useStore } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-import { getURL } from 'lib/helpers'
 import Link from 'next/link'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
 import {
   Alert,
   Badge,
@@ -32,12 +17,27 @@ import {
   IconMoreHorizontal,
   IconPlus,
 } from 'ui'
+
+import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
+import {
+  ScaffoldSection,
+  ScaffoldSectionContent,
+  ScaffoldSectionDetail,
+} from 'components/layouts/Scaffold'
+import AlertError from 'components/ui/AlertError'
+import { FormPanel, FormSection, FormSectionContent } from 'components/ui/Forms'
+import NoPermission from 'components/ui/NoPermission'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { organizationKeys } from 'data/organizations/keys'
+import { useOrganizationPaymentMethodsQuery } from 'data/organizations/organization-payment-methods-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
+import { getURL } from 'lib/helpers'
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
 import DeletePaymentMethodModal from './DeletePaymentMethodModal'
-import AddNewPaymentMethodModal from 'components/interfaces/Billing/Payment/AddNewPaymentMethodModal'
 
 const PaymentMethods = () => {
-  const { ui } = useStore()
   const { slug } = useParams()
   const queryClient = useQueryClient()
   const [selectedMethodForUse, setSelectedMethodForUse] = useState<any>()
@@ -224,10 +224,7 @@ const PaymentMethods = () => {
         onCancel={() => setShowAddPaymentMethodModal(false)}
         onConfirm={async () => {
           setShowAddPaymentMethodModal(false)
-          ui.setNotification({
-            category: 'success',
-            message: 'Successfully added new payment method',
-          })
+          toast.success('Successfully added new payment method')
           await queryClient.invalidateQueries(organizationKeys.paymentMethods(slug))
         }}
       />

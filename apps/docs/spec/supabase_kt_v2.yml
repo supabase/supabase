@@ -29,11 +29,12 @@ functions:
       ### OAuth and OTP link verification
 
       [supabase-kt](https://github.com/supabase-community/supabase-kt) provides several platform implementations for OAuth and OTP link verification. \
-      **On JVM**, it uses a HTTP Callback Server to receive the session data from a successful OAuth login.
+      **On Desktop platforms (JVM, MacOS\*, Linux)**, it uses a HTTP Callback Server to receive the session data from a successful OAuth login. The success page can be customized via `AuthConfig#httpCallbackConfig`
+      \* If no deeplinks are being used.
 
       *Note: OTP link verification such as sign ups are not supported on JVM. You may have to send a verification token rather than a url in your email. To send the token, rather than a redirect url, change `{{ .ConfirmationURL }}` in your sign up email to `{{ .Token }}`*
 
-      **On Android, iOS & MacOS**, OAuth and OTP verification use deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you can use Native Google Auth or a WebView for OAuth. Refer to the [demo](https://github.com/supabase-community/supabase-kt/tree/master/demos/android-login) to learn more.
+      **On Android, iOS & MacOS**, OAuth and OTP verification use deeplinks. Refer to the guide below on how to setup deeplinks. Alternatively you can use Native Google Auth. Refer to the [Supabase Auth documentation](/docs/guides/auth/social-login/auth-google?platform=android) to learn more.
       **On JS**, it uses the website origin as the callback url. Session importing gets handled automatically.
       **Windows, tvOS, watchOS & Linux** currently have no default implementation. Feel free to create a PR.
 
@@ -61,6 +62,7 @@ functions:
           ```
       4. **Call platform specific function on startup** \
       On Android: `supabase.handleDeeplinks(intent)` \
+      If you don't want a separate activity, just call this function at the top of your `onCreate` function in your MainActivity. \
       On iOS/MacOS: `supabase.handleDeeplinks(url)`
 
       Then you can log in using OAuth:
@@ -2585,12 +2587,12 @@ functions:
         description: |
           - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectUrl` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
           - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
-          - oAuthUrl() provides the URL which needs to be opened in a browser.
+          - getOAuthUrl() provides the URL which needs to be opened in a browser.
           - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs.
           - To see how you can use a custom in-app browser on Android, check our [demo](https://github.com/supabase-community/supabase-kt/tree/development/demos/android-login) on GitHub.
         code: |
           ```kotlin
-          val url = supabase.auth.oAuthUrl(Github, redirectUrl = "https://example.com")
+          val url = supabase.auth.getOAuthUrl(Github, redirectUrl = "https://example.com")
           ```
       - id: sign-in-with-scopes
         name: Create a custom url with scopes
@@ -2600,7 +2602,7 @@ functions:
           You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider. The list of scopes will be documented by the third-party provider you are using and specifying scopes will enable you to use the OAuth provider token to call additional APIs supported by the third-party provider to get more information.
         code: |
           ```kotlin
-          val url = supabase.auth.oAuthUrl(Github, redirectUrl = "https://example.com") {
+          val url = supabase.auth.getOAuthUrl(Github, redirectUrl = "https://example.com") {
               scopes.add("email")
           }
           ```
@@ -2944,19 +2946,37 @@ functions:
           ```kotlin
           supabase.auth.sessionStatus.collect {
               when(it) {
-                  is SessionStatus.Authenticated -> println(it.session.user)
+                  is SessionStatus.Authenticated -> {
+                      println("Received new authenticated session.")
+                      when(it.source) { //Check the source of the session
+                          SessionSource.External -> TODO()
+                          is SessionSource.Refresh -> TODO()
+                          is SessionSource.SignIn -> TODO()
+                          is SessionSource.SignUp -> TODO()
+                          SessionSource.Storage -> TODO()
+                          SessionSource.Unknown -> TODO()
+                          is SessionSource.UserChanged -> TODO()
+                          is SessionSource.UserIdentitiesChanged -> TODO()
+                      }
+                  }
                   SessionStatus.LoadingFromStorage -> println("Loading from storage")
                   SessionStatus.NetworkError -> println("Network error")
-                  SessionStatus.NotAuthenticated -> println("Not authenticated")
+                  is SessionStatus.NotAuthenticated -> {
+                      if(it.isSignOut) {
+                          println("User signed out")
+                      } else {
+                          println("User not signed in")
+                      }
+                  }
               }
           }
           ```
         description: |
           Types of statuses:
-          - `NotAuthenticated`,
+          - `NotAuthenticated(isSignOut)`,
           - `LoadingFromStorage`,
           - `NetworkError`,
-          - `Authenticated(session)`
+          - `Authenticated(session, source)`
   - id: reset-password-for-email
     title: 'Send a password reset request'
     notes: |

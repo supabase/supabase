@@ -1,6 +1,5 @@
 import { useMonaco } from '@monaco-editor/react'
 import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 
@@ -150,7 +149,7 @@ const SqlEditor: NextPageWithLayout = () => {
   }, [isPgInfoReady])
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 overflow-auto">
       <SQLEditor />
     </div>
   )
@@ -158,4 +157,4 @@ const SqlEditor: NextPageWithLayout = () => {
 
 SqlEditor.getLayout = (page) => <SQLEditorLayout title="SQL">{page}</SQLEditorLayout>
 
-export default observer(SqlEditor)
+export default SqlEditor

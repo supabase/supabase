@@ -1,8 +1,9 @@
+import toast from 'react-hot-toast'
+import { Modal } from 'ui'
+
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useFDWDeleteMutation } from 'data/fdw/fdw-delete-mutation'
 import type { FDW } from 'data/fdw/fdws-query'
-import { useStore } from 'hooks'
-import { Modal } from 'ui'
 import { WRAPPERS } from './Wrappers.constants'
 
 interface DeleteWrapperModalProps {
@@ -11,14 +12,10 @@ interface DeleteWrapperModalProps {
 }
 
 const DeleteWrapperModal = ({ selectedWrapper, onClose }: DeleteWrapperModalProps) => {
-  const { ui } = useStore()
   const { project } = useProjectContext()
   const { mutate: deleteFDW, isLoading: isDeleting } = useFDWDeleteMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully disabled ${selectedWrapper?.name} foreign data wrapper`,
-      })
+      toast.success(`Successfully disabled ${selectedWrapper?.name} foreign data wrapper`)
       onClose()
     },
   })

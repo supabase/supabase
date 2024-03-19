@@ -438,7 +438,7 @@ The Supabase CLI provides two options: [manual migrations](https://supabase.com/
 
             The Supabase integration detects the new migration and runs it on the remote Preview Branch. It can take up to 10 minutes for migrations to be applied. If you have a PR for your branch, errors are reflected in the GitHub check run status and in a PR comment.
 
-            If you need to reset your database to a clean state (that is, discard any changes that aren't reflected in the migration files), run `supabase db reset` locally. Then, delete the preview branch and recreate it.
+            If you need to reset your database to a clean state (that is, discard any changes that aren't reflected in the migration files), run `supabase db reset` locally. Then, delete the preview branch and recreate it by closing, and reopening your pull request.
 
      </StepHikeCompact.Details>
 
@@ -566,7 +566,7 @@ The new preview branch is reseeded from your `./supabase/seed.sql` file. Any add
 
 Your Preview Branches are seeded with sample data from the file `./supabase/seed.sql`.
 
-The database is only seeded once, when the preview branch is created. To rerun seeding, delete the preview branch and recreate it.
+The database is only seeded once, when the preview branch is created. To rerun seeding, delete the preview branch and recreate it by closing, and reopening your pull request.
 
 ## Troubleshooting
 
