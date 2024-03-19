@@ -4,13 +4,14 @@ import { useParams } from 'common'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import ReactMarkdown from 'react-markdown'
-import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from 'ui'
 
 import type { components } from 'data/api'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useCheckPermissions } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
+import { Alert, Button, Collapsible, Form, IconCheck, IconChevronUp, Input } from 'ui'
 import { ProviderCollapsibleClasses } from './AuthProvidersForm.constants'
 import type { Provider } from './AuthProvidersForm.types'
 import FormField from './FormField'
@@ -28,7 +29,11 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
   const doubleNegativeKeys = ['MAILER_AUTOCONFIRM', 'SMS_AUTOCONFIRM']
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
+  const { data: settings } = useProjectApiQuery({ projectRef })
+  const apiUrl = `${settings?.autoApiService.protocol}://${settings?.autoApiService.endpoint}`
+
   const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
+
   const generateInitialValues = () => {
     const initialValues: { [x: string]: string | boolean } = {}
 
@@ -176,7 +181,7 @@ const ProviderForm = ({ config, provider }: ProviderFormProps) => {
                         value={
                           customDomainData?.customDomain?.status === 'active'
                             ? `https://${customDomainData.customDomain?.hostname}/auth/v1/callback`
-                            : `https://${projectRef}.supabase.co/auth/v1/callback`
+                            : `${apiUrl}/auth/v1/callback`
                         }
                         descriptionText={
                           <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>

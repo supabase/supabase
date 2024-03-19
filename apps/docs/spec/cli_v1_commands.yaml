@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.148.6
+  version: 1.150.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -2323,6 +2323,10 @@ commands:
       - id: use-orioledb
         name: --use-orioledb
         description: Use OrioleDB storage engine for Postgres
+        default_value: 'false'
+      - id: with-intellij-settings
+        name: --with-intellij-settings
+        description: Generate IntelliJ IDEA settings for Deno.
         default_value: 'false'
       - id: with-vscode-settings
         name: --with-vscode-settings

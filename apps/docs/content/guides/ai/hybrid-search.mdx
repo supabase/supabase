@@ -95,25 +95,23 @@ as $$
 with full_text as (
   select
     id,
-    row_number() over() as rank_ix
+    -- Note: ts_rank_cd is not indexable but will only rank matches of the where clause
+    -- which shouldn't be too big
+    row_number() over(order by ts_rank_cd(fts, websearch_to_tsquery(query_text)) desc) as rank_ix
   from
     documents
   where
     fts @@ websearch_to_tsquery(query_text)
-  order by
-    -- Note: this is not indexable but will only rank matches of the where clause
-    -- which shouldn't be too big
-    ts_rank_cd(fts, websearch_to_tsquery(query_text)) desc
+  order by rank_ix
   limit least(match_count, 30) * 2
 ),
 semantic as (
   select
     id,
-    row_number() over () as rank_ix
+    row_number() over (order by doc_vector <#> query_embedding) as rank_ix
   from
     documents
-  order by
-    doc_vector <#> query_embedding
+  order by rank_ix
   limit least(match_count, 30) * 2
 )
 select

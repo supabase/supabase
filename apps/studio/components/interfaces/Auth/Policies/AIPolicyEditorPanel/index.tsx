@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useChat } from 'ai/react'
 import { useParams, useTelemetryProps } from 'common'
 import { isEqual, uniqBy } from 'lodash'
-import { FileDiff, Lock } from 'lucide-react'
+import { FileDiff } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
@@ -14,7 +14,6 @@ import {
   Button,
   Checkbox_Shadcn_,
   Form_Shadcn_,
-  IconLock,
   Modal,
   ScrollArea,
   Sheet,
@@ -36,6 +35,7 @@ import {
   IStandaloneDiffEditor,
 } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
+import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
@@ -50,18 +50,16 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AIPolicyChat } from './AIPolicyChat'
 import {
   MessageWithDebug,
-  generatePolicyDefinition,
   generateCreatePolicyQuery,
+  generatePolicyDefinition,
   generateThreadMessage,
 } from './AIPolicyEditorPanel.utils'
 import { AIPolicyHeader } from './AIPolicyHeader'
-import PolicyDetails from './PolicyDetails'
+import { LockedCreateQuerySection, LockedRenameQuerySection } from './LockedQuerySection'
 import { PolicyDetailsV2 } from './PolicyDetailsV2'
 import { PolicyTemplates } from './PolicyTemplates'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
-import { LockedCreateQuerySection, LockedRenameQuerySection } from './LockedQuerySection'
-import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
