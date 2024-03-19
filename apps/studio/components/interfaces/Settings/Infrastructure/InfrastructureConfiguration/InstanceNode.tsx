@@ -195,12 +195,12 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                 Replica {id.length > 0 && `(ID: ${formatDatabaseID(id)})`}
               </p>
               {status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
-                <Badge color="green">Healthy</Badge>
+                <Badge variant="brand">Healthy</Badge>
               ) : status === REPLICA_STATUS.INIT_READ_REPLICA ? (
-                <Badge color="slate">Initializing</Badge>
+                <Badge>Initializing</Badge>
               ) : status === REPLICA_STATUS.INIT_READ_REPLICA_FAILED ? (
                 <>
-                  <Badge color="red">Init failed</Badge>
+                  <Badge variant="destructive">Init failed</Badge>
                   <Tooltip_Shadcn_>
                     <TooltipTrigger_Shadcn_>
                       <IconHelpCircle />
@@ -211,11 +211,11 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                   </Tooltip_Shadcn_>
                 </>
               ) : status === REPLICA_STATUS.COMING_UP ? (
-                <Badge color="slate">Coming up</Badge>
+                <Badge>Coming up</Badge>
               ) : status === REPLICA_STATUS.RESTORING ? (
-                <Badge color="slate">Restoring</Badge>
+                <Badge>Restoring</Badge>
               ) : (
-                <Badge color="amber">Unhealthy</Badge>
+                <Badge variant="warning">Unhealthy</Badge>
               )}
             </div>
             <div className="my-0.5">

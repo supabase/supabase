@@ -126,9 +126,7 @@ const Footer = (props: Props) => {
                             {link.text}
                             {!link.url && !Component && (
                               <div className="ml-2 inline text-xs xl:ml-0 xl:block 2xl:ml-2 2xl:inline">
-                                <Badge color="scale" size="small">
-                                  Coming soon
-                                </Badge>
+                                <Badge size="small">Coming soon</Badge>
                               </div>
                             )}
                           </div>

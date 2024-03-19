@@ -174,9 +174,9 @@ export const UsePoolerCheckbox = ({
                 )}
               </div>
               <div className="flex items-center gap-x-1">
-                {isSuccess && checked && <Badge color="scale">Supavisor</Badge>}
+                {isSuccess && checked && <Badge>Supavisor</Badge>}
                 {isSuccessSettings && (
-                  <Badge color="scale">
+                  <Badge>
                     {checked
                       ? 'Resolves to IPv4'
                       : resolvesToIpV6
@@ -184,7 +184,9 @@ export const UsePoolerCheckbox = ({
                         : 'Will resolve to IPv6'}
                   </Badge>
                 )}
-                {pgBouncerStatus?.active && <Badge color="amber">PgBouncer pending removal</Badge>}
+                {pgBouncerStatus?.active && (
+                  <Badge variant="warning">PgBouncer pending removal</Badge>
+                )}
               </div>
             </div>
           </div>
