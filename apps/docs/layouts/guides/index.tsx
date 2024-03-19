@@ -93,8 +93,18 @@ const Layout: FC<Props> = (props) => {
         <title>{`${props.meta?.title} | Supabase Docs`}</title>
         <meta name="description" content={props.meta?.description} />
         <meta property="og:image" content={ogImageUrl} />
-        <meta name="twitter:image" content={ogImageUrl} />
+        <meta property="og:image:width" content={'800'} />
+        <meta property="og:image:height" content={'600'} />
+        <meta property="og:image:alt" content={props.meta?.title} />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@supabase" />
+        <meta name="twitter:creator" content="@supabase" />
+        <meta property="og:title" content={`${props.meta?.title} | Supabase Docs`} />
+        <meta property="og:description" content={props.meta?.description} />
+        <meta property="og:url" content={'https://supabase.com/docs'} />
+        <meta property="og:type" content={'website'} />
+        <meta property="og:site_name" content={'Supabase'} />
       </Head>
       <NextSeo
         canonical={props.meta?.canonical ?? `https://supabase.com/docs${asPath}`}
