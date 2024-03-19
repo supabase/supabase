@@ -153,7 +153,7 @@ This is traditionally done by setting cookies. Here's an example you can add to 
 
 ```typescript
 supabase.auth.onAuthStateChange((event, session) => {
-  if (event === 'SIGNED_OUT' || event === 'USER_DELETED') {
+  if (event === 'SIGNED_OUT') {
     // delete cookies on sign out
     const expires = new Date(0).toUTCString()
     document.cookie = `my-access-token=; path=/; expires=${expires}; SameSite=Lax; secure`

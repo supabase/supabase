@@ -27,7 +27,11 @@ All API requests must be authenticated and made over HTTPS.
 
 ## Rate limits
 
-The API is currently subject to our fair-use policy. In the future, are likely to introduce rate limits.
+The rate limit for Management API is 60 requests per one minute per user, and applies cumulatively across all requests made with your personal access tokens.
+
+If you exceed this limit, all Management API calls for the next minute will be blocked, resulting in a HTTP 429 response.
+
+The Management API is subject to our fair-use policy.
 All resources created via the API are subject to the pricing detailed on our [Pricing](https://supabase.com/pricing) pages.
 
 ## Additional links

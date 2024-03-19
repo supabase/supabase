@@ -178,12 +178,14 @@ function Feedback() {
           )}
         >
           <span className="text-foreground-light">Thanks for your feedback!</span>
+          {/**
           <FeedbackButton
             ref={feedbackButtonRef}
             onClick={() => setModalOpen(true)}
             isYes={isYes}
             visible={!unanswered}
           />
+          */}
         </div>
       </div>
       <FeedbackModal
