@@ -511,13 +511,18 @@ functions:
     $ref: '@supabase/auth-js.GoTrueClient.signInAnonymously'
     notes: |
       - Returns an anonymous user
+      - It is recommended to set up captcha for anonymous sign-ins to prevent abuse. You can pass in the captcha token in the `options` param.
     examples:
       - id: sign-in-anonymously
         name: Create an anonymous user
         isSpotlight: true
         code: |
           ```js
-          const { data, error } = await supabase.auth.signInAnonymously();
+          const { data, error } = await supabase.auth.signInAnonymously({
+            options: {
+              captchaToken
+            }
+          });
           ```
       - id: sign-in-anonymously-with-user-metadata
         name: Create an anonymous user with custom user metadata
