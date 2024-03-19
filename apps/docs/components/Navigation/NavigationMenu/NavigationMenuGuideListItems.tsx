@@ -1,10 +1,11 @@
+import * as Accordion from '@radix-ui/react-accordion'
+import { ChevronLeft } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect, useRef } from 'react'
-import { IconChevronLeft } from '~/../../packages/ui'
-import * as Accordion from '@radix-ui/react-accordion'
+
 import HomeMenuIconPicker from './HomeMenuIconPicker'
 
 const HeaderLink = React.memo(function HeaderLink(props: {
@@ -151,7 +152,7 @@ const Content = (props) => {
       >
         <div className="relative w-2">
           <div className="transition-all ease-out ml-0 group-hover:-ml-1">
-            <IconChevronLeft size={10} strokeWidth={3} />
+            <ChevronLeft size={10} strokeWidth={3} />
           </div>
         </div>
         <span>Back to Home</span>
