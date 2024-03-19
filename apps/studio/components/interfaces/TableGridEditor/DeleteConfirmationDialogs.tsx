@@ -19,14 +19,12 @@ import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 export type DeleteConfirmationDialogsProps = {
-  projectRef?: string
   selectedTable?: TableLike
   includeColumns?: boolean
   onAfterDeleteTable?: (tables: TableLike[]) => void
 }
 
 const DeleteConfirmationDialogs = ({
-  projectRef,
   selectedTable,
   includeColumns = false,
   onAfterDeleteTable = noop,
@@ -152,6 +150,7 @@ const DeleteConfirmationDialogs = ({
 
   const onConfirmDeleteColumn = async () => {
     if (!(snap.confirmationDialog?.type === 'column')) return
+    if (project === undefined) return
 
     const selectedColumnToDelete = snap.confirmationDialog.column
     if (selectedColumnToDelete === undefined) return
@@ -159,7 +158,7 @@ const DeleteConfirmationDialogs = ({
     deleteColumn({
       id: selectedColumnToDelete.id,
       cascade: isDeleteWithCascade,
-      projectRef: projectRef!,
+      projectRef: project?.ref,
       connectionString: project?.connectionString,
       table: selectedTable,
     })
