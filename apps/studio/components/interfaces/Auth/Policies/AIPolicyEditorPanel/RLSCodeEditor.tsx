@@ -26,7 +26,7 @@ interface RLSCodeEditorProps {
   onChange?: () => void
 
   editorRef: MutableRefObject<editor.IStandaloneCodeEditor | null>
-  monacoRef: MutableRefObject<Monaco>
+  monacoRef?: MutableRefObject<Monaco>
 }
 
 const RLSCodeEditor = ({
@@ -46,23 +46,28 @@ const RLSCodeEditor = ({
 }: RLSCodeEditorProps) => {
   const hasValue = useRef<any>()
 
+  const options: editor.IStandaloneEditorConstructionOptions = {
+    tabSize: 2,
+    fontSize: 13,
+    readOnly,
+    minimap: { enabled: false },
+    wordWrap: 'on' as const,
+    contextmenu: true,
+    lineNumbers:
+      lineNumberStart !== undefined ? (num) => (num + lineNumberStart).toString() : undefined,
+    glyphMargin: undefined,
+    lineNumbersMinChars: 4,
+    folding: undefined,
+    scrollBeyondLastLine: false,
+  }
+
   const onMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
-    monacoRef.current = monaco
-
-    // const constrainedInstance = constrainedEditor(monaco)
-    // const model = editor.getModel()
-    // constrainedInstance.addRestrictionsTo(model, [
-    //   {
-    //     range: [6, 1, 7, 1],
-    //     allowMultiline: true,
-    //     label: 'expression',
-    //   },
-    // ])
+    if (monacoRef !== undefined) monacoRef.current = monaco
 
     hasValue.current = editor.createContextKey('hasValue', false)
-    // const placeholderEl = document.querySelector('.monaco-placeholder') as HTMLElement | null
-    // if (placeholderEl) placeholderEl.style.display = 'block'
+    const placeholderEl = document.querySelector('.monaco-placeholder') as HTMLElement | null
+    if (placeholderEl && placeholder !== undefined) placeholderEl.style.display = 'block'
 
     editor.addCommand(
       monaco.KeyCode.Tab,
@@ -86,19 +91,19 @@ const RLSCodeEditor = ({
     editor.focus()
   }
 
-  const options: editor.IStandaloneEditorConstructionOptions = {
-    tabSize: 2,
-    fontSize: 13,
-    readOnly,
-    minimap: { enabled: false },
-    wordWrap: 'on' as const,
-    contextmenu: true,
-    lineNumbers:
-      lineNumberStart !== undefined ? (num) => (num + lineNumberStart).toString() : undefined,
-    glyphMargin: undefined,
-    lineNumbersMinChars: 4,
-    folding: undefined,
-    scrollBeyondLastLine: false,
+  const onChangeContent: OnChange = (value) => {
+    hasValue.current.set((value ?? '').length > 0)
+
+    const placeholderEl = document.querySelector('.monaco-placeholder') as HTMLElement | null
+    if (placeholderEl) {
+      if (!value) {
+        placeholderEl.style.display = 'block'
+      } else {
+        placeholderEl.style.display = 'none'
+      }
+    }
+
+    onChange()
   }
 
   return (
@@ -113,11 +118,11 @@ const RLSCodeEditor = ({
         defaultValue={defaultValue ?? undefined}
         options={options}
         onMount={onMount}
-        onChange={onChange}
+        onChange={onChangeContent}
       />
       {placeholder !== undefined && (
         <div
-          className="monaco-placeholder absolute top-[3px] left-[57px] text-sm pointer-events-none font-mono [&>div>p]:text-foreground-lighter [&>div>p]:!m-0 tracking-tighter"
+          className="monaco-placeholder absolute top-[0px] left-[57px] text-sm pointer-events-none font-mono [&>div>p]:text-foreground-lighter [&>div>p]:!m-0 tracking-tighter"
           style={{ display: 'none' }}
         >
           <Markdown content={placeholder} />

@@ -51,6 +51,7 @@ import { AIPolicyChat } from './AIPolicyChat'
 import {
   MessageWithDebug,
   generateCreatePolicyQuery,
+  generatePlaceholder,
   generatePolicyDefinition,
   generateThreadMessage,
 } from './AIPolicyEditorPanel.utils'
@@ -109,7 +110,7 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
   const isTogglingPreviewRef = useRef<boolean>(false)
-  // const placeholder = generatePlaceholder(selectedPolicy)
+  const placeholder = generatePlaceholder(selectedPolicy)
   const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
 
   const [error, setError] = useState<QueryResponseError>()
@@ -410,12 +411,6 @@ export const AIPolicyEditorPanel = memo(function ({
                   setAssistantVisible={setAssistantPanel}
                 />
 
-                {/* <PolicyDetails
-                  policy={selectedPolicy}
-                  showDetails={showDetails}
-                  toggleShowDetails={() => setShowDetails(!showDetails)}
-                /> */}
-
                 <div className="flex flex-col h-full w-full justify-between">
                   {incomingChange ? (
                     <div className="px-5 py-3 flex justify-between gap-3 bg-surface-75">
@@ -488,114 +483,131 @@ export const AIPolicyEditorPanel = memo(function ({
                     />
                   ) : null}
 
-                  <PolicyDetailsV2 isEditing={selectedPolicy !== undefined} form={form} />
-
-                  <div className="h-full">
-                    <LockedCreateQuerySection
-                      selectedPolicy={selectedPolicy}
-                      editorOneRef={editorOneRef}
-                      editorTwoRef={editorTwoRef}
-                      formFields={{ name, table, behaviour, command, roles }}
-                    />
-
-                    <div
-                      className={`py-1 relative ${incomingChange ? 'hidden' : 'block'}`}
-                      style={{
-                        height: expOneLineCount <= 5 ? `${8 + expOneLineCount * 20}px` : '108px',
-                      }}
-                    >
+                  {isAiAssistantEnabled ? (
+                    <div className={`relative h-full ${incomingChange ? 'hidden' : 'block'}`}>
                       <RLSCodeEditor
-                        id="rls-exp-one-editor"
-                        defaultValue={command === 'insert' ? check : using}
-                        value={command === 'insert' ? check : using}
+                        id="rls-sql-policy"
+                        defaultValue={''}
                         editorRef={editorOneRef}
-                        monacoRef={monacoOneRef as any}
-                        lineNumberStart={6}
-                        onChange={() => {
-                          setExpOneLineCount(editorOneRef.current?.getModel()?.getLineCount() ?? 1)
-                        }}
+                        placeholder={placeholder}
                       />
                     </div>
+                  ) : (
+                    <>
+                      <PolicyDetailsV2 isEditing={selectedPolicy !== undefined} form={form} />
+                      <div className="h-full">
+                        <LockedCreateQuerySection
+                          selectedPolicy={selectedPolicy}
+                          editorOneRef={editorOneRef}
+                          editorTwoRef={editorTwoRef}
+                          formFields={{ name, table, behaviour, command, roles }}
+                        />
 
-                    <div className="bg-surface-300 py-1">
-                      <div className="flex items-center" style={{ fontSize: '14px' }}>
-                        <div className="w-[57px]">
-                          <p className="w-[31px] flex justify-end font-mono text-sm text-foreground-light select-none">
-                            {7 + expOneLineCount}
-                          </p>
-                        </div>
-                        <p className="font-mono tracking-tighter">
-                          {showCheckBlock ? (
-                            <>
-                              <span className="text-[#569cd6]">WITH CHECK</span>{' '}
-                              <span className="text-[#ffd700]">(</span>
-                            </>
-                          ) : (
-                            <>
-                              <span className="text-[#ffd700]">)</span>;
-                            </>
-                          )}
-                        </p>
-                      </div>
-                    </div>
-
-                    {showCheckBlock && (
-                      <>
                         <div
                           className={`py-1 relative ${incomingChange ? 'hidden' : 'block'}`}
                           style={{
                             height:
-                              expTwoLineCount <= 5 ? `${8 + expTwoLineCount * 20}px` : '108px',
+                              expOneLineCount <= 5 ? `${8 + expOneLineCount * 20}px` : '108px',
                           }}
                         >
                           <RLSCodeEditor
-                            id="rls-exp-two-editor"
-                            defaultValue={check}
-                            value={check}
-                            editorRef={editorTwoRef}
-                            monacoRef={monacoTwoRef as any}
-                            lineNumberStart={7 + expOneLineCount}
+                            id="rls-exp-one-editor"
+                            defaultValue={command === 'insert' ? check : using}
+                            value={command === 'insert' ? check : using}
+                            editorRef={editorOneRef}
+                            monacoRef={monacoOneRef as any}
+                            lineNumberStart={6}
                             onChange={() => {
-                              setExpTwoLineCount(
-                                editorTwoRef.current?.getModel()?.getLineCount() ?? 1
+                              setExpOneLineCount(
+                                editorOneRef.current?.getModel()?.getLineCount() ?? 1
                               )
                             }}
                           />
                         </div>
+
                         <div className="bg-surface-300 py-1">
                           <div className="flex items-center" style={{ fontSize: '14px' }}>
                             <div className="w-[57px]">
                               <p className="w-[31px] flex justify-end font-mono text-sm text-foreground-light select-none">
-                                {8 + expOneLineCount + expTwoLineCount}
+                                {7 + expOneLineCount}
                               </p>
                             </div>
                             <p className="font-mono tracking-tighter">
-                              <span className="text-[#ffd700]">)</span>;
+                              {showCheckBlock ? (
+                                <>
+                                  <span className="text-[#569cd6]">WITH CHECK</span>{' '}
+                                  <span className="text-[#ffd700]">(</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="text-[#ffd700]">)</span>;
+                                </>
+                              )}
                             </p>
                           </div>
                         </div>
-                      </>
-                    )}
 
-                    {isRenamingPolicy && (
-                      <LockedRenameQuerySection
-                        oldName={selectedPolicy.name}
-                        newName={name}
-                        table={table}
-                        lineNumber={8 + expOneLineCount + (showCheckBlock ? expTwoLineCount : 0)}
-                      />
-                    )}
+                        {showCheckBlock && (
+                          <>
+                            <div
+                              className={`py-1 relative ${incomingChange ? 'hidden' : 'block'}`}
+                              style={{
+                                height:
+                                  expTwoLineCount <= 5 ? `${8 + expTwoLineCount * 20}px` : '108px',
+                              }}
+                            >
+                              <RLSCodeEditor
+                                id="rls-exp-two-editor"
+                                defaultValue={check}
+                                value={check}
+                                editorRef={editorTwoRef}
+                                monacoRef={monacoTwoRef as any}
+                                lineNumberStart={7 + expOneLineCount}
+                                onChange={() => {
+                                  setExpTwoLineCount(
+                                    editorTwoRef.current?.getModel()?.getLineCount() ?? 1
+                                  )
+                                }}
+                              />
+                            </div>
+                            <div className="bg-surface-300 py-1">
+                              <div className="flex items-center" style={{ fontSize: '14px' }}>
+                                <div className="w-[57px]">
+                                  <p className="w-[31px] flex justify-end font-mono text-sm text-foreground-light select-none">
+                                    {8 + expOneLineCount + expTwoLineCount}
+                                  </p>
+                                </div>
+                                <p className="font-mono tracking-tighter">
+                                  <span className="text-[#ffd700]">)</span>;
+                                </p>
+                              </div>
+                            </div>
+                          </>
+                        )}
 
-                    {supportWithCheck && (
-                      <div className="px-5 py-3 flex items-center gap-x-2">
-                        <Checkbox_Shadcn_
-                          checked={showCheckBlock}
-                          onCheckedChange={() => setShowCheckBlock(!showCheckBlock)}
-                        />
-                        <p className="text-xs">Use check expression</p>
+                        {isRenamingPolicy && (
+                          <LockedRenameQuerySection
+                            oldName={selectedPolicy.name}
+                            newName={name}
+                            table={table}
+                            lineNumber={
+                              8 + expOneLineCount + (showCheckBlock ? expTwoLineCount : 0)
+                            }
+                          />
+                        )}
+
+                        {supportWithCheck && (
+                          <div className="px-5 py-3 flex items-center gap-x-2">
+                            <Checkbox_Shadcn_
+                              checked={showCheckBlock}
+                              onCheckedChange={() => setShowCheckBlock(!showCheckBlock)}
+                            />
+                            <p className="text-xs">Use check expression</p>
+                          </div>
+                        )}
                       </div>
-                    )}
-                  </div>
+                    </>
+                  )}
 
                   <div className="flex flex-col">
                     {error !== undefined && (
@@ -649,7 +661,7 @@ export const AIPolicyEditorPanel = memo(function ({
                       >
                         Templates
                       </TabsTrigger_Shadcn_>
-                      {!hasHipaaAddon && (
+                      {isAiAssistantEnabled && !hasHipaaAddon && (
                         <TabsTrigger_Shadcn_
                           key="conversation"
                           value="conversation"

@@ -4,10 +4,9 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Badge, Button, IconLock } from 'ui'
 
 import { useCheckPermissions } from 'hooks'
-import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { Badge, Button, IconLock } from 'ui'
 
 interface PolicyTableRowHeaderProps {
   table: PostgresTable
@@ -24,9 +23,7 @@ const PolicyTableRowHeader = ({
 }: PolicyTableRowHeaderProps) => {
   const router = useRouter()
   const { ref } = router.query
-  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
   const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
-  const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
 
   return (
     <div id={table.id.toString()} className="flex w-full items-center justify-between">
@@ -78,36 +75,6 @@ const PolicyTableRowHeader = ({
                 </Tooltip.Portal>
               )}
             </Tooltip.Root>
-            {!isAiAssistantEnabled && (
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger asChild>
-                  <Button
-                    type="outline"
-                    disabled={!canCreatePolicies}
-                    onClick={() => onSelectCreatePolicy(table)}
-                  >
-                    New Policy
-                  </Button>
-                </Tooltip.Trigger>
-                {!canCreatePolicies && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground">
-                          You need additional permissions to create RLS policies
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
-            )}
           </div>
         </div>
       )}
