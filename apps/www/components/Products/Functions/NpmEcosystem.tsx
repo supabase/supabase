@@ -37,7 +37,6 @@ const npmList = [
   '@octokit/rest',
   'cross-env',
   'commander',
-  '@supabase/auth-helpers-react',
   'yargs',
   'minimist',
   'chalk',
@@ -47,13 +46,14 @@ const npmList = [
   'axios',
   'passport',
   'nodemailer',
+  '@supabase/auth-helpers-react',
   'mongoose',
   'openai',
   'jwt',
-  '@supabase/auth-ui-react',
   'react',
   'mocha',
   'autoprefixer',
+  '@supabase/auth-ui-react',
   'gray-matter',
   'request',
   'prop-types',
@@ -68,18 +68,28 @@ const npmList = [
   'rxjs',
   'babel-runtime',
   'jquery',
+  'fetch',
+  'crypto',
+  'eslint',
+  'atob',
+  'moment',
+  'express',
+  'fastify',
+  'socket.io',
+  'async',
+  'lodash',
 ]
 
 const NpmEcosystem = () => {
   return (
-    <div className="relative w-full h-full overflow-hidden group">
+    <div className="relative w-full h-full flex items-stretch justify-center overflow-hidden group">
       <div
-        className="absolute flex flex-wrap items-start gap-2 opacity-80 dark:opacity-50"
+        className="absolute flex w-full !h-full inset-0 flex-wrap items-start gap-2 opacity-80 dark:opacity-50"
         style={{ left: -50, right: -150 }}
       >
-        {npmList.map((module) => (
+        {npmList.map((module, i) => (
           <span
-            key={module}
+            key={`${module}-${i}`}
             className="py-1 px-2 rounded-md bg-surface-75 border text-foreground-muted"
           >
             {module}

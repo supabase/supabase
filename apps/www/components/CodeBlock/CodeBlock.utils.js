@@ -118,7 +118,7 @@ const monokaiCustomTheme = {
       display: 'block',
       overflowX: 'auto',
       padding: '0.5em',
-      background: '#f7f6fc',
+      background: '#f9f9f9',
       color: '#24292f',
     },
     'hljs-tag': {

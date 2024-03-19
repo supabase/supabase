@@ -1,6 +1,6 @@
 import { Button, IconCheck, IconCopy, IconFile, IconTerminal, cn } from 'ui'
 import { useTheme } from 'next-themes'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
@@ -27,6 +27,7 @@ function CodeBlock(props: CodeBlockProps) {
   const { resolvedTheme } = useTheme()
   const isDarkTheme = resolvedTheme?.includes('dark')!
   const [copied, setCopied] = useState(false)
+  const [mounted, setMounted] = useState(false)
 
   const firstLine = props.children ? props.children.split('\n')[0] : ''
 
@@ -63,6 +64,12 @@ function CodeBlock(props: CodeBlockProps) {
 
   // const large = props.size === 'large' ? true : false
   const large = false
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
 
   return (
     <div className="not-prose dark overflow-hidden">
@@ -101,7 +108,7 @@ function CodeBlock(props: CodeBlockProps) {
           language={lang}
           style={isDarkTheme ? monokaiCustomTheme.dark : monokaiCustomTheme.light}
           className={cn(
-            'synthax-highlighter border border-default/20 rounded-lg',
+            'synthax-highlighter border border-default/15 rounded-lg',
             !filename && 'rounded-t-lg',
             'rounded-b-lg',
             props.className

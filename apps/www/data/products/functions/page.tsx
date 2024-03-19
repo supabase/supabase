@@ -151,7 +151,7 @@ export default (isMobile?: boolean) => ({
             <svg
               className="w-7 h-7"
               width="100%"
-              height="100&"
+              height="100%"
               viewBox="0 0 26 28"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"

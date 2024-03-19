@@ -25,8 +25,8 @@ const CodeWindow = ({ code, lang, style, className, showLineNumbers }: Props) =>
         <div className="w-2 h-2 bg-border rounded-full" />
         <div className="w-2 h-2 bg-border rounded-full" />
       </div>
-      <div className="h-full w-full border rounded-lg">
-        <CodeBlock lang={lang ?? 'js'} size="small" className="" showLineNumbers={showLineNumbers}>
+      <div className="h-full w-full rounded-lg">
+        <CodeBlock lang={lang ?? 'js'} size="small" showLineNumbers={showLineNumbers}>
           {code}
         </CodeBlock>
       </div>

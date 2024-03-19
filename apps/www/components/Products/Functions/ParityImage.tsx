@@ -7,6 +7,7 @@ const ParityImage = () => (
       src="/images/product/functions/lines-gradient-light.svg"
       alt=""
       fill
+      sizes="100%"
       aria-hidden
       draggable={false}
       className="object-cover absolute z-0 inset-0 dark:hidden block"
@@ -15,6 +16,7 @@ const ParityImage = () => (
       src="/images/product/functions/lines-gradient-dark.svg"
       alt=""
       fill
+      sizes="100%"
       aria-hidden
       draggable={false}
       className="object-cover absolute z-0 inset-0 hidden dark:block"

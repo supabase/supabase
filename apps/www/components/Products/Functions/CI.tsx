@@ -1,5 +1,5 @@
 import React from 'react'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
+import CodeWindow from '~/components/CodeWindow'
 
 const ciCode = `jobs:
  deploy:
@@ -14,26 +14,20 @@ const ciCode = `jobs:
 `
 
 const CI = () => (
-  <div className="w-full h-full relative pl-4 mb-4 lg:-mb-0 pt-4 sm:pt-4 border-b lg:border-none overflow-hidden">
-    <div
-      className="relative pl-2 lg:pl-3 w-full transform h-full bg-alternative-200 border-l border-t flex flex-col"
-      style={{ borderTopLeftRadius: '12px' }}
-    >
-      <div className="w-full py-2 lg:py-3 relative flex items-center gap-1.5 lg:gap-2">
-        <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-foreground-muted rounded-full" />
-        <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-foreground-muted rounded-full" />
-        <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-foreground-muted rounded-full" />
-      </div>
-      <div className="md:-mb-4 h-full [&_div]:h-full flex-1 bottom-0">
-        <CodeBlock
-          lang="yaml"
-          size="small"
-          className="rounded-r-none rounded-b-none border-r-0 border-b-0 p-4 h-full d:!p-2 g:!p-4 text-[13px] g:!text-sm leading-4"
-        >
-          {ciCode}
-        </CodeBlock>
-      </div>
-    </div>
+  <div className="w-full h-full relative pl-4 lg:-mb-0 pt-4 sm:pt-4 border-b lg:border-none overflow-hidden">
+    <CodeWindow
+      code={ciCode}
+      lang="yaml"
+      className="
+        rounded-r-none rounded-b-none border-r-0 border-b-0
+        h-full !text-[13px] lg:!text-sm leading-4
+        [&_.synthax-highlighter]:rounded-b-none
+        [&_.synthax-highlighter]:rounded-r-none
+        [&_.synthax-highlighter]:border-r-0
+        [&_.synthax-highlighter]:border-b-0
+        pr-0 pb-0 -bottom-2 lg:-bottom-4
+      "
+    />
   </div>
 )
 

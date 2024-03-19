@@ -19,6 +19,7 @@ const LocalDXImage = () => {
         src="/images/product/functions/grid-gradient-dark.svg"
         alt=""
         fill
+        sizes="100%"
         aria-hidden
         draggable={false}
         className="object-cover absolute z-0 inset-0 hidden dark:block"
@@ -27,6 +28,7 @@ const LocalDXImage = () => {
         src="/images/product/functions/grid-gradient-light.svg"
         alt=""
         fill
+        sizes="100%"
         aria-hidden
         draggable={false}
         className="object-cover absolute z-0 inset-0 dark:hidden block"
