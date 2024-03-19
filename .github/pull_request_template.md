@@ -1,4 +1,6 @@
-- [ ] I have read the [CONTRIBUTING.md](https://github.com/supabase/supabase/blob/master/CONTRIBUTING.md) file.
+## I have read the [CONTRIBUTING.md](https://github.com/supabase/supabase/blob/master/CONTRIBUTING.md) file.
+
+YES/NO
 
 ## What kind of change does this PR introduce?
 
