@@ -207,6 +207,17 @@ app.get("/auth/callback", async function (req, res) {
 
 Let's point our `.signInWithOAuth` method's redirect to the callback route we create above:
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="client"
+  queryGroup="environment"
+>
+<TabPanel id="client" label="Client">
+
+In the browser, `signInWithOAuth` automatically redirects to the SSO provider's authentication endpoint, which then redirects to your endpoint.
+
 ```js
 await supabase.auth.signInWithOAuth({
   provider,
@@ -216,74 +227,22 @@ await supabase.auth.signInWithOAuth({
 })
 ```
 
-<Admonition type="caution">
-
-The `.signInWithOAuth` method uses the `window` object for the automatic redirect. For automatic redirect to work, it should be called from a Client component. If the method is used server-side, you need to handle the redirect yourself and set `skipBrowserRedirect` option to `true`.
-
-</Admonition>
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="client-side"
-  queryGroup="sign-in-with-oauth-ssr"
->
-<TabPanel id="server-side" label="Server Action">
-
-```ts /sign-in.ts
-import { createClient } from '@/utils/supabase/server'
-import { Provider } from '@supabase/supabase-js'
-import { redirect } from 'next/navigation'
-
-export function SignInWithProvider({ provider }: { provider: Provider }) {
-  const signIn = async () => {
-    'use server'
-    const supabase = createClient()
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: '/auth/callback',
-	skipBrowserRedirect: true,
-      },
-    })
-
-    if (data.url) {
-      redirect(data.url)
-    }
-  }
-
-  return (
-    <form action={signIn}>
-      <button>Sign In with OAuth Provider</button>
-    </form>
-  )
-}
-```
-
 </TabPanel>
 
-<TabPanel id="client-side" label="Client Component">
+<TabPanel id="server" label="Server">
 
-```ts /sign-in.ts
-"use client";
+In the server, you need to handle the redirect to the SSO provider's authentication endpoint. The `signInWithOAuth` method returns the endpoint URL, which you can redirect to.
 
-import { createClient } from '@/utils/supabase/client'
-import { Provider } from '@supabase/supabase-js'
+```js
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider,
+  options: {
+    redirectTo: '/auth/callback',
+  },
+})
 
-export function SignInWithProvider({ provider }: { provider: Provider }) {
-
-  const signIn = async () => {
-    const supabase = createClient()
-    await supabase.auth.signInWithOAuth({
-      provider,
-      options: {
-        redirectTo: '/auth/callback'
-      }
-    })
-  }
-
-  return (<button onClick={signIn}>Sign In with OAuth Provider</button>)
+if (data.url) {
+  redirect(data.url) // use the redirect API for your server framework
 }
 ```
 
