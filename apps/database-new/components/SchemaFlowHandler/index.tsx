@@ -13,6 +13,7 @@ import 'reactflow/dist/style.css'
 import { PostgresTable } from '@/lib/types'
 import { parseTables } from '@/lib/utils'
 import { getGraphDataFromTables } from './SchemaFlow.utils'
+import SchemaFlowLegend from './SchemaFlowLegend'
 import { TableNode } from 'ui-patterns'
 
 interface SchemaGraphProps {
@@ -81,6 +82,7 @@ const SchemaFlowHandler = ({ content }: SchemaGraphProps) => {
               color={'inherit'}
             />
           )}
+          <SchemaFlowLegend />
         </ReactFlow>
       </div>
     </>

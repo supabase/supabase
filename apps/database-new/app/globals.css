@@ -188,6 +188,14 @@ main {
   animation-timing-function: ease-in-out;
   animation-fill-mode: forwards;
 }
+.fade-in--delay {
+  opacity: 0;
+  animation-name: fadeIn;
+  animation-delay: 2250ms;
+  animation-duration: 12500ms;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: forwards;
+}
 
 @keyframes fadeIn {
   from {

@@ -1,5 +1,4 @@
 import { stripIndent } from 'common-tags'
-import { cookies } from 'next/headers'
 import OpenAI from 'openai'
 
 // import is weird, what's up with this?

@@ -11,9 +11,8 @@ function CodeEditorContainer({ children }: { children: ReactNode }) {
   return (
     <div
       className={cn(
-        snap.hideCode ? 'max-w-0' : 'max-w-lg 2xl:max-w-xl',
-        'w-full xl:border-l',
-        'grow flex flex-col h-full'
+        'grow flex flex-col h-full w-full xl:border-l pt-4',
+        snap.hideCode ? 'max-w-0' : 'max-w-lg 2xl:max-w-xl'
       )}
     >
       {children}

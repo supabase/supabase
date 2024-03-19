@@ -1,10 +1,10 @@
 import { createClient } from '@/lib/supabase/server'
 import { Database } from '@/types/supabase'
-import { cookies } from 'next/headers'
 import EmptyState from './EmptyState'
 import Thread from './Thread'
 
-export type ThreadType = Database['public']['Views']['profile_threads']['Row']
+export type ThreadViewType = Database['public']['Views']['profile_threads']['Row']
+export type ThreadType = Database['public']['Tables']['threads']['Row']
 
 async function Threads() {
   const supabase = createClient()

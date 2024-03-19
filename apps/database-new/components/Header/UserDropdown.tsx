@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { User2 } from 'lucide-react'
-import { cookies } from 'next/headers'
 import { Suspense } from 'react'
 import { Button, DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 import AvatarDropdown from './AvatarDropdown'

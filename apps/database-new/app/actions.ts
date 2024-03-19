@@ -3,7 +3,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { Message } from 'ai'
 import { revalidatePath } from 'next/cache'
-import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import { z } from 'zod'
@@ -228,6 +227,43 @@ export async function updateThreadName(prevState: any, formData: FormData) {
     return {
       success: false,
       message: 'Failed to update title to update title',
+      data: undefined,
+    }
+  }
+}
+export async function updateThreadVisibility(prevState: any, formData: FormData) {
+  const supabase = createClient()
+
+  try {
+    const schema = z.object({
+      thread_visibility: z.string(),
+      thread_id: z.string(),
+    })
+
+    const data = schema.parse({
+      thread_visibility: formData.get('thread_visibility'),
+      thread_id: formData.get('thread_id'),
+    })
+
+    const { error } = await supabase
+      .from('threads')
+      .update({ is_public: data.thread_visibility === 'public' ? true : false })
+      .eq('id', data.thread_id)
+    if (error) {
+      throw error
+    }
+    revalidatePath('/profile')
+
+    return {
+      message: 'Thread visibility has been updated.',
+      success: true,
+      data,
+    }
+  } catch (error: any) {
+    console.error('Error updating record:', error)
+    return {
+      success: false,
+      message: 'Failed to update thread visibility',
       data: undefined,
     }
   }

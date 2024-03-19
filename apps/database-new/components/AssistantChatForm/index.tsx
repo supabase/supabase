@@ -2,13 +2,22 @@
 
 import { Loader2 } from 'lucide-react'
 import { useParams } from 'next/navigation'
-import { ChangeEvent, FormHTMLAttributes, ReactNode, forwardRef, useRef } from 'react'
+import {
+  ChangeEvent,
+  FormHTMLAttributes,
+  ReactNode,
+  forwardRef,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
+
 import { useFormStatus } from 'react-dom'
 import { TextArea_Shadcn_, cn } from 'ui'
-
+import { useAppStateSnapshot } from '@/lib/state'
 import { ChatSuggestions } from './ChatSuggestions'
 import { upsertMessageFormAction } from './action'
-
+import { createClient } from '@/lib/supabase/client'
 export interface FormProps extends FormHTMLAttributes<HTMLFormElement> {
   loading?: boolean
   disabled?: boolean
@@ -62,18 +71,28 @@ const SubmitButton = forwardRef<HTMLButtonElement, { isLoading: boolean; canSubm
 SubmitButton.displayName = 'SubmitButton'
 
 interface AssistantChatFormProps {
-  chatContext: string
   placeholder: string
   canSubmit?: () => Promise<boolean>
 }
 
-const AssistantChatForm = ({
-  chatContext,
-  placeholder,
-  canSubmit = () => Promise.resolve(true),
-}: AssistantChatFormProps) => {
+const AssistantChatForm = ({ placeholder }: AssistantChatFormProps) => {
+  const supabase = createClient()
+  const snap = useAppStateSnapshot()
+
   const { thread_id } = useParams()
+
   const textAreaRef = useRef<HTMLTextAreaElement>(null)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
+  useEffect(() => {
+    async function checkUser() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+      if (user) setIsLoggedIn(true)
+    }
+    checkUser()
+  })
 
   const disabled = false
 
@@ -101,10 +120,7 @@ const AssistantChatForm = ({
       <form
         className="relative"
         action={async (formData) => {
-          const flag = await canSubmit()
-          if (flag) {
-            upsertMessageFormAction(formData)
-          }
+          isLoggedIn ? upsertMessageFormAction(formData) : snap.setLoginDialogOpen(true)
         }}
       >
         <div className={cn('absolute', 'top-2 left-2', 'ml-1 w-6 h-6 rounded-full bg-dbnew')}></div>
@@ -132,7 +148,8 @@ const AssistantChatForm = ({
           isLoading={disabled}
         />
       </form>
-      {chatContext === 'new' && (
+
+      {!thread_id && (
         <ChatSuggestions
           setInput={(v) => {
             if (textAreaRef?.current) textAreaRef.current.value = v
