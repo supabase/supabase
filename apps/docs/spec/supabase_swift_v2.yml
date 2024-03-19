@@ -3247,8 +3247,9 @@ functions:
             .upload(
               path: "public/\(fileName)",
               file: fileData,
-              fileOptions: FileOptions(
+              options: FileOptions(
                 cacheControl: "3600",
+                contentType: "image/png",
                 upsert: false
               )
             )
@@ -3274,8 +3275,9 @@ functions:
             .update(
               path: "public/\(fileName)",
               file: fileData,
-              fileOptions: FileOptions(
+              options: FileOptions(
                 cacheControl: "3600",
+                contentType: "image/png",
                 upsert: true
               )
             )
