@@ -276,7 +276,7 @@ const TableEditor = ({
           label={
             <div className="flex items-center space-x-2">
               <span>Enable Row Level Security (RLS)</span>
-              <Badge color="gray">Recommended</Badge>
+              <Badge>Recommended</Badge>
             </div>
           }
           // @ts-ignore

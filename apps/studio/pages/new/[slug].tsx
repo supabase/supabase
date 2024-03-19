@@ -514,7 +514,7 @@ const Wizard: NextPageWithLayout = () => {
                             <div className="flex space-x-2">
                               <div className="text-center w-[80px]">
                                 <Badge
-                                  color={option === 'micro' ? 'gray' : 'brand'}
+                                  variant={option === 'micro' ? 'default' : 'brand'}
                                   className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
                                 >
                                   {instanceSizeSpecs[option].label}
