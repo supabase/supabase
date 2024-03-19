@@ -82,7 +82,7 @@ export const generateCreatePolicyQuery = ({
   name,
   schema,
   table,
-  behaviour,
+  behavior,
   command,
   roles,
   using,
@@ -91,13 +91,13 @@ export const generateCreatePolicyQuery = ({
   name: string
   schema: string
   table: string
-  behaviour: string
+  behavior: string
   command: string
   roles: string
   using?: string
   check?: string
 }) => {
-  const querySkeleton = `create policy "${name}" on "${schema}"."${table}" as ${behaviour} for ${command} to ${roles}`
+  const querySkeleton = `create policy "${name}" on "${schema}"."${table}" as ${behavior} for ${command} to ${roles}`
   const query =
     command === 'insert'
       ? `${querySkeleton} with check (${check});`

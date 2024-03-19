@@ -129,14 +129,14 @@ export const AIPolicyEditorPanel = memo(function ({
   const FormSchema = z.object({
     name: z.string(),
     table: z.string(),
-    behaviour: z.string(),
+    behavior: z.string(),
     command: z.string(),
     roles: z.string(),
   })
   const defaultValues = {
     name: '',
     table: '',
-    behaviour: 'permissive',
+    behavior: 'permissive',
     command: 'select',
     roles: '',
   }
@@ -160,7 +160,7 @@ export const AIPolicyEditorPanel = memo(function ({
   )
   const entityDefinitions = entities?.map((def) => def.sql.trim())
 
-  const { name, table, behaviour, command, roles } = form.watch()
+  const { name, table, behavior, command, roles } = form.watch()
   const supportWithCheck = ['update', 'all'].includes(command)
   const isRenamingPolicy = selectedPolicy !== undefined && name !== selectedPolicy.name
 
@@ -292,7 +292,7 @@ export const AIPolicyEditorPanel = memo(function ({
   }
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
-    const { name, table, behaviour, command, roles } = data
+    const { name, table, behavior, command, roles } = data
     const using = editorOneRef.current?.getValue().trim() ?? undefined
     const check = editorTwoRef.current?.getValue().trim() ?? undefined
 
@@ -301,7 +301,7 @@ export const AIPolicyEditorPanel = memo(function ({
         name: name,
         schema: state.selectedSchemaName,
         table,
-        behaviour,
+        behavior,
         command,
         roles: roles.length === 0 ? 'public' : roles,
         using: using ?? '',
@@ -369,7 +369,7 @@ export const AIPolicyEditorPanel = memo(function ({
         form.reset({
           name,
           table,
-          behaviour: action.toLowerCase(),
+          behavior: action.toLowerCase(),
           command: command.toLowerCase(),
           roles: roles.length === 1 && roles[0] === 'public' ? '' : roles.join(', '),
         })
@@ -500,7 +500,7 @@ export const AIPolicyEditorPanel = memo(function ({
                           selectedPolicy={selectedPolicy}
                           editorOneRef={editorOneRef}
                           editorTwoRef={editorTwoRef}
-                          formFields={{ name, table, behaviour, command, roles }}
+                          formFields={{ name, table, behavior, command, roles }}
                         />
 
                         <div
@@ -683,7 +683,7 @@ export const AIPolicyEditorPanel = memo(function ({
                           selectedTemplate={selectedDiff}
                           onSelectTemplate={(value) => {
                             form.setValue('name', value.name)
-                            form.setValue('behaviour', 'permissive')
+                            form.setValue('behavior', 'permissive')
                             form.setValue('command', value.command.toLowerCase())
                             form.setValue('roles', value.roles.join(', ') ?? '')
 

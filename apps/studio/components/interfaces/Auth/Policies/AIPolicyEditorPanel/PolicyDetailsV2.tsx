@@ -117,11 +117,11 @@ export const PolicyDetailsV2 = ({ isEditing, form }: PolicyDetailsV2Props) => {
 
           <FormField_Shadcn_
             control={form.control}
-            name="behaviour"
+            name="behavior"
             render={({ field }) => (
               <FormItem_Shadcn_ className="col-span-6 flex flex-col gap-y-1">
                 <FormLabel_Shadcn_ className="flex items-center gap-x-4">
-                  <p className="text-foreground-light text-sm">Policy Behaviour</p>
+                  <p className="text-foreground-light text-sm">Policy Behavior</p>
                   <p className="text-foreground-light text-sm">
                     <code className="text-xs">as</code> clause
                   </p>
@@ -130,7 +130,7 @@ export const PolicyDetailsV2 = ({ isEditing, form }: PolicyDetailsV2Props) => {
                   <Select_Shadcn_
                     disabled={isEditing}
                     value={field.value}
-                    onValueChange={(value) => form.setValue('behaviour', value)}
+                    onValueChange={(value) => form.setValue('behavior', value)}
                   >
                     <SelectTrigger_Shadcn_ className="text-sm h-10 capitalize">
                       {field.value}

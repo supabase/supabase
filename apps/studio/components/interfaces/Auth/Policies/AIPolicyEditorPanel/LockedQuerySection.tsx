@@ -9,7 +9,7 @@ import { generateAlterPolicyQuery, generateCreatePolicyQuery } from './AIPolicyE
 
 interface LockedCreateQuerySection {
   selectedPolicy?: PostgresPolicy
-  formFields: { name: string; table: string; behaviour: string; command: string; roles: string }
+  formFields: { name: string; table: string; behavior: string; command: string; roles: string }
   editorOneRef: any
   editorTwoRef: any
 }
@@ -25,7 +25,7 @@ export const LockedCreateQuerySection = ({
   const state = useTableEditorStateSnapshot()
 
   const isEditing = selectedPolicy !== undefined
-  const { name, table, behaviour, command, roles } = formFields
+  const { name, table, behavior, command, roles } = formFields
 
   return (
     <div className="bg-surface-300 pt-2 pb-1">
@@ -46,7 +46,7 @@ export const LockedCreateQuerySection = ({
                   name,
                   schema: state.selectedSchemaName,
                   table,
-                  behaviour,
+                  behavior,
                   command,
                   roles: roles.length === 0 ? 'public' : roles,
                   using: (editorOneRef.current?.getValue() ?? undefined)?.trim(),
@@ -93,7 +93,7 @@ export const LockedCreateQuerySection = ({
           <div className="flex items-start" style={{ fontSize: '14px' }}>
             <p className="px-6 font-mono text-sm text-foreground-light select-none">3</p>
             <p className="font-mono tracking-tighter">
-              <span className="text-[#569cd6]">AS</span> {behaviour.toLocaleUpperCase()}
+              <span className="text-[#569cd6]">AS</span> {behavior.toLocaleUpperCase()}
             </p>
           </div>
           <div className="flex items-start" style={{ fontSize: '14px' }}>

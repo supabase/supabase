@@ -193,7 +193,7 @@ const Reports = () => {
   /*
    * handleChartSelection()
    *
-   * Handler for the chart behaviour
+   * Handler for the chart behavior
    */
   function handleChartSelection({ metric, value }: any) {
     if (value) {
