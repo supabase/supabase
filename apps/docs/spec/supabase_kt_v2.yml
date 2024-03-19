@@ -101,7 +101,7 @@ functions:
           - name: httpEngine
             isOptional: true
             type: HttpClientEngine?
-            description: Custom Ktor Client engine. Shouldn't be set manually as Ktor uses an engine from your dependencies, but can be set it to a MockEngine for tests.
+            description: Custom Ktor Client engine. Shouldn't be set manually as Ktor uses an engine from your dependencies, but can be set to a MockEngine for tests.
           - name: ignoreModulesInUrl
             isOptional: true
             type: Boolean
@@ -113,7 +113,7 @@ functions:
           - name: defaultLogLevel
             isOptional: true
             type: LogLevel
-            description: The default log level used for plugins. Can be overriden per plugin. Defaults to `LogLevel.INFO`.
+            description: The default log level used for plugins. Can be overridden per plugin. Defaults to `LogLevel.INFO`.
           - name: defaultSerializer
             isOptional: true
             type: SupabaseSerializer
