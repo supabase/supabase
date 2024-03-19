@@ -48,8 +48,7 @@ export default (isMobile?: boolean) => ({
     highlights: [
       {
         title: 'Fully managed',
-        paragraph:
-          'Use pgvector to store, query, and index your vector embeddings at scale in a Postgres instance.',
+        paragraph: 'Edge Functions scale automatically, reducing your devops burden',
         svg: (
           <div className="w-12 h-12 p-2 bg-alternative rounded-lg border flex justify-center items-center">
             <svg
@@ -93,7 +92,7 @@ export default (isMobile?: boolean) => ({
       },
       {
         title: 'Secure and Scalable',
-        paragraph: 'Simply write your code in TypeScript and deploy.',
+        paragraph: 'Simply write your code in TypeScript and deploy',
         svg: (
           <div className="w-12 h-12 p-2 bg-alternative rounded-lg border flex justify-center items-center">
             <svg
@@ -187,7 +186,10 @@ export default (isMobile?: boolean) => ({
       {
         label: (
           <>
-            Importing from <Link href="deno.land">deno.land</Link>
+            Importing from{' '}
+            <Link href="https://deno.com/" className="underline">
+              deno.land
+            </Link>
           </>
         ),
         paragraph: '',
@@ -199,16 +201,20 @@ export default (isMobile?: boolean) => ({
     title: <>Delightful DX from local to production</>,
     paragraph: (
       <>
-        Deno comes bundled in with a linter, test runner, format, benchmarking tool and a compiler.
-        Spend less time configuring tools and more time writing business logic.
+        Edge Functions are developed using{' '}
+        <Link href="https://deno.com/" className="underline" target="_blank">
+          Deno
+        </Link>
+        , which offers a few benefits to you as a developer so you can spend less time configuring
+        tools and more time building your products.
       </>
     ),
     cards: [
       {
         id: 'localDX',
-        label: 'First-class local development experience',
+        label: 'First-class local dev experience',
         paragraph:
-          'Write code with hot code reloading, a fast Language server for autocompletion, type checking and linting.',
+          'Write code with hot code reloading, a fast Language server for autocompletion, type checking and linting',
         className: '',
         image: <LocalDXImage />,
       },
@@ -231,7 +237,7 @@ export default (isMobile?: boolean) => ({
       {
         id: 'ecosystem',
         label: 'Use any NPM module',
-        paragraph: 'Tap into the 2+ million modules in the Deno and NPM ecosystem.',
+        paragraph: 'Tap into the 2+ million modules in the Deno and NPM ecosystem',
         className: '',
         image: <NpmEcosystem />,
       },
@@ -276,7 +282,7 @@ export default (isMobile?: boolean) => ({
         label: 'Realtime logs',
         icon: '',
         paragraph:
-          'Stream logs to the dashboard in realtime. Logs are populated with rich metadata to help debugging. ',
+          'Stream logs to the dashboard in realtime. Logs are populated with rich metadata to help debugging',
         image: <RealtimeLogs />,
       },
       {
@@ -284,20 +290,20 @@ export default (isMobile?: boolean) => ({
         label: 'Query Logs via Log explorer',
         icon: '',
         paragraph:
-          'Get deeper insights into how your functions are behaving by writing SQL queries on function logs. ',
+          'Get deeper insights into how your functions are behaving by writing SQL queries on function logs',
         image: <QueryLogs />,
       },
       {
         id: 'metrics',
         label: 'Metrics',
         icon: '',
-        paragraph: 'Dashboards show the health of your functions at all times.',
+        paragraph: 'Dashboards show the health of your functions at all times',
         image: <Metrics />,
       },
     ],
   },
   integratesWithSupabase: {
-    title: 'Integrates perfectly with the Supabase ecosystem',
+    title: 'Edge Functions integrate perfectly with the Supabase ecosystem',
     useCases: [
       {
         label: 'Zero configuration',
@@ -320,7 +326,7 @@ export default (isMobile?: boolean) => ({
         label: 'Works with Supabase Auth',
         paragraph: (
           <>
-            Edge Functions is designed to work seamlessly with{' '}
+            Edge Functions are designed to work seamlessly with{' '}
             <Link href="https://supabase.com/docs/guides/functions/auth" className="underline">
               Supabase Auth
             </Link>
@@ -332,7 +338,7 @@ export default (isMobile?: boolean) => ({
         label: 'Works with Supabase Storage',
         paragraph: (
           <>
-            Edge Functions is designed to work seamlessly with{' '}
+            Edge Functions are designed to work seamlessly with{' '}
             <Link
               href="https://supabase.com/docs/guides/functions/storage-caching"
               className="underline"

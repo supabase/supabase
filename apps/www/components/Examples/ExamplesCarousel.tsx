@@ -25,7 +25,7 @@ const ExamplesCarousel = ({
   const nextRef = useRef(null)
 
   return (
-    <div id="examples">
+    <div id="examples" className="container">
       <div className="w-full flex flex-col lg:flex-row justify-between items-start lg:items-end gap-4">
         <h3 className="h2 !mb-0">{title}</h3>
         {cta && (
@@ -57,13 +57,15 @@ const ExamplesCarousel = ({
           breakpoints={{
             320: {
               slidesPerView: 1.1,
+              spaceBetween: 10,
             },
             720: {
               slidesPerView: 2,
+              spaceBetween: 10,
             },
             920: {
               slidesPerView: 3,
-              spaceBetween: 20,
+              spaceBetween: 10,
             },
             1024: {
               slidesPerView: 3,
@@ -80,15 +82,15 @@ const ExamplesCarousel = ({
               </SwiperSlide>
             )
           })}
-          <div className="container mx-auto mt-3 hidden flex-row justify-between md:flex">
-            <div ref={prevRef} className="p ml-4 cursor-pointer">
-              <IconArrowLeft />
-            </div>
-            <div ref={nextRef} className="p mr-4 cursor-pointer">
-              <IconArrowRight />
-            </div>
-          </div>
         </Swiper>
+        <div className="container mx-auto mt-3 hidden flex-row justify-between md:flex">
+          <div ref={prevRef} className="p ml-4 cursor-pointer">
+            <IconArrowLeft />
+          </div>
+          <div ref={nextRef} className="p mr-4 cursor-pointer">
+            <IconArrowRight />
+          </div>
+        </div>
       </div>
     </div>
   )

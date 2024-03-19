@@ -46,7 +46,7 @@ function Database() {
           ],
         }}
       />
-      <DefaultLayout>
+      <DefaultLayout className="overflow-hidden">
         <ProductsNav activePage={PRODUCT_NAMES.FUNCTIONS} />
         <ProductHeader
           {...pageData.heroSection}
@@ -56,8 +56,10 @@ function Database() {
           <ExamplesCarousel {...pageData.examplesSection} />
         </SectionContainer>
         <SectionContainer className="flex flex-col gap-4">
-          <h2 className="h2">{pageData.localDXsection.title}</h2>
-          <p className="text-foreground-lighter lg:w-1/2">{pageData.localDXsection.paragraph}</p>
+          <div>
+            <h2 className="h2">{pageData.localDXsection.title}</h2>
+            <p className="text-foreground-lighter lg:w-1/2">{pageData.localDXsection.paragraph}</p>
+          </div>
           <div className="mt-4 md:mt-8">
             <LocalDXGrid />
           </div>

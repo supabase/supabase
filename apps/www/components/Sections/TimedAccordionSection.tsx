@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { AnimatePresence, motion, useAnimation } from 'framer-motion'
+import { AnimatePresence, motion, useAnimation, useInView } from 'framer-motion'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { cn } from 'ui'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
@@ -96,6 +96,8 @@ const TimedAccordionSection = ({
   intervalDuration = 25,
   updateFrequency = 10,
 }: Props) => {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { margin: '-25%' })
   const [activeTab, setActiveTab] = useState(0)
   const [progress, setProgress] = useState(0)
   const [apiSwiper, setApiSwiper] = useState(undefined)
@@ -118,10 +120,15 @@ const TimedAccordionSection = ({
   }
 
   useEffect(() => {
+    // pause timer when component is not in view
+    if (!isInView) {
+      controls.stop()
+      setProgress(progress)
+      return
+    }
+
     const progressIncrement = (100 / intervalDuration) * (updateFrequency / 1000)
-
     controls.start(animation)
-
     const progressInterval = setInterval(() => {
       setProgress((prevProgress) => (prevProgress + progressIncrement) % 101)
     }, updateFrequency)
@@ -130,7 +137,7 @@ const TimedAccordionSection = ({
       clearInterval(progressInterval)
       setProgress(0)
     }
-  }, [activeTab, controls])
+  }, [activeTab, controls, isInView])
 
   useEffect(() => {
     if (progress >= 100.9) {
@@ -143,7 +150,7 @@ const TimedAccordionSection = ({
   }
 
   return (
-    <div className="flex flex-col lg:flex-row gap-8 xl:gap-32 justify-between">
+    <div ref={ref} className="flex flex-col lg:flex-row gap-8 xl:gap-32 justify-between">
       <div className="lg:w-1/3 gap-1 flex flex-col items-start" role="tablist">
         {tabs.map((tab, index) => (
           <Tab

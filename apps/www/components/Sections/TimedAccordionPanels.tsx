@@ -1,7 +1,7 @@
 import 'swiper/swiper.min.css'
 
-import React, { useState, useEffect } from 'react'
-import { AnimatePresence, motion, useAnimation } from 'framer-motion'
+import React, { useState, useEffect, useRef } from 'react'
+import { AnimatePresence, motion, useAnimation, useInView } from 'framer-motion'
 import { cn } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import Panel from '../Panel'
@@ -95,9 +95,12 @@ interface Props {
   panels: PanelProps[]
   intervalDuration?: number
   updateFrequency?: number
+  isInView?: boolean
 }
 
 const TimedAccordionPanels = ({ panels, intervalDuration = 25, updateFrequency = 10 }: Props) => {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { margin: '-25%' })
   const [activeTab, setActiveTab] = useState(0)
   const [progress, setProgress] = useState(0)
   const [apiSwiper, setApiSwiper] = useState(undefined)
@@ -120,10 +123,15 @@ const TimedAccordionPanels = ({ panels, intervalDuration = 25, updateFrequency =
   }
 
   useEffect(() => {
+    // pause timer when component is not in view
+    if (!isInView) {
+      controls.stop()
+      setProgress(progress)
+      return
+    }
+
     const progressIncrement = (100 / intervalDuration) * (updateFrequency / 1000)
-
     controls.start(animation)
-
     const progressInterval = setInterval(() => {
       setProgress((prevProgress) => (prevProgress + progressIncrement) % 101)
     }, updateFrequency)
@@ -132,7 +140,7 @@ const TimedAccordionPanels = ({ panels, intervalDuration = 25, updateFrequency =
       clearInterval(progressInterval)
       setProgress(0)
     }
-  }, [activeTab, controls])
+  }, [activeTab, controls, isInView])
 
   useEffect(() => {
     if (progress >= 100.9) {
@@ -145,7 +153,7 @@ const TimedAccordionPanels = ({ panels, intervalDuration = 25, updateFrequency =
   }
 
   return (
-    <div className="flex flex-col gap-8 xl:gap-32 justify-between">
+    <div ref={ref} className="flex flex-col gap-8 xl:gap-32 justify-between">
       <div className="hidden md:flex gap-4" role="tablist">
         {panels.map((panel, index) => (
           <TimedPanel
