@@ -2,12 +2,12 @@ import * as Accordion from '@radix-ui/react-accordion'
 import { useRouter } from 'next/router'
 
 import * as NavItems from './NavigationMenu.constants'
+import { getPathWithoutHash } from './NavigationMenu.utils'
 import NavigationMenuGuideListItems from './NavigationMenuGuideListItems'
 
 const NavigationMenuGuideList = ({ id }: { id: string }) => {
   const path = useRouter().asPath
-  // Get the pathname without the hash
-  const url = new URL(path, 'http://placeholder').pathname
+  const url = getPathWithoutHash(path)
   const firstLevelRoute = url?.split('/')?.slice(0, 4)?.join('/')
 
   console.log('url', url, 'firstLevelRoute', firstLevelRoute)
