@@ -24,8 +24,12 @@ const CI = () => (
         <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-foreground-muted rounded-full" />
         <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 bg-foreground-muted rounded-full" />
       </div>
-      <div className="md:-mb-4 h-full [&_div]:h-full flex-1 bottom-0 [&_.synthax-highlighter]:!p-4 [&_.synthax-highlighter]:!h-full [&_.synthax-highlighter]:md:!p-2 [&_.synthax-highlighter]:lg:!p-4 [&_.synthax-highlighter]:!text-[13px] [&_.synthax-highlighter]:lg:!text-sm [&_.synthax-highlighter]:!leading-4">
-        <CodeBlock lang="js" size="small">
+      <div className="md:-mb-4 h-full [&_div]:h-full flex-1 bottom-0">
+        <CodeBlock
+          lang="yaml"
+          size="small"
+          className="rounded-r-none rounded-b-none border-r-0 border-b-0 p-4 h-full d:!p-2 g:!p-4 text-[13px] g:!text-sm leading-4"
+        >
           {ciCode}
         </CodeBlock>
       </div>

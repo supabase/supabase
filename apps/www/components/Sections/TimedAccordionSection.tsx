@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react'
-import Link from 'next/link'
-import { AnimatePresence, motion, useAnimation, useInView } from 'framer-motion'
-import SectionContainer from '~/components/Layouts/SectionContainer'
+import { motion, useAnimation, useInView } from 'framer-motion'
 import { cn } from 'ui'
-import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import { Swiper, SwiperSlide } from 'swiper/react'
-import Image from 'next/image'
 
 interface TabProps {
   label: string | React.ReactNode
@@ -77,25 +73,12 @@ interface Tab {
 }
 
 interface Props {
-  // title: string | ReactNode
-  // paragraph: string
-  cta?: {
-    label?: string
-    link: string
-  }
   tabs: Tab[]
   intervalDuration?: number
   updateFrequency?: number
 }
 
-const TimedAccordionSection = ({
-  // title,
-  // paragraph,
-  cta,
-  tabs,
-  intervalDuration = 25,
-  updateFrequency = 10,
-}: Props) => {
+const TimedAccordionSection = ({ tabs, intervalDuration = 25, updateFrequency = 10 }: Props) => {
   const ref = useRef(null)
   const isInView = useInView(ref, { margin: '-25%' })
   const [activeTab, setActiveTab] = useState(0)
@@ -150,7 +133,7 @@ const TimedAccordionSection = ({
   }
 
   return (
-    <div ref={ref} className="flex flex-col lg:flex-row gap-8 xl:gap-32 justify-between">
+    <div ref={ref} className="flex flex-col lg:flex-row gap-8 xl:gap-24 justify-between">
       <div className="lg:w-1/3 gap-1 flex flex-col items-start" role="tablist">
         {tabs.map((tab, index) => (
           <Tab
@@ -164,24 +147,20 @@ const TimedAccordionSection = ({
           />
         ))}
       </div>
-      <div className="relative w-full lg:w-1/2 min-h-[300px] overflow-hidden">
+      <div className="relative w-full lg:flex-1 min-h-[300px] md:overflow-hidden -mt-4">
         <Swiper
           // @ts-ignore
           onSwiper={setApiSwiper}
           style={{ zIndex: 0, marginRight: '1px' }}
           initialSlide={activeTab}
-          spaceBetween={0}
+          spaceBetween={20}
           slidesPerView={1}
           speed={300}
           allowTouchMove={false}
         >
           {tabs.map((tab, i) => (
-            <SwiperSlide key={i}>
-              <>
-                <CodeBlock hideCopy key={i} lang="py" size="large" background="#1A1A1A">
-                  {tab.code}
-                </CodeBlock>
-              </>
+            <SwiperSlide key={i} className="md:p-4">
+              {tab.panel}
             </SwiperSlide>
           ))}
         </Swiper>

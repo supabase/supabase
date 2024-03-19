@@ -14,6 +14,17 @@ const LocalDXImage = dynamic(() => import('~/components/Products/Functions/Local
 const ParityImage = dynamic(() => import('~/components/Products/Functions/ParityImage'))
 const NpmEcosystem = dynamic(() => import('~/components/Products/Functions/NpmEcosystem'))
 const CI = dynamic(() => import('~/components/Products/Functions/CI'))
+const ZeroConfigPanel = dynamic(() => import('~/components/Products/Functions/ZeroConfigPanel'))
+const ConnectToDBPanel = dynamic(() => import('~/components/Products/Functions/ConnectToDBPanel'))
+const TriggerViaWebhookPanel = dynamic(
+  () => import('~/components/Products/Functions/TriggerViaWebhookPanel')
+)
+const WorksWithAuthPanel = dynamic(
+  () => import('~/components/Products/Functions/WorksWithAuthPanel')
+)
+const WorksWithStoragePanel = dynamic(
+  () => import('~/components/Products/Functions/WorksWithStoragePanel')
+)
 
 export default (isMobile?: boolean) => ({
   metaTitle: 'Supabase Edge Functions - Deploy JavaScript globally in seconds',
@@ -159,43 +170,14 @@ export default (isMobile?: boolean) => ({
       },
     ],
   },
-  useCasesSection: {
-    title: <>What you can build with Edge Functions</>,
-    useCases: [
-      {
-        label: 'Sending Emails',
-        paragraph: 'Using Sendgrid, AWS SES, and others — generic mail & SMTP variables',
-        panel: <div>lorem</div>,
-      },
-      {
-        label: 'OpenAI proxying',
-        paragraph:
-          'Proxy API requests from clients to OpenAI so they won’t expose their openAI secret to their users',
-        panel: <div>lorem</div>,
-      },
-      {
-        label: 'Stripe',
-        paragraph: 'Handling signed Stripe Webhooks with Edge Functions',
-        panel: <div>lorem</div>,
-      },
-      {
-        label: 'Connecting directly to DB',
-        paragraph: 'To connect directly to DB without using Postgrest',
-        panel: <div>lorem</div>,
-      },
-      {
-        label: (
-          <>
-            Importing from{' '}
-            <Link href="https://deno.com/" className="underline">
-              deno.land
-            </Link>
-          </>
-        ),
-        paragraph: '',
-        panel: <div>lorem</div>,
-      },
-    ],
+  examplesSection: {
+    title: 'What you can build with Edge Functions',
+    cta: {
+      label: 'View all examples',
+      href: '/docs/guides/functions#examples',
+      type: 'default' as any,
+    },
+    examples: Examples.filter((example) => example.products.includes(PRODUCT_NAMES.FUNCTIONS)),
   },
   localDXsection: {
     title: <>Delightful DX from local to production</>,
@@ -303,24 +285,24 @@ export default (isMobile?: boolean) => ({
     ],
   },
   integratesWithSupabase: {
-    title: 'Edge Functions integrate perfectly with the Supabase ecosystem',
+    title: 'Integrates seamlessly with the Supabase ecosystem',
     useCases: [
       {
         label: 'Zero configuration',
         paragraph: 'Pre-populated environment variables required to access your supabase project',
-        panel: <div>lorem</div>,
+        panel: <ZeroConfigPanel />,
       },
       {
         label: 'Connect to your database',
         paragraph:
           'Connect to your Postgres database from an Edge Function by using the supabase-js client',
-        panel: <div>lorem</div>,
+        panel: <ConnectToDBPanel />,
       },
       {
         label: 'Trigger via webhook',
         paragraph:
           'Database Webhooks allow you to send real-time data from your database to another system whenever a table event occurs',
-        panel: <div>lorem</div>,
+        panel: <TriggerViaWebhookPanel />,
       },
       {
         label: 'Works with Supabase Auth',
@@ -332,7 +314,7 @@ export default (isMobile?: boolean) => ({
             </Link>
           </>
         ),
-        panel: <div>lorem</div>,
+        panel: <WorksWithAuthPanel />,
       },
       {
         label: 'Works with Supabase Storage',
@@ -347,17 +329,8 @@ export default (isMobile?: boolean) => ({
             </Link>
           </>
         ),
-        panel: <div>lorem</div>,
+        panel: <WorksWithStoragePanel />,
       },
     ],
-  },
-  examplesSection: {
-    title: 'What you can build with Edge Functions',
-    cta: {
-      label: 'View all examples',
-      href: '/docs/guides/functions#examples',
-      type: 'default' as any,
-    },
-    examples: Examples.filter((example) => example.products.includes(PRODUCT_NAMES.FUNCTIONS)),
   },
 })

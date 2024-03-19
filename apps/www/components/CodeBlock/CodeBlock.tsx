@@ -1,4 +1,5 @@
-import { Button, IconCheck, IconCopy, IconFile, IconTerminal } from 'ui'
+import { Button, IconCheck, IconCopy, IconFile, IconTerminal, cn } from 'ui'
+import { useTheme } from 'next-themes'
 import { useState } from 'react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
@@ -7,10 +8,12 @@ import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
+import yaml from 'react-syntax-highlighter/dist/cjs/languages/hljs/yaml'
 import monokaiCustomTheme from './CodeBlock.utils'
 
+export type LANG = 'js' | 'sql' | 'py' | 'bash' | 'ts' | 'tsx' | 'kotlin' | 'yaml'
 export interface CodeBlockProps {
-  lang: 'js' | 'sql' | 'py' | 'bash' | 'ts' | 'tsx' | 'kotlin'
+  lang: LANG
   startingLineNumber?: number
   hideCopy?: boolean
   showLineNumbers?: boolean
@@ -21,6 +24,8 @@ export interface CodeBlockProps {
 }
 
 function CodeBlock(props: CodeBlockProps) {
+  const { resolvedTheme } = useTheme()
+  const isDarkTheme = resolvedTheme?.includes('dark')!
   const [copied, setCopied] = useState(false)
 
   const firstLine = props.children ? props.children.split('\n')[0] : ''
@@ -54,6 +59,7 @@ function CodeBlock(props: CodeBlockProps) {
   SyntaxHighlighter.registerLanguage('sql', sql)
   SyntaxHighlighter.registerLanguage('bash', bash)
   SyntaxHighlighter.registerLanguage('kotlin', kotlin)
+  SyntaxHighlighter.registerLanguage('yaml', yaml)
 
   // const large = props.size === 'large' ? true : false
   const large = false
@@ -93,13 +99,17 @@ function CodeBlock(props: CodeBlockProps) {
         {/* @ts-ignore */}
         <SyntaxHighlighter
           language={lang}
-          style={monokaiCustomTheme}
-          className={[!filename && 'synthax-highlighter rounded-t-lg', 'rounded-b-lg'].join(' ')}
+          style={isDarkTheme ? monokaiCustomTheme.dark : monokaiCustomTheme.light}
+          className={cn(
+            'synthax-highlighter border border-default/20 rounded-lg',
+            !filename && 'rounded-t-lg',
+            'rounded-b-lg',
+            props.className
+          )}
           customStyle={{
-            padding: '21px 24px',
+            padding: props.showLineNumbers ? '1.25rem 1rem' : '1.25rem 1.5rem',
             fontSize: large ? 18 : '0.875rem',
             lineHeight: large ? 1.6 : 1.4,
-            background: props.background ?? '#1A1A1A',
           }}
           showLineNumbers={props.showLineNumbers}
           lineNumberStyle={{
@@ -128,9 +138,8 @@ function CodeBlock(props: CodeBlockProps) {
                 }
                 onClick={() => handleCopy()}
                 aria-label="Copy"
-              >
-                {/* {copied ? 'Copied' : 'Copy'} */}
-              </Button>
+                className="px-1.5 py-1.5 border border-transparent hover:border-strong"
+              />
             </CopyToClipboard>
           </div>
         ) : null}
