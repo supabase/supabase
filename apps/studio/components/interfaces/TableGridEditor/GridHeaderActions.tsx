@@ -18,6 +18,7 @@ import { useDatabasePublicationUpdateMutation } from 'data/database-publications
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 
 export interface GridHeaderActionsProps {
   table: PostgresTable
@@ -30,6 +31,7 @@ const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeade
   const { ref } = useParams()
   const { project } = useProjectContext()
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
+  const isLocked = EXCLUDED_SCHEMAS.includes(table.schema)
 
   const { mutate: updateTable } = useTableUpdateMutation({
     onError: (error) => {
@@ -149,7 +151,7 @@ const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeade
         {isTableSelected ? (
           table.rls_enabled ? (
             <>
-              {policies.length < 1 ? (
+              {policies.length < 1 && !isLocked ? (
                 <Tooltip.Root delayDuration={0}>
                   <Tooltip.Trigger asChild className="w-full">
                     <Button
@@ -188,10 +190,10 @@ const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeade
               ) : (
                 <Button
                   asChild
-                  type={policies.length < 1 ? 'warning' : 'default'}
+                  type={policies.length < 1 && !isLocked ? 'warning' : 'default'}
                   className="group"
                   icon={
-                    policies.length > 0 ? (
+                    isLocked || policies.length > 0 ? (
                       <span className="text-right text-xs rounded-xl px-[6px] bg-foreground-lighter/30 text-brand-1100">
                         {policies.length}
                       </span>
@@ -215,9 +217,9 @@ const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeade
               </PopoverTrigger_Shadcn_>
               <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
                 <h3 className="flex items-center gap-2">
-                  <Lock /> Row Level Security (RLS)
+                  <Lock size={16} /> Row Level Security (RLS)
                 </h3>
-                <div className="grid gap-2 mt-4">
+                <div className="grid gap-2 mt-4 text-foreground-light text-sm">
                   <p>
                     You can restrict and control who can read, write and update data in this table
                     using Row Level Security.
@@ -226,14 +228,16 @@ const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeade
                     With RLS enabled, anonymous users will not be able to read/write data in the
                     table.
                   </p>
-                  <div className="mt-2">
-                    <Button
-                      type="default"
-                      onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
-                    >
-                      Enable RLS for this table
-                    </Button>
-                  </div>
+                  {!isLocked && (
+                    <div className="mt-2">
+                      <Button
+                        type="default"
+                        onClick={() => setRlsConfirmModalOpen(!rlsConfirmModalOpen)}
+                      >
+                        Enable RLS for this table
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </PopoverContent_Shadcn_>
             </Popover_Shadcn_>
