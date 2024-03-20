@@ -16,7 +16,7 @@ interface PanelProps {
   onClick?: VoidFunction
   progress?: number | undefined
   intervalDuration?: number
-  image?: React.ReactNode
+  image?: any
 }
 
 const TimedPanel = ({
