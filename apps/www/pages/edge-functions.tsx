@@ -7,25 +7,22 @@ import { useBreakpoint } from 'common'
 import { PRODUCT_NAMES, PRODUCT_SHORTNAMES } from 'shared-data/products'
 import page from '~/data/products/functions/page'
 
-import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
+import SectionContainer from '~/components/Layouts/SectionContainer'
 import ProductHeader from '~/components/Sections/ProductHeader2'
 import ProductsNav from '~/components/Products/ProductsNav'
 
-import SectionContainer from '~/components/Layouts/SectionContainer'
-
-const HighlightColumns = dynamic(() => import('~/components/Sections/HighlightColumns'))
-const TimedAccordionSection = dynamic(() => import('~/components/Sections/TimedAccordionSection'))
-const TimedAccordionPanels = dynamic(() => import('~/components/Sections/TimedAccordionPanels'))
-const ProductsCta = dynamic(() => import('~/components/Sections/ProductsCta2'))
-const LocalDXGrid = dynamic(() => import('~/components/Products/Functions/LocalDXGrid'))
+const ExamplesCarousel = dynamic(() => import('~/components/Examples/ExamplesCarousel'))
 const GlobalPresenceSection = dynamic(
   () => import('~/components/Products/Functions/GlobalPresenceSection')
 )
-const ExamplesCarousel = dynamic(() => import('~/components/Examples/ExamplesCarousel'))
+const HighlightColumns = dynamic(() => import('~/components/Sections/HighlightColumns'))
+const LocalDXGrid = dynamic(() => import('~/components/Products/Functions/LocalDXGrid'))
+const ProductsCta = dynamic(() => import('~/components/Sections/ProductsCta2'))
+const TimedAccordionPanels = dynamic(() => import('~/components/Sections/TimedAccordionPanels'))
+const TimedAccordionSection = dynamic(() => import('~/components/Sections/TimedAccordionSection'))
 
-function Database() {
-  // base path for images
+function EdgeFunctions() {
   const { basePath } = useRouter()
   const isXs = useBreakpoint(640)
   const pageData = page(isXs)
@@ -81,4 +78,4 @@ function Database() {
   )
 }
 
-export default Database
+export default EdgeFunctions
