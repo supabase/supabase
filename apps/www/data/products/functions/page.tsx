@@ -265,7 +265,7 @@ export default (isMobile?: boolean) => ({
         icon: '',
         paragraph:
           'Stream logs to the dashboard in realtime. Logs are populated with rich metadata to help debugging',
-        image: <RealtimeLogs />,
+        image: RealtimeLogs,
       },
       {
         id: 'log-explorer',
@@ -273,14 +273,14 @@ export default (isMobile?: boolean) => ({
         icon: '',
         paragraph:
           'Get deeper insights into how your functions are behaving by writing SQL queries on function logs',
-        image: <QueryLogs />,
+        image: QueryLogs,
       },
       {
         id: 'metrics',
         label: 'Metrics',
         icon: '',
         paragraph: 'Dashboards show the health of your functions at all times',
-        image: <Metrics />,
+        image: Metrics,
       },
     ],
   },

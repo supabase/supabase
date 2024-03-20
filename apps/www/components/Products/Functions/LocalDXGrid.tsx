@@ -38,7 +38,7 @@ const Content = ({ card }: { card: any }) => {
     >
       <div
         className={cn(
-          'relative flex-1 h-full w-full flex items-center',
+          'relative flex-[1_1_0] h-full w-full inline-flex items-center',
           isHoriz && 'lg:order-last flex-1 h-full'
         )}
       >

@@ -49,8 +49,9 @@ function getRandomNumber(min: number, max: number) {
   return Math.round(randomNumber)
 }
 
-const QueryLogs = () => {
+const QueryLogs = ({ isActive }: { isActive?: boolean }) => {
   const [mounted, setMounted] = useState(false)
+  const INTERVAL = 550 // in milliseconds
 
   const logs = [
     createLog(),
@@ -83,13 +84,16 @@ const QueryLogs = () => {
     }
   }
 
-  useInterval(() => {
-    const skip = Math.random() > 0.4
-    if (skip) return
+  useInterval(
+    () => {
+      const skip = Math.random() > 0.6
+      if (skip) return
 
-    const newLog = createLog()
-    setActiveLogs([newLog, ...activeLogs])
-  }, 1000)
+      const newLog = createLog()
+      setActiveLogs([newLog, ...activeLogs])
+    },
+    isActive ? INTERVAL : null
+  )
 
   useEffect(() => {
     setMounted(true)
@@ -106,17 +110,25 @@ const QueryLogs = () => {
             'linear-gradient(to top, hsl(var(--background-surface-100)) 0%, transparent 100%)',
         }}
       />
-      <motion.ul layout className="relative z-10 w-full h-auto flex flex-col px-4 overflow-y-auto">
+      <motion.ul
+        layout
+        transition={{
+          delay: -0.22,
+          duration: 0.1,
+          staggerChildren: 0.1,
+        }}
+        className="relative z-10 w-full h-auto flex flex-col px-4 overflow-y-auto"
+      >
         <AnimatePresence>
           {activeLogs.map((log, i) => (
             <motion.li
               layout
               key={log.id}
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, y: -20 }}
               animate={{
                 opacity: 1,
-                x: 0,
-                transition: { delay: i * 0.03, duration: 0.2 },
+                y: 0,
+                transition: { delay: 0.2 + i * 0.03, duration: 0.15 },
               }}
               className="py-2 md:px-4 pointer-events-auto border-b hover:bg-selection/20 first:border-t w-full font-mono text-xs flex gap-4 lg:gap-5 items-center"
             >

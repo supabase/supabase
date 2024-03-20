@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis } from 'recharts'
+import { cn } from 'ui'
 
 const CHART_COLORS = {
   TICK: 'hsl(var(--background-overlay-hover))',
@@ -9,7 +10,7 @@ const CHART_COLORS = {
   GREEN_2: 'hsl(var(--brand-500))',
 }
 
-const Metrics = () => {
+const Metrics = ({ isActive }: { isActive?: boolean }) => {
   const [mounted, setMounted] = useState(false)
   const [displayValue, setDisplayValue] = useState<number | null>(null)
   const dateFormat = 'MMM D, h:mma'
@@ -75,13 +76,18 @@ const Metrics = () => {
   if (!mounted) return null
 
   return (
-    <div className="absolute inset-0 bottom-4 px-4">
-      <div className="relative rounded-md w-full h-full border border-overlay shadow p-4">
+    <div
+      className={cn(
+        'absolute inset-0 bottom-4 px-4 opacity-50 transition-opacity overflow-hidden',
+        isActive && 'opacity-100'
+      )}
+    >
+      <div className="relative rounded-md w-full h-full border border-overlay shadow p-4 !min-w-[300px]">
         <p className="text-foreground text-sm mb-2">Execution time</p>
         <p className="text-foreground text-base mb-4">
           {displayValue ? data[displayValue]?.pv : highlightedValue}ms {!displayValue ?? '(Avg)'}
         </p>
-        <ResponsiveContainer width="100%" height="90%">
+        <ResponsiveContainer minWidth={200} minHeight={200} width="100%" height="90%">
           <AreaChart
             className="relative z-20 text-xs"
             data={data}

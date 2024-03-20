@@ -29,6 +29,12 @@ const TimedPanel = ({
   image,
 }: PanelProps) => {
   const isSm = useBreakpoint()
+  const Image: any = image ?? null
+
+  const variants = {
+    active: { opacity: 1 },
+    hidden: { opacity: 0.25 },
+  }
 
   return (
     <button
@@ -61,18 +67,23 @@ const TimedPanel = ({
           </p>
         </div>
         <AnimatePresence>
-          {image && isActive && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={isActive && { opacity: 1 }}
-              exit={{ opacity: 0 }}
+          <motion.div
+            variants={variants}
+            initial={'hidden'}
+            animate={isActive ? 'active' : 'hidden'}
+            exit={'hidden'}
+            className={cn(
+              'absolute h-[calc(100%-150px)] mt-14 inset-0 m-auto flex items-center justify-center'
+            )}
+          >
+            <div
               className={cn(
-                'absolute h-[calc(100%-150px)] mt-14 inset-0 m-auto flex items-center justify-center'
+                'absolute z-20 w-full h-full inset-0 bg-gradient-to-r from-transparent to-background-surface-100 transition-opacity',
+                isActive && 'opacity-0'
               )}
-            >
-              {image}
-            </motion.div>
-          )}
+            />
+            <Image isActive={isActive} />
+          </motion.div>
         </AnimatePresence>
       </Panel>
       {!isSm && isActive && (
@@ -173,13 +184,14 @@ const TimedAccordionPanels = ({ panels, intervalDuration = 10, updateFrequency =
           style={{ zIndex: 0, overflow: 'visible' }}
           initialSlide={0}
           spaceBetween={10}
+          onSlideChange={(s) => handleTabClick(s.activeIndex)}
           slidesPerView={1.1}
           speed={300}
         >
           {panels.map((panel, index) => (
             <SwiperSlide key={index}>
               <TimedPanel
-                isActive
+                isActive={index === activeTab}
                 onClick={() => handleTabClick(index)}
                 progress={index === activeTab ? progress : undefined}
                 intervalDuration={intervalDuration}
