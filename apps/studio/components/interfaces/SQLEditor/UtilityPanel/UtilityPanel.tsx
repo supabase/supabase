@@ -3,10 +3,8 @@ import ResultsDropdown from './ResultsDropdown'
 import UtilityActions from './UtilityActions'
 import UtilityTabResults from './UtilityTabResults'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-
 import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
 import { ChartConfig } from './ChartConfig'
-import { useFlag } from 'hooks'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { useContentQuery } from 'data/content/content-query'
 import { useParams } from 'common'
@@ -42,60 +40,57 @@ const UtilityPanel = ({
   const snap = useSqlEditorStateSnapshot()
   const { ref } = useParams()
   const { data } = useContentQuery(ref)
+  const snippet = snap.snippets[id]?.snippet
+
   const queryKeys = contentKeys.list(ref)
 
   const upsertContent = useContentUpsertMutation({
     invalidateQueriesOnSuccess: false,
     // Optimistic update to the cache
     onMutate: async (newContentSnippet) => {
-      // No need to update the cache for non-SQL content
       const { payload } = newContentSnippet
+
+      // No need to update the cache for non-SQL content
       if (payload.type !== 'sql') return
       if (!('chart' in payload.content)) return
 
+      // Cancel any existing queries so that the new content is fetched
       await queryClient.cancelQueries(queryKeys)
 
-      const newContent = {
-        ...data,
-        content: data?.content.map((i) => {
-          if (i.id === payload.id) {
-            return {
-              ...i,
-              content: {
-                ...i.content,
-                chart: (newContentSnippet.payload.content as SqlSnippets.Content).chart,
-              },
-            }
-          }
-          return i
-        }),
+      const newSnippet = {
+        ...snippet,
+        content: {
+          ...snippet.content,
+          chart: payload.content.chart,
+        },
       }
 
-      queryClient.setQueryData(queryKeys, () => {
-        return newContent
-      })
-
-      return { newContent }
+      snap.updateSnippet(id, newSnippet)
     },
     onError: async (err, newContent, context) => {
       toast.error(`Failed to update chart. Please try again.`)
     },
   })
-  const snippet = snap.snippets[id]?.snippet
   const queryClient = useQueryClient()
 
-  const chartConfig = useMemo(() => {
-    const contentItem = data?.content.find((i) => i.id === id)
-    if (!contentItem || contentItem.type !== 'sql') {
+  function getChartConfig() {
+    if (!snippet || snippet.type !== 'sql') {
       return DEFAULT_CHART_CONFIG
     }
-    return contentItem.content.chart || DEFAULT_CHART_CONFIG
-  }, [data?.content, id])
+
+    if (!snippet.content.chart) {
+      return DEFAULT_CHART_CONFIG
+    }
+
+    return snippet.content.chart
+  }
+
+  const chartConfig = getChartConfig()
 
   const result = snap.results[id]?.[0]
 
   function onConfigChange(config: ChartConfig) {
-    if (!ref) {
+    if (!ref || !snippet.id) {
       return
     }
 
@@ -103,7 +98,7 @@ const UtilityPanel = ({
       projectRef: ref,
       payload: {
         ...snippet,
-        id: snippet.id || '',
+        id: snippet.id,
         description: snippet.description || '',
         project_id: snippet.project_id || 0,
         content: {
