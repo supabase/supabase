@@ -77,6 +77,7 @@ const InputField = ({
       <Input
         layout="horizontal"
         label={field.name}
+        inputClassName='pr-32'
         value={field.value ?? ''}
         descriptionText={
           <>
@@ -120,6 +121,7 @@ const InputField = ({
           label={field.name}
           className="text-sm"
           descriptionText={field.comment}
+          textAreaClassName="pr-24"
           labelOptional={field.format}
           disabled={!isEditable}
           error={errors[field.name]}
