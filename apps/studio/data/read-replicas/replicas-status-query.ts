@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { replicaKeys } from './keys'
 
 export type ReadReplicasStatusesVariables = {

@@ -37,7 +37,7 @@ import useLogsQuery from 'hooks/analytics/useLogsQuery'
 import { useUpgradePrompt } from 'hooks/misc/useUpgradePrompt'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
-import { LogSqlSnippets, NextPageWithLayout } from 'types'
+import type { LogSqlSnippets, NextPageWithLayout } from 'types'
 
 const PLACEHOLDER_QUERY =
   'select\n  cast(timestamp as datetime) as timestamp,\n  event_message, metadata \nfrom edge_logs \nlimit 5'

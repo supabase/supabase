@@ -1,4 +1,5 @@
 import { useCallback } from 'react'
+import toast from 'react-hot-toast'
 
 import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -12,13 +13,18 @@ import {
 } from 'components/layouts/Scaffold'
 import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { useSelectedOrganization, useStore } from 'hooks'
-import { BASE_PATH, OPT_IN_TAGS } from 'lib/constants'
+import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import { useFlag, useSelectedOrganization } from 'hooks'
+import { BASE_PATH } from 'lib/constants'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
 import { IntegrationConnectionItem } from '../../Integrations/IntegrationConnection'
 import SidePanelGitHubRepoLinker from './SidePanelGitHubRepoLinker'
 import SidePanelVercelProjectLinker from './SidePanelVercelProjectLinker'
+import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
+import {
+  GITHUB_INTEGRATION_INSTALLATION_URL,
+  GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL,
+} from 'lib/github'
 
 const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
   return (
@@ -31,17 +37,15 @@ const IntegrationImageHandler = ({ title }: { title: 'vercel' | 'github' }) => {
 }
 
 const IntegrationSettings = () => {
-  const { ui } = useStore()
   const org = useSelectedOrganization()
-  const hasAccessToBranching = org?.opt_in_tags?.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) ?? false
+  const hasAccessToBranching = useFlag<boolean>('branchManagement')
+  const { data: gitHubAuthorization, isLoading: isLoadingGitHubAuthorization } =
+    useGitHubAuthorizationQuery()
   const { data: connections } = useGitHubConnectionsQuery({ organizationId: org?.id })
 
   const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: 'Successfully deleted Github connection',
-      })
+      toast.success('Successfully deleted Github connection')
     },
   })
 
@@ -82,6 +86,10 @@ Connect any of your GitHub repositories to a project.
 You will be able to connect a GitHub repository to a Supabase project.
 The GitHub app will watch for changes in your repository such as file changes, branch changes as well as pull request activity.
 `
+
+  const GitHubContentSectionBottom = gitHubAuthorization
+    ? `You are authorized with Supabase GitHub App. You can configure your GitHub App installations and repository access [here](${GITHUB_INTEGRATION_INSTALLATION_URL}). You can revoke your authorization [here](${GITHUB_INTEGRATION_REVOKE_AUTHORIZATION_URL}).`
+    : ''
 
   const GitHubSection = () => (
     <ScaffoldContainer>
@@ -139,6 +147,9 @@ The GitHub app will watch for changes in your repository such as file changes, b
               </a>{' '}
               is required to add GitHub connections.
             </p>
+          )}
+          {GitHubContentSectionBottom && (
+            <Markdown content={GitHubContentSectionBottom} className="text-foreground-lighter" />
           )}
         </ScaffoldSectionContent>
       </ScaffoldSection>

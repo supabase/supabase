@@ -149,7 +149,7 @@ const LogsQueryPanel = ({
                     </Alert>
                   }
                 >
-                  <Badge color="yellow">
+                  <Badge variant="warning">
                     {warnings.length} {warnings.length > 1 ? 'warnings' : 'warning'}
                   </Badge>
                 </Popover>

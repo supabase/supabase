@@ -1,9 +1,9 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { components } from 'data/api'
+import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { replicaKeys } from './keys'
 
 export type LoadBalancersVariables = {

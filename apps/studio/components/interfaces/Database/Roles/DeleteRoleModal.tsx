@@ -1,4 +1,4 @@
-import { PostgresRole } from '@supabase/postgres-meta'
+import type { PostgresRole } from '@supabase/postgres-meta'
 import toast from 'react-hot-toast'
 import { Modal } from 'ui'
 

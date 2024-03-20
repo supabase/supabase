@@ -30,6 +30,8 @@ For this guide we'll use the following example data:
 >
 <TabPanel id="data" label="Data">
 
+{/* <!-- vale off --> */}
+
 | id  | title                               | author                 | description                                                        |
 | --- | ----------------------------------- | ---------------------- | ------------------------------------------------------------------ |
 | 1   | The Poky Little Puppy               | Janette Sebring Lowrey | Puppy is slower than other, bigger animals.                        |
@@ -37,6 +39,8 @@ For this guide we'll use the following example data:
 | 3   | Tootle                              | Gertrude Crampton      | Little toy train has big dreams.                                   |
 | 4   | Green Eggs and Ham                  | Dr. Seuss              | Sam has changing food preferences and eats unusually colored food. |
 | 5   | Harry Potter and the Goblet of Fire | J.K. Rowling           | Fourth year of school starts, big drama ensues.                    |
+
+{/* <!-- vale on --> */}
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
@@ -80,7 +84,7 @@ The functions we'll cover in this guide are:
 
 ### `to_tsvector()` [#to-tsvector]
 
-Converts your data into searchable "tokens". `to_tsvector()` stands for "to text search vector". For example:
+Converts your data into searchable tokens. `to_tsvector()` stands for "to text search vector." For example:
 
 ```sql
 select to_tsvector('green eggs and ham');
@@ -91,10 +95,10 @@ Collectively these tokens are called a "document" which Postgres can use for com
 
 ### `to_tsquery()` [#to-tsquery]
 
-Converts a query string into "tokens" to match. `to_tsquery()` stands for "to text search query".
+Converts a query string into tokens to match. `to_tsquery()` stands for "to text search query."
 
 This conversion step is important because we will want to "fuzzy match" on keywords.
-For example if a user searches for "eggs", and a column has the value "egg", we probably still want to return a match.
+For example if a user searches for `eggs`, and a column has the value `egg`, we probably still want to return a match.
 
 ### Match: `@@` [#match]
 
@@ -253,10 +257,14 @@ val data = supabase.from("books").select {
 </TabPanel>
 <TabPanel id="data" label="Data">
 
+{/* <!-- vale off --> */}
+
 | id  | title                               | author            | description                                     |
 | --- | ----------------------------------- | ----------------- | ----------------------------------------------- |
 | 3   | Tootle                              | Gertrude Crampton | Little toy train has big dreams.                |
 | 5   | Harry Potter and the Goblet of Fire | J.K. Rowling      | Fourth year of school starts, big drama ensues. |
+
+{/* <!-- vale on --> */}
 
 </TabPanel>
 </Tabs>
@@ -338,10 +346,14 @@ val data = supabase.from("books").select {
 </TabPanel>
 <TabPanel id="data" label="Data">
 
+{/* <!-- vale off --> */}
+
 | id  | title                 | author                 | description                                 |
 | --- | --------------------- | ---------------------- | ------------------------------------------- |
 | 1   | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals. |
 | 3   | Tootle                | Gertrude Crampton      | Little toy train has big dreams.            |
+
+{/* <!-- vale on --> */}
 
 </TabPanel>
 </Tabs>
@@ -403,9 +415,13 @@ val data = supabase.from("books").select {
 </TabPanel>
 <TabPanel id="data" label="Data">
 
+{/* <!-- vale off --> */}
+
 | id  | title  | author            | description                      |
 | --- | ------ | ----------------- | -------------------------------- |
 | 3   | Tootle | Gertrude Crampton | Little toy train has big dreams. |
+
+{/* <!-- vale on --> */}
 
 </TabPanel>
 </Tabs>
@@ -467,10 +483,14 @@ val data = supabase.from("books").select {
 </TabPanel>
 <TabPanel id="data" label="Data">
 
+{/* <!-- vale off --> */}
+
 | id  | title                 | author                 | description                                 |
 | --- | --------------------- | ---------------------- | ------------------------------------------- |
 | 1   | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals. |
 | 3   | Tootle                | Gertrude Crampton      | Little toy train has big dreams.            |
+
+{/* <!-- vale on --> */}
 
 </TabPanel>
 </Tabs>
@@ -514,6 +534,8 @@ from books;
 </TabPanel>
 <TabPanel id="data" label="Data">
 
+{/* <!-- vale off --> */}
+
 | id  | fts                                                                                                             |
 | --- | --------------------------------------------------------------------------------------------------------------- |
 | 1   | 'anim':7 'bigger':6 'littl':10 'poki':9 'puppi':1,11 'slower':3                                                 |
@@ -521,6 +543,8 @@ from books;
 | 3   | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3                                                         |
 | 4   | 'chang':3 'color':9 'eat':7 'egg':12 'food':4,10 'green':11 'ham':14 'prefer':5 'sam':1 'unus':8                |
 | 5   | 'big':6 'drama':7 'ensu':8 'fire':15 'fourth':1 'goblet':13 'harri':9 'potter':10 'school':4 'start':5 'year':2 |
+
+{/* <!-- vale on --> */}
 
 </TabPanel>
 </Tabs>
@@ -578,9 +602,13 @@ val data = supabase.from("books").select {
 </TabPanel>
 <TabPanel id="data" label="Data">
 
+{/* <!-- vale off --> */}
+
 | id  | title  | author            | description                      | fts                                                     |
 | --- | ------ | ----------------- | -------------------------------- | ------------------------------------------------------- |
 | 3   | Tootle | Gertrude Crampton | Little toy train has big dreams. | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3 |
+
+{/* <!-- vale on --> */}
 
 </TabPanel>
 </Tabs>

@@ -17,7 +17,7 @@ import {
   IconXCircle,
 } from 'ui'
 
-import { Bucket } from 'data/storage/buckets-query'
+import type { Bucket } from 'data/storage/buckets-query'
 import { useCheckPermissions } from 'hooks'
 
 export interface BucketRowProps {
@@ -61,7 +61,7 @@ const BucketRow = ({
           >
             {bucket.name}
           </p>
-          {bucket.public && <Badge color="yellow">Public</Badge>}
+          {bucket.public && <Badge variant="warning">Public</Badge>}
         </div>
       </Link>
       {/* [JOSHEN TODO] need to change this */}

@@ -264,7 +264,7 @@ export const gettingstarted: NavMenuConstant = {
       ],
     },
     {
-      name: 'Web app tutorials',
+      name: 'Web app demos',
       items: [
         {
           name: 'Next.js',
@@ -492,6 +492,12 @@ export const PhoneLoginsItems = [
     isDarkMode: true,
     hasLightIcon: true,
   },
+  {
+    name: 'Textlocal SMS Login (Community Supported)',
+    icon: '/docs/img/icons/textlocal-icon',
+    url: '/guides/auth/phone-login/textlocal',
+    linkDescription: 'Textlocal is a cloud-based SMS platform offering bulk messaging services.',
+  },
 ]
 
 export const auth = {
@@ -607,6 +613,10 @@ export const auth = {
           name: 'Column Level Security',
           url: '/guides/auth/column-level-security',
         },
+        {
+          name: 'Custom Claims & RBAC',
+          url: '/guides/auth/custom-claims-and-role-based-access-control-rbac',
+        },
       ],
     },
     {
@@ -690,6 +700,12 @@ export const database: NavMenuConstant = {
         {
           name: 'Connecting to your database',
           url: '/guides/database/connecting-to-postgres',
+          items: [
+            {
+              name: 'Serverless Drivers',
+              url: '/guides/database/connecting-to-postgres/serverless-drivers',
+            },
+          ],
         },
         { name: 'Importing data', url: '/guides/database/import-data' },
         { name: 'Securing your data', url: '/guides/database/secure-data' },
@@ -1119,6 +1135,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/debugging',
         },
         {
+          name: 'Logging and Using Headers',
+          url: '/guides/functions/functions-headers',
+        },
+        {
           name: 'Testing your Edge Functions',
           url: '/guides/functions/unit-test',
         },
@@ -1186,6 +1206,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Hugging Face',
           url: '/guides/ai/examples/huggingface-image-captioning',
+        },
+        {
+          name: 'Monitoring with Sentry',
+          url: '/guides/functions/examples/sentry-monitoring',
         },
         { name: 'OpenAI API', url: '/guides/ai/examples/openai' },
         {
@@ -1387,6 +1411,7 @@ export const ai = {
           url: '/guides/ai/vector-indexes',
           items: vectorIndexItems,
         },
+        { name: 'Hybrid search', url: '/guides/ai/hybrid-search' },
         {
           name: 'Engineering for scale',
           url: '/guides/ai/engineering-for-scale',
@@ -1580,6 +1605,15 @@ export const platform: NavMenuConstant = {
       ],
     },
     {
+      name: 'Logging and observability',
+      url: undefined,
+      items: [
+        { name: 'Logging', url: '/guides/platform/logs' },
+        { name: 'Metrics', url: '/guides/platform/metrics' },
+        { name: 'Monitoring with Sentry', url: '/guides/platform/sentry-monitoring' },
+      ],
+    },
+    {
       name: 'Platform Management',
       url: undefined,
       items: [
@@ -1594,8 +1628,6 @@ export const platform: NavMenuConstant = {
           name: 'HTTP Status Codes',
           url: '/guides/platform/http-status-codes',
         },
-        { name: 'Logging', url: '/guides/platform/logs' },
-        { name: 'Metrics', url: '/guides/platform/metrics' },
         {
           name: 'Migrating and Upgrading',
           url: '/guides/platform/migrating-and-upgrading-projects',

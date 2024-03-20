@@ -20,10 +20,10 @@ import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import Table from 'components/to-be-cleaned/Table'
 import Panel from 'components/ui/Panel'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
-import { DbQueryHook } from 'hooks/analytics/useDbQuery'
+import type { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
 import { formatBytes } from 'lib/helpers'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (

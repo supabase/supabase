@@ -22,7 +22,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
 
   const tsDefinition =
     hasTsRef && props.typeSpec ? extractTsDocNode(hasTsRef, props.typeSpec) : null
-  const parameters = hasTsRef && tsDefinition ? generateParameters(tsDefinition) : ''
+  const parameters = hasTsRef && tsDefinition ? generateParameters(tsDefinition) : item.params
   const shortText = hasTsRef && tsDefinition ? tsDefinition.signatures[0].comment.shortText : ''
 
   return (
@@ -51,24 +51,15 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                 </ReactMarkdown>
               </div>
             )}
-            {/* // parameters */}
+            {/* parameters */}
             {parameters && (
               <div className="not-prose mt-12">
                 <h5 className="mb-3 text-base text-foreground">Parameters</h5>
                 <ul>
                   {parameters.map((param) => {
-                    // grab override params from yaml file
-                    const overrideParams = item.overrideParams
-
-                    // params from the yaml file can override the params from parameters if it matches the name
-                    const overide = overrideParams?.filter((x) => {
-                      return param.name === x.name
-                    })
-
-                    const paramItem = overide?.length > 0 ? overide[0] : param
                     return (
-                      <Param {...paramItem} key={param.name}>
-                        {paramItem.subContent && (
+                      <Param {...param} key={param.name}>
+                        {param.subContent && (
                           <div className="mt-3">
                             <Options>
                               {param.subContent.map((param) => {

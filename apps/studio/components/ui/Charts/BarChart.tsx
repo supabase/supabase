@@ -3,9 +3,9 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useState } from 'react'
 import { Bar, BarChart as RechartBarChart, Cell, Tooltip, XAxis, Legend } from 'recharts'
-import { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart'
+import type { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart'
 import ChartHeader from './ChartHeader'
-import { CommonChartProps, Datum } from './Charts.types'
+import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
 import ChartNoData from './NoDataPlaceholder'
 dayjs.extend(utc)
@@ -47,12 +47,22 @@ const BarChart = ({
     return <ChartNoData message={emptyStateMessage} size={size} className={className} />
 
   const day = (value: number | string) => (displayDateInUtc ? dayjs(value).utc() : dayjs(value))
-  const resolvedHighlightedLabel =
-    (focusDataIndex !== null &&
-      data &&
-      data[focusDataIndex] !== undefined &&
-      day(data[focusDataIndex][xAxisKey]).format(customDateFormat)) ||
-    highlightedLabel
+
+  function getHeaderLabel() {
+    if (!xAxisIsDate) {
+      if (!focusDataIndex) return highlightedLabel
+      return data[focusDataIndex]?.[xAxisKey]
+    }
+    return (
+      (focusDataIndex !== null &&
+        data &&
+        data[focusDataIndex] !== undefined &&
+        day(data[focusDataIndex][xAxisKey]).format(customDateFormat)) ||
+      highlightedLabel
+    )
+  }
+
+  const resolvedHighlightedLabel = getHeaderLabel()
 
   const resolvedHighlightedValue =
     focusDataIndex !== null ? data[focusDataIndex]?.[yAxisKey] : highlightedValue

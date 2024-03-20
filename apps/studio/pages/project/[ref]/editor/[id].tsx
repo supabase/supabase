@@ -6,7 +6,7 @@ import { TableEditorLayout } from 'components/layouts'
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
 import useTable from 'hooks/misc/useTable'
 import { useRouter } from 'next/router'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -24,7 +24,6 @@ const TableEditorPage: NextPageWithLayout = () => {
         theme={resolvedTheme?.includes('dark') ? 'dark' : 'light'}
       />
       <DeleteConfirmationDialogs
-        projectRef={projectRef}
         selectedTable={selectedTable}
         onAfterDeleteTable={(tables) => {
           // For simplicity for now, we just open the first table within the same schema

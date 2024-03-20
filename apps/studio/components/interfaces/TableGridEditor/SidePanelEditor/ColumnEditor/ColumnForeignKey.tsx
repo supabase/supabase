@@ -6,8 +6,8 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import useTable from 'hooks/misc/useTable'
 import { ForeignKeySelector } from '../ForeignKeySelector/ForeignKeySelector'
-import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
-import { ColumnField } from '../SidePanelEditor.types'
+import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
+import type { ColumnField } from '../SidePanelEditor.types'
 import { ForeignKeyRow } from '../TableEditor/ForeignKeysManagement/ForeignKeyRow'
 import { checkIfRelationChanged } from '../TableEditor/ForeignKeysManagement/ForeignKeysManagement.utils'
 

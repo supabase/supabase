@@ -36,7 +36,7 @@ import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubBranchesQuery } from 'data/integrations/github-branches-query'
 import { useGitHubConnectionUpdateMutation } from 'data/integrations/github-connection-update-mutation'
-import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
 
 interface GitHubIntegrationConnectionFormProps {
@@ -122,6 +122,16 @@ const GitHubIntegrationConnectionForm = ({ connection }: GitHubIntegrationConnec
           <p className="text-xs text-foreground-light mb-3">
             All other branches will be treated as Preview branches
           </p>
+
+          <Alert_Shadcn_ className="mb-4 w-96">
+            <AlertTitle_Shadcn_ className="text-sm">
+              Changing Git branch for Production Branch coming soon
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_ className="text-xs">
+              If you wish to change the Git branch that is used for the Production Branch you will
+              need to disable Branching and opt back in.
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
 
           {/* <pre>! This should only work if branching is turned on !</pre> */}
 

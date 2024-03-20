@@ -1,7 +1,7 @@
 import Reports from 'components/interfaces/Reports/Reports'
 import { ReportsLayout } from 'components/layouts'
 import EditReportModal from 'components/to-be-cleaned/Reports/EditReportModal'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => (
   <>

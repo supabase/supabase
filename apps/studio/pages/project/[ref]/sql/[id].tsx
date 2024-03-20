@@ -1,6 +1,5 @@
 import { useMonaco } from '@monaco-editor/react'
 import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 
@@ -9,7 +8,7 @@ import { useKeywordsQuery } from 'data/database/keywords-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
 import { SQLEditorLayout } from 'components/layouts'
@@ -150,7 +149,7 @@ const SqlEditor: NextPageWithLayout = () => {
   }, [isPgInfoReady])
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 overflow-auto">
       <SQLEditor />
     </div>
   )
@@ -158,4 +157,4 @@ const SqlEditor: NextPageWithLayout = () => {
 
 SqlEditor.getLayout = (page) => <SQLEditorLayout title="SQL">{page}</SQLEditorLayout>
 
-export default observer(SqlEditor)
+export default SqlEditor

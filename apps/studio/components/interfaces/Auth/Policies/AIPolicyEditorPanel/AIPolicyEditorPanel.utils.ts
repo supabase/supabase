@@ -1,4 +1,4 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
+import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { Message } from 'ai/react'
 import { uuidv4 } from 'lib/helpers'
 

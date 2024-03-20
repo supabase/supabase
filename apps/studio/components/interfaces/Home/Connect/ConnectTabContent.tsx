@@ -6,12 +6,15 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { pluckObjectFields } from 'lib/helpers'
-import { projectKeys } from './Connect.types'
+import type { projectKeys } from './Connect.types'
 
 interface ConnectContentTabProps {
   projectKeys: projectKeys
   filePath: string
-  connectionStringPooler?: string
+  connectionStringPooler?: {
+    transaction: string
+    session: string
+  }
   connectionStringDirect?: string
 }
 
@@ -40,14 +43,8 @@ const ConnectTabContentNew = ({ projectKeys, filePath }: ConnectContentTabProps)
           usePoolerConnection: false,
         })
       : { uri: '' }
-  const connectionStringPooler =
-    filePath !== 'drizzle'
-      ? connectionStringsPooler.uri.replace('6543', '5432')
-      : connectionStringsPooler.uri
-  const connectionStringDirect =
-    filePath !== 'drizzle'
-      ? connectionStringsDirect.uri.replace('6543', '5432')
-      : connectionStringsDirect.uri
+  const connectionStringPoolerTransaction = connectionStringsPooler.uri
+  const connectionStringPoolerSession = connectionStringsPooler.uri.replace('6543', '5432')
 
   const ContentFile = dynamic<ConnectContentTabProps>(
     () => import(`./content/${filePath}/content`),
@@ -65,8 +62,11 @@ const ConnectTabContentNew = ({ projectKeys, filePath }: ConnectContentTabProps)
       <ContentFile
         projectKeys={projectKeys}
         filePath={filePath}
-        connectionStringPooler={connectionStringPooler}
-        connectionStringDirect={connectionStringDirect}
+        connectionStringPooler={{
+          transaction: connectionStringPoolerTransaction,
+          session: connectionStringPoolerSession,
+        }}
+        connectionStringDirect={connectionStringsDirect.uri}
       />
     </div>
   )

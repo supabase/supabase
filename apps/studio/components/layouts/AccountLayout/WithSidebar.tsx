@@ -5,7 +5,7 @@ import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
 
 import { useFlag } from 'hooks'
 import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
-import { SidebarLink, SidebarSection } from './AccountLayout.types'
+import type { SidebarLink, SidebarSection } from './AccountLayout.types'
 
 interface WithSidebarProps {
   title: string
@@ -98,7 +98,7 @@ const SectionWithHeaders = ({ section, subitems, subitemsParentKey }: SectionWit
     {section.heading && <Menu.Group title={section.heading} />}
     {section.versionLabel && (
       <div className="mb-1 px-3">
-        <Badge color="yellow">{section.versionLabel}</Badge>
+        <Badge variant="warning">{section.versionLabel}</Badge>
       </div>
     )}
     {

@@ -2,10 +2,11 @@ import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Alert, Badge, Button, Checkbox, IconBookOpen, Input, Modal, SidePanel } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import {
   CONSTRAINT_TYPE,
@@ -17,20 +18,20 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { useIsFeatureEnabled, useStore } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SpreadsheetImport } from '../'
 import ActionBar from '../ActionBar'
-import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
+import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
-import { ColumnField } from '../SidePanelEditor.types'
+import type { ColumnField } from '../SidePanelEditor.types'
 import ColumnManagement from './ColumnManagement'
 import { ForeignKeysManagement } from './ForeignKeysManagement/ForeignKeysManagement'
 import HeaderTitle from './HeaderTitle'
 import RLSDisableModalContent from './RLSDisableModal'
 import { DEFAULT_COLUMNS } from './TableEditor.constants'
-import { ImportContent, TableField } from './TableEditor.types'
+import type { ImportContent, TableField } from './TableEditor.types'
 import {
   formatImportedContentToColumnFields,
   generateTableField,
@@ -75,7 +76,6 @@ const TableEditor = ({
   updateEditorDirty = noop,
 }: TableEditorProps) => {
   const snap = useTableEditorStateSnapshot()
-  const { ui } = useStore()
   const { project } = useProjectContext()
   const isNewRecord = isUndefined(table)
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
@@ -171,13 +171,13 @@ const TableEditor = ({
     if (tableFields) {
       const errors: any = validateFields(tableFields)
       if (errors.columns) {
-        ui.setNotification({ category: 'error', message: errors.columns, duration: 4000 })
+        toast.error(errors.columns)
       }
       setErrors(errors)
 
       if (isEmpty(errors)) {
         const payload = {
-          name: tableFields.name,
+          name: tableFields.name.trim(),
           schema: snap.selectedSchemaName,
           comment: tableFields.comment,
           ...(!isNewRecord && { rls_enabled: tableFields.isRLSEnabled }),
@@ -276,7 +276,7 @@ const TableEditor = ({
           label={
             <div className="flex items-center space-x-2">
               <span>Enable Row Level Security (RLS)</span>
-              <Badge color="gray">Recommended</Badge>
+              <Badge>Recommended</Badge>
             </div>
           }
           // @ts-ignore

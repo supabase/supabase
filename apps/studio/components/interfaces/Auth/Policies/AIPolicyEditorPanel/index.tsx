@@ -1,4 +1,4 @@
-import { PostgresPolicy } from '@supabase/postgres-meta'
+import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useChat } from 'ai/react'
 import { useParams, useTelemetryProps } from 'common'
@@ -14,9 +14,9 @@ import {
   IconGrid,
   Modal,
   ScrollArea,
-  SheetContent_Shadcn_,
-  SheetFooter_Shadcn_,
-  Sheet_Shadcn_,
+  Sheet,
+  SheetContent,
+  SheetFooter,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
@@ -52,7 +52,6 @@ import RLSCodeEditor from './RLSCodeEditor'
 import { PolicyTemplates } from './PolicyTemplates'
 import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import CardButton from 'components/ui/CardButton'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -163,6 +162,9 @@ export const AIPolicyEditorPanel = memo(function ({
         sql: policy,
         projectRef: selectedProject?.ref,
         connectionString: selectedProject?.connectionString,
+        handleError: (error) => {
+          throw error
+        },
       })
     }
   }, [executeMutation, selectedProject?.connectionString, selectedProject?.ref])
@@ -291,14 +293,15 @@ export const AIPolicyEditorPanel = memo(function ({
 
   return (
     <>
-      <Sheet_Shadcn_ open={visible} onOpenChange={() => onClosingPanel()}>
-        <SheetContent_Shadcn_
+      <Sheet open={visible} onOpenChange={() => onClosingPanel()}>
+        <SheetContent
           size={assistantVisible ? 'lg' : 'default'}
           className={cn(
             'bg-surface-200',
             'p-0 flex flex-row gap-0',
             assistantVisible ? '!min-w-[1200px]' : '!min-w-[600px]'
           )}
+          showClose={false}
         >
           <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
             <AIPolicyHeader
@@ -400,7 +403,7 @@ export const AIPolicyEditorPanel = memo(function ({
                     setOpen={setErrorPanelOpen}
                   />
                 )}
-                <SheetFooter_Shadcn_ className="flex items-center !justify-between px-5 py-4 w-full">
+                <SheetFooter className="flex items-center !justify-between px-5 py-4 w-full">
                   <Button type="text" onClick={toggleFeaturePreviewModal}>
                     Toggle feature preview
                   </Button>
@@ -417,7 +420,7 @@ export const AIPolicyEditorPanel = memo(function ({
                       Save policy
                     </Button>
                   </div>
-                </SheetFooter_Shadcn_>
+                </SheetFooter>
               </div>
             </div>
           </div>
@@ -510,8 +513,8 @@ export const AIPolicyEditorPanel = memo(function ({
               </p>
             </Modal.Content>
           </ConfirmationModal>
-        </SheetContent_Shadcn_>
-      </Sheet_Shadcn_>
+        </SheetContent>
+      </Sheet>
     </>
   )
 })

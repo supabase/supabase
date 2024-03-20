@@ -1,6 +1,6 @@
 import { constructHeaders, handleError, handleResponse, handleResponseError } from './base'
 import { uuidv4 } from '../../helpers'
-import { SupaResponse } from 'types/base'
+import type { SupaResponse } from 'types/base'
 
 /**
  * @deprecated please use post method from data/fetchers instead

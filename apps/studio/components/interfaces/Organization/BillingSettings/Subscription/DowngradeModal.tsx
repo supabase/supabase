@@ -1,5 +1,5 @@
-import { ProjectInfo } from 'data/projects/projects-query'
-import { OrgSubscription, ProjectAddon } from 'data/subscriptions/types'
+import type { ProjectInfo } from 'data/projects/projects-query'
+import type { OrgSubscription, ProjectAddon } from 'data/subscriptions/types'
 import { PricingInformation } from 'shared-data'
 import { Alert, IconAlertOctagon, IconMinusCircle, IconPauseCircle, Modal } from 'ui'
 

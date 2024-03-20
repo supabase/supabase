@@ -8,7 +8,6 @@ import CardButton from 'components/ui/CardButton'
 import CopyButton from 'components/ui/CopyButton'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { getGeneralPolicyTemplates } from '../PolicyEditorModal/PolicyEditorModal.constants'
-import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
 
 interface PolicyTemplatesProps {
   selectedTemplate?: string
@@ -67,16 +66,16 @@ export const PolicyTemplates = ({ selectedTemplate, onSelectTemplate }: PolicyTe
                     <div className="min-w-16">
                       <Badge
                         className="!rounded font-mono"
-                        color={
+                        variant={
                           template.command === 'ALL'
-                            ? 'scale'
+                            ? 'default'
                             : template.command === 'SELECT'
-                              ? 'green'
+                              ? 'brand'
                               : template.command === 'UPDATE'
-                                ? 'blue'
+                                ? 'default'
                                 : template.command === 'DELETE'
-                                  ? 'tomato'
-                                  : 'yellow'
+                                  ? 'destructive'
+                                  : 'warning'
                         }
                       >
                         {template.command}

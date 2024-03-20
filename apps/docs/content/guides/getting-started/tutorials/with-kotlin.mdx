@@ -33,7 +33,7 @@ Open Android Studio > New Project > Base Activity (Jetpack Compose).
 
 Create or edit the `local.properties` file at the root (same level as `build.gradle`) of your project.
 
-> **Note**: Do not commit this file to your source control, e.g. by adding it to your `.gitignore` file!
+> **Note**: Do not commit this file to your source control, for example, by adding it to your `.gitignore` file!
 
 ```kotlin
 SUPABASE_ANON_KEY=YOUR_SUPABASE_ANON_KEY
@@ -75,7 +75,7 @@ val apiKey = BuildConfig.SUPABASE_ANON_KEY
 
 ![Gradle dependencies](/docs/img/guides/kotlin/gradle-dependencies.png)
 
-In the `build.gradle` (app) file, add these dependencies then press "Sync now". Replace the dependency version placeholders `$supabase_version` and `$ktor_version` with their respective latest versions.
+In the `build.gradle` (app) file, add these dependencies then press "Sync now." Replace the dependency version placeholders `$supabase_version` and `$ktor_version` with their respective latest versions.
 
 ```kotlin
 implementation "io.github.jan-tennert.supabase:postgrest-kt:$supabase_version"

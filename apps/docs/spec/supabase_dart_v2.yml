@@ -6,8 +6,6 @@ info:
   description: |
 
     Supabase Dart.
-
-  definition: spec/enrichments/tsdoc_v2/combined.json
   slugPrefix: '/'
   specUrl: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_dart_v2.yml
   libraries:
@@ -23,7 +21,67 @@ functions:
 
       The Supabase client is your entrypoint to the rest of the Supabase functionality
       and is the easiest way to interact with everything we offer within the Supabase ecosystem.
-
+    params:
+      - name: url
+        isOptional: false
+        type: string
+        description: The unique Supabase URL which is supplied when you create a new project in your project dashboard.
+      - name: anonKey
+        isOptional: false
+        type: string
+        description: The unique Supabase Key which is supplied when you create a new project in your project dashboard.
+      - name: headers
+        isOptional: true
+        type: Map<String, String>
+        description: Custom header to be passed to the Supabase client.
+      - name: httpClient
+        isOptional: true
+        type: Client
+        description: Custom http client to be used by the Supabase client.
+      - name: authOptions
+        isOptional: true
+        type: FlutterAuthClientOptions
+        description: Options to change the Auth behaviors.
+        subContent:
+          - name: authFlowType
+            isOptional: true
+            type: AuthFlowType
+            description: Whether to use the `pkce` flow or the `implicit` flow. Defaults to `pkce`.
+          - name: localStorage
+            isOptional: true
+            type: LocalStorage
+            description: Parameter to override the local storage to store auth tokens.
+          - name: autoRefreshToken
+            isOptional: true
+            type: bool
+            description: Whether to automatically refresh the token when it expires. Defaults to `true`.
+      - name: postgrestOptions
+        isOptional: true
+        type: PostgrestClientOptions
+        description: Options to change the Postgrest behaviors.
+        subContent:
+          - name: schema
+            isOptional: true
+            type: String
+            description: Schema to query with the Supabase client. Defaults to `public`.
+      - name: realtimeClientOptions
+        isOptional: true
+        type: RealtimeClientOptions
+        description: Options to change the Realtime behaviors.
+        subContent:
+          - name: logLevel
+            isOptional: true
+            type: RealtimeLogLevel
+            description: Level of realtime server logs to to be logged.
+      - name: storageOptions
+        isOptional: true
+        type: StorageClientOptions
+        description: Options to change the Storage behaviors.
+        subContent:
+          - name: retryAttempts
+            isOptional: true
+            type: int
+            description: The number of times to retry a failed upload request. Defaults to `0`.
     examples:
       - id: flutter-initialize
         name: For Flutter
@@ -59,10 +117,39 @@ functions:
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/guides/auth/concepts/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
         - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
+    params:
+      - name: email
+        isOptional: true
+        type: String
+        description: User's email address to be used for email authentication.
+      - name: phone
+        isOptional: true
+        type: String
+        description: User's phone number to be used for phone authentication.
+      - name: password
+        isOptional: false
+        type: String
+        description: Password to be used for authentication.
+      - name: emailRedirectTo
+        isOptional: true
+        type: String
+        description: The URL to redirect the user to after they confirm their email address.
+      - name: data
+        isOptional: true
+        type: Map<String, dynamic>
+        description: The user's metadata to be stored in the user's object.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification.
+      - name: channel
+        isOptional: true
+        type: OtpChannel
+        description: Messaging channel to use (e.g. whatsapp or sms). Defaults to `OtpChannel.sms`.
     examples:
       - id: sign-up
         name: Sign up.
@@ -109,6 +196,23 @@ functions:
       Log in an existing user using email or phone number with password.
     notes: |
       - Requires either an email and password or a phone number and password.
+    params:
+      - name: email
+        isOptional: true
+        type: String
+        description: User's email address to be used for email authentication.
+      - name: phone
+        isOptional: true
+        type: String
+        description: User's phone number to be used for phone authentication.
+      - name: password
+        isOptional: false
+        type: String
+        description: Password to be used for authentication.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification.
     examples:
       - id: sign-in-with-email-and-password
         name: Sign in with email and password
@@ -140,7 +244,36 @@ functions:
       - This method is used for passwordless sign-ins where an OTP is sent to the user's email or phone number.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or an OTP.
       - If you're using phone, you can configure whether you want the user to receive an OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/guides/auth/concepts/redirect-urls). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+    params:
+      - name: email
+        isOptional: true
+        type: String
+        description: Email address to send the magic link or OTP to.
+      - name: phone
+        isOptional: true
+        type: String
+        description: Phone number to send the OTP to.
+      - name: emailRedirectTo
+        isOptional: true
+        type: String
+        description: The URL to redirect the user to after they click on the magic link.
+      - name: shouldCreateUser
+        isOptional: true
+        type: bool
+        description: If set to false, this method will not create a new user. Defaults to true.
+      - name: data
+        isOptional: true
+        type: Map<String, dynamic>
+        description: The user's metadata to be stored in the user's object.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification.
+      - name: channel
+        isOptional: true
+        type: OtpChannel
+        description: Messaging channel to use (e.g. whatsapp or sms). Defaults to `OtpChannel.sms`.
     examples:
       - id: sign-in-with-email
         name: Sign in with email.
@@ -179,6 +312,27 @@ functions:
     title: 'signInWithIdToken()'
     description: |
       Allows you to perform native Google and Apple sign in by combining it with [google_sign_in](https://pub.dev/packages/google_sign_in) or [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple) packages.
+    params:
+      - name: provider
+        isOptional: false
+        type: OAuthProvider
+        description: The provider to perform the sign in with. Currently, `OAuthProvider.google` and `OAuthProvider.apple` are supported.
+      - name: idToken
+        isOptional: false
+        type: String
+        description: The identity token obtained from the third-party provider.
+      - name: accessToken
+        isOptional: true
+        type: String
+        description: Access token obtained from the third-party provider. Required for Google sign in.
+      - name: nonce
+        isOptional: true
+        type: String
+        description: Raw nonce value used to perform the third-party sign in. Required for Apple sign-in.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification.
     examples:
       - id: sign-in-with-google
         name: Native Google sign in
@@ -268,6 +422,27 @@ functions:
     notes: |
       - This method is used for signing in using a third-party provider.
       - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
+    params:
+      - name: provider
+        isOptional: false
+        type: OAuthProvider
+        description: The OAuth provider to use for signing in.
+      - name: redirectTo
+        isOptional: true
+        type: String
+        description: The URL to redirect the user to after they sign in with the third-party provider.
+      - name: scopes
+        isOptional: true
+        type: String
+        description: A list of scopes to request from the third-party provider.
+      - name: authScreenLaunchMode
+        isOptional: true
+        type: LaunchMode
+        description: The launch mode for the auth screen. Defaults to `LaunchMode.platformDefault`.
+      - name: queryParams
+        isOptional: true
+        type: Map<String, String>
+        description: Additional query parameters to be passed to the OAuth flow.
     examples:
       - id: sign-in-using-a-third-party-provider
         name: Sign in using a third-party provider
@@ -313,6 +488,27 @@ functions:
       - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `providerId` property. For example:
           - Mapping specific user email addresses with an identity provider.
           - Using different hints to identify the correct identity provider, like a company-specific page, IP address or other tracking information.
+    params:
+      - name: providerId
+        isOptional: true
+        type: String
+        description: The ID of the SSO provider to use for signing in.
+      - name: domain
+        isOptional: true
+        type: String
+        description: The email domain to use for signing in.
+      - name: redirectTo
+        isOptional: true
+        type: String
+        description: The URL to redirect the user to after they sign in with the third-party provider.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification.
+      - name: launchMode
+        isOptional: true
+        type: LaunchMode
+        description: The launch mode for the auth screen. Defaults to `LaunchMode.platformDefault`.
     examples:
       - id: sign-in-with-domain
         name: Sign in with email domain
@@ -338,6 +534,11 @@ functions:
       Signs out the current user, if there is a logged in user.
     notes: |
       - In order to use the `signOut()` method, the user needs to be signed in first.
+    params:
+      - name: scope
+        isOptional: true
+        type: SignOutScope
+        description: Whether to sign out from all devices or just the current device. Defaults to `SignOutScope.local`.
     examples:
       - id: sign-out
         name: Sign out
@@ -905,6 +1106,11 @@ functions:
       - `select()` can be combined with [Filters](/docs/reference/dart/using-filters)
       - `select()` can be combined with [Modifiers](/docs/reference/dart/using-modifiers)
       - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+    params:
+      - name: columns
+        isOptional: true
+        type: String
+        description: The columns to retrieve, separated by commas. Columns can be renamed when returned with `customName:columnName`
     examples:
       - id: getting-your-data
         name: Getting your data
@@ -1023,6 +1229,11 @@ functions:
     description: |
       Perform an INSERT into the table or view.
     title: 'Create data: insert()'
+    params:
+      - name: values
+        isOptional: false
+        type: Map<String, dynamic> or List<Map<String, dynamic>>
+        description: The values to insert. Pass an object to insert a single row or an array to insert multiple rows.
     examples:
       - id: create-a-record
         name: Create a record
@@ -1059,6 +1270,11 @@ functions:
     title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to update.
+    params:
+      - name: values
+        isOptional: false
+        type: Map<String, dynamic>
+        description: The values to update with.
     examples:
       - id: updating-your-data
         name: Update your data
@@ -1108,6 +1324,23 @@ functions:
     title: 'Upsert data: upsert()'
     notes: |
       - Primary keys must be included in `values` to use upsert.
+    params:
+      - name: values
+        isOptional: false
+        type: Map<String, dynamic> or List<Map<String, dynamic>>
+        description: The values to upsert with. Pass a Map to upsert a single row or an List to upsert multiple rows.
+      - name: onConflict
+        isOptional: true
+        type: String
+        description: Comma-separated UNIQUE column(s) to specify how duplicate rows are determined. Two rows are duplicates if all the `onConflict` columns are equal.
+      - name: ignoreDuplicates
+        isOptional: true
+        type: bool
+        description: If `true`, duplicate rows are ignored. If `false`, duplicate rows are merged with existing rows.
+      - name: defaultToNull
+        isOptional: true
+        type: bool
+        description: Make missing fields default to `null`. Otherwise, use the default value for the column. This only applies when inserting new rows, not when merging with existing rows where ignoreDuplicates is set to false. This also only applies when doing bulk upserts.
     examples:
       - id: upsert-your-data
         name: Upsert your data
@@ -1183,6 +1416,15 @@ functions:
 
       You can call Postgres functions as Remote Procedure Calls, logic in your database that you can execute from anywhere.
       Functions are useful when the logic rarely changes—like for password resets and updates.
+    params:
+      - name: fn
+        isOptional: false
+        type: String
+        description: The function name to call.
+      - name: params
+        isOptional: true
+        type: Map<String, dynamic>
+        description: The arguments to pass to the function call.
     examples:
       - id: call-a-postgres-function-without-arguments
         name: Call a Postgres function without arguments
@@ -1932,6 +2174,15 @@ functions:
     title: limit()
     description: |
       Limits the result with the specified count.
+    params:
+      - name: count
+        isOptional: false
+        type: int
+        description: The maximum number of rows to return.
+      - name: referencedTable
+        isOptional: true
+        type: int
+        description: Set this to limit rows of referenced tables instead of the parent table.
     examples:
       - id: with-select
         name: With `select()`
@@ -1958,6 +2209,23 @@ functions:
     title: order()
     description: |
       Orders the result with the specified column.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to order by.
+      - name: ascending
+        isOptional: true
+        type: bool
+        description: Whether to order in ascending order. Default is `false`.
+      - name: nullsFirst
+        isOptional: true
+        type: bool
+        description: Whether to order nulls first. Default is `false`.
+      - name: referencedTable
+        isOptional: true
+        type: String
+        description: Specify the referenced table when ordering by a column in an embedded resource.
     examples:
       - id: with-select
         name: With `select()`
@@ -1984,6 +2252,19 @@ functions:
     title: range()
     description: |
       Limits the result to rows within the specified range, inclusive.
+    params:
+      - name: from
+        isOptional: false
+        type: int
+        description: The starting index from which to limit the result.
+      - name: to
+        isOptional: false
+        type: int
+        description: The last index to which to limit the result.
+      - name: referencedTable
+        isOptional: true
+        type: String
+        description: Set this to limit rows of referenced tables instead of the parent table.
     examples:
       - id: with-select
         name: With `select()`
@@ -2011,7 +2292,141 @@ functions:
             .select('name, country_id')
             .single();
           ```
+  - id: maybe-single
+    title: maybeSingle()
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select()
+            .eq('name', 'Singapore')
+            .maybeSingle();
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
 
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          null
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: explain
+    title: Using Explain
+    description: |
+      For debugging slow queries, you can get the [Postgres `EXPLAIN` execution plan](https://www.postgresql.org/docs/current/sql-explain.html) of a query
+      using the `explain()` method. This works on any query, even for `rpc()` or writes.
+
+      Explain is not enabled by default as it can reveal sensitive information about your database.
+      It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
+
+      Follow the [Performance Debugging Guide](/docs/guides/database/debugging-performance) to enable the functionality on your project.
+    params:
+      - name: analyze
+        isOptional: true
+        type: bool
+        description: If `true`, the query will be executed and the actual run time will be returned.
+      - name: verbose
+        isOptional: true
+        type: bool
+        description: If `true`, the query identifier will be returned and `data` will include the output columns of the query.
+      - name: settings
+        isOptional: true
+        type: bool
+        description: If `true`, include information on configuration parameters that affect query planning.
+      - name: buffers
+        isOptional: true
+        type: bool
+        description: If `true`, include information on buffer usage.
+      - name: wal
+        isOptional: true
+        type: bool
+        description: If `true`, include information on WAL record generation.
+    examples:
+      - id: get-execution-plan
+        name: Get the execution plan
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select()
+            .explain();
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          Aggregate  (cost=33.34..33.36 rows=1 width=112)
+            ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
+                  ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
+          ```
+        description: |
+          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
+        hideCodeBlock: true
+        isSpotlight: true
+
+      - id: get-execution-plan-with-analyze-and-verbose
+        name: Get the execution plan with analyze and verbose
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select()
+            .explain(analyze:true, verbose:true);
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          Aggregate  (cost=33.34..33.36 rows=1 width=112) (actual time=0.041..0.041 rows=1 loops=1)
+            Output: NULL::bigint, count(ROW(countries.id, countries.name)), COALESCE(json_agg(ROW(countries.id, countries.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
+            ->  Limit  (cost=0.00..18.33 rows=1000 width=40) (actual time=0.005..0.006 rows=3 loops=1)
+                  Output: countries.id, countries.name
+                  ->  Seq Scan on public.countries  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
+                        Output: countries.id, countries.name
+          Query Identifier: -4730654291623321173
+          Planning Time: 0.407 ms
+          Execution Time: 0.119 ms
+          ```
+        description: |
+          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
+        hideCodeBlock: true
+        isSpotlight: false
   - id: using-filters
     title: Using Filters
     description: |
@@ -2165,6 +2580,15 @@ functions:
     title: or()
     description: |
       Finds all rows satisfying at least one of the filters.
+    params:
+      - name: filters
+        isOptional: false
+        type: String
+        description: The filters to use, following PostgREST syntax
+      - name: referencedTable
+        isOptional: true
+        type: String
+        description: Set this to filter on referenced tables instead of the parent table
     notes: |
       - `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
 
@@ -2254,10 +2678,23 @@ functions:
         .not('id','in','(6,7)')  // Use Postgres list () and 'in' instead of `inFilter`.
         .not('id','in','(${mylist.join(',')})')  // You can insert a Dart list array.
         ```
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: operator
+        isOptional: false
+        type: String
+        description: The operator to be negated to filter with, following PostgREST syntax.
+      - name: value
+        isOptional: true
+        type: Object
+        description: The value to filter with, following PostgREST syntax.
     examples:
       - id: with-select
         name: With `select()`
-        isSpotlight: true
+        isSpotlight: false
         code: |
           ```dart
           final data = await supabase
@@ -2297,6 +2734,11 @@ functions:
     title: match()
     description: |
       Finds all rows whose columns match the specified `query` object.
+    params:
+      - name: query
+        isOptional: false
+        type: Map<String, dynamic>
+        description: The object to filter with, with column names as keys mapped to their filter values
     examples:
       - id: with-select
         name: With `select()`
@@ -2335,6 +2777,15 @@ functions:
     title: eq()
     description: |
       Match only rows where `column` is equal to `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2374,6 +2825,15 @@ functions:
     title: neq()
     description: |
       Finds all rows whose value on the stated `column` doesn't match the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2417,6 +2877,15 @@ functions:
     title: gt()
     description: |
       Finds all rows whose value on the stated `column` is greater than the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2456,6 +2925,15 @@ functions:
     title: gte()
     description: |
       Finds all rows whose value on the stated `column` is greater than or equal to the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2499,6 +2977,15 @@ functions:
     title: lt()
     description: |
       Finds all rows whose value on the stated `column` is less than the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2538,6 +3025,15 @@ functions:
     title: lte()
     description: |
       Finds all rows whose value on the stated `column` is less than or equal to the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2581,6 +3077,15 @@ functions:
     title: like()
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case sensitive).
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: pattern
+        isOptional: false
+        type: String
+        description: The pattern to match with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2620,6 +3125,15 @@ functions:
     title: ilike()
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case insensitive).
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: pattern
+        isOptional: false
+        type: String
+        description: The pattern to match with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2659,6 +3173,15 @@ functions:
     title: isFilter()
     description: |
       A check for exact equality (null, true, false), finds all rows whose value on the stated `column` exactly match the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Object?
+        description: The value to filter with.
     examples:
       - id: checking-nullness
         name: Checking for nullness, true or false
@@ -2703,6 +3226,15 @@ functions:
     title: inFilter()
     description: |
       Finds all rows whose value on the stated `column` is found on the specified `values`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: values
+        isOptional: false
+        type: List
+        description: The List to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -2746,6 +3278,16 @@ functions:
 
   - id: contains
     title: contains()
+    description: Only relevant for jsonb, array, and range columns. Match only rows where `column` contains every element appearing in `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The jsonb, array, or range column to filter on.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The jsonb, array, or range value to filter with.
     examples:
       - id: on-array-columns
         name: On array columns
@@ -2866,6 +3408,15 @@ functions:
     title: containedBy()
     description: |
       Only relevant for jsonb, array, and range columns. Match only rows where every element appearing in `column` is contained by `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The jsonb, array, or range column to filter on.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The jsonb, array, or range value to filter with.
     examples:
       - id: on-array-columns
         name: On array columns
@@ -2982,6 +3533,15 @@ functions:
     title: rangeLt()
     description: |
       Only relevant for range columns. Match only rows where every element in `column` is less than any element in `range`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The range column to filter on.
+      - name: range
+        isOptional: false
+        type: String
+        description: The range to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -3030,6 +3590,15 @@ functions:
     title: rangeGt()
     description: |
       Only relevant for range columns. Match only rows where every element in `column` is greater than any element in `range`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The range column to filter on.
+      - name: range
+        isOptional: false
+        type: String
+        description: The range to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -3078,6 +3647,15 @@ functions:
     title: rangeGte()
     description: |
       Only relevant for range columns. Match only rows where every element in `column` is either contained in `range` or greater than any element in `range`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The range column to filter on.
+      - name: range
+        isOptional: false
+        type: String
+        description: The range to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -3126,6 +3704,15 @@ functions:
     title: rangeLte()
     description: |
       Only relevant for range columns. Match only rows where every element in `column` is either contained in `range` or less than any element in `range`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The range column to filter on.
+      - name: range
+        isOptional: false
+        type: String
+        description: The range to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -3174,6 +3761,15 @@ functions:
     title: rangeAdjacent()
     description: |
       Only relevant for range columns. Match only rows where `column` is mutually exclusive to `range` and there can be no element between the two ranges.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The range column to filter on.
+      - name: range
+        isOptional: false
+        type: String
+        description: The range to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -3222,6 +3818,15 @@ functions:
     title: overlaps()
     description: |
       Only relevant for array and range columns. Match only rows where `column` and `value` have an element in common.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The array or range column to filter on.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The array or range value to filter with.
     examples:
       - id: on-array-columns
         name: On array columns
@@ -3304,6 +3909,23 @@ functions:
     title: textSearch()
     description: |
       Finds all rows whose tsvector value on the stated `column` matches to_tsquery(query).
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The text or tsvector column to filter on.
+      - name: query
+        isOptional: false
+        type: String
+        description: The query text to match with.
+      - name: config
+        isOptional: true
+        type: String
+        description: The text search configuration to use.
+      - name: type
+        isOptional: true
+        type: TextSearchType
+        description: Change how the `query` text is interpreted.
     examples:
       - id: text-search
         name: Text search
@@ -3368,15 +3990,28 @@ functions:
   - id: filter
     title: filter()
     description: |
-      Finds all rows whose `column` satisfies the filter.
+      Match only rows which satisfy the filter. This is an escape hatch - you should use the specific filter methods wherever possible.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: operator
+        isOptional: false
+        type: String
+        description: The operator to filter with, following PostgREST syntax.
+      - name: value
+        isOptional: false
+        type: Object
+        description: The value to filter with, following PostgREST syntax.
     notes: |
-      - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
-        ```dart
-          .filter('arraycol','cs','{"a","b"}') // Use Postgres array {} and 'cs' for contains.
-          .filter('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
-          .filter('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
-          .filter('id','cs','{${mylist.join(',')}}')  // You can insert a Dart array list.
-        ```
+      `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
+      ```dart
+      .filter('arraycol','cs','{"a","b"}') // Use Postgres array {} and 'cs' for contains.
+      .filter('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+      .filter('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
+      .filter('id','cs','{${mylist.join(',')}}')  // You can insert a Dart array list.
+      ```
     examples:
       - id: with-select
         name: With `select()`

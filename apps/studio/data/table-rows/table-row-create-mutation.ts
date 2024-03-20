@@ -5,7 +5,7 @@ import { Query, SupaTable } from 'components/grid'
 import { sqlKeys } from 'data/sql/keys'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { executeSql } from 'data/sql/execute-sql-query'
 
 export type TableRowCreateVariables = {

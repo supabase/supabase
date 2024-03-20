@@ -7,8 +7,7 @@ import { useInView } from 'react-intersection-observer'
 
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBranchQuery } from 'data/branches/branch-query'
-import { Branch } from 'data/branches/branches-query'
-import { GitHubPullRequest } from 'data/integrations/github-pull-requests-query'
+import type { Branch } from 'data/branches/branches-query'
 import {
   Badge,
   Button,
@@ -76,7 +75,6 @@ interface BranchRowProps {
   repo: string
   branch: Branch
   isMain?: boolean
-  pullRequest?: GitHubPullRequest
   generateCreatePullRequestURL?: (branchName?: string) => string
   onSelectDeleteBranch: () => void
 }
@@ -85,7 +83,6 @@ export const BranchRow = ({
   branch,
   isMain = false,
   repo,
-  pullRequest,
   generateCreatePullRequestURL,
   onSelectDeleteBranch,
 }: BranchRowProps) => {
@@ -103,7 +100,7 @@ export const BranchRow = ({
   const { data } = useBranchQuery(
     { projectRef, id: branch.id },
     {
-      enabled: inView,
+      enabled: branch.status === 'CREATING_PROJECT' && inView,
       refetchInterval(data) {
         if (data?.status !== 'ACTIVE_HEALTHY') {
           return 1000 * 3 // 3 seconds
@@ -127,17 +124,21 @@ export const BranchRow = ({
             {branch.name}
           </Link>
         </Button>
-        {isActive && <Badge color="slate">Current</Badge>}
-        {data?.status !== undefined && <BranchStatusBadge status={data.status} />}
+        {isActive && <Badge>Current</Badge>}
+        <BranchStatusBadge
+          status={
+            branch.status === 'CREATING_PROJECT' ? data?.status ?? branch.status : branch.status
+          }
+        />
         <p className="text-xs text-foreground-lighter">
           {daysFromNow > 1 ? `Updated on ${formattedUpdatedAt}` : `Updated ${formattedTimeFromNow}`}
         </p>
       </div>
       <div className="flex items-center gap-x-8">
-        {pullRequest !== undefined && (
+        {branch.pr_number !== undefined && (
           <div className="flex items-center">
             <Link
-              href={pullRequest.url}
+              href={`https://github.com/${repo}/pull/${branch.pr_number}`}
               target="_blank"
               rel="noreferrer"
               className="text-xs transition text-foreground-lighter mr-4 hover:text-foreground"
@@ -154,9 +155,9 @@ export const BranchRow = ({
                 passHref
                 target="_blank"
                 rel="noreferer"
-                href={`http://github.com/${pullRequest.target.repo}/tree/${pullRequest.target.branch}`}
+                href={`http://github.com/${repo}/tree/${branch.git_branch}`}
               >
-                {pullRequest.target.branch}
+                {branch.git_branch}
               </Link>
             </Button>
           </div>
@@ -189,7 +190,11 @@ export const BranchRow = ({
                 passHref
                 target="_blank"
                 rel="noreferrer"
-                href={pullRequest?.url ?? createPullRequestURL}
+                href={
+                  branch.pr_number !== undefined
+                    ? `https://github.com/${repo}/pull/${branch.pr_number}`
+                    : createPullRequestURL
+                }
               >
                 {branch.pr_number !== undefined ? 'View Pull Request' : 'Create Pull Request'}
               </Link>

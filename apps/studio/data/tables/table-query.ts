@@ -1,4 +1,4 @@
-import { PostgresTable } from '@supabase/postgres-meta'
+import type { PostgresTable } from '@supabase/postgres-meta'
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 // import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'

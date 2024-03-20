@@ -29,14 +29,18 @@ export const USAGE_APPROACHING_THRESHOLD = 0.75
 export const LOCAL_STORAGE_KEYS = {
   RECENTLY_VISITED_ORGANIZATION: 'supabase-organization',
   TELEMETRY_CONSENT: 'supabase-consent',
+
   UI_PREVIEW_NAVIGATION_LAYOUT: 'supabase-ui-preview-nav-layout',
   UI_PREVIEW_API_SIDE_PANEL: 'supabase-ui-api-side-panel',
   UI_PREVIEW_RLS_AI_ASSISTANT: 'supabase-ui-rls-ai-assistant',
-  DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
   UI_PREVIEW_CLS: 'supabase-ui-cls',
+  UI_PREVIEW_SQL_EDITOR_AI_ASSISTANT: 'supabase-ui-sql-editor-ai-assistant',
+
+  DASHBOARD_HISTORY: (ref: string) => `dashboard-history-${ref}`,
 
   SQL_EDITOR_INTELLISENSE: 'supabase_sql-editor-intellisense-enabled',
   SQL_EDITOR_SPLIT_SIZE: 'supabase_sql-editor-split-size',
+  SQL_EDITOR_AI_SCHEMA: 'supabase_sql-editor-ai-schema-enabled',
   LOG_EXPLORER_SPLIT_SIZE: 'supabase_log-explorer-split-size',
   GRAPHIQL_RLS_BYPASS_WARNING: 'graphiql-rls-bypass-warning-dismissed',
   CLS_DIFF_WARNING: 'cls-diff-warning-dismissed',
@@ -48,7 +52,6 @@ export const LOCAL_STORAGE_KEYS = {
 
 export const OPT_IN_TAGS = {
   AI_SQL: 'AI_SQL_GENERATOR_OPT_IN',
-  PREVIEW_BRANCHES: 'PREVIEW_BRANCHES_OPT_IN',
 }
 
 export const GB = 1024 * 1024 * 1024

@@ -1,10 +1,18 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+
+import { useParams } from 'common'
+import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
+import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
+import type { StorageBucket } from 'components/interfaces/Storage/Storage.types'
+import { DeleteBucketModal } from 'components/to-be-cleaned/Storage'
+import { EmptyBucketModal } from 'components/to-be-cleaned/Storage/EmptyBucketModal'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useBucketsQuery } from 'data/storage/buckets-query'
+import { useCheckPermissions, useSelectedProject } from 'hooks'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -13,15 +21,6 @@ import {
   IconEdit,
   Menu,
 } from 'ui'
-
-import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
-import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
-import { StorageBucket } from 'components/interfaces/Storage/Storage.types'
-import { DeleteBucketModal } from 'components/to-be-cleaned/Storage'
-import { EmptyBucketModal } from 'components/to-be-cleaned/Storage/EmptyBucketModal'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useBucketsQuery } from 'data/storage/buckets-query'
-import { useCheckPermissions, useSelectedProject } from 'hooks'
 import BucketRow from './BucketRow'
 
 const StorageMenu = () => {
@@ -183,4 +182,4 @@ const StorageMenu = () => {
   )
 }
 
-export default observer(StorageMenu)
+export default StorageMenu

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { AnchorHTMLAttributes, forwardRef } from 'react'
 import { cn } from 'ui'
 
-import { Route } from 'components/ui/ui.types'
+import type { Route } from 'components/ui/ui.types'
 import { useAppStateSnapshot } from 'state/app-state'
 
 interface NavigationIconButtonProps extends AnchorHTMLAttributes<HTMLAnchorElement> {

@@ -17,7 +17,7 @@ import { useFunctionsResourceUsageQuery } from 'data/analytics/functions-resourc
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useCheckPermissions } from 'hooks'
 import useFillTimeseriesSorted from 'hooks/analytics/useFillTimeseriesSorted'
-import { ChartIntervals, NextPageWithLayout } from 'types'
+import type { ChartIntervals, NextPageWithLayout } from 'types'
 
 const CHART_INTERVALS: ChartIntervals[] = [
   {

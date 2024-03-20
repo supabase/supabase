@@ -2,9 +2,9 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { replicaKeys } from './keys'
-import { Database } from './replicas-query'
+import type { Database } from './replicas-query'
 
 export type ReadReplicaRemoveVariables = {
   projectRef: string
@@ -42,7 +42,7 @@ export const useReadReplicaRemoveMutation = ({
       async onSuccess(data, variables, context) {
         const { projectRef, identifier, skipInvalidateOnSuccess } = variables
 
-        if (!!skipInvalidateOnSuccess) {
+        if (skipInvalidateOnSuccess === false) {
           // [Joshen] Just FYI, will remove this once API changes to remove the need for optimistic rendering
           queryClient.setQueriesData<any>(replicaKeys.list(projectRef), (old: any) => {
             return old.filter((db: Database) => db.identifier !== identifier)

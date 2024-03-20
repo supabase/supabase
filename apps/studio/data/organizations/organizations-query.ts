@@ -2,7 +2,7 @@ import { QueryClient, useQuery, useQueryClient, UseQueryOptions } from '@tanstac
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { useCallback } from 'react'
-import { Organization, ResponseError } from 'types'
+import type { Organization, ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
 export async function getOrganizations(signal?: AbortSignal): Promise<Organization[]> {

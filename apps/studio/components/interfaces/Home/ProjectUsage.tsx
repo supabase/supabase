@@ -4,7 +4,7 @@ import sumBy from 'lodash/sumBy'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { ChartIntervals } from 'types'
+import type { ChartIntervals } from 'types'
 import {
   Button,
   DropdownMenu,
