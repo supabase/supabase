@@ -39,7 +39,7 @@ export default (isMobile?: boolean) => ({
       </>
     ),
     subheader: [
-      'Easily author, deploy and monitor serverless functions distributed globally at the edge,close to your users.',
+      'Easily author, deploy and monitor serverless functions distributed globally at the edge, close to your users.',
     ],
     image: <FunctionsHero />,
     ctas: [

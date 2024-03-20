@@ -4,7 +4,7 @@ import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 
 import { Swiper, SwiperSlide } from 'swiper/react'
 
-import 'swiper/swiper.min.css'
+import 'swiper/css'
 
 interface Props {
   users: UserData[]

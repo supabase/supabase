@@ -1,7 +1,10 @@
+import 'swiper/css'
+
 import React, { useState, useEffect, useRef } from 'react'
 import { motion, useAnimation, useInView } from 'framer-motion'
 import { cn } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
+import { useBreakpoint } from 'common'
 
 interface TabProps {
   label: string | React.ReactNode
@@ -85,6 +88,7 @@ const TimedAccordionSection = ({ tabs, intervalDuration = 25, updateFrequency = 
   const [progress, setProgress] = useState(0)
   const [apiSwiper, setApiSwiper] = useState(undefined)
   const controls = useAnimation()
+  const isMobile = useBreakpoint()
 
   useEffect(() => {
     if (!apiSwiper) return
@@ -147,16 +151,17 @@ const TimedAccordionSection = ({ tabs, intervalDuration = 25, updateFrequency = 
           />
         ))}
       </div>
-      <div className="relative w-full lg:flex-1 min-h-[300px] md:overflow-hidden -mt-4">
+      <div className="relative w-full lg:flex-1 min-h-[400px] md:overflow-hidden -mt-4">
         <Swiper
           // @ts-ignore
           onSwiper={setApiSwiper}
-          style={{ zIndex: 0, marginRight: '1px' }}
+          style={{ zIndex: 0, marginRight: '1px', overflow: 'visible' }}
           initialSlide={activeTab}
           spaceBetween={20}
+          onSlideChange={(s) => handleTabClick(s.activeIndex)}
           slidesPerView={1}
           speed={300}
-          allowTouchMove={false}
+          allowTouchMove={isMobile}
         >
           {tabs.map((tab, i) => (
             <SwiperSlide key={i} className="md:p-4">

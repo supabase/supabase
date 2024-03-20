@@ -25,6 +25,8 @@ const CI = () => (
         [&_.synthax-highlighter]:rounded-r-none
         [&_.synthax-highlighter]:border-r-0
         [&_.synthax-highlighter]:border-b-0
+        [&_.synthax-highlighter]:!pb-8
+        [&_.synthax-highlighter]:lg:min-h-[240px]
         pr-0 pb-0 -bottom-2 lg:-bottom-4
       "
     />

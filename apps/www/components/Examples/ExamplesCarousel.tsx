@@ -1,13 +1,16 @@
-import { useRef } from 'react'
-import { Button, IconArrowLeft, IconArrowRight, IconGitHubSolid } from 'ui'
-import Link from 'next/link'
+import 'swiper/css'
 
-import SectionContainer from '../Layouts/SectionContainer'
-import ExampleCard from '../ExampleCard'
-import { CTA } from '../../types/common'
+import { useRef } from 'react'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { Button } from 'ui'
+import Link from 'next/link'
+import { CTA } from '~/types/common'
+
+import ExampleCard from '~/components/ExampleCard'
 import { Swiper, SwiperSlide } from 'swiper/react'
 // import Swiper core and required modules
-import SwiperCore, { Navigation, Pagination } from 'swiper'
+import SwiperCore from 'swiper'
+import { Navigation, Pagination } from 'swiper/modules'
 
 // install Swiper modules
 SwiperCore.use([Navigation, Pagination])
@@ -75,20 +78,18 @@ const ExamplesCarousel = ({
         >
           {Object.values(examples).map((example: any, i: number) => {
             return (
-              <SwiperSlide key={i}>
-                <div className="">
-                  <ExampleCard i={i} {...example} />
-                </div>
+              <SwiperSlide key={example.title}>
+                <ExampleCard i={i} {...example} />
               </SwiperSlide>
             )
           })}
         </Swiper>
         <div className="container mx-auto mt-3 hidden flex-row justify-between md:flex">
           <div ref={prevRef} className="p ml-4 cursor-pointer">
-            <IconArrowLeft />
+            <ArrowLeft />
           </div>
           <div ref={nextRef} className="p mr-4 cursor-pointer">
-            <IconArrowRight />
+            <ArrowRight />
           </div>
         </div>
       </div>

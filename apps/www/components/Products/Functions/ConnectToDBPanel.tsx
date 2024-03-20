@@ -18,6 +18,8 @@ const { data, error } = await supabase
                                 .from('countries')
                                 .select('*')`
 
-const ConnectToDBPanel = () => <CodeWindow code={code} showLineNumbers />
+const ConnectToDBPanel = () => (
+  <CodeWindow className="[&_.synthax-highlighter]:!min-h-[200px]" code={code} showLineNumbers />
+)
 
 export default ConnectToDBPanel

@@ -1,4 +1,4 @@
-import 'swiper/swiper.min.css'
+import 'swiper/css'
 
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'

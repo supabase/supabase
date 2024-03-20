@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import anime from 'animejs'
-import { IconCheck, IconCopy } from 'ui'
+import { Check, Copy } from 'lucide-react'
 import CopyToClipboard from 'react-copy-to-clipboard'
 import Typed from 'typed.js'
 
@@ -179,10 +179,12 @@ const FunctionsHero = () => {
         xl:-left-32 xl:w-[130%]
       "
     >
+      {/* Snippet element */}
       <div
         className="
           opacity-0 animate-fade-in absolute z-20 flex-1 flex items-center justify-center h-auto
-          w-[50%] left-[27%] top-[2%]
+          w-[60%] left-[25%] top-[2%]
+          sm:w-[35%] sm:left-[34%] sm:top-[6%]
           md:left-[33.5%] md:w-[35%] md:top-[6%]
           lg:left-[26%] lg:w-[52%] lg:top-[3%]
           xl:left-[28%] xl:w-[48%] xl:top-[3%]
@@ -192,7 +194,7 @@ const FunctionsHero = () => {
         <CopyToClipboard text="supabase functions new hello && supabase functions deploy hello">
           <button
             onClick={handleCopy}
-            className="w-full px-3 py-2 group hover:border-strong flex gap-2 items-center bg-alternative rounded-xl border"
+            className="w-full px-3 py-2 group hover:border-strong flex gap-1 sm:gap-2 items-center bg-alternative rounded-xl border"
           >
             <div className="text-foreground-muted text-sm font-mono">$</div>
             <div
@@ -202,15 +204,16 @@ const FunctionsHero = () => {
             <div className="text-foreground rounded p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
               {copied ? (
                 <span className="text-brand">
-                  <IconCheck className="w-3.5 h-3.5" />
+                  <Check className="w-3.5 h-3.5" />
                 </span>
               ) : (
-                <IconCopy className="w-3.5 h-3.5" />
+                <Copy className="w-3.5 h-3.5" />
               )}
             </div>
           </button>
         </CopyToClipboard>
       </div>
+      {/* Animated svgs in globe */}
       {svgs.map((s) => (
         <svg
           key={s.id}
@@ -246,6 +249,7 @@ const FunctionsHero = () => {
         </svg>
       ))}
 
+      {/* Dots on globe */}
       {dots.map((dot) => (
         <div
           key={dot.id}
@@ -260,6 +264,7 @@ const FunctionsHero = () => {
       <div className="absolute left-[51.15%] top-[10%] w-px h-[20%] overflow-hidden">
         <span className="absolute inset-0 w-full bg-gradient-to-t from-current to-transparent h-full delay-1200 animate-slide-in" />
       </div>
+      {/* Globe background */}
       <Image
         src="/images/product/functions/globe-light.svg"
         alt="globe wireframe"

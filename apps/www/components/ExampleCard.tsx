@@ -1,8 +1,9 @@
-import Link from 'next/link'
-import { Button, IconArrowUpRight } from 'ui'
-import { useBreakpoint } from 'common'
-import Panel from './Panel'
 import { useEffect, useState } from 'react'
+import { useBreakpoint } from 'common'
+import Link from 'next/link'
+import { ArrowUpRight } from 'lucide-react'
+import { Button } from 'ui'
+import Panel from './Panel'
 
 function ExampleCard(props: any) {
   const isXs = useBreakpoint()
@@ -85,9 +86,9 @@ function ExampleCard(props: any) {
           )}
           <div className="p-5 flex flex-col gap-2">
             <div className="flex items-start justify-between">
-              <h4 className="text-foreground text-lg">{props.title} </h4>
+              <h4 className="text-foreground text-lg">{props.title}</h4>
             </div>
-            <p className="text-sm text-foreground-muted">{props.description}</p>
+            <p className="text-sm text-foreground-lighter">{props.description}</p>
           </div>
         </div>
         <div>
@@ -100,8 +101,8 @@ function ExampleCard(props: any) {
                   className="group overflow-hidden text-foreground-lighter group-hover/panel:text-foreground !bg-transparent !p-0"
                   iconRight={
                     <div className="relative w-3.5 h-3.5 flex items-center justify-center">
-                      <IconArrowUpRight className="absolute inset-0 transition-transform duration-200 translate-x-0 translate-y-0 group-hover/panel:translate-x-6 group-hover/panel:-translate-y-6" />
-                      <IconArrowUpRight className="absolute inset-0 transition-transform duration-200 -translate-x-6 translate-y-6 group-hover/panel:translate-x-0 group-hover/panel:-translate-y-0" />
+                      <ArrowUpRight className="absolute w-3.5 h-3.5 inset-0 transition-transform duration-200 translate-x-0 translate-y-0 group-hover/panel:translate-x-6 group-hover/panel:-translate-y-6" />
+                      <ArrowUpRight className="absolute w-3.5 h-3.5 inset-0 transition-transform duration-200 -translate-x-6 translate-y-6 group-hover/panel:translate-x-0 group-hover/panel:-translate-y-0" />
                     </div>
                   }
                 >

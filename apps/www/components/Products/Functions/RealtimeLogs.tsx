@@ -4,9 +4,10 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Badge } from 'ui'
 import { useInterval } from 'react-use'
 
-const RealtimeLogs = ({ isActive }: { isActive?: boolean }) => {
+const RealtimeLogs = ({ isActive, isInView }: { isActive?: boolean; isInView?: boolean }) => {
   const [mounted, setMounted] = useState(false)
 
+  const isPlaying = isActive && isInView
   const INTERVAL = 550 // in milliseconds
 
   const logs = [
@@ -44,7 +45,7 @@ const RealtimeLogs = ({ isActive }: { isActive?: boolean }) => {
       const newLog = createLog()
       setActiveLogs([newLog, ...activeLogs])
     },
-    isActive ? INTERVAL : null
+    isPlaying ? INTERVAL : null
   )
 
   useEffect(() => {

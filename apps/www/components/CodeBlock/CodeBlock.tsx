@@ -114,8 +114,14 @@ function CodeBlock(props: CodeBlockProps) {
             props.className
           )}
           customStyle={{
-            padding: props.showLineNumbers ? '1.25rem 1rem' : '1.25rem 1.5rem',
-            fontSize: large ? 18 : '0.875rem',
+            padding: props.showLineNumbers
+              ? large
+                ? '1.25rem 1rem'
+                : '1rem 0.8rem'
+              : large
+                ? '1.25rem 1.5rem'
+                : '1.25rem 1.5rem',
+            fontSize: large ? 18 : '0.775rem',
             lineHeight: large ? 1.6 : 1.4,
           }}
           showLineNumbers={props.showLineNumbers}

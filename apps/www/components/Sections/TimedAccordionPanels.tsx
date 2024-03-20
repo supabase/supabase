@@ -1,4 +1,4 @@
-import 'swiper/swiper.min.css'
+import 'swiper/css'
 
 import React, { useState, useEffect, useRef } from 'react'
 import { AnimatePresence, motion, useAnimation, useInView } from 'framer-motion'
@@ -13,6 +13,7 @@ interface PanelProps {
   paragraph?: string
   icon?: React.ReactNode
   isActive?: boolean
+  isInView?: boolean
   onClick?: VoidFunction
   progress?: number | undefined
   intervalDuration?: number
@@ -27,6 +28,7 @@ const TimedPanel = ({
   progress,
   intervalDuration,
   image,
+  isInView,
 }: PanelProps) => {
   const isSm = useBreakpoint()
   const Image: any = image ?? null
@@ -82,7 +84,7 @@ const TimedPanel = ({
                 isActive && 'opacity-0'
               )}
             />
-            <Image isActive={isActive} />
+            <Image isActive={isActive} isInView={isInView} />
           </motion.div>
         </AnimatePresence>
       </Panel>
@@ -170,6 +172,7 @@ const TimedAccordionPanels = ({ panels, intervalDuration = 10, updateFrequency =
           <TimedPanel
             key={index}
             isActive={index === activeTab}
+            isInView={isInView}
             onClick={() => handleTabClick(index)}
             progress={index === activeTab ? progress : undefined}
             intervalDuration={intervalDuration}
@@ -192,6 +195,7 @@ const TimedAccordionPanels = ({ panels, intervalDuration = 10, updateFrequency =
             <SwiperSlide key={index}>
               <TimedPanel
                 isActive={index === activeTab}
+                isInView={isInView}
                 onClick={() => handleTabClick(index)}
                 progress={index === activeTab ? progress : undefined}
                 intervalDuration={intervalDuration}

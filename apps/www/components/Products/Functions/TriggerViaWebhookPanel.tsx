@@ -11,6 +11,13 @@ execute function "supabase_functions"."http_request"(
   '1000'
 );`
 
-const TriggerViaWebhookPanel = () => <CodeWindow code={code} lang="sql" showLineNumbers />
+const TriggerViaWebhookPanel = () => (
+  <CodeWindow
+    className="[&_.synthax-highlighter]:md:!min-h-[300px]"
+    code={code}
+    lang="sql"
+    showLineNumbers
+  />
+)
 
 export default TriggerViaWebhookPanel
