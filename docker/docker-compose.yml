@@ -386,6 +386,8 @@ services:
   vector:
     container_name: supabase-vector
     image: timberio/vector:0.28.1-alpine
+    environment:
+      LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
     healthcheck:
       test:
         [
