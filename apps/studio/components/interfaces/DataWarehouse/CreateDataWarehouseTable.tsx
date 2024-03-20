@@ -1,4 +1,5 @@
-import { useCreateCollection } from 'data/collections/collections-create-mutation'
+import { useCreateCollection } from 'data/analytics/warehouse-collections-create-mutation'
+import { useSelectedProject } from 'hooks'
 import { useRouter } from 'next/router'
 import React from 'react'
 import toast from 'react-hot-toast'
@@ -8,10 +9,9 @@ type Props = {}
 
 export const CreateDataWarehouseTableModal = (props: Props) => {
   const [isOpen, setIsOpen] = React.useState(false)
-  const router = useRouter()
-  const projectRef = router.query.projectRef as string
+  const project = useSelectedProject()
   const { mutateAsync: createCollection, isLoading } = useCreateCollection({
-    projectRef: projectRef,
+    projectRef: project?.ref!,
   })
 
   return (
