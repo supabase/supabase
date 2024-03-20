@@ -1,5 +1,4 @@
 import { GetStaticPaths, GetStaticProps } from 'next'
-import 'swiper/css'
 import supabase from '~/lib/supabaseMisc'
 import Error404 from '../404'
 
