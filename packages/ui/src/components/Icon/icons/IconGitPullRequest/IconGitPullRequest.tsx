@@ -9,5 +9,12 @@
     return <IconBase icon={GitPullRequest} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { gitPullRequest } from 'lucide-react'
+  */
   export default IconGitPullRequest
   

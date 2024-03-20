@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite'
 import { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -65,4 +64,4 @@ const GenericProjectPage: NextPage = () => {
   )
 }
 
-export default withAuth(observer(GenericProjectPage))
+export default withAuth(GenericProjectPage)

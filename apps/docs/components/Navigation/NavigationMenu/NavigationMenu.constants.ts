@@ -700,6 +700,12 @@ export const database: NavMenuConstant = {
         {
           name: 'Connecting to your database',
           url: '/guides/database/connecting-to-postgres',
+          items: [
+            {
+              name: 'Serverless Drivers',
+              url: '/guides/database/connecting-to-postgres/serverless-drivers',
+            },
+          ],
         },
         { name: 'Importing data', url: '/guides/database/import-data' },
         { name: 'Securing your data', url: '/guides/database/secure-data' },
@@ -1405,6 +1411,7 @@ export const ai = {
           url: '/guides/ai/vector-indexes',
           items: vectorIndexItems,
         },
+        { name: 'Hybrid search', url: '/guides/ai/hybrid-search' },
         {
           name: 'Engineering for scale',
           url: '/guides/ai/engineering-for-scale',

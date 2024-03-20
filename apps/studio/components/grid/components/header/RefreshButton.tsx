@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import { Button, IconCheck, IconRefreshCw } from 'ui'
 import { SupabaseGridQueue } from '../../queue'
 import type { TableLike } from 'hooks/misc/useTable'
+import { Check, RefreshCw } from 'lucide-react'
 
 export type RefreshButtonProps = {
   table: TableLike | SupaTable
@@ -50,9 +51,9 @@ const RefreshButton = ({ table, isRefetching }: RefreshButtonProps) => {
       type="text"
       icon={
         !status ? (
-          <IconRefreshCw className="text-foreground-light" strokeWidth={1.5} />
+          <RefreshCw className="text-foreground-muted" strokeWidth={1.5} />
         ) : status === 'saved' ? (
-          <IconCheck className="text-brand" strokeWidth={3} />
+          <Check className="text-brand" strokeWidth={3} />
         ) : (
           <></>
         )

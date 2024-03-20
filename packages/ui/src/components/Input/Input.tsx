@@ -155,6 +155,7 @@ function Input({
     >
       <div className={__styles.container}>
         <input
+          data-size={size}
           autoComplete={autoComplete}
           autoFocus={autoFocus}
           defaultValue={defaultValue}
@@ -171,7 +172,7 @@ function Input({
           className={cn(inputClasses)}
           {...props}
         />
-        {icon && <InputIconContainer icon={icon} className={iconContainerClassName} />}
+        {icon && <InputIconContainer size={size} icon={icon} className={iconContainerClassName} />}
         {copy || error || actions ? (
           <div className={__styles.actions_container}>
             {error && <InputErrorIcon size={size} />}

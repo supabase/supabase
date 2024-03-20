@@ -1,4 +1,3 @@
-import type { Dictionary } from 'types'
 import { isEmpty } from 'lodash'
 
 /**
@@ -22,7 +21,7 @@ export function convertArgumentTypes(value: string) {
  * convert config_params =  {search_path: "auth, public"}
  * to {value: [{name: 'search_path', value: 'auth, public'}]}
  */
-export function convertConfigParams(value: Dictionary<any>) {
+export function convertConfigParams(value: Record<string, string> | null | undefined) {
   const temp = []
   if (value) {
     for (var key in value) {

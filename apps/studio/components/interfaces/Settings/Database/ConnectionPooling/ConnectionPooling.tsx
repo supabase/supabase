@@ -166,7 +166,7 @@ export const ConnectionPooling = () => {
                   ? 'Connection Pooling is not available for this project'
                   : 'Connection pooling configuration'}
               </p>
-              <Badge color="scale">Supavisor</Badge>
+              <Badge>Supavisor</Badge>
             </div>
             <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
               <a

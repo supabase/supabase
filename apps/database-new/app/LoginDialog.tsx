@@ -1,18 +1,18 @@
 'use client'
 
 import { useAppStateSnapshot } from '@/lib/state'
-import { DialogContent_Shadcn_, Dialog_Shadcn_ } from 'ui'
+import { DialogContent, Dialog } from 'ui'
 
 const LoginDialog = ({ children }: { children: React.ReactNode }) => {
   const snap = useAppStateSnapshot()
 
   return (
-    <Dialog_Shadcn_
+    <Dialog
       open={snap.loginDialogOpen}
       onOpenChange={() => snap.setLoginDialogOpen(!snap.loginDialogOpen)}
     >
-      <DialogContent_Shadcn_ className="max-w-md">{children}</DialogContent_Shadcn_>
-    </Dialog_Shadcn_>
+      <DialogContent className="max-w-md">{children}</DialogContent>
+    </Dialog>
   )
 }
 

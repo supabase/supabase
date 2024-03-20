@@ -22,8 +22,8 @@ import {
   Theme,
   cn,
   themes,
-  useCommandMenu,
 } from 'ui'
+import { useCommandMenu } from 'ui-patterns/Cmdk'
 
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useSignOut } from 'lib/auth'

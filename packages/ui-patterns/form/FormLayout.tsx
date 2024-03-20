@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Box, FileWarning } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import {
-  Badge_Shadcn_,
+  Badge,
   Button,
   Checkbox_Shadcn_,
   Form_Shadcn_,
@@ -23,6 +23,9 @@ import { Input } from '../DataInputs/Input'
 import { InfoTooltip } from '../InfoTooltip/InfoTooltip'
 import { FormItemLayout } from './FormItemLayout/FormItemLayout'
 
+/**
+ * This is helper file for the FormLayout stories.
+ */
 const items = [
   {
     id: 'recents',
@@ -228,10 +231,10 @@ export const Page = () => {
           render={({ field }) => (
             <FormItemLayout
               afterLabel={
-                <Badge_Shadcn_ variant={'destructive'} className="flex gap-1">
+                <Badge variant={'destructive'} className="flex gap-1">
                   <FileWarning size={14} strokeWidth={1.5} className="text-destructive-500" />
                   Danger zone!
-                </Badge_Shadcn_>
+                </Badge>
               }
               label="Use consistent settings"
               description="This is your public display name."
