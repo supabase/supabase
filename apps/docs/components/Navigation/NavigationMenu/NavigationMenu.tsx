@@ -1,7 +1,7 @@
 import { memo } from 'react'
 
 import NavigationMenuHome from './HomeMenu'
-import { isNavMenuWithId, useNavMenu } from './NavigationMenuContext'
+import { useNavMenu } from './NavigationMenuContext'
 import NavigationMenuGuideList from './NavigationMenuGuideList'
 import { NavigationMenuGuideRef, type GuideRefItem } from './NavigationMenuGuideRef'
 import NavigationMenuRefList from './NavigationMenuRefList'
@@ -12,7 +12,7 @@ function getMenuById(id: MenuId | null) {
 }
 
 function getMenuElement(menu: Menu, refData?: Array<GuideRefItem>) {
-  if (refData) return <NavigationMenuGuideRef refData={refData} />
+  if (refData) return <NavigationMenuGuideRef id={menu.id} refData={refData} />
 
   const menuType = menu.type
   switch (menuType) {
@@ -36,8 +36,8 @@ function getMenuElement(menu: Menu, refData?: Array<GuideRefItem>) {
 
 const NavigationMenu = () => {
   const navMenuConfig = useNavMenu()
-  const level = isNavMenuWithId(navMenuConfig) ? navMenuConfig.menuId : null
-  const refData = isNavMenuWithId(navMenuConfig) ? null : navMenuConfig.refData
+  const level = navMenuConfig.menuId
+  const refData = 'refData' in navMenuConfig ? navMenuConfig.refData : null
 
   const menu = getMenuById(level)
 

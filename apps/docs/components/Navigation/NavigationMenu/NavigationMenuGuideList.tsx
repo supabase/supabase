@@ -12,7 +12,11 @@ import { useNavMenu } from './NavigationMenuContext'
 import NavigationMenuGuideListItems from './NavigationMenuGuideListItems'
 import { type GuideRefItem } from './NavigationMenuGuideRef'
 
-const HeaderLink = memo(function HeaderLink(props: { id: MenuId; title: string; url: string }) {
+export const HeaderLink = memo(function HeaderLink(props: {
+  id: MenuId
+  title: string
+  url: string
+}) {
   const pathname = usePathname()
 
   return (
@@ -134,7 +138,10 @@ const NavigationMenuGuideList: React.FC<Props> = ({ id, refData, value }) => {
   )
 }
 
-const TabLink = ({
+/**
+ * A link styled to look like a tab.
+ */
+export const TabLink = ({
   children,
   href,
   active = false,

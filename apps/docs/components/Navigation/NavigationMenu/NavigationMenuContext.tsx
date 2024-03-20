@@ -3,50 +3,43 @@ import { type PropsWithChildren, createContext, useMemo, useContext } from 'reac
 import { type MenuId } from './menus'
 import { type GuideRefItem } from './NavigationMenuGuideRef'
 
-type NavMenuWithId = {
-  __identifier: 'id'
+type NavMenuBase = {
   menuId: MenuId
   dualMenu: boolean
 }
 
-type NavMenuWithData = {
-  __identifier: 'data'
+type NavMenuWithData = NavMenuBase & {
+  dualMenu: true
   refData: Array<GuideRefItem>
-  dualMenu: boolean
 }
 
-type NavMenuContextValue = NavMenuWithId | NavMenuWithData
-
-const isNavMenuWithId = (navMenu: NavMenuContextValue): navMenu is NavMenuWithId =>
-  navMenu.__identifier === 'id'
+type NavMenuContextValue = NavMenuBase | NavMenuWithData
 
 type ConvertToProviderProps<T extends NavMenuContextValue> = Omit<T, '__identifier' | 'dualMenu'> &
   Pick<Partial<T>, 'dualMenu'>
 type NavMenuProviderProps =
-  | ConvertToProviderProps<NavMenuWithId>
+  | ConvertToProviderProps<NavMenuBase>
   | ConvertToProviderProps<NavMenuWithData>
 
 const NavMenuContext = createContext<NavMenuContextValue | undefined>(undefined)
 
 const NavMenuProvider = (props: PropsWithChildren<NavMenuProviderProps>) => {
-  const dualMenu = 'dualMenu' in props ? props.dualMenu : false
-  const menuId = 'menuId' in props ? props.menuId : undefined
+  const menuId = props.menuId
   const refData = 'refData' in props ? props.refData : undefined
 
   const contextValue = useMemo(
     () =>
-      !!menuId
+      !!refData
         ? ({
-            __identifier: 'id',
             menuId,
-            dualMenu,
-          } satisfies NavMenuWithId)
-        : ({
-            __identifier: 'data',
+            dualMenu: true,
             refData,
-            dualMenu,
-          } satisfies NavMenuWithData),
-    [dualMenu, menuId, refData]
+          } satisfies NavMenuWithData)
+        : ({
+            menuId,
+            dualMenu: props.dualMenu ?? false,
+          } satisfies NavMenuBase),
+    [props.dualMenu, menuId, refData]
   )
 
   return <NavMenuContext.Provider value={contextValue}>{props.children}</NavMenuContext.Provider>
@@ -59,4 +52,4 @@ const useNavMenu = () => {
   return context
 }
 
-export { NavMenuProvider, isNavMenuWithId, useNavMenu }
+export { NavMenuProvider, useNavMenu }
