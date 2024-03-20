@@ -79,7 +79,7 @@ const TimedPanel = ({
         <div className="opacity-0 animate-fade-in absolute bottom-0 w-full h-[1px] bg-border-strong group-hover:opacity-100 rounded-full overflow-hidden">
           <motion.div
             className={cn(
-              'absolute inset-0 w-full right-full bg-brand h-full transition-opacity',
+              'absolute inset-0 w-full right-full bg-foreground h-full transition-opacity',
               progress! > 99.7 ? 'opacity-0' : 'opacity-100'
             )}
             style={{ x: `${progress! - 100}%` }}
@@ -98,7 +98,7 @@ interface Props {
   isInView?: boolean
 }
 
-const TimedAccordionPanels = ({ panels, intervalDuration = 25, updateFrequency = 10 }: Props) => {
+const TimedAccordionPanels = ({ panels, intervalDuration = 10, updateFrequency = 10 }: Props) => {
   const ref = useRef(null)
   const isInView = useInView(ref, { margin: '-25%' })
   const [activeTab, setActiveTab] = useState(0)

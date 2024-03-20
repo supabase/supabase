@@ -13,7 +13,7 @@ interface Props {
 
 function ProductsCta(props: Props) {
   return (
-    <SectionContainer className="overflow-hidden flex flex-col xl:grid xl:grid-cols-2 gap-4 md:gap-8 xl:gap-10">
+    <SectionContainer className="overflow-hidden flex flex-col xl:grid xl:grid-cols-2 gap-4 md:gap-8 xl:gap-10 !pt-0">
       <div className="w-full pb-6 md:h-[120px] flex items-center justify-center text-center col-span-1">
         <MagnifiedProducts currentProduct={props.currentProduct} />
       </div>

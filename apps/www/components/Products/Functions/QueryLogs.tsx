@@ -89,7 +89,7 @@ const QueryLogs = () => {
 
     const newLog = createLog()
     setActiveLogs([newLog, ...activeLogs])
-  }, 1500)
+  }, 1000)
 
   useEffect(() => {
     setMounted(true)
@@ -116,7 +116,7 @@ const QueryLogs = () => {
               animate={{
                 opacity: 1,
                 x: 0,
-                transition: { delay: i * 0.05, duration: 0.2 },
+                transition: { delay: i * 0.03, duration: 0.2 },
               }}
               className="py-2 md:px-4 pointer-events-auto border-b hover:bg-selection/20 first:border-t w-full font-mono text-xs flex gap-4 lg:gap-5 items-center"
             >

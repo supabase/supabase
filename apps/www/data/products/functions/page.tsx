@@ -187,8 +187,8 @@ export default (isMobile?: boolean) => ({
         <Link href="https://deno.com/" className="underline" target="_blank">
           Deno
         </Link>
-        , which offers a few benefits to you as a developer so you can spend less time configuring
-        tools and more time building your products.
+        , a performant and open source JavaScript runtime that ensures maximum power and
+        flexibility.
       </>
     ),
     cards: [
