@@ -14,7 +14,7 @@ Semantic search is useful in applications where the depth of understanding and c
 
 For instance, a user searching for "increase text size on display" might miss articles titled "How to adjust font size in settings" in a keyword-based search system. However, a semantic search engine would understand the intent behind the query and correctly match it to relevant articles, regardless of the specific terminology used.
 
-It is also possible to combine semantic search with keyword search to get the best of both worlds. See [Hybrid search](/docs/guides/ai/hybrid-search) for more details.
+It's also possible to combine semantic search with keyword search to get the best of both worlds. See [Hybrid search](/docs/guides/ai/hybrid-search) for more details.
 
 ## How semantic search works
 
@@ -97,7 +97,7 @@ $$;
 
 Here we create a function `match_documents` that accepts three parameters:
 
-1. `query_embedding`: a one-time embedding generated for the user's search query. Here we set the size to 512, but adjust this to match the number of dimensions produced by your embedding module.
+1. `query_embedding`: a one-time embedding generated for the user's search query. Here we set the size to 512, but adjust this to match the number of dimensions produced by your embedding model.
 1. `match_threshold`: the minimum similarity between embeddings. This is a value between 1 and -1, where 1 is most similar and -1 is most dissimilar.
 1. `match_count`: the maximum number of results to return. Note the query may return less than this number if `match_threshold` resulted in a small shortlist. Limited to 200 records to avoid unintentionally overloading your database.
 
