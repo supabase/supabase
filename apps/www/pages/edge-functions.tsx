@@ -1,5 +1,3 @@
-import 'swiper/css'
-
 import React from 'react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'

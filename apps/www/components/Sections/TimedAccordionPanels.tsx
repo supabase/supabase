@@ -1,7 +1,14 @@
 import 'swiper/css'
 
 import React, { useState, useEffect, useRef } from 'react'
-import { AnimatePresence, motion, useAnimation, useInView } from 'framer-motion'
+import {
+  AnimatePresence,
+  LazyMotion,
+  domAnimation,
+  m,
+  useAnimation,
+  useInView,
+} from 'framer-motion'
 import { cn } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import Panel from '../Panel'
@@ -69,13 +76,10 @@ const TimedPanel = ({
           </p>
         </div>
         <AnimatePresence>
-          <motion.div
-            variants={variants}
-            initial={'hidden'}
-            animate={isActive ? 'active' : 'hidden'}
-            exit={'hidden'}
+          <div
             className={cn(
-              'absolute h-[calc(100%-150px)] mt-14 inset-0 m-auto flex items-center justify-center'
+              'absolute h-[calc(100%-150px)] mt-14 inset-0 m-auto flex items-center justify-center transition-opacity',
+              isActive ? 'opacity-100' : 'opacity-25'
             )}
           >
             <div
@@ -85,19 +89,21 @@ const TimedPanel = ({
               )}
             />
             <Image isActive={isActive} isInView={isInView} />
-          </motion.div>
+          </div>
         </AnimatePresence>
       </Panel>
       {!isSm && isActive && (
         <div className="opacity-0 animate-fade-in absolute bottom-0 w-full h-[1px] bg-border-strong group-hover:opacity-100 rounded-full overflow-hidden">
-          <motion.div
-            className={cn(
-              'absolute inset-0 w-full right-full bg-foreground h-full transition-opacity',
-              progress! > 99.7 ? 'opacity-0' : 'opacity-100'
-            )}
-            style={{ x: `${progress! - 100}%` }}
-            transition={{ duration: intervalDuration }}
-          />
+          <LazyMotion features={domAnimation}>
+            <m.div
+              className={cn(
+                'absolute inset-0 w-full right-full bg-foreground h-full transition-opacity',
+                progress! > 99.7 ? 'opacity-0' : 'opacity-100'
+              )}
+              style={{ x: `${progress! - 100}%` }}
+              transition={{ duration: intervalDuration }}
+            />
+          </LazyMotion>
         </div>
       )}
     </button>

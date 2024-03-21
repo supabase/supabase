@@ -187,8 +187,8 @@ export default (isMobile?: boolean) => ({
         <Link href="https://deno.com/" className="underline" target="_blank">
           Deno
         </Link>
-        , a performant and open source JavaScript runtime that ensures maximum power and
-        flexibility.
+        , an open source JavaScript runtime that ensures maximum power and flexibility. Migrate in
+        and out at any time with no vendor lock-in.
       </>
     ),
     cards: [

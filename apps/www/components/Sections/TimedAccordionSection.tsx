@@ -1,7 +1,7 @@
 import 'swiper/css'
 
 import React, { useState, useEffect, useRef } from 'react'
-import { motion, useAnimation, useInView } from 'framer-motion'
+import { LazyMotion, domAnimation, m, useAnimation, useInView } from 'framer-motion'
 import { cn } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { useBreakpoint } from 'common'
@@ -23,11 +23,6 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
     setHeight(isActive ? paragraphRef.current?.clientHeight ?? 0 : 0)
   }, [isActive])
 
-  const variants = {
-    show: { opacity: 1, height: height },
-    hide: { opacity: 0, height: 0 },
-  }
-
   return (
     <button
       onClick={onClick}
@@ -40,29 +35,31 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
     >
       <div className="flex flex-col py-4">
         <p className="font-mono text-sm uppercase">{label}</p>
-        <motion.div
-          variants={variants}
-          initial="hide"
-          exit="hide"
-          animate={isActive ? 'show' : 'hide'}
-          className="text-foreground-lighter text-sm inline-block overflow-hidden"
+        <div
+          className={cn(
+            'text-foreground-lighter text-sm inline-block overflow-hidden transition-all',
+            isActive ? 'opacity-100' : 'opacity-0'
+          )}
+          style={{ height: isActive ? `${height}px` : 0 }}
         >
           <p ref={paragraphRef} className="pt-2">
             {paragraph}
           </p>
-        </motion.div>
+        </div>
       </div>
       <div className="relative w-full h-[1px] bg-border-strong opacity-80 group-hover:opacity-100 rounded-full overflow-hidden">
-        {isActive && (
-          <motion.div
-            className={cn(
-              'absolute inset-0 w-full right-full bg-foreground h-full transition-opacity',
-              progress! > 99.7 ? 'opacity-0' : 'opacity-100'
-            )}
-            style={{ x: `${progress! - 100}%` }}
-            transition={{ duration: intervalDuration }}
-          />
-        )}
+        <LazyMotion features={domAnimation}>
+          {isActive && (
+            <m.div
+              className={cn(
+                'absolute inset-0 w-full right-full bg-foreground h-full transition-opacity',
+                progress! > 99.7 ? 'opacity-0' : 'opacity-100'
+              )}
+              style={{ x: `${progress! - 100}%` }}
+              transition={{ duration: intervalDuration }}
+            />
+          )}
+        </LazyMotion>
       </div>
     </button>
   )
