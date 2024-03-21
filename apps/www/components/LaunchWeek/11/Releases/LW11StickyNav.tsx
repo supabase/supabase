@@ -6,7 +6,6 @@ import { cn } from 'ui'
 import { isBrowser } from 'common'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import Player from '../Album/Player'
 
 const LWXStickyNav: FC = () => {
   const OFFSET = 66
@@ -94,9 +93,7 @@ const LWXStickyNav: FC = () => {
               </li>
             </ul>
           </div>
-          <div>
-            <Player />
-          </div>
+          <div></div>
         </SectionContainer>
       </nav>
     </div>

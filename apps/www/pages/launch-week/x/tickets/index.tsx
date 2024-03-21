@@ -9,12 +9,12 @@ import { debounce } from 'lodash'
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 import { useTheme } from 'next-themes'
 
-import FaviconImports from '~/components/LaunchWeek/11/FaviconImports'
+import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import CTABanner from '~/components/CTABanner'
-import TicketsGrid from '~/components/LaunchWeek/11/TicketsGrid'
+import TicketsGrid from '~/components/LaunchWeek/X/TicketsGrid'
 import supabase from '~/lib/supabaseMisc'
 
 interface Props {
@@ -129,7 +129,7 @@ export default function TicketsPage({ users }: Props) {
                 </p>
                 <div className="mt-1">
                   <Button asChild type="outline" size="medium">
-                    <Link href="/launch-week">Go to Launch Week X</Link>
+                    <Link href="/launch-week/x">Go to Launch Week X</Link>
                   </Button>
                 </div>
               </motion.div>

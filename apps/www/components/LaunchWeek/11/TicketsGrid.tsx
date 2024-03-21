@@ -35,7 +35,7 @@ export default function TicketsGrid({ loadedUsers, isLoading, pageCount, offset 
 
         return (
           <Link
-            href={`/launch-week/x/tickets/${user.username}`}
+            href={`/launch-week/tickets/${user.username}`}
             key={`${user.username}-000${i}`}
             onClick={() => window.scrollTo(0, 0)}
             legacyBehavior

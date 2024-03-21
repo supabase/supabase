@@ -19,13 +19,14 @@ interface Props {
 
 const LWXGame = ({ setIsGameMode }: Props) => {
   const { supabase, userData: user } = useConfData()
-  const word = process.env.NEXT_PUBLIC_LWX_GAME_WORD ?? 'database'
+  const word =
+    process.env.NEXT_PUBLIC_LWX_GAME_WORD ?? 'supabase_is_going_into_general_availability'
   const winningWord = word?.split('')
   const [currentWord, setCurrentWord] = useState<string[]>(Array(winningWord.length))
   const [gameState, setGameState] = useState<'playing' | 'winner' | 'loading'>('playing')
   const [hasKeyDown, setHasKeyDown] = useState(false)
   const [attempts, setAttempts] = useState(1)
-  const hasWon = currentWord.join('') === winningWord.join('')
+  const hasWon = currentWord.join('') === winningWord.join('').replaceAll('_', '')
   const winningCompliment = useMemo(
     () => COMPLIMENTS[Math.floor(Math.random() * COMPLIMENTS.length)],
     []
@@ -61,6 +62,8 @@ const LWXGame = ({ setIsGameMode }: Props) => {
     setTimeout(() => {
       setHasKeyDown(false)
     }, 100)
+
+    console.log(currentWord.join(''), winningWord.join('').replaceAll('_', ''))
   }
 
   useEffect(() => {
@@ -149,9 +152,11 @@ const LWXGame = ({ setIsGameMode }: Props) => {
           Guess the word
         </div>
       </div>
-      <div className="flex items-center justify-center gap-2 flex-wrap font-mono h-16">
+      <div className="flex items-center justify-center gap-2 flex-wrap font-mono min-h-[100px]">
         {winningWord.map((letter, i) => {
-          const isMatch = letter === currentWord[i]
+          const isSpace = letter === '_'
+          const isMatch = isSpace || letter === currentWord[i]
+
           return (
             <div
               key={`${currentWord[i]}-${i}`}
@@ -159,7 +164,8 @@ const LWXGame = ({ setIsGameMode }: Props) => {
                 'w-6 md:w-14 aspect-square bg-[#06080930] backdrop-blur-sm flex items-center hover:border-strong justify-center uppercase border rounded-sm md:rounded-lg transition-colors',
                 isMatch && 'border-stronger bg-foreground text-[#060809]',
                 hasWon && 'animate-pulse !border-foreground',
-                hasKeyDown && 'border-strong'
+                hasKeyDown && 'border-strong',
+                isSpace && '!opacity-0'
               )}
             >
               {currentWord[i]}

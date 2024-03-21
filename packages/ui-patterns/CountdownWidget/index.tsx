@@ -15,7 +15,7 @@ export function CountdownWidget({
   seconds,
   showCard = true,
 }: CountdownWidgetProps) {
-  const Colon = () => <span className="text-xs mx-px text-foreground-lighter">:</span>
+  const Colon = () => <span className="text-xs mx-px">:</span>
 
   const showItem = (item: string | undefined) => item !== undefined && item !== '0'
 

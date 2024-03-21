@@ -30,7 +30,7 @@ export const VALID_KEYS = [
   'z',
 ]
 
-const useLwxGame = (showCustomizationForm?: boolean) => {
+const useLwGame = (showCustomizationForm?: boolean) => {
   const [isGameMode, setIsGameMode] = useState(false)
   const { ticketState } = useConfData()
 
@@ -57,4 +57,4 @@ const useLwxGame = (showCustomizationForm?: boolean) => {
   return { isGameMode, setIsGameMode }
 }
 
-export default useLwxGame
+export default useLwGame

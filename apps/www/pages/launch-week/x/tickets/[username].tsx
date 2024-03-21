@@ -10,17 +10,15 @@ import { Button } from 'ui'
 import { SITE_URL } from '~/lib/constants'
 import supabase from '~/lib/supabaseMisc'
 
-import FaviconImports from '~/components/LaunchWeek/11/FaviconImports'
+import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
-import LW11Background from '~/components/LaunchWeek/11/LW11Background'
+import LWXBackground from '~/components/LaunchWeek/X/LWXBackground'
 
-const LW11TicketContainer = dynamic(
-  () => import('~/components/LaunchWeek/11/Ticket/TicketContainer')
-)
+const LWXTicketContainer = dynamic(() => import('~/components/LaunchWeek/X/Ticket/TicketContainer'))
 const LaunchWeekPrizeSection = dynamic(
-  () => import('~/components/LaunchWeek/11/LaunchWeekPrizeSection')
+  () => import('~/components/LaunchWeek/X/LaunchWeekPrizeSection')
 )
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
@@ -35,7 +33,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
 
   const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
   const DESCRIPTION = `Claim and share your Supabase Launch Week X ticket for a chance to win Supabase swag.`
-  const OG_URL = `${SITE_URL}/tickets/${username}`
+  const OG_URL = `${SITE_URL}/x/tickets/${username}`
 
   const [session, setSession] = useState<Session | null>(null)
   const { resolvedTheme, setTheme } = useTheme()
@@ -89,7 +87,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
           <div className="-mt-[65px]">
             <SectionContainer className="relative z-10 flex flex-col justify-around items-center gap-2 md:gap-10 !px-2 !mx-auto md:min-h-[auto]">
               <div className="w-full min-h-[400px] pt-24 flex items-center">
-                <LW11TicketContainer />
+                <LWXTicketContainer />
               </div>
               <div className="flex flex-col items-center justify-center text-center gap-2 max-w-lg">
                 <h1 className="text-2xl">
@@ -97,17 +95,12 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
                   <br />
                   Launch Week X Ticket
                 </h1>
-                <span className="text-foreground-lighter">
-                  Claim your own ticket and share it for a chance to win.
-                </span>
               </div>
               <Button type="secondary" asChild>
-                <Link href={`${SITE_URL}${username ? '?referral=' + username : ''}`}>
-                  Join Launch Week X
-                </Link>
+                <Link href={`${SITE_URL}/x`}>Go to Launch Week X</Link>
               </Button>
             </SectionContainer>
-            <LW11Background className="absolute z-0 top-0 left-0 right-0 w-full flex items-center justify-center opacity-20" />
+            <LWXBackground className="absolute z-0 top-0 left-0 right-0 w-full flex items-center justify-center opacity-20" />
           </div>
           <SectionContainer className="!pt-4 !pb-0">
             <LaunchWeekPrizeSection />
@@ -162,7 +155,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
       ogImageUrl,
       key: username,
     },
-    revalidate: 5,
+    // revalidate: 5,
   }
 }
 

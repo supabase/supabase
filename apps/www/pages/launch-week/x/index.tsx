@@ -1,21 +1,37 @@
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
+import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { Session } from '@supabase/supabase-js'
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 import supabase from '~/lib/supabaseMisc'
 
-import FaviconImports from '~/components/LaunchWeek/11/FaviconImports'
+import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
-import TicketingFlow from '~/components/LaunchWeek/11/Ticket/TicketingFlow'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import { Meetup } from '~/components/LaunchWeek/X/LWXMeetups'
+import LWXStickyNav from '~/components/LaunchWeek/X/Releases/LWXStickyNav'
+import LWXHeader from '~/components/LaunchWeek/X/Releases/LWXHeader'
+import MainStage from '~/components/LaunchWeek/X/Releases/MainStage'
 
-export default function LaunchWeekIndex() {
+const BuildStage = dynamic(() => import('~/components/LaunchWeek/X/Releases/BuildStage'))
+const LWXMeetups = dynamic(() => import('~/components/LaunchWeek/X/LWXMeetups'))
+const LaunchWeekPrizeSection = dynamic(
+  () => import('~/components/LaunchWeek/X/LaunchWeekPrizeSection')
+)
+
+interface Props {
+  meetups?: Meetup[]
+}
+
+export default function LaunchWeekIndex({ meetups }: Props) {
   const { query } = useRouter()
 
-  const TITLE = 'Supabase GA | 11-15 April 2024'
+  const TITLE = 'Supabase Launch Week X | 11-15 December 2023'
   const DESCRIPTION = 'Join us for a week of announcing new features, every day at 8 AM PT.'
-  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/lw11/lw11-og.jpg`
+  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/lwx/lwx-og.jpg`
 
   const ticketNumber = query.ticketNumber?.toString()
   const bgImageId = query.bgImageId?.toString()
@@ -96,10 +112,29 @@ export default function LaunchWeekIndex() {
           setShowCustomizationForm,
         }}
       >
-        <DefaultLayout className="flex items-center">
-          <TicketingFlow />
+        <DefaultLayout>
+          <LWXStickyNav />
+          <LWXHeader />
+          <MainStage />
+          <BuildStage />
+          <SectionContainer id="meetups" className="scroll-mt-[66px]">
+            <LWXMeetups meetups={meetups} />
+          </SectionContainer>
+          <SectionContainer className="lg:pb-40">
+            <LaunchWeekPrizeSection />
+          </SectionContainer>
         </DefaultLayout>
       </ConfDataContext.Provider>
     </>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const { data: meetups } = await supabase!.from('lwx_meetups').select('*')
+
+  return {
+    props: {
+      meetups: meetups?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1)),
+    },
+  }
 }

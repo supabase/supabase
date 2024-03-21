@@ -39,7 +39,8 @@ const Nav = (props: Props) => {
 
   const isHomePage = router.pathname === '/'
   const isLaunchWeekPage = router.pathname.includes('launch-week')
-  const isLaunchWeekXPage = router.pathname === '/launch-week'
+  const isLaunchWeekXPage = router.pathname === '/launch-week/x'
+  const isLaunchWeekGAPage = router.pathname === '/launch-week'
   const showLaunchWeekNavMode = isLaunchWeekPage && !open
 
   React.useEffect(() => {
@@ -108,7 +109,7 @@ const Nav = (props: Props) => {
                     />
                   </Link>
 
-                  {isLaunchWeekPage && !isLaunchWeekXPage && (
+                  {!isLaunchWeekGAPage && isLaunchWeekPage && !isLaunchWeekXPage && (
                     <Link
                       href="/launch-week"
                       as="/launch-week"
