@@ -10,7 +10,7 @@
 <path d="M192.285 197.623L-5.48601 197.623" stroke="url(#paint7_linear_1200_89039)"/>
 <path d="M206.871 174.51L-5.48402 174.51" stroke="url(#paint8_linear_1200_89039)"/>
 <path d="M211.328 266.279L-5.48434 266.279" stroke="url(#paint9_linear_1200_89039)"/>
-<g clip-path="url(#clip0_1200_89039)">
+<g clipPath="url(#clip0_1200_89039)">
 <rect x="160.598" y="158.094" width="131.505" height="121.291" rx="16" fill="white"/>
 <circle cx="250.666" cy="205.185" r="0.978774" transform="rotate(-180 250.666 205.185)" fill="#73867C"/>
 <circle cx="263.638" cy="185.072" r="0.978774" transform="rotate(-180 263.638 185.072)" fill="#73867C"/>
