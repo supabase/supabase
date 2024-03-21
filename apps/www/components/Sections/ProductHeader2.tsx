@@ -25,7 +25,7 @@ const ProductHeader = (props: Props) => (
               {props.icon && <ProductIcon icon={props.icon} />}
               {props.title && (
                 <span
-                  className="text-brand font-mono uppercase"
+                  className="text-brand-600 dark:text-brand font-mono uppercase"
                   key={`product-name-${props.title}`}
                 >
                   {props.title}

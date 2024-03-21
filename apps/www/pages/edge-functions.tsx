@@ -1,3 +1,5 @@
+import 'swiper/css'
+
 import React from 'react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
@@ -43,15 +45,17 @@ function EdgeFunctions() {
           ],
         }}
       />
-      <DefaultLayout className="overflow-hidden">
+      <DefaultLayout>
         <ProductsNav activePage={PRODUCT_NAMES.FUNCTIONS} />
         <ProductHeader
           {...pageData.heroSection}
           footer={<HighlightColumns highlights={pageData.highlightsSection.highlights} />}
         />
-        <SectionContainer className="flex flex-col gap-4 lg:gap-8 !pb-0">
-          <ExamplesCarousel {...pageData.examplesSection} />
-        </SectionContainer>
+        <div className="overflow-hidden">
+          <SectionContainer className="flex flex-col gap-4 lg:gap-8 !pb-0">
+            <ExamplesCarousel {...pageData.examplesSection} />
+          </SectionContainer>
+        </div>
         <SectionContainer className="flex flex-col gap-4">
           <div>
             <h2 className="h2">{pageData.localDXsection.title}</h2>
@@ -64,15 +68,19 @@ function EdgeFunctions() {
         <SectionContainer className="flex flex-col gap-4 lg:gap-8">
           <GlobalPresenceSection {...pageData.globalPresenceSection} />
         </SectionContainer>
-        <SectionContainer className="flex flex-col gap-4 lg:gap-8">
-          <h2 className="h2">{pageData.o11y.title}</h2>
-          <TimedAccordionPanels {...pageData.o11y} />
-        </SectionContainer>
-        <SectionContainer className="flex flex-col gap-4 lg:gap-8">
-          <h2 className="h2">{pageData.integratesWithSupabase.title}</h2>
-          <TimedAccordionSection tabs={pageData.integratesWithSupabase.useCases} />
-        </SectionContainer>
-        <ProductsCta currentProduct={PRODUCT_SHORTNAMES.FUNCTIONS} />
+        <div className="overflow-hidden">
+          <SectionContainer className="flex flex-col gap-4 lg:gap-8">
+            <h2 className="h2">{pageData.o11y.title}</h2>
+            <TimedAccordionPanels {...pageData.o11y} />
+          </SectionContainer>
+        </div>
+        <div className="overflow-hidden">
+          <SectionContainer className="flex flex-col gap-4 lg:gap-8">
+            <h2 className="h2">{pageData.integratesWithSupabase.title}</h2>
+            <TimedAccordionSection tabs={pageData.integratesWithSupabase.useCases} />
+          </SectionContainer>
+        </div>
+        <ProductsCta currentProduct={PRODUCT_SHORTNAMES.FUNCTIONS} className="!pt-0 lg:!pt-16" />
       </DefaultLayout>
     </>
   )

@@ -94,7 +94,13 @@ function Product({
             fillRule="evenodd"
             clipRule="evenodd"
           >
-            <path d={product.icon} stroke="currentColor" strokeWidth={1.5} strokeLinejoin="bevel" />
+            <path
+              d={product.icon}
+              stroke="currentColor"
+              strokeWidth={1.5}
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </motion.div>
         <div className="text-foreground flex justify-center relative opacity-70 md:absolute md:bottom-0 md:opacity-0 group-hover:opacity-100 transition-opacity md:translate-y-8 md:-left-20 md:md:-right-20 font-mono uppercase text-center text-xs mt-2">

@@ -78,13 +78,23 @@ const npmList = [
   'socket.io',
   'async',
   'lodash',
+  'underscore',
+  'ramda',
+  'validator',
+  'yup',
+  'day.js',
+  'date-fns',
+  'jsonwebtoken',
+  'bcrypt',
+  'minimist',
+  'chalk',
 ]
 
 const NpmEcosystem = () => {
   return (
-    <div className="relative w-full h-full flex items-stretch justify-center overflow-hidden group">
+    <div className="relative w-full h-full flex justify-center overflow-hidden group">
       <div
-        className="absolute flex w-full !h-full inset-0 flex-wrap items-start gap-2 opacity-80 dark:opacity-50"
+        className="absolute flex flex-wrap items-start gap-2 opacity-80 dark:opacity-50"
         style={{ left: -50, right: -150 }}
       >
         {npmList.map((module, i) => (
