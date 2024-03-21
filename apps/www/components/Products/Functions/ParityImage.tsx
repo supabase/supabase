@@ -21,7 +21,7 @@ const ParityImage = () => (
       draggable={false}
       className="object-cover absolute z-0 inset-0 hidden dark:block"
     />
-    <div className="p-4 bg-surface-200 bg-opacity-30 border-2 border-dashed rounded-2xl justify-center items-center gap-1 flex">
+    <div className="relative z-10 p-4 bg-surface-200 border-2 border-dashed rounded-2xl justify-center items-center gap-1 flex">
       <div className="py-2 px-4 bg-alternative-200 rounded-lg shadow border flex-col justify-center items-center">
         <div className="text-foreground uppercase tracking-wide">Dev</div>
       </div>
