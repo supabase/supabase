@@ -14,7 +14,7 @@ const LocalDXImage = () => {
   }
 
   return (
-    <div className="w-full h-full flex-1 flex items-center justify-center">
+    <div className="relative w-full h-full flex-1 flex items-center justify-center">
       <Image
         src="/images/product/functions/grid-gradient-dark.svg"
         alt=""

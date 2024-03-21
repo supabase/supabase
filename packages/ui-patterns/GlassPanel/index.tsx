@@ -56,6 +56,7 @@ export const GlassPanel = ({
           src={logoImage}
           alt={title}
           fill
+          sizes="100%"
           className={cn('object-contain object-left', className)}
         />
       </div>

@@ -40,11 +40,6 @@ const TimedPanel = ({
   const isSm = useBreakpoint()
   const Image: any = image ?? null
 
-  const variants = {
-    active: { opacity: 1 },
-    hidden: { opacity: 0.25 },
-  }
-
   return (
     <button
       onMouseEnter={() => !isSm && onClick && onClick()}
@@ -84,7 +79,7 @@ const TimedPanel = ({
           >
             <div
               className={cn(
-                'absolute z-20 w-full h-full inset-0 bg-gradient-to-r from-transparent to-background-surface-100 transition-opacity',
+                'absolute z-20 w-full h-full inset-0 bg-gradient-to-r from-transparent to-background-surface-100 transition-opacity pointer-events-none',
                 isActive && 'opacity-0'
               )}
             />
