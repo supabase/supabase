@@ -78,7 +78,7 @@ const Panel = ({
     <Component
       ref={outerRef}
       className={cn(
-        'relative rounded-xl p-px bg-surface-100 bg-gradient-to-b from-border-strong dark:from-border to-border-strong/70 dark:to-surface-100 transition-all shadow-md flex items-center justify-center',
+        'relative rounded-xl p-px bg-surface-100 bg-gradient-to-b from-border to-border/50 dark:to-surface-100 transition-all shadow-md flex items-center justify-center',
         !trackCursor && hasActiveOnHover
           ? activeColor === 'brand'
             ? 'hover:bg-none hover:!bg-brand'

@@ -25,16 +25,12 @@ function ProductsCta(props: Props) {
       </div>
       <div className="flex flex-col col-span-1 text-center xl:text-left xl:justify-center items-center xl:items-start">
         <h2 className="h2">Ready to start building?</h2>
-        <p className="mx-auto text-foreground-lighter">
-          Supabase products are built to work both in isolation and seamlessly together to ensure
-          the most flexible and scalable developer experience.
-        </p>
-        <div className="flex gap-2 py-4">
+        <div className="flex gap-2 py-2">
           <Button asChild type="primary" size="small" className="h-full">
             <Link href="https://supabase.com/dashboard">Start for free</Link>
           </Button>
           <Button asChild type="default" size="small">
-            <Link href="/docs">See documentation</Link>
+            <Link href="https://forms.supabase.com/enterprise">Contact Enterprise</Link>
           </Button>
         </div>
       </div>

@@ -58,7 +58,8 @@ function Product({
     return val - bounds.x - bounds.width / 2
   })
 
-  let widthSync = useTransform(distance, [-150, 0, 150], [75, 100, 75])
+  const initialWidth = isMobile ? 50 : 65
+  let widthSync = useTransform(distance, [-100, 0, 100], [initialWidth, 80, initialWidth])
   let width = useSpring(widthSync, { mass: 0.1, stiffness: 150, damping: 12 })
 
   const xDelta = 91
@@ -83,7 +84,7 @@ function Product({
       <Link href={product.url} className="flex w-full flex-col items-center text-center group">
         <motion.div
           style={isMobile ? (undefined as any) : { width, willChange: 'width' }}
-          className="relative w-[50px] !min-w-[50px] aspect-square will-change-transform bg-background rounded-xl border p-3 text-foreground-lighter group-hover:text-foreground"
+          className="relative w-[30px] !min-w-[30px] md:!min-w-[50px] aspect-square will-change-transform bg-background rounded-xl border p-3 text-foreground-lighter group-hover:text-foreground"
         >
           <svg
             width="100%"

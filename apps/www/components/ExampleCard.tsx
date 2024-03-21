@@ -84,7 +84,7 @@ function ExampleCard(props: any) {
               </svg>
             </div>
           )}
-          <div className="p-5 flex flex-col gap-2">
+          <div className="p-5 flex flex-col gap-2 border-t border-muted">
             <div className="flex items-start justify-between">
               <h4 className="text-foreground text-lg">{props.title}</h4>
             </div>
