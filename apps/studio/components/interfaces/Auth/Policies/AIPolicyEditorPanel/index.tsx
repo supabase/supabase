@@ -232,7 +232,7 @@ export const AIPolicyEditorPanel = memo(function ({
 
     const policyCreateUnsaved =
       selectedPolicy === undefined &&
-      (!name || !roles || editorOneFormattedValue || editorTwoFormattedValue)
+      (name.length > 0 || roles.length > 0 || editorOneFormattedValue || editorTwoFormattedValue)
     const policyUpdateUnsaved =
       selectedPolicy !== undefined
         ? checkIfPolicyHasChanged(selectedPolicy, {
@@ -409,6 +409,7 @@ export const AIPolicyEditorPanel = memo(function ({
         <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
           <Sheet open={visible} onOpenChange={() => onClosingPanel()}>
             <SheetContent
+              showClose={false}
               size={assistantVisible ? 'lg' : 'default'}
               className={cn(
                 'bg-surface-200',
@@ -644,7 +645,7 @@ export const AIPolicyEditorPanel = memo(function ({
                       <Button
                         type="default"
                         disabled={isExecuting || isUpdating}
-                        onClick={() => onSelectCancel()}
+                        onClick={() => onClosingPanel()}
                       >
                         Cancel
                       </Button>
