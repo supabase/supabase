@@ -89,7 +89,7 @@ functions:
       - id: sign-up-with-redirect
         name: Sign up with a redirect URL
         description: |
-          - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - See [redirect URLs and wildcards](/docs/guides/auth/concepts/redirect-urls) to add additional redirect URLs to your project.
         code: |
           ```
           res = supabase.auth.sign_up(
