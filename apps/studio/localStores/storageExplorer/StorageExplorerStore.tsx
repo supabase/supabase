@@ -1188,11 +1188,8 @@ class StorageExplorerStore {
     const files = await this.getAllItemsAlongFolder(folder)
     await this.deleteFiles(files, isDeleteFolder)
 
-    // const isFolderOpen = this.openedFolders[this.openedFolders.length - 1]?.name === folder.name
-    // if (isFolderOpen) {
     this.popColumnAtIndex(folder.columnIndex)
     this.popOpenedFoldersAtIndex(folder.columnIndex - 1)
-    // }
 
     if (folder.columnIndex > 0) {
       const parentFolderPrefix = this.openedFolders
