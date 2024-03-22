@@ -8,7 +8,7 @@ import {
 } from 'components/interfaces/Home/Connect/ConnectTabs'
 import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 
-const ContentFile = ({ connectionStringPooler, connectionStringDirect }: ContentFileProps) => {
+const ContentFile = ({ connectionStringPooler }: ContentFileProps) => {
   return (
     <ConnectTabs>
       <ConnectTabTriggers>
@@ -20,10 +20,10 @@ const ContentFile = ({ connectionStringPooler, connectionStringDirect }: Content
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
 # Connect to Supabase via connection pooling with Supavisor.
-DATABASE_URL="${connectionStringPooler}"
+DATABASE_URL="${connectionStringPooler.transaction}"
 
 # Direct connection to the database. Used for migrations.
-DIRECT_URL="${connectionStringDirect}"
+DIRECT_URL="${connectionStringPooler.session}"
         `}
         </SimpleCodeBlock>
       </ConnectTabContent>

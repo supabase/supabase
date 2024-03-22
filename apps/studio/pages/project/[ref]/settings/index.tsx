@@ -1,5 +1,3 @@
-import { observer } from 'mobx-react-lite'
-
 import { SettingsLayout } from 'components/layouts'
 import type { NextPageWithLayout } from 'types'
 
@@ -9,4 +7,4 @@ const Settings: NextPageWithLayout = () => {
 
 Settings.getLayout = (page) => <SettingsLayout>{page}</SettingsLayout>
 
-export default observer(Settings)
+export default Settings

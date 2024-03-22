@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { forwardRef, useCallback, useState } from 'react'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -23,11 +24,10 @@ import {
   IntegrationConnection,
   IntegrationConnectionProps,
 } from 'components/interfaces/Integrations/IntegrationPanels'
-import { WarningIcon } from 'components/ui/Icons'
 import { useIntegrationsVercelConnectionSyncEnvsMutation } from 'data/integrations/integrations-vercel-connection-sync-envs-mutation'
 import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
-import { useStore } from 'hooks'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
   disabled?: boolean
@@ -36,7 +36,6 @@ interface IntegrationConnectionItemProps extends IntegrationConnectionProps {
 
 const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectionItemProps>(
   ({ disabled, onDeleteConnection, ...props }, ref) => {
-    const { ui } = useStore()
     const router = useRouter()
 
     const { type, connection } = props
@@ -62,10 +61,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
     const { mutate: syncEnvs, isLoading: isSyncEnvLoading } =
       useIntegrationsVercelConnectionSyncEnvsMutation({
         onSuccess: () => {
-          ui.setNotification({
-            category: 'success',
-            message: 'Successfully synced environment variables',
-          })
+          toast.success('Successfully synced environment variables')
           setDropdownVisible(false)
         },
       })

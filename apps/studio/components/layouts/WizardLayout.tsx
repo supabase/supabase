@@ -1,11 +1,10 @@
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
-import { IconChevronRight } from 'ui'
 
 import { withAuth } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import type { Organization, Project } from 'types'
+import { IconChevronRight } from 'ui'
 import { FeedbackDropdown } from './ProjectLayout/LayoutHeader/FeedbackDropdown'
 import HelpPopover from './ProjectLayout/LayoutHeader/HelpPopover'
 
@@ -31,9 +30,9 @@ const WizardLayout = ({
   )
 }
 
-export default withAuth(observer(WizardLayout))
+export default withAuth(WizardLayout)
 
-export const WizardLayoutWithoutAuth = observer(WizardLayout)
+export const WizardLayoutWithoutAuth = WizardLayout
 
 const Header = ({ organization, project }: WizardLayoutProps) => {
   let stepNumber = organization ? 1 : project ? 2 : 0

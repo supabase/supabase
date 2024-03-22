@@ -1,11 +1,11 @@
 import { useMemo } from 'react'
 import toast from 'react-hot-toast'
-import { Button, SidePanel } from 'ui'
 
 import ProjectLinker from 'components/interfaces/Integrations/ProjectLinker'
 import { Markdown } from 'components/interfaces/Markdown'
 import { useGitHubAuthorizationQuery } from 'data/integrations/github-authorization-query'
 import { useGitHubConnectionCreateMutation } from 'data/integrations/github-connection-create-mutation'
+import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
 import type { IntegrationConnectionsCreateVariables } from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
@@ -13,6 +13,8 @@ import { useSelectedOrganization } from 'hooks'
 import { openInstallGitHubIntegrationWindow } from 'lib/github'
 import { EMPTY_ARR } from 'lib/void'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
+import { Button, SidePanel } from 'ui'
+import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 
 const GITHUB_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" className="w-6">
@@ -64,13 +66,19 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
     [githubReposData]
   )
 
-  const { mutate: createConnections, isLoading: isCreatingConnection } =
+  const { data: connections } = useGitHubConnectionsQuery({
+    organizationId: selectedOrganization?.id,
+  })
+
+  const { mutate: createConnection, isLoading: isCreatingConnection } =
     useGitHubConnectionCreateMutation({
       onSuccess() {
         toast.success('Successfully linked project to repository!')
         sidePanelStateSnapshot.setGithubConnectionsOpen(false)
       },
     })
+
+  const { mutateAsync: deleteConnection } = useGitHubConnectionDeleteMutation()
 
   const createGithubConnection = async (variables: IntegrationConnectionsCreateVariables) => {
     if (!selectedOrganization?.id) {
@@ -80,7 +88,23 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
       throw new Error('No new connection')
     }
 
-    createConnections({
+    const existingConnection = connections?.find(
+      (connection) => connection.project.ref === projectRef
+    )
+
+    if (existingConnection) {
+      // remove existing connection so we can recreate it or update it
+      try {
+        await deleteConnection({
+          organizationId: selectedOrganization.id,
+          connectionId: existingConnection.id,
+        })
+      } catch (error) {
+        // ignore the error to let createConnection handle it
+      }
+    }
+
+    createConnection({
       organizationId: selectedOrganization.id,
       connection: variables.new,
     })
@@ -95,7 +119,7 @@ const SidePanelGitHubRepoLinker = ({ projectRef }: SidePanelGitHubRepoLinkerProp
       onCancel={() => sidePanelStateSnapshot.setGithubConnectionsOpen(false)}
     >
       <div className="py-10 flex flex-col gap-6 bg-studio h-full">
-        <SidePanel.Content>
+        <SidePanel.Content className="flex flex-col gap-4">
           <Markdown
             content={`
 ### Choose repository to connect to
@@ -133,6 +157,7 @@ Check the details below before proceeding
               integrationIcon={GITHUB_ICON}
               choosePrompt="Choose GitHub Repo"
               showNoEntitiesState={false}
+              mode="GitHub"
             />
           )}
         </SidePanel.Content>

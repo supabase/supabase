@@ -36,13 +36,13 @@ const PolicyTableRowHeader = ({
         </Link>
         <div className="flex items-center gap-x-2">
           {isLocked && (
-            <Badge color="scale">
+            <Badge>
               <span className="flex gap-2 items-center text-xs uppercase text-foreground-lighter">
                 <IconLock width={12} /> Locked
               </span>
             </Badge>
           )}
-          <Badge color={table.rls_enabled ? 'green' : 'yellow'}>
+          <Badge variant={table.rls_enabled ? 'brand' : 'warning'}>
             {table.rls_enabled ? 'Row Level Security enabled' : 'Row Level Security disabled'}
           </Badge>
         </div>

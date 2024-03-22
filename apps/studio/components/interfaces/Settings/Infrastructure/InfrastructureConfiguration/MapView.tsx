@@ -258,11 +258,11 @@ const MapView = ({ onSelectDeployNewReplica, onSelectDropReplica }: MapViewProps
                                 `(ID: ${formatDatabaseID(database.identifier)})`
                               }`}
                           {database.status === PROJECT_STATUS.ACTIVE_HEALTHY ? (
-                            <Badge color="green">Healthy</Badge>
+                            <Badge variant="brand">Healthy</Badge>
                           ) : database.status === PROJECT_STATUS.COMING_UP ? (
-                            <Badge color="slate">Coming up</Badge>
+                            <Badge>Coming up</Badge>
                           ) : (
-                            <Badge color="amber">Unhealthy</Badge>
+                            <Badge variant="warning">Unhealthy</Badge>
                           )}
                         </p>
                         <p className="text-xs text-foreground-light">AWS • {database.size}</p>

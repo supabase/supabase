@@ -1,4 +1,8 @@
+import { Check, ChevronsUpDown, Plus } from 'lucide-react'
 import { useState } from 'react'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useSchemasQuery } from 'data/database/schemas-query'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -11,19 +15,11 @@ import {
   CommandList_Shadcn_,
   CommandSeparator_Shadcn_,
   Command_Shadcn_,
-  IconCheck,
-  IconCode,
-  IconLoader,
-  IconPlus,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
   ScrollArea,
 } from 'ui'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { ChevronDownIcon, ChevronsUpDown } from 'lucide-react'
 
 interface SchemaSelectorProps {
   className?: string
@@ -32,6 +28,7 @@ interface SchemaSelectorProps {
   showError?: boolean
   selectedSchemaName: string
   supportSelectAll?: boolean
+  excludedSchemas?: string[]
   onSelectSchema: (name: string) => void
   onSelectCreateSchema?: () => void
 }
@@ -43,6 +40,7 @@ const SchemaSelector = ({
   showError = true,
   selectedSchemaName,
   supportSelectAll = false,
+  excludedSchemas = [],
   onSelectSchema,
   onSelectCreateSchema,
 }: SchemaSelectorProps) => {
@@ -61,7 +59,9 @@ const SchemaSelector = ({
     connectionString: project?.connectionString,
   })
 
-  const schemas = (data ?? []).sort((a, b) => (a.name > b.name ? 0 : -1))
+  const schemas = (data || [])
+    .filter((schema) => !excludedSchemas.includes(schema.name))
+    .sort((a, b) => a.name.localeCompare(b.name))
 
   return (
     <div className={className}>
@@ -106,7 +106,7 @@ const SchemaSelector = ({
               </div>
             </Button>
           </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0 w-64" side="bottom" align="start">
+          <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start" sameWidthAsTrigger>
             <Command_Shadcn_>
               <CommandInput_Shadcn_ placeholder="Find schema..." />
               <CommandList_Shadcn_>
@@ -128,7 +128,7 @@ const SchemaSelector = ({
                       >
                         <span>All schemas</span>
                         {selectedSchemaName === '*' && (
-                          <IconCheck className="text-brand" strokeWidth={2} />
+                          <Check className="text-brand" strokeWidth={2} size={16} />
                         )}
                       </CommandItem_Shadcn_>
                     )}
@@ -147,7 +147,7 @@ const SchemaSelector = ({
                       >
                         <span>{schema.name}</span>
                         {selectedSchemaName === schema.name && (
-                          <IconCheck className="text-brand" strokeWidth={2} />
+                          <Check className="text-brand" strokeWidth={2} size={16} />
                         )}
                       </CommandItem_Shadcn_>
                     ))}
@@ -168,7 +168,7 @@ const SchemaSelector = ({
                           setOpen(false)
                         }}
                       >
-                        <IconPlus />
+                        <Plus size={12} />
                         Create a new schema
                       </CommandItem_Shadcn_>
                     </CommandGroup_Shadcn_>

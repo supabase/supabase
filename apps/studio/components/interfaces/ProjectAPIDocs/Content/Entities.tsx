@@ -1,18 +1,16 @@
-import { useParams } from 'common'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Button, IconDownload, IconExternalLink } from 'ui'
+import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import { generateTypes } from 'data/projects/project-type-generation-query'
-import { useStore } from 'hooks'
+import { Button, IconDownload, IconExternalLink } from 'ui'
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
 
 const Entities = ({ language }: ContentProps) => {
-  const { ui } = useStore()
   const { ref } = useParams()
-
   const [isGeneratingTypes, setIsGeneratingTypes] = useState(false)
 
   const onClickGenerateTypes = async () => {
@@ -26,16 +24,9 @@ const Entities = ({ language }: ContentProps) => {
       document.body.appendChild(element)
       element.click()
       document.body.removeChild(element)
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully generated types! File is being downloaded`,
-      })
+      toast.success(`Successfully generated types! File is being downloaded`)
     } catch (error: any) {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Failed to generate types: ${error.message}`,
-      })
+      toast.error(`Failed to generate types: ${error.message}`)
     } finally {
       setIsGeneratingTypes(false)
     }

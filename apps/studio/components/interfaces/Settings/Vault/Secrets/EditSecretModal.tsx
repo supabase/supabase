@@ -1,14 +1,14 @@
 import { isEmpty } from 'lodash'
 import { useEffect, useState } from 'react'
-import { Button, Form, IconEye, IconEyeOff, Input, Modal } from 'ui'
+import toast from 'react-hot-toast'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
 import { useVaultSecretDecryptedValueQuery } from 'data/vault/vault-secret-decrypted-value-query'
 import { useVaultSecretUpdateMutation } from 'data/vault/vault-secret-update-mutation'
-import { useStore } from 'hooks'
 import type { VaultSecret } from 'types'
+import { Button, Form, IconEye, IconEyeOff, Input, Modal } from 'ui'
 import EncryptionKeySelector from '../Keys/EncryptionKeySelector'
 
 interface EditSecretModalProps {
@@ -17,7 +17,6 @@ interface EditSecretModalProps {
 }
 
 const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
-  const { ui } = useStore()
   const [selectedKeyId, setSelectedKeyId] = useState<string>()
   const [showSecretValue, setShowSecretValue] = useState(false)
   const { project } = useProjectContext()
@@ -60,11 +59,7 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
           name: values.keyName || undefined,
         })
         if (addKeyRes.error) {
-          return ui.setNotification({
-            error: addKeyRes.error,
-            category: 'error',
-            message: `Failed to create new key: ${addKeyRes.error.message}`,
-          })
+          return toast.error(`Failed to create new key: ${addKeyRes.error.message}`)
         } else {
           encryptionKeyId = addKeyRes[0].id
         }
@@ -83,15 +78,11 @@ const EditSecretModal = ({ selectedSecret, onClose }: EditSecretModalProps) => {
         ...payload,
       })
       if (!res.error) {
-        ui.setNotification({ category: 'success', message: 'Successfully updated secret' })
+        toast.success('Successfully updated secret')
         setSubmitting(false)
         onClose()
       } else {
-        ui.setNotification({
-          error: res.error,
-          category: 'error',
-          message: `Failed to update secret: ${res.error.message}`,
-        })
+        toast.error(`Failed to update secret: ${res.error.message}`)
         setSubmitting(false)
       }
     }

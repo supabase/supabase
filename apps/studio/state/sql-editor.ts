@@ -140,6 +140,11 @@ export const sqlEditorState = proxy({
   addNeedsSaving: (id: string) => {
     sqlEditorState.needsSaving.add(id)
   },
+  resetResult: (id: string) => {
+    if (sqlEditorState.results[id]) {
+      sqlEditorState.results[id] = []
+    }
+  },
   addResult: (id: string, results: any[]) => {
     if (sqlEditorState.results[id]) {
       sqlEditorState.results[id].unshift({ rows: results })

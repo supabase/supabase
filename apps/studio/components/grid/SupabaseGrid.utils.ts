@@ -112,7 +112,6 @@ export async function initTable(
       gridColumns,
       savedState,
       editable: props.editable,
-      onSqlQuery: props.onSqlQuery,
       onError: props.onError ?? defaultErrorHandler,
     },
   })

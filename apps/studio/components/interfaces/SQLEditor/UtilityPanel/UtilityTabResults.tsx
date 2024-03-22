@@ -1,3 +1,5 @@
+import { useParams } from 'common'
+import toast from 'react-hot-toast'
 import { format } from 'sql-formatter'
 import { AiIconAnimation, Button } from 'ui'
 
@@ -6,8 +8,9 @@ import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { isError } from 'data/utils/error-check'
-import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
+import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useSqlEditor } from '../SQLEditor'
 import { sqlAiDisclaimerComment } from '../SQLEditor.constants'
@@ -20,16 +23,17 @@ export type UtilityTabResultsProps = {
 }
 
 const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
-  const { ui } = useStore()
-  const organization = useSelectedOrganization()
+  const { ref } = useParams()
   const snap = useSqlEditorStateSnapshot()
-  const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
-  const { setDebugSolution, setAiInput, setSqlDiff, sqlDiff, setSelectedDiffType } = useSqlEditor()
-  const selectedOrganization = useSelectedOrganization()
+  const state = useDatabaseSelectorStateSnapshot()
   const selectedProject = useSelectedProject()
-  const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
-  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
+  const organization = useSelectedOrganization()
 
+  const { sqlDiff, setDebugSolution, setAiInput, setSqlDiff, setSelectedDiffType } = useSqlEditor()
+  const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
+
+  const isOptedInToAI = organization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
+  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
 
   const { data } = useEntityDefinitionsQuery(
@@ -67,6 +71,9 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
     const formattedError = (result.error?.formattedError?.split('\n') ?? []).filter(
       (x: string) => x.length > 0
     )
+    const readReplicaError =
+      state.selectedDatabaseId !== ref &&
+      result.error.message.includes('in a read-only transaction')
 
     return (
       <div className="bg-table-header-light [[data-theme*=dark]_&]:bg-table-header-dark">
@@ -97,58 +104,82 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
               </p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="">
               {formattedError.length > 0 ? (
                 formattedError.map((x: string, i: number) => (
-                  <pre key={`error-${i}`} className="font-mono text-sm">
+                  <pre key={`error-${i}`} className="font-mono text-sm text-wrap">
                     {x}
                   </pre>
                 ))
               ) : (
-                <p className="font-mono text-sm">{result.error?.message}</p>
+                <>
+                  <p className="font-mono text-sm">Error: {result.error?.message}</p>
+                  {readReplicaError && (
+                    <p className="text-sm text-foreground-light">
+                      Note: Read replicas are for read only queries. Run write queries on the
+                      primary database instead.
+                    </p>
+                  )}
+                </>
               )}
             </div>
           )}
-          {!hasHipaaAddon && (
-            <Button
-              icon={
-                <div className="scale-75">
-                  <AiIconAnimation className="w-3 h-3" loading={isDebugSqlLoading} />
-                </div>
-              }
-              disabled={!!sqlDiff || isDebugSqlLoading}
-              onClick={async () => {
-                try {
-                  const { solution, sql } = await debugSql({
-                    sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
-                    errorMessage: result.error.message,
-                    entityDefinitions,
-                  })
 
-                  const formattedSql = format(sql, {
-                    language: 'postgresql',
-                    keywordCase: 'lower',
-                  })
-                  setAiInput('')
-                  setDebugSolution(solution)
-                  setSqlDiff({
-                    original: snippet.snippet.content.sql,
-                    modified: formattedSql,
-                  })
-                  setSelectedDiffType(DiffType.Modification)
-                } catch (error: unknown) {
-                  if (isError(error)) {
-                    ui.setNotification({
-                      category: 'error',
-                      message: `Failed to debug: ${error.message}`,
+          <div className="flex items-center gap-x-2">
+            {readReplicaError && (
+              <Button
+                className="py-2"
+                type="default"
+                onClick={() => {
+                  state.setSelectedDatabaseId(ref)
+                  snap.resetResult(id)
+                }}
+              >
+                Switch to primary database
+              </Button>
+            )}
+            {!hasHipaaAddon && (
+              <Button
+                icon={<AiIconAnimation className="scale-75 w-3 h-3" loading={isDebugSqlLoading} />}
+                disabled={!!sqlDiff || isDebugSqlLoading}
+                onClick={async () => {
+                  try {
+                    const { solution, sql } = await debugSql({
+                      sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
+                      errorMessage: result.error.message,
+                      entityDefinitions,
                     })
+
+                    const formattedSql =
+                      sqlAiDisclaimerComment +
+                      '\n\n' +
+                      format(sql, {
+                        language: 'postgresql',
+                        keywordCase: 'lower',
+                      })
+                    setAiInput('')
+                    setDebugSolution(solution)
+                    setSqlDiff({
+                      original: snippet.snippet.content.sql,
+                      modified: formattedSql,
+                    })
+                    setSelectedDiffType(DiffType.Modification)
+                  } catch (error: unknown) {
+                    // [Joshen] There's a tendency for the SQL debug to chuck a lengthy error message
+                    // that's not relevant for the user - so we prettify it here by avoiding to return the
+                    // entire error body from the assistant
+                    if (isError(error)) {
+                      toast.error(
+                        `Sorry, the assistant failed to debug your query! Please try again with a different one.`
+                      )
+                    }
                   }
-                }
-              }}
-            >
-              Debug with Supabase AI
-            </Button>
-          )}
+                }}
+              >
+                Debug with Supabase AI
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     )

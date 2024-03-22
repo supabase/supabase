@@ -3,11 +3,11 @@
 import { Slot } from '@radix-ui/react-slot'
 import { VariantProps, cva } from 'class-variance-authority'
 import { cloneElement, forwardRef, isValidElement } from 'react'
-
-import { sizes } from '../../lib/commonCva'
+import { SIZE_VARIANTS, SIZE_VARIANTS_DEFAULT } from '../../lib/constants'
 import { cn } from '../../lib/utils/cn'
 import { IconContext } from '../Icon/IconContext'
 import { IconLoader } from '../Icon/icons/IconLoader'
+import { Loader } from 'lucide-react'
 
 export type ButtonVariantProps = VariantProps<typeof buttonVariants>
 const buttonVariants = cva(
@@ -136,7 +136,7 @@ const buttonVariants = cva(
         true: 'w-full flex items-center justify-center',
       },
       size: {
-        ...sizes,
+        ...SIZE_VARIANTS,
       },
       overlay: {
         base: `absolute inset-0 bg-background opacity-50`,
@@ -151,10 +151,27 @@ const buttonVariants = cva(
       defaultVariants: {
         //   variant: 'default',
         //   size: 'default',
+        size: {
+          SIZE_VARIANTS_DEFAULT,
+        },
       },
     },
   }
 )
+
+const IconContainerVariants = cva('', {
+  variants: {
+    size: {
+      tiny: '[&_svg]:h-[14px] [&_svg]:w-[14px]',
+      small: '[&_svg]:h-[18px] [&_svg]:w-[18px]',
+      medium: '[&_svg]:h-[20px] [&_svg]:w-[20px]',
+      large: '[&_svg]:h-[20px] [&_svg]:w-[20px]',
+      xlarge: '[&_svg]:h-[24px] [&_svg]:w-[24px]',
+      xxlarge: '[&_svg]:h-[30px] [&_svg]:w-[30px]',
+      xxxlarge: '[&_svg]:h-[42px] [&_svg]:w-[42px]',
+    },
+  },
+})
 
 export type LoadingVariantProps = VariantProps<typeof loadingVariants>
 const loadingVariants = cva('', {
@@ -211,6 +228,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     return (
       <Comp
         ref={ref}
+        data-size={size}
         type={htmlType}
         {...props}
         className={cn(buttonVariants({ type, size, disabled, block, rounded }), className)}
@@ -222,19 +240,17 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
               undefined,
               showIcon &&
                 (loading ? (
-                  <IconLoader size={size} className={cn(loadingVariants({ loading }))} />
+                  <div className={cn(IconContainerVariants({ size }))}>
+                    <Loader className={cn(loadingVariants({ loading }))} />
+                  </div>
                 ) : _iconLeft ? (
-                  <IconContext.Provider value={{ contextSize: size }}>
-                    {_iconLeft}
-                  </IconContext.Provider>
+                  <div className={cn(IconContainerVariants({ size }))}>{_iconLeft}</div>
                 ) : null),
               children.props.children && (
                 <span className={'truncate'}>{children.props.children}</span>
               ),
               iconRight && !loading && (
-                <IconContext.Provider value={{ contextSize: size }}>
-                  {iconRight}
-                </IconContext.Provider>
+                <div className={cn(IconContainerVariants({ size }))}>{iconRight}</div>
               )
             )
           ) : null
@@ -242,11 +258,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           <>
             {showIcon &&
               (loading ? (
-                <IconLoader size={size} className={cn(loadingVariants({ loading }))} />
+                <div className={cn(IconContainerVariants({ size }))}>
+                  <Loader className={cn(loadingVariants({ loading }))} />
+                </div>
               ) : _iconLeft ? (
-                <IconContext.Provider value={{ contextSize: size }}>
-                  {_iconLeft}
-                </IconContext.Provider>
+                <div className={cn(IconContainerVariants({ size }))}>{_iconLeft}</div>
               ) : null)}{' '}
             {children && <span className={'truncate'}>{children}</span>}{' '}
             {iconRight && !loading && (

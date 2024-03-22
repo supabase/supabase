@@ -1,12 +1,12 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useRef, useState } from 'react'
-import { Alert, Button, Form, IconEye, IconEyeOff, Input } from 'ui'
+import toast from 'react-hot-toast'
 import * as yup from 'yup'
 
 import { useSignUpMutation } from 'data/misc/signup-mutation'
-import { useStore } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { passwordSchema } from 'lib/schemas'
+import { Alert, Button, Form, IconEye, IconEyeOff, Input } from 'ui'
 import PasswordConditionsHelper from './PasswordConditionsHelper'
 
 const signUpSchema = passwordSchema.shape({
@@ -14,7 +14,6 @@ const signUpSchema = passwordSchema.shape({
 })
 
 const SignUpForm = () => {
-  const { ui } = useStore()
   const captchaRef = useRef<HCaptcha>(null)
   const [showConditions, setShowConditions] = useState(false)
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -23,19 +22,13 @@ const SignUpForm = () => {
 
   const { mutate: signup, isLoading: isSigningUp } = useSignUpMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Signed up successfully!`,
-      })
+      toast.success(`Signed up successfully!`)
       setIsSubmitted(true)
     },
     onError: (error) => {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to sign up: ${error.message}`,
-      })
+      toast.error(`Failed to sign up: ${error.message}`)
     },
   })
 

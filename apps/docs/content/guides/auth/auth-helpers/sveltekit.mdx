@@ -155,7 +155,7 @@ export const GET = async ({ url, locals: { supabase } }) => {
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  throw redirect(303, '/')
+  redirect(303, '/')
 }
 ```
 
@@ -175,7 +175,7 @@ export const GET = async ({ url, locals: { supabase } }) => {
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  throw redirect(303, '/')
+  redirect(303, '/')
 }
 ```
 
@@ -639,7 +639,7 @@ async function authorization({ event, resolve }) {
     const session = await event.locals.getSession()
     if (!session) {
       // the user is not signed in
-      throw redirect(303, '/')
+      redirect(303, '/')
     }
   }
 
@@ -701,7 +701,7 @@ async function authorization({ event, resolve }) {
     const session = await event.locals.getSession()
     if (!session) {
       // the user is not signed in
-      throw redirect(303, '/')
+      redirect(303, '/')
     }
   }
 
@@ -773,7 +773,7 @@ import { redirect } from '@sveltejs/kit'
 export const load = async ({ parent }) => {
   const { supabase, session } = await parent()
   if (!session) {
-    throw redirect(303, '/')
+    redirect(303, '/')
   }
   const { data: tableData } = await supabase.from('test').select('*')
 
@@ -819,12 +819,12 @@ export const actions = {
       })
     }
 
-    throw redirect(303, '/dashboard')
+    redirect(303, '/dashboard')
   },
 
   signout: async ({ locals: { supabase } }) => {
     await supabase.auth.signOut()
-    throw redirect(303, '/')
+    redirect(303, '/')
   },
 }
 ```
@@ -1109,7 +1109,7 @@ import { redirect } from '@sveltejs/kit'
 export const load: PageLoad = async (event) => {
   const { session, supabaseClient } = await getSupabase(event)
   if (!session) {
-    throw redirect(303, '/')
+    redirect(303, '/')
   }
   const { data: tableData } = await supabaseClient.from('test').select('*')
 
@@ -1145,7 +1145,7 @@ import { redirect } from '@sveltejs/kit'
 export const load: PageLoad = async ({ parent }) => {
   const { supabase, session } = await parent()
   if (!session) {
-    throw redirect(303, '/')
+    redirect(303, '/')
   }
   const { data: tableData } = await supabase.from('test').select('*')
 
@@ -1179,7 +1179,7 @@ import { json, redirect } from '@sveltejs/kit'
 export const GET: RequestHandler = async (event) => {
   const { session, supabaseClient } = await getSupabase(event)
   if (!session) {
-    throw redirect(303, '/')
+    redirect(303, '/')
   }
   const { data } = await supabaseClient.from('test').select('*')
 
@@ -1457,7 +1457,7 @@ import type { PageLoad } from './$types'
 
 export const load: PageLoad = withAuth(async ({ session, getSupabaseClient }) => {
   if (!session.user) {
-    throw redirect(303, '/')
+    redirect(303, '/')
   }
 
   const { data: tableData } = await getSupabaseClient().from('test').select('*')
@@ -1489,7 +1489,7 @@ import { redirect } from '@sveltejs/kit'
 export const load: PageLoad = async (event) => {
   const { session, supabaseClient } = await getSupabase(event)
   if (!session) {
-    throw redirect(303, '/')
+    redirect(303, '/')
   }
   const { data: tableData } = await supabaseClient.from('test').select('*')
 
@@ -1526,7 +1526,7 @@ interface TestTable {
 
 export const GET: RequestHandler = withAuth(async ({ session, getSupabaseClient }) => {
   if (!session.user) {
-    throw redirect(303, '/')
+    redirect(303, '/')
   }
 
   const { data } = await getSupabaseClient().from<TestTable>('test').select('*')
@@ -1546,7 +1546,7 @@ import { json, redirect } from '@sveltejs/kit'
 export const GET: RequestHandler = async (event) => {
   const { session, supabaseClient } = await getSupabase(event)
   if (!session) {
-    throw redirect(303, '/')
+    redirect(303, '/')
   }
   const { data } = await supabaseClient.from('test').select('*')
 
@@ -1886,7 +1886,7 @@ import type { PageLoad } from './$types'
 
 export const load: PageLoad = withAuth(async ({ session, getSupabaseClient }) => {
   if (!session.user) {
-    throw redirect(303, '/')
+    redirect(303, '/')
   }
 
   const { data: tableData } = await getSupabaseClient().from('test').select('*')
@@ -1948,7 +1948,7 @@ interface TestTable {
 
 export const GET: RequestHandler = withAuth(async ({ session, getSupabaseClient }) => {
   if (!session.user) {
-    throw redirect(303, '/');
+    redirect(303, '/');
   }
 
   const { data } = await getSupabaseClient()
