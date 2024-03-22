@@ -14,7 +14,7 @@ export default function TicketActions() {
   const isTablet = useBreakpoint(1280)
   const downloadLink = useRef<HTMLAnchorElement>()
   const hasSecretTicket = metadata?.hasSecretTicket
-  const link = `${SITE_URL}/tickets/${username}?lw=x${
+  const link = `${SITE_URL}/tickets/${username}?lw=ga${
     hasSecretTicket ? '&secret=true' : golden ? `&platinum=true` : ''
   }`
   const permalink = encodeURIComponent(link)
@@ -22,12 +22,12 @@ export default function TicketActions() {
   const encodedText = encodeURIComponent(text)
   const tweetUrl = `https://twitter.com/intent/tweet?url=${permalink}&text=${encodedText}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink}`
-  const downloadUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-og?username=${encodeURIComponent(
+  const downloadUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw11-og?username=${encodeURIComponent(
     username ?? ''
   )}`
   const params = useParams()
   const sharePage = !!params.username
-  const LW_TABLE = 'lwx_tickets'
+  const LW_TABLE = 'lw11_ga_tickets'
 
   useEffect(() => {
     setImgReady(false)
