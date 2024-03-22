@@ -92,7 +92,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
           <Accordion.Content className="transition data-open:animate-slide-down data-closed:animate-slide-up ml-2">
             {props.subItem.items.map((subSubItem) => {
               return (
-                <li key={props.subItem.name}>
+                <li key={subSubItem.name}>
                   <Link
                     href={`${subSubItem.url}`}
                     className={[

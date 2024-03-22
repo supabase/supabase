@@ -1,0 +1,116 @@
+---
+title: 'Configure links for PKCE Email Auth with a third-party email provider'
+subtitle: 'Configure email links for a PKCE Auth flow when using a third-party email provider.'
+description: 'Configure email links for a PKCE Auth flow when using a third-party email provider.'
+---
+
+When using a PKCE flow, you need to provide the token hash in the confirmation email sent to the user. If you're manually generating the link for use in a third-party email provider, you can access the token hash by calling the [`supabase.auth.admin.generateLink`](/docs/reference/javascript/auth-admin-generatelink) function. Note this function is an `admin` function, which means:
+
+- It should _only_ be used on a trusted server.
+- It requires a service role key.
+
+<Admonition type="danger">
+
+Never expose your service role key on a browser or in any untrusted environment. Only use it on a trusted server.
+
+</Admonition>
+
+## Manually generating email links
+
+Use the following code to generate email links. Replace `<site_url>` with your site URL.
+
+<Tabs defaultId="signup" queryGroup="template" scrollable type="underlined" size="small">
+
+<TabPanel id="signup" label="Confirm email signup">
+
+```ts
+const linkResult = await supabase.auth.admin.generateLink({
+  email: 'current@email.com',
+  type: 'signup',
+})
+
+const tokenHash = linkResult.data.properties.hashed_token
+
+const link = `<site_url>/auth/confirm?type=signup&token_hash=${tokenHash}`
+```
+
+</TabPanel>
+
+<TabPanel id="invite" label="Invite a user">
+
+```ts
+const linkResult = await supabase.auth.admin.generateLink({
+  email: 'new@email.com',
+  type: 'invite',
+})
+
+const tokenHash = linkResult.data.properties.hashed_token
+
+const link = `<site_url>/auth/confirm?type=invite&token_hash=${tokenHash}`
+```
+
+</TabPanel>
+
+<TabPanel id="magic-link" label="Magic link">
+
+```ts
+const linkResult = await supabase.auth.admin.generateLink({
+  email: 'current@email.com',
+  type: 'magiclink',
+})
+
+const tokenHash = linkResult.data.properties.hashed_token
+
+const link = `<site_url>/auth/confirm?type=magiclink&token_hash=${tokenHash}`
+```
+
+</TabPanel>
+
+<TabPanel id="change-email-current" label="Change email address (sent to old email)">
+
+```ts
+const linkResult = await ctx.supabaseServerClient.auth.admin.generateLink({
+  email: 'current@email.com',
+  newEmail: 'new@email.com',
+  type: 'email_change_current',
+})
+
+const tokenHash = linkResult.data.properties.hashed_token
+
+const link = `<site_url>/auth/confirm?type=email_change_current&token_hash=${tokenHash}`
+```
+
+</TabPanel>
+
+<TabPanel id="change-email-new" label="Change email address (sent to new email)">
+
+```ts
+const linkResult = await ctx.supabaseServerClient.auth.admin.generateLink({
+  email: 'current@email.com',
+  newEmail: 'new@email.com',
+  type: 'email_change_new',
+})
+
+const tokenHash = linkResult.data.properties.hashed_token
+
+const link = `<site_url>/auth/confirm?type=email_change_new&token_hash=${tokenHash}`
+```
+
+</TabPanel>
+
+<TabPanel id="recovery" label="Password recovery">
+
+```ts
+const linkResult = await supabase.auth.admin.generateLink({
+  email: 'current@email.com',
+  type: 'recovery',
+})
+
+const tokenHash = linkResult.data.properties.hashed_token
+
+const link = `<site_url>/auth/confirm?type=recovery&token_hash=${tokenHash}`
+```
+
+</TabPanel>
+
+</Tabs>

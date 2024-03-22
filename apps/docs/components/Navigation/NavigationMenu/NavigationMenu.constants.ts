@@ -637,6 +637,10 @@ export const auth = {
           url: '/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr',
         },
         {
+          name: 'Email Auth with PKCE flow and third-party email provider',
+          url: '/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr/with-third-party-email-provider',
+        },
+        {
           name: 'OAuth with PKCE flow',
           url: '/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
         },
