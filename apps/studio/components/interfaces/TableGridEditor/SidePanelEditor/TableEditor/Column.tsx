@@ -157,19 +157,14 @@ const Column = ({
                       <Popover.Separator />
                     </>
                   )}
-
-                  {column.isNewColumn && (
-                    <>
-                      <Checkbox
-                        label="Is Unique"
-                        description="Enforce if values in the column should be unique across rows"
-                        checked={column.isUnique}
-                        className="p-4"
-                        onChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
-                      />
-                      <Popover.Separator />
-                    </>
-                  )}
+                  <Checkbox
+                    label="Is Unique"
+                    description="Enforce if values in the column should be unique across rows"
+                    checked={column.isUnique}
+                    className="p-4"
+                    onChange={() => onUpdateColumn({ isUnique: !column.isUnique })}
+                  />
+                  <Popover.Separator />
                   {column.format.includes('int') && (
                     <>
                       <Checkbox
