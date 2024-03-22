@@ -33,7 +33,9 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     }
   }, [orgUsage])
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
+  const { data: subscription } = useOrgSubscriptionQuery({
+    orgSlug: selectedOrganization?.slug,
+  })
 
   const projectHasNoLimits = subscription?.usage_billing_enabled === true
 
