@@ -14,6 +14,7 @@ import {
   Button,
   Checkbox_Shadcn_,
   Form_Shadcn_,
+  Label_Shadcn_,
   Modal,
   ScrollArea,
   Sheet,
@@ -41,15 +42,15 @@ import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-quer
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { BASE_PATH, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { BASE_PATH, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { useAppStateSnapshot } from 'state/app-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AIPolicyChat } from './AIPolicyChat'
 import {
   MessageWithDebug,
+  checkIfPolicyHasChanged,
   generateCreatePolicyQuery,
   generatePlaceholder,
   generatePolicyDefinition,
@@ -88,7 +89,6 @@ export const AIPolicyEditorPanel = memo(function ({
   const selectedOrganization = useSelectedOrganization()
 
   const telemetryProps = useTelemetryProps()
-  const snap = useAppStateSnapshot()
   const state = useTableEditorStateSnapshot()
   const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
@@ -105,11 +105,10 @@ export const AIPolicyEditorPanel = memo(function ({
   const editorTwoRef = useRef<IStandaloneCodeEditor | null>(null)
   const [expTwoLineCount, setExpTwoLineCount] = useState(1)
 
-  // use chat id because useChat doesn't have a reset function to clear all messages
+  // Use chat id because useChat doesn't have a reset function to clear all messages
   const [chatId, setChatId] = useState(uuidv4())
 
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
-  const isTogglingPreviewRef = useRef<boolean>(false)
   const placeholder = generatePlaceholder(selectedPolicy)
   const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
 
@@ -225,20 +224,33 @@ export const AIPolicyEditorPanel = memo(function ({
     setIncomingChange(undefined)
   }, [incomingChange])
 
-  const toggleFeaturePreviewModal = () => {
-    isTogglingPreviewRef.current = true
-    onClosingPanel()
-  }
-
   const onClosingPanel = () => {
-    const policy = editorOneRef.current?.getValue()
-    if (policy || messages.length > 0 || !isAssistantChatInputEmpty) {
+    const editorOneValue = editorOneRef.current?.getValue().trim() ?? null
+    const editorOneFormattedValue = !editorOneValue ? null : editorOneValue
+    const editorTwoValue = editorTwoRef.current?.getValue().trim() ?? null
+    const editorTwoFormattedValue = !editorTwoValue ? null : editorTwoValue
+
+    const policyCreateUnsaved =
+      selectedPolicy === undefined &&
+      (!name || !roles || editorOneFormattedValue || editorTwoFormattedValue)
+    const policyUpdateUnsaved =
+      selectedPolicy !== undefined
+        ? checkIfPolicyHasChanged(selectedPolicy, {
+            name,
+            roles: roles.length === 0 ? ['public'] : roles.split(', '),
+            definition: editorOneFormattedValue,
+            check: command === 'INSERT' ? editorOneFormattedValue : editorTwoFormattedValue,
+          })
+        : false
+
+    if (
+      policyCreateUnsaved ||
+      policyUpdateUnsaved ||
+      messages.length > 0 ||
+      !isAssistantChatInputEmpty
+    ) {
       setIsClosingPolicyEditorPanel(true)
     } else {
-      if (isTogglingPreviewRef.current) {
-        snap.setSelectedFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT)
-        snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
-      }
       onSelectCancel()
     }
   }
@@ -494,7 +506,13 @@ export const AIPolicyEditorPanel = memo(function ({
                     </div>
                   ) : (
                     <>
-                      <PolicyDetailsV2 isEditing={selectedPolicy !== undefined} form={form} />
+                      <PolicyDetailsV2
+                        isEditing={selectedPolicy !== undefined}
+                        form={form}
+                        onUpdateCommand={(command: string) => {
+                          if (!['update', 'all'].includes(command)) setShowCheckBlock(false)
+                        }}
+                      />
                       <div className="h-full">
                         <LockedCreateQuerySection
                           selectedPolicy={selectedPolicy}
@@ -599,10 +617,14 @@ export const AIPolicyEditorPanel = memo(function ({
                         {supportWithCheck && (
                           <div className="px-5 py-3 flex items-center gap-x-2">
                             <Checkbox_Shadcn_
+                              id="use-check"
+                              name="use-check"
                               checked={showCheckBlock}
                               onCheckedChange={() => setShowCheckBlock(!showCheckBlock)}
                             />
-                            <p className="text-xs">Use check expression</p>
+                            <Label_Shadcn_ className="text-xs cursor-pointer" htmlFor="use-check">
+                              Use check expression
+                            </Label_Shadcn_>
                           </div>
                         )}
                       </div>
@@ -618,28 +640,22 @@ export const AIPolicyEditorPanel = memo(function ({
                         setOpen={setErrorPanelOpen}
                       />
                     )}
-                    <SheetFooter className="flex items-center !justify-between px-5 py-4 w-full border-t">
-                      <Button type="text" onClick={toggleFeaturePreviewModal}>
-                        Toggle feature preview
+                    <SheetFooter className="flex items-center !justify-end px-5 py-4 w-full border-t">
+                      <Button
+                        type="default"
+                        disabled={isExecuting || isUpdating}
+                        onClick={() => onSelectCancel()}
+                      >
+                        Cancel
                       </Button>
-                      <div className="flex items-center gap-x-2">
-                        <Button
-                          type="default"
-                          disabled={isExecuting || isUpdating}
-                          onClick={() => onSelectCancel()}
-                        >
-                          Cancel
-                        </Button>
-                        <Button
-                          form={formId}
-                          htmlType="submit"
-                          loading={isExecuting || isUpdating}
-                          disabled={isExecuting || isUpdating || incomingChange !== undefined}
-                          // onClick={() => onExecuteSQL()}
-                        >
-                          Save policy
-                        </Button>
-                      </div>
+                      <Button
+                        form={formId}
+                        htmlType="submit"
+                        loading={isExecuting || isUpdating}
+                        disabled={isExecuting || isUpdating || incomingChange !== undefined}
+                      >
+                        Save policy
+                      </Button>
                     </SheetFooter>
                   </div>
                 </div>
@@ -680,6 +696,7 @@ export const AIPolicyEditorPanel = memo(function ({
                     >
                       <ScrollArea className="h-full w-full">
                         <PolicyTemplates
+                          selectedPolicy={selectedPolicy}
                           selectedTemplate={selectedDiff}
                           onSelectTemplate={(value) => {
                             form.setValue('name', value.name)
@@ -735,16 +752,10 @@ export const AIPolicyEditorPanel = memo(function ({
         header="Discard changes"
         buttonLabel="Discard"
         onSelectCancel={() => {
-          isTogglingPreviewRef.current = false
           setIsClosingPolicyEditorPanel(false)
         }}
         onSelectConfirm={() => {
-          if (isTogglingPreviewRef.current) {
-            snap.setSelectedFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT)
-            snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
-          }
           onSelectCancel()
-          isTogglingPreviewRef.current = false
           setIsClosingPolicyEditorPanel(false)
         }}
       >

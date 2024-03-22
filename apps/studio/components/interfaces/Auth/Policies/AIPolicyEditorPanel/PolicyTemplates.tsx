@@ -1,3 +1,4 @@
+import { PostgresPolicy } from '@supabase/postgres-meta'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 import { Badge, HoverCard, HoverCardContent, HoverCardTrigger, Input, cn } from 'ui'
@@ -10,21 +11,31 @@ import NoSearchResults from 'components/ui/NoSearchResults'
 import { getGeneralPolicyTemplates } from '../PolicyEditorModal/PolicyEditorModal.constants'
 
 interface PolicyTemplatesProps {
+  selectedPolicy?: PostgresPolicy
   selectedTemplate?: string
   onSelectTemplate: (template: any) => void
 }
 
-export const PolicyTemplates = ({ selectedTemplate, onSelectTemplate }: PolicyTemplatesProps) => {
+export const PolicyTemplates = ({
+  selectedPolicy,
+  selectedTemplate,
+  onSelectTemplate,
+}: PolicyTemplatesProps) => {
   const [search, setSearch] = useState('')
   const templates = getGeneralPolicyTemplates('schema_name', 'table_name')
+
+  const baseTemplates =
+    selectedPolicy !== undefined
+      ? templates.filter((t) => t.command === selectedPolicy.command)
+      : templates
   const filteredTemplates =
     search.length > 0
-      ? templates.filter(
+      ? baseTemplates.filter(
           (template) =>
             template.name.toLowerCase().includes(search.toLowerCase()) ||
             template.command.toLowerCase().includes(search.toLowerCase())
         )
-      : templates
+      : baseTemplates
 
   return (
     <div className="h-full px-content py-content flex flex-col gap-3">

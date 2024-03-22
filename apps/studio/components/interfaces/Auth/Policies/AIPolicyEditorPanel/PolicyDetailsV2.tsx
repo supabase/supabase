@@ -24,9 +24,10 @@ import MultiSelect from 'ui-patterns/MultiSelect'
 interface PolicyDetailsV2Props {
   isEditing: boolean
   form: any
+  onUpdateCommand: (command: string) => void
 }
 
-export const PolicyDetailsV2 = ({ isEditing, form }: PolicyDetailsV2Props) => {
+export const PolicyDetailsV2 = ({ isEditing, form, onUpdateCommand }: PolicyDetailsV2Props) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
@@ -174,7 +175,10 @@ export const PolicyDetailsV2 = ({ isEditing, form }: PolicyDetailsV2Props) => {
                     disabled={isEditing}
                     value={field.value}
                     defaultValue={field.value}
-                    onValueChange={(value) => form.setValue('command', value)}
+                    onValueChange={(value) => {
+                      form.setValue('command', value)
+                      onUpdateCommand(value)
+                    }}
                     className={`grid grid-cols-10 gap-3 ${isEditing ? 'opacity-50' : ''}`}
                   >
                     {['select', 'insert', 'update', 'delete', 'all'].map((x) => (

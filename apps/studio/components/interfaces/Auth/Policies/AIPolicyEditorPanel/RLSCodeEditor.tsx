@@ -1,12 +1,9 @@
 import Editor, { Monaco, OnChange, OnMount } from '@monaco-editor/react'
 import type { editor } from 'monaco-editor'
-import { MutableRefObject, useEffect, useRef } from 'react'
+import { MutableRefObject, useRef } from 'react'
 import { cn } from 'ui'
-// @ts-ignore [Joshen] Odd error that it can't find the module
-import { constrainedEditor } from 'constrained-editor-plugin'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import { IStandaloneCodeEditor } from 'components/interfaces/SQLEditor/SQLEditor.types'
 import { noop } from 'lodash'
 
 // [Joshen] Is there a way we can just have one single MonacoEditor component that's shared across the dashboard?

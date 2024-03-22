@@ -86,12 +86,13 @@ const Policies = ({
   }
 
   const onSelectEditPolicy = (policy: any) => {
-    if (isAiAssistantEnabled) {
-      onSelectEditPolicyAI(policy)
-    } else {
-      setSelectedPolicyToEdit(policy)
-      setSelectedSchemaAndTable({ schema: policy.schema, table: policy.table })
-    }
+    onSelectEditPolicyAI(policy)
+    // if (isAiAssistantEnabled) {
+    //   onSelectEditPolicyAI(policy)
+    // } else {
+    //   setSelectedPolicyToEdit(policy)
+    //   setSelectedSchemaAndTable({ schema: policy.schema, table: policy.table })
+    // }
   }
 
   const onSelectDeletePolicy = (policy: any) => {

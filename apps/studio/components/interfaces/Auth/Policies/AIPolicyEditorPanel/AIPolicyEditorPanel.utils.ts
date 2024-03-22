@@ -1,6 +1,7 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { Message } from 'ai/react'
 import { uuidv4 } from 'lib/helpers'
+import { isEqual } from 'lodash'
 
 export type MessageWithDebug = Message & { isDebug: boolean }
 
@@ -131,4 +132,32 @@ export const generateAlterPolicyQuery = ({
       : `${querySkeleton} using (${using})${(check ?? '').length > 0 ? `with check (${check});` : ';'}`
   if (newName === name) return query
   else return `${query}\n${querySkeleton} rename to "${newName}"`
+}
+
+export const checkIfPolicyHasChanged = (
+  selectedPolicy: PostgresPolicy,
+  policyForm: {
+    name: string
+    roles: string[]
+    check: string | null
+    definition: string | null
+  }
+) => {
+  if (selectedPolicy.command === 'INSERT' && selectedPolicy.check !== policyForm.check) {
+    return true
+  }
+  if (
+    selectedPolicy.command !== 'INSERT' &&
+    (selectedPolicy.definition !== policyForm.definition ||
+      selectedPolicy.check !== policyForm.check)
+  ) {
+    return true
+  }
+  if (selectedPolicy.name !== policyForm.name) {
+    return true
+  }
+  if (!isEqual(selectedPolicy.roles, policyForm.roles)) {
+    return true
+  }
+  return false
 }
