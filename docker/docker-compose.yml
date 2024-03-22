@@ -400,6 +400,8 @@ services:
       timeout: 5s
       interval: 5s
       retries: 3
+    environment:
+      LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
     volumes:
       - ./volumes/logs/vector.yml:/etc/vector/vector.yml:ro
       - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro
