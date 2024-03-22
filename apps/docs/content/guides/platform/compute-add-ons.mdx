@@ -43,28 +43,28 @@ When considering compute upgrades, assess whether your bottlenecks are hardware-
 
 ## Disk IO
 
-SSD Disks are attached to your servers and the disk performance depends on the compute add-on of your instance. Disk IO refers to two metrics: throughput (Megabits per Second) and IOPS (Input/Output Operations per Second).
+SSD Disks are attached to your servers and the disk performance depends on the compute add-on of your instance. Disk IO refers to two metrics: throughput (Megabits per Second) and IOPS (Input/Output Operations per Second). Disk throughput is capped at 1,048 Mbps and IOPS is capped at 3,000 IOPS for all compute add-ons.
 
-| Plan   | Max Disk Throughput | Baseline Disk Throughput | Max IOPS    | Baseline IOPS |
-| ------ | ------------------- | ------------------------ | ----------- | ------------- |
-| Micro  | 2,085 Mbps          | 87 Mbps                  | 11,800 IOPS | 500 IOPS      |
-| Small  | 2,085 Mbps          | 174 Mbps                 | 11,800 IOPS | 1,000 IOPS    |
-| Medium | 2,085 Mbps          | 347 Mbps                 | 11,800 IOPS | 2,000 IOPS    |
-| Large  | 4,750 Mbps          | 630 Mbps                 | 20,000 IOPS | 3,600 IOPS    |
-| XL     | 4,750 Mbps          | 1,188 Mbps               | 20,000 IOPS | 6,000 IOPS    |
-| 2XL    | 4,750 Mbps          | 2,375 Mbps               | 20,000 IOPS | 12,000 IOPS   |
-| 4XL    | 4,750 Mbps          | 4,750 Mbps               | 20,000 IOPS | 20,000 IOPS   |
-| 8XL    | 9,500 Mbps          | 9,500 Mbps               | 40,000 IOPS | 40,000 IOPS   |
-| 12XL   | 14,250 Mbps         | 14,250 Mbps              | 50,000 IOPS | 50,000 IOPS   |
-| 16XL   | 19,000 Mbps         | 19,000 Mbps              | 80,000 IOPS | 80,000 IOPS   |
+| Plan   | Baseline Disk Throughput | Baseline IOPS |
+| ------ | ------------------------ | ------------- |
+| Micro  | 87 Mbps                  | 500 IOPS      |
+| Small  | 174 Mbps                 | 1,000 IOPS    |
+| Medium | 347 Mbps                 | 2,000 IOPS    |
+| Large  | 630 Mbps                 | 3,000 IOPS    |
+| XL     | 1,048 Mbps               | 3,000 IOPS    |
+| 2XL    | 1,048 Mbps               | 3,000 IOPS    |
+| 4XL    | 1,048 Mbps               | 3,000 IOPS    |
+| 8XL    | 1,048 Mbps               | 3,000 IOPS    |
+| 12XL   | 1,048 Mbps               | 3,000 IOPS    |
+| 16XL   | 1,048 Mbps               | 3,000 IOPS    |
 
-[Contact us](https://supabase.com/contact/enterprise) if you require a custom plan.
+[Contact us](https://supabase.com/contact/enterprise) if you require a plan with higher disk throughput and IOPS.
 
 ### Bursting and disk IO budget
 
-Smaller compute instances can burst up to their largest throughput and IOPS for 30 minutes in a day. Beyond that, the performance reverts to the baseline. For example, the Micro plan can burst up to 2,085 Mbps for 30 minutes a day and reverts to the baseline performance of 87 Mbps. Your disk IO budget gets replenished throughout the day.
+Smaller compute instances can burst up to 1,048 Mbps and 3,000 IOPS for 30 minutes in a day. Beyond that, the performance reverts to the baseline. For example, the micro plan can burst up to 1,048 Mbps for 30 minutes a day and reverts to the baseline performance of 87 Mbps. Your disk IO budget gets replenished throughout the day.
 
-If you need consistent disk performance, choose the 4XL or larger compute add-on which has the same baseline and maximum disk throughput and IOPS.
+If you need consistent disk performance, choose the XL or larger compute add-on which has the same baseline and maximum disk throughput and IOPS.
 
 If you're unsure of how much throughput or IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](https://supabase.com/dashboard/project/_/reports). If the `Disk IO % consumed` stat is more than 1%, it indicates that your workload has burst beyond the baseline IO throughput during the day. If this metric goes to 100%, the workload has used up all available disk IO budget and will revert to baseline performance. Projects that use any disk IO budget are good candidates for upgrading to a larger compute add-on with higher baseline throughput.
 
