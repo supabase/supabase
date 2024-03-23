@@ -858,7 +858,7 @@ export const insertRowsViaSpreadsheet = async (
               formattedRow[header] = tryParseJson(row[header])
             } else if (row[header] === '') {
               // if the cell is empty string, convert it to NULL
-              formattedRow[header] = null
+              formattedRow[header] = column?.is_nullable ? null : ''
             } else {
               formattedRow[header] = row[header]
             }
@@ -907,6 +907,8 @@ export const insertTableRows = async (
       const column = table.columns?.find((c) => c.name === header)
       if ((column?.data_type ?? '') === 'ARRAY' || (column?.format ?? '').includes('json')) {
         formattedRow[header] = tryParseJson(row[header])
+      } else if (row[header] === '') {
+        formattedRow[header] = column?.is_nullable ? null : ''
       } else {
         formattedRow[header] = row[header]
       }
