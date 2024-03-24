@@ -196,7 +196,7 @@ const UserDropdown = ({
                   disabled={!canRemoveUser}
                   className="space-x-2"
                 >
-                  <IconTrash size="tiny" />
+                  <IconTrash size="tiny" stroke="red" />
                   <p>Delete user</p>
                 </DropdownMenuItem>
               </Tooltip.Trigger>
