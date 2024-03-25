@@ -1,7 +1,8 @@
-import { PropsWithChildren, createContext, useCallback, useContext } from 'react'
-import { proxy, snapshot, useSnapshot } from 'valtio'
+import { PropsWithChildren, createContext, useCallback, useContext, useEffect } from 'react'
+import { proxy, snapshot, subscribe, useSnapshot } from 'valtio'
 
 import { useConstant } from 'common'
+import { useLatest } from 'hooks'
 import { ImpersonationRole } from 'lib/role-impersonation'
 
 export function createRoleImpersonationState() {
@@ -41,6 +42,19 @@ export function useGetImpersonatedRole() {
   const roleImpersonationState = useContext(RoleImpersonationStateContext)
 
   return useCallback(() => snapshot(roleImpersonationState).role, [roleImpersonationState])
+}
+
+export function useSubscribeToImpersonatedRole(
+  onChange: (role: ImpersonationRole | undefined) => void
+) {
+  const roleImpersonationState = useContext(RoleImpersonationStateContext)
+  const onChangeRef = useLatest(onChange)
+
+  useEffect(() => {
+    return subscribe(roleImpersonationState, () => {
+      onChangeRef.current(snapshot(roleImpersonationState).role)
+    })
+  }, [roleImpersonationState])
 }
 
 export function isRoleImpersonationEnabled(impersonationRole?: ImpersonationRole) {

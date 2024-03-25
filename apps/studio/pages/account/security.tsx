@@ -1,4 +1,4 @@
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import { Badge, cn, Collapsible, IconSmartphone } from 'ui'
 
 import { TOTPFactors } from 'components/interfaces/Account'
@@ -42,7 +42,7 @@ const Security: NextPageWithLayout = () => {
             </div>
 
             {data ? (
-              <Badge color={data.totp.length === 0 ? 'gray' : 'green'}>
+              <Badge variant={data.totp.length === 0 ? 'default' : 'brand'}>
                 {data.totp.length} app{data.totp.length === 1 ? '' : 's'} configured
               </Badge>
             ) : null}

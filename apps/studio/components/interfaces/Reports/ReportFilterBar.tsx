@@ -22,7 +22,7 @@ import {
 
 import DatePickers from '../Settings/Logs/Logs.DatePickers'
 import { REPORTS_DATEPICKER_HELPERS } from './Reports.constants'
-import { ReportFilterItem } from './Reports.types'
+import type { ReportFilterItem } from './Reports.types'
 
 interface ReportFilterBarProps {
   filters: ReportFilterItem[]
@@ -121,7 +121,7 @@ const ReportFilterBar = ({
           key: productFilter.filterKey,
           compare: 'matches',
           value: productFilter.filterValue,
-        } as ReportFilterItem)
+        }) as ReportFilterItem
     )
     onRemoveFilters(toRemove)
     if (nextProductFilter) {

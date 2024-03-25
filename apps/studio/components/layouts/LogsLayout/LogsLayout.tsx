@@ -3,9 +3,9 @@ import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
 import NoPermission from 'components/ui/NoPermission'
-import ProductMenu from 'components/ui/ProductMenu'
+import { ProductMenu } from 'components/ui/ProductMenu'
 import { useCheckPermissions, useIsFeatureEnabled, useSelectedProject, withAuth } from 'hooks'
-import ProjectLayout from '../'
+import { ProjectLayout } from '../'
 import { generateLogsMenu } from './LogsMenu.utils'
 
 interface LogsLayoutProps {

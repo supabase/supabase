@@ -1,7 +1,7 @@
 import { isNull, noop } from 'lodash'
 import { IconChevronRight } from 'ui'
 
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 
 interface DrilldownPaneProps {
   pane: number
@@ -72,8 +72,8 @@ const DrilldownPane = ({ pane, jsonData, activeKey, onSelectKey = noop }: Drilld
             {isNull(jsonData[key])
               ? 'null'
               : typeof jsonData[key] === 'string'
-              ? `"${jsonData[key]}"`
-              : jsonData[key].toString()}
+                ? `"${jsonData[key]}"`
+                : jsonData[key].toString()}
           </p>
         </div>
       ))}

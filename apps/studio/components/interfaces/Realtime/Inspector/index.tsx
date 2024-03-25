@@ -1,6 +1,8 @@
+import { useParams, useTelemetryProps } from 'common'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import { useParams } from 'common'
+import Telemetry from 'lib/telemetry'
 import { Header } from './Header'
 import MessagesTable from './MessagesTable'
 import { SendMessageModal } from './SendMessageModal'
@@ -11,6 +13,8 @@ import { RealtimeConfig, useRealtimeMessages } from './useRealtimeMessages'
  */
 export const RealtimeInspector = () => {
   const { ref } = useParams()
+  const telemetryProps = useTelemetryProps()
+  const router = useRouter()
   const [sendMessageShown, setSendMessageShown] = useState(false)
 
   const [realtimeConfig, setRealtimeConfig] = useState<RealtimeConfig>({
@@ -47,8 +51,16 @@ export const RealtimeInspector = () => {
         visible={sendMessageShown}
         onSelectCancel={() => setSendMessageShown(false)}
         onSelectConfirm={(v) => {
-          sendMessage(v.message, v.payload)
-          setSendMessageShown(false)
+          Telemetry.sendEvent(
+            {
+              category: 'realtime_inspector',
+              action: 'send_broadcast_message',
+              label: 'realtime_inspector_results',
+            },
+            telemetryProps,
+            router
+          )
+          sendMessage(v.message, v.payload, () => setSendMessageShown(false))
         }}
       />
     </div>

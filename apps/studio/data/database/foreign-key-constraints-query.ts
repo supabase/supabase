@@ -5,7 +5,7 @@ type GetForeignKeyConstraintsVariables = {
   schema?: string
 }
 
-export type ForeignKeyConstraint = {
+export type ForeignKeyConstraintRaw = {
   id: number
   constraint_name: string
   deletion_action: string
@@ -18,6 +18,21 @@ export type ForeignKeyConstraint = {
   target_schema: string
   target_table: string
   target_columns: string
+}
+
+export type ForeignKeyConstraint = {
+  id: number
+  constraint_name: string
+  deletion_action: string
+  update_action: string
+  source_id: number
+  source_schema: string
+  source_table: string
+  source_columns: string[]
+  target_id: number
+  target_schema: string
+  target_table: string
+  target_columns: string[]
 }
 
 export const getForeignKeyConstraintsQuery = ({ schema }: GetForeignKeyConstraintsVariables) => {
@@ -82,7 +97,7 @@ export type ForeignKeyConstraintsData = ForeignKeyConstraint[]
 export type ForeignKeyConstraintsError = unknown
 
 export const useForeignKeyConstraintsQuery = <
-  TData extends ForeignKeyConstraintsData = ForeignKeyConstraintsData
+  TData extends ForeignKeyConstraintsData = ForeignKeyConstraintsData,
 >(
   { projectRef, connectionString, schema }: ForeignKeyConstraintsVariables,
   options: UseQueryOptions<ExecuteSqlData, ForeignKeyConstraintsError, TData> = {}
@@ -96,7 +111,7 @@ export const useForeignKeyConstraintsQuery = <
     },
     {
       select(data) {
-        return ((data as any)?.result ?? []).map((foreignKey: ForeignKeyConstraint) => {
+        return ((data as any)?.result ?? []).map((foreignKey: ForeignKeyConstraintRaw) => {
           return {
             ...foreignKey,
             source_columns: foreignKey.source_columns.replace('{', '').replace('}', '').split(','),

@@ -3,14 +3,14 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common/hooks'
+import { CreateReportModal } from 'components/interfaces/Reports/Reports.CreateReportModal'
 import { ReportsLayout } from 'components/layouts'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
-import { createReport } from 'components/to-be-cleaned/Reports/Reports.utils'
-import Loading from 'components/ui/Loading'
-import { useCheckPermissions, useStore } from 'hooks'
+import { Loading } from 'components/ui/Loading'
+import { useCheckPermissions } from 'hooks'
 import { useProfile } from 'lib/profile'
 import { useProjectContentStore } from 'stores/projectContentStore'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 export const UserReportPage: NextPageWithLayout = () => {
   const [loading, setLoading] = useState(true)
@@ -19,7 +19,7 @@ export const UserReportPage: NextPageWithLayout = () => {
   const { ref } = useParams()
 
   const { profile } = useProfile()
-  const { ui } = useStore()
+  const [showCreateReportModal, setShowCreateReportModal] = useState(false)
 
   const contentStore = useProjectContentStore(ref)
   const canCreateReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
@@ -47,28 +47,34 @@ export const UserReportPage: NextPageWithLayout = () => {
       {loading ? (
         <Loading />
       ) : (
-        <ProductEmptyState
-          title="Reports"
-          ctaButtonLabel="Create report"
-          onClickCta={() => {
-            try {
-              createReport({ router })
-            } catch (error: any) {
-              ui.setNotification({
-                category: 'error',
-                message: `Failed to create report: ${error.message}`,
-              })
-            }
-          }}
-          disabled={!canCreateReport}
-          disabledMessage="You need additional permissions to create a report"
-        >
-          <p className="text-foreground-light text-sm">Create custom reports for your projects.</p>
-          <p className="text-foreground-light text-sm">
-            Get a high level overview of your network traffic, user actions, and infrastructure
-            health.
-          </p>
-        </ProductEmptyState>
+        <>
+          <ProductEmptyState
+            title="Reports"
+            ctaButtonLabel="New custom report"
+            onClickCta={() => {
+              setShowCreateReportModal(true)
+            }}
+            disabled={!canCreateReport}
+            disabledMessage="You need additional permissions to create a report"
+          >
+            <p className="text-foreground-light text-sm">
+              Create custom reports for your projects.
+            </p>
+            <p className="text-foreground-light text-sm">
+              Get a high level overview of your network traffic, user actions, and infrastructure
+              health.
+            </p>
+          </ProductEmptyState>
+          <CreateReportModal
+            visible={showCreateReportModal}
+            onCancel={() => {
+              setShowCreateReportModal(false)
+            }}
+            afterSubmit={() => {
+              setShowCreateReportModal(false)
+            }}
+          />
+        </>
       )}
     </div>
   )

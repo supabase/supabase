@@ -8,7 +8,7 @@ import { useParams } from 'common/hooks'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
+import type { EdgeFunctionsResponse } from 'data/edge-functions/edge-functions-query'
 
 interface EdgeFunctionsListItemProps {
   function: EdgeFunctionsResponse
@@ -39,12 +39,12 @@ const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) =
         router.push(`/project/${ref}/functions/${item.slug}/details`)
       }}
     >
-      <Table.td className="">
+      <Table.td>
         <div className="flex items-center gap-2">
           <p className="text-sm text-foreground">{item.name}</p>
         </div>
       </Table.td>
-      <Table.td className="">
+      <Table.td>
         <div className="text-xs text-foreground-light flex gap-2 items-center truncate">
           <p className="font-mono truncate hidden md:inline">{endpoint}</p>
           <button

@@ -2,7 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
-import { Permission, ResponseError } from 'types'
+import type { Permission, ResponseError } from 'types'
 import { permissionKeys } from './keys'
 
 export type PermissionsResponse = Permission[]

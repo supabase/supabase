@@ -1,17 +1,17 @@
 import { Meta } from '@storybook/react'
-import {
-  Command,
-  CommandDialog,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-  CommandSeparator,
-  CommandShortcut,
-} from '@ui/components/shadcn/ui/command'
 import { Calculator, Calendar, CreditCard, Settings, Smile, User } from 'lucide-react'
 import * as React from 'react'
+import {
+    Command,
+    CommandDialog,
+    CommandEmpty,
+    CommandGroup,
+    CommandInput,
+    CommandItem,
+    CommandList,
+    CommandSeparator,
+    CommandShortcut,
+} from '../ui/command'
 
 const meta: Meta = {
   title: 'shadcn/Command',

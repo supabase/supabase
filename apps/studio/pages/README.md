@@ -9,9 +9,7 @@
 
 ```tsx
 import { NextPage } from 'next'
-import { observer } from 'mobx-react-lite'
-
-import { useStore, withAuth } from 'hooks'
+import { withAuth } from 'hooks'
 
 // Import the corresponding layout based on the page
 import { Layout } from 'components/layouts'
@@ -25,9 +23,6 @@ import { ... } from 'components/ui/xxx'
 // Name your page accordingly
 const Page: NextPage = () => {
 
-  // Access the store via the useStore hook
-  const { meta } = useStore()
-
   return (
     <Layout>
       <div>Page content</div>
@@ -35,5 +30,5 @@ const Page: NextPage = () => {
   )
 }
 
-export default withAuth(observer(Page))
+export default withAuth(Page)
 ```

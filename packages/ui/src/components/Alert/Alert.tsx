@@ -29,6 +29,9 @@ const icons: Record<AlertVariant, React.ReactElement> = {
   neutral: <></>,
 }
 
+/**
+ * @deprecated Use Alert_Shadcn_
+ */
 export function Alert({
   variant = 'neutral',
   className,

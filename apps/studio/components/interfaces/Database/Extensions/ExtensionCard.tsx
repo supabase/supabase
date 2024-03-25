@@ -1,13 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { extensions } from 'shared-data'
 import { Badge, IconExternalLink, IconLoader, Modal, Toggle } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
 import { useDatabaseExtensionDisableMutation } from 'data/database-extensions/database-extension-disable-mutation'
 import { useCheckPermissions } from 'hooks'
 import EnableExtensionModal from './EnableExtensionModal'
@@ -126,7 +125,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
             <div className="py-3 px-4">
               <div className="flex items-center flex-grow space-x-2 text-sm text-foreground-light">
                 <span>Schema:</span>
-                <Badge color="scale">{`${extension.schema}`}</Badge>
+                <Badge>{`${extension.schema}`}</Badge>
               </div>
             </div>
           )}
@@ -156,4 +155,4 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
   )
 }
 
-export default observer(ExtensionCard)
+export default ExtensionCard

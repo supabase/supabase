@@ -1,9 +1,14 @@
-import { Dispatch, SetStateAction, useEffect } from 'react'
+import { useTelemetryProps } from 'common'
+import { useRouter } from 'next/router'
+import { Dispatch, SetStateAction, useEffect, useRef } from 'react'
+import toast from 'react-hot-toast'
 
 import { RoleImpersonationPopover } from 'components/interfaces/RoleImpersonationSelector'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { IS_PLATFORM } from 'lib/constants'
 import { getRoleImpersonationJWT } from 'lib/role-impersonation'
+import Telemetry from 'lib/telemetry'
 import { useRoleImpersonationStateSnapshot } from 'state/role-impersonation-state'
 import { RealtimeConfig } from '../useRealtimeMessages'
 
@@ -14,22 +19,44 @@ interface RealtimeTokensPopoverProps {
 
 export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokensPopoverProps) => {
   const { data: settings } = useProjectApiQuery({ projectRef: config.projectRef })
+  const telemetryProps = useTelemetryProps()
+  const router = useRouter()
 
   const apiService = settings?.autoApiService
   const serviceRoleKey = apiService?.service_api_keys.find((x) => x.name === 'service_role key')
     ? apiService.serviceApiKey
     : undefined
 
-  const anonServiceRoleKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
+  const anonRoleKey = apiService?.service_api_keys.find((x) => x.name === 'anon key')
     ? apiService.serviceApiKey
     : undefined
 
-  const { data: postgrestConfig } = useProjectPostgrestConfigQuery({
-    projectRef: config.projectRef,
-  })
+  const { data: postgrestConfig } = useProjectPostgrestConfigQuery(
+    {
+      projectRef: config.projectRef,
+    },
+    { enabled: IS_PLATFORM }
+  )
   const jwtSecret = postgrestConfig?.jwt_secret
 
   const snap = useRoleImpersonationStateSnapshot()
+
+  // only send a telemetry event if the user changes the role. Don't send an event during initial render.
+  const isMounted = useRef(false)
+  useEffect(() => {
+    if (isMounted.current) {
+      Telemetry.sendEvent(
+        {
+          category: 'realtime_inspector',
+          action: 'changed_database_role',
+          label: 'realtime_inspector_config',
+        },
+        telemetryProps,
+        router
+      )
+    }
+    isMounted.current = true
+  }, [snap.role])
 
   useEffect(() => {
     let token: string | undefined
@@ -41,8 +68,10 @@ export const RealtimeTokensPopover = ({ config, onChangeConfig }: RealtimeTokens
       snap.role !== undefined &&
       snap.role.type === 'postgrest'
     ) {
-      token = anonServiceRoleKey
-      bearer = getRoleImpersonationJWT(config.projectRef, jwtSecret, snap.role)
+      token = anonRoleKey
+      getRoleImpersonationJWT(config.projectRef, jwtSecret, snap.role)
+        .then((token) => (bearer = token))
+        .catch((err) => toast.error(`Failed to get JWT for role: ${err.message}`))
     } else {
       token = serviceRoleKey
     }

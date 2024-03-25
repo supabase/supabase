@@ -1,10 +1,11 @@
-import { useFlag } from 'hooks'
 import { isUndefined } from 'lodash'
 import Link from 'next/link'
 import { ReactNode } from 'react'
 import { Badge, IconArrowUpRight, IconLogOut, Menu } from 'ui'
-import LayoutHeader from '../ProjectLayout/LayoutHeader'
-import { SidebarLink, SidebarSection } from './AccountLayout.types'
+
+import { useFlag } from 'hooks'
+import { LayoutHeader } from '../ProjectLayout/LayoutHeader'
+import type { SidebarLink, SidebarSection } from './AccountLayout.types'
 
 interface WithSidebarProps {
   title: string
@@ -18,15 +19,6 @@ interface WithSidebarProps {
   children: ReactNode
 }
 
-/*
-The information hierarchy for WithSidebar is:
-  WithSidebar
-    SectionsWithHeaders
-      SidebarItem
-        SidebarLink
-    SidebarItem
-      SidebarLink
-*/
 const WithSidebar = ({
   title,
   header,
@@ -39,18 +31,15 @@ const WithSidebar = ({
   customSidebarContent,
 }: WithSidebarProps) => {
   const noContent = !sections && !customSidebarContent
-  const ongoingIncident = useFlag('ongoingIncident')
   const navLayoutV2 = useFlag('navigationLayoutV2')
-  const maxHeight = ongoingIncident ? 'calc(100vh - 44px)' : '100vh'
 
   return (
-    <div className="flex max-h-full">
+    <div className="flex h-full">
       {!hideSidebar && !noContent && (
         <div
           id="with-sidebar"
-          style={{ height: maxHeight, maxHeight }}
           className={[
-            'h-full bg-background',
+            'h-full bg-studio',
             'hide-scrollbar w-64 overflow-auto border-r border-default',
           ].join(' ')}
         >
@@ -91,7 +80,7 @@ const WithSidebar = ({
       )}
       <div className="flex flex-1 flex-col">
         {!navLayoutV2 && <LayoutHeader breadcrumbs={breadcrumbs} />}
-        <div className="flex-1 flex-grow overflow-auto">{children}</div>
+        <div className="flex-1 flex-grow overflow-y-auto">{children}</div>
       </div>
     </div>
   )
@@ -109,7 +98,7 @@ const SectionWithHeaders = ({ section, subitems, subitemsParentKey }: SectionWit
     {section.heading && <Menu.Group title={section.heading} />}
     {section.versionLabel && (
       <div className="mb-1 px-3">
-        <Badge color="yellow">{section.versionLabel}</Badge>
+        <Badge variant="warning">{section.versionLabel}</Badge>
       </div>
     )}
     {
@@ -185,7 +174,7 @@ const SidebarLinkItem = ({
       icon = <IconArrowUpRight size={'tiny'} />
     }
 
-    if (label === 'Logout') {
+    if (label === 'Log out') {
       icon = <IconLogOut size={'tiny'} />
     }
 

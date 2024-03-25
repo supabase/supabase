@@ -46,6 +46,7 @@ import {
 } from 'ui'
 import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
 import styles from './graphiql.module.css'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export interface GraphiQLProps {
   fetcher: Fetcher
@@ -84,7 +85,7 @@ const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const canReadJWTSecret = useCheckPermissions(PermissionAction.READ, 'field.jwt_secret')
 
   const [rlsBypassedWarningDismissed, setRlsBypassedWarningDismissed] = useLocalStorage(
-    'graphiql-rls-bypass-warning-dismissed',
+    LOCAL_STORAGE_KEYS.GRAPHIQL_RLS_BYPASS_WARNING,
     false
   )
 

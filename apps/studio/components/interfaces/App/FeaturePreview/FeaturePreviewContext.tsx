@@ -21,6 +21,8 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
     [LOCAL_STORAGE_KEYS.UI_PREVIEW_NAVIGATION_LAYOUT]: false,
     [LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL]: false,
     [LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT]: false,
+    [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]: false,
+    [LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_AI_ASSISTANT]: false,
   })
 
   useEffect(() => {
@@ -32,6 +34,10 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren<{}
           localStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_API_SIDE_PANEL) === 'true',
         [LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT]:
           localStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT) === 'true',
+        [LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]:
+          localStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS) === 'true',
+        [LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_AI_ASSISTANT]:
+          localStorage.getItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_AI_ASSISTANT) === 'true',
       })
     }
   }, [])
@@ -60,4 +66,14 @@ export const useIsAPIDocsSidePanelEnabled = () => {
 export const useIsRLSAIAssistantEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT]
+}
+
+export const useIsColumnLevelPrivilegesEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
+}
+
+export const useIsSQLEditorAiAssistantEnabled = () => {
+  const { flags } = useFeaturePreviewContext()
+  return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_AI_ASSISTANT]
 }

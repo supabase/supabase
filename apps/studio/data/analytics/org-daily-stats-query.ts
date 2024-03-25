@@ -2,7 +2,7 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { AnalyticsData } from './constants'
+import type { AnalyticsData } from './constants'
 import { analyticsKeys } from './keys'
 
 export enum EgressType {
@@ -46,7 +46,7 @@ export const computeUsageMetricLabel = (computeUsageMetric: ComputeUsageMetric) 
     case 'COMPUTE_HOURS_BRANCH':
       return 'Branches'
     case 'COMPUTE_HOURS_XS':
-      return 'Starter'
+      return 'Micro'
     case 'COMPUTE_HOURS_SM':
       return 'Small'
     case 'COMPUTE_HOURS_MD':

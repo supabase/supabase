@@ -1,5 +1,5 @@
 import Table from 'components/to-be-cleaned/Table'
-import { ProjectSecret } from 'data/secrets/secrets-query'
+import type { ProjectSecret } from 'data/secrets/secrets-query'
 import { Button, IconTrash } from 'ui'
 
 interface EdgeFunctionSecretProps {

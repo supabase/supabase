@@ -128,10 +128,10 @@ const RolesList = () => {
                       maxConnectionLimit === 0 || maxConnectionLimit === undefined
                         ? 'bg-control'
                         : totalActiveConnections > 0.9 * maxConnectionLimit
-                        ? 'bg-red-800'
-                        : totalActiveConnections > 0.75 * maxConnectionLimit
-                        ? 'bg-amber-900'
-                        : 'bg-green-800'
+                          ? 'bg-red-800'
+                          : totalActiveConnections > 0.75 * maxConnectionLimit
+                            ? 'bg-amber-900'
+                            : 'bg-green-800'
                     }
                     labelTop={
                       Number.isInteger(maxConnectionLimit)
@@ -191,7 +191,7 @@ const RolesList = () => {
           <div>
             <div className="bg-surface-100 border border-default px-6 py-3 rounded-t flex items-center space-x-4">
               <p className="text-sm text-foreground-light">Roles managed by Supabase</p>
-              <Badge color="green">Protected</Badge>
+              <Badge variant="brand">Protected</Badge>
             </div>
 
             {isLoading

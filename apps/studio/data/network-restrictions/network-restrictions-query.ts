@@ -1,8 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
+import { get } from 'data/fetchers'
 import { networkRestrictionKeys } from './keys'
-import { get } from 'lib/common/fetch'
-import { API_ADMIN_URL } from 'lib/constants'
 
 export type NetworkRestrictionsVariables = { projectRef?: string }
 
@@ -20,16 +19,17 @@ export async function getNetworkRestrictions(
 ) {
   if (!projectRef) throw new Error('projectRef is required')
 
-  const response = (await get(`${API_ADMIN_URL}/projects/${projectRef}/network-restrictions`, {
+  const { data, error } = await get('/v1/projects/{ref}/network-restrictions', {
+    params: { path: { ref: projectRef } },
     signal,
-  })) as NetworkRestrictionsResponse
+  })
 
   // Not allowed error is a valid response to denote if a project
   // has access to the network restrictions UI, so we'll handle it here
-  if (response.error) {
+  if (error) {
     const isNotAllowedError =
-      (response.error as any)?.code === 400 &&
-      (response.error as any)?.message?.includes('not allowed to set up network restrictions')
+      (error as any)?.code === 400 &&
+      (error as any)?.message?.includes('not allowed to set up network restrictions')
 
     if (isNotAllowedError) {
       return {
@@ -38,11 +38,11 @@ export async function getNetworkRestrictions(
         status: '',
       } as NetworkRestrictionsResponse
     } else {
-      throw response.error
+      throw error
     }
   }
 
-  return response
+  return data
 }
 
 export type NetworkRestrictionsData = Awaited<ReturnType<typeof getNetworkRestrictions>>
