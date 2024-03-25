@@ -30,7 +30,7 @@ export const AIPolicyHeader = ({
   const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
   return (
-    <SheetHeader className={cn('py-3 flex flex-row justify-between items-center border-b')}>
+    <SheetHeader className={cn('py-3 flex flex-row justify-between items-start border-b')}>
       <div
         className={`flex flex-row gap-3 max-w-[75%] ${isAiAssistantEnabled ? 'items-start' : 'items-center'}`}
       >
@@ -115,8 +115,7 @@ export const AIPolicyHeader = ({
             aria-controls="ai-chat-assistant"
             className={cn(
               !assistantVisible ? 'text-foreground-lighter' : 'text-light',
-              'hover:text-foreground',
-              'transition'
+              'mt-1 hover:text-foreground transition'
             )}
             onClick={() => setAssistantVisible(!assistantVisible)}
           >

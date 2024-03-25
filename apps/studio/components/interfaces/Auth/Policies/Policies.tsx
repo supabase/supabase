@@ -228,18 +228,6 @@ const Policies = ({
         ) : null}
       </div>
 
-      <PolicyEditorModal
-        showAssistantPreview
-        visible={!isEmpty(selectedSchemaAndTable)}
-        schema={selectedSchemaAndTable.schema}
-        table={selectedSchemaAndTable.table}
-        selectedPolicyToEdit={selectedPolicyToEdit}
-        onSelectCancel={closePolicyEditorModal}
-        onCreatePolicy={onCreatePolicy}
-        onUpdatePolicy={onUpdatePolicy}
-        onSaveSuccess={onSavePolicySuccess}
-      />
-
       <ConfirmModal
         danger
         visible={!isEmpty(selectedPolicyToDelete)}
