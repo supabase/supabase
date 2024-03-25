@@ -50,6 +50,8 @@ interface Props {
   onRun?: () => void
   onSave?: () => void
   hasEditorValue?: boolean
+  hideHeader?: boolean
+  maxHeight?: string
 }
 type LogMap = { [id: string]: LogData }
 
@@ -70,6 +72,8 @@ const LogTable = ({
   onRun,
   onSave,
   hasEditorValue,
+  hideHeader = false,
+  maxHeight,
 }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
@@ -81,10 +85,7 @@ const LogTable = ({
 
   // move timestamp to the first column
   function getFirstRow() {
-    if (!firstRow) return {}
-
-    const { timestamp, ...rest } = firstRow || {}
-    return { timestamp, ...rest }
+    return firstRow || {}
   }
 
   const columnNames = Object.keys(getFirstRow() || {})
@@ -175,10 +176,16 @@ const LogTable = ({
     }
   }, [stringData])
 
+  if (!queryType) {
+    hideHeader = true
+  }
+
   // [Joshen] Hmm quite hacky now, but will do
-  const maxHeight = !queryType ? 'calc(100vh - 42px - 10rem)' : 'calc(100vh - 42px - 3rem)'
+  const _maxHeight =
+    maxHeight || (!queryType ? 'calc(100vh - 42px - 10rem)' : 'calc(100vh - 42px - 3rem)')
 
   const logDataRows = useMemo(() => {
+    console.log('DEBUG: ', hasId, hasTimestamp, logMap, dedupedData)
     if (hasId && hasTimestamp) {
       return Object.values(logMap).sort((a, b) => b.timestamp - a.timestamp)
     } else {
@@ -329,8 +336,8 @@ const LogTable = ({
 
   return (
     <>
-      <section className={'flex w-full flex-col ' + (!queryType ? '' : '')} style={{ maxHeight }}>
-        {!queryType && <LogsExplorerTableHeader />}
+      <section className={'flex w-full flex-col h-full'} style={{ maxHeight: _maxHeight }}>
+        {!hideHeader && <LogsExplorerTableHeader />}
         <div className={`flex h-full flex-row ${!queryType ? 'border-l border-r' : ''}`}>
           <DataGrid
             style={{ height: '100%' }}

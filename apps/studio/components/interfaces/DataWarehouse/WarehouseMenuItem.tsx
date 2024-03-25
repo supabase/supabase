@@ -26,11 +26,10 @@ type Props = {
   item: {
     id: string
     name: string
-    description: string
   }
 }
 
-export const DatawarehouseMenuItem = ({ item }: Props) => {
+export const WarehouseMenuItem = ({ item }: Props) => {
   const router = useRouter()
   const project = useSelectedProject()
   const projectRef = project?.ref || 'default'
@@ -106,11 +105,9 @@ export const DatawarehouseMenuItem = ({ item }: Props) => {
               const formData = new FormData(e.target as HTMLFormElement)
 
               const name = formData.get('name') as string
-              const description = formData.get('description') as string
 
               await updateCollection.mutateAsync({
                 name,
-                description,
               })
 
               toast.success('Collection updated successfully')
@@ -129,16 +126,6 @@ export const DatawarehouseMenuItem = ({ item }: Props) => {
               id="name"
               defaultValue={item.name}
             />
-            <div className="text-area-text-sm">
-              <Input.TextArea
-                layout="horizontal"
-                labelOptional="Optional"
-                label="Description"
-                id="description"
-                rows={2}
-                defaultValue={item.description}
-              />
-            </div>
           </Modal.Content>
           <div className="flex gap-2 justify-end p-3 border-t">
             <Button

@@ -7,7 +7,7 @@ import { Button, IconPlus, Input, Modal } from 'ui'
 
 type Props = {}
 
-export const CreateDataWarehouseTableModal = (props: Props) => {
+export const CreateWarehouseCollectionModal = (props: Props) => {
   const [isOpen, setIsOpen] = React.useState(false)
   const project = useSelectedProject()
   const { mutateAsync: createCollection, isLoading } = useCreateCollection({
@@ -24,7 +24,7 @@ export const CreateDataWarehouseTableModal = (props: Props) => {
           setIsOpen(!isOpen)
         }}
       >
-        New table
+        New collection
       </Button>
       <Modal
         size="medium"
@@ -40,13 +40,12 @@ export const CreateDataWarehouseTableModal = (props: Props) => {
               const formData = new FormData(e.target as HTMLFormElement)
               const values = {
                 name: formData.get('name') as string,
-                description: formData.get('description') as string,
               }
               await createCollection(values)
               toast.success(`Collection ${values.name} created`)
             } catch (error) {
               console.error(error)
-              toast.error(`Failed to create collection. Check the console for more details.`)
+              toast.error(`Failed to create table. Check the console for more details.`)
             } finally {
               setIsOpen(false)
             }
@@ -56,15 +55,6 @@ export const CreateDataWarehouseTableModal = (props: Props) => {
             <Modal.Content>
               <div className="space-y-6">
                 <Input required layout="horizontal" label="Collection name" id="name" />
-                <div className="text-area-text-sm">
-                  <Input.TextArea
-                    layout="horizontal"
-                    labelOptional="Optional"
-                    label="Description"
-                    id="description"
-                    rows={2}
-                  />
-                </div>
               </div>
             </Modal.Content>
           </div>
@@ -75,7 +65,7 @@ export const CreateDataWarehouseTableModal = (props: Props) => {
                   Cancel
                 </Button>
                 <Button size="tiny" loading={isLoading} disabled={isLoading} htmlType="submit">
-                  Create collection
+                  Create table
                 </Button>
               </div>
             </Modal.Content>

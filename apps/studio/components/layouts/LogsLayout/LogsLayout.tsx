@@ -16,9 +16,8 @@ import { generateLogsMenu } from './LogsMenu.utils'
 import { useCollectionsQuery } from 'data/collections/collections-query'
 import { Menu } from 'ui'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { CreateDataWarehouseTableModal } from 'components/interfaces/DataWarehouse/CreateDataWarehouseTable'
-import { DatawarehouseMenuItem } from 'components/interfaces/DataWarehouse/DataWarehouseMenuItem'
-import { get } from 'data/fetchers'
+import { CreateWarehouseCollectionModal } from 'components/interfaces/DataWarehouse/CreateWarehouseCollection'
+import { WarehouseMenuItem } from 'components/interfaces/DataWarehouse/WarehouseMenuItem'
 import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
 import { useWarehouseTenantQuery } from 'data/analytics/warehouse-tenant-query'
 interface LogsLayoutProps {
@@ -40,14 +39,17 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   const project = useSelectedProject()
   const projectRef = project?.ref || 'default'
 
-  const { data: _collections, isLoading: _collectionsLoading } = useCollectionsQuery({
-    projectRef,
-  })
+  // const { data: _collections, isLoading: _collectionsLoading } = useCollectionsQuery({
+  //   projectRef,
+  // })
 
   const { data: tenant } = useWarehouseTenantQuery({ projectRef })
-  const { data: collections, isLoading: collectionsLoading } = useWarehouseCollectionsQuery({
-    projectRef: !tenant ? 'undefined' : projectRef,
-  }, {enabled: !!tenant})
+  const { data: collections, isLoading: collectionsLoading } = useWarehouseCollectionsQuery(
+    {
+      projectRef: !tenant ? 'undefined' : projectRef,
+    },
+    { enabled: !!tenant }
+  )
 
   const canUseLogsExplorer = useCheckPermissions(PermissionAction.ANALYTICS_READ, 'logflare')
 
@@ -80,11 +82,11 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
               <div className="h-px w-full bg-overlay"></div>
               <div className="py-6">
                 <div className="px-6">
-                  <Menu.Group title="Data Warehouse" />
+                  <Menu.Group title="Warehouse" />
                 </div>
                 <div className="px-3 flex flex-col  editor-product-menu">
                   <div className="space-y-1">
-                    <CreateDataWarehouseTableModal />
+                    <CreateWarehouseCollectionModal />
                     <div className="py-3">
                       {collectionsLoading ? (
                         <div className="py-3 px-3 space-y-1.5">
@@ -94,7 +96,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
                         </div>
                       ) : (
                         collections?.map((item) => (
-                          <DatawarehouseMenuItem item={item} key={item.id + '-collection-item'} />
+                          <WarehouseMenuItem item={item} key={item.id + '-collection-item'} />
                         ))
                       )}
                     </div>
