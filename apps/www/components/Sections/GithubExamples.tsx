@@ -1,7 +1,5 @@
 import { useRef } from 'react'
 
-import { useRouter } from 'next/router'
-
 import { Swiper, SwiperSlide } from 'swiper/react'
 // import Swiper core and required modules
 import SwiperCore, { Navigation, Pagination } from 'swiper'
@@ -9,16 +7,13 @@ import SwiperCore, { Navigation, Pagination } from 'swiper'
 import Link from 'next/link'
 import { Button, IconGitHub, IconArrowLeft, IconArrowRight, IconBookOpen } from 'ui'
 
-import Examples from '../../data/Examples.json'
+import Examples from '~/data/Examples'
 import ExampleCard from '../ExampleCard'
 
 // install Swiper modules
 SwiperCore.use([Navigation, Pagination])
 
 function GithubExamples() {
-  // base path for images
-  const { basePath } = useRouter()
-
   const prevRef = useRef(null)
   const nextRef = useRef(null)
 
@@ -31,24 +26,17 @@ function GithubExamples() {
             Supported by a network of early advocates, contributors, and champions.
           </p>
           <div className="flex items-center justify-center gap-2 py-4">
-            <Link href="/docs/guides/auth/overview" passHref>
-              <a>
-                <Button size="small" type="default" icon={<IconBookOpen size={12} />}>
-                  View guides
-                </Button>
-              </a>
-            </Link>
-            <Link
-              href="https://github.com/supabase/supabase/tree/master/examples"
-              as="https://github.com/supabase/supabase/tree/master/examples"
-              passHref
-            >
-              <a>
-                <Button size="small" type="default" icon={<IconGitHub size={12} />}>
-                  Official GitHub library
-                </Button>
-              </a>
-            </Link>
+            <Button asChild size="small" type="default" icon={<IconBookOpen size={12} />}>
+              <Link href="/docs/guides/resources/examples">View guides</Link>
+            </Button>
+            <Button asChild size="small" type="default" icon={<IconGitHub size={12} />}>
+              <Link
+                href="https://github.com/supabase/supabase/tree/master/examples"
+                as="https://github.com/supabase/supabase/tree/master/examples"
+              >
+                Official GitHub library
+              </Link>
+            </Button>
           </div>
         </div>
       </div>

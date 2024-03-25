@@ -124,7 +124,7 @@ export interface Database {
             columns: ['contact']
             referencedRelation: 'partner_contacts'
             referencedColumns: ['id']
-          }
+          },
         ]
       }
     }

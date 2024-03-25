@@ -42,7 +42,7 @@ const Favicons = () => {
       <link rel="shortcut icon" href={`${basePath}/favicon/favicon.ico`} />
       <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon.ico`} />
       {/* misc */}
-      <link rel="manifest" href={`${basePath}/favicon/site.webmanifest`} />
+      <link rel="manifest" href={`${basePath}/favicon/manifest.json`} />
       <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
       <link rel="apple-touch-icon" href={`${basePath}/favicon/favicon.ico`} />
       <meta name="msapplication-config" content={`${basePath}/favicon/browserconfig.xml`} />

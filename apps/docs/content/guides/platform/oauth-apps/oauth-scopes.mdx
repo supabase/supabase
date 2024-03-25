@@ -1,0 +1,39 @@
+---
+id: 'oauth-scopes'
+title: 'Scopes for your OAuth App'
+description: 'Scopes let you specify the level of access your integration needs'
+subtitle: 'Scopes let you specify the level of access your integration needs'
+---
+
+<Admonition type="note">
+
+Scopes are only available for OAuth apps. Check out [**our guide**](/docs/guides/platform/oauth-apps/build-a-supabase-integration) to learn how to build an OAuth app integration.
+
+</Admonition>
+
+Scopes restrict access to the specific [Supabase Management API endpoints](/docs/reference/api/introduction) for OAuth tokens. All scopes can be specified as read and/or write.
+
+Scopes are set when you [create an OAuth app](/docs/guides/platform/oauth-apps/build-a-supabase-integration#create-an-oauth-app) in the Supabase Dashboard.
+
+## Available scopes
+
+| Name             | Type    | Description                                                                                                                                                                                                                                                                              |
+| ---------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Auth`           | `Read`  | Retrieve a project's auth configuration<br/>Retrieve a project's SAML SSO providers                                                                                                                                                                                                      |
+| `Auth`           | `Write` | Update a project's auth configuration<br/>Create, update, or delete a project's SAML SSO providers                                                                                                                                                                                       |
+| `Database`       | `Read`  | Retrieve the database configuration<br/>Retrieve SQL snippets<br/>Check if the database is in read-only mode<br/>Retrieve a database's SSL enforcement configuration<br/>Retrieve a database's schema typescript types                                                                   |
+| `Database`       | `Write` | Create a SQL query<br/>Enable database webhooks on the project<br/>Update the project's database configuration<br/>Update a database's SSL enforcement configuration<br/>Disable read-only mode for 15mins<br/>Retrieve the pooler configuration<br/>Create a PITR backup for a database |
+| `Domains`        | `Read`  | Retrieve the custom domains for a project<br/>Retrieve the vanity subdomain configuration for a project                                                                                                                                                                                  |
+| `Domains`        | `Write` | Activate, initialize, reverify, or delete the custom domain for a project<br/>Activate, delete or check the availability of a vanity subdomain for a project                                                                                                                             |
+| `Edge Functions` | `Read`  | Retrieve information about a project's edge functions                                                                                                                                                                                                                                    |
+| `Edge Functions` | `Write` | Create, update, or delete an edge function                                                                                                                                                                                                                                               |
+| `Environment`    | `Read`  | Retrieve branches in a project                                                                                                                                                                                                                                                           |
+| `Environment`    | `Write` | Create, update, or delete a branch                                                                                                                                                                                                                                                       |
+| `Organizations`  | `Read`  | Retrieve an organization's metadata<br/>Retrieve all members in an organization                                                                                                                                                                                                          |
+| `Organizations`  | `Write` | Create an organization                                                                                                                                                                                                                                                                   |
+| `Projects`       | `Read`  | Retrieve a project's metadata<br/>Check if a project's database is eligible for upgrade<br/>Retrieve a project's network restrictions<br/>Retrieve a project's network bans                                                                                                              |
+| `Projects`       | `Write` | Create a project<br/>Upgrade a project's database<br/>Remove a project's network bans<br/>Update a project's network restrictions                                                                                                                                                        |
+| `Rest`           | `Read`  | Retrieve a project's PostgREST configuration                                                                                                                                                                                                                                             |
+| `Rest`           | `Write` | Update a project's PostgREST configuration                                                                                                                                                                                                                                               |
+| `Secrets`        | `Read`  | Retrieve a project's API keys<br/>Retrieve a project's secrets<br/>Retrieve a project's pgsodium config                                                                                                                                                                                  |
+| `Secrets`        | `Write` | Create or update a project's secrets<br/>Update a project's pgsodium configuration                                                                                                                                                                                                       |

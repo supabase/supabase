@@ -100,10 +100,8 @@ const ImageGrid = ({
             <MaybeAnimatedDiv
               key={`${x.name}-${i}`}
               className={`
-                  dark:bg-scale-400 col-span-1 flex items-center 
-                justify-center 
-                bg-gray-50
-                  ${x.link && 'dark:hover:bg-scale-600 hover:bg-gray-100'}
+                  bg-surface-200 col-span-1 flex items-center justify-center 
+                  ${x.link && 'hover:bg-overlay-hover'}
                   p-8 ${className}`}
             >
               <div className={`relative h-8 w-full overflow-auto ${imgPadding[padding]}`}>

@@ -14,7 +14,7 @@ import { debounce } from 'lodash'
 import TicketsGrid from '~/components/LaunchWeek/7/TicketsGrid'
 import { Button } from 'ui'
 import Link from 'next/link'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 
 interface Props {
   users: UserData[]
@@ -41,7 +41,7 @@ export default function TicketsPage({ users }: Props) {
   const DESCRIPTION = 'Supabase Launch Week 7 | 10–14 April 2023'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/seven/launch-week-7-teaser.jpg`
 
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   const [isLoading, setIsLoading] = useState(false)
   const [offset, setOffset] = useState(1)
   const [isLast, setIsLast] = useState(false)
@@ -86,7 +86,7 @@ export default function TicketsPage({ users }: Props) {
     window.addEventListener('scroll', handleDebouncedScroll)
 
     return () => {
-      document.body.className = isDarkMode ? 'dark' : 'light'
+      document.body.className = resolvedTheme?.includes('dark') ? 'dark' : 'light'
       window.removeEventListener('scroll', handleDebouncedScroll)
     }
   }, [])
@@ -129,15 +129,11 @@ export default function TicketsPage({ users }: Props) {
                 <h2 className="text-4xl">
                   Check out <span className="gradient-text-pink-500">all the tickets</span>
                 </h2>
-                <p className="radial-gradient-text-scale-500">Submissions are closed.</p>
+                <p className="radial-gradient-text-500">Submissions are closed.</p>
                 <div className="mt-1">
-                  <Link href="/launch-week/7">
-                    <a>
-                      <Button type="outline" size="medium">
-                        Go to Launch Week 7
-                      </Button>
-                    </a>
-                  </Link>
+                  <Button asChild type="outline" size="medium">
+                    <Link href="/launch-week/7">Go to Launch Week 7</Link>
+                  </Button>
                 </div>
               </motion.div>
             </div>

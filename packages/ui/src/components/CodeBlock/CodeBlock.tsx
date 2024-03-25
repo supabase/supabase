@@ -1,9 +1,8 @@
-import * as React from 'react'
-import { Children, FC } from 'react'
+import { Children } from 'react'
 import * as CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { monokaiCustomTheme } from './CodeBlock.utils'
-import { Button, IconCheck, IconCopy } from 'ui'
+import { Button, IconCheck, IconCopy, cn } from 'ui'
 
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
@@ -16,11 +15,11 @@ import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
 
 import { useState } from 'react'
-import { useTheme } from 'common/Providers'
+import { useTheme } from 'next-themes'
 
 export interface CodeBlockProps {
   title?: string
-  language: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json' | 'csharp' | 'kotlin'
+  language?: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json' | 'csharp' | 'kotlin'
   linesToHighlight?: number[]
   hideCopy?: boolean
   hideLineNumbers?: boolean
@@ -39,8 +38,9 @@ export const CodeBlock = ({
   hideCopy = false,
   hideLineNumbers = false,
 }: CodeBlockProps) => {
-  const { isDarkMode } = useTheme()
-  const monokaiTheme = monokaiCustomTheme(isDarkMode)
+  const { resolvedTheme } = useTheme()
+  const isDarkTheme = resolvedTheme?.includes('dark')!
+  const monokaiTheme = monokaiCustomTheme(isDarkTheme)
 
   const [copied, setCopied] = useState(false)
 
@@ -79,13 +79,13 @@ export const CodeBlock = ({
 
   const large = false
   // don't show line numbers if bash == lang
-  if (lang !== 'bash') hideLineNumbers = true
+  if (lang === 'bash' || lang === 'sh') hideLineNumbers = true
   const showLineNumbers = !hideLineNumbers
 
   return (
     <>
       {title && (
-        <div className="rounded-t-md bg-scale-300 py-2 px-4 border-b border-scale-500 text-blue-1100 font-sans">
+        <div className="rounded-t-md bg-surface-100 py-2 px-4 border-b border-default text-blue-1100 font-sans">
           {title.replace(/%20/g, ' ')}
         </div>
       )}
@@ -97,12 +97,12 @@ export const CodeBlock = ({
             wrapLines={true}
             // @ts-ignore
             style={monokaiTheme}
-            className={[
-              'code-block border p-4 w-full !my-0 !bg-scale-300',
+            className={cn(
+              'code-block border border-surface p-4 w-full !my-0 !bg-surface-100',
               `${!title ? '!rounded-md' : '!rounded-t-none !rounded-b-md'}`,
               `${!showLineNumbers ? 'pl-6' : ''}`,
-              className,
-            ].join(' ')}
+              className
+            )}
             customStyle={{
               fontSize: large ? 18 : 13,
               lineHeight: large ? 1.5 : 1.4,
@@ -111,7 +111,7 @@ export const CodeBlock = ({
             lineProps={(lineNumber) => {
               if (linesToHighlight.includes(lineNumber)) {
                 return {
-                  style: { display: 'block', backgroundColor: 'var(--colors-scale6)' },
+                  style: { display: 'block', backgroundColor: 'hsl(var(--background-selection))' },
                 }
               }
               return {}
@@ -137,7 +137,7 @@ export const CodeBlock = ({
             <div
               className={[
                 'absolute right-2',
-                `${isDarkMode ? 'dark' : ''}`,
+                `${isDarkTheme ? 'dark' : ''}`,
                 `${!title ? 'top-2' : 'top-[3.25rem]'}`,
               ].join(' ')}
             >

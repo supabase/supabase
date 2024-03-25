@@ -1,0 +1,21 @@
+{
+  "name": "playwright-tests",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "env:setup": "supabase start -x studio && supabase status --output json > keys.json && node scripts/generate-env.js",
+    "pretest": "npm run env:setup",
+    "test": "playwright test",
+    "posttest": "supabase stop --no-backup",
+    "codegen:setup": "npm run env:setup && NODE_ENV=test npm --prefix ../apps/studio run dev",
+    "codegen": "playwright codegen http://localhost:8082/project/default"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.41.2",
+    "@types/node": "^20.11.16"
+  }
+}

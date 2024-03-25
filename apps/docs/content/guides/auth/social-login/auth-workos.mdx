@@ -1,0 +1,134 @@
+---
+id: 'auth-workos'
+title: 'Login with WorkOS'
+description: 'Add WorkOS OAuth to your Supabase project'
+---
+
+To enable WorkOS Auth for your project, you need to set up WorkOS OAuth application and add the application credentials to your Supabase Dashboard.
+
+## Overview
+
+In this guide, we will cover how to use Supabase OAuth with WorkOS to implement Single-Sign-On(SSO).
+
+The procedure consists of five broad steps:
+
+- Create a new organization from your WorkOS Dashboard.
+- Obtain the `Client ID` from the Configuration tab and configure redirect URI.
+- Obtain the `WorkOS Secret` from the credentials tab.
+- Connect a WorkOS Supported Identity Provider
+- Add your WorkOS credentials into your Supabase project
+
+## Create a WorkOS organization
+
+Log in to the dashboard and hop over to the Organizations tab to create and organization
+![Create an Organization](/docs/img/guides/auth-workos/workos-create-organization.png)
+
+## Obtain the client ID and configure redirect URI
+
+Head over to the Configuration tab and configure the redirect URI.The redirect URI should look like `https://<project-ref>.supabase.co/auth/v1/callback`
+Note that this is distinct from the redirect URI referred to in the Supabase dashboard
+
+![Fetch Client ID and configure Redirect URI](/docs/img/guides/auth-workos/workos-clientid-redirect-uri.png)
+
+## Obtain the WorkOS secret
+
+Head over to the API Keys page and obtain the secret key.
+
+![WorkOS Secret Key](/docs/img/guides/auth-workos/workos-secret-key.png)
+
+## Connect a WorkOS supported identity provider
+
+Set up the identity provider by visiting the setup link.
+
+![Visiting the setup link](/docs/img/guides/auth-workos/workos-setup-identity-provider.png)
+
+You can pick between any one of the many identity providers that WorkOS supports.
+
+## Add your WorkOS credentials into your Supabase project
+
+<SocialProviderSettingsSupabase provider="WorkOS" />
+
+## Add login code to your client app
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `workos` as the `provider`:
+
+```js
+async function signInWithWorkOS() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'workos',
+    options: {
+      queryParams: {
+        connection: '<your_connection>',
+        organization: '<your_organization',
+        workos_provider: '<your_provider>',
+      },
+    },
+  })
+}
+```
+
+Refer to the [WorkOS Documentation](https://workos.com/docs/reference/sso/authorize/) to learn more about the different methods.
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `WorkOS` as the `Provider`:
+
+```kotlin
+suspend fun signInWithWorkOS() {
+	supabase.auth.signInWith(WorkOS) {
+		queryParams["connection"] = "<your_connection>"
+		queryParams["organization"] = "<your_organization>"
+		queryParams["workos_provider"] = "<your_provider>"
+	}
+}
+```
+
+Refer to the [WorkOS Documentation](https://workos.com/docs/reference/sso/authorize/) to learn more about the different methods.
+
+</TabPanel>
+</Tabs>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```js
+async function signOut() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```kotlin
+suspend fun signOut() {
+	supabase.auth.signOut()
+}
+```
+
+</TabPanel>
+</Tabs>
+
+## Resources
+
+- [WorkOS Documentation](https://workos.com/docs/sso/guide)

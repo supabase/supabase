@@ -1,4 +1,8 @@
-import { Button } from '@ui/components/shadcn/ui/button'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Meta } from '@storybook/react'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+import { Button } from '../ui/button'
 import {
   Form,
   FormControl,
@@ -7,13 +11,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@ui/components/shadcn/ui/form'
-import { toast } from '@ui/components/shadcn/ui/use-toast'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Meta } from '@storybook/react'
-import { Textarea } from '@ui/components/shadcn/ui/textarea'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
+} from '../ui/form'
+import { Label } from '../ui/label'
+import { Textarea } from '../ui/textarea'
+import { toast } from '../ui/use-toast'
 
 const meta: Meta = {
   title: 'shadcn/Textarea',
@@ -42,7 +43,7 @@ export function TextareaWithText() {
     <div className="grid w-full gap-1.5">
       <Label htmlFor="message-2">Your Message</Label>
       <Textarea placeholder="Type your message here." id="message-2" />
-      <p className="text-sm text-muted-foreground">
+      <p className="text-sm text-foreground-muted">
         Your message will be copied to the support team.
       </p>
     </div>

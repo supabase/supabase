@@ -85,7 +85,6 @@ export interface StepProps {
   className?: string
   hideInBlog?: boolean
   bg_layers?: {
-    lottie?: any
     img?: string
     mobileImg?: string
   }[]
@@ -220,7 +219,7 @@ const days: WeekDayProps[] = [
     dd: 'Wed',
     youtube_id: '',
     blogpost: '',
-    docs: '/docs/guides/storage/uploads#resumable-upload',
+    docs: '/docs/guides/storage/uploads/resumable-uploads',
     steps: [
       {
         title: 'Storage v3: Resumable Uploads with support for 50GB files',
@@ -229,7 +228,7 @@ const days: WeekDayProps[] = [
         blog: '/blog/storage-v3-resumable-uploads',
         thumb: images['03-storage-thumb'],
         video: 'https://www.youtube.com/watch?v=pT2PcZFq_M0',
-        docs: '/docs/guides/storage/uploads#resumable-upload',
+        docs: '/docs/guides/storage/uploads/resumable-uploads',
         steps: [],
         bg_layers: [
           {

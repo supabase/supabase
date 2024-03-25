@@ -1,3 +1,14 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { Meta } from '@storybook/react'
+import { addDays, format } from 'date-fns'
+import { Calendar as CalendarIcon } from 'lucide-react'
+import * as React from 'react'
+import { DateRange } from 'react-day-picker'
+import { useForm } from 'react-hook-form'
+import * as z from 'zod'
+import { cn } from '../../../lib/utils/cn'
+import { Button } from '../ui/button'
+import { Calendar } from '../ui/calendar'
 import {
   Form,
   FormControl,
@@ -6,27 +17,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@ui/components/shadcn/ui/form'
-import { toast } from '@ui/components/shadcn/ui/use-toast'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { Meta } from '@storybook/react'
-import { Button } from '@ui/components/shadcn/ui/button'
-import { Calendar } from '@ui/components/shadcn/ui/calendar'
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@ui/components/shadcn/ui/select'
-import { cn } from '@ui/lib/utils'
-import { addDays, format } from 'date-fns'
-import { Calendar as CalendarIcon } from 'lucide-react'
-import * as React from 'react'
-import { DateRange } from 'react-day-picker'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
+} from '../ui/form'
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { toast } from '../ui/use-toast'
 
 const meta: Meta = {
   title: 'shadcn/DatePicker',
@@ -43,7 +37,7 @@ export function Default() {
           variant={'outline'}
           className={cn(
             'w-[280px] justify-start text-left font-normal',
-            !date && 'text-muted-foreground'
+            !date && 'text-foreground-muted'
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
@@ -72,7 +66,7 @@ export function DatePickerWithRange({ className }: React.HTMLAttributes<HTMLDivE
             variant={'outline'}
             className={cn(
               'w-[300px] justify-start text-left font-normal',
-              !date && 'text-muted-foreground'
+              !date && 'text-foreground-muted'
             )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
@@ -132,7 +126,7 @@ export function DatePickerWithPresets() {
           variant={'outline'}
           className={cn(
             'w-[280px] justify-start text-left font-normal',
-            !date && 'text-muted-foreground'
+            !date && 'text-foreground-muted'
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
@@ -197,7 +191,7 @@ export function DatePickerForm() {
                       variant={'outline'}
                       className={cn(
                         'w-[240px] pl-3 text-left font-normal',
-                        !field.value && 'text-muted-foreground'
+                        !field.value && 'text-foreground-muted'
                       )}
                     >
                       {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}

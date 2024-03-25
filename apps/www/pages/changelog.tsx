@@ -6,12 +6,155 @@ import CTABanner from '~/components/CTABanner'
 import DefaultLayout from '~/components/Layouts/Default'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
+import { createAppAuth } from '@octokit/auth-app'
+import { Octokit as OctokitRest } from '@octokit/rest'
+import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
+import { GetServerSideProps } from 'next'
+import Link from 'next/link'
+import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
+import { deletedDiscussions } from '~/lib/changelog.utils'
 
-export async function getStaticProps() {
-  const response = await fetch('https://api.github.com/repos/supabase/supabase/releases')
-  const data = await response.json()
+export type Discussion = {
+  id: string
+  updatedAt: string
+  url: string
+  title: string
+  body: string
+}
 
-  if (!data) {
+type Entry = {
+  id: string
+  title: string
+  url: string
+  created_at: string
+  source: MDXRemoteSerializeResult
+  type: string
+}
+
+export type DiscussionsResponse = {
+  repository: {
+    discussions: {
+      totalCount: number
+      nodes: Discussion[]
+      pageInfo: any
+    }
+  }
+}
+
+/**
+ * [Terry]
+ * this page powers supabase.com/changelog
+ * this page used to just be a feed of the releases endpoint
+ * (https://api.github.com/repos/supabase/supabase/releases) (rest api)
+ * but is now a blend of that legacy relases and the new Changelog category of the Discussions
+ * https://github.com/orgs/supabase/discussions/categories/changelog (graphql api)
+ * We should use the Changelog Discussions category for all future changelog entries and stop using releases
+ */
+
+export const getServerSideProps: GetServerSideProps = async ({ res, query }) => {
+  // refresh every 15 minutes
+  res.setHeader('Cache-Control', 'public, max-age=900, stale-while-revalidate=900')
+  const next = query.next ?? (null as string | null)
+  const restPage = query.restPage ? Number(query.restPage) : 1
+
+  const octokitRest = new OctokitRest({
+    auth: process.env.GITHUB_CHANGELOG_APP_REST_KEY,
+  })
+
+  // uses the rest api
+  async function fetchGitHubReleases() {
+    try {
+      const response = await octokitRest.repos.listReleases({
+        owner: 'supabase',
+        repo: 'supabase',
+        per_page: 10,
+        page: restPage,
+      })
+
+      return response.data || []
+    } catch (error) {
+      console.error(error)
+      return []
+    }
+  }
+
+  // Process as of Feb. 2024:
+  // create a Release each month and create a corresponding changelog discussion
+  // — we don't want to pull in both the changelog entry and the release entry
+  // — we want to ignore new releases and only show the old ones that don't have a corresponding changelog discussion
+  // — so we have this list of old releases that we want to show
+  const oldReleases = [
+    40981345, 39091930, 37212777, 35927141, 34612423, 33383788, 32302703, 30830915, 29357247,
+    28108378,
+  ]
+
+  const releases = await (
+    await fetchGitHubReleases()
+  ).filter((release) => release.id && oldReleases.includes(release.id))
+
+  // uses the graphql api
+  async function fetchDiscussions(owner: string, repo: string, categoryId: string, cursor: string) {
+    const { Octokit } = await import('@octokit/core')
+    const ExtendedOctokit = Octokit.plugin(paginateGraphql)
+    type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
+
+    const octokit = new ExtendedOctokit({
+      authStrategy: createAppAuth,
+      auth: {
+        appId: process.env.GITHUB_CHANGELOG_APP_ID,
+        installationId: process.env.GITHUB_CHANGELOG_APP_INSTALLATION_ID,
+        privateKey: process.env.GITHUB_CHANGELOG_APP_PRIVATE_KEY,
+      },
+    })
+
+    const query = `
+      query troubleshootDiscussions($cursor: String, $owner: String!, $repo: String!, $categoryId: ID!) {
+        repository(owner: $owner, name: $repo) {
+          discussions(first: 50, after: $cursor, categoryId: $categoryId, orderBy: { field: CREATED_AT, direction: DESC }) {
+            totalCount
+            pageInfo {
+              hasPreviousPage
+              hasNextPage
+              startCursor
+              endCursor
+            }
+            nodes {
+              id
+              publishedAt
+              createdAt
+              url
+              title
+              body
+            }
+          }
+        }
+      }
+    `
+    const queryVars = {
+      owner,
+      repo,
+      categoryId,
+      cursor: next,
+    }
+
+    // fetch discussions
+    const {
+      repository: {
+        discussions: { nodes: discussions, pageInfo },
+      },
+    } = await octokit.graphql<DiscussionsResponse>(query, queryVars)
+
+    return { discussions, pageInfo }
+  }
+
+  const { discussions, pageInfo } = await fetchDiscussions(
+    'supabase',
+    'supabase',
+    'DIC_kwDODMpXOc4CAFUr', // 'Changelog' category
+    next as string
+  )
+
+  if (!discussions) {
     return {
       props: {
         notFound: true,
@@ -19,46 +162,87 @@ export async function getStaticProps() {
     }
   }
 
-  const changelogRenderToString = await Promise.all(
-    data.map(async (item: any): Promise<any> => {
-      const mdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
+  // Process discussions
+  const formattedDiscussions = await Promise.all(
+    discussions.map(async (item: any): Promise<any> => {
+      const discussionsMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
+      // Find a date rewrite for the current item's title
+      const dateRewrite = deletedDiscussions.find((rewrite) => {
+        return item.title && rewrite.title && item.title.includes(rewrite.title)
+      })
+
+      // Use the createdAt date from dateRewrite if found, otherwise use item.createdAt
+      const created_at = dateRewrite ? dateRewrite.createdAt : item.createdAt
+
       return {
         ...item,
-        source: mdxSource,
+        source: discussionsMdxSource,
+        type: 'discussion',
+        created_at,
+        url: item.url,
       }
     })
   )
 
+  // Process releases
+  const formattedReleases = await Promise.all(
+    releases.map(async (item: any): Promise<any> => {
+      const releasesMdxSource: MDXRemoteSerializeResult = await mdxSerialize(item.body)
+
+      return {
+        ...item,
+        source: releasesMdxSource,
+        type: 'release',
+        created_at: item.created_at,
+        title: item.name ?? '',
+        url: item.html_url ?? '',
+      }
+    })
+  )
+
+  // Combine discussions and releases into a single array of entries
+  const combinedEntries = formattedDiscussions.concat(formattedReleases)
+
+  const sortedCombinedEntries = combinedEntries.sort((a, b) => {
+    const dateA = dayjs(a.created_at)
+    const dateB = dayjs(b.created_at)
+
+    if (dateA.isValid() && dateB.isValid()) {
+      return dateB.diff(dateA)
+    } else {
+      return 0
+    }
+  })
+
   return {
     props: {
-      changelog: changelogRenderToString,
+      changelog: sortedCombinedEntries,
+      pageInfo: pageInfo,
+      restPage: Number(restPage),
     },
   }
 }
 
-function ChangelogPage(props: any) {
+interface ChangelogPageProps {
+  changelog: Entry[]
+  pageInfo: any
+  restPage: number
+}
+
+function ChangelogPage({ changelog, pageInfo, restPage }: ChangelogPageProps) {
+  const { endCursor: end, hasNextPage, hasPreviousPage } = pageInfo
+
+  const TITLE = 'Changelog'
+  const DESCRIPTION = 'New updates and improvements to Supabase'
   return (
     <>
       <NextSeo
-        title={'Changelog'}
+        title={TITLE}
         openGraph={{
-          title: 'Changelog',
-          description: 'props.blog.description',
+          title: TITLE,
+          description: DESCRIPTION,
           url: `https://supabase.com/changelog`,
           type: 'article',
-          article: {
-            //
-            // to do: add expiration and modified dates
-            // https://github.com/garmeeh/next-seo#article
-            // publishedTime: props.blog.date,
-          },
-          // images: [
-          //   {
-          //     url: `https://supabase.com${basePath}/images/blog/${
-          //       props.blog.image ? props.blog.image : props.blog.thumb
-          //     }`,
-          //   },
-          // ],
         }}
       />
       <DefaultLayout>
@@ -66,51 +250,66 @@ function ChangelogPage(props: any) {
           className="
             container mx-auto flex flex-col
             gap-20
-            px-8 py-10 sm:px-16
+            px-4 py-10 sm:px-16
             xl:px-20
           "
         >
-          {/* Title and description */}
           <div className="py-10">
             <h1 className="h1">Changelog</h1>
-            <p className="text-scale-900 text-lg">New updates and product improvements</p>
+            <p className="text-foreground-lighter text-lg">New updates and product improvements</p>
           </div>
 
           {/* Content */}
-          <div>
-            {props.changelog.map((changelog: any, i: number) => {
-              const date = changelog.published_at.split('T')
-              return (
-                <div
-                  key={i}
-                  className="border-scale-400 grid border-l pb-10 lg:grid-cols-12 lg:gap-8"
-                >
-                  <div
-                    className="col-span-12 mb-8 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32
+          <div className="grid gap-12 lg:gap-36">
+            {changelog.length > 0 &&
+              changelog
+                .filter((entry: Entry) => !entry.title.includes('[d]'))
+                .map((entry: Entry, i: number) => {
+                  return (
+                    <div key={i} className="border-muted grid border-l lg:grid-cols-12 lg:gap-8">
+                      <div
+                        className="col-span-12 mb-8 self-start lg:sticky lg:top-0 lg:col-span-4 lg:-mt-32 lg:pt-32
                 "
-                  >
-                    <div className="flex w-full items-baseline gap-6">
-                      <div className="bg-scale-100 dark:bg-scale-500 border-scale-400 dark:border-scale-600 text-scale-900 -ml-2.5 flex h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
-                        <IconGitCommit size={14} strokeWidth={1.5} />
+                      >
+                        <div className="flex w-full items-baseline gap-6">
+                          <div className="bg-border border-muted text-foreground-lighter -ml-2.5 flex h-5 w-5 items-center justify-center rounded border drop-shadow-sm">
+                            <IconGitCommit size={14} strokeWidth={1.5} />
+                          </div>
+                          <div className="flex w-full flex-col gap-1">
+                            {entry.title && (
+                              <Link href={entry.url}>
+                                <h3 className="text-foreground text-2xl">{entry.title}</h3>{' '}
+                              </Link>
+                            )}
+                            <p className="text-muted text-lg">
+                              {dayjs(entry.created_at).format('MMM D, YYYY')}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                      <div className="flex w-full flex-col gap-1">
-                        {changelog.name && (
-                          <h3 className="text-scale-1200 text-2xl">{changelog.name}</h3>
-                        )}
-                        <p className="text-scale-900 text-lg">
-                          {dayjs(date[0]).format('MMM D, YYYY')}
-                        </p>
+                      <div className="col-span-8 ml-8 lg:ml-0 max-w-[calc(100vw-80px)]">
+                        <article className="prose prose-docs max-w-none">
+                          <MDXRemote {...entry.source} components={mdxComponents('blog')} />
+                        </article>
                       </div>
                     </div>
-                  </div>
-                  <div className="col-span-8 ml-8 lg:ml-0">
-                    <article className="prose prose-docs max-w-none">
-                      <MDXRemote {...changelog.source} components={mdxComponents('blog')} />
-                    </article>
-                  </div>
-                </div>
-              )
-            })}
+                  )
+                })}
+          </div>
+          <div className="my-8 flex items-center gap-4">
+            {hasPreviousPage && (
+              <Link href={`/changelog`} className="flex items-center gap-2">
+                <ArrowLeftIcon width={14} /> Previous
+              </Link>
+            )}
+            {hasNextPage && (
+              <Link
+                href={`/changelog?next=${end}&restPage=${restPage + 1}`}
+                className="flex items-center gap-2"
+              >
+                Next <ArrowRightIcon width={14} />
+              </Link>
+            )}
           </div>
         </div>
 
