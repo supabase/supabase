@@ -323,9 +323,11 @@ export type Lint = {
   detail: string
   remediation: any
   metadata: {
-    table: string
-    fkey_name: string
-    fkey_columns: number[]
+    schema?: string
+    table?: string
+    view_name?: string
+    fkey_name?: string
+    fkey_columns?: number[]
   } | null
   cache_key: string
 }
