@@ -117,7 +117,7 @@ const TextConfirmModal = forwardRef<
           }
         }}
       >
-        <DialogContent ref={ref} className="p-0 gap-0 pb-5" size={size}>
+        <DialogContent ref={ref} className="p-0 gap-0 pb-5 !block" size={size}>
           <DialogHeader className={cn('border-b')} padding={'small'}>
             <DialogTitle className="">{title}</DialogTitle>
           </DialogHeader>
@@ -164,13 +164,14 @@ const TextConfirmModal = forwardRef<
                   </FormItem_Shadcn_>
                 )}
               />
-              <div className="flex justify-end gap-2">
+              <div className="flex gap-2">
                 {!blockDeleteButton && (
                   <Button size="medium" block type="default" disabled={loading}>
                     {cancelLabel}
                   </Button>
                 )}
                 <Button
+                  block
                   size="medium"
                   type={
                     variant === 'destructive'
@@ -180,9 +181,9 @@ const TextConfirmModal = forwardRef<
                         : 'primary'
                   }
                   htmlType="submit"
-                  block
                   loading={loading}
                   disabled={loading}
+                  className="truncate"
                 >
                   {confirmLabel}
                 </Button>

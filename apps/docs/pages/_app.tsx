@@ -8,6 +8,7 @@ import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
 import { QueryClientProvider, useQueryClient } from '@tanstack/react-query'
 import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
+import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState, type PropsWithChildren } from 'react'
 import { PortalToast, TabsProvider } from 'ui'
@@ -16,7 +17,7 @@ import { useConsent } from 'ui-patterns/ConsentToast'
 
 import Favicons from '~/components/Favicons'
 import SiteLayout from '~/layouts/SiteLayout'
-import { IS_PLATFORM, IS_PREVIEW } from '~/lib/constants'
+import { BUILD_PREVIEW_HTML, IS_PLATFORM, IS_PREVIEW } from '~/lib/constants'
 import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
 import { useRootQueryClient } from '~/lib/fetch/queryClient'
 import { LOCAL_STORAGE_KEYS, remove } from '~/lib/storage'
@@ -33,7 +34,7 @@ import { AppPropsWithLayout } from '~/types'
  * you within a single build.
  */
 function ShortcutPreviewBuild({ children }: PropsWithChildren) {
-  if (IS_PREVIEW) {
+  if (IS_PREVIEW && !BUILD_PREVIEW_HTML) {
     // eslint-disable-next-line react-hooks/rules-of-hooks
     const [isMounted, setIsMounted] = useState(false)
 
@@ -217,6 +218,9 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
     <ShortcutPreviewBuild>
       <QueryClientProvider client={queryClient}>
         <Favicons />
+        <Head>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        </Head>
         <AuthContainer>
           <SignOutHandler>
             <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>

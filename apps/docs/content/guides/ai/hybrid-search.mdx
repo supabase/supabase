@@ -6,7 +6,7 @@ subtitle: 'Combine keyword search with semantic search.'
 sidebar_label: 'Hybrid search'
 ---
 
-Hybrid search combines [full text search](/docs/guides/database/full-text-search) (searching by keyword) with [semantic search](/docs/guides/ai/concepts#what-are-embeddings) (searching by meaning) to identify results that are both directly and contextually relevant to the user's query.
+Hybrid search combines [full text search](/docs/guides/ai/keyword-search) (searching by keyword) with [semantic search](/docs/guides/ai/semantic-search) (searching by meaning) to identify results that are both directly and contextually relevant to the user's query.
 
 ## Why would I want to use hybrid search?
 
@@ -62,7 +62,7 @@ The table contains 4 columns:
 - `id` is an auto-generated unique ID for the record. We'll use this later to match records when performing RRF.
 - `content` contains the actual text we will be searching over.
 - `fts` is an auto-generated `tsvector` column that is generated using the text in `content`. We will use this for [full text search](/docs/guides/database/full-text-search) (search by keyword).
-- `embedding` is a [vector column](/docs/guides/ai/vector-columns) that stores the vector generated from our embedding model. We will use this for [semantic search](/docs/guides/ai/concepts#what-are-embeddings) (search by meaning). We chose 512 dimensions for this example, but adjust this to match the size of the embedding vectors generated from your preferred model.
+- `embedding` is a [vector column](/docs/guides/ai/vector-columns) that stores the vector generated from our embedding model. We will use this for [semantic search](/docs/guides/ai/semantic-search) (search by meaning). We chose 512 dimensions for this example, but adjust this to match the size of the embedding vectors generated from your preferred model.
 
 Next we'll create indexes on the `fts` and `embedding` columns so that their individual queries will remain fast at scale:
 
@@ -225,4 +225,5 @@ For more information on how to create, test, and deploy edge functions, see [Get
 - [Embedding concepts](/docs/guides/ai/concepts)
 - [Vector columns](/docs/guides/ai/vector-columns)
 - [Vector indexes](/docs/guides/ai/vector-indexes)
+- [Semantic search](/docs/guides/ai/semantic-search)
 - [Full text (keyword) search](/docs/guides/database/full-text-search)

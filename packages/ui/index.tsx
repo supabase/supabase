@@ -17,7 +17,6 @@ export * from './src/components/Icon/IconBackground'
 // DISPLAYS
 
 export * from './src/components/Card'
-export * from './src/components/Badge'
 export * from './src/components/Tabs'
 export * from './src/components/Alert'
 export * from './src/components/Accordion'
@@ -82,10 +81,9 @@ export * from './src/components/shadcn/ui/use-toast'
 export * from './src/components/shadcn/ui/toast'
 export * from './src/components/shadcn/ui/toaster'
 
-export { Badge as Badge_Shadcn_ } from './src/components/shadcn/ui/badge'
-
 export * from './src/components/shadcn/ui/separator'
 export * from './src/components/shadcn/ui/sheet'
+export * from './src/components/shadcn/ui/badge'
 
 export {
   Command as Command_Shadcn_,

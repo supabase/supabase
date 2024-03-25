@@ -1411,7 +1411,6 @@ export const ai = {
           url: '/guides/ai/vector-indexes',
           items: vectorIndexItems,
         },
-        { name: 'Hybrid search', url: '/guides/ai/hybrid-search' },
         {
           name: 'Engineering for scale',
           url: '/guides/ai/engineering-for-scale',
@@ -1425,6 +1424,15 @@ export const ai = {
           name: 'RAG with Permissions',
           url: '/guides/ai/rag-with-permissions',
         },
+      ],
+    },
+    {
+      name: 'Search',
+      url: undefined,
+      items: [
+        { name: 'Semantic search', url: '/guides/ai/semantic-search' },
+        { name: 'Keyword search', url: '/guides/ai/keyword-search' },
+        { name: 'Hybrid search', url: '/guides/ai/hybrid-search' },
       ],
     },
     {

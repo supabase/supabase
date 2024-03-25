@@ -165,7 +165,14 @@ const UtilityTabResults = ({ id, isExecuting }: UtilityTabResultsProps) => {
                     })
                     setSelectedDiffType(DiffType.Modification)
                   } catch (error: unknown) {
-                    if (isError(error)) toast.error(`Failed to debug: ${error.message}`)
+                    // [Joshen] There's a tendency for the SQL debug to chuck a lengthy error message
+                    // that's not relevant for the user - so we prettify it here by avoiding to return the
+                    // entire error body from the assistant
+                    if (isError(error)) {
+                      toast.error(
+                        `Sorry, the assistant failed to debug your query! Please try again with a different one.`
+                      )
+                    }
                   }
                 }}
               >
