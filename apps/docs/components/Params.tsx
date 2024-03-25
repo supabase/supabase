@@ -22,7 +22,7 @@ const Param = ({ name, isOptional, type, description, children }: IParamProps) =
       </div>
       {description && (
         <ReactMarkdown className="text-sm text-foreground-lighter m-0">
-          {paramItem.description}
+          {description}
         </ReactMarkdown>
       )}
       {children}
