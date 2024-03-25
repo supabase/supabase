@@ -2398,4 +2398,9 @@ module.exports = [
     source: '/docs/learn/auth-deep-dive/auth-google-oauth',
     destination: '/docs/guides/auth/auth-deep-dive/auth-google-oauth',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/sso/auth-sso-saml',
+    destination: '/guides/auth/enterprise-sso/auth-sso-saml',
+  },
 ]
