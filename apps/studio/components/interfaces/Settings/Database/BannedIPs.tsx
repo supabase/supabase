@@ -89,7 +89,7 @@ const BannedIPs = () => {
               <div className="flex items-center space-x-5">
                 <IconGlobe size={16} className="text-foreground-lighter" />
                 <p className="text-sm font-mono">{ip}</p>
-                {ip === userIPAddress && <Badge color="scale">Your IP address</Badge>}
+                {ip === userIPAddress && <Badge>Your IP address</Badge>}
               </div>
               <div>
                 <Button type="default" onClick={() => openConfirmationModal(ip)}>

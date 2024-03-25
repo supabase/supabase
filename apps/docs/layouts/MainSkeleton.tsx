@@ -160,12 +160,15 @@ const MobileHeader = memo(function MobileHeader({ menuId }: { menuId: MenuId }) 
       )}
     >
       <button
-        className={['mr-2', mobileMenuOpen && 'mt-0.5'].join(' ')}
+        className={[
+          'h-8 w-8 flex group items-center justify-center mr-2',
+          mobileMenuOpen && 'mt-0.5',
+        ].join(' ')}
         onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
       >
         <div
           className={[
-            'space-y-1 group cursor-pointer relative',
+            'space-y-1  cursor-pointer relative',
             mobileMenuOpen ? 'w-4 h-4' : 'w-4 h-[8px]',
           ].join(' ')}
         >
@@ -372,7 +375,7 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
             'backdrop-blur backdrop-filter bg-background',
           ].join(' ')}
         >
-          <div className={['lg:hidden', 'px-5 ', 'border-b z-10'].join(' ')}>
+          <div className={['lg:hidden', 'px-3.5', 'border-b z-10'].join(' ')}>
             <MobileHeader menuId={menuId} />
           </div>
         </div>

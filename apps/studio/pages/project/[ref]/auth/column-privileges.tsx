@@ -137,7 +137,9 @@ const PrivilegesPage: NextPageWithLayout = () => {
     allRoles?.filter((role: PostgresRole) => EDITABLE_ROLES.includes(role.name)) ?? []
   const roles = rolesList.map((role: PostgresRole) => role.name)
 
-  const table = tableList?.find((table) => table.name === selectedTable)
+  const table = tableList?.find(
+    (table) => table.schema === selectedSchema && table.name === selectedTable
+  )
   const isLocked = EXCLUDED_SCHEMAS.includes(selectedSchema)
 
   const {
