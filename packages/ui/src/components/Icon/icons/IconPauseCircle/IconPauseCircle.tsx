@@ -9,5 +9,12 @@
     return <IconBase icon={PauseCircle} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { pauseCircle } from 'lucide-react'
+  */
   export default IconPauseCircle
   

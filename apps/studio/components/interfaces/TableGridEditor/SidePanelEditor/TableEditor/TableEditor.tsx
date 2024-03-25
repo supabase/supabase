@@ -179,7 +179,7 @@ const TableEditor = ({
         const payload = {
           name: tableFields.name.trim(),
           schema: snap.selectedSchemaName,
-          comment: tableFields.comment,
+          comment: tableFields.comment?.trim(),
           ...(!isNewRecord && { rls_enabled: tableFields.isRLSEnabled }),
         }
         const configuration = {
@@ -191,8 +191,11 @@ const TableEditor = ({
           existingForeignKeyRelations: foreignKeys,
           primaryKey,
         }
+        const columns = tableFields.columns.map((column) => {
+          return { ...column, name: column.name.trim() }
+        })
 
-        saveChanges(payload, tableFields.columns, fkRelations, isNewRecord, configuration, resolve)
+        saveChanges(payload, columns, fkRelations, isNewRecord, configuration, resolve)
       } else {
         resolve()
       }
@@ -276,7 +279,7 @@ const TableEditor = ({
           label={
             <div className="flex items-center space-x-2">
               <span>Enable Row Level Security (RLS)</span>
-              <Badge color="gray">Recommended</Badge>
+              <Badge>Recommended</Badge>
             </div>
           }
           // @ts-ignore

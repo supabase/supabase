@@ -168,7 +168,7 @@ const PaymentMethods = () => {
                                       {paymentMethod.card.exp_year}
                                     </p>
                                   </div>
-                                  {isActive && <Badge color="green">Active</Badge>}
+                                  {isActive && <Badge variant="brand">Active</Badge>}
                                   {canUpdatePaymentMethods && !isActive ? (
                                     <DropdownMenu>
                                       <DropdownMenuTrigger asChild>

@@ -28,6 +28,7 @@ import * as z from 'zod'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useEnumeratedTypeCreateMutation } from 'data/enumerated-types/enumerated-type-create-mutation'
 import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
+import { NATIVE_POSTGRES_TYPES } from './EnumeratedTypes.constants'
 
 interface CreateEnumeratedTypeSidePanelProps {
   visible: boolean
@@ -51,7 +52,13 @@ const CreateEnumeratedTypeSidePanel = ({
   })
 
   const FormSchema = z.object({
-    name: z.string().min(1, 'Please provide a name for your enumerated type').default(''),
+    name: z
+      .string()
+      .min(1, 'Please provide a name for your enumerated type')
+      .refine((value) => !NATIVE_POSTGRES_TYPES.includes(value), {
+        message: 'Name cannot be a native Postgres data type',
+      })
+      .default(''),
     description: z.string().default('').optional(),
     values: z
       .object({ value: z.string().min(1, 'Please provide a value') })

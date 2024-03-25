@@ -4,7 +4,6 @@ import {
   NetworkRestrictions,
 } from 'components/interfaces/Settings/Database'
 import { SettingsLayout } from 'components/layouts'
-import { observer } from 'mobx-react-lite'
 import type { NextPageWithLayout } from 'types'
 
 import BannedIPs from 'components/interfaces/Settings/Database/BannedIPs'
@@ -40,4 +39,4 @@ const ProjectSettings: NextPageWithLayout = () => {
 
 ProjectSettings.getLayout = (page) => <SettingsLayout title="Database">{page}</SettingsLayout>
 
-export default observer(ProjectSettings)
+export default ProjectSettings

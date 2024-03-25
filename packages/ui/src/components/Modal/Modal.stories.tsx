@@ -4,7 +4,7 @@ import { action } from '@storybook/addon-actions'
 
 import { Modal } from '.'
 import Typography from '../Typography'
-import { Badge } from '../Badge'
+import { Badge } from '../shadcn/ui/Badge'
 import { Form } from '../Form'
 import { Button } from '../Button'
 import { Space } from '../Space'
@@ -531,7 +531,7 @@ customFooter.args = {
   customFooter: [
     <Space>
       <div>
-        <Badge color="red" dot size="small">
+        <Badge variant="destructive" dot size="small">
           Proceed with caution
         </Badge>
       </div>

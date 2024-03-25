@@ -80,6 +80,45 @@ functions:
       }
       ```
       That's it! If you already implemented deeplinks to handle OTPs and OAuth you don't have to change anything!
+    params:
+      - name: supabaseUrl
+        isOptional: false
+        type: String
+        description: The unique Supabase URL which is supplied when you create a new project in your project dashboard.
+      - name: supabaseKey
+        isOptional: false
+        type: String
+        description: The unique Supabase Key which is supplied when you create a new project in your project dashboard.
+      - name: builder
+        isOptional: true
+        type: SupabaseClientBuilder.() -> Unit
+        description: Apply additional configuration and install plugins.
+        subContent:
+          - name: useHTTPS
+            isOptional: true
+            type: Boolean
+            description: Whether to use HTTPS for network requests. Will be set automatically depending on your Supabase url, but can be changed manually.
+          - name: httpEngine
+            isOptional: true
+            type: HttpClientEngine?
+            description: Custom Ktor Client engine. Shouldn't be set manually as Ktor uses an engine from your dependencies, but can be set to a MockEngine for tests.
+          - name: ignoreModulesInUrl
+            isOptional: true
+            type: Boolean
+            description: Whether to ignore if [supabaseUrl] contains modules like 'realtime' or 'auth'. If false, an exception will be thrown. Defaults to false.
+          - name: requestTimeout
+            isOptional: true
+            type: Duration
+            description: Timeout after network requests throw a `HttpRequestTimeoutException`. Defaults to 10 seconds.
+          - name: defaultLogLevel
+            isOptional: true
+            type: LogLevel
+            description: The default log level used for plugins. Can be overridden per plugin. Defaults to `LogLevel.INFO`.
+          - name: defaultSerializer
+            isOptional: true
+            type: SupabaseSerializer
+            description: The default serializer used to serialize and deserialize custom data types. Defaults to `KotlinXSerializer`.
+
     examples:
       - id: initialize-client
         name: Initialize Client
@@ -275,6 +314,19 @@ functions:
       - When calling a `decode` method, you have to provide a [serializable class](/docs/reference/kotlin/installing#serialization) as the type parameter.
       - You can provide a `Columns` object to select specific columns.
       - You can provide a [filter](/docs/reference/kotlin/using-filters) block to filter the results
+    params:
+      - name: columns
+        isOptional: true
+        type: Columns
+        description: The columns to retrieve, defaults to `Columns.ALL`. You can also use `Columns.list`, `Columns.type` or `Columns.raw` to specify the columns.
+      - name: head
+        isOptional: true
+        type: Boolean
+        description: If true, select will delete the selected data.
+      - name: request
+        isOptional: true
+        type: PostgrestRequestBuilder.() -> Unit
+        description: Additional configuration & filtering for the request.
     examples:
       - id: getting-your-data
         name: Getting your data
@@ -340,10 +392,10 @@ functions:
         code: |
           ```kotlin
           val count = supabase.from("countries")
-                      .select(head = true) {
-                          count(Count.EXACT)
-                      }
-                      .count()!!
+              .select {
+                  count(Count.EXACT)
+              }
+              .count()!!
           ```
       - id: querying-json-data
         name: Querying JSON data
@@ -371,6 +423,16 @@ functions:
       - When calling an `insert` method, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization).
       - By default, every time you run `insert()`, the client library will make a `select` to return the full record.
       This is convenient, but it can also cause problems if your policies are not configured to allow the `select` operation.
+    params:
+      - name: value # This function has two signatures: "value: T" and "values: List<T>"
+        isOptional: false
+        type: T or List<T>
+        description: The value(s) you want to insert. `T` can be any serializable type.
+      - name: request
+        isOptional: true
+        type: PostgrestRequestBuilder.() -> Unit
+        description: Additional configuration & filtering for the request.
+
     examples:
       - id: create-a-record
         name: Create a record
@@ -407,6 +469,15 @@ functions:
     notes: |
       - `update()` should always be combined with a [filter](/docs/reference/kotlin/using-filters) block to avoid updating all records.
       - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
+    params:
+      - name: value
+        type: T or PostgrestUpdate.() -> Unit = {}
+        isOptional: false
+        description: The new value, can be either a serializable value or PostgrestUpdate DSL where you can set new values per column.
+      - name: request
+        isOptional: true
+        type: PostgrestRequestBuilder.() -> Unit
+        description: Additional configuration & filtering for the request.
     examples:
       - id: updating-your-data
         name: Updating your data
@@ -500,6 +571,27 @@ functions:
       - Primary keys  must be natural, not surrogate. There are however, [workarounds](https://github.com/PostgREST/postgrest/issues/1118) for surrogate primary keys.
       - If you need to insert new data and update existing data at the same time, use [Postgres triggers](https://github.com/supabase/postgrest-js/issues/173#issuecomment-825124550).
       - When calling `insert` or `update`, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
+    params:
+      - name: value # This function has two signatures: "value: T" and "values: List<T>"
+        isOptional: false
+        type: T or List<T>
+        description: The value(s) you want to insert. `T` can be any serializable type.
+      - name: onConflict
+        isOptional: true
+        type: String?
+        description: Comma-separated UNIQUE column(s) to specify how duplicate rows are determined. Two rows are duplicates if all the `onConflict` columns are equal.
+      - name: defaultToNull
+        isOptional: true
+        type: Boolean
+        description: Make missing fields default to `null`. Otherwise, use the default value for the column. This only applies when inserting new rows, not when merging with existing rows under
+      - name: ignoreDuplicates
+        isOptional: true
+        type: Boolean
+        description: If `true`, duplicate rows are ignored. If `false`, duplicate rows are merged with existing rows.
+      - name: request
+        isOptional: true
+        type: PostgrestRequestBuilder.() -> Unit
+        description: Additional configuration & filtering for the request.
     examples:
       - id: upsert-your-data
         name: Upsert your data
@@ -542,6 +634,11 @@ functions:
         rows visible through `SELECT` policies are deleted. Note that by default
         no rows are visible, so you need at least one `SELECT`/`ALL` policy that
         makes the rows visible.
+    params:
+      - name: request
+        isOptional: true
+        type: PostgrestRequestBuilder.() -> Unit
+        description: Additional configuration & filtering for the request.
     examples:
       - id: delete-records
         name: Delete records
@@ -578,6 +675,23 @@ functions:
       It's especially useful when the logic rarely changes - like password resets and updates.
 
       - When calling `rpc` with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
+    params:
+      - name: function
+        isOptional: false
+        type: String
+        description: The name of the function
+      - name: parameters
+        isOptional: true # Not directly `optional`, as there are two overloads one with and one without `parameters`.
+        type: T
+        description: Parameters to pass to the function. T can be any serializable type.
+      - name: head
+        isOptional: true
+        type: Boolean
+        description: If true, delete will delete the selected data.
+      - name: request
+        isOptional: true
+        type: PostgrestRequestBuilder.() -> Unit
+        description: Additional configuration & filtering for the request.
     examples:
       - id: call-a-stored-procedure
         name: Call a stored procedure
@@ -758,7 +872,15 @@ functions:
     title: or()
     description: |
       Finds all rows satisfying at least one of the filters.
-    notes: |
+    params:
+      - name: negate
+        isOptional: true
+        type: Boolean
+        description: If true, negate the entire block.
+      - name: block
+        isOptional: false
+        type: PostgrestFilterBuilder.() -> Unit
+        description: The block to apply the `or` filter to.
     examples:
       - id: with-select
         name: With `select()`
@@ -800,6 +922,19 @@ functions:
       Finds all rows that don't satisfy the filter.
     notes: |
       - `.filterNot()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: operator
+        isOptional: false
+        type: FilterOperator
+        description: The operator to use for the filter.
+      - name: value
+        isOptional: false
+        type: Any
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -817,6 +952,15 @@ functions:
     title: eq()
     description: |
       Finds all rows whose value on the stated `column` exactly matches the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Any
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -873,6 +1017,15 @@ functions:
     title: neq()
     description: |
       Finds all rows whose value on the stated `column` doesn't match the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Any
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -927,6 +1080,15 @@ functions:
     title: gt()
     description: |
       Finds all rows whose value on the stated `column` is greater than the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Any
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -983,6 +1145,15 @@ functions:
     title: gte()
     description: |
       Finds all rows whose value on the stated `column` is greater than or equal to the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Any
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1039,6 +1210,15 @@ functions:
     title: lt()
     description: |
       Finds all rows whose value on the stated `column` is less than the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Any
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1095,6 +1275,15 @@ functions:
     title: lte()
     description: |
       Finds all rows whose value on the stated `column` is less than or equal to the specified `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Any
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1151,6 +1340,15 @@ functions:
     title: like()
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case sensitive).
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: pattern
+        isOptional: false
+        type: String
+        description: The pattern to match with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1207,6 +1405,15 @@ functions:
     title: ilike()
     description: |
       Finds all rows whose value in the stated `column` matches the supplied `pattern` (case insensitive).
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: pattern
+        isOptional: false
+        type: String
+        description: The pattern to match with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1265,6 +1472,15 @@ functions:
       A check for exact equality (null, true, false), finds all rows whose value on the stated `column` exactly match the specified `value`.
 
       `is_` and `in_` filter methods are suffixed with `_` to avoid collisions with reserved keywords.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: value
+        isOptional: false
+        type: Boolean?
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1321,6 +1537,15 @@ functions:
     title: in_()
     description: |
       Finds all rows whose value on the stated `column` is found on the specified `values`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: values
+        isOptional: false
+        type: List<Any>
+        description: The values to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1375,6 +1600,17 @@ functions:
 
   - id: contains
     title: contains()
+    description: |
+      Only relevant for jsonb, array, and range columns. Match only rows where `column` contains every element appearing in `value`.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The jsonb, array, or range column to filter on
+      - name: value
+        isOptional: false
+        type: List<Any>
+        description: The jsonb, array, or range value to filter with
     examples:
       - id: with-select
         name: With `select()`
@@ -1431,6 +1667,15 @@ functions:
     title: rangeLt()
     description: |
       Only relevant for range columns. Match only rows where every element in column is less than any element in range.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: values
+        isOptional: false
+        type: Pair<Any, Any>
+        description: The values to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1486,7 +1731,15 @@ functions:
     title: rangeGt()
     description: |
       Only relevant for range columns. Match only rows where every element in column is greater than any element in range.
-
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: values
+        isOptional: false
+        type: Pair<Any, Any>
+        description: The values to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1542,6 +1795,15 @@ functions:
     title: rangeGte()
     description: |
       Only relevant for range columns. Match only rows where every element in column is either contained in range or greater than any element in range.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: values
+        isOptional: false
+        type: Pair<Any, Any>
+        description: The values to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1597,7 +1859,15 @@ functions:
     title: rangeLte()
     description: |
       Only relevant for range columns. Match only rows where every element in column is either contained in range or less than any element in range.
-
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: values
+        isOptional: false
+        type: Pair<Any, Any>
+        description: The values to filter with.
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
     examples:
       - id: with-select
@@ -1654,7 +1924,15 @@ functions:
     title: rangeAdjacent()
     description: |
       Only relevant for range columns. Match only rows where column is mutually exclusive to range and there can be no element between the two ranges.
-
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: values
+        isOptional: false
+        type: Pair<Any, Any>
+        description: The values to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1707,7 +1985,15 @@ functions:
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.overlaps'
     description: |
       Only relevant for array and range columns. Match only rows where column and value have an element in common.
-
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: values
+        isOptional: false
+        type: List<Any>
+        description: The values to filter with.
     examples:
       - id: on-array-columns
         name: On array columns
@@ -1806,6 +2092,23 @@ functions:
       Only relevant for text and tsvector columns. Match only rows where `column` matches the query string in `query`.
 
       For more information, see [Postgres full text search](https://supabase.com/docs/guides/database/full-text-search).
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The text or tsvector column to filter on
+      - name: query
+        isOptional: false
+        type: String
+        description: The query text to match with
+      - name: textSearchType
+        isOptional: true
+        type: TextSearchType
+        description: The type of text search to use. Defaults to `TextSearchType.NONE`.
+      - name: config
+        isOptional: true
+        type: String
+        description: The text search configuration to use.
     examples:
       - id: text-search
         name: Text search
@@ -1878,6 +2181,19 @@ functions:
     $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.filter'
     notes: |
       filter() expects you to use the raw PostgREST syntax for the filter values.
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to filter on.
+      - name: operator
+        isOptional: false
+        type: FilterOperator
+        description: The operator to use for the filter.
+      - name: value
+        isOptional: false
+        type: Any
+        description: The value to filter with.
     examples:
       - id: with-select
         name: With `select()`
@@ -1990,6 +2306,11 @@ functions:
   - id: db-modifiers-select
     title: select()
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.select'
+    params:
+      - name: columns
+        isOptional: true
+        type: Columns
+        description: The columns to select.
     examples:
       - id: with-upsert
         name: With `upsert()`
@@ -2031,6 +2352,23 @@ functions:
     description: |
       Order the query result by column.
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.order'
+    params:
+      - name: column
+        isOptional: false
+        type: String
+        description: The column to order by.
+      - name: order
+        isOptional: false
+        type: Order
+        description: The order to use.
+      - name: nullsFirst
+        isOptional: true
+        type: Boolean
+        description: Whether to order nulls first.
+      - name: referencedTable
+        isOptional: true
+        type: String
+        description: The foreign table to order by.
     examples:
       - id: with-select
         name: With `select()`
@@ -2089,7 +2427,7 @@ functions:
           supabase.from("countries").select(
               columns = columns
           ) {
-              order(column = "id", order = Order.ASCENDING, foreignTable = "cities")
+              order(column = "id", order = Order.ASCENDING, referencedTable = "cities")
           }
           ```
         data:
@@ -2149,6 +2487,15 @@ functions:
     description: |
       Limit the query result by count.
     $ref: '@supabase/postgrest-js.PostgrestTransformBuilder.limit'
+    params:
+      - name: count
+        isOptional: false
+        type: Long
+        description: The number of rows to limit the result to.
+      - name: referencedTable
+        isOptional: true
+        type: String
+        description: The foreign table to limit by.
     examples:
       - id: with-select
         name: With `select()`
@@ -2198,7 +2545,7 @@ functions:
           supabase.from("countries").select(
               columns = columns
           ) {
-              limit(count = 1, foreignTable = "cities")
+              limit(count = 1, referencedTable = "cities")
           }
           ```
         data:
@@ -2245,6 +2592,19 @@ functions:
     title: range()
     description: |
       Limit the query result by from and to inclusively.
+    params:
+      - name: from
+        isOptional: false
+        type: Long
+        description: The start of the range.
+      - name: to
+        isOptional: false
+        type: Long
+        description: The end of the range.
+      - name: referencedTable
+        isOptional: true
+        type: String
+        description: The foreign table to limit by.
     examples:
       - id: with-select
         name: With `select()`
@@ -2372,6 +2732,31 @@ functions:
       It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
 
       Follow the [Performance Debugging Guide](/docs/guides/api/rest/debugging-performance) to enable the functionality on your project.
+    params:
+      - name: analyze
+        isOptional: true
+        type: Boolean
+        description: If `true`, the query will be executed and the actual run time will be returned
+      - name: verbose
+        isOptional: true
+        type: Boolean
+        description: If `true`, the query identifier will be returned and `data` will include the output columns of the query
+      - name: settings
+        isOptional: true
+        type: Boolean
+        description: If `true`, include information on configuration parameters that affect query planning
+      - name: buffers
+        isOptional: true
+        type: Boolean
+        description: If `true`, include information on buffer usage
+      - name: wal
+        isOptional: true
+        type: Boolean
+        description: If `true`, include information on WAL record generation
+      - name: format
+        isOptional: true
+        type: String
+        description: The format of the output, can be `"text"` (default) or `"json"`
     examples:
       - id: get-execution-plan
         name: Get the execution plan
@@ -2426,11 +2811,41 @@ functions:
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, the return value is the user and you won't be logged in automatically.
         - If **Confirm email** is disabled, the return value is null and you will be logged in instead.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/guides/auth/concepts/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
       - If signUpWith() is called for an existing confirmed user:
         - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
+    params:
+      - name: provider
+        isOptional: false
+        type: Email or Phone
+        description: The provider to use for the user's authentication. In this case `Email` or `Phone`.
+      - name: redirectUrl
+        isOptional: true
+        type: String?
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: config
+        isOptional: true
+        type: Email.Config.() -> Unit or Phone.Config.() -> Unit
+        description: The configuration for signing in with `Email` or `Phone`.
+        subContent:
+          - name: password
+            isOptional: false
+            type: String
+            description: The user's password
+          - name: email/phone
+            isOptional: false
+            type: String
+            description: The user's email or phone.
+          - name: captchaToken
+            isOptional: true
+            type: String?
+            description: The captcha token when having captcha enabled.
+          - name: data
+            isOptional: true
+            type: JsonObject?
+            description: Extra user data to pass in.
     examples:
       - id: sign-up-email
         name: Sign up with email
@@ -2442,8 +2857,19 @@ functions:
               password = "example-password"
           }
           ```
-      - id: sign-up-phone
-        name: Sign up with a phone number
+      - id: sign-up-phone-whatsapp
+        name: Sign up with a phone number and password (whatsapp)
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val user = supabase.auth.signUpWith(Phone) {
+              phone = "+4912345679"
+              password = "example-password"
+              channel = Phone.Channel.WHATSAPP
+          }
+          ```
+      - id: sign-up-phone-sms
+        name: Sign up with a phone number and password (sms)
         isSpotlight: true
         code: |
           ```kotlin
@@ -2483,6 +2909,32 @@ functions:
     notes: |
       Logs in an existing user.
       - Requires either an email and password or a phone number and password.
+    params:
+      - name: provider
+        isOptional: false
+        type: Email or Phone
+        description: The provider to use for the user's authentication, in this case `Email` or `Phone`.
+      - name: redirectUrl
+        isOptional: true
+        type: String?
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: config
+        isOptional: true
+        type: Email.Config.() -> Unit or Phone.Config.() -> Unit
+        description: The configuration for signing in with `Email` or `Phone`.
+        subContent:
+          - name: password
+            isOptional: false
+            type: String
+            description: The user's password
+          - name: email/phone
+            isOptional: false
+            type: String
+            description: The user's email or phone.
+          - name: captchaToken
+            isOptional: true
+            type: String?
+            description: The captcha token when having captcha enabled.
     examples:
       - id: sign-in-with-email-and-password
         name: Sign in with email and password
@@ -2504,9 +2956,46 @@ functions:
               password = "example-password"
           }
           ```
+  - id: sign-in-with-id-token
+    title: 'signInWithIdToken'
+    params:
+      - name: provider
+        isOptional: false
+        type: IDToken
+        description: The provider to use for the user's authentication. For this method it will be `IDToken`.
+      - name: redirectUrl
+        isOptional: true
+        type: String?
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: config
+        isOptional: true
+        type: IDToken.Config.() -> Unit
+        description: The configuration for signing in with an id token.
+        subContent:
+          - name: idToken
+            isOptional: false
+            type: String
+            description: OIDC ID token issued by the specified provider. The `iss` claim in the ID token must match the supplied provider. Some ID tokens contain an `at_hash` which require that you provide an `access_token` value to be accepted properly. If the token contains a `nonce` claim you must supply the nonce used to obtain the ID token.
+          - name: provider
+            isOptional: false
+            type: IDTokenProvider
+            description: The provider of the id token. Only `Apple`, `Google`, `Facebook` and `Azure` are supported.
+          - name: accessToken
+            isOptional: true
+            type: String?
+            description: If the ID token contains an `at_hash` claim, then the hash of this value is compared to the value in the ID token.
+          - name: nonce
+            isOptional: true
+            type: String?
+            description: If the ID token contains a `nonce` claim, then the hash of this value is compared to the value in the ID token.
+          - name: captchaToken
+            isOptional: true
+            type: String?
+            description: The captcha token when having captcha enabled.
+
+    examples:
       - id: sign-in-with-id-token
-        name: Sign in with id token
-        isSpotlight: false
+        name: 'Sign In using ID Token'
         code: |
           ```kotlin
           supabase.auth.signInWith(IDToken) {
@@ -2519,7 +3008,6 @@ functions:
               }
           }
           ```
-
   - id: sign-in-with-otp
     title: 'signInWith(OTP)'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
@@ -2531,10 +3019,32 @@ functions:
       - The method `signUpWith(OTP)` does the exact same thing as `signInWith(OTP)`, so it doesn't matter which one you use.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
+      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls).
       - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](https://supabase.com/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
+    params:
+      - name: provider
+        isOptional: false
+        type: OTP
+        description: The provider to use for the user's authentication, in this case `OTP`.
+      - name: redirectUrl
+        isOptional: true
+        type: String?
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: config
+        isOptional: true
+        type: OTP.Config.() -> Unit
+        description: The configuration for signing in with `OTP`.
+        subContent:
+          - name: email/phone
+            isOptional: false
+            type: String
+            description: The user's email or phone.
+          - name: captchaToken
+            isOptional: true
+            type: String?
+            description: The captcha token when having captcha enabled.
     examples:
       - id: sign-in-with-email
         name: Sign in with email
@@ -2563,6 +3073,28 @@ functions:
       - This method is used for signing in using a third-party provider.
       - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
+    params:
+      - name: provider
+        isOptional: false
+        type: OAuthProvider
+        description: The OAuth provider to use for the user's authentication, for example `Google` or `Github`.
+      - name: redirectUrl
+        isOptional: true
+        type: String?
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: config
+        isOptional: true
+        type: ExternalAuthConfig.() -> Unit
+        description: The configuration for signing in with an OAuth provider.
+        subContent:
+          - name: scopes
+            isOptional: true
+            type: MutableList<String>
+            description: The scopes to request from the OAuth provider.
+          - name: queryParams
+            isOptional: true
+            type: MutableMap<String, String>
+            description: Additional query parameters to use.
     examples:
       - id: sign-in-using-a-third-party-provider
         name: Sign in using a third-party provider
@@ -2585,7 +3117,7 @@ functions:
         name: Create a custom url
         isSpotlight: false
         description: |
-          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectUrl` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
+          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectUrl` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls). It does not redirect the user immediately after invoking this method.
           - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
           - getOAuthUrl() provides the URL which needs to be opened in a browser.
           - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs.
@@ -2616,7 +3148,28 @@ functions:
           - Mapping specific user email addresses with an identity provider.
           - Using different hints to identity the identity provider to be used by the user, like a company-specific page, IP address or other tracking information.
       - To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
-
+    params:
+      - name: provider
+        isOptional: false
+        type: SSO
+        description: The OAuth provider to use for the user's authentication, in this case `SSO`.
+      - name: redirectUrl
+        isOptional: true
+        type: String?
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: config
+        isOptional: true
+        type: ExternalAuthConfig.() -> Unit
+        description: The configuration for signing in with an OAuth provider.
+        subContent:
+          - name: providerId/domain
+            isOptional: false
+            type: String
+            description: The providerId or domain.
+          - name: captchaToken
+            isOptional: true
+            type: String?
+            description: The captcha token when having captcha enabled.
     examples:
       - id: sign-in-with-domain
         name: Sign in with email domain
@@ -2640,7 +3193,7 @@ functions:
             // Useful when you need to map a user's sign in request according
             // to different rules that can't use email domains.
 
-            supabase.auth.signInWith(SSO){
+            supabase.auth.signInWith(SSO) {
                 providerId = "21648a9d-8d5a-4555-a9d1-d6375dc14e92"
             }
 
@@ -2652,6 +3205,11 @@ functions:
     notes: |
       Logs out the current user.
       - In order to use the `signOut()` method, the user needs to be signed in first.
+    params:
+      - name: scope
+        isOptional: true
+        type: SignOutScope
+        description: The scope of the sign-out.
     examples:
       - id: sign-out
         name: Sign out
@@ -2680,6 +3238,23 @@ functions:
     notes: |
       - Verifying an OTP is done through either `verifyPhoneOtp` or `verifyEmailOtp`.     
       - The verification type used should be determined based on the corresponding auth method called before using `verifyPhoneOtp`/`verifyEmailOtp` to sign up / sign-in a user.
+    params:
+      - name: type
+        isOptional: false
+        type: OtpType.Email or OtpType.Phone
+        description: The OTP type. Depending on the type, an email or phone has to be specified as parameter.
+      - name: email/phone
+        isOptional: false
+        type: String
+        description: The email or phone number, depending on which type you specified.
+      - name: token
+        isOptional: false
+        type: String
+        description: The token to verify.
+      - name: captchaToken
+        isOptional: true
+        type: String?
+        description: The captcha token when having captcha enabled.
     examples:
       - id: verify-email-otp(otp)
         name: Verify an Email OTP
@@ -2730,6 +3305,19 @@ functions:
       - Passwordless sign-ins can be resent by calling the `signInWith(OTP)` method again.
       - Password recovery emails can be resent by calling the `resetPasswordForEmail()` method again.
       - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
+    params:
+      - name: type
+        isOptional: false
+        type: OtpType.Email or OtpType.Phone
+        description: The OTP type. Depending on the type, an email or phone has to be specified as parameter.
+      - name: email/phone
+        isOptional: false
+        type: String
+        description: The email or phone number, depending on which type you specified.
+      - name: captchaToken
+        isOptional: true
+        type: String?
+        description: The captcha token when having captcha enabled.
     examples:
       - id: resend-email-signup-confirmation
         name: Resend an email signup confirmation
@@ -2780,6 +3368,11 @@ functions:
       - This method gets the user object from the current session.
       - Fetches the user object from the database instead of local session.
       - Should be used only when you require the most current user data. For faster results, `getCurrentSessionOrNull()?.user` is recommended.
+    params:
+      - name: jwt
+        isOptional: false
+        type: String
+        description: The JWT token.
     examples:
       - id: get-the-logged-in-user-with-the-current-existing-session
         name: Get the logged in user with the current session
@@ -2805,6 +3398,39 @@ functions:
       - In order to use the `modifyUser()` method, the user needs to be signed in first.
       - By default, email updates sends a confirmation link to both the user's current and new email.
       To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
+    params:
+      - name: updateCurrentUser
+        isOptional: true
+        type: Boolean
+        description: Whether to update the local session with the new user. Defaults to `true`.
+      - name: redirectUrl
+        isOptional: true
+        type: String?
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: config
+        isOptional: false
+        type: UserUpdateBuilder.() -> Unit
+        subContent:
+          - name: email
+            isOptional: true
+            type: String?
+            description: The new email.
+          - name: password
+            isOptional: true
+            type: String?
+            description: The new password.
+          - name: phone
+            isOptional: true
+            type: String?
+            description: The new phone number.
+          - name: nonce
+            isOptional: true
+            type: String?
+            description: The nonce sent for reauthentication if the user's password is to be updated.
+          - name: data
+            isOptional: true
+            type: JsonObject
+            description: The new user data.
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
@@ -2860,6 +3486,28 @@ functions:
       - The user needs to be signed in to call `linkIdentity()`.
       - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
       - This method works similarly to `signInWith()` using an OAuthProvider. To learn how to handle OTP links & OAuth refer to [initializing](/docs/reference/kotlin/initializing)
+    params:
+      - name: provider
+        isOptional: false
+        type: OAuthProvider
+        description: The OAuth provider you want to link the user with.
+      - name: redirectUrl
+        isOptional: true
+        type: String?
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: config
+        isOptional: true
+        type: ExternalAuthConfigDefaults.() -> Unit
+        description: Extra configuration.
+        subContent:
+          - name: scopes
+            isOptional: true
+            type: MutableList<String>
+            description: The scopes to request from the OAuth provider.
+          - name: queryParams
+            isOptional: true
+            type: MutableMap<String, String>
+            description: Additional query parameters to use.
     examples:
       - id: link-identity
         name: Link an identity to a user
@@ -2879,6 +3527,15 @@ functions:
       - The user needs to be signed in to call `unlinkIdentity()`.
       - The user must have at least 2 identities in order to unlink an identity.
       - The identity to be unlinked must belong to the user.
+    params:
+      - name: identityId
+        isOptional: false
+        type: String
+        description: The id of the OAuth identity
+      - name: updateLocalUser
+        isOptional: true
+        type: Boolean
+        description: Whether to delete the identity from the local user or not. Defaults to `true`.
     examples:
       - id: unlink-identity
         name: Unlink an identity
@@ -2902,6 +3559,11 @@ functions:
       - `importSession()` takes in a UserSession.
       - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
       - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+    params:
+      - name: session
+        isOptional: false
+        type: UserSession
+        description: The session to set.
     examples:
       - id: refresh-the-session
         name: Set local session
@@ -2918,6 +3580,11 @@ functions:
       This method will refresh the session whether the current one is expired or not.
 
       - This is done automatically, but can be disabled in the Auth config.
+    params:
+      - name: refreshToken
+        isOptional: false
+        type: String
+        description: The refresh token to use.
     examples:
       - id: refresh-current-session
         name: Refresh current session
@@ -2991,6 +3658,19 @@ functions:
             password = "1234567"
         }
         ```
+    params:
+      - name: email
+        isOptional: false
+        type: String
+        description: The email to send the password reset email to.
+      - name: redirectUrl
+        isOptional: true
+        type: String?
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: captchaToken
+        isOptional: true
+        type: String?
+        description: The captcha token when having captcha enabled.
     examples:
       - id: send-password-reset-email
         name: Send password reset email
@@ -3004,6 +3684,15 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueClient.exchangeCodeForSession'
     notes: |
       - Used when `flowType` is set to `FlowType.PKCE` in the Auth configuration.
+    params:
+      - name: code
+        isOptional: false
+        type: String
+        description: The code to exchange.
+      - name: saveSession
+        isOptional: true
+        type: Boolean
+        description: Whether to save the session. Defaults to true.
     examples:
       - id: exchange-auth-code
         name: Exchange Auth Code
@@ -3029,6 +3718,19 @@ functions:
       - To create a challenge, see [`mfa.createChallenge()`](/docs/reference/kotlin/auth-mfa-challenge).
       - To verify a challenge, see [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify).
       - To create and verify a challenge in a single step, see [`mfa.createChallengeAndVerify()`](/docs/reference/kotlin/auth-mfa-challengeandverify).
+    params:
+      - name: factorType
+        isOptional: false
+        type: FactorType<R>
+        description: The type of MFA factor to enroll. Currently only supports `FactorType.TOTP`.
+      - name: issuer
+        isOptional: true
+        type: String?
+        description: Domain which the user is enrolling with.
+      - name: friendlyName
+        isOptional: true
+        type: String?
+        description: Human readable name assigned to a device.
     examples:
       - id: enroll-totp-factor
         name: Enroll a time-based, one-time password (TOTP) factor
@@ -3064,6 +3766,11 @@ functions:
       Creates a challenge for a factor.
       - An [enrolled factor](/docs/reference/kotlin/auth-mfa-enroll) is required before creating a challenge.
       - To verify a challenge, see [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify).
+    params:
+      - name: factorId
+        isOptional: false
+        type: String
+        description: The id of the MFA factor you want to create a challenge for.
     examples:
       - id: create-mfa-challenge
         name: Create a challenge for a factor
@@ -3078,6 +3785,23 @@ functions:
     notes: |
       Verifies a challenge for a factor.
       - To verify a challenge, please [create a challenge](/docs/reference/kotlin/auth-mfa-challenge) first.
+    params:
+      - name: factorId
+        isOptional: false
+        type: String
+        description: The id of the MFA factor to verify.
+      - name: challengeId
+        isOptional: false
+        type: String
+        description: The id of the challenge to verify.
+      - name: code
+        isOptional: false
+        type: String
+        description: The code used to verify.
+      - name: saveSession
+        isOptional: true
+        type: Boolean
+        description: Whether to save the session. Defaults to true.
     examples:
       - id: verify-challenge
         name: Verify a challenge for a factor
@@ -3098,6 +3822,19 @@ functions:
       Creates and verifies a challenge for a factor.
       - An [enrolled factor](/docs/reference/kotlin/auth-mfa-enroll) is required before invoking `createChallengeAndVerify()`.
       - Executes [`mfa.createChallenge()`](/docs/reference/kotlin/auth-mfa-challenge) and [`mfa.verifyChallenge()`](/docs/reference/kotlin/auth-mfa-verify) in a single step.
+    params:
+      - name: factorId
+        isOptional: false
+        type: String
+        description: The id of the MFA factor to verify.
+      - name: code
+        isOptional: false
+        type: String
+        description: The code used to verify.
+      - name: saveSession
+        isOptional: true
+        type: Boolean
+        description: Whether to save the session. Defaults to true.
     examples:
       - id: challenge-and-verify
         name: Create and verify a challenge for a factor
@@ -3115,6 +3852,11 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueMFAApi.unenroll'
     notes: |
       Unenroll removes a MFA factor. A user has to have an `AAL2` authentication level in order to unenroll a verified factor.
+    params:
+      - name: factorId
+        isOptional: false
+        type: String
+        description: The id of the factor you want to unenroll.
     examples:
       - id: unenroll-a-factor
         name: Unenroll a factor
@@ -3180,7 +3922,7 @@ functions:
           supabase.auth.importAuthToken("service_role")
 
           // Access auth admin api
-          val adminGoTrueClient = supabase.auth.admin
+          val adminAuthClient = supabase.auth.admin
           ```
 
   - id: get-user-by-id
@@ -3189,6 +3931,11 @@ functions:
     notes: |
       Fetches the user object from the database based on the user's id.
       - The `retrieveUserById()` method requires the user's id which maps to the `auth.users.id` column.
+    params:
+      - name: uid
+        isOptional: false
+        type: String
+        description: The id of the user you want to retrieve.
     examples:
       - id: fetch-the-user-object-using-the-access-token-jwt
         name: Fetch the user object using the access_token jwt
@@ -3204,6 +3951,15 @@ functions:
     notes: |
       Retrieves a list of users.
       - Defaults to return 50 users per page.
+    params:
+      - name: page
+        isOptional: true
+        type: Int
+        description: The page number to retrieve.
+      - name: perPage
+        isOptional: true
+        type: Int
+        description: The number of users to retrieve per page.
     examples:
       - id: get-a-full-list-of-users
         name: Get a page of users
@@ -3228,6 +3984,32 @@ functions:
     notes: |
       Creates a new user.
       - To confirm the user's email address or phone number, set `autoConfirm` to true. Both arguments default to false.
+    params:
+      - name: builder
+        isOptional: false
+        type: AdminUserBuilder.Email.() -> Unit or AdminUserBuilder.Phone.() -> Unit
+        description: The builder to create a new user.
+        subContent:
+          - name: email/phone
+            isOptional: true
+            type: String
+            description: The new user's email or phone.
+          - name: password
+            isOptional: false
+            type: String
+            description: The user's password.
+          - name: autoConfirm
+            isOptional: true
+            type: Boolean
+            description: Whether to auto-confirm the user's email or phone number.
+          - name: userMetadata
+            isOptional: true
+            type: JsonObject?
+            description: Custom user metadata.
+          - name: appMetadata
+            isOptional: true
+            type: JsonObject?
+            description: Custom app metadata.
     examples:
       - id: create-a-new-user-with-email-custom-user-metadata
         name: Create user with email
@@ -3281,6 +4063,11 @@ functions:
     notes: |
       Deletes a user from the database.
       - The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
+    params:
+      - name: uid
+        isOptional: false
+        type: String
+        description: The id of the user you want to delete.
     examples:
       - id: removes-a-user
         name: Removes a user
@@ -3295,6 +4082,19 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.inviteUserByEmail'
     notes: |
       Sends an invite link to the user's email address.
+    params:
+      - name: email
+        isOptional: false
+        type: String
+        description: The email to send the invite to.
+      - name: redirectTo
+        isOptional: true
+        type: String
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: data
+        isOptional: true
+        type: JsonObject
+        description: Custom data to create the user with.
     examples:
       - id: invite-a-user
         name: Invite a user
@@ -3316,6 +4116,19 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
     notes: |
       Generates email links and OTPs to be sent via a custom email provider.
+    params:
+      - name: type
+        isOptional: false
+        type: LinkType<C>
+        description: The type of link to generate, e.g. `LinkType.Signup`.
+      - name: redirectTo
+        isOptional: true
+        type: String
+        description: The redirect url to use. If you don't specify this, the platform specific will be used, like deeplinks on android.
+      - name: config
+        isOptional: true
+        type: C.() -> Unit
+        description: The builder to create a new link.
     examples:
       - id: generate-a-signup-link
         name: Generate a signup link
@@ -3377,6 +4190,52 @@ functions:
     $ref: '@supabase/gotrue-js.GoTrueAdminApi.updateUserById'
     notes: |
       Updates the user data.
+    params:
+        - name: uid
+          isOptional: false
+          type: String
+          description: The id of the user you want to update.
+        - name: builder
+          isOptional: false
+          type: AdminUserUpdateBuilder.() -> Unit
+          description: The builder to update the user.
+          subContent:
+            - name: email
+              isOptional: true
+              type: String
+              description: The new email.
+            - name: phone
+              isOptional: true
+              type: String
+              description: The new phone number.
+            - name: password
+              isOptional: true
+              type: String
+              description: The new password.
+            - name: userMetadata
+              isOptional: true
+              type: JsonObject?
+              description: Custom user metadata.
+            - name: appMetadata
+              isOptional: true
+              type: JsonObject?
+              description: Custom app metadata.
+            - name: emailConfirm
+              isOptional: true
+              type: Boolean
+              description: Whether to confirm the user's email.
+            - name: phoneConfirm
+              isOptional: true
+              type: Boolean
+              description: Whether to confirm the user's phone number.
+            - name: banDuration
+              isOptional: true
+              type: String
+              description: The format for the ban duration follows a strict sequence of decimal numbers with a unit suffix. Valid time units are "ns", "us" (or "µs"), "ms", "s", "m", "h".
+            - name: role
+              isOptional: true
+              type: String
+              description: The `role` claim set in the user's access token JWT. When a user signs up, this role is set to `authenticated` by default. You should only modify the `role` if you need to provision several levels of admin access that have different permissions on individual columns in your database.
     examples:
       - id: updates-a-users-email
         name: Updates a user's email
@@ -3440,7 +4299,11 @@ functions:
     title: 'mfa.listFactors()'
     notes: |
       Lists all factors associated to a user.
-    $ref: '@supabase/gotrue-js.GoTrueAdminMFAApi.listFactors'
+    params:
+        - name: uid
+          isOptional: false
+          type: String
+          description: The id of the user you want to list factors for.
     examples:
       - id: list-factors
         name: List all factors for a user
@@ -3451,9 +4314,17 @@ functions:
           ```
   - id: mfa-delete-factor
     title: 'mfa.deleteFactor()'
-    $ref: '@supabase/gotrue-js.GoTrueAdminMFAApi.deleteFactor'
     notes: |
       Deletes a factor on a user. This will log the user out of all active sessions if the deleted factor was verified.
+    params:
+        - name: uid
+          isOptional: false
+          type: String
+          description: The id of the user you want to delete a factor for.
+        - name: factorId
+          isOptional: false
+          type: String
+          description: The id of the factor you want to delete.
     examples:
       - id: delete-factor
         name: Delete a factor for a user
@@ -3469,6 +4340,19 @@ functions:
       - When invoking a function with parameters, you have to provide a [serializable value](/docs/reference/kotlin/installing#serialization) in the function parameter.
     notes: |
       - Requires an Authorization header.
+    params:
+        - name: function
+          isOptional: false
+          type: String
+          description: The name of the function to invoke.
+        - name: body
+          isOptional: true
+          type: T
+          description: The body to send with the request. T can be any serializable type.
+        - name: headers
+          isOptional: true
+          type: Headers
+          description: The headers to send with the request.
     examples:
       - id: basic-invocation
         name: Basic invocation
@@ -3833,13 +4717,31 @@ functions:
         - `buckets` table permissions: `insert`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: String
+        description: The id of the bucket you want to create.
+      - name: builder
+        isOptional: true
+        type: BucketBuilder.() -> Unit
+        description: The builder to create a new bucket.
+        subContent:
+          - name: public
+            isOptional: true
+            type: Boolean
+            description: Whether the bucket is public or not.
+          - name: fileSizeLimit
+            isOptional: true
+            type: FileSizeLimit
+            description: The maximum file size.
     examples:
       - id: create-bucket
         name: Create bucket
         isSpotlight: true
         code: |
           ```kotlin
-          supabase.storage.createBucket(name = "icons", id = "icons") {
+          supabase.storage.createBucket(id = "icons") {
               public = true
               fileSizeLimit = 5.megabytes
           }
@@ -3852,6 +4754,24 @@ functions:
         - `buckets` table permissions: `select` and `update`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: id
+        isOptional: false
+        type: String
+        description: The id of the bucket you want to create.
+      - name: builder
+        isOptional: true
+        type: BucketBuilder.() -> Unit
+        description: The builder to create a new bucket.
+        subContent:
+          - name: public
+            isOptional: true
+            type: Boolean
+            description: Whether the bucket is public or not.
+          - name: fileSizeLimit
+            isOptional: true
+            type: FileSizeLimit
+            description: The maximum file size.
     examples:
       - id: update-bucket
         name: Update bucket
@@ -3873,6 +4793,11 @@ functions:
         - `buckets` table permissions: `select`
         - `objects` table permissions: `select` and `delete`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+        - name: bucketId
+          isOptional: false
+          type: String
+          description: The id of the bucket you want to empty.
     examples:
       - id: empty-bucket
         name: Empty bucket
@@ -3889,6 +4814,11 @@ functions:
         - `buckets` table permissions: `select` and `delete`
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+        - name: bucketId
+          isOptional: false
+          type: String
+          description: The id of the bucket you want to delete.
     examples:
       - id: delete-bucket
         name: Delete bucket
@@ -3907,6 +4837,19 @@ functions:
         - `objects` table permissions: `insert`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
       - Resumable uploads use a `Disk` cache by default to store the upload urls. You can customize that in the Auth config by changing the `resumable.cache` property.
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The path of the file you want to upload.
+      - name: data
+        isOptional: false
+        type: ByteArray
+        description: The data of the file you want to upload.
+      - name: upsert
+        isOptional: true
+        type: Boolean
+        description: Whether to overwrite the file if it already exists.
     examples:
       - id: upload-file
         name: Upload file
@@ -4011,6 +4954,19 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The path of the file you want to upload.
+      - name: data
+        isOptional: false
+        type: ByteArray
+        description: The data of the file you want to upload.
+      - name: upsert
+        isOptional: true
+        type: Boolean
+        description: Whether to overwrite the file if it already exists.
     examples:
       - id: update-file
         name: Update file
@@ -4031,6 +4987,15 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `update` and `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: from
+        isOptional: false
+        type: String
+        description: The path of the file you want to move.
+      - name: to
+        isOptional: false
+        type: String
+        description: The new path of the file.
     examples:
       - id: move-file
         name: Move file
@@ -4048,6 +5013,15 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert` and `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: from
+        isOptional: false
+        type: String
+        description: The path of the file you want to copy.
+      - name: to
+        isOptional: false
+        type: String
+        description: The new path of the file.
     examples:
       - id: copy-file
         name: Copy file
@@ -4064,6 +5038,40 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The path of the file you want to create a signed url for.
+      - name: expiresIn
+        isOptional: false
+        type: Duration
+        description: The duration the signed url should be valid for.
+      - name: builder
+        isOptional: true
+        type: ImageTransformation.() -> Unit
+        description: The transformation to apply to the image.
+        subContent:
+          - name: width
+            isOptional: true
+            type: Int
+            description: The width of the image.
+          - name: height
+            isOptional: true
+            type: Int
+            description: The height of the image.
+          - name: resize
+            isOptional: true
+            type: Resize
+            description: The resize mode of the image.
+          - name: quality
+            isOptional: true
+            type: Int
+            description: The quality of the image. (Percentage 1-100, defaults to 80)
+          - name: format
+            isOptional: true
+            type: String
+            description: Specify in which format you want the image to receive. (Defaults to 'origin', which means the original format)
     examples:
       - id: create-signed-url
         name: Create Signed URL
@@ -4091,6 +5099,15 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: expiresIn
+        isOptional: false
+        type: Duration
+        description: The duration the signed url should be valid for.
+      - name: paths
+        isOptional: false
+        type: vararg String
+        description: The paths of the files you want to create signed urls for.
     examples:
       - id: create-signed-urls
         name: Create Signed URLs
@@ -4107,6 +5124,11 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `insert`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The path of the file you want to upload.
     examples:
       - id: create-signed-upload-url
         name: Create Signed Upload URL
@@ -4123,6 +5145,19 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The path of the file you want to upload.
+      - name: token
+        isOptional: false
+        type: String
+        description: The token you received from `createSignedUploadUrl`.
+      - name: data
+        isOptional: true
+        type: ByteArray
+        description: The data of the file you want to upload.
     examples:
       - id: upload-to-signed-url
         name: Upload to a signed URL
@@ -4142,6 +5177,11 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: none
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The path of the file you want to get the public url for.
     examples:
       - id: returns-the-url-for-an-asset-in-a-public-bucket
         name: Returns the URL for an asset in a public bucket
@@ -4168,6 +5208,11 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: path
+        isOptional: false
+        type: String
+        description: The path of the file you want to download.
     examples:
       - id: download-file-authenticated
         name: Download file from non-public bucket
@@ -4235,6 +5280,11 @@ functions:
         - `buckets` table permissions: none
         - `objects` table permissions: `delete` and `select`
       - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    params:
+      - name: paths
+        isOptional: false
+        type: vararg String
+        description: The paths of the files you want to remove.
     examples:
       - id: delete-file
         name: Delete file

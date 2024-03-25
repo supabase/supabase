@@ -210,6 +210,7 @@ function Listbox({
       <DropdownMenuPrimitive.Root>
         <DropdownMenuPrimitive.Trigger asChild disabled={disabled}>
           <button
+            data-size={size}
             ref={triggerRef}
             className={cn(selectClasses)}
             onBlur={handleBlurEvent}
@@ -218,7 +219,7 @@ function Listbox({
             id={id}
           >
             <span className={cn(addonBeforeClasses)}>
-              {icon && <InputIconContainer icon={icon} />}
+              {icon && <InputIconContainer size={size} icon={icon} />}
               {selectedNode?.addOnBefore && <selectedNode.addOnBefore />}
               <span className={__styles.label}>{selectedNode?.label}</span>
             </span>

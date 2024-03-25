@@ -10,7 +10,6 @@ import {
   HoverCardContent_Shadcn_,
   HoverCardTrigger_Shadcn_,
   HoverCard_Shadcn_,
-  IconAlertCircle,
   IconAlertTriangle,
   IconEye,
   IconUnlock,
@@ -27,6 +26,7 @@ import CopyButton from 'components/ui/CopyButton'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { QueryItemActions } from './QueryItemActions'
 
 export interface QueryItemProps {
@@ -65,7 +65,9 @@ const QueryItem = ({
     isDownloadSnippetModalOpen
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
-    onSuccess: (data) => onDeleteQuery(data),
+    onSuccess: (data) => {
+      onDeleteQuery(data)
+    },
     onError: (error, data) => {
       if (error.message.includes('Contents not found')) {
         onDeleteQuery(data.ids)
@@ -198,7 +200,7 @@ const QueryItem = ({
         <Modal.Content className="my-6 grid gap-1 text-sm text-foreground-light grid gap-4">
           {visibility === 'project' && (
             <Alert_Shadcn_ variant="destructive">
-              <IconAlertCircle strokeWidth={2} />
+              <CriticalIcon />
               <AlertTitle_Shadcn_>This SQL snippet will be lost forever</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
                 Deleting this query will remove it for all members of the project team.
@@ -219,7 +221,7 @@ const QueryItem = ({
       >
         <Modal.Content className="my-6 text-sm text-foreground-light grid gap-4 grid gap-1">
           <Alert_Shadcn_ variant="warning">
-            <IconAlertTriangle strokeWidth={2} />
+            <WarningIcon />
             <AlertTitle_Shadcn_>
               This SQL query will become public to all team members
             </AlertTitle_Shadcn_>
