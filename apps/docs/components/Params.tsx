@@ -21,9 +21,7 @@ const Param = ({ name, isOptional, type, description, children }: IParamProps) =
         <span className="text-foreground-muted text-xs">{type ?? 'no type'}</span>
       </div>
       {description && (
-        <ReactMarkdown className="text-sm text-foreground-lighter m-0">
-          {description}
-        </ReactMarkdown>
+        <ReactMarkdown className="text-sm text-foreground-lighter m-0">{description}</ReactMarkdown>
       )}
       {children}
     </div>
