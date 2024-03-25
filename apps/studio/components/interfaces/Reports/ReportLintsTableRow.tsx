@@ -1,4 +1,4 @@
-import { EyeOff, Maximize2, MoreVertical } from 'lucide-react'
+import { EyeIcon, EyeOff, HelpCircle } from 'lucide-react'
 import { useState } from 'react'
 
 import Table from 'components/to-be-cleaned/Table'
@@ -8,12 +8,10 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import {
   Badge,
   Button,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
   Modal,
-  cn,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 import { getHumanReadableTitle } from './ReportLints.utils'
 
@@ -22,14 +20,13 @@ type ReportLintsTableRowProps = {
 }
 
 const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
-  const [expanded, setExpanded] = useState(false)
   const [seletectdLint, setSelectedLint] = useState<Lint | null>(null)
 
   const [lintIgnoreList, setLintIgnoreList] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.PROJECT_LINT_IGNORE_LIST,
     ''
   )
-  const selectedLintIsIgnored = lintIgnoreList.split(',').includes(lint.cache_key)
+  const isIgnored = lintIgnoreList.split(',').includes(lint.cache_key)
 
   function toggleLintIgnore(lint: Lint) {
     const currentIgnoreList = lintIgnoreList ? lintIgnoreList.split(',') : []
@@ -49,84 +46,67 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
   return (
     <>
       <Table.tr>
-        <Table.td className=" w-20">
+        <Table.td className="w-20 align-top">
           <Badge
             className="!rounded w-16 font-mono text-center justify-center"
-            color={
-              lint.level === 'INFO'
-                ? 'scale'
-                : lint.level === 'WARN'
-                  ? 'amber'
-                  : lint.level === 'ERROR'
-                    ? 'red'
-                    : 'yellow'
+            variant={
+              lint.level === 'ERROR' ? 'destructive' : lint.level === 'WARN' ? 'warning' : 'default'
             }
           >
             {lint.level}
           </Badge>
         </Table.td>
-        <Table.td className="truncate w-48">{getHumanReadableTitle(lint.name)}</Table.td>
-        <Table.td className="">{lint.description}</Table.td>
-        <Table.td className="w-16 text-right">
-          <div className="flex items-center gap-4 text-right ml-auto">
-            {lint.remediation && (
-              <Button type="text" onClick={() => setExpanded(!expanded)}>
-                <Maximize2 size={14} />
-              </Button>
-            )}
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button type="default" className="px-1 ml-auto">
-                  <MoreVertical size={14} />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="bottom" className="w-[150px]">
-                <DropdownMenuItem
-                  className="flex items-center gap-2"
-                  onClick={(event) => {
-                    event.stopPropagation()
-                    setSelectedLint(lint)
-                  }}
-                >
-                  <EyeOff size={16} strokeWidth={1} />
-                  <p>
-                    {lintIgnoreList.split(',').includes(lint.cache_key) ? 'Unignore' : 'Ignore'}{' '}
-                    this lint
-                  </p>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+        <Table.td className="flex flex-col gap-y-1">
+          <div className="flex items-center gap-x-2">
+            <p className="text-foreground">{getHumanReadableTitle(lint.name)}</p>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <HelpCircle size={14} />
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="bottom" className="w-72">
+                {lint.description}
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
           </div>
+          <p>{lint.detail}</p>
+          <p>{lint.remediation}</p>
+        </Table.td>
+        <Table.td className="w-16 text-right">
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_ asChild>
+              <Button
+                type="text"
+                className="px-1 ml-auto"
+                onClick={(event) => {
+                  event.stopPropagation()
+                  setSelectedLint(lint)
+                }}
+              >
+                {isIgnored ? (
+                  <EyeIcon size={16} strokeWidth={1} />
+                ) : (
+                  <EyeOff size={16} strokeWidth={1} />
+                )}
+              </Button>
+            </TooltipTrigger_Shadcn_>
+            <TooltipContent_Shadcn_ side="bottom">
+              {isIgnored ? 'Unignore problem' : 'Ignore problem'}
+            </TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
         </Table.td>
       </Table.tr>
-      {expanded && (
-        <Table.tr
-          className={cn(
-            {
-              'h-0 opacity-0': !expanded,
-              'h-auto opacity-100': expanded,
-            },
-            'transition-all'
-          )}
-        >
-          <Table.td colSpan={4}>
-            <p className="text-foreground">Remediation suggestions</p>
-            <div className="mt-1 text-foreground-lighter text-sm max-w-3xl">{lint.remediation}</div>
-          </Table.td>
-        </Table.tr>
-      )}
       <Modal
         size="small"
         alignFooter="right"
         visible={seletectdLint !== null}
         onCancel={() => setSelectedLint(null)}
         onConfirm={() => toggleLintIgnore(lint)}
-        header={<h3>Confirm to {selectedLintIsIgnored ? 'unignore' : 'ignore'} this lint</h3>}
+        header={<h3>Confirm to {isIgnored ? 'unignore' : 'ignore'} this lint</h3>}
       >
         <div className="py-4">
           <Modal.Content>
             <p className="text-sm">
-              {selectedLintIsIgnored
+              {isIgnored
                 ? 'Unignoring this lint will remove it from the Ignored Issues list. It will move it back to the main list above.'
                 : 'Ignoring this lint will remove it from the main list. It will still be visible in the Ignored Issues list below.'}
             </p>
