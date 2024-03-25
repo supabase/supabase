@@ -6,8 +6,8 @@
 
 name: supabase
 version: "3.8"
-services:
 
+services:
   studio:
     container_name: supabase-studio
     image: supabase/studio:20240301-0942bfe
@@ -380,6 +380,8 @@ services:
       - ./volumes/db/data:/var/lib/postgresql/data:Z
       # Changes required for Analytics support
       - ./volumes/db/logs.sql:/docker-entrypoint-initdb.d/migrations/99-logs.sql:Z
+      # Use named volume to persist pgsodium decryption key between restarts
+      - db-config:/etc/postgresql-custom
 
   vector:
     container_name: supabase-vector
@@ -403,3 +405,6 @@ services:
       - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro
 
     command: [ "--config", "etc/vector/vector.yml" ]
+
+volumes:
+  db-config:

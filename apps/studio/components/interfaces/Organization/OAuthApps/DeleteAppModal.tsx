@@ -1,7 +1,8 @@
+import toast from 'react-hot-toast'
+
 import { useParams } from 'common'
 import { useOAuthAppDeleteMutation } from 'data/oauth/oauth-app-delete-mutation'
 import type { OAuthApp } from 'data/oauth/oauth-apps-query'
-import { useStore } from 'hooks'
 import { Alert, IconLock, Modal } from 'ui'
 
 export interface DeleteAppModalProps {
@@ -10,14 +11,10 @@ export interface DeleteAppModalProps {
 }
 
 const DeleteAppModal = ({ selectedApp, onClose }: DeleteAppModalProps) => {
-  const { ui } = useStore()
   const { slug } = useParams()
   const { mutate: deleteOAuthApp, isLoading: isDeleting } = useOAuthAppDeleteMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully deleted the app "${selectedApp?.name}"`,
-      })
+      toast.success(`Successfully deleted the app "${selectedApp?.name}"`)
       onClose()
     },
   })

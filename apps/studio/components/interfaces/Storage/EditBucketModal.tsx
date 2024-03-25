@@ -1,16 +1,7 @@
-import clsx from 'clsx'
 import { useParams } from 'common'
-import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
-import {
-  convertFromBytes,
-  convertToBytes,
-} from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
-import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
-import { useBucketUpdateMutation } from 'data/storage/bucket-update-mutation'
-import { useStore } from 'hooks'
-import { IS_PLATFORM } from 'lib/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import {
   Alert,
   Button,
@@ -21,7 +12,17 @@ import {
   Listbox,
   Modal,
   Toggle,
+  cn,
 } from 'ui'
+
+import { StorageSizeUnits } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.constants'
+import {
+  convertFromBytes,
+  convertToBytes,
+} from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
+import { useProjectStorageConfigQuery } from 'data/config/project-storage-config-query'
+import { useBucketUpdateMutation } from 'data/storage/bucket-update-mutation'
+import { IS_PLATFORM } from 'lib/constants'
 import type { StorageBucket } from './Storage.types'
 
 export interface EditBucketModalProps {
@@ -31,15 +32,11 @@ export interface EditBucketModalProps {
 }
 
 const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => {
-  const { ui } = useStore()
   const { ref } = useParams()
 
   const { mutate: updateBucket, isLoading: isUpdating } = useBucketUpdateMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated bucket "${bucket?.name}"`,
-      })
+      toast.success(`Successfully updated bucket "${bucket?.name}"`)
       onClose()
     },
   })
@@ -168,7 +165,7 @@ const EditBucketModal = ({ visible, bucket, onClose }: EditBucketModalProps) => 
                     <IconChevronDown
                       size={18}
                       strokeWidth={2}
-                      className={clsx('text-foreground-light', showConfiguration && 'rotate-180')}
+                      className={cn('text-foreground-light', showConfiguration && 'rotate-180')}
                     />
                   </div>
                 </Collapsible.Trigger>

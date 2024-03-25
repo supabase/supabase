@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import { useCallback, useState } from 'react'
 import toast from 'react-hot-toast'
 import { IconHelpCircle } from 'ui'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
@@ -18,7 +19,6 @@ import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database
 import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 interface PoliciesProps {
   tables: PostgresTable[]
@@ -37,7 +37,6 @@ const Policies = ({
   const { ref } = useParams()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
-
   const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
   const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})

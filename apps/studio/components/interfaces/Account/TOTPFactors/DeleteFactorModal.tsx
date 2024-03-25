@@ -1,3 +1,4 @@
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -6,9 +7,8 @@ import {
   Modal,
 } from 'ui'
 
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useMfaUnenrollMutation } from 'data/profile/mfa-unenroll-mutation'
-import { useStore } from 'hooks'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface DeleteFactorModalProps {
   visible: boolean
@@ -23,10 +23,9 @@ const DeleteFactorModal = ({
   lastFactorToBeDeleted,
   onClose,
 }: DeleteFactorModalProps) => {
-  const { ui } = useStore()
   const { mutate: unenroll, isLoading } = useMfaUnenrollMutation({
     onSuccess: () => {
-      ui.setNotification({ category: 'success', message: `Successfully deleted factor` })
+      toast.success(`Successfully deleted factor`)
       onClose()
     },
   })

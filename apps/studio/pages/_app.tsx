@@ -31,8 +31,8 @@ import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
+import { PortalToast, Toaster } from 'ui'
 import { ConsentToast } from 'ui-patterns/ConsentToast'
-import PortalToast from 'ui/src/layout/PortalToast'
 
 import Favicons from 'components/head/Favicons'
 import {
@@ -41,21 +41,17 @@ import {
   RouteValidationWrapper,
 } from 'components/interfaces/App'
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
+import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
-import { StoreProvider } from 'hooks'
 import { AuthProvider } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
-
-import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
 import { ProfileProvider } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
-import { RootStore } from 'stores'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
-import type { AppPropsWithLayout } from 'types'
-import { Toaster } from 'ui'
+import { AppPropsWithLayout } from 'types'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
@@ -83,9 +79,7 @@ loader.config({
 function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const snap = useAppStateSnapshot()
   const queryClient = useRootQueryClient()
-
   const consentToastId = useRef<string>()
-  const [rootStore] = useState(() => new RootStore())
 
   // [Joshen] Some issues with using createBrowserSupabaseClient
   const [supabase] = useState(() =>
@@ -148,43 +142,41 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <QueryClientProvider client={queryClient}>
       <Hydrate state={pageProps.dehydratedState}>
-        <StoreProvider rootStore={rootStore}>
-          <AuthContainer>
-            <ProfileProvider>
-              <FlagProvider>
-                <Head>
-                  <title>Supabase</title>
-                  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-                </Head>
-                <Favicons />
+        <AuthContainer>
+          <ProfileProvider>
+            <FlagProvider>
+              <Head>
+                <title>Supabase</title>
+                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+              </Head>
+              <Favicons />
 
-                <PageTelemetry>
-                  <TooltipProvider>
-                    <RouteValidationWrapper>
-                      <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-                        <AppBannerContextProvider>
-                          <CommandMenuWrapper>
-                            <AppBannerWrapper>
-                              <FeaturePreviewContextProvider>
-                                {getLayout(<Component {...pageProps} />)}
-                                <FeaturePreviewModal />
-                              </FeaturePreviewContextProvider>
-                            </AppBannerWrapper>
-                          </CommandMenuWrapper>
-                        </AppBannerContextProvider>
-                      </ThemeProvider>
-                    </RouteValidationWrapper>
-                  </TooltipProvider>
-                </PageTelemetry>
+              <PageTelemetry>
+                <TooltipProvider>
+                  <RouteValidationWrapper>
+                    <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+                      <AppBannerContextProvider>
+                        <CommandMenuWrapper>
+                          <AppBannerWrapper>
+                            <FeaturePreviewContextProvider>
+                              {getLayout(<Component {...pageProps} />)}
+                              <FeaturePreviewModal />
+                            </FeaturePreviewContextProvider>
+                          </AppBannerWrapper>
+                        </CommandMenuWrapper>
+                      </AppBannerContextProvider>
+                    </ThemeProvider>
+                  </RouteValidationWrapper>
+                </TooltipProvider>
+              </PageTelemetry>
 
-                <HCaptchaLoadedStore />
-                <Toaster />
-                <PortalToast />
-                {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
-              </FlagProvider>
-            </ProfileProvider>
-          </AuthContainer>
-        </StoreProvider>
+              <HCaptchaLoadedStore />
+              <Toaster />
+              <PortalToast />
+              {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
+            </FlagProvider>
+          </ProfileProvider>
+        </AuthContainer>
       </Hydrate>
     </QueryClientProvider>
   )

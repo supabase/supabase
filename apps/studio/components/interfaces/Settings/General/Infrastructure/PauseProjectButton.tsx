@@ -3,21 +3,21 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { Button, IconPause, Modal } from 'ui'
+import toast from 'react-hot-toast'
 
 import {
   useIsProjectActive,
   useProjectContext,
 } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useProjectPauseMutation } from 'data/projects/project-pause-mutation'
 import { setProjectStatus } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
+import { Button, IconPause, Modal } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const PauseProjectButton = () => {
-  const { ui } = useStore()
   const router = useRouter()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
@@ -38,17 +38,14 @@ const PauseProjectButton = () => {
   const { mutate: pauseProject, isLoading: isPausing } = useProjectPauseMutation({
     onSuccess: (res, variables) => {
       setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.PAUSING)
-      ui.setNotification({ category: 'success', message: 'Pausing project...' })
+      toast.success('Pausing project...')
       router.push(`/project/${projectRef}`)
     },
   })
 
   const requestPauseProject = () => {
     if (!canPauseProject) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'You do not have the required permissions to pause this project',
-      })
+      return toast.error('You do not have the required permissions to pause this project')
     }
     pauseProject({ ref: projectRef })
   }

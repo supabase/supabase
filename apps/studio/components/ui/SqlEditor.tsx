@@ -2,7 +2,8 @@ import Editor, { OnChange, useMonaco } from '@monaco-editor/react'
 import { noop } from 'lodash'
 import { useEffect, useRef } from 'react'
 
-import { useStore } from 'hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { formatQuery } from 'data/sql/format-sql-query'
 
 // [Joshen] We should deprecate this and use CodeEditor instead
 
@@ -24,7 +25,7 @@ const SqlEditor = ({
   onInputChange = noop,
 }: SqlEditorProps) => {
   const monaco = useMonaco()
-  const { meta } = useStore()
+  const { project } = useProjectContext()
   const editorRef = useRef<any>()
 
   useEffect(() => {
@@ -64,8 +65,11 @@ const SqlEditor = ({
 
   async function formatPgsql(value: any) {
     try {
-      const formatted = await meta.formatQuery(value)
-      if (formatted.error) throw formatted.error
+      const formatted = await formatQuery({
+        projectRef: project?.ref!,
+        connectionString: project?.connectionString,
+        sql: value,
+      })
       return formatted
     } catch (error) {
       console.error('formatPgsql error:', error)
@@ -91,7 +95,7 @@ const SqlEditor = ({
   return (
     <Editor
       className="monaco-editor"
-      theme="vs-dark"
+      theme="supabase"
       defaultLanguage={language}
       defaultValue={defaultValue}
       path={queryId}

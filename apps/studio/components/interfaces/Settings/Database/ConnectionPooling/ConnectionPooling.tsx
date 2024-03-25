@@ -4,6 +4,7 @@ import { useParams } from 'common'
 import { capitalize } from 'lodash'
 import { Fragment, useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -34,7 +35,7 @@ import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
@@ -62,7 +63,6 @@ const FormSchema = z.object({
 })
 
 export const ConnectionPooling = () => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const snap = useDatabaseSettingsStateSnapshot()
@@ -126,8 +126,7 @@ export const ConnectionPooling = () => {
             max_client_conn: poolingConfiguration?.max_client_conn,
           })
         }
-
-        ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+        toast.success('Successfully saved settings')
       },
     })
 
@@ -273,7 +272,7 @@ export const ConnectionPooling = () => {
                             </AlertTitle_Shadcn_>
                             <AlertDescription_Shadcn_>
                               Session mode can be used concurrently with transaction mode by using
-                              5432 for session and 6543 for session. However, by configuring the
+                              5432 for session and 6543 for transaction. However, by configuring the
                               pooler mode to session here, you will not be able to use transaction
                               mode at the same time.
                             </AlertDescription_Shadcn_>
