@@ -458,7 +458,7 @@ const SelectEnabledMode = observer(({}) => {
         label="Origin"
       >
         Origin
-        <span className="block text-foreground-lighter">This is a default behaviour</span>
+        <span className="block text-foreground-lighter">This is a default behavior</span>
       </Listbox.Option>
       <Listbox.Option
         addOnBefore={({ active, selected }: any) => {

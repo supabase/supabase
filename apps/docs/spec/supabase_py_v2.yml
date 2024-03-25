@@ -68,25 +68,35 @@ functions:
         name: Sign up
         code: |
           ```
-          res = supabase.auth.sign_up({
-            "email": 'example@email.com',
-            "password": 'example-password',
-          })
+          res = supabase.auth.sign_up(
+            email= 'example@email.com',
+            password= 'example-password',
+          )
           ```
       - id: sign-up-with-additional-user-metadata
         name: Sign up with additional user metadata
         code: |
           ```
-          res = supabase.auth.sign_up({
-            "email": 'example@email.com',
-            "password": 'example-password',
-            "options": {
-              "data": {
-                "first_name": 'John',
-                "age": 27,
-              }
+          res = supabase.auth.sign_up(
+            email= 'example@email.com',
+            password= 'example-password',
+            data= {
+              first_name= 'John',
+              age= 27,
             }
-          })
+          )
+          ```
+      - id: sign-up-with-redirect
+        name: Sign up with a redirect URL
+        description: |
+          - See [redirect URLs and wildcards](/docs/guides/auth/concepts/redirect-urls) to add additional redirect URLs to your project.
+        code: |
+          ```
+          res = supabase.auth.sign_up(
+            email= 'example@email.com',
+            password= 'example-password',
+            redirect_to= 'https://example.com/welcome'
+          )
           ```
   - id: sign-in-with-password
     title: 'sign_in_with_password'
