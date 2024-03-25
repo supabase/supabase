@@ -53,7 +53,7 @@ Deno.serve(async (req) => {
   // Validate the token by calling the
   // "/siteverify" API endpoint.
   let formData = new FormData()
-  formData.append('secret', Deno.env.get('CLOUDFLARE_SECRET_KEY') ?? '')
+  formData.append('secret', Deno.env.get('CLOUDFLARE_TURNSTILE_SECRET_KEY') ?? '')
   formData.append('response', token)
   formData.append('remoteip', ip)
 
@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
 
 ```bash
 supabase functions deploy cloudflare-turnstile
-supabase secrets set CLOUDFLARE_SECRET_KEY=your_secret_key
+supabase secrets set CLOUDFLARE_TURNSTILE_SECRET_KEY=your_secret_key
 ```
 
 ## Invoke the function from your site
