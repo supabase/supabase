@@ -128,7 +128,7 @@ const LWXGame = ({ setIsGameMode }: Props) => {
     )
 
   return (
-    <div className="flex flex-col items-center text-center gap-12 md:gap-16">
+    <div className="flex flex-col items-center text-center gap-12 md:gap-16 max-w-6xl">
       <div className="flex flex-col items-center h-10 text-foreground-light">
         <div
           className={cn(
