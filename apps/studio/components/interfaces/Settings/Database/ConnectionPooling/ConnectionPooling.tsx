@@ -18,7 +18,6 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
-  IconAlertTriangle,
   IconExternalLink,
   Input_Shadcn_,
   Listbox,
@@ -234,44 +233,57 @@ export const ConnectionPooling = () => {
                       <FormLabel_Shadcn_ className="flex flex-col space-y-2 col-span-4 text-sm justify-center text-foreground-light">
                         Pool Mode
                       </FormLabel_Shadcn_>
-                      {poolingConfiguration?.pool_mode === 'session' ? (
-                        <FormControl_Shadcn_ className="col-span-8">
-                          <Listbox
-                            value={field.value}
-                            className="w-full"
-                            onChange={(value) => field.onChange(value)}
-                          >
-                            <Listbox.Option
-                              key="transaction"
-                              label="Transaction"
-                              value="transaction"
-                            >
-                              <p>Transaction mode</p>
-                              <p className="text-xs text-foreground-lighter">
-                                {TRANSACTION_MODE_DESCRIPTION}
-                              </p>
-                            </Listbox.Option>
-                            <Listbox.Option key="session" label="Session" value="session">
-                              <p>Session mode</p>
-                              <p className="text-xs text-foreground-lighter">
-                                {SESSION_MODE_DESCRIPTION}
-                              </p>
-                            </Listbox.Option>
-                          </Listbox>
-                        </FormControl_Shadcn_>
-                      ) : (
+                      <FormControl_Shadcn_ className="col-span-8">
+                        <Listbox
+                          disabled={poolingConfiguration?.pool_mode === 'transaction'}
+                          value={field.value}
+                          className="w-full"
+                          onChange={(value) => field.onChange(value)}
+                        >
+                          <Listbox.Option key="transaction" label="Transaction" value="transaction">
+                            <p>Transaction mode</p>
+                            <p className="text-xs text-foreground-lighter">
+                              {TRANSACTION_MODE_DESCRIPTION}
+                            </p>
+                          </Listbox.Option>
+                          <Listbox.Option key="session" label="Session" value="session">
+                            <p>Session mode</p>
+                            <p className="text-xs text-foreground-lighter">
+                              {SESSION_MODE_DESCRIPTION}
+                            </p>
+                          </Listbox.Option>
+                        </Listbox>
+                      </FormControl_Shadcn_>
+
+                      {poolingConfiguration?.pool_mode === 'transaction' && (
                         <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
                           <Alert_Shadcn_>
                             <AlertTitle_Shadcn_ className="text-foreground">
-                              Pool mode is set to transaction permanently on port 6543
+                              Pool mode is permanently set to Transaction on port 6543
                             </AlertTitle_Shadcn_>
                             <AlertDescription_Shadcn_>
-                              You can use session mode by pointing the pooler connection to use port
-                              5432.
+                              You can use Session mode by connecting to the pooler on port 5432
+                              instead
                             </AlertDescription_Shadcn_>
                           </Alert_Shadcn_>
                         </FormDescription_Shadcn_>
                       )}
+
+                      {field.value === 'transaction' &&
+                        poolingConfiguration?.pool_mode === 'session' && (
+                          <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
+                            <Alert_Shadcn_>
+                              <AlertTitle_Shadcn_ className="text-foreground">
+                                Pool mode will be set to transaction permanently on port 6543
+                              </AlertTitle_Shadcn_>
+                              <AlertDescription_Shadcn_>
+                                This will take into effect once saved. You can use session mode by
+                                pointing the pooler connection to use port 5432.
+                              </AlertDescription_Shadcn_>
+                            </Alert_Shadcn_>
+                          </FormDescription_Shadcn_>
+                        )}
+
                       <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
                         <p>
                           Specify when a connection can be returned to the pool.{' '}
@@ -285,20 +297,7 @@ export const ConnectionPooling = () => {
                           .
                         </p>
                       </FormDescription_Shadcn_>
-                      {field.value === 'transaction' &&
-                      poolingConfiguration?.pool_mode === 'session' ? (
-                        <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
-                          <Alert_Shadcn_>
-                            <AlertTitle_Shadcn_ className="text-foreground">
-                              Pool mode will be set to transaction permanently on port 6543
-                            </AlertTitle_Shadcn_>
-                            <AlertDescription_Shadcn_>
-                              This will take into effect once saved. You can use session mode by
-                              pointing the pooler connection to use port 5432.
-                            </AlertDescription_Shadcn_>
-                          </Alert_Shadcn_>
-                        </FormDescription_Shadcn_>
-                      ) : null}
+
                       <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
                     </FormItem_Shadcn_>
                   )}
