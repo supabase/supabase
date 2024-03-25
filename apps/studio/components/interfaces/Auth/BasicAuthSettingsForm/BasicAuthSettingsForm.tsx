@@ -32,6 +32,7 @@ import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-que
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import FormField from '../AuthProvidersForm/FormField'
+import Link from 'next/link'
 
 // Use a const string to represent no chars option. Represented as empty string on the backend side.
 const NO_REQUIRED_CHARACTERS = 'NO_REQUIRED_CHARS'
@@ -191,20 +192,6 @@ const BasicAuthSettingsForm = () => {
                     disabled={!canUpdateConfig}
                   />
                   <Toggle
-                    id="EXTERNAL_ANONYMOUS_USERS_ENABLED"
-                    size="small"
-                    label="Allow anonymous sign-ins"
-                    layout="flex"
-                    descriptionText={
-                      <Markdown
-                        extLinks
-                        className="[&>p>a]:text-foreground-light [&>p>a]:transition-all [&>p>a]:hover:text-foreground [&>p>a]:hover:decoration-brand"
-                        content="Enable [anonymous sign-ins](https://supabase.com/docs/guides/auth/auth-anonymous) for your project."
-                      />
-                    }
-                    disabled={!canUpdateConfig}
-                  />
-                  <Toggle
                     id="SECURITY_MANUAL_LINKING_ENABLED"
                     size="small"
                     label="Allow manual linking"
@@ -214,6 +201,56 @@ const BasicAuthSettingsForm = () => {
                         extLinks
                         className="[&>p>a]:text-foreground-light [&>p>a]:transition-all [&>p>a]:hover:text-foreground [&>p>a]:hover:decoration-brand"
                         content="Enable [manual linking APIs](https://supabase.com/docs/guides/auth/auth-identity-linking#manual-linking-beta) for your project."
+                      />
+                    }
+                    disabled={!canUpdateConfig}
+                  />
+                  {values.EXTERNAL_ANONYMOUS_USERS_ENABLED ? (
+                    <>
+                      {!values.SECURITY_CAPTCHA_ENABLED}
+                      <Alert_Shadcn_ className="flex w-full items-center justify-between">
+                        <IconAlertCircle strokeWidth={1.5} />
+                        <AlertTitle_Shadcn_>
+                          <p className="!leading-tight">
+                            Enable captcha to prevent abuse for anonymous sign-ins
+                          </p>
+                        </AlertTitle_Shadcn_>
+                      </Alert_Shadcn_>
+                      <Alert_Shadcn_
+                        className="flex w-full items-center justify-between"
+                        variant="warning"
+                      >
+                        <IconAlertCircle strokeWidth={1.5} />
+                        <div>
+                          <AlertTitle_Shadcn_>
+                            <p className="!leading-tight">
+                              Enabling anonymous sign-ins may compromise your existing Row Level
+                              Security policies
+                            </p>
+                          </AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_>
+                            Review your{' '}
+                            <Link
+                              href={`/project/${projectRef}/auth/policies`}
+                              className="underline"
+                            >
+                              Row Level Security policies
+                            </Link>
+                          </AlertDescription_Shadcn_>
+                        </div>
+                      </Alert_Shadcn_>
+                    </>
+                  ) : null}
+                  <Toggle
+                    id="EXTERNAL_ANONYMOUS_USERS_ENABLED"
+                    size="small"
+                    label="Allow anonymous sign-ins"
+                    layout="flex"
+                    descriptionText={
+                      <Markdown
+                        extLinks
+                        className="[&>p>a]:text-foreground-light [&>p>a]:transition-all [&>p>a]:hover:text-foreground [&>p>a]:hover:decoration-brand"
+                        content="Enable [anonymous sign-ins](https://supabase.com/docs/guides/auth/auth-anonymous) for your project."
                       />
                     }
                     disabled={!canUpdateConfig}

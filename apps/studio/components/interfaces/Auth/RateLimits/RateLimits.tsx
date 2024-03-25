@@ -184,9 +184,9 @@ const RateLimits = () => {
                             <IconAlertCircle strokeWidth={1.5} />
                             <AlertTitle_Shadcn_>
                               {!authConfig.EXTERNAL_EMAIL_ENABLED &&
-                                'Enable email-based logins to update this configuration'}
+                                'Enable email-based logins to update this configuration. '}
                               {!isSmtpEnabled(authConfig) &&
-                                'Custom SMTP provider is required to update this configuration'}
+                                'Custom SMTP provider is required to update this configuration.'}
                             </AlertTitle_Shadcn_>
                             <AlertDescription_Shadcn_>
                               <p className="!leading-tight">
@@ -248,7 +248,7 @@ const RateLimits = () => {
                           <Alert_Shadcn_>
                             <IconAlertCircle strokeWidth={1.5} />
                             <AlertTitle_Shadcn_>
-                              Enable phone-based logins to update this configuration
+                              Enable phone-based logins to update this configuration.
                             </AlertTitle_Shadcn_>
                             <AlertDescription_Shadcn_>
                               <p className="!leading-tight">
@@ -375,11 +375,11 @@ const RateLimits = () => {
                             </AlertTitle_Shadcn_>
                             <AlertDescription_Shadcn_>
                               <p className="!leading-tight">
-                                Head over to the providers page to enable anonymous logins before
+                                Head over to the providers page to enable anonymous sign-ins before
                                 updating your rate limit
                               </p>
                               <Button asChild type="default" className="mt-2">
-                                <Link href={`/project/${projectRef}/auth/providers`}>
+                                <Link href={`/project/${projectRef}/settings/auth`}>
                                   View providers configuration
                                 </Link>
                               </Button>
