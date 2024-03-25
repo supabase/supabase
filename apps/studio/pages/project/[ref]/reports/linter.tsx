@@ -132,7 +132,7 @@ const ProjectLints: NextPageWithLayout = () => {
                   <Accordion.Item
                     header={
                       <div className=" text-sm text-foreground-light flex flex-row gap-2 items-center p-2">
-                        Ignored issues ({ignoredLints.length})
+                        Ignored problems ({ignoredLints.length})
                       </div>
                     }
                     id="1"

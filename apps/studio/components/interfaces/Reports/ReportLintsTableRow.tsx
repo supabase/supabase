@@ -74,7 +74,9 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
             {lint.detail && (
               <Markdown className="text-foreground-light max-w-full" content={lint.detail} />
             )}
-            {lint.remediation && <p>{lint.remediation}</p>}
+            {lint.remediation && (
+              <Markdown className="text-foreground-light max-w-full" content={lint.remediation} />
+            )}
 
             <div>
               {(lint.metadata?.table || lint.metadata?.view_name) && (
