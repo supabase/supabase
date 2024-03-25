@@ -182,7 +182,7 @@ const REAUTHENTICATION: FormSchema = {
   $schema: JSON_SCHEMA_VERSION,
   id: 'REAUTHENTICATION',
   type: 'object',
-  title: 'REAUTHENTICATION',
+  title: 'Reauthentication',
   properties: {
     MAILER_SUBJECTS_REAUTHENTICATION: {
       title: 'Subject heading',
