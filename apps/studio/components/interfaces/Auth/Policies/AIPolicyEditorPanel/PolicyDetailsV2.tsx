@@ -185,6 +185,7 @@ export const PolicyDetailsV2 = ({ isEditing, form, onUpdateCommand }: PolicyDeta
                       <RadioGroupLargeItem_Shadcn_
                         key={x}
                         value={x}
+                        disabled={isEditing}
                         label={x.toLocaleUpperCase()}
                         className={`col-span-2 w-auto ${isEditing ? 'cursor-not-allowed' : ''}`}
                       />
