@@ -193,9 +193,7 @@ const REAUTHENTICATION: FormSchema = {
       descriptionOptional: 'HTML body of your email',
       type: 'code',
       description: `
-- \`{{ .ConfirmationURL }}\` : URL to confirm the password reset
 - \`{{ .Token }}\` : The 6-digit numeric email OTP
-- \`{{ .TokenHash }}\` : The hashed token used in the URL
 - \`{{ .SiteURL }}\` : The URL of the site
 - \`{{ .Email }}\` : The user's email address
 - \`{{ .Data }}\` : The user's \`user_metadata\`
