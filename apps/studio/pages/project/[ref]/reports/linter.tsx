@@ -26,6 +26,8 @@ const ProjectLints: NextPageWithLayout = () => {
     connectionString: project?.connectionString,
   })
 
+  console.log({ lints })
+
   const [ignoredLints, activeLints] = partition(lints ?? [], (lint) =>
     lintIgnoreList.split(',').includes(lint.cache_key)
   )
@@ -37,7 +39,7 @@ const ProjectLints: NextPageWithLayout = () => {
       <ScaffoldSection>
         <div className="col-span-12 flex items-center justify-between">
           <div className="flec flex-col gap-y-1">
-            <h3 className="text-xl text-foreground">Project Lints</h3>
+            <h3 className="text-xl text-foreground">Project Linter</h3>
             <div className="text-sm text-foreground-lighter">
               Identify common database schema issues
             </div>
@@ -174,6 +176,6 @@ const ProjectLints: NextPageWithLayout = () => {
   )
 }
 
-ProjectLints.getLayout = (page) => <ReportsLayout title="Lints (rename)">{page}</ReportsLayout>
+ProjectLints.getLayout = (page) => <ReportsLayout title="Linter">{page}</ReportsLayout>
 
 export default ProjectLints

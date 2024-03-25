@@ -14,6 +14,7 @@ import {
   Tooltip_Shadcn_,
 } from 'ui'
 import { getHumanReadableTitle } from './ReportLints.utils'
+import { Markdown } from '../Markdown'
 
 type ReportLintsTableRowProps = {
   lint: Lint
@@ -70,7 +71,9 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
             </Tooltip_Shadcn_>
           </div>
           <div className="grid gap-3">
-            {lint.detail && <p>{lint.detail}</p>}
+            {lint.detail && (
+              <Markdown className="text-foreground-light max-w-full" content={lint.detail} />
+            )}
             {lint.remediation && <p>{lint.remediation}</p>}
 
             <div>

@@ -198,12 +198,15 @@ select
     'EXTERNAL' as facing,
     'Detects if a table does not have a primary key. Tables without a primary key can be inefficient to interact with at scale.' as description,
     format(
-        'Table "%s.%s" does not have a primary key',
+        'Table \`%s.%s\` does not have a primary key',
         pgns.nspname,
         pgc.relname
     ) as detail,
     null as remediation,
-    null as metadata,
+     jsonb_build_object(
+        'schema', pgns.nspname,
+        'table', pgc.relname
+    ) as metadata,
     format(
         'no_primary_key_%s_%s',
         pgns.nspname,
@@ -234,13 +237,16 @@ select
     'EXTERNAL' as facing,
     'Detects if an index has never been used and may be a candidate for removal.' as description,
     format(
-        'Index "%s" on table "%s"."%s" has not been used',
+        'Index \`%s\` on table \`%s.%s\` has not been used',
         psui.indexrelname,
         psui.schemaname,
         psui.relname
     ) as detail,
     null as remediation,
-    null as metadata,
+    jsonb_build_object(
+        'schema', psui.schemaname,
+        'table', psui.relname
+    ) as metadata,
     format(
         'unused_index_%s_%s_%s',
         psui.schemaname,
@@ -275,7 +281,10 @@ select
         array_agg(p.polname order by p.polname)
     ) as detail,
     null as remediation,
-    null as metadata,
+    jsonb_build_object(
+        'schema', n.nspname,
+        'table', c.relname
+    ) as metadata,
     format(
         'multiple_permissive_policies_%s_%s_%s_%s',
         n.nspname,
