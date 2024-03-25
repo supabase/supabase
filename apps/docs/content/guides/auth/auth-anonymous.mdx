@@ -109,6 +109,14 @@ Depending on your application requirements, data conflicts can arise when an ano
 2. Overwrite the items in the cart with those from the anonymous user
 3. Merge the items in the cart together
 
+## Abuse prevention and rate limits
+
+It is strongly recommended to enable captcha or turnstile to prevent abuse for anonymous sign-ins. There is also an IP-based rate limit for anonymous sign-ins at 30 requests per hour which can be configured in your [dashboard](/dashboard/project/_/auth/rate-limits).
+
+## Automatic cleanup
+
+To clean up orphaned anonymous users, you can enable automatic cleanup which will delete anonymous users that are older than 30 days.
+
 ## Resources
 
 - [Supabase Account - Free Plan OK](https://supabase.com)
