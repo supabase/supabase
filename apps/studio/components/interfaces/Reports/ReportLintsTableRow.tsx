@@ -1,9 +1,10 @@
+import { EyeOff, Maximize2, MoreVertical } from 'lucide-react'
+import { useState } from 'react'
+
 import Table from 'components/to-be-cleaned/Table'
+import { Lint } from 'data/lint/lint-query'
 import { useLocalStorageQuery } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import { EyeOff, Maximize2, MoreVertical } from 'lucide-react'
-import { Lint } from 'pages/project/[ref]/reports/lints'
-import { useState } from 'react'
 import {
   Badge,
   Button,
