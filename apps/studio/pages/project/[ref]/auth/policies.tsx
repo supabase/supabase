@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition } from 'lodash'
@@ -21,7 +20,15 @@ import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { NextPageWithLayout } from 'types'
-import { Button, IconExternalLink, IconSearch, Input } from 'ui'
+import {
+  Button,
+  IconExternalLink,
+  IconSearch,
+  Input,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
 
 /**
  * Filter tables by table name and policy name
@@ -107,6 +114,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const canReadPolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
   const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
   const isPermissionsLoaded = usePermissionsLoaded()
+  const schemaHasNoTables = (tables ?? []).length === 0
 
   if (isPermissionsLoaded && !canReadPolicies) {
     return <NoPermission isFullPage resourceText="view this project's RLS policies" />
@@ -146,36 +154,27 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                 Documentation
               </a>
             </Button>
-            {isAiAssistantEnabled && (
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger asChild>
-                  <Button
-                    type="primary"
-                    disabled={!canCreatePolicies}
-                    onClick={() => setShowPolicyAiEditor(true)}
-                  >
-                    Create a new policy
-                  </Button>
-                </Tooltip.Trigger>
-                {isPermissionsLoaded && !canCreatePolicies && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground">
-                          You need additional permissions to create RLS policies
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
-            )}
+
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <Button
+                  type="primary"
+                  disabled={!canCreatePolicies || schemaHasNoTables}
+                  onClick={() => setShowPolicyAiEditor(true)}
+                >
+                  Create a new policy
+                </Button>
+              </TooltipTrigger_Shadcn_>
+              {(!canCreatePolicies || schemaHasNoTables) && (
+                <TooltipContent_Shadcn_ side="bottom">
+                  {!canCreatePolicies
+                    ? 'You need additional permissions to create RLS policies'
+                    : schemaHasNoTables
+                      ? `No table in schema ${snap.selectedSchemaName} to create policies on`
+                      : null}
+                </TooltipContent_Shadcn_>
+              )}
+            </Tooltip_Shadcn_>
           </div>
         </div>
       </div>
