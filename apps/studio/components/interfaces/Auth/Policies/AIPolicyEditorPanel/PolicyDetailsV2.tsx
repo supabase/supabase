@@ -19,7 +19,7 @@ import {
   SelectTrigger_Shadcn_,
   Select_Shadcn_,
 } from 'ui'
-import MultiSelect from 'ui-patterns/MultiSelect'
+import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
 
 interface PolicyDetailsV2Props {
   isEditing: boolean
@@ -208,7 +208,7 @@ export const PolicyDetailsV2 = ({ isEditing, form, onUpdateCommand }: PolicyDeta
                   </p>
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
-                  <MultiSelect
+                  <MultiSelectV2
                     options={formattedRoles}
                     value={field.value.length === 0 ? [] : field.value?.split(', ')}
                     placeholder="Defaults to all (public) roles if none selected"

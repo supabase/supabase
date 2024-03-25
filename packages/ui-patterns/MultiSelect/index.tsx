@@ -43,6 +43,9 @@ interface Props {
  * input base + standard
  */
 
+/**
+ * @deprecated To be replaced with MultiSelectV2
+ */
 export default function MultiSelect({
   options,
   value,
