@@ -119,7 +119,7 @@ def search(args=sys.argv):
 
     # query the collection filtering metadata for "type" = "jpg"
     results = images.query(
-        data=text_emb,              # required
+        data=text_emb,                      # required
         limit=1,                            # number of records to return
         filters={"type": {"$eq": "jpg"}},   # metadata filters
     )
