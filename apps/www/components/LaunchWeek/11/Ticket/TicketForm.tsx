@@ -24,7 +24,7 @@ export default function TicketForm() {
       const username = session.user.user_metadata.user_name
       const name = session.user.user_metadata.full_name
       const email = session.user.email
-      const hasSecretTicket = localStorage.getItem('lw11_secret') === 'true'
+      // const hasSecretTicket = localStorage.getItem('lw11_secret') === 'true'
 
       await supabase
         .from('lw11_ga_tickets')
@@ -33,7 +33,7 @@ export default function TicketForm() {
           name,
           username,
           referred_by: router.query?.referral ?? null,
-          ...(hasSecretTicket && { secret: true }),
+          // ...(hasSecretTicket && { gameWonAt: new Date() }),
         })
         .eq('email', email)
         .select()
@@ -74,9 +74,11 @@ export default function TicketForm() {
                 },
                 (payload: any) => {
                   const golden = !!payload.new.sharedOnTwitter && !!payload.new.sharedOnLinkedIn
+                  const secret = !!payload.new.gameWonAt
                   setUserData({
                     ...payload.new,
                     golden,
+                    secret,
                   })
                 }
               )

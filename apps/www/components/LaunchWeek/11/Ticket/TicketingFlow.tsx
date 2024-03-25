@@ -29,7 +29,7 @@ const TicketingFlow = () => {
   const isRegistering = !isGameMode && ticketState === 'registration'
   const hasTicket = !isGameMode && ticketState === 'ticket'
   const hasPlatinumTicket = userData.golden
-  const hasSecretTicket = userData.metadata?.hasSecretTicket
+  const hasSecretTicket = userData.secret
 
   const transition = DEFAULT_TRANSITION
   const initial = INITIAL_BOTTOM
@@ -40,7 +40,7 @@ const TicketingFlow = () => {
 
   return (
     <>
-      <SectionContainer className="relative !pt-8 lg:!pt-20 gap-5 h-full lg:min-h-[886px]">
+      <SectionContainer className="relative !pt-8 lg:!pt-20 gap-5 h-full flex-1">
         <div className="relative z-10 flex flex-col h-full">
           <h1 className="sr-only">Supabase General Availability Week | {LW11_DATE}</h1>
           <div className="relative z-10 w-full h-full flex flex-col justify-center gap-5 md:gap-10">
@@ -52,7 +52,7 @@ const TicketingFlow = () => {
                     initial={exit}
                     animate={animate}
                     exit={exit}
-                    className="relative w-full -mt-5 md:mt-3 lg:mt-10 xl:mt-8 2xl:mt-6 pb-64 flex flex-col items-center gap-6 text-foreground"
+                    className="relative w-full min-h-[400px] mx-auto py-16 md:py-24 flex flex-col items-center gap-6 text-foreground"
                   >
                     <div className="hidden">
                       <TicketForm />
@@ -80,7 +80,7 @@ const TicketingFlow = () => {
                     animate={animate}
                     exit={exit}
                     className={cn(
-                      'w-full min-h-[400px] h-[80vh] max-w-2xl mx-auto py-16 md:py-24 flex flex-col justify-center gap-4 md:gap-8 transition-all opacity-0 invisible',
+                      'w-full min-h-[400px] max-w-2xl mx-auto flex flex-col justify-center gap-4 md:gap-8 transition-all opacity-0 invisible',
                       !isGameMode && !hasTicket && 'opacity-100 visible'
                     )}
                   >
@@ -108,27 +108,29 @@ const TicketingFlow = () => {
                     initial={initial}
                     animate={animate}
                     exit={exit}
-                    className="w-full flex-1 min-h-[400px] !h-[80vh] md:py-24 flex flex-col xl:flex-row items-center xl:justify-center xl:items-center gap-8 md:gap-10 xl:gap-20 text-foreground"
+                    className="w-full flex-1 min-h-[400px] flex flex-col xl:flex-row items-center xl:justify-center xl:items-center gap-8 md:gap-10 xl:gap-20 text-foreground"
                   >
-                    <div className="w-full ld:w-auto h-full mt-3 md:mt-12 xl:mt-0 max-w-2xl flex flex-col items-center">
+                    <div className="w-full lg:w-auto h-full mt-3 md:mt-12 xl:mt-0 max-w-2xl flex flex-col items-center">
                       <TicketContainer />
                     </div>
-                    <div className="order-first xl:h-full max-w-md gap-3 flex flex-col items-center justify-center xl:items-start xl:justify-start xl:text-left">
+                    <div className="order-first xl:h-full w-full max-w-lg gap-3 flex flex-col items-center justify-center xl:items-start xl:justify-start xl:text-left">
                       {hasSecretTicket ? (
-                        <p className="text-2xl lg:text-3xl">
-                          <span className="text-[#8B9092]">You got the secret ticket.</span> Share
-                          it to increase your chances of winning even more.
+                        <p className="text-2xl lg:text-3xl flex flex-col">
+                          <span className="text-[#8B9092]">You found the secret ticket.</span>
+                          <span>Share it with the community.</span>
                         </p>
                       ) : hasPlatinumTicket ? (
                         <p className="text-2xl lg:text-3xl">
                           <span className="text-[#8B9092]">Congrats!</span> You maximized your
-                          chances and have a platinum ticket now.
+                          chances and have a platinum ticket.
                         </p>
                       ) : winningChances !== 2 ? (
-                        <p className="text-2xl lg:text-3xl">
-                          <span className="text-[#8B9092]">You're in!</span>{' '}
-                          <span>Now share your ticket to win limited swag.</span>
-                        </p>
+                        <>
+                          <p className="text-2xl lg:text-3xl">You're in!</p>
+                          <p className="text-xl text-[#8B9092]">
+                            Now share your ticket to maximize your chances of winning limited swag.
+                          </p>
+                        </>
                       ) : (
                         <p className="text-2xl lg:text-3xl">
                           <span className="text-[#8B9092]">Just one more.</span>{' '}
@@ -137,33 +139,32 @@ const TicketingFlow = () => {
                       )}
                       <CountdownComponent date={LW11_LAUNCH_DATE} showCard={false} />
                       {!hasPlatinumTicket && <TicketPresence />}
-                      <div className="w-full h-auto text-center md:text-left border border-muted flex flex-col md:flex-row items-stretch rounded-lg bg-[#060809] mt-2 md:mt-8 overflow-hidden">
-                        <div className="flex flex-col md:w-2/3 gap-1 pb-6">
-                          {hasPlatinumTicket ? (
-                            <p className="p-6 pb-3">
-                              Stay tuned after General Availability Launch Week to know if you won.
-                            </p>
-                          ) : (
-                            <p className="p-6 pb-3">
-                              Win a keyboard and other{' '}
-                              <Link href="#prizes" className="underline">
-                                awards
-                              </Link>
-                              .
-                            </p>
-                          )}
-                          <div className="w-full px-6">
-                            <TicketActions />
-                          </div>
-                        </div>
-                        <div className="hidden md:block relative h-auto w-full pl-6 pt-6">
+                      <div className="w-full h-auto text-center md:text-left border border-muted flex flex-col md:flex-row items-stretch rounded-lg bg-surface-100 mt-2 md:mt-8 overflow-hidden">
+                        <div className="hidden md:block relative h-full w-full md:w-1/3 top-0 -bottom-8 overflow-visible">
                           <Image
-                            src="/images/launchweek/lwx/swag/lwx_keyboard_preview.png"
-                            alt="Supabase Launch Week X keyboard prize"
+                            src="/images/launchweek/11_ga/airpods-max-alpha.png"
+                            alt="Supabase GA Week AirPod Max prize"
                             width={300}
                             height={300}
-                            className="object-cover object-left-top w-full h-full"
+                            className="absolute p-2 object-cover object-left-top w-full h-[200px] overflow-visible opacity-50"
                           />
+                        </div>
+                        <div className="flex flex-col md:w-2/3 gap-1 p-3">
+                          <p className="text-sm text-foreground-lighter">5 sets</p>
+                          <p className="">Win AirPods Max</p>
+                          {hasPlatinumTicket ? (
+                            <p className="text-foreground-light text-sm">
+                              Stay tuned until the end of GA week to find out the lucky winners.
+                            </p>
+                          ) : (
+                            <p className="text-foreground-light text-sm">
+                              Grow your chances of winning limited edition swag by sharing on all
+                              channels.
+                            </p>
+                          )}
+                          <div className="w-full mt-3 md:mt-6">
+                            <TicketActions />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -191,12 +192,6 @@ const TicketingFlow = () => {
           hasTicket && 'opacity-20'
         )}
       />
-      {/* <div
-        className="absolute z-0 inset-0 w-full h-full"
-        style={{
-          background: 'radial-gradient(80% 60% at 50% 40%,transparent 0%, #060809 100%)',
-        }}
-      /> */}
     </>
   )
 }

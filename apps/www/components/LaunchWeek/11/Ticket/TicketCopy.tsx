@@ -10,7 +10,7 @@ export default function TicketCopy({ sharePage }: { sharePage: boolean }) {
   const [copied, setCopied] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const hasSecretTicket = metadata?.hasSecretTicket
-  const url = `${SITE_URL}/tickets/${username}?lw=x${
+  const url = `${SITE_URL}/tickets/${username}?lw=ga${
     hasSecretTicket ? '&secret=true' : golden ? `&platinum=true` : ''
   }`
 

@@ -21,7 +21,7 @@ export default function TicketFooter() {
         hasLightTicket ? 'text-[#11181C]' : 'text-white'
       )}
     >
-      <Image
+      {/* <Image
         src={SupabaseLogo}
         alt="Supabase Logo for Launch Week X"
         width="30"
@@ -29,10 +29,10 @@ export default function TicketFooter() {
         className="mb-1 hidden md:block"
         priority
         quality={100}
-      />
+      /> */}
       <TicketNumber number={ticketNumber} />
-      <span>Launch Week X</span>
-      <span>{LWX_DATE}</span>
+      {/* <span>Launch Week X</span>
+      <span>{LWX_DATE}</span> */}
     </div>
   )
 }

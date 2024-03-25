@@ -3,8 +3,8 @@ import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 
 export default function TicketProfile() {
   const { userData: user } = useConfData()
-  const { username, name, metadata, golden } = user
-  const hasLightTicket = golden || metadata?.hasSecretTicket
+  const { username, name, metadata, golden, secret: hasSecretTicket } = user
+  const hasLightTicket = golden
 
   const HAS_ROLE = !!metadata?.role
   const HAS_COMPANY = !!metadata?.company
@@ -15,18 +15,16 @@ export default function TicketProfile() {
       <div
         className={cn(
           'text-foreground-light flex flex-col gap-1 text-left text-xl md:max-w-[300px] mb-8',
-          hasLightTicket ? 'text-[#7E868C]' : 'text-[#8B9092]'
+          hasLightTicket ? 'text-[#1c1c1c]' : 'text-white',
+          hasSecretTicket && '!text-white'
         )}
       >
-        <p
-          className={cn(
-            'text-2xl text-foreground leading-[105%]',
-            hasLightTicket ? 'text-[#11181C]' : 'text-white'
-          )}
-        >
-          {name || username || 'Your Name'}
-        </p>
-        {HAS_NO_META && username && <p className="text-foreground-lighter">@{username}</p>}
+        <p className={cn('text-4xl leading-[105%]')}>{name || username || 'Your Name'}</p>
+        {HAS_NO_META && username && (
+          <p className={cn('text-foreground-lighter', hasSecretTicket && '!text-white')}>
+            @{username}
+          </p>
+        )}
         <div>
           {HAS_ROLE && <span>{metadata?.role}</span>}
           {HAS_COMPANY && (

@@ -96,7 +96,7 @@ export default function LaunchWeekIndex() {
           setShowCustomizationForm,
         }}
       >
-        <DefaultLayout className="flex items-center">
+        <DefaultLayout className="min-h-[92vh] h-full flex items-center">
           <TicketingFlow />
         </DefaultLayout>
       </ConfDataContext.Provider>

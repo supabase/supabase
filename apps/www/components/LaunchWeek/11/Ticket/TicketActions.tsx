@@ -70,7 +70,7 @@ export default function TicketActions() {
         <Button
           onClick={() => handleShare('twitter')}
           type={userData.sharedOnTwitter ? 'secondary' : 'default'}
-          icon={<IconTwitterX className="text-light w-3" />}
+          icon={<IconTwitterX className="text-light w-3 h-3" />}
           size={isTablet ? 'tiny' : 'tiny'}
           block
           asChild
@@ -82,7 +82,7 @@ export default function TicketActions() {
         <Button
           onClick={() => handleShare('linkedin')}
           type={userData.sharedOnLinkedIn ? 'secondary' : 'default'}
-          icon={<IconLinkedinSolid className="text-light w-3" />}
+          icon={<IconLinkedinSolid className="text-light w-3 h-3" />}
           size={isTablet ? 'tiny' : 'tiny'}
           block
           asChild

@@ -33,8 +33,8 @@ interface Props {
 export default function UsernamePage({ user, ogImageUrl }: Props) {
   const { username, ticketNumber, name } = user
 
-  const TITLE = `${name ? name + '’s' : 'Get your'} #SupaLaunchWeek Ticket`
-  const DESCRIPTION = `Claim and share your Supabase Launch Week X ticket for a chance to win Supabase swag.`
+  const TITLE = `${name ? name + '’s' : 'Get your'} Supabase GA Week ticket`
+  const DESCRIPTION = ``
   const OG_URL = `${SITE_URL}/tickets/${username}`
 
   const [session, setSession] = useState<Session | null>(null)
@@ -92,10 +92,10 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
                 <LW11TicketContainer />
               </div>
               <div className="flex flex-col items-center justify-center text-center gap-2 max-w-lg">
-                <h1 className="text-2xl">
+                <h1 className="text-2xl font-mono">
                   {name}'s
                   <br />
-                  Launch Week X Ticket
+                  GA Week Ticket
                 </h1>
                 <span className="text-foreground-lighter">
                   Claim your own ticket and share it for a chance to win.
@@ -103,7 +103,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
               </div>
               <Button type="secondary" asChild>
                 <Link href={`${SITE_URL}${username ? '?referral=' + username : ''}`}>
-                  Join Launch Week X
+                  Join GA Week
                 </Link>
               </Button>
             </SectionContainer>
@@ -124,12 +124,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   let user
 
   fetch(
-    `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-og?username=${encodeURIComponent(
-      username ?? ''
-    )}`
-  )
-  fetch(
-    `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket?username=${encodeURIComponent(
+    `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw11-ga-og?username=${encodeURIComponent(
       username ?? ''
     )}`
   )
@@ -137,21 +132,17 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   // fetch a specific user
   if (username) {
     const { data } = await supabase!
-      .from('lwx_tickets_golden')
-      .select('name, username, ticketNumber, metadata, golden')
+      .from('lw11_ga_tickets_golden')
+      .select('name, username, ticketNumber, metadata, golden, secret')
       .eq('username', username)
       .single()
 
     user = data
   }
 
-  const ticketType = user?.metadata?.hasSecretTicket
-    ? 'secret'
-    : user?.golden
-      ? 'platinum'
-      : 'regular'
+  const ticketType = user?.secret ? 'secret' : user?.golden ? 'platinum' : 'regular'
 
-  const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx/og/${ticketType}/${username}.png`
+  const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw11_ga/og/${ticketType}/${username}.png`
 
   return {
     props: {

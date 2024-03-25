@@ -62,8 +62,6 @@ const LWXGame = ({ setIsGameMode }: Props) => {
     setTimeout(() => {
       setHasKeyDown(false)
     }, 100)
-
-    console.log(currentWord.join(''), winningWord.join('').replaceAll('_', ''))
   }
 
   useEffect(() => {
@@ -92,15 +90,15 @@ const LWXGame = ({ setIsGameMode }: Props) => {
     if (supabase) {
       if (user.id) {
         await supabase
-          .from('lwx_tickets')
-          .update({ metadata: { ...user.metadata, hasSecretTicket: hasWon } })
+          .from('lw11_ga_tickets')
+          .update({ gameWonAt: new Date() })
           .eq('username', user.username)
           .then((res) => {
             if (res.error) return console.log('error', res.error)
             setIsGameMode(false)
           })
       } else {
-        localStorage.setItem('lwx_hasSecretTicket', 'true')
+        localStorage.setItem('lw11_secret', 'true')
 
         handleGithubSignIn()
       }

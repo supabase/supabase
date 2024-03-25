@@ -20,6 +20,7 @@ export type UserData = {
   }
   sharedOnTwitter?: string
   sharedOnLinkedIn?: string
+  secret?: boolean
 }
 
 type ConfDataContextType = {

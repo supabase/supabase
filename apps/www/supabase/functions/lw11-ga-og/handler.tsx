@@ -35,7 +35,7 @@ const STYLING_CONGIF = {
     FOREGROUND_LIGHT: '#6c7277',
     TICKET_FOREGROUND: '#11181C',
     TICKET_FOREGROUND_LIGHT: '#6c7277',
-    BORDER: '#a1a1a1',
+    BORDER: '#303030',
   },
   secret: {
     BACKGROUND: '#060809',
@@ -94,7 +94,7 @@ export async function handler(req: Request) {
 
     // Generate image and upload to storage.
     // const ticketType = data.metadata?.hasSecretTicket ? 'secret' : platinum ? 'platinum' : 'regular'
-    const ticketType = 'regular'
+    const ticketType = 'secret'
 
     const fontData = await font
     const monoFontData = await mono_font
@@ -112,7 +112,7 @@ export async function handler(req: Request) {
     const TICKET_RATIO = 396 / 613
     const TICKET_HEIGHT = TICKET_WIDTH / TICKET_RATIO
     const TICKET_POS_TOP = OG_PADDING_Y
-    const TICKET_POS_LEFT = 520
+    const TICKET_POS_LEFT = 500
     const TICKET_PADDING_X = 40
     const TICKET_PADDING_Y = 40
     const LOGO_WIDTH = 160
@@ -123,7 +123,7 @@ export async function handler(req: Request) {
     const BACKGROUND = {
       regular: {
         OG: `${STORAGE_URL}/assets/backgrounds/regular/${BG_NUMBER}.png`,
-        BG: `${STORAGE_URL}/assets/lw11_ticket_regular.png`,
+        BG: `${STORAGE_URL}/assets/lw11_ticket_regular_darker.png`,
         LOGO: `${STORAGE_URL}/assets/lw11_ga_logo_white.svg`,
       },
       platinum: {
@@ -133,7 +133,7 @@ export async function handler(req: Request) {
       },
       secret: {
         OG: `${STORAGE_URL}/assets/backgrounds/secret/${BG_NUMBER}.png`,
-        BG: `${STORAGE_URL}/assets/lw11_ticket_secret.png`,
+        BG: `${STORAGE_URL}/assets/lw11_ticket_gold.png?t=a`,
         LOGO: `${STORAGE_URL}/assets/lw11_ga_logo_white.svg`,
       },
     }
@@ -167,6 +167,7 @@ export async function handler(req: Request) {
                 bottom: '-1px',
                 right: '-1px',
                 zIndex: '0',
+                background: STYLING_CONGIF[ticketType].BACKGROUND,
               }}
               src={BACKGROUND[ticketType].OG}
             />
@@ -181,9 +182,9 @@ export async function handler(req: Request) {
                 width: TICKET_WIDTH,
                 height: TICKET_HEIGHT,
                 margin: 0,
-                // borderRadius: '20px',
+                borderRadius: '26px',
                 // border: `1px solid blue`,
-                // boxShadow: '0px 4px 45px rgba(0, 0, 0, 0.3)',
+                boxShadow: '0px 4px 45px rgba(0, 0, 0, 0.1)',
               }}
             >
               <img
