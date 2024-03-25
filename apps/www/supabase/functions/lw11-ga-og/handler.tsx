@@ -22,22 +22,28 @@ const LW_MATERIALIZED_VIEW = 'lw11_ga_tickets_golden'
 
 const STYLING_CONGIF = {
   regular: {
-    BACKGROUND: '#303030',
+    BACKGROUND: '#060809',
     FOREGROUND: '#F8F9FA',
     FOREGROUND_LIGHT: '#8B9092',
+    TICKET_FOREGROUND: '#F8F9FA',
+    TICKET_FOREGROUND_LIGHT: '#8B9092',
     BORDER: '#303030',
   },
   platinum: {
     BACKGROUND: '#f1f1f1',
     FOREGROUND: '#11181C',
     FOREGROUND_LIGHT: '#6c7277',
-    BORDER: '#CFCFCF',
+    TICKET_FOREGROUND: '#11181C',
+    TICKET_FOREGROUND_LIGHT: '#6c7277',
+    BORDER: '#a1a1a1',
   },
   secret: {
-    BACKGROUND: '#f1f1f1',
-    FOREGROUND: '#11181C',
-    FOREGROUND_LIGHT: '#6c7277',
-    BORDER: '#CFCFCF',
+    BACKGROUND: '#060809',
+    FOREGROUND: '#F8F9FA',
+    FOREGROUND_LIGHT: '#8B9092',
+    TICKET_FOREGROUND: '#F8F9FA',
+    TICKET_FOREGROUND_LIGHT: '#F8F9FA',
+    BORDER: '#303030',
   },
 }
 
@@ -85,26 +91,10 @@ export async function handler(req: Request) {
 
     const platinum = (!!data?.sharedOnTwitter && !!data?.sharedOnLinkedIn) ?? false
     if (assumePlatinum && !platinum) return await fetch(`${STORAGE_URL}/assets/golden_no_meme.png`)
-    const ticketType = data.metadata?.hasSecretTicket ? 'secret' : platinum ? 'platinum' : 'regular'
 
-    // Else, generate image and upload to storage.
-    const BACKGROUND = {
-      regular: {
-        OG: `${STORAGE_URL}/assets/lw11_og_bg_temp.png`,
-        BG: `${STORAGE_URL}/assets/lw11_ticket_regular.png`,
-        LOGO: `${STORAGE_URL}/assets/lw11_ga_logo_white.svg`,
-      },
-      platinum: {
-        OG: `${STORAGE_URL}/assets/lw11_og_bg_temp.png`,
-        BG: `${STORAGE_URL}/assets/lw11_ticket_platinum.png`,
-        LOGO: `${STORAGE_URL}/assets/lw11_ga_logo_black.svg`,
-      },
-      secret: {
-        OG: `${STORAGE_URL}/assets/lw11_og_bg_temp.png`,
-        BG: `${STORAGE_URL}/assets/lw11_ticket_secret.png`,
-        LOGO: `${STORAGE_URL}/assets/lw11_ga_logo_white.svg`,
-      },
-    }
+    // Generate image and upload to storage.
+    // const ticketType = data.metadata?.hasSecretTicket ? 'secret' : platinum ? 'platinum' : 'regular'
+    const ticketType = 'regular'
 
     const fontData = await font
     const monoFontData = await mono_font
@@ -127,6 +117,26 @@ export async function handler(req: Request) {
     const TICKET_PADDING_Y = 40
     const LOGO_WIDTH = 160
     const LOGO_RATIO = 145 / 79
+    // Select one of 30 pre generated bg images base on ticket number
+    const BG_NUMBER = `000${(ticketNumber % 30) + 1}`.slice(-3)
+
+    const BACKGROUND = {
+      regular: {
+        OG: `${STORAGE_URL}/assets/backgrounds/regular/${BG_NUMBER}.png`,
+        BG: `${STORAGE_URL}/assets/lw11_ticket_regular.png`,
+        LOGO: `${STORAGE_URL}/assets/lw11_ga_logo_white.svg`,
+      },
+      platinum: {
+        OG: `${STORAGE_URL}/assets/backgrounds/platinum/${BG_NUMBER}.png`,
+        BG: `${STORAGE_URL}/assets/lw11_ticket_platinum.png`,
+        LOGO: `${STORAGE_URL}/assets/lw11_ga_logo_black.svg`,
+      },
+      secret: {
+        OG: `${STORAGE_URL}/assets/backgrounds/secret/${BG_NUMBER}.png`,
+        BG: `${STORAGE_URL}/assets/lw11_ticket_secret.png`,
+        LOGO: `${STORAGE_URL}/assets/lw11_ga_logo_white.svg`,
+      },
+    }
 
     const generatedTicketImage = new ImageResponse(
       (
@@ -138,7 +148,7 @@ export async function handler(req: Request) {
               position: 'relative',
               fontFamily: '"Circular"',
               color: STYLING_CONGIF[ticketType].FOREGROUND,
-              background: STYLING_CONGIF[ticketType].BACKGROUND,
+              backgroundColor: STYLING_CONGIF[ticketType].BACKGROUND,
               overflow: 'hidden',
               display: 'flex',
               flexDirection: 'column',
@@ -213,7 +223,7 @@ export async function handler(req: Request) {
               >
                 <p
                   style={{
-                    color: STYLING_CONGIF[ticketType].FOREGROUND,
+                    color: STYLING_CONGIF[ticketType].TICKET_FOREGROUND,
                     margin: '0',
                     padding: '0',
                     fontSize: '48',
@@ -227,7 +237,7 @@ export async function handler(req: Request) {
 
                 <div
                   style={{
-                    color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
+                    color: STYLING_CONGIF[ticketType].TICKET_FOREGROUND_LIGHT,
                     opacity: 0.8,
                     display: 'flex',
                     fontSize: '32',
@@ -248,7 +258,7 @@ export async function handler(req: Request) {
                 bottom: TICKET_PADDING_Y,
                 left: TICKET_PADDING_X + TICKET_POS_LEFT,
                 width: '50%',
-                color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
+                color: STYLING_CONGIF[ticketType].TICKET_FOREGROUND_LIGHT,
                 margin: '0',
                 marginBottom: '5',
                 fontFamily: '"SourceCodePro"',

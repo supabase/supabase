@@ -47,7 +47,7 @@ const LW11Background = ({ className }: { className?: string }) => {
         const isAnimated = isLarge || Math.random() > config.percentageAnimated
         const direction = isAnimated ? (Math.random() > 0.5 ? 'vertical' : 'horizontal') : undefined
         const speed = isAnimated ? anime.random(config.minSpeed, config.maxSpeed) : undefined
-        const opacity = isLarge ? 1 : anime.random(0, 1)
+        const opacity = isLarge ? 1 : anime.random(0.4, 1)
         const isReverse = isAnimated ? Math.random() > 0.5 : undefined
         const oscillation = isAnimated
           ? anime.random(config.minOscillation, config.maxOscillation).toFixed()
