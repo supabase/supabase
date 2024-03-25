@@ -15,7 +15,7 @@ image: launch-week-7/day-5-one-more-thing/day-5-dbdev-og.jpg
 thumb: launch-week-7/day-5-one-more-thing/day-5-dbdev-thumb.jpg
 ---
 
-Today we’re publicly previewing [**`database.dev`**](https://database.dev), a PostgreSQL package manager. At this stage the package registry is read-only. We've preloaded it with a handful of packages, or pglets (PostGres appLETs), to showcase some of the more interesting possibilities.
+Today we’re publicly previewing [**`database.dev`**](https://database.dev), a PostgreSQL package manager. At this stage the package registry is read-only. We've preloaded it with a handful of packages to showcase some of the more interesting possibilities.
 
 <Img
   src="/images/blog/launch-week-7/day-5-one-more-thing/dbdev-landing.png"
@@ -23,7 +23,7 @@ Today we’re publicly previewing [**`database.dev`**](https://database.dev), a 
   alt="db dev landing page"
 />
 
-`dbdev` fills the same role for PostgreSQL as `npm` for JavaScript, `pip` for Python and `cargo` for Rust in that it enables publishing libraries and applications for repeatable deployment. We'll be releasing the tooling necessary for third-parties to publish `pglets` to the registry once we’ve collected some community feedback and incorporate any great new ideas. Our goal is to create an [open ecosystem](https://github.com/supabase/dbdev) for packaging and discovering SQL.
+`dbdev` fills the same role for PostgreSQL as `npm` for JavaScript, `pip` for Python and `cargo` for Rust in that it enables publishing libraries and applications for repeatable deployment. We'll be releasing the tooling necessary for third-parties to publish packages to the registry once we’ve collected some community feedback and incorporate any great new ideas. Our goal is to create an [open ecosystem](https://github.com/supabase/dbdev) for packaging and discovering SQL.
 
 The initial preview is compatible with [new projects](https://database.new) on the Supabase platform. It can also be installed on any PostgreSQL instance that support [`pg_tle`](https://github.com/aws/pg_tle) and [`pgsql-http`](https://github.com/pramsey/pgsql-http).
 
@@ -31,7 +31,7 @@ The initial preview is compatible with [new projects](https://database.new) on t
 
 The in-database client is the easiest way to get started. You can setup the installer by executing the SQL snippet available at [database.dev/installer](https://database.dev/installer).
 
-Once the `dbdev` client is present, `pglet`s can be installed from the registry as shown below:
+Once the `dbdev` client is present, packages can be installed from the registry as shown below:
 
 ```sql
 -- Load the package from the package index
@@ -42,9 +42,9 @@ select
 create extension "olirice-asciiplot" version '0.2.1';
 ```
 
-You can explore all available `pglet`s on [database.dev](https://database.dev).
+You can explore all available packages on [database.dev](https://database.dev).
 
-Notice that PostgreSQL sees the [`olirice-asciiplot`](https://database.dev/olirice/asciiplot) `pglet` as a native extension, rather than a raw snippet of SQL. That approach allows us to leverage PostgreSQL's builtin tooling for extension management.
+Notice that PostgreSQL sees the [`olirice-asciiplot`](https://database.dev/olirice/asciiplot) package as a native extension, rather than a raw snippet of SQL. That approach allows us to leverage PostgreSQL's builtin tooling for extension management.
 
 With our extension installed, you can use it like any other PostgreSQL extension. Continuing with the [`olirice-asciiplot`](https://database.dev/olirice/asciiplot) example, we can call the `scatter` function it provides to create an ASCII scatterplot:
 
@@ -92,13 +92,13 @@ Two common challenges faced by package indexes are name squatting and typo squat
 - Name squatting: reserving names for future use
 - Typo squatting: reserving misspelling of existing package
 
-The ethics of name squatting get dicey at scale while typo squatting is widely viewed as malicious behavior. To mitigate both issues, all `pglet`s published to [database.dev](https://database.dev) are namespaced to their owning organization or user’s handle. For example a `pglet` named [`olirice-index_advisor`](https://database.dev/olirice/index_advisor) was created by the account `olirice` under the name `index_advisor`. If another user, `some_user`, forks and republishes the project, it would be available under `some_user-index_advisor`. Problem solved ✅
+The ethics of name squatting get dicey at scale while typo squatting is widely viewed as malicious behavior. To mitigate both issues, all packages published to [database.dev](https://database.dev) are namespaced to their owning organization or user’s handle. For example a package named [`olirice-index_advisor`](https://database.dev/olirice/index_advisor) was created by the account `olirice` under the name `index_advisor`. If another user, `some_user`, forks and republishes the project, it would be available under `some_user-index_advisor`. Problem solved ✅
 
 ## Running on Supabase
 
 [database.dev](https://database.dev) is not coupled to the Supabase platform. `dbdev` can load SQL libraries on any PostgreSQL instance with the required base extensions. However, using `dbdev` in tandem with Supabase yields some extra possibilities.
 
-Supabase reflects APIs directly from your database’s structure, so a `pglet` can contain an entire stateful application, pre-configured with authentication, REST, GraphQL, and realtime change data capture all baked in!
+Supabase reflects APIs directly from your database’s structure, so a package can contain an entire stateful application, pre-configured with authentication, REST, GraphQL, and realtime change data capture all baked in!
 
 For example, our friends at [LangChain](https://python.langchain.com/en/latest/index.html) published a Supabase backend for their docs search tool that uses a hybrid of document embeddings and full text search to find relevant documents for a user’s query
 

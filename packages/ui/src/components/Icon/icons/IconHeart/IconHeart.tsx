@@ -9,5 +9,12 @@
     return <IconBase icon={Heart} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { heart } from 'lucide-react'
+  */
   export default IconHeart
   

@@ -1,0 +1,410 @@
+[
+  {
+    "name": "address_standardizer",
+    "comment": "Used to parse an address into constituent elements. Generally used to support geocoding address normalization step.",
+    "tags": ["Utility"],
+    "link": "https://postgis.net/docs/manual-2.5/Address_Standardizer.html"
+  },
+  {
+    "name": "address_standardizer_data_us",
+    "comment": "Address Standardizer US dataset example",
+    "tags": ["Dataset"],
+    "link": "https://postgis.net/docs/manual-2.5/Address_Standardizer.html"
+  },
+  {
+    "name": "amcheck",
+    "comment": "functions for verifying relation integrity",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/amcheck.html"
+  },
+  {
+    "name": "autoinc",
+    "comment": "functions for autoincrementing fields",
+    "tags": ["Utility"],
+    "link": "https://www.postgresql.org/docs/current/contrib-spi.html#id-1.11.7.50.6"
+  },
+  {
+    "name": "bloom",
+    "comment": "bloom access method - signature file based index",
+    "tags": ["Index"],
+    "link": "https://www.postgresql.org/docs/current/bloom.html"
+  },
+  {
+    "name": "btree_gin",
+    "comment": "support for indexing common datatypes in GIN",
+    "tags": ["Index"],
+    "link": "https://www.postgresql.org/docs/current/btree-gin.html"
+  },
+  {
+    "name": "btree_gist",
+    "comment": "support for indexing common datatypes in GiST",
+    "tags": ["Index"],
+    "link": "https://www.postgresql.org/docs/current/btree-gist.html"
+  },
+  {
+    "name": "citext",
+    "comment": "data type for case-insensitive character strings",
+    "tags": ["Data Type"],
+    "link": "https://www.postgresql.org/docs/current/citext.html"
+  },
+  {
+    "name": "cube",
+    "comment": "data type for multidimensional cubes",
+    "tags": ["Data Type"],
+    "link": "https://www.postgresql.org/docs/current/cube.html"
+  },
+  {
+    "name": "dblink",
+    "comment": "connect to other PostgreSQL databases from within a database",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/contrib-dblink-function.html"
+  },
+  {
+    "name": "dict_int",
+    "comment": "text search dictionary template for integers",
+    "tags": ["Search"],
+    "link": "https://www.postgresql.org/docs/current/dict-int.html"
+  },
+  {
+    "name": "dict_xsyn",
+    "comment": "text search dictionary template for extended synonym processing",
+    "tags": ["Search"],
+    "link": "https://www.postgresql.org/docs/current/dict-xsyn.html"
+  },
+  {
+    "name": "earthdistance",
+    "comment": "calculate great-circle distances on the surface of the Earth",
+    "tags": ["Geo", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/earthdistance.html"
+  },
+  {
+    "name": "fuzzystrmatch",
+    "comment": "determine similarities and distance between strings",
+    "tags": ["Search"],
+    "link": "https://www.postgresql.org/docs/current/fuzzystrmatch.html"
+  },
+  {
+    "name": "hstore",
+    "comment": "data type for storing sets of (key, value) pairs",
+    "tags": ["Data Type"],
+    "link": "https://www.postgresql.org/docs/current/hstore.html"
+  },
+  {
+    "name": "hypopg",
+    "comment": "Hypothetical indexes for PostgreSQL",
+    "tags": ["Admin", "Index"],
+    "link": "/guides/database/extensions/hypopg"
+  },
+  {
+    "name": "http",
+    "comment": "HTTP client for PostgreSQL, allows web page retrieval inside the database.",
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/http"
+  },
+  {
+    "name": "insert_username",
+    "comment": "functions for tracking who changed a table",
+    "tags": ["Audit", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/contrib-spi.html#id-1.11.7.50.7"
+  },
+  {
+    "name": "old_snapshot",
+    "comment": "utilities in support of old_snapshot_threshold",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/oldsnapshot.html"
+  },
+  {
+    "name": "index_advisor",
+    "comment": "optimize query performance with automatic index recommendation",
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/index_advisor"
+  },
+  {
+    "name": "intarray",
+    "comment": "functions, operators, and index support for 1-D arrays of integers",
+    "tags": ["Utility"],
+    "link": "https://www.postgresql.org/docs/current/intarray.html"
+  },
+  {
+    "name": "isn",
+    "comment": "data types for international product numbering standards",
+    "tags": ["Data Type"],
+    "link": "https://www.postgresql.org/docs/current/isn.html"
+  },
+  {
+    "name": "lo",
+    "comment": "Large Object maintenance",
+    "tags": ["Data Type"],
+    "link": "https://www.postgresql.org/docs/current/lo.html"
+  },
+  {
+    "name": "ltree",
+    "comment": "data type for hierarchical tree-like structures",
+    "tags": ["Data Type"],
+    "link": "https://www.postgresql.org/docs/current/ltree.html"
+  },
+  {
+    "name": "moddatetime",
+    "comment": "functions for tracking last modification time",
+    "tags": ["Audit", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/contrib-spi.html#id-1.11.7.50.8"
+  },
+  {
+    "name": "pg_cron",
+    "comment": "Job scheduler for PostgreSQL",
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/pg_cron"
+  },
+  {
+    "name": "pg_freespacemap",
+    "comment": "examine the free space map (FSM)",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/pgfreespacemap.html"
+  },
+  {
+    "name": "pg_graphql",
+    "comment": "pg_graphql: GraphQL support",
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/pg_graphql"
+  },
+  {
+    "name": "pg_hashids",
+    "comment": "pg_hashids",
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/pg_hashids"
+  },
+  {
+    "name": "pg_jsonschema",
+    "comment": "pg_jsonschema",
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/pg_jsonschema"
+  },
+  {
+    "name": "pg_net",
+    "comment": "Async HTTP",
+    "tags": ["Utility", "Notifications"],
+    "link": "/guides/database/extensions/pg_net"
+  },
+  {
+    "name": "pg_prewarm",
+    "comment": "prewarm relation data",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/pgprewarm.html"
+  },
+  {
+    "name": "pg_stat_monitor",
+    "comment": "The pg_stat_monitor is a PostgreSQL Query Performance Monitoring tool, based on PostgreSQL contrib module pg_stat_statements. pg_stat_monitor provides aggregated statistics, client information, plan details including plan, and histogram information.",
+    "tags": ["Utility"],
+    "link": "/guides/database/extensions/pg_stat_monitor"
+  },
+  {
+    "name": "pg_stat_statements",
+    "comment": "track execution statistics of all SQL statements executed",
+    "tags": ["Admin", "Utility"],
+    "link": "/guides/database/extensions/pg_stat_statements"
+  },
+  {
+    "name": "pg_surgery",
+    "comment": "extension to perform surgery on a damaged relation",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/pgsurgery.html"
+  },
+  {
+    "name": "pg_trgm",
+    "comment": "text similarity measurement and index searching based on trigrams",
+    "tags": ["Search"],
+    "link": "https://www.postgresql.org/docs/current/pgtrgm.html"
+  },
+  {
+    "name": "pgaudit",
+    "comment": "provides auditing functionality",
+    "tags": ["Audit", "Utility"],
+    "link": "/guides/database/extensions/pgaudit"
+  },
+  {
+    "name": "pg_walinspect",
+    "comment": "functions to inspect contents of PostgreSQL Write-Ahead Log",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/pgwalinspect.html"
+  },
+  {
+    "name": "pgcrypto",
+    "comment": "cryptographic functions",
+    "tags": ["Utility", "Cryptography"],
+    "link": "https://www.postgresql.org/docs/current/pgcrypto.html"
+  },
+  {
+    "name": "pgjwt",
+    "comment": "JSON Web Token API for Postgresql",
+    "tags": ["Utility", "Cryptography"],
+    "link": "/guides/database/extensions/pgjwt"
+  },
+  {
+    "name": "pgroonga",
+    "comment": "Super fast and all languages supported full text search index based on Groonga",
+    "tags": ["Search"],
+    "link": "/guides/database/extensions/pgroonga"
+  },
+  {
+    "name": "pgroonga_database",
+    "comment": "PGroonga database management module",
+    "tags": ["Admin"],
+    "link": "https://pgroonga.github.io/reference/modules/pgroonga-database.html"
+  },
+  {
+    "name": "pgrouting",
+    "comment": "pgRouting Extension",
+    "tags": ["Geo", "Utility"],
+    "link": "/guides/database/extensions/pgrouting"
+  },
+  {
+    "name": "pgrowlocks",
+    "comment": "show row-level locking information",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/pgrowlocks.html"
+  },
+  {
+    "name": "pgsodium",
+    "comment": "Postgres extension for libsodium functions",
+    "tags": ["Utility", "Cryptography"],
+    "link": "/guides/database/extensions/pgsodium"
+  },
+  {
+    "name": "pgstattuple",
+    "comment": "show tuple-level statistics",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/pgstattuple.html"
+  },
+  {
+    "name": "pgtap",
+    "comment": "Unit testing for PostgreSQL",
+    "tags": ["Utility", "Testing"],
+    "link": "/guides/database/extensions/pgtap"
+  },
+  {
+    "name": "plcoffee",
+    "comment": "PL/CoffeeScript (v8) trusted procedural language",
+    "tags": ["Language"],
+    "link": "https://github.com/plv8/plv8/blob/master/doc/plv8.md#coffeescript-extension"
+  },
+  {
+    "name": "pljava",
+    "comment": "PL/Java procedural language (https://tada.github.io/pljava/)",
+    "tags": ["Language"],
+    "link": "https://tada.github.io/pljava/"
+  },
+  {
+    "name": "plls",
+    "comment": "PL/LiveScript (v8) trusted procedural language",
+    "tags": ["Language"],
+    "link": "https://github.com/plv8/plv8/blob/master/doc/plv8.md#livescript-extension"
+  },
+  {
+    "name": "plpgsql",
+    "comment": "PL/pgSQL procedural language",
+    "tags": ["Language"],
+    "link": "https://www.postgresql.org/docs/current/plpgsql.html"
+  },
+  {
+    "name": "plpgsql_check",
+    "comment": "extended check for plpgsql functions",
+    "tags": ["Utility", "Testing"],
+    "link": "/guides/database/extensions/plpgsql_check"
+  },
+  {
+    "name": "plv8",
+    "comment": "PL/JavaScript (v8) trusted procedural language",
+    "tags": ["Language"],
+    "link": "/guides/database/extensions/plv8"
+  },
+  {
+    "name": "postgis",
+    "comment": "PostGIS geometry and geography spatial types and functions",
+    "tags": ["Geo"],
+    "link": "/guides/database/extensions/postgis"
+  },
+  {
+    "name": "postgres_fdw",
+    "comment": "foreign-data wrapper for remote PostgreSQL servers",
+    "tags": ["Admin"],
+    "link": "https://www.postgresql.org/docs/current/postgres-fdw.html"
+  },
+  {
+    "name": "refint",
+    "comment": "functions for implementing referential integrity (obsolete)",
+    "tags": ["Utility"],
+    "link": "https://www.postgresql.org/docs/current/contrib-spi.html#id-1.11.7.50.5"
+  },
+  {
+    "name": "rum",
+    "comment": "GIN-like index for text search",
+    "tags": ["Index", "Search"],
+    "link": "/guides/database/extensions/rum"
+  },
+  {
+    "name": "seg",
+    "comment": "data type for representing line segments or floating-point intervals",
+    "tags": ["Utility"],
+    "link": "https://www.postgresql.org/docs/current/seg.html"
+  },
+  {
+    "name": "sslinfo",
+    "comment": "information about SSL certificates",
+    "tags": ["Admin", "Utility"],
+    "link": "https://www.postgresql.org/docs/current/sslinfo.html"
+  },
+  {
+    "name": "tablefunc",
+    "comment": "functions that manipulate whole tables, including crosstab",
+    "tags": ["Utility"],
+    "link": "https://www.postgresql.org/docs/current/tablefunc.html"
+  },
+  {
+    "name": "tcn",
+    "comment": "Triggered change notifications",
+    "tags": ["Utility", "Notifications"],
+    "link": "https://www.postgresql.org/docs/current/tcn.html"
+  },
+  {
+    "name": "timescaledb",
+    "comment": "Enables scalable inserts and complex queries for time-series data",
+    "tags": ["Time Series", "Data Type", "Utility"],
+    "link": "/guides/database/extensions/timescaledb"
+  },
+  {
+    "name": "tsm_system_rows",
+    "comment": "TABLESAMPLE method which accepts number of rows as a limit",
+    "tags": ["Utility"],
+    "link": "https://www.postgresql.org/docs/current/tsm-system-rows.html"
+  },
+  {
+    "name": "tsm_system_time",
+    "comment": "TABLESAMPLE method which accepts time in milliseconds as a limit",
+    "tags": ["Utility"],
+    "link": "https://www.postgresql.org/docs/current/tsm-system-time.html"
+  },
+  {
+    "name": "unaccent",
+    "comment": "text search dictionary that removes accents",
+    "tags": ["Search"],
+    "link": "https://www.postgresql.org/docs/current/unaccent.html"
+  },
+  {
+    "name": "uuid-ossp",
+    "comment": "generate universally unique identifiers (UUIDs)",
+    "tags": ["Utility", "Data Type"],
+    "link": "/guides/database/extensions/uuid-ossp"
+  },
+  {
+    "name": "pgvector",
+    "comment": "vector data type with similarity search",
+    "tags": ["AI", "Data Type", "Search"],
+    "link": "/guides/database/extensions/pgvector"
+  },
+  {
+    "name": "wrappers",
+    "comment": "Foreign data wrappers developed by Supabase",
+    "tags": ["Admin", "Utility"],
+    "link": "/guides/database/extensions/wrappers/overview"
+  }
+]

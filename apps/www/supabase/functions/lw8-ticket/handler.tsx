@@ -252,7 +252,7 @@ export async function handler(req: Request) {
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
 
     // Generate og image
-    fetch('https://obuldanrptloktxcffvn.functions.supabase.co/lw8-ticket-og', {
+    fetch('https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw8-ticket-og', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

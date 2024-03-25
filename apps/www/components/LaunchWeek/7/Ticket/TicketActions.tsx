@@ -31,7 +31,7 @@ export default function TicketActions({
     'twitter'
   )}&via=supabase&text=${text}`
   const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${permalink('linkedin')}`
-  const downloadUrl = `https://obuldanrptloktxcffvn.functions.supabase.co/lw7-ticket-og?username=${encodeURIComponent(
+  const downloadUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw7-ticket-og?username=${encodeURIComponent(
     username
   )}`
   const params = useParams()
@@ -57,9 +57,9 @@ export default function TicketActions({
     <div className="grid gap-1 grid-cols-1 sm:grid-cols-3 lg:grid-cols-1">
       {!sharePage ? (
         <>
-          <div className="rounded-full bg-[#E6E8EB] text-scale-500 py-1 px-3 border border-[#dfe1e3] text-xs mb-1">
+          <div className="rounded-full bg-[#E6E8EB] text-background-surface-300 py-1 px-3 border border-[#dfe1e3] text-xs mb-1">
             <div className="flex items-center justify-center gap-2">
-              <div className="text-scale-900">
+              <div className="text-muted">
                 <IconCheckCircle size={10} strokeWidth={1} />
               </div>
               Connect with GitHub
@@ -67,19 +67,21 @@ export default function TicketActions({
           </div>
           <div
             className={`rounded-full ${
-              userData.sharedOnTwitter ? 'bg-[#E6E8EB] text-scale-500' : 'text-white'
-            }  text-scale-500 py-1 px-3 border border-[#dfe1e3] text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]`}
+              userData.sharedOnTwitter ? 'bg-[#E6E8EB] text-background-surface-300' : 'text-white'
+            } text-background-surface-300 py-1 px-3 border border-[#dfe1e3] text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]`}
           >
             <a
               href={tweetUrl}
               rel="noopener noreferrer prefetch"
               target="_blank"
               className={`flex items-center justify-center gap-2 ${
-                userData.sharedOnTwitter ? 'text-scale-500' : 'text-white hover:text-scale-500'
+                userData.sharedOnTwitter
+                  ? 'text-background-surface-300'
+                  : 'text-white hover:text-background-surface-300'
               }`}
             >
               {userData.sharedOnTwitter && (
-                <div className="text-scale-900">
+                <div className="text-muted">
                   <IconCheckCircle size={10} strokeWidth={1} />
                 </div>
               )}
@@ -88,19 +90,21 @@ export default function TicketActions({
           </div>
           <div
             className={`rounded-full ${
-              userData.sharedOnLinkedIn ? 'bg-[#E6E8EB] text-scale-500' : 'text-white'
-            }  text-scale-500 py-1 px-3 border border-[#dfe1e3] text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]`}
+              userData.sharedOnLinkedIn ? 'bg-[#E6E8EB] text-background-surface-300' : 'text-white'
+            }  text-background-surface-300 py-1 px-3 border border-[#dfe1e3] text-xs mb-1 transition-all ease-out hover:bg-[#dfe1e3]`}
           >
             <a
               href={linkedInUrl}
               rel="noopener noreferrer prefetch"
               target="_blank"
               className={`flex items-center justify-center gap-2 ${
-                userData.sharedOnLinkedIn ? 'text-scale-500' : 'text-white hover:text-scale-500'
+                userData.sharedOnLinkedIn
+                  ? 'text-background-surface-300'
+                  : 'text-white hover:text-background-surface-300'
               }`}
             >
               {userData.sharedOnLinkedIn && (
-                <div className="text-scale-900">
+                <div className="text-muted">
                   <IconCheckCircle size={10} strokeWidth={1} />
                 </div>
               )}

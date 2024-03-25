@@ -1,5 +1,5 @@
 .sbui-popover__content {
-  @apply bg-scale-200 p-0;
+  @apply bg-background p-0;
   @apply border;
   @apply rounded;
   @apply shadow;
@@ -46,7 +46,7 @@
 } */
 
 .sbui-popover__arrow {
-  @apply fill-current text-scale-200;
+  @apply fill-current text-background;
   @apply border-0 border-t;
   border-style: solid;
 }
@@ -55,9 +55,9 @@
   @apply absolute top-1 right-0;
   @apply bg-transparent cursor-pointer border-none;
 
-  @apply text-gray-300;
-  @apply hover:text-gray-400;
+  @apply text-background-surface-100;
+  @apply hover:text-background-surface-200;
 
-  @apply dark:text-dark-400;
-  @apply dark:hover:text-dark-300;
+  @apply dark:text-background-surface-200;
+  @apply dark:hover:text-background-surface-00;
 }

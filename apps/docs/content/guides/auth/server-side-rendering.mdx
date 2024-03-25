@@ -1,0 +1,240 @@
+---
+id: 'server-side-rendering'
+title: 'Server-Side Rendering'
+description: 'Render pages with user information on the server.'
+---
+
+Single-page apps with server-side rendering (SSR) is a popular way to optimize rendering performance and leverage advanced caching strategies.
+
+Supabase Auth supports server-side rendering when you need access to user information, or your server needs to authorize API requests on behalf of your user to render content.
+
+When a user authenticates with Supabase Auth, two pieces of information are issued by the server:
+
+1. **Access token** in the form of a JWT.
+2. **Refresh token** which is a randomly generated string.
+
+Most Supabase projects have their auth server listening on `<project-ref>.supabase.co/auth/v1`, thus the access token and refresh token are set as `sb-access-token` and `sb-refresh-token` cookies on the `<project-ref>.supabase.co` domain.
+
+<Admonition type="note">
+
+These cookie names are for internal Supabase use only and may change without warning. They are included in this guide for illustration purposes only.
+
+</Admonition>
+
+Web browsers limit access to cookies across domains, consistent with the [Same-Origin Policy (SOP)](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy).
+
+Your web application cannot access these cookies, nor will these cookies be sent to your application's server.
+
+## Understanding the authentication flow
+
+When you call one of the `signIn` methods, the client library running in the browser sends the request to the Supabase Auth server. The Auth server determines whether to verify a phone number, email and password combination, a Magic Link, or use a social login (if you have any setup in your project).
+
+Upon successful verification of the identity of the user, the Supabase Auth server redirects the user back to your single-page app.
+
+<Admonition type="tip">
+
+You can configure [redirects URLs](https://supabase.com/dashboard/project/_/auth/url-configuration) in the Supabase Dashboard. You can use [wildcard match patterns](/docs/guides/auth#redirect-urls-and-wildcards) like `*` and `**` to allow redirects to different forms of URLs.
+
+</Admonition>
+
+Supabase Auth supports two authentication flows: **Implicit** and **PKCE**. The **PKCE** flow is generally preferred when on the server. It introduces a few additional steps which guard against replay and URL capture attacks. Unlike the implicit flow, it also allows users to access the `access_token` and `refresh_token` on the server.
+
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light"
+  >
+    <div className="border-b pb-3">
+      <Accordion.Item
+        header={<span className="text-foreground font-bold">Implicit</span>}
+        id={`ssr-implicit-flow`}
+      >
+
+        When using the implicit flow, a redirect URL will be returned with the following structure:
+        ```
+        https://yourapp.com/...#access_token=<...>&refresh_token=<...>&...
+        ```
+
+        The first access and refresh tokens after a successful verification are contained in the URL fragment (anything after the `#` sign) of the redirect location. This is intentional and not configurable.
+
+        The client libraries are designed to listen for this type of URL, extract the access token, refresh token and some extra information from it, and finally persist it in local storage for further use by the library and your app.
+
+        <Admonition type="note">
+
+        Web browsers do not send the URL fragment to the server they're making the request to. Since you may not be hosting the single-page app on a server under your direct control (such as on GitHub Pages or other freemium hosting providers), we want to prevent hosting services from getting access to your user's authorization credentials by default.
+
+        Even if the server is under your direct control, `GET` requests and their full URLs are often logged. This approach also avoids leaking credentials in request or access logs. If you wish to obtain the `access_token` and `refresh_token` on a server, please consider using the PKCE flow.
+
+        </Admonition>
+
+      </Accordion.Item>
+    </div>
+    <div className="border-b pb-3">
+      <Accordion.Item
+        header={<span className="text-foreground font-bold">PKCE</span>}
+        id={`ssr-pkce-flow`}
+      >
+
+        When using the PKCE flow, a redirect URL will be returned with the following structure:
+        ```
+        https://yourapp.com/...?code=<...>
+        ```
+        The `code` parameter is commonly known as the Auth Code and can be exchanged for an access token by calling `exchangeCodeForSession(code)`.
+
+        <Admonition type="note">
+
+        For security purposes, the code has a validity of 5 minutes and can only be exchanged for an access token once. You will need to restart the authentication flow from scratch if you wish to obtain a new access token.
+
+        </Admonition>
+
+        As the flow is run server side, `localStorage` may not be available. You may configure the client library to use a custom storage adapter an alternate backing storage such as cookies by setting the `storage` option to an object with the following methods:
+
+        ```js
+        const customStorageAdapter: SupportedStorage = {
+          getItem: (key) => {
+            if (!supportsLocalStorage()) {
+              // Configure alternate storage
+              return null
+            }
+            return globalThis.localStorage.getItem(key)
+          },
+          setItem: (key, value) => {
+            if (!supportsLocalStorage()) {
+              // Configure alternate storage here
+              return
+            }
+            globalThis.localStorage.setItem(key, value)
+          },
+          removeItem: (key) => {
+            if (!supportsLocalStorage()) {
+              // Configure alternate storage here
+              return
+            }
+            globalThis.localStorage.removeItem(key)
+          },
+        }
+        ```
+        You may also configure the client library to automatically exchange it for a session after a successful redirect. This can be done by setting the `detectSessionInUrl` option to `true`.
+
+        Putting it all together, your client library initialization may look like this:
+        ```js
+        const supabase = createClient(
+             'https://xyzcompany.supabase.co',
+             'public-anon-key',
+             {
+               ...
+               auth: {
+                 ...
+                 detectSessionInUrl: true,
+                 flowType: 'pkce',
+                 storage: customStorageAdapter,
+               }
+               ...
+             }
+        )
+        ```
+        [Learn more](https://oauth.net/2/pkce/) about the PKCE flow.
+
+      </Accordion.Item>
+    </div>
+
+</Accordion>
+
+## Bringing it together
+
+As seen from the authentication flow, the initial request after successful login made by the browser to your app's server after user login **does not contain any information about the user**. This is because first the client-side JavaScript library must run before it makes the access and refresh token available to your server.
+
+It is very important to make sure that the redirect route right after login works without any server-side rendering. Other routes requiring authorization do not have the same limitation, provided you send the access and refresh tokens to your server.
+
+This is traditionally done by setting cookies. Here's an example you can add to the root of your application:
+
+```typescript
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_OUT') {
+    // delete cookies on sign out
+    const expires = new Date(0).toUTCString()
+    document.cookie = `my-access-token=; path=/; expires=${expires}; SameSite=Lax; secure`
+    document.cookie = `my-refresh-token=; path=/; expires=${expires}; SameSite=Lax; secure`
+  } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
+    const maxAge = 100 * 365 * 24 * 60 * 60 // 100 years, never expires
+    document.cookie = `my-access-token=${session.access_token}; path=/; max-age=${maxAge}; SameSite=Lax; secure`
+    document.cookie = `my-refresh-token=${session.refresh_token}; path=/; max-age=${maxAge}; SameSite=Lax; secure`
+  }
+})
+```
+
+This uses the standard [`document.cookie` API](https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie) to set cookies on all paths of your app's domain. All subsequent requests made by the browser to your app's server include the `my-access-token` and `my-refresh-token` cookies (the names of the cookies and additional parameters can be changed).
+
+In your server-side rendering code you can now access user and session information:
+
+```typescript
+const refreshToken = req.cookies['my-refresh-token']
+const accessToken = req.cookies['my-access-token']
+
+if (refreshToken && accessToken) {
+  await supabase.auth.setSession({
+    refresh_token: refreshToken,
+    access_token: accessToken,
+    {
+      auth: { persistSession: false },
+    }
+  })
+} else {
+  // make sure you handle this case!
+  throw new Error('User is not authenticated.')
+}
+
+// returns user information
+await supabase.auth.getUser()
+```
+
+Use `setSession({ access_token, refresh_token })` instead of `setSession(refreshToken)` or `getUser(accessToken)` as refresh tokens or access tokens alone do not properly identify a user session.
+
+Access tokens are valid only for a short amount of time.
+
+Even though refresh tokens are long-lived, there is no guarantee that a user has an active session. They may have logged out and your application failed to remove the `my-refresh-token` cookie, or some other failure occurred that left a stale refresh token in the browser. Furthermore, a refresh token can only be used a few seconds after it was first used. Only use a refresh token if the access token is about to expire, which will avoid the introduction of difficult to diagnose logout bugs in your app.
+
+A good practice is to handle unauthorized errors by deferring rendering the page in the browser instead of in the server. Some user information is contained in the access token though, so in certain cases, you may be able to use this potentially stale information to render a page.
+
+## Frequently asked questions
+
+### No session on the server side with Next.js route prefetching?
+
+When you use route prefetching in Next.js using `<Link href="/...">` components or the `Router.push()` APIs can send server-side requests before the browser processes the access and refresh tokens. This means that those requests may not have any cookies set and your server code will render unauthenticated content.
+
+To improve experience for your users, we recommend redirecting users to one specific page after sign-in that does not include any route prefetching from Next.js. Once the Supabase client library running in the browser has obtained the access and refresh tokens from the URL fragment, you can send users to any pages that use prefetching.
+
+### How do I make the cookies `HttpOnly`?
+
+This is not necessary. Both the access token and refresh token are designed to be passed around to different components in your application. The browser-based side of your application needs access to the refresh token to properly maintain a browser session anyway.
+
+### My server is getting invalid refresh token errors. What's going on?
+
+It is likely that the refresh token sent from the browser to your server is stale. Make sure the `onAuthStateChange` listener callback is free of bugs and is registered relatively early in your application's lifetime
+
+When you receive this error on the server-side, try to defer rendering to the browser where the client library can access an up-to-date refresh token and present the user with a better experience.
+
+### Should I set a shorter `Max-Age` parameter on the cookies?
+
+The `Max-Age` or `Expires` cookie parameters only control whether the browser sends the value to the server. Since a refresh token represents the long-lived authentication session of the user on that browser, setting a short `Max-Age` or `Expires` parameter on the cookies only results in a degraded user experience.
+
+The only way to ensure that a user has logged out or their session has ended is to get the user's details with `getUser()`.
+
+### What should I use for the `SameSite` property?
+
+Make sure you [understand the behavior of the property in different situations](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Set-Cookie/SameSite) as some properties can degrade the user experience.
+
+A good default is to use `Lax` which sends cookies when users are navigating to your site. Cookies typically require the `Secure` attribute, which only sends them over HTTPS. However, this can be a problem when developing on `localhost`.
+
+### Can I use server-side rendering with a CDN or cache?
+
+Yes, but you need to be careful to include at least the refresh token cookie value in the cache key. Otherwise you may be accidentally serving pages with data belonging to different users!
+
+Also be sure you set proper cache control headers. We recommend invalidating cache keys every hour or less.
+
+### Which authentication flows have PKCE support?
+
+At present, PKCE is supported on the Magic Link, OAuth, Sign Up, and Password Recovery routes. These correspond to the `signInWithOtp`, `signInWithOAuth`, `signUp`, and `resetPasswordForEmail` methods on the Supabase client library. When using PKCE with Phone and Email OTPs, there is no behavior change with respect to the implicit flow - an access token will be returned in the body when a request is successful.

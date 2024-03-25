@@ -1,32 +1,38 @@
-import { Badge, Button, IconArrowUpRight, IconX, Tabs } from 'ui'
-// data
-import ApiExamplesData from 'data/products/database/api-examples'
-import ExtensionsExamplesData from 'data/products/database/extensions-examples'
-import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
-import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
-import Solutions from 'data/Solutions'
+// Import Swiper styles
+import 'swiper/swiper.min.css'
+
+import dynamic from 'next/dynamic'
 import { NextSeo } from 'next-seo'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import { Badge, Button, IconArrowUpRight, IconX, Tabs } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
-// Import Swiper styles
-import 'swiper/swiper.min.css'
-import ImageCarousel from '~/components/Carousels/ImageCarousel'
-import SplitCodeBlockCarousel from '~/components/Carousels/SplitCodeBlockCarousel'
-import FeatureColumn from '~/components/FeatureColumn'
-import FloatingIcons from '~/components/FloatingIcons'
-import DefaultLayout from '~/components/Layouts/Default'
-import SectionContainer from '~/components/Layouts/SectionContainer'
-import ProductIcon from '~/components/ProductIcon'
-import APISection from '~/components/Sections/APISection'
-import GithubExamples from '~/components/Sections/GithubExamples'
-import ProductHeader from '~/components/Sections/ProductHeader'
-import TweetCard from '~/components/TweetCard'
 
-// install Swiper's Controller component
-// SwiperCore.use([Controller])
+// data
+import Solutions from 'data/Solutions'
+import ApiExamplesData from 'data/products/database/api-examples'
+import HighlightsCards from '~/data/products/database/highlight-cards'
+import ExtensionsExamplesData from 'data/products/database/extensions-examples'
+import SqlViewCarouselData from 'data/products/database/sql-view-carousel.json'
+import TableViewCarouselData from 'data/products/database/table-view-carousel.json'
+
+import { ThemeImage } from 'ui-patterns/ThemeImage'
+import { TweetCard } from 'ui-patterns/TweetCard'
+import ProductHeader from '~/components/Sections/ProductHeader'
+
+const NewFeatureCard = dynamic(() => import('~/components/NewFeatureCard'))
+const ImageCarousel = dynamic(() => import('~/components/Carousels/ImageCarousel'))
+const SplitCodeBlockCarousel = dynamic(
+  () => import('~/components/Carousels/SplitCodeBlockCarousel')
+)
+const FeatureColumn = dynamic(() => import('~/components/FeatureColumn'))
+const DefaultLayout = dynamic(() => import('~/components/Layouts/Default'))
+const SectionContainer = dynamic(() => import('~/components/Layouts/SectionContainer'))
+const ProductIcon = dynamic(() => import('~/components/ProductIcon'))
+const APISection = dynamic(() => import('~/components/Sections/APISection'))
+const GithubExamples = dynamic(() => import('~/components/Sections/GithubExamples'))
 
 function Database() {
   // base path for images
@@ -76,24 +82,16 @@ function Database() {
             'PostgreSQL is one of the worlds most scalable databases.',
           ]}
           image={[
-            <div className="header--light block w-full" key="light">
-              <Image
-                src={`${basePath}/images/product/database/header--light-2.png`}
-                alt="database header"
-                layout="responsive"
-                width="1680"
-                height="1116"
-              />
-            </div>,
-            <div className="header--dark mr-0 w-full dark:block" key="dark">
-              <Image
-                src={`${basePath}/images/product/database/header--dark-2.png`}
-                alt="database header"
-                layout="responsive"
-                width="1680"
-                height="1116"
-              />
-            </div>,
+            <ThemeImage
+              src={{
+                light: `${basePath}/images/product/database/header--light-2.png`,
+                dark: `${basePath}/images/product/database/header--dark-2.png`,
+              }}
+              alt="database header"
+              layout="responsive"
+              width="1680"
+              height="1116"
+            />,
           ]}
           documentation_url={'/docs/guides/database'}
         />
@@ -147,6 +145,11 @@ function Database() {
               </p>
             </div>
           </div>
+        </SectionContainer>
+
+        <SectionContainer className="!py-0 grid lg:grid-cols-2 gap-2 lg:gap-4">
+          <NewFeatureCard {...HighlightsCards.branching} />
+          <NewFeatureCard {...HighlightsCards.readReplicas} />
         </SectionContainer>
 
         {/* <SectionContainer>÷ */}
@@ -241,25 +244,28 @@ function Database() {
             ]}
             footer={[
               <div className="grid grid-cols-12" key={0}>
-                <div className="col-span-12 mt-0 flex lg:col-span-6 xl:col-span-12 xl:mb-8">
-                  <p>
-                    <p className="text-scale-1100 m-0">Libraries coming soon:</p>
-                  </p>
-                  <div className="ml-1 space-x-1">
-                    <Badge dot={false}>Python</Badge>
-                    <Badge dot={false}>Dart</Badge>
-                    <Badge dot={false}>C#</Badge>
-                    <Badge dot={false}>Kotlin</Badge>
+                <div className="col-span-12 mt-0 flex flex-col 2xl:flex-row lg:col-span-6 xl:col-span-12 xl:mb-8 gap-1">
+                  <p className="text-foreground-light m-0">Available libraries:</p>
+                  <div className="flex gap-1">
+                    <Link href="/docs/reference/javascript/introduction" target="_blank">
+                      <Badge>Javascript</Badge>
+                    </Link>
+                    <Link href="/docs/reference/dart/introduction" target="_blank">
+                      <Badge>Flutter</Badge>
+                    </Link>
+                    <Link href="/docs/reference/python/introduction" target="_blank">
+                      <Badge>Python</Badge>
+                    </Link>
+                    <Link href="/docs/reference/csharp/introduction" target="_blank">
+                      <Badge>C#</Badge>
+                    </Link>
+                    <Link href="/docs/reference/kotlin/introduction" target="_blank">
+                      <Badge>Kotlin</Badge>
+                    </Link>
+                    <Link href="/docs/reference/swift/introduction" target="_blank">
+                      <Badge>Swift</Badge>
+                    </Link>
                   </div>
-                </div>
-                <div className="col-span-12 hidden lg:col-span-6 xl:col-span-10 xl:block" key={1}>
-                  {/* <TweetCard
-                    handle="@eunjae_lee"
-                    img_url="https://pbs.twimg.com/profile_images/1188191474401320965/eGjSYbQd_400x400.jpg"
-                    quote="So they just help me use @PostgreSQL better. They don't try to invent a wheel and trap me
-          in it. Whereas they provide a good abstraction overall, they also provide a raw access to
-          the database."
-                  /> */}
                 </div>
               </div>,
             ]}
@@ -270,10 +276,9 @@ function Database() {
         <div className="relative">
           <div className="section--masked">
             <div className="section--bg-masked">
-              <div className="section--bg border-t border-b border-gray-100 dark:border-gray-600"></div>
+              <div className="section--bg border-t border-b border-control"></div>
             </div>
             <div className="section-container pt-12 pb-0">
-              <FloatingIcons />
               <div className="overflow-x-hidden">
                 <SectionContainer className="mb-0 pb-8 lg:pt-32">
                   <GithubExamples />
@@ -283,7 +288,7 @@ function Database() {
           </div>
         </div>
 
-        <SectionContainer className="lg:py-48">
+        <SectionContainer>
           <div className="grid grid-cols-12 lg:gap-16">
             <div className="col-span-12 mb-8 lg:col-span-6 xl:col-span-5">
               <h2 className="h3">Extend your database</h2>
@@ -295,15 +300,11 @@ function Database() {
 
               <FeatureColumn
                 title="40+ preinstalled extensions"
-                text="We only show a few of the extensions supported by supabase here, but we preinstall many more that you can use right away."
+                text="We only show a few of the extensions supported by Supabase here, but we preinstall many more that you can use right away."
               />
-              <Link href="/docs/guides/database" passHref>
-                <a>
-                  <Button size="small" type="default" icon={<IconArrowUpRight />}>
-                    Explore documentation
-                  </Button>
-                </a>
-              </Link>
+              <Button asChild size="small" type="default" icon={<IconArrowUpRight />}>
+                <Link href="/docs/guides/database">Explore documentation</Link>
+              </Button>
             </div>
             <div className="col-span-12 mt-8 lg:col-span-6 lg:col-start-7 lg:mt-0">
               <SplitCodeBlockCarousel

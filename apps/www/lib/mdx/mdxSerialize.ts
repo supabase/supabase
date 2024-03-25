@@ -5,7 +5,25 @@ import remarkGfm from 'remark-gfm'
 import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
+// mdx2 needs self-closing tags.
+// dragging an image onto a Github discussion creates an <img>
+// we need to fix this before running them through mdx
+function addSelfClosingTags(htmlString: string): string {
+  const modifiedHTML = htmlString.replace(/<img[^>]*>/g, (match) => {
+    // Check if the <img> tag already has a closing slash
+    if (match.endsWith('/>')) {
+      return match
+    } else {
+      // Add slash (/) to make it self-closing
+      return match.slice(0, -1) + ' />'
+    }
+  })
+
+  return modifiedHTML
+}
+
 export async function mdxSerialize(source: string) {
+  const formattedSource = addSelfClosingTags(source)
   const codeHikeOptions: CodeHikeConfig = {
     theme: codeHikeTheme,
     lineNumbers: true,
@@ -14,7 +32,7 @@ export async function mdxSerialize(source: string) {
     autoImport: false,
   }
 
-  const mdxSource: any = await serialize(source, {
+  const mdxSource: any = await serialize(formattedSource, {
     scope: {
       chCodeConfig: codeHikeOptions,
     },

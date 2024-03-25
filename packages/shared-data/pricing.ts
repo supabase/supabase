@@ -19,10 +19,10 @@ type PricingFeature = {
   title: string
   tooltips?: { main?: string; pro?: string; team?: string; enterprise?: string }
   plans: {
-    free: boolean | string
-    pro: boolean | string
-    team: boolean | string
-    enterprise: boolean | string
+    free: boolean | string | string[]
+    pro: boolean | string | string[]
+    team: boolean | string | string[]
+    enterprise: boolean | string | string[]
   }
   usage_based: boolean
 }
@@ -61,10 +61,10 @@ export const pricing: Pricing = {
           main: 'Billing is based on the average daily database size in GB throughout the billing period.',
         },
         plans: {
-          free: '500 MB included',
-          pro: '8 GB included, then $0.125 per GB',
-          team: '8 GB included, then $0.125 per GB',
-          enterprise: 'Unlimited',
+          free: '500 MB included',
+          pro: ['8 GB included', 'then $0.125 per GB'],
+          team: ['8 GB included', 'then $0.125 per GB'],
+          enterprise: 'Custom',
         },
         usage_based: true,
       },
@@ -72,8 +72,8 @@ export const pricing: Pricing = {
         title: 'Automatic backups',
         tooltips: {
           main: 'Backups are entire copies of your database that can be restored in the future.',
-          pro: '7 days of backup (if > 1TB, contact for Enterprise pricing)',
-          team: '14 days of backup (if > 1TB, contact for Enterprise pricing)',
+          pro: '7 days of backup (if > 1 TB, contact for Enterprise pricing)',
+          team: '14 days of backup (if > 1 TB, contact for Enterprise pricing)',
         },
         plans: {
           free: false,
@@ -87,24 +87,22 @@ export const pricing: Pricing = {
         title: 'Point in time recovery',
         tooltips: {
           main: 'PITR cannot be applied retroactively, projects can only be rolled back to the point from which PITR has been applied.',
-          pro: '$100 per 7 days. If > 28 day rollback period, contact enterprise',
-          team: '$100 per 7 days. If > 28 day rollback period, contact enterprise',
         },
         plans: {
           free: false,
           pro: '$100 per 7 days',
           team: '$100 per 7 days',
-          enterprise: true,
+          enterprise: '$100 per 7 days, >28 days available',
         },
         usage_based: false,
       },
       {
         title: 'Pausing',
         tooltips: {
-          main: 'Projects that have no activity or API requests will be paused. They can be reactivated via the dashboard',
+          main: 'Projects that have no activity or API requests will be paused. They can be reactivated via the dashboard.',
         },
         plans: {
-          free: 'After 1 inactive week',
+          free: 'After 1 week of inactivity',
           pro: 'Never',
           team: 'Never',
           enterprise: 'Never',
@@ -112,15 +110,15 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'Database egress',
+        title: 'Bandwidth',
         tooltips: {
-          main: 'Billing is based on the total sum of outgoing traffic of your database in GB throughout your billing period.',
+          main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions) in GB throughout your billing period.',
         },
         plans: {
-          free: '2GB included',
-          pro: '50 GB included, then $0.09 per GB',
-          team: '50 GB included, then $0.09 per GB',
-          enterprise: 'Unlimited',
+          free: '5 GB included',
+          pro: ['250 GB included', 'then $0.09 per GB'],
+          team: ['250 GB included', 'then $0.09 per GB'],
+          enterprise: 'Custom',
         },
         usage_based: true,
       },
@@ -148,9 +146,9 @@ export const pricing: Pricing = {
         },
         plans: {
           free: '50,000 included',
-          pro: '100,000 included, then $0.00325 per MAU',
-          team: '100,000 included, then $0.00325 per MAU',
-          enterprise: 'Unlimited',
+          pro: ['100,000 included', 'then $0.00325 per MAU'],
+          team: ['100,000 included', 'then $0.00325 per MAU'],
+          enterprise: 'Custom',
         },
         usage_based: true,
       },
@@ -185,16 +183,6 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'Enterprise OAuth providers',
-        plans: {
-          free: false,
-          pro: false,
-          team: false,
-          enterprise: true,
-        },
-        usage_based: false,
-      },
-      {
         title: 'Audit trails',
         plans: {
           free: '1 hour',
@@ -208,9 +196,49 @@ export const pricing: Pricing = {
         title: 'Single Sign-On (SAML 2.0)',
         plans: {
           free: false,
-          pro: '50 included, then $0.015 per MAU',
-          team: '50 included, then $0.015 per MAU',
+          pro: ['50 included', 'then $0.015 per MAU'],
+          team: ['50 included', 'then $0.015 per MAU'],
           enterprise: 'Contact Us',
+        },
+        usage_based: false,
+      },
+      {
+        title: 'Leaked password protection',
+        plans: {
+          free: false,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
+        title: 'Single session per user',
+        plans: {
+          free: false,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
+        title: 'Session timeouts',
+        plans: {
+          free: false,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
+        title: 'Auth Hooks',
+        plans: {
+          free: 'Custom Access Token (JWT)',
+          pro: 'Custom Access Token (JWT)',
+          team: 'All',
+          enterprise: 'All',
         },
         usage_based: false,
       },
@@ -237,23 +265,10 @@ export const pricing: Pricing = {
           main: "The sum of all objects' size in your storage buckets.\nBilling is based on the average daily size in GB throughout your billing period.",
         },
         plans: {
-          free: '1 GB included',
-          pro: '100 GB included, then $0.021 per GB',
-          team: '100 GB included, then $0.021 per GB',
-          enterprise: 'Unlimited',
-        },
-        usage_based: true,
-      },
-      {
-        title: 'Storage egress',
-        tooltips: {
-          main: 'All requests to view and download your storage items go through our CDN. We sum up all outgoing traffic (egress) for storage related requests through our CDN. We do not differentiate between cache and no cache hits.\nBilling is based on the total amount of egress in GB throughout your billing period.',
-        },
-        plans: {
-          free: '2 GB included',
-          pro: '200 GB included, then $0.09 per GB',
-          team: '200 GB included, then $0.09 per GB',
-          enterprise: 'Unlimited',
+          free: '1 GB included',
+          pro: ['100 GB included', 'then $0.021 per GB'],
+          team: ['100 GB included', 'then $0.021 per GB'],
+          enterprise: 'Custom',
         },
         usage_based: true,
       },
@@ -271,10 +286,10 @@ export const pricing: Pricing = {
         title: 'Max file upload size',
         tooltips: { main: 'You can change the upload size in the dashboard' },
         plans: {
-          free: '50MB',
-          pro: '5GB',
-          team: '5GB',
-          enterprise: 'Unlimited',
+          free: '50 MB',
+          pro: '50 GB',
+          team: '50 GB',
+          enterprise: 'Custom',
         },
         usage_based: false,
       },
@@ -285,9 +300,9 @@ export const pricing: Pricing = {
         },
         plans: {
           free: false,
-          pro: '100 origin images, then $5 per 1000 origin images',
-          team: '100 origin images, then $5 per 1000 origin images',
-          enterprise: 'Unlimited',
+          pro: ['100 origin images included', 'then $5 per 1000 origin images'],
+          team: ['100 origin images included', 'then $5 per 1000 origin images'],
+          enterprise: 'Custom',
         },
         usage_based: true,
       },
@@ -313,20 +328,20 @@ export const pricing: Pricing = {
           main: 'Billing is based on the sum of all invocations, independent of response status, throughout your billing period.',
         },
         plans: {
-          free: '500K/month included',
-          pro: '2 Million included, then $2 per 1 Million',
-          team: '2 Million included, then $2 per 1 Million',
-          enterprise: 'Unlimited',
+          free: '500,000 included',
+          pro: ['2 Million included', 'then $2 per 1 Million'],
+          team: ['2 Million included', 'then $2 per 1 Million'],
+          enterprise: 'Custom',
         },
         usage_based: true,
       },
       {
         title: 'Script size',
         plans: {
-          free: '2 MB',
-          pro: '10 MB',
-          team: '10 MB',
-          enterprise: 'Unlimited',
+          free: '10 MB',
+          pro: '10 MB',
+          team: '10 MB',
+          enterprise: 'Custom',
         },
         usage_based: false,
       },
@@ -337,9 +352,9 @@ export const pricing: Pricing = {
         },
         plans: {
           free: '10 included',
-          pro: '100 included, then $10 per additional 100',
-          team: '100 included, then $10 per additional 100',
-          enterprise: 'Unlimited',
+          pro: ['100 included', 'then $10 per additional 100'],
+          team: ['100 included', 'then $10 per additional 100'],
+          enterprise: 'Custom',
         },
         usage_based: true,
       },
@@ -366,21 +381,21 @@ export const pricing: Pricing = {
         },
         plans: {
           free: '200 included',
-          pro: '500 included, then $10 per 1000',
-          team: '500 included, then $10 per 1000',
-          enterprise: 'Unlimited concurrent connections and volume discount',
+          pro: ['500 included', 'then $10 per 1000'],
+          team: ['500 included', 'then $10 per 1000'],
+          enterprise: 'Custom concurrent connections and volume discount',
         },
         usage_based: true,
       },
       {
         title: 'Messages Per Month',
         tooltips: {
-          main: "Count of messages going through Realtime.\nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
+          main: "Count of messages going through Realtime. Includes database changes, broadcast and presence. \nUsage example: If you do a database change and 5 clients listen to that change via Realtime, that's 5 messages. If you broadcast a message and 4 clients listen to that, that's 5 messages (1 message sent, 4 received).\nBilling is based on the total amount of messages throughout your billing period.",
         },
         plans: {
           free: '2 Million included',
-          pro: '5 Million included, then $2.50 per Million',
-          team: '5 Million included, then $2.50 per Million',
+          pro: ['5 Million included', 'then $2.50 per Million'],
+          team: ['5 Million included', 'then $2.50 per Million'],
           enterprise: 'Volume discounts on messages',
         },
         usage_based: true,
@@ -388,9 +403,9 @@ export const pricing: Pricing = {
       {
         title: 'Max Message Size',
         plans: {
-          free: '250 KB',
-          pro: '3 MB',
-          team: '3 MB',
+          free: '250 KB',
+          pro: '3 MB',
+          team: '3 MB',
           enterprise: 'Custom',
         },
         usage_based: false,
@@ -492,8 +507,8 @@ export const pricing: Pricing = {
         plans: {
           free: false,
           pro: false,
-          team: true,
-          enterprise: true,
+          team: 'Available as paid add-on',
+          enterprise: 'Available as paid add-on',
         },
         tooltips: {
           main: 'Available as a paid add-on on Team plan and above.',
@@ -511,7 +526,7 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: '99.9% SLA',
+        title: 'Uptime SLAs',
         plans: {
           free: false,
           pro: false,
@@ -573,7 +588,7 @@ export const pricing: Pricing = {
     icon: 'M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z',
     features: [
       {
-        title: 'Community support',
+        title: 'Community Support',
         plans: {
           free: true,
           pro: true,
@@ -583,7 +598,7 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'Email support',
+        title: 'Email Support',
         plans: {
           free: false,
           pro: true,
@@ -593,7 +608,7 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'Email support SLA',
+        title: 'Email Support SLA',
         plans: {
           free: false,
           pro: false,
@@ -623,7 +638,7 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
-        title: 'Designated customer success engineer ',
+        title: 'Designated Customer Success Team',
         plans: {
           free: false,
           pro: false,

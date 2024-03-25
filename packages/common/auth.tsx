@@ -1,4 +1,4 @@
-import { Session } from '@supabase/supabase-js'
+import type { Session } from '@supabase/supabase-js'
 import {
   createContext,
   PropsWithChildren,
@@ -102,6 +102,8 @@ export const useAuth = () => useContext(AuthContext)
 export const useSession = () => useAuth().session
 
 export const useUser = () => useSession()?.user ?? null
+
+export const useIsUserLoading = () => useAuth().isLoading
 
 export const useIsLoggedIn = () => {
   const user = useUser()

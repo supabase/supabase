@@ -1,25 +1,13 @@
 import { Meta } from '@storybook/react'
-import { Button } from '@ui/components/shadcn/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@ui/components/shadcn/ui/card'
-import { Input } from '@ui/components/shadcn/ui/input'
-import { Label } from '@ui/components/shadcn/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@ui/components/shadcn/ui/select'
-import { Switch } from '@ui/components/shadcn/ui/switch'
-import { cn } from '@ui/lib/utils'
 import { BellRing, Check } from 'lucide-react'
+import React from 'react'
+import { cn } from '../../../lib/utils/cn'
+import { Button } from '../ui/button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card'
+import { Input } from '../ui/input'
+import { Label } from '../ui/label'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { Switch } from '../ui/switch'
 
 const meta: Meta = {
   title: 'shadcn/Card',
@@ -111,7 +99,7 @@ export const CardDemo = ({ className, ...props }: CardProps) => {
           <BellRing />
           <div className="flex-1 space-y-1">
             <p className="text-sm font-medium leading-none">Push Notifications</p>
-            <p className="text-sm text-muted-foreground">Send notifications to device.</p>
+            <p className="text-sm text-foreground-muted">Send notifications to device.</p>
           </div>
           <Switch />
         </div>
@@ -124,7 +112,7 @@ export const CardDemo = ({ className, ...props }: CardProps) => {
               <span className="flex h-2 w-2 translate-y-1 rounded-full bg-sky-500" />
               <div className="space-y-1">
                 <p className="text-sm font-medium leading-none">{notification.title}</p>
-                <p className="text-sm text-muted-foreground">{notification.description}</p>
+                <p className="text-sm text-foreground-muted">{notification.description}</p>
               </div>
             </div>
           ))}
