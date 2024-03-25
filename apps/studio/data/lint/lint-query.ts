@@ -2,10 +2,10 @@ import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 import { executeSql } from '../sql/execute-sql-query'
 import { lintKeys } from './keys'
 
-export const LINT_SQL = `
-(
+export const LINT_SQL = `(
 with foreign_keys as (
     select
+        cl.relnamespace::regnamespace as schema_,
         cl.oid::regclass as table_,
         ct.conname as fkey_name,
         ct.conkey col_attnums
@@ -39,11 +39,15 @@ select
     'EXTERNAL' as facing,
     'Identifies foreign key constraints without a covering index, which can impact database performance.' as description,
     format(
-        'Table "%s" has a foreign key "%s" without a covering index. This can lead to suboptimal query performance.',
-        fk.table_, fk.fkey_name
+        'Table "%s"."%s" has a foreign key "%s" without a covering index. This can lead to suboptimal query performance.',
+        fk.schema_,
+        fk.table_,
+        fk.table_,
+        fk.fkey_name
     ) as detail,
     null as remediation,
     jsonb_build_object(
+        'schema', fk.schema_,
         'table', fk.table_,
         'fkey_name', fk.fkey_name,
         'fkey_columns', fk.col_attnums
@@ -51,7 +55,9 @@ select
     format('0001_unindexed_foreign_keys_%s_%s', fk.table_, fk.fkey_name) as cache_key
 from
     foreign_keys fk
-left join index_ idx on fk.table_ = idx.table_ and fk.col_attnums = idx.col_attnums
+    left join index_ idx
+        on fk.table_ = idx.table_
+        and fk.col_attnums = idx.col_attnums
 where
     idx.index_ is null
 order by
@@ -259,7 +265,7 @@ select
     'multiple_permissive_policies' as name,
     'WARN' as level,
     'EXTERNAL' as facing,
-    'Detects if multiple permissive row level security policies are present on a table for the same role and action (e.g. insert). Multiple permissive policies are suboptimal for performance as each policy must be executed for every relevant query.' as description,
+    'Detects if multiple permissive row level security policies are present on a table for the same \`role\` and \`action\` (e.g. insert). Multiple permissive policies are suboptimal for performance as each policy must be executed for every relevant query.' as description,
     format(
         'Table "%s"."%s" has multiple permissive policies for role "%s" for action "%s". Policies include %s',
         n.nspname,
@@ -312,8 +318,7 @@ group by
     r.rolname,
     act.cmd
 having
-    count(1) > 1)
-	`.trim()
+    count(1) > 1)`.trim()
 
 export type Lint = {
   name: string

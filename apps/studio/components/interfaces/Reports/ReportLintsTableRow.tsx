@@ -1,4 +1,4 @@
-import { EyeIcon, EyeOff, HelpCircle } from 'lucide-react'
+import { Eye, EyeIcon, EyeOff, HelpCircle, Table2 } from 'lucide-react'
 import { useState } from 'react'
 
 import Table from 'components/to-be-cleaned/Table'
@@ -59,6 +59,7 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
         <Table.td className="flex flex-col gap-y-1">
           <div className="flex items-center gap-x-2">
             <p className="text-foreground">{getHumanReadableTitle(lint.name)}</p>
+
             <Tooltip_Shadcn_>
               <TooltipTrigger_Shadcn_ asChild>
                 <HelpCircle size={14} />
@@ -68,8 +69,32 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
               </TooltipContent_Shadcn_>
             </Tooltip_Shadcn_>
           </div>
-          <p>{lint.detail}</p>
-          <p>{lint.remediation}</p>
+          <div className="grid gap-3">
+            {lint.detail && <p>{lint.detail}</p>}
+            {lint.remediation && <p>{lint.remediation}</p>}
+
+            <div>
+              {(lint.metadata?.table || lint.metadata?.view_name) && (
+                <div className="flex items-center gap-2 text-xs">
+                  {lint.metadata?.table && (
+                    <Table2 size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+                  )}
+                  {lint.metadata?.view_name && (
+                    <Eye size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+                  )}
+                  <span className="font-mono">
+                    {lint.metadata?.table || lint.metadata?.view_name}
+                  </span>
+                  {lint.metadata?.schema && (
+                    <div className="flex items-center gap-1 ml-2">
+                      <span className="text-foreground-lighter">schema</span>
+                      <span className="text-foreground font-mono">{lint.metadata?.schema}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
         </Table.td>
         <Table.td className="w-16 text-right">
           <Tooltip_Shadcn_>
