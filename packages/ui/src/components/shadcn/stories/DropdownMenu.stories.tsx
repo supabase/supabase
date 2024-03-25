@@ -1,36 +1,36 @@
-import React from 'react'
+import { DropdownMenuCheckboxItemProps, DropdownMenuProps } from '@radix-ui/react-dropdown-menu'
 import type { Meta, StoryObj } from '@storybook/react'
-import { Button } from '@ui/components/shadcn/ui/button'
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuPortal,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from '@ui/components/shadcn/ui/dropdown-menu'
-import {
-  Cloud,
-  Github,
-  LifeBuoy,
-  LogOut,
-  Mail,
-  MessageSquare,
-  Plus,
-  PlusCircle,
-  UserPlus,
-  Users,
+    Cloud,
+    Github,
+    LifeBuoy,
+    LogOut,
+    Mail,
+    MessageSquare,
+    Plus,
+    PlusCircle,
+    UserPlus,
+    Users,
 } from 'lucide-react'
-import { DropdownMenuProps, DropdownMenuCheckboxItemProps } from '@radix-ui/react-dropdown-menu'
+import React from 'react'
+import { Button } from '../ui/button'
+import {
+    DropdownMenu,
+    DropdownMenuCheckboxItem,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuPortal,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
+    DropdownMenuSeparator,
+    DropdownMenuShortcut,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from '../ui/dropdown-menu'
 
 type Checked = DropdownMenuCheckboxItemProps['checked']
 

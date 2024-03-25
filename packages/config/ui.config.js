@@ -142,7 +142,7 @@ const uiConfig = {
         },
         colors: { ...variables.root },
       },
-      '.dark': {
+      "[data-theme*='dark']": {
         colors: { ...variables.dark },
       },
     },
@@ -281,6 +281,7 @@ const uiConfig = {
         'panel-slide-right-in': 'panelSlideRightIn 250ms cubic-bezier(0.87, 0, 0.13, 1)',
 
         'line-loading': 'lineLoading 1.8s infinite',
+        'line-loading-slower': 'lineLoading 2.3s infinite',
 
         // tailwind class for this is `animate-dropdownFadeIn`
         dropdownFadeIn: 'dropdownFadeIn 0.1s ease-out',
@@ -289,8 +290,8 @@ const uiConfig = {
       },
       colors: {
         ...colorClasses,
-        'hi-contrast': `var(--colors-fixed-scale12)`,
-        'lo-contrast': `var(--colors-fixed-scale1)`,
+        'hi-contrast': `hsl(var(--foreground-default))`,
+        'lo-contrast': `hsl(var(--background-alternative-default))`,
         warning: {
           default: 'red',
           100: '#342355',

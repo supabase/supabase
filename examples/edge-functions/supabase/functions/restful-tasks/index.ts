@@ -2,12 +2,12 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { serve } from 'std/server'
-import { createClient, SupabaseClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey',
+  'Access-Control-Allow-Methods': 'POST, GET, OPTIONS, PUT, DELETE',
 }
 
 interface Task {
@@ -65,7 +65,7 @@ async function createTask(supabaseClient: SupabaseClient, task: Task) {
   })
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   const { url, method } = req
 
   // This is needed if you're planning to invoke your function from a browser.
@@ -82,7 +82,11 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       // Create client with Auth context of the user that called the function.
       // This way your row-level-security (RLS) policies are applied.
-      { global: { headers: { Authorization: req.headers.get('Authorization')! } } }
+      {
+        global: {
+          headers: { Authorization: req.headers.get('Authorization')! },
+        },
+      }
     )
 
     // For more details on URLPattern, check https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API

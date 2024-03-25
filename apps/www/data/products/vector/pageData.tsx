@@ -1,27 +1,33 @@
 import Link from 'next/link'
-import IntegrationsImage from '~/components/Products/VectorAI/IntegrationsImage'
 import OpenAIImage from '~/components/Products/VectorAI/OpenAIImage'
 import SecureAndScalableImg from '~/components/Products/VectorAI/SecureAndScalableImg'
 import PGvectorImg from '~/components/Products/VectorAI/PGvectorImg'
 import DeployGlobally from '~/components/Products/VectorAI/DeployGlobally'
+import IntegrationsImage from '~/components/Products/VectorAI/IntegrationsImage'
 
-export default {
+export default (isMobile?: boolean) => ({
   metaTitle: '',
   metaDescription: '',
   heroSection: {
+    announcement: {
+      url: 'https://youtu.be/qw4PrtyvJI0?t=10584',
+      badge: 'AI Engineer Summit',
+      announcement: "Watch our CEO's talk",
+      target: '_blank',
+      hasArrow: !isMobile,
+    },
     title: 'Supabase Vector',
     h1: (
       <span key={'vector-h1'} className="heading-gradient">
-        The Postgres Vector database <br />
+        The Postgres Vector database <br className="hidden md:block" />
         and AI Toolkit
       </span>
     ),
     subheader: (
       <>
         An open source Vector database for developing AI applications.
-        <br className="hidden md:block" />
-        Use pgvector to store, index, and access embeddings, and our AI toolkit to build AI
-        applications with Hugging Face and OpenAI.
+        <br className="hidden md:block" /> Use pgvector to store, index, and access embeddings, and
+        our AI toolkit to build AI applications with Hugging Face and OpenAI.
       </>
     ),
     image: '/images/product/vector/vector-hero.svg',
@@ -50,17 +56,8 @@ export default {
       },
       {
         title: 'Secure and Scalable',
-        paragraph: (
-          <>
-            Supabase is{' '}
-            <Link href="https://forms.supabase.com/soc2">
-              <a className="text-scale-1100 hover:underline" target="_blank">
-                SOC2 type 2
-              </a>
-            </Link>{' '}
-            compliant, and comes with an advanced permissions system.
-          </>
-        ),
+        paragraph:
+          'Supabase is SOC2 Type 2 compliant, and comes with an advanced permissions system.',
         image: SecureAndScalableImg,
       },
       {
@@ -73,7 +70,7 @@ export default {
   },
   integrations: {
     title: 'Leverage the tools you love',
-    image: <IntegrationsImage />,
+    image: IntegrationsImage,
   },
   useCasesSection: {
     title: (
@@ -100,25 +97,23 @@ export default {
       },
       {
         icon: 'M18 10C18 13.866 14.4183 17 10 17C8.50836 17 7.11208 16.6428 5.91677 16.0208L2 17L3.3383 13.8773C2.4928 12.7673 2 11.434 2 10C2 6.13401 5.58172 3 10 3C14.4183 3 18 6.13401 18 10ZM7 9H5V11H7V9ZM15 9H13V11H15V9ZM9 9H11V11H9V9Z',
-        title: 'Chatbots',
+        title: 'ChatGPT Plugins',
         description: 'Enhance chatbot memory with content-based long-term retention.',
         cta: {
-          label: 'Template coming soon',
-          link: '/docs/guides/ai/examples/nextjs-vector-search',
-          isDisabled: true,
+          label: 'View example',
+          link: '/docs/guides/ai/examples/building-chatgpt-plugins',
         },
       },
       {
         icon: `M6 2C4.89543 2 4 2.89543 4 4V9.52779C5.06151 8.57771 6.46329 8 8 8C11.3137 8 14 10.6863 14 14C14 15.5367 13.4223 16.9385 12.4722 18H14C15.1046 18 16 17.1046 16 16V7.41421C16 6.88378 15.7893 6.37507 15.4142 6L12 2.58579C11.6249 2.21071 11.1162 2 10.5858 2H6Z
-        
+
         M4 14C4 11.7909 5.79086 10 8 10C10.2091 10 12 11.7909 12 14C12 16.2091 10.2091 18 8 18C7.25862 18 6.56362 17.7977 5.96818 17.446L4.70711 18.7071C4.31658 19.0976 3.68342 19.0976 3.29289 18.7071C2.90237 18.3166 2.90237 17.6834 3.29289 17.2929L4.55397 16.0318C4.20229 15.4364 4 14.7414 4 14ZM8 12C6.89543 12 6 12.8954 6 14C6 14.5526 6.22276 15.0512 6.58579 15.4142C6.94881 15.7772 7.44744 16 8 16C9.10457 16 10 15.1046 10 14C10 12.8954 9.10457 12 8 12Z
         `,
-        title: 'Hybrid search',
-        description: 'Combine semantic and full-text search with powerful SQL filtering.',
+        title: 'OpenAI completions',
+        description: 'Generate GPT text completions using OpenAI in Edge Functions.',
         cta: {
-          label: 'Template coming soon',
-          link: '/examples/ai/image_search/README.md',
-          isDisabled: true,
+          label: 'View example',
+          link: '/docs/guides/ai/examples/openai',
         },
       },
       {
@@ -146,12 +141,11 @@ export default {
       },
       {
         icon: 'M11 4C11 3.44772 10.5523 3 10 3V3.66667C10 4.74852 9.64911 5.80119 9 6.66667L7.6 8.53333C7.21053 9.05262 7 9.68422 7 10.3333V15.7639C7 16.1427 7.214 16.489 7.55279 16.6584L7.60263 16.6833C8.01919 16.8916 8.47854 17 8.94427 17H14.3604C14.8371 17 15.2475 16.6635 15.341 16.1961L16.541 10.1961C16.6647 9.57732 16.1914 9 15.5604 9H11V4ZM3.5 10C3.22386 10 3 10.2239 3 10.5V16.5C3 16.7761 3.22386 17 3.5 17C3.77614 17 4 16.7761 4 16.5V10.5C4 10.2239 3.77614 10 3.5 10Z',
-        title: 'Recommendations',
-        description: 'Discover related content: articles, videos, restaurants, and more.',
+        title: 'Next.js Vector Search',
+        description: 'Learn how to build ChatGPT-style doc search powered by Next.js and OpenAI.',
         cta: {
-          label: 'Template coming soon',
-          link: '#',
-          isDisabled: true,
+          label: 'View example',
+          link: '/docs/guides/ai/examples/nextjs-vector-search',
         },
       },
     ],
@@ -294,14 +288,28 @@ docs.query(
       {
         type: 'customer-story',
         avatar: '',
-        customer: 'markprompt',
-        author: 'Michael Fester',
-        role: 'Co-Founder at Markprompt',
+        customer: 'mozilla',
+        author: 'Hermina Condei',
+        role: 'Director at MDN, Mozilla',
+        target: '_blank',
         quote:
-          'We decided to use Supabase over other specialized vector databases because it enabled us to be GDPR compliant from day one with little effort.',
-        image: '/images/customers/logos/markprompt.png',
-        abstract: 'Markprompt and Supabase - GDPR-Compliant AI Chatbots for Docs and Websites.',
-        url: '/customers/markprompt',
+          'We store embeddings in a PostgreSQL database, hosted by Supabase, to perform a similarity search to identify the most relevant sections within the MDN.',
+        image: '/images/customers/logos/mozilla.png',
+        abstract:
+          'MDN introduces an AI assistant powered by Supabase Vector to answer all web development questions in real time.',
+        url: 'https://developer.mozilla.org/en-US/blog/introducing-ai-help/',
+      },
+      {
+        type: 'customer-story',
+        avatar: '',
+        customer: 'quivr',
+        author: 'Stan Girard',
+        role: 'Founder of Quivr',
+        quote:
+          'Supabase Vector powered by pgvector allowed us to create a simple and efficient product. We are storing over 1.6 million embeddings and the performance and results are great. Open source develop can easily contribute thanks to the SQL syntax known by millions of developers.',
+        image: '/images/customers/logos/quivr.png',
+        abstract: 'Quivr launch 5,000 Vector databases on Supabase.',
+        url: '/customers/quivr',
       },
       {
         type: 'customer-story',
@@ -316,12 +324,5 @@ docs.query(
         url: '/customers/mendableai',
       },
     ],
-    secondaryLinks: [
-      // {
-      //   customer: 'BerriAI',
-      //   image: '/images/product/vector/community/berriAI.svg',
-      //   url: '/customers/berriai',
-      // },
-    ],
   },
-}
+})

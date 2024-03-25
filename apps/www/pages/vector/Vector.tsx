@@ -1,12 +1,13 @@
+import 'swiper/swiper.min.css'
+
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import DefaultLayout from '~/components/Layouts/Default'
 
+import { useBreakpoint } from 'common'
 import { PRODUCT_SHORTNAMES } from '~/lib/constants'
-import pageData from '~/data/products/vector/pageData'
-
-import 'swiper/swiper.min.css'
+import vectorPageData from '~/data/products/vector/pageData'
 
 const ProductHeaderCentered = dynamic(() => import('~/components/Sections/ProductHeaderCentered'))
 const HighlightCards = dynamic(() => import('~/components/Sections/HighlightCards'))
@@ -20,10 +21,12 @@ const EnterpriseCta = dynamic(() => import('~/components/Sections/EnterpriseCta'
 
 function VectorPage() {
   // base path for images
+  const isXs = useBreakpoint(640)
   const { basePath } = useRouter()
   const meta_title = 'Supabase Vector | The Postgres Vector database.'
   const meta_description =
     'An open source Vector database for developing AI applications. Use pgvector to store, index, and access embeddings, and our AI toolkit to build AI applications with Hugging Face and OpenAI.'
+  const pageData = vectorPageData(isXs)
 
   return (
     <>
@@ -41,21 +44,21 @@ function VectorPage() {
           ],
         }}
       />
-      <DefaultLayout className="!bg-scale-300 dark:!bg-scale-100">
+      <DefaultLayout className="!bg-alternative">
         <ProductHeaderCentered {...pageData.heroSection} />
-        <HighlightCards {...pageData.highlightsSection} />
+        <HighlightCards {...(pageData.highlightsSection as any)} />
         <CenteredTitleImage {...pageData.integrations} />
         <TimedTabsSection {...pageData.APIsection} />
-        <div className="bg-white dark:bg-[#121212]">
+        <div className="bg-alternative">
           <UseCasesSection {...pageData.useCasesSection} />
           <FeaturesSection {...pageData.featuresSection} />
         </div>
         <CustomerQuotesSection {...pageData.quotesSection} />
-        <div className="bg-gradient-to-t from-white dark:from-[#121212] to-transparent">
+        <div className="bg-gradient-to-t from-alternative to-transparent">
           <EnterpriseCta />
         </div>
-        <div className="bg-scale-200">
-          <div className="w-full h-[1px] bg-gradient-to-r from-scale-100 via-scale-500 dark:via-scale-600 to-scale-100" />
+        <div className="bg-background">
+          <div className="w-full h-[1px] bg-gradient-to-r from-background-alternative via-border to-background-alternative" />
           <ProductsCta currentProduct={PRODUCT_SHORTNAMES.VECTOR} />
         </div>
       </DefaultLayout>

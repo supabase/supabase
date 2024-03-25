@@ -2,8 +2,7 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { serve } from 'std/server'
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.7.1'
 import { corsHeaders } from '../_shared/cors.ts'
 
 console.log(`Function "get-tshirt-competition" up and running!`)
@@ -23,7 +22,7 @@ function turnEmailToCount(email: string): string {
   )}`
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // This is needed if you're planning to invoke your function from a browser.
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -41,15 +40,17 @@ serve(async (req) => {
       !answer ||
       !twitter ||
       !size
-    )
+    ) {
       throw new Error(
         `Please provide valid 'email', 'twitter', 'size', and 'answer' params. HINT: https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/get-tshirt-competition/index.ts`
       )
+    }
 
-    if (answer !== countEmailSegments(email!))
+    if (answer !== countEmailSegments(email!)) {
       throw new Error(
         `Sorry, that's wrong, please try again! HINT: https://github.com/supabase/supabase/blob/master/examples/edge-functions/supabase/functions/get-tshirt-competition/index.ts`
       )
+    }
 
     const supabaseAdminClient = createClient(
       // Supabase API URL - env var exported by default when deployed.

@@ -1,5 +1,4 @@
-import { Pool } from 'postgres'
-import { serve } from 'std/server'
+import { Pool } from 'https://deno.land/x/postgres@v0.17.0/mod.ts'
 
 // Create a database pool with one connection.
 const pool = new Pool(
@@ -7,14 +6,14 @@ const pool = new Pool(
     tls: { enabled: false },
     database: 'postgres',
     hostname: Deno.env.get('DB_HOSTNAME'),
-    user: 'postgres',
-    port: 5432,
+    user: Deno.env.get('DB_USER'),
+    port: 6543,
     password: Deno.env.get('DB_PASSWORD'),
   },
   1
 )
 
-serve(async (_req) => {
+Deno.serve(async (_req) => {
   try {
     // Grab a connection from the pool
     const connection = await pool.connect()

@@ -19,12 +19,12 @@ const ApiOperationSection = (props) => {
     >
       <RefSubLayout.Details>
         <div className="mt-4">
-          <code className="text-md flex gap-4 text-md text-scale-900 break-all">
+          <code className="text-md flex gap-4 text-md text-foreground-lighter break-all">
             <span
               className="
                 uppercase 
                 whitespace-nowrap 
-                bg-scale-1200 text-scale-100 
+                bg-foreground text-background 
                 flex items-center justify-center 
                 rounded-full font-mono font-medium text-xs px-2 py-0.5"
             >
@@ -33,20 +33,20 @@ const ApiOperationSection = (props) => {
             {operation.path}
           </code>
         </div>
-        <div className="prose dark:prose-dark py-4">
+        <div className="prose py-4">
           <p>{operation.description}</p>
         </div>
         {/* Path Parameters */}
         {operation.parameters &&
           operation.parameters.filter((parameter) => parameter.in === 'path').length > 0 && (
             <div className="not-prose mt-12">
-              <h5 className="mb-3 text-base text-scale-1200">Path Parameters</h5>
+              <h5 className="mb-3 text-base text-foreground">Path Parameters</h5>
               <ul className="mt-4">
                 {operation.parameters &&
                   operation.parameters
                     .filter((parameter: any) => parameter.in === 'path')
-                    .map((parameter: any) => (
-                      <Param {...parameter} isOptional={!parameter.required}></Param>
+                    .map((parameter: any, index: number) => (
+                      <Param key={index} {...parameter} isOptional={!parameter.required}></Param>
                     ))}
               </ul>
             </div>
@@ -56,13 +56,13 @@ const ApiOperationSection = (props) => {
         {operation.parameters &&
           operation.parameters.filter((parameter) => parameter.in === 'query').length > 0 && (
             <div className="not-prose mt-12">
-              <h5 className="mb-3 text-base text-scale-1200">Query Parameters</h5>
+              <h5 className="mb-3 text-base text-foreground">Query Parameters</h5>
               <ul className="mt-4">
                 {operation.parameters &&
                   operation.parameters
                     .filter((parameter: any) => parameter.in === 'query')
-                    .map((parameter: any) => (
-                      <Param {...parameter} isOptional={!parameter.required}></Param>
+                    .map((parameter: any, index: number) => (
+                      <Param key={index} {...parameter} isOptional={!parameter.required}></Param>
                     ))}
               </ul>
             </div>
@@ -72,13 +72,13 @@ const ApiOperationSection = (props) => {
         {operation.parameters &&
           operation.parameters.filter((parameter) => parameter.in === 'header').length > 0 && (
             <div className="not-prose mt-12">
-              <h5 className="mb-3 text-base text-scale-1200">Query Parameters</h5>
+              <h5 className="mb-3 text-base text-foreground">Query Parameters</h5>
               <ul className="mt-4">
                 {operation.parameters &&
                   operation.parameters
                     .filter((parameter: any) => parameter.in === 'header')
-                    .map((parameter: any) => (
-                      <Param {...parameter} isOptional={!parameter.required}></Param>
+                    .map((parameter: any, index) => (
+                      <Param key={index} {...parameter} isOptional={!parameter.required}></Param>
                     ))}
               </ul>
             </div>
@@ -86,16 +86,17 @@ const ApiOperationSection = (props) => {
       </RefSubLayout.Details>
       {operation.responseList && operation.responseList.length > 0 && (
         <RefSubLayout.Examples>
-          <h5 className="mb-3 text-base text-scale-1200">Responses</h5>
+          <h5 className="mb-3 text-base text-foreground">Responses</h5>
           <Tabs
             scrollable
             size="small"
             type="underlined"
             defaultActiveId={operation.responseList[0].responseCode}
+            queryGroup="response-status"
           >
-            {operation.responseList.map((response: any) => (
-              <Tabs.Panel id={response.responseCode} label={response.responseCode}>
-                <p className="text-scale-1000">{response.description}</p>
+            {operation.responseList.map((response: any, i: number) => (
+              <Tabs.Panel key={i} id={response.responseCode} label={response.responseCode}>
+                <p className="text-foreground">{response.description}</p>
                 {response?.content && response?.content['application/json'] && (
                   <div className="mt-8">
                     <CodeBlock language="bash" className="relative">

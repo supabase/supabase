@@ -408,12 +408,6 @@
     "link": "/guides/database/extensions/pgvector"
   },
   {
-    "name": "pg_repack",
-    "comment": "Optimize physical storage and remove bloat from tables and indexes",
-    "tags": ["Admin", "Utility"],
-    "link": "/guides/database/extensions/pg_repack"
-  },
-  {
     "name": "wrappers",
     "comment": "Foreign data wrappers developed by Supabase",
     "tags": ["Admin", "Utility"],

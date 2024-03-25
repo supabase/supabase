@@ -1,8 +1,7 @@
 import { Meta } from '@storybook/react'
-import { Card } from '@ui/components/shadcn/ui/card'
 import * as React from 'react'
 // import Link from 'next/link'
-import { cn } from '@ui/lib/utils'
+import { cn } from '../../../lib/utils/cn'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -10,8 +9,7 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from '@ui/components/shadcn/ui/navigation-menu'
+} from '../ui/navigation-menu'
 
 const meta: Meta = {
   title: 'shadcn/NavigationMenu',
@@ -70,7 +68,7 @@ export function Default() {
               {...props}
             >
               <div className="text-sm font-medium leading-none">{title}</div>
-              <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">{children}</p>
+              <p className="line-clamp-2 text-sm leading-snug text-foreground-muted">{children}</p>
             </a>
           </NavigationMenuLink>
         </li>
@@ -109,7 +107,7 @@ export function Default() {
                     >
                       <div className="w-7 h-7 rounded-lg bg-foreground"></div>
                       <div className="mb-2 mt-4 text-lg font-medium">shadcn/ui</div>
-                      <p className="text-sm leading-tight text-muted-foreground">
+                      <p className="text-sm leading-tight text-foreground-muted">
                         Beautifully designed components built with Radix UI and Tailwind CSS.
                       </p>
                     </a>

@@ -1,9 +1,8 @@
 import { Meta } from '@storybook/react'
-import { Card } from '@ui/components/shadcn/ui/card'
-import { Button } from '@ui/components/shadcn/ui/button'
-import { Input } from '@ui/components/shadcn/ui/input'
-import { Label } from '@ui/components/shadcn/ui/label'
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
+import { Button } from '../ui/button'
+import { Input } from '../ui/input'
+import { Label } from '../ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 
 const meta: Meta = {
   title: 'shadcn/Popover',
@@ -20,7 +19,7 @@ export function PopoverDemo() {
         <div className="grid gap-4">
           <div className="space-y-2">
             <h4 className="font-medium leading-none">Dimensions</h4>
-            <p className="text-sm text-muted-foreground">Set the dimensions for the layer.</p>
+            <p className="text-sm text-foreground-muted">Set the dimensions for the layer.</p>
           </div>
           <div className="grid gap-2">
             <div className="grid grid-cols-3 items-center gap-4">

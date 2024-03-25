@@ -1,14 +1,15 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { useWindowSize } from 'react-use'
-import { useBreakpoint, useTheme } from 'common'
+import { useBreakpoint } from 'common'
+import { useTheme } from 'next-themes'
 import { cn } from 'ui'
 
 import styles from './hero.module.css'
 
 const OSSHero = () => (
   <>
-    <div className="absolute z-[-4] flex flex-col top-0 left-0 w-screen h-[500px] overflow-hidden pointer-events-none">
+    <div className="absolute z-[-4] flex flex-col top-0 left-0 w-full h-[500px] overflow-hidden pointer-events-none">
       <div className="absolute bottom-0 z-[1] w-full h-4/5 bg-gradient-to-t from-background to-transparent" />
       <div className="absolute top-0 z-[1] w-full h-2/5 bg-gradient-to-b from-background to-transparent" />
     </div>
@@ -19,7 +20,7 @@ const OSSHero = () => (
       )}
     >
       <div
-        className="absolute select-none pointer-events-none inset-0 z-[3] blur-[100px] w-full h-full opacity-60 dark:opacity-60"
+        className="absolute select-none pointer-events-none inset-0 z-[3] blur-[100px] w-full h-full opacity-60"
         style={{ transform: 'translateZ(0px)' }}
       />
       <div className="absolute bottom-0 z-[-2] w-full h-full bg-gradient-to-t from-background to-transparent" />
@@ -29,12 +30,12 @@ const OSSHero = () => (
 )
 
 const HeroGrid = () => {
-  const { isDarkMode } = useTheme()
+  const { resolvedTheme } = useTheme()
   const { width } = useWindowSize()
   const isSm = useBreakpoint(640)
 
   const svgGridOptions = {
-    color: isDarkMode ? '#00d4ad' : '#015a42',
+    color: resolvedTheme?.includes('dark') ? '#00d4ad' : '#015a42',
     boxWidth: width ? width * 7 : 7500,
     boxHeight: width ? width * 5 : 6000,
     xLines: isSm ? 20 : 49,
