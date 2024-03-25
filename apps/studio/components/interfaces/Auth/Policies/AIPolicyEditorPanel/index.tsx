@@ -424,7 +424,7 @@ export const AIPolicyEditorPanel = memo(function ({
                   setAssistantVisible={setAssistantPanel}
                 />
 
-                <div className="flex flex-col h-full w-full justify-between">
+                <div className="flex flex-col h-full w-full justify-between overflow-y-auto">
                   {incomingChange ? (
                     <div className="px-5 py-3 flex justify-between gap-3 bg-surface-75">
                       <div className="flex gap-2 items-center text-foreground-light">
@@ -554,7 +554,7 @@ export const AIPolicyEditorPanel = memo(function ({
                             <p className="font-mono tracking-tighter">
                               {showCheckBlock ? (
                                 <>
-                                  <span className="text-[#569cd6]">WITH CHECK</span>{' '}
+                                  <span className="text-[#569cd6]">with check</span>{' '}
                                   <span className="text-[#ffd700]">(</span>
                                 </>
                               ) : (

@@ -77,14 +77,14 @@ export const LockedCreateQuerySection = ({
       <div className="flex items-start" style={{ fontSize: '14px' }}>
         <p className="px-6 font-mono text-sm text-foreground-light select-none">1</p>
         <p className="font-mono tracking-tighter">
-          <span className="text-[#569cd6]">{isEditing ? 'ALTER' : 'CREATE'}</span> POLICY "
+          <span className="text-[#569cd6]">{isEditing ? 'alter' : 'create'}</span> policy "
           {name.length === 0 ? 'policy_name' : name}"
         </p>
       </div>
       <div className="flex items-start" style={{ fontSize: '14px' }}>
         <p className="px-6 font-mono text-sm text-foreground-light select-none">2</p>
         <p className="font-mono tracking-tighter">
-          <span className="text-[#569cd6]">ON</span> "{state.selectedSchemaName}"."
+          <span className="text-[#569cd6]">on</span> "{state.selectedSchemaName}"."
           {table}"
         </p>
       </div>
@@ -93,13 +93,13 @@ export const LockedCreateQuerySection = ({
           <div className="flex items-start" style={{ fontSize: '14px' }}>
             <p className="px-6 font-mono text-sm text-foreground-light select-none">3</p>
             <p className="font-mono tracking-tighter">
-              <span className="text-[#569cd6]">AS</span> {behavior.toLocaleUpperCase()}
+              <span className="text-[#569cd6]">as</span> {behavior.toLocaleUpperCase()}
             </p>
           </div>
           <div className="flex items-start" style={{ fontSize: '14px' }}>
             <p className="px-6 font-mono text-sm text-foreground-light select-none">4</p>
             <p className="font-mono tracking-tighter">
-              <span className="text-[#569cd6]">FOR</span> {command.toLocaleUpperCase()}
+              <span className="text-[#569cd6]">for</span> {command.toLocaleUpperCase()}
             </p>
           </div>
         </>
@@ -107,13 +107,13 @@ export const LockedCreateQuerySection = ({
       <div className="flex items-start" style={{ fontSize: '14px' }}>
         <p className="px-6 font-mono text-sm text-foreground-light select-none">5</p>
         <p className="font-mono tracking-tighter">
-          <span className="text-[#569cd6]">TO</span> {roles.length === 0 ? 'public' : roles}
+          <span className="text-[#569cd6]">to</span> {roles.length === 0 ? 'public' : roles}
         </p>
       </div>
       <div className="flex items-start" style={{ fontSize: '14px' }}>
         <p className="px-6 font-mono text-sm text-foreground-light select-none">6</p>
         <p className="font-mono tracking-tighter">
-          <span className="text-[#569cd6]">{command === 'insert' ? 'WITH CHECK' : 'USING'}</span>{' '}
+          <span className="text-[#569cd6]">{command === 'insert' ? 'with check' : 'using'}</span>{' '}
           <span className="text-[#ffd700]">(</span>
         </p>
       </div>
@@ -143,7 +143,7 @@ export const LockedRenameQuerySection = ({
           </p>
         </div>
         <p className="font-mono tracking-tighter">
-          <span className="text-[#569cd6]">ALTER</span> POLICY {oldName}
+          <span className="text-[#569cd6]">alter</span> policy {oldName}
         </p>
       </div>
       <div className="flex items-center" style={{ fontSize: '14px' }}>
@@ -153,7 +153,7 @@ export const LockedRenameQuerySection = ({
           </p>
         </div>
         <p className="font-mono tracking-tighter">
-          <span className="text-[#569cd6]">ON</span> "{state.selectedSchemaName}"."{table}"
+          <span className="text-[#569cd6]">on</span> "{state.selectedSchemaName}"."{table}"
         </p>
       </div>
       <div className="flex items-center" style={{ fontSize: '14px' }}>
@@ -163,7 +163,7 @@ export const LockedRenameQuerySection = ({
           </p>
         </div>
         <p className="font-mono tracking-tighter">
-          <span className="text-[#569cd6]">RENAME</span> TO "{newName}";
+          <span className="text-[#569cd6]">rename</span> to "{newName}";
         </p>
       </div>
     </div>
