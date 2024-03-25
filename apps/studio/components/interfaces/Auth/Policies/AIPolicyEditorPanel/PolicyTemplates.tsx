@@ -1,3 +1,4 @@
+import { PostgresPolicy } from '@supabase/postgres-meta'
 import { Search } from 'lucide-react'
 import { useState } from 'react'
 import { Badge, HoverCard, HoverCardContent, HoverCardTrigger, Input, cn } from 'ui'
@@ -8,23 +9,35 @@ import CardButton from 'components/ui/CardButton'
 import CopyButton from 'components/ui/CopyButton'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { getGeneralPolicyTemplates } from '../PolicyEditorModal/PolicyEditorModal.constants'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 interface PolicyTemplatesProps {
+  selectedPolicy?: PostgresPolicy
   selectedTemplate?: string
-  onSelectTemplate: (template: { id: string; content: string }) => void
+  onSelectTemplate: (template: any) => void
 }
 
-export const PolicyTemplates = ({ selectedTemplate, onSelectTemplate }: PolicyTemplatesProps) => {
+export const PolicyTemplates = ({
+  selectedPolicy,
+  selectedTemplate,
+  onSelectTemplate,
+}: PolicyTemplatesProps) => {
   const [search, setSearch] = useState('')
-  const templates = getGeneralPolicyTemplates('schema_name', 'table_name')
+  const state = useTableEditorStateSnapshot()
+  const templates = getGeneralPolicyTemplates(state.selectedSchemaName, 'table_name')
+
+  const baseTemplates =
+    selectedPolicy !== undefined
+      ? templates.filter((t) => t.command === selectedPolicy.command)
+      : templates
   const filteredTemplates =
     search.length > 0
-      ? templates.filter(
+      ? baseTemplates.filter(
           (template) =>
             template.name.toLowerCase().includes(search.toLowerCase()) ||
             template.command.toLowerCase().includes(search.toLowerCase())
         )
-      : templates
+      : baseTemplates
 
   return (
     <div className="h-full px-content py-content flex flex-col gap-3">
@@ -47,7 +60,7 @@ export const PolicyTemplates = ({ selectedTemplate, onSelectTemplate }: PolicyTe
       <div className="flex flex-col gap-1.5">
         {filteredTemplates.map((template) => {
           return (
-            <HoverCard key={template.id} openDelay={100} closeDelay={0}>
+            <HoverCard key={template.id} openDelay={100} closeDelay={100}>
               <HoverCardTrigger>
                 <CardButton
                   title={template.name}
@@ -59,7 +72,7 @@ export const PolicyTemplates = ({ selectedTemplate, onSelectTemplate }: PolicyTe
                       : ''
                   )}
                   key={template.id}
-                  onClick={() => onSelectTemplate({ id: template.id, content: template.statement })}
+                  onClick={() => onSelectTemplate(template)}
                   hideChevron
                   fixedHeight={false}
                   icon={
@@ -90,7 +103,7 @@ export const PolicyTemplates = ({ selectedTemplate, onSelectTemplate }: PolicyTe
                 hideWhenDetached
                 side="left"
                 align="center"
-                className="w-96 flex"
+                className="w-[500px] flex"
                 animate="slide-in"
               >
                 <SimpleCodeBlock
