@@ -40,7 +40,7 @@ Now we can use the [Headless Vector Search](https://github.com/supabase/headless
 1. Clone the repo to your local machine: `git clone git@github.com:supabase/headless-vector-search.git`
 2. Link the repo to your remote project: `supabase link --project-ref XXX`
 3. Apply the database migrations: `supabase db push`
-4. Set your OpenAI key as a secret: `supabase secrets set OPENAI_KEY=sk-xxx`
+4. Set your OpenAI key as a secret: `supabase secrets set OPENAI_API_KEY=sk-xxx`
 5. Deploy the Edge Functions: `supabase functions deploy --no-verify-jwt`
 6. Expose `docs` schema via API in Supabase Dashboard [settings](https://supabase.com/dashboard/project/_/settings/api) > `API Settings` > `Exposed schemas`
 
@@ -66,11 +66,11 @@ jobs:
         with:
           supabase-url: 'https://your-project-ref.supabase.co' # Update this to your project URL.
           supabase-service-role-key: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          openai-key: ${{ secrets.OPENAI_KEY }}
+          openai-key: ${{ secrets.OPENAI_API_KEY }}
           docs-root-path: 'docs' # the path to the root of your md(x) files
 ```
 
-Make sure to choose the latest version, and set your `SUPABASE_SERVICE_ROLE_KEY` and `OPENAI_KEY` as repository secrets in your repo settings (settings > secrets > actions).
+Make sure to choose the latest version, and set your `SUPABASE_SERVICE_ROLE_KEY` and `OPENAI_API_KEY` as repository secrets in your repo settings (settings > secrets > actions).
 
 ### Add a search interface
 

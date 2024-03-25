@@ -22,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      OPENAI_KEY: ${{ secrets.OPENAI_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
       PROJECT_ID: ${{ secrets.SEARCH_SUPABASE_PROJECT_ID }}
       NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SEARCH_SUPABASE_URL }}

@@ -17,7 +17,7 @@
     },
     "docs#build": {
       "dependsOn": ["^build"],
-      "env": ["SUPABASE_SERVICE_ROLE_KEY", "OPENAI_KEY"],
+      "env": ["SUPABASE_SERVICE_ROLE_KEY", "OPENAI_API_KEY"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "studio#build": {

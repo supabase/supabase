@@ -5,7 +5,7 @@ import { collectStream, extractMarkdownSql, formatSql, getPolicyInfo } from '../
 import { debugSql, editSql, generateSql, titleSql } from './sql'
 import { chatRlsPolicy } from './sql.edge'
 
-const openAiKey = process.env.OPENAI_KEY
+const openAiKey = process.env.OPENAI_API_KEY
 const openai = new OpenAI({ apiKey: openAiKey })
 
 describe('generate', () => {
@@ -50,7 +50,7 @@ describe('debug', () => {
           email text,
           department_id bigint references departments (id)
         );
-        
+
         create table departments (
           id bigint primary key generated always as identity,
           name text
@@ -86,7 +86,7 @@ describe('title', () => {
           email text,
           department_id bigint references departments (id)
         );
-        
+
         create table departments (
           id bigint primary key generated always as identity,
           name text

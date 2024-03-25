@@ -170,7 +170,7 @@ import { Configuration, OpenAIApi } from 'openai'
 import { supabaseClient } from './lib/supabase'
 
 async function generateEmbeddings() {
-  const configuration = new Configuration({ apiKey: '<YOUR_OPENAI_KEY>' })
+  const configuration = new Configuration({ apiKey: '<YOUR_OPENAI_API_KEY>' })
   const openAi = new OpenAIApi(configuration)
 
   const documents = await getDocuments() // Your custom function to load docs
@@ -224,7 +224,7 @@ serve(async (req) => {
   // OpenAI recommends replacing newlines with spaces for best results
   const input = query.replace(/\n/g, ' ')
 
-  const configuration = new Configuration({ apiKey: '<YOUR_OPENAI_KEY>' })
+  const configuration = new Configuration({ apiKey: '<YOUR_OPENAI_API_KEY>' })
   const openai = new OpenAIApi(configuration)
 
   // Generate a one-time embedding for the query itself
@@ -287,7 +287,7 @@ serve(async (req) => {
   // OpenAI recommends replacing newlines with spaces for best results
   const input = query.replace(/\n/g, ' ')
 
-  const configuration = new Configuration({ apiKey: '<YOUR_OPENAI_KEY>' })
+  const configuration = new Configuration({ apiKey: '<YOUR_OPENAI_API_KEY>' })
   const openai = new OpenAIApi(configuration)
 
   // Generate a one-time embedding for the query itself
