@@ -199,7 +199,7 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const { mutate: updatePolicy, isLoading: isUpdating } = useDatabasePolicyUpdateMutation({
     onSuccess: () => {
-      toast.success('Successfully created updated policy')
+      toast.success('Successfully updated policy')
       onSelectCancel()
     },
   })
