@@ -111,11 +111,16 @@ Depending on your application requirements, data conflicts can arise when an ano
 
 ## Abuse prevention and rate limits
 
-It is strongly recommended to enable captcha or turnstile to prevent abuse for anonymous sign-ins. There is also an IP-based rate limit for anonymous sign-ins at 30 requests per hour which can be configured in your [dashboard](/dashboard/project/_/auth/rate-limits).
+It is strongly recommended to [enable captcha or turnstile](/dashboard/project/_/settings/auth) to prevent abuse for anonymous sign-ins. There is also an IP-based rate limit for anonymous sign-ins at 30 requests per hour which can be configured in your [dashboard](/dashboard/project/_/auth/rate-limits).
 
 ## Automatic cleanup
 
-To clean up orphaned anonymous users, you can enable automatic cleanup which will delete anonymous users that are older than 30 days.
+We are working on adding the ability to automatically cleanup anonymous users that were created more than 30 days ago. However, you can delete anonymous users from your project by running:
+
+```sql
+-- deletes anonymous users that were created more than 30 days ago
+delete from auth.users where is_anonymous is true and created_at < now() - interval '30 days';
+```
 
 ## Resources
 
