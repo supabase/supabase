@@ -95,6 +95,7 @@ export const AIPolicyEditorPanel = memo(function ({
   // [Joshen] Hyrid form fields, just spit balling to get a decent POC out
   const [using, setUsing] = useState('')
   const [check, setCheck] = useState('')
+  const [fieldError, setFieldError] = useState<string>()
   const [showCheckBlock, setShowCheckBlock] = useState(false)
 
   const monacoOneRef = useRef<Monaco | null>(null)
@@ -126,7 +127,7 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const formId = 'rls-editor'
   const FormSchema = z.object({
-    name: z.string(),
+    name: z.string().min(1, 'Please provide a name'),
     table: z.string(),
     behavior: z.string(),
     command: z.string(),
@@ -308,6 +309,14 @@ export const AIPolicyEditorPanel = memo(function ({
     const using = editorOneRef.current?.getValue().trim() ?? undefined
     const check = editorTwoRef.current?.getValue().trim() ?? undefined
 
+    if (command === 'insert' && (check === undefined || check.length === 0)) {
+      return setFieldError('Please provide a SQL expression for the WITH CHECK statement')
+    } else if (command !== 'insert' && (using === undefined || using.length === 0)) {
+      return setFieldError('Please provide a SQL expression for the USING statement')
+    } else {
+      setFieldError(undefined)
+    }
+
     if (selectedPolicy === undefined) {
       const sql = generateCreatePolicyQuery({
         name: name,
@@ -342,7 +351,13 @@ export const AIPolicyEditorPanel = memo(function ({
       if (!isEqual(selectedPolicy.roles, updatedRoles)) payload.roles = updatedRoles
       if (selectedPolicy.definition !== null && selectedPolicy.definition !== using)
         payload.definition = using
-      if (selectedPolicy.check !== null && selectedPolicy.check !== check) payload.check = check
+
+      if (selectedPolicy.command === 'INSERT') {
+        // [Joshen] Cause editorOneRef will be the check statement in this scenario
+        if (selectedPolicy.check !== null && selectedPolicy.check !== using) payload.check = using
+      } else {
+        if (selectedPolicy.check !== null && selectedPolicy.check !== check) payload.check = check
+      }
 
       if (Object.keys(payload).length === 0) return onSelectCancel()
 
@@ -372,6 +387,7 @@ export const AIPolicyEditorPanel = memo(function ({
       setUsing('')
       setCheck('')
       setShowCheckBlock(false)
+      setFieldError(undefined)
 
       form.reset(defaultValues)
     } else {
@@ -511,6 +527,7 @@ export const AIPolicyEditorPanel = memo(function ({
                         isEditing={selectedPolicy !== undefined}
                         form={form}
                         onUpdateCommand={(command: string) => {
+                          setFieldError(undefined)
                           if (!['update', 'all'].includes(command)) setShowCheckBlock(false)
                         }}
                       />
@@ -615,13 +632,20 @@ export const AIPolicyEditorPanel = memo(function ({
                           />
                         )}
 
+                        {fieldError !== undefined && (
+                          <p className="px-5 py-2 pb-0 text-sm text-red-900">{fieldError}</p>
+                        )}
+
                         {supportWithCheck && (
                           <div className="px-5 py-3 flex items-center gap-x-2">
                             <Checkbox_Shadcn_
                               id="use-check"
                               name="use-check"
                               checked={showCheckBlock}
-                              onCheckedChange={() => setShowCheckBlock(!showCheckBlock)}
+                              onCheckedChange={() => {
+                                setFieldError(undefined)
+                                setShowCheckBlock(!showCheckBlock)
+                              }}
                             />
                             <Label_Shadcn_ className="text-xs cursor-pointer" htmlFor="use-check">
                               Use check expression
@@ -709,6 +733,7 @@ export const AIPolicyEditorPanel = memo(function ({
                             setCheck(`  ${value.check}`)
                             setExpOneLineCount(1)
                             setExpTwoLineCount(1)
+                            setFieldError(undefined)
 
                             if (!['update', 'all'].includes(value.command.toLowerCase())) {
                               setShowCheckBlock(false)

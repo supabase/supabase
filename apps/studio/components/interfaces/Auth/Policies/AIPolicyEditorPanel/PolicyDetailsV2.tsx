@@ -55,13 +55,13 @@ export const PolicyDetailsV2 = ({ isEditing, form, onUpdateCommand }: PolicyDeta
     .sort((a, b) => a.name.localeCompare(b.name))
 
   useEffect(() => {
-    if (isSuccessTables && tables.length > 0) form.setValue('table', tables[0].name)
-  }, [isSuccessTables, tables])
+    if (!isEditing && isSuccessTables && tables.length > 0) form.setValue('table', tables[0].name)
+  }, [isEditing, isSuccessTables, tables])
 
   return (
     <>
       <div className="px-5 py-5 flex flex-col gap-y-4 border-b">
-        <div className="flex items-center justify-between gap-4 grid grid-cols-12">
+        <div className="flex items-start justify-between gap-4 grid grid-cols-12">
           <FormField_Shadcn_
             control={form.control}
             name="name"
