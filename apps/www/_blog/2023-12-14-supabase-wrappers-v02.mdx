@@ -1,0 +1,184 @@
+---
+title: 'Supabase Wrappers v0.2: Query Pushdown & Remote Subqueries'
+description: 'Supabase Wrappers v0.2 brings more Wrappers, query pushdown, remote subquery, and more'
+launchweek: x
+categories:
+  - product
+tags:
+  - launch-week
+  - foreign-data-wrappers
+  - planetpg
+date: '2023-12-14'
+published_at: '2023-12-14:00:00.000-07:00'
+to_depth: 3
+author: bo_lu
+image: lwx-wrappers/wrappers-OG.png
+thumb: lwx-wrappers/wrappers-thumb.png
+---
+
+Supabase Wrappers v0.2 is out and now available on the Supabase platform. Wrappers is a Postgres extension that provides integrations with external sources so you can interact with third-party data using SQL.
+
+```sql
+-- Connect Postgres to Stripe
+create foreign table products (
+  id text,
+  name text,
+  description text,
+  default_price text
+)
+server my_stripe_server
+options ( object 'products' );
+
+-- Fetch all your Stripe products in Postgres
+select * from products limit 10;
+```
+
+**Key Features and Improvements in Wrappers v0.2:**
+
+- [New Wrappers](#new-wrappers-and-improvements)
+- [Query Pushdown](#support-for-query-pushdown)
+- [Remote Subqueries](#remote-subqueries)
+- [Usage Statistics](#fdw-usage-statistics)
+
+To start using Wrappers on the Supabase platform, check out the [Wrappers docs](https://supabase.com/docs/guides/database/extensions/wrappers/overview).
+
+## New Wrappers and Improvements
+
+- [Airtable](https://supabase.com/docs/guides/database/extensions/wrappers/airtable) (Read-only): query your Airtable bases with [support for jsonb](https://github.com/supabase/wrappers/pull/181)
+- [AWS S3](https://supabase.com/docs/guides/database/extensions/wrappers/s3) (Read-only): with support for CSV, JSON, and Parquet
+- [Clerk](https://github.com/tembo-io/clerk_fdw) (from the team at [Tembo](https://tembo.io/)). Not yet available on our platform since it is a community wrapper, see below for details.
+- And a WIP Wrapper for [Auth0](https://github.com/supabase/wrappers/pull/183)
+
+We cannot support community Wrappers inside the Supabase Dashboard until the Wrappers API is stabilized. You can vote your favorite Wrapper if you'd like it to be added to Supabase in the future. If you have developed a Wrapper that you want inside the Supabase Dashboard, please contribute it as a PR in [the wrappers repo](https://github.com/supabase/wrappers). Once we release Wrappers 1.0, we will support community Wrappers within the Supabase Dashboard.
+
+More improvements and updates can be found on [Wrappers release page](https://github.com/supabase/wrappers/releases), including support for Query Pushdown, Remote Subqueries, and Usage Statistics which we’ll explore below.
+
+## Support for Query Pushdown
+
+The Wrappers v0.2 framework now supports Query Pushdown.
+
+### What is Query Pushdown?
+
+Query pushdown is a technique that enhances query performance by executing parts of the query directly on the data source. It reduces data transfer between the database and the application, enabling faster execution and improved performance.
+
+<Img
+  src={{
+    dark: '/images/blog/lwx-wrappers/query-pushdown-dark.png',
+    light: '/images/blog/lwx-wrappers/query-pushdown-light.png',
+  }}
+  alt="Examples of Query Pushdown: with and without it."
+/>
+
+### How to Use Query Pushdown in Wrappers
+
+In Wrappers, the pushdown logic is integrated into each extension. You don’t need to modify your queries to benefit from this feature. For example, the [Stripe FDW](https://supabase.com/docs/guides/database/extensions/wrappers/stripe) automatically applies query pushdown for `id` within the `customer` object:
+
+```sql
+select *
+from stripe.customers
+where id = 'cus_N5WMk7pvQPkY3B';
+```
+
+This approach contrasts with fetching and filtering all customers locally, which is less efficient. Query pushdown translates this into a single API call, significantly speeding up the process:
+
+```bash
+https://api.stripe.com/v1/customers/cus_N5WMk7pvQPkY3B
+```
+
+We can use push down criteria and other query parameters too. For example, [ClickHouse FDW](https://supabase.com/docs/guides/database/extensions/wrappers/clickhouse) supports `order by` and `limit` pushdown:
+
+```sql
+select *
+from clickhouse.people
+order by name
+limit 20;
+```
+
+This query executes `order by name limit 20` on ClickHouse before transferring the result to Postgres.
+
+For details on where pushdown is supported, consult each FDW's documentation in the [Wrappers Documentation](https://supabase.com/docs/guides/database/extensions/wrappers/overview).
+
+## Remote Subqueries
+
+Remote subqueries enable the use of prepared data on a remote server, which is beneficial for complex queries or sensitive data protection.
+
+### Static Subqueries
+
+In its most basic form, you can map a query on the remote server into a foreign table in Postgres. For instance:
+
+```sql
+create foreign table clickhouse.people (
+  id bigint,
+  name text,
+  age bigint
+)
+server clickhouse_server
+options (
+  table '(select * from people where age < 25)'
+);
+```
+
+In this example, the foreign table `clickhouse.people` data is read from the result of the subquery `select * from people where age < 25` which runs on ClickHouse server.
+
+### Dynamic Subqueries
+
+What if the query is not fixed and needs to be dynamic? For example, ClickHouse provides [Parameterized Views](https://clickhouse.com/docs/en/sql-reference/statements/create/view#parameterized-view) which can accept parameters for a view. Wrappers v0.2 supports this by defining a column for each parameter. Let's take a look at an example:
+
+```sql
+create foreign table clickhouse.my_table (
+  id bigint,
+  col1 text,
+  col2 bigint,
+  _param1 text,
+  _param2 bigint
+)
+server clickhouse_server
+options (
+  table '(select * from my_view(column1=${_param1}, column2=${_param2}))'
+);
+```
+
+You can then pass values to these parameters in your query:
+
+```sql
+select id, col1, col2
+from clickhouse.my_table
+where _param1 = 'abc' and _param2 = 42;
+```
+
+Currently, this feature is supported by [ClickHouse FDW](https://supabase.com/docs/guides/database/extensions/wrappers/clickhouse) and [BigQuery FDW](https://supabase.com/docs/guides/database/extensions/wrappers/bigquery), with plans to expand support in the future.
+
+## FDW Usage Statistics
+
+Quantitative metrics play a pivotal role when working with Postgres FDWs because of their impact on performance optimisation, monitoring, and query planning across distributed databases. We introduced a FDW usage statistics table `wrappers_fdw_stats` in Wrappers v0.2, storing:
+
+- `create_times` - number of times the FDW instance has been created
+- `rows_in` - number of rows transferred from source
+- `rows_out` - number of rows transferred to source
+- `bytes_in` - number of bytes transferred from source
+- `bytes_out` - number of bytes transferred to source
+- `metadata` - additional usage statistics specific to a FDW
+
+We can use these to identify bottlenecks, latency issues, and inefficiencies in data retrieval. Access this table on the Supabase platform using the following:
+
+```sql
+select *
+from extensions.wrappers_fdw_stats;
+```
+
+## Thanks to Our Community Contributors
+
+We couldn't build Wrappers v0.2 without our community and we'd like to thank all the following people for their contributions:
+
+[Dom Jocubeit,](https://github.com/jocubeit) [0xflotus,](https://github.com/0xflotus) [Glitch,](https://github.com/zer0eXploit) [Tobias Florek,](https://github.com/ibotty) [Jubilee,](https://github.com/workingjubilee) [Germán Larraín,](https://github.com/glarrain-cdd) [Kavanaugh Latiolais,](https://github.com/kav) [tedverse](https://github.com/tedverse).
+
+A separate shout-out belongs to the [pgrx](https://github.com/pgcentralfoundation/pgrx) team, which allows us to write Wrappers with Rust.
+
+Want to join the Supabase Wrappers community contributors? [Check out our contribution docs](https://supabase.github.io/wrappers/contributing/). We'd love to add you to the list next time.
+
+## More About Wrappers
+
+- [Wrappers: 3rd Party Integrations](https://supabase.com/docs/guides/database/extensions/wrappers/overview)
+- [Wrappers Documentation](https://supabase.github.io/wrappers/)
+- [Blog Post: Supabase Wrappers, a Postgres FDW framework written in Rust](https://supabase.com/blog/postgres-foreign-data-wrappers-rust)
+- [Blog Post: Wrappers UI](https://supabase.com/blog/supabase-studio-3-0#wrappers-ui)

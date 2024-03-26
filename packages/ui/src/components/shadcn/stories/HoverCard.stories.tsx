@@ -1,8 +1,8 @@
 import { Meta } from '@storybook/react'
-import { Avatar, AvatarFallback, AvatarImage } from '@ui/components/shadcn/ui/avatar'
-import { Button } from '@ui/components/shadcn/ui/button'
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@ui/components/shadcn/ui/hover-card'
 import { CalendarDays } from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { Button } from '../ui/button'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '../ui/hover-card'
 
 const meta: Meta = {
   title: 'shadcn/HoverCard',
@@ -26,7 +26,7 @@ export function Default() {
             <p className="text-sm">The React Framework – created and maintained by @vercel.</p>
             <div className="flex items-center pt-2">
               <CalendarDays className="mr-2 h-4 w-4 opacity-70" />{' '}
-              <span className="text-xs text-muted-foreground">Joined December 2021</span>
+              <span className="text-xs text-foreground-muted">Joined December 2021</span>
             </div>
           </div>
         </div>

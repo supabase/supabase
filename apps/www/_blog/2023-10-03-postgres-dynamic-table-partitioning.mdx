@@ -38,20 +38,20 @@ Partitioning is a simple solution, but for Postgres this usually requires settin
 Let’s explore a working example showing how to escape this situation using dynamic table partitioning. We’ll setup a simulated “chat app” that has to store possibly millions of chat messages per day. The first step is to set up a fake “Large Table” problem to simulate a data set that has grown past where Postgres can handle it all in one table. So first, we’ll add a couple of new tables for our example chat app:
 
 ```sql
-CREATE TABLE chats(
+create table chats (
   id bigserial,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  PRIMARY KEY (id)
+  created_at timestamptz not null default now(),
+  primary key (id)
 );
 
-CREATE TABLE chat_messages(
+create table chat_messages (
   id bigserial,
-  created_at timestamptz NOT NULL,
-  chat_id bigint NOT NULL,
-  chat_created_at timestamptz NOT NULL,
-  message text NOT NULL,
-  PRIMARY KEY (id),
-  FOREIGN KEY (chat_id) REFERENCES chats(id)
+  created_at timestamptz not null,
+  chat_id bigint not null,
+  chat_created_at timestamptz not null,
+  message text not null,
+  primary key (id),
+  foreign key (chat_id) references chats (id)
 );
 ```
 
@@ -105,16 +105,12 @@ In our example below, we will be copying lots of existing chat messages out of o
 
 After we have pre-loaded a new child table with copied rows and verified that the rows are valid with a check constraint, then we can **attach** the partition to the parent table with `ATTACH PARTITION ...` command. This will make the new range of child data available for queries on the parent table.
 
-<img
-  className="dark:hidden !m-0"
+<Img
   alt="diagram reference"
-  src="/images/blog/partitions/dynamic-table-partitioning-diagram-light.png"
-/>
-
-<img
-  className="hidden dark:block !m-0"
-  alt="diagram reference"
-  src="/images/blog/partitions/dynamic-table-partitioning-diagram-dark.png"
+  src={{
+    light: '/images/blog/partitions/dynamic-table-partitioning-diagram-light.png',
+    dark: '/images/blog/partitions/dynamic-table-partitioning-diagram-dark.png',
+  }}
 />
 
 Postgres partitioning became significantly easier in recent versions. Postgres added the new syntax for [Declarative Partitioning](https://www.postgresql.org/docs/current/ddl-partitioning.html#DDL-PARTITIONING-DECLARATIVE) that makes it easy to create new partitions by adding additional details to your `CREATE TABLE` statements:
@@ -254,7 +250,7 @@ BEGIN
         ALTER INDEX app."chats_created_at"
             ATTACH PARTITION app."chats_%1$s_created_at";
 
-        -- Droping the now unnecessary check constraint they were just needed
+        -- Dropping the now unnecessary check constraint they were just needed
         -- to prevent the attachment from forcing a scan to do the same check
         ALTER TABLE app."chats_%1$s" DROP CONSTRAINT
             "chats_partition_by_range_check_%1$s";
@@ -318,7 +314,7 @@ END;
 $$;
 --
 -- This procedure loops over all days in the old table, copying each day
--- and then commiting the transaction.
+-- and then committing the transaction.
 --
 CREATE OR REPLACE PROCEDURE app.load_chats_partitions()
     LANGUAGE plpgsql AS
@@ -365,7 +361,7 @@ BEGIN
 END;
 $$;
 
-SELECT cron.schedule('new-chat-partition', '0 23 * * *', 'CALL app.create_daily_partition(now()::date + 'interval 1 day')');
+SELECT cron.schedule('new-chat-partition', '0 23 * * *', 'CALL app.create_daily_partition(now()::date + "interval 1 day")');
 COMMIT;
 ```
 

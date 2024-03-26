@@ -34,13 +34,17 @@ class ProductRepositoryImpl @Inject constructor(
 
     override suspend fun getProduct(id: String): ProductDto {
         return postgrest["products"].select {
-            eq("id", id)
+            filter {
+                eq("id", id)
+            }
         }.decodeSingle<ProductDto>()
     }
 
     override suspend fun deleteProduct(id: String) {
         postgrest["products"].delete {
-            eq("id", id)
+            filter {
+                eq("id", id)
+            }
         }
     }
 
@@ -63,14 +67,18 @@ class ProductRepositoryImpl @Inject constructor(
                 set("price", price)
                 set("image", buildImageUrl(imageFileName = imageUrl))
             }) {
-                eq("id", id)
+                filter {
+                    eq("id", id)
+                }
             }
         } else {
             postgrest["products"].update({
                 set("name", name)
                 set("price", price)
             }) {
-                eq("id", id)
+                filter {
+                    eq("id", id)
+                }
             }
         }
     }

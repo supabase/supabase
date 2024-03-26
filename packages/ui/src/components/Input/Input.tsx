@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from 'react'
-import { IconCopy } from '../Icon/icons/IconCopy'
-import { Button } from '../Button'
 
-import { FormLayout } from '../../lib/Layout/FormLayout'
-
+import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
 import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
 import InputIconContainer from '../../lib/Layout/InputIconContainer'
-
-import { HIDDEN_PLACEHOLDER } from './../../lib/constants'
-
+import { HIDDEN_PLACEHOLDER } from '../../lib/constants'
 import styleHandler from '../../lib/theme/styleHandler'
+import { cn } from '../../lib/utils/cn'
+import { Button } from '../Button'
 import { useFormContext } from '../Form/FormContext'
+import { IconCopy } from '../Icon/icons/IconCopy'
 
 export interface Props
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onCopy'> {
@@ -136,8 +134,8 @@ function Input({
 
   if (error) inputClasses.push(__styles.variants.error)
   if (!error) inputClasses.push(__styles.variants.standard)
-  if (icon) inputClasses.push(__styles.with_icon)
   if (size) inputClasses.push(__styles.size[size])
+  if (icon) inputClasses.push(__styles.with_icon)
   if (disabled) inputClasses.push(__styles.disabled)
   if (inputClassName) inputClasses.push(inputClassName)
 
@@ -157,6 +155,7 @@ function Input({
     >
       <div className={__styles.container}>
         <input
+          data-size={size}
           autoComplete={autoComplete}
           autoFocus={autoFocus}
           defaultValue={defaultValue}
@@ -170,10 +169,10 @@ function Input({
           ref={inputRef}
           type={type}
           value={reveal && hidden ? HIDDEN_PLACEHOLDER : value}
-          className={inputClasses.join(' ')}
+          className={cn(inputClasses)}
           {...props}
         />
-        {icon && <InputIconContainer icon={icon} className={iconContainerClassName} />}
+        {icon && <InputIconContainer size={size} icon={icon} className={iconContainerClassName} />}
         {copy || error || actions ? (
           <div className={__styles.actions_container}>
             {error && <InputErrorIcon size={size} />}
@@ -198,13 +197,13 @@ function Input({
 export interface TextAreaProps
   extends Omit<React.InputHTMLAttributes<HTMLTextAreaElement>, 'size' | 'onCopy'> {
   textAreaClassName?: string
-  descriptionText?: string
+  descriptionText?: string | React.ReactNode | undefined
   error?: string
   icon?: any
   label?: string | React.ReactNode
   afterLabel?: string
   beforeLabel?: string
-  labelOptional?: string
+  labelOptional?: string | React.ReactNode
   layout?: 'horizontal' | 'vertical'
   rows?: number
   limit?: number
@@ -337,9 +336,7 @@ function TextArea({
           className={classes.join(' ')}
           maxLength={limit}
           {...props}
-        >
-          {value}
-        </textarea>
+        />
         {copy || error || actions ? (
           <div className={__styles['textarea_actions_container']}>
             <div className={__styles['textarea_actions_container_items']}>

@@ -1,0 +1,37 @@
+---
+id: 'cli'
+title: 'Local Dev with CLI'
+description: 'Developing locally using the Supabase CLI.'
+subtitle: 'Developing locally using the Supabase CLI.'
+sidebar_label: 'Overview'
+---
+
+You can use the Supabase CLI to run the entire Supabase stack locally on your machine, simply by running `supabase init` and then `supabase start`.
+
+The Supabase CLI provides tools to develop your project locally, deploy to the Supabase Platform, handle database migrations, and generate types directly from your database schema.
+
+## Resources
+
+<div className="grid md:grid-cols-12 gap-4 not-prose">
+  {[
+    {
+      name: 'Supabase CLI',
+      description:
+        'The Supabase CLI provides tools to develop manage your Supabase projects from your local machine.',
+      href: 'https://github.com/supabase/cli',
+    },
+    {
+      name: 'GitHub Action',
+      description: ' A GitHub action for interacting with your Supabase projects using the CLI.',
+      href: 'https://github.com/supabase/setup-cli',
+    },
+  ].map((x) => (
+    <div className="col-span-6" key={x.href}>
+      <Link href={x.href} passHref>
+        <GlassPanel icon={'/docs/img/icons/github-icon'} hasLightIcon={true} title={x.name}>
+          {x.description}
+        </GlassPanel>
+      </Link>
+    </div>
+  ))}
+</div>

@@ -10,6 +10,7 @@ import MenuItem from './MenuItem'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 import { useKey } from 'react-use'
+import { useIsLoggedIn, useIsUserLoading } from 'common'
 
 interface Props {
   open: boolean
@@ -19,6 +20,8 @@ interface Props {
 }
 
 const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
+  const isLoggedIn = useIsLoggedIn()
+  const isUserLoading = useIsUserLoading()
   const container = {
     hidden: { opacity: 0 },
     show: { opacity: 1, transition: { duration: 0.15, staggerChildren: 0.05, ease: DEFAULT_EASE } },
@@ -108,10 +111,11 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
               <AccordionMenuItem menuItem={menuItem} />
             </Accordion.Item>
           ) : (
-            <Link href={menuItem.url}>
-              <a className="block py-2 pl-3 pr-4 text-base font-medium text-strong hover:bg-surface-200 dark:text-white focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded">
-                {menuItem.title}
-              </a>
+            <Link
+              href={menuItem.url}
+              className="block py-2 pl-3 pr-4 text-base font-medium text-foreground hover:bg-surface-200 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:rounded"
+            >
+              {menuItem.title}
             </Link>
           )}
         </m.div>
@@ -121,7 +125,7 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
 
   return (
     <LazyMotion features={domAnimation}>
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence mode="wait">
         {open && (
           <m.div
             variants={container}
@@ -131,20 +135,22 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
             className="bg-overlay fixed overflow-hidden inset-0 z-50 h-screen max-h-screen w-screen supports-[height:100cqh]:h-[100cqh] supports-[height:100svh]:h-[100svh] transform"
           >
             <div className="absolute h-16 px-6 flex items-center justify-between w-screen left-0 top-0 z-50 bg-overlay before:content[''] before:absolute before:w-full before:h-3 before:inset-0 before:top-full before:bg-gradient-to-b before:from-background-overlay before:to-transparent">
-              <Link href="/" as="/">
-                <a className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm">
-                  <Image
-                    src={isDarkMode ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
-                    width={124}
-                    height={24}
-                    alt="Supabase Logo"
-                  />
-                </a>
+              <Link
+                href="/"
+                as="/"
+                className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
+              >
+                <Image
+                  src={isDarkMode ? supabaseLogoWordmarkDark : supabaseLogoWordmarkLight}
+                  width={124}
+                  height={24}
+                  alt="Supabase Logo"
+                />
               </Link>
               <button
                 onClick={() => setOpen(false)}
                 type="button"
-                className="inline-flex items-center justify-center p-2 bg-white rounded-md text-lighter focus:ring-brand dark:bg-surface-100 dark:hover:bg-surface-200 hover:bg-surface-100 focus:outline-none focus:ring-2 focus:ring-inset"
+                className="inline-flex items-center justify-center p-2 rounded-md text-foreground-lighter focus:ring-brand bg-surface-100 hover:bg-surface-200 focus:outline-none focus:ring-2 focus:ring-inset"
               >
                 <span className="sr-only">Close menu</span>
                 <svg
@@ -168,25 +174,41 @@ const MobileMenu = ({ open, setOpen, isDarkMode, menu }: Props) => {
               <Menu />
             </div>
             <div className="absolute bottom-0 left-0 right-0 top-auto w-full bg-alternative flex items-stretch p-4 gap-4">
-              <Link href="https://supabase.com/dashboard" passHref>
-                <Button block type="default" asChild>
-                  <a type={undefined} className="">
-                    Sign in
-                  </a>
-                </Button>
-              </Link>
-              <Link href="https://supabase.com/dashboard" passHref>
-                <Button block asChild>
-                  <a type={undefined} className="h-10 py-4">
-                    Start your project
-                  </a>
-                </Button>
-              </Link>
+              {!isUserLoading && (
+                <>
+                  {isLoggedIn ? (
+                    <Link href="/dashboard/projects" passHref legacyBehavior>
+                      <Button block asChild>
+                        <a type={undefined} className="h-10 py-4">
+                          Dashboard
+                        </a>
+                      </Button>
+                    </Link>
+                  ) : (
+                    <>
+                      <Link href="https://supabase.com/dashboard" passHref legacyBehavior>
+                        <Button block type="default" asChild>
+                          <a type={undefined} className="">
+                            Sign in
+                          </a>
+                        </Button>
+                      </Link>
+                      <Link href="https://supabase.com/dashboard" passHref legacyBehavior>
+                        <Button block asChild>
+                          <a type={undefined} className="h-10 py-4">
+                            Start your project
+                          </a>
+                        </Button>
+                      </Link>
+                    </>
+                  )}
+                </>
+              )}
             </div>
           </m.div>
         )}
       </AnimatePresence>
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence mode="wait">
         {open && (
           <m.div
             variants={container}

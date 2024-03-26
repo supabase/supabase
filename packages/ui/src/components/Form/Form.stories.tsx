@@ -356,12 +356,8 @@ export const CardForm = () => {
     header?: React.ReactNode
     footer?: React.ReactNode
   }) => (
-    <div className="bg-scale-300 border border-scale-400 rounded-md w-3/4 mx-auto my-8 shadow overflow-hidden">
-      {header && (
-        <div className="bg-scale-100 dark:bg-scale-200 px-8 py-4 border-b border-scale-400">
-          {header}
-        </div>
-      )}
+    <div className="bg-surface-100 border border-overlay rounded-md w-3/4 mx-auto my-8 shadow overflow-hidden">
+      {header && <div className="bg-surface-100 px-8 py-4 border-b border-overlay">{header}</div>}
       <div className="space-y-6 py-6">{children}</div>
       {footer}
     </div>
@@ -400,8 +396,8 @@ export const CardForm = () => {
           <Panel
             header={
               <>
-                <h3 className="text-scale-1200 text-xl font-semibold">Custom Options</h3>
-                <p className="text-scale-900">
+                <h3 className="text-foreground text-xl font-semibold">Custom Options</h3>
+                <p className="text-foreground-muted">
                   These settings apply to payment pages you create using Stripe Checkout and Payment
                   Links.
                 </p>
@@ -409,7 +405,7 @@ export const CardForm = () => {
             }
             footer={
               <>
-                <div className="border-t border-scale-400"></div>
+                <div className="border-t border-muted"></div>
                 <div className="py-3 px-6 flex gap-2 justify-end">
                   <Button loading={isSubmitting} type="secondary" htmlType="submit">
                     Cancel
@@ -422,9 +418,9 @@ export const CardForm = () => {
             }
           >
             {/* <p>{isSubmitting ? 'submitting' : 'not submitting'}</p> */}
-            {/* <div className="border-t border-scale-400"></div> */}
+            {/* <div className="border-t border-muted"></div> */}
             <Section
-              header={<label className="text-sm text-scale-1200 col-span-4">Faster checkout</label>}
+              header={<label className="text-sm text-foreground col-span-4">Faster checkout</label>}
             >
               <Toggle
                 className="col-span-8"
@@ -434,9 +430,9 @@ export const CardForm = () => {
                 descriptionText="Go to Payment methods settings to configure Apple Pay and Google Pay."
               />
             </Section>
-            <div className="border-t border-scale-400"></div>
+            <div className="border-t border-muted"></div>
             <Section
-              header={<label className="text-sm text-scale-1200 col-span-4">Faster checkout</label>}
+              header={<label className="text-sm text-foreground col-span-4">Faster checkout</label>}
             >
               <Radio.Group
                 className="col-span-8"
@@ -461,9 +457,9 @@ export const CardForm = () => {
                 />
               </Radio.Group>
             </Section>
-            <div className="border-t border-scale-400"></div>
+            <div className="border-t border-muted"></div>
             <Section
-              header={<label className="text-sm text-scale-1200 col-span-4">Faster checkout</label>}
+              header={<label className="text-sm text-foreground col-span-4">Faster checkout</label>}
             >
               <div className="col-span-8 space-y-4">
                 <Input name="app_id" label="Application ID in Stripe" />

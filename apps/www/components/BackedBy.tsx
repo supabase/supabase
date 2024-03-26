@@ -26,7 +26,6 @@ const BackedBy = ({
         <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-8 sm:flex-nowrap">
           <div className="relative h-6 w-6 sm:h-8">
             <Image
-              className=""
               src={`${basePath}/images/logos/yc--grey.png`}
               alt="Y Combinator"
               layout="fill"
@@ -35,7 +34,6 @@ const BackedBy = ({
           </div>
           <div className="relative w-20 h-4 sm:h-5">
             <Image
-              className=""
               src={`${basePath}/images/logos/mozilla--grey.png`}
               alt="Mozilla"
               layout="fill"
@@ -44,7 +42,6 @@ const BackedBy = ({
           </div>
           <div className="relative w-20 h-4 sm:h-5">
             <Image
-              className=""
               src={`${basePath}/images/logos/coatue.png`}
               alt="Coatue"
               layout="fill"
@@ -53,7 +50,6 @@ const BackedBy = ({
           </div>
           <div className="relative w-20 h-5 sm:h-6">
             <Image
-              className=""
               src={`${basePath}/images/logos/felicis.png`}
               alt="Felicis"
               layout="fill"

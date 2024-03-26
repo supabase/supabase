@@ -1,11 +1,11 @@
 # This file tracks properties of this Flutter project.
 # Used by Flutter tool to assess capabilities and perform upgrades etc.
 #
-# This file should be version controlled.
+# This file should be version controlled and should not be manually edited.
 
 version:
-  revision: 796c8ef79279f9c774545b3771238c3098dbefab
-  channel: stable
+  revision: "6c4930c4ac86fb286f30e31d0ec8bffbcbb9953e"
+  channel: "stable"
 
 project_type: app
 
@@ -13,26 +13,26 @@ project_type: app
 migration:
   platforms:
     - platform: root
-      create_revision: 796c8ef79279f9c774545b3771238c3098dbefab
-      base_revision: 796c8ef79279f9c774545b3771238c3098dbefab
+      create_revision: 6c4930c4ac86fb286f30e31d0ec8bffbcbb9953e
+      base_revision: 6c4930c4ac86fb286f30e31d0ec8bffbcbb9953e
     - platform: android
-      create_revision: 796c8ef79279f9c774545b3771238c3098dbefab
-      base_revision: 796c8ef79279f9c774545b3771238c3098dbefab
+      create_revision: 6c4930c4ac86fb286f30e31d0ec8bffbcbb9953e
+      base_revision: 6c4930c4ac86fb286f30e31d0ec8bffbcbb9953e
     - platform: ios
-      create_revision: 796c8ef79279f9c774545b3771238c3098dbefab
-      base_revision: 796c8ef79279f9c774545b3771238c3098dbefab
+      create_revision: 6c4930c4ac86fb286f30e31d0ec8bffbcbb9953e
+      base_revision: 6c4930c4ac86fb286f30e31d0ec8bffbcbb9953e
     - platform: linux
-      create_revision: 796c8ef79279f9c774545b3771238c3098dbefab
-      base_revision: 796c8ef79279f9c774545b3771238c3098dbefab
+      create_revision: 6c4930c4ac86fb286f30e31d0ec8bffbcbb9953e
+      base_revision: 6c4930c4ac86fb286f30e31d0ec8bffbcbb9953e
     - platform: macos
-      create_revision: 796c8ef79279f9c774545b3771238c3098dbefab
-      base_revision: 796c8ef79279f9c774545b3771238c3098dbefab
+      create_revision: 6c4930c4ac86fb286f30e31d0ec8bffbcbb9953e
+      base_revision: 6c4930c4ac86fb286f30e31d0ec8bffbcbb9953e
     - platform: web
-      create_revision: 796c8ef79279f9c774545b3771238c3098dbefab
-      base_revision: 796c8ef79279f9c774545b3771238c3098dbefab
+      create_revision: 6c4930c4ac86fb286f30e31d0ec8bffbcbb9953e
+      base_revision: 6c4930c4ac86fb286f30e31d0ec8bffbcbb9953e
     - platform: windows
-      create_revision: 796c8ef79279f9c774545b3771238c3098dbefab
-      base_revision: 796c8ef79279f9c774545b3771238c3098dbefab
+      create_revision: 6c4930c4ac86fb286f30e31d0ec8bffbcbb9953e
+      base_revision: 6c4930c4ac86fb286f30e31d0ec8bffbcbb9953e
 
   # User provided section
 

@@ -47,7 +47,7 @@ const OpenSource = () => {
           <Repos tabs={pageData.repo_tabs} />
         </SectionContainer>
         <SectionContainer className="!py-0">
-          <div className="w-full bg-scale-400 border-b" />
+          <div className="w-full border-b" />
         </SectionContainer>
         <SectionContainer>
           <Sponsorships sponsorships={pageData.sponsorships} />

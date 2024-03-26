@@ -26,10 +26,11 @@ const OldVersionAlert = ({ sections }: OldVersionAlertProps) => {
       <Admonition type="caution">
         You&apos;re viewing an older version of this library.
         <br />
-        <Link href={latestVersionUrl}>
-          <a className="underline decoration-brand-400 underline-offset-4 decoration-1">
-            Switch to the latest
-          </a>
+        <Link
+          href={latestVersionUrl}
+          className="underline decoration-brand-400 underline-offset-4 decoration-1"
+        >
+          Switch to the latest
         </Link>
         .
       </Admonition>

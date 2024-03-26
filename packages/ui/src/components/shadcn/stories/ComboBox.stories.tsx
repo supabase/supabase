@@ -1,39 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Meta } from '@storybook/react'
-import { Button } from '@ui/components/shadcn/ui/button'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@ui/components/shadcn/ui/command'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from '@ui/components/shadcn/ui/dropdown-menu'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@ui/components/shadcn/ui/form'
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
-import { toast } from '@ui/components/shadcn/ui/use-toast'
-import { cn } from '@ui/lib/utils'
 import {
   ArrowUpCircle,
   Calendar,
@@ -52,6 +18,40 @@ import {
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { cn } from '../../../lib/utils/cn'
+import { Button } from '../ui/button'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '../ui/command'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../ui/form'
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
+import { toast } from '../ui/use-toast'
 
 const meta: Meta<typeof DropdownMenu> = {
   /* 👇 The title prop is optional.
@@ -188,7 +188,7 @@ export const PopoverExample = {
 
     return (
       <div className="flex items-center space-x-4">
-        <p className="text-sm text-muted-foreground">Status</p>
+        <p className="text-sm text-foreground-muted">Status</p>
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="w-[150px] justify-start">
@@ -259,7 +259,7 @@ export const DropdownExample = {
           <span className="mr-2 rounded-lg bg-primary px-2 py-1 text-xs text-primary-foreground">
             {label}
           </span>
-          <span className="text-muted-foreground">Create a new project</span>
+          <span className="text-foreground-muted">Create a new project</span>
         </p>
         <DropdownMenu open={open} onOpenChange={setOpen}>
           <DropdownMenuTrigger asChild>
@@ -373,7 +373,7 @@ export const ReactHookFormDemo = {
                         role="combobox"
                         className={cn(
                           'w-[200px] justify-between',
-                          !field.value && 'text-muted-foreground'
+                          !field.value && 'text-foreground-muted'
                         )}
                       >
                         {field.value
@@ -464,7 +464,7 @@ export const ComboOrgPicker = {
 
     return (
       <div className="flex items-center space-x-4">
-        <p className="text-sm text-muted-foreground">Status</p>
+        <p className="text-sm text-foreground-muted">Status</p>
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="w-[320px] justify-start">
@@ -638,7 +638,7 @@ export const MultipleComboPickers = {
 
     return (
       <div className="flex items-center space-x-4">
-        <p className="text-sm text-muted-foreground">Status</p>
+        <p className="text-sm text-foreground-muted">Status</p>
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="w-[320px] justify-start">

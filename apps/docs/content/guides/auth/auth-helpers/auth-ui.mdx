@@ -1,0 +1,483 @@
+---
+id: 'auth-ui'
+title: 'Auth UI'
+description: 'A prebuilt, customizable React component for authenticating users.'
+---
+
+Auth UI is a pre-built React component for authenticating users.
+It supports custom themes and extensible styles to match your brand and aesthetic.
+
+<video width="99%" muted playsInline controls={true}>
+  <source src="https://supabase.com/images/blog/lw5-one-more/auth-ui-demo.mp4" type="video/mp4" />
+</video>
+
+## Set up Auth UI
+
+Install the latest version of [supabase-js](/docs/reference/javascript) and the Auth UI package:
+
+```bash
+npm install @supabase/supabase-js @supabase/auth-ui-react @supabase/auth-ui-shared
+```
+
+### Import the Auth component
+
+Pass `supabaseClient` from `@supabase/supabase-js` as a prop to the component.
+
+```js /src/index.js
+import { createClient } from '@supabase/supabase-js'
+import { Auth } from '@supabase/auth-ui-react'
+
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
+
+const App = () => <Auth supabaseClient={supabase} />
+```
+
+This renders the Auth component without any styling.
+We recommend using one of the predefined themes to style the UI.
+Import the theme you want to use and pass it to the `appearance.theme` prop.
+
+```js mark=4,16 /src/index.js
+import { Auth } from '@supabase/auth-ui-react'
+import {
+  // Import predefined theme
+  ThemeSupa,
+} from '@supabase/auth-ui-shared'
+
+const supabase = createClient(
+  '<INSERT PROJECT URL>',
+  '<INSERT PROJECT ANON API KEY>'
+)
+
+const App = () => (
+  <Auth
+    supabaseClient={supabase}
+    {/* Apply predefined theme */}
+    appearance={{ theme: ThemeSupa }}
+  />
+)
+```
+
+### Social providers
+
+The Auth component also supports login with [official social providers](../../auth#providers).
+
+```js mark=11 /src/index.js
+import { createClient } from '@supabase/supabase-js'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
+
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
+
+const App = () => (
+  <Auth
+    supabaseClient={supabase}
+    appearance={{ theme: ThemeSupa }}
+    providers={['google', 'facebook', 'twitter']}
+  />
+)
+```
+
+### Options
+
+Options are available via `queryParams`:
+
+```jsx
+<Auth
+  supabaseClient={supabase}
+  providers={['google']}
+  queryParams={{
+    access_type: 'offline',
+    prompt: 'consent',
+    hd: 'domain.com',
+  }}
+  onlyThirdPartyProviders
+/>
+```
+
+### Provider scopes
+
+Provider Scopes can be requested through `providerScope`;
+
+```jsx
+<Auth
+  supabaseClient={supabase}
+  providers={['google']}
+  queryParams={{
+    access_type: 'offline',
+    prompt: 'consent',
+    hd: 'domain.com',
+  }}
+  providerScopes={{
+    google: 'https://www.googleapis.com/auth/calendar.readonly',
+  }}
+/>
+```
+
+### Supported views
+
+The Auth component is currently shipped with the following views:
+
+- [Email Login](../auth-email)
+- [Magic Link login](../auth-magic-link)
+- [Social Login](../social-login)
+- Update password
+- Forgotten password
+
+We are planning on adding more views in the future. Follow along on that [repo](https://github.com/supabase/auth-ui).
+
+## Customization
+
+There are several ways to customize Auth UI:
+
+- Use one of the [predefined themes](#predefined-themes) that comes with Auth UI
+- Extend a theme by [overriding the variable tokens](#override-themes) in a theme
+- [Create your own theme](#create-theme)
+- [Use your own CSS classes](#custom-css-classes)
+- [Use inline styles](#custom-inline-styles)
+- [Use your own labels](#custom-labels)
+
+### Predefined themes
+
+Auth UI comes with several themes to customize the appearance. Each predefined theme comes with at least two variations, a `default` variation, and a `dark` variation. You can switch between these themes using the `theme` prop. Import the theme you want to use and pass it to the `appearance.theme` prop.
+
+```js mark=3,14 /src/index.js
+import { createClient } from '@supabase/supabase-js'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
+
+const supabase = createClient(
+  '<INSERT PROJECT URL>',
+  '<INSERT PROJECT ANON API KEY>'
+)
+
+const App = () => (
+  <Auth
+    supabaseClient={supabase}
+    {/* Apply predefined theme */}
+    appearance={{ theme: ThemeSupa }}
+  />
+)
+```
+
+<Admonition type="note">
+
+Currently there is only one predefined theme available, but we plan to add more.
+
+</Admonition>
+
+### Switch theme variations
+
+Auth UI comes with two theme variations: `default` and `dark`. You can switch between these themes with the `theme` prop.
+
+```js mark=15 /src/index.js
+import { createClient } from '@supabase/supabase-js'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
+
+const supabase = createClient(
+  '<INSERT PROJECT URL>',
+  '<INSERT PROJECT ANON API KEY>'
+)
+
+const App = () => (
+  <Auth
+    supabaseClient={supabase}
+    appearance={{ theme: ThemeSupa }}
+    {/* Set theme to dark */}
+    theme="dark"
+  />
+)
+```
+
+If you don't pass a value to `theme` it uses the `"default"` theme. You can pass `"dark"` to the theme prop to switch to the `dark` theme. If your theme has other variations, use the name of the variation in this prop.
+
+### Override themes
+
+Auth UI themes can be overridden using variable tokens. See the [list of variable tokens](https://github.com/supabase/auth-ui/blob/main/packages/shared/src/theming/Themes.ts).
+
+```js mark=12:19 /src/index.js
+import { createClient } from '@supabase/supabase-js'
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
+
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
+
+const App = () => (
+  <Auth
+    supabaseClient={supabase}
+    appearance={{
+      theme: ThemeSupa,
+      variables: {
+        default: {
+          colors: {
+            brand: 'red',
+            brandAccent: 'darkred',
+          },
+        },
+      },
+    }}
+  />
+)
+```
+
+If you created your own theme, you may not need to override any of them.
+
+### Create your own theme [#create-theme]
+
+You can create your own theme by following the same structure within a `appearance.theme` property.
+See the list of [tokens within a theme](https://github.com/supabase/auth-ui/blob/main/packages/shared/src/theming/Themes.ts).
+
+```js /src/index.js
+import { createClient } from '@supabase/supabase-js'
+import { Auth } from '@supabase/auth-ui-react'
+
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
+
+const customTheme = {
+  default: {
+    colors: {
+      brand: 'hsl(153 60.0% 53.0%)',
+      brandAccent: 'hsl(154 54.8% 45.1%)',
+      brandButtonText: 'white',
+      // ..
+    },
+  },
+  dark: {
+    colors: {
+      brandButtonText: 'white',
+      defaultButtonBackground: '#2e2e2e',
+      defaultButtonBackgroundHover: '#3e3e3e',
+      //..
+    },
+  },
+  // You can also add more theme variations with different names.
+  evenDarker: {
+    colors: {
+      brandButtonText: 'white',
+      defaultButtonBackground: '#1e1e1e',
+      defaultButtonBackgroundHover: '#2e2e2e',
+      //..
+    },
+  },
+}
+
+const App = () => (
+  <Auth
+    supabaseClient={supabase}
+    theme="default" // can also be "dark" or "evenDarker"
+    appearance={{ theme: customTheme }}
+  />
+)
+```
+
+You can switch between different variations of your theme with the ["theme" prop](#switch-theme-variations).
+
+### Custom CSS classes [#custom-css-classes]
+
+You can use custom CSS classes for the following elements:
+`"button"`, `"container"`, `"anchor"`, `"divider"`, `"label"`, `"input"`, `"loader"`, `"message"`.
+
+```js /src/index.js
+import { createClient } from '@supabase/supabase-js'
+import { Auth } from '@supabase/auth-ui-react'
+
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
+
+const App = () => (
+  <Auth
+    supabaseClient={supabase}
+    appearance={{
+      // If you want to extend the default styles instead of overriding it, set this to true
+      extend: false,
+      // Your custom classes
+      className: {
+        anchor: 'my-awesome-anchor',
+        button: 'my-awesome-button',
+        //..
+      },
+    }}
+  />
+)
+```
+
+### Custom inline CSS [#custom-inline-styles]
+
+You can use custom CSS inline styles for the following elements:
+`"button"`, `"container"`, `"anchor"`, `"divider"`, `"label"`, `"input"`, `"loader"`, `"message"`.
+
+```js /src/index.js
+import { createClient } from '@supabase/supabase-js'
+import { Auth } from '@supabase/auth-ui-react'
+
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
+
+const App = () => (
+  <Auth
+    supabaseClient={supabase}
+    appearance={{
+      style: {
+        button: { background: 'red', color: 'white' },
+        anchor: { color: 'blue' },
+        //..
+      },
+    }}
+  />
+)
+```
+
+### Custom labels [#custom-labels]
+
+You can use custom labels with `localization.variables` like so:
+
+```js mark=10:15 /src/index.js
+import { createClient } from '@supabase/supabase-js'
+import { Auth } from '@supabase/auth-ui-react'
+
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
+
+const App = () => (
+  <Auth
+    supabaseClient={supabase}
+    localization={{
+      variables: {
+        sign_in: {
+          email_label: 'Your email address',
+          password_label: 'Your strong password',
+        },
+      },
+    }}
+  />
+)
+```
+
+A full list of the available variables is below:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sign-up"
+>
+<TabPanel id="sign-up" label="Sign Up">
+
+| Label Tag                    | Default Label                              |
+| ---------------------------- | ------------------------------------------ |
+| `email_label`                | Email address                              |
+| `password_label`             | Create a Password                          |
+| `email_input_placeholder`    | Your email address                         |
+| `password_input_placeholder` | Your password                              |
+| `button_label`               | Sign up                                    |
+| `loading_button_label`       | Signing up ...                             |
+| `social_provider_text`       | Sign in with `{{provider}}`                |
+| `link_text`                  | Don't have an account? Sign up             |
+| `confirmation_text`          | Check your email for the confirmation link |
+
+</TabPanel>
+
+<TabPanel id="sign-in" label="Sign In">
+
+| Label Tag                    | Default Label                    |
+| ---------------------------- | -------------------------------- |
+| `email_label`                | Email address                    |
+| `password_label`             | Your Password                    |
+| `email_input_placeholder`    | Your email address               |
+| `password_input_placeholder` | Your password                    |
+| `button_label`               | Sign in                          |
+| `loading_button_label`       | Signing in ...                   |
+| `social_provider_text`       | Sign in with `{{provider}}`      |
+| `link_text`                  | Already have an account? Sign in |
+
+</TabPanel>
+
+<TabPanel id="magic_link" label="Magic Link">
+
+| Label Tag                 | Default Label                       |
+| ------------------------- | ----------------------------------- |
+| `email_input_label`       | Email address                       |
+| `email_input_placeholder` | Your email address                  |
+| `button_label`            | Sign in                             |
+| `loading_button_label`    | Signing in ...                      |
+| `link_text`               | Send a magic link email             |
+| `confirmation_text`       | Check your email for the magic link |
+
+</TabPanel>
+
+<TabPanel id="forgotten-password" label="Forgotten Password">
+
+| Label Tag                 | Default Label                                |
+| ------------------------- | -------------------------------------------- |
+| `email_label`             | Email address                                |
+| `password_label`          | Your Password                                |
+| `email_input_placeholder` | Your email address                           |
+| `button_label`            | Send reset password instructions             |
+| `loading_button_label`    | Sending reset instructions ...               |
+| `link_text`               | Forgot your password?                        |
+| `confirmation_text`       | Check your email for the password reset link |
+
+</TabPanel>
+
+<TabPanel id="update-password" label="Update Password">
+
+| Label Tag                    | Default Label                  |
+| ---------------------------- | ------------------------------ |
+| `password_label`             | New Password                   |
+| `password_input_placeholder` | Your new password              |
+| `button_label`               | Update password                |
+| `loading_button_label`       | Updating password ...          |
+| `confirmation_text`          | Your password has been updated |
+
+</TabPanel>
+
+<TabPanel id="verify-otp" label="Verify OTP">
+
+| Label Tag                 | Default Label      |
+| ------------------------- | ------------------ |
+| `email_input_label`       | Email address      |
+| `email_input_placeholder` | Your email address |
+| `phone_input_label`       | Phone number       |
+| `phone_input_placeholder` | Your phone number  |
+| `token_input_label`       | Token              |
+| `token_input_placeholder` | Your Otp token     |
+| `button_label`            | Verify token       |
+| `loading_button_label`    | Signing in ...     |
+
+</TabPanel>
+
+</Tabs>
+
+<Admonition type="caution">
+
+Currently, translating error messages (e.g. "Invalid credentials") is not supported. Check [related issue.](https://github.com/supabase/auth-ui/issues/86)
+
+</Admonition>
+
+### Hiding links [#hiding-links]
+
+You can hide links by setting the `showLinks` prop to `false`
+
+```js mark=9 /src/index.js
+import { createClient } from '@supabase/supabase-js'
+import { Auth } from '@supabase/auth-ui-react'
+
+const supabase = createClient('<INSERT PROJECT URL>', '<INSERT PROJECT ANON API KEY>')
+
+const App = () => <Auth supabaseClient={supabase} showLinks={false} />
+```
+
+Setting `showLinks` to `false` will hide the following links:
+
+- Don't have an account? Sign up
+- Already have an account? Sign in
+- Send a magic link email
+- Forgot your password?
+
+### Sign in and Sign up views
+
+Add `sign_in` or `sign_up` views with the `view` prop:
+
+```
+<Auth
+  supabaseClient={supabase}
+  view="sign_up"
+/>
+```
