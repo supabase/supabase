@@ -15,7 +15,7 @@ const FONT_URL = `${STORAGE_URL}/assets/font/CircularStd-Book.otf`
 const MONO_FONT_URL = `${STORAGE_URL}/assets/font/SourceCodePro-Regular.ttf`
 const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
 const mono_font = fetch(new URL(MONO_FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
-const BUCKET_FOLDER_VERSION = 'v1'
+// const BUCKET_FOLDER_VERSION = 'v1'
 
 const LW_TABLE = 'lw11_ga_tickets'
 const LW_MATERIALIZED_VIEW = 'lw11_ga_tickets_golden'
@@ -93,13 +93,12 @@ export async function handler(req: Request) {
     if (assumePlatinum && !platinum) return await fetch(`${STORAGE_URL}/assets/golden_no_meme.png`)
 
     // Generate image and upload to storage.
-    // const ticketType = data.metadata?.hasSecretTicket ? 'secret' : platinum ? 'platinum' : 'regular'
-    const ticketType = 'secret'
+    const ticketType = data.metadata?.hasSecretTicket ? 'secret' : platinum ? 'platinum' : 'regular'
 
     const fontData = await font
     const monoFontData = await mono_font
     const numDigits = `${Number(ticketNumber)}`.length
-    const prefix = `00000000`.slice(numDigits)
+    // const prefix = `00000000`.slice(numDigits)
     const HAS_ROLE = !!metadata?.role
     const HAS_COMPANY = !!metadata?.company
     const HAS_LOCATION = !!metadata?.location
@@ -219,7 +218,6 @@ export async function handler(req: Request) {
                   textOverflow: 'clip',
                   textAlign: 'left',
                   marginBottom: '10px',
-                  // border: `1px solid yellow`,
                 }}
               >
                 <p
@@ -288,7 +286,6 @@ export async function handler(req: Request) {
                 textTransform: 'uppercase',
                 letterSpacing: '0.35rem',
                 lineHeight: '120%',
-                // border: '1px solid red',
               }}
             >
               <div style={{ display: 'flex', marginBottom: '40' }}>
@@ -304,12 +301,7 @@ export async function handler(req: Request) {
                   margin: '0',
                 }}
               >
-                April 11th{' '}
-                {/* <span
-                  style={{ display: 'flex', color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT }}
-                >
-                  8AM PT
-                </span> */}
+                April 11th
               </p>
               <p
                 style={{
