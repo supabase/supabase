@@ -12,25 +12,25 @@
     "@gregnr/libpg-query": "^13.4.0-dev.12",
     "@serafin/schema-builder": "^0.18.5",
     "@supabase/supabase-js": "*",
-    "ai": "^2.2.29",
+    "ai": "^3.0.13",
     "common-tags": "^1.8.2",
     "config": "*",
     "js-tiktoken": "^1.0.10",
-    "jsonrepair": "^3.5.0",
-    "openai": "^4.26.1"
+    "jsonrepair": "^3.6.0",
+    "openai": "^4.29.2"
   },
   "devDependencies": {
     "@babel/core": "^7.23.6",
-    "@babel/preset-env": "^7.23.6",
+    "@babel/preset-env": "^7.24.3",
     "@jest/globals": "^29.7.0",
     "@types/common-tags": "^1.8.4",
     "babel-jest": "^29.7.0",
     "babel-plugin-transform-import-meta": "^2.2.1",
-    "dotenv": "^16.3.1",
+    "dotenv": "^16.4.5",
     "jest": "^29.7.0",
     "mdast-util-from-markdown": "^2.0.0",
-    "sql-formatter": "^15.0.2",
-    "ts-jest": "^29.1.1",
+    "sql-formatter": "^15.3.0",
+    "ts-jest": "^29.1.2",
     "tsconfig": "*",
     "typescript": "^5.4.3"
   }

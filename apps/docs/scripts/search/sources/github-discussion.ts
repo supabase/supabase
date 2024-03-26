@@ -1,10 +1,10 @@
 import { createAppAuth } from '@octokit/auth-app'
 import { Octokit } from '@octokit/core'
-import { paginateGraphql } from '@octokit/plugin-paginate-graphql'
+import { paginateGraphQL } from '@octokit/plugin-paginate-graphql'
 import { createHash } from 'crypto'
 import { BaseLoader, BaseSource } from './base'
 
-export const ExtendedOctokit = Octokit.plugin(paginateGraphql)
+export const ExtendedOctokit = Octokit.plugin(paginateGraphQL)
 export type ExtendedOctokit = InstanceType<typeof ExtendedOctokit>
 
 export type Discussion = {

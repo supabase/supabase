@@ -3,7 +3,6 @@ import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useState } from 'react'
 import { Bar, BarChart as RechartBarChart, Cell, Tooltip, XAxis, Legend } from 'recharts'
-import type { CategoricalChartState } from 'recharts/types/chart/generateCategoricalChart'
 import ChartHeader from './ChartHeader'
 import type { CommonChartProps, Datum } from './Charts.types'
 import { numberFormatter, useChartSize } from './Charts.utils'
@@ -15,7 +14,7 @@ export interface BarChartProps<D = Datum> extends CommonChartProps<D> {
   xAxisKey: string
   customDateFormat?: string
   displayDateInUtc?: boolean
-  onBarClick?: (datum: Datum, tooltipData?: CategoricalChartState) => void
+  onBarClick?: (datum: Datum, tooltipData?: any) => void
   emptyStateMessage?: string
   showLegend?: boolean
   xAxisIsDate?: boolean

@@ -1,5 +1,3 @@
-import { AreaProps } from 'recharts'
-
 export interface CommonChartProps<D>
   extends Pick<
     HeaderType<D>,

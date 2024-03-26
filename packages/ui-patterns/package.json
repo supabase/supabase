@@ -13,7 +13,7 @@
     "lodash": "*",
     "lucide-react": "*",
     "next-themes": "*",
-    "react-error-boundary": "^4.0.12",
+    "react-error-boundary": "^4.0.13",
     "react-hot-toast": "*",
     "react-tooltip": "*",
     "reactflow": "*",

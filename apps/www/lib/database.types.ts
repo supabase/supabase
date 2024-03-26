@@ -127,8 +127,40 @@ export interface Database {
           },
         ]
       }
+      dpa_downloads: {
+        Row: {
+          contact_email: string
+          document: string
+        }
+        Insert: {
+          contact_email: string
+          document: string
+        }
+        Update: {
+          contact_email: string
+          document: string
+        }
+        Relationships: []
+      }
+      lwx_meetups: {
+        Row: {
+          startAt: Date
+        }
+        Relationships: []
+      }
     }
-    Views: {}
+    Views: {
+      lwx_tickets_golden: {
+        Row: {
+          name: string
+          username: string
+          ticketNumber: string
+          metadata: Json
+          golden: boolean
+          createdAt: Date
+        }
+      }
+    }
     Functions: {}
     Enums: {
       partner_type: 'technology' | 'expert'
