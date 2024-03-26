@@ -44,9 +44,10 @@ const MetaFaviconsPagesRouter = ({
       <link rel="apple-touch-icon-precomposed" sizes="76x76" href={`${basePath}${route}/apple-icon-76x76.png`}/>
       {/* prettier-ignore */}
       <link rel="apple-touch-icon-precomposed" sizes="152x152" href={`${basePath}${route}/apple-icon-152x152.png`}/>
-      {/* These favicons are missing form public directories */}
-      {/* <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-128.png`} sizes="128x128"/> */}
-      {/* <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-196x196.png`} sizes="196x196"/> */}
+      {/* prettier-ignore */}
+      <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-128.png`} sizes="128x128"/>
+      {/* prettier-ignore */}
+      <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-196x196.png`} sizes="196x196"/>
       {/* prettier-ignore */}
       <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-96x96.png`} sizes="96x96"/>
       {/* prettier-ignore */}
