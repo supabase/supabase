@@ -1,3 +1,5 @@
+import { useEffect } from 'react'
+
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useTablesQuery } from 'data/tables/tables-query'
@@ -29,7 +31,7 @@ export const PolicyDetailsV2 = ({ isEditing, form, onUpdateCommand }: PolicyDeta
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
-  const { data: tables } = useTablesQuery({
+  const { data: tables, isSuccess: isSuccessTables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: snap.selectedSchemaName,
@@ -51,6 +53,10 @@ export const PolicyDetailsV2 = ({ isEditing, form, onUpdateCommand }: PolicyDeta
       }
     })
     .sort((a, b) => a.name.localeCompare(b.name))
+
+  useEffect(() => {
+    if (!isEditing && isSuccessTables && tables.length > 0) form.setValue('table', tables[0].name)
+  }, [isEditing, isSuccessTables, tables])
 
   return (
     <>
