@@ -1,6 +1,6 @@
 [
   {
-    "name": "TypeScript Support",
+    "name": "TypeScript support",
     "description": "Type definitions built directly from your database schema",
     "badge": "",
     "url": "/docs/client/generating-types"

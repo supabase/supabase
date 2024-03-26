@@ -1,0 +1,2923 @@
+openref: 0.1
+
+info:
+  id: reference/dart
+  title: Supabase Dart Client
+  description: |
+
+    Supabase Dart.
+
+  definition: spec/enrichments/tsdoc_v2/combined.json
+  slugPrefix: '/'
+  specUrl: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_dart_v1.yml
+  libraries:
+    - name: 'Dart'
+      id: 'dart'
+      version: '0.0.1'
+
+functions:
+  - id: initializing
+    title: 'Initializing'
+    $ref: '@supabase/supabase-js.index.SupabaseClient.constructor'
+    description: |
+      You can initialize Supabase with the static `initialize()` method of `Supabase` class.
+
+      The Supabase client is your entrypoint to the rest of the Supabase functionality
+      and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+
+    examples:
+      - id: flutter-initialize
+        name: For Flutter
+        code: |
+          ```dart
+          Future<void> main() async {
+            await Supabase.initialize(
+              url: 'https://xyzcompany.supabase.co',
+              anonKey: 'public-anon-key',
+            );
+
+            runApp(MyApp());
+          }
+
+          // Get a reference your Supabase client
+          final supabase = Supabase.instance.client;
+          ```
+      - id: for-other-dart-projects
+        name: For other Dart projects
+        code: |
+          ```dart
+          final supabase = SupabaseClient(
+            'https://xyzcompany.supabase.co',
+            'public-anon-key',
+          );
+          ```
+  - id: sign-up
+    title: 'signUp()'
+    description: |
+      Creates a new user.
+    notes: |
+      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](https://supabase.com/dashboard/project/_/auth/providers).
+      - **Confirm email** determines if users need to confirm their email address after signing up.
+        - If **Confirm email** is enabled, a `user` is returned but `session` is null.
+        - If **Confirm email** is disabled, both a `user` and a `session` are returned.
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/guides/auth/concepts/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+      - If signUp() is called for an existing confirmed user:
+          - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
+          - If **Confirm email** is disabled, the error message, `User already registered` is returned.
+    examples:
+      - id: sign-up
+        name: Sign up.
+        isSpotlight: true
+        code: |
+          ```dart
+          final AuthResponse res = await supabase.auth.signUp(
+            email: 'example@email.com',
+            password: 'example-password',
+          );
+          final Session? session = res.session;
+          final User? user = res.user;
+          ```
+      - id: sign-up-with-metadata
+        name: Sign up with additional metadata
+        isSpotlight: true
+        code: |
+          ```dart
+          final AuthResponse res = await supabase.auth.signUp(
+            email: 'example@email.com',
+            password: 'example-password',
+            data: {'username': 'my_user_name'},
+          );
+          final Session? session = res.session;
+          final User? user = res.user;
+          ```
+      - id: sign-up-with-redirect-url
+        name: Sign up with redirect URL
+        isSpotlight: true
+        code: |
+          ```dart
+          final AuthResponse res = await supabase.auth.signUp(
+            email: 'example@email.com',
+            password: 'example-password',
+            emailRedirectTo: 'com.supabase.myapp://callback',
+          );
+          final Session? session = res.session;
+          final User? user = res.user;
+          ```
+
+  - id: sign-in-with-password
+    title: 'signInWithPassword()'
+    description: |
+      Log in an existing user using email or phone number with password.
+    notes: |
+      - Requires either an email and password or a phone number and password.
+    examples:
+      - id: sign-in-with-email-and-password
+        name: Sign in with email and password
+        isSpotlight: true
+        code: |
+          ```dart
+          final AuthResponse res = await supabase.auth.signInWithPassword(
+            email: 'example@email.com',
+            password: 'example-password',
+          );
+          final Session? session = res.session;
+          final User? user = res.user;
+          ```
+      - id: sign-in-with-phone-and-password
+        name: Sign in with phone and password
+        code: |
+          ```dart
+          final AuthResponse res = await supabase.auth.signInWithPassword(
+            phone: '+13334445555',
+            password: 'example-password',
+          );
+          final Session? session = res.session;
+          final User? user = res.user;
+          ```
+  - id: sign-in-with-otp
+    title: 'signInWithOtp()'
+    notes: |
+      - Requires either an email or phone number.
+      - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
+      - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
+      - If you're using phone, you can configure whether you want the user to receive a OTP.
+      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/guides/auth/concepts/redirect-urls). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+    examples:
+      - id: sign-in-with-email
+        name: Sign in with email.
+        isSpotlight: true
+        description: |
+          The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
+          You can pass `emailRedirectTo` with dynamic link to bring the users back to your app after they click on the magic link.
+        code: |
+          ```dart
+          await supabase.auth.signInWithOtp(
+            email: 'example@email.com',
+            emailRedirectTo: kIsWeb ? null : 'io.supabase.flutter://signin-callback/',
+          );
+          ```
+      - id: sign-in-with-sms-otp
+        name: Sign in with SMS OTP.
+        description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
+        code: |
+          ```dart
+          await supabase.auth.signInWithOtp(
+            phone: '+13334445555',
+          );
+          ```
+      - id: sign-in-with-whatsapp-otp
+        name: Sign in with WhatsApp OTP
+        isSpotlight: false
+        description: The user will be sent a WhatsApp message which contains a OTP. By default, a given user can only request a OTP once every 60 seconds. Note that a user will need to have a valid WhatsApp account that is linked to Twilio in order to use this feature.
+        code: |
+          ```dart
+          await supabase.auth.signInWithOtp(
+            phone: '+13334445555',
+            channel: OtpChannel.whatsapp,  
+          );
+          ```
+  - id: sign-in-with-apple
+    title: 'signInWithApple()'
+    description: |
+      Signs in a user using native Apple login.
+    notes: |
+      - You need to [register your bundle ID](https://developer.apple.com/help/account/manage-identifiers/register-an-app-id/) and add it to Supabase dashboard.
+      - This method is only available in iOS and macOS
+      - For other platforms, [signInWithOAuth()](https://supabase.com/docs/reference/dart/auth-signinwithoauth) should be used.
+    examples:
+      - id: sign-in-with-apple
+        name: Sign in with Apple
+        isSpotlight: true
+        code: |
+          ```dart
+          final AuthResponse res = await supabase.auth.signInWithApple();
+          ```
+  - id: sign-in-with-oauth
+    title: 'signInWithOAuth()'
+    description: |
+      Signs the user in using third party OAuth providers.
+    notes: |
+      - This method is used for signing in using a third-party provider.
+      - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
+    examples:
+      - id: sign-in-using-a-third-party-provider
+        name: Sign in using a third-party provider
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.signInWithOAuth(Provider.github);
+          ```
+      - id: sign-in-using-a-third-party-provider-with-redirect
+        name: With `redirectTo`
+        description: |
+          Specify the redirect link to bring back the user via deeplink.
+          Note that `redirectTo` should be null for Flutter Web.
+        code: |
+          ```dart
+          await supabase.auth.signInWithOAuth(
+            Provider.github,
+            redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
+          );
+          ```
+      - id: sign-in-with-scopes
+        name: With scopes
+        description: |
+          If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
+          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider.
+        code: |
+          ```dart
+          await supabase.auth.signInWithOAuth(
+            Provider.github,
+            scopes: 'repo gist notifications'
+          );
+          ...
+          // after user comes back from signin flow
+
+          final Session? session = supabase.auth.currentSession;
+          final String? oAuthToken = session?.providerToken;
+          ```
+  - id: sign-out
+    title: 'signOut()'
+    description: |
+      Signs out the current user, if there is a logged in user.
+    notes: |
+      - In order to use the `signOut()` method, the user needs to be signed in first.
+    examples:
+      - id: sign-out
+        name: Sign out
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.signOut();
+          ```
+  - id: verify-otp
+    title: 'verifyOtp()'
+    notes: |
+      - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
+      - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
+    examples:
+      - id: verify-sms-one-time-password(otp)
+        name: Verify Sms One-Time Password (OTP)
+        isSpotlight: true
+        code: |
+          ```dart
+          final AuthResponse res = await supabase.auth.verifyOTP(
+            type: OtpType.sms,
+            token: '111111',
+            phone: '+13334445555',
+          );
+          final Session? session = res.session;
+          final User? user = res.user;
+          ```
+      - id: verify-signup-one-time-password(otp)
+        name: Verify Signup One-Time Password (OTP)
+        isSpotlight: false
+        code: |
+          ```dart
+          final AuthResponse res = await supabase.auth.verifyOTP(
+            type: OtpType.signup,
+            token: token,
+            phone: '+13334445555',
+          );
+          final Session? session = res.session;
+          final User? user = res.user;
+          ```
+  - id: get-session
+    title: 'currentSession'
+    description: |
+      Returns the session data, if there is an active session.
+    examples:
+      - id: get-the-session-data
+        name: Get the session data
+        isSpotlight: true
+        code: |
+          ```dart
+          final Session? session = supabase.auth.currentSession;
+          ```
+  - id: get-user
+    title: 'currentUser'
+    description: |
+      Returns the user data, if there is a logged in user.
+    examples:
+      - name: Get the logged in user
+        isSpotlight: true
+        code: |
+          ```dart
+          final User? user = supabase.auth.currentUser;
+          ```
+  - id: update-user
+    title: 'updateUser()'
+    description: |
+      Updates user data for a logged in user.
+    notes: |
+      - In order to use the `updateUser()` method, the user needs to be signed in first.
+      - By Default, email updates sends a confirmation link to both the user's current and new email.
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
+    examples:
+      - id: update-the-email-for-an-authenticated-user
+        name: Update the email for an authenticated user
+        description: Sends a "Confirm Email Change" email to the new email address.
+        isSpotlight: true
+        code: |
+          ```dart
+          final UserResponse res = await supabase.auth.updateUser(
+            UserAttributes(
+              email: 'example@email.com',
+            ),
+          );
+          final User? updatedUser = res.user;
+          ```
+      - id: update-the-password-for-an-authenticated-user
+        name: Update the password for an authenticated user
+        isSpotlight: false
+        code: |
+          ```dart
+          final UserResponse res = await supabase.auth.updateUser(
+            UserAttributes(
+              password: 'new password',
+            ),
+          );
+          final User? updatedUser = res.user;
+          ```
+      - id: update-the-users-metadata
+        name: Update the user's metadata
+        isSpotlight: true
+        code: |
+          ```dart
+          final UserResponse res = await supabase.auth.updateUser(
+            UserAttributes(
+              data: { 'hello': 'world' },
+            ),
+          );
+          final User? updatedUser = res.user;
+          ```
+      - id: update-password-with-reauthentication
+        name: Update the user's password with a nonce
+        description: If "Secure password change" is enabled, updating the user's password would require a nonce. The nonce is sent to the user's email or phone number.
+        isSpotlight: true
+        code: |
+          ```dart
+          supabase.auth.updateUser(UserAttributes(
+            email: 'example@email.com',
+            nonce: '123456',
+          ));
+          ```
+  - id: send-password-reauthentication
+    title: 'reauthenticate()'
+    notes: |
+      - This method is used together with `updateUser()` when a user's password needs to be updated.
+      - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
+    examples:
+      - id: send-reauthentication-nonce
+        name: Send reauthentication nonce
+        description: Sends a reauthentication nonce to the user's email or phone number.
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.reauthenticate();
+          ```
+  - id: resend-email-or-phone-otps
+    title: 'resend()'
+    notes: |
+      - Resends a signup confirmation, email change or phone change email to the user.
+      - Passwordless sign-ins can be resent by calling the `signInWithOtp()` method again.
+      - Password recovery emails can be resent by calling the `resetPasswordForEmail()` method again.
+      - This method will only resend an email or phone OTP to the user if there was an initial signup, email change or phone change request being made.
+    examples:
+      - id: resend-email-signup-confirmation
+        name: Resend an email signup confirmation
+        description: Resends the email signup confirmation to the user
+        isSpotlight: true
+        code: |
+          ```dart
+          final ResendResponse res = await supabase.auth.resend(
+            type: OtpType.email,
+            email: 'email@example.com',
+          );
+          ```
+  - id: on-auth-state-change
+    title: 'onAuthStateChange()'
+    description: |
+      Receive a notification every time an auth event happens.
+    notes: |
+      - Types of auth events: `AuthChangeEvent.passwordRecovery`, `AuthChangeEvent.signedIn`, `AuthChangeEvent.signedOut`, `AuthChangeEvent.tokenRefreshed`, `AuthChangeEvent.userUpdated`and `AuthChangeEvent.userDeleted`
+    examples:
+      - id: listen-to-auth-changes
+        name: Listen to auth changes
+        isSpotlight: true
+        code: |
+          ```dart
+          final authSubscription = supabase.auth.onAuthStateChange.listen((data) {
+            final AuthChangeEvent event = data.event;
+            final Session? session = data.session;
+          });
+          ```
+      - id: list-to-a-specific-event
+        name: Listen to a specific event
+        code: |
+          ```dart
+          final authSubscription = supabase.auth.onAuthStateChange.listen((data) {
+            final AuthChangeEvent event = data.event;
+            if (event == AuthChangeEvent.signedIn) {
+              // handle signIn
+            }
+          });
+          ```
+      - id: unsubscribe-from-auth-subscription
+        name: Unsubscribe from auth subscription
+        code: |
+          ```dart
+          final authSubscription = supabase.auth.onAuthStateChange((event, session) {});
+
+          authSubscription.cancel();
+          ```
+  - id: auth-reset-password-for-email
+    title: 'resetPasswordForEmail()'
+    description: |
+      Sends a reset request to an email address.
+    notes: |
+      Sends a password reset request to an email address. When the user clicks the reset link in the email they are redirected back to your application. Prompt the user for a new password and call auth.updateUser():
+
+      ```dart
+      await supabase.auth.resetPasswordForEmail(
+        'sample@email.com',
+        redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
+      );
+      ```
+    examples:
+      - id: reset-password
+        name: Reset password for Flutter
+        isSpotlight: true
+        code: |
+          `redirectTo` is used to open the app via deeplink when user opens the password reset email.
+          ```dart
+          await supabase.auth.resetPasswordForEmail(
+            'sample@email.com',
+            redirectTo: kIsWeb ? null : 'io.supabase.flutter://reset-callback/',
+          );
+          ```
+  - id: auth-mfa-api
+    title: 'Overview'
+    notes: |
+      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace. 
+
+      Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
+
+      Having a 2nd TOTP factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup TOTP factor.
+  - id: mfa-enroll
+    title: 'mfa.enroll()'
+    notes: |
+      Starts the enrollment process for a new Multi-Factor Authentication (MFA) factor. This method creates a new `unverified` factor.
+      To verify a factor, present the QR code or secret to the user and ask them to add it to their authenticator app.
+      The user has to enter the code from their authenticator app to verify it.
+      - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
+      - To create a challenge, see [`mfa.challenge()`](/docs/reference/dart/auth-mfa-challenge).
+      - To verify a challenge, see [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify).
+      - To create and verify a challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/dart/auth-mfa-challengeandverify).
+    examples:
+      - id: enroll-totp-factor
+        name: Enroll a time-based, one-time password (TOTP) factor
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.mfa.enroll(factorType: FactorType.totp);
+
+          final qrCodeUrl = res.totp.qrCode;
+          ```
+  - id: mfa-challenge
+    title: 'mfa.challenge()'
+    notes: |
+      Prepares a challenge used to verify that a user has access to a MFA factor.
+      - An [enrolled factor](/docs/reference/dart/auth-mfa-enroll) is required before creating a challenge.
+      - To verify a challenge, see [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify).
+    examples:
+      - id: create-mfa-challenge
+        name: Create a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.mfa.challenge(
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+          );
+          ```
+  - id: mfa-verify
+    title: 'mfa.verify()'
+    notes: |
+      Verifies a code against a challenge. The verification code is provided by the user by entering a code seen in their authenticator app.
+      - To verify a challenge, please [create a challenge](/docs/reference/dart/auth-mfa-challenge) first.
+    examples:
+      - id: verify-challenge
+        name: Verify a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.mfa.verify(
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+            challengeId: '4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15',
+            code: '123456',
+          );
+          ```
+  - id: mfa-challenge-and-verify
+    title: 'mfa.challengeAndVerify()'
+    notes: |
+      Helper method which creates a challenge and immediately uses the given code to verify against it thereafter. The verification code is provided by the user by entering a code seen in their authenticator app.
+      - An [enrolled factor](/docs/reference/dart/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
+      - Executes [`mfa.challenge()`](/docs/reference/dart/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify) in a single step.
+    examples:
+      - id: challenge-and-verify
+        name: Create and verify a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.mfa.challengeAndVerify(
+            factorId: '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+            code: '123456',
+          );
+          ```
+  - id: mfa-unenroll
+    title: 'mfa.unenroll()'
+    notes: |
+      Unenroll removes a MFA factor. A user has to have an aal2 authenticator level in order to unenroll a verified factor.
+    examples:
+      - id: unenroll-a-factor
+        name: Unenroll a factor
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.mfa.unenroll(
+            '34e770dd-9ff9-416c-87fa-43b31d7ef225',
+          );
+          ```
+  - id: mfa-get-authenticator-assurance-level
+    title: 'mfa.getAuthenticatorAssuranceLevel()'
+    notes: |
+      Returns the Authenticator Assurance Level (AAL) for the active session.
+      - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
+      - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
+      - If the user has a verified factor, the `nextLevel` field will return `aal2`, else, it will return `aal1`.
+    examples:
+      - id: get-aal
+        name: Get the AAL details of a session
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+          final currentLevel = res.currentLevel;
+          final nextLevel = res.nextLevel;
+          final currentAuthenticationMethods = res.currentAuthenticationMethods;
+          ```
+  - id: admin-api
+    title: 'Overview'
+    notes: |
+      - Any method under the `supabase.auth.admin` namespace requires a `service_role` key.
+      - These methods are considered admin methods and should be called on a trusted server. Never expose your `service_role` key in the Flutter app.
+    examples:
+      - id: create-auth-admin-client
+        name: Create server-side auth client
+        isSpotlight: true
+        code: |
+          ```dart
+          final supabase = SupabaseClient(supabaseUrl, serviceRoleKey);
+          ```
+  - id: get-user-by-id
+    title: 'getUserById()'
+    notes: |
+      Get user by id.
+      - Fetches the user object from the database based on the user's id.
+      - The `getUserById()` method requires the user's id which maps to the `auth.users.id` column.
+    examples:
+      - id: fetch-the-user-object-using-the-access-token-jwt
+        name: Fetch the user object using the access_token jwt
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.admin.getUserById(userId);
+          final user = res.user;
+          ```
+  - id: list-users
+    title: 'listUsers()'
+    notes: |
+      Get a list of users.
+      - Defaults to return 50 users per page.
+    examples:
+      - id: get-a-full-list-of-users
+        name: Get a page of users
+        isSpotlight: true
+        code: |
+          ```dart
+          final List<User> users = await supabase.auth.admin.listUsers();
+          ```
+      - id: get-paginated-list-of-users
+        name: Paginated list of users
+        isSpotlight: false
+        code: |
+          ```dart
+          final List<User> res = await supabase.auth.admin.listUsers(
+            page: 1,
+            perPage: 100,
+          );
+          ```
+  - id: create-user
+    title: 'createUser()'
+    notes: |
+      Creates a new user.
+      - To confirm the user's email address or phone number, set `email_confirm` or `phone_confirm` to true. Both arguments default to false.
+      - `createUser()` will not send a confirmation email to the user. You can use [`inviteUserByEmail()`](/docs/reference/dart/auth-admin-inviteuserbyemail) if you want to send them an email invite instead.
+      - If you are sure that the created user's email or phone number is legitimate and verified, you can set the `email_confirm` or `phone_confirm` param to `true`.
+    examples:
+      - id: create-a-new-user-with-custom-user-metadata
+        name: With custom user metadata
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.admin.createUser(AdminUserAttributes(
+            email: 'user@email.com',
+            password: 'password',
+            userMetadata: {'name': 'Yoda'},
+          ));
+          ```
+      - id: auto-confirm-the-users-email
+        name: Auto-confirm the user's email
+        code: |
+          ```dart
+          final res = await supabase.auth.admin.createUser(AdminUserAttributes(
+            email: 'user@email.com',
+            emailConfirm: true,
+          ));
+          ```
+      - id: auto-confirm-the-users-phone-number
+        name: Auto-confirm the user's phone number
+        code: |
+          ```dart
+          final res = await supabase.auth.admin.createUser(AdminUserAttributes(
+            phone: '1234567890',
+            phoneConfirm: true,
+          ));
+          ```
+  - id: delete-user
+    title: 'deleteUser()'
+    notes: |
+      Delete a user.
+      - The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
+    examples:
+      - id: removes-a-user
+        name: Removes a user
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.admin
+              .deleteUser('715ed5db-f090-4b8c-a067-640ecee36aa0');
+          ```
+  - id: invite-user-by-email
+    title: 'inviteUserByEmail()'
+    notes: |
+      Sends an invite link to the user's email address.
+    examples:
+      - id: invite-a-user
+        name: Invite a user
+        isSpotlight: true
+        code: |
+          ```dart
+          final UserResponse res = await supabase.auth.admin
+              .inviteUserByEmail('email@example.com');
+          final User? user = res.user;
+          ```
+  - id: generate-link
+    title: 'generateLink()'
+    notes: |
+      Generates email links and OTPs to be sent via a custom email provider.
+      - The following types can be passed into `generateLink()`: `signup`, `magiclink`, `invite`, `recovery`, `emailChangeCurrent`, `emailChangeNew`, `phoneChange`.
+      - `generateLink()` only generates the email link for `email_change_email` if the "Secure email change" setting is enabled under the "Email" provider in your Supabase project.
+      - `generateLink()` handles the creation of the user for `signup`, `invite` and `magiclink`.
+    examples:
+      - id: generate-a-signup-link
+        name: Generate a signup link
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.auth.admin.generateLink(
+            type: GenerateLinkType.signup,
+            email: 'email@example.com',
+            password: 'secret',
+          );
+          final actionLink = res.properties.actionLink;
+          ```
+  - id: update-user-by-id
+    title: 'updateUserById()'
+    examples:
+      - id: updates-a-users-email
+        name: Updates a user's email
+        isSpotlight: false
+        code: |
+          ```dart
+          final UserResponse res = await supabase.auth.admin.updateUserById(
+            '6aa5d0d4-2a9f-4483-b6c8-0cf4c6c98ac4',
+            attributes: AdminUserAttributes(
+              email: 'new@email.com',
+            ),
+          );
+          ```
+  - id: invoke
+    title: 'invoke()'
+    description: |
+      Invokes a Supabase Function. See the [guide](/docs/guides/functions) for details on writing Functions.
+    notes: |
+      - Requires an Authorization header.
+      - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
+    examples:
+      - id: basic-invocation
+        name: Basic invocation.
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.functions.invoke('hello', body: {'foo': 'baa'});
+          final data = res.data;
+          ```
+      - id: specifying-response-type
+        name: Specifying response type.
+        description: |
+          By default, `invoke()` will parse the response as JSON. You can parse the response in the following formats: `json`, `blob`, `text`, and `arrayBuffer`.
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.functions.invoke(
+            'hello',
+            body: {'foo': 'baa'},
+            responseType: ResponseType.text,
+          );
+          final data = res.data;
+          ```
+      - id: parsing-custom-headers
+        name: Parsing custom headers.
+        description: |
+          Any `headers` will be passed through to the function. A common pattern is to pass a logged-in user's JWT token as an Authorization header.
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase.functions.invoke(
+            'hello',
+            body: {'foo': 'baa'},
+            headers: {
+              'Authorization': 'Bearer ${supabase.auth.currentSession?.accessToken}'
+            },
+          );
+          ```
+  - id: select
+    description: |
+      Perform a SELECT query on the table or view.
+    title: 'Fetch data: select()'
+    notes: |
+      - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
+      - `select()` can be combined with [Filters](/docs/reference/dart/using-filters)
+      - `select()` can be combined with [Modifiers](/docs/reference/dart/using-modifiers)
+      - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+    examples:
+      - id: getting-your-data
+        name: Getting your data
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name');
+          ```
+      - id: selecting-specific-columns
+        name: Selecting specific columns
+        description: You can select specific fields from your tables.
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select('''
+              name,
+              cities (
+                name
+              )
+            ''');
+          ```
+      - id: query-foreign-tables
+        name: Query foreign tables
+        description: If your database has relationships, you can query related tables too.
+        code: |
+          ```dart
+          final data = await supabase
+            .from('products')
+            .select('''
+              id,
+              supplier:supplier_id ( name ),
+              purchaser:purchaser_id ( name )
+            ''');
+          ```
+      - id: query-the-same-foreign-table-multiple-times
+        name: Query the same foreign table multiple times
+        description: |
+          Sometimes you will need to query the same foreign table twice.
+          In this case, you can use the name of the joined column to identify
+          which join you intend to use. For convenience, you can also give an
+          alias for each column.
+        code: |
+          ```dart
+          final data = await supabase
+            .from('messages')
+            .select('*, users!inner(*)')
+            .eq('users.username', 'Jane');
+          ```
+      - id: filtering-with-inner-joins
+        name: Filtering with inner joins
+        description: |
+          If you want to filter a table based on a child table's values you can use the `!inner()` function. For example, if you wanted
+          to select all rows in a `message` table which belong to a user with the `username` "Jane":
+        code: |
+          ```dart
+          final data = await supabase
+            .from('messages')
+            .select('*, users!inner(*)')
+            .eq('users.username', 'Jane');
+          ```
+      - id: querying-with-count-option
+        name: Querying with count option
+        description: |
+          You can get the number of rows by using the count option.
+          Allowed values for count option are [exact](https://postgrest.org/en/stable/api.html#exact-count), [planned](https://postgrest.org/en/stable/api.html#planned-count) and [estimated](https://postgrest.org/en/stable/api.html#estimated-count).
+        code: |
+          ```dart
+          final res = await supabase.from('cities').select(
+                'name',
+                const FetchOptions(
+                  count: CountOption.exact,
+                ),
+              );
+
+          final count = res.count;
+          ```
+      - id: querying-json-data
+        name: Querying JSON data
+        description: |
+          If you have data inside of a JSONB column, you can apply select
+          and query filters to the data values. Postgres offers a
+          [number of operators](https://www.postgresql.org/docs/current/functions-json.html)
+          for querying JSON data. Also see
+          [PostgREST docs](http://postgrest.org/en/v7.0.0/api.html#json-columns) for more details.
+        code: |
+          ```dart
+          final data = await supabase
+            .from('users')
+            .select('''
+              id, name,
+              address->street
+            ''')
+            .eq('address->postcode', 90210);
+          ```
+      - id: return-data-as-csv
+        name: Return data as CSV
+        description: |
+          By default the data is returned in JSON format, however you can also request for it to be returned as Comma Separated Values.
+        code: |
+          ```dart
+          final data = await supabase
+            .from('users')
+            .select()
+            .csv();
+          ```
+      - id: switching-schemas-per-query
+        name: Switching schemas per query
+        description: |
+          You can perform queries on custom schemas.
+          Make sure you've set up your [database privileges and API settings](/docs/guides/api/using-custom-schemas).
+        code: |
+          ```dart
+          final data = await supabase
+            .useSchema('myschema')
+            .from('users')
+            .select();
+          ```
+
+  - id: insert
+    description: |
+      Perform an INSERT into the table or view.
+    title: 'Create data: insert()'
+    examples:
+      - id: create-a-record
+        name: Create a record
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase
+              .from('cities')
+              .insert({'name': 'The Shire', 'country_id': 554});
+          ```
+      - id: bulk-create
+        name: Bulk create
+        code: |
+          ```dart
+          await supabase.from('cities').insert([
+            {'name': 'The Shire', 'country_id': 554},
+            {'name': 'Rohan', 'country_id': 555},
+          ]);
+          ```
+      - id: fetch-inserted-data
+        name: Fetch inserted record
+        code: |
+          ```dart
+          final List<Map<String, dynamic>> data =
+                  await supabase.from('cities').insert([
+                {'name': 'The Shire', 'country_id': 554},
+                {'name': 'Rohan', 'country_id': 555},
+              ]).select();
+          ```
+
+  - id: update
+    description: |
+      Perform an UPDATE on the table or view.
+    title: 'Modify data: update()'
+    notes: |
+      - `update()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to update.
+    examples:
+      - id: updating-your-data
+        name: Update your data
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase
+            .from('cities')
+            .update({ 'name': 'Middle Earth' })
+            .match({ 'name': 'Auckland' });
+          ```
+      - id: updating-json-data
+        name: Update JSON data
+        description: |
+          Postgres offers a
+          [number of operators](https://www.postgresql.org/docs/current/functions-json.html)
+          for working with JSON data. Right now it is only possible to update an entire JSON document,
+          but we are [working on ideas](https://github.com/PostgREST/postgrest/issues/465) for updating individual keys.
+        code: |
+          ```dart
+          await supabase
+            .from('users')
+            .update({
+              'address': {
+                'street': 'Melrose Place',
+                'postcode': 90210
+              }
+            })
+            .eq('address->postcode', 90210);
+          ```
+      - id: fetch-updated-rows
+        name: Fetch updated rows
+        code: |
+          ```dart
+          final List<Map<String, dynamic>> data = await supabase
+              .from('users')
+              .update({
+                'address': {'street': 'Melrose Place', 'postcode': 90210}
+              })
+              .eq('address->postcode', 90210)
+              .select();
+          ```
+
+  - id: upsert
+    description: |
+      Perform an UPSERT on the table or view. Depending on the column(s) passed to `onConflict`, `.upsert()` allows you to perform the equivalent of `.insert()` if a row with the corresponding `onConflict` columns doesn't exist, or if it does exist, perform an alternative action depending on `ignoreDuplicates`.
+    title: 'Upsert data: upsert()'
+    notes: |
+      - Primary keys must be included in `values` to use upsert.
+    examples:
+      - id: upsert-your-data
+        name: Upsert your data
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase
+            .from('messages')
+            .upsert({ 'id': 3, 'message': 'foo', 'username': 'supabot' });
+          ```
+      - id: upserting-into-tables-with-constraints
+        name: Upserting into tables with constraints
+        description: |
+          Running the following will cause supabase to upsert data into the `users` table.
+          If the username 'supabot' already exists, the `onConflict` argument tells supabase to overwrite that row
+          based on the column passed into `onConflict`.
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase
+            .from('users')
+            .upsert({ 'username': 'supabot' }, onConflict: 'username');
+          ```
+      - id: return-the-exact-number-of-rows
+        name: Return the exact number of rows
+        description: |
+          Allowed values for count option are `exact`, `planned` and `estimated`.
+        code: |
+          ```dart
+          final res = await supabase.from('users').upsert(
+            {'id': 3, 'message': 'foo', 'username': 'supabot'},
+            options: const FetchOptions(count: CountOption.exact),
+          );
+
+          final data = res.data;
+          final count = res.count;
+          ```
+
+  - id: delete
+    description: |
+      Perform a DELETE on the table or view.
+    title: 'Delete data: delete()'
+    notes: |
+      - `delete()` should always be combined with [Filters](/docs/reference/dart/using-filters) to target the item(s) you wish to delete.
+      - If you use `delete()` with filters and you have RLS enabled, only rows visible through `SELECT` policies are deleted. Note that by default no rows are visible, so you need at least one `SELECT`/`ALL` policy that makes the rows visible.
+    examples:
+      - id: delete-records
+        name: Delete records
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase
+            .from('cities')
+            .delete()
+            .match({ 'id': 666 });
+          ```
+      - id: fetch-delete-records
+        name: Fetch deleted records
+        code: |
+          ```dart
+          final List<Map<String,dynamic>> data = await supabase
+            .from('cities')
+            .delete()
+            .match({ 'id': 666 })
+            .select();
+          ```
+
+  - id: rpc
+    title: 'Stored Procedures: rpc()'
+    description: |
+      You can call stored procedures as a "Remote Procedure Call".
+
+      That's a fancy way of saying that you can put some logic into your database then call it from anywhere.
+      It's especially useful when the logic rarely changes - like password resets and updates.
+    examples:
+      - id: call-a-stored-procedure
+        name: Call a stored procedure
+        isSpotlight: true
+        description: This is an example invoking a stored procedure.
+        code: |
+          ```dart
+          final data = await supabase
+            .rpc('hello_world');
+          ```
+      - id: with-parameters
+        name: With Parameters
+        code: |
+          ```dart
+          final data = await supabase
+            .rpc('echo_city', params: { 'name': 'The Shire' });
+          ```
+
+  - id: subscribe
+    description: |
+      Subscribe to realtime changes in your database.
+    title: 'on().subscribe()'
+    notes: |
+      - Realtime is disabled by default for new tables. You can turn it on by [managing replication](/docs/guides/realtime/postgres-changes#replication-setup).
+      - If you want to receive the "previous" data for updates and deletes, you will need to set `REPLICA IDENTITY` to `FULL`, like this: `ALTER TABLE your_table REPLICA IDENTITY FULL;`
+    examples:
+      - id: listen-to-all-database-changes
+        name: Listen to all database changes
+        isSpotlight: true
+        code: |
+          ```dart
+          supabase.channel('*').on(
+            RealtimeListenTypes.postgresChanges,
+            ChannelFilter(event: '*', schema: '*'),
+            (payload, [ref]) {
+              print('Change received: ${payload.toString()}');
+            },
+          ).subscribe();
+          ```
+      - id: listen-to-a-specific-table
+        name: Listen to a specific table
+        code: |
+          ```dart
+          supabase.channel('public:countries').on(
+            RealtimeListenTypes.postgresChanges,
+            ChannelFilter(event: '*', schema: 'public', table: 'countries'),
+            (payload, [ref]) {
+              print('Change received: ${payload.toString()}');
+            },
+          ).subscribe();
+          ```
+      - id: listen-to-inserts
+        name: Listen to inserts
+        code: |
+          ```dart
+          supabase.channel('public:countries').on(
+            RealtimeListenTypes.postgresChanges,
+            ChannelFilter(event: 'INSERT', schema: 'public', table: 'countries'),
+            (payload, [ref]) {
+              print('Change received: ${payload.toString()}');
+            },
+          ).subscribe();
+          ```
+      - id: listen-to-updates
+        name: Listen to updates
+        description: |
+          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+          enable full replication for the table you are listening too:
+
+          ```sql
+          alter table "your_table" replica identity full;
+          ```
+        code: |
+          ```dart
+          supabase.channel('public:countries').on(
+            RealtimeListenTypes.postgresChanges,
+            ChannelFilter(event: 'UPDATE', schema: 'public', table: 'countries'),
+            (payload, [ref]) {
+              print('Change received: ${payload.toString()}');
+            },
+          ).subscribe();
+          ```
+      - id: listen-to-deletes
+        name: Listen to deletes
+        description: |
+          By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+          enable full replication for the table you are listening too:
+
+          ```sql
+          alter table "your_table" replica identity full;
+          ```
+        code: |
+          ```dart
+          supabase.channel('public:countries').on(
+            RealtimeListenTypes.postgresChanges,
+            ChannelFilter(event: 'DELETE', schema: 'public', table: 'countries'),
+            (payload, [ref]) {
+              print('Change received: ${payload.toString()}');
+            },
+          ).subscribe();
+          ```
+      - id: listen-to-multiple-events
+        name: Listen to multiple events
+        description: You can chain listeners if you want to listen to multiple events for each table.
+        code: |
+          ```dart
+          supabase.channel('public:countries').on(RealtimeListenTypes.postgresChanges,
+              ChannelFilter(event: 'INSERT', schema: 'public', table: 'countries'),
+              (payload, [ref]) {
+            print('Change received: ${payload.toString()}');
+          }).on(RealtimeListenTypes.postgresChanges,
+              ChannelFilter(event: 'DELETE', schema: 'public', table: 'countries'),
+              (payload, [ref]) {
+            print('Change received: ${payload.toString()}');
+          }).subscribe();
+          ```
+      - id: listening-to-row-level-changes
+        name: Listen to row level changes
+        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+        code: |
+          ```dart
+          supabase.channel('public:countries:id=eq.200').on(
+              RealtimeListenTypes.postgresChanges,
+              ChannelFilter(
+                event: 'UPDATE',
+                schema: 'public',
+                table: 'countries',
+                filter: 'id=eq.200',
+              ), (payload, [ref]) {
+            print('Change received: ${payload.toString()}');
+          }).subscribe();
+          ```
+
+  - id: remove-channel
+    description: |
+      Unsubscribes and removes Realtime channel from Realtime client.
+    title: 'removeChannel()'
+    notes: |
+      - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+    examples:
+      - id: removes-a-channel
+        name: Remove a channel
+        isSpotlight: true
+        code: |
+          ```dart
+          final status = await supabase.removeChannel(channel);
+          ```
+
+  - id: remove-all-channels
+    description: |
+      Unsubscribes and removes all Realtime channels from Realtime client.
+    title: 'removeAllChannels()'
+    notes: |
+      - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+    examples:
+      - id: remove-all-channels
+        name: Remove all channels
+        isSpotlight: true
+        code: |
+          ```dart
+          final statuses = await supabase.removeAllChannels();
+          ```
+
+  - id: get-channels
+    description: |
+      Returns all Realtime channels.
+    title: 'getChannels()'
+    examples:
+      - id: get-all-channels
+        name: Get all channels
+        isSpotlight: true
+        code: |
+          ```dart
+          final channels = supabase.getChannels();
+          ```
+
+  - id: stream
+    description: |
+      Returns real-time data from your table as a `Stream`.
+    title: 'stream()'
+    notes: |
+      - Realtime is disabled by default for new tables. You can turn it on by [managing replication](/docs/guides/realtime/postgres-changes#replication-setup).
+      - `stream()` will emit the initial data as well as any further change on the database as `Stream<List<Map<String, dynamic>>>` by combining Postgrest and Realtime.
+      - Takes a list of primary key column names that will be used to update and delete the proper records within the SDK.
+      - The following filters are available
+        - `.eq('column', value)` listens to rows where the column equals the value
+        - `.neq('column', value)` listens to rows where the column does not equal the value
+        - `.gt('column', value)` listens to rows where the column is greater than the value
+        - `.gte('column', value)` listens to rows where the column is greater than or equal to the value
+        - `.lt('column', value)` listens to rows where the column is less than the value
+        - `.lte('column', value)` listens to rows where the column is less than or equal to the value
+        - `.inFilter('column', [val1, val2, val3])` listens to rows where the column is one of the values
+    examples:
+      - id: listen-to-table
+        name: Listen to a table
+        isSpotlight: true
+        code: |
+          ```dart
+          supabase.from('countries')
+            .stream(primaryKey: ['id'])
+            .listen((List<Map<String, dynamic>> data) {
+            // Do something awesome with the data
+          });
+          ```
+      - id: with-filter-order-limit
+        name: With filter, order and limit
+        code: |
+          ```dart
+          supabase.from('countries')
+            .stream(primaryKey: ['id'])
+            .eq('id', 120)
+            .order('name')
+            .limit(10);
+          ```
+      - id: with-in-filter
+        name: With an IN filter
+        code: |
+          ```dart
+          supabase.from('countries')
+            .stream(primaryKey: ['id'])
+            .inFilter('id', [1, 2, 3])
+            .order('name')
+            .limit(10);
+          ```
+      - id: using-stream-with-stream-builder
+        name: Using `stream()` with `StreamBuilder`
+        description: |
+          When using `stream()` with a `StreamBuilder` within your Flutter application, make sure to store your stream in a variable to prevent refetching upon rebuilding.
+        code: |
+          ```dart
+          final supabase = Supabase.instance.client;
+
+          class MyWidget extends StatefulWidget {
+            const MyWidget({Key? key}) : super(key: key);
+
+            @override
+            State<MyWidget> createState() => _MyWidgetState();
+          }
+
+          class _MyWidgetState extends State<MyWidget> {
+            // Persist the stream in a local variable to prevent refetching upon rebuilds
+            final _stream = supabase.from('countries').stream(primaryKey: ['id']);
+
+            @override
+            Widget build(BuildContext context) {
+              return StreamBuilder(
+                stream: _stream,
+                builder: (context, snapshot) {
+                  // Return your widget with the data from the snapshot
+                },
+              );
+            }
+          }
+          ```
+
+  - id: list-buckets
+    description: |
+      Retrieves the details of all Storage buckets within an existing product.
+    title: 'listBuckets()'
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.listBuckets'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `select`
+        - `objects` permissions: none
+    examples:
+      - id: list-buckets
+        name: List buckets
+        isSpotlight: true
+        code: |
+          ```dart
+          final List<Bucket> buckets = await supabase
+            .storage
+            .listBuckets();
+          ```
+
+  - id: get-bucket
+    description: |
+      Retrieves the details of an existing Storage bucket.
+    title: 'getBucket()'
+    $ref: '@supabase/storage-js.packages/StorageBucketApi.default.getBucket'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `select`
+        - `objects` permissions: none
+    examples:
+      - id: get-bucket
+        name: Get bucket
+        isSpotlight: true
+        code: |
+          ```dart
+          final Bucket bucket = await supabase
+            .storage
+            .getBucket('avatars');
+          ```
+
+  - id: create-bucket
+    description: |
+      Creates a new Storage bucket
+    title: 'createBucket()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `insert`
+        - `objects` permissions: none
+    examples:
+      - id: create-bucket
+        name: Create bucket
+        isSpotlight: true
+        code: |
+          ```dart
+          final String bucketId = await supabase
+            .storage
+            .createBucket('avatars');
+          ```
+
+  - id: empty-bucket
+    description: |
+      Removes all objects inside a single bucket.
+    title: 'emptyBucket()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `select`
+        - `objects` permissions: `select` and `delete`
+    examples:
+      - id: empty-bucket
+        name: Empty bucket
+        isSpotlight: true
+        code: |
+          ```dart
+          final String result = await supabase
+            .storage
+            .emptyBucket('avatars');
+          ```
+  - id: update-bucket
+    description: |
+      Updates a new Storage bucket
+    title: 'updateBucket()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `update`
+        - `objects` permissions: none
+    examples:
+      - id: update-bucket
+        name: Update bucket
+        isSpotlight: true
+        code: |
+          ```dart
+          final res = await supabase
+            .storage
+            .updateBucket('avatars', const BucketOptions(public: false));
+          ```
+
+  - id: delete-bucket
+    description: |
+      Deletes an existing bucket. A bucket can't be deleted with existing objects inside it. You must first `empty()` the bucket.
+    title: 'deleteBucket()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: `select` and `delete`
+        - `objects` permissions: none
+    examples:
+      - id: delete-bucket
+        name: Delete bucket
+        isSpotlight: true
+        code: |
+          ```dart
+          final String result = await supabase
+            .storage
+            .deleteBucket('avatars');
+          ```
+
+  - id: from-upload
+    description: |
+      Uploads a file to an existing bucket.
+    title: 'from.upload()'
+    $ref: '@supabase/storage-js.packages/StorageFileApi.default.upload'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `insert`
+    examples:
+      - id: upload-file
+        name: Upload file
+        isSpotlight: true
+        code: |
+          ```dart
+          final avatarFile = File('path/to/file');
+          final String path = await supabase.storage.from('avatars').upload(
+                'public/avatar1.png',
+                avatarFile,
+                fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+              );
+          ```
+      - id: upload-file-on-web
+        name: Upload file on web
+        code: |
+          ```dart
+          final avatarFile = chosenFile.bytes;
+          final String path = await supabase.storage.from('avatars').uploadBinary(
+                'public/avatar1.png',
+                avatarFile,
+                fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+              );
+          ```
+
+  - id: from-update
+    description: |
+      Replaces an existing file at the specified path with a new one.
+    title: 'from.update()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `update` and `select`
+    examples:
+      - id: update-file
+        name: Update file
+        isSpotlight: true
+        code: |
+          ```dart
+          final avatarFile = File('path/to/local/file');
+          final String path = await supabase.storage.from('avatars').update(
+                'public/avatar1.png',
+                avatarFile,
+                fileOptions: const FileOptions(cacheControl: '3600', upsert: false),
+              );
+          ```
+
+  - id: from-move
+    description: |
+      Moves an existing file, optionally renaming it at the same time.
+    title: 'from.move()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `update` and `select`
+    examples:
+      - id: move-file
+        name: Move file
+        isSpotlight: true
+        code: |
+          ```dart
+          final String result = await supabase
+            .storage
+            .from('avatars')
+            .move('public/avatar1.png', 'private/avatar2.png');
+          ```
+
+  - id: from-create-signed-url
+    description: |
+      Create signed url to download file without requiring permissions. This URL can be valid for a set number of seconds.
+    title: 'from.createSignedUrl()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `select`
+    examples:
+      - id: create-signed-url
+        name: Create Signed URL
+        isSpotlight: true
+        code: |
+          ```dart
+          final String signedUrl = await supabase
+            .storage
+            .from('avatars')
+            .createSignedUrl('avatar1.png', 60);
+          ```
+      - id: create-signed-url-with-transform
+        name: With transform
+        code: |
+          ```dart
+          final String signedUrl = await supabase
+            .storage
+            .from('avatars')
+            .createSignedUrl(
+              'avatar1.png',
+              60,
+              transform: TransformOptions(
+                width: 200,
+                height: 200,
+              ),
+            );
+          ```
+
+  - id: from-get-public-url
+    description: |
+      Retrieve URLs for assets in public buckets
+    title: 'from.getPublicUrl()'
+    notes: |
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/dart/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: none
+    examples:
+      - id: returns-the-url-for-an-asset-in-a-public-bucket
+        name: Returns the URL for an asset in a public bucket
+        isSpotlight: true
+        code: |
+          ```dart
+          final String publicUrl = supabase
+            .storage
+            .from('public-bucket')
+            .getPublicUrl('avatar1.png');
+          ```
+      - id: returns-the-url-for-an-asset-in-a-public-bucket-with-transform
+        name: With transform
+        isSpotlight: true
+        code: |
+          ```dart
+          final String publicUrl = await supabase
+            .storage
+            .from('public-bucket')
+            .getPublicUrl(
+              'avatar1.png',
+              transform: TransformOptions(
+                width: 200,
+                height: 200,
+              ),
+            );
+          ```
+
+  - id: from-download
+    description: |
+      Downloads a file.
+    title: 'from.download()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `select`
+    examples:
+      - id: download-file
+        name: Download file
+        isSpotlight: true
+        code: |
+          ```dart
+          final Uint8List file = await supabase
+            .storage
+            .from('avatars')
+            .download('avatar1.png');
+          ```
+      - id: download-file-with-transform
+        name: With transform
+        isSpotlight: true
+        code: |
+          ```dart
+          final Uint8List file = await supabase
+            .storage
+            .from('avatars')
+            .download(
+              'avatar1.png',
+              transform: TransformOptions(
+                width: 200,
+                height: 200,
+              ),
+            );
+          ```
+
+  - id: from-remove
+    description: |
+      Deletes files within the same bucket
+    title: 'from.remove()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `delete` and `select`
+    examples:
+      - id: delete-file
+        name: Delete file
+        isSpotlight: true
+        code: |
+          ```dart
+          final List<FileObject> objects = await supabase
+            .storage
+            .from('avatars')
+            .remove(['avatar1.png']);
+          ```
+
+  - id: from-list
+    description: |
+      Lists all the files within a bucket.
+    title: 'from.list()'
+    notes: |
+      - Policy permissions required:
+        - `buckets` permissions: none
+        - `objects` permissions: `select`
+    examples:
+      - id: list-files-in-a-bucket
+        name: List files in a bucket
+        isSpotlight: true
+        code: |
+          ```dart
+          final List<FileObject> objects = await supabase
+            .storage
+            .from('avatars')
+            .list();
+          ```
+  - id: using-modifiers
+    title: Using Modifiers
+    description: |
+      Filters work on the row level—they allow you to return rows that
+      only match certain conditions without changing the shape of the rows.
+      Modifiers are everything that don't fit that definition—allowing you to
+      change the format of the response (e.g., returning a CSV string).
+
+      Modifiers must be specified after filters. Some modifiers only apply for
+      queries that return rows (e.g., `select()` or `rpc()` on a function that
+      returns a table response).
+
+  - id: limit
+    title: limit()
+    description: |
+      Limits the result with the specified count.
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .limit(1);
+          ```
+      - id: with-embedded-resources
+        name: With embedded resources
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select('name, cities(name)')
+            .eq('name', 'United States')
+            .limit(1,  foreignTable: 'cities' );
+          ```
+
+  - id: order
+    title: order()
+    description: |
+      Orders the result with the specified column.
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .order('id', ascending: true);
+          ```
+      - id: with-embedded-resources
+        name: With embedded resources
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select('name, cities(name)')
+            .eq('name', 'United States')
+            .order('name', foreignTable: 'cities');
+          ```
+
+  - id: range
+    title: range()
+    description: |
+      Limits the result to rows within the specified range, inclusive.
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .range(0,3);
+          ```
+
+  - id: single
+    title: single()
+    description: |
+      Retrieves only one row from the result. Result must be one row (e.g. using limit), otherwise this will result in an error.
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .single();
+          ```
+
+  - id: using-filters
+    title: Using Filters
+    description: |
+      Filters allow you to only return rows that match certain conditions.
+
+      Filters can be used on `select()`, `update()`, and `delete()` queries.
+
+      If a Database function returns a table response, you can also apply filters.
+    examples:
+      - id: applying-filters
+        name: Applying Filters
+        description: |
+          Filters must be applied after any of `select()`, `update()`, `upsert()`,
+          `delete()`, and `rpc()` and before
+          [modifiers](/docs/reference/dart/using-modifiers).
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .eq('name', 'The Shire');  // Correct
+
+          final data = await supabase
+            .from('cities')
+            .eq('name', 'The Shire')  // Incorrect
+            .select('name, country_id');
+          ```
+      - id: chaining-filters
+        name: Chaining Filters
+        description: |
+          Filters must be applied after any of `select()`, `update()`, `upsert()`,
+          `delete()`, and `rpc()` and before
+          [modifiers](/docs/reference/dart/using-modifiers).
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .gte('population', 1000)
+            .lt('population', 10000)
+          ```
+      - id: conditional-chaining
+        name: Conditional Chaining
+        description: |
+          Filters can be built up one step at a time and then executed as shown in the example code.
+        code: |
+          ```dart
+          final filterByName = null;
+          final filterPopLow = 1000;
+          final filterPopHigh = 10000;
+
+          var query = supabase
+            .from('cities')
+            .select('name, country_id');
+
+          if (filterByName != null)  { query = query.eq('name', filterByName); }
+          if (filterPopLow != null)  { query = query.gte('population', filterPopLow); }
+          if (filterPopHigh != null) { query = query.lt('population', filterPopHigh); }
+
+          final data = await query;
+          ```
+      - id: filter-by-value-within-json-column
+        name: Filter by values within a JSON column
+        description: |
+          Filters can be built up one step at a time and then executed. For example:
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Michael', '{ "postcode": 90210 }'),
+              (2, 'Jane', null);
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Michael",
+                "address": {
+                  "postcode": 90210
+                }
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        code: |
+          ```dart
+          final data = await supabase
+            .from('users')
+            .select()
+            .eq('address->postcode', 90210);
+          ```
+      - id: filter-foreign-tables
+        name: Filter Foreign Tables
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select('''
+              name,
+              cities!inner (
+                name
+              )
+            ''')
+            .eq('cities.name', 'Bali');
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+          response: |
+            ```json
+            {
+              "data": [
+                {
+                  "name": "Indonesia",
+                  "cities": [
+                    {
+                      "name": "Bali"
+                    }
+                  ]
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+  - id: or
+    title: or()
+    description: |
+      Finds all rows satisfying at least one of the filters.
+    notes: |
+      - `.or()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+        ```dart
+        .or('id.in.(6,7),arraycol.cs.{"a","b"}')  // Use Postgres list () and 'in' for in_ filter. Array {} and 'cs' for contains.
+        .or('id.in.(${mylist.join(',')}),arraycol.cs.{${mylistArray.join(',')}}')	// You can insert a Dart list for list or array column.
+        .or('id.in.(${mylist.join(',')}),rangecol.cs.(${mylistRange.join(',')}]')	// You can insert a Dart list for list or range column.
+        ```
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .or('id.eq.20,id.eq.30');
+          ```
+      - id: use-or-with-and
+        name: Use `or` with `and`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .or('id.gt.20,and(name.eq.New Zealand,name.eq.France)');
+          ```
+
+  - id: not
+    title: not()
+    description: |
+      Finds all rows which doesn't satisfy the filter.
+    notes: |
+      - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+        ```dart
+        .not('name','eq','Paris')
+        .not('arraycol','cs','{"a","b"}') // Use Postgres array {} for array column and 'cs' for contains.
+        .not('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+        .not('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
+        .not('id','in','(${mylist.join(',')})')  // You can insert a Dart list array.
+        ```
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .not('name', 'eq', 'Paris');
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .not('name', 'eq', 'Paris');
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .delete()
+            .not('name', 'eq', 'Paris');
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_cities)
+            .not('name', 'eq', 'Paris');
+          ```
+
+  - id: match
+    title: match()
+    description: |
+      Finds all rows whose columns match the specified `query` object.
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .match({'name': 'Beijing', 'country_id': 156});
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .match({'name': 'Beijing', 'country_id': 156});
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .delete()
+            .match({'name': 'Beijing', 'country_id': 156});
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_cities')
+            .match({'name': 'Beijing', 'country_id': 156});
+          ```
+
+  - id: eq
+    title: eq()
+    description: |
+      Finds all rows whose value on the stated `column` exactly matches the specified `value`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .eq('name', 'The shire');
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .eq('name', 'San Francisco');
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .delete()
+            .eq('name', 'Mordor');
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_cities')
+            .eq('name', 'San Francisco');
+          ```
+
+  - id: neq
+    title: neq()
+    description: |
+      Finds all rows whose value on the stated `column` doesn't match the specified `value`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .neq('name', 'The shire');
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .neq('name', 'San Francisco');
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .delete()
+            .neq('name', 'Mordor');
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_cities')
+            .neq('name', 'Lagos');
+          ```
+
+  - id: gt
+    title: gt()
+    description: |
+      Finds all rows whose value on the stated `column` is greater than the specified `value`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .gt('country_id', 250);
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .gt('country_id', 250);
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .delete()
+            .gt('country_id', 250);
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_cities')
+            .gt('country_id', 250);
+          ```
+
+  - id: gte
+    title: gte()
+    description: |
+      Finds all rows whose value on the stated `column` is greater than or equal to the specified `value`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .gte('country_id', 250);
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .gte('country_id', 250);
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .delete()
+            .gte('country_id', 250);
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_cities')
+            .gte('country_id', 250);
+          ```
+
+  - id: lt
+    title: lt()
+    description: |
+      Finds all rows whose value on the stated `column` is less than the specified `value`.
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .lt('country_id', 250);
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .lt('country_id', 250);
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .delete()
+            .lt('country_id', 250);
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_cities')
+            .lt('country_id', 250);
+          ```
+
+  - id: lte
+    title: lte()
+    description: |
+      Finds all rows whose value on the stated `column` is less than or equal to the specified `value`.
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .lte('country_id', 250);
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .lte('country_id', 250);
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .delete()
+            .lte('country_id', 250);
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_cities')
+            .lte('country_id', 250);
+          ```
+
+  - id: like
+    title: like()
+    description: |
+      Finds all rows whose value in the stated `column` matches the supplied `pattern` (case sensitive).
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.lte'
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .like('name', '%la%');
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .like('name', '%la%');
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .delete()
+            .like('name', '%la%');
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_cities')
+            .like('name', '%la%');
+          ```
+
+  - id: ilike
+    title: ilike()
+    description: |
+      Finds all rows whose value in the stated `column` matches the supplied `pattern` (case insensitive).
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .ilike('name', '%la%');
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .ilike('name', '%la%');
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .delete()
+            .ilike('name', '%la%');
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_cities')
+            .ilike('name', '%la%');
+          ```
+
+  - id: is
+    title: is_()
+    description: |
+      A check for exact equality (null, true, false), finds all rows whose value on the stated `column` exactly match the specified `value`.
+
+      `is_` and `in_` filter methods are suffixed with `_` to avoid collisions with reserved keywords.
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .is_('name', null);
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .is_('name', null);
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .delete()
+            .is_('name', null);
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_cities')
+            .is_('name', null);
+          ```
+
+  - id: in
+    title: in_()
+    description: |
+      Finds all rows whose value on the stated `column` is found on the specified `values`.
+
+      `is_` and `in_` filter methods are suffixed with `_` to avoid collisions with reserved keywords.
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .in_('name', ['Rio de Janeiro', 'San Francisco']);
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .in_('name', ['Rio de Janeiro', 'San Francisco']);
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .delete()
+            .in_('name', ['Rio de Janeiro', 'San Francisco']);
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_cities')
+            .in_('name', ['Rio de Janeiro', 'San Francisco']);
+          ```
+
+  - id: contains
+    title: contains()
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select('name, id, main_exports')
+            .contains('main_exports', ['oil']);
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .update({ 'name': 'Mordor' })
+            .contains('main_exports', ['oil']);
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .delete()
+            .contains('main_exports', ['oil']);
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_countries')
+            .contains('main_exports', ['oil']);
+          ```
+
+  - id: contained-by
+    title: containedBy()
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select('name, id, main_exports')
+            .containedBy('main_exports', ['cars', 'food', 'machine']);
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .update({ 'name': 'Mordor' })
+            .containedBy('main_exports', ['orks', 'surveillance', 'evil']);
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .delete()
+            .containedBy('main_exports', ['cars', 'food', 'machine']);
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_countries')
+            .containedBy('main_exports', ['cars', 'food', 'machine']);
+          ```
+
+  - id: range-lt
+    title: rangeLt()
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeLt('population_range_millions', '[150, 250]');
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .update({ 'name': 'Mordor' })
+            .rangeLt('population_range_millions', '[150, 250]');
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .delete()
+            .rangeLt('population_range_millions', '[150, 250]');
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_countries')
+            .rangeLt('population_range_millions', '[150, 250]');
+          ```
+
+  - id: range-gt
+    title: rangeGt()
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeGt('population_range_millions', '[150, 250]');
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .update({ 'name': 'Mordor' })
+            .rangeGt('population_range_millions', '[150, 250]');
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .delete()
+            .rangeGt('population_range_millions', '[150, 250]');
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_countries')
+            .rangeGt('population_range_millions', '[150, 250]');
+          ```
+
+  - id: range-gte
+    title: rangeGte()
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeGte('population_range_millions', '[150, 250]');
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .update({ 'name': 'Mordor' })
+            .rangeGte('population_range_millions', '[150, 250]');
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .delete()
+            .rangeGte('population_range_millions', '[150, 250]');
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_countries')
+            .rangeGte('population_range_millions', '[150, 250]');
+          ```
+
+  - id: range-lte
+    title: rangeLte()
+    $ref: '@supabase/postgrest-js.PostgrestFilterBuilder.rangeLte'
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeLte('population_range_millions', '[150, 250]');
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .update({ 'name': 'Mordor' })
+            .rangeLte('population_range_millions', '[150, 250]');
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .delete()
+            .rangeLte('population_range_millions', '[150, 250]');
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_countries')
+            .rangeLte('population_range_millions', [150, 250]);
+          ```
+
+  - id: range-adjacent
+    title: rangeAdjacent()
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select('name, id, population_range_millions')
+            .rangeAdjacent('population_range_millions', '[70, 185]');
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .update({ 'name': 'Mordor' })
+            .rangeAdjacent('population_range_millions', '[70, 185]');
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .delete()
+            .rangeAdjacent('population_range_millions', '[70, 185]');
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_countries')
+            .rangeAdjacent('population_range_millions', '[70, 185]');
+          ```
+
+  - id: overlaps
+    title: overlaps()
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .select('name, id, main_exports')
+            .overlaps('main_exports', ['computers', 'minerals']);
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .update({ 'name': 'Mordor' })
+            .overlaps('main_exports', ['computers', 'minerals']);
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('countries')
+            .delete()
+            .overlaps('main_exports', ['computers', 'minerals']);
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_countries')
+            .overlaps('main_exports', ['computers', 'minerals']);
+          ```
+
+  - id: text-search
+    title: textSearch()
+    description: |
+      Finds all rows whose tsvector value on the stated `column` matches to_tsquery(query).
+    examples:
+      - id: text-search
+        name: Text search
+        code: |
+          ```dart
+          final data = await supabase
+            .from('quotes')
+            .select('catchphrase')
+            .textSearch('catchphrase', "'fat' & 'cat'",
+              config: 'english'
+            );
+          ```
+      - id: basic-normalization
+        name: Basic normalization
+        description: Uses PostgreSQL's `plainto_tsquery` function.
+        code: |
+          ```dart
+          final data = await supabase
+            .from('quotes')
+            .select('catchphrase')
+            .textSearch('catchphrase', "'fat' & 'cat'",
+              type: TextSearchType.plain,
+              config: 'english'
+            );
+          ```
+      - id: full-normalization
+        name: Full normalization
+        description: Uses PostgreSQL's `phraseto_tsquery` function.
+        code: |
+          ```dart
+          final data = await supabase
+            .from('quotes')
+            .select('catchphrase')
+            .textSearch('catchphrase', "'fat' & 'cat'",
+              type: TextSearchType.phrase,
+              config: 'english'
+            );
+          ```
+      - id: web-search
+        name: Websearch
+        description: |
+          Uses PostgreSQL's `websearch_to_tsquery` function.
+          This function will never raise syntax errors, which makes it possible to use raw user-supplied input for search, and can be used
+          with advanced operators.
+
+          - `unquoted text`: text not inside quote marks will be converted to terms separated by & operators, as if processed by plainto_tsquery.
+          - `"quoted text"`: text inside quote marks will be converted to terms separated by <-> operators, as if processed by phraseto_tsquery.
+          - `OR`: the word “or” will be converted to the | operator.
+          - `-`: a dash will be converted to the ! operator.
+
+        code: |
+          ```dart
+          final data = await supabase
+            .from('quotes')
+            .select('catchphrase')
+            .textSearch('catchphrase', "'fat or cat'",
+              type: TextSearchType.websearch,
+              config: 'english'
+            );
+          ```
+
+  - id: filter
+    title: filter()
+    description: |
+      Finds all rows whose `column` satisfies the filter.
+    notes: |
+      - `.filter()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values, so it should only be used as an escape hatch in case other filters don't work.
+        ```dart
+          .filter('arraycol','cs','{"a","b"}') // Use Postgres array {} and 'cs' for contains.
+          .filter('rangecol','cs','(1,2]') // Use Postgres range syntax for range column.
+          .filter('id','in','(6,7)')  // Use Postgres list () and 'in' for in_ filter.
+          .filter('id','cs','{${mylist.join(',')}}')  // You can insert a Dart array list.
+        ```
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, country_id')
+            .filter('name', 'in', '("Paris","Tokyo")');
+          ```
+      - id: with-update
+        name: With `update()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .update({ 'name': 'Mordor' })
+            .filter('name', 'in', '("Paris","Tokyo")');
+          ```
+      - id: with-delete
+        name: With `delete()`
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .delete()
+            .filter('name', 'in', '("Paris","Tokyo")');
+          ```
+      - id: with-rpc
+        name: With `rpc()`
+        code: |
+          ```dart
+          // Only valid if the Stored Procedure returns a table type.
+          final data = await supabase
+            .rpc('echo_all_cities')
+            .filter('name', 'in', '("Paris","Tokyo")');
+          ```
+      - id: filter-embedded-resources
+        name: Filter embedded resources
+        code: |
+          ```dart
+          final data = await supabase
+            .from('cities')
+            .select('name, countries ( name )')
+            .filter('countries.name', 'in', '("France","Japan")');
+          ```

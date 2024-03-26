@@ -5,13 +5,7 @@
   "author": "Supabase, Inc.",
   "license": "Apache-2.0",
   "private": true,
-  "workspaces": [
-    "apps/www",
-    "apps/docs",
-    "studio",
-    "tests",
-    "packages/*"
-  ],
+  "workspaces": ["apps/*", "apps/docs/spec/parser", "tests", "playwright-tests", "packages/*"],
   "scripts": {
     "build": "turbo run build",
     "build:studio": "turbo run build --filter=studio",
@@ -20,8 +14,10 @@
     "dev:studio": "turbo run dev --filter=studio --parallel",
     "dev:docs": "turbo run dev --filter=docs --parallel",
     "dev:www": "turbo run dev --filter=www --parallel",
+    "dev:database-design": "turbo run dev --filter=database-design --parallel",
     "lint": "turbo run lint",
-    "format": "prettier --write \"{apps,studio}/**/*.{js,jsx,ts,tsx,css,md,mdx,json}\"",
+    "typecheck": "turbo --continue typecheck",
+    "format": "prettier --write \"apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}\"",
     "docker:dev": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up --renew-anon-volumes",
     "docker:up": "cd docker && docker compose up",
     "docker:down": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down --remove-orphans",
@@ -29,43 +25,30 @@
     "test:docs": "turbo run test --filter=docs",
     "test:ui": "turbo run test --filter=ui",
     "test:studio": "turbo run test --filter=studio",
+    "test:playwright": "npm --prefix playwright-tests run test",
     "perf:kong": "ab -t 5 -c 20 -T application/json http://localhost:8000/",
     "perf:meta": "ab -t 5 -c 20 -T application/json http://localhost:5555/tables",
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts"
   },
-  "overrides": {
-    "@code-hike/mdx": {
-      "@code-hike/lighter": "^0.6.7"
-    }
-  },
   "devDependencies": {
-    "eslint": "^8.41.0",
+    "eslint": "^8.57.0",
     "eslint-config-custom": "*",
-    "prettier": "^2.8.8",
-    "prettier-plugin-sql-cst": "^0.5.0",
-    "supabase": "^1.45.2",
-    "turbo": "^1.10.13"
+    "prettier": "^4.0.0-alpha.8",
+    "prettier-plugin-sql-cst": "^0.11.0",
+    "sass": "^1.72.0",
+    "supabase": "^1.151.1",
+    "turbo": "^1.13.0"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/supabase/supabase.git"
   },
   "engines": {
-    "npm": ">=9.0.0 <10.0.0",
-    "node": ">=18.0.0 <19.0.0"
+    "npm": ">=9.0.0",
+    "node": ">=20.0.0"
   },
-  "keywords": [
-    "postgres",
-    "firebase",
-    "storage",
-    "functions",
-    "database",
-    "auth"
-  ],
+  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
   "volta": {
-    "node": "18.17.1"
-  },
-  "dependencies": {
-    "next-themes": "^0.2.1"
+    "node": "20.11.1"
   }
 }

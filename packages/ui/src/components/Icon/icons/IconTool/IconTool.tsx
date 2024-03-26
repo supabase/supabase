@@ -9,5 +9,12 @@
     return <IconBase icon={Tool} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { tool } from 'lucide-react'
+  */
   export default IconTool
   

@@ -1,0 +1,450 @@
+---
+id: 'pg_net'
+title: 'pg_net: Async Networking'
+description: 'pg_net: an async networking extension for PostgreSQL.'
+---
+
+<Admonition type="caution">
+
+The pg_net API is in beta. Functions signatures may change.
+
+</Admonition>
+
+[pg_net](https://github.com/supabase/pg_net/) enables PostgreSQL to make asynchronous HTTP/HTTPS requests in SQL. It differs from the [`http`](https://supabase.com/docs/guides/database/extensions/http) extension in that it is asynchronous by default. This makes it useful in blocking functions (like triggers).
+
+It eliminates the need for servers to continuously poll for database changes and instead allows the database to proactively notify external resources about significant events.
+
+## Enable the extension
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+  queryGroup="database-method"
+>
+<TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+2. Click on **Extensions** in the sidebar.
+3. Search for "pg_net" and enable the extension.
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
+
+```sql
+-- Example: enable the "pg_net" extension.
+create extension pg_net;
+-- Note: The extension creates its own schema/namespace named "net" to avoid naming conflicts.
+
+-- Example: disable the "pg_net" extension
+drop extension if exists pg_net;
+drop schema net;
+```
+
+Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+To disable an extension, call `drop extension`.
+
+Procedural languages are automatically installed within `pg_catalog`, so you don't need to specify a schema.
+
+</TabPanel>
+</Tabs>
+
+## `http_get`
+
+Creates an HTTP GET request returning the request's ID. HTTP requests are not started until the transaction is committed.
+
+### Signature [#get-signature]
+
+<Admonition type="caution">
+
+This is a Postgres [SECURITY DEFINER](https://supabase.com/docs/guides/database/postgres/row-level-security#use-security-definer-functions) function.
+
+</Admonition>
+
+```sql
+net.http_get(
+    -- url for the request
+    url text,
+    -- key/value pairs to be url encoded and appended to the `url`
+    params jsonb default '{}'::jsonb,
+    -- key/values to be included in request headers
+    headers jsonb default '{}'::jsonb,
+    -- the maximum number of milliseconds the request may take before being canceled
+    timeout_milliseconds int default 2000
+)
+    -- request_id reference
+    returns bigint
+
+    strict
+    volatile
+    parallel safe
+    language plpgsql
+```
+
+### Usage [#get-usage]
+
+```sql
+select
+    net.http_get('https://news.ycombinator.com')
+    as request_id;
+request_id
+----------
+         1
+(1 row)
+```
+
+## `http_post`
+
+Creates an HTTP POST request with a JSON body, returning the request's ID. HTTP requests are not started until the transaction is committed.
+
+The body's character set encoding matches the database's `server_encoding` setting.
+
+### Signature [#post-signature]
+
+<Admonition type="caution">
+
+This is a Postgres [SECURITY DEFINER](https://supabase.com/docs/guides/database/postgres/row-level-security#use-security-definer-functions) function
+
+</Admonition>
+
+```sql
+net.http_post(
+    -- url for the request
+    url text,
+    -- body of the POST request
+    body jsonb default '{}'::jsonb,
+    -- key/value pairs to be url encoded and appended to the `url`
+    params jsonb default '{}'::jsonb,
+    -- key/values to be included in request headers
+    headers jsonb default '{"Content-Type": "application/json"}'::jsonb,
+    -- the maximum number of milliseconds the request may take before being canceled
+    timeout_milliseconds int default 2000
+)
+    -- request_id reference
+    returns bigint
+
+    volatile
+    parallel safe
+    language plpgsql
+```
+
+### Usage [#post-usage]
+
+```sql
+select
+    net.http_post(
+        url:='https://httpbin.org/post',
+        body:='{"hello": "world"}'::jsonb
+    ) as request_id;
+request_id
+----------
+         1
+(1 row)
+```
+
+## `http_delete`
+
+Creates an HTTP DELETE request, returning the request's ID. HTTP requests are not started until the transaction is committed.
+
+### Signature [#post-signature]
+
+<Admonition type="caution">
+
+This is a Postgres [SECURITY DEFINER](https://supabase.com/docs/guides/database/postgres/row-level-security#use-security-definer-functions) function
+
+</Admonition>
+
+```sql
+net.http_delete(
+    -- url for the request
+    url text,
+    -- key/value pairs to be url encoded and appended to the `url`
+    params jsonb default '{}'::jsonb,
+    -- key/values to be included in request headers
+    headers jsonb default '{}'::jsonb,
+    -- the maximum number of milliseconds the request may take before being canceled
+    timeout_milliseconds int default 2000
+)
+    -- request_id reference
+    returns bigint
+
+    strict
+    volatile
+    parallel safe
+    language plpgsql
+    security definer
+```
+
+### Usage [#delete-usage]
+
+```sql
+select
+    net.http_delete(
+        'https://dummy.restapiexample.com/api/v1/delete/2'
+    ) as request_id;
+----------
+         1
+(1 row)
+```
+
+## Analyzing responses
+
+Waiting requests are stored in the `net.http_request_queue` table. Upon execution, they are deleted.
+
+```sql
+CREATE UNLOGGED TABLE
+    net.http_request_queue (
+        id bigint NOT NULL DEFAULT nextval('net.http_request_queue_id_seq'::regclass),
+        method text NOT NULL,
+        url text NOT NULL,
+        headers jsonb NOT NULL,
+        body bytea NULL,
+        timeout_milliseconds integer NOT NULL
+    )
+```
+
+Once a response is returned, by default, it is stored for 6 hours in the `net._http_response` table.
+
+```sql
+CREATE UNLOGGED TABLE
+    net._http_response (
+        id bigint NULL,
+        status_code integer NULL,
+        content_type text NULL,
+        headers jsonb NULL,
+        content text NULL,
+        timed_out boolean NULL,
+        error_msg text NULL,
+        created timestamp with time zone NOT NULL DEFAULT now()
+    )
+```
+
+The responses can be observed with the following query:
+
+```sql
+select * from net._http_response;
+```
+
+The data can also be observed in the `net` schema with the [Supabase Dashboard's SQL Editor](https://supabase.com/dashboard/project/_/editor)
+
+## Debugging requests
+
+### Inspecting request data
+
+The [Postman Echo API](https://documenter.getpostman.com/view/5025623/SWTG5aqV) returns a response with the same body and content
+as the request. It can be used to inspect the data being sent.
+
+Sending a post request to the echo API
+
+```sql
+select
+    net.http_post(
+        url := 'https://postman-echo.com/post',
+        body := '{"key1": "value", "key2": 5}'::jsonb
+    ) as request_id;
+```
+
+Inspecting the echo API response content to ensure it contains the right body
+
+```sql
+select
+    "content"
+from net._http_response
+where id = <request_id>
+-- returns information about the request
+-- including the body sent: {"key": "value", "key": 5}
+```
+
+Alternatively, by wrapping a request in a [database function](https://supabase.com/docs/guides/database/functions), sent row data can be logged or returned for inspection and debugging.
+
+```sql
+create or replace function debugging_example (row_id int)
+returns jsonb as $$
+declare
+    -- Store payload data
+    row_data_var jsonb;
+begin
+    -- Retrieve row data and convert to JSON
+    select to_jsonb("<example_table>".*) into row_data_var
+    from "<example_table>"
+    where "<example_table>".id = row_id;
+
+    -- Initiate HTTP POST request to URL
+    perform
+        net.http_post(
+            url := 'https://postman-echo.com/post',
+            -- Use row data as payload
+            body := row_data_var
+        ) as request_id;
+
+    -- Optionally Log row data or other data for inspection in Supabase Dashboard's Postgres Logs
+    -- (https://supabase.com/dashboard/project/_/logs/postgres-logs)
+    raise log 'Logging an entire row as JSON (%)', row_data_var;
+
+    -- return the row data to inspect
+    return row_data_var;
+-- Handle exceptions here if needed
+exception
+    when others then
+        raise exception 'An error occurred: %', SQLERRM;
+end;
+$$ language plpgsql;
+
+-- calling function
+select debugging_example(<row_id>);
+```
+
+### Inspecting failed requests
+
+Finds all failed requests
+
+```sql
+select
+  *
+from net._http_response
+where "status_code" >= 400 or "error_msg" is not null
+order by "created" desc;
+```
+
+## Configuration
+
+<Admonition type="note" label="Only Self-Hosted Deployments can Modify Configuration Variables">
+
+See the [self-hosting docs](/docs/guides/hosting/overview#configuration) for self-hosting instructions.
+
+</Admonition>
+
+The extension is configured to execute up to 200 requests per second reliably. The response messages are stored for only 6 hours to prevent needless buildup. The default behavior can be modified by rewriting config variables.
+
+### Get current settings
+
+```sql
+select
+  "name",
+  "setting"
+from pg_settings
+where "name" like 'pg_net%';
+```
+
+### Alter settings
+
+Note, that doing `ALTER SYSTEM` requires SUPERUSER but on PostgreSQL >= 15, you can do:
+
+```sql
+grant alter system on parameter pg_net.ttl to <role>;
+grant alter system on parameter pg_net.batch_size to <role>;
+```
+
+Then variables can be changed:
+
+```sql
+alter system set pg_net.ttl to '1 hour'
+alter system set pg_net.batch_size to 500;
+```
+
+Then reload the settings and restart the `pg_net` background worker with:
+
+```sql
+select net.worker_restart();
+```
+
+## Examples
+
+### Invoke a Supabase Edge Function
+
+Make a POST request to a Supabase Edge Function with auth header and JSON body payload:
+
+```sql
+select
+    net.http_post(
+        url:='https://project-ref.supabase.co/functions/v1/function-name',
+        headers:='{"Content-Type": "application/json", "Authorization": "Bearer <YOUR_ANON_KEY>"}'::jsonb,
+        body:='{"name": "pg_net"}'::jsonb
+    ) as request_id;
+```
+
+### Call an endpoint every minute with [pg_cron](https://supabase.com/docs/guides/database/extensions/pgcron)
+
+The pg_cron extension enables PostgreSQL to become its own cron server. With it you can schedule regular calls with up to a minute precision to endpoints.
+
+```sql
+select cron.schedule(
+	'cron-job-name',
+	'* * * * *', -- Executes every minute (cron syntax)
+	$$
+	    -- SQL query
+	    select "net"."http_post"(
+            -- URL of Edge function
+            url:='https://project-ref.supabase.co/functions/v1/function-name',
+            headers:='{"Authorization": "Bearer <YOUR_ANON_KEY>"}'::jsonb,
+            body:='{"name": "pg_net"}'::jsonb
+	    ) as "request_id";
+	$$
+);
+```
+
+### Execute pg_net in a trigger
+
+Make a call to an external endpoint when a trigger event occurs.
+
+```sql
+-- function called by trigger
+create or replace function <function_name>()
+    returns trigger
+    language plpgSQL
+as $$
+begin
+    -- calls pg_net function net.http_post
+    -- sends request to postman API
+    perform "net"."http_post"(
+      'https://postman-echo.com/post'::text,
+      jsonb_build_object(
+        'old_row', to_jsonb(old.*),
+        'new_row', to_jsonb(new.*)
+      ),
+      headers:='{"Content-Type": "application/json"}'::jsonb
+    ) as request_id;
+    return new;
+END $$;
+
+-- trigger for table update
+create trigger <trigger_name>
+    after update on <table_name>
+    for each row
+    execute function <function_name>();
+```
+
+### Send multiple table rows in one request
+
+```sql
+with "selected_table_rows" as (
+    select
+        -- Converts all the rows into a JSONB array
+        jsonb_agg(to_jsonb(<table_name>.*)) as JSON_payload
+    from <table_name>
+    -- Generally good practice to LIMIT the max amount of rows
+)
+select
+    net.http_post(
+        url := 'https://postman-echo.com/post'::text,
+        body := JSON_payload
+    ) AS request_id
+FROM "selected_table_rows";
+```
+
+More examples can be seen in the [Extension's GitHub page](https://github.com/supabase/pg_net/)
+
+## Limitations
+
+- To improve speed and performance, the requests and responses are stored in [unlogged tables](https://pgpedia.info/u/unlogged-table.html), which are not preserved during a crash or unclean shutdown.
+- By default, response data is saved for only 6 hours
+- Can only make POST requests with JSON data. No other data formats are supported
+- Intended to handle at most 200 requests per second. Increasing the rate can introduce instability
+- Does not have support for PATCH/PUT requests
+- Can only work with one database at a time in PostgreSQL. It defaults to the postgres database.
+
+## Resources
+
+- Source code: [github.com/supabase/pg_net](https://github.com/supabase/pg_net/)
+- Official Docs: [github.com/supabase/pg_net](https://github.com/supabase/pg_net/)

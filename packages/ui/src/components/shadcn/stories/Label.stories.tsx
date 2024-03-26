@@ -1,7 +1,7 @@
 import { Meta } from '@storybook/react'
 
-import { Checkbox } from '@ui/components/shadcn/ui/checkbox'
-import { Label } from '@ui/components/shadcn/ui/label'
+import { Checkbox } from '../ui/checkbox'
+import { Label } from '../ui/label'
 
 const meta: Meta = {
   title: 'shadcn/Label',

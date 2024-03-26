@@ -1,5 +1,3 @@
-import Author from './author'
-
 type PostTypes = {
   slug?: string
   type: 'casestudy' | 'blog'
@@ -19,6 +17,7 @@ type PostTypes = {
   url: string
   path: string
   tags?: []
+  categories?: []
   logo?: string
   logo_inverse?: string
   hideAuthor?: boolean

@@ -37,17 +37,17 @@ const ScrollableCodeBlock = ({
   return (
     <div>
       {showToolbar && (
-        <div className="bg-scale-1200 dark:bg-scale-200 border-scale-1200 dark:border-scale-400 flex h-7 w-full items-center gap-1.5 rounded-t-lg border border-b-0 px-4">
+        <div className="bg-surface-100 border-overlay flex h-7 w-full items-center gap-1.5 rounded-t-lg border border-b-0 px-4">
           <div className="flex items-center gap-1.5">
-            <div className="bg-scale-1100 dark:bg-scale-400 h-2.5 w-2.5 rounded-full"></div>
-            <div className="bg-scale-1100 dark:bg-scale-400 h-2.5 w-2.5 rounded-full"></div>
-            <div className="bg-scale-1100 dark:bg-scale-400 h-2.5 w-2.5 rounded-full"></div>
+            <div className="bg-surface-300 h-2.5 w-2.5 rounded-full"></div>
+            <div className="bg-surface-300 h-2.5 w-2.5 rounded-full"></div>
+            <div className="bg-surface-300 h-2.5 w-2.5 rounded-full"></div>
           </div>
         </div>
       )}
 
       <div
-        className="border-scale-1100 dark:border-scale-400 overflow-hidden rounded-b-lg border"
+        className="border-overlay overflow-hidden rounded-b-lg border"
         style={{ maxHeight: MAX_HEIGHT, transform: 'translateZ(0)' }}
       >
         <div

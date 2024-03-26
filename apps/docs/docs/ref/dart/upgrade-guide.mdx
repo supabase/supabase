@@ -1,0 +1,817 @@
+---
+id: upgrade-guide
+title: Upgrade to supabase_flutter v2
+description: 'Learn how to upgrade to supabase_flutter v2.'
+---
+
+Although `supabase_flutter` v2 brings a few breaking changes, for the most part the public API should be the same with a few minor exceptions.
+We have brought numerous updates behind the scenes to make the SDK work more intuitively for Flutter and Dart developers.
+
+## Upgrade the client library
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    Make sure you are using v2 of the client library in your `pubspec.yaml` file.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    ```yaml
+    supabase_flutter: ^2.0.0
+    ```
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    _Optionally_ passing custom configuration to `Supabase.initialize()` is now organized into separate objects:
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+  <Tabs
+    scrollable
+    size="small"
+    type="underlined"
+    defaultActiveId="1.0x"
+    queryGroup="version"
+  >
+    <TabPanel id="1.0x" label="Before">
+
+      ```dart main.dart
+      await Supabase.initialize(
+        url: supabaseUrl,
+        anonKey: supabaseKey,
+        authFlowType: AuthFlowType.pkce,
+        storageRetryAttempts: 10,
+        realtimeClientOptions: const RealtimeClientOptions(
+          logLevel: RealtimeLogLevel.info,
+        ),
+      );
+      ```
+
+    </TabPanel>
+    <TabPanel id="2.0x" label="After">
+
+      ```dart main.dart
+      await Supabase.initialize(
+        url: 'SUPABASE_URL',
+        anonKey: 'SUPABASE_ANON_KEY',
+        authOptions: const FlutterAuthClientOptions(
+          authFlowType: AuthFlowType.pkce,
+        ),
+        realtimeClientOptions: const RealtimeClientOptions(
+          logLevel: RealtimeLogLevel.info,
+        ),
+        storageOptions: const StorageClientOptions(
+          retryAttempts: 10,
+        ),
+      );
+      ```
+
+    </TabPanel>
+
+  </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Auth updates
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### Renaming Provider to OAuthProvider
+
+    `Provider` enum is renamed to `OAuthProvider`.
+    Previously the `Provider` symbol often collided with classes in the [provider](https://pub.dev/packages/provider) package and developers needed to add import prefixes to avoid collisions.
+    With the new update, developers can use Supabase and Provider in the same codebase without any import prefixes.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="1.0x"
+      queryGroup="version"
+    >
+      <TabPanel id="1.0x" label="Before">
+      ```dart
+      await supabase.auth.signInWithOAuth(
+        Provider.google,
+      );
+      ```
+
+      </TabPanel>
+      <TabPanel id="2.0x" label="After">
+      ```dart
+      await supabase.auth.signInWithOAuth(
+        OAuthProvider.google,
+      );
+      ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### Sign in with Apple method deprecated
+
+    We have removed the [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple) dependency in v2.
+    This is because not every developer needs to sign in with Apple, and we want to reduce the number of dependencies in the library.
+
+    With v2, you can import [sign_in_with_apple](https://pub.dev/packages/sign_in_with_apple) as a separate dependency if you need to sign in with Apple.
+    We have also added `auth.generateRawNonce()` method to easily generate a secure nonce.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="1.0x"
+      queryGroup="version"
+    >
+      <TabPanel id="1.0x" label="Before">
+        ```dart
+        await supabase.auth.signInWithApple();
+        ```
+
+      </TabPanel>
+      <TabPanel id="2.0x" label="After">
+        ```dart
+        Future<AuthResponse> signInWithApple() async {
+          final rawNonce = supabase.auth.generateRawNonce();
+          final hashedNonce = sha256.convert(utf8.encode(rawNonce)).toString();
+
+          final credential = await SignInWithApple.getAppleIDCredential(
+            scopes: [
+              AppleIDAuthorizationScopes.email,
+              AppleIDAuthorizationScopes.fullName,
+            ],
+            nonce: hashedNonce,
+          );
+
+          final idToken = credential.identityToken;
+          if (idToken == null) {
+            throw const AuthException(
+                'Could not find ID Token from generated credential.',
+            );
+          }
+
+          return signInWithIdToken(
+            provider: OAuthProvider.apple,
+            idToken: idToken,
+            nonce: rawNonce,
+          );
+        }
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### Initialization does not await for session refresh
+
+    In v1, `Supabase.initialize()` would await for the session to be refreshed before returning.
+    This caused delays in the app's launch time, especially when the app is opened in a poor network environment.
+
+    In v2, `Supabase.initialize()` returns immediately after obtaining the session from the local storage, which makes the app launch faster.
+    Because of this, there is no guarantee that the session is valid when the app starts.
+
+    If you need to make sure the session is valid, you can access the `isExpired` getter to check if the session is valid.
+    If the session is expired, you can listen to the `onAuthStateChange` event and wait for a new `tokenRefreshed` event to be fired.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+  <Tabs
+    scrollable
+    size="small"
+    type="underlined"
+    defaultActiveId="1.0x"
+    queryGroup="version"
+  >
+    <TabPanel id="1.0x" label="Before">
+      ```dart
+      // Session is valid, no check required
+      final session = supabase.auth.currentSession;
+      ```
+
+    </TabPanel>
+    <TabPanel id="2.0x" label="After">
+      ```dart
+      final session = supabase.auth.currentSession;
+
+      // Check if the session is valid.
+      final isSessionExpired = session?.isExpired;
+      ```
+
+    </TabPanel>
+
+  </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### Removing Flutter Webview dependency for OAuth sign in
+
+    In v1, on iOS you could pass a `BuildContext` to the `signInWithOAuth()` method to launch the OAuth flow in a Flutter Webview.
+
+    In v2, we have dropped the [webview_flutter](https://pub.dev/packages/webview_flutter) dependency in v2 to allow you to have full control over the UI of the OAuth flow.
+    We now have [native support for Google and Apple sign in](/docs/reference/dart/auth-signinwithidtoken), so opening an external browser is no longer needed on iOS.
+
+    Because of this update, we no longer need the `context` parameter, so we have removed the `context` parameter from the `signInWithOAuth()` method.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="1.0x"
+      queryGroup="version"
+    >
+      <TabPanel id="1.0x" label="Before">
+        ```dart
+        // Opens a webview on iOS.
+        await supabase.auth.signInWithOAuth(
+          Provider.github,
+          authScreenLaunchMode: LaunchMode.inAppWebView,
+          context: context,
+        );
+        ```
+
+      </TabPanel>
+      <TabPanel id="2.0x" label="After">
+        ```dart
+        // Opens in app webview on iOS.
+        await supabase.auth.signInWithOAuth(
+          OAuthProvider.github,
+          authScreenLaunchMode: LaunchMode.inAppWebView,
+        );
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### PKCE is the default auth flow type
+
+    [PKCE flow](https://supabase.com/blog/supabase-auth-sso-pkce#introducing-pkce), which is a more secure method for obtaining sessions from deep links, is now the default auth flow for any authentication involving deep links.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="1.0x"
+      queryGroup="version"
+    >
+      <TabPanel id="1.0x" label="Before">
+        ```dart
+        await Supabase.initialize(
+          url: 'SUPABASE_URL',
+          anonKey: 'SUPABASE_ANON_KEY',
+          authFlowType: AuthFlowType.implicit, // set to implicit by default
+        );
+        ```
+
+      </TabPanel>
+      <TabPanel id="2.0x" label="After">
+        ```dart
+        await Supabase.initialize(
+          url: 'SUPABASE_URL',
+          anonKey: 'SUPABASE_ANON_KEY',
+          authOptions: FlutterAuthClientOptions(
+            authFlowType: AuthFlowType.pkce, // set to pkce by default
+          )
+        );
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### Auth callback host name parameter removed
+
+    `Supabase.initialize()` no longer has the `authCallbackUrlHostname` parameter.
+    The `supabase_flutter` SDK will automatically detect auth callback URLs and handle them internally.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="1.0x"
+      queryGroup="version"
+    >
+      <TabPanel id="1.0x" label="Before">
+        ```dart
+        await Supabase.initialize(
+          url: 'SUPABASE_URL',
+          anonKey: 'SUPABASE_ANON_KEY',
+          authCallbackUrlHostname: 'auth-callback',
+        );
+        ```
+
+      </TabPanel>
+      <TabPanel id="2.0x" label="After">
+        ```dart
+        await Supabase.initialize(
+          url: 'SUPABASE_URL',
+          anonKey: 'SUPABASE_ANON_KEY',
+        );
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### SupabaseAuth class removed
+
+    The `SupabaseAuth` had an `initialSession` member, which was used to obtain the initial session upon app start.
+    This is now removed, and `currentSession` should be used to access the session at any time.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="1.0x"
+      queryGroup="version"
+    >
+      <TabPanel id="1.0x" label="Before">
+        ```dart
+        // Use `initialSession` to obtain the initial session when the app starts.
+        final initialSession = await SupabaseAuth.initialSession;
+        ```
+
+      </TabPanel>
+      <TabPanel id="2.0x" label="After">
+        ```dart
+        // Use `currentSession` to access the session at any time.
+        final initialSession = await supabase.auth.currentSession;
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+### Data methods
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### Insert and return data
+
+    We made the query builder immutable, which means you can reuse the same query object to chain multiple filters and get the expected outcome.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="1.0x"
+      queryGroup="version"
+    >
+      <TabPanel id="1.0x" label="Before">
+        ```dart
+        // If you declare a query and chain filters on it
+        final myQuery = supabase.from('my_table').select();
+
+        final foo = await myQuery.eq('some_col', 'foo');
+
+        // The `eq` filter above is applied in addition to the following filter
+        final bar = await myQuery.eq('another_col', 'bar');
+        ```
+
+      </TabPanel>
+      <TabPanel id="2.0x" label="After">
+        ```dart
+        // Now you can declare a query and reuse it.
+        final myQuery = supabase.from('my_table').select();
+
+        final foo = await myQuery.eq('some_col', 'foo');
+
+        // The `eq` filter above is not applied to the following result
+        final bar = await myQuery.eq('another_col', 'bar');
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### Renaming is and in filter
+
+    Because `is` and `in` are [reserved keywords](https://dart.dev/languages/keywords) in Dart, v1 used `is_` and `in_` as query filter names.
+    Users found the underscore confusing, so the query filters are now renamed to `isFilter` and `inFilter`.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="1.0x"
+      queryGroup="version"
+    >
+      <TabPanel id="1.0x" label="Before">
+        ```dart
+        final data = await supabase
+          .from('users')
+          .select()
+          .is_('status', null);
+
+        final data = await supabase
+          .from('users')
+          .select()
+          .in_('status', ['ONLINE', 'OFFLINE']);
+        ```
+
+      </TabPanel>
+      <TabPanel id="2.0x" label="After">
+        ```dart
+        final data = await supabase
+          .from('users')
+          .select()
+          .isFilter('status', null);
+
+        final data = await supabase
+          .from('users')
+          .select()
+          .inFilter('status', ['ONLINE', 'OFFLINE']);
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### Deprecate FetchOption in favor of `count()` and `head()` methods
+
+    `FetchOption()` on `.select()` is now deprecated, and new `.count()` and `head()` methods are added to the query builder.
+
+    `count()` on `.select()` performs the select while also getting the count value, and `.count()` directly on `.from()` performs a head request resulting in only fetching the count value.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="1.0x"
+      queryGroup="version"
+    >
+      <TabPanel id="1.0x" label="Before">
+        ```dart
+        // Request with count option
+        final res = await supabase.from('cities').select(
+              'name',
+              const FetchOptions(
+                count: CountOption.exact,
+              ),
+            );
+
+        final data = res.data;
+        final count = res.count;
+
+        // Request with count and head option
+        // obtains the count value without fetching the data.
+        final res = await supabase.from('cities').select(
+              'name',
+              const FetchOptions(
+                count: CountOption.exact,
+                head: true,
+              ),
+            );
+
+        final count = res.count;
+        ```
+
+      </TabPanel>
+      <TabPanel id="2.0x" label="After">
+        ```dart
+        // Request with count option
+        final res = await supabase
+            .from('cities')
+            .select('name')
+            .count(); // CountOption.exact is the default value
+
+        final data = res.data;
+        final int count = res.count;
+
+        // `.count()` directly on `.from()` performs a head request,
+        // obtaining the count value without fetching the data.
+        final int count = await supabase
+            .from('cities')
+            .count(); // CountOption.exact is the default value
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### PostgREST error codes
+
+    The `PostgrestException` instance thrown by the API methods has a `code` property. In v1, the `code` property contained the http status code.
+
+    In v2, the `code` property contains the [PostgREST error code](https://postgrest.org/en/stable/references/errors.html), which is more useful for debugging.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="1.0x"
+      queryGroup="version"
+    >
+      <TabPanel id="1.0x" label="Before">
+        ```dart
+        try {
+          await supabase.from('countries').select();
+        } on PostgrestException catch (error) {
+          error.code; // Contains http status code
+        }
+        ```
+
+      </TabPanel>
+      <TabPanel id="2.0x" label="After">
+        ```dart
+        try {
+          await supabase.from('countries').select();
+        } on PostgrestException catch (error) {
+          error.code; // Contains PostgREST error code
+        }
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+    ### Realtime methods
+
+    Realtime methods contains the biggest breaking changes. Most of these changes are to make the interface more type safe.
+
+    We have removed the `.on()` method and replaced it with `.onPostgresChanges()`, `.onBroadcast()`, and three different presence methods.
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### Postgres Changes
+
+    Use the new `.onPostgresChanges()` method to listen to realtime changes in the database.
+
+    In v1, filters were not strongly typed because they took a `String` type. In v2, `filter` takes an object. Its properties are strictly typed to catch type errors.
+
+    The payload of the callback is now typed as well. In `v1`, the payload was returned as `dynamic`. It is now returned as a `PostgresChangePayload` object. The object contains the `oldRecord` and `newRecord` properties for accessing the data before and after the change.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="1.0x"
+      queryGroup="version"
+    >
+      <TabPanel id="1.0x" label="Before">
+
+        ```dart
+        supabase.channel('my_channel').on(
+          RealtimeListenTypes.postgresChanges,
+          ChannelFilter(
+            event: '*',
+            schema: 'public',
+            table: 'messages',
+            filter: 'room_id=eq.200',
+          ),
+          (dynamic payload, [ref]) {
+            final Map<String, dynamic> newRecord = payload['new'];
+            final Map<String, dynamic> oldRecord = payload['old'];
+          },
+        ).subscribe();
+        ```
+
+      </TabPanel>
+      <TabPanel id="2.0x" label="After">
+
+        ```dart
+        supabase.channel('my_channel')
+          .onPostgresChanges(
+            event: PostgresChangeEvent.all,
+            schema: 'public',
+            table: 'messages',
+            filter: PostgresChangeFilter(
+              type: PostgresChangeFilterType.eq,
+              column: 'room_id',
+              value: 200,
+            ),
+            callback: (PostgresChangePayload payload) {
+              final Map<String, dynamic> newRecord = payload.newRecord;
+              final Map<String, dynamic> oldRecord = payload.oldRecord;
+            })
+          .subscribe();
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### Broadcast
+
+    Broadcast now uses the dedicated `.onBroadcast()` method, rather than the generic `.on()` method.
+    Because the method is specific to broadcast, it takes fewer properties.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="1.0x"
+      queryGroup="version"
+    >
+      <TabPanel id="1.0x" label="Before">
+
+        ```dart
+        supabase.channel('my_channel').on(
+          RealtimeListenTypes.broadcast,
+          ChannelFilter(
+            event: 'position',
+          ),
+          (dynamic payload, [ref]) {
+            print(payload);
+          },
+        ).subscribe();
+        ```
+
+      </TabPanel>
+      <TabPanel id="2.0x" label="After">
+
+        ```dart
+        supabase
+          .channel('my_channel')
+          .onBroadcast(
+            event: 'position',
+            callback: (Map<String, dynamic> payload) {
+              print(payload);
+            })
+          .subscribe();
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    #### Presence
+
+    Realtime Presence gets three different methods for listening to three different presence events: `sync`, `join`, and `leave`.
+    This allows the callback to be strictly typed.
+
+  </RefSubLayout.Details>
+  <RefSubLayout.Examples>
+
+    <Tabs
+      scrollable
+      size="small"
+      type="underlined"
+      defaultActiveId="1.0x"
+      queryGroup="version"
+    >
+      <TabPanel id="1.0x" label="Before">
+
+        ```dart
+        final channel = supabase.channel('room1');
+
+        channel.on(
+          RealtimeListenTypes.presence,
+          ChannelFilter(event: 'sync'),
+          (payload, [ref]) {
+            print('Synced presence state: ${channel.presenceState()}');
+          },
+        ).on(
+          RealtimeListenTypes.presence,
+          ChannelFilter(event: 'join'),
+          (payload, [ref]) {
+            print('Newly joined presences $payload');
+          },
+        ).on(
+          RealtimeListenTypes.presence,
+          ChannelFilter(event: 'leave'),
+          (payload, [ref]) {
+            print('Newly left presences: $payload');
+          },
+        ).subscribe(
+          (status, [error]) async {
+            if (status == 'SUBSCRIBED') {
+              await channel.track({'online_at': DateTime.now().toIso8601String()});
+            }
+          },
+        );
+        ```
+
+      </TabPanel>
+      <TabPanel id="2.0x" label="After">
+
+        ```dart
+        final channel = supabase.channel('room1');
+
+        channel.onPresenceSync(
+          (payload) {
+            print('Synced presence state: ${channel.presenceState()}');
+          },
+        ).onPresenceJoin(
+          (payload) {
+            print('Newly joined presences $payload');
+          },
+        ).onPresenceLeave(
+          (payload) {
+            print('Newly left presences: $payload');
+          },
+        ).subscribe(
+          (status, error) async {
+            if (status == RealtimeSubscribeStatus.subscribed) {
+              await channel
+                  .track({'online_at': DateTime.now().toIso8601String()});
+            }
+          },
+        );
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>

@@ -1,7 +1,6 @@
 import { IconHelpCircle } from 'ui'
 import ProductIcon from 'components/ProductIcon'
 import React, { Fragment } from 'react'
-import ReactTooltip from 'react-tooltip'
 import { IconPricingIncludedCheck, IconPricingInfo, IconPricingMinus } from './PricingIcons'
 
 export const PricingTableRowDesktop = (props: any) => {
@@ -10,12 +9,12 @@ export const PricingTableRowDesktop = (props: any) => {
   return (
     <>
       <tr
-        className="divide-scale-600 dark:divide-scale-400 bg-scale-200"
+        className="divide-border -scroll-mt-5"
         style={{ borderTop: 'none' }}
         id={`${props.sectionId}-desktop`}
       >
         <th
-          className="border-b border-scale-600 bg-scale-200 bg-scale-50 dark:bg-scale-200 text-scale-1200 sticky top-[62px] z-10 py-3 pl-6 text-left text-sm font-medium dark:text-white"
+          className="bg-background text-foreground sticky top-[108px] xl:top-[84px] z-10 py-3 pl-6 text-left text-sm font-medium"
           scope="colgroup"
         >
           <div className="flex items-center gap-4">
@@ -23,24 +22,24 @@ export const PricingTableRowDesktop = (props: any) => {
             <h4 className="m-0 text-base font-normal">{category.title}</h4>
           </div>
         </th>
-        <td className="border-b-2 border-scale-700 bg-scale-50 dark:bg-scale-200 px-6 py-5 free"></td>
-        <td className="border-b-2 border-scale-700 bg-scale-50 dark:bg-scale-200 px-6 py-5 pro"></td>
-        <td className="border-b-2 border-scale-700 bg-scale-50 dark:bg-scale-200 px-6 py-5 team"></td>
-        <td className="border-b-2 border-scale-700 bg-scale-50 dark:bg-scale-200 px-6 py-5 enterprise"></td>
+        <td className="bg-background px-6 py-5 free"></td>
+        <td className="bg-background px-6 py-5 pro"></td>
+        <td className="bg-background px-6 py-5 team"></td>
+        <td className="bg-background px-6 py-5 enterprise"></td>
       </tr>
 
       {category.features.map((feat: any, i: number) => {
         return (
           <Fragment key={feat.title}>
-            <tr className="divide-scale-600 dark:divide-scale-400" key={i}>
+            <tr className="divide-border" key={i}>
               <th
-                className={`text-scale-1200 flex items-center px-6 py-5 last:pb-24 text-left text-xs font-normal dark:text-white `}
+                className={`text-foreground flex items-center px-6 py-5 last:pb-24 text-left text-xs font-normal `}
                 scope="row"
               >
                 <span>{feat.title}</span>
                 {feat.tooltips?.main && (
                   <span
-                    className="text-scale-900 hover:text-scale-1200 ml-2 cursor-pointer transition-colors"
+                    className="text-muted hover:text-foreground ml-2 cursor-pointer transition-colors"
                     data-tip={feat.tooltips.main}
                   >
                     <IconHelpCircle size={14} strokeWidth={2} />
@@ -56,40 +55,44 @@ export const PricingTableRowDesktop = (props: any) => {
                   <td
                     key={i}
                     className={[
-                      `px-6 tier-${planName}`,
+                      `pl-6 pr-2 tier-${planName}`,
                       typeof planValue === 'boolean' ? 'text-center' : '',
                     ].join(' ')}
                   >
                     {typeof planValue === 'boolean' && planValue === true ? (
                       <IconPricingIncludedCheck plan={planValue} />
                     ) : typeof planValue === 'boolean' && planValue === false ? (
-                      <div className="text-scale-900">
+                      <div className="text-muted">
                         <IconPricingMinus plan={planValue} />
                       </div>
                     ) : (
-                      <span className="text-scale-1200 text-xs dark:text-white flex items-center gap-3">
-                        {feat.tooltips?.[planName] && (
-                          <span
-                            className="shrink-0 hover:text-scale-300 cursor-pointer transition-colors"
-                            data-tip={feat.tooltips[planName]}
-                          >
-                            <IconPricingInfo />
-                          </span>
+                      <div className="text-foreground text-xs flex flex-col justify-center">
+                        <span className="flex items-center gap-2">
+                          {feat.tooltips?.[planName] && (
+                            <span
+                              className="shrink-0 hover:text-background-overlay-default cursor-pointer transition-colors"
+                              data-tip={feat.tooltips[planName]}
+                            >
+                              <IconPricingInfo />
+                            </span>
+                          )}
+                          {typeof planValue === 'string' ? planValue : planValue[0]}
+                        </span>
+                        {typeof planValue !== 'string' && (
+                          <span className="text-lighter leading-4">{planValue[1]}</span>
                         )}
-                        {planValue}
-                      </span>
+                      </div>
                     )}
                   </td>
                 )
               })}
             </tr>
             {i === category.features.length - 1 && (
-              <div className="my-16 bg-green-400 border-none"></div>
+              <tr className="my-16 bg-green-400 border-none"></tr>
             )}
           </Fragment>
         )
       })}
-      <ReactTooltip effect={'solid'} className="!max-w-[320px] whitespace-pre-line" />
     </>
   )
 }
@@ -99,52 +102,59 @@ export const PricingTableRowMobile = (props: any) => {
   const plan = props.plan
 
   return (
-    <>
-      <table className="mt-8 w-full" id={`${props.sectionId}-mobile`}>
-        <caption className="bg-scale-50 dark:bg-dark-900 border-scale-400 border-t px-4 py-3 text-left text-sm font-medium dark:text-white">
-          <div className="flex items-center gap-2">
-            {category.icon ? <ProductIcon icon={props.icon} /> : null}
-            <span className="text-scale-1200 font-normal">{category.title}</span>
-          </div>
-        </caption>
-        <thead>
-          <tr>
-            <th className="sr-only" scope="col">
-              Feature
-            </th>
-            <th className="sr-only" scope="col">
-              Included
-            </th>
-          </tr>
-        </thead>
-        <tbody className="divide-scale-400 divide-y">
-          {category.features.map((feat: any, i: number) => {
-            return (
-              <tr key={i} className="border-scale-400 border-t">
-                <th className="text-scale-1100 px-4 py-3 text-left text-sm font-normal" scope="row">
-                  <span>
-                    <p>{feat.title}</p>
+    <table className="mt-8 w-full -scroll-mt-5" id={`${props.sectionId}-mobile`}>
+      <caption className="bg-background border-default border-t px-4 py-3 text-left text-sm font-medium text-foreground">
+        <span className="flex items-center gap-2">
+          {category.icon ? <ProductIcon icon={props.icon} /> : null}
+          <span className="text-foreground font-normal">{category.title}</span>
+        </span>
+      </caption>
+      <thead>
+        <tr>
+          <th className="sr-only" scope="col">
+            Feature
+          </th>
+          <th className="sr-only" scope="col">
+            Included
+          </th>
+        </tr>
+      </thead>
+      <tbody className="divide-border-default divide-y">
+        {category.features.map((feat: any, i: number) => {
+          return (
+            <tr key={i} className="border-default border-t">
+              <th
+                className="text-foreground-light px-4 py-3 text-left text-sm font-normal"
+                scope="row"
+              >
+                <p>{feat.title}</p>
+              </th>
+              <td className="py-3 pr-4 text-right">
+                {typeof feat.plans[plan] === 'boolean' && feat.plans[plan] === true ? (
+                  <span className="inline-block">
+                    <IconPricingIncludedCheck plan={plan} />
                   </span>
-                </th>
-                <td className="py-3 pr-4 text-right">
-                  {typeof feat.plans[plan] === 'boolean' && feat.plans[plan] === true ? (
-                    <div className="inline-block">
-                      <IconPricingIncludedCheck plan={plan} />
-                    </div>
-                  ) : typeof feat.plans[plan] === 'boolean' && feat.plans[plan] === false ? (
-                    <div className="inline-block">
-                      <IconPricingMinus plan={plan} />
-                    </div>
-                  ) : (
-                    <span className="text-scale-1200 block text-sm">{feat.plans[plan]}</span>
-                  )}
-                </td>
-              </tr>
-            )
-          })}
-        </tbody>
-      </table>
-      <ReactTooltip effect={'solid'} className="!max-w-[320px] whitespace-pre-line" />
-    </>
+                ) : typeof feat.plans[plan] === 'boolean' && feat.plans[plan] === false ? (
+                  <span className="inline-block">
+                    <IconPricingMinus plan={plan} />
+                  </span>
+                ) : (
+                  <span className="text-foreground flex flex-col text-sm">
+                    <span>
+                      {typeof feat.plans[plan] === 'string'
+                        ? feat.plans[plan]
+                        : feat.plans[plan][0]}
+                    </span>
+                    {typeof feat.plans[plan] !== 'string' && (
+                      <span className="text-lighter leading-5">{feat.plans[plan][1]}</span>
+                    )}
+                  </span>
+                )}
+              </td>
+            </tr>
+          )
+        })}
+      </tbody>
+    </table>
   )
 }

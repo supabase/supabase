@@ -1,8 +1,8 @@
-import { Badge, ExpandableVideo } from 'ui'
+import { Badge } from 'ui'
 
 import Link from 'next/link'
-import CountdownComponent from '../../Countdown'
 import Image from 'next/image'
+import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 
 export const PencilSvg = () => (
   <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -99,7 +99,7 @@ export const TwitterSpacesSvg = () => (
 
 export const ProductHuntSvg = () => (
   <svg width="16" height="17" viewBox="0 0 16 17" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <g clip-path="url(#clip0_3061_22934)">
+    <g clipPath="url(#clip0_3061_22934)">
       <path
         fill-rule="evenodd"
         clip-rule="evenodd"
@@ -165,7 +165,7 @@ export const StyledArticleBadge = ({
       ' '
     )}
   >
-    <div className="!bg-transparent rounded-full !py-1 !px-4 w-full inset-[1px] text-sm border-none dark:from-white dark:to-[#6453C5] dark:border-none">
+    <div className="!bg-transparent rounded-full !py-1 !px-4 w-full inset-[1px] text-sm border-none from-foreground to-[#6453C5]">
       <span className="text-sm text-[#F4FFFA80] bg-clip-text bg-gradient-to-r from-[#F4FFFA] to-[#7E7AAD]">
         {children}
       </span>
@@ -197,7 +197,7 @@ export const AccordionHeader = ({
 }) => (
   <div
     className={[
-      'h-[79px] hover:cursor-default flex flex-1 items-center scroll-mt-20 text-scale-900',
+      'h-[79px] hover:cursor-default flex flex-1 items-center scroll-mt-20 text-muted',
     ].join(' ')}
   >
     <div
@@ -238,28 +238,6 @@ export const AccordionHeader = ({
           </div>
         )}
       </div>
-      {/* {shippable && !shipped && (
-        <span className="text-sm font-normal text-[#A0A0A0] mt-1 sm:mt-0 flex items-center gap-1 md:gap-4">
-          <svg
-            width="17"
-            height="17"
-            viewBox="0 0 17 17"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <g opacity="0.5">
-              <path
-                fillRule="evenodd"
-                clipRule="evenodd"
-                d="M4.32656 7.58047V5.98047C4.32656 3.77133 6.11742 1.98047 8.32656 1.98047C10.5357 1.98047 12.3266 3.77133 12.3266 5.98047V7.58047C13.2102 7.58047 13.9266 8.29681 13.9266 9.18047V13.1805C13.9266 14.0641 13.2102 14.7805 12.3266 14.7805H4.32656C3.44291 14.7805 2.72656 14.0641 2.72656 13.1805V9.18047C2.72656 8.29681 3.44291 7.58047 4.32656 7.58047ZM10.7266 5.98047V7.58047H5.92656V5.98047C5.92656 4.65499 7.00108 3.58047 8.32656 3.58047C9.65205 3.58047 10.7266 4.65499 10.7266 5.98047Z"
-                fill="#A0A0A0"
-              />
-            </g>
-          </svg>
-
-          {day === 5 && <CountdownComponent date={publishedAt} showCard={false} />}
-        </span>
-      )} */}
     </div>
   </div>
 )
@@ -271,8 +249,8 @@ export const VideoPreviewTrigger = ({
   title?: string
   thumbnail: string
 }) => (
-  <div className="flex items-center h-full gap-3 text-xs group/vid text-scale-1100 hover:text-scale-1200 transition-colors">
-    <div className="relative h-10 !aspect-video flex items-center justify-center rounded overflow-hidden border border-scale-1000 opacity-80 group-hover/vid:opacity-100 transition-colors">
+  <div className="flex items-center h-full gap-3 text-xs group/vid text-foreground-light hover:text-foreground transition-colors">
+    <div className="relative h-10 !aspect-video flex items-center justify-center rounded overflow-hidden border border-foreground-lighter opacity-80 group-hover/vid:opacity-100 transition-colors">
       <div className="absolute z-10 w-2.5 h-2.5 text-white opacity-100">
         <svg viewBox="0 0 81 91" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
@@ -291,7 +269,7 @@ export const MultistepSectionHeader = ({ title, blog }: any) => {
   return (
     <div className="flex flex-1 flex-col sm:flex-row py-8">
       <div className="flex gap-4 w-full items-center justify-between md:justify-start">
-        {title && <span className="text-scale-1200 text-lg mt-3 sm:mt-0">{title}</span>}
+        {title && <span className="text-foreground text-lg mt-3 sm:mt-0">{title}</span>}
         {!!blog && (
           <ChipLink href={blog} className="!w-auto !text-left !justify-between !flex-none">
             Blog post
@@ -321,24 +299,23 @@ export const ChipLink = ({
   uiOnly ? (
     <span
       className={[
-        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444460] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191990] hover:border-scale-800 backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
+        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444460] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191990] hover:border-stronger backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
         className,
       ].join(' ')}
     >
       {children}
     </span>
   ) : !!href ? (
-    <Link href={href}>
-      <a
-        target={target ?? '_self'}
-        rel="noopener"
-        className={[
-          'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444460] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191990] hover:border-scale-800 backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
-          className,
-        ].join(' ')}
-      >
-        {children}
-      </a>
+    <Link
+      href={href}
+      target={target ?? '_self'}
+      rel="noopener"
+      className={[
+        'flex flex-auto justify-center sm:justify-between w-full text-center sm:text-left min-h-[43px] sm:w-auto items-center border border-[#232323] bg-gradient-to-r text-white from-[#46444460] to-[#19191980] hover:from-[#4e4e4e90] hover:to-[#19191990] hover:border-stronger backdrop-blur-xl rounded-full text-sm py-2 px-3 sm:pr-2',
+        className,
+      ].join(' ')}
+    >
+      {children}
     </Link>
   ) : null
 

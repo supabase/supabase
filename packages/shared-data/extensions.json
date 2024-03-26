@@ -354,12 +354,6 @@
     "link": "https://www.postgresql.org/docs/current/sslinfo.html"
   },
   {
-    "name": "supautils",
-    "comment": "Supabase standard library",
-    "tags": ["Utility"],
-    "link": "https://supabase.github.io/supautils/"
-  },
-  {
     "name": "tablefunc",
     "comment": "functions that manipulate whole tables, including crosstab",
     "tags": ["Utility"],
@@ -406,12 +400,6 @@
     "comment": "vector data type with similarity search",
     "tags": ["AI", "Data Type", "Search"],
     "link": "/guides/database/extensions/pgvector"
-  },
-  {
-    "name": "pg_repack",
-    "comment": "Optimize physical storage and remove bloat from tables and indexes",
-    "tags": ["Admin", "Utility"],
-    "link": "/guides/database/extensions/pg_repack"
   },
   {
     "name": "wrappers",

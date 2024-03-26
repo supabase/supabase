@@ -4,7 +4,7 @@ import components from '~/components/index'
 import { MDXRemote } from 'next-mdx-remote'
 import { serialize } from 'next-mdx-remote/serialize'
 
-import specFile from '~/../../spec/realtime_v0_config.yaml' assert { type: 'yml' }
+import specFile from '~/spec/realtime_v0_config.yaml' assert { type: 'yml' }
 import { Parameter } from '~/lib/refGenerator/refTypes'
 
 import ReactMarkdown from 'react-markdown'
@@ -35,14 +35,14 @@ export default function Config(props) {
                     {index === 0 && <h2 className="text-xl capitalize">{tag} Settings</h2>}
                     <div className="mt-8">
                       <div>
-                        <h2 className="text-xl font-medium text-scale-1200 font-mono">
+                        <h2 className="text-xl font-medium text-foreground font-mono">
                           <span className="mr-2">$</span>
                           {parameter.title}
                         </h2>
                         <div className="grid" id={parameter.id}>
                           <div className="border-b pb-8" key={parameter.id}>
                             <div className=" mb-16">
-                              <p className="mb-4 scroll-mt-16 mt-0 text-scale-1100 text-base">
+                              <p className="mb-4 scroll-mt-16 mt-0 text-foreground-light text-base">
                                 <ReactMarkdown>{parameter.description}</ReactMarkdown>
                               </p>
                               <div className="grid gap-2">

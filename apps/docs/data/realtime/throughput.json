@@ -1,0 +1,232 @@
+[
+  {
+    "computeAddOn": "micro",
+    "filters": false,
+    "rls": false,
+    "concurrency": 500,
+    "maxDBChanges": 64,
+    "maxMessagesPerClient": 64,
+    "totalMessagesPerSecond": 32000,
+    "p95Latency": 238
+  },
+  {
+    "computeAddOn": "micro",
+    "filters": false,
+    "rls": false,
+    "concurrency": 5000,
+    "maxDBChanges": 10,
+    "maxMessagesPerClient": 10,
+    "totalMessagesPerSecond": 50000,
+    "p95Latency": 807
+  },
+  {
+    "computeAddOn": "micro",
+    "filters": false,
+    "rls": false,
+    "concurrency": 10000,
+    "maxDBChanges": 5,
+    "maxMessagesPerClient": 5,
+    "totalMessagesPerSecond": 50000,
+    "p95Latency": 1310
+  },
+  {
+    "computeAddOn": "micro",
+    "filters": false,
+    "rls": false,
+    "concurrency": 30000,
+    "maxDBChanges": 1,
+    "maxMessagesPerClient": 1,
+    "totalMessagesPerSecond": 30000,
+    "p95Latency": 941
+  },
+  {
+    "computeAddOn": "micro",
+    "filters": false,
+    "rls": true,
+    "concurrency": 500,
+    "maxDBChanges": 30,
+    "maxMessagesPerClient": 6,
+    "totalMessagesPerSecond": 3000,
+    "p95Latency": 228
+  },
+  {
+    "computeAddOn": "micro",
+    "filters": false,
+    "rls": true,
+    "concurrency": 1500,
+    "maxDBChanges": 10,
+    "maxMessagesPerClient": 2,
+    "totalMessagesPerSecond": 3000,
+    "p95Latency": 356
+  },
+  {
+    "computeAddOn": "micro",
+    "filters": false,
+    "rls": true,
+    "concurrency": 3000,
+    "maxDBChanges": 5,
+    "maxMessagesPerClient": 1,
+    "totalMessagesPerSecond": 3000,
+    "p95Latency": 616
+  },
+  {
+    "computeAddOn": "small",
+    "filters": false,
+    "rls": false,
+    "concurrency": 500,
+    "maxDBChanges": 64,
+    "maxMessagesPerClient": 64,
+    "totalMessagesPerSecond": 32000,
+    "p95Latency": 184
+  },
+  {
+    "computeAddOn": "small",
+    "filters": false,
+    "rls": false,
+    "concurrency": 5000,
+    "maxDBChanges": 10,
+    "maxMessagesPerClient": 10,
+    "totalMessagesPerSecond": 50000,
+    "p95Latency": 782
+  },
+  {
+    "computeAddOn": "small",
+    "filters": false,
+    "rls": false,
+    "concurrency": 10000,
+    "maxDBChanges": 5,
+    "maxMessagesPerClient": 5,
+    "totalMessagesPerSecond": 50000,
+    "p95Latency": 1349
+  },
+  {
+    "computeAddOn": "small",
+    "filters": false,
+    "rls": false,
+    "concurrency": 35000,
+    "maxDBChanges": 1,
+    "maxMessagesPerClient": 1,
+    "totalMessagesPerSecond": 35000,
+    "p95Latency": 1287
+  },
+  {
+    "computeAddOn": "small",
+    "filters": false,
+    "rls": true,
+    "concurrency": 500,
+    "maxDBChanges": 30,
+    "maxMessagesPerClient": 6,
+    "totalMessagesPerSecond": 3000,
+    "p95Latency": 282
+  },
+  {
+    "computeAddOn": "small",
+    "filters": false,
+    "rls": true,
+    "concurrency": 1500,
+    "maxDBChanges": 10,
+    "maxMessagesPerClient": 2,
+    "totalMessagesPerSecond": 3000,
+    "p95Latency": 387
+  },
+  {
+    "computeAddOn": "small",
+    "filters": false,
+    "rls": true,
+    "concurrency": 3000,
+    "maxDBChanges": 5,
+    "maxMessagesPerClient": 1,
+    "totalMessagesPerSecond": 3000,
+    "p95Latency": 920
+  },
+  {
+    "computeAddOn": "large",
+    "filters": false,
+    "rls": false,
+    "concurrency": 500,
+    "maxDBChanges": 64,
+    "maxMessagesPerClient": 64,
+    "totalMessagesPerSecond": 32000,
+    "p95Latency": 184
+  },
+  {
+    "computeAddOn": "large",
+    "filters": false,
+    "rls": false,
+    "concurrency": 5000,
+    "maxDBChanges": 10,
+    "maxMessagesPerClient": 10,
+    "totalMessagesPerSecond": 50000,
+    "p95Latency": 672
+  },
+  {
+    "computeAddOn": "large",
+    "filters": false,
+    "rls": false,
+    "concurrency": 10000,
+    "maxDBChanges": 5,
+    "maxMessagesPerClient": 5,
+    "totalMessagesPerSecond": 50000,
+    "p95Latency": 1253
+  },
+  {
+    "computeAddOn": "large",
+    "filters": false,
+    "rls": false,
+    "concurrency": 35000,
+    "maxDBChanges": 1,
+    "maxMessagesPerClient": 1,
+    "totalMessagesPerSecond": 35000,
+    "p95Latency": 1257
+  },
+  {
+    "computeAddOn": "large",
+    "filters": false,
+    "rls": false,
+    "concurrency": 100000,
+    "maxDBChanges": "0.1 (6/min)",
+    "maxMessagesPerClient": "0.1 (6/min)",
+    "totalMessagesPerSecond": 40000,
+    "p95Latency": 4951
+  },
+  {
+    "computeAddOn": "large",
+    "filters": false,
+    "rls": false,
+    "concurrency": 200000,
+    "maxDBChanges": "0.05 (3/min)",
+    "maxMessagesPerClient": "0.05 (3/min)",
+    "totalMessagesPerSecond": 40000,
+    "p95Latency": 4581
+  },
+  {
+    "computeAddOn": "large",
+    "filters": false,
+    "rls": true,
+    "concurrency": 500,
+    "maxDBChanges": 40,
+    "maxMessagesPerClient": 8,
+    "totalMessagesPerSecond": 4000,
+    "p95Latency": 618
+  },
+  {
+    "computeAddOn": "large",
+    "filters": false,
+    "rls": true,
+    "concurrency": 2000,
+    "maxDBChanges": 10,
+    "maxMessagesPerClient": 2,
+    "totalMessagesPerSecond": 4000,
+    "p95Latency": 606
+  },
+  {
+    "computeAddOn": "large",
+    "filters": false,
+    "rls": true,
+    "concurrency": 4000,
+    "maxDBChanges": 5,
+    "maxMessagesPerClient": 1,
+    "totalMessagesPerSecond": 4000,
+    "p95Latency": 918
+  }
+]

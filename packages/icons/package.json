@@ -1,0 +1,11 @@
+{
+  "name": "icons",
+  "main": "./src/icons/index.ts",
+  "scripts": {
+    "build:icons": "build-icons --templateSrc=./scripts/exportTemplate.mjs --renderUniqueKey --iconFileExtension=.ts --exportFileName=index.ts"
+  },
+  "dependencies": {
+    "typescript": "^5.4.3",
+    "@supabase/build-icons": "*"
+  }
+}
