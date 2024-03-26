@@ -2,6 +2,7 @@ import { partition } from 'lodash'
 import { Check, ExternalLink, Loader } from 'lucide-react'
 import { useState } from 'react'
 
+import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { FilterPopover } from 'components/interfaces/AuditLogs'
 import ReportLintsTableRow from 'components/interfaces/Reports/ReportLintsTableRow'
 import { ReportsLayout } from 'components/layouts'
@@ -12,7 +13,13 @@ import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useLocalStorageQuery } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
-import { Accordion, Button, LoadingLine } from 'ui'
+import {
+  AccordionContent_Shadcn_,
+  AccordionItem_Shadcn_,
+  Accordion_Shadcn_,
+  Button,
+  LoadingLine,
+} from 'ui'
 
 const ProjectLints: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -168,57 +175,47 @@ const ProjectLints: NextPageWithLayout = () => {
           />
         </div>
 
-        <div className="col-span-12 flex flex-col">
-          <div className="'text-sm max-w-none flex flex-col gap-8 py-4'">
-            {ignoredLints.length > 0 && (
-              <div className="mt-4">
-                <Accordion
-                  openBehaviour="multiple"
-                  chevronAlign="right"
-                  className="border p-2 bg-surface-100 rounded"
-                >
-                  <Accordion.Item
-                    header={
-                      <div className=" text-sm text-foreground-light flex flex-row gap-2 items-center p-2">
-                        Ignored problems ({ignoredLints.length})
-                      </div>
+        {ignoredLints.length > 0 && (
+          <div className="col-span-12 flex flex-col text-sm max-w-none gap-8 py-4">
+            <Accordion_Shadcn_ type="single" collapsible>
+              <AccordionItem_Shadcn_ value="1" className="border-none">
+                <AccordionTrigger className="px-4 bg-surface-100 rounded border [&[data-state=open]]:rounded-b-none hover:no-underline">
+                  <div className="text-sm text-foreground-light font-normal">
+                    Ignored problems ({ignoredLints.length})
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent_Shadcn_>
+                  <Table
+                    body={
+                      (lints ?? []).length === 0 ? (
+                        <Table.tr>
+                          <Table.td colSpan={6} className="p-3 py-12 text-center">
+                            <p className="text-foreground-light">
+                              {isLoading ? (
+                                <>
+                                  <Loader className="animate-spin" size={12} />
+                                  Checking for project issues
+                                </>
+                              ) : (
+                                'No issues have been found for this project'
+                              )}
+                            </p>
+                          </Table.td>
+                        </Table.tr>
+                      ) : (
+                        <>
+                          {ignoredLints.map((lint: Lint) => {
+                            return <ReportLintsTableRow key={lint.cache_key} lint={lint} />
+                          })}
+                        </>
+                      )
                     }
-                    id="1"
-                    className="flex flex-row gap-8"
-                  >
-                    <Table
-                      className="border-t mt-4"
-                      body={
-                        (lints ?? []).length === 0 ? (
-                          <Table.tr>
-                            <Table.td colSpan={6} className="p-3 py-12 text-center">
-                              <p className="text-foreground-light">
-                                {isLoading ? (
-                                  <>
-                                    <Loader className="animate-spin" size={12} />
-                                    Checking for project issues
-                                  </>
-                                ) : (
-                                  'No issues have been found for this project'
-                                )}
-                              </p>
-                            </Table.td>
-                          </Table.tr>
-                        ) : (
-                          <>
-                            {ignoredLints.map((lint: Lint) => {
-                              return <ReportLintsTableRow key={lint.cache_key} lint={lint} />
-                            })}
-                          </>
-                        )
-                      }
-                    />
-                  </Accordion.Item>
-                </Accordion>
-              </div>
-            )}
+                  />
+                </AccordionContent_Shadcn_>
+              </AccordionItem_Shadcn_>
+            </Accordion_Shadcn_>
           </div>
-        </div>
+        )}
       </ScaffoldSection>
     </ScaffoldContainer>
   )
