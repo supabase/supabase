@@ -71,7 +71,12 @@ export default function App({ Component, pageProps }: AppProps) {
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <MetaFaviconsPagesRouter applicationName="Supabase" />
+      <MetaFaviconsPagesRouter
+        applicationName="Supabase"
+        includeManifest
+        includeMsApplicationConfig
+        includeRssXmlFeed
+      />
       <DefaultSeo
         title={site_title}
         description={DEFAULT_META_DESCRIPTION}
