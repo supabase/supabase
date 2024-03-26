@@ -4,7 +4,7 @@ Generate Open Graph images with Deno and Supabase Edge Functions and cache the g
 
 - Docs: https://deno.land/x/og_edge@0.0.2
 - Examples: https://vercel.com/docs/concepts/functions/edge-functions/og-image-examples
-- Demo: https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw11-ga-ticket?username=<username>
+- Demo: https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw11-ga-og?username=<username>
 
 ## Run locally
 
@@ -13,7 +13,7 @@ supabase start
 supabase functions serve lw11-ga-og --no-verify-jwt --env-file ./supabase/.env.local
 ```
 
-Navigate to http://localhost:54321/functions/v1/lw11-ga-ticket?username=<username>
+Navigate to http://localhost:54321/functions/v1/lw11-ga-og?username=<username>
 
 ## Deploy
 

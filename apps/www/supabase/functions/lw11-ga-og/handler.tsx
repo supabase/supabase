@@ -227,7 +227,7 @@ export async function handler(req: Request) {
                     color: STYLING_CONGIF[ticketType].TICKET_FOREGROUND,
                     margin: '0',
                     padding: '0',
-                    fontSize: '48',
+                    fontSize: '56',
                     lineHeight: '105%',
                     display: 'flex',
                     marginBottom: '6px',
@@ -252,7 +252,7 @@ export async function handler(req: Request) {
               </div>
             </div>
             {/* Ticket No  */}
-            <p
+            {/* <p
               style={{
                 display: 'flex',
                 position: 'absolute',
@@ -271,7 +271,7 @@ export async function handler(req: Request) {
               }}
             >
               {`NO ${prefix}${ticketNumber}`}
-            </p>
+            </p> */}
 
             <div
               style={{
