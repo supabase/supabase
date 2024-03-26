@@ -217,7 +217,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <ShortcutPreviewBuild>
       <QueryClientProvider client={queryClient}>
-        <MetaFaviconsPagesRouter />
+        <MetaFaviconsPagesRouter applicationName="Supabase Docs" />
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         </Head>
