@@ -47,7 +47,7 @@ export function doPermissionsCheck(
         permission.organization_id === organizationId &&
         permission.actions.some((act) => (action ? action.match(toRegexpString(act)) : null)) &&
         permission.resources.some((res) => resource.match(toRegexpString(res))) &&
-        permission.project_ids.includes(projectId)
+        permission.project_ids?.includes(projectId)
     )
     if (projectPermissions.length > 0) {
       return doPermissionConditionCheck(projectPermissions, { resource_name: resource, ...data })
