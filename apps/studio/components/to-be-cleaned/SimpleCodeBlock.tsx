@@ -5,14 +5,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import { Prism, themes, Highlight, Language } from 'prism-react-renderer'
+import { themes, Highlight, Language } from 'prism-react-renderer'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 import { useTheme } from 'next-themes'
 import { copyToClipboard } from 'lib/helpers'
-import { dart } from 'lib/constants/prism'
-
-dart(Prism)
 
 const prism = {
   defaultLanguage: 'js',

@@ -30,6 +30,7 @@ import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Prism } from 'prism-react-renderer'
 import toast from 'react-hot-toast'
 import { PortalToast, Toaster } from 'ui'
 import { ConsentToast } from 'ui-patterns/ConsentToast'
@@ -48,6 +49,7 @@ import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
 import { AuthProvider } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { dart } from 'lib/constants/prism'
 import { ProfileProvider } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
@@ -57,6 +59,8 @@ dayjs.extend(customParseFormat)
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
+
+dart(Prism)
 
 loader.config({
   // [Joshen] Attempt for offline support/bypass ISP issues is to store the assets required for monaco
