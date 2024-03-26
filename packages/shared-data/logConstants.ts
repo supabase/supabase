@@ -225,8 +225,8 @@ const schemas = [
     ],
   },
   {
-    name: 'PgBouncer',
-    reference: 'pgbouncer_logs',
+    name: 'Supavisor',
+    reference: 'supavisor_logs',
     fields: [
       { path: 'event_message', type: 'string' },
       { path: 'id', type: 'string' },

@@ -9,5 +9,12 @@
     return <IconBase icon={TrendingUp} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { trendingUp } from 'lucide-react'
+  */
   export default IconTrendingUp
   

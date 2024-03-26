@@ -1,7 +1,5 @@
 import { useRef } from 'react'
 
-import { useRouter } from 'next/router'
-
 import { Swiper, SwiperSlide } from 'swiper/react'
 // import Swiper core and required modules
 import SwiperCore, { Navigation, Pagination } from 'swiper'
@@ -16,9 +14,6 @@ import ExampleCard from '../ExampleCard'
 SwiperCore.use([Navigation, Pagination])
 
 function GithubExamples() {
-  // base path for images
-  const { basePath } = useRouter()
-
   const prevRef = useRef(null)
   const nextRef = useRef(null)
 
@@ -32,7 +27,7 @@ function GithubExamples() {
           </p>
           <div className="flex items-center justify-center gap-2 py-4">
             <Button asChild size="small" type="default" icon={<IconBookOpen size={12} />}>
-              <Link href="/docs/guides/auth/overview">View guides</Link>
+              <Link href="/docs/guides/resources/examples">View guides</Link>
             </Button>
             <Button asChild size="small" type="default" icon={<IconGitHub size={12} />}>
               <Link

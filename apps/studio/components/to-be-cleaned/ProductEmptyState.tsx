@@ -30,7 +30,7 @@ const ProductEmptyState = ({
 
   return (
     <div className="flex h-full w-full items-center justify-center">
-      <div className="flex space-x-4 rounded border border-overlay bg-surface-100 p-6 shadow-md">
+      <div className="flex space-x-4 rounded border bg-surface-100 p-6 shadow-md">
         {/* A graphic can probably be placed here as a sibling to the div below*/}
         <div className="flex flex-col">
           <div className={`${size === 'medium' ? 'w-80' : 'w-[400px]'} space-y-4`}>

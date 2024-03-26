@@ -62,7 +62,7 @@ const ProjectAPIDocs = () => {
       onCancel={() => snap.setShowProjectApiDocs(false)}
     >
       <div className="flex items-start h-full">
-        <div className="w-64 border-r h-full">
+        <div className="w-72 border-r h-full">
           <div className="border-b px-4 py-2 flex items-center justify-between">
             <h4>API Docs</h4>
             <div className="flex items-center space-x-1">

@@ -1,6 +1,6 @@
 const ANIMATION_DELAY = 150
 
-const ShimmeringLoader = ({ className = '', delayIndex = 0, animationDelay = 150 }) => {
+const ShimmeringLoader = ({ className = '', delayIndex = 0, animationDelay = ANIMATION_DELAY }) => {
   return (
     <div
       className={`shimmering-loader rounded py-3 ${className}`}

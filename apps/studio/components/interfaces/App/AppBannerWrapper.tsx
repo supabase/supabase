@@ -1,10 +1,11 @@
 import { useMonaco } from '@monaco-editor/react'
 import { useTheme } from 'next-themes'
+import { PropsWithChildren, useEffect } from 'react'
+
 import IncidentBanner from 'components/layouts/AppLayout/IncidentBanner'
+import { NoticeBanner } from 'components/layouts/AppLayout/NoticeBanner'
 import { getTheme } from 'components/ui/CodeEditor'
 import { useFlag } from 'hooks'
-import { PropsWithChildren, useEffect } from 'react'
-import { NoticeBanner } from 'components/layouts/AppLayout/NoticeBanner'
 
 const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
   const monaco = useMonaco()
@@ -22,8 +23,10 @@ const AppBannerWrapper = ({ children }: PropsWithChildren<{}>) => {
 
   return (
     <div className="min-h-full flex flex-col">
-      {ongoingIncident && <IncidentBanner />}
-      {showNoticeBanner && <NoticeBanner />}
+      <div className="flex-none">
+        {ongoingIncident && <IncidentBanner />}
+        {showNoticeBanner && <NoticeBanner />}
+      </div>
       {children}
     </div>
   )

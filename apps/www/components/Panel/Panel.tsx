@@ -1,7 +1,7 @@
 import React, { PropsWithChildren, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { cn } from 'ui'
-import { isBrowser } from 'common'
+import { detectBrowser, isBrowser } from 'common'
 
 interface Props {
   outerClassName?: string
@@ -30,10 +30,11 @@ const Panel = ({
   const outerRef = useRef(null)
   const innerRef = useRef(null)
   const Component = hasMotion ? motion.div : 'div'
+  const isSafari = isBrowser && detectBrowser() === 'Safari'
   const trackCursor = hasShimmer || hasInnerShimmer
 
   const handleGlow = (event: any) => {
-    if (!trackCursor || !outerRef.current || !innerRef.current) return null
+    if (!outerRef.current || !innerRef.current) return
 
     const outerElement = outerRef.current as HTMLDivElement
     const innerElement = innerRef.current as HTMLDivElement
@@ -63,7 +64,7 @@ const Panel = ({
   }
 
   useEffect(() => {
-    if (!isBrowser) return
+    if (!isBrowser || trackCursor || isSafari) return
 
     window.addEventListener('mousemove', handleGlow)
     return () => {

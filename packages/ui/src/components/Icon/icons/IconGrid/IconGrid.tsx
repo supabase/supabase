@@ -9,5 +9,12 @@
     return <IconBase icon={Grid} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { grid } from 'lucide-react'
+  */
   export default IconGrid
   

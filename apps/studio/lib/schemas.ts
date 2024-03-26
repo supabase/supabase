@@ -5,5 +5,10 @@ import YupPassword from 'yup-password'
 YupPassword(yup)
 
 export const passwordSchema = yup.object({
-  password: yup.string().password().required().label('Password'),
+  password: yup
+    .string()
+    .password()
+    .required()
+    .max(72, 'Password cannot exceed 72 characters')
+    .label('Password'),
 })

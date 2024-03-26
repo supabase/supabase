@@ -1,6 +1,6 @@
 import { Meta } from '@storybook/react'
-import { Alert, AlertDescription, AlertTitle } from '@ui/components/shadcn/ui/alert'
 import { AlertCircle, Info } from 'lucide-react'
+import { Alert, AlertDescription, AlertTitle } from '../ui/alert'
 
 const meta: Meta<typeof Alert> = {
   title: 'shadcn/Alert',

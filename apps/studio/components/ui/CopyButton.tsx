@@ -5,8 +5,18 @@ import { useEffect, useState } from 'react'
 export interface CopyButtonProps extends ButtonProps {
   text: string
   iconOnly?: boolean
+  copyLabel?: string
+  copiedLabel?: string
 }
-const CopyButton = ({ text, iconOnly = false, children, onClick, ...props }: CopyButtonProps) => {
+const CopyButton = ({
+  text,
+  iconOnly = false,
+  children,
+  onClick,
+  copyLabel = 'Copy',
+  copiedLabel = 'Copied',
+  ...props
+}: CopyButtonProps) => {
   const [showCopied, setShowCopied] = useState(false)
 
   useEffect(() => {
@@ -31,7 +41,7 @@ const CopyButton = ({ text, iconOnly = false, children, onClick, ...props }: Cop
       }
       {...props}
     >
-      {!iconOnly && <>{children ?? (showCopied ? 'Copied' : 'Copy')}</>}
+      {!iconOnly && <>{children ?? (showCopied ? copiedLabel : copyLabel)}</>}
     </Button>
   )
 }

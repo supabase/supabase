@@ -1,9 +1,8 @@
 import { Meta } from '@storybook/react'
-import { Card } from '@ui/components/shadcn/ui/card'
-import { Button } from '@ui/components/shadcn/ui/button'
-import { Input } from '@ui/components/shadcn/ui/input'
-import { Label } from '@ui/components/shadcn/ui/label'
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
+import { Button } from '../ui/button'
+import { Input } from '../ui/input'
+import { Label } from '../ui/label'
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
 
 const meta: Meta = {
   title: 'shadcn/Popover',

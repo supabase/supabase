@@ -13,9 +13,10 @@ import APISidePanelPreview from './APISidePanelPreview'
 import CLSPreview from './CLSPreview'
 import { useFeaturePreviewContext } from './FeaturePreviewContext'
 import RLSAIAssistantPreview from './RLSAIAssistantPreview'
+import { SQLEditorAIAssistantPreview } from './SQLEditorAIAssistantPreview'
 
 const FeaturePreviewModal = () => {
-  const isAiAssistantEnabled = useFlag('policyEditorWithAi')
+  const isAIConversational = useFlag('sqlEditorConversationalAi')
 
   // [Ivan] We should probably move this to a separate file, together with LOCAL_STORAGE_KEYS. We should make adding new feature previews as simple as possible.
   const FEATURE_PREVIEWS: { key: string; name: string; content: any; discussionsUrl?: string }[] = [
@@ -25,22 +26,29 @@ const FeaturePreviewModal = () => {
       content: <APISidePanelPreview />,
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/18038',
     },
-    ...(isAiAssistantEnabled
-      ? [
-          {
-            key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
-            name: 'Supabase Assistant for RLS policies',
-            content: <RLSAIAssistantPreview />,
-            discussionsUrl: 'https://github.com/orgs/supabase/discussions/19594',
-          },
-        ]
-      : []),
+    {
+      key: LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT,
+      name: 'Supabase Assistant for RLS policies',
+      content: <RLSAIAssistantPreview />,
+      discussionsUrl: 'https://github.com/orgs/supabase/discussions/21882',
+    },
     {
       key: LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS,
       name: 'Column-level privileges',
       content: <CLSPreview />,
       discussionsUrl: 'https://github.com/orgs/supabase/discussions/20295',
     },
+    // the user should only be able to see the panel for the AI assistant if the feature flag is true
+    ...(isAIConversational
+      ? [
+          {
+            key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_AI_ASSISTANT,
+            name: 'SQL Editor Conversational Assistant ',
+            content: <SQLEditorAIAssistantPreview />,
+            discussionsUrl: 'https://github.com/orgs/supabase/discussions/21967',
+          },
+        ]
+      : []),
   ]
 
   const router = useRouter()

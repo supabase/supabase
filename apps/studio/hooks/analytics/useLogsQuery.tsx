@@ -5,7 +5,11 @@ import {
   getDefaultHelper,
 } from 'components/interfaces/Settings/Logs'
 import { Dispatch, SetStateAction, useState } from 'react'
-import { LogsEndpointParams, Logs, LogData } from 'components/interfaces/Settings/Logs/Logs.types'
+import type {
+  LogsEndpointParams,
+  Logs,
+  LogData,
+} from 'components/interfaces/Settings/Logs/Logs.types'
 import { API_URL } from 'lib/constants'
 import { get, isResponseOk } from 'lib/common/fetch'
 export interface LogsQueryHook {

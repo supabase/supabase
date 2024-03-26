@@ -2,8 +2,8 @@ import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
 import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
-import { components } from 'data/api'
+import type { ResponseError } from 'types'
+import type { components } from 'data/api'
 
 export type BackupRestoreVariables = {
   ref: string

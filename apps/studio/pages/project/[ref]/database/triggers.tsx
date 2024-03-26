@@ -7,7 +7,7 @@ import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const TriggersPage: NextPageWithLayout = () => {
   const [selectedTrigger, setSelectedTrigger] = useState<any>()

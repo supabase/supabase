@@ -1,0 +1,305 @@
+---
+title: 'Email Auth with PKCE flow for SSR'
+description: 'Learn how to configure email authentication in your server-side rendering (SSR) application to work with the PKCE flow.'
+subtitle: 'Learn how to configure email authentication in your server-side rendering (SSR) application to work with the PKCE flow.'
+---
+
+### Setting up SSR client
+
+Check out our [guide for creating a client](/docs/guides/auth/server-side/creating-a-client) to learn how to install the necessary packages, declare environment variables, and create a Supabase client configured for SSR in your framework.
+
+### Create API endpoint for handling `token_hash`
+
+In order to use the updated email links we will need to setup a endpoint for verifying the `token_hash` along with the `type` to exchange `token_hash` for the user's `session`, which is set as a cookie for future requests made to Supabase.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="nextjs"
+  queryGroup="framework"
+>
+<TabPanel id="nextjs" label="Next.js">
+
+Create a new file at `app/auth/confirm/route.ts` and populate with the following:
+
+```ts app/auth/confirm/route.ts
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { type EmailOtpType } from '@supabase/supabase-js'
+import { cookies } from 'next/headers'
+import { NextRequest, NextResponse } from 'next/server'
+
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url)
+  const token_hash = searchParams.get('token_hash')
+  const type = searchParams.get('type') as EmailOtpType | null
+  const next = searchParams.get('next') ?? '/'
+  const redirectTo = request.nextUrl.clone()
+  redirectTo.pathname = next
+
+  if (token_hash && type) {
+    const cookieStore = cookies()
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value
+          },
+          set(name: string, value: string, options: CookieOptions) {
+            cookieStore.set({ name, value, ...options })
+          },
+          remove(name: string, options: CookieOptions) {
+            cookieStore.delete({ name, ...options })
+          },
+        },
+      }
+    )
+
+    const { error } = await supabase.auth.verifyOtp({
+      type,
+      token_hash,
+    })
+    if (!error) {
+      return NextResponse.redirect(redirectTo)
+    }
+  }
+
+  // return the user to an error page with some instructions
+  redirectTo.pathname = '/auth/auth-code-error'
+  return NextResponse.redirect(redirectTo)
+}
+```
+
+</TabPanel>
+<TabPanel id="sveltekit" label="SvelteKit">
+
+Create a new file at `src/routes/auth/confirm/+server.ts` and populate with the following:
+
+```ts src/routes/auth/confirm/+server.ts
+import { redirect } from '@sveltejs/kit'
+import { type EmailOtpType } from '@supabase/supabase-js'
+
+export const GET = async (event) => {
+  const {
+    url,
+    locals: { supabase },
+  } = event
+  const token_hash = url.searchParams.get('token_hash') as string
+  const type = url.searchParams.get('type') as EmailOtpType | null
+  const next = url.searchParams.get('next') ?? '/'
+
+  if (token_hash && type) {
+    const { error } = await supabase.auth.verifyOtp({ token_hash, type })
+    if (!error) {
+      throw redirect(303, `/${next.slice(1)}`)
+    }
+  }
+
+  // return the user to an error page with some instructions
+  throw redirect(303, '/auth/auth-code-error')
+}
+```
+
+</TabPanel>
+
+<TabPanel id="astro" label="Astro">
+
+Create a new file at `src/pages/auth/confirm.ts` and populate with the following:
+
+```ts src/pages/auth/confirm.ts
+import { createServerClient } from '@supabase/ssr'
+import { type EmailOtpType } from '@supabase/supabase-js'
+import { type APIRoute } from 'astro'
+
+export const GET: APIRoute = async ({ request, cookies, redirect }) => {
+  const requestUrl = new URL(request.url)
+  const token_hash = requestUrl.searchParams.get('token_hash')
+  const type = requestUrl.searchParams.get('type') as EmailOtpType | null
+  const next = requestUrl.searchParams.get('next') || '/'
+
+  if (token_hash && type) {
+    const supabase = createServerClient(
+      import.meta.env.PUBLIC_SUPABASE_URL,
+      import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+      {
+        cookies: {
+          get(key) {
+            return cookies.get(key)?.value
+          },
+          set(key, value, options) {
+            cookies.set(key, value, options)
+          },
+          remove(key, options) {
+            cookies.delete(key, options)
+          },
+        },
+      }
+    )
+
+    const { error } = await supabase.auth.verifyOtp({
+      type,
+      token_hash,
+    })
+
+    if (!error) {
+      return redirect(next)
+    }
+  }
+
+  // return the user to an error page with some instructions
+  return redirect('/auth/auth-code-error')
+}
+```
+
+</TabPanel>
+
+<TabPanel id="remix" label="Remix">
+
+Create a new file at `app/routes/auth.confirm.tsx` and populate with the following:
+
+```ts app/routes/auth.confirm.tsx
+import { redirect, type LoaderFunctionArgs } from '@remix-run/node'
+import { createServerClient, parse, serialize } from '@supabase/ssr'
+import { type EmailOtpType } from '@supabase/supabase-js'
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const requestUrl = new URL(request.url)
+  const token_hash = requestUrl.searchParams.get('token_hash')
+  const type = requestUrl.searchParams.get('type') as EmailOtpType | null
+  const next = requestUrl.searchParams.get('next') || '/'
+  const headers = new Headers()
+
+  if (token_hash && type) {
+    const cookies = parse(request.headers.get('Cookie') ?? '')
+
+    const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
+      cookies: {
+        get(key) {
+          return cookies[key]
+        },
+        set(key, value, options) {
+          headers.append('Set-Cookie', serialize(key, value, options))
+        },
+        remove(key, options) {
+          headers.append('Set-Cookie', serialize(key, '', options))
+        },
+      },
+    })
+
+    const { error } = await supabase.auth.verifyOtp({
+      type,
+      token_hash,
+    })
+
+    if (!error) {
+      return redirect(next, { headers })
+    }
+  }
+
+  // return the user to an error page with instructions
+  return redirect('/auth/auth-code-error', { headers })
+}
+```
+
+</TabPanel>
+<TabPanel id="express" label="Express">
+
+Create a new route in your express app and populate with the following:
+
+```js app.js
+...
+app.get("/auth/confirm", async function (req, res) {
+  const token_hash = req.query.token_hash
+  const type = req.query.type
+  const next = req.query.next ?? "/"
+
+  if (token_hash && type) {
+    const supabase = createClient({ req, res })
+    const { error } = await supabase.auth.verifyOtp({
+      type,
+      token_hash,
+    })
+    if (!error) {
+      res.redirect(303, `/${next.slice(1)}`)
+    }
+  }
+
+  // return the user to an error page with some instructions
+  res.redirect(303, '/auth/auth-code-error')
+})
+```
+
+</TabPanel>
+</Tabs>
+
+### Update email templates with URL for API endpoint
+
+Let's update the URL in our email templates to point to our new confirmation endpoint for the user to get confirmed.
+
+**Confirm signup template**
+
+```html
+<h2>Confirm your signup</h2>
+
+<p>Follow this link to confirm your user:</p>
+<p>
+  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email"
+    >Confirm your email</a
+  >
+</p>
+```
+
+**Invite user template**
+
+```html
+<h2>You have been invited</h2>
+
+<p>
+  You have been invited to create a user on {{ .SiteURL }}. Follow this link to accept the invite:
+</p>
+
+<p>
+  <a
+    href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=invite&next=/path-to-your-update-password-page"
+    >Accept the invite</a
+  >
+</p>
+```
+
+**Magic Link template**
+
+```html
+<h2>Magic Link</h2>
+
+<p>Follow this link to login:</p>
+<p><a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=magiclink">Log In</a></p>
+```
+
+**Change Email Address template**
+
+```html
+<h2>Confirm Change of Email</h2>
+
+<p>Follow this link to confirm the update of your email from {{ .Email }} to {{ .NewEmail }}:</p>
+<p>
+  <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email_change">
+    Change Email
+  </a>
+</p>
+```
+
+**Reset Password template**
+
+```html
+<h2>Reset Password</h2>
+
+<p>Follow this link to reset the password for your user:</p>
+<p>
+  <a
+    href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/path-to-your-update-password-page"
+    >Reset Password</a
+  >
+</p>
+```

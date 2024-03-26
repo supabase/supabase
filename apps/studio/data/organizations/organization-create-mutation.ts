@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast'
 
 import { post } from 'data/fetchers'
 import { permissionKeys } from 'data/permissions/keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationCreateVariables = {

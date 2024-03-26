@@ -1,5 +1,3 @@
-import CPUWarnings from './CPUWarnings'
-import DiskIOBandwidthWarnings from './DiskIOBandwidthWarnings'
-import RAMWarnings from './RAMWarnings'
-
-export { CPUWarnings, DiskIOBandwidthWarnings, RAMWarnings }
+export { default as CPUWarnings } from './CPUWarnings'
+export { default as DiskIOBandwidthWarnings } from './DiskIOBandwidthWarnings'
+export { default as RAMWarnings } from './RAMWarnings'

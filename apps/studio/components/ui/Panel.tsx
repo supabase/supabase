@@ -1,5 +1,5 @@
 import { PropsWithChildren, ReactNode } from 'react'
-import { Loading } from 'ui'
+import { Loading, cn } from 'ui'
 
 interface PanelProps {
   bodyClassName?: string
@@ -11,28 +11,30 @@ interface PanelProps {
   title?: ReactNode | false
   wrapWithLoading?: boolean
   noHideOverflow?: boolean
+  headerClasses?: string
 }
+
 function Panel(props: PropsWithChildren<PanelProps>) {
-  let headerClasses: string[] = []
-
-  if (!props.hideHeaderStyling) {
-    headerClasses = [`bg-surface-100 border-b border-overlay`]
-  } else {
-    headerClasses = [`bg-surface-100`]
-  }
-
   const content = (
     <div
-      className={`
-        ${props.noHideOverflow ? '' : 'overflow-hidden'} rounded-md border
-        border-overlay shadow-sm ${props.noMargin ? '' : 'mb-8'} ${props.className}`}
+      className={cn(
+        'rounded-md border border-overlay shadow-sm',
+        props.noHideOverflow ? '' : 'overflow-hidden',
+        props.noMargin ? '' : 'mb-8',
+        props.className
+      )}
     >
       {props.title && (
-        <div className={headerClasses.join(' ')}>
+        <div
+          className={cn(
+            props.hideHeaderStyling ? 'bg-surface-100 border-b border-overlay' : 'bg-surface-100',
+            props.headerClasses
+          )}
+        >
           <div className="flex items-center px-6 py-4">{props.title}</div>
         </div>
       )}
-      <div className={`bg-surface-100 ${props.bodyClassName || ''}`}>{props.children}</div>
+      <div className={cn('bg-surface-100', props.bodyClassName)}>{props.children}</div>
 
       {props.footer && (
         <div className="bg-surface-100 border-t border-overlay">
@@ -50,9 +52,7 @@ function Panel(props: PropsWithChildren<PanelProps>) {
 }
 
 function Content({ children, className }: { children: ReactNode; className?: string | false }) {
-  let classes = ['px-6 py-4']
-  if (className) classes.push(className)
-  return <div className={classes.join(' ')}>{children}</div>
+  return <div className={cn('px-6 py-4', className)}>{children}</div>
 }
 
 Panel.Content = Content

@@ -5,6 +5,8 @@ import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import { Heading } from '~/components/CustomHTMLElements'
 import Head from 'next/head'
 import { CodeBlock } from 'ui'
+import { MainSkeleton } from '~/layouts/MainSkeleton'
+import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 
 // Parameters are grouped on the page by tag
 const tocList = []
@@ -29,24 +31,26 @@ export default function Config() {
       <Head>
         <title>Supabase CLI config</title>
       </Head>
-      <div className="grid grid-cols-12 relative gap-4 px-5 max-w-7xl mx-auto py-16">
-        <div className="relative col-span-12 md:col-span-9 transition-all ease-out duration-100">
-          <div className="w-full prose">
-            <h1>CLI configuration</h1>
-            <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-300 to-brand my-8"></div>
-            <ReactMarkdown>{specFile.info.description}</ReactMarkdown>
-            <div>{content}</div>
+      <MainSkeleton menuId={MenuId.Cli}>
+        <div className="grid grid-cols-12 relative gap-4 px-5 max-w-7xl mx-auto py-16">
+          <div className="relative col-span-12 md:col-span-9 transition-all ease-out duration-100">
+            <div className="w-full prose">
+              <h1>CLI configuration</h1>
+              <div className="max-w-xs w-32 h-[1px] bg-gradient-to-r from-brand-300 to-brand my-8"></div>
+              <ReactMarkdown>{specFile.info.description}</ReactMarkdown>
+              <div>{content}</div>
+            </div>
+          </div>
+          <div className="md:col-span-3">
+            <div className="sticky overflow-auto max-h-[calc(100vh-60px-5rem)] pb-3 top-32 border-l">
+              <span className="block font-mono text-xs uppercase text-foreground pl-5 mb-4">
+                On this page
+              </span>
+              <GuidesTableOfContents list={tocList} />
+            </div>
           </div>
         </div>
-        <div className="md:col-span-3">
-          <div className="sticky overflow-auto max-h-[calc(100vh-60px-5rem)] pb-3 top-32 border-l">
-            <span className="block font-mono text-xs uppercase text-foreground pl-5 mb-4">
-              On this page
-            </span>
-            <GuidesTableOfContents list={tocList} />
-          </div>
-        </div>
-      </div>
+      </MainSkeleton>
     </>
   )
 }

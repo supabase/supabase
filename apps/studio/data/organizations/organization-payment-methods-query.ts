@@ -1,9 +1,8 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { organizationKeys } from './keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type OrganizationPaymentMethodsVariables = { slug?: string }
 export type OrganizationPaymentMethod = {

@@ -1,4 +1,4 @@
-import { ModalProps } from '@ui/components/Modal/Modal'
+import type { ModalProps } from '@ui/components/Modal/Modal'
 import { snakeCase } from 'lodash'
 import Link from 'next/link'
 import { useState } from 'react'

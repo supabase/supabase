@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import { PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 
 import Divider from 'components/ui/Divider'
 import { BASE_PATH } from 'lib/constants'

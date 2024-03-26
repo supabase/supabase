@@ -1,4 +1,3 @@
-import CodeEditor from './CodeEditor'
+export { default as CodeEditor } from './CodeEditor'
 
 export * from './CodeEditor.utils'
-export default CodeEditor

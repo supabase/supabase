@@ -43,11 +43,13 @@ export interface ExtendedPostgresRelationship extends PostgresRelationship {
 export interface ColumnField {
   id: string
   name: string
+  table: string
+  schema: string
   check: string | null
   comment?: string
   format: string
   defaultValue: string | null
-  foreignKey: ExtendedPostgresRelationship | undefined
+  foreignKey?: ExtendedPostgresRelationship
   isNullable: boolean
   isUnique: boolean
   isArray: boolean

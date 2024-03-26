@@ -1,6 +1,6 @@
 import { DataPoint } from 'data/analytics/constants'
 import { ComputeUsageMetric, computeUsageMetricLabel } from 'data/analytics/org-daily-stats-query'
-import { OrgSubscription } from 'data/subscriptions/types'
+import type { OrgSubscription } from 'data/subscriptions/types'
 import SectionContent from './SectionContent'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import AlertError from 'components/ui/AlertError'

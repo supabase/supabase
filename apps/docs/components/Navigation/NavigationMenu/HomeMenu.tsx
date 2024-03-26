@@ -40,11 +40,7 @@ const NavigationMenuHome = () => {
                           >
                             {link?.icon && <HomeMenuIconPicker icon={link.icon} />}
                             {link.label}
-                            {link.community && (
-                              <Badge size="small" color="scale">
-                                Community
-                              </Badge>
-                            )}
+                            {link.community && <Badge size="small">Community</Badge>}
                           </li>
                         </Link>
                       )

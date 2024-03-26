@@ -1,6 +1,7 @@
 import React from 'react'
-import styleHandler from '../../lib/theme/styleHandler'
 import { IconContext } from './IconContext'
+
+import styleHandler from '../../lib/theme/styleHandler'
 // @ts-ignore
 // import IconStyles from './Icon.module.css'
 

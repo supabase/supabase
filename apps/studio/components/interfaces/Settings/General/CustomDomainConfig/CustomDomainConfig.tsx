@@ -71,8 +71,8 @@ const CustomDomainConfig = () => {
               ? 'New custom domains are temporarily disabled'
               : 'Custom domains are a Pro plan add-on'
           }
-          projectRef={ref as string}
-          organizationSlug={organization!.slug}
+          projectRef={ref}
+          organizationSlug={organization?.slug}
           secondaryText={
             customDomainsDisabledDueToQuota
               ? 'We are working with our upstream DNS provider before we are able to sign up new custom domains. Please check back in a few hours.'

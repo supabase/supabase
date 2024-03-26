@@ -31,20 +31,22 @@ export const SelectionDetailedRow = ({
 }) => {
   return (
     <div className="grid grid-cols-12 group">
-      <span className="text-foreground-lighter text-sm col-span-4 whitespace-pre-wrap">
+      <span className="text-foreground-lighter text-sm col-span-3 whitespace-pre-wrap">
         {label}
       </span>
-      <span className="text-foreground text-sm col-span-6 whitespace-pre-wrap break-all">
+      <span
+        title={value}
+        className="truncate text-foreground text-sm col-span-8 whitespace-pre-wrap break-all"
+      >
         {valueRender ?? value}
       </span>
       <CopyButton
+        iconOnly
         text={value}
-        className="group-hover:opacity-100 opacity-0 my-auto transition col-span-2  h-4 w-4 px-0 py-0"
+        className="group-hover:opacity-100 opacity-0 p-0 h-6 w-6 col-span-1"
         type="text"
         title="Copy to clipboard"
-      >
-        {''}
-      </CopyButton>
+      />
     </div>
   )
 }

@@ -1,16 +1,15 @@
 import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
 import { find, isUndefined } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
+import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import { parseSupaTable, SupabaseGrid, SupaTable } from 'components/grid'
 import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Connecting from 'components/ui/Loading/Loading'
-import TwoOptionToggle from 'components/ui/TwoOptionToggle'
+import { Loading } from 'components/ui/Loading'
 import { FOREIGN_KEY_CASCADE_ACTION } from 'data/database/database-query-constants'
 import {
   ForeignKeyConstraint,
@@ -19,18 +18,17 @@ import {
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { sqlKeys } from 'data/sql/keys'
 import { useTableRowUpdateMutation } from 'data/table-rows/table-row-update-mutation'
-import { useCheckPermissions, useLatest, useStore, useUrlState } from 'hooks'
+import { useCheckPermissions, useLatest, useUrlState } from 'hooks'
 import useEntityType from 'hooks/misc/useEntityType'
-import { TableLike } from 'hooks/misc/useTable'
+import type { TableLike } from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { EMPTY_ARR } from 'lib/void'
 import { useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
-import { Dictionary, SchemaView } from 'types'
-import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
+import type { Dictionary, SchemaView } from 'types'
 import GridHeaderActions from './GridHeaderActions'
 import NotFoundState from './NotFoundState'
-import SidePanelEditor from './SidePanelEditor'
+import { SidePanelEditor } from './SidePanelEditor'
 import { useEncryptedColumns } from './SidePanelEditor/SidePanelEditor.utils'
 import TableDefinition from './TableDefinition'
 
@@ -48,22 +46,12 @@ const TableGridEditor = ({
   selectedTable,
 }: TableGridEditorProps) => {
   const router = useRouter()
-  const { meta, ui } = useStore()
   const { ref: projectRef, id } = useParams()
 
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
-
   const getImpersonatedRole = useGetImpersonatedRole()
-
-  const [{ view: selectedView = 'data' }, setUrlState] = useUrlState()
-  const setSelectedView = (view: string) => {
-    if (view === 'data') {
-      setUrlState({ view: undefined })
-    } else {
-      setUrlState({ view })
-    }
-  }
+  const [{ view: selectedView = 'data' }] = useUrlState()
 
   const canEditTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
   const canEditColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
@@ -145,7 +133,7 @@ const TableGridEditor = ({
 
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable) {
-    return <Connecting />
+    return <Loading />
   }
 
   if (isUndefined(selectedTable)) {
@@ -198,15 +186,6 @@ const TableGridEditor = ({
     router.push(`/project/${projectRef}/editor/${table.id}`)
   }
 
-  const onSqlQuery = async (query: string) => {
-    const res = await meta.query(query)
-    if (res.error) {
-      return { error: res.error }
-    } else {
-      return { data: res }
-    }
-  }
-
   // columns must be accessed via columnsRef.current as these two functions immediately become
   // stale as they are accessed via some react-tracked madness
   // [TODO]: refactor out all of react-tracked
@@ -215,10 +194,7 @@ const TableGridEditor = ({
     if (column) {
       snap.onEditColumn(column)
     } else {
-      ui.setNotification({
-        category: 'error',
-        message: `Unable to find column ${name} in ${selectedTable?.name}`,
-      })
+      toast.error(`Unable to find column ${name} in ${selectedTable?.name}`)
     }
   }
 
@@ -227,18 +203,12 @@ const TableGridEditor = ({
     if (column) {
       snap.onDeleteColumn(column)
     } else {
-      ui.setNotification({
-        category: 'error',
-        message: `Unable to find column ${name} in ${selectedTable?.name}`,
-      })
+      toast.error(`Unable to find column ${name} in ${selectedTable?.name}`)
     }
   }
 
   const onError = (error: any) => {
-    ui.setNotification({
-      category: 'error',
-      message: error?.details ?? error?.message ?? error,
-    })
+    toast.error(error?.details ?? error?.message ?? error)
   }
 
   const updateTableRow = (previousRow: any, updatedData: any) => {
@@ -260,10 +230,7 @@ const TableGridEditor = ({
 
     const configuration = { identifiers }
     if (Object.keys(identifiers).length === 0) {
-      return ui.setNotification({
-        category: 'error',
-        message: ERROR_PRIMARY_KEY_NOTFOUND,
-      })
+      toast.error(ERROR_PRIMARY_KEY_NOTFOUND)
     }
 
     mutateUpdateTableRow({
@@ -294,30 +261,12 @@ const TableGridEditor = ({
         table={gridTable}
         headerActions={
           isTableSelected || isViewSelected || canEditViaTableEditor ? (
-            <>
-              {canEditViaTableEditor && (
-                <GridHeaderActions table={selectedTable as PostgresTable} />
-              )}
-              {(isTableSelected || isViewSelected) && (
-                <>
-                  {isViewSelected && <RoleImpersonationPopover serviceRoleLabel="postgres" />}
-
-                  {canEditViaTableEditor && (
-                    <div className="h-[20px] w-px border-r border-control"></div>
-                  )}
-
-                  <div>
-                    <TwoOptionToggle
-                      width={75}
-                      options={['definition', 'data']}
-                      activeOption={selectedView}
-                      borderOverride="border-gray-500"
-                      onClickOption={setSelectedView}
-                    />
-                  </div>
-                </>
-              )}
-            </>
+            <GridHeaderActions
+              table={selectedTable as PostgresTable}
+              canEditViaTableEditor={canEditViaTableEditor}
+              isViewSelected={isViewSelected}
+              isTableSelected={isTableSelected}
+            />
           ) : null
         }
         onAddColumn={snap.onAddColumn}
@@ -328,7 +277,6 @@ const TableGridEditor = ({
         onEditRow={snap.onEditRow}
         onImportData={snap.onImportData}
         onError={onError}
-        onSqlQuery={onSqlQuery}
         onExpandJSONEditor={(column, row) => {
           snap.onExpandJSONEditor({ column, row, jsonString: JSON.stringify(row[column]) || '' })
         }}
@@ -362,4 +310,4 @@ const TableGridEditor = ({
   )
 }
 
-export default observer(TableGridEditor)
+export default TableGridEditor

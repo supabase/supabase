@@ -1,6 +1,6 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { databasePublicationsKeys } from './keys'
 
 export type DatabasePublicationsVariables = {

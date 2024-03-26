@@ -1,19 +1,19 @@
-import { Button } from '@ui/components/shadcn/ui/button'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-} from '@ui/components/shadcn/ui/form'
-import { toast } from '@ui/components/shadcn/ui/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Meta } from '@storybook/react'
-import { Label } from '@ui/components/shadcn/ui/label'
-import { Switch } from '@ui/components/shadcn/ui/switch'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { Button } from '../ui/button'
+import {
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+} from '../ui/form'
+import { Label } from '../ui/label'
+import { Switch } from '../ui/switch'
+import { toast } from '../ui/use-toast'
 
 const meta: Meta = {
   title: 'shadcn/Switch',

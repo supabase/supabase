@@ -1,0 +1,41 @@
+---
+id: 'exhaust-disk-io'
+title: 'High Disk IO Consumption'
+description: 'Understand Disk IO, what can deplete your Disk IO Budget and what you can do about it.'
+---
+
+## Understanding disk IO and disk IO budget
+
+Disk IO refers to two metrics: throughput in Megabits per Second and IOPS which are Input/Output Operations per Second. Depending on the compute add-on of your instance you will have [different baseline performances](https://supabase.com/docs/guides/platform/compute-add-ons#disk-io).
+
+Smaller compute instances can burst and exceed their baseline performance for a short quota of time every day. This quota is represented as your Disk IO Budget and once your Disk IO Budget is consumed, your instance reverts back to its baseline performance. You can read more about this under [Bursting and Disk IO Budget](https://supabase.com/docs/guides/platform/compute-add-ons#bursting-and-disk-io-budget).
+
+## Depleting your disk IO budget
+
+Running out of Disk IO Budget means that your instance is using more disk than its compute add-on can handle and essentially gets throttled. This could have a wide range of implications:
+
+- Response times on requests can increase noticeably
+- CPU usage rises noticeably due to IO wait
+- Disruption of [daily backup](https://supabase.com/docs/guides/platform/backups#daily-backups) routines
+- Disruption of internal Postgres processes such as [autovacuuming](https://supabase.com/docs/guides/platform/database-size#vacuum-operations)
+- Your instance may become unresponsive
+
+## Monitor your disk IO budget
+
+To check your Disk IO Budget on the Supabase Platform, head over to [Database Health in the Reports section](https://supabase.com/dashboard/project/_/reports/database).
+
+It is also possible to monitor your resources and set up alerts using Prometheus/Grafana. With Grafana you will be able to see how much of your RAM is used for caching and you can track other metrics such as your Swap usage. Read the [Metrics Guide](https://supabase.com/docs/guides/platform/metrics) to learn more.
+
+## Common reasons for high disk IO usage
+
+Most operations on your Supabase project require disk IO in some form. Hence, there can be many reasons for high disk IO usage. Here are some common ones:
+
+- **High Memory Usage:** Every Supabase project has 1GB of disk allocated for swapping. When your memory usage is high, the operating system might frequently move parts of the memory back and forth of the swap space on the disk.
+- **Low Cache Usage:** If your cache hit rate is low, many of your database requests might go straight to the disk. Go to the [Cache Hit Rate Guide](https://supabase.com/docs/guides/platform/performance#hit-rate) to learn more.
+- **Query performance:** Queries that take a long time to complete (>1 second) could be using your disk inefficiently. Check our guide on [examining query performance](https://supabase.com/docs/guides/platform/performance#examining-query-performance).
+- **High popularity:** Congrats! Your side project turned out to be a real success and is getting more requests than it can handle.
+
+## How to fix
+
+1. **Upgrade your compute:** You can get a Compute Add-on for your project. See your [upgrade options](https://supabase.com/dashboard/project/_/settings/addons?panel=computeInstance) by selecting your project. Do reference the [different baseline performances](https://supabase.com/docs/guides/platform/compute-add-ons#disk-io) that come with larger Compute Add-ons.
+2. **Optimize performance:** Get more out of your instance's resources by optimizing your usage. Have a look at our [performance tuning guide](https://supabase.com/docs/guides/platform/performance#examining-query-performance) and our [production readiness guide](https://supabase.com/docs/guides/platform/going-into-prod#performance).

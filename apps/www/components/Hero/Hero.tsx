@@ -3,10 +3,9 @@ import { useRouter } from 'next/router'
 import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 import gaEvents from '~/lib/gaEvents'
-import { Button, IconBookOpen, cn } from 'ui'
+import { Button, IconBookOpen } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import HeroFrameworks from './HeroFrameworks'
-import styles from './hero.module.css'
 
 const Hero = () => {
   const router = useRouter()
@@ -21,12 +20,7 @@ const Hero = () => {
         <div className="relative">
           <div className="mx-auto">
             <div className="mx-auto max-w-2xl lg:col-span-6 lg:flex lg:items-center justify-center text-center">
-              <div
-                className={cn(
-                  'relative z-10 appear-first lg:h-auto pt-[90px] lg:pt-[90px] lg:min-h-[300px] flex flex-col items-center justify-center sm:mx-auto md:w-3/4 lg:mx-0 lg:w-full gap-4 lg:gap-8',
-                  styles['hero-text']
-                )}
-              >
+              <div className="relative z-10 lg:h-auto pt-[90px] lg:pt-[90px] lg:min-h-[300px] flex flex-col items-center justify-center sm:mx-auto md:w-3/4 lg:mx-0 lg:w-full gap-4 lg:gap-8">
                 <div className="flex flex-col items-center">
                   {/* <div className="z-40 w-full flex justify-center mb-8 lg:mb-8">
                     <AnnouncementBadge

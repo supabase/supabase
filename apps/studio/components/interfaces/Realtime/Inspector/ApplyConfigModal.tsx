@@ -1,6 +1,6 @@
 import { Modal } from 'ui'
 
-import ConfirmationModal from 'components/ui/ConfirmationModal'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface ApplyConfigModalProps {
   visible: boolean

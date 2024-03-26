@@ -6,6 +6,7 @@
 
 @import './../../../packages/ui/build/css/source/global.css';
 @import './../../../packages/ui/build/css/themes/dark.css';
+@import './../../../packages/ui/build/css/themes/deep-dark.css';
 @import './../../../packages/ui/build/css/themes/light.css';
 
 @layer utilities {
@@ -42,7 +43,7 @@ html {
 }
 
 body {
-  @apply bg-background;
+  @apply bg-background text-foreground;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -182,7 +183,6 @@ h6:not(.overwrite) {
   top: 0;
   left: 0;
   transform-origin: 100% 0;
-  transform: skewY(-2deg);
   overflow: hidden;
 }
 

@@ -1,5 +1,10 @@
 {
-  "name": "App",
+  "name": "Supabase",
+  "short_name": "Supabase",
+  "description": "The open source Firebase alternative.",
+  "display": "standalone",
+  "theme_color": "#1C1C1C",
+  "background_color": "#1C1C1C",
   "icons": [
     {
       "src": "/android-icon-36x36.png",

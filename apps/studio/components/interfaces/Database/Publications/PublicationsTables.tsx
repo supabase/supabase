@@ -7,7 +7,7 @@ import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import InformationBox from 'components/ui/InformationBox'
-import Connecting from 'components/ui/Loading/Loading'
+import { Loading } from 'components/ui/Loading'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
@@ -83,7 +83,7 @@ const PublicationsTables = ({ selectedPublication, onSelectBack }: PublicationsT
       </div>
       {isLoading && (
         <div className="mt-8">
-          <Connecting />
+          <Loading />
         </div>
       )}
 

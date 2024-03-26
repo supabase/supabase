@@ -5,6 +5,7 @@ import { useRouter } from 'next/router'
 import { FC, PropsWithChildren } from 'react'
 import components from '~/components'
 import TableOfContents from '~/components/TableOfContents'
+import { MainSkeleton } from './MainSkeleton'
 
 interface Props {
   meta: {

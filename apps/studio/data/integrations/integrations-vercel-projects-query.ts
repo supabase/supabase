@@ -1,7 +1,7 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
 import { useCallback } from 'react'
-import { VercelFramework } from './integrations.types'
+import type { VercelFramework } from './integrations.types'
 import { integrationKeys } from './keys'
 
 export type VercelProjectsVariables = {

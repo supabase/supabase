@@ -1,0 +1,197 @@
+---
+title: 'Resources'
+description: 'Resources for getting started building with Supabase.'
+hideToc: true
+---
+
+{/* <!-- vale off --> */}
+
+<div className="flex flex-col gap-12 my-12">
+
+<div>
+
+  <div className="grid grid-cols-12 gap-6 not-prose">
+    {
+    [
+      {
+        title: 'Examples',
+        hasLightIcon: true,
+        href: '/guides/resources/examples',
+        description: 'Official GitHub examples, curated content from the community, and more.',
+      },
+      {
+        title: 'Glossary',
+        hasLightIcon: true,
+        href: '/guides/resources/glossary',
+        description: 'Definitions for terminology and acronyms used in the Supabase documentation.',
+      }
+    ]
+.map((resource) => {
+      return (
+        <Link
+          href={`${resource.href}`}
+          key={resource.title}
+          className={'col-span-12 md:col-span-4'}
+          passHref
+        >
+          <GlassPanel {...resource} background={false} showIconBg={true}>
+            {resource.description}
+          </GlassPanel>
+        </Link>
+      )
+
+})}
+
+  </div>
+
+</div>
+
+<div>
+  <div className="max-w-xl mb-6">
+
+### Migrate to Supabase
+
+  </div>
+
+  <div className="grid grid-cols-12 gap-6 not-prose">
+    {
+    [
+      {
+        title: 'Firebase Auth',
+        icon: '/docs/img/icons/firebase-icon',
+        href: '/guides/resources/migrating-to-supabase/firebase-auth',
+        description: 'Move your auth users from a Firebase project to a Supabase project.',
+      },
+      {
+        title: 'Firestore Data',
+        icon: '/docs/img/icons/firebase-icon',
+        href: '/guides/resources/migrating-to-supabase/firestore-data',
+        description: 'Migrate the contents of a Firestore collection to a single PostgreSQL table.',
+      },
+      {
+        title: 'Firebase Storage',
+        icon: '/docs/img/icons/firebase-icon',
+        href: '/guides/resources/migrating-to-supabase/firebase-storage',
+        description: 'Convert your Firebase Storage files to Supabase Storage.'
+      },
+      {
+        title: 'Heroku',
+        icon: '/docs/img/icons/heroku-icon',
+        href: '/guides/resources/migrating-to-supabase/heroku',
+        description: 'Migrate your Heroku Postgres database to Supabase.'
+      },
+      {
+        title: 'Render',
+        icon: '/docs/img/icons/render-icon',
+        href: '/guides/resources/migrating-to-supabase/render',
+        description: 'Migrate your Render Postgres database to Supabase.'
+      },
+      {
+        title: 'Amazon RDS',
+        icon: '/docs/img/icons/aws-rds-icon',
+        href: '/guides/resources/migrating-to-supabase/amazon-rds',
+        description: 'Migrate your Amazon RDS database to Supabase.'
+      },
+      {
+        title: 'Postgres',
+        icon: '/docs/img/icons/postgres-icon',
+        href: '/guides/resources/migrating-to-supabase/postgres',
+        description: 'Migrate your Postgres database to Supabase.'
+      },
+      {
+        title: 'MySQL',
+        icon: '/docs/img/icons/mysql-icon',
+        href: '/guides/resources/migrating-to-supabase/mysql',
+        description: 'Migrate your MySQL database to Supabase.'
+      },
+      {
+        title: 'Microsoft SQL Server',
+        icon: '/docs/img/icons/mssql-icon',
+        href: '/guides/resources/migrating-to-supabase/mssql',
+        description: 'Migrate your Microsoft SQL Server database to Supabase.'
+      }
+    ]
+.map((product) => {
+      return (
+        <Link
+          href={`${product.href}`}
+          key={product.title}
+          className={product.span ?? 'col-span-6 md:col-span-3'}
+          passHref
+        >
+          <IconPanel {...product} background={true} showIconBg={true} showLink={true}>
+            {product.description}
+          </IconPanel>
+        </Link>
+      )
+
+})}
+
+  </div>
+
+</div>
+
+<div>
+  <div className="max-w-xl mb-6">
+
+### Postgres resources
+
+  </div>
+
+  <div className="grid grid-cols-12 gap-6 not-prose">
+    {
+    [
+      {
+        title: 'Managing Indexes',
+        hasLightIcon: true,
+        href: '/guides/database/postgres/indexes',
+        description: 'Improve query performance using various index types in Postgres.'
+      },
+      {
+        title: 'Cascade Deletes',
+        hasLightIcon: true,
+        href: '/guides/database/postgres/cascade-deletes',
+        description: 'Understand the types of foreign key constraint deletes.'
+      },
+      {
+        title: 'Drop all tables in schema',
+        hasLightIcon: true,
+        href: '/guides/database/postgres/dropping-all-tables-in-schema',
+        description: 'Delete all tables in a given schema.'
+      },
+      {
+        title: 'Select first row per group',
+        hasLightIcon: true,
+        href: '/guides/database/postgres/first-row-in-group',
+        description: 'Retrieve the first row in each distinct group.'
+      },
+      {
+        title: 'Print PostgreSQL version',
+        hasLightIcon: true,
+        href: '/guides/database/postgres/which-version-of-postgres',
+        description: 'Find out which version of Postgres you are running.'
+      }
+    ]
+.map((resource) => {
+      return (
+        <Link
+          href={`${resource.href}`}
+          key={resource.title}
+          className={'col-span-12 md:col-span-4'}
+          passHref
+        >
+          <GlassPanel {...resource} background={false} showIconBg={true}>
+            {resource.description}
+          </GlassPanel>
+        </Link>
+      )
+
+})}
+
+  </div>
+
+</div>
+
+{/* end of container */}
+
+</div>

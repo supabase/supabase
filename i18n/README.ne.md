@@ -50,14 +50,14 @@
 
 सुपाबेस एक [होस्ट गरिएको प्लेटफर्म](https://supabase.com/dashboard) हो। तपाई आफै साइन अप गर्न सक्नुहुन्छ र कुनै स्थापना बिना सुपाबेस प्रयोग गर्न सक्नुहुन्छ। हामी अझै स्थानीय विकासको अनुभव सिर्जना गर्दैछौं। यो प्लेटफर्म स्थिरताको साथ हाम्रो मूल फोकस हो।
 
-![आर्किटेक्चर](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![आर्किटेक्चर](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
 - [PostgreSQL](https://www.postgresql.org/) एक वस्तु-रिलेशनल डाटाबेस प्रणाली हो जसले ३० बर्ष भन्दा बढी सक्रिय विकासको साथ विश्वसनीयता, सुविधा मजबूती र प्रदर्शनको बलियो प्रतिष्ठा कमाएको छ।
 - [Realtime](https://github.com/supabase/realtime) एक Elixer सर्भर हो जसले तपाइँलाई वेबसकेटहरू प्रयोग गरेर PostgreSQL इन्सर्टहरू, अपडेटहरु, र डिलीटहरु सुन्न अनुमति दिन्छ। सुपाबेसले पोष्टग्रेसको भित्र निर्मित प्रतिकृति कार्यक्षमता सुन्दछ, प्रतिकृति बाइट स्ट्रिमलाई JSON मा रूपान्तरण गर्दछ, र त्यसपछि JSON लाई वेबसकेटमा प्रसारण गर्दछ।।
 - [PostgREST](http://postgrest.org/) एक वेब सर्वर हो जसले तपाईको PostgreSQL डाटाबेसलाई सीधा एक RESTful एपीआई मा बदल्छ।
 - [Storage](https://github.com/supabase/storage-api) ले अनुमतिहरू प्रबन्ध गर्न पोष्टग्रेस प्रयोग गरेर S3 मा भण्डारित फाइलहरू प्रबन्ध गर्नका लागि RESTful ईन्टरफेस प्रदान गर्दछ।
 - [postgres-meta](https://github.com/supabase/postgres-meta) तपाईंको Postgres प्रबन्धको लागि RESTful एपीआई हो जसले तपाईंलाई टेबुलहरू प्राप्त गर्न, भूमिकाहरू थप्न र प्रश्नहरू चलाउन र अधिकको लागि अनुमति दिन्छ।
-- [GoTrue](https://github.com/netlify/gotrue) प्रयोगकर्ताहरू प्रबन्ध गर्न र SWT टोकनहरू जारी गर्नका लागि एक SWT आधारित एपीआई हो।
+- [GoTrue](https://github.com/netlify/gotrue) प्रयोगकर्ताहरू प्रबन्ध गर्न र JWT टोकनहरू जारी गर्नका लागि एक JWT आधारित एपीआई हो।
 - [Kong](https://github.com/Kong/kong) एक क्लाउड नेटिभ एपीआई गेटवे हो।
 
 #### ग्राहक पुस्तकालयहरू

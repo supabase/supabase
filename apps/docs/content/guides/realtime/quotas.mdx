@@ -1,0 +1,63 @@
+---
+id: 'quotas'
+title: 'Realtime Quotas'
+description: 'Understanding Realtime quotas'
+sidebar_label: 'Quotas'
+---
+
+Our cluster supports millions of concurrent connections and message throughput for production workloads.
+
+<Admonition type="note">
+
+Upgrade your plan to increase your quotas. Without a spend cap, or on an Enterprise plan, some quotas are still in place to protect budgets. All quotas are configurable per project. [Contact support](https://supabase.com/dashboard/support/new) if you need your quotas increased.
+
+</Admonition>
+
+## Quotas by plan
+
+|                                                                                        | Free  | Pro   | Pro (no spend cap) | Team   | Enterprise |
+| -------------------------------------------------------------------------------------- | ----- | ----- | ------------------ | ------ | ---------- |
+| **Concurrent clients**                                                                 | 200   | 500   | 10,000             | 10,000 | 10,000     |
+| **Messages per second**                                                                | 100   | 500   | 2,500              | 2,500  | 2,500      |
+| **Channel joins per second**                                                           | 100   | 500   | 2,500              | 2,500  | 2,500      |
+| **Channels per client**                                                                | 100   | 100   | 100                | 100    | 100        |
+| **Presence keys per object**                                                           | 10    | 10    | 10                 | 10     | 10         |
+| **Presence messages per second**                                                       | 20    | 50    | 1,000              | 1,000  | 1,000      |
+| **Broadcast payload size KB**                                                          | 256   | 3,000 | 3,000              | 3,000  | 3,000      |
+| **Postgres change payload size KB ([**read more**](#postgres-changes-payload-quota))** | 1,024 | 1,024 | 1,024              | 1,024  | 1,024      |
+
+Beyond the Free and Pro plan you can customize your quotas by [contacting support](https://supabase.com/dashboard/support/new).
+
+## Quota errors
+
+When you exceed a quota, errors will appear in the backend logs and client-side messages in the WebSocket connection.
+
+- **Logs**: check the [Realtime logs](https://supabase.com/dashboard/project/_/database/realtime-logs) inside your project Dashboard.
+- **Websocket errors**: Use your browser's developer tools to find the WebSocket initiation request and view individual messages.
+
+<Admonition type="tip" label="Realtime Inspector">
+
+You can use the [Realtime Inspector](https://realtime.supabase.com/inspector/new) to reproduce an error and share those connection details with Supabase support.
+
+</Admonition>
+Some quotas can cause a Channel join to be refused. Realtime will reply with one of the following WebSocket messages:
+
+### `too_many_channels`
+
+Too many channels currently joined for a single client.
+
+### `too_many_connections`
+
+Too many total concurrent connections for a project.
+
+### `too_many_joins`
+
+Too many Channel joins per second.
+
+### `tenant_events`
+
+Clients will be disconnected if your project is generating too many messages per second. `supabase-js` will reconnect automatically when the message throughput decreases below your plan quota. An `event` is a WebSocket message delivered to, or sent from a client.
+
+## Postgres changes payload quota
+
+When this quota is reached, the `new` and `old` record payloads only include the fields with a value size of less than or equal to 64 bytes.

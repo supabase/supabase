@@ -20,11 +20,6 @@ export interface SupabaseGridProps {
    * database table id
    */
   tableId?: string
-  /**
-   *
-   * run sql query
-   */
-  onSqlQuery: (query: string) => Promise<{ data?: any; error?: any }>
 
   /**
    * Optional react node to display in grid header

@@ -2,7 +2,7 @@ import { KeyboardEvent, memo } from 'react'
 import { Button, IconChevronDown, IconX, Input } from 'ui'
 
 import { DropdownControl } from 'components/grid/components/common'
-import { Filter, FilterOperator, SupaTable } from 'components/grid/types'
+import type { Filter, FilterOperator, SupaTable } from 'components/grid/types'
 import { FilterOperatorOptions } from './Filter.constants'
 
 export interface FilterRowProps {
@@ -43,7 +43,7 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: 
               <IconChevronDown strokeWidth={1.5} size={14} />
             </div>
           }
-          className="w-32"
+          className="w-32 justify-start"
         >
           <span>{column?.name ?? ''}</span>
         </Button>

@@ -1,0 +1,66 @@
+---
+id: 'auth-vonage'
+title: 'Phone Auth with Vonage'
+description: 'How to set up and use Mobile OTP with Vonage and Supabase.'
+---
+
+<Admonition type="tip">
+
+Authenticating users via SMS can become expensive. Adjust your project's rate limits and [configure CAPTCHA](/docs/guides/auth/auth-captcha) to control the bill. Read more about this in the [Production Checklist](/docs/guides/platform/going-into-prod).
+
+</Admonition>
+
+## Prerequisites
+
+You'll need:
+
+- A Vonage account (sign up here: https://dashboard.nexmo.com/sign-up)
+- A Supabase project (create one here: https://supabase.com/dashboard)
+- A mobile phone capable of receiving SMS
+
+## Set up Vonage as an SMS provider
+
+### Getting your Vonage credentials
+
+Start by logging into your Vonage Dashboard at https://dashboard.nexmo.com/
+
+You will see you API Key and API Secret here, which is actually all you need to get started.
+
+In most countries, a phone number is actually optional and you can also use any Alphanumeric Sender ID of up to 11 characters length (8 for India) as a Sender ID (from). This means you do not need a number to test with in most cases.
+
+To find out more about supported countries for Alphanumeric Sender ID, check this overview: https://help.nexmo.com/hc/en-us/articles/115011781468-SMS-Features-Overview-Outbound-only-
+
+Hint: Some countries might need a Sender ID Registration to allow sending with an Alphanumeric Sender ID. You can find this information in the help article as well. If Alpha Sender IDs are not supported, you will need to buy a phone number.
+
+### Getting a phone number (optional)
+
+If you want a phone number to send SMS from, you can buy one from the Vonage Dashboard under Numbers > Buy Numbers (https://dashboard.nexmo.com/buy-numbers).
+
+Select the country you want a number for. You will need a mobile phone number with SMS or SMS+Voice capability. After you have bought the number, you will be able to send SMS from it.
+
+### Configure Supabase
+
+Now go to the [Auth > Providers](https://supabase.com/dashboard/project/_/auth/providers) page in the Supabase dashboard and select "Phone" from the Auth Providers list.
+
+You should see an option to enable the Phone provider.
+
+Toggle it on, and copy the API key, API secret and phone number values over from the Vonage dashboard. Click save.
+
+Now the backend should be setup, we can proceed to add our client-side code!
+
+#### SMS custom template
+
+The SMS message sent to a phone containing an OTP code can be customized. This is useful if you need to mention a brand name or display a website address.
+
+Go to [Auth > Templates](https://supabase.com/dashboard/project/_/auth/templates) page in the Supabase dashboard.
+
+Use the variable `.Code` in the template to display the code.
+
+## Next steps
+
+To implement Phone Login, see the docs on [using Phone Login](/docs/guides/auth/phone-login#using-phone-login).
+
+## Resources
+
+- [Vonage Signup](https://dashboard.nexmo.com/sign-up)
+- [Supabase Dashboard](https://supabase.com/dashboard)

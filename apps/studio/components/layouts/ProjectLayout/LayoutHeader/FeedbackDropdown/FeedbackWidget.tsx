@@ -3,6 +3,7 @@ import { toPng } from 'html-to-image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 import {
   Button,
   DropdownMenu,
@@ -17,7 +18,6 @@ import {
 } from 'ui'
 
 import { useSendFeedbackMutation } from 'data/feedback/feedback-send'
-import { useStore } from 'hooks'
 import { timeout } from 'lib/helpers'
 import { convertB64toBlob, uploadAttachment } from './FeedbackDropdown.utils'
 
@@ -38,8 +38,6 @@ const FeedbackWidget = ({
 }: FeedbackWidgetProps) => {
   const router = useRouter()
   const { ref, slug } = useParams()
-
-  const { ui } = useStore()
   const inputRef = useRef<any>(null)
   const uploadButtonRef = useRef()
 
@@ -69,14 +67,7 @@ const FeedbackWidget = ({
     await timeout(100)
     toPng(document.body, { filter })
       .then((dataUrl: any) => setScreenshot(dataUrl))
-      .catch((error: any) => {
-        ui.setNotification({
-          error,
-          category: 'error',
-          message: 'Failed to capture screenshot',
-          duration: 4000,
-        })
-      })
+      .catch((error: any) => toast.error('Failed to capture screenshot'))
       .finally(() => {
         setIsSavingScreenshot(false)
       })
@@ -96,11 +87,7 @@ const FeedbackWidget = ({
 
   const sendFeedback = async () => {
     if (feedback.length === 0 && screenshot !== undefined) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'Please include a message in your feedback.',
-        duration: 4000,
-      })
+      return toast.error('Please include a message in your feedback.')
     } else if (feedback.length > 0) {
       setSending(true)
 
@@ -118,11 +105,9 @@ const FeedbackWidget = ({
           pathname: router.asPath,
         })
         setFeedback('')
-        ui.setNotification({
-          category: 'success',
-          message:
-            'Feedback sent. Thank you!\n\nPlease be aware that we do not provide responses to feedback. If you require assistance or a reply, consider submitting a support ticket.',
-        })
+        toast.success(
+          'Feedback sent. Thank you!\n\nPlease be aware that we do not provide responses to feedback. If you require assistance or a reply, consider submitting a support ticket.'
+        )
       } finally {
         setSending(false)
       }

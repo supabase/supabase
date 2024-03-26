@@ -1,7 +1,7 @@
 import Migrations from 'components/interfaces/Database/Migrations/Migrations'
 import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const MigrationsPage: NextPageWithLayout = () => {
   return (

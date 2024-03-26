@@ -92,7 +92,9 @@ const FunctionList = ({
               <p title={x.name}>{x.name}</p>
             </Table.td>
             <Table.td className="hidden md:table-cell md:overflow-auto">
-              <p title={x.argument_types}>{x.argument_types || '-'}</p>
+              <p title={x.argument_types} className="truncate">
+                {x.argument_types || '-'}
+              </p>
             </Table.td>
             <Table.td className="hidden lg:table-cell">
               <p title={x.return_type}>{x.return_type}</p>

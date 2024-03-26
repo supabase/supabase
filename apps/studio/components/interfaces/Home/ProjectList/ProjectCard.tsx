@@ -1,9 +1,9 @@
 import { GitBranch, Github } from 'lucide-react'
 
 import CardButton from 'components/ui/CardButton'
-import { IntegrationProjectConnection } from 'data/integrations/integrations.types'
-import { ProjectInfo } from 'data/projects/projects-query'
-import { ResourceWarning } from 'data/usage/resource-warnings-query'
+import type { IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import type { ProjectInfo } from 'data/projects/projects-query'
+import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { BASE_PATH } from 'lib/constants'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
@@ -26,7 +26,7 @@ const ProjectCard = ({
   const { name, ref: projectRef } = project
   const desc = `${project.cloud_provider} | ${project.region}`
 
-  const isBranchingEnabled = project.preview_branch_refs.length > 0
+  const isBranchingEnabled = project.preview_branch_refs?.length > 0
   const isGithubIntegrated = githubIntegration !== undefined
   const isVercelIntegrated = vercelIntegration !== undefined
   const githubRepository = githubIntegration?.metadata.name ?? undefined

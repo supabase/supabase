@@ -1,5 +1,5 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { ResponseError } from '~/types/fetch'
+import type { ResponseError } from '~/types/fetch'
 import { get } from './fetchWrappers'
 
 const projectKeys = {

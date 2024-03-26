@@ -9,5 +9,12 @@
     return <IconBase icon={Rewind} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { rewind } from 'lucide-react'
+  */
   export default IconRewind
   

@@ -8,7 +8,7 @@ import CommandRender from 'components/interfaces/Functions/CommandRender'
 import { useAccessTokensQuery } from 'data/access-tokens/access-tokens-query'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
-import { Commands } from './Functions.types'
+import type { Commands } from './Functions.types'
 
 interface TerminalInstructionsProps {
   closable?: boolean

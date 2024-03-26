@@ -1,0 +1,128 @@
+---
+id: 'auth-github'
+title: 'Login with GitHub'
+description: 'Add GitHub OAuth to your Supabase project'
+---
+
+To enable GitHub Auth for your project, you need to set up a GitHub OAuth application and add the application credentials to your Supabase Dashboard.
+
+## Overview
+
+Setting up GitHub logins for your application consists of 3 parts:
+
+- Create and configure a GitHub OAuth App on [GitHub](https://github.com)
+- Add your GitHub OAuth keys to your [Supabase Project](https://supabase.com/dashboard)
+- Add the login code to your [Supabase JS Client App](https://github.com/supabase/supabase-js)
+
+## Access your GitHub account
+
+- Go to [github.com](https://github.com).
+- Click on `Sign In` at the top right to log in.
+
+![GitHub Developer Portal.](/docs/img/guides/auth-github/github-portal.png)
+
+## Create a GitHub OAuth app
+
+Go to the [GitHub Developer Settings](https://github.com/settings/developers) page:
+
+- Click on your profile photo at the top right
+- Click Settings near the bottom of the menu
+- In the left sidebar, click `Developer settings` (near the bottom)
+- In the left sidebar, click `OAuth Apps`
+
+## Find your callback URL
+
+<SocialProviderSetup provider="GitHub" />
+
+## Register a new OAuth application on GitHub
+
+- Navigate to `Settings`/`Developer settings`/`OAuth Apps`
+- Click `Register a new application`. If you've created an app before, click `New OAuth App` here.
+- In `Application name`, type the name of your app.
+- In `Homepage URL`, type the full URL to your app's website.
+- In `Authorization callback URL`, type the callback URL of your app.
+- Enter the URL in the `Valid OAuth Redirect URIs` box.
+- Click `Save Changes` at the bottom right.
+- Click `Register Application`.
+
+Copy your new OAuth credentials
+
+- Copy and save your `Client ID`.
+- Click `Generate a new client secret`.
+- Copy and save your `Client secret`.
+
+## Enter your GitHub credentials into your Supabase project
+
+<SocialProviderSettingsSupabase provider="GitHub" />
+
+## Add login code to your client app
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+When your user signs in, call [signInWithOAuth()](/docs/reference/javascript/auth-signinwithoauth) with `github` as the `provider`:
+
+```js
+async function signInWithGithub() {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: 'github',
+  })
+}
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs in, call [signInWith(Provider)](/docs/reference/kotlin/auth-signinwithoauth) with `Github` as the `Provider`:
+
+```kotlin
+suspend fun signInWithGithub() {
+	supabase.auth.signInWith(Github)
+}
+```
+
+</TabPanel>
+</Tabs>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+When your user signs out, call [signOut()](/docs/reference/javascript/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```js
+async function signOut() {
+  const { error } = await supabase.auth.signOut()
+}
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
+
+```kotlin
+suspend fun signOut() {
+	supabase.auth.signOut()
+}
+```
+
+</TabPanel>
+</Tabs>
+
+## Resources
+
+- [Supabase Account - Free Plan OK](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [GitHub Developer Settings](https://github.com/settings/developers)

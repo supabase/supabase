@@ -25,29 +25,23 @@ jobs:
     # Uses larger hosted runner as it significantly decreases build times
     runs-on: [larger-runner-4cpu]
 
-    strategy:
-      matrix:
-        node-version: [18.x]
-        cmd:
-          - npm run test:studio
-
     steps:
       - uses: actions/checkout@v4
         with:
           sparse-checkout: |
             apps/studio
             packages
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version-file: '.nvmrc'
           cache: 'npm'
       - name: Install deps
         run: npm ci
         working-directory: ./
-      - name: Run ${{ matrix.cmd }}
+      - name: Run Tests
         env:
           # Default is 2 GB, increase to have less frequent OOM errors
           NODE_OPTIONS: '--max_old_space_size=3072'
-        run: ${{ matrix.cmd }}
+        run: npm run test:studio
         working-directory: ./

@@ -60,23 +60,23 @@ export const RESOURCE_WARNING_MESSAGES = {
     bannerContent: {
       warning: {
         title:
-          'Your project is about to exhaust its disk space budget, and may become unresponsive once fully exhausted',
+          'Your project is about to exhaust its available disk space, and may become unresponsive once fully exhausted',
         description:
           'You can opt to increase your disk size up to 200GB on the database settings page.',
       },
       critical: {
-        title: 'Your project has exhausted its disk space budget, and may become unresponsive',
+        title: 'Your project has exhausted its available disk space, and may become unresponsive',
         description:
           'You can opt to increase your disk size up to 200GB on the database settings page.',
       },
     },
     cardContent: {
       warning: {
-        title: 'Project is exhausting disk space budget',
+        title: 'Project is exhausting its available disk space',
         description: 'It may become unresponsive if fully exhausted',
       },
       critical: {
-        title: 'Project has exhausted disk space budget',
+        title: 'Project has exhausted its available disk space',
         description: 'It may become unresponsive',
       },
     },

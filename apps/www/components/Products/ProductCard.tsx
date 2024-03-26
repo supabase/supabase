@@ -2,6 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import Panel from '~/components/Panel'
 import { cn } from 'ui'
+import { detectBrowser, isBrowser } from 'common'
 
 const ProductCard = ({
   className,
@@ -19,7 +20,7 @@ const ProductCard = ({
   highlights?: string | React.ReactNode
   url: string
   icon?: string
-  image: any
+  image?: any
   className?: string
   onClick?: any
   alignLeft?: boolean
@@ -33,7 +34,7 @@ const ProductCard = ({
     onClick={onClick}
   >
     <Panel
-      hasShimmer
+      hasShimmer={isBrowser && detectBrowser() !== 'Safari'}
       hasActiveOnHover
       hasMotion={title.includes('Edge Functions')}
       outerClassName="relative w-full h-full shadow-lg"
@@ -74,7 +75,7 @@ const ProductCard = ({
           {highlights && <span className="hidden lg:block">{highlights}</span>}
         </div>
       </div>
-      {image}
+      {image && image}
     </Panel>
   </Link>
 )

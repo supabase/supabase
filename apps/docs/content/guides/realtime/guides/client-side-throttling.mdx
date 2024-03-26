@@ -1,0 +1,87 @@
+---
+id: 'realtime'
+title: 'Throttling messages'
+description: 'Use client-side throttling to manage message frequency.'
+subtitle: 'Use client-side throttling to manage message frequency.'
+---
+
+The Supabase clients include functionality for throttling messages.
+
+## Managing client-side throttling
+
+You can customize the client-side throttling when creating the client:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const SUPABASE_URL = 'https://<project>.supabase.co'
+const SUPABASE_ANON_KEY = '<your-anon-key>'
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  realtime: {
+    params: {
+      eventsPerSecond: 2,
+    },
+  },
+})
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+void main() async {
+  Supabase.initialize(
+    url: 'https://<project>.supabase.co',
+    anonKey: '<your-anon-key>',
+    realtimeClientOptions: const RealtimeClientOptions(
+      eventsPerSecond: 2,
+    ),
+  );
+  runApp(const MyApp());
+}
+
+final supabase = Supabase.instance.client;
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val supabase = createSupabaseClient(
+    "https://<project>.supabase.co",
+    "<your-anon-key>"
+) {
+    install(Realtime) {
+        eventsPerSecond = 2
+    }
+}
+```
+
+</TabPanel>
+</Tabs>
+
+## Default client throttling
+
+By default the Supabase clients throttles messages to 10 messages per-second (1 message every 100 milliseconds). This is a soft-limit provided as a safe-guard when you're getting started. You'll rarely need to send more messages than this.
+
+Each client has their own throttling behavior. If you instantiate two clients, by default you would send 20 messages per-second to your project.
+
+## Project quotas
+
+Each Broadcast and Presence message counts towards your [Project Quotas](/docs/guides/realtime/quotas).
+
+It's common to unintentionally flood the Realtime service with messages. For example, tracking mouse movements without throttling would send hundreds of events per second. It's rare that you need so many messages. Updating a mouse movement even a few times per second is usually enough for the human eye.
+
+The throttling parameter protects against these unintended floods.

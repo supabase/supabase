@@ -19,8 +19,7 @@ export function UserDropdown() {
 }
 
 async function Dropdowns() {
-  const cookieStore = cookies()
-  const supabase = createClient(cookieStore)
+  const supabase = createClient()
 
   const {
     data: { user },

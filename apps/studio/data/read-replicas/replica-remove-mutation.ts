@@ -2,13 +2,14 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { replicaKeys } from './keys'
-import { Database } from './replicas-query'
+import type { Database } from './replicas-query'
 
 export type ReadReplicaRemoveVariables = {
   projectRef: string
   identifier: string
+  skipInvalidateOnSuccess?: boolean
 }
 
 export async function removeReadReplica({ projectRef, identifier }: ReadReplicaRemoveVariables) {
@@ -20,7 +21,6 @@ export async function removeReadReplica({ projectRef, identifier }: ReadReplicaR
       database_identifier: identifier,
     },
   })
-
   if (error) throw error
   return data
 }
@@ -40,16 +40,19 @@ export const useReadReplicaRemoveMutation = ({
     (vars) => removeReadReplica(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef, identifier } = variables
+        const { projectRef, identifier, skipInvalidateOnSuccess } = variables
 
-        // [Joshen] Just FYI, will remove this once API changes to remove the need for optimistic rendering
-        queryClient.setQueriesData<any>(replicaKeys.list(projectRef), (old: any) => {
-          return old.filter((db: Database) => db.identifier !== identifier)
-        })
+        if (skipInvalidateOnSuccess === false) {
+          // [Joshen] Just FYI, will remove this once API changes to remove the need for optimistic rendering
+          queryClient.setQueriesData<any>(replicaKeys.list(projectRef), (old: any) => {
+            return old.filter((db: Database) => db.identifier !== identifier)
+          })
 
-        setTimeout(async () => {
-          await queryClient.invalidateQueries(replicaKeys.list(projectRef))
-        }, 5000)
+          setTimeout(async () => {
+            await queryClient.invalidateQueries(replicaKeys.list(projectRef))
+            await queryClient.invalidateQueries(replicaKeys.loadBalancers(projectRef))
+          }, 5000)
+        }
 
         await onSuccess?.(data, variables, context)
       },

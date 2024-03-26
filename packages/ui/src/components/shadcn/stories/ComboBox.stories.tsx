@@ -1,39 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Meta } from '@storybook/react'
-import { Button } from '@ui/components/shadcn/ui/button'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from '@ui/components/shadcn/ui/command'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
-} from '@ui/components/shadcn/ui/dropdown-menu'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@ui/components/shadcn/ui/form'
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
-import { toast } from '@ui/components/shadcn/ui/use-toast'
-import { cn } from '@ui/lib/utils'
 import {
   ArrowUpCircle,
   Calendar,
@@ -52,6 +18,40 @@ import {
 import React from 'react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { cn } from '../../../lib/utils/cn'
+import { Button } from '../ui/button'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '../ui/command'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu'
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '../ui/form'
+import { Popover, PopoverContent, PopoverTrigger } from '../ui/popover'
+import { toast } from '../ui/use-toast'
 
 const meta: Meta<typeof DropdownMenu> = {
   /* 👇 The title prop is optional.

@@ -1,5 +1,5 @@
 import { Meta } from '@storybook/react'
-import { Skeleton } from '@ui/components/shadcn/ui/skeleton'
+import { Skeleton } from '../ui/skeleton'
 
 const meta: Meta = {
   title: 'shadcn/Skeleton',

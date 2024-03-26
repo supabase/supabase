@@ -9,7 +9,7 @@ import {
   IconKey,
 } from 'ui'
 
-import { showApiKey } from 'components/interfaces/Docs/Docs.types'
+import type { showApiKey } from 'components/interfaces/Docs/Docs.types'
 
 const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 

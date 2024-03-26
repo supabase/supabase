@@ -1,12 +1,12 @@
 import { Meta } from '@storybook/react'
-import { Button } from '@ui/components/shadcn/ui/button'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@ui/components/shadcn/ui/collapsible'
 import { ChevronsUpDown } from 'lucide-react'
 import * as React from 'react'
+import { Button } from '../ui/button'
+import {
+    Collapsible,
+    CollapsibleContent,
+    CollapsibleTrigger,
+} from '../ui/collapsible'
 
 const meta: Meta = {
   title: 'shadcn/Collapsible',

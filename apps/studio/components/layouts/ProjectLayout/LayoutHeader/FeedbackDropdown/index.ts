@@ -1,3 +1,1 @@
-import FeedbackDropdown from './FeedbackDropdown'
-
-export default FeedbackDropdown
+export { default as FeedbackDropdown } from './FeedbackDropdown'

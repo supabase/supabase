@@ -1,15 +1,14 @@
 import React, { useEffect } from 'react'
-import { FormLayout } from '../../lib/Layout/FormLayout'
-import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
+
 // import { IconChevronDown } from '../Icon/icons/IconChevronDown'
 // import { IconChevronUp } from '../Icon/icons/IconChevronUp'
+import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
+import InputErrorIcon from '../../lib/Layout/InputErrorIcon'
 import InputIconContainer from '../../lib/Layout/InputIconContainer'
-
-import { useFormContext } from '../Form/FormContext'
 import styleHandler from '../../lib/theme/styleHandler'
+import { useFormContext } from '../Form/FormContext'
 
-export interface Props
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
+export interface Props extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   defaultValue?: string | number
   descriptionText?: string | React.ReactNode
   error?: string
@@ -46,14 +45,8 @@ function InputNumber({
 }: Props) {
   const __styles = styleHandler('inputNumber')
 
-  const {
-    formContextOnChange,
-    values,
-    errors,
-    handleBlur,
-    touched,
-    fieldLevelValidation,
-  } = useFormContext()
+  const { formContextOnChange, values, errors, handleBlur, touched, fieldLevelValidation } =
+    useFormContext()
 
   if (values && !value) value = values[id || name]
 
@@ -153,6 +146,7 @@ function InputNumber({
       >
         <div className={__styles.container}>
           <input
+            data-size={size}
             id={id}
             name={name}
             onChange={onInputChange}
@@ -179,7 +173,7 @@ function InputNumber({
               }}
             />
           </div> */}
-          {icon && <InputIconContainer icon={icon} />}
+          {icon && <InputIconContainer size={size} icon={icon} />}
           {error || actions ? (
             <div className={__styles.actions_container}>
               {error && <InputErrorIcon size={size} />}

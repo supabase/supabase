@@ -9,5 +9,12 @@
     return <IconBase icon={Filter} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { filter } from 'lucide-react'
+  */
   export default IconFilter
   

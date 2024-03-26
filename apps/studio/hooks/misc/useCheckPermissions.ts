@@ -4,7 +4,7 @@ import jsonLogic from 'json-logic-js'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { IS_PLATFORM } from 'lib/constants'
-import { Permission } from 'types'
+import type { Permission } from 'types'
 import { useSelectedOrganization } from './useSelectedOrganization'
 
 const toRegexpString = (actionOrResource: string) =>

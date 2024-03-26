@@ -1,5 +1,5 @@
 import { IS_PLATFORM } from 'lib/constants'
-import { OrgSubscription, ProjectSelectedAddon } from 'data/subscriptions/types'
+import type { OrgSubscription, ProjectSelectedAddon } from 'data/subscriptions/types'
 
 export const getAddons = (selectedAddons: ProjectSelectedAddon[]) => {
   const computeInstance = selectedAddons.find((addon) => addon.type === 'compute_instance')
@@ -10,11 +10,10 @@ export const getAddons = (selectedAddons: ProjectSelectedAddon[]) => {
   return { computeInstance, pitr, customDomain, ipv4 }
 }
 
-export const subscriptionHasHipaaAddon = (subscription: OrgSubscription | undefined): boolean => {
+export const subscriptionHasHipaaAddon = (subscription?: OrgSubscription): boolean => {
   if (!IS_PLATFORM) return false
 
-  return (
-    subscription !== undefined &&
-    subscription.addons.some((addon) => addon.supabase_prod_id === 'addon_security_hipaa')
+  return (subscription?.addons ?? []).some(
+    (addon) => addon.supabase_prod_id === 'addon_security_hipaa'
   )
 }

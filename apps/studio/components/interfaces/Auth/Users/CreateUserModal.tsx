@@ -1,11 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
+import toast from 'react-hot-toast'
 import { Button, Checkbox, Form, IconLock, IconMail, Input, Loading, Modal } from 'ui'
 
 import { useUserCreateMutation } from 'data/auth/user-create-mutation'
 import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 
 export type CreateUserModalProps = {
   visible: boolean
@@ -13,7 +13,6 @@ export type CreateUserModalProps = {
 }
 
 const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
 
   const { data, isLoading, isSuccess } = useProjectApiQuery({ projectRef }, { enabled: visible })
@@ -41,22 +40,15 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
 
   const { mutate: createUser, isLoading: isCreatingUser } = useUserCreateMutation({
     async onSuccess(res) {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully created user: ${res.email}`,
-      })
+      toast.success(`Successfully created user: ${res.email}`)
       setVisible(false)
     },
   })
 
   const onCreateUser = async (values: any) => {
     if (!isSuccess) {
-      return ui.setNotification({
-        category: 'error',
-        message: `Failed to create user: Error loading project config`,
-      })
+      return toast.error(`Failed to create user: Error loading project config`)
     }
-
     const { protocol, endpoint, serviceApiKey } = data.autoApiService
     createUser({ projectRef, endpoint, protocol, serviceApiKey, user: values })
   }
@@ -137,4 +129,4 @@ const CreateUserModal = ({ visible, setVisible }: CreateUserModalProps) => {
   )
 }
 
-export default observer(CreateUserModal)
+export default CreateUserModal

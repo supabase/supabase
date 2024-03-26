@@ -24,7 +24,7 @@ import {
 
 import { useParams } from 'common/hooks'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
-import Loading from 'components/ui/Loading'
+import { Loading } from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
 import { METRICS, METRIC_CATEGORIES, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
@@ -33,6 +33,7 @@ import { useProfile } from 'lib/profile'
 import { useProjectContentStore } from 'stores/projectContentStore'
 import GridResize from './GridResize'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
+import { useContentQuery } from 'data/content/content-query'
 
 const DEFAULT_CHART_COLUMN_COUNT = 12
 const DEFAULT_CHART_ROW_COUNT = 4
@@ -45,6 +46,10 @@ const Reports = () => {
     'project_auth:all',
     'project_storage:all',
   ])
+
+  const reportQuery = useContentQuery(ref)
+  const currentReport =
+    reportQuery.data && reportQuery.data?.content.find((report) => report.id === id)
 
   const [report, setReport] = useState<any>()
 
@@ -188,7 +193,7 @@ const Reports = () => {
   /*
    * handleChartSelection()
    *
-   * Handler for the chart behaviour
+   * Handler for the chart behavior
    */
   function handleChartSelection({ metric, value }: any) {
     if (value) {
@@ -314,9 +319,11 @@ const Reports = () => {
   }
 
   return (
-    <div className="mx-6 flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
-      <h1 className="text-xl text-foreground">Reports</h1>
-
+    <div className="flex flex-col space-y-4" style={{ maxHeight: '100%' }}>
+      <div className="space-y-0.5">
+        <h1 className="text-xl text-foreground">{currentReport?.name || 'Reports'}</h1>
+        <p className="text-foreground-light">{currentReport?.description}</p>
+      </div>
       <div className="mb-4 flex items-center justify-between space-x-3">
         <div className="flex items-center space-x-3">
           <DateRangePicker
@@ -344,7 +351,7 @@ const Reports = () => {
         <div className="flex items-center space-x-2">
           {hasEdits && (
             <div className="hidden xl:inline-block">
-              <Badge color="green">There are unsaved changes</Badge>
+              <Badge variant="brand">There are unsaved changes</Badge>
             </div>
           )}
           {hasEdits && (
@@ -419,7 +426,6 @@ const Reports = () => {
       ) : (
         <div className="relative mb-16 max-w-7xl flex-grow">
           {config && startDate && endDate && (
-            // @ts-ignore
             <GridResize
               startDate={startDate}
               endDate={endDate}

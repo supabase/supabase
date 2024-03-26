@@ -1,8 +1,8 @@
 import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { components } from 'data/api'
+import type { components } from 'data/api'
 import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { databaseKeys } from './keys'
 
 export type SchemasVariables = {
@@ -53,7 +53,7 @@ export const useSchemasQuery = <TData = SchemasData>(
   useQuery<SchemasData, SchemasError, TData>(
     databaseKeys.schemaList(projectRef),
     ({ signal }) => getSchemas({ projectRef, connectionString }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
+    { enabled: enabled && typeof projectRef !== 'undefined', staleTime: 0, ...options }
   )
 
 export function invalidateSchemasQuery(client: QueryClient, projectRef: string | undefined) {

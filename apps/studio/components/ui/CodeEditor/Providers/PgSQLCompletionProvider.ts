@@ -1,8 +1,8 @@
-import { RefObject } from 'react'
+import type { RefObject } from 'react'
 import BackwardIterator from './BackwardIterator'
-import { Schema } from 'data/database/schemas-query'
-import { TableColumn } from 'data/database/table-columns-query'
-import { DatabaseFunction } from 'data/database/functions-query'
+import type { Schema } from 'data/database/schemas-query'
+import type { TableColumn } from 'data/database/table-columns-query'
+import type { DatabaseFunction } from 'data/database/functions-query'
 
 // [Joshen] Needs to be fixed
 

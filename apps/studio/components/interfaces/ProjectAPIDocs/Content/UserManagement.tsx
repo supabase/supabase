@@ -1,6 +1,6 @@
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
-import { ContentProps } from './Content.types'
+import type { ContentProps } from './Content.types'
 
 const UserManagement = ({ language, apikey, endpoint }: ContentProps) => {
   return (

@@ -1,8 +1,7 @@
 import { PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, Modal } from 'ui'
-
-import { useStore } from 'hooks'
 
 interface AddPaymentMethodFormProps {
   returnUrl: string
@@ -15,7 +14,6 @@ interface AddPaymentMethodFormProps {
 // Small UX annoyance here, that the page will be refreshed
 
 const AddPaymentMethodForm = ({ returnUrl, onCancel, onConfirm }: AddPaymentMethodFormProps) => {
-  const { ui } = useStore()
   const stripe = useStripe()
   const elements = useElements()
 
@@ -44,10 +42,7 @@ const AddPaymentMethodForm = ({ returnUrl, onCancel, onConfirm }: AddPaymentMeth
 
     if (error) {
       setIsSaving(false)
-      ui.setNotification({
-        category: 'error',
-        message: error?.message ?? ' Failed to save card details',
-      })
+      toast.error(error?.message ?? ' Failed to save card details')
     } else {
       setIsSaving(false)
       onConfirm()

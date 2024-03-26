@@ -1,7 +1,9 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useEffect } from 'react'
-
 import { useParams } from 'common'
+import { useEffect } from 'react'
+import toast from 'react-hot-toast'
+import { Form, Input, Listbox } from 'ui'
+
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -13,12 +15,10 @@ import NoPermission from 'components/ui/NoPermission'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useOrganizationCustomerProfileQuery } from 'data/organizations/organization-customer-profile-query'
 import { useOrganizationCustomerProfileUpdateMutation } from 'data/organizations/organization-customer-profile-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
-import { Form, Input, Listbox } from 'ui'
+import { useCheckPermissions } from 'hooks'
 import { COUNTRIES } from './BillingAddress.constants'
 
 const BillingAddress = () => {
-  const { ui } = useStore()
   const { slug } = useParams()
   const { data, error, isLoading, isSuccess, isError } = useOrganizationCustomerProfileQuery({
     slug,
@@ -56,10 +56,7 @@ const BillingAddress = () => {
 
     try {
       await updateCustomerProfile({ slug, address: values })
-      ui.setNotification({
-        category: 'success',
-        message: 'Successfully updated billing address',
-      })
+      toast.success('Successfully updated billing address')
       resetForm({ values, initialValues: values })
     } catch (error) {}
   }

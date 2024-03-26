@@ -1,5 +1,5 @@
 import SVG from 'react-inlinesvg'
-import { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
+import type { ProductMenuGroup } from 'components/ui/ProductMenu/ProductMenu.types'
 import { IconBook, IconBookOpen } from 'ui'
 import { BASE_PATH } from 'lib/constants'
 

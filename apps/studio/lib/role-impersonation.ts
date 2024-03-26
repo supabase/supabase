@@ -1,6 +1,4 @@
-import jwt from 'jwt-simple'
-
-import { User } from 'data/auth/users-query'
+import type { User } from 'data/auth/users-query'
 import { uuidv4 } from './helpers'
 
 type PostgrestImpersonationRole =
@@ -114,12 +112,53 @@ export function wrapWithRoleImpersonation(
   `
 }
 
+function encodeText(data: string) {
+  return new TextEncoder().encode(data)
+}
+
+function encodeBase64Url(data: ArrayBuffer | Uint8Array | string): string {
+  return btoa(
+    String.fromCharCode(...new Uint8Array(typeof data === 'string' ? encodeText(data) : data))
+  )
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '')
+}
+
+function genKey(rawKey: string) {
+  return window.crypto.subtle.importKey(
+    'raw',
+    encodeText(rawKey),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign', 'verify']
+  )
+}
+
+async function createToken(jwtPayload: object, key: string) {
+  const headerAndPayload =
+    encodeBase64Url(encodeText(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))) +
+    '.' +
+    encodeBase64Url(encodeText(JSON.stringify(jwtPayload)))
+
+  const signature = encodeBase64Url(
+    new Uint8Array(
+      await window.crypto.subtle.sign(
+        { name: 'HMAC' },
+        await genKey(key),
+        encodeText(headerAndPayload)
+      )
+    )
+  )
+
+  return `${headerAndPayload}.${signature}`
+}
+
 export function getRoleImpersonationJWT(
   projectRef: string,
   jwtSecret: string,
   role: PostgrestImpersonationRole
-) {
+): Promise<string> {
   const claims = getPostgrestClaims(projectRef, role)
-
-  return jwt.encode(claims, jwtSecret, 'HS256')
+  return createToken(claims, jwtSecret)
 }

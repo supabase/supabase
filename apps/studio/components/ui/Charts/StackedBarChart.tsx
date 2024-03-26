@@ -10,7 +10,7 @@ import {
   genStackColorScales,
   ValidStackColor,
 } from './Charts.constants'
-import { CommonChartProps } from './Charts.types'
+import type { CommonChartProps } from './Charts.types'
 import {
   numberFormatter,
   precisionFormatter,

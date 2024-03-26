@@ -70,7 +70,7 @@ They shouldn't include:
 
 ## Repo organization
 
-Most docs pages are contained in the `apps/docs/pages` directory. Some docs sections are federated from other repositories, for example [`pg_graphql`](https://github.com/supabase/pg_graphql/tree/master/docs). Reference docs are generated from spec files in the `spec` directory.
+Most docs pages are contained in the `apps/docs/content` directory. Some docs sections are federated from other repositories, for example [`pg_graphql`](https://github.com/supabase/pg_graphql/tree/master/docs). Reference docs are generated from spec files in the `spec` directory.
 
 You can usually identify a federated or reference doc because it uses a Next.js dynamic route (for example, `[[...slug]].tsx`). Look for the spec file import or the repo definition to find the content location.
 
@@ -98,43 +98,16 @@ The Supabase docs use [MDX](https://mdxjs.com/). Guides are written in unstructu
 
 Adding a new guide requires:
 
-- A layout
-- Metadata
-- A page export
+- YAML frontmatter
 - A navigation entry (in a separate file)
 
-```js
-// required import
-import Layout from '~/layouts/DefaultGuideLayout'
+Frontmatter looks like this. `title` is mandatory. There are also optional properties that you can use to control the page display, including `subtitle`, `tocVideo`, and `hideToc`.
 
-
-/*
- * required metadata fields
- * title: required - page title
- * description: required - page description
- *
- * optional metadata fields
- * id: optional - not currently being used 
- * subtitle: optional - displayed below the title
- * sidebar_label: optional - if you want the sidebar text to be different from the title
- * hide_table_of_contents: optional - hides the table of contents on the right side
- * tocVideo: optional - a YouTube slug, displays the video above the table of contents
- */
-export const meta = {
-  id: 'nextjs-server-components',
-  title: 'Supabase Auth with Next.js Server Components',
-  description:
-    'Authentication helpers for creating an authenticated Supabase client in Next.js 13 app directory Server Components.',
-  sidebar_label: 'Next.js Server Components',
-}
-
-// content
-You can use **Markdown syntax**.
-
-// required export
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page
+```yaml
+---
+title: How to connect to Supabase
+hideToc: true
+---
 ```
 
 The navigation is defined in [`NavigationMenu.constants.ts`](https://github.com/supabase/supabase/blob/master/apps/docs/components/Navigation/NavigationMenu/NavigationMenu.constants.ts).
@@ -305,13 +278,12 @@ The `queryGroup` param is optional. It lets you link directly to a tab by using 
 
 Include videos as TOC (Table of Contents) videos rather than putting them in the main text.
 
-You can define a TOC video in the page metadata:
+You can define a TOC video in the page frontmatter:
 
-```js
-export const meta = {
-  ...
-  tocVideo: 'rzglqRdZUQE',
-}
+```yaml
+---
+tocVideo: 'rzglqRdZUQE',
+---
 ```
 
 ## Styling, formatting, and grammar

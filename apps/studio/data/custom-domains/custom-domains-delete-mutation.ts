@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { del } from 'data/fetchers'
 import { toast } from 'react-hot-toast'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { customDomainKeys } from './keys'
 
 export type CustomDomainDeleteVariables = {

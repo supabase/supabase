@@ -7,7 +7,7 @@ import { SignInLayout } from 'components/layouts'
 import { IS_PLATFORM } from 'lib/constants'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const SignInPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -31,7 +31,7 @@ const SignInPage: NextPageWithLayout = () => {
             <div className="w-full border-t border-strong" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 text-sm bg-background text-foreground">or</span>
+            <span className="px-2 text-sm bg-studio text-foreground">or</span>
           </div>
         </div>
 

@@ -9,5 +9,12 @@
     return <IconBase icon={ToggleRight} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { toggleRight } from 'lucide-react'
+  */
   export default IconToggleRight
   

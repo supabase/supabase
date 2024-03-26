@@ -4,7 +4,7 @@ import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
 import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
-import { ContentProps } from './Content.types'
+import type { ContentProps } from './Content.types'
 
 const Bucket = ({ language, apikey = 'API_KEY', endpoint }: ContentProps) => {
   const { ref } = useParams()

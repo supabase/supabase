@@ -17,8 +17,8 @@ import {
   DropdownMenuShortcut,
   DropdownMenuTrigger,
   IconUser,
-  useCommandMenu,
 } from 'ui'
+import { useCommandMenu } from 'ui-patterns/Cmdk'
 
 const UserSettingsDropdown = () => {
   const signOut = useSignOut()

@@ -1,9 +1,9 @@
-import * as React from 'react'
+import type * as RadixPopoverTypes from '@radix-ui/react-popover'
 import * as RadixPopover from '@radix-ui/react-popover'
-import type * as RadixPopoverTypes from '@radix-ui/react-popover/'
+import * as React from 'react'
 
-import { IconX } from '../Icon/icons/IconX'
 import styleHandler from '../../lib/theme/styleHandler'
+import { IconX } from '../Icon/icons/IconX'
 
 interface RootProps {
   align?: RadixPopoverTypes.PopoverContentProps['align']

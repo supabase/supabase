@@ -1,5 +1,5 @@
 import Table from 'components/to-be-cleaned/Table'
-import { OAuthApp } from 'data/oauth/oauth-apps-query'
+import type { OAuthApp } from 'data/oauth/oauth-apps-query'
 import dayjs from 'dayjs'
 import { copyToClipboard } from 'lib/helpers'
 import { useState } from 'react'

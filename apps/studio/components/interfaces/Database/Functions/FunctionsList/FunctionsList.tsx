@@ -1,5 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { PostgresFunction } from '@supabase/postgres-meta'
+import type { PostgresFunction } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
 import { useState } from 'react'
@@ -145,7 +145,7 @@ const FunctionsList = ({
                 <Table.th key="return_type" className="hidden lg:table-cell">
                   Return type
                 </Table.th>
-                <Table.th key="return_type" className="hidden lg:table-cell w-[100px]">
+                <Table.th key="security" className="hidden lg:table-cell w-[100px]">
                   Security
                 </Table.th>
                 <Table.th key="buttons" className="w-1/6"></Table.th>

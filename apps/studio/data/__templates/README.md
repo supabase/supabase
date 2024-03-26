@@ -79,10 +79,10 @@ We should also aim to convert most of the `mutateAsync` to `mutate`, otherwise w
 ```jsx
 const { mutate: someAction } = useMutation({
   onSuccess: (res) => {
-    ui.setNotification({ category: 'success', message: 'Success' })
+    toast.success('Success')
   },
   onError: (error) => {
-    ui.setNotification({ category: 'error', message: `Failed: ${error.message}` })
+    toast.error(`Failed: ${error.message}`)
   },
 })
 

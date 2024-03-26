@@ -33,7 +33,7 @@ const FeaturesSection = ({ title, paragraph, cta, features }: Props) => {
             <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-[360px] tracking-[-1px]">
               {title}
             </h2>
-            <p className="text-muted mb-4">{paragraph}</p>
+            <p className="text-lighter mb-4">{paragraph}</p>
             {cta && (
               <Button asChild type="default" size="small" icon={<IconArrowUpRight />}>
                 <Link href={cta.link}>{cta.label ?? 'Explore documentation'}</Link>
@@ -94,7 +94,7 @@ const Feature = ({
       </div>
       <div className="text-sm lg:text-base">
         <h2 className="text-base">{feature.title}</h2>
-        <ReactMarkdown className="prose pt-1 text-sm text-foreground-muted">
+        <ReactMarkdown className="prose pt-1 text-sm text-foreground-lighter">
           {feature.text}
         </ReactMarkdown>
       </div>

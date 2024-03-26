@@ -1,3 +1,5 @@
+import 'swiper/swiper.min.css'
+
 import { NextSeo } from 'next-seo'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
@@ -6,8 +8,6 @@ import DefaultLayout from '~/components/Layouts/Default'
 import { useBreakpoint } from 'common'
 import { PRODUCT_SHORTNAMES } from '~/lib/constants'
 import vectorPageData from '~/data/products/vector/pageData'
-
-import 'swiper/swiper.min.css'
 
 const ProductHeaderCentered = dynamic(() => import('~/components/Sections/ProductHeaderCentered'))
 const HighlightCards = dynamic(() => import('~/components/Sections/HighlightCards'))

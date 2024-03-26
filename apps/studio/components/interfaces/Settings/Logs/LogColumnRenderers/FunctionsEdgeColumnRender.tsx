@@ -1,5 +1,5 @@
 import { Column } from 'react-data-grid'
-import { LogData } from '../Logs.types'
+import type { LogData } from '../Logs.types'
 import {
   ResponseCodeFormatter,
   RowLayout,

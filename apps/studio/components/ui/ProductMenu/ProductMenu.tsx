@@ -1,6 +1,6 @@
 import { Badge, Menu } from 'ui'
 
-import { ProductMenuGroup } from './ProductMenu.types'
+import type { ProductMenuGroup } from './ProductMenu.types'
 import ProductMenuItem from './ProductMenuItem'
 
 interface ProductMenuProps {
@@ -22,7 +22,7 @@ const ProductMenu = ({ page, menu }: ProductMenuProps) => {
                     group.title ? (
                       <div className="flex flex-col space-y-2">
                         <span>{group.title}</span>
-                        {group.isPreview && <Badge color="amber">Not production ready</Badge>}
+                        {group.isPreview && <Badge variant="warning">Not production ready</Badge>}
                       </div>
                     ) : null
                   }

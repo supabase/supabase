@@ -1,0 +1,9 @@
+extends: existence
+message: "Don't use '%s'. The sentence is more concise and/or the tone is more neutral without it."
+ignorecase: true
+level: error
+tokens:
+  - easily
+  - please
+  - simply
+  - that's it

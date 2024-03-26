@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 import Panel from 'components/ui/Panel'
 import { useSession } from 'lib/auth'
-import { Profile } from 'data/profile/types'
+import type { Profile } from 'data/profile/types'
 
 const AccountInformation = ({ profile }: { profile?: Profile }) => {
   const session = useSession()

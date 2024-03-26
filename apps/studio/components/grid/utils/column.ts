@@ -1,6 +1,6 @@
 import { CalculatedColumn } from 'react-data-grid'
 import { ADD_COLUMN_KEY, SELECT_COLUMN_KEY } from '../constants'
-import { SavedState } from '../types'
+import type { SavedState } from '../types'
 import { deepClone } from './common'
 
 export function cloneColumn(column: CalculatedColumn<any, any>) {

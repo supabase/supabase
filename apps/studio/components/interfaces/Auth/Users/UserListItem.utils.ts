@@ -1,4 +1,4 @@
-import { User } from 'data/auth/users-query'
+import type { User } from 'data/auth/users-query'
 
 export function getDisplayName(user: User, fallback = '-'): string {
   const {

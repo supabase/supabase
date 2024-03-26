@@ -8,11 +8,11 @@ export const meta = {
 
 <SectionContainer>
 
-# Service Level Agreement
+# Service Level Agreements
+
+## Enterprise Platform Uptime SLA
 
 The following Service Level Agreement, which is incorporated into and forms part of the Subscription Agreement between Supabase, Inc. ("Supabase") and Customer (the "Agreement"), will apply to the Services for Enterprise Customers specified in an Order Form during the applicable Subscription Term:
-
-## Platform
 
 ### 1. Uptime Commitment
 
@@ -44,15 +44,72 @@ All capitalized words used but not defined in this Service Level Agreement have 
 
 #### 4.2 Unscheduled Downtime
 
-"Unscheduled Downtime" means the time, in minutes, that the applicable Services are not generally accessible and available to Customer's Permitted Users, excluding inaccessibility or unavailability due to Customer's or Permitted Users' acts or omissions, force majeure events, scheduled maintenance disclosed with at least 24 hours' notice by email, hacking or virus attacks, or reasonable emergency maintenance.
+"Unscheduled Downtime" means the time, in minutes, that the applicable Services are not generally accessible and available to Customer's Permitted Users, excluding inaccessibility or unavailability due to Customer's or Permitted Users' acts or omissions, force majeure events, scheduled maintenance disclosed with at least 24 hours' notice by email, hacking or virus attacks, reasonable emergency maintenance or other product specific exclusions listed under SLA Exclusions.
 
 #### 4.3 Actual Availability
 
 "Actual Availability" means Scheduled Availability less Unscheduled Downtime.
 
+#### 4.4 Production
+
+"Production" is defined as a system serving live customer-facing or business systems with existing deployed and functional features.
+
+"Development", "Staging", "uat", "pre-production" or new feature implementation even if in a production environment, are not considered Production.
+
+### SLA Exclusions
+
+#### General Service Exclusions
+
+- (i) Caused by factors outside of our reasonable control, including but not limited to any force majeure event or Internet access, ISP provider issues, and/or related problems beyond the demarcation point of Supabase. For the avoidance of doubt, this list is not exhaustive, and we will endeavor to inform you if the issue is beyond a factor that we can reasonably control.
+- (ii) That result from any voluntary actions or inactions from you.
+- (iii) That result from instance class CPU and memory resource limitations.
+- (iv) That result from you not following the basic operational guidelines described in our [Docs](https://supabase.com/docs) (e.g., overloading a database instance to the point it is inoperable, creating an excessively large number of tables that significantly increase the recovery time, etc.).
+- (vi) That result in a long recovery time due to insufficient IO capacity for your database workload.
+- (vii) That result from your equipment, software, or other technology.
+- (viii) Arising from our suspension and termination of your right to use Supabase in accordance with our Terms.
+
+#### Database SLA Exclusions
+
+- (i) Unofficially supported Postgres extensions are excluded from our SLA.
+- (ii) Our SLA only applies to the 2 most recent major releases of Postgres that Supabase has officially supported. Older versions are excluded.
+
+#### Auth SLA Exclusions
+
+- (i) Inappropriately provisioned compute resources related to your project for the expected load on your database and Auth servers, especially in the case of verifying or storing password-based credentials in the sign-in, sign-up, password change, password reset, and other such flows and APIs.
+- (ii) Any accidental or intentional modifications, additions, or deletions of database objects (tables, views, triggers, roles, functions, indexes, constraints, permissions, grants, and similar) in the `auth` schema or foreign key relationships in any schema to non-primary key columns within the `auth` schema that may cause total or partial outage, including outages caused in the future but related to such modifications, additions, or deletions in the past when arising from schema migrations initiated by Supabase.
+- (iii) Total or partial outages caused by third-party services as configured by default or by choice, including and not limited to: OAuth, OpenID Connect, Security Assertion Markup Language servers and related APIs and protocols; Email (via SMTP or otherwise) and SMS sending servers and related APIs; CAPTCHA services and APIs; Password Strength Checking services such as HaveIBeenPwned.org; IP geo-location; and other such services.
+- (iv) Outages caused by overly permissive rate-limiting configurations.
+- (v) Outages caused by email sending issues when using the provisional (default) email sending configuration included with any Supabase project with the intention of getting started but not for production use.
+- (vi) Outages or issues caused by retracted versions of official Supabase libraries, frameworks, software packages (CLI, Docker image, executable, Infrastructure-as-Code plugins, etc.) or APIs, including urgent retractions due to identified security vulnerabilities.
+- (vii) Outages or issues caused by unofficial Supabase client libraries, frameworks, or API proxies, including security vulnerabilities, even when those libraries internally use official Supabase libraries.
+- (viii) Outages or issues that could have been resolved by upgrading to a higher minor or patch version of an official Supabase client library, framework, or software package (CLI, Docker image, executable, Infrastructure-as-Code plugin, etc.).
+
+#### Storage SLA Exclusions
+
+- (i) Inappropriately provisioned compute resources related to your project for the expected load on your database.
+- (ii) Low amounts of pgBouncer or Supervisor connection pool configuration, such as max_clients and pool_size, for high amounts of traffic.
+- (iii) Any accidental or intentional modifications, additions, or deletions of database objects (tables, views, triggers, roles, functions, indexes, constraints, permissions, grants, and similar) in the `storage` schema, or foreign key relationships in any schema to non-primary key columns within the `storage` schema, that may cause total or partial outage, including outages caused in the future but related to such modifications, additions, or deletions in the past when arising from schema migrations initiated by Supabase.
+- (iv) Outages or issues that could have been resolved by upgrading to a higher minor or patch version of an official Supabase client library, framework, or software package (CLI, Docker image, executable, Infrastructure-as-Code plugin, etc.).
+- (v) Outages caused by accidental deletions of objects or buckets via the Storage API by the user.
+
+#### Management API SLA Exclusions
+
+- (i) Until the management API reaches General Availability (GA), we cannot provide an uptime commitment.
+- (ii) Personal access tokens getting lost or leaked due to improper maintenance or improper use of confidential information.
+- (iii) Violation of Supabase fair-use policy.
+
+#### Realtime SLA Exclusions
+
+- (i) Inappropriately provisioned compute resources related to your project for the expected load on your database.
+- (ii) The Realtime service does not guarantee messaging deliverability. If you need at-least-once, exactly-once, or at-most-once guarantees, you will need to build this functionality on top of the realtime service.
+
+#### Edge Functions
+
+- (i) **Uptime Commitment Exclusion:** Until Edge Functions reach General Availability (GA), we cannot provide an uptime commitment. Customers acknowledge that the service may experience downtime, interruptions, or performance issues, and no specific availability percentage is promised at this time.
+
 ## Support
 
-Supabase Support Service Level Agreements.
+Supabase provides Support Service Level Agreements for our Team and Enterprise customers.
 
 ### 1. Urgent
 
@@ -85,65 +142,14 @@ An Information request about Supabase or feature request.
 
 ## Target response times
 
-| Severity Level | Standard                              | Priority                              | Priority Plus                          |
-| -------------- | ------------------------------------- | ------------------------------------- | -------------------------------------- |
-| 1. Urgent      | 1 hour<br />24/7 × 365                | 1 hour<br />24/7 × 365                | 1 hour<br />24/7 × 365                 |
-| 2. High        | 4 business hours<br />Monday - Friday | 2 business hours<br />Monday - Friday | 2 hours<br />24/7 × 365                |
-| 3. Normal      | 1 business day<br />Monday - Friday   | 1 business day<br />Monday - Friday   | 12 business hours<br />Monday - Friday |
-| 4. Low         | 2 business days<br />Monday - Friday  | 2 business days<br />Monday - Friday  | 1 business day<br />Monday - Friday    |
+| Severity Level | Team                                 | Enterprise Standard                   | Priority Plus            |
+| -------------- | ------------------------------------ | ------------------------------------- | ------------------------ |
+| 1. Urgent      | 24 hours<br />24/7 × 365             | 1 hour<br />24/7 × 365                | 1 hour<br />24/7 × 365   |
+| 2. High        | 1 business day<br />Monday - Friday  | 2 business hours<br />Monday - Friday | 2 hours<br />24/7 × 365  |
+| 3. Normal      | 1 business day<br />Monday - Friday  | 1 business day<br />Monday - Friday   | 12 hours<br />24/7 x 365 |
+| 4. Low         | 2 business days<br />Monday - Friday | 2 business days<br />Monday - Friday  | 24 hours<br />24/7 x 365 |
 
 Business hours are from 6am to 6pm (local time), except where otherwise stated.
-
-## SLA Exclusions
-
-### General Service Exclusions
-
-- (i) Caused by factors outside of our reasonable control, including but not limited to any force majeure event or Internet access, ISP provider issues, and/or related problems beyond the demarcation point of Supabase. For the avoidance of doubt, this list is not exhaustive, and we will endeavor to inform you if the issue is beyond a factor that we can reasonably control.
-- (ii) That result from any voluntary actions or inactions from you.
-- (iii) That result from instance class CPU and memory resource limitations.
-- (iv) That result from you not following the basic operational guidelines described in our [Docs](https://supabase.com/docs) (e.g., overloading a database instance to the point it is inoperable, creating an excessively large number of tables that significantly increase the recovery time, etc.).
-- (vi) That result in a long recovery time due to insufficient IO capacity for your database workload.
-- (vii) That result from your equipment, software, or other technology.
-- (viii) Arising from our suspension and termination of your right to use Supabase in accordance with our Terms.
-
-### Database SLA Exclusions
-
-- (i) Unofficially supported Postgres extensions are excluded from our SLA.
-- (ii) Our SLA only applies to the 2 most recent major releases of Postgres that Supabase has officially supported. Older versions are excluded.
-
-### Auth SLA Exclusions
-
-- (i) Inappropriately provisioned compute resources related to your project for the expected load on your database and Auth servers, especially in the case of verifying or storing password-based credentials in the sign-in, sign-up, password change, password reset, and other such flows and APIs.
-- (ii) Any accidental or intentional modifications, additions, or deletions of database objects (tables, views, triggers, roles, functions, indexes, constraints, permissions, grants, and similar) in the `auth` schema or foreign key relationships in any schema to non-primary key columns within the `auth` schema that may cause total or partial outage, including outages caused in the future but related to such modifications, additions, or deletions in the past when arising from schema migrations initiated by Supabase.
-- (iii) Total or partial outages caused by third-party services as configured by default or by choice, including and not limited to: OAuth, OpenID Connect, Security Assertion Markup Language servers and related APIs and protocols; Email (via SMTP or otherwise) and SMS sending servers and related APIs; CAPTCHA services and APIs; Password Strength Checking services such as HaveIBeenPwned.org; IP geo-location; and other such services.
-- (iv) Outages caused by overly permissive rate-limiting configurations.
-- (v) Outages caused by email sending issues when using the provisional (default) email sending configuration included with any Supabase project with the intention of getting started but not for production use.
-- (vi) Outages or issues caused by retracted versions of official Supabase libraries, frameworks, software packages (CLI, Docker image, executable, Infrastructure-as-Code plugins, etc.) or APIs, including urgent retractions due to identified security vulnerabilities.
-- (vii) Outages or issues caused by unofficial Supabase client libraries, frameworks, or API proxies, including security vulnerabilities, even when those libraries internally use official Supabase libraries.
-- (viii) Outages or issues that could have been resolved by upgrading to a higher minor or patch version of an official Supabase client library, framework, or software package (CLI, Docker image, executable, Infrastructure-as-Code plugin, etc.).
-
-### Storage SLA Exclusions
-
-- (i) Inappropriately provisioned compute resources related to your project for the expected load on your database.
-- (ii) Low amounts of pgBouncer or Supervisor connection pool configuration, such as max_clients and pool_size, for high amounts of traffic.
-- (iii) Any accidental or intentional modifications, additions, or deletions of database objects (tables, views, triggers, roles, functions, indexes, constraints, permissions, grants, and similar) in the `storage` schema, or foreign key relationships in any schema to non-primary key columns within the `storage` schema, that may cause total or partial outage, including outages caused in the future but related to such modifications, additions, or deletions in the past when arising from schema migrations initiated by Supabase.
-- (iv) Outages or issues that could have been resolved by upgrading to a higher minor or patch version of an official Supabase client library, framework, or software package (CLI, Docker image, executable, Infrastructure-as-Code plugin, etc.).
-- (v) Outages caused by accidental deletions of objects or buckets via the Storage API by the user.
-
-### Management API SLA Exclusions
-
-- (i) Until the management API reaches General Availability (GA), we cannot provide an uptime commitment.
-- (ii) Personal access tokens getting lost or leaked due to improper maintenance or improper use of confidential information.
-- (iii) Violation of Supabase fair-use policy.
-
-### Realtime SLA Exclusions
-
-- (i) Inappropriately provisioned compute resources related to your project for the expected load on your database.
-- (ii) The Realtime service does not guarantee messaging deliverability. If you need at-least-once, exactly-once, or at-most-once guarantees, you will need to build this functionality on top of the realtime service.
-
-### Edge Functions
-
-- (i) **Uptime Commitment Exclusion:** Until Edge Functions reach General Availability (GA), we cannot provide an uptime commitment. Customers acknowledge that the service may experience downtime, interruptions, or performance issues, and no specific availability percentage is promised at this time.
 
 </SectionContainer>
 

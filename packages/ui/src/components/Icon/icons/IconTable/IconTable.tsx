@@ -9,5 +9,12 @@
     return <IconBase icon={Table} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { table } from 'lucide-react'
+  */
   export default IconTable
   

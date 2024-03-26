@@ -1,8 +1,8 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { authKeys } from './keys'
-import { components } from 'data/api'
+import type { components } from 'data/api'
 
 export type UsersVariables = {
   projectRef?: string
@@ -37,7 +37,7 @@ export async function getUsers(
     signal,
   })
 
-  if (error) throw error
+  if (error) throw handleError(error)
   return data
 }
 

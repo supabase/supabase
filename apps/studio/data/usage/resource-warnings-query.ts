@@ -2,8 +2,8 @@ import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get } from 'data/fetchers'
 import { usageKeys } from './keys'
-import { ResponseError } from 'types'
-import { components } from 'data/api'
+import type { ResponseError } from 'types'
+import type { components } from 'data/api'
 import { IS_PLATFORM } from 'common'
 
 export async function getResourceWarnings(signal?: AbortSignal) {

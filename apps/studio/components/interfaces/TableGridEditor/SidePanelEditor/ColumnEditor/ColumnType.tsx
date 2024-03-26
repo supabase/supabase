@@ -1,4 +1,4 @@
-import type { PostgresType } from '@supabase/postgres-meta'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { noop } from 'lodash'
 import Link from 'next/link'
 import { ReactNode } from 'react'
@@ -6,6 +6,7 @@ import {
   Alert,
   Button,
   IconCalendar,
+  IconCircle,
   IconExternalLink,
   IconHash,
   IconToggleRight,
@@ -19,12 +20,13 @@ import {
   POSTGRES_DATA_TYPE_OPTIONS,
   RECOMMENDED_ALTERNATIVE_DATA_TYPE,
 } from '../SidePanelEditor.constants'
-import { PostgresDataTypeOption } from '../SidePanelEditor.types'
+import type { PostgresDataTypeOption } from '../SidePanelEditor.types'
 import { ListPlus } from 'lucide-react'
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 
 interface ColumnTypeProps {
   value: string
-  enumTypes: PostgresType[]
+  enumTypes: EnumeratedType[]
   size?: 'tiny' | 'small' | 'medium' | 'large' | 'xlarge'
   layout?: 'vertical' | 'horizontal'
   className?: string
@@ -54,25 +56,6 @@ const ColumnType = ({
   const isAvailableType = value ? availableTypes.includes(value) : true
   const recommendation = RECOMMENDED_ALTERNATIVE_DATA_TYPE[value]
 
-  if (!isAvailableType) {
-    return (
-      <Input
-        readOnly
-        disabled
-        label={showLabel ? 'Type' : ''}
-        layout={showLabel ? 'horizontal' : undefined}
-        className="md:gap-x-0"
-        size="small"
-        value={value}
-        descriptionText={
-          showLabel
-            ? 'Custom non-native psql data types cannot currently be changed to a different data type via Supabase Studio'
-            : ''
-        }
-      />
-    )
-  }
-
   const inferIcon = (type: string) => {
     switch (type) {
       case 'number':
@@ -90,8 +73,84 @@ const ColumnType = ({
       case 'bool':
         return <IconToggleRight size={16} className="text-foreground" strokeWidth={1.5} />
       default:
-        return <div />
+        return <IconCircle size={16} className="text-foreground p-0.5" strokeWidth={1.5} />
     }
+  }
+
+  if (!isAvailableType) {
+    return (
+      <Tooltip.Root delayDuration={0}>
+        <Tooltip.Trigger>
+          <Input
+            readOnly
+            disabled
+            label={showLabel ? 'Type' : ''}
+            layout={showLabel ? 'horizontal' : undefined}
+            className="md:gap-x-0"
+            size="small"
+            icon={inferIcon(POSTGRES_DATA_TYPE_OPTIONS.find((x) => x.name === value)?.type ?? '')}
+            value={value}
+            descriptionText={
+              showLabel
+                ? 'Custom non-native psql data types currently cannot be changed to a different data type via Supabase Studio'
+                : ''
+            }
+          />
+        </Tooltip.Trigger>
+        {!showLabel && (
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                  'border border-background w-[240px]',
+                ].join(' ')}
+              >
+                <span className="text-xs text-foreground">
+                  Custom non-native psql data types currently cannot be changed to a different data
+                  type via Supabase Studio
+                </span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        )}
+      </Tooltip.Root>
+    )
+  }
+
+  if (disabled && !showLabel) {
+    return (
+      <Tooltip.Root delayDuration={0}>
+        <Tooltip.Trigger>
+          <Input
+            readOnly
+            disabled
+            label={showLabel ? 'Type' : ''}
+            layout={showLabel ? 'horizontal' : undefined}
+            className="md:gap-x-0"
+            size="small"
+            icon={inferIcon(POSTGRES_DATA_TYPE_OPTIONS.find((x) => x.name === value)?.type ?? '')}
+            value={value}
+          />
+        </Tooltip.Trigger>
+        {!showLabel && description && (
+          <Tooltip.Portal>
+            <Tooltip.Content side="bottom">
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              <div
+                className={[
+                  'rounded bg-alternative py-1 px-2 leading-none shadow',
+                  'border border-background w-[240px]',
+                ].join(' ')}
+              >
+                <span className="text-xs text-foreground">{description}</span>
+              </div>
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        )}
+      </Tooltip.Root>
+    )
   }
 
   return (

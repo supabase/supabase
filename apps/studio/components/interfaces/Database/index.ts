@@ -1,41 +1,23 @@
-import ColumnList from './Tables/ColumnList'
-import TableList from './Tables/TableList'
+export { default as ColumnList } from './Tables/ColumnList'
+export { default as TableList } from './Tables/TableList'
 
-import RolesList from './Roles/RolesList'
+export { default as RolesList } from './Roles/RolesList'
 
-import Extensions from './Extensions/Extensions'
+export { default as Extensions } from './Extensions/Extensions'
 
-import CreateWrapper from './Wrappers/CreateWrapper'
-import EditWrapper from './Wrappers/EditWrapper'
-import Wrappers from './Wrappers/Wrappers'
+export { default as CreateWrapper } from './Wrappers/CreateWrapper'
+export { default as EditWrapper } from './Wrappers/EditWrapper'
+export { default as Wrappers } from './Wrappers/Wrappers'
 
-import PublicationsList from './Publications/PublicationsList'
-import PublicationsTables from './Publications/PublicationsTables'
+export { default as PublicationsList } from './Publications/PublicationsList'
+export { default as PublicationsTables } from './Publications/PublicationsTables'
 
-import BackupsList from './Backups/BackupsList'
+export { default as BackupsList } from './Backups/BackupsList'
 
-import CreateTrigger from './Triggers/CreateTrigger'
-import DeleteTrigger from './Triggers/DeleteTrigger'
+export { default as CreateTrigger } from './Triggers/CreateTrigger'
+export { default as DeleteTrigger } from './Triggers/DeleteTrigger'
 
-import CreateFunction from './Functions/CreateFunction'
-import DeleteFunction from './Functions/DeleteFunction'
+export { default as CreateFunction } from './Functions/CreateFunction'
+export { default as DeleteFunction } from './Functions/DeleteFunction'
 
-import EnumeratedTypes from './EnumeratedTypes/EnumeratedTypes'
-
-export {
-  BackupsList,
-  ColumnList,
-  CreateFunction,
-  CreateTrigger,
-  CreateWrapper,
-  DeleteFunction,
-  DeleteTrigger,
-  EditWrapper,
-  EnumeratedTypes,
-  Extensions,
-  PublicationsList,
-  PublicationsTables,
-  RolesList,
-  TableList,
-  Wrappers,
-}
+export { default as EnumeratedTypes } from './EnumeratedTypes/EnumeratedTypes'

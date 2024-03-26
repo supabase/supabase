@@ -6,7 +6,7 @@
 .light,
 .light .docs-story,
 .dark .docs-story {
-  @apply bg-background;
+  @apply bg-studio;
 }
 
 /* // date picker */
@@ -62,11 +62,11 @@
 }
 
 .react-datepicker__navigation--previous {
-  @apply right-12 w-10 h-10 rounded transition flex items-center justify-center hover:bg-background;
+  @apply right-12 w-10 h-10 rounded transition flex items-center justify-center hover:bg-studio;
 }
 
 .react-datepicker__navigation--next {
-  @apply right-4 w-10 h-10 rounded transition flex items-center justify-center hover:bg-background;
+  @apply right-4 w-10 h-10 rounded transition flex items-center justify-center hover:bg-studio;
 }
 
 .react-datepicker__day {
@@ -93,11 +93,11 @@
 }
 
 .react-datepicker__day--selecting-range-start {
-  @apply bg-background;
+  @apply bg-studio;
 }
 
 .react-datepicker__day--selecting-range-end {
-  @apply bg-background;
+  @apply bg-studio;
 }
 
 .react-datepicker__day--selected {

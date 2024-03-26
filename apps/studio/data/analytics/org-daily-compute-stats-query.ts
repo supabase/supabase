@@ -1,9 +1,9 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { get } from 'data/fetchers'
-import { AnalyticsData } from './constants'
+import type { AnalyticsData } from './constants'
 import { analyticsKeys } from './keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type OrgDailyComputeStatsVariables = {
   // API parameters

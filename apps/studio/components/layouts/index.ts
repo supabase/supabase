@@ -1,40 +1,17 @@
-import AccountLayout from './AccountLayout/AccountLayout'
-import AuthLayout from './AuthLayout/AuthLayout'
-import BillingLayout from './BillingLayout'
-import DatabaseLayout from './DatabaseLayout/DatabaseLayout'
-import DocsLayout from './DocsLayout/DocsLayout'
-import LogsLayout from './LogsLayout/LogsLayout'
-import OrganizationLayout from './OrganizationLayout'
-import ProjectLayout, { ProjectLayoutWithAuth } from './ProjectLayout/ProjectLayout'
-import SettingsLayout from './ProjectSettingsLayout/SettingsLayout'
-import ReportsLayout from './ReportsLayout/ReportsLayout'
-import SQLEditorLayout from './SQLEditorLayout/SQLEditorLayout'
-import ForgotPasswordLayout from './SignInLayout/ForgotPasswordLayout'
-import SignInLayout from './SignInLayout/SignInLayout'
-import StorageLayout from './StorageLayout/StorageLayout'
-import TableEditorLayout from './TableEditorLayout/TableEditorLayout'
-import VercelIntegrationLayout from './VercelIntegrationLayout'
-import WizardLayout, { WizardLayoutWithoutAuth } from './WizardLayout'
-
-export {
-  AccountLayout,
-  AuthLayout,
-  BillingLayout,
-  DatabaseLayout,
-  DocsLayout,
-  ForgotPasswordLayout,
-  LogsLayout,
-  OrganizationLayout,
-  ProjectLayoutWithAuth,
-  ReportsLayout,
-  SQLEditorLayout,
-  SettingsLayout,
-  SignInLayout,
-  StorageLayout,
-  TableEditorLayout,
-  VercelIntegrationLayout,
-  WizardLayout,
-  WizardLayoutWithoutAuth,
-}
-
-export default ProjectLayout
+export { default as AccountLayout } from './AccountLayout/AccountLayout'
+export { default as AuthLayout } from './AuthLayout/AuthLayout'
+export { default as BillingLayout } from './BillingLayout'
+export { default as DatabaseLayout } from './DatabaseLayout/DatabaseLayout'
+export { default as DocsLayout } from './DocsLayout/DocsLayout'
+export { default as LogsLayout } from './LogsLayout/LogsLayout'
+export { default as OrganizationLayout } from './OrganizationLayout'
+export { default as ProjectLayout } from './ProjectLayout/ProjectLayout'
+export { default as SettingsLayout } from './ProjectSettingsLayout/SettingsLayout'
+export { default as ReportsLayout } from './ReportsLayout/ReportsLayout'
+export { default as SQLEditorLayout } from './SQLEditorLayout/SQLEditorLayout'
+export { default as ForgotPasswordLayout } from './SignInLayout/ForgotPasswordLayout'
+export { default as SignInLayout } from './SignInLayout/SignInLayout'
+export { default as StorageLayout } from './StorageLayout/StorageLayout'
+export { default as TableEditorLayout } from './TableEditorLayout/TableEditorLayout'
+export { default as VercelIntegrationLayout } from './VercelIntegrationLayout'
+export { default as WizardLayout } from './WizardLayout'

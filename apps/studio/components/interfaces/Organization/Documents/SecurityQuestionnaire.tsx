@@ -1,5 +1,8 @@
-import Link from 'next/link'
 import { useParams } from 'common'
+import Link from 'next/link'
+import toast from 'react-hot-toast'
+import { Button, IconDownload } from 'ui'
+
 import {
   ScaffoldSection,
   ScaffoldSectionContent,
@@ -7,14 +10,11 @@ import {
 } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { Button, IconDownload } from 'ui'
-import { useStore } from 'hooks'
 import { getDocument } from 'data/documents/document-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const SecurityQuestionnaire = () => {
   const { slug } = useParams()
-  const { ui } = useStore()
   const {
     data: subscription,
     error,
@@ -32,10 +32,7 @@ const SecurityQuestionnaire = () => {
       })
       if (questionnaireLink?.fileUrl) window.open(questionnaireLink.fileUrl, '_blank')
     } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to download Security Questionnaire: ${error.message}`,
-      })
+      toast.error(`Failed to download Security Questionnaire: ${error.message}`)
     }
   }
 

@@ -6,9 +6,9 @@ import Link from 'next/link'
 import { Button, Collapsible, IconChevronUp, IconEdit, IconExternalLink, IconTrash } from 'ui'
 
 import { useParams } from 'common/hooks'
-import { FDW } from 'data/fdw/fdws-query'
+import type { FDW } from 'data/fdw/fdws-query'
 import { useCheckPermissions } from 'hooks'
-import { WrapperMeta } from './Wrappers.types'
+import type { WrapperMeta } from './Wrappers.types'
 
 interface WrapperRowProps {
   wrappers: FDW[]

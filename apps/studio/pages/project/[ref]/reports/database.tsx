@@ -1,11 +1,7 @@
 import { useParams } from 'common/hooks'
 import dayjs from 'dayjs'
-import { observer } from 'mobx-react-lite'
+import Link from 'next/link'
 import { useState } from 'react'
-
-import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
-import { formatBytes } from 'lib/helpers'
-import { NextPageWithLayout } from 'types'
 import {
   AlertDescription_Shadcn_,
   Alert_Shadcn_,
@@ -14,18 +10,20 @@ import {
   IconExternalLink,
 } from 'ui'
 
+import ReportWidget from 'components/interfaces/Reports/ReportWidget'
+import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
+import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import { ReportsLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
+import Table from 'components/to-be-cleaned/Table'
 import Panel from 'components/ui/Panel'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
-import ReportWidget from 'components/interfaces/Reports/ReportWidget'
-import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
-import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
-import Table from 'components/to-be-cleaned/Table'
-import Link from 'next/link'
-import { DbQueryHook } from 'hooks/analytics/useDbQuery'
+import type { DbQueryHook } from 'hooks/analytics/useDbQuery'
+import { TIME_PERIODS_INFRA } from 'lib/constants/metrics'
+import { formatBytes } from 'lib/helpers'
+import type { NextPageWithLayout } from 'types'
 
 const DatabaseReport: NextPageWithLayout = () => {
   return (
@@ -43,9 +41,8 @@ DatabaseReport.getLayout = (page) => <ReportsLayout title="Database">{page}</Rep
 
 export default DatabaseReport
 
-const DatabaseUsage = observer(() => {
+const DatabaseUsage = () => {
   const { project } = useProjectContext()
-
   const [dateRange, setDateRange] = useState<any>(undefined)
 
   const { data } = useDatabaseSizeQuery({
@@ -223,7 +220,7 @@ const DatabaseUsage = observer(() => {
       </div>
     </>
   )
-})
+}
 
 const useDatabaseReport = () => {
   const { ref: projectRef } = useParams()

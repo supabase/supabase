@@ -1,9 +1,8 @@
-import { observer } from 'mobx-react-lite'
-import { NextPageWithLayout } from 'types'
-import FunctionsLayout from 'components/layouts/FunctionsLayout'
 import { EdgeFunctionDetails } from 'components/interfaces/Functions'
+import FunctionsLayout from 'components/layouts/FunctionsLayout'
+import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => <EdgeFunctionDetails />
 PageLayout.getLayout = (page) => <FunctionsLayout>{page}</FunctionsLayout>
 
-export default observer(PageLayout)
+export default PageLayout

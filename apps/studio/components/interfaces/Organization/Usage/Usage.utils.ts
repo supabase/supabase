@@ -1,5 +1,5 @@
 import { DataPoint } from 'data/analytics/constants'
-import { OrgSubscription } from 'data/subscriptions/types'
+import type { OrgSubscription } from 'data/subscriptions/types'
 
 // [Joshen] This is just for development to generate some test data for chart rendering
 export const generateUsageData = (attribute: string, days: number): DataPoint[] => {

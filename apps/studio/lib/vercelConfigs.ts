@@ -1,4 +1,4 @@
-import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.constants'
+import { SQL_TEMPLATES } from 'components/interfaces/SQLEditor/SQLEditor.queries'
 
 const QuickStart = SQL_TEMPLATES.filter((template) => template.type === 'quickstart')
 

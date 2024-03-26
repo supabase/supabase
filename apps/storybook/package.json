@@ -1,0 +1,32 @@
+{
+  "name": "storybook",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@storybook/addon-essentials": "^8.0.0-rc.1",
+    "@storybook/addon-interactions": "^8.0.0-rc.1",
+    "@storybook/addon-links": "^8.0.0-rc.1",
+    "@storybook/addon-mdx-gfm": "^8.0.0-rc.1",
+    "@storybook/addon-onboarding": "^8.0.0-rc.1",
+    "@storybook/addon-styling-webpack": "^0.0.6",
+    "@storybook/addon-themes": "^8.0.0-rc.1",
+    "@storybook/blocks": "^8.0.0-rc.1",
+    "@storybook/nextjs": "^8.0.0-rc.1",
+    "@storybook/react": "^8.0.0-rc.1",
+    "@storybook/test": "^8.0.0-rc.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "storybook": "^8.0.4"
+  },
+  "dependencies": {
+    "@storybook/node-logger": "^8.0.0-rc.1"
+  }
+}

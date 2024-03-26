@@ -1,7 +1,7 @@
 import { describe, expect, test } from '@jest/globals'
 import { codeBlock } from 'common-tags'
 import OpenAI from 'openai'
-import { collectStream, extractMarkdownSql, formatSql } from '../test/util'
+import { collectStream, extractMarkdownSql, formatSql, getPolicyInfo } from '../test/util'
 import { debugSql, editSql, generateSql, titleSql } from './sql'
 import { chatRlsPolicy } from './sql.edge'
 
@@ -123,6 +123,11 @@ describe('rls chat', () => {
     const responseText = await collectStream(responseStream)
     const [sql] = extractMarkdownSql(responseText)
 
-    expect(formatSql(sql)).toMatchSnapshot()
+    const { name, ...otherInfo } = await getPolicyInfo(sql)
+
+    expect(otherInfo).toMatchSnapshot()
+    await expect(name).toMatchCriteria(
+      'policy says that users can select their own todos (not insert, update, delete, etc)'
+    )
   })
 })

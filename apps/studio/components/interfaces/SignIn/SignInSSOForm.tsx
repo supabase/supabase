@@ -1,28 +1,25 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { useQueryClient } from '@tanstack/react-query'
-import { useStore } from 'hooks'
+import { useRef, useState } from 'react'
+import toast from 'react-hot-toast'
+import { object, string } from 'yup'
+
 import { BASE_PATH } from 'lib/constants'
 import { auth, buildPathWithParams } from 'lib/gotrue'
-import { useRef, useState } from 'react'
 import { Button, Form, Input } from 'ui'
-import { object, string } from 'yup'
 
 const signInSchema = object({
   email: string().email('Must be a valid email').required('Email is required'),
 })
 
 const SignInSSOForm = () => {
-  const { ui } = useStore()
   const queryClient = useQueryClient()
 
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const captchaRef = useRef<HCaptcha>(null)
 
   const onSignIn = async ({ email }: { email: string }) => {
-    const toastId = ui.setNotification({
-      category: 'loading',
-      message: `Signing in...`,
-    })
+    const toastId = toast.loading('Signing in...')
 
     let token = captchaToken
     if (!token) {
@@ -57,12 +54,7 @@ const SignInSSOForm = () => {
     } else {
       setCaptchaToken(null)
       captchaRef.current?.resetCaptcha()
-
-      ui.setNotification({
-        id: toastId,
-        category: 'error',
-        message: error.message,
-      })
+      toast.error(error.message, { id: toastId })
     }
   }
 

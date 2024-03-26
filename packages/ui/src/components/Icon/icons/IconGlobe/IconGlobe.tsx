@@ -9,5 +9,12 @@
     return <IconBase icon={Globe} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { globe } from 'lucide-react'
+  */
   export default IconGlobe
   

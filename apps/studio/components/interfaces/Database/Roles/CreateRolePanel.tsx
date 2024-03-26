@@ -56,7 +56,7 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   const { mutate: createDatabaseRole, isLoading: isCreating } = useDatabaseRoleCreateMutation({
     onSuccess: (res) => {
       toast.success(`Successfully created new role: ${res.name}`)
-      onClose()
+      handleClose()
     },
   })
 
@@ -71,7 +71,7 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
 
   const handleClose = () => {
     onClose()
-    form.reset()
+    form.reset(initialValues)
   }
 
   return (
@@ -88,7 +88,7 @@ const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
             form={formId}
             isSubmitting={isCreating}
             hasChanges={form.formState.isDirty}
-            handleReset={() => form.reset()}
+            handleReset={handleClose}
           />
         </div>
       }

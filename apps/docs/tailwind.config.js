@@ -2,12 +2,13 @@ const config = require('config/tailwind.config')
 
 module.exports = config({
   content: [
-    '../../packages/ui/src/**/*.{tsx,ts,js}',
-    './pages/**/*.{tsx,mdx}',
     './components/**/*.tsx',
-    './layouts/**/*.tsx',
-    './src/**/*.{ts,tsx,mdx}',
+    './content/**/*.{ts,tsx,mdx}',
     './docs/**/*.{tsx,mdx}',
+    './layouts/**/*.tsx',
+    './pages/**/*.{tsx,mdx}',
+    './../../packages/ui/src/**/*.{tsx,ts,js}',
+    './../../packages/ui-patterns/**/*.{tsx,ts,js}',
   ],
   plugins: [
     function ({ addUtilities, addVariant }) {
@@ -19,5 +20,6 @@ module.exports = config({
         },
       })
     },
+    require('@tailwindcss/container-queries'),
   ],
 })

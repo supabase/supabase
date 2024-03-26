@@ -1,6 +1,6 @@
 import { Input, Modal } from 'ui'
 
-import CodeEditor from 'components/ui/CodeEditor'
+import { CodeEditor } from 'components/ui/CodeEditor'
 import { useEffect, useState } from 'react'
 import { tryParseJson } from 'lib/helpers'
 

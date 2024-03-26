@@ -9,5 +9,12 @@
     return <IconBase icon={Triangle} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { triangle } from 'lucide-react'
+  */
   export default IconTriangle
   

@@ -1,4 +1,4 @@
-import { QueryKey, UseQueryOptions } from '@tanstack/react-query'
+import type { QueryKey, UseQueryOptions } from '@tanstack/react-query'
 
 import { Filter, Query, SupaTable } from 'components/grid'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'

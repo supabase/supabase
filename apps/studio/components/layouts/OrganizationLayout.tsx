@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 
 import { useParams } from 'common'
 import { useFlag, useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
@@ -13,7 +13,6 @@ const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const selectedOrganization = useSelectedOrganization()
   const router = useRouter()
   const { slug } = useParams()
-  const id = router.asPath.split('/').at(-1)?.split('?')[0]?.split('#')[0]
 
   const invoicesEnabled = useIsFeatureEnabled('billing:invoices')
 

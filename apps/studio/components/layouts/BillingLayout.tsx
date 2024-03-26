@@ -1,7 +1,7 @@
 import Link from 'next/link'
-import { PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 
-import BaseLayout from 'components/layouts'
+import { ProjectLayout } from 'components/layouts'
 import { useSelectedOrganization, useSelectedProject, withAuth } from 'hooks'
 import { IconX } from 'ui'
 
@@ -12,7 +12,7 @@ const BillingLayout = ({ children }: PropsWithChildren<BillingLayoutProps>) => {
   const selectedProject = useSelectedProject()
 
   return (
-    <BaseLayout hideHeader hideIconBar>
+    <ProjectLayout hideHeader hideIconBar>
       <div className="flex h-full w-full flex-col">
         {/* Header */}
         <div className="flex items-center space-x-4 border-b py-4 px-5 border-default">
@@ -50,7 +50,7 @@ const BillingLayout = ({ children }: PropsWithChildren<BillingLayoutProps>) => {
           <section className="relative">{children}</section>
         </div>
       </div>
-    </BaseLayout>
+    </ProjectLayout>
   )
 }
 

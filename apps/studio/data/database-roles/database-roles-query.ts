@@ -1,8 +1,8 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
-import { PostgresRole } from '@supabase/postgres-meta'
+import type { PostgresRole } from '@supabase/postgres-meta'
 
 import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { databaseRolesKeys } from './keys'
 
 export type DatabaseRolesVariables = {

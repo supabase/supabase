@@ -1,7 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { observer } from 'mobx-react-lite'
+import { useParams } from 'common'
 import { useEffect, useState } from 'react'
-
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -18,7 +18,7 @@ import {
 } from 'ui'
 import { number, object, string } from 'yup'
 
-import { useParams } from 'common'
+import { Markdown } from 'components/interfaces/Markdown'
 import {
   FormActions,
   FormHeader,
@@ -29,15 +29,13 @@ import {
 } from 'components/ui/Forms'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import EmailRateLimitsAlert from '../EmailRateLimitsAlert'
 import { urlRegex } from './../Auth.constants'
 import { defaultDisabledSmtpFormValues } from './SmtpForm.constants'
 import { generateFormValues, isSmtpEnabled } from './SmtpForm.utils'
-import { Markdown } from 'components/interfaces/Markdown'
 
 const SmtpForm = () => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -135,13 +133,13 @@ const SmtpForm = () => {
       { projectRef: projectRef!, config: payload },
       {
         onError: (error) => {
-          ui.setNotification({ category: 'error', message: 'Failed to update settings', error })
+          toast.error(`Failed to update settings: ${error.message}`)
         },
         onSuccess: () => {
           setHidden(true)
+          toast.success('Successfully updated settings')
           const updatedFormValues = generateFormValues(payload)
           resetForm({ values: updatedFormValues, initialValues: updatedFormValues })
-          ui.setNotification({ category: 'success', message: 'Successfully updated settings' })
         },
       }
     )
@@ -346,4 +344,4 @@ const SmtpForm = () => {
   )
 }
 
-export default observer(SmtpForm)
+export default SmtpForm

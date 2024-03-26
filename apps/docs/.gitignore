@@ -23,7 +23,3 @@ yarn-error.log*
 **/*/generated/**/*
 !**/*/generated/.gitkeep
 !**/*/generated/**/.gitkeep
-
-# Temporary to avoid storing a lot of duplicate Markdown
-# before finalizing the codemod
-/content

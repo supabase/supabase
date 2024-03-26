@@ -9,5 +9,12 @@
     return <IconBase icon={RefreshCw} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { refreshCw } from 'lucide-react'
+  */
   export default IconRefreshCw
   

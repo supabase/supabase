@@ -1,19 +1,19 @@
-import { Button } from '@ui/components/shadcn/ui/button'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@ui/components/shadcn/ui/form'
-import { Label } from '@ui/components/shadcn/ui/label'
-import { RadioGroup, RadioGroupItem } from '@ui/components/shadcn/ui/radio-group'
-import { toast } from '@ui/components/shadcn/ui/use-toast'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Meta } from '@storybook/react'
 import { useForm } from 'react-hook-form'
 import * as z from 'zod'
+import { Button } from '../ui/button'
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from '../ui/form'
+import { Label } from '../ui/label'
+import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
+import { toast } from '../ui/use-toast'
 
 const meta: Meta = {
   title: 'shadcn/RadioGroup',

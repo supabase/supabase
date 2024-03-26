@@ -6,7 +6,7 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { Form, IconDatabase, IconPlus, Input, Listbox, Modal, SidePanel } from 'ui'
 import WrapperDynamicColumns from './WrapperDynamicColumns'
-import { Table, TableOption } from './Wrappers.types'
+import type { Table, TableOption } from './Wrappers.types'
 import { makeValidateRequired } from './Wrappers.utils'
 
 export type WrapperTableEditorProps = {

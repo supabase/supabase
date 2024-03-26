@@ -1,5 +1,5 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { CalculatedColumn } from 'react-data-grid'
+import type { CalculatedColumn } from 'react-data-grid'
 import {
   Button,
   Divider,

@@ -1,0 +1,31 @@
+import createSupabaseIcon from '../createSupabaseIcon';
+
+/**
+ * @component @name Database
+ * @description Supabase SVG icon component, renders SVG Element with children.
+ *
+ * @preview ![img](data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiAjZmZmOyBib3JkZXItcmFkaXVzOiAycHgiICAgIHN0cm9rZS13aWR0aD0iMSI+CiAgICA8cGF0aCBkPSIgTTUuNTY3NzQgOS43MDY0MkgxOC40NTQ3VjE1LjcwNjRINS41Njc3NFY5LjcwNjQyWiIgLz4KICAgIDxwYXRoIGQ9IiBNNC41IDE2LjcwOTRDNC41IDE2LjE1NzEgNC45NDc3MiAxNS43MDk0IDUuNSAxNS43MDk0SDE4LjVDMTkuMDUyMyAxNS43MDk0IDE5LjUgMTYuMTU3MSAxOS41CiAgICAgICAgMTYuNzA5NFYyMC43MDk0QzE5LjUgMjEuMjYxNiAxOS4wNTIzIDIxLjcwOTQgMTguNSAyMS43MDk0SDUuNUM0Ljk0NzcyIDIxLjcwOTQgNC41IDIxLjI2MTYgNC41CiAgICAgICAgMjAuNzA5NFYxNi43MDk0WiIgLz4KICAgIDxwYXRoCiAgICAgICAgZD0iTTQuNSA0LjcwNjc5QzQuNSA0LjE1NDUgNC45NDc3MiAzLjcwNjc5IDUuNSAzLjcwNjc5SDE4LjVDMTkuMDUyMyAzLjcwNjc5IDE5LjUgNC4xNTQ1IDE5LjUgNC43MDY3OVY4LjcwNjc5QzE5LjUgOS4yNTkwNyAxOS4wNTIzIDkuNzA2NzkgMTguNSA5LjcwNjc5SDUuNUM0Ljk0NzcyIDkuNzA2NzkgNC41IDkuMjU5MDcgNC41IDguNzA2NzlWNC43MDY3OVoiIC8+Cjwvc3ZnPg==)
+ *
+ * @param {Object} props - Supabase icons props and any valid SVG attribute
+ * @returns {JSX.Element} JSX Element
+ *
+ */
+const Database = createSupabaseIcon('Database', [
+  ['path', { d: ' M5.56774 9.70642H18.4547V15.7064H5.56774V9.70642Z', key: 'g5hndz' }],
+  [
+    'path',
+    {
+      d: ' M4.5 16.7094C4.5 16.1571 4.94772 15.7094 5.5 15.7094H18.5C19.0523 15.7094 19.5 16.1571 19.5\n        16.7094V20.7094C19.5 21.2616 19.0523 21.7094 18.5 21.7094H5.5C4.94772 21.7094 4.5 21.2616 4.5\n        20.7094V16.7094Z',
+      key: '1m5ehm',
+    },
+  ],
+  [
+    'path',
+    {
+      d: 'M4.5 4.70679C4.5 4.1545 4.94772 3.70679 5.5 3.70679H18.5C19.0523 3.70679 19.5 4.1545 19.5 4.70679V8.70679C19.5 9.25907 19.0523 9.70679 18.5 9.70679H5.5C4.94772 9.70679 4.5 9.25907 4.5 8.70679V4.70679Z',
+      key: '1w4kbe',
+    },
+  ],
+]);
+
+export default Database;

@@ -1,3 +1,1 @@
-import SortPopover from './SortPopover'
-
-export default SortPopover
+export { default as SortPopover } from './SortPopover'

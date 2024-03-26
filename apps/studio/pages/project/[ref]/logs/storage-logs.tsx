@@ -1,9 +1,8 @@
-import React from 'react'
 import { useRouter } from 'next/router'
-import { observer } from 'mobx-react-lite'
-import { LogsLayout } from 'components/layouts'
+
 import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
-import { NextPageWithLayout } from 'types'
+import { LogsLayout } from 'components/layouts'
+import type { NextPageWithLayout } from 'types'
 
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -22,4 +21,4 @@ export const LogPage: NextPageWithLayout = () => {
 
 LogPage.getLayout = (page) => <LogsLayout title="Storage">{page}</LogsLayout>
 
-export default observer(LogPage)
+export default LogPage

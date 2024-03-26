@@ -5,7 +5,7 @@ import { useRef } from 'react'
 import { cn } from 'ui'
 
 import { timeout } from 'lib/helpers'
-import Connecting from '../Loading'
+import { Loading } from '../Loading'
 import { alignEditor } from './CodeEditor.utils'
 
 interface CodeEditorProps {
@@ -88,7 +88,7 @@ const CodeEditor = ({
       value={value ?? undefined}
       language={language}
       defaultValue={defaultValue ?? undefined}
-      loading={loading || <Connecting />}
+      loading={loading || <Loading />}
       options={optionsMerged}
       onMount={onMount}
       onChange={onInputChange}

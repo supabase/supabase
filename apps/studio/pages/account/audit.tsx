@@ -2,7 +2,7 @@ import { AuditLogs } from 'components/interfaces/Account'
 import { AccountLayout } from 'components/layouts'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
   return (

@@ -34,7 +34,13 @@ const FileExplorerRowEditing = ({ item, view, columnIndex }: FileExplorerRowEdit
   }
 
   useEffect(() => {
-    if (inputRef.current) inputRef.current.select()
+    // select just the name of the file without the extension
+    if (inputRef.current) {
+      const dotIndex = item.name.lastIndexOf('.')
+      const selectionEnd = dotIndex !== -1 ? dotIndex : item.name.length
+      inputRef.current.setSelectionRange(0, selectionEnd)
+      inputRef.current.focus()
+    }
 
     // [Joshen] Esc should revert changes
     const handleEsc = (event: KeyboardEvent) => {

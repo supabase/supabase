@@ -1,28 +1,29 @@
-import { useRouter } from 'next/router'
 import { useMonaco } from '@monaco-editor/react'
-import { observer } from 'mobx-react-lite'
-import { useEffect, useRef } from 'react'
 import { useParams } from 'common'
+import { useRouter } from 'next/router'
+import { useEffect, useRef } from 'react'
 
 import { useFunctionsQuery } from 'data/database/functions-query'
 import { useKeywordsQuery } from 'data/database/keywords-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 import SQLEditor from 'components/interfaces/SQLEditor/SQLEditor'
 import { SQLEditorLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
 import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
+import { useLocalStorageQuery } from 'hooks'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
   const monaco = useMonaco()
-  const { id, ref } = useParams()
+  const { id, ref, content } = useParams()
 
   const { project } = useProjectContext()
   const snap = useSqlEditorStateSnapshot()
@@ -30,6 +31,11 @@ const SqlEditor: NextPageWithLayout = () => {
 
   const snippets = useSnippets(ref)
   const { mutateAsync: formatQuery } = useFormatQueryMutation()
+
+  const [intellisenseEnabled] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
+    true
+  )
 
   async function formatPgsql(value: string) {
     try {
@@ -46,29 +52,46 @@ const SqlEditor: NextPageWithLayout = () => {
     }
   }
 
-  const { data: keywords, isSuccess: isKeywordsSuccess } = useKeywordsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const { data: functions, isSuccess: isFunctionsSuccess } = useFunctionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const { data: schemas, isSuccess: isSchemasSuccess } = useSchemasQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
-  const { data: tableColumns, isSuccess: isTableColumnsSuccess } = useTableColumnsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data: keywords, isSuccess: isKeywordsSuccess } = useKeywordsQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: intellisenseEnabled }
+  )
+  const { data: functions, isSuccess: isFunctionsSuccess } = useFunctionsQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: intellisenseEnabled }
+  )
+  const { data: schemas, isSuccess: isSchemasSuccess } = useSchemasQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: intellisenseEnabled }
+  )
+  const { data: tableColumns, isSuccess: isTableColumnsSuccess } = useTableColumnsQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    { enabled: intellisenseEnabled }
+  )
 
   const pgInfoRef = useRef<any>(null)
   const formatPgsqlRef = useRef(formatPgsql)
   formatPgsqlRef.current = formatPgsql
 
   const isPgInfoReady =
-    isTableColumnsSuccess && isSchemasSuccess && isKeywordsSuccess && isFunctionsSuccess
+    intellisenseEnabled &&
+    isTableColumnsSuccess &&
+    isSchemasSuccess &&
+    isKeywordsSuccess &&
+    isFunctionsSuccess
+
   if (isPgInfoReady) {
     if (pgInfoRef.current === null) {
       pgInfoRef.current = {}
@@ -80,11 +103,11 @@ const SqlEditor: NextPageWithLayout = () => {
   }
 
   useEffect(() => {
-    if (id === 'new' && appSnap.dashboardHistory.sql !== undefined) {
+    if (id === 'new' && appSnap.dashboardHistory.sql !== undefined && content === undefined) {
       const snippet = snippets.find((snippet) => snippet.id === appSnap.dashboardHistory.sql)
       if (snippet !== undefined) router.push(`/project/${ref}/sql/${appSnap.dashboardHistory.sql}`)
     }
-  }, [id, snippets])
+  }, [id, snippets, content])
 
   // Enable pgsql format
   useEffect(() => {
@@ -126,7 +149,7 @@ const SqlEditor: NextPageWithLayout = () => {
   }, [isPgInfoReady])
 
   return (
-    <div className="SQLTabContainer flex-1">
+    <div className="flex-1 overflow-auto">
       <SQLEditor />
     </div>
   )
@@ -134,4 +157,4 @@ const SqlEditor: NextPageWithLayout = () => {
 
 SqlEditor.getLayout = (page) => <SQLEditorLayout title="SQL">{page}</SQLEditorLayout>
 
-export default observer(SqlEditor)
+export default SqlEditor

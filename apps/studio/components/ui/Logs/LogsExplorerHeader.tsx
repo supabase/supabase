@@ -1,7 +1,4 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { LOGS_EXPLORER_DOCS_URL } from 'components/interfaces/Settings/Logs'
-import Table from 'components/to-be-cleaned/Table'
-import { copyToClipboard } from 'lib/helpers'
 import Link from 'next/link'
 import { useState } from 'react'
 import { logConstants } from 'shared-data'
@@ -16,6 +13,10 @@ import {
   SidePanel,
   Tabs,
 } from 'ui'
+
+import { LOGS_EXPLORER_DOCS_URL } from 'components/interfaces/Settings/Logs'
+import Table from 'components/to-be-cleaned/Table'
+import { copyToClipboard } from 'lib/helpers'
 
 export interface LogsExplorerHeaderProps {
   subtitle?: string

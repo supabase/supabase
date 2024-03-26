@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { useCallback } from 'react'
 
-import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { get, handleError } from 'data/fetchers'
+import type { ResponseError } from 'types'
 import { resourceKeys } from './keys'
 
 export type ResourcesVariables = {
@@ -17,8 +17,7 @@ export async function getResources({ projectRef }: ResourcesVariables, signal?: 
     params: { path: { ref: projectRef } },
     signal,
   })
-  if (error) throw error
-
+  if (error) handleError(error)
   return data
 }
 

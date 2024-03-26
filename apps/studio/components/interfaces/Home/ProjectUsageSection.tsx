@@ -1,16 +1,15 @@
-import { observer } from 'mobx-react-lite'
-import { IconAlertCircle } from 'ui'
+import dayjs from 'dayjs'
 
 import { NewProjectPanel } from 'components/interfaces/Home'
 import { ProjectUsageLoadingState } from 'components/layouts/ProjectLayout/LoadingState'
 import InformationBox from 'components/ui/InformationBox'
 import { useProjectLogRequestsCountQuery } from 'data/analytics/project-log-requests-count-query'
 import { useProjectLogStatsQuery } from 'data/analytics/project-log-stats-query'
-import ProjectUsage from './ProjectUsage'
 import { useSelectedProject } from 'hooks'
-import dayjs from 'dayjs'
+import { IconAlertCircle } from 'ui'
+import ProjectUsage from './ProjectUsage'
 
-const ProjectUsageSection = observer(() => {
+const ProjectUsageSection = () => {
   const project = useSelectedProject()
 
   const {
@@ -54,5 +53,6 @@ const ProjectUsageSection = observer(() => {
       )}
     </>
   )
-})
+}
+
 export default ProjectUsageSection

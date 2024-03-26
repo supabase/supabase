@@ -1,8 +1,9 @@
 import { useParams } from 'common'
-import { useAuthorizedAppRevokeMutation } from 'data/oauth/authorized-app-revoke-mutation'
-import { AuthorizedApp } from 'data/oauth/authorized-apps-query'
-import { useStore } from 'hooks'
+import toast from 'react-hot-toast'
 import { Alert, IconLock, Modal } from 'ui'
+
+import { useAuthorizedAppRevokeMutation } from 'data/oauth/authorized-app-revoke-mutation'
+import type { AuthorizedApp } from 'data/oauth/authorized-apps-query'
 
 export interface RevokeAppModalProps {
   selectedApp?: AuthorizedApp
@@ -10,14 +11,10 @@ export interface RevokeAppModalProps {
 }
 
 const RevokeAppModal = ({ selectedApp, onClose }: RevokeAppModalProps) => {
-  const { ui } = useStore()
   const { slug } = useParams()
   const { mutate: revokeAuthorizedApp, isLoading: isDeleting } = useAuthorizedAppRevokeMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully revoked the app "${selectedApp?.name}"`,
-      })
+      toast.success(`Successfully revoked the app "${selectedApp?.name}"`)
       onClose()
     },
   })

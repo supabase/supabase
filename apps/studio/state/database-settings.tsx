@@ -5,6 +5,10 @@ import { useConstant } from 'common'
 
 export function createDatabaseSettingsState() {
   const state = proxy({
+    usePoolerConnection: true,
+    setUsePoolerConnection: (value: boolean) => {
+      state.usePoolerConnection = value
+    },
     showPoolingModeHelper: false,
     setShowPoolingModeHelper: (value: boolean) => {
       state.showPoolingModeHelper = value

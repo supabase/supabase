@@ -10,7 +10,6 @@ import { Button } from 'ui'
 import { SITE_URL } from '~/lib/constants'
 import supabase from '~/lib/supabaseMisc'
 
-import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
@@ -72,7 +71,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
           ],
         }}
       />
-      <FaviconImports />
+
       <ConfDataContext.Provider
         value={{
           supabase,

@@ -1,7 +1,13 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
+import { GitPullRequest } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren, ReactNode } from 'react'
+import { useInView } from 'react-intersection-observer'
+
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useBranchQuery } from 'data/branches/branch-query'
+import type { Branch } from 'data/branches/branches-query'
 import {
   Badge,
   Button,
@@ -15,11 +21,7 @@ import {
   IconShield,
   IconTrash,
 } from 'ui'
-
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { Branch } from 'data/branches/branches-query'
-import { GitHubPullRequest } from 'data/integrations/integrations-github-pull-requests-query'
-import { GitPullRequest } from 'lucide-react'
+import BranchStatusBadge from './BranchStatusBadge'
 
 interface BranchManagementSectionProps {
   header: string
@@ -73,7 +75,6 @@ interface BranchRowProps {
   repo: string
   branch: Branch
   isMain?: boolean
-  pullRequest?: GitHubPullRequest
   generateCreatePullRequestURL?: (branchName?: string) => string
   onSelectDeleteBranch: () => void
 }
@@ -82,12 +83,11 @@ export const BranchRow = ({
   branch,
   isMain = false,
   repo,
-  pullRequest,
   generateCreatePullRequestURL,
   onSelectDeleteBranch,
 }: BranchRowProps) => {
-  const { ref } = useParams()
-  const isActive = ref === branch?.project_ref
+  const { ref: projectRef } = useParams()
+  const isActive = projectRef === branch?.project_ref
 
   const daysFromNow = dayjs().diff(dayjs(branch.updated_at), 'day')
   const formattedTimeFromNow = dayjs(branch.updated_at).fromNow()
@@ -96,8 +96,23 @@ export const BranchRow = ({
   const createPullRequestURL =
     generateCreatePullRequestURL?.(branch.git_branch) ?? 'https://github.com'
 
+  const { ref, inView } = useInView()
+  const { data } = useBranchQuery(
+    { projectRef, id: branch.id },
+    {
+      enabled: branch.status === 'CREATING_PROJECT' && inView,
+      refetchInterval(data) {
+        if (data?.status !== 'ACTIVE_HEALTHY') {
+          return 1000 * 3 // 3 seconds
+        }
+
+        return false
+      },
+    }
+  )
+
   return (
-    <div className="w-full flex items-center justify-between px-6 py-2.5">
+    <div className="w-full flex items-center justify-between px-6 py-2.5" ref={ref}>
       <div className="flex items-center gap-x-4">
         <Button
           asChild
@@ -109,16 +124,21 @@ export const BranchRow = ({
             {branch.name}
           </Link>
         </Button>
-        {isActive && <Badge color="slate">Current</Badge>}
+        {isActive && <Badge>Current</Badge>}
+        <BranchStatusBadge
+          status={
+            branch.status === 'CREATING_PROJECT' ? data?.status ?? branch.status : branch.status
+          }
+        />
         <p className="text-xs text-foreground-lighter">
           {daysFromNow > 1 ? `Updated on ${formattedUpdatedAt}` : `Updated ${formattedTimeFromNow}`}
         </p>
       </div>
       <div className="flex items-center gap-x-8">
-        {pullRequest !== undefined && (
+        {branch.pr_number !== undefined && (
           <div className="flex items-center">
             <Link
-              href={pullRequest.url}
+              href={`https://github.com/${repo}/pull/${branch.pr_number}`}
               target="_blank"
               rel="noreferrer"
               className="text-xs transition text-foreground-lighter mr-4 hover:text-foreground"
@@ -135,9 +155,9 @@ export const BranchRow = ({
                 passHref
                 target="_blank"
                 rel="noreferer"
-                href={`http://github.com/${pullRequest.target.repo}/tree/${pullRequest.target.branch}`}
+                href={`http://github.com/${repo}/tree/${branch.git_branch}`}
               >
-                {pullRequest.target.branch}
+                {branch.git_branch}
               </Link>
             </Button>
           </div>
@@ -155,7 +175,7 @@ export const BranchRow = ({
                 <Button type="text" icon={<IconMoreVertical />} className="px-1" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="p-0 w-56" side="bottom" align="end">
-                <Link passHref href={`/project/${ref}/settings/integrations`}>
+                <Link passHref href={`/project/${projectRef}/settings/integrations`}>
                   <DropdownMenuItem asChild className="gap-x-2">
                     <a>Change production branch</a>
                   </DropdownMenuItem>
@@ -170,7 +190,11 @@ export const BranchRow = ({
                 passHref
                 target="_blank"
                 rel="noreferrer"
-                href={pullRequest?.url ?? createPullRequestURL}
+                href={
+                  branch.pr_number !== undefined
+                    ? `https://github.com/${repo}/pull/${branch.pr_number}`
+                    : createPullRequestURL
+                }
               >
                 {branch.pr_number !== undefined ? 'View Pull Request' : 'Create Pull Request'}
               </Link>

@@ -1,6 +1,6 @@
 import BranchManagement from 'components/interfaces/BranchManagement/BranchManagement'
-import { ProjectLayoutWithAuth } from 'components/layouts'
-import { NextPageWithLayout } from 'types'
+import { ProjectLayoutWithAuth } from 'components/layouts/ProjectLayout/ProjectLayout'
+import type { NextPageWithLayout } from 'types'
 
 const BranchManagementPage: NextPageWithLayout = () => {
   return <BranchManagement />

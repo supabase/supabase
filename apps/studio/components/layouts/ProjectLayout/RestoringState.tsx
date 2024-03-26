@@ -4,15 +4,13 @@ import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Button, IconAlertCircle, IconCheckCircle, IconLoader } from 'ui'
 
-import { getProjectDetail, invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
-import { useStore } from 'hooks'
+import { invalidateProjectDetailsQuery } from 'data/projects/project-detail-query'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
 import { useProjectContext } from './ProjectContext'
 
 const RestoringState = () => {
   const { ref } = useParams()
-  const { meta } = useStore()
   const queryClient = useQueryClient()
   const { project } = useProjectContext()
   const checkServerInterval = useRef<number>()
@@ -48,8 +46,6 @@ const RestoringState = () => {
     if (!project) return console.error('Project is required')
 
     setLoading(true)
-    const projectDetail = await getProjectDetail({ ref: project?.ref })
-    if (projectDetail) meta.setProjectDetails(projectDetail)
     if (ref) await invalidateProjectDetailsQuery(queryClient, ref)
   }
 

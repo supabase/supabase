@@ -3,7 +3,10 @@ import Image from 'next/legacy/image'
 import React from 'react'
 
 import { Markdown } from 'components/interfaces/Markdown'
-import { Integration, IntegrationProjectConnection } from 'data/integrations/integrations.types'
+import type {
+  Integration,
+  IntegrationProjectConnection,
+} from 'data/integrations/integrations.types'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { BASE_PATH } from 'lib/constants'
 import { getIntegrationConfigurationUrl } from 'lib/integration-utils'
@@ -100,9 +103,7 @@ const IntegrationInstallation = React.forwardRef<HTMLLIElement, IntegrationInsta
                     integration.metadata?.gitHubConnectionOwner)}
               </span>
 
-              <Badge color="scale" className="capitalize">
-                {integration.metadata?.account.type}
-              </Badge>
+              <Badge className="capitalize">{integration.metadata?.account.type}</Badge>
             </div>
             <div className="flex flex-col gap-0">
               <span className="text-foreground-lighter text-xs">
@@ -154,7 +155,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
         ref={ref}
         key={connection.id}
         {...props}
-        className={cn(showNode && 'pl-8 ml-6 border-l border-muted', 'pb-2', 'relative')}
+        className={cn(showNode && 'pl-8 ml-6 border-l border-muted', 'relative')}
       >
         {showNode && (
           <div className="absolute w-8 rounded-bl-full border-b border-l border-muted h-10 -left-px"></div>
@@ -162,30 +163,56 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
         <div
           className={cn(
             orientation === 'horizontal'
-              ? 'flex items-center justify-between'
+              ? 'flex items-center justify-between gap-2'
               : 'flex flex-col gap-3',
-            'bg-surface-100 border shadow-sm px-8 py-4 rounded-lg',
+            'bg-surface-100 border shadow-sm px-6 py-4 rounded-lg',
             className
           )}
         >
-          <div className={'flex flex-col gap-1'}>
-            <div className="flex gap-2 items-center">
-              <HandleIcon type={'Supabase'} />
-              <span className="text-sm">{project?.name}</span>
-              <IconArrowRight size={14} className="text-foreground-lighter" strokeWidth={1.5} />
-              {!connection?.metadata?.framework ? (
-                <div className="bg-black text-white w-4 h-4 rounded flex items-center justify-center">
-                  <HandleIcon type={type} className={'!w-2.5'} />
-                </div>
-              ) : (
-                <img
-                  src={`${BASE_PATH}/img/icons/frameworks/${connection.metadata.framework}.svg`}
-                  width={21}
-                  height={21}
-                  alt={`icon`}
-                />
-              )}
-              <span className="text-sm truncate">{connection.metadata?.name}</span>
+          <div className="flex flex-col gap-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <div className="flex-shrink-0 flex gap-x-2 items-center max-w-40 ">
+                <HandleIcon type={'Supabase'} />
+                <span title={project?.name} className="text-sm truncate">
+                  {project?.name}
+                </span>
+              </div>
+
+              <IconArrowRight
+                size={14}
+                className="flex-shrink-0 text-foreground-lighter"
+                strokeWidth={1.5}
+              />
+
+              <div className="flex-1 min-w-0 flex gap-2 items-center">
+                {!connection?.metadata?.framework ? (
+                  <div className="bg-black text-white w-4 h-4 rounded flex items-center justify-center">
+                    <HandleIcon type={type} className={'!w-2.5'} />
+                  </div>
+                ) : (
+                  <img
+                    src={`${BASE_PATH}/img/icons/frameworks/${connection.metadata.framework}.svg`}
+                    width={21}
+                    height={21}
+                    alt={`icon`}
+                  />
+                )}
+                {type === 'GitHub' ? (
+                  <a
+                    title={connection.metadata.name}
+                    href={`https://github.com/${connection.metadata?.name}`}
+                    className="text-sm truncate"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {connection.metadata?.name}
+                  </a>
+                ) : (
+                  <span title={connection.metadata.name} className="text-sm truncate">
+                    {connection.metadata?.name}
+                  </span>
+                )}
+              </div>
             </div>
 
             <div className="flex flex-col gap-0">
@@ -198,7 +225,7 @@ const IntegrationConnection = React.forwardRef<HTMLLIElement, IntegrationConnect
             </div>
           </div>
 
-          <div>{actions}</div>
+          <div className="flex-shrink-0">{actions}</div>
         </div>
       </li>
     )

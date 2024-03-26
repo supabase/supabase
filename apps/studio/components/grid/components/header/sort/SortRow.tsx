@@ -3,7 +3,7 @@ import { memo, useRef } from 'react'
 import { useDrag, useDrop } from 'react-dnd'
 import { Button, IconMenu, IconX, Toggle } from 'ui'
 
-import { DragItem, Sort, SupaTable } from 'components/grid/types'
+import type { DragItem, Sort, SupaTable } from 'components/grid/types'
 
 export interface SortRowProps {
   table: SupaTable

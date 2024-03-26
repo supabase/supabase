@@ -1,7 +1,7 @@
 import Indexes from 'components/interfaces/Database/Indexes/Indexes'
 import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const IndexesPage: NextPageWithLayout = () => {
   return (

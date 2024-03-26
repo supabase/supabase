@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { Button, IconAlertCircle } from 'ui'
 
 import InformationBox from 'components/ui/InformationBox'
-import { MemberWithFreeProjectLimit } from 'data/organizations/free-project-limit-check-query'
+import type { MemberWithFreeProjectLimit } from 'data/organizations/free-project-limit-check-query'
 
 interface FreeProjectLimitWarningProps {
   membersExceededLimit: MemberWithFreeProjectLimit[]

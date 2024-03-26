@@ -6,7 +6,7 @@ import {
   ColumnPrivilegesGrant,
   grantColumnPrivileges,
 } from 'data/privileges/column-privileges-grant-mutation'
-import { ColumnPrivilege } from 'data/privileges/column-privileges-query'
+import type { ColumnPrivilege } from 'data/privileges/column-privileges-query'
 import {
   ColumnPrivilegesRevoke,
   revokeColumnPrivileges,
@@ -15,7 +15,7 @@ import {
   TablePrivilegesGrant,
   grantTablePrivileges,
 } from 'data/privileges/table-privileges-grant-mutation'
-import { TablePrivilege } from 'data/privileges/table-privileges-query'
+import type { TablePrivilege } from 'data/privileges/table-privileges-query'
 import {
   TablePrivilegesRevoke,
   revokeTablePrivileges,

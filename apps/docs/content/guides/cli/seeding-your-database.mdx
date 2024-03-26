@@ -1,0 +1,114 @@
+---
+id: 'seeding-your-database'
+title: 'Seeding your database'
+description: 'Populate your database with initial data for reproducible environments across local and testing.'
+subtitle: 'Populate your database with initial data for reproducible environments across local and testing.'
+---
+
+When you run `supabase init` we create an empty `seed.sql` file in the root of the `supabase` folder. You can use this to populate your database with seed data.
+
+## What is seed data?
+
+Seeding is the process of populating a database with initial data, typically used to provide sample or default records for testing and development purposes. You can use this to create "reproducible environments" for local development, staging, and production.
+
+## Using the seed file
+
+The `seed.sql` file is run every time you run `supabase start` or `supabase db reset`. Seeding is done _after_ all the database migrations have been run. As a general rule, you should not add schema statements to your seed file, only data.
+
+You can add any SQL statements to this file. For example:
+
+```sql supabase/seed.sql
+insert into countries
+  (name, code)
+values
+  ('United States', 'US'),
+  ('Canada', 'CA'),
+  ('Mexico', 'MX');
+```
+
+{/* prettier-ignore */}
+{/*
+
+### Splitting up your seed file
+
+The seed file can grow quite large, so you can split it up into multiple files. For example, you can create a `seed` folder and add a `countries.sql` file. Then you can add the following to your `seed.sql` file.
+
+```sql supabase/seed.sql
+\i seed/countries.sql
+```
+
+### Using CSV data to seed your database
+
+co
+You can use the `COPY` command to import CSV data into your database. For example, you can create a `seed` folder and add a `countries.csv` file. Then you can add the following to your `seed.sql` file.
+
+```sql supabase/seed.sql
+COPY countries (name, code) FROM 'seed/countries.csv' WITH (FORMAT csv);
+```
+
+\*/}
+
+## Generating seed data
+
+You can generate seed data for local development using [Snaplet](https://www.snaplet.dev/).
+
+If this is your first time using Snaplet to seed your project, you'll need to setup Snaplet
+for your project with `npx snaplet setup`, and follow the interactive prompts. `snaplet setup`
+will look at your database and its structure, and use it to generate the configuration files
+and assets needed by `@snaplet/seed`.
+
+Suppose you have a database with the following schema:
+
+![An example schema](/docs/img/guides/cli/snaplet-example-schema.png)
+
+You can use the Snaplet configuration file `seed.mts` to define the values you want to generate. For example
+
+- A `Post` with the title `"There is a lot of snow around here!"`
+- The `Post.createdBy` user with an email address ending in `"@acme.org"`
+- Three `Post.comments` from three different users.
+
+```ts seed.mts
+import { createSeedClient } from '@snaplet/seed'
+import { copycat } from '@snaplet/copycat'
+
+const seed = await createSeedClient();
+
+await seed.posts([{
+  title: "There is a lot of snow around here!"
+  createdBy: {
+    email: (ctx) =>
+      copycat.email(ctx.seed, {
+        domain: 'acme.org',
+      })
+  },
+  comments: (x) => x(3)
+}])
+```
+
+Running `npx tsx seed.mts > supabase/seed.sql` generates the relevant SQL statements inside your `supabase/seed.sql` file:
+
+```sql
+-- The `Post.createdBy` user with an email address ending in `"@acme.org"`
+INSERT INTO "User" (name, email) VALUES ("John Snow", "snow@acme.org")
+
+--- A `Post` with the title `"There is a lot of snow around here!"`
+INSERT INTO "Post" (title, content, createdBy) VALUES (
+  "There is a lot of snow around here!",
+  "Lorem ipsum dolar",
+  1)
+
+--- Three `Post.comments` from three different users.
+INSERT INTO "User" (name, email) VALUES ("Stephanie Shadow", "shadow@domain.com")
+INSERT INTO "Comment" (text, userId, postId) VALUES ("I love cheese", 2, 1)
+
+INSERT INTO "User" (name, email) VALUES ("John Rambo", "rambo@trymore.dev")
+INSERT INTO "Comment" (text, userId, postId) VALUES ("Lorem ipsum dolar sit", 3, 1)
+
+INSERT INTO "User" (name, email) VALUES ("Steven Plank", "s@plank.org")
+INSERT INTO "Comment" (text, userId, postId) VALUES ("Actually, that's not correct...", 4, 1)
+```
+
+Whenever your database structure changes, `@snaplet/seed` will need to be regenerated so that it is
+in sync with your new database structure. You can do this by running `npx snaplet generate`.
+
+For more information, check out Snaplet's [seed documentation](https://docs.snaplet.dev/core-concepts/seed)

@@ -2,9 +2,9 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { replicaKeys } from './keys'
-import { Database } from './replicas-query'
+import type { Database } from './replicas-query'
 
 export type Region =
   | 'us-east-1'
@@ -77,9 +77,10 @@ export const useReadReplicaSetUpMutation = ({
           return [...old, scaffoldNewDatabase]
         })
 
+        // [Joshen] Wait 30 seconds before checking if the replica actually is coming up
         setTimeout(async () => {
           await queryClient.invalidateQueries(replicaKeys.list(projectRef))
-        }, 5000)
+        }, 30000)
 
         await onSuccess?.(data, variables, context)
       },

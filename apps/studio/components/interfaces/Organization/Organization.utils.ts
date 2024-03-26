@@ -1,4 +1,4 @@
-import { OrganizationMember } from 'data/organizations/organization-members-query'
+import type { OrganizationMember } from 'data/organizations/organization-members-query'
 
 // Invite is expired if older than 24hrs
 export function isInviteExpired(timestamp: string) {

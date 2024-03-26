@@ -2,8 +2,8 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { patch } from 'data/fetchers'
-import { ResponseError } from 'types'
-import { UpdateConnectionPayload } from './integrations.types'
+import type { ResponseError } from 'types'
+import type { UpdateConnectionPayload } from './integrations.types'
 import { integrationKeys } from './keys'
 
 export async function updateVercelConnection({
@@ -40,11 +40,9 @@ export const useVercelConnectionUpdateMutation = ({
     (vars) => updateVercelConnection(vars),
     {
       async onSuccess(data, variables, context) {
-        await Promise.all([
-          queryClient.invalidateQueries(
-            integrationKeys.vercelConnectionsList(variables.organizationIntegrationId)
-          ),
-        ])
+        await queryClient.invalidateQueries(
+          integrationKeys.vercelConnectionsList(variables.organizationIntegrationId)
+        )
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

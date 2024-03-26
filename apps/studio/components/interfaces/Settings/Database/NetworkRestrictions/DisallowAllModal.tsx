@@ -18,8 +18,8 @@ const DisallowAllModal = ({ visible, onClose }: DisallowAllModalProps) => {
     if (!ref) return console.error('Project ref is required')
     await applyNetworkRestrictions({
       projectRef: ref,
-      dbAllowedCidrs: ['127.0.0.1/32'],
-      dbAllowedCidrsV6: ['::1/128'],
+      dbAllowedCidrs: [],
+      dbAllowedCidrsV6: [],
     })
   }
 

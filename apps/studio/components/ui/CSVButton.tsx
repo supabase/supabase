@@ -1,8 +1,13 @@
-import { Button, IconDownloadCloud } from 'ui'
-import { ButtonProps } from 'ui/src/components/Button/Button'
-import { flattenDeep } from 'lodash'
 import React, { PropsWithChildren, useMemo, useRef } from 'react'
 import { CSVLink } from 'react-csv'
+import {
+  Button,
+  IconDownload,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
+import { ButtonProps } from 'ui/src/components/Button/Button'
 
 interface CSVButtonProps {
   buttonType?: ButtonProps['type']
@@ -52,17 +57,25 @@ const CSVButton = ({
         filename={`supabase_logs.csv`}
         title={title}
       />
-      <Button
-        type={buttonType}
-        icon={icon || <IconDownloadCloud />}
-        disabled={disabled}
-        onClick={(e) => {
-          if (onClick) onClick(e)
-          handleDownload()
-        }}
-      >
-        {children}
-      </Button>
+      <Tooltip_Shadcn_ delayDuration={100}>
+        <TooltipTrigger_Shadcn_ asChild>
+          <Button
+            type={buttonType}
+            icon={icon || <IconDownload />}
+            disabled={disabled}
+            className="px-1.5"
+            onClick={(e) => {
+              if (onClick) onClick(e)
+              handleDownload()
+            }}
+          >
+            {children}
+          </Button>
+        </TooltipTrigger_Shadcn_>
+        <TooltipContent_Shadcn_ side="bottom" className="text-xs">
+          Download logs as CSV
+        </TooltipContent_Shadcn_>
+      </Tooltip_Shadcn_>
     </>
   )
 }

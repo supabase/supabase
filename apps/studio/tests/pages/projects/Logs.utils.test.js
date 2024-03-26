@@ -24,7 +24,7 @@ describe.each(Object.values(LogsTableName))('%s', (table) => {
     { filter: { search_query: undefined } },
     { filter: {} },
     { filter: { search_query: '123test' }, contains: ['123test'] },
-    //   test behaviour with overrides
+    //   test behavior with overrides
     {
       filter: { search_query: '123test', override: 'something' },
       contains: ['123test', 'override', 'something'],

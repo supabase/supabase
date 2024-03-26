@@ -1,0 +1,400 @@
+---
+title: 'Native Mobile Deep Linking'
+description: 'Learn how to handle deep linking for OAuth and email based login.'
+tocVideo: '8TZ6O1C8ujE'
+---
+
+In certain auth scenarios you will need to handle linking back into your application to finish the user's sign in.
+
+### When do you need to setup deep links
+
+- Magic link login.
+- Have `confirm email` enabled and are using email login.
+- Resetting password for email login.
+- Calling `.signInWithOAuth()` method.
+
+<Tabs
+  scrollable
+  size="large"
+  type="underlined"
+  defaultActiveId="react-native"
+  queryGroup="platform"
+>
+  <TabPanel id="react-native" label="Expo React Native">
+    To link to your development build or standalone app, you need to specify a custom URL scheme for your app. You can register a scheme in your app config (app.json, app.config.js) by adding a string under the `scheme` key:
+
+    ```json
+    {
+      "expo": {
+        "scheme": "com.supabase"
+      }
+    }
+    ```
+
+    In your project's [auth settings](https://supabase.com/dashboard/project/_/auth/url-configuration) add the redirect URL, e.g. `com.supabase://**`.
+
+    Finally, implement the OAuth and linking handlers. See the [supabase-js reference](/docs/reference/javascript/initializing?example=react-native-options-async-storage) for instructions on initializing the supabase-js client in React Native.
+
+    ```tsx ./components/Auth.tsx
+    import { Button } from "react-native";
+    import { makeRedirectUri } from "expo-auth-session";
+    import * as QueryParams from "expo-auth-session/build/QueryParams";
+    import * as WebBrowser from "expo-web-browser";
+    import * as Linking from "expo-linking";
+    import { supabase } from "app/utils/supabase";
+
+    WebBrowser.maybeCompleteAuthSession(); // required for web only
+    const redirectTo = makeRedirectUri();
+
+    const createSessionFromUrl = async (url: string) => {
+      const { params, errorCode } = QueryParams.getQueryParams(url);
+
+      if (errorCode) throw new Error(errorCode);
+      const { access_token, refresh_token } = params;
+
+      if (!access_token) return;
+
+      const { data, error } = await supabase.auth.setSession({
+        access_token,
+        refresh_token,
+      });
+      if (error) throw error;
+      return data.session;
+    };
+
+    const performOAuth = async () => {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "github",
+        options: {
+          redirectTo,
+          skipBrowserRedirect: true,
+        },
+      });
+      if (error) throw error;
+
+      const res = await WebBrowser.openAuthSessionAsync(
+        data?.url ?? "",
+        redirectTo
+      );
+
+      if (res.type === "success") {
+        const { url } = res;
+        await createSessionFromUrl(url);
+      }
+    };
+
+    const sendMagicLink = async () => {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: "example@email.com",
+        options: {
+          emailRedirectTo: redirectTo,
+        },
+      });
+
+      if (error) throw error;
+      // Email sent.
+    };
+
+    export default function Auth() {
+      // Handle linking into app from email app.
+      const url = Linking.useURL();
+      if (url) createSessionFromUrl(url);
+
+      return (
+        <>
+          <Button onPress={performOAuth} title="Sign in with Github" />
+          <Button onPress={sendMagicLink} title="Send Magic Link" />
+        </>
+      );
+    }
+    ```
+
+    For the best user experience it is recommended to use universal links which require a more elaborate setup. You can find the detailed setup instructions in the [Expo docs](https://docs.expo.dev/guides/deep-linking/).
+
+  </TabPanel>
+  <TabPanel id="flutter" label="Flutter">
+    \*Currently supabase_flutter supports deep links on Android, iOS, Web, MacOS and Windows.
+
+    ### Deep link config
+
+    - Go to your [auth settings](https://supabase.com/dashboard/project/_/auth/url-configuration) page.
+    - You need to enter your app redirect callback on `Additional Redirect URLs` field.
+
+    The redirect callback url should have this format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.flutterquickstart://login-callback` is just an example, you can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
+
+    ![Supabase console deep link setting](/docs/img/deeplink-setting.png)
+
+    ### Platform specific config
+
+    <Tabs
+      scrollable
+      size="large"
+      type="underlined"
+      defaultActiveId="android"
+      queryGroup="os"
+    >
+      <TabPanel id="android" label="Android">
+
+      ```xml
+      <manifest ...>
+        <!-- ... other tags -->
+        <application ...>
+          <activity ...>
+            <!-- ... other tags -->
+
+            <!-- Deep Links -->
+            <intent-filter>
+              <action android:name="android.intent.action.VIEW" />
+              <category android:name="android.intent.category.DEFAULT" />
+              <category android:name="android.intent.category.BROWSABLE" />
+              <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
+              <data
+                android:scheme="YOUR_SCHEME"
+                android:host="YOUR_HOSTNAME" />
+            </intent-filter>
+          </activity>
+        </application>
+      </manifest>
+      ```
+
+      The `android:host` attribute is optional for Deep Links.
+
+      For more info: https://developer.android.com/training/app-links/deep-linking
+
+    </TabPanel>
+    <TabPanel id="ios" label="iOS">
+
+      For **Custom URL schemes** you need to declare the scheme in
+      `ios/Runner/Info.plist` (or through Xcode's Target Info editor,
+      under URL Types):
+
+      ```xml
+      <!-- ... other tags -->
+      <plist>
+      <dict>
+        <!-- ... other tags -->
+        <key>CFBundleURLTypes</key>
+        <array>
+          <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+              <string>[YOUR_SCHEME]</string>
+            </array>
+          </dict>
+        </array>
+        <!-- ... other tags -->
+      </dict>
+      </plist>
+      ```
+
+      For more info: https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app
+
+    </TabPanel>
+    <TabPanel id="windows" label="Windows">
+
+      Setting up deep links in Windows has few more steps than other platforms.
+      [Learn more](https://pub.dev/packages/app_links#windows)
+
+      Declare this method in `<PROJECT_DIR>\windows\runner\win32_window.h`
+
+      ```cpp
+        // Dispatches link if any.
+        // This method enables our app to be with a single instance too.
+        // This is optional but mandatory if you want to catch further links in same app.
+        bool SendAppLinkToInstance(const std::wstring& title);
+      ```
+
+      Add this inclusion at the top of `<PROJECT_DIR>\windows\runner\win32_window.cpp`
+
+      ```cpp
+      #include "app_links_windows/app_links_windows_plugin.h"
+      ```
+
+      Add this method in `<PROJECT_DIR>\windows\runner\win32_window.cpp`
+
+      ```cpp
+      bool Win32Window::SendAppLinkToInstance(const std::wstring& title) {
+        // Find our exact window
+        HWND hwnd = ::FindWindow(kWindowClassName, title.c_str());
+
+        if (hwnd) {
+          // Dispatch new link to current window
+          SendAppLink(hwnd);
+
+          // (Optional) Restore our window to front in same state
+          WINDOWPLACEMENT place = { sizeof(WINDOWPLACEMENT) };
+          GetWindowPlacement(hwnd, &place);
+          switch(place.showCmd) {
+            case SW_SHOWMAXIMIZED:
+                ShowWindow(hwnd, SW_SHOWMAXIMIZED);
+                break;
+            case SW_SHOWMINIMIZED:
+                ShowWindow(hwnd, SW_RESTORE);
+                break;
+            default:
+                ShowWindow(hwnd, SW_NORMAL);
+                break;
+          }
+          SetWindowPos(0, HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOSIZE | SWP_NOMOVE);
+          SetForegroundWindow(hwnd);
+          // END Restore
+
+          // Window has been found, don't create another one.
+          return true;
+        }
+
+        return false;
+      }
+      ```
+
+      Add the call to the previous method in `CreateAndShow`
+
+      ```cpp
+      bool Win32Window::CreateAndShow(const std::wstring& title,
+                                      const Point& origin,
+                                      const Size& size) {
+      if (SendAppLinkToInstance(title)) {
+          return false;
+      }
+
+      ...
+      ```
+
+      At this point, you can register your own scheme.
+      On Windows, URL protocols are setup in the Windows registry.
+
+      This package won't do it for you.
+
+      You can achieve it with [url_protocol](https://pub.dev/packages/url_protocol) inside you app.
+
+      The most relevant solution is to include those registry modifications into your installer to allow
+      for deregistration.
+
+    </TabPanel>
+    <TabPanel id="macos" label="MacOS">
+
+      Add this XML chapter in your `macos/Runner/Info.plist` inside `<plist version="1.0"><dict>` chapter:
+
+      ```xml
+      <!-- ... other tags -->
+      <plist version="1.0">
+      <dict>
+        <!-- ... other tags -->
+        <key>CFBundleURLTypes</key>
+        <array>
+            <dict>
+                <key>CFBundleURLName</key>
+                <!-- abstract name for this URL type (you can leave it blank) -->
+                <string>sample_name</string>
+                <key>CFBundleURLSchemes</key>
+                <array>
+                    <!-- your schemes -->
+                    <string>sample</string>
+                </array>
+            </dict>
+        </array>
+        <!-- ... other tags -->
+      </dict>
+      </plist>
+      ```
+
+      </TabPanel>
+    </Tabs>
+
+  </TabPanel>
+
+  <TabPanel id="swift" label="Swift">
+  ### Deep link config
+
+    1. Go to your [auth settings](https://supabase.com/dashboard/project/_/auth/url-configuration) page.
+    2. Enter your app redirect URL in the `Additional Redirect URLs` field. This is the URL that the user gets redirected to after clicking a magic link.
+
+    The redirect callback url should have the format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.user-management://login-callback` is just an example. You can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
+
+    ![Supabase console deep link setting](/docs/img/deeplink-setting.png)
+
+    Now add a custom URL to your application, so the OS knows how to redirect back your application once the user clicks the magic link.
+
+    You have the option to use Xcode's Target Info Editor following [official Apple documentation](https://developer.apple.com/documentation/xcode/defining-a-custom-url-scheme-for-your-app#Register-your-URL-scheme).
+
+    Or, declare the URL scheme manually in your `Info.plist` file.
+
+    ```xml Info.plist
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+      <plist version="1.0">
+      <dict>
+        <!-- other tags -->
+        <key>CFBundleURLTypes</key>
+        <array>
+          <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+              <string>io.supabase.user-management</string>
+            </array>
+          </dict>
+        </array>
+      </dict>
+      </plist>
+    ```
+
+  </TabPanel>
+  <TabPanel id="kotlin" label="Android Kotlin">
+  ### Deep link config
+
+    1. Go to your [auth settings](https://supabase.com/dashboard/project/_/auth/url-configuration) page.
+    2. Enter your app redirect URL in the `Additional Redirect URLs` field. This is the URL that the user gets redirected to after clicking a magic link.
+
+    The redirect callback url should have the format `[YOUR_SCHEME]://[YOUR_HOSTNAME]`. Here, `io.supabase.user-management://login-callback` is just an example. You can choose whatever you would like for `YOUR_SCHEME` and `YOUR_HOSTNAME` as long as the scheme is unique across the user's device. For this reason, typically a reverse domain of your website is used.
+
+    Now, edit the Android manifest to make sure the app opens when the user clicks on the magic link.
+
+    ```xml
+    <manifest ...>
+      <!-- ... other tags -->
+      <application ...>
+        <activity ...>
+          <!-- ... other tags -->
+
+          <!-- Deep Links -->
+          <intent-filter>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.DEFAULT" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <!-- Accepts URIs that begin with YOUR_SCHEME://YOUR_HOST -->
+            <data
+              android:scheme="YOUR_SCHEME"
+              android:host="YOUR_HOSTNAME" />
+          </intent-filter>
+        </activity>
+      </application>
+    </manifest>
+    ```
+
+    Check the [Android documentation](https://developer.android.com/training/app-links/deep-linking) for more information.
+
+    Next, specify the scheme and host in the Supabase Client:
+    ```kotlin
+    install(Auth) {
+       host = "login-callback"
+       scheme = "io.supabase.user-management"
+    }
+    ```
+
+    Finally, call `Auth#handleDeeplinks` when the app opens:
+
+    ```kotlin
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        supabase.handleDeeplinks(intent)
+    }
+    ```
+
+    The user will now be authenticated when your app receives a valid deeplink!
+
+  </TabPanel>
+</Tabs>

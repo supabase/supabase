@@ -7,6 +7,7 @@ import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
 import handleRefStaticProps from '~/lib/mdx/handleRefStaticProps'
 import { useRouter } from 'next/router'
 import RefSEO from '~/components/reference/RefSEO'
+import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 
 const sections = flattenSections(clientLibsCommonSections)
 const libraryPath = '/csharp'
@@ -25,6 +26,7 @@ export default function CSharpReference(props) {
       <RefSEO title={pageTitle} />
 
       <RefSectionHandler
+        menuId={MenuId.RefCSharpV0}
         sections={filteredSection}
         spec={spec}
         typeSpec={typeSpec}

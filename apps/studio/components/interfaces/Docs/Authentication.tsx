@@ -1,6 +1,6 @@
 import Link from 'next/link'
 
-import { AutoApiService } from 'data/config/project-api-query'
+import type { AutoApiService } from 'data/config/project-api-query'
 import CodeSnippet from './CodeSnippet'
 import Snippets from './Snippets'
 

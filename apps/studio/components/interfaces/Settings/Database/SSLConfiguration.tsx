@@ -1,10 +1,10 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Alert, Button, IconDownload, IconExternalLink, IconLoader, Toggle } from 'ui'
+import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   FormHeader,
@@ -16,10 +16,10 @@ import {
 import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { useSSLEnforcementQuery } from 'data/ssl-enforcement/ssl-enforcement-query'
 import { useSSLEnforcementUpdateMutation } from 'data/ssl-enforcement/ssl-enforcement-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
+import { Alert, Button, IconDownload, IconExternalLink, IconLoader, Toggle } from 'ui'
 
 const SSLConfiguration = () => {
-  const { ui } = useStore()
   const { ref } = useParams()
   const [isEnforced, setIsEnforced] = useState(false)
 
@@ -34,18 +34,11 @@ const SSLConfiguration = () => {
   const { mutate: updateSSLEnforcement, isLoading: isSubmitting } = useSSLEnforcementUpdateMutation(
     {
       onSuccess: () => {
-        ui.setNotification({
-          category: 'success',
-          message: 'Successfully updated SSL configuration',
-        })
+        toast.success('Successfully updated SSL configuration')
       },
       onError: (error) => {
         setIsEnforced(initialIsEnforced)
-        ui.setNotification({
-          error,
-          category: 'error',
-          message: `Failed to update SSL enforcement: ${error.message}`,
-        })
+        toast.error(`Failed to update SSL enforcement: ${error.message}`)
       },
     }
   )

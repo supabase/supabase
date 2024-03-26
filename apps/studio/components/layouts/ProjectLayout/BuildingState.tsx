@@ -13,6 +13,7 @@ import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedProject } from 'hooks'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
+import Connect from 'components/interfaces/Home/Connect/Connect'
 
 const BuildingState = () => {
   const { ref } = useParams()
@@ -53,7 +54,7 @@ const BuildingState = () => {
         <div className=" flex flex-col gap-4">
           <div className="flex items-center space-x-3">
             <h1 className="text-3xl text-foreground">{project?.name}</h1>
-            <Badge color="brand">
+            <Badge variant="brand">
               <div className="flex items-center gap-2">
                 <IconLoader className="animate-spin" size={12} />
                 <span>

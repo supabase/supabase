@@ -6,13 +6,15 @@ const FormHeader = ({
   title,
   description,
   docsUrl,
+  className,
 }: {
   title: string
   description?: string
   docsUrl?: string
+  className?: string
 }) => {
   return (
-    <div className="mb-6 flex items-center justify-between">
+    <div className={`mb-6 flex items-center justify-between ${className}`}>
       <div className="space-y-1">
         <h3 className="text-foreground text-xl">
           <ReactMarkdown unwrapDisallowed disallowedElements={['p']}>

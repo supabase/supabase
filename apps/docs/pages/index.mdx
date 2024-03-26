@@ -1,14 +1,8 @@
 import HomeLayout from '~/layouts/HomeLayout'
 import Link from 'next/link'
-import {
-  Button,
-  GlassPanel,
-  IconBackground,
-  IconChevronRight,
-  IconPanel,
-  IconPlay,
-  TextLink,
-} from 'ui'
+import { Button, IconBackground, IconChevronRight, IconPlay, TextLink } from 'ui'
+import { GlassPanel } from 'ui-patterns/GlassPanel'
+import { IconPanel } from 'ui-patterns/IconPanel'
 
 import HomeMenuIconPicker from '~/components/Navigation/NavigationMenu/HomeMenuIconPicker'
 
@@ -191,7 +185,7 @@ export const products = [
     title: 'Database',
     icon: 'database',
     hasLightIcon: true,
-    href: '/guides/database',
+    href: '/guides/database/overview',
     description:
       'Supabase provides a full Postgres database for every project with Realtime functionality, database backups, extensions, and more.',
   },

@@ -548,9 +548,9 @@
         "type": "cli-command"
       },
       {
-        "id": "supabase-storage-cp",
+        "id": "supabase-storage-rm",
         "title": "Delete objects from Storage",
-        "slug": "supabase-storage-cp",
+        "slug": "supabase-storage-rm",
         "type": "cli-command"
       }
     ]

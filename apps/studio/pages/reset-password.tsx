@@ -2,7 +2,7 @@ import ResetPasswordForm from 'components/interfaces/SignIn/ResetPasswordForm'
 import { ForgotPasswordLayout } from 'components/layouts'
 import { withAuth } from 'hooks'
 import Link from 'next/link'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const ResetPasswordPage: NextPageWithLayout = () => {
   return (

@@ -6,7 +6,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { FormHeader } from 'components/ui/Forms'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import VaultNavTabs from 'components/interfaces/Settings/Vault/VaultNavTabs'
 
 const VaultSettingsSecrets: NextPageWithLayout = () => {

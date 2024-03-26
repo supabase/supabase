@@ -2,8 +2,8 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 import { isResponseOk, post } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { ResponseError } from 'types'
-import { AccessToken } from './access-tokens-query'
+import type { ResponseError } from 'types'
+import type { AccessToken } from './access-tokens-query'
 import { accessTokenKeys } from './keys'
 
 export type AccessTokenCreateVariables = {

@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { miscKeys } from './keys'
 import { COUNTRY_LAT_LON } from 'components/interfaces/ProjectCreation/ProjectCreation.constants'
 import { getDistanceLatLonKM } from 'lib/helpers'

@@ -1,6 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { configKeys } from './keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { get } from 'data/fetchers'
 import { IS_PLATFORM } from 'lib/constants'
 

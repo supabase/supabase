@@ -1,10 +1,15 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
   Form,
   IconAlertCircle,
   IconBarChart2,
@@ -23,14 +28,24 @@ import {
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useProjectUpdateMutation } from 'data/projects/project-update-mutation'
-import { useCheckPermissions, useProjectByRef, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useFlag, useProjectByRef, useSelectedOrganization } from 'hooks'
 import PauseProjectButton from './Infrastructure/PauseProjectButton'
 import RestartServerButton from './Infrastructure/RestartServerButton'
 
 const General = () => {
-  const { ui } = useStore()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
+
+  // Also doubles up as a feature flag to enable display of the related alert,
+  // another dedicated flag would be redundant.
+  const v2AnnouncementUrl = useFlag('v2AnnouncementUrl')
+
+  const v2MaintenanceWindow = project?.v2MaintenanceWindow
+  const v2MaintenanceDate = v2MaintenanceWindow?.start
+    ? new Date(v2MaintenanceWindow.start).toUTCString().slice(0, 16)
+    : undefined
+  const v2MaintenanceStartTime = v2MaintenanceWindow?.start?.substring(11, 16)
+  const v2MaintenanceEndTime = v2MaintenanceWindow?.end?.substring(11, 16)
 
   const parentProject = useProjectByRef(project?.parent_project_ref)
   const isBranch = parentProject !== undefined
@@ -50,7 +65,7 @@ const General = () => {
     try {
       const { name } = await updateProject({ ref: project.ref, name: values.name.trim() })
       resetForm({ values: { name }, initialValues: { name } })
-      ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+      toast.success('Successfully saved settings')
     } catch (error) {}
   }
 
@@ -120,16 +135,61 @@ const General = () => {
         <>
           <div className="mt-6" id="restart-project">
             <FormPanel>
-              <div className="flex w-full items-center justify-between px-8 py-4">
-                <div>
-                  <p className="text-sm">Restart project</p>
-                  <div className="max-w-[420px]">
-                    <p className="text-sm text-foreground-light">
-                      Your project will not be available for a few minutes.
-                    </p>
+              <div className="flex flex-col px-8 py-4">
+                {v2MaintenanceStartTime &&
+                  v2MaintenanceEndTime &&
+                  v2AnnouncementUrl !== 'https://' && (
+                    <Alert_Shadcn_ variant="warning" className="mb-4">
+                      <IconAlertCircle strokeWidth={2} />
+                      <AlertTitle_Shadcn_>Upcoming project restart scheduled</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                        This project will automatically restart on {v2MaintenanceDate} between{' '}
+                        {v2MaintenanceStartTime} and {v2MaintenanceEndTime} UTC, which will cause up
+                        to a few minutes of downtime.
+                        <Collapsible_Shadcn_>
+                          <CollapsibleTrigger_Shadcn_ className="text-foreground-light transition-all [&[data-state=open]&_svg]:rotate-90 hover:text-foreground data-[state=open]:text-foreground flex items-center gap-x-2 w-full">
+                            <ChevronRight
+                              className="transition-transform"
+                              strokeWidth={1.5}
+                              size={14}
+                            />
+                            Why this time?
+                          </CollapsibleTrigger_Shadcn_>
+                          <CollapsibleContent_Shadcn_>
+                            Your project has historically had the least database queries across the
+                            previous 10 weeks during this 30 minute window.
+                          </CollapsibleContent_Shadcn_>
+                        </Collapsible_Shadcn_>
+                        You may also manually restart this project anytime before{' '}
+                        {v2MaintenanceDate} {v2MaintenanceStartTime} UTC at a time that is
+                        convenient for you.
+                        <br />
+                        <br />
+                        <em>
+                          <a
+                            href={v2AnnouncementUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="underline"
+                          >
+                            Find out more
+                          </a>{' '}
+                          about our v2 platform architecture migration.
+                        </em>
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  )}
+                <div className="flex justify-between">
+                  <div>
+                    <p className="text-sm">Restart project</p>
+                    <div className="max-w-[420px]">
+                      <p className="text-sm text-foreground-light">
+                        Your project will not be available for a few minutes.
+                      </p>
+                    </div>
                   </div>
+                  <RestartServerButton />
                 </div>
-                <RestartServerButton />
               </div>
               <div
                 className="flex w-full items-center justify-between px-8 py-4"

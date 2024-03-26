@@ -1,7 +1,7 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
 
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { enumeratedTypesKeys } from './keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 

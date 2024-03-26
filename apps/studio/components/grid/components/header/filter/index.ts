@@ -1,4 +1,3 @@
-import FilterPopover from './FilterPopover'
+export { default as FilterPopover } from './FilterPopover'
 
 export * from './Filter.constants'
-export default FilterPopover

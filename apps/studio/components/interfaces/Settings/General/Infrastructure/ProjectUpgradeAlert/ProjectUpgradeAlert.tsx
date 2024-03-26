@@ -2,6 +2,13 @@ import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
+
+import { useParams } from 'common'
+import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
+import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
+import { setProjectStatus } from 'data/projects/projects-query'
+import { PROJECT_STATUS } from 'lib/constants'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -14,16 +21,8 @@ import {
   Modal,
 } from 'ui'
 
-import { useParams } from 'common/hooks'
-import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
-import { useProjectUpgradeMutation } from 'data/projects/project-upgrade-mutation'
-import { setProjectStatus } from 'data/projects/projects-query'
-import { useStore } from 'hooks'
-import { PROJECT_STATUS } from 'lib/constants'
-
 const ProjectUpgradeAlert = () => {
   const router = useRouter()
-  const { ui } = useStore()
   const { ref } = useParams()
   const queryClient = useQueryClient()
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
@@ -40,13 +39,13 @@ const ProjectUpgradeAlert = () => {
   const { mutate: upgradeProject, isLoading: isUpgrading } = useProjectUpgradeMutation({
     onSuccess: (res, variables) => {
       setProjectStatus(queryClient, variables.ref, PROJECT_STATUS.UPGRADING)
-      ui.setNotification({ category: 'success', message: 'Upgrading project' })
+      toast.success('Upgrading project')
       router.push(`/project/${variables.ref}?upgradeInitiated=true`)
     },
   })
 
   const onConfirmUpgrade = async (values: any) => {
-    if (!ref) return ui.setNotification({ category: 'error', message: 'Project ref not found' })
+    if (!ref) return toast.error('Project ref not found')
     upgradeProject({ ref, target_version: values.version })
   }
 

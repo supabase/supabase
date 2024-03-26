@@ -1,5 +1,4 @@
 import { useIsLoggedIn, useParams, useTelemetryProps } from 'common'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect } from 'react'
 
@@ -87,4 +86,4 @@ const PageTelemetry = ({ children }: PropsWithChildren<{}>) => {
   return <>{children}</>
 }
 
-export default observer(PageTelemetry)
+export default PageTelemetry

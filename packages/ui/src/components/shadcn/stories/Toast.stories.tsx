@@ -1,8 +1,8 @@
 import { Meta } from '@storybook/react'
-import { Card } from '@ui/components/shadcn/ui/card'
-import { Button } from '@ui/components/shadcn/ui/button'
-import { ToastAction } from '@ui/components/shadcn/ui/toast'
-import { useToast } from '@ui/components/shadcn/ui/use-toast'
+import { Button } from '../ui/button'
+import { ToastAction } from '../ui/toast'
+import { useToast } from '../ui/use-toast'
+
 
 const meta: Meta = {
   title: 'shadcn/Toast',

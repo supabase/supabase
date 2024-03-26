@@ -1,9 +1,9 @@
 import { useParams } from 'common'
+import toast from 'react-hot-toast'
 import { Alert, Button, Modal } from 'ui'
 
-import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
-import { useStore } from 'hooks'
 import { useNetworkRestrictionsQuery } from 'data/network-restrictions/network-restrictions-query'
+import { useNetworkRestrictionsApplyMutation } from 'data/network-restrictions/network-retrictions-apply-mutation'
 
 interface RemoveRestrictionModalProps {
   visible: boolean
@@ -16,7 +16,6 @@ const RemoveRestrictionModal = ({
   selectedRestriction,
   onClose,
 }: RemoveRestrictionModalProps) => {
-  const { ui } = useStore()
   const { ref } = useParams()
 
   const { data } = useNetworkRestrictionsQuery({ projectRef: ref })
@@ -29,10 +28,7 @@ const RemoveRestrictionModal = ({
     useNetworkRestrictionsApplyMutation({
       onSuccess: () => onClose(),
       onError: (error) => {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to remove restriction: ${error.message}`,
-        })
+        toast.error(`Failed to remove restriction: ${error.message}`)
       },
     })
 

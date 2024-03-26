@@ -4,13 +4,13 @@ import { useRouter } from 'next/router'
 import Link from 'next/link'
 import { useWindowSize } from 'react-use'
 
-import { TweetCard } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import SwiperCore, { Autoplay } from 'swiper'
 
 import 'swiper/swiper.min.css'
 import SectionContainer from '../Layouts/SectionContainer'
 import { useBreakpoint } from 'common'
+import { TweetCard } from 'ui-patterns/TweetCard'
 
 SwiperCore.use([Autoplay])
 

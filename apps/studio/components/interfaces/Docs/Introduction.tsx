@@ -1,4 +1,4 @@
-import { AutoApiService } from 'data/config/project-api-query'
+import type { AutoApiService } from 'data/config/project-api-query'
 import Snippets from 'components/interfaces/Docs/Snippets'
 import CodeSnippet from './CodeSnippet'
 

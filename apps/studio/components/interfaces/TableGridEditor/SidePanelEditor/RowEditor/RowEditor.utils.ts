@@ -1,5 +1,5 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
-import { Dictionary } from 'types'
+import type { Dictionary } from 'types'
 import dayjs from 'dayjs'
 import { compact, find, isEqual, isNull, isString, isUndefined, omitBy } from 'lodash'
 
@@ -10,7 +10,7 @@ import {
   TIMESTAMP_TYPES,
   TIME_TYPES,
 } from '../SidePanelEditor.constants'
-import { RowField } from './RowEditor.types'
+import type { RowField } from './RowEditor.types'
 
 export const generateRowFields = (
   row: Dictionary<any> | undefined,

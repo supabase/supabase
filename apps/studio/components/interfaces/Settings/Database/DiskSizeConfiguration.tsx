@@ -3,23 +3,23 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useState } from 'react'
-import { Alert, Button, Form, InputNumber, Modal } from 'ui'
+import toast from 'react-hot-toast'
 import { number, object } from 'yup'
 
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import { useProjectDiskResizeMutation } from 'data/config/project-disk-resize-mutation'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { Alert, Button, Form, InputNumber, Modal } from 'ui'
 
 export interface DiskSizeConfigurationProps {
   disabled?: boolean
 }
 
 const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps) => {
-  const { ui } = useStore()
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
   const { ref: projectRef } = useParams()
@@ -46,10 +46,7 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   const { mutate: updateProjectUsage, isLoading: isUpdatingDiskSize } =
     useProjectDiskResizeMutation({
       onSuccess: (res, variables) => {
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully updated disk size to ${variables.volumeSize} GB`,
-        })
+        toast.success(`Successfully updated disk size to ${variables.volumeSize} GB`)
         setShowResetDbPass(false)
       },
     })

@@ -3,7 +3,7 @@ import dayjs from 'dayjs'
 import { Badge, Button, IconDownload } from 'ui'
 
 import { useBackupDownloadMutation } from 'data/database/backup-download-mutation'
-import { DatabaseBackup } from 'data/database/backups-query'
+import type { DatabaseBackup } from 'data/database/backups-query'
 import { useCheckPermissions } from 'hooks'
 
 interface BackupItemProps {
@@ -57,7 +57,7 @@ const BackupItem = ({ index, isHealthy, backup, projectRef, onSelectBackup }: Ba
           )}
         </div>
       )
-    return <Badge color="yellow">Backup In Progress...</Badge>
+    return <Badge variant="warning">Backup In Progress...</Badge>
   }
 
   const generateBackupName = (backup: any) => {

@@ -9,5 +9,12 @@
     return <IconBase icon={HelpCircle} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { helpCircle } from 'lucide-react'
+  */
   export default IconHelpCircle
   
