@@ -5,39 +5,46 @@ on:
 jobs:
   check-external:
     runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.is-member.outputs.result }}
     steps:
-    - name: Install deps
+    - name: Get deps
       run: |
-        sudo apt update && sudo apt install -y jq
+        sudo apt-get update && sudo apt-get install -y jq
     - name: Get org members
-      id: fetch-members
+      id: is-member
+      env:
+        GH_ORG: supabase
+        GH_USER: ${{ github.event.pull_request.user.login }}
+        GH_TOKEN: ${{ secrets.GH_ORG_MEMBERSHIP_PAT }}
       run: |
-        members=$(gh api \
-          -H "Accept: application/vnd.github+json" \
-          /orgs/supabase/members | jq -r '.[].login' | tr '\n' ' ')
-        echo "::set-output name=members::$members"
-    - name: Check if external contribution
+        gh api /orgs/supabase/members/$GH_USER
+    - if: failure()
+      name: is-member
       run: |
-        PR_OPENER="${{ github.event.pull_request.user.login }}"
-        MEMBERS="${{ steps.fetch-members.outputs.members }}"
-        if [[ $MEMBERS =~ (^|[[:space:]])"$PR_OPENER"($|[[:space:]]) ]]; then
-          echo "PR opener is a member of the organization."
-          exit 1
-        fi
-        exit 0
-  label-pr:
-    runs-on: ubuntu-latest
-    if: success()
-    steps:
-    - uses: actions/checkout@v2
-    - name: Label PR
-      uses: actions/labeler@v3
-      with:
-        repo-token: "${{ secrets.GITHUB_TOKEN }}"
-        configuration-path: .github/labeler.yml
-    - run: gh issue edit "$NUMBER" --add-label "$LABELS"
+        echo "User is not a member of Supabase org"
+        echo "result=false" >> $GH_OUTPUT
+    - if: success()
+      run: |
+        echo "User is a member of Supabase org, not applying labels"
+    - name: Label contributor
+      id: label-contributor
+      if:  ${{ steps.is-member.outputs.result == 'false' }}
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        USERNAME: ${{ github.event.pull_request.user.login }}
         GH_REPO: ${{ github.repository }}
         NUMBER: ${{ github.event.pull_request.number }}
         LABELS: contributor
+      run: |
+        gh pr edit $NUMBER --add-label $LABELS
+    - uses: actions/checkout@v4
+      if:  ${{ steps.is-member.outputs.result == 'false' }}
+    - name: Label PR
+      if:  ${{ steps.is-member.outputs.result == 'false' }}
+      uses: actions/labeler@v5
+    
+    
+
+
+      
