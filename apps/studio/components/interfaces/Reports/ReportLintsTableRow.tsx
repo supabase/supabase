@@ -57,48 +57,51 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
             {lint.level}
           </Badge>
         </Table.td>
-        <Table.td className="flex flex-col gap-y-1">
-          <div className="flex items-center gap-x-2">
-            <p className="text-foreground">{getHumanReadableTitle(lint.name)}</p>
 
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <HelpCircle size={14} />
-              </TooltipTrigger_Shadcn_>
-              <TooltipContent_Shadcn_ side="bottom" className="w-72">
-                {lint.description}
-              </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
-          </div>
-          <div className="grid gap-3">
-            {lint.detail && (
-              <Markdown className="text-foreground-light max-w-full" content={lint.detail} />
-            )}
-            {lint.remediation && (
-              <Markdown className="text-foreground-light max-w-full" content={lint.remediation} />
-            )}
+        <Table.td className="flex flex-col gap-y-2">
+          <div>
+            <div className="flex items-center gap-x-2">
+              <p className="text-foreground">{getHumanReadableTitle(lint.name)}</p>
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_ asChild>
+                  <HelpCircle size={14} />
+                </TooltipTrigger_Shadcn_>
+                <TooltipContent_Shadcn_ side="bottom" className="w-72">
+                  {lint.description}
+                </TooltipContent_Shadcn_>
+              </Tooltip_Shadcn_>
+            </div>
 
-            <div>
-              {(lint.metadata?.table || lint.metadata?.view_name) && (
-                <div className="flex items-center gap-2 text-xs">
+            {(lint.metadata?.table || lint.metadata?.view_name) && (
+              <div className="flex items-center gap-x-4 text-xs py-1">
+                {lint.metadata?.schema && (
+                  <div className="flex items-center gap-x-1">
+                    <p className="text-foreground-lighter">schema</p>
+                    <p className="text-foreground font-mono">{lint.metadata?.schema}</p>
+                  </div>
+                )}
+                <div className="flex items-center gap-x-1">
                   {lint.metadata?.table && (
                     <Table2 size={15} strokeWidth={1.5} className="text-foreground-lighter" />
                   )}
                   {lint.metadata?.view_name && (
                     <Eye size={15} strokeWidth={1.5} className="text-foreground-lighter" />
                   )}
-                  <span className="font-mono">
+                  <p className="text-foreground font-mono">
                     {lint.metadata?.table || lint.metadata?.view_name}
-                  </span>
-                  {lint.metadata?.schema && (
-                    <div className="flex items-center gap-1 ml-2">
-                      <span className="text-foreground-lighter">schema</span>
-                      <span className="text-foreground font-mono">{lint.metadata?.schema}</span>
-                    </div>
-                  )}
+                  </p>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-y-1">
+            {lint.detail && (
+              <Markdown className="text-foreground-light max-w-full" content={lint.detail} />
+            )}
+            {lint.remediation && (
+              <Markdown className="text-foreground-light max-w-full" content={lint.remediation} />
+            )}
           </div>
         </Table.td>
         <Table.td className="w-16 text-right">
