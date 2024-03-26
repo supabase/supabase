@@ -23,15 +23,12 @@ export default function Ticket() {
   const ticketBg = {
     regular: {
       background: `/images/launchweek/11_ga/tickets/lw11_ticket_regular_darker.png`,
-      background_mobile: `/images/launchweek/11_ga/tickets/lw11_ticket_regular_darker.png`,
     },
     platinum: {
       background: `/images/launchweek/11_ga/tickets/lw11_ticket_platinum.png`,
-      background_mobile: `/images/launchweek/11_ga/tickets/lw11_ticket_platinum.png`,
     },
     secret: {
       background: `/images/launchweek/11_ga/tickets/lw11_ticket_gold.png`,
-      background_mobile: `/images/launchweek/11_ga/tickets/lw11_ticket_gold.png`,
     },
   }
 
@@ -78,10 +75,7 @@ export default function Ticket() {
           </>
         )}
 
-        <div className="absolute inset-0 h-full p-6 top-20 bottom-20 z-30 flex flex-col justify-between w-full flex-1 overflow-hidden">
-          <TicketProfile />
-          {/* <TicketFooter /> */}
-        </div>
+        <TicketProfile className="absolute inset-0 h-full p-6 top-20 bottom-20 z-30 flex flex-col justify-between w-full flex-1 overflow-hidden" />
         <Image
           src={ticketBg[ticketType].background}
           alt={`Launch Week X ticket background #${bgImageId}`}

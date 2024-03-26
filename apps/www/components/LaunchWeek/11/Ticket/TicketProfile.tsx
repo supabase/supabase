@@ -1,7 +1,7 @@
 import { cn } from 'ui'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 
-export default function TicketProfile() {
+export default function TicketProfile({ className }: { className?: string }) {
   const { userData: user } = useConfData()
   const { username, name, metadata, golden, secret: hasSecretTicket } = user
   const hasLightTicket = golden
@@ -11,7 +11,7 @@ export default function TicketProfile() {
   const HAS_NO_META = !HAS_ROLE && !HAS_COMPANY
 
   return (
-    <div className="relative z-10 flex gap-4">
+    <div className={cn('relative z-10 flex gap-4', className)}>
       <div
         className={cn(
           'text-foreground-light flex flex-col gap-1 text-left text-xl md:max-w-[300px] mb-8',
