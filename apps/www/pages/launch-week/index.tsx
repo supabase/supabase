@@ -7,7 +7,6 @@ import { Session } from '@supabase/supabase-js'
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 import supabase from '~/lib/supabaseMisc'
 
-import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -15,7 +14,6 @@ import { Meetup } from '~/components/LaunchWeek/X/LWXMeetups'
 import LWXStickyNav from '~/components/LaunchWeek/X/Releases/LWXStickyNav'
 import LWXHeader from '~/components/LaunchWeek/X/Releases/LWXHeader'
 import MainStage from '~/components/LaunchWeek/X/Releases/MainStage'
-import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 
 const BuildStage = dynamic(() => import('~/components/LaunchWeek/X/Releases/BuildStage'))
 const LWXMeetups = dynamic(() => import('~/components/LaunchWeek/X/LWXMeetups'))
@@ -99,12 +97,6 @@ export default function LaunchWeekIndex({ meetups }: Props) {
             },
           ],
         }}
-      />
-      <MetaFaviconsPagesRouter
-        applicationName="Supabase LWX"
-        route="/images/launchweek/lwx/favicon"
-        themeColor="FFFFFF"
-        includeManifest
       />
       <ConfDataContext.Provider
         value={{

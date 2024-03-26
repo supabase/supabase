@@ -13,7 +13,10 @@ import { PortalToast, themes } from 'ui'
 import { CommandMenuProvider } from 'ui-patterns/Cmdk'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
-import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
+import MetaFaviconsPagesRouter, {
+  DEFAULT_FAVICON_ROUTE,
+  DEFAULT_FAVICON_THEME_COLOR,
+} from 'common/MetaFavicons/pages-router'
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import { post } from '~/lib/fetchWrapper'
 import supabase from '~/lib/supabase'
@@ -66,13 +69,31 @@ export default function App({ Component, pageProps }: AppProps) {
 
   const forceDarkMode = pathname === '/' || router.pathname.startsWith('/launch-week')
 
+  let applicationName = 'Supabase'
+  let faviconRoute = DEFAULT_FAVICON_ROUTE
+  let themeColor = DEFAULT_FAVICON_THEME_COLOR
+
+  console.log('router.asPath', router.asPath)
+
+  switch (router.asPath) {
+    case '/launch-week':
+      applicationName = 'Supabase LWX'
+      faviconRoute = 'images/launchweek/lwx/favicon/'
+      themeColor = 'FFFFFF'
+      break
+    default:
+      break
+  }
+
   return (
     <>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
       <MetaFaviconsPagesRouter
-        applicationName="Supabase"
+        applicationName={applicationName}
+        route={faviconRoute}
+        themeColor={themeColor}
         includeManifest
         includeMsApplicationConfig
         includeRssXmlFeed

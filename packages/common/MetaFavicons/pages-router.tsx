@@ -1,10 +1,13 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 
+export const DEFAULT_FAVICON_THEME_COLOR = '1E1E1E'
+export const DEFAULT_FAVICON_ROUTE = '/favicon'
+
 const MetaFaviconsPagesRouter = ({
   applicationName,
-  route = '/favicon',
-  themeColor = '1E1E1E',
+  route = DEFAULT_FAVICON_ROUTE,
+  themeColor = DEFAULT_FAVICON_THEME_COLOR,
   includeRssXmlFeed = false,
   includeManifest = false,
   includeMsApplicationConfig = false,
@@ -22,6 +25,8 @@ const MetaFaviconsPagesRouter = ({
   includeMsApplicationConfig?: boolean
 }) => {
   const { basePath } = useRouter()
+
+  console.log('route', route)
 
   return (
     <Head>
