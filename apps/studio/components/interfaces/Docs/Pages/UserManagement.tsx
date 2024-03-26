@@ -216,7 +216,7 @@ export default function UserManagement({
           </p>
         </article>
         <article className="code">
-          <CodeSnippet selectedLang={selectedLang} snippet={Snippets.authThirdPartyLogin()} />
+          <CodeSnippet selectedLang={selectedLang} snippet={Snippets.authThirdPartyLogin(autoApiService.endpoint, keyToShow)} />
         </article>
       </div>
 
