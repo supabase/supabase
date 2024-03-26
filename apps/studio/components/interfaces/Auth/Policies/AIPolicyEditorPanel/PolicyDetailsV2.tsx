@@ -20,6 +20,7 @@ import {
   Select_Shadcn_,
 } from 'ui'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
+import { useRouter } from 'next/router'
 
 interface PolicyDetailsV2Props {
   isEditing: boolean
@@ -30,6 +31,8 @@ interface PolicyDetailsV2Props {
 export const PolicyDetailsV2 = ({ isEditing, form, onUpdateCommand }: PolicyDetailsV2Props) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
+  const router = useRouter()
+  const searchTableId = router.query.search as string
 
   const { data: tables, isSuccess: isSuccessTables } = useTablesQuery({
     projectRef: project?.ref,
@@ -57,6 +60,13 @@ export const PolicyDetailsV2 = ({ isEditing, form, onUpdateCommand }: PolicyDeta
   useEffect(() => {
     if (!isEditing && isSuccessTables && tables.length > 0) form.setValue('table', tables[0].name)
   }, [isEditing, isSuccessTables, tables])
+
+  useEffect(() => {
+    const table = tables?.find((table) => table.id.toString() === searchTableId)
+    if (table) {
+      form.setValue('table', table.name)
+    }
+  }, [form, searchTableId, tables])
 
   return (
     <>
