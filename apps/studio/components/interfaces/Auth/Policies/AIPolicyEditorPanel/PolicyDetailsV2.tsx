@@ -55,8 +55,8 @@ export const PolicyDetailsV2 = ({ isEditing, form, onUpdateCommand }: PolicyDeta
     .sort((a, b) => a.name.localeCompare(b.name))
 
   useEffect(() => {
-    if (isSuccessTables && tables.length > 0) form.setValue('table', tables[0].name)
-  }, [isSuccessTables, tables])
+    if (!isEditing && isSuccessTables && tables.length > 0) form.setValue('table', tables[0].name)
+  }, [isEditing, isSuccessTables, tables])
 
   return (
     <>
