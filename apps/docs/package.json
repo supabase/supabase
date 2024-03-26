@@ -41,7 +41,7 @@
     "gray-matter": "^4.0.3",
     "hast-util-has-property": "^2.0.1",
     "icons": "*",
-    "isbot": "^3.6.5",
+    "isbot": "^5.1.2",
     "jsrsasign": "^11.0.0",
     "katex": "^0.16.9",
     "lodash": "^4.17.21",
