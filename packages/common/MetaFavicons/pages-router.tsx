@@ -26,8 +26,6 @@ const MetaFaviconsPagesRouter = ({
 }) => {
   const { basePath } = useRouter()
 
-  console.log('route', route)
-
   return (
     <Head>
       {/* prettier-ignore */}

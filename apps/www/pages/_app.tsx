@@ -73,8 +73,6 @@ export default function App({ Component, pageProps }: AppProps) {
   let faviconRoute = DEFAULT_FAVICON_ROUTE
   let themeColor = DEFAULT_FAVICON_THEME_COLOR
 
-  console.log('router.asPath', router.asPath)
-
   switch (router.asPath) {
     case '/launch-week':
       applicationName = 'Supabase LWX'
