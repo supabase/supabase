@@ -729,7 +729,6 @@ export const AIPolicyEditorPanel = memo(function ({
                           selectedPolicy={selectedPolicy}
                           selectedTemplate={selectedDiff}
                           onSelectTemplate={(value) => {
-                            console.log({ using }, { check })
                             form.setValue('name', value.name)
                             form.setValue('behavior', 'permissive')
                             form.setValue('command', value.command.toLowerCase())
