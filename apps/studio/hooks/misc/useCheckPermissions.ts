@@ -6,37 +6,74 @@ import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { IS_PLATFORM } from 'lib/constants'
 import type { Permission } from 'types'
 import { useSelectedOrganization } from './useSelectedOrganization'
+import { useSelectedProject } from './useSelectedProject'
 
 const toRegexpString = (actionOrResource: string) =>
   `^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`
+
+function doPermissionConditionCheck(permissions: Permission[], data?: object) {
+  const isRestricted = permissions
+    .filter((permission) => permission.restrictive)
+    .some(
+      ({ condition }: { condition: jsonLogic.RulesLogic }) =>
+        condition === null || jsonLogic.apply(condition, data)
+    )
+  if (isRestricted) return false
+
+  return permissions
+    .filter((permission) => !permission.restrictive)
+    .some(
+      ({ condition }: { condition: jsonLogic.RulesLogic }) =>
+        condition === null || jsonLogic.apply(condition, data)
+    )
+}
 
 export function doPermissionsCheck(
   permissions: Permission[] | undefined,
   action: string,
   resource: string,
   data?: object,
-  organizationId?: number
+  organizationId?: number,
+  projectId?: number
 ) {
   if (!permissions || !Array.isArray(permissions)) {
     return false
   }
 
-  return permissions
-    .filter(
+  if (projectId) {
+    const projectPermissions = permissions.filter(
       (permission) =>
         permission.organization_id === organizationId &&
         permission.actions.some((act) => (action ? action.match(toRegexpString(act)) : null)) &&
-        permission.resources.some((res) => resource.match(toRegexpString(res)))
+        permission.resources.some((res) => resource.match(toRegexpString(res))) &&
+        permission.project_ids.includes(projectId)
     )
-    .some(
-      ({ condition }: { condition: jsonLogic.RulesLogic }) =>
-        condition === null || jsonLogic.apply(condition, { resource_name: resource, ...data })
-    )
+    if (projectPermissions.length > 0) {
+      return doPermissionConditionCheck(projectPermissions, { resource_name: resource, ...data })
+    }
+  }
+
+  const orgPermissions = permissions.filter(
+    (permission) =>
+      permission.organization_id === organizationId &&
+      permission.actions.some((act) => (action ? action.match(toRegexpString(act)) : null)) &&
+      permission.resources.some((res) => resource.match(toRegexpString(res)))
+  )
+  return doPermissionConditionCheck(orgPermissions, { resource_name: resource, ...data })
 }
 
 export function useGetPermissions(
   permissionsOverride?: Permission[],
   organizationIdOverride?: number,
+  enabled = true
+) {
+  return useGetProjectPermissions(permissionsOverride, organizationIdOverride, undefined, enabled)
+}
+
+export function useGetProjectPermissions(
+  permissionsOverride?: Permission[],
+  organizationIdOverride?: number,
+  projectIdOverride?: number,
   enabled = true
 ) {
   const permissionsResult = usePermissionsQuery({
@@ -54,9 +91,17 @@ export function useGetPermissions(
     organizationIdOverride === undefined ? organizationResult : { id: organizationIdOverride }
   const organizationId = organization?.id
 
+  const projectResult = useSelectedProject({
+    enabled: projectIdOverride === undefined && enabled,
+  })
+
+  const project = projectIdOverride === undefined ? projectResult : { id: projectIdOverride }
+  const projectId = project?.id
+
   return {
     permissions,
     organizationId,
+    projectId,
   }
 }
 
@@ -69,18 +114,31 @@ export function useCheckPermissions(
   organizationId?: number,
   permissions?: Permission[]
 ) {
+  return useCheckProjectPermissions(action, resource, data, organizationId, undefined, permissions)
+}
+
+export function useCheckProjectPermissions(
+  action: string,
+  resource: string,
+  data?: object,
+  // [Joshen] Pass the variables if you want to avoid hooks in this
+  // e.g If you want to use useCheckPermissions in a loop like organization settings
+  organizationId?: number,
+  projectId?: number,
+  permissions?: Permission[]
+) {
   const isLoggedIn = useIsLoggedIn()
 
-  const { permissions: allPermissions, organizationId: orgId } = useGetPermissions(
-    permissions,
-    organizationId,
-    isLoggedIn
-  )
+  const {
+    permissions: allPermissions,
+    organizationId: orgId,
+    projectId: _projectId,
+  } = useGetProjectPermissions(permissions, organizationId, projectId, isLoggedIn)
 
   if (!isLoggedIn) return false
   if (!IS_PLATFORM) return true
 
-  return doPermissionsCheck(allPermissions, action, resource, data, orgId)
+  return doPermissionsCheck(allPermissions, action, resource, data, orgId, _projectId)
 }
 
 export function usePermissionsLoaded() {
