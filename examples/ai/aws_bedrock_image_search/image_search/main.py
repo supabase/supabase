@@ -5,6 +5,7 @@ import json
 import base64
 from matplotlib import pyplot as plt
 from matplotlib import image as mpimg
+from typing import Optional
 
 DB_CONNECTION = "postgresql://postgres:postgres@localhost:54322/postgres"
 
@@ -19,6 +20,7 @@ bedrock_client = boto3.client(
 
 
 def readFileAsBase64(file_path):
+    """Encode image as base64 string."""
     try:
         with open(file_path, "rb") as image_file:
             input_image = base64.b64encode(image_file.read()).decode("utf8")
@@ -29,7 +31,10 @@ def readFileAsBase64(file_path):
 
 
 def construct_bedrock_image_body(base64_string):
-    # https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-titan-embed-mm.html
+    """Construct the request body.
+
+    https://docs.aws.amazon.com/bedrock/latest/userguide/model-parameters-titan-embed-mm.html
+    """
     return json.dumps(
         {
             "inputImage": base64_string,
@@ -39,6 +44,7 @@ def construct_bedrock_image_body(base64_string):
 
 
 def get_embedding_from_titan_multimodal(body):
+    """Invoke the Amazon Titan Model via API request."""
     response = bedrock_client.invoke_model(
         body=body,
         modelId="amazon.titan-embed-image-v1",
@@ -52,6 +58,7 @@ def get_embedding_from_titan_multimodal(body):
 
 
 def encode_image(file_path):
+    """Generate embedding for the image at file_path."""
     base64_string = readFileAsBase64(file_path)
     body = construct_bedrock_image_body(base64_string)
     emb = get_embedding_from_titan_multimodal(body)
@@ -62,11 +69,8 @@ def seed():
     # create vector store client
     vx = vecs.create_client(DB_CONNECTION)
 
-    # create a collection of vectors with 512 dimensions
-    try:
-        images = vx.create_collection(name="image_vectors", dimension=1024)
-    except:
-        images = vx.get_collection(name="image_vectors")
+    # get or create a collection of vectors with 1024 dimensions
+    images = vx.get_or_create_collection(name="image_vectors", dimension=1024)
 
     # Generate image embeddings with Amazon Titan Model
     img_emb1 = encode_image('./images/one.jpg')
@@ -103,16 +107,18 @@ def seed():
     print("Created index")
 
 
-def search(args=sys.argv):
+def search(query_term: Optional[str] = None):
+    if query_term is None:
+        query_term = sys.argv[1]
+    
     # create vector store client
     vx = vecs.create_client(DB_CONNECTION)
-    images = vx.get_collection(name="image_vectors")
+    images = vx.get_or_create_collection(name="image_vectors", dimension=1024)
 
     # Encode text query
-    query_string = args[1]
     text_emb = get_embedding_from_titan_multimodal(json.dumps(
         {
-            "inputText": query_string,
+            "inputText": query_term,
             "embeddingConfig": {"outputEmbeddingLength": 1024},
         }
     ))
