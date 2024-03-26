@@ -13,6 +13,7 @@ import {
   DialogTitle,
   Dialog,
   IconExternalLink,
+  DialogSectionSeparator,
 } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
@@ -40,9 +41,9 @@ export const PoolingModesModal = () => {
 
   return (
     <Dialog open={snap.showPoolingModeHelper} onOpenChange={snap.setShowPoolingModeHelper}>
-      <DialogContent className="sm:max-w-4xl">
-        <DialogHeader className="pr-8">
-          <DialogTitle className="mb-4">
+      <DialogContent hideClose className="sm:max-w-4xl">
+        <DialogHeader className="pb-0">
+          <DialogTitle>
             <div className="w-full flex items-center justify-between">
               <p className="text-lg max-w-2xl">Which pooling mode should I use?</p>
               <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
@@ -56,13 +57,12 @@ export const PoolingModesModal = () => {
               </Button>
             </div>
           </DialogTitle>
-          <DialogDescription className="border-b pb-4 ">
-            <p className="text-lg max-w-2xl">
-              A connection pooler is a system (external to Postgres) which manages Postgres
-              connections by allocating connections whenever clients make requests.
-            </p>
+          <DialogDescription className="text-lg max-w-2xl">
+            A connection pooler is a system (external to Postgres) which manages Postgres
+            connections by allocating connections whenever clients make requests.
           </DialogDescription>
         </DialogHeader>
+        <DialogSectionSeparator />
         <Markdown
           className="px-6 max-w-full [&>h3]:text-sm"
           content={`
@@ -83,27 +83,30 @@ This mode is similar to connecting to your database directly. There is full supp
 `}
         />
         {primaryConfig?.pool_mode === 'session' && (
-          <Alert_Shadcn_ variant="warning">
-            <AlertTriangleIcon strokeWidth={2} />
-            <AlertTitle_Shadcn_>
-              Pooling mode is currently configured to use session mode
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              To use transaction mode concurrently with session mode, change the pooling mode to
-              transaction first in the{' '}
-              <span
-                tabIndex={0}
-                className="text-foreground cursor-pointer underline underline-offset-2"
-                onClick={() => {
-                  snap.setShowPoolingModeHelper(false)
-                  navigateToPoolerSettings()
-                }}
-              >
-                connection pooling settings
-              </span>
-              . After this, you can use transaction mode on port 6543 and session mode on port 5432.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
+          <div className="px-6">
+            <Alert_Shadcn_ variant="warning">
+              <AlertTriangleIcon strokeWidth={2} />
+              <AlertTitle_Shadcn_>
+                Pooling mode is currently configured to use session mode
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                To use transaction mode concurrently with session mode, change the pooling mode to
+                transaction first in the{' '}
+                <span
+                  tabIndex={0}
+                  className="text-foreground cursor-pointer underline underline-offset-2"
+                  onClick={() => {
+                    snap.setShowPoolingModeHelper(false)
+                    navigateToPoolerSettings()
+                  }}
+                >
+                  connection pooling settings
+                </span>
+                . After this, you can use transaction mode on port 6543 and session mode on port
+                5432.
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          </div>
         )}
         <DialogFooter>
           <DialogClose onClick={() => snap.setShowPoolingModeHelper(false)}>

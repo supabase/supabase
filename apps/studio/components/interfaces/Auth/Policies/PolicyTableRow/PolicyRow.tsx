@@ -84,15 +84,15 @@ const PolicyRow = ({
                 icon={<IconMoreVertical />}
               />
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="bottom" align="end" className="w-32">
+            <DropdownMenuContent side="bottom" align="end" className="w-40">
               <DropdownMenuItem className="space-x-2" onClick={() => onSelectEditPolicy(policy)}>
                 <IconEdit size={14} />
-                <p>Edit</p>
+                <p>Edit policy</p>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem className="space-x-2" onClick={() => onSelectDeletePolicy(policy)}>
                 <IconTrash size={14} />
-                <p>Delete</p>
+                <p>Delete policy</p>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react'
 import { ICommonItem } from '~/components/reference/Reference.types'
 import { Json } from '~/types'
 
+export function getPathWithoutHash(relativePath: string) {
+  return new URL(relativePath, 'http://placeholder').pathname
+}
+
 /**
  * Recursively filter common sections and their sub items based on
  * what is available in their spec

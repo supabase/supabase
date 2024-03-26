@@ -174,7 +174,7 @@ const InfrastructureInfo = () => {
                         isOnLatestVersion && (
                           <Tooltip.Root key="tooltip-latest" delayDuration={0}>
                             <Tooltip.Trigger>
-                              <Badge color="green" className="mr-1">
+                              <Badge variant="brand" className="mr-1">
                                 Latest
                               </Badge>
                             </Tooltip.Trigger>

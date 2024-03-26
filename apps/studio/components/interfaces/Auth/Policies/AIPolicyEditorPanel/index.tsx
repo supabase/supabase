@@ -1,17 +1,20 @@
+import { zodResolver } from '@hookform/resolvers/zod'
 import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { useChat } from 'ai/react'
 import { useParams, useTelemetryProps } from 'common'
-import { uniqBy } from 'lodash'
+import { isEqual, uniqBy } from 'lodash'
 import { FileDiff } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import {
   Button,
-  IconEdit,
-  IconGrid,
+  Checkbox_Shadcn_,
+  Form_Shadcn_,
+  Label_Shadcn_,
   Modal,
   ScrollArea,
   Sheet,
@@ -23,35 +26,42 @@ import {
   Tabs_Shadcn_,
   cn,
 } from 'ui'
+import * as z from 'zod'
 
+import { Monaco } from '@monaco-editor/react'
+import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 import {
   IStandaloneCodeEditor,
   IStandaloneDiffEditor,
 } from 'components/interfaces/SQLEditor/SQLEditor.types'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
+import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { databasePoliciesKeys } from 'data/database-policies/keys'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
 import { QueryResponseError, useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { BASE_PATH, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { BASE_PATH, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { useAppStateSnapshot } from 'state/app-state'
+import { useTableEditorStateSnapshot } from 'state/table-editor'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AIPolicyChat } from './AIPolicyChat'
 import {
   MessageWithDebug,
+  checkIfPolicyHasChanged,
+  generateCreatePolicyQuery,
   generatePlaceholder,
   generatePolicyDefinition,
   generateThreadMessage,
 } from './AIPolicyEditorPanel.utils'
 import { AIPolicyHeader } from './AIPolicyHeader'
-import PolicyDetails from './PolicyDetails'
+import { LockedCreateQuerySection, LockedRenameQuerySection } from './LockedQuerySection'
+import { PolicyDetailsV2 } from './PolicyDetailsV2'
+import { PolicyTemplates } from './PolicyTemplates'
 import QueryError from './QueryError'
 import RLSCodeEditor from './RLSCodeEditor'
-import { PolicyTemplates } from './PolicyTemplates'
-import { subscriptionHasHipaaAddon } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 
 const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
@@ -72,19 +82,34 @@ export const AIPolicyEditorPanel = memo(function ({
   selectedPolicy,
   onSelectCancel,
 }: AIPolicyEditorPanelProps) {
+  const router = useRouter()
   const { ref } = useParams()
   const queryClient = useQueryClient()
   const selectedProject = useSelectedProject()
   const selectedOrganization = useSelectedOrganization()
-  const router = useRouter()
-  const snap = useAppStateSnapshot()
-  const telemetryProps = useTelemetryProps()
 
-  // use chat id because useChat doesn't have a reset function to clear all messages
+  const telemetryProps = useTelemetryProps()
+  const state = useTableEditorStateSnapshot()
+  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
+
+  // [Joshen] Hyrid form fields, just spit balling to get a decent POC out
+  const [using, setUsing] = useState('')
+  const [check, setCheck] = useState('')
+  const [fieldError, setFieldError] = useState<string>()
+  const [showCheckBlock, setShowCheckBlock] = useState(false)
+
+  const monacoOneRef = useRef<Monaco | null>(null)
+  const editorOneRef = useRef<IStandaloneCodeEditor | null>(null)
+  const [expOneLineCount, setExpOneLineCount] = useState(1)
+
+  const monacoTwoRef = useRef<Monaco | null>(null)
+  const editorTwoRef = useRef<IStandaloneCodeEditor | null>(null)
+  const [expTwoLineCount, setExpTwoLineCount] = useState(1)
+
+  // Use chat id because useChat doesn't have a reset function to clear all messages
   const [chatId, setChatId] = useState(uuidv4())
-  const editorRef = useRef<IStandaloneCodeEditor | null>(null)
+
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
-  const isTogglingPreviewRef = useRef<boolean>(false)
   const placeholder = generatePlaceholder(selectedPolicy)
   const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
 
@@ -97,8 +122,30 @@ export const AIPolicyEditorPanel = memo(function ({
   const [assistantVisible, setAssistantPanel] = useState<boolean>(false)
   const [isAssistantChatInputEmpty, setIsAssistantChatInputEmpty] = useState<boolean>(true)
   const [incomingChange, setIncomingChange] = useState<string | undefined>(undefined)
-  // used for confirmation when closing the panel with unsaved changes
+  // Used for confirmation when closing the panel with unsaved changes
   const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState<boolean>(false)
+
+  const formId = 'rls-editor'
+  const FormSchema = z.object({
+    name: z.string().min(1, 'Please provide a name'),
+    table: z.string(),
+    behavior: z.string(),
+    command: z.string(),
+    roles: z.string(),
+  })
+  const defaultValues = {
+    name: '',
+    table: '',
+    behavior: 'permissive',
+    command: 'select',
+    roles: '',
+  }
+  const form = useForm<z.infer<typeof FormSchema>>({
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
+    resolver: zodResolver(FormSchema),
+    defaultValues,
+  })
 
   // Customers on HIPAA plans should not have access to Supabase AI
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
@@ -111,8 +158,11 @@ export const AIPolicyEditorPanel = memo(function ({
     },
     { enabled: true, refetchOnWindowFocus: false }
   )
-
   const entityDefinitions = entities?.map((def) => def.sql.trim())
+
+  const { name, table, behavior, command, roles } = form.watch()
+  const supportWithCheck = ['update', 'all'].includes(command)
+  const isRenamingPolicy = selectedPolicy !== undefined && name !== selectedPolicy.name
 
   const {
     messages: chatMessages,
@@ -145,80 +195,69 @@ export const AIPolicyEditorPanel = memo(function ({
       toast.success('Successfully created new policy')
       onSelectCancel()
     },
-    onError: (error) => {
-      setError(error)
+    onError: (error) => setError(error),
+  })
+
+  const { mutate: updatePolicy, isLoading: isUpdating } = useDatabasePolicyUpdateMutation({
+    onSuccess: () => {
+      toast.success('Successfully updated policy')
+      onSelectCancel()
     },
   })
 
   const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
 
-  const onExecuteSQL = useCallback(() => {
-    // clean up the sql before sending
-    const policy = editorRef.current?.getValue().replaceAll('  ', ' ')
-
-    if (policy) {
-      setError(undefined)
-      executeMutation({
-        sql: policy,
-        projectRef: selectedProject?.ref,
-        connectionString: selectedProject?.connectionString,
-        handleError: (error) => {
-          throw error
-        },
-      })
-    }
-  }, [executeMutation, selectedProject?.connectionString, selectedProject?.ref])
-
   const acceptChange = useCallback(async () => {
-    if (!incomingChange) {
-      return
-    }
+    if (!incomingChange || !editorOneRef.current || !diffEditorRef.current) return
 
-    if (!editorRef.current || !diffEditorRef.current) {
-      return
-    }
-
-    const editorModel = editorRef.current.getModel()
+    const editorModel = editorOneRef.current.getModel()
     const diffModel = diffEditorRef.current.getModel()
-
-    if (!editorModel || !diffModel) {
-      return
-    }
+    if (!editorModel || !diffModel) return
 
     const sql = diffModel.modified.getValue()
 
     // apply the incoming change in the editor directly so that Undo/Redo work properly
-    editorRef.current.executeEdits('apply-ai-edit', [
-      {
-        text: sql,
-        range: editorModel.getFullModelRange(),
-      },
+    editorOneRef.current.executeEdits('apply-ai-edit', [
+      { text: sql, range: editorModel.getFullModelRange() },
     ])
 
     // remove the incoming change to revert to the original editor
     setIncomingChange(undefined)
   }, [incomingChange])
 
-  const toggleFeaturePreviewModal = () => {
-    isTogglingPreviewRef.current = true
-    onClosingPanel()
-  }
-
   const onClosingPanel = () => {
-    const policy = editorRef.current?.getValue()
-    if (policy || messages.length > 0 || !isAssistantChatInputEmpty) {
+    const editorOneValue = editorOneRef.current?.getValue().trim() ?? null
+    const editorOneFormattedValue = !editorOneValue ? null : editorOneValue
+    const editorTwoValue = editorTwoRef.current?.getValue().trim() ?? null
+    const editorTwoFormattedValue = !editorTwoValue ? null : editorTwoValue
+
+    const policyCreateUnsaved =
+      selectedPolicy === undefined &&
+      (name.length > 0 || roles.length > 0 || editorOneFormattedValue || editorTwoFormattedValue)
+    const policyUpdateUnsaved =
+      selectedPolicy !== undefined
+        ? checkIfPolicyHasChanged(selectedPolicy, {
+            name,
+            roles: roles.length === 0 ? ['public'] : roles.split(', '),
+            definition: editorOneFormattedValue,
+            check: command === 'INSERT' ? editorOneFormattedValue : editorTwoFormattedValue,
+          })
+        : false
+
+    if (
+      policyCreateUnsaved ||
+      policyUpdateUnsaved ||
+      messages.length > 0 ||
+      !isAssistantChatInputEmpty
+    ) {
       setIsClosingPolicyEditorPanel(true)
     } else {
-      if (isTogglingPreviewRef.current) {
-        snap.setSelectedFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT)
-        snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
-      }
       onSelectCancel()
     }
   }
 
   const onSelectDebug = async () => {
-    const policy = editorRef.current?.getValue().replaceAll('\n', ' ').replaceAll('  ', ' ')
+    const policy = editorOneRef.current?.getValue().replaceAll('\n', ' ').replaceAll('  ', ' ')
     if (error === undefined || policy === undefined) return
 
     setAssistantPanel(true)
@@ -248,12 +287,12 @@ export const AIPolicyEditorPanel = memo(function ({
   }
 
   const updateEditorWithCheckForDiff = (value: { id: string; content: string }) => {
-    const editorModel = editorRef.current?.getModel()
+    const editorModel = editorOneRef.current?.getModel()
     if (!editorModel) return
 
-    const existingValue = editorRef.current?.getValue() ?? ''
+    const existingValue = editorOneRef.current?.getValue() ?? ''
     if (existingValue.length === 0) {
-      editorRef.current?.executeEdits('apply-template', [
+      editorOneRef.current?.executeEdits('apply-template', [
         {
           text: value.content,
           range: editorModel.getFullModelRange(),
@@ -265,10 +304,77 @@ export const AIPolicyEditorPanel = memo(function ({
     }
   }
 
+  const onSubmit = (data: z.infer<typeof FormSchema>) => {
+    const { name, table, behavior, command, roles } = data
+    const using = editorOneRef.current?.getValue().trim() ?? undefined
+    const check = editorTwoRef.current?.getValue().trim() ?? undefined
+
+    if (command === 'insert' && (check === undefined || check.length === 0)) {
+      return setFieldError('Please provide a SQL expression for the WITH CHECK statement')
+    } else if (command !== 'insert' && (using === undefined || using.length === 0)) {
+      return setFieldError('Please provide a SQL expression for the USING statement')
+    } else {
+      setFieldError(undefined)
+    }
+
+    if (selectedPolicy === undefined) {
+      const sql = generateCreatePolicyQuery({
+        name: name,
+        schema: state.selectedSchemaName,
+        table,
+        behavior,
+        command,
+        roles: roles.length === 0 ? 'public' : roles,
+        using: using ?? '',
+        check: command === 'insert' ? using ?? '' : check ?? '',
+      })
+
+      setError(undefined)
+      executeMutation({
+        sql,
+        projectRef: selectedProject?.ref,
+        connectionString: selectedProject?.connectionString,
+        handleError: (error) => {
+          throw error
+        },
+      })
+    } else if (selectedProject !== undefined) {
+      const payload: {
+        name?: string
+        definition?: string
+        check?: string
+        roles?: string[]
+      } = {}
+      const updatedRoles = roles.length === 0 ? ['public'] : roles.split(', ')
+
+      if (name !== selectedPolicy.name) payload.name = name
+      if (!isEqual(selectedPolicy.roles, updatedRoles)) payload.roles = updatedRoles
+      if (selectedPolicy.definition !== null && selectedPolicy.definition !== using)
+        payload.definition = using
+
+      if (selectedPolicy.command === 'INSERT') {
+        // [Joshen] Cause editorOneRef will be the check statement in this scenario
+        if (selectedPolicy.check !== null && selectedPolicy.check !== using) payload.check = using
+      } else {
+        if (selectedPolicy.check !== null && selectedPolicy.check !== check) payload.check = check
+      }
+
+      if (Object.keys(payload).length === 0) return onSelectCancel()
+
+      updatePolicy({
+        id: selectedPolicy.id,
+        projectRef: selectedProject.ref,
+        connectionString: selectedProject?.connectionString,
+        payload,
+      })
+    }
+  }
+
   // when the panel is closed, reset all values
   useEffect(() => {
     if (!visible) {
-      editorRef.current?.setValue('')
+      editorOneRef.current?.setValue('')
+      editorTwoRef.current?.setValue('')
       setIncomingChange(undefined)
       setAssistantPanel(false)
       setIsClosingPolicyEditorPanel(false)
@@ -277,244 +383,415 @@ export const AIPolicyEditorPanel = memo(function ({
       setChatId(uuidv4())
       setShowDetails(false)
       setSelectedDiff(undefined)
+
+      setUsing('')
+      setCheck('')
+      setShowCheckBlock(false)
+      setFieldError(undefined)
+
+      form.reset(defaultValues)
     } else {
       setAssistantPanel(true)
+      if (selectedPolicy !== undefined) {
+        const { name, action, table, command, roles } = selectedPolicy
+        form.reset({
+          name,
+          table,
+          behavior: action.toLowerCase(),
+          command: command.toLowerCase(),
+          roles: roles.length === 1 && roles[0] === 'public' ? '' : roles.join(', '),
+        })
+        if (selectedPolicy.definition) setUsing(`  ${selectedPolicy.definition}`)
+        if (selectedPolicy.check) setCheck(`  ${selectedPolicy.check}`)
+        if (selectedPolicy.check && selectedPolicy.command !== 'INSERT') {
+          setShowCheckBlock(true)
+        }
+      }
     }
   }, [visible])
 
   // whenever the deps (current policy details, new error or error panel opens) change, recalculate
   // the height of the editor
   useEffect(() => {
-    editorRef.current?.layout({ width: 0, height: 0 })
+    editorOneRef.current?.layout({ width: 0, height: 0 })
     window.requestAnimationFrame(() => {
-      editorRef.current?.layout()
+      editorOneRef.current?.layout()
     })
   }, [showDetails, error, errorPanelOpen])
 
   return (
     <>
-      <Sheet open={visible} onOpenChange={() => onClosingPanel()}>
-        <SheetContent
-          size={assistantVisible ? 'lg' : 'default'}
-          className={cn(
-            'bg-surface-200',
-            'p-0 flex flex-row gap-0',
-            assistantVisible ? '!min-w-[1200px]' : '!min-w-[600px]'
-          )}
-          showClose={false}
-        >
-          <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
-            <AIPolicyHeader
-              selectedPolicy={selectedPolicy}
-              assistantVisible={assistantVisible}
-              setAssistantVisible={setAssistantPanel}
-            />
-            <PolicyDetails
-              policy={selectedPolicy}
-              showDetails={showDetails}
-              toggleShowDetails={() => setShowDetails(!showDetails)}
-            />
-            <div className="flex flex-col h-full w-full justify-between">
-              {incomingChange ? (
-                <div className="px-5 py-3 flex justify-between gap-3 bg-surface-75">
-                  <div className="flex gap-2 items-center text-foreground-light">
-                    <FileDiff className="h-4 w-4" />
-                    <span className="text-sm">Accept changes from assistant</span>
-                  </div>
-                  <div className="flex gap-3">
-                    <Button
-                      type="default"
-                      onClick={() => {
-                        setIncomingChange(undefined)
-                        setSelectedDiff(undefined)
-                        Telemetry.sendEvent(
-                          {
-                            category: 'rls_editor',
-                            action: 'ai_suggestion_discarded',
-                            label: 'rls-ai-assistant',
-                          },
-                          telemetryProps,
-                          router
-                        )
-                      }}
-                    >
-                      Discard
-                    </Button>
-                    <Button
-                      type="primary"
-                      onClick={() => {
-                        acceptChange()
-                        setSelectedDiff(undefined)
-                        Telemetry.sendEvent(
-                          {
-                            category: 'rls_editor',
-                            action: 'ai_suggestion_accepted',
-                            label: 'rls-ai-assistant',
-                          },
-                          telemetryProps,
-                          router
-                        )
-                      }}
-                    >
-                      Accept
-                    </Button>
-                  </div>
-                </div>
-              ) : null}
-
-              {incomingChange ? (
-                <DiffEditor
-                  theme="supabase"
-                  language="pgsql"
-                  className="grow"
-                  original={editorRef.current?.getValue()}
-                  modified={incomingChange}
-                  onMount={(editor) => (diffEditorRef.current = editor)}
-                  options={{
-                    wordWrap: 'on',
-                    renderSideBySide: false,
-                    scrollBeyondLastLine: false,
-                    renderOverviewRuler: false,
-                    renderLineHighlight: 'none',
-                    minimap: { enabled: false },
-                    occurrencesHighlight: false,
-                    folding: false,
-                    selectionHighlight: false,
-                    lineHeight: 20,
-                    padding: { top: 10, bottom: 10 },
-                  }}
-                />
-              ) : null}
-              <div className={`relative h-full ${incomingChange ? 'hidden' : 'block'}`}>
-                <RLSCodeEditor
-                  id="rls-sql-policy"
-                  defaultValue={''}
-                  editorRef={editorRef}
-                  placeholder={placeholder}
-                />
-              </div>
-
-              <div className="flex flex-col">
-                {error !== undefined && (
-                  <QueryError
-                    error={error}
-                    onSelectDebug={onSelectDebug}
-                    open={errorPanelOpen}
-                    setOpen={setErrorPanelOpen}
-                  />
-                )}
-                <SheetFooter className="flex items-center !justify-between px-5 py-4 w-full">
-                  <Button type="text" onClick={toggleFeaturePreviewModal}>
-                    Toggle feature preview
-                  </Button>
-                  <div className="flex items-center gap-x-2">
-                    <Button type="default" disabled={isExecuting} onClick={() => onSelectCancel()}>
-                      Cancel
-                    </Button>
-                    <Button
-                      loading={isExecuting}
-                      htmlType="submit"
-                      disabled={isExecuting || incomingChange !== undefined}
-                      onClick={() => onExecuteSQL()}
-                    >
-                      Save policy
-                    </Button>
-                  </div>
-                </SheetFooter>
-              </div>
-            </div>
-          </div>
-          {assistantVisible && (
-            <div
+      <Form_Shadcn_ {...form}>
+        <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
+          <Sheet open={visible} onOpenChange={() => onClosingPanel()}>
+            <SheetContent
+              showClose={false}
+              size={assistantVisible ? 'lg' : 'default'}
               className={cn(
-                'border-l shadow-[rgba(0,0,0,0.13)_-4px_0px_6px_0px] z-10',
-                assistantVisible && 'w-[50%]',
-                'bg-studio'
+                'bg-surface-200',
+                'p-0 flex flex-row gap-0',
+                assistantVisible ? '!min-w-[1200px]' : '!min-w-[600px]'
               )}
             >
-              <Tabs_Shadcn_ defaultValue="templates" className="flex flex-col h-full w-full">
-                <TabsList_Shadcn_ className="flex gap-4 px-content pt-2">
-                  <TabsTrigger_Shadcn_
-                    key="templates"
-                    value="templates"
-                    className="px-0 data-[state=active]:bg-transparent"
-                  >
-                    Templates
-                  </TabsTrigger_Shadcn_>
-                  {!hasHipaaAddon && (
-                    <TabsTrigger_Shadcn_
-                      key="conversation"
-                      value="conversation"
-                      className="px-0 data-[state=active]:bg-transparent"
-                    >
-                      Assistant
-                    </TabsTrigger_Shadcn_>
-                  )}
-                </TabsList_Shadcn_>
-                <TabsContent_Shadcn_
-                  value="templates"
-                  className={cn(
-                    '!mt-0 overflow-y-auto',
-                    'data-[state=active]:flex data-[state=active]:grow'
-                  )}
-                >
-                  <ScrollArea className="h-full w-full">
-                    <PolicyTemplates
-                      selectedTemplate={selectedDiff}
-                      onSelectTemplate={updateEditorWithCheckForDiff}
-                    />
-                  </ScrollArea>
-                </TabsContent_Shadcn_>
-                <TabsContent_Shadcn_
-                  value="conversation"
-                  className="flex grow !mt-0 overflow-y-auto"
-                >
-                  <AIPolicyChat
-                    messages={messages}
-                    selectedMessage={selectedDiff}
-                    onSubmit={(message) =>
-                      append({
-                        content: message,
-                        role: 'user',
-                        createdAt: new Date(),
-                      })
-                    }
-                    onDiff={updateEditorWithCheckForDiff}
-                    onChange={setIsAssistantChatInputEmpty}
-                    loading={isLoading || isDebugSqlLoading}
-                  />
-                </TabsContent_Shadcn_>
-              </Tabs_Shadcn_>
-            </div>
-          )}
+              <div className={cn('flex flex-col grow w-full', assistantVisible && 'w-[60%]')}>
+                <AIPolicyHeader
+                  selectedPolicy={selectedPolicy}
+                  assistantVisible={assistantVisible}
+                  setAssistantVisible={setAssistantPanel}
+                />
 
-          <ConfirmationModal
-            visible={isClosingPolicyEditorPanel}
-            header="Discard changes"
-            buttonLabel="Discard"
-            onSelectCancel={() => {
-              isTogglingPreviewRef.current = false
-              setIsClosingPolicyEditorPanel(false)
-            }}
-            onSelectConfirm={() => {
-              if (isTogglingPreviewRef.current) {
-                snap.setSelectedFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT)
-                snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
-              }
-              onSelectCancel()
-              isTogglingPreviewRef.current = false
-              setIsClosingPolicyEditorPanel(false)
-            }}
-          >
-            <Modal.Content>
-              <p className="py-4 text-sm text-foreground-light">
-                Are you sure you want to close the editor? Any unsaved changes on your policy and
-                conversations with the Assistant will be lost.
-              </p>
-            </Modal.Content>
-          </ConfirmationModal>
-        </SheetContent>
-      </Sheet>
+                <div className="flex flex-col h-full w-full justify-between overflow-y-auto">
+                  {incomingChange ? (
+                    <div className="px-5 py-3 flex justify-between gap-3 bg-surface-75">
+                      <div className="flex gap-2 items-center text-foreground-light">
+                        <FileDiff className="h-4 w-4" />
+                        <span className="text-sm">Accept changes from assistant</span>
+                      </div>
+                      <div className="flex gap-3">
+                        <Button
+                          type="default"
+                          onClick={() => {
+                            setIncomingChange(undefined)
+                            setSelectedDiff(undefined)
+                            Telemetry.sendEvent(
+                              {
+                                category: 'rls_editor',
+                                action: 'ai_suggestion_discarded',
+                                label: 'rls-ai-assistant',
+                              },
+                              telemetryProps,
+                              router
+                            )
+                          }}
+                        >
+                          Discard
+                        </Button>
+                        <Button
+                          type="primary"
+                          onClick={() => {
+                            acceptChange()
+                            setSelectedDiff(undefined)
+                            Telemetry.sendEvent(
+                              {
+                                category: 'rls_editor',
+                                action: 'ai_suggestion_accepted',
+                                label: 'rls-ai-assistant',
+                              },
+                              telemetryProps,
+                              router
+                            )
+                          }}
+                        >
+                          Accept
+                        </Button>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {incomingChange ? (
+                    <DiffEditor
+                      theme="supabase"
+                      language="pgsql"
+                      className="grow"
+                      original={editorOneRef.current?.getValue()}
+                      modified={incomingChange}
+                      onMount={(editor) => (diffEditorRef.current = editor)}
+                      options={{
+                        wordWrap: 'on',
+                        renderSideBySide: false,
+                        scrollBeyondLastLine: false,
+                        renderOverviewRuler: false,
+                        renderLineHighlight: 'none',
+                        minimap: { enabled: false },
+                        occurrencesHighlight: false,
+                        folding: false,
+                        selectionHighlight: false,
+                        lineHeight: 20,
+                        padding: { top: 10, bottom: 10 },
+                      }}
+                    />
+                  ) : null}
+
+                  {isAiAssistantEnabled ? (
+                    <div className={`relative h-full ${incomingChange ? 'hidden' : 'block'}`}>
+                      <RLSCodeEditor
+                        id="rls-sql-policy"
+                        defaultValue={''}
+                        editorRef={editorOneRef}
+                        placeholder={placeholder}
+                      />
+                    </div>
+                  ) : (
+                    <>
+                      <PolicyDetailsV2
+                        isEditing={selectedPolicy !== undefined}
+                        form={form}
+                        onUpdateCommand={(command: string) => {
+                          setFieldError(undefined)
+                          if (!['update', 'all'].includes(command)) setShowCheckBlock(false)
+                        }}
+                      />
+                      <div className="h-full">
+                        <LockedCreateQuerySection
+                          selectedPolicy={selectedPolicy}
+                          editorOneRef={editorOneRef}
+                          editorTwoRef={editorTwoRef}
+                          formFields={{ name, table, behavior, command, roles }}
+                        />
+
+                        <div
+                          className={`py-1 relative ${incomingChange ? 'hidden' : 'block'}`}
+                          style={{
+                            height:
+                              expOneLineCount <= 5 ? `${8 + expOneLineCount * 20}px` : '108px',
+                          }}
+                        >
+                          <RLSCodeEditor
+                            id="rls-exp-one-editor"
+                            defaultValue={command === 'insert' ? check : using}
+                            value={command === 'insert' ? check : using}
+                            editorRef={editorOneRef}
+                            monacoRef={monacoOneRef as any}
+                            lineNumberStart={6}
+                            onChange={() => {
+                              setExpOneLineCount(
+                                editorOneRef.current?.getModel()?.getLineCount() ?? 1
+                              )
+                            }}
+                          />
+                        </div>
+
+                        <div className="bg-surface-300 py-1">
+                          <div className="flex items-center" style={{ fontSize: '14px' }}>
+                            <div className="w-[57px]">
+                              <p className="w-[31px] flex justify-end font-mono text-sm text-foreground-light select-none">
+                                {7 + expOneLineCount}
+                              </p>
+                            </div>
+                            <p className="font-mono tracking-tighter">
+                              {showCheckBlock ? (
+                                <>
+                                  <span className="text-[#569cd6]">with check</span>{' '}
+                                  <span className="text-[#ffd700]">(</span>
+                                </>
+                              ) : (
+                                <>
+                                  <span className="text-[#ffd700]">)</span>;
+                                </>
+                              )}
+                            </p>
+                          </div>
+                        </div>
+
+                        {showCheckBlock && (
+                          <>
+                            <div
+                              className={`py-1 relative ${incomingChange ? 'hidden' : 'block'}`}
+                              style={{
+                                height:
+                                  expTwoLineCount <= 5 ? `${8 + expTwoLineCount * 20}px` : '108px',
+                              }}
+                            >
+                              <RLSCodeEditor
+                                id="rls-exp-two-editor"
+                                defaultValue={check}
+                                value={check}
+                                editorRef={editorTwoRef}
+                                monacoRef={monacoTwoRef as any}
+                                lineNumberStart={7 + expOneLineCount}
+                                onChange={() => {
+                                  setExpTwoLineCount(
+                                    editorTwoRef.current?.getModel()?.getLineCount() ?? 1
+                                  )
+                                }}
+                              />
+                            </div>
+                            <div className="bg-surface-300 py-1">
+                              <div className="flex items-center" style={{ fontSize: '14px' }}>
+                                <div className="w-[57px]">
+                                  <p className="w-[31px] flex justify-end font-mono text-sm text-foreground-light select-none">
+                                    {8 + expOneLineCount + expTwoLineCount}
+                                  </p>
+                                </div>
+                                <p className="font-mono tracking-tighter">
+                                  <span className="text-[#ffd700]">)</span>;
+                                </p>
+                              </div>
+                            </div>
+                          </>
+                        )}
+
+                        {isRenamingPolicy && (
+                          <LockedRenameQuerySection
+                            oldName={selectedPolicy.name}
+                            newName={name}
+                            table={table}
+                            lineNumber={
+                              8 + expOneLineCount + (showCheckBlock ? expTwoLineCount : 0)
+                            }
+                          />
+                        )}
+
+                        {fieldError !== undefined && (
+                          <p className="px-5 py-2 pb-0 text-sm text-red-900">{fieldError}</p>
+                        )}
+
+                        {supportWithCheck && (
+                          <div className="px-5 py-3 flex items-center gap-x-2">
+                            <Checkbox_Shadcn_
+                              id="use-check"
+                              name="use-check"
+                              checked={showCheckBlock}
+                              onCheckedChange={() => {
+                                setFieldError(undefined)
+                                setShowCheckBlock(!showCheckBlock)
+                              }}
+                            />
+                            <Label_Shadcn_ className="text-xs cursor-pointer" htmlFor="use-check">
+                              Use check expression
+                            </Label_Shadcn_>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+
+                  <div className="flex flex-col">
+                    {error !== undefined && (
+                      <QueryError
+                        error={error}
+                        onSelectDebug={onSelectDebug}
+                        open={errorPanelOpen}
+                        setOpen={setErrorPanelOpen}
+                      />
+                    )}
+                    <SheetFooter className="flex items-center !justify-end px-5 py-4 w-full border-t">
+                      <Button
+                        type="default"
+                        disabled={isExecuting || isUpdating}
+                        onClick={() => onClosingPanel()}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        form={formId}
+                        htmlType="submit"
+                        loading={isExecuting || isUpdating}
+                        disabled={isExecuting || isUpdating || incomingChange !== undefined}
+                      >
+                        Save policy
+                      </Button>
+                    </SheetFooter>
+                  </div>
+                </div>
+              </div>
+              {assistantVisible && (
+                <div
+                  className={cn(
+                    'border-l shadow-[rgba(0,0,0,0.13)_-4px_0px_6px_0px] z-10',
+                    assistantVisible && 'w-[50%]',
+                    'bg-studio'
+                  )}
+                >
+                  <Tabs_Shadcn_ defaultValue="templates" className="flex flex-col h-full w-full">
+                    <TabsList_Shadcn_ className="flex gap-4 px-content pt-2">
+                      <TabsTrigger_Shadcn_
+                        key="templates"
+                        value="templates"
+                        className="px-0 data-[state=active]:bg-transparent"
+                      >
+                        Templates
+                      </TabsTrigger_Shadcn_>
+                      {isAiAssistantEnabled && !hasHipaaAddon && (
+                        <TabsTrigger_Shadcn_
+                          key="conversation"
+                          value="conversation"
+                          className="px-0 data-[state=active]:bg-transparent"
+                        >
+                          Assistant
+                        </TabsTrigger_Shadcn_>
+                      )}
+                    </TabsList_Shadcn_>
+                    <TabsContent_Shadcn_
+                      value="templates"
+                      className={cn(
+                        '!mt-0 overflow-y-auto',
+                        'data-[state=active]:flex data-[state=active]:grow'
+                      )}
+                    >
+                      <ScrollArea className="h-full w-full">
+                        <PolicyTemplates
+                          selectedPolicy={selectedPolicy}
+                          selectedTemplate={selectedDiff}
+                          onSelectTemplate={(value) => {
+                            form.setValue('name', value.name)
+                            form.setValue('behavior', 'permissive')
+                            form.setValue('command', value.command.toLowerCase())
+                            form.setValue('roles', value.roles.join(', ') ?? '')
+
+                            setUsing(`  ${value.definition}`)
+                            setCheck(`  ${value.check}`)
+                            setExpOneLineCount(1)
+                            setExpTwoLineCount(1)
+                            setFieldError(undefined)
+
+                            if (!['update', 'all'].includes(value.command.toLowerCase())) {
+                              setShowCheckBlock(false)
+                            } else if (value.check.length > 0) {
+                              setShowCheckBlock(true)
+                            } else {
+                              setShowCheckBlock(false)
+                            }
+                          }}
+                        />
+                      </ScrollArea>
+                    </TabsContent_Shadcn_>
+                    <TabsContent_Shadcn_
+                      value="conversation"
+                      className="flex grow !mt-0 overflow-y-auto"
+                    >
+                      <AIPolicyChat
+                        messages={messages}
+                        selectedMessage={selectedDiff}
+                        onSubmit={(message) =>
+                          append({
+                            content: message,
+                            role: 'user',
+                            createdAt: new Date(),
+                          })
+                        }
+                        onDiff={updateEditorWithCheckForDiff}
+                        onChange={setIsAssistantChatInputEmpty}
+                        loading={isLoading || isDebugSqlLoading}
+                      />
+                    </TabsContent_Shadcn_>
+                  </Tabs_Shadcn_>
+                </div>
+              )}
+            </SheetContent>
+          </Sheet>
+        </form>
+      </Form_Shadcn_>
+
+      <ConfirmationModal
+        visible={isClosingPolicyEditorPanel}
+        header="Discard changes"
+        buttonLabel="Discard"
+        onSelectCancel={() => {
+          setIsClosingPolicyEditorPanel(false)
+        }}
+        onSelectConfirm={() => {
+          onSelectCancel()
+          setIsClosingPolicyEditorPanel(false)
+        }}
+      >
+        <Modal.Content>
+          <p className="py-4 text-sm text-foreground-light">
+            Are you sure you want to close the editor? Any unsaved changes on your policy and
+            conversations with the Assistant will be lost.
+          </p>
+        </Modal.Content>
+      </ConfirmationModal>
     </>
   )
 })

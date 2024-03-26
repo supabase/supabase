@@ -38,7 +38,7 @@ for select using (true);`.trim(),
     description: 'This policy gives insert access to your table for all authenticated users only.',
     statement: `
 create policy "Enable insert for authenticated users only"
-on ${schema}.${table}
+on "${schema}"."${table}"
 for insert to authenticated 
 with check (true);`.trim(),
     name: 'Enable insert for authenticated users only',
@@ -55,7 +55,7 @@ with check (true);`.trim(),
       'This policy assumes that your table has a column "email", and allows users to update rows which the "email" column matches their email.',
     statement: `
 create policy "Enable update for users based on email"
-on ${schema}.${table}
+on "${schema}"."${table}"
 for update using (
   auth.jwt() ->> 'email' = email
 ) with check (
@@ -75,7 +75,7 @@ for update using (
       'This policy assumes that your table has a column "user_id", and allows users to delete rows which the "user_id" column matches their ID',
     statement: `
 create policy "Enable delete for users based on user_id"
-on ${schema}.${table}
+on "${schema}"."${table}"
 for delete using (
   auth.uid() = user_id
 );`.trim(),
@@ -93,7 +93,7 @@ for delete using (
       'This policy assumes that your table has a column "user_id", and allows users to insert rows which the "user_id" column matches their ID',
     statement: `
 create policy "Enable insert for users based on user_id"
-on ${schema}.${table}
+on "${schema}"."${table}"
 for insert with check (
   auth.uid() = user_id
 );`.trim(),
@@ -113,7 +113,7 @@ Query across tables to build more advanced RLS rules
     
 Assuming 2 tables called \`teams\` and \`members\`, you can query both tables in the policy to control access to the members table.`,
     statement: `
-create policy "Team members can update team details if they belong to the team"
+create policy "Members can update team details if they belong to the team"
 on teams for update using (
   auth.uid() in (
     select user_id from members where team_id = id
@@ -159,10 +159,10 @@ for all using (
     description: `
 Implement a TTL-like feature that you see in Instagram stories or Snapchat where messages expire after a day.
     
-Assuming a \`stories\` table, rows under the table are available only if they have been created within the last 24 hours.`,
+Rows under the table are available only if they have been created within the last 24 hours.`,
     statement: `
 create policy "Stories are live for a day"
-on stories
+on "${schema}"."${table}"
 for select using (
   created_at > (current_timestamp - interval '1 day')
 );

@@ -15,7 +15,8 @@ const PasswordConditionsHelper = ({ password }: PasswordConditionsHelperProps) =
       <PasswordCondition title="Lowercase letter" isMet={hasLowercase} />
       <PasswordCondition title="Number" isMet={hasNumber} />
       <PasswordCondition title="Special character (e.g. !?<>@#$%)" isMet={hasSpecialCharacter} />
-      <PasswordCondition title="> 7 characters" isMet={isEightCharactersLong} />
+      <PasswordCondition title="8 characters or more" isMet={isEightCharactersLong} />
+      {password.length > 72 && <PasswordCondition title="72 characters or less" isMet={false} />}
     </div>
   )
 }

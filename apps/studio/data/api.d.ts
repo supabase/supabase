@@ -100,6 +100,10 @@ export interface paths {
     /** Gets project backups */
     get: operations['BackupsController_getBackups']
   }
+  '/platform/database/{ref}/backups/enable-physical-backups': {
+    /** Enable usage of physical backups */
+    post: operations['BackupsController_enablePhysicalBackup']
+  }
   '/platform/database/{ref}/backups/download': {
     /** Download project backup */
     post: operations['BackupsController_downloadBackup']
@@ -822,14 +826,6 @@ export interface paths {
     /** Get GitHub connection branch */
     get: operations['GitHubBranchesController_getConnectionBranch']
   }
-  '/platform/integrations/github/pull-requests/{connectionId}': {
-    /** List GitHub connection pull requests */
-    get: operations['GitHubPullRequestsController_getConnectionPullRequests']
-  }
-  '/platform/integrations/github/pull-requests/{connectionId}/{branchName}': {
-    /** List GitHub pull requests for a specific branch */
-    get: operations['GitHubPullRequestsController_validateConnectionBranch']
-  }
   '/platform/integrations/github/repositories': {
     /** Gets GitHub repositories for user */
     get: operations['GitHubRepositoriesController_listRepositories']
@@ -1019,6 +1015,10 @@ export interface paths {
   '/v0/database/{ref}/backups': {
     /** Gets project backups */
     get: operations['BackupsController_getBackups']
+  }
+  '/v0/database/{ref}/backups/enable-physical-backups': {
+    /** Enable usage of physical backups */
+    post: operations['BackupsController_enablePhysicalBackup']
   }
   '/v0/database/{ref}/backups/download': {
     /** Download project backup */
@@ -1467,6 +1467,13 @@ export interface paths {
      * @description Updates the configuration of the specified database branch
      */
     patch: operations['BranchController_updateBranch']
+  }
+  '/v1/branches/{branch_id}/reset': {
+    /**
+     * Resets a database branch
+     * @description Resets the specified database branch
+     */
+    post: operations['BranchController_resetBranch']
   }
   '/v1/projects': {
     /**
@@ -2207,6 +2214,7 @@ export interface components {
       updated_at?: string
       is_sso_user?: boolean
       deleted_at?: string
+      is_anonymous?: boolean
     }
     UsersResponse: {
       total: number
@@ -2263,14 +2271,17 @@ export interface components {
       migrated_at: string | null
     }
     OrganizationResponse: {
+      /** @enum {string|null} */
+      restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
       id: number
       slug: string
       name: string
-      billing_email: string
+      billing_email: string | null
       is_owner: boolean
-      stripe_customer_id: string
-      subscription_id?: string
+      stripe_customer_id: string | null
+      subscription_id: string | null
       opt_in_tags: string[]
+      restriction_data: Record<string, never>
     }
     GetOrganizationByFlyOrganizationIdResponse: {
       slug: string
@@ -4565,6 +4576,7 @@ export interface components {
       branch_name?: string
       git_branch?: string
       reset_on_push?: boolean
+      persistent?: boolean
     }
     BranchResponse: {
       id: string
@@ -4575,10 +4587,17 @@ export interface components {
       git_branch?: string
       pr_number?: number
       reset_on_push: boolean
+      persistent: boolean
       /** @enum {string} */
       status: 'CREATING_PROJECT' | 'RUNNING_MIGRATIONS' | 'MIGRATIONS_PASSED' | 'MIGRATIONS_FAILED'
       created_at: string
       updated_at: string
+    }
+    BranchDeleteResponse: {
+      message: string
+    }
+    BranchResetResponse: {
+      message: string
     }
     V1DatabaseResponse: {
       /** @description Database host */
@@ -5981,6 +6000,24 @@ export interface operations {
         }
       }
       /** @description Failed to get project backups */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Enable usage of physical backups */
+  BackupsController_enablePhysicalBackup: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to enable usage of physical backups */
       500: {
         content: never
       }
@@ -11079,52 +11116,6 @@ export interface operations {
       }
     }
   }
-  /** List GitHub connection pull requests */
-  GitHubPullRequestsController_getConnectionPullRequests: {
-    parameters: {
-      query: {
-        pr_number: number[]
-      }
-      path: {
-        connectionId: number
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>[]
-        }
-      }
-      /** @description Failed to list GitHub connection pull requests */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** List GitHub pull requests for a specific branch */
-  GitHubPullRequestsController_validateConnectionBranch: {
-    parameters: {
-      query?: {
-        per_page?: number
-        page?: number
-      }
-      path: {
-        connectionId: number
-        branchName: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>[]
-        }
-      }
-      /** @description Failed to validate GitHub connection branch */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Gets GitHub repositories for user */
   GitHubRepositoriesController_listRepositories: {
     responses: {
@@ -11845,7 +11836,9 @@ export interface operations {
     }
     responses: {
       200: {
-        content: never
+        content: {
+          'application/json': components['schemas']['BranchDeleteResponse']
+        }
       }
       /** @description Failed to delete database branch */
       500: {
@@ -11876,6 +11869,29 @@ export interface operations {
         }
       }
       /** @description Failed to update database branch */
+      500: {
+        content: never
+      }
+    }
+  }
+  /**
+   * Resets a database branch
+   * @description Resets the specified database branch
+   */
+  BranchController_resetBranch: {
+    parameters: {
+      path: {
+        /** @description Branch ID */
+        branch_id: string
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['BranchResetResponse']
+        }
+      }
+      /** @description Failed to reset database branch */
       500: {
         content: never
       }
