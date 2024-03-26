@@ -1496,6 +1496,10 @@ export const ai = {
           url: '/guides/ai/examples/image-search-openai-clip',
         },
         {
+          name: 'Semantic search with Amazon Titan',
+          url: '/guides/ai/examples/semantic-image-search-amazon-titan',
+        },
+        {
           name: 'Building ChatGPT Plugins',
           url: '/guides/ai/examples/building-chatgpt-plugins',
         },
@@ -1524,6 +1528,10 @@ export const ai = {
         {
           name: 'Roboflow',
           url: '/guides/ai/integrations/roboflow',
+        },
+        {
+          name: 'Amazon Bedrock',
+          url: '/guides/ai/integrations/amazon-bedrock',
         },
       ],
     },
