@@ -1,5 +1,5 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
-import { Message } from 'ai/react'
+import type { Message } from 'ai/react'
 import { uuidv4 } from 'lib/helpers'
 import { isEqual } from 'lodash'
 
