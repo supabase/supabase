@@ -90,8 +90,7 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
       <DataGrid
         columns={columns}
         rows={rows}
-        // style={{ height: '100%' }}
-        className="flex-grow border-t-0 pb-24"
+        className="flex-grow border-t-0"
         rowClass={() => '[&>.rdg-cell]:items-center'}
         onSelectedCellChange={onSelectedCellChange}
       />
