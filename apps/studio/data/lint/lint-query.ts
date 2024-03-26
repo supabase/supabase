@@ -336,6 +336,7 @@ export type Lint = {
     | 'no_primary_key'
     | 'unused_index'
     | 'multiple_permissive_policies'
+    | 'auth_rls_initplan'
   level: 'ERROR' | 'WARN' | 'INFO'
   facing: string
   description: string
