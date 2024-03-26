@@ -5,7 +5,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { startCase } from 'lodash'
 import { useKey } from 'react-use'
 import { LOCAL_STORAGE_KEYS, useBreakpoint } from 'common'
-import PostTypes from '~/types/post'
+import type PostTypes from '~/types/post'
 import type { BlogView } from '~/pages/blog'
 
 import {
