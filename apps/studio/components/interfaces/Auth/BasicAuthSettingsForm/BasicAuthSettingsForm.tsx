@@ -46,13 +46,14 @@ const schema = object({
   SECURITY_CAPTCHA_ENABLED: boolean().required(),
   SECURITY_CAPTCHA_SECRET: string().when('SECURITY_CAPTCHA_ENABLED', {
     is: true,
-    then: string().required('Must have a Captcha secret'),
+    then: (schema) => schema.required('Must have a Captcha secret'),
   }),
   SECURITY_CAPTCHA_PROVIDER: string().when('SECURITY_CAPTCHA_ENABLED', {
     is: true,
-    then: string()
-      .oneOf(['hcaptcha', 'turnstile'])
-      .required('Captcha provider must be either hcaptcha or turnstile'),
+    then: (schema) =>
+      schema
+        .oneOf(['hcaptcha', 'turnstile'])
+        .required('Captcha provider must be either hcaptcha or turnstile'),
   }),
   SESSIONS_TIMEBOX: number().min(0, 'Must be a positive number'),
   SESSIONS_INACTIVITY_TIMEOUT: number().min(0, 'Must be a positive number'),
