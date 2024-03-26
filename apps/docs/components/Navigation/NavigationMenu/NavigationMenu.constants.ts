@@ -592,7 +592,7 @@ export const auth = {
           items: [
             {
               name: 'SAML 2.0',
-              url: '/guides/auth/sso/auth-sso-saml',
+              url: '/guides/auth/enterprise-sso/auth-sso-saml',
             },
           ],
         },
@@ -1259,10 +1259,6 @@ export const realtime: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Throttling messages',
-          url: '/guides/realtime/guides/client-side-throttling',
-        },
-        {
           name: 'Subscribing to Database Changes',
           url: '/guides/realtime/subscribing-to-database-changes',
         },
@@ -1411,7 +1407,6 @@ export const ai = {
           url: '/guides/ai/vector-indexes',
           items: vectorIndexItems,
         },
-        { name: 'Hybrid search', url: '/guides/ai/hybrid-search' },
         {
           name: 'Engineering for scale',
           url: '/guides/ai/engineering-for-scale',
@@ -1425,6 +1420,15 @@ export const ai = {
           name: 'RAG with Permissions',
           url: '/guides/ai/rag-with-permissions',
         },
+      ],
+    },
+    {
+      name: 'Search',
+      url: undefined,
+      items: [
+        { name: 'Semantic search', url: '/guides/ai/semantic-search' },
+        { name: 'Keyword search', url: '/guides/ai/keyword-search' },
+        { name: 'Hybrid search', url: '/guides/ai/hybrid-search' },
       ],
     },
     {

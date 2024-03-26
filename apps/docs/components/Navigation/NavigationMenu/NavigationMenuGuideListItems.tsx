@@ -1,11 +1,13 @@
+import * as Accordion from '@radix-ui/react-accordion'
+import { ChevronLeft } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect, useRef } from 'react'
-import { IconChevronLeft } from '~/../../packages/ui'
-import * as Accordion from '@radix-ui/react-accordion'
+
 import HomeMenuIconPicker from './HomeMenuIconPicker'
+import { getPathWithoutHash } from './NavigationMenu.utils'
 
 const HeaderLink = React.memo(function HeaderLink(props: {
   title: string
@@ -30,7 +32,7 @@ const HeaderLink = React.memo(function HeaderLink(props: {
 const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any) {
   const router = useRouter()
   const { resolvedTheme } = useTheme()
-  const activeItem = props.subItem.url === router.asPath
+  const activeItem = props.subItem.url === getPathWithoutHash(router.asPath)
   const activeItemRef = useRef(null)
 
   const LinkContainer = (props) => {
@@ -97,7 +99,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                     href={`${subSubItem.url}`}
                     className={[
                       'cursor-pointer transition text-sm',
-                      subSubItem.url === router.asPath
+                      subSubItem.url === getPathWithoutHash(router.asPath)
                         ? 'text-brand'
                         : 'hover:text-brand text-foreground-lighter',
                     ].join(' ')}
@@ -151,7 +153,7 @@ const Content = (props) => {
       >
         <div className="relative w-2">
           <div className="transition-all ease-out ml-0 group-hover:-ml-1">
-            <IconChevronLeft size={10} strokeWidth={3} />
+            <ChevronLeft size={10} strokeWidth={3} />
           </div>
         </div>
         <span>Back to Home</span>

@@ -354,12 +354,6 @@
     "link": "https://www.postgresql.org/docs/current/sslinfo.html"
   },
   {
-    "name": "supautils",
-    "comment": "Supabase standard library",
-    "tags": ["Utility"],
-    "link": "https://supabase.github.io/supautils/"
-  },
-  {
     "name": "tablefunc",
     "comment": "functions that manipulate whole tables, including crosstab",
     "tags": ["Utility"],
