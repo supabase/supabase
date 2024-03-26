@@ -1,0 +1,32 @@
+name: 'Suggest Related Issues'
+
+on:
+  issues:
+    types:
+      - opened
+      - edited
+  workflow_dispatch:
+  schedule:
+    - cron: '13 13 * * */7'
+
+jobs:
+  action:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/actions-suggest-related-links-tmp
+          key: ${{ runner.os }}-action-${{ hashFiles('~/actions-suggest-related-links-tmp/training-data.json') }}
+          restore-keys: |
+            ${{ runner.os }}-action-
+      - uses: peaceiris/actions-suggest-related-links@v1.1.1
+      - uses: peaceiris/actions-suggest-related-links/models/fasttext@v1.1.1
+        if: github.event_name == 'issues'
+        with:
+          version: v1.1.1
+      - uses: peaceiris/actions-suggest-related-links@v1.1.1
+        with:
+          mode: 'suggest'
+          repository: 'supabase/supabase'
+          unclickable: true
