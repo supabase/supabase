@@ -58,7 +58,9 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
             ? `/project/${ref}/auth/policies?schema=${lint.metadata?.schema}&search=${lint.metadata?.table}`
             : lint.name === 'unindexed_foreign_keys'
               ? `/project/${ref}/database/indexes?schema=${lint.metadata?.schema}`
-              : '/'
+              : lint.name === 'auth_rls_initplan'
+                ? `/project/${ref}/auth/policies`
+                : '/'
 
   const ctaText =
     lint.name === 'unused_index'
@@ -67,7 +69,7 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
         ? 'View table'
         : lint.name === 'auth_users_exposed'
           ? 'View table'
-          : lint.name === 'multiple_permissive_policies'
+          : lint.name === 'multiple_permissive_policies' || lint.name === 'auth_rls_initplan'
             ? 'View policies'
             : lint.name === 'unindexed_foreign_keys'
               ? 'Create an index'
