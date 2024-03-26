@@ -14,7 +14,7 @@
     "@gregnr/libpg-query": "13.4.0-dev.12",
     "@monaco-editor/react": "^4.6.0",
     "@supabase/ssr": "^0.1.0",
-    "@tanstack/react-query": "^5.7.2",
+    "@tanstack/react-query": "^5.13.4",
     "ai": "^2.2.31",
     "common": "*",
     "config": "*",
@@ -23,7 +23,7 @@
     "lodash": "^4.17.21",
     "lucide-react": "^0.338.0",
     "next": "^14.0.3",
-    "openai": "^4.17.0",
+    "openai": "^4.20.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-flow": "^1.0.3",
@@ -34,12 +34,12 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
-    "@types/node": "^18.11.9",
+    "@types/node": "^20.11.16",
     "@types/react": "^18.2.24",
     "@types/react-dom": "^18.2.8",
-    "autoprefixer": "10.4.14",
+    "autoprefixer": "^10.4.14",
     "nextjs-node-loader": "^1.1.5-alpha.0",
-    "postcss": "8.4.31",
-    "typescript": "^5.2.2"
+    "postcss": "^8.4.31",
+    "typescript": "^5.4.3"
   }
 }

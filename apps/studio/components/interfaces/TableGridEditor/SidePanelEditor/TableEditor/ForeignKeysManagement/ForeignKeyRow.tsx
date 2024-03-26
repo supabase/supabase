@@ -47,7 +47,11 @@ export const ForeignKeyRow = ({
           )}
           <div className="flex items-center gap-x-2">
             {status !== undefined && (
-              <Badge color={status === 'ADD' ? 'green' : status === 'UPDATE' ? 'amber' : 'red'}>
+              <Badge
+                variant={
+                  status === 'ADD' ? 'brand' : status === 'UPDATE' ? 'warning' : 'destructive'
+                }
+              >
                 {status}
               </Badge>
             )}

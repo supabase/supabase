@@ -124,7 +124,7 @@ export const BranchRow = ({
             {branch.name}
           </Link>
         </Button>
-        {isActive && <Badge color="slate">Current</Badge>}
+        {isActive && <Badge>Current</Badge>}
         <BranchStatusBadge
           status={
             branch.status === 'CREATING_PROJECT' ? data?.status ?? branch.status : branch.status

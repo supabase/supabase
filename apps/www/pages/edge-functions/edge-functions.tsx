@@ -263,10 +263,10 @@ serve(async (req) => {
                 <div className="col-span-12 mt-0 flex lg:col-span-6 xl:col-span-12 xl:mb-8">
                   <p className="text-foreground-light m-0">Libraries coming soon:</p>
                   <div className="ml-1 space-x-1">
-                    <Badge dot={false}>Python</Badge>
-                    <Badge dot={false}>Dart</Badge>
-                    <Badge dot={false}>C#</Badge>
-                    <Badge dot={false}>Kotlin</Badge>
+                    <Badge>Python</Badge>
+                    <Badge>Dart</Badge>
+                    <Badge>C#</Badge>
+                    <Badge>Kotlin</Badge>
                   </div>
                 </div>
                 <div

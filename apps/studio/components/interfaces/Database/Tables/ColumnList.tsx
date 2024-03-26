@@ -1,7 +1,7 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
+import Link from 'next/link'
 import { useState } from 'react'
 import {
   Button,
@@ -19,6 +19,7 @@ import {
   Input,
 } from 'ui'
 
+import { useParams } from 'common'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -26,52 +27,56 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions } from 'hooks'
 import useTable from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 
 interface ColumnListProps {
-  table: PostgresTable
-  onSelectBack: () => void
   onAddColumn: () => void
   onEditColumn: (column: any) => void
   onDeleteColumn: (column: any) => void
 }
 
 const ColumnList = ({
-  table,
-  onSelectBack = noop,
   onAddColumn = noop,
   onEditColumn = noop,
   onDeleteColumn = noop,
 }: ColumnListProps) => {
+  const { id, ref } = useParams()
   const [filterString, setFilterString] = useState<string>('')
-  const { data: selectedTable, error, isError, isLoading, isSuccess } = useTable(table.id)
+  const { data: selectedTable, error, isError, isLoading, isSuccess } = useTable(Number(id))
 
   const columns =
     (filterString.length === 0
       ? selectedTable?.columns ?? []
       : selectedTable?.columns?.filter((column: any) => column.name.includes(filterString))) ?? []
 
-  const isLocked = EXCLUDED_SCHEMAS.includes(table.schema ?? '')
+  const isLocked = EXCLUDED_SCHEMAS.includes(selectedTable?.schema ?? '')
   const canUpdateColumns = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'columns')
 
   return (
     <div className="space-y-4">
       <div className="flex items-center space-x-2">
         <div className="flex items-center space-x-2">
-          <h3 className="mb-1 text-xl text-foreground">Database Tables</h3>
+          <h3 className="text-xl text-foreground">Database Tables</h3>
           <IconChevronRight strokeWidth={1.5} className="text-foreground-light" />
-          <h3 className="mb-1 text-xl text-foreground">{table.name}</h3>
+          {isLoading ? (
+            <ShimmeringLoader className="w-40" />
+          ) : (
+            <h3 className="text-xl text-foreground">{selectedTable?.name}</h3>
+          )}
         </div>
       </div>
 
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Button
+            asChild
             type="outline"
-            onClick={() => onSelectBack()}
             icon={<IconChevronLeft size="small" />}
             style={{ padding: '5px' }}
-          />
+          >
+            <Link href={`/project/${ref}/database/tables`} />
+          </Button>
           <Input
             size="small"
             placeholder="Filter columns"
@@ -114,14 +119,14 @@ const ColumnList = ({
         )}
       </div>
 
-      {isLocked && <ProtectedSchemaWarning schema={table.schema} entity="columns" />}
+      {isLocked && <ProtectedSchemaWarning schema={selectedTable?.schema ?? ''} entity="columns" />}
 
       {isLoading && <GenericSkeletonLoader />}
 
       {isError && (
         <AlertError
           error={error as any}
-          subject={`Failed to retrieve columns for table "${table.schema}.${table.name}"`}
+          subject={`Failed to retrieve columns for table "${selectedTable?.schema}.${selectedTable?.name}"`}
         />
       )}
 

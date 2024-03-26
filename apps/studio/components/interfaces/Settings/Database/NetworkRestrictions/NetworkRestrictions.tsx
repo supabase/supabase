@@ -298,9 +298,7 @@ const NetworkRestrictions = () => {
                     <div key={ip} className="px-8 py-4 flex items-center justify-between">
                       <div className="flex items-center space-x-5">
                         <IconGlobe size={16} className="text-foreground-light" />
-                        <Badge color="scale">
-                          {ipv4Restrictions.includes(ip) ? 'IPv4' : 'IPv6'}
-                        </Badge>
+                        <Badge>{ipv4Restrictions.includes(ip) ? 'IPv4' : 'IPv6'}</Badge>
                         <p className="text-sm font-mono">{ip}</p>
                       </div>
                       <Button type="default" onClick={() => setSelectedRestrictionToRemove(ip)}>
