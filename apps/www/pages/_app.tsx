@@ -13,7 +13,7 @@ import { PortalToast, themes } from 'ui'
 import { CommandMenuProvider } from 'ui-patterns/Cmdk'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
-import Meta from '~/components/Favicons'
+import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import { post } from '~/lib/fetchWrapper'
 import supabase from '~/lib/supabase'
@@ -71,7 +71,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <Meta />
+      <MetaFaviconsPagesRouter />
       <DefaultSeo
         title={site_title}
         description={DEFAULT_META_DESCRIPTION}
