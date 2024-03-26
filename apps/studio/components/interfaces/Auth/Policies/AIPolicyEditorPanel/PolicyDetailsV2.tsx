@@ -61,7 +61,7 @@ export const PolicyDetailsV2 = ({ isEditing, form, onUpdateCommand }: PolicyDeta
   return (
     <>
       <div className="px-5 py-5 flex flex-col gap-y-4 border-b">
-        <div className="flex items-center justify-between gap-4 grid grid-cols-12">
+        <div className="flex items-start justify-between gap-4 grid grid-cols-12">
           <FormField_Shadcn_
             control={form.control}
             name="name"
