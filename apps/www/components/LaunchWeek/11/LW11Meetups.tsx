@@ -21,7 +21,7 @@ function addHours(date: Date, hours: number) {
   return dateCopy
 }
 
-const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
+const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
   const { supabase } = useConfData()
   const now = new Date(Date.now())
   const [meets, setMeets] = useState<Meetup[]>(meetups ?? [])
@@ -39,17 +39,17 @@ const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
     // Listen to realtime changes
     if (supabase && !realtimeChannel) {
       const channel = supabase
-        .channel('lwx_meetups')
+        .channel('lw11_ga_meetups')
         .on(
           'postgres_changes',
           {
             event: '*',
             schema: 'public',
-            table: 'lwx_meetups',
+            table: 'lw11_ga_meetups',
             filter: undefined,
           },
           async () => {
-            const { data: newMeets } = await supabase.from('lwx_meetups').select('*')
+            const { data: newMeets } = await supabase.from('lw11_ga_meetups').select('*')
             setMeets(
               newMeets?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1))!
             )
@@ -80,10 +80,14 @@ const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
       <div className="mb-4 col-span-1 xl:col-span-4 flex flex-col max-w-lg text-[#575E61]">
         <h2 className="text-sm font-mono uppercase tracking-[1px] mb-4">Community meetups</h2>
         <p className="text-base xl:max-w-md mb-2">
-          Celebrate Launch Week X at our live community-driven meetups. Network with the community,
-          listen to tech talks and grab some swag.
+          Celebrate{' '}
+          <strong className="font-normal text-foreground-light">
+            Supabase General Availability Week
+          </strong>{' '}
+          at our live community-driven meetups. Network with the community, listen to tech talks and
+          grab some swag.
         </p>
-        <TextLink label="Read more about meetups" hasChevron url="/blog/community-meetups-lwx" />
+        <TextLink label="Read more about meetups" hasChevron url="/blog/community-meetups-lw11" />
       </div>
       <div className="col-span-1 xl:col-span-6 xl:col-start-7 w-full max-w-4xl flex flex-wrap gap-x-3 gap-y-1">
         {meets &&
@@ -127,4 +131,4 @@ const LWXMeetups = ({ meetups }: { meetups?: Meetup[] }) => {
   )
 }
 
-export default LWXMeetups
+export default LW11Meetups
