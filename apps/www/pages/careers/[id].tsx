@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { NextPage } from 'next'
 import { NextSeo } from 'next-seo'
 import DefaultLayout from '~/components/Layouts/Default'
@@ -29,7 +30,7 @@ const Job: NextPage = ({ data }: any) => {
       '&#x3D;': '=',
     }
 
-    return html.replace(/&[^\s;]+;/g, match => {
+    return html.replace(/&[^\s;]+;/g, (match) => {
       return entityMap[match] || match
     })
   }
@@ -70,7 +71,7 @@ const Job: NextPage = ({ data }: any) => {
             allow="autoplay; modestbranding; encrypted-media"
             allowFullScreen
           />
-          <div dangerouslySetInnerHTML={{ __html: decodeHtml(data.content) }} />
+          <div className='application' dangerouslySetInnerHTML={{ __html: decodeHtml(data.content) }} />
         </div>
         <div
           id="application"
@@ -96,6 +97,7 @@ const Job: NextPage = ({ data }: any) => {
                           {question.required ? <span className="ml-1 text-red-900">*</span> : null}
                         </div>
                       }
+                      onChange={() => {}}
                       required={question.required}
                     />
                   )
