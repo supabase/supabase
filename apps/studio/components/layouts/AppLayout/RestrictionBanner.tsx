@@ -35,33 +35,6 @@ export const RestrictrionBanner = () => {
         {currentOrg.restriction_status === 'restricted' &&
           'Projects in this organization are over quota and restricted.'}
       </p>
-      {/* <div className="flex items-center gap-x-1">
-        <Button asChild type="link" iconRight={<IconExternalLink />}>
-          <a
-            href={
-              currentlyViewing === 'vercel'
-                ? 'https://supabase.com/partners/integrations/vercel'
-                : 'https://github.com/orgs/supabase/discussions/17817'
-            }
-            target="_blank"
-            rel="noreferrer"
-          >
-            Learn more
-          </a>
-        </Button>
-        <Button
-          type="text"
-          className="opacity-75"
-          onClick={() =>
-            onUpdateAcknowledged(
-              currentlyViewing,
-              currentlyViewing === 'ipv6' ? true : projectRef ?? ''
-            )
-          }
-        >
-          Dismiss
-        </Button>
-      </div> */}
     </div>
   )
 }
