@@ -101,8 +101,8 @@
     "ui-patterns": "*",
     "uuid": "^9.0.1",
     "valtio": "^1.12.0",
-    "yup": "^0.32.11",
-    "yup-password": "^0.2.2",
+    "yup": "^1.4.0",
+    "yup-password": "^0.3.0",
     "zxcvbn": "^4.4.2"
   },
   "devDependencies": {

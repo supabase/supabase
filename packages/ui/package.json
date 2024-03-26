@@ -81,7 +81,7 @@
     "tailwindcss": "^3.4.1",
     "tailwindcss-animate": "^1.0.6",
     "tailwindcss-radix": "^2.0.0",
-    "yup": "^0.32.11",
+    "yup": "^1.4.0",
     "zod": "^3.22.3"
   },
   "devDependencies": {
