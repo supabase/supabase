@@ -306,8 +306,13 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     const { name, table, behavior, command, roles } = data
-    const using = editorOneRef.current?.getValue().trim() ?? undefined
-    const check = editorTwoRef.current?.getValue().trim() ?? undefined
+    let using = editorOneRef.current?.getValue().trim() ?? undefined
+    let check = editorTwoRef.current?.getValue().trim()
+
+    // [Terry] b/c editorOneRef will be the check statement in this scenario
+    if (command === 'insert') {
+      check = using
+    }
 
     if (command === 'insert' && (check === undefined || check.length === 0)) {
       return setFieldError('Please provide a SQL expression for the WITH CHECK statement')
@@ -724,6 +729,7 @@ export const AIPolicyEditorPanel = memo(function ({
                           selectedPolicy={selectedPolicy}
                           selectedTemplate={selectedDiff}
                           onSelectTemplate={(value) => {
+                            console.log({ using }, { check })
                             form.setValue('name', value.name)
                             form.setValue('behavior', 'permissive')
                             form.setValue('command', value.command.toLowerCase())
