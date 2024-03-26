@@ -1,0 +1,37 @@
+{
+  "name": "ai-commands",
+  "version": "0.0.0",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "license": "MIT",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@gregnr/libpg-query": "^13.4.0-dev.12",
+    "@serafin/schema-builder": "^0.18.5",
+    "@supabase/supabase-js": "*",
+    "ai": "^2.2.29",
+    "common-tags": "^1.8.2",
+    "config": "*",
+    "js-tiktoken": "^1.0.10",
+    "jsonrepair": "^3.5.0",
+    "openai": "^4.26.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.6",
+    "@babel/preset-env": "^7.23.6",
+    "@jest/globals": "^29.7.0",
+    "@types/common-tags": "^1.8.4",
+    "babel-jest": "^29.7.0",
+    "babel-plugin-transform-import-meta": "^2.2.1",
+    "dotenv": "^16.3.1",
+    "jest": "^29.7.0",
+    "mdast-util-from-markdown": "^2.0.0",
+    "sql-formatter": "^15.0.2",
+    "ts-jest": "^29.1.1",
+    "tsconfig": "*",
+    "typescript": "^5.4.3"
+  }
+}

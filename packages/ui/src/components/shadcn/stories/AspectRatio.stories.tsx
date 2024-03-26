@@ -1,6 +1,5 @@
-import React from 'react'
 import { Meta } from '@storybook/react'
-import { AspectRatio } from '@ui/components/shadcn/ui/aspect-ratio'
+import { AspectRatio } from '../ui/aspect-ratio'
 
 const meta: Meta<typeof AspectRatio> = {
   title: 'shadcn/AspectRatio',

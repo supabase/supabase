@@ -1,24 +1,29 @@
-import '../../../packages/ui/build/css/themes/light.css'
-import '../../../packages/ui/build/css/themes/dark.css'
-import '../styles/index.css'
+import '@code-hike/mdx/styles'
 import 'config/code-hike.scss'
+import '../styles/index.css'
 
-import { useEffect } from 'react'
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
+import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { DefaultSeo } from 'next-seo'
+import { useEffect } from 'react'
+import { PortalToast, themes } from 'ui'
+import { CommandMenuProvider } from 'ui-patterns/Cmdk'
+import { useConsent } from 'ui-patterns/ConsentToast'
 
-import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from 'lib/constants'
 import Meta from '~/components/Favicons'
+import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import { post } from '~/lib/fetchWrapper'
-import PortalToast from 'ui/src/layout/PortalToast'
-import { AuthProvider, ThemeProvider, useConsent, useTelemetryProps } from 'common'
+import supabase from '~/lib/supabase'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
   const { consentValue, hasAcceptedConsent } = useConsent()
+
+  useThemeSandbox()
 
   function handlePageTelemetry(route: string) {
     return post(`${API_URL}/telemetry/page`, {
@@ -89,18 +94,22 @@ export default function App({ Component, pageProps }: AppProps) {
           cardType: 'summary_large_image',
         }}
       />
-      <AuthProvider>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-          forcedTheme={forceDarkMode ? 'dark' : undefined}
-        >
-          <PortalToast />
-          <Component {...pageProps} />
-        </ThemeProvider>
-      </AuthProvider>
+      <SessionContextProvider supabaseClient={supabase}>
+        <AuthProvider>
+          <ThemeProvider
+            themes={themes.map((theme) => theme.value)}
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+            forcedTheme={forceDarkMode ? 'dark' : undefined}
+          >
+            <CommandMenuProvider site="website">
+              <PortalToast />
+              <Component {...pageProps} />
+            </CommandMenuProvider>
+          </ThemeProvider>
+        </AuthProvider>
+      </SessionContextProvider>
     </>
   )
 }

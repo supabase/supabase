@@ -9,7 +9,8 @@
     ),
     hsla(200, 43%, 1%, 0.8);
   /* background: hsla(200, 43%, 1%, 0.2); */
-  box-shadow: 0px 1px 27px rgba(158, 68, 239, 0.06),
+  box-shadow:
+    0px 1px 27px rgba(158, 68, 239, 0.06),
     /* 0 0 0 1px rgba(121, 89, 134, 0.25), */ 0 10px 20px 0px rgba(20, 17, 21, 0.8),
     inset 0 0.2px 1px 0.2px rgba(214, 210, 210, 0.4),
     inset -0.4px -0.4px 1px -0.3px rgba(74, 252, 175, 0.4);

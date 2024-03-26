@@ -9,5 +9,12 @@
     return <IconBase icon={Unlock} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { unlock } from 'lucide-react'
+  */
   export default IconUnlock
   

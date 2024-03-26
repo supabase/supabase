@@ -1,0 +1,18 @@
+.instance-configuration {
+  .react-flow__pane {
+    @apply cursor-default;
+  }
+  .react-flow__node {
+    @apply cursor-default;
+  }
+}
+
+.map-path {
+  animation: dash 8s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 100;
+  }
+}

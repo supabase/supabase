@@ -1,0 +1,3447 @@
+openref: 0.1
+
+info:
+  id: reference/supabase-swift
+  title: Supabase Swift Client
+  description: |
+
+    Supabase Swift.
+
+  specUrl: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_swift_v1.yml
+  slugPrefix: "/"
+  libraries:
+    - id: "Swift"
+      version: "0.0.1"
+
+functions:
+  - id: initializing
+    title: "Initializing"
+    description: |
+      You can initialize Supabase with the `SupabaseClient` by passing your `Project URL` and `Project Key`. You can find these under your `Project Settings` → `API Settings`
+      The Supabase client is your entrypoint to the rest of the Supabase functionality and is the easiest way to interact with everything we offer within the Supabase ecosystem.
+
+    examples:
+      - id: initialize-client
+        name: Initialize Client
+        code: |
+          ```swift
+          let client = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "public-anon-key")
+          ```
+      - id: initialize-client-custom-options
+        name: Initialize Client with custom options
+        code: |
+          ```swift
+          let client = SupabaseClient(
+            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, 
+            supabaseKey: "public-anon-key",
+            options: SupabaseClientOptions(
+              db: .init(
+                schema: "public"
+              ),
+              auth: .init(
+                storage: MyCustomLocalStorage(),
+                flowType: .pkce
+              ),
+              global: .init(
+                headers: ["x-my-custom-header": "my-app-name"],
+                session: URLSession.myCustomSession
+              )
+            )
+          )
+          ```
+  - id: auth-api
+    title: "Overview"
+    notes: |
+      - The auth methods can be accessed via the `supabase.auth` namespace.
+    examples:
+      - id: create-auth-client
+        name: Create auth client
+        isSpotlight: true
+        code: |
+          ```swift
+          let supabase = SupabaseClient(supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, supabaseKey: "public-anon-key")
+          let auth = supabase.auth
+          ```
+      - id: create-auth-client-with-custom-storage
+        name: Create auth client with custom storage
+        isSpotlight: true
+        code: |
+          ```swift
+          let supabase = SupabaseClient(
+            supabaseURL: URL(string: "https://xyzcompany.supabase.co")!, 
+            supabaseKey: "public-anon-key",
+            options: .init(
+              auth: .init(
+                MyCustomLocalStorage()
+              )
+            )
+          )
+          let auth = supabase.auth
+          ```
+  - id: sign-up
+    title: "signUp()"
+    notes: |
+      - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](/dashboard/project/_/auth/providers).
+      - **Confirm email** determines if users need to confirm their email address after signing up.
+        - If **Confirm email** is enabled, a `user` is returned but `session` is null.
+        - If **Confirm email** is disabled, both a `user` and a `session` are returned.
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
+      - If signUp() is called for an existing confirmed user:
+          - If **Confirm email** is enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
+          - If **Confirm email** is disabled, the error message, `User already registered` is returned.
+      - To fetch the currently logged-in user, refer to [`getUser()`](/docs/reference/swift/get-user).
+    examples:
+      - id: sign-up
+        name: Sign up
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.signUp(
+            email: "example@email.com",
+            password: "example-password"
+          )
+          ```
+      - id: sign-up-with-additional-user-metadata
+        name: Sign up with additional user metadata
+        isSpotlight: false
+        description: |
+          The custom data is defined as `[String: AnyJSON]`, where `AnyJSON` is a helper type defined in the library.
+        code: |
+          ```swift
+          try await supabase.auth.signUp(
+            email: "example@email.com",
+            password: "example-password",
+            data: [
+              "first_name": .string("John"),
+              "age": .number(24)
+            ]
+          )
+          ```
+      - id: sign-up-with-redirect
+        name: Sign up with a redirect URL
+        description: |
+          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+        code: |
+          ```swift
+          try await supabase.auth.signUp(
+            email:  "example@email.com",
+            password: "example-password",
+            redirectTo: URL(string: "https://example.com/welcome")!
+          )
+          ```
+  - id: sign-in-with-password
+    title: "signInWithPassword()"
+    notes: |
+      - Requires either an email and password or a phone number and password.
+    examples:
+      - id: sign-in-with-email-and-password
+        name: Sign in with email and password
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.signIn(
+            email: "example@email.com",
+            password: "example-password"
+          )
+          ```
+      - id: sign-in-with-phone-and-password
+        name: Sign in with phone and password
+        isSpotlight: false
+        code: |
+          ```swift
+          try await supabase.auth.signIn(
+            phone: "+13334445555",
+            password: "same-password"
+          )
+
+          // After receiving a SMS with a OTP.
+          try await supabase.auth.verifyOTP(
+            phone: "+13334445555",
+            token: "123456",
+            type: .sms
+          )
+          ```
+  - id: sign-in-with-otp
+    title: "signInWithOTP()"
+    notes: |
+      - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
+      - If the user doesn't exist, `signInWithOTP()` will signup the user instead. To restrict this behavior, you can set `shouldCreateUser` to `false`.
+      - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
+      - If you're using phone, you can configure whether you want the user to receive a OTP.
+      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls).
+      - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+      - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
+      - When using magic links, specify a `redirectTo` that matches a configured url scheme in your iOS app, so Supabase can correctly redirect back to your app.
+      - See our [Twilio Phone Auth Guide](/docs/guides/auth/phone-login/twilio) for details about configuring WhatsApp sign in.
+    examples:
+      - id: sign-in-with-email
+        name: Sign in with email
+        isSpotlight: true
+        description: The user will be sent an email which contains either a magiclink or a OTP or both. By default, a given user can only request a OTP once every 60 seconds.
+        code: |
+          ```swift
+          try await supabase.auth.signInWithOTP(
+            email: "example@email.com",
+            redirectTo: URL(string: "my-app-scheme://")!
+          )
+          ```
+      - id: sign-in-with-sms-otp
+        name: Sign in with SMS OTP
+        isSpotlight: false
+        description: The user will be sent a SMS which contains a OTP. By default, a given user can only request a OTP once every 60 seconds.
+        code: |
+          ```swift
+          try await supabase.auth.signInWithOTP(phone: "+13334445555")
+          ```
+  - id: sign-in-with-oauth
+    title: "getOAuthSignInURL()"
+    notes: |
+      - This method is used for signing in using a third-party provider.
+      - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
+    examples:
+      - id: sign-in-using-a-third-party-provider
+        name: Sign in using a third-party provider
+        isSpotlight: true
+        description: |
+          - getOAuthSignInURL() provides the URL which needs to be opened preferably in a [ASWebAuthenticationSession](ASWebAuthenticationSession) instance..
+          - The redirectTo URL, or `callbackURLScheme` needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs.
+          - When using `ASWebAuthenticationSession` or any other implementation, use the returning URL as input to `session(from:)` method.
+        code: |
+          ```swift
+          let url = try await supabase.auth.getOAuthSignInURL(provider: .github)
+
+          let session = ASWebAuthenticationSession(url: url, callbackURLScheme: "my-app-scheme") { url, error in 
+            guard let url else { return }
+
+            Task {
+              try await supabase.auth.session(from: url)
+            }
+          }
+
+          session.presentationContextProvider = self // yours ASWebAuthenticationPresentationContextProviding implementation.
+
+          session.start()
+          ```
+
+      - id: sign-in-using-a-third-party-provider-with-redirect
+        name: Sign in using a third-party provider with redirect
+        isSpotlight: false
+        description: |
+          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls). It does not redirect the user immediately after invoking this method.
+          - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
+          - getOAuthSignInURL() provides the URL which needs to be opened in a SFSafariViewController instance.
+          - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs.
+        code: |
+          ```swift
+          let url = try await supabase.auth.getOAuthSignInURL(
+            provider: .google,
+            redirectTo: URL(string: "https://example.com/welcome")!
+          )
+          ```
+      - id: sign-in-with-scopes
+        name: Sign in with scopes
+        isSpotlight: false
+        description: |
+          If you need additional data from an OAuth provider, you can include a space-separated list of scopes in your request to get back an OAuth provider token.
+          You may also need to specify the scopes in the provider's OAuth app settings, depending on the provider. The list of scopes will be documented by the third-party provider you are using and specifying scopes will enable you to use the OAuth provider token to call additional APIs supported by the third-party provider to get more information.
+        code: |
+          ```swift
+          let url = try await supabase.auth.getOAuthSignInURL(
+            provider: .github,
+            scopes: "repo gist notifications"
+          )
+          ```
+  - id: sign-in-with-id-token
+    title: "signInWithIdToken()"
+    examples:
+      - id: sign-in-with-id-token
+        name: "Sign In using ID Token"
+        description: Use this method to implement native Sign In With Apple.
+        code: |
+          ```swift
+          let session = try await supabase.auth.signInWithIdToken(
+            credentials: OpenIDConnectCredentials(
+              provider: .apple,
+              idToken: "your-id-token",
+              nonce: "your nonce"
+            )
+          )
+          ```
+  - id: sign-out
+    title: "signOut()"
+    notes: |
+      - In order to use the `signOut()` method, the user needs to be signed in first.
+    examples:
+      - id: sign-out
+        name: Sign out
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.signOut()
+          ```
+  - id: verify-otp
+    title: "verifyOTP()"
+    notes: |
+      - The `verifyOTP` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite`, `email_change`, or `email`.
+      - The verification type used should be determined based on the corresponding auth method called before `verifyOTP` to sign up / sign-in a user.
+    examples:
+      - id: verify-sms-one-time-password(otp)
+        name: Verify Sms One-Time Password (OTP)
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.verifyOTP(
+            phone: "+13334445555",
+            token: "123456",
+            type: .sms
+          )
+          ```
+      - id: verify-signup-one-time-password(otp)
+        name: Verify Signup One-Time Password (OTP)
+        isSpotlight: false
+        code: |
+          ```swift
+             try await supabase.auth.verifyOTP(
+              email: "example@example-email.com",
+              token: "123456",
+              type: .signup
+            )
+          ```
+  - id: get-session
+    title: "session"
+    description: |
+      - Returns the session, refreshing it if necessary. If no session can be found, a `GoTrueError.sessionNotFound` error is thrown.
+    examples:
+      - id: get-the-session-data
+        name: Get the session data
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.session
+          ```
+  - id: get-user
+    title: "user()"
+    description: |
+      - This method is useful for checking if the user is authorized because it validates the user's access token JWT on the server.
+      - Fetches the user object from the database instead of local session.
+      - Should be used only when you require the most current user data. For faster results, `session.user` is recommended.
+    examples:
+      - id: get-the-logged-in-user-with-the-current-existing-session
+        name: Get the logged in user with the current existing session
+        isSpotlight: true
+        code: |
+          ```swift
+          let user = try await supabase.auth.user()
+          ```
+      - id: get-the-logged-in-user-with-a-custom-access-token-jwt
+        name: Get the logged in user with a custom access token jwt
+        isSpotlight: false
+        code: |
+          ```swift
+          let user = try await supabase.auth.user(jwt: "custom-jwt")
+          ```
+  - id: update-user
+    title: "updateUser()"
+    notes: |
+      - In order to use the `updateUser()` method, the user needs to be signed in first.
+      - By default, email updates sends a confirmation link to both the user's current and new email.
+      To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
+    examples:
+      - id: update-the-email-for-an-authenticated-user
+        name: Update the email for an authenticated user
+        description: Sends a "Confirm Email Change" email to the new email address.
+        isSpotlight: false
+        code: |
+          ```swift
+          try await supabase.auth.update(user: UserAttributes(email: "new@email.com"))
+          ```
+      - id: update-the-password-for-an-authenticated-user
+        name: Update the password for an authenticated user
+        isSpotlight: false
+        code: |
+          ```swift
+          try await supabase.auth.update(user: UserAttributes(password: "newPassw0rd?"))
+          ```
+      - id: update-the-users-metadata
+        name: Update the user's metadata
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.update(
+            user: UserAttributes(
+              data: [
+                "hello": .string("world")
+              ]
+            )
+          )
+          ```
+  - id: set-session
+    title: "setSession()"
+    notes: |
+      - `setSession()` takes in a refresh token and uses it to get a new session.
+      - The refresh token can only be used once to obtain a new session.
+      - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
+      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+    examples:
+      - id: refresh-the-session
+        name: Refresh the session
+        description: Sets the session data from refresh_token and returns current session or an error if the refresh_token is invalid.
+        isSpotlight: true
+        code: |
+          ```swift
+            try await supabase.auth.setSession(accessToken: "access_token", refreshToken: "refresh_token")
+          ```
+  - id: refresh-session
+    title: "refreshSession()"
+    notes: |
+      - This method will refresh the session whether the current one is expired or not.
+    examples:
+      - id: refresh-session-using-the-current-session
+        name: Refresh session using the current session
+        isSpotlight: true
+        code: |
+          ```swift
+          let session = try await supabase.auth.refreshSession()
+          ```
+      - id: refresh-session-using-a-passed-in-session
+        name: Refresh session using a refresh token
+        isSpotlight: false
+        code: |
+          ```swift
+          let session = try await supabase.auth.refreshSession(refreshToken: "custom-refresh-token")
+          ```
+  - id: on-auth-state-change
+    title: "authStateChanges"
+    notes: |
+      - Types of auth events: `INITIAL_SESSION`, `SIGNED_IN`, `SIGNED_OUT`, `TOKEN_REFRESHED`, `USER_UPDATED`, `PASSWORD_RECOVERY`, `MFA_CHALLENGE_VERIFIED`
+      - The `INITIAL_SESSION` can be used to allow you to invoke the callback function when `authStateChanges` is first called.
+    examples:
+      - id: listen-to-auth-changes
+        name: Listen to auth changes
+        isSpotlight: true
+        code: |
+          ```swift
+          for await (event, session) in await supabase.auth.authStateChanges {
+            print(event, session)
+          }
+          ```
+      - id: list-to-a-specific-event
+        name: Listen to a specific event
+        code: |
+          ```swift
+          for await (_, session) in await supabase.auth.authStateChanges.filter({ $0.event == .signedIn }) {
+            // handle signIn event.
+          }
+          ```
+  - id: exchange-code-for-session
+    title: "exchangeCodeForSession()"
+    notes: |
+      - Used when `flowType` is set to `pkce` in client options.
+    examples:
+      - id: exchange-auth-code
+        name: Exchange Auth Code
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.exchangeCodeForSession(authCode: "34e770dd-9ff9-416c-87fa-43b31d7ef225")
+          ```
+  - id: auth-mfa-api
+    title: "Overview"
+    notes: |
+      This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.
+
+      Currently, we only support time-based one-time password (TOTP) as the 2nd factor. We don't support recovery codes but we allow users to enroll more than 1 TOTP factor, with an upper limit of 10.
+
+      Having a 2nd TOTP factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup TOTP factor.
+  - id: mfa-enroll
+    title: "mfa.enroll()"
+    notes: |
+      - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
+      - To create a challenge, see [`mfa.challenge()`](/docs/reference/swift/auth-mfa-challenge).
+      - To verify a challenge, see [`mfa.verify()`](/docs/reference/swift/auth-mfa-verify).
+      - To create and verify a challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/swift/auth-mfa-challengeandverify).
+
+    examples:
+      - id: enroll-totp-factor
+        name: Enroll a time-based, one-time password (TOTP) factor
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.auth.mfa.enroll(
+            params: MFAEnrollParams(
+              issuer: "optional issuer",
+              friendlyName: "optional friendly name"
+            )
+          )
+
+          // Use the id to create a challenge.
+          // The challenge can be verified by entering the code generated from the authenticator app.
+          // The code will be generated upon scanning the qrCode or entering the secret into the authenticator app.
+          let id = response.id
+          let type = response.type
+          let qrCode = response.totp?.qrCode
+          let secret = response.totp?.secret
+          let uri = response.totp?.uri
+          ```
+  - id: mfa-challenge
+    title: "mfa.challenge()"
+    notes: |
+      - An [enrolled factor](/docs/reference/swift/auth-mfa-enroll) is required before creating a challenge.
+      - To verify a challenge, see [`mfa.verify()`](/docs/reference/swift/auth-mfa-verify).
+    examples:
+      - id: create-mfa-challenge
+        name: Create a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.auth.mfa.challenge(
+            params: MFAChallengeParams(
+              factorId: "34e770dd-9ff9-416c-87fa-43b31d7ef225"
+            )
+          )
+          ```
+  - id: mfa-verify
+    title: "mfa.verify()"
+    notes: |
+      - To verify a challenge, please [create a challenge](/docs/reference/swift/auth-mfa-challenge) first.
+    examples:
+      - id: verify-challenge
+        name: Verify a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```swift
+          let session = try await supabase.auth.mfa.verify(
+            params: MFAVerifyParams(
+              factorId: "34e770dd-9ff9-416c-87fa-43b31d7ef225",
+              challengeId: "4034ae6f-a8ce-4fb5-8ee5-69a5863a7c15",
+              code: "123456"
+            )
+          )
+          ```
+  - id: mfa-challenge-and-verify
+    title: "mfa.challengeAndVerify()"
+    notes: |
+      - An [enrolled factor](/docs/swift/javascript/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
+      - Executes [`mfa.challenge()`](/docs/reference/swift/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/swift/auth-mfa-verify) in a single step.
+    examples:
+      - id: challenge-and-verify
+        name: Create and verify a challenge for a factor
+        isSpotlight: true
+        code: |
+          ```swift
+          let session = try await supabase.auth.mfa.challengeAndVerify(
+            params: MFAChallengeAndVerifyParams(
+              factorId: "34e770dd-9ff9-416c-87fa-43b31d7ef225",
+              code: "123456"
+            )
+          )
+          ```
+  - id: mfa-unenroll
+    title: "mfa.unenroll()"
+    examples:
+      - id: unenroll-a-factor
+        name: Unenroll a factor
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.auth.mfa.unenroll(
+            params: MFAUnenrollParams(
+              factorId: "34e770dd-9ff9-416c-87fa-43b31d7ef225"
+            )
+          )
+          ```
+  - id: mfa-get-authenticator-assurance-level
+    title: "mfa.getAuthenticatorAssuranceLevel()"
+    notes: |
+      - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
+      - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
+      - If the user has a verified factor, the `nextLevel` field will return `aal2`, else, it will return `aal1`.
+    examples:
+      - id: get-aal
+        name: Get the AAL details of a session
+        isSpotlight: true
+        code: |
+          ```swift
+          let aal = try await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+          let currentLevel = aal.currentLevel
+          let nextLevel = aal.nextLevel
+          let currentAuthenticationMethods = aal.currentAuthenticationMethods
+          ```
+  - id: mfa-list-factors
+    title: "mfa.listFactors()"
+    examples:
+      - id: list-factors
+        name: List all factors for a user
+        isSpotlight: true
+        code: |
+          ```swift
+          let factors = try await supabase.auth.mfa.listFactors()
+          ```
+  - id: select
+    title: "Fetch data: select()"
+    notes: |
+      - By default, Supabase projects will return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
+      - `select()` can be combined with [Modifiers](/docs/reference/swift/using-modifiers)
+      - `select()` can be combined with [Filters](/docs/reference/swift/using-filters)
+      - If using the Supabase hosted platform `apikey` is technically a reserved keyword, since the API gateway will pluck it out for authentication. [It should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+      - The recommended solution for getting data is to use the value property which will return a decoded model. Create a `Codable` to easily decode your database responses.
+    examples:
+      - id: getting-your-data
+        name: Getting your data
+        isSpotlight: true
+        code: |
+          ```swift
+          struct Country: Decodable {
+            let id: Int
+            let name: String
+          }
+
+          let countries: [Country] = try await supabase.database
+            .from("countries")
+            .select()
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              },
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+      - id: selecting-specific-columns
+        name: Selecting specific columns
+        code: |
+          ```swift
+          struct Country: Decodable {
+            let name: String
+          }
+
+          let countries: [Country] = try await supabase.database
+            .from("countries")
+            .select("name")
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              },
+              {
+                "name": "Albania"
+              },
+              {
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+      - id: query-foreign-tables
+        name: Query foreign tables
+        description: |
+          If your database has foreign key relationships, you can query related tables too.
+        code: |
+          ```swift
+          struct Country: Decodable {
+            let name: String
+            let cities: [City]
+          }
+
+          struct City: Decodable {
+            let name: String
+          }
+
+          let countries: [Country] = try await supabase.database
+            .from("countries")
+            .select(
+              """
+                name,
+                cities (
+                  name
+                )
+              """
+            )
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Germany",
+                "cities": [
+                  {
+                    "name": "Munich"
+                  }
+                ]
+              },
+              {
+                "name": "Indonesia",
+                "cities": [
+                  {
+                    "name": "Bali"
+                  }
+                ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+      - id: query-foreign-tables-through-a-join-table
+        name: Query foreign tables through a join table
+        code: |
+          ```swift
+            struct User: Decodable {
+              let name: String
+              let teams: [Team]
+            }
+            
+            struct Team: Decodable {
+              let name: String
+            }
+
+            let users: [User] = try await supabase.database
+              .from("users")
+              .select(
+                """
+                  name,
+                  teams (
+                    name
+                  )
+                """
+              )
+              .execute()
+              .value
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text
+              );
+            create table
+              teams (
+                id int8 primary key,
+                name text
+              );
+            -- join table
+            create table
+              users_teams (
+                user_id int8 not null references users,
+                team_id int8 not null references teams,
+                -- both foreign keys must be part of a composite primary key
+                primary key (user_id, team_id)
+              );
+
+            insert into
+              users (id, name)
+            values
+              (1, 'Kiran'),
+              (2, 'Evan');
+            insert into
+              teams (id, name)
+            values
+              (1, 'Green'),
+              (2, 'Blue');
+            insert into
+              users_teams (user_id, team_id)
+            values
+              (1, 1),
+              (1, 2),
+              (2, 2);
+            ```
+        response: |
+          ```json
+            {
+              "data": [
+                {
+                  "name": "Kiran",
+                  "teams": [
+                    {
+                      "name": "Green"
+                    },
+                    {
+                      "name": "Blue"
+                    }
+                  ]
+                },
+                {
+                  "name": "Evan",
+                  "teams": [
+                    {
+                      "name": "Blue"
+                    }
+                  ]
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+        description: |
+          If you're in a situation where your tables are **NOT** directly
+          related, but instead are joined by a _join table_, you can still use
+          the `select()` method to query the related data. The join table needs
+          to have the foreign keys as part of its composite primary key.
+        hideCodeBlock: true
+      - id: query-the-same-foreign-table-multiple-times
+        name: Query the same foreign table multiple times
+        code: |
+          ```swift
+          struct Message: Decodable {
+            let content: String
+            let from: User
+            let to: User
+          }
+
+          struct User: Decodable {
+            let name: String
+          }
+
+          let messages: [Message] = try await supabase.database
+            .from("messages")
+            .select(
+              """
+                content,
+                from:sender_id(name),
+                to:sended_id(name)
+              """
+            )
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+             create table
+             users (id int8 primary key, name text);
+
+             create table
+               messages (
+                 sender_id int8 not null references users,
+                 receiver_id int8 not null references users,
+                 content text
+               );
+
+             insert into
+               users (id, name)
+             values
+               (1, 'Kiran'),
+               (2, 'Evan');
+
+             insert into
+               messages (sender_id, receiver_id, content)
+             values
+               (1, 2, '👋');
+             ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "content": "👋",
+                "from": {
+                  "name": "Kiran"
+                },
+                "to": {
+                  "name": "Evan"
+                }
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          If you need to query the same foreign table twice, use the name of the
+          joined column to identify which join to use. You can also give each
+          column an alias.
+        hideCodeBlock: true
+      - id: filtering-through-foreign-tables
+        name: Filtering through foreign tables
+        code: |
+          ```swift
+          struct City: Decodable {
+            let name: String
+            let countries: [Country]?
+          }
+
+          struct Country: Decodable {
+            let name: String
+          }
+
+          let cities: [City] = try await supabase.database
+            .from("cities")
+            .select("name, countries(*)")
+            .eq("countries.name", value: "Estonia")
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Bali",
+                "countries": null
+              },
+              {
+                "name": "Munich",
+                "countries": null
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          If the filter on a foreign table's column is not satisfied, the foreign
+          table returns `[]` or `null` but the parent table is not filtered out.
+          If you want to filter out the parent table rows, use the `!inner` hint
+        hideCodeBlock: true
+      - id: querying-foreign-table-with-count
+        name: Querying foreign table with count
+        code: |
+          ```swift
+          struct Country: Decodable {
+            let id: UUID
+            let name: String
+            let cities: [City]
+          }
+
+          struct City: Decodable {
+            let count: Int
+          }
+
+          let countries: [Country] = try await supabase.database
+            .from("countries")
+            .select("*, cities(count)")
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table countries (
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+              "name" text
+            );
+
+            create table cities (
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+              "name" text,
+              "country_id" "uuid" references public.countries on delete cascade
+            );
+
+            with country as (
+              insert into countries (name)
+              values ('united kingdom') returning id
+            )
+            insert into cities (name, country_id) values
+            ('London', (select id from country)),
+            ('Manchester', (select id from country)),
+            ('Liverpool', (select id from country)),
+            ('Bristol', (select id from country));
+            ```
+        response: |
+          ```json
+          [
+            {
+              "id": "693694e7-d993-4360-a6d7-6294e325d9b6",
+              "name": "United Kingdom",
+              "cities": [
+                {
+                  "count": 4
+                }
+              ]
+            }
+          ]
+          ```
+        description: |
+          You can get the number of rows in a related table by using the
+          **count** property.
+        hideCodeBlock: true
+      - id: querying-with-count-option
+        name: Querying with count option
+        code: |
+          ```swift
+          let count = try await supabase.database
+            .from("countries")
+            .select("*", head: true, count: .exact)
+            .execute()
+            .count
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "count": 3,
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          You can get the number of rows by using the
+          [count](/docs/reference/swift/select#parameters) option.
+        hideCodeBlock: true
+      - id: querying-json-data
+        name: Querying JSON data
+        code: |
+          ```swift
+          struct User: Decodable {
+            let id: Int
+            let name: String
+            let city: String
+          }
+
+          let users: [User] = try await supabase.database
+            .from("users")
+            .select(
+              """
+                id, name,
+                address->city
+              """
+            )
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Avdotya', '{"city":"Saint Petersburg"}');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Avdotya",
+                "city": "Saint Petersburg"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          You can select and filter data inside of
+          [JSON](/docs/guides/database/json) columns. Postgres offers some
+          [operators](/docs/guides/database/json#query-the-jsonb-data) for
+          querying JSON data.
+        hideCodeBlock: true
+      - id: querying-foreign-table-with-inner-join
+        name: Querying foreign table with inner join
+        code: |
+          ```swift
+          struct City: Decodable {
+            let name: String
+            let countries: [Country]
+          }
+
+          struct Country: Decodable {
+            let name: String
+          }
+
+          let cities: [City] = try await supabase.database
+            .from("cities")
+            .select("name, countries!inner(name)")
+            .eq("countries.name", value: "Indonesia")
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table countries (
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+              "name" text
+            );
+
+            create table cities (
+              "id" "uuid" primary key default "extensions"."uuid_generate_v4"() not null,
+              "name" text,
+              "country_id" "uuid" references public.countries on delete cascade
+            );
+
+            with country as (
+              insert into countries (name)
+              values ('united kingdom') returning id
+            )
+            insert into cities (name, country_id) values
+            ('London', (select id from country)),
+            ('Manchester', (select id from country)),
+            ('Liverpool', (select id from country)),
+            ('Bristol', (select id from country));
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Bali",
+                "countries": {"name": "Indonesia"}
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          If you don't want to return the foreign table contents, you can leave the parenthesis empty.
+          Like `.select('name, countries!inner()')`.
+        hideCodeBlock: true
+
+  - id: insert
+    title: "Create data: insert()"
+    examples:
+      - id: create-a-record
+        name: Create a record
+        code: |
+          ```swift
+          struct Country: Encodable {
+            let id: Int
+            let name: String
+          }
+
+          let country = Country(id: 1, name: "Denmark")
+
+          try await supabase.database
+            .from("countries")
+            .insert(country)
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            ```
+        response: |
+          ```json
+          {
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: create-a-record-and-return-it
+        name: Create a record and return it
+        code: |
+          ```swift
+          struct Country: Codable {
+            let id: Int
+            let name: String
+          }
+
+          let country: Country = try await supabase.database
+            .from("countries")
+            // use `returning: .representation` to return the created object.
+            .insert(Country(id: 1, name: "Denmark"), returning: .representation)
+            // specify you want a single value returned, otherwise it returns a list.
+            .single() 
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Denmark"
+              }
+            ],
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
+        hideCodeBlock: true
+      - id: bulk-create
+        name: Bulk create
+        code: |
+          ```swift
+          struct Country: Encodable {
+            let id: Int
+            let name: String
+          }
+
+          let countries = [
+            Country(id: 1, name: "Nepal"),
+            Country(id: 1, name: "Vietnam"),
+          ]
+
+          try await supabase.database
+            .from("countries")
+            .insert(countries)
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            ```
+        response: |
+          ```json
+          {
+            "error": {
+              "code": "23505",
+              "details": "Key (id)=(1) already exists.",
+              "hint": null,
+              "message": "duplicate key value violates unique constraint \"countries_pkey\""
+            },
+            "status": 409,
+            "statusText": "Conflict"
+          }
+          ```
+        description: |
+          A bulk create operation is handled in a single transaction.
+          If any of the inserts fail, none of the rows are inserted.
+        hideCodeBlock: true
+
+  - id: update
+    title: "Modify data: update()"
+    notes: |
+      - `update()` should always be combined with [Filters](/docs/reference/swift/using-filters) to target the item(s) you wish to update.
+    examples:
+      - id: updating-your-data
+        name: Updating your data
+        code: |
+          ```swift
+          try await supabase.database
+            .from("countries")
+            .update(["name": "Australia"])
+            .eq("id", value: 1)
+            .execute()
+          ```
+        notes: |
+          Not always you need to create a `Encodable`` struct to define
+          the object being updated, in this example we use a `[String: String]`
+          type directly, since it conforms to `Encodable``.
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Taiwan');
+            ```
+        response: |
+          ```json
+          {
+            "status": 204,
+            "statusText": "No Content"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: update-a-record-and-return-it
+        name: Update a record and return it
+        code: |
+          ```swift
+          struct Country: Decodable {
+            let id: Int
+            let name: String          
+          }
+
+          let country: Country = try await supabase.database
+            .from("countries")
+            .update(["name": "Australia"], returning: .representation)
+            .eq("id", value: 1)
+             // If you know this query should return a single object, append a `single()` modifier to it.
+            .single()
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Taiwan');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Australia"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+      - id: updating-json-data
+        name: Updating JSON data
+        code: |
+          ```swift
+          struct User: Decodable {
+            let id: Int
+            let name: String
+            let address: Address
+
+            struct Address: Codable {
+              let street: String
+              let postcode: String
+            }
+          }
+
+          struct UpdateUser: Encodable {
+            let address: User.Address
+          }
+
+          let users: [User] = try await supabase.database
+            .from("users")
+            .update(
+              UpdateUser(
+                address: .init(
+                  street: "Melrose Place",
+                  postcode: "90210"
+                )
+              ),
+              returning: .representation
+            )
+            .eq("address->postcode", value: "90210")
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Michael', '{ "postcode": "90210" }');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Michael",
+                "address": {
+                  "street": "Melrose Place",
+                  "postcode": "90210"
+                }
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          Postgres offers some
+          [operators](/docs/guides/database/json#query-the-jsonb-data) for
+          working with JSON data. Currently, it is only possible to update the entire JSON document.
+        hideCodeBlock: true
+
+  - id: upsert
+    title: "Upsert data: upsert()"
+    notes: |
+      - Primary keys must be included in `values` to use upsert.
+    examples:
+      - id: upsert-your-data
+        name: Upsert your data
+        code: |
+          ```swift
+          struct Country: Encodable {
+            let id: Int
+            let name: String
+          }
+          try await supabase.database
+            .from("countries")
+            .upsert(Country(id: 1, name: "Albania"))
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Albania"
+              }
+            ],
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: bulk-upsert-your-data
+        name: Bulk Upsert your data
+        code: |
+          ```swift
+          struct Country: Encodable {
+            let id: Int
+            let name: String
+          }
+          try await supabase.database
+            .from("countries")
+            .upsert([
+              Country(id: 1, name: "Albania"),
+              Country(id: 2, name: "Algeria"),
+            ])
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Albania"
+              },
+              {
+                "id": 2,
+                "name": "Algeria"
+              }
+            ],
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
+        hideCodeBlock: true
+      - id: upserting-into-tables-with-constraints
+        name: Upserting into tables with constraints
+        code: |
+          ```swift
+          struct User: Encodable {
+            let id: Int
+            let handle: String
+            let displayName: String
+
+            enum CodingKeys: String, CodingKey {
+              case id
+              case handle
+              case displayName = "display_name"
+            }
+          }
+
+          try await supabase.database
+            .from("users")
+            .upsert(
+              User(id: 42, handle: "saoirse", displayName: "Saoirse"),
+              onConflict: "handle"
+            )
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 generated by default as identity primary key,
+                handle text not null unique,
+                display_name text
+              );
+
+            insert into
+              users (id, handle, display_name)
+            values
+              (1, 'saoirse', null);
+            ```
+        response: |
+          ```json
+          {
+            "error": {
+              "code": "23505",
+              "details": "Key (handle)=(saoirse) already exists.",
+              "hint": null,
+              "message": "duplicate key value violates unique constraint \"users_handle_key\""
+            },
+            "status": 409,
+            "statusText": "Conflict"
+          }
+          ```
+        description: |
+          In the following query, `upsert()` implicitly uses the `id`
+          (primary key) column to determine conflicts. If there is no existing
+          row with the same `id`, `upsert()` inserts a new row, which
+          will fail in this case as there is already a row with `handle` `"saoirse"`.
+          Using the `onConflict` option, you can instruct `upsert()` to use
+          another column with a unique constraint to determine conflicts.
+        hideCodeBlock: true
+
+  - id: delete
+    title: "Delete data: delete()"
+
+    notes: |
+      - `delete()` should always be combined with [filters](/docs/reference/swift/using-filters) to target the item(s) you wish to delete.
+      - If you use `delete()` with filters and you have
+        [RLS](/docs/learn/auth-deep-dive/auth-row-level-security) enabled, only
+        rows visible through `SELECT` policies are deleted. Note that by default
+        no rows are visible, so you need at least one `SELECT`/`ALL` policy that
+        makes the rows visible.
+    examples:
+      - id: delete-records
+        name: Delete records
+        code: |
+          ```swift
+          try await supabase.database
+            .from("countries")
+            .delete()
+            .eq("id", value: 1)
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Spain');
+            ```
+        response: |
+          ```json
+          {
+            "status": 204,
+            "statusText": "No Content"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+
+  - id: rpc
+    title: "Postgres functions: rpc()"
+    description: |
+      You can call Postgres functions as _Remote Procedure Calls_, logic in your database that you can execute from anywhere.
+      Functions are useful when the logic rarely changes—like for password resets and updates.
+
+      ```sql
+      create or replace function hello_world() returns text as $$
+        select 'Hello world';
+      $$ language sql;
+      ```
+    examples:
+      - id: call-a-postgres-function-without-arguments
+        name: Call a Postgres function without arguments
+        code: |
+          ```swift
+          let value: String = try await supabase.database
+            .rpc("hello_world")
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create function hello_world() returns text as $$
+              select 'Hello world';
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": "Hello world",
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: call-a-postgres-function-with-arguments
+        name: Call a Postgres function with arguments
+        code: |
+          ```swift
+          let response: String = try await supabase.database
+            .rpc("echo", params: ["say": "👋"])
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create function echo(say text) returns text as $$
+              select say;
+            $$ language sql;
+            ```
+        response: |
+          ```json
+            {
+              "data": "👋",
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+        hideCodeBlock: true
+      - id: bulk-processing
+        name: Bulk processing
+        code: |
+          ```swift
+          let response: [Int] = try await supabase.database
+            .rpc("add_one_each", params: ["arr": [1, 2, 3]])
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create function add_one_each(arr int[]) returns int[] as $$
+              select array_agg(n + 1) from unnest(arr) as n;
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              2,
+              3,
+              4
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          You can process large payloads by passing in an array as an argument.
+        hideCodeBlock: true
+
+      - id: call-a-postgres-function-with-filters
+        name: Call a Postgres function with filters
+        code: |
+          ```swift
+          struct Country: Decodable {
+            let id: Int
+            let name: String
+          }
+
+          let country: Country = await supabase.database
+            .rpc("list_stored_countries")
+            .eq("id", value: 1)
+            .single()
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'France'),
+              (2, 'United Kingdom');
+
+            create function list_stored_countries() returns setof countries as $$
+              select * from countries;
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": {
+              "id": 1,
+              "name": "France"
+            },
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          Postgres functions that return tables can also be combined with
+          [Filters](/docs/reference/javascript/using-filters) and
+          [Modifiers](/docs/reference/javascript/using-modifiers).
+        hideCodeBlock: true
+
+  - id: using-filters
+    title: Using Filters
+    description: |
+      Filters allow you to only return rows that match certain conditions.
+
+      Filters can be used on `select()`, `update()`, `upsert()`, and `delete()` queries.
+
+      If a Postgres function returns a table response, you can also apply filters.
+
+      Implement `URLQueryRepresentable` protocol in your own types to be able to use them as filter value.
+
+      Supported filtes are: `eq`, `neq`, `gt`, `gte`, `lt`, `lte`, `like`, `ilike`, `is`, `in`, `cs`, `cd`, `sl`, `sr`, `nxl`, `nxr`, `adj`, `ov`, `fts`, `plfts`, `phfts`, `wfts`. Check available operators in [PostgREST](https://postgrest.org/en/stable/references/api/tables_views.html#operators).
+    examples:
+      - id: applying-filters
+        name: Applying Filters
+        description: |
+          Filters must be applied after any of `select()`, `update()`, `upsert()`,
+          `delete()`, and `rpc()` and before
+          [modifiers](/docs/reference/swift/using-modifiers).
+        code: |
+          ```swift
+          try await supabase.database
+            .from("cities")
+            .select("name, country_id")
+            .eq("name", value: "The Shire")    // Correct
+
+          try await supabase.database
+            .from("citites")
+            .eq("name", value: "The Shire")    // Incorrect
+            .select("name, country_id")
+          ```
+      - id: chaining-filters
+        name: Chaining
+        description: |
+          Filters can be chained together to produce advanced queries. For example,
+          to query cities with population between 1,000 and 10,000:
+        code: |
+          ```swift
+          try await supabase.database
+            .from("cities")
+            .select("name, country_id")
+            .gte("population", value: 1000)
+            .lt("population", value: 10000)
+          ```
+      - id: conditional-chaining
+        name: Conditional Chaining
+        description: |
+          Filters can be built up one step at a time and then executed.
+        code: |
+          ```swift
+          let filterByName: String? = nil
+          let filterPopLow: Int? = 1000
+          let filterPopHigh: Int? = 10000
+
+          var query = await supabase.database
+            .from("cities")
+            .select("name, country_id")
+
+          if let filterByName {
+            query = query.eq("name", value: filterByName)
+          }
+          if let filterPopLow {
+            query = query.gte("population", value: filterPopLow)
+          }
+          if let filterPopHigh {
+            query = query.lt("population", value: filterPopHigh)
+          }
+
+          struct Response: Decodable {
+            // expected fields
+          }
+          let result: Response = try await query.execute().value
+          ```
+      - id: filter-by-value-within-json-column
+        name: Filter by values within a JSON column
+        code: |
+          ```swift
+          try await supabase.database
+            .from("users")
+            .select()
+            .eq("address->postcode", value: 90210)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Michael', '{ "postcode": 90210 }'),
+              (2, 'Jane', null);
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Michael",
+                "address": {
+                  "postcode": 90210
+                }
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+      - id: filter-foreign-tables
+        name: Filter Foreign Tables
+        code: |
+          ```swift
+          try await supabase.database
+            .from("countries")
+            .select(
+              """
+                name,
+                cities!inner (
+                  name
+                )
+              """
+            )
+            .eq("cities.name", value: "Bali")
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+          response: |
+            ```json
+            {
+              "data": [
+                {
+                  "name": "Indonesia",
+                  "cities": [
+                    {
+                      "name": "Bali"
+                    }
+                  ]
+                }
+              ],
+              "status": 200,
+              "statusText": "OK"
+            }
+            ```
+        description: |
+          You can filter on foreign tables in your `select()` query using dot
+          notation.
+  - id: or
+    title: or()
+    notes: |
+      or() expects you to use the raw PostgREST syntax for the filter names and values.
+
+      ```swift
+      .or(#"id.in.(5,6,7), arraycol.cs.{"a","b"}"#)  // Use `()` for `in` filter, `{}` for array values and `cs` for `contains()`.
+      .or(#"id.in.(5,6,7), arraycol.cd.{"a","b"}"#)  // Use `cd` for `containedBy()`
+      ```
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase.database
+            .from("countries")
+            .select("name")
+            .or("id.eq.2,name.eq.Algeria")
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Albania"
+              },
+              {
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: use-or-with-and
+        name: Use `or` with `and`
+        code: |
+          ```swift
+          try await supabase.database
+            .from("countries")
+            .select("name")
+            .or("id.gt.3,and(id.eq.1,name.eq.Afghanistan)")
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        reponse: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+
+  - id: not
+    title: not()
+    description: |
+      Finds all rows that don't satisfy the filter.
+    notes: |
+      - `.not()` expects you to use the raw [PostgREST syntax](https://postgrest.org/en/stable/api.html#horizontal-filtering-rows) for the filter names and values.
+
+        ```swift
+        .not("name", operator: .eq, value: "Paris")
+        .not("arraycol", operator: .cs, value: #"{"a","b"}"#) // Use Postgres array {} for array column and 'cs' for contains.
+        .not("rangecol", operator: .cs, value: "(1,2]") // Use Postgres range syntax for range column.
+        .not("id", operator: .in, value: "(6,7)")  // Use Postgres list () and 'in' for in_ filter.
+        .not("id", operator: .in, value: "(\(mylist.join(separator: ",")))")  // You can insert a Swift list array.
+        ```
+    examples:
+      - id: with-select
+        name: With `select()`
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.database
+            .from("countries")
+            .select()
+            .not("name", operator: .is, value: "")
+            .execute()
+          ```
+
+  - id: match
+    title: match()
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase.database
+            .from("countries")
+            .select("name")
+            .match(["id": 2, "name": "Albania"])
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Albania"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+
+  - id: filter
+    title: filter()
+    notes: |
+      filter() expects you to use the raw PostgREST syntax for the filter values.
+
+      ```swift
+      .filter("id", operator: .in, value: "(5,6,7)")  // Use `()` for `in` filter
+      .filter("arraycol", operator: .cs, value: #"{"a","b"}"#)  // Use `cs` for `contains()`, `{}` for array values
+      ```
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase.database
+            .from("countries")
+            .select()
+            .filter("name", operator: .in, value: #"("Algeria","Japan")"#)
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 3,
+                "name": "Algeria"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: on-a-foreign-table
+        name: On a foreign table
+        code: |
+          ```swift
+          try await supabase.database
+            .from("countries")
+            .select(
+              """
+                name,
+                cities!inner (
+                  name
+                )
+              """
+            )
+            .filter("cities.name", operator: .eq, value: "Bali")
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Germany'),
+              (2, 'Indonesia');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 2, 'Bali'),
+              (2, 1, 'Munich');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Indonesia",
+                "cities": [
+                  {
+                    "name": "Bali"
+                  }
+                ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+  - id: using-modifiers
+    title: Using Modifiers
+    description: |
+      Filters work on the row level—they allow you to return rows that
+      only match certain conditions without changing the shape of the rows.
+      Modifiers are everything that don't fit that definition—allowing you to
+      change the format of the response (e.g. returning a CSV string).
+
+      Modifiers must be specified after filters. Some modifiers only apply for
+      queries that return rows (e.g., `select()` or `rpc()` on a function that
+      returns a table response).
+
+  - id: db-modifiers-select
+    title: select()
+    description: |
+      Perform a SELECT on the query result.
+    examples:
+      - id: with-upsert
+        name: With `upsert()`
+        code: |
+          ```swift
+            try await database.database
+              .from("countries")
+              .upsert(CountryModel(id: 1, name: "Algeria"))
+              .select()
+              .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "id": 1,
+                "name": "Algeria"
+              }
+            ],
+            "status": 201,
+            "statusText": "Created"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: order
+    title: order()
+    description: |
+      Order the query result by column.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase.database
+            .from("countries")
+            .select("id, name")
+            .order("id", ascending: false)
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```swifton
+          {
+            "data": [
+              {
+                "id": 3,
+                "name": "Algeria"
+              },
+              {
+                "id": 2,
+                "name": "Albania"
+              },
+              {
+                "id": 1,
+                "name": "Afghanistan"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: on-a-foreign-table
+        name: On a foreign table
+        code: |
+          ```swift
+            try await supabase.database
+              .from("countries")
+              .select(
+                """
+                  name,
+                  cities (
+                    name
+                  )
+                """
+              )
+              .order("name", ascending: false, foreignTable: "cities")
+              .execute()
+            ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'United States'),
+              (2, 'Vanuatu');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 1, 'Atlanta'),
+              (2, 1, 'New York City');
+            ```
+        response: |
+          ```swifton
+          {
+            "data": [
+              {
+                "name": "United States",
+                "cities": [
+                  {
+                    "name": "New York City"
+                  },
+                  {
+                    "name": "Atlanta"
+                  }
+                ]
+              },
+              {
+                "name": "Vanuatu",
+                "cities": []
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          Ordering on foreign tables doesn't affect the ordering of
+          the parent table.
+        hideCodeBlock: true
+
+  - id: limit
+    title: limit()
+    description: |
+      Limit the query result by count.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase.database
+            .from("countries")
+            .select("id, name")
+            .limit(1)
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+      - id: on-a-foreign-table
+        name: On a foreign table
+        code: |
+          ```swift
+          try await supabase.database
+            .from("countries")
+            .select(
+              """
+              name,
+              cities (
+                name
+              )
+              """
+            )
+            .limit(1, foreignTable: "cities")
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            create table
+              cities (
+                id int8 primary key,
+                country_id int8 not null references countries,
+                name text
+              );
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'United States');
+            insert into
+              cities (id, country_id, name)
+            values
+              (1, 1, 'Atlanta'),
+              (2, 1, 'New York City');
+            ```
+        response: |
+          ```json
+          {
+            "data": [
+              {
+                "name": "United States",
+                "cities": [
+                  {
+                    "name": "Atlanta"
+                  }
+                ]
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+  - id: range
+    title: range()
+    description: |
+      Limit the query result by from and to inclusively.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase.database
+            .from("countries")
+            .select(
+              """
+                name,
+                cities (
+                  name
+                )
+              """
+            )
+            .range(from: 0, to: 1)
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```swifton
+          {
+            "data": [
+              {
+                "name": "Afghanistan"
+              },
+              {
+                "name": "Albania"
+              }
+            ],
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+
+  - id: single
+    title: single()
+    description: |
+      By default PostgREST returns all JSON results in an array, even when there is only one item, use `single()` to return the first object unenclosed by an array.
+    examples:
+      - id: with-select
+        name: With `select()`
+        code: |
+          ```swift
+          try await supabase.database
+            .from("countries")
+            .select("name")
+            .limit(1)
+            .single()
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": {
+              "name": "Afghanistan"
+            },
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: csv
+    title: csv()
+    examples:
+      - id: return-data-as-csv
+        name: Return data as CSV
+        code: |
+          ```swift
+          try await supabase
+            .from("countries")
+            .select()
+            .csv()
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```json
+          {
+            "data": "id,name\n1,Afghanistan\n2,Albania\n3,Algeria",
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
+        description: |
+          By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
+        hideCodeBlock: true
+        isSpotlight: true
+  - id: invoke
+    title: invoke()
+    description: |
+      Invoke a Supabase Edge Function.
+    notes: |
+      - Requires an Authorization header.
+      - When you pass in a body to your function, we automatically attach the Content-Type header for `String`, and `Data`. If it doesn't match any of these types we assume the payload is `json`, serialize it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
+    examples:
+      - id: invocation-with-decodable
+        name: Invocation with `Decodable` response
+        isSpotlight: true
+        code: |
+          ```swift
+          struct Response: Decodable {
+            // Expected response definition
+          }
+
+          let response: Response = try await supabase.functions
+            .invoke(
+              "hello", 
+              options: FunctionInvokeOptions(
+                body: ["foo": "bar"]
+              )
+            )
+          ```
+      - id: invocation-with-custom-response
+        name: Invocation with custom response
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.functions
+            .invoke(
+              "hello", 
+              options: FunctionInvokeOptions(
+                body: ["foo": "bar"]
+              ),
+              decode: { data, response in 
+                String(data: data, encoding: .utf8)
+              }
+            )
+
+          print(type(of: response)) // String?
+          ```
+      - id: error-handling
+        name: Error handling
+        description: |
+          A `FunctionsError` error is returned if your function throws an error, `FunctionsRelayError` if the Supabase Relay has an error processing your function and `FunctionsFetchError` if there is a network error in calling your function.
+            - `httpError(code: Int, data: Data)` in case a non-2xx status code is returned by the edge function.
+            - `relayError` in case the Supabase Relay has an error processing your function.
+        isSpotlight: true
+        code: |
+          ```swift
+
+          do {
+            let response = try await supabase.functions
+              .invoke(
+                "hello", 
+                options: FunctionInvokeOptions(
+                  body: ["foo": "bar"]
+                )
+              )
+          } catch FunctionsError.httpError(let code, let data) {
+            print("Function returned code \(code) with response \(String(data: data, encoding: .utf8) ?? "")")
+          } catch FunctionsError.relayError {
+            print("Relay error")
+          } catch {
+            print("Other error: \(error.localizedDescription)")
+          }
+          ```
+      - id: passing-custom-headers
+        name: Passing custom headers
+        description: |
+          You can pass custom headers to your function. Note: supabase-js automatically passes the `Authorization` header with the signed in user's JWT.
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.functions
+            .invoke(
+              "hello", 
+              options: FunctionInvokeOptions(
+                headers: [
+                  "my-custom-header": "my-custom-header-value"
+                ]
+              )
+            )
+          ```
+      - id: calling-with-delete-verb
+        name: Calling with DELETE HTTP verb
+        description: |
+          You can also set the HTTP verb to `DELETE` when calling your Edge Function.
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.functions
+            .invoke(
+              "hello", 
+              options: FunctionInvokeOptions(
+                method: .delete,
+                headers: [
+                  "my-custom-header": "my-custom-header-value"
+                ],
+                body: ["foo": "bar"]
+              )
+            )
+          ```
+      - id: calling-with-get-verb
+        name: Calling with GET HTTP verb
+        description: |
+          You can also set the HTTP verb to `GET` when calling your Edge Function.
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.functions
+            .invoke(
+              "hello", 
+              options: FunctionInvokeOptions(
+                method: .get,
+                headers: [
+                  "my-custom-header": "my-custom-header-value"
+                ]
+              )
+            )
+          ```
+  - id: subscribe
+    title: on().subscribe()
+    notes: |
+      - By default, Broadcast and Presence are enabled for all projects.
+      - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/api#realtime-api-overview).
+      - You can receive the "previous" data for updates and deletes by setting the table's `REPLICA IDENTITY` to `FULL` (e.g., `ALTER TABLE your_table REPLICA IDENTITY FULL;`).
+      - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
+    examples:
+      - id: listen-to-broadcast
+        name: Listen to broadcast messages
+        isSpotlight: true
+        code: |
+          ```swift
+          let channel = supabase
+            .realtime
+            .channel("room1")
+
+          channel
+            .on("broadcast", filter: ChannelFilter(event: "cursor-pos")) { message in 
+              print("Cursor position received!", message.payload)
+            }
+            .subscribe { status, error in
+              if status == .subscribed {
+                Task {
+                  await channel.send(
+                    type: .broadcast,
+                    event: "cursor-pos",
+                    payload: ["x": Double.random(in: 0...1), "y": Double.random(in: 0...1)]
+                  )
+                }
+              }
+            }
+          ```
+      - id: listen-to-presence-sync
+        name: Listen to presence sync
+        isSpotlight: true
+        code: |
+          ```swift
+          let channel = supabase.realtime.channel("room1")
+          channel
+            .on("presence", filter: ChannelFilter(event: "sync")) { _ in
+              print("Synced presence state: ", channel.presenceState())
+            }
+            .subscribe { status, error in
+              if status == .subscribed {
+                Task {
+                  await channel.track(["online_at": Date().ISO8601Format()])
+                }
+              }
+            }
+          ```
+      - id: listen-to-presence-join
+        name: Listen to presence join
+        isSpotlight: true
+        code: |
+          ```swift
+          let channel = supabase.realtime.channel("room1")
+          channel
+            .on("presence", filter: ChannelFilter(event: "join")) { message in 
+              print("Newly joined presences: ", message.payload)
+            }
+            .subscribe { status, error in
+              if status == .subscribed {
+                Task {
+                  await channel.track(["online_at": Date().ISO8601Format()])
+                }
+              }
+            }
+          ```
+      - id: listen-to-presence-leave
+        name: Listen to presence leave
+        isSpotlight: true
+        code: |
+          ```swift
+          let channel = supabase.realtime.channel("room1")
+          channel
+            .on("presence", filter: ChannelFilter(event: "leave")) { message in 
+              print("Newly left presences: ", message.payload)
+            }
+            .subscribe { status, error in
+              if status == .subscribed {
+                Task {
+                  await channel.track(["online_at": Date().ISO8601Format()])
+                  await channel.untrack()
+                }
+              }
+            }
+          ```
+      - id: listen-to-all-database-changes
+        name: Listen to all database changes
+        isSpotlight: true
+        code: |
+          ```swift
+          supabase.realtime
+            .channel("room1")
+            .on("postgres_changes", filter: ChannelFilter(event: "*", schema: "*")) { message in
+              print("Change received!", message.payload)
+            }
+            .subscribe()
+          ```
+      - id: listen-to-a-specific-table
+        name: Listen to a specific table
+        code: |
+          ```swift
+          supabase.realtime
+            .channel("room1")
+            .on("postgres_changes", filter: ChannelFilter(event: "*", schema: "public", table: "countries")) { message in
+              print("Change received!", message.payload)
+            }
+            .subscribe()
+          ```
+      - id: listen-to-inserts
+        name: Listen to inserts
+        code: |
+          ```swift
+          supabase.realtime
+            .channel("room1")
+            .on("postgres_changes", filter: ChannelFilter(event: "INSERT", schema: "public", table: "countries")) { message in
+              print("Change received!", message.payload)
+            }
+            .subscribe()
+          ```
+      - id: listen-to-updates
+        name: Listen to updates
+        description: |
+          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+          enable full replication for the table you are listening to:
+
+          ```sql
+          alter table "your_table" replica identity full;
+          ```
+        code: |
+          ```swift
+          supabase.realtime
+            .channel("room1")
+            .on("postgres_changes", filter: ChannelFilter(event: "UPDATE", schema: "public", table: "countries")) { message in
+              print("Change received!", message.payload)
+            }
+            .subscribe()
+          ```
+      - id: listen-to-deletes
+        name: Listen to deletes
+        description: |
+          By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+          enable full replication for the table you are listening too:
+
+          ```sql
+          alter table "your_table" replica identity full;
+          ```
+        code: |
+          ```swift
+          supabase.realtime
+            .channel("room1")
+            .on("postgres_changes", filter: ChannelFilter(event: "DELETE", schema: "public", table: "countries")) { message in
+              print("Change received!", message.payload)
+            }
+            .subscribe()
+          ```
+      - id: listen-to-multiple-events
+        name: Listen to multiple events
+        description: You can chain listeners if you want to listen to multiple events for each table.
+        code: |
+          ```swift
+          supabase.realtime
+            .channel("room1")
+            .on("postgres_changes", filter: ChannelFilter(event: "INSERT", schema: "public", table: "countries"), handler: handleRecordInserted)
+            .on("postgres_changes", filter: ChannelFilter(event: "DELETE", schema: "public", table: "countries"), handler: handleRecordDeleted)
+            .subscribe()
+
+          func handleRecordInserted(_ message: Message) {
+            // handle message
+          }
+
+          func handleRecordDeleted(_ message: Message) {
+            // handle message
+          }
+          ```
+      - id: listening-to-row-level-changes
+        name: Listen to row level changes
+        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
+        notes: |
+          - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
+        code: |
+          ```swift
+          supabase.realtime
+            .channel("room1")
+            .on(
+              "postgres_changes",
+              filter: ChannelFilter(
+                event: "INSERT",
+                schema: "public",
+                table: "countries",
+                filter: "id=eq.200"
+              ),
+              handler: handleRecordInserted
+            )
+            .subscribe()
+
+            func handleRecordInserted(_ message: Message) {
+              // handle message
+            }
+          ```
+  - id: broadcast-message
+    title: broadcastMessage()
+    description: |
+      Broadcast a message to all connected clients to a channel.
+    notes: |
+      - When using REST you don't need to subscribe to the channel
+    examples:
+      - id: send-a-message
+        name: Send a message via websocket
+        isSpotlight: true
+        code: |
+          ```swift
+          supabase.realtime
+            .channel("room1")
+            .subscribe { status, error in
+              if status == .subscribed {
+                Task {
+                  await channel.send(
+                    type: "broadcast",
+                    event: "cursor-pos",
+                    payload: ["x": Double.random(in: 0...1), "y": Double.random(in: 0...1)]
+                  )
+                }
+              }
+            }
+          ```
+      - id: send-a-message-via-rest
+        name: Send a message via REST
+        isSpotlight: true
+        code: |
+          ```swift
+          await supabase.realtime
+            .channel("room1")
+            .send(
+              type: "broadcast",
+              event: "cursor-pos",
+              payload: ["x": Double.random(in: 0...1), "y": Double.random(in: 0...1)]
+            )
+          ```
+  - id: get-channels
+    title: channels
+    examples:
+      - id: get-all-channels
+        name: Get all channels
+        isSpotlight: true
+        code: |
+          ```swift
+          let channels = supabase.realtime.channels
+          ```
+
+  - id: remove-channel
+    title: removeChannel()
+    notes: |
+      - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+    examples:
+      - id: removes-a-channel
+        name: Removes a channel
+        isSpotlight: true
+        code: |
+          ```swift
+          supabase.realtime.remove(myChannel)
+          ```
+
+  - id: remove-all-channels
+    title: removeAllChannels()
+    notes: |
+      - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+    examples:
+      - id: remove-all-channels
+        name: Remove all channels
+        isSpotlight: true
+        code: |
+          ```swift
+          supabase.realtime.removeAllChannels()
+          ```
+
+  - id: list-buckets
+    title: listBuckets()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: list-buckets
+        name: List buckets
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.storage
+            .listBuckets()
+          ```
+
+  - id: get-bucket
+    title: getBucket()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: get-bucket
+        name: Get bucket
+        isSpotlight: true
+        code: |
+          ```swift
+          let bucket = try await supabase.storage
+            .getBucket("avatars")
+          ```
+
+  - id: create-bucket
+    title: createBucket()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: `insert`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: create-bucket
+        name: Create bucket
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.storage
+            .createBucket(
+              "avatars", 
+              options: BucketOptions(
+                public: false,
+                allowedMimeTypes: ["image/png"],
+                fileSizeLimit: 1024
+              )
+            )
+          ```
+
+  - id: empty-bucket
+    title: emptyBucket()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select`
+        - `objects` table permissions: `select` and `delete`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: empty-bucket
+        name: Empty bucket
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.storage
+            .emptyBucket("avatars")
+          ```
+  - id: update-bucket
+    title: updateBucket()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select` and `update`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: update-bucket
+        name: Update bucket
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.storage
+            .updateBucket(
+              "avatars", 
+              options: BucketOptions(
+                public: false,
+                fileSizeLimit: 1024,
+                allowedMimeTypes: ["image/png"]
+              )
+            )
+          ```
+
+  - id: delete-bucket
+    title: deleteBucket()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: `select` and `delete`
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: delete-bucket
+        name: Delete bucket
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.storage
+            .deleteBucket("avatars")
+          ```
+
+  - id: from-upload
+    title: from.upload()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: only `insert` when you are uploading new files and `select`, `insert` and `update` when you are upserting files
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: upload-file
+        name: Upload file
+        isSpotlight: true
+        code: |
+          ```swift
+          let fileName = "avatar1.png"
+
+          try await supabase.storage
+            .from("avatars")
+            .upload(
+              path: "public/\(fileName)",
+              file: fileData,
+              options: FileOptions(
+                cacheControl: "3600",
+                contentType: "image/png",
+                upsert: false
+              )
+            )
+          ```
+
+  - id: from-update
+    title: from.update()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `update` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: update-file
+        name: Update file
+        isSpotlight: true
+        code: |
+          ```swift
+          let fileName = "avatar1.png"
+
+          try await supabase.storage
+            .from("avatars")
+            .update(
+              path: "public/\(fileName)",
+              file: fileData,
+              options: FileOptions(
+                cacheControl: "3600",
+                contentType: "image/png",
+                upsert: true
+              )
+            )
+          ```
+
+  - id: from-move
+    title: from.move()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `update` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: move-file
+        name: Move file
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase
+            .storage
+            .from("avatars")
+            .move(from: "public/avatar1.png", to: "private/avatar2.png")
+          ```
+
+  - id: from-copy
+    title: from.copy()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `insert` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: copy-file
+        name: Copy file
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase
+            .storage
+            .from("avatars")
+            .copy(from: "public/avatar1.png", to: "private/avatar2.png")
+          ```
+
+  - id: from-create-signed-url
+    title: from.createSignedUrl()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: create-signed-url
+        name: Create Signed URL
+        isSpotlight: true
+        code: |
+          ```swift
+          let signedURL = try await supabase.storage
+            .from("avatars")
+            .createSignedURL(path: "folder/avatar1.png", expiresIn: 60)
+          ```
+      - id: create-signed-url-with-transformations
+        name: Create a signed URL for an asset with transformations
+        isSpotlight: true
+        code: |
+          ```swift
+          let signedURL = try await supabase.storage
+            .from("avatars")
+            .createSignedURL(
+              path: "folder/avatar1.png",
+              expiresIn: 60,
+              transform: TransformOptions(
+                width: 100,
+                height: 100
+              )
+            )
+          ```
+      - id: create-signed-url-with-download
+        name: Create a signed URL which triggers the download of the asset
+        isSpotlight: true
+        code: |
+          ```swift
+          let signedURL = try await supabase.storage
+            .from("avatars")
+            .createSignedURL(
+              path: "folder/avatar1.png", expiresIn: 60,
+              download: true
+            )
+          ```
+        note: |
+          You can also sepcify a `String` in the `download` parameter to define the file name for the downloaded asset.
+
+  - id: from-get-public-url
+    title: from.getPublicUrl()
+    notes: |
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/javascript/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: none
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: returns-the-url-for-an-asset-in-a-public-bucket
+        name: Returns the URL for an asset in a public bucket
+        isSpotlight: true
+        code: |
+          ```swift
+          let publicURL = try supabase.storage
+            .from("public-bucket")
+            .getPublicURL(path: "folder/avatar1.png")
+          ```
+      - id: transform-asset-in-public-bucket
+        name: Returns the URL for an asset in a public bucket with transformations
+        isSpotlight: true
+        code: |
+          ```swift
+          let publicURL = try supabase.storage
+            .from("public-bucket")
+            .getPublicURL(
+              path: "folder/avatar1.png",
+              options: TransformOptions(
+                width: 100,
+                height: 100
+              )
+            )
+          ```
+      - id: download-asset-in-public-bucket
+        name: Returns the URL which triggers the download of an asset in a public bucket
+        isSpotlight: true
+        code: |
+          ```swift
+          let publicURL = try supabase.storage
+            .from("public-bucket")
+            .getPublicURL(
+              path: "folder/avatar1.png",
+              download: true
+            )
+          ```
+        note: |
+          You can also sepcify a `String` in the `download` parameter to define the file name for the downloaded asset.
+
+  - id: from-download
+    title: from.download()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: download-file
+        name: Download file
+        isSpotlight: true
+        code: |
+          ```swift
+          let data = try await supabase.storage
+            .from("avatars")
+            .download(path: "folder/avatar1.png")
+          ```
+      - id: download-file-with-transformations
+        name: Download file with transformations
+        isSpotlight: true
+        code: |
+          ```swift
+          let data = try await supabase.storage
+            .from("avatars")
+            .download(
+              path: "folder/avatar1.png",
+              options: TransformOptions(
+                width: 100,
+                height: 100,
+                quality: 80
+              )
+            )
+          ```
+
+  - id: from-remove
+    title: from.remove()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `delete` and `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: delete-file
+        name: Delete file
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.storage
+            .from("avatars")
+            .remove(paths: ["folder/avatar1.png"])
+          ```
+
+  - id: from-list
+    title: from.list()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: list-files-in-a-bucket
+        name: List files in a bucket
+        isSpotlight: true
+        code: |
+          ```swift
+          let files = try await supabase.storage
+            .from("avatars")
+            .list(
+              path: "folder",
+              options: SearchOptions(
+                limit: 100,
+                offset: 0,
+                sortBy: SortBy(column: "name", order: "asc")
+              )
+            )
+          ```
+      - id: search-files-in-a-bucket
+        name: Search files in a bucket
+        code: |
+          ```swift
+          let files = try await supabase.storage
+            .from("avatars")
+            .list(
+              path: "folder",
+              options: SearchOptions(
+                limit: 100,
+                offset: 0,
+                sortBy: SortBy(column: "name", order: "asc"),
+                search: "jon"
+              )
+            )
+          ```

@@ -1,5 +1,5 @@
 .sbui-card {
-  @apply flex flex-col bg-white dark:bg-dark-700 rounded-md shadow-lg overflow-hidden relative;
+  @apply flex flex-col bg-white [[data-theme*=dark]_&]:bg-dark-700 rounded-md shadow-lg overflow-hidden relative;
 
   border: 1px solid #e0e0e0;
 }

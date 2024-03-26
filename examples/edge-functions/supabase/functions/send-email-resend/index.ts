@@ -1,5 +1,3 @@
-import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-
 const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
 
 const handler = async (_request: Request): Promise<Response> => {
@@ -27,4 +25,4 @@ const handler = async (_request: Request): Promise<Response> => {
   })
 }
 
-serve(handler)
+Deno.serve(handler)

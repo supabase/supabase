@@ -8,20 +8,20 @@ const PGvectorImg = ({ isHovered }: { isHovered: boolean }) => {
   const svgRef = useRef<any>()
 
   const colors = {
-    circles1: resolvedTheme === 'dark' ? '#105C3B' : '#008B4F',
-    circles2: resolvedTheme === 'dark' ? '#1A2520' : '#DDDFDE',
-    pgLogoStart: resolvedTheme === 'dark' ? '#70F8BB' : '#7CDBC5',
-    pgLogoEnd: resolvedTheme === 'dark' ? '#A3A3A3' : '#006136',
-    pgLogoBg: resolvedTheme === 'dark' ? '#161616' : 'white',
-    radialBgStart: resolvedTheme === 'dark' ? '#131313' : '#F1F3F5',
-    radialBgEnd: resolvedTheme === 'dark' ? '#161616' : '#F8F9FA',
-    coordinatesStart: resolvedTheme === 'dark' ? '#23FF98' : '#002313',
-    coordinatesEnd: resolvedTheme === 'dark' ? '#49FFAA' : '#032C18',
-    rectStart: resolvedTheme === 'dark' ? '#17FDDF' : '#49615E',
-    rectEnd: resolvedTheme === 'dark' ? '#10FFE0' : '#202020',
-    arrow: resolvedTheme === 'dark' ? '#02FF8F' : '#00542F',
-    asdfStart: resolvedTheme === 'dark' ? '#23FF98' : '#002313',
-    asdfEnd: resolvedTheme === 'dark' ? '#49FFAA' : '#032C18',
+    circles1: resolvedTheme?.includes('dark') ? '#105C3B' : '#008B4F',
+    circles2: resolvedTheme?.includes('dark') ? '#1A2520' : '#DDDFDE',
+    pgLogoStart: resolvedTheme?.includes('dark') ? '#70F8BB' : '#7CDBC5',
+    pgLogoEnd: resolvedTheme?.includes('dark') ? '#A3A3A3' : '#006136',
+    pgLogoBg: resolvedTheme?.includes('dark') ? '#161616' : 'white',
+    radialBgStart: resolvedTheme?.includes('dark') ? '#131313' : '#F1F3F5',
+    radialBgEnd: resolvedTheme?.includes('dark') ? '#161616' : '#F8F9FA',
+    coordinatesStart: resolvedTheme?.includes('dark') ? '#23FF98' : '#002313',
+    coordinatesEnd: resolvedTheme?.includes('dark') ? '#49FFAA' : '#032C18',
+    rectStart: resolvedTheme?.includes('dark') ? '#17FDDF' : '#49615E',
+    rectEnd: resolvedTheme?.includes('dark') ? '#10FFE0' : '#202020',
+    arrow: resolvedTheme?.includes('dark') ? '#02FF8F' : '#00542F',
+    asdfStart: resolvedTheme?.includes('dark') ? '#23FF98' : '#002313',
+    asdfEnd: resolvedTheme?.includes('dark') ? '#49FFAA' : '#032C18',
   }
 
   const transition = (type: string) => ({
