@@ -1,56 +1,79 @@
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 
-const MetaFaviconsPagesRouter = ({ applicationName }: { applicationName: string }) => {
+const MetaFaviconsPagesRouter = ({
+  applicationName,
+  route = '/favicon',
+  themeColor = '1E1E1E',
+  includeRssXmlFeed = false,
+  includeManifest = false,
+  includeMsApplicationConfig = false,
+}: {
+  applicationName: string
+  // alternative route to use for the favicons
+  route?: string
+  // theme color for the browser
+  themeColor?: string
+  // include RSS feed
+  includeRssXmlFeed?: boolean
+  // include manifest.json
+  includeManifest?: boolean
+  // include browserconfig.xml
+  includeMsApplicationConfig?: boolean
+}) => {
   const { basePath } = useRouter()
+
   return (
     <Head>
       {/* prettier-ignore */}
-      <link rel="apple-touch-icon-precomposed" sizes="57x57" href={`${basePath}/favicon/apple-icon-57x57.png`}/>
+      <link rel="apple-touch-icon-precomposed" sizes="57x57" href={`${basePath}${route}/apple-icon-57x57.png`}/>
       {/* prettier-ignore */}
-      <link rel="apple-touch-icon-precomposed" sizes="114x114" href={`${basePath}/favicon/apple-icon-114x114.png`}/>
+      <link rel="apple-touch-icon-precomposed" sizes="114x114" href={`${basePath}${route}/apple-icon-114x114.png`}/>
       {/* prettier-ignore */}
-      <link rel="apple-touch-icon-precomposed" sizes="72x72" href={`${basePath}/favicon/apple-icon-72x72.png`}/>
+      <link rel="apple-touch-icon-precomposed" sizes="72x72" href={`${basePath}${route}/apple-icon-72x72.png`}/>
       {/* prettier-ignore */}
-      <link rel="apple-touch-icon-precomposed" sizes="144x144" href={`${basePath}/favicon/apple-icon-144x144.png`}/>
+      <link rel="apple-touch-icon-precomposed" sizes="144x144" href={`${basePath}${route}/apple-icon-144x144.png`}/>
       {/* prettier-ignore */}
-      <link rel="apple-touch-icon-precomposed" sizes="60x60" href={`${basePath}/favicon/apple-icon-60x60.png`}/>
+      <link rel="apple-touch-icon-precomposed" sizes="60x60" href={`${basePath}${route}/apple-icon-60x60.png`}/>
       {/* prettier-ignore */}
-      <link rel="apple-touch-icon-precomposed" sizes="120x120" href={`${basePath}/favicon/apple-icon-120x120.png`}/>
+      <link rel="apple-touch-icon-precomposed" sizes="120x120" href={`${basePath}${route}/apple-icon-120x120.png`}/>
       {/* prettier-ignore */}
-      <link rel="apple-touch-icon-precomposed" sizes="76x76" href={`${basePath}/favicon/apple-icon-76x76.png`}/>
+      <link rel="apple-touch-icon-precomposed" sizes="76x76" href={`${basePath}${route}/apple-icon-76x76.png`}/>
       {/* prettier-ignore */}
-      <link rel="apple-touch-icon-precomposed" sizes="152x152" href={`${basePath}/favicon/apple-icon-152x152.png`}/>
+      <link rel="apple-touch-icon-precomposed" sizes="152x152" href={`${basePath}${route}/apple-icon-152x152.png`}/>
       {/* These favicons are missing form public directories */}
-      {/* <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon-128.png`} sizes="128x128"/> */}
-      {/* <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon-196x196.png`} sizes="196x196"/> */}
+      {/* <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-128.png`} sizes="128x128"/> */}
+      {/* <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-196x196.png`} sizes="196x196"/> */}
       {/* prettier-ignore */}
-      <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon-96x96.png`} sizes="96x96"/>
+      <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-96x96.png`} sizes="96x96"/>
       {/* prettier-ignore */}
-      <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon-32x32.png`} sizes="32x32"/>
+      <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-32x32.png`} sizes="32x32"/>
       {/* prettier-ignore */}
-      <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon-16x16.png`} sizes="16x16"/>
+      <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-16x16.png`} sizes="16x16"/>
       <meta name="application-name" content={applicationName ?? '&nbsp;'} />
       {/* prettier-ignore */}
-      <meta name="msapplication-TileColor" content="#1E1E1E" />
+      <meta name="msapplication-TileColor" content={`#${themeColor}`} />
       {/* prettier-ignore */}
-      <meta name="msapplication-TileImage" content={`${basePath}/favicon/mstile-144x144.png`} />
+      <meta name="msapplication-TileImage" content={`${basePath}${route}/mstile-144x144.png`} />
       {/* prettier-ignore */}
-      <meta name="msapplication-square70x70logo" content={`${basePath}/favicon/mstile-70x70.png`} />
+      <meta name="msapplication-square70x70logo" content={`${basePath}${route}/mstile-70x70.png`} />
       {/* prettier-ignore */}
-      <meta name="msapplication-square150x150logo" content={`${basePath}/favicon/mstile-150x150.png`} />
+      <meta name="msapplication-square150x150logo" content={`${basePath}${route}/mstile-150x150.png`} />
       {/* prettier-ignore */}
-      <meta name="msapplication-wide310x150logo" content={`${basePath}/favicon/mstile-310x150.png`} />
+      <meta name="msapplication-wide310x150logo" content={`${basePath}${route}/mstile-310x150.png`} />
       {/* prettier-ignore */}
-      <meta name="msapplication-square310x310logo" content={`${basePath}/favicon/mstile-310x310.png`} />
-      <meta name="theme-color" content="#1E1E1E" />
-      <link rel="shortcut icon" href={`${basePath}/favicon/favicon.ico`} />
-      <link rel="icon" type="image/png" href={`${basePath}/favicon/favicon.ico`} />
-      {/* misc */}
-      <link rel="manifest" href={`${basePath}/favicon/manifest.json`} />
-      <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
-      <link rel="apple-touch-icon" href={`${basePath}/favicon/favicon.ico`} />
-      <meta name="msapplication-config" content={`${basePath}/favicon/browserconfig.xml`} />
+      <meta name="msapplication-square310x310logo" content={`${basePath}${route}/mstile-310x310.png`} />
+      <meta name="theme-color" content={`#${themeColor}`} />
+      <link rel="shortcut icon" href={`${basePath}${route}/favicon.ico`} />
+      <link rel="icon" type="image/png" href={`${basePath}${route}/favicon.ico`} />
+      <link rel="apple-touch-icon" href={`${basePath}${route}/favicon.ico`} />
+      {includeRssXmlFeed && (
+        <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
+      )}
+      {includeManifest && <link rel="manifest" href={`${basePath}${route}/manifest.json`} />}
+      {includeMsApplicationConfig && (
+        <meta name="msapplication-config" content={`${basePath}${route}/browserconfig.xml`} />
+      )}
     </Head>
   )
 }
