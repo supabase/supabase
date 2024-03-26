@@ -15,12 +15,15 @@ import {
 } from 'ui'
 import { getHumanReadableTitle } from './ReportLints.utils'
 import { Markdown } from '../Markdown'
+import { useParams } from 'common'
+import Link from 'next/link'
 
 type ReportLintsTableRowProps = {
   lint: Lint
 }
 
 const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
+  const { ref } = useParams()
   const [seletectdLint, setSelectedLint] = useState<Lint | null>(null)
 
   const [lintIgnoreList, setLintIgnoreList] = useLocalStorageQuery(
@@ -43,6 +46,32 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
     const ignoreString = currentIgnoreList.join(',')
     setLintIgnoreList(ignoreString)
   }
+
+  const ctaUrl =
+    lint.name === 'unused_index'
+      ? `/project/${ref}/database/indexes?schema=${lint.metadata?.schema}&table=${lint.metadata?.table}`
+      : lint.name === 'no_primary_key'
+        ? `/project/${ref}/editor`
+        : lint.name === 'auth_users_exposed'
+          ? `/project/${ref}/editor`
+          : lint.name === 'multiple_permissive_policies'
+            ? `/project/${ref}/auth/policies?schema=${lint.metadata?.schema}&search=${lint.metadata?.table}`
+            : lint.name === 'unindexed_foreign_keys'
+              ? `/project/${ref}/database/indexes?schema=${lint.metadata?.schema}`
+              : '/'
+
+  const ctaText =
+    lint.name === 'unused_index'
+      ? 'View index'
+      : lint.name === 'no_primary_key'
+        ? 'View table'
+        : lint.name === 'auth_users_exposed'
+          ? 'View table'
+          : lint.name === 'multiple_permissive_policies'
+            ? 'View policies'
+            : lint.name === 'unindexed_foreign_keys'
+              ? 'Create an index'
+              : undefined
 
   return (
     <>
@@ -104,28 +133,37 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
             )}
           </div>
         </Table.td>
-        <Table.td className="w-16 text-right">
-          <Tooltip_Shadcn_>
-            <TooltipTrigger_Shadcn_ asChild>
-              <Button
-                type="text"
-                className="px-1 ml-auto"
-                onClick={(event) => {
-                  event.stopPropagation()
-                  setSelectedLint(lint)
-                }}
-              >
-                {isIgnored ? (
-                  <EyeIcon size={16} strokeWidth={1} />
-                ) : (
-                  <EyeOff size={16} strokeWidth={1} />
-                )}
+        <Table.td>
+          <div className="flex items-center justify-end gap-x-2">
+            {ctaText !== undefined && (
+              <Button asChild type="default">
+                <Link href={ctaUrl} target="_blank" rel="noreferrer">
+                  {ctaText}
+                </Link>
               </Button>
-            </TooltipTrigger_Shadcn_>
-            <TooltipContent_Shadcn_ side="bottom">
-              {isIgnored ? 'Unignore problem' : 'Ignore problem'}
-            </TooltipContent_Shadcn_>
-          </Tooltip_Shadcn_>
+            )}
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <Button
+                  type="text"
+                  className="px-1"
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    setSelectedLint(lint)
+                  }}
+                >
+                  {isIgnored ? (
+                    <EyeIcon size={16} strokeWidth={1} />
+                  ) : (
+                    <EyeOff size={16} strokeWidth={1} />
+                  )}
+                </Button>
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="bottom">
+                {isIgnored ? 'Unignore problem' : 'Ignore problem'}
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
+          </div>
         </Table.td>
       </Table.tr>
       <Modal

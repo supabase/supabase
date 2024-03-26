@@ -37,10 +37,10 @@ const ProjectLints: NextPageWithLayout = () => {
   )
   const filteredLints =
     filters.levels.length > 0 || filters.types.length > 0
-      ? (lints ?? [])
+      ? (activeLints ?? [])
           .filter((x) => (filters.levels.length > 0 ? filters.levels.includes(x.level) : x))
           .filter((x) => (filters.types.length > 0 ? filters.types.includes(x.name) : x))
-      : lints ?? []
+      : activeLints ?? []
   const warnLintsCount = activeLints.filter((x) => x.level === 'WARN').length
   const errorLintsCount = activeLints.filter((x) => x.level === 'ERROR').length
 
