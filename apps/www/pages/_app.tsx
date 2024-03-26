@@ -13,7 +13,10 @@ import { PortalToast, themes } from 'ui'
 import { CommandMenuProvider } from 'ui-patterns/Cmdk'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
-import Meta from '~/components/Favicons'
+import MetaFaviconsPagesRouter, {
+  DEFAULT_FAVICON_ROUTE,
+  DEFAULT_FAVICON_THEME_COLOR,
+} from 'common/MetaFavicons/pages-router'
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import { post } from '~/lib/fetchWrapper'
 import supabase from '~/lib/supabase'
@@ -66,12 +69,29 @@ export default function App({ Component, pageProps }: AppProps) {
 
   const forceDarkMode = pathname === '/' || router.pathname.startsWith('/launch-week')
 
+  let applicationName = 'Supabase'
+  let faviconRoute = DEFAULT_FAVICON_ROUTE
+  let themeColor = DEFAULT_FAVICON_THEME_COLOR
+
+  if (router.asPath && router.asPath.includes('/launch-week')) {
+    applicationName = 'Supabase LWX'
+    faviconRoute = 'images/launchweek/lwx/favicon/'
+    themeColor = 'FFFFFF'
+  }
+
   return (
     <>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <Meta />
+      <MetaFaviconsPagesRouter
+        applicationName={applicationName}
+        route={faviconRoute}
+        themeColor={themeColor}
+        includeManifest
+        includeMsApplicationConfig
+        includeRssXmlFeed
+      />
       <DefaultSeo
         title={site_title}
         description={DEFAULT_META_DESCRIPTION}
