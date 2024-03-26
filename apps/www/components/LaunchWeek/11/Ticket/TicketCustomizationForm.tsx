@@ -39,7 +39,7 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
 
     if (supabase) {
       await supabase
-        .from('lwx_tickets')
+        .from('lw11_ga_tickets')
         .update(payload)
         .eq('username', user.username)
         .then((res) => {

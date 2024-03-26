@@ -25,7 +25,7 @@ export default function TicketProfile() {
             @{username}
           </p>
         )}
-        <div>
+        <div className={cn('text-foreground-lighter', hasSecretTicket && '!text-white')}>
           {HAS_ROLE && <span>{metadata?.role}</span>}
           {HAS_COMPANY && (
             <span>

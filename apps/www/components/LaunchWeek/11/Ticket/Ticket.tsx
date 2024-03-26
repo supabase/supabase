@@ -54,12 +54,12 @@ export default function Ticket() {
   return (
     <div
       ref={ticketRef}
-      className="w-auto h-auto flex justify-center rounded-2xl overflow-hidden will-change-transform"
+      className="w-auto h-auto flex justify-center rounded-xl overflow-hidden will-change-transform"
       style={{ transformStyle: 'preserve-3d', transform: 'perspective(1000px)' }}
     >
       <Panel
         hasShimmer
-        outerClassName="flex relative flex-col w-[400px] h-auto max-h-[680px] rounded-3xl !shadow-xl !p-0"
+        outerClassName="flex relative flex-col w-[360px] h-auto max-h-[680px] rounded-3xl !shadow-xl !p-0"
         innerClassName="flex relative flex-col justify-between w-full transition-colors aspect-[396/613] rounded-xl bg-[#020405] text-left text-sm group/ticket"
         shimmerFromColor="hsl(var(--border-strong))"
         shimmerToColor="hsl(var(--background-default))"

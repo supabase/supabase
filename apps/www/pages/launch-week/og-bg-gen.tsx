@@ -192,7 +192,7 @@ const LW11 = () => {
     imageError && setUploadState(`error: ${imageError.message}`)
   }
 
-  const record = (e) => {
+  const record = (e: any) => {
     e.preventDefault()
     if (!ctx || !canvas || !canvasSnapRef) return
     console.log('Capture image', ctx)
