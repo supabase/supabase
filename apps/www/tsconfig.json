@@ -6,7 +6,7 @@
       "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
     },
     "downlevelIteration": true,
-    "target": "ES2021",
+    "target": "es5",
     "module": "esnext",
     "jsx": "preserve",
     "strict": true,
