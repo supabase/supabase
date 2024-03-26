@@ -14,7 +14,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { FormSchema } from 'types'
+import type { FormSchema } from 'types'
 import {
   Button,
   FormControl_Shadcn_,
