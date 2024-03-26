@@ -1,4 +1,4 @@
-import { useIsLoggedIn } from 'common'
+import { useIsLoggedIn, useParams } from 'common'
 import jsonLogic from 'json-logic-js'
 
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
@@ -7,6 +7,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import type { Permission } from 'types'
 import { useSelectedOrganization } from './useSelectedOrganization'
 import { useSelectedProject } from './useSelectedProject'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 
 const toRegexpString = (actionOrResource: string) =>
   `^${actionOrResource.replace('.', '\\.').replace('%', '.*')}$`
@@ -146,7 +147,17 @@ export function usePermissionsLoaded() {
   const { isFetched: isPermissionsFetched } = usePermissionsQuery({ enabled: isLoggedIn })
   const { isFetched: isOrganizationsFetched } = useOrganizationsQuery({ enabled: isLoggedIn })
 
+  const { ref } = useParams()
+  const { isFetched: isProjectDetailFetched } = useProjectDetailQuery(
+    { ref },
+    { enabled: !!ref && isLoggedIn }
+  )
+
   if (!IS_PLATFORM) return true
+
+  if (ref) {
+    return isLoggedIn && isPermissionsFetched && isOrganizationsFetched && isProjectDetailFetched
+  }
 
   return isLoggedIn && isPermissionsFetched && isOrganizationsFetched
 }
