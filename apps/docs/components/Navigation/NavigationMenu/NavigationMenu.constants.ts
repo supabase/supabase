@@ -1774,6 +1774,10 @@ export const platform: NavMenuConstant = {
           name: 'High RAM Usage',
           url: '/guides/platform/exhaust-ram',
         },
+        {
+          name: 'High Swap Usage',
+          url: '/guides/platform/exhaust-swap',
+        },
       ],
     },
   ],
