@@ -14,11 +14,11 @@ date: '2024-03-26'
 toc_depth: 3
 ---
 
-[Amazon Bedrock](https://aws.amazon.com/bedrock) is a fully managed service that offers a choice of high-performing foundation models (FMs) from leading AI companies like AI21 Labs, Anthropic, Cohere, Meta, Mistral AI, Stability AI, and Amazon via a single API, along with a broad set of capabilities you need to build generative AI applications with security, privacy, and responsible AI.
+[Amazon Bedrock](https://aws.amazon.com/bedrock) is a fully managed service that offers a choice of high-performing foundation models (FMs) from leading AI companies like AI21 Labs, Anthropic, Cohere, Meta, Mistral AI, Stability AI, and Amazon. Each model is accessible through a common API which implements a broad set of features to help build generative AI applications with security, privacy, and responsible AI in mind.
 
 [Amazon Titan](https://aws.amazon.com/bedrock/titan/) is a family of foundation models (FMs) for text and image generation, summarization, classification, open-ended Q&A, information extraction, and text or image search.
 
-In this guide we'll look at how we can get started with Amazon Bedrock and Supabase Vector in Python using the Amazon Titan multimodal model and the [vecs client](/guides/ai/vecs-python-client).
+In this post we'll look at how we can get started with Amazon Bedrock and Supabase Vector in Python using the Amazon Titan multimodal model and the [vecs client](/docs/guides/ai/vecs-python-client).
 
 You can find the full application code as a Python Poetry project on [GitHub](https://github.com/supabase/supabase/tree/master/examples/ai/aws_bedrock_image_search).
 
@@ -196,7 +196,7 @@ After activating the virtual environtment with `poetry shell` you can now run yo
 
 ## Perform an image search from a text query
 
-With Supabase Vector we can easily query our embeddings. We can use either an image as search input or alternative we can generate an embedding from a string input and use that as the query input:
+With Supabase Vector we can easily query our embeddings. We can use either an image as the search input or alternatively we can generate an embedding from a string input and use that as the query input:
 
 ```python
 def search(args=sys.argv):
@@ -237,5 +237,5 @@ With just a couple of lines of Python you are able to implement image search as 
 
 ## More Supabase
 
-- [Getting started with Amazon Bedrock and vecs](/guides/ai/integrations/amazon-bedrock)
+- [Getting started with Amazon Bedrock and vecs](/docs/guides/ai/integrations/amazon-bedrock)
 - [Matryoshka embeddings: faster OpenAI vector search using Adaptive Retrieval](/blog/matryoshka-embeddings)
