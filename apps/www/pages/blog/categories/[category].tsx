@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { startCase } from 'lodash'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import BlogListItem from '~/components/Blog/BlogListItem'
+import BlogGridItem from '~/components/Blog/BlogGridItem'
 import PostTypes from '~/types/post'
 
 export async function getStaticProps({ params }: any) {
@@ -55,7 +55,7 @@ function CategoriesIndex(props: Props) {
                 className="col-span-12 mb-16 md:col-span-12 lg:col-span-6 xl:col-span-4"
                 key={idx}
               >
-                <BlogListItem post={blog} />
+                <BlogGridItem post={blog} />
               </div>
             ))}
           </ol>

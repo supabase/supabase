@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -25,7 +25,11 @@ import { menu } from '~/data/nav'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
 
-const Nav = () => {
+interface Props {
+  hideNavbar: boolean
+}
+
+const Nav = (props: Props) => {
   const { resolvedTheme } = useTheme()
   const router = useRouter()
   const { width } = useWindowSize()
@@ -35,6 +39,7 @@ const Nav = () => {
 
   const isHomePage = router.pathname === '/'
   const isLaunchWeekPage = router.pathname.includes('launch-week')
+  const isLaunchWeekXPage = router.pathname === '/launch-week'
   const showLaunchWeekNavMode = isLaunchWeekPage && !open
 
   React.useEffect(() => {
@@ -51,24 +56,18 @@ const Nav = () => {
     if (width >= 1024) setOpen(false)
   }, [width])
 
-  /**
-   * Temporary fix for next-theme client side bug
-   * https://github.com/pacocoursey/next-themes/issues/169
-   * TODO: remove when bug has been fixed
-   */
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
+  if (props.hideNavbar) {
     return null
   }
 
+  const showDarkLogo = isLaunchWeekPage || resolvedTheme?.includes('dark')! || isHomePage
+
   return (
     <>
-      <div className="sticky top-0 z-40 transform" style={{ transform: 'translate3d(0,0,999px)' }}>
+      <div
+        className={cn('sticky top-0 z-40 transform', isLaunchWeekXPage && 'relative')}
+        style={{ transform: 'translate3d(0,0,999px)' }}
+      >
         <div
           className={cn(
             'absolute inset-0 h-full w-full opacity-80 bg-background',
@@ -92,18 +91,24 @@ const Nav = () => {
                     className="block w-auto h-6 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
                   >
                     <Image
-                      src={
-                        isLaunchWeekPage || (mounted && resolvedTheme === 'dark') || isHomePage
-                          ? supabaseLogoWordmarkDark
-                          : supabaseLogoWordmarkLight
-                      }
+                      src={supabaseLogoWordmarkLight}
                       width={124}
                       height={24}
                       alt="Supabase Logo"
+                      className="dark:hidden"
+                      priority
+                    />
+                    <Image
+                      src={supabaseLogoWordmarkDark}
+                      width={124}
+                      height={24}
+                      alt="Supabase Logo"
+                      className="hidden dark:block"
+                      priority
                     />
                   </Link>
 
-                  {isLaunchWeekPage && (
+                  {isLaunchWeekPage && !isLaunchWeekXPage && (
                     <Link
                       href="/launch-week"
                       as="/launch-week"
@@ -122,7 +127,7 @@ const Nav = () => {
                     {menu.primaryNav.map((menuItem) =>
                       menuItem.hasDropdown ? (
                         <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
-                          <NavigationMenuTrigger className="bg-transparent data-[state=open]:!text-brand data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground-strong p-2 h-auto">
+                          <NavigationMenuTrigger className="bg-transparent text-foreground hover:text-brand-link data-[state=open]:!text-brand-link data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground p-2 h-auto">
                             {menuItem.title}
                           </NavigationMenuTrigger>
                           <NavigationMenuContent
@@ -137,7 +142,8 @@ const Nav = () => {
                             <MenuItem
                               href={menuItem.url}
                               title={menuItem.title}
-                              className="group-hover:bg-transparent text-strong hover:text-brand focus-visible:text-brand"
+                              className="group-hover:bg-transparent text-foreground focus-visible:text-brand-link"
+                              hoverColor="brand"
                             />
                           </NavigationMenuLink>
                         </NavigationMenuItem>
@@ -146,7 +152,7 @@ const Nav = () => {
                   </NavigationMenuList>
                 </NavigationMenu>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 opacity-0 animate-fade-in !scale-100 delay-300">
                 <GitHubButton />
                 {!isUserLoading && (
                   <>
@@ -173,12 +179,7 @@ const Nav = () => {
               showLaunchWeekNavMode={showLaunchWeekNavMode}
             />
           </div>
-          <MobileMenu
-            open={open}
-            setOpen={setOpen}
-            isDarkMode={isLaunchWeekPage || (mounted && resolvedTheme === 'dark') || isHomePage}
-            menu={menu}
-          />
+          <MobileMenu open={open} setOpen={setOpen} isDarkMode={showDarkLogo} menu={menu} />
         </nav>
 
         <ScrollProgress />

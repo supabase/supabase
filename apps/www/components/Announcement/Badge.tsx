@@ -29,12 +29,13 @@ const AnnouncementBadge = ({
     <Link
       href={url}
       target={target}
-      className="
+      className={cn(
+        `
           group/announcement
           relative
           flex flex-row
           items-center
-          pr-3 p-1
+          p-1 pr-3
           text-sm
           w-auto
           gap-2
@@ -48,16 +49,18 @@ const AnnouncementBadge = ({
           shadow-md
           overflow-hidden
           focus-visible:outline-none focus-visible:ring-brand-600 focus-visible:ring-2 focus-visible:rounded-full
-          "
+          `,
+        !badge && 'px-4'
+      )}
     >
       {badge && (
-        <Badge color="brandAlt" size="large" className="py-1">
+        <Badge variant="brand" size="large" className="py-1">
           {badge}
         </Badge>
       )}
       <span className="text-foreground">{announcement}</span>
       {hasArrow && (
-        <ArrowNarrowRightIcon className="h-4 ml-2 -translate-x-1 transition-transform group-hover/announcement:translate-x-0" />
+        <ArrowNarrowRightIcon className="h-4 ml-2 -translate-x-1 text-foreground transition-transform group-hover/announcement:translate-x-0" />
       )}
       <div
         className="absolute inset-0 -z-10 bg-gradient-to-br

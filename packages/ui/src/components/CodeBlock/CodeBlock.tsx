@@ -2,7 +2,7 @@ import { Children } from 'react'
 import * as CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
 import { monokaiCustomTheme } from './CodeBlock.utils'
-import { Button, IconCheck, IconCopy } from 'ui'
+import { Button, IconCheck, IconCopy, cn } from 'ui'
 
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
@@ -19,7 +19,7 @@ import { useTheme } from 'next-themes'
 
 export interface CodeBlockProps {
   title?: string
-  language: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json' | 'csharp' | 'kotlin'
+  language?: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json' | 'csharp' | 'kotlin'
   linesToHighlight?: number[]
   hideCopy?: boolean
   hideLineNumbers?: boolean
@@ -38,8 +38,9 @@ export const CodeBlock = ({
   hideCopy = false,
   hideLineNumbers = false,
 }: CodeBlockProps) => {
-  const { theme } = useTheme()
-  const monokaiTheme = monokaiCustomTheme(theme === 'dark')
+  const { resolvedTheme } = useTheme()
+  const isDarkTheme = resolvedTheme?.includes('dark')!
+  const monokaiTheme = monokaiCustomTheme(isDarkTheme)
 
   const [copied, setCopied] = useState(false)
 
@@ -78,7 +79,7 @@ export const CodeBlock = ({
 
   const large = false
   // don't show line numbers if bash == lang
-  if (lang !== 'bash') hideLineNumbers = true
+  if (lang === 'bash' || lang === 'sh') hideLineNumbers = true
   const showLineNumbers = !hideLineNumbers
 
   return (
@@ -96,12 +97,12 @@ export const CodeBlock = ({
             wrapLines={true}
             // @ts-ignore
             style={monokaiTheme}
-            className={[
-              'code-block border p-4 w-full !my-0 !bg-surface-100',
+            className={cn(
+              'code-block border border-surface p-4 w-full !my-0 !bg-surface-100',
               `${!title ? '!rounded-md' : '!rounded-t-none !rounded-b-md'}`,
               `${!showLineNumbers ? 'pl-6' : ''}`,
-              className,
-            ].join(' ')}
+              className
+            )}
             customStyle={{
               fontSize: large ? 18 : 13,
               lineHeight: large ? 1.5 : 1.4,
@@ -136,7 +137,7 @@ export const CodeBlock = ({
             <div
               className={[
                 'absolute right-2',
-                `${theme === 'dark' ? 'dark' : ''}`,
+                `${isDarkTheme ? 'dark' : ''}`,
                 `${!title ? 'top-2' : 'top-[3.25rem]'}`,
               ].join(' ')}
             >

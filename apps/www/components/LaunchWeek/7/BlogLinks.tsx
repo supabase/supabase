@@ -11,7 +11,7 @@ const BlogLinks = () => {
 
   return (
     <div className="flex flex-col gap-3 lg:gap-4 border-t border-muted py-4 lg:py-8 mt-4 lg:mt-8">
-      <h3 className="text-black dark:text-white text-xl mb-4">More Launch Week 7</h3>
+      <h3 className="text-foreground text-xl mb-4">More Launch Week 7</h3>
       {activeDays.map((day) =>
         day.steps?.map((step, i) => {
           return (
@@ -46,7 +46,7 @@ before:absolute before:w-full before:h-full before:top-52 before:right-0 before:
 before:border-[#1f3536] before:-z-10
 `}
     >
-      <div className="relative z-10 flex items-center text-lg flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+      <div className="relative z-10 flex items-center text-lg flex-col-reverse lg:flex-row lg:justify-start gap-2 text-foreground">
         <div
           className={[
             'text-transparent bg-clip-text bg-gradient-to-r text-base from-[#F4FFFA] to-[#B7B2C9] drop-shadow-lg',

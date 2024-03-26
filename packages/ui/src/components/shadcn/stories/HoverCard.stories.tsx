@@ -1,8 +1,8 @@
 import { Meta } from '@storybook/react'
-import { Avatar, AvatarFallback, AvatarImage } from '@ui/components/shadcn/ui/avatar'
-import { Button } from '@ui/components/shadcn/ui/button'
-import { HoverCard, HoverCardContent, HoverCardTrigger } from '@ui/components/shadcn/ui/hover-card'
 import { CalendarDays } from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar'
+import { Button } from '../ui/button'
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '../ui/hover-card'
 
 const meta: Meta = {
   title: 'shadcn/HoverCard',

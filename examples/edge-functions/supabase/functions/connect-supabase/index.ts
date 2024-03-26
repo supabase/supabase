@@ -9,9 +9,6 @@ const config = {
   authorizationEndpointUri: 'https://api.supabase.com/v1/oauth/authorize',
   tokenUri: 'https://api.supabase.com/v1/oauth/token',
   redirectUri: 'http://localhost:54321/functions/v1/connect-supabase/oauth2/callback',
-  defaults: {
-    scope: 'all',
-  },
 }
 const oauth2Client = new OAuth2Client(config)
 

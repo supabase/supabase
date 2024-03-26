@@ -60,7 +60,7 @@ export function PreLaunchTeaser() {
                   <Image
                     key={author.author_id + ' profile image'}
                     src={author.author_image_url}
-                    className="dark:border-dark rounded-lg border"
+                    className="rounded-lg border border-default"
                     width={54}
                     height={54}
                     alt="Author profile image"

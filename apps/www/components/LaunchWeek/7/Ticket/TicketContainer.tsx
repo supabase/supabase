@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { PageState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
+import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import Ticket from './ActualTicket'
 import Form from './form'
 import { SupabaseClient, Session } from '@supabase/supabase-js'
@@ -9,7 +9,7 @@ type Props = {
   session: Session | null
   defaultUserData: UserData
   sharePage?: boolean
-  defaultPageState?: PageState
+  defaultTicketState?: TicketState
 }
 
 export default function Conf({
@@ -17,10 +17,10 @@ export default function Conf({
   session,
   defaultUserData,
   sharePage,
-  defaultPageState = 'registration',
+  defaultTicketState = 'registration',
 }: Props) {
   const [userData, setUserData] = useState<UserData>(defaultUserData)
-  const [pageState, setPageState] = useState<PageState>(defaultPageState)
+  const [ticketState, setTicketState] = useState<TicketState>(defaultTicketState)
 
   return (
     <ConfDataContext.Provider
@@ -29,11 +29,12 @@ export default function Conf({
         session,
         userData,
         setUserData,
-        setPageState,
+        ticketState,
+        setTicketState,
       }}
     >
-      {pageState === 'registration' && !sharePage ? (
-        <Form align={defaultPageState === 'registration' ? 'Center' : 'Left'} />
+      {ticketState === 'registration' && !sharePage ? (
+        <Form align={defaultTicketState === 'registration' ? 'Center' : 'Left'} />
       ) : (
         <Ticket
           username={userData.username}

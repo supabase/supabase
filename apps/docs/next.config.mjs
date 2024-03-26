@@ -1,11 +1,11 @@
 // @ts-check
-import nextMdx from '@next/mdx'
-import remarkGfm from 'remark-gfm'
-import rehypeSlug from 'rehype-slug'
 import { remarkCodeHike } from '@code-hike/mdx'
+import nextMdx from '@next/mdx'
+import rehypeSlug from 'rehype-slug'
+import remarkGfm from 'remark-gfm'
 
-import withYaml from 'next-plugin-yaml'
 import configureBundleAnalyzer from '@next/bundle-analyzer'
+import withYaml from 'next-plugin-yaml'
 
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 
@@ -38,7 +38,7 @@ const nextConfig = {
   pageExtensions: ['ts', 'tsx', 'js', 'jsx', 'md', 'mdx'],
   // reactStrictMode: true,
   // swcMinify: true,
-  basePath: '/docs',
+  basePath: process.env.NEXT_PUBLIC_BASE_PATH || '/docs',
   images: {
     dangerouslyAllowSVG: true,
     domains: [
@@ -60,7 +60,16 @@ const nextConfig = {
       transform: 'lodash/{{member}}',
     },
   },
-  transpilePackages: ['ui', 'common', 'mermaid', 'mdx-mermaid', 'dayjs', 'shared-data'],
+  transpilePackages: [
+    'ui',
+    'ui-patterns',
+    'common',
+    'mermaid',
+    'mdx-mermaid',
+    'dayjs',
+    'shared-data',
+    'icons',
+  ],
   async headers() {
     return [
       {

@@ -4,7 +4,7 @@ import { action } from '@storybook/addon-actions'
 
 import { Modal } from '.'
 import Typography from '../Typography'
-import { Badge } from '../Badge'
+import { Badge } from '../shadcn/ui/Badge'
 import { Form } from '../Form'
 import { Button } from '../Button'
 import { Space } from '../Space'
@@ -111,7 +111,7 @@ export const withUseState = () => {
                       <span className="text-foreground font-regular">MyProject</span>.
                     </p>
                   </div>
-                  <div className="border-t border-muted dark:border-default"></div>
+                  <div className="border-t border-default"></div>
                   <div className="px-5">
                     <Input
                       id="name"
@@ -120,7 +120,7 @@ export const withUseState = () => {
                       label="Please type MyProject to confirm."
                     />
                   </div>
-                  <div className="border-t border-muted dark:border-default"></div>
+                  <div className="border-t border-default"></div>
                   <div className="px-5">
                     <Button
                       type="danger"
@@ -531,7 +531,7 @@ customFooter.args = {
   customFooter: [
     <Space>
       <div>
-        <Badge color="red" dot size="small">
+        <Badge variant="destructive" dot size="small">
           Proceed with caution
         </Badge>
       </div>

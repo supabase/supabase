@@ -1,23 +1,24 @@
+import matter from 'gray-matter'
 import { NextSeo } from 'next-seo'
 import type { GetStaticProps, InferGetStaticPropsType } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import matter from 'gray-matter'
-import authors from 'lib/authors.json'
 import { MDXRemote } from 'next-mdx-remote'
-import { Badge, Divider, IconChevronLeft } from 'ui'
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
+import { Badge, IconChevronLeft } from 'ui'
 
-import CTABanner from '~/components/CTABanner'
-import DefaultLayout from '~/components/Layouts/Default'
-import BlogLinks from '~/components/LaunchWeek/7/BlogLinks'
-import { generateReadingTime, isNotNullOrUndefined } from '~/lib/helpers'
-import ShareArticleActions from '~/components/Blog/ShareArticleActions'
-import useActiveAnchors from '~/hooks/useActiveAnchors'
+import authors from 'lib/authors.json'
+import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
 import mdxComponents from '~/lib/mdx/mdxComponents'
 import { mdxSerialize } from '~/lib/mdx/mdxSerialize'
-import { getAllPostSlugs, getPostdata, getSortedPosts } from '~/lib/posts'
-import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
+import { generateReadingTime, isNotNullOrUndefined } from '~/lib/helpers'
+
+import BlogLinks from '~/components/LaunchWeek/7/BlogLinks'
+import CTABanner from '~/components/CTABanner'
+import DefaultLayout from '~/components/Layouts/Default'
+import LWXSummary from '~/components/LaunchWeek/X/LWXSummary'
+import ShareArticleActions from '~/components/Blog/ShareArticleActions'
 
 type Post = ReturnType<typeof getSortedPosts>[number]
 
@@ -32,7 +33,7 @@ type BlogData = {
   thumb?: string
   youtubeHero?: string
   author_url?: string
-  launchweek?: number
+  launchweek?: number | string
   meta_title?: string
   meta_description?: string
   video?: string
@@ -120,8 +121,8 @@ export const getStaticProps: GetStaticProps<BlogPostPageProps, Params> = async (
 function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
   const content = props.blog.content
   const authorArray = props.blog.author.split(',')
-  useActiveAnchors('h2, h3, h4', '.prose-toc a')
   const isLaunchWeek7 = props.blog.launchweek === 7
+  const isLaunchWeekX = props.blog.launchweek?.toString().toLocaleLowerCase() === 'x'
 
   const author = authorArray
     .map((authorId) => {
@@ -232,36 +233,36 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
       <DefaultLayout>
         <div
           className="
-            container mx-auto px-8 py-16 sm:px-16
+            container mx-auto px-4 py-4 md:py-8 xl:py-10 sm:px-16
             xl:px-20
           "
         >
           <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12 mb-2 lg:col-span-2">
+            <div className="hidden col-span-12 xl:block lg:col-span-2">
               {/* Back button */}
-              <p>
-                <Link
-                  href={'/blog'}
-                  className="text-foreground-lighter hover:text-foreground flex cursor-pointer items-center text-sm transition"
-                >
-                  <IconChevronLeft style={{ padding: 0 }} />
-                  Back
-                </Link>
-              </p>
+              <Link
+                href="/blog"
+                className="text-foreground-lighter hover:text-foreground flex cursor-pointer items-center text-sm transition"
+              >
+                <IconChevronLeft style={{ padding: 0 }} />
+                Back
+              </Link>
             </div>
             <div className="col-span-12 lg:col-span-12 xl:col-span-10">
               {/* Title and description */}
-              <div className="mb-16 max-w-5xl space-y-8">
+              <div className="mb-6 lg:mb-10 max-w-5xl space-y-8">
                 <div className="space-y-4">
-                  <p className="text-brand">Blog post</p>
-                  <h1 className="h1">{props.blog.title}</h1>
+                  <Link href="/blog" className="text-brand hidden lg:inline">
+                    Blog
+                  </Link>
+                  <h1 className="text-2xl sm:text-4xl">{props.blog.title}</h1>
                   <div className="text-light flex space-x-3 text-sm">
                     <p>{props.blog.date}</p>
                     <p>•</p>
                     <p>{generateReadingTime(props.blog.source)}</p>
                   </div>
-                  <div className="flex justify-between">
-                    <div className="flex-1 flex flex-col gap-3 pt-6 md:flex-row md:gap-0 lg:gap-3">
+                  <div className="hidden lg:flex justify-between">
+                    <div className="flex-1 flex flex-col gap-3 pt-2 md:flex-row md:gap-0 lg:gap-3">
                       {author.map((author: any, i: number) => {
                         return (
                           <div className="mr-4 w-max" key={i}>
@@ -275,7 +276,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                                   <div className="w-10">
                                     <Image
                                       src={author.author_image_url}
-                                      className="dark:border-dark rounded-full border"
+                                      className="border-default rounded-full border w-full aspect-square object-cover"
                                       alt={`${author.author} avatar`}
                                       width={40}
                                       height={40}
@@ -301,7 +302,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
               </div>
               <div className="grid grid-cols-12 lg:gap-16 xl:gap-8">
                 {/* Content */}
-                <div className="col-span-12 lg:col-span-7 xl:col-span-7">
+                <div className="col-span-12 lg:col-span-7 xl:col-span-7 overflow-x-hidden">
                   <article>
                     <div className={['prose prose-docs'].join(' ')}>
                       {props.blog.youtubeHero ? (
@@ -310,18 +311,17 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                           width="700"
                           height="350"
                           src={props.blog.youtubeHero}
-                          frameBorder="0"
                           allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                          // @ts-expect-error
-                          allowfullscreen={true}
-                        ></iframe>
+                          allowFullScreen={true}
+                        />
                       ) : (
                         props.blog.thumb && (
-                          <div className="relative mb-8 h-96 w-full overflow-auto rounded-lg border">
+                          <div className="hidden md:block relative mb-8 h-96 w-full overflow-auto rounded-lg border">
                             <Image
                               src={'/images/blog/' + props.blog.thumb}
                               alt={props.blog.title}
                               fill
+                              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                               className="object-cover m-0"
                             />
                           </div>
@@ -331,6 +331,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                     </div>
                   </article>
                   {isLaunchWeek7 && <BlogLinks />}
+                  {isLaunchWeekX && <LWXSummary />}
                   <div className="block lg:hidden py-8">
                     <div className="text-foreground-lighter text-sm">Share this article</div>
                     <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />
@@ -347,44 +348,12 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                   </div>
                 </div>
                 {/* Sidebar */}
-                <div className="col-span-12 space-y-8 lg:col-span-5 xl:col-span-3 xl:col-start-9">
-                  <div className="space-y-6 lg:sticky lg:top-24 lg:mb-48">
+                <div className="relative col-span-12 space-y-8 lg:col-span-5 xl:col-span-3 xl:col-start-9">
+                  <div className="space-y-6">
                     <div className="hidden lg:block">{toc}</div>
-                    <div>
-                      <div className="mb-4">
-                        <p className="text-foreground text-sm">Related articles</p>
-                      </div>
-                      <div className="space-y-2">
-                        {props.relatedPosts.map((post) => (
-                          <Link href={`${post.path}`} as={`${post.path}`} key={post.slug}>
-                            <div>
-                              <div className="cursor-pointer">
-                                <div className="flex gap-2">
-                                  {/* <div className="text-foreground-lighter">
-                                    <IconFile size={'small'} style={{ minWidth: '1.2rem' }} />
-                                  </div> */}
-                                  <span className="text-light hover:text-gray-1200 text-sm">
-                                    {post.title}
-                                  </span>
-                                </div>
-                              </div>
-                              <Divider light className="mt-2" />
-                            </div>
-                          </Link>
-                        ))}
-                        <div className="mt-2">
-                          <Link
-                            href={`/blog`}
-                            className="text-light hover:text-foreground cursor-pointer text-xs"
-                          >
-                            View all posts
-                          </Link>
-                        </div>
-                        <div className="py-4 hidden lg:block">
-                          <div className="text-foreground text-sm">Share this article</div>
-                          <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />
-                        </div>
-                      </div>
+                    <div className="hidden lg:block">
+                      <div className="text-foreground text-sm">Share this article</div>
+                      <ShareArticleActions title={props.blog.title} slug={props.blog.slug} />
                     </div>
                   </div>
                 </div>

@@ -52,7 +52,7 @@ export function TicketBrickWallSlider({ users, reverse, speed = 50000, animate }
           {users.map((user, i) => (
             <SwiperSlide key={user.username}>
               <Link
-                href={`/launch-week/tickets/${user.username}`}
+                href={`/launch-week/8/tickets/${user.username}`}
                 key={user.username}
                 className="relative !w-[230px] md:w-[450px] !h-[200px] rounded-md md:rounded-lg transition-transform"
               >

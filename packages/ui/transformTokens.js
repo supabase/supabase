@@ -225,7 +225,10 @@ console.log(`Building Theme Styles...`)
 console.log(`\n`)
 
 themeFiles.map(function (filePath, i) {
-  const fileName = fileNameCleaner(filePath)
+  let fileName = fileNameCleaner(filePath)
+
+  // rename concept-one to dark-new
+  fileName = fileName === 'concept-one' ? 'deep-dark' : fileName
 
   let configTailwindFilesByType = []
 
@@ -251,7 +254,8 @@ themeFiles.map(function (filePath, i) {
             options: {
               showFileHeader: false,
               outputReferences: true,
-              selector: `.${fileName}`,
+              selector: `[data-theme='${fileName}'],
+.${fileName}`,
             },
             filter: (token) => token.filePath === filePath,
           },

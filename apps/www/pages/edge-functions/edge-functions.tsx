@@ -2,7 +2,6 @@ import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw, cn } from 
 import UseCaseExamples from 'data/products/functions/usecase-examples'
 import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
-import Image from 'next/image'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import 'swiper/swiper.min.css'
@@ -12,6 +11,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import ScrollableCodeBlock from '~/components/ScrollableCodeBlock'
 import FunctionsUsecases from '~/components/Sections/FunctionsUsecases'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import { ThemeImage } from 'ui-patterns/ThemeImage'
 
 const featureBlocks = [
   {
@@ -22,7 +22,7 @@ const featureBlocks = [
   },
   {
     title: 'Global',
-    description: 'Deployed to 29 regions worldwide',
+    description: 'Deploy worldwide for maximum resiliency and low latency',
     highlightLines: '8',
     icon: <IconGlobe strokeWidth={1.5} />,
   },
@@ -114,24 +114,13 @@ function Database() {
           ]}
           subheader={[subtitle]}
           image={[
-            <div className="header--light block w-full" key="light">
-              <Image
-                src={`${basePath}/images/product/functions/functions-hero.png`}
-                alt="database header"
-                layout="responsive"
-                width="1680"
-                height="1116"
-              />
-            </div>,
-            <div className="header--dark mr-0 w-full dark:block" key="dark">
-              <Image
-                src={`${basePath}/images/product/functions/functions-hero.png`}
-                alt="database header"
-                layout="responsive"
-                width="1680"
-                height="1116"
-              />
-            </div>,
+            <ThemeImage
+              src={`${basePath}/images/product/functions/functions-hero.png`}
+              alt="edge functions header"
+              layout="responsive"
+              width="1680"
+              height="1116"
+            />,
           ]}
           documentation_url={'/docs/guides/functions'}
         />
@@ -151,7 +140,7 @@ function Database() {
 
                     <div>
                       <h3 className="text-foreground text-lg">{item.title}</h3>
-                      <p className="text-foreground-light text-sm">{item.description}</p>
+                      <div className="text-foreground-light text-sm">{item.description}</div>
                     </div>
                   </div>
                 )
@@ -272,14 +261,12 @@ serve(async (req) => {
             footer={[
               <div className="grid grid-cols-12" key={0}>
                 <div className="col-span-12 mt-0 flex lg:col-span-6 xl:col-span-12 xl:mb-8">
-                  <p>
-                    <p className="text-foreground-light m-0">Libraries coming soon:</p>
-                  </p>
+                  <p className="text-foreground-light m-0">Libraries coming soon:</p>
                   <div className="ml-1 space-x-1">
-                    <Badge dot={false}>Python</Badge>
-                    <Badge dot={false}>Dart</Badge>
-                    <Badge dot={false}>C#</Badge>
-                    <Badge dot={false}>Kotlin</Badge>
+                    <Badge>Python</Badge>
+                    <Badge>Dart</Badge>
+                    <Badge>C#</Badge>
+                    <Badge>Kotlin</Badge>
                   </div>
                 </div>
                 <div

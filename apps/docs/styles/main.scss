@@ -4,11 +4,13 @@
 
 @import './../../../packages/ui/build/css/source/global.css';
 @import './../../../packages/ui/build/css/themes/dark.css';
+@import './../../../packages/ui/build/css/themes/deep-dark.css';
 @import './../../../packages/ui/build/css/themes/light.css';
 
 @font-face {
   font-family: 'custom-font';
-  src: url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
+  src:
+    url(../../../packages/common/assets/fonts/CustomFont-Book.woff2) format('woff2'),
     url(../../../packages/common/assets/fonts/CustomFont-Book.woff) format('woff');
   font-weight: 400;
   font-style: normal;
@@ -17,7 +19,8 @@
 
 @font-face {
   font-family: 'custom-font';
-  src: url(../../../packages/common/assets/fonts/CustomFont-Medium.woff2) format('woff2'),
+  src:
+    url(../../../packages/common/assets/fonts/CustomFont-Medium.woff2) format('woff2'),
     url(../../../packages/common/assets/fonts/CustomFont-Medium.woff) format('woff');
   font-weight: 500;
   font-style: normal;
@@ -29,7 +32,7 @@
 }
 
 body {
-  @apply bg-background;
+  @apply bg-background text-foreground;
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -64,11 +67,6 @@ article h1 {
   @media screen and (max-width: 1024px) {
     max-width: none;
   }
-}
-
-.table-of-contents-height {
-  max-height: calc(100vh - 3.75rem - 2rem);
-  top: calc(4rem + 60px); // padding height + navbar height
 }
 
 .width-full {
@@ -247,21 +245,6 @@ article p code {
 .toc-menu li a code {
   background: none;
   border: none;
-}
-
-// prevent horizontal scroll on mobile for tablist tab headers
-div[role='tablist'] {
-  @media screen and (min-width: 320px) {
-    max-width: 320px;
-  }
-
-  @media screen and (min-width: 600px) {
-    max-width: 520px;
-  }
-
-  @media screen and (min-width: 769px) {
-    max-width: 620px;
-  }
 }
 
 /*

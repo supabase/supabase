@@ -60,7 +60,7 @@ const TicketCustomizationForm = ({ supabase, user }: Props) => {
             Something went wrong
           </span>
         )}
-        <Badge color="brand">@{user.username}</Badge>
+        <Badge variant="brand">@{user.username}</Badge>
       </div>
       <Input
         className="[&_input]:border-background"

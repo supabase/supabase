@@ -5,7 +5,7 @@ import { addChannel, deleteChannel } from '~/lib/Store'
 import TrashIcon from '~/components/TrashIcon'
 
 export default function Layout(props) {
-  const { signOut, user, userRoles } = useContext(UserContext)
+  const { signOut, user } = useContext(UserContext)
 
   const slugify = (text) => {
     return text
@@ -60,7 +60,6 @@ export default function Layout(props) {
                 key={x.id}
                 isActiveChannel={x.id === props.activeChannelId}
                 user={user}
-                userRoles={userRoles}
               />
             ))}
           </ul>
@@ -73,13 +72,13 @@ export default function Layout(props) {
   )
 }
 
-const SidebarItem = ({ channel, isActiveChannel, user, userRoles }) => (
+const SidebarItem = ({ channel, isActiveChannel, user }) => (
   <>
     <li className="flex items-center justify-between">
       <Link href="/channels/[id]" as={`/channels/${channel.id}`}>
         <a className={isActiveChannel ? 'font-bold' : ''}>{channel.slug}</a>
       </Link>
-      {channel.id !== 1 && (channel.created_by === user?.id || userRoles.includes('admin')) && (
+      {channel.id !== 1 && (channel.created_by === user?.id || user?.appRole === 'admin') && (
         <button onClick={() => deleteChannel(channel.id)}>
           <TrashIcon />
         </button>

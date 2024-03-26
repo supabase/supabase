@@ -12,6 +12,7 @@ import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLin
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
+import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 
 // We fetch these docs at build time from an external repo
 const org = 'supabase'
@@ -62,7 +63,7 @@ interface ActionDocsProps {
 
 export default function ActionDocs({ source, meta }: ActionDocsProps) {
   return (
-    <Layout meta={meta}>
+    <Layout meta={meta} menuId={MenuId.Cli}>
       <MDXRemote {...source} components={components} />
     </Layout>
   )

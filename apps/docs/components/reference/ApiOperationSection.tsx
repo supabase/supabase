@@ -1,6 +1,7 @@
 import { CodeBlock, Tabs } from 'ui'
 import Param from '~/components/Params'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 
 const ApiOperationSection = (props) => {
   const operation = props.spec.operations.find((x: any) => x.operationId === props.funcData.id)
@@ -33,7 +34,7 @@ const ApiOperationSection = (props) => {
             {operation.path}
           </code>
         </div>
-        <div className="prose dark:prose-dark py-4">
+        <div className="prose py-4">
           <p>{operation.description}</p>
         </div>
         {/* Path Parameters */}
@@ -45,8 +46,8 @@ const ApiOperationSection = (props) => {
                 {operation.parameters &&
                   operation.parameters
                     .filter((parameter: any) => parameter.in === 'path')
-                    .map((parameter: any) => (
-                      <Param {...parameter} isOptional={!parameter.required}></Param>
+                    .map((parameter: any, index: number) => (
+                      <Param key={index} {...parameter} isOptional={!parameter.required}></Param>
                     ))}
               </ul>
             </div>
@@ -61,8 +62,8 @@ const ApiOperationSection = (props) => {
                 {operation.parameters &&
                   operation.parameters
                     .filter((parameter: any) => parameter.in === 'query')
-                    .map((parameter: any) => (
-                      <Param {...parameter} isOptional={!parameter.required}></Param>
+                    .map((parameter: any, index: number) => (
+                      <Param key={index} {...parameter} isOptional={!parameter.required}></Param>
                     ))}
               </ul>
             </div>
@@ -77,8 +78,8 @@ const ApiOperationSection = (props) => {
                 {operation.parameters &&
                   operation.parameters
                     .filter((parameter: any) => parameter.in === 'header')
-                    .map((parameter: any) => (
-                      <Param {...parameter} isOptional={!parameter.required}></Param>
+                    .map((parameter: any, index) => (
+                      <Param key={index} {...parameter} isOptional={!parameter.required}></Param>
                     ))}
               </ul>
             </div>
@@ -94,9 +95,9 @@ const ApiOperationSection = (props) => {
             defaultActiveId={operation.responseList[0].responseCode}
             queryGroup="response-status"
           >
-            {operation.responseList.map((response: any) => (
-              <Tabs.Panel id={response.responseCode} label={response.responseCode}>
-                <p className="text-background">{response.description}</p>
+            {operation.responseList.map((response: any, i: number) => (
+              <Tabs.Panel key={i} id={response.responseCode} label={response.responseCode}>
+                <ReactMarkdown className="text-foreground">{response.description}</ReactMarkdown>
                 {response?.content && response?.content['application/json'] && (
                   <div className="mt-8">
                     <CodeBlock language="bash" className="relative">

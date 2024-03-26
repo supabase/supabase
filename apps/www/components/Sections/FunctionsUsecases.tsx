@@ -36,7 +36,7 @@ function FunctionsUsecases(props: Props) {
     <div className="grid grid-cols-12 lg:gap-16">
       <div className="col-span-12 pb-8 lg:col-span-5 xl:col-span-5">
         <h2 className="h3">{props.title}</h2>
-        <p className="p">{props.text}</p>
+        <div className="p">{props.text}</div>
 
         <div className="flex flex-col gap-3">
           {props.content.map((feat, i) => {

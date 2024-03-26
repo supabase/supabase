@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import { useEffect } from 'react'
 import { Accordion } from 'ui'
-import Lottie from 'lottie-light-react'
 
 import days, { WeekDayProps, endOfLW7 } from '~/components/LaunchWeek/7/lw7_days'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -297,21 +296,8 @@ export default function LW7Releases() {
                       blog={preRelease.steps[0].blog}
                     />
                     {preRelease.steps[0].bg_layers &&
-                      preRelease.steps[0].bg_layers?.map((layer, i) =>
-                        !!layer.lottie ? (
-                          <div className="absolute inset-0 opacity-90 w-full h-full -z-10 transition-all duration-300">
-                            <Lottie
-                              style={{
-                                position: 'absolute',
-                                inset: 0,
-                                width: '100%',
-                                height: '100%',
-                              }}
-                              autoplay={true}
-                              animationData={layer.lottie}
-                            />
-                          </div>
-                        ) : (
+                      preRelease.steps[0].bg_layers?.map(
+                        (layer, i) =>
                           !!layer.img && (
                             <motion.div
                               className="absolute opacity-90 inset-0 w-full h-full -z-10"
@@ -319,8 +305,8 @@ export default function LW7Releases() {
                                 i === 2 && isTablet
                                   ? aiImageMobileVariant
                                   : i !== 0
-                                  ? opacityVariant
-                                  : undefined
+                                    ? opacityVariant
+                                    : undefined
                               }
                             >
                               <Image
@@ -336,7 +322,6 @@ export default function LW7Releases() {
                               />
                             </motion.div>
                           )
-                        )
                       )}
                   </motion.div>
                   <motion.div
@@ -364,12 +349,8 @@ export default function LW7Releases() {
                       hackernews={preRelease.steps[1].hackernews}
                     />
                     {preRelease.steps[1].bg_layers &&
-                      preRelease.steps[1].bg_layers?.map((layer, i) =>
-                        !!layer.lottie ? (
-                          <div className="absolute inset-0 opacity-90 w-full h-full -z-10 transition-all duration-300">
-                            <Lottie loop={true} autoplay={true} animationData={layer.lottie} />
-                          </div>
-                        ) : (
+                      preRelease.steps[1].bg_layers?.map(
+                        (layer, i) =>
                           !!layer.img && (
                             <motion.div
                               className="absolute opacity-90 inset-0 w-full h-full -z-10"
@@ -388,7 +369,6 @@ export default function LW7Releases() {
                               />
                             </motion.div>
                           )
-                        )
                       )}
                   </motion.div>
                 </div>
@@ -430,21 +410,8 @@ export default function LW7Releases() {
                       hackernews={day1.steps[0].hackernews}
                     />
                     {day1.steps[0].bg_layers &&
-                      day1.steps[0].bg_layers?.map((layer, i) =>
-                        !!layer.lottie ? (
-                          <div className="absolute inset-0 opacity-90 w-full h-full -z-10 transition-all duration-300">
-                            <Lottie
-                              style={{
-                                position: 'absolute',
-                                inset: 0,
-                                width: '100%',
-                                height: '100%',
-                              }}
-                              autoplay={true}
-                              animationData={layer.lottie}
-                            />
-                          </div>
-                        ) : (
+                      day1.steps[0].bg_layers?.map(
+                        (layer, i) =>
                           !!layer.img && (
                             <motion.div
                               className={[
@@ -476,7 +443,6 @@ export default function LW7Releases() {
                               />
                             </motion.div>
                           )
-                        )
                       )}
                   </motion.div>
                 </div>
@@ -508,7 +474,7 @@ export default function LW7Releases() {
                     animate="default"
                     whileHover="hover"
                   >
-                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-foreground">
                       <CartTitle>{day2.steps[0].title}</CartTitle>
                       <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
                     </div>
@@ -518,21 +484,8 @@ export default function LW7Releases() {
                       hackernews={day2.steps[0].hackernews}
                     />
                     {day2.steps[0].bg_layers &&
-                      day2.steps[0].bg_layers?.map((layer, i) =>
-                        !!layer.lottie ? (
-                          <div className="absolute inset-0 opacity-90 w-full h-full -z-10 transition-all duration-300">
-                            <Lottie
-                              style={{
-                                position: 'absolute',
-                                inset: 0,
-                                width: '100%',
-                                height: '100%',
-                              }}
-                              autoplay={true}
-                              animationData={layer.lottie}
-                            />
-                          </div>
-                        ) : (
+                      day2.steps[0].bg_layers?.map(
+                        (layer, i) =>
                           !!layer.img && (
                             <motion.div
                               className={[
@@ -564,7 +517,6 @@ export default function LW7Releases() {
                               />
                             </motion.div>
                           )
-                        )
                       )}
                   </motion.div>
                 </div>
@@ -596,7 +548,7 @@ export default function LW7Releases() {
                     animate="default"
                     whileHover="hover"
                   >
-                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-foreground">
                       <CartTitle>{day3.steps[0].title}</CartTitle>
                       <StyledArticleBadge className="lg:ml-2">Updated</StyledArticleBadge>
                     </div>
@@ -606,21 +558,8 @@ export default function LW7Releases() {
                       video={day3.steps[0].video}
                     />
                     {day3.steps[0].bg_layers &&
-                      day3.steps[0].bg_layers?.map((layer, i) =>
-                        !!layer.lottie ? (
-                          <div className="absolute inset-0 opacity-90 w-full h-full -z-10 transition-all duration-300">
-                            <Lottie
-                              style={{
-                                position: 'absolute',
-                                inset: 0,
-                                width: '100%',
-                                height: '100%',
-                              }}
-                              autoplay={true}
-                              animationData={layer.lottie}
-                            />
-                          </div>
-                        ) : (
+                      day3.steps[0].bg_layers?.map(
+                        (layer, i) =>
                           !!layer.img && (
                             <motion.div
                               className={[
@@ -652,7 +591,6 @@ export default function LW7Releases() {
                               />
                             </motion.div>
                           )
-                        )
                       )}
                   </motion.div>
                 </div>
@@ -684,7 +622,7 @@ export default function LW7Releases() {
                     animate="default"
                     whileHover="hover"
                   >
-                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-black dark:text-white">
+                    <div className="flex items-center text-center lg:text-left justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-foreground">
                       <CartTitle>{day4.steps[0].title}</CartTitle>
                       <StyledArticleBadge className="lg:ml-2">New</StyledArticleBadge>
                     </div>
@@ -696,21 +634,8 @@ export default function LW7Releases() {
                       mobileGrid
                     />
                     {day4.steps[0].bg_layers &&
-                      day4.steps[0].bg_layers?.map((layer, i) =>
-                        !!layer.lottie ? (
-                          <div className="absolute inset-0 opacity-90 w-full h-full -z-10 transition-all duration-300">
-                            <Lottie
-                              style={{
-                                position: 'absolute',
-                                inset: 0,
-                                width: '100%',
-                                height: '100%',
-                              }}
-                              autoplay={true}
-                              animationData={layer.lottie}
-                            />
-                          </div>
-                        ) : (
+                      day4.steps[0].bg_layers?.map(
+                        (layer, i) =>
                           !!layer.img && (
                             <motion.div
                               className={['absolute inset-0 w-full h-full -z-10'].join(' ')}
@@ -738,7 +663,6 @@ export default function LW7Releases() {
                               />
                             </motion.div>
                           )
-                        )
                       )}
                   </motion.div>
                 </div>

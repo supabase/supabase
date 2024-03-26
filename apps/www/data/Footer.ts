@@ -1,4 +1,4 @@
-import { PrivacySettings } from 'ui'
+import { PrivacySettings } from 'ui-patterns/PrivacySettings'
 
 const footerData = [
   {
@@ -33,7 +33,7 @@ const footerData = [
         url: '/pricing',
       },
       {
-        text: 'Launch Week 8',
+        text: 'Launch Week X',
         url: '/launch-week',
       },
     ],

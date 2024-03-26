@@ -89,9 +89,9 @@ const Team = () => {
   }
 
   return (
-    <div className="border-t dark:border-gray-600">
-      <SectionContainer className="">
-        <SectionHeader title="Team" paragraph={<div className=""></div>} />
+    <div className="border-t border-default">
+      <SectionContainer>
+        <SectionHeader title="Team" paragraph={<div></div>} />
         <div className="grid grid-cols-2 md:grid-cols-12">
           <div className="col-span-8 ">
             <p>
@@ -187,8 +187,8 @@ const Community = () => {
               key={x.title}
               className={`
               space-y-4 text-center lg:text-left
-              ${i !== CommunityData.length - 1 ? 'dark:border-r-dark lg:border-r' : ''}
-              ${i === 1 ? 'dark:border-r-dark md:border-0 lg:border-r ' : ''}
+              ${i !== CommunityData.length - 1 ? 'border-default lg:border-r' : ''}
+              ${i === 1 ? 'border-default md:border-0 lg:border-r ' : ''}
           `}
             >
               <div

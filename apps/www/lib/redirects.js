@@ -632,6 +632,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/blog/supavisor-postgres-connection-pooler-ga',
+    destination: '/blog/supavisor-postgres-connection-pooler',
+  },
+  {
+    permanent: true,
     source: '/blog/2022/06/15/blog/2022/06/29/visualizing-supabase-data-using-metabase',
     destination: '/blog/visualizing-supabase-data-using-metabase',
   },
@@ -1904,11 +1909,6 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/reference/dart/upgrade-guide',
-    destination: '/docs/reference/dart/v0/upgrade-guide',
-  },
-  {
-    permanent: true,
     source: '/docs/guides/examples',
     destination: '/docs/guides/resources/examples',
   },
@@ -2075,6 +2075,11 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/realtime/quickstart',
     destination: '/docs/guides/realtime',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/realtime/guides/client-side-throttling',
+    destination: '/docs/guides/realtime/quotas',
   },
   {
     permanent: true,
@@ -2342,5 +2347,60 @@ module.exports = [
     permanent: true,
     source: '/docs/guides/auth/auth-magic-link',
     destination: '/docs/guides/auth/passwordless-login/auth-magic-link',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-password-reset',
+    destination: '/docs/guides/auth/passwords',
+  },
+  {
+    permanent: true,
+    source: '/docs/reference/dart/sign-in-with-apple',
+    destination: '/docs/reference/dart/sign-in-with-id-token',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/large-datasets',
+    destination: '/docs/guides/database/import-data',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/rest/debugging-performance',
+    destination: '/docs/guides/database/debugging-performance',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/api/rest/joins-and-nesting',
+    destination: '/docs/guides/database/joins-and-nesting',
+  },
+  {
+    permanent: true,
+    source: '/docs/learn/auth-deep-dive/auth-deep-dive-jwts',
+    destination: '/docs/guides/auth/auth-deep-dive/auth-deep-dive-jwts',
+  },
+  {
+    permanent: true,
+    source: '/docs/learn/auth-deep-dive/auth-row-level-security',
+    destination: '/docs/guides/auth/auth-deep-dive/auth-row-level-security',
+  },
+  {
+    permanent: true,
+    source: '/docs/learn/auth-deep-dive/auth-policies',
+    destination: '/docs/guides/auth/auth-deep-dive/auth-policies',
+  },
+  {
+    permanent: true,
+    source: '/docs/learn/auth-deep-dive/auth-gotrue',
+    destination: '/docs/guides/auth/auth-deep-dive/auth-gotrue',
+  },
+  {
+    permanent: true,
+    source: '/docs/learn/auth-deep-dive/auth-google-oauth',
+    destination: '/docs/guides/auth/auth-deep-dive/auth-google-oauth',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/sso/auth-sso-saml',
+    destination: '/guides/auth/enterprise-sso/auth-sso-saml',
   },
 ]

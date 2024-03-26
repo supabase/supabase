@@ -62,7 +62,7 @@ jobs:
         with:
           push: true
           context: '{{defaultContext}}'
-          file: studio/Dockerfile
+          file: apps/studio/Dockerfile
           target: production
           platforms: linux/${{ env.arch }}
           tags: ${{ steps.meta.outputs.tags }}
@@ -105,7 +105,7 @@ jobs:
         with:
           push: true
           context: .
-          file: studio/Dockerfile
+          file: apps/studio/Dockerfile
           target: production
           platforms: linux/${{ env.arch }}
           tags: ${{ steps.meta.outputs.tags }}
