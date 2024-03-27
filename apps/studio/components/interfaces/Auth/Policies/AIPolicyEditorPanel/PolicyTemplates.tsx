@@ -12,19 +12,21 @@ import { getGeneralPolicyTemplates } from '../PolicyEditorModal/PolicyEditorModa
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 interface PolicyTemplatesProps {
+  table?: string
   selectedPolicy?: PostgresPolicy
   selectedTemplate?: string
   onSelectTemplate: (template: any) => void
 }
 
 export const PolicyTemplates = ({
+  table,
   selectedPolicy,
   selectedTemplate,
   onSelectTemplate,
 }: PolicyTemplatesProps) => {
   const [search, setSearch] = useState('')
   const state = useTableEditorStateSnapshot()
-  const templates = getGeneralPolicyTemplates(state.selectedSchemaName, 'table_name')
+  const templates = getGeneralPolicyTemplates(state.selectedSchemaName, table ?? 'table_name')
 
   const baseTemplates =
     selectedPolicy !== undefined

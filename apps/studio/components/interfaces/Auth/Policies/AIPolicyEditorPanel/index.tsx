@@ -729,6 +729,7 @@ export const AIPolicyEditorPanel = memo(function ({
                     >
                       <ScrollArea className="h-full w-full">
                         <PolicyTemplates
+                          table={table}
                           selectedPolicy={selectedPolicy}
                           selectedTemplate={selectedDiff}
                           onSelectTemplate={(value) => {
