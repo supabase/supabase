@@ -10,6 +10,7 @@ export enum EgressType {
   AUTH = 'egress_auth',
   STORAGE = 'egress_storage',
   REALTIME = 'egress_realtime',
+  FUNCTIONS = 'egress_functions',
   UNIFIED = 'egress',
 }
 
