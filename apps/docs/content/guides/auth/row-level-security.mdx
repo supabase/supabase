@@ -63,6 +63,12 @@ to authenticated
 using ( true );
 ```
 
+<Admonition type="note" label="Anonymous user vs the anon key">
+
+Using the `anon` Postgres role is different from an [anonymous user](/docs/guides/auth/auth-anonymous) in Supabase Auth. An anonymous user assumes the `authenticated` role to access the database and can be differentiated from a permanent user by checking the `is_anonymous` claim in the JWT.
+
+</Admonition>
+
 ## Helper functions
 
 Supabase provides some helper functions that make it easier to write Policies.
