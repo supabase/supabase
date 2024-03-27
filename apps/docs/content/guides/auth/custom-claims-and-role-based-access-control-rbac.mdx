@@ -216,7 +216,7 @@ To utilize Role-Based Access Control (RBAC) in Row Level Security (RLS) policies
 
 ```sql supabase/migrations/init.sql
 create function public.authorize(
-  requested_permission app_permission,
+  requested_permission app_permission
 )
 returns boolean as $$
 declare
@@ -242,8 +242,8 @@ You can read more about using functions in RLS policies in the [RLS guide](/docs
 You can then use the `authorize` method within your RLS policies. For example, to enable the desired delete access, you would add the following policies:
 
 ```sql
-create policy "Allow authorized delete access" on public.channels for delete using ( authorize('channels.delete', auth.uid()) );
-create policy "Allow authorized delete access" on public.messages for delete using ( authorize('messages.delete', auth.uid()) );
+create policy "Allow authorized delete access" on public.channels for delete using ( authorize('channels.delete') );
+create policy "Allow authorized delete access" on public.messages for delete using ( authorize('messages.delete') );
 ```
 
 ## Accessing custom claims in your application
