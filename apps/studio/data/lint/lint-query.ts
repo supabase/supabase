@@ -48,11 +48,12 @@ select
     null as remediation,
     jsonb_build_object(
         'schema', fk.schema_,
-        'table', fk.table_,
+        'name', fk.table_,
+        'type', 'table',
         'fkey_name', fk.fkey_name,
         'fkey_columns', fk.col_attnums
     ) as metadata,
-    format('0001_unindexed_foreign_keys_%s_%s', fk.table_, fk.fkey_name) as cache_key
+    format('0001_unindexed_foreign_keys_%s_%s_%s', fk.schema_, fk.table_, fk.fkey_name) as cache_key
 from
     foreign_keys fk
     left join index_ idx
@@ -71,16 +72,17 @@ select
     'EXTERNAL' as facing,
     'Detects if auth.users is exposed to anon or authenticated roles via a view or materialized view in the public schema, potentially compromising user data security.' as description,
     format(
-        'View/Materialized View \`%s\` in the public schema may expose auth.users data to anon or authenticated roles.',
+        'View/Materialized View "%s" in the public schema may expose \`auth.users\` data to anon or authenticated roles.',
         c.relname
     ) as detail,
-    'Review the view/materialized view definition to ensure it does not unintentionally expose sensitive user data. Apply proper role permissions and consider using row-level security to protect sensitive data.' as remediation,
+    'Review the View/Materialized View definition to ensure it does not unintentionally expose sensitive user data. Apply proper role permissions and consider using row-level security to protect sensitive data.' as remediation,
     jsonb_build_object(
-        'view_name', c.relname,
         'schema', 'public',
+        'name', c.relname,
+        'type', 'view',
         'exposed_to', array_remove(array_agg(DISTINCT case when pg_catalog.has_table_privilege('anon', c.oid, 'SELECT') then 'anon' when pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT') then 'authenticated' end), null)
     ) as metadata,
-    format('auth_users_exposed_%s', c.relname) as cache_key
+    format('auth_users_exposed_%s_%s', 'public', c.relname) as cache_key
 from
     pg_depend d
     join pg_rewrite r
@@ -133,6 +135,7 @@ NOTE:
 
 with policies as (
     select
+        nsp.nspname as schema_,
         polrelid::regclass table_,
         pc.relrowsecurity is_rls_active,
         polname as policy_name,
@@ -162,15 +165,19 @@ select
     'auth_rls_initplan' as name,
     'WARN' as level,
     'EXTERNAL' as facing,
-    'Detects if calls to auth.<function>() in RLS policies are being unnecessarily re-evaluated for each row' as description,
+    'Detects if calls to \`auth.<function>()\` in RLS policies are being unnecessarily re-evaluated for each row' as description,
     format(
-        'Table "%s" has a row level security policy "%s" that re-evaluates an auth.<function>() for each row. This produces suboptimal query performance at scale. Resolve the issue by replacing "auth.<function>()" with "(select auth.<function>())". See https://supabase.com/docs/guides/database/postgres/row-level-security#call-functions-with-select for more.',
+        'Table \`%s\` has a row level security policy \`%s\` that re-evaluates an auth.<function>() for each row. This produces suboptimal query performance at scale. Resolve the issue by replacing \`auth.<function>()\` with \`(select auth.<function>())\`. See https://supabase.com/docs/guides/database/postgres/row-level-security#call-functions-with-select for more.',
         table_,
         policy_name
     ) as detail,
     null as remediation,
-    null as metadata,
-    format('auth_rls_init_plan_%s_%s', table_, policy_name) as cache_key
+    jsonb_build_object(
+        'schema', schema_,
+        'name', table_,
+        'type', 'table'
+    ) as metadata,
+    format('auth_rls_init_plan_%s_%s_%s', schema_, table_, policy_name) as cache_key
 from
     policies
 where
@@ -205,7 +212,8 @@ select
     null as remediation,
      jsonb_build_object(
         'schema', pgns.nspname,
-        'table', pgc.relname
+        'name', pgc.relname,
+        'type', 'table'
     ) as metadata,
     format(
         'no_primary_key_%s_%s',
@@ -245,7 +253,8 @@ select
     null as remediation,
     jsonb_build_object(
         'schema', psui.schemaname,
-        'table', psui.relname
+        'name', psui.relname,
+        'type', 'table'
     ) as metadata,
     format(
         'unused_index_%s_%s_%s',
@@ -273,7 +282,7 @@ select
     'EXTERNAL' as facing,
     'Detects if multiple permissive row level security policies are present on a table for the same \`role\` and \`action\` (e.g. insert). Multiple permissive policies are suboptimal for performance as each policy must be executed for every relevant query.' as description,
     format(
-        'Table "%s"."%s" has multiple permissive policies for role "%s" for action "%s". Policies include %s',
+        'Table \`%s.%s\` has multiple permissive policies for role \`%s\` for action \`%s\`. Policies include \`%s\`',
         n.nspname,
         c.relname,
         r.rolname,
@@ -283,7 +292,8 @@ select
     null as remediation,
     jsonb_build_object(
         'schema', n.nspname,
-        'table', c.relname
+        'name', c.relname,
+        'type', 'table'
     ) as metadata,
     format(
         'multiple_permissive_policies_%s_%s_%s_%s',
@@ -344,8 +354,8 @@ export type Lint = {
   remediation: any
   metadata: {
     schema?: string
-    table?: string
-    view_name?: string
+    name?: string
+    type?: 'table' | 'view'
     fkey_name?: string
     fkey_columns?: number[]
   } | null

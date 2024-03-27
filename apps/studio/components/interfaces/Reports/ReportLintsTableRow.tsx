@@ -49,13 +49,13 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
 
   const ctaUrl =
     lint.name === 'unused_index'
-      ? `/project/${ref}/database/indexes?schema=${lint.metadata?.schema}&table=${lint.metadata?.table}`
+      ? `/project/${ref}/database/indexes?schema=${lint.metadata?.schema}&table=${lint.metadata?.name}`
       : lint.name === 'no_primary_key'
         ? `/project/${ref}/editor`
         : lint.name === 'auth_users_exposed'
           ? `/project/${ref}/editor`
           : lint.name === 'multiple_permissive_policies'
-            ? `/project/${ref}/auth/policies?schema=${lint.metadata?.schema}&search=${lint.metadata?.table}`
+            ? `/project/${ref}/auth/policies?schema=${lint.metadata?.schema}&search=${lint.metadata?.name}`
             : lint.name === 'unindexed_foreign_keys'
               ? `/project/${ref}/database/indexes?schema=${lint.metadata?.schema}`
               : lint.name === 'auth_rls_initplan'
@@ -103,7 +103,7 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
               </Tooltip_Shadcn_>
             </div>
 
-            {(lint.metadata?.table || lint.metadata?.view_name) && (
+            {(lint.metadata?.type === 'table' || lint.metadata?.type === 'view') && (
               <div className="flex items-center gap-x-4 text-xs py-1">
                 {lint.metadata?.schema && (
                   <div className="flex items-center gap-x-1">
@@ -112,15 +112,13 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
                   </div>
                 )}
                 <div className="flex items-center gap-x-1">
-                  {lint.metadata?.table && (
+                  {lint.metadata?.type === 'table' && (
                     <Table2 size={15} strokeWidth={1.5} className="text-foreground-lighter" />
                   )}
-                  {lint.metadata?.view_name && (
+                  {lint.metadata?.type === 'view' && (
                     <Eye size={15} strokeWidth={1.5} className="text-foreground-lighter" />
                   )}
-                  <p className="text-foreground font-mono">
-                    {lint.metadata?.table || lint.metadata?.view_name}
-                  </p>
+                  <p className="text-foreground font-mono">{lint.metadata?.name}</p>
                 </div>
               </div>
             )}
@@ -128,10 +126,16 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
 
           <div className="flex flex-col gap-y-1">
             {lint.detail && (
-              <Markdown className="text-foreground-light max-w-full" content={lint.detail} />
+              <Markdown
+                className="text-foreground-light max-w-full leading-relaxed"
+                content={lint.detail}
+              />
             )}
             {lint.remediation && (
-              <Markdown className="text-foreground-light max-w-full" content={lint.remediation} />
+              <Markdown
+                className="text-foreground-light max-w-full leading-relaxed"
+                content={lint.remediation}
+              />
             )}
           </div>
         </Table.td>
