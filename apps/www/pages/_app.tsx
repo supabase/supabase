@@ -125,6 +125,7 @@ export default function App({ Component, pageProps }: AppProps) {
           >
             <CommandMenuProvider site="website">
               <PortalToast />
+              <h1>test</h1>
               <Component {...pageProps} />
             </CommandMenuProvider>
           </ThemeProvider>

@@ -229,6 +229,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                   <div className="h-screen flex flex-col">
                     <SiteLayout>
                       <PortalToast />
+                      <h1>testing node 20</h1>
                       <Component {...pageProps} />
                     </SiteLayout>
                   </div>
