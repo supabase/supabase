@@ -14,6 +14,7 @@ import {
   Input_Shadcn_,
   RadioGroupLargeItem_Shadcn_,
   RadioGroup_Shadcn_,
+  ScrollArea,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
@@ -120,11 +121,17 @@ export const PolicyDetailsV2 = ({
                     </SelectTrigger_Shadcn_>
                     <SelectContent_Shadcn_>
                       <SelectGroup_Shadcn_>
-                        {(tables ?? []).map((table) => (
-                          <SelectItem_Shadcn_ key={table.id} value={table.name} className="text-sm">
-                            {table.name}
-                          </SelectItem_Shadcn_>
-                        ))}
+                        <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>
+                          {(tables ?? []).map((table) => (
+                            <SelectItem_Shadcn_
+                              key={table.id}
+                              value={table.name}
+                              className="text-sm"
+                            >
+                              {table.name}
+                            </SelectItem_Shadcn_>
+                          ))}
+                        </ScrollArea>
                       </SelectGroup_Shadcn_>
                     </SelectContent_Shadcn_>
                   </Select_Shadcn_>
