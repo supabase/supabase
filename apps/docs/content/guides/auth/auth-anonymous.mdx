@@ -14,6 +14,14 @@ An anonymous user is defined as a user that is created through the `signInAnonym
 
 To get started, [enable anonymous sign-ins](/dashboard/project/_/auth/providers) for your Supabase Project.
 
+<Admonition type="caution">
+
+Review your existing RLS policies before enabling anonymous sign-ins. Anonymous users use the `authenticated` role. To distinguish between anonymous users and permanent users, your policies need to check the `is_anonymous` field of the user's JWT.
+
+See the [Access control section](#access-control) for more details.
+
+</Admonition>
+
 <Admonition type="note" label="Self hosting">
 
 For self-hosting, you can update your project configuration using the files and environment variables provided. See the [self-hosting docs](/docs/guides/self-hosting#configuration) for more details.
