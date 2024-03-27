@@ -54,21 +54,6 @@ const LWXStickyNav: FC = () => {
       <nav className="sticky z-30 top-0 bg-[#06080999] backdrop-blur-sm pointer-events-auto w-full border-t border-b border-[#111718] h-[60px] flex items-center">
         <SectionContainer className="!max-w-none !py-0 lg:!container flex items-center justify-between font-mono gap-4 md:gap-8 text-sm">
           <div className="flex items-center gap-4 md:gap-8">
-            <div className="flex items-center gap-3 leading-none uppercase">
-              <Link href="/launch-week" className="text-foreground tracking-[1px]">
-                Launch Week
-              </Link>{' '}
-              <Link href="/launch-week/x">
-                <Image
-                  src="/images/launchweek/lwx/logos/lwx_logo.svg"
-                  alt="Supabase Launch Week X icon"
-                  width={16}
-                  height={16}
-                />
-              </Link>
-            </div>
-
-            {/* Nav items */}
             <ul className="lwx-sticky-nav hidden md:flex items-center gap-2 md:gap-4 text-foreground-muted">
               {days.map((day: WeekDayProps) => (
                 <li key={day.id}>

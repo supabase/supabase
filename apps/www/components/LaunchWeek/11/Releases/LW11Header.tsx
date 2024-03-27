@@ -2,12 +2,13 @@ import React from 'react'
 import SectionContainer from '../../../Layouts/SectionContainer'
 import Image from 'next/image'
 import GALogo from '../GALogo'
+import LW11Background from '../LW11Background'
 
 const LWXHeader = () => {
   return (
-    <div className="pt-16 w-full overflow-hidden">
-      <SectionContainer className="h-full flex flex-col">
-        <GALogo className="w-24 md:w-44 aspect-[1.83/1] h-auto min-h-16 md:min-h-24" />
+    <div className="relative w-full overflow-visible">
+      <SectionContainer className="h-full flex flex-col gap-4 !max-w-none lg:!container">
+        <GALogo className="w-20 md:w-24 aspect-[1.83/1] h-auto min-h-20 md:min-h-24" />
         <p className="text-foreground-lighter text-xl md:text-2xl">
           Supabase is{' '}
           <strong className="font-normal text-foreground">
@@ -17,6 +18,7 @@ const LWXHeader = () => {
           features that come with it.
         </p>
       </SectionContainer>
+      <LW11Background className="absolute z-0 inset-0 w-full h-full flex items-center justify-center opacity-100 transition-opacity" />
     </div>
   )
 }

@@ -49,7 +49,11 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
             filter: undefined,
           },
           async () => {
-            const { data: newMeets } = await supabase.from('lw11_ga_meetups').select('*')
+            const { data: newMeets } = await supabase
+              .from('lw11_ga_meetups')
+              .select('*')
+              .neq('isPublished', false)
+            console.log('newMeets', newMeets)
             setMeets(
               newMeets?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1))!
             )

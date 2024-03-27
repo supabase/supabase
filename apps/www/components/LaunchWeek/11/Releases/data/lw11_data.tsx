@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
+import { PRODUCT_NAMES, products } from 'shared-data/products'
 
-type StepLinkType = 'productHunt' | 'video' | 'docs' | 'xSpace' | 'blog'
+type StepLinkType = 'productHunt' | 'video' | 'docs' | 'xSpace' | 'blog' | 'podcast'
 
 export interface StepLink {
   type: StepLinkType
@@ -11,6 +12,7 @@ export interface StepLink {
 
 export interface StepProps {
   title: string
+  icon?: string
   badge?: string
   blog?: string
   docs?: string
@@ -29,7 +31,8 @@ export interface StepProps {
     mobileImg?: string
     className?: string
   }[]
-  steps: StepProps[] | []
+  steps?: StepProps[] | []
+  links?: StepLink[]
 }
 
 export interface WeekDayProps {
@@ -61,39 +64,108 @@ const days: WeekDayProps[] = [
     isToday: false,
     blog: '#',
     hasCountdown: true,
-    date: '11 Apr',
-    published_at: '2024-04-11T08:00:00.000-08:00',
-    description: <>Lorem ipsum</>,
-    links: [
-      // {
-      //   type: 'productHunt',
-      //   href: 'https://www.producthunt.com/',
-      // },
-      // {
-      //   type: 'blog',
-      //   href: '#',
-      // },
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
-      // {
-      //   type: 'xSpace',
-      //   href: '#',
-      // },
-    ],
+    date: '15 April',
+    published_at: '2024-04-15T08:00:00.000-08:00',
+    description: (
+      <>
+        <p className="text-foreground">Our products are now ready for production use.</p>{' '}
+        <p className="text-foreground-lighter">
+          Confidently leverage the full power of Supabase to build scalable, high-performance
+          applications with ease.
+        </p>
+      </>
+    ),
     steps: [
-      // {
-      //   title: '',
-      //   blog: '#',
-      //   bg_layers: [
-      //     {
-      //       img: '',
-      //       mobileImg: '',
-      //     },
-      //   ],
-      //   steps: [],
-      // },
+      {
+        icon: products.database.icon[16],
+        title: 'Database',
+        description: 'Fully portable Postgres Database',
+        links: [
+          {
+            type: 'podcast',
+            href: '#',
+          },
+          {
+            type: 'docs',
+            href: 'https://supabase.com/docs/guides/database/overview',
+          },
+        ],
+      },
+      {
+        icon: products.authentication.icon[16],
+        title: 'Auth',
+        description: 'User management out of the box',
+        links: [
+          {
+            type: 'podcast',
+            href: '#',
+          },
+          {
+            type: 'docs',
+            href: 'https://supabase.com/docs/guides/auth',
+          },
+        ],
+      },
+      {
+        icon: products.storage.icon[16],
+        title: 'Storage',
+        description: 'Serverless storage for any media',
+        links: [
+          {
+            type: 'podcast',
+            href: '#',
+          },
+          {
+            type: 'docs',
+            href: 'https://supabase.com/docs/guides/storage',
+          },
+        ],
+      },
+      {
+        icon: products.functions.icon[16],
+        title: 'Edge Functions',
+        description: 'Deploy code globally on the edge',
+        links: [
+          {
+            type: 'podcast',
+            href: '#',
+          },
+          {
+            type: 'docs',
+            href: 'https://supabase.com/docs/guides/functions',
+          },
+        ],
+      },
+      {
+        icon: products.realtime.icon[16],
+        title: 'Realtime',
+        description: 'Syncronize and broadcast events',
+        links: [
+          {
+            type: 'podcast',
+            href: '#',
+          },
+          {
+            type: 'docs',
+            href: 'https://supabase.com/docs/guides/realtime',
+          },
+        ],
+      },
+      {
+        icon: products.vector.icon[16],
+        title: 'Vector',
+        description: 'AI toolkit to manage embeddings',
+        links: [
+          {
+            type: 'podcast',
+            href: '#',
+          },
+          {
+            type: 'docs',
+            href: 'https://supabase.com/docs/guides/ai',
+          },
+        ],
+      },
     ],
   },
   {
@@ -104,8 +176,8 @@ const days: WeekDayProps[] = [
     shipped: false,
     hasCountdown: false,
     blog: '#',
-    date: '12 Apr',
-    published_at: '2024-04-12T08:00:00.000-08:00',
+    date: '16 April',
+    published_at: '2024-04-16T08:00:00.000-08:00',
     description: <>TBD</>,
     links: [
       // {
@@ -143,8 +215,8 @@ const days: WeekDayProps[] = [
     shipped: false,
     hasCountdown: false,
     blog: '#',
-    date: '13 Apr',
-    published_at: '2024-04-13T08:00:00.000-08:00',
+    date: '17 April',
+    published_at: '2024-04-17T08:00:00.000-08:00',
     description: <>TBD</>,
     links: [
       // {
@@ -170,8 +242,8 @@ const days: WeekDayProps[] = [
     shipped: false,
     hasCountdown: false,
     blog: '#',
-    date: '14 Apr',
-    published_at: '2024-04-14T08:00:00.000-08:00',
+    date: '18 April',
+    published_at: '2024-04-18T08:00:00.000-08:00',
     description: <>TBD</>,
     links: [
       // {
@@ -197,8 +269,8 @@ const days: WeekDayProps[] = [
     shipped: false,
     hasCountdown: false,
     blog: '#',
-    date: '15 Apr',
-    published_at: '2024-04-15T08:00:00.000-08:00',
+    date: '19 April',
+    published_at: '2024-04-19T08:00:00.000-08:00',
     description: <>TBD</>,
     links: [
       // {

@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react'
-import { IconDocumentation, IconMicSolid, IconProductHunt, IconYoutubeSolid, cn } from 'ui'
+import {
+  IconDocumentation,
+  IconMicSolid,
+  IconMusic,
+  IconProductHunt,
+  IconYoutubeSolid,
+  cn,
+} from 'ui'
 
 import Link from 'next/link'
 import { StepLink } from '../data/lw11_data'
@@ -34,6 +41,10 @@ export const DayLink = ({ type, icon, text, href = '', className }: DayLink) => 
     video: {
       icon: IconYoutubeSolid,
       text: 'Watch video',
+    },
+    podcast: {
+      icon: IconMusic,
+      text: 'Podcast',
     },
     xSpace: {
       icon: IconMicSolid,

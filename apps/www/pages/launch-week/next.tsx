@@ -130,7 +130,10 @@ export default function LaunchWeekIndex({ meetups }: Props) {
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const { data: meetups } = await supabase!.from('lw11_ga_meetups').select('*')
+  const { data: meetups } = await supabase!
+    .from('lw11_ga_meetups')
+    .select('*')
+    .neq('isPublished', false)
 
   return {
     props: {

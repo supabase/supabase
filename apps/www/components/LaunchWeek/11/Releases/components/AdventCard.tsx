@@ -11,7 +11,7 @@ import { AdventLink } from '../data/lw11_build_stage'
 
 const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
   const isTablet = useBreakpoint(1024)
-  const ticketRef = useRef<HTMLDivElement>(null)
+  const tiltRef = useRef<HTMLDivElement>(null)
   const hiddenRef = useRef<HTMLDivElement>(null)
   const { width } = useWindowSize()
   const [hiddenHeight, setHiddenHeight] = useState(0)
@@ -32,15 +32,15 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
   const isClientLibsCard = day.type === 'clientLibs'
 
   useEffect(() => {
-    if (ticketRef.current) {
-      Tilt.init(ticketRef.current, {
+    if (tiltRef.current) {
+      Tilt.init(tiltRef.current, {
         glare: false,
         max: isClientLibsCard ? 1 : 4,
         gyroscope: false,
         'full-page-listening': false,
       })
     }
-  }, [ticketRef])
+  }, [tiltRef])
 
   useEffect(() => {
     if (hiddenRef?.current) {
@@ -50,14 +50,7 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
   }, [hiddenRef, width])
 
   return (
-    <div
-      id={day.id}
-      ref={ticketRef}
-      className="absolute -inset-px group"
-      style={{
-        perspective: '1000px',
-      }}
-    >
+    <div id={day.id} ref={tiltRef} className="absolute -inset-px group will-change">
       <motion.div
         className={cn(
           'opacity-0 flex flex-col justify-between w-full h-full p-6 rounded-xl bg-[#121516] transition-colors text-[#575E61] border hover:border-strong overflow-hidden',
@@ -65,7 +58,7 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
         )}
         variants={variants}
       >
-        <div className={cn('w-full h-full flex flex-col flex-1')}>
+        <div className="relative w-full h-full flex flex-col flex-1">
           <div className="flex-1 opacity-30 group-hover:opacity-100 transition-opacity">
             {day.icon}
           </div>
