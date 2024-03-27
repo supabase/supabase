@@ -110,6 +110,7 @@ export const AIPolicyEditorPanel = memo(function ({
 
   // Use chat id because useChat doesn't have a reset function to clear all messages
   const [chatId, setChatId] = useState(uuidv4())
+  const [tabId, setTabId] = useState<'templates' | 'conversation'>('templates')
 
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
   const placeholder = generatePlaceholder(selectedPolicy)
@@ -668,7 +669,10 @@ export const AIPolicyEditorPanel = memo(function ({
                     {error !== undefined && (
                       <QueryError
                         error={error}
-                        onSelectDebug={onSelectDebug}
+                        onSelectDebug={() => {
+                          setTabId('conversation')
+                          onSelectDebug()
+                        }}
                         open={errorPanelOpen}
                         setOpen={setErrorPanelOpen}
                       />
@@ -715,11 +719,16 @@ export const AIPolicyEditorPanel = memo(function ({
                     'bg-studio'
                   )}
                 >
-                  <Tabs_Shadcn_ defaultValue="templates" className="flex flex-col h-full w-full">
+                  <Tabs_Shadcn_
+                    value={tabId}
+                    defaultValue="templates"
+                    className="flex flex-col h-full w-full"
+                  >
                     <TabsList_Shadcn_ className="flex gap-4 px-content pt-2">
                       <TabsTrigger_Shadcn_
                         key="templates"
                         value="templates"
+                        onClick={() => setTabId('templates')}
                         className="px-0 data-[state=active]:bg-transparent"
                       >
                         Templates
@@ -728,6 +737,7 @@ export const AIPolicyEditorPanel = memo(function ({
                         <TabsTrigger_Shadcn_
                           key="conversation"
                           value="conversation"
+                          onClick={() => setTabId('conversation')}
                           className="px-0 data-[state=active]:bg-transparent"
                         >
                           Assistant
