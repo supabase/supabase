@@ -1,5 +1,5 @@
 import { Command as CommandPrimitive } from 'cmdk'
-import { type PropsWithChildren, forwardRef } from 'react'
+import { type PropsWithChildren, forwardRef, useEffect } from 'react'
 
 import { Dialog, DialogContent, cn } from 'ui'
 
