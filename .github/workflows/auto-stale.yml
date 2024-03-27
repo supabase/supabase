@@ -1,0 +1,27 @@
+name: Automatically stale issue and PRs
+on:
+  push:
+    branches:
+      - master
+
+# Cancel old builds on new commit for same workflow + branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close Stale Issues
+        uses: actions/stale@v9.0.0
+        with:
+          days-before-pr-close: 30
+          days-before-issue-close: 90
+          close-issue-label: staled
+          close-pr-label: staled
+          any-of-labels: contributor
+          exempt-issue-labels: dnc, needs-analysis
+          exempt-pr-labels: dnc
+          exempt-all-pr-assignees: true
+          exempt-draft-pr: false
