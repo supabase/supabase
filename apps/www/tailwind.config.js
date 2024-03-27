@@ -4,6 +4,7 @@ module.exports = config({
   content: [
     './_blog/*.mdx',
     './components/**/*.tsx',
+    './data/**/*.tsx',
     './layouts/**/*.tsx',
     './lib/mdx/mdxComponents.tsx',
     './pages/**/*.{tsx,mdx}',
@@ -18,10 +19,8 @@ module.exports = config({
           '100%': { backgroundColor: 'transparent' },
         },
         slideIn: {
-          '0%, 100%': { transform: 'translate3d(0,0,0)' },
-        },
-        slideIn: {
-          '0%, 100%': { transform: 'translate3d(0,0,0)' },
+          '0%': { transform: 'translate3d(0,-100%,0)' },
+          '100%': { transform: 'translate3d(0,0,0)' },
         },
         spinner: {
           '0%': {
@@ -47,6 +46,11 @@ module.exports = config({
         spinner: 'spinner 1s both infinite',
         marquee: 'marquee 35s linear infinite',
         'pulse-radar': 'pulse-radar 3s linear infinite',
+        'slide-in': 'slideIn 250ms ease-in both',
+      },
+      transitionDelay: {
+        1200: '1200ms',
+        1500: '1500ms',
       },
     },
   },

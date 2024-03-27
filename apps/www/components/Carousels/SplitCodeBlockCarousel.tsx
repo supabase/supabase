@@ -6,7 +6,7 @@ import { Tabs, Button, Space } from 'ui'
 import CodeBlock from '../CodeBlock/CodeBlock'
 
 // Import Swiper styles
-import 'swiper/swiper.min.css'
+import 'swiper/css'
 import { Badge } from 'ui'
 import Link from 'next/link'
 

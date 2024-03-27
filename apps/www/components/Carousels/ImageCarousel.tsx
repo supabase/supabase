@@ -6,7 +6,7 @@ import { useRef, useState } from 'react'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 // Import Swiper styles
-import 'swiper/swiper.min.css'
+import 'swiper/css'
 
 import Image from 'next/image'
 import TextLink from '../TextLink'

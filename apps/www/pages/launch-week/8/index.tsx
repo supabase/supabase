@@ -1,3 +1,5 @@
+import 'swiper/css'
+
 import { useState, useEffect } from 'react'
 import { GetServerSideProps } from 'next'
 import dynamic from 'next/dynamic'
@@ -14,8 +16,6 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHeader'
 import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
 import LW8CalloutsSection from '~/components/LaunchWeek/8/LW8CalloutsSection'
-
-import 'swiper/swiper.min.css'
 
 const AnimatedParticles = dynamic(
   () => import('~/components/LaunchWeek/8/AnimatedParticles/ParticlesCanvas')

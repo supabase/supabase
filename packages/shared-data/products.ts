@@ -31,12 +31,12 @@ interface Icon {
   '24': string
 }
 
-interface ProductProps {
+export interface ProductProps {
   name: PRODUCT_NAMES
   icon: Icon
 }
 
-type Products = {
+export type Products = {
   [product in PRODUCT]: ProductProps
 }
 
