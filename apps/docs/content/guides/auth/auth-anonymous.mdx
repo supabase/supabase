@@ -14,9 +14,9 @@ It's most useful for:
 
 <Admonition type="note" label="Anonymous user vs the anon key">
 
-Calling `supabase.auth.signInAnonymously()` creates an anonymous user. It's just like a regular user, except the user can't access their account if they sign out, clear browsing data, or use another device.
+Calling `signInAnonymously()` creates an anonymous user. It's just like a permanent user, except the user can't access their account if they sign out, clear browsing data, or use another device.
 
-Like regular users, the `authenticated` Postgres role will be used when using the Data APIs to access your project. JWTs for these users will have an `is_anonymous` claim which you can use to distinguish in RLS policies.
+Like permanent users, the `authenticated` Postgres role will be used when using the Data APIs to access your project. JWTs for these users will have an `is_anonymous` claim which you can use to distinguish in RLS policies.
 
 This is different from the `anon` API key which does not create a user and can be used to implement public access to your database as it uses the `anonymous` Postgres role.
 
@@ -128,11 +128,11 @@ Depending on your application requirements, data conflicts can arise when an ano
 
 ## Abuse prevention and rate limits
 
-Since anonymous users are stored in your database, bad actors can abuse the endpoint to increase your database size drastically. It is strongly recommended to [enable silent captcha or turnstile](/docs/guides/auth/auth-captcha) to prevent abuse for anonymous sign-ins. There is also an IP-based rate limit for anonymous sign-ins at 30 requests per hour which can be configured in your [dashboard](/dashboard/project/_/auth/rate-limits). You can refer to the full list of rate limits [here](/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention).
+Since anonymous users are stored in your database, bad actors can abuse the endpoint to increase your database size drastically. It is strongly recommended to [enable invisible Captcha or Cloudflare Turnstile](/docs/guides/auth/auth-captcha) to prevent abuse for anonymous sign-ins. An IP-based rate limit is enforced at 30 requests per hour which can be modified in your [dashboard](/dashboard/project/_/auth/rate-limits). You can refer to the full list of rate limits [here](/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention).
 
 ## Automatic cleanup
 
-We are working on adding the ability to automatically cleanup anonymous users that were created more than 30 days ago. For now, you can delete anonymous users from your project by running:
+Automatic cleanup of anonymous users is currently not available. Instead, you can delete anonymous users from your project by running the following SQL:
 
 ```sql
 -- deletes anonymous users created more than 30 days ago
