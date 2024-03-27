@@ -3,10 +3,10 @@ import { collectionKeys } from './keys'
 
 type UpdateCollectionArgs = {
   projectRef: string
+  collectionToken: string
 }
 type UpdateCollectionPayload = {
   name?: string
-  description?: string
 }
 export function useUpdateCollection({ projectRef }: UpdateCollectionArgs) {
   const queryClient = useQueryClient()

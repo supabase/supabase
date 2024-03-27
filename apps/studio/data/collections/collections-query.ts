@@ -40,15 +40,14 @@ export function useCollectionsQuery({ projectRef }: CollectionsQueryArgs) {
 
 type CollectionQueryArgs = {
   projectRef: string
-  collectionId: string
+  collectionToken: string
 }
-export function useCollectionQuery({ projectRef, collectionId }: CollectionQueryArgs) {
-  const collectionQuery = useQuery(collectionKeys.item(projectRef, collectionId), async () => {
+export function useCollectionQuery({ projectRef, collectionToken }: CollectionQueryArgs) {
+  const collectionQuery = useQuery(collectionKeys.item(projectRef, collectionToken), async () => {
     // mock collection
     const collection = {
-      id: collectionId,
-      name: `Collection ${collectionId}`,
-      description: `Collection ${collectionId} description`,
+      name: `Collection ${collectionToken}`,
+      description: `Collection ${collectionToken} description`,
       data: [
         {
           id: 'issTIuFRIlLB',

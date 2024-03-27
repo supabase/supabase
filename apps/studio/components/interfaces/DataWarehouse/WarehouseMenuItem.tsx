@@ -1,5 +1,5 @@
-import { useDeleteCollection } from 'data/collections/collections-delete-mutation'
-import { useUpdateCollection } from 'data/collections/collections-update-mutation'
+import { useDeleteCollection } from 'data/analytics/warehouse-collections-delete-mutation'
+import { useUpdateCollection } from 'data/analytics/warehouse-collections-update-mutation'
 import { useSelectedProject } from 'hooks'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -24,7 +24,8 @@ import {
 
 type Props = {
   item: {
-    id: string
+    id: number
+    token: string
     name: string
   }
 }
@@ -38,8 +39,8 @@ export const WarehouseMenuItem = ({ item }: Props) => {
   const [showDeleteDialog, setDeleteDialog] = React.useState(false)
   const [confirmDelete, setConfirmDelete] = React.useState(false)
 
-  const updateCollection = useUpdateCollection({ projectRef })
-  const deleteCollection = useDeleteCollection({ projectRef })
+  const updateCollection = useUpdateCollection({ projectRef, collectionToken: item.token })
+  const deleteCollection = useDeleteCollection({ projectRef, collectionToken: item.token })
 
   const isLoading = updateCollection.isLoading || deleteCollection.isLoading
 
@@ -49,12 +50,12 @@ export const WarehouseMenuItem = ({ item }: Props) => {
         className={cn(
           'pr-1 h-7 pl-3 mt-1 text-foreground-light group-hover:text-foreground/80 text-sm',
           'flex items-center justify-between rounded-md group relative',
-          item.id === router.query.collectionId
+          item.token === router.query.collectionToken
             ? 'bg-surface-300 text-foreground'
             : 'hover:bg-surface-200'
         )}
-        key={item.id + '-collection-item'}
-        href={`/project/${projectRef}/logs/collections/${item.id}`}
+        key={item.token + '-collection-item'}
+        href={`/project/${projectRef}/logs/collections/${item.token}`}
       >
         <div>{item.name}</div>
 
@@ -124,6 +125,7 @@ export const WarehouseMenuItem = ({ item }: Props) => {
               layout="horizontal"
               label={`Collection name`}
               id="name"
+              name="name"
               defaultValue={item.name}
             />
           </Modal.Content>
@@ -156,7 +158,7 @@ export const WarehouseMenuItem = ({ item }: Props) => {
           onSubmit={async (e) => {
             e.preventDefault()
             try {
-              await deleteCollection.mutateAsync({ id: item.id })
+              await deleteCollection.mutateAsync()
               setDeleteDialog(false)
               toast.success('Collection deleted successfully')
             } catch (error) {
