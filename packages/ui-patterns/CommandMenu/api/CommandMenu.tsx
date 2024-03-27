@@ -1,0 +1,3 @@
+const CommandMenu = () => {}
+
+export { CommandMenu }
