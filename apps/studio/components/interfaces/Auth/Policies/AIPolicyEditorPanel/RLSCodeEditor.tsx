@@ -23,6 +23,7 @@ interface RLSCodeEditorProps {
 
   lineNumberStart?: number
   onChange?: () => void
+  onMount?: () => void
 
   editorRef: MutableRefObject<editor.IStandaloneCodeEditor | null>
   monacoRef?: MutableRefObject<Monaco>
@@ -39,6 +40,7 @@ const RLSCodeEditor = ({
 
   lineNumberStart,
   onChange = noop,
+  onMount: _onMount = noop,
 
   editorRef,
   monacoRef,
@@ -90,6 +92,8 @@ const RLSCodeEditor = ({
     )
 
     editor.focus()
+
+    _onMount()
   }
 
   const onChangeContent: OnChange = (value) => {

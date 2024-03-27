@@ -570,6 +570,16 @@ export const AIPolicyEditorPanel = memo(function ({
                                 editorOneRef.current?.getModel()?.getLineCount() ?? 1
                               )
                             }}
+                            onMount={() => {
+                              setTimeout(() => {
+                                setExpOneContentHeight(
+                                  editorOneRef.current?.getContentHeight() ?? 0
+                                )
+                                setExpOneLineCount(
+                                  editorOneRef.current?.getModel()?.getLineCount() ?? 1
+                                )
+                              }, 200)
+                            }}
                           />
                         </div>
 
@@ -620,6 +630,16 @@ export const AIPolicyEditorPanel = memo(function ({
                                   setExpTwoLineCount(
                                     editorTwoRef.current?.getModel()?.getLineCount() ?? 1
                                   )
+                                }}
+                                onMount={() => {
+                                  setTimeout(() => {
+                                    setExpTwoContentHeight(
+                                      editorTwoRef.current?.getContentHeight() ?? 0
+                                    )
+                                    setExpTwoLineCount(
+                                      editorTwoRef.current?.getModel()?.getLineCount() ?? 1
+                                    )
+                                  }, 200)
                                 }}
                               />
                             </div>
