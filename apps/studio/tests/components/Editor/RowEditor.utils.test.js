@@ -10,19 +10,6 @@ describe('parseValue', () => {
     expect(parseValue(originalValue, format)).toBeNull()
   })
 
-  it('should return originalValue when it is an empty array', () => {
-    const originalValue = []
-    const format = 'some format'
-    expect(parseValue(originalValue, format)).toEqual(originalValue)
-  })
-
-  it('should return originalValue when it is an empty object', () => {
-    const originalValue = {}
-    const format = 'some format'
-    const expectedValue = JSON.stringify(originalValue)
-    expect(parseValue(originalValue, format)).toEqual(expectedValue)
-  })
-
   it('should return originalValue when it is 0', () => {
     const originalValue = 0
     const format = 'some format'
@@ -39,6 +26,20 @@ describe('parseValue', () => {
     const originalValue = 42
     const format = ''
     expect(parseValue(originalValue, format)).toEqual(originalValue)
+  })
+
+  it('should return JSON string representation when originalValue is an empty array', () => {
+    const originalValue = []
+    const format = 'some format'
+    const expectedValue = JSON.stringify(originalValue)
+    expect(parseValue(originalValue, format)).toEqual(expectedValue)
+  })
+
+  it('should return JSON string representation when originalValue is an empty object', () => {
+    const originalValue = {}
+    const format = 'some format'
+    const expectedValue = JSON.stringify(originalValue)
+    expect(parseValue(originalValue, format)).toEqual(expectedValue)
   })
 
   it('should return JSON string representation when originalValue is an object', () => {
