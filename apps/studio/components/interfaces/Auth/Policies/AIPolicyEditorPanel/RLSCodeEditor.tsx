@@ -9,7 +9,8 @@ import { formatQuery } from 'data/sql/format-sql-query'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 // [Joshen] Is there a way we can just have one single MonacoEditor component that's shared across the dashboard?
-// Feels like we're creating multiple copies of Editor
+// Feels like we're creating multiple copies of Editor. I'm keen to make this one the defacto as well so lets make sure
+// this component does not have RLS specific logic
 
 interface RLSCodeEditorProps {
   id: string
