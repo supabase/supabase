@@ -1,10 +1,9 @@
-import { type DialogProps } from '@radix-ui/react-dialog'
 import { Command as CommandPrimitive } from 'cmdk'
 import { type PropsWithChildren, forwardRef } from 'react'
 
 import { Dialog, DialogContent, cn } from 'ui'
 
-import { useCommandPages } from './useCommandPages'
+import { useCommandPagesContext } from '../internal/Context'
 
 const CommandWrapper = forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -22,7 +21,7 @@ const CommandWrapper = forwardRef<
 CommandWrapper.displayName = CommandPrimitive.displayName
 
 const PageSwitch = ({ children }: PropsWithChildren) => {
-  const { commandPages, pageStack } = useCommandPages()
+  const { commandPages, pageStack } = useCommandPagesContext()
   const currentPage = pageStack.at(-1)
 
   if (currentPage && currentPage in commandPages) {
@@ -33,11 +32,9 @@ const PageSwitch = ({ children }: PropsWithChildren) => {
   return <CommandWrapper>{children}</CommandWrapper>
 }
 
-interface CommandDialogProps extends DialogProps {}
-
-const CommandMenu = ({ children, ...props }: CommandDialogProps) => {
+const CommandMenu = ({ children, open }: PropsWithChildren<{ open: boolean }>) => {
   return (
-    <Dialog {...props}>
+    <Dialog open={open}>
       <DialogContent className="overflow-hidden p-0 shadow-lg">
         <PageSwitch>{children}</PageSwitch>
       </DialogContent>

@@ -12,10 +12,11 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState, type PropsWithChildren } from 'react'
 import { PortalToast, PromoToast, TabsProvider } from 'ui'
-import { CommandMenuProvider } from 'ui-patterns/Cmdk'
+import { CommandProvider, commandMenuView as commandMenuView_ } from 'ui-patterns/CommandMenu'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
+import { DocsCommandMenu } from '~/components/CommandMenu'
 import SiteLayout from '~/layouts/SiteLayout'
 import { BUILD_PREVIEW_HTML, IS_PLATFORM, IS_PREVIEW } from '~/lib/constants'
 import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
@@ -23,6 +24,7 @@ import { useRootQueryClient } from '~/lib/fetch/queryClient'
 import { LOCAL_STORAGE_KEYS, remove } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
 import { AppPropsWithLayout } from '~/types'
+import { useSnapshot } from 'valtio'
 
 /**
  * Preview builds don't need to be statically generated to optimize performance.
@@ -96,6 +98,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const telemetryProps = useTelemetryProps()
   const { consentValue, hasAcceptedConsent } = useConsent()
   const queryClient = useRootQueryClient()
+  const commandMenuView = useSnapshot(commandMenuView_)
 
   useThemeSandbox()
 
@@ -224,17 +227,18 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         <AuthContainer>
           <SignOutHandler>
             <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-              <CommandMenuProvider site="docs">
+              <CommandProvider>
                 <TabsProvider>
                   <div className="h-screen flex flex-col">
                     <SiteLayout>
                       <PortalToast />
                       <PromoToast />
                       <Component {...pageProps} />
+                      {commandMenuView.init && <DocsCommandMenu open={commandMenuView.open} />}
                     </SiteLayout>
                   </div>
                 </TabsProvider>
-              </CommandMenuProvider>
+              </CommandProvider>
             </ThemeProvider>
           </SignOutHandler>
         </AuthContainer>

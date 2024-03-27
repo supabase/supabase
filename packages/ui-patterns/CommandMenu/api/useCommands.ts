@@ -1,3 +1,5 @@
+import { useRunOnce } from 'common'
+
 import { type ICommand } from '../internal/Command'
 import {
   section$new,
@@ -26,28 +28,30 @@ const useCommands = (
 ) => {
   const { commandSections: currCommandSections, setCommandSections } = useCommandSectionsContext()
 
-  const existingSectionIndex = currCommandSections.findIndex(
-    (section) => section.name === sectionName
-  )
-  const newSection = appendCommands(
-    existingSectionIndex !== -1
-      ? currCommandSections[existingSectionIndex]
-      : section$new(sectionName),
-    commands,
-    options?.orderCommands
-  )
+  useRunOnce(() => {
+    const existingSectionIndex = currCommandSections.findIndex(
+      (section) => section.name === sectionName
+    )
+    const newSection = appendCommands(
+      existingSectionIndex !== -1
+        ? currCommandSections[existingSectionIndex]
+        : section$new(sectionName),
+      commands,
+      options?.orderCommands
+    )
 
-  if (!options?.orderSection) {
-    const insertionIndex =
-      existingSectionIndex !== -1 ? existingSectionIndex : currCommandSections.length
-    return setCommandSections([
-      ...currCommandSections.slice(0, insertionIndex),
-      newSection,
-      ...currCommandSections.slice(insertionIndex),
-    ])
-  } else {
-    return setCommandSections(options.orderSection(currCommandSections, newSection))
-  }
+    if (!options?.orderSection) {
+      const insertionIndex =
+        existingSectionIndex !== -1 ? existingSectionIndex : currCommandSections.length
+      return setCommandSections([
+        ...currCommandSections.slice(0, insertionIndex),
+        newSection,
+        ...currCommandSections.slice(insertionIndex),
+      ])
+    } else {
+      return setCommandSections(options.orderSection(currCommandSections, newSection))
+    }
+  })
 }
 
 const appendCommands = (
