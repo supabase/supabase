@@ -35,6 +35,7 @@ import LogSelection, { LogSelectionProps } from './LogSelection'
 import type { LogData, QueryType } from './Logs.types'
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
+import { motion } from 'framer-motion'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -357,7 +358,7 @@ const LogTable = ({
               [
                 'font-mono tracking-tight',
                 isEqual(row, focusedLog)
-                  ? '!bg-border-stronger rdg-row--focused'
+                  ? 'rdg-row--focused'
                   : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
               ].join(' ')
             }
@@ -380,14 +381,15 @@ const LogTable = ({
             }}
           />
           {logDataRows.length > 0 ? (
-            <div
-              className={
-                queryType
-                  ? 'flex w-1/2 flex-col'
-                  : focusedLog
-                    ? 'flex w-1/2 flex-col'
-                    : 'hidden w-0'
-              }
+            <motion.div
+              variants={{
+                hidden: { width: 0 },
+                visible: { width: '50%' },
+              }}
+              initial="hidden"
+              animate={focusedLog ? 'visible' : 'hidden'}
+              exit="hidden"
+              transition={{ duration: 0.2 }}
             >
               <LogSelection
                 projectRef={projectRef}
@@ -396,7 +398,7 @@ const LogTable = ({
                 queryType={queryType}
                 params={params}
               />
-            </div>
+            </motion.div>
           ) : null}
         </div>
       </section>

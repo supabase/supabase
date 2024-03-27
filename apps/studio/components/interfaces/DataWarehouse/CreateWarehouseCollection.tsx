@@ -54,7 +54,14 @@ export const CreateWarehouseCollectionModal = (props: Props) => {
           <div className="py-4">
             <Modal.Content>
               <div className="space-y-6">
-                <Input required layout="horizontal" label="Collection name" id="name" />
+                <Input
+                  required
+                  layout="horizontal"
+                  label="Collection name"
+                  id="name"
+                  name="name"
+                  autoComplete="off"
+                />
               </div>
             </Modal.Content>
           </div>
