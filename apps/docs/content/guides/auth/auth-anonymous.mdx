@@ -14,7 +14,11 @@ It's most useful for:
 
 <Admonition type="note" label="Difference between an anonymous user and the anon key">
 
-An anonymous user is defined as a user that is created through the `signInAnonymously()` method. The anonymous user will have an `is_anonymous: true` claim in the access token JWT. Like permanent users, an anonymous user will use the `authenticated` role in your database. This is different from the `anon` key in your project, which has no user ID and uses the `anonymous` role in your database.
+Calling `supabase.auth.signInAnonymously()` creates an anonymous user. It's just like a regular user, except the user can't access their account if they sign out, clear browsing data, or use another device.
+
+Like regular users, the `authenticated` Postgres role will be used when using the Data APIs to access your project. JWTs for these users will have an `is_anonymous` claim which you can use to distinguish in RLS policies.
+
+This is different from the `anon` API key which does not create a user and can be used to implement public access to your database as it uses the `anonymous` Postgres role.
 
 </Admonition>
 
