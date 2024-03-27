@@ -4,7 +4,7 @@ import { type PropsWithChildren, forwardRef } from 'react'
 
 import { Dialog, DialogContent, cn } from 'ui'
 
-import { useCommandPagesContext } from '../internal/Context'
+import { useCommandPages } from './useCommandPages'
 
 const CommandWrapper = forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -22,7 +22,7 @@ const CommandWrapper = forwardRef<
 CommandWrapper.displayName = CommandPrimitive.displayName
 
 const PageSwitch = ({ children }: PropsWithChildren) => {
-  const { commandPages, pageStack } = useCommandPagesContext()
+  const { commandPages, pageStack } = useCommandPages()
   const currentPage = pageStack.at(-1)
 
   if (currentPage && currentPage in commandPages) {

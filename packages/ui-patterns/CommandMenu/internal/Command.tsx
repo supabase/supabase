@@ -10,6 +10,7 @@ type IBaseCommand = {
   name: string
   keywords?: Array<string>
   shortcut?: string
+  forceMount?: boolean
 }
 
 type IActionCommand = IBaseCommand & {

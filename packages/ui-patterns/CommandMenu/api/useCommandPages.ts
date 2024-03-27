@@ -1,4 +1,6 @@
-import { type ReactNode, useEffect, useRef, useCallback } from 'react'
+import { type ReactNode, useCallback } from 'react'
+
+import { useCleanup, useRunOnce } from 'common'
 
 import { useCommandPagesContext } from '../internal/Context'
 
@@ -10,30 +12,11 @@ const useCommandPages = () => {
   }
 }
 
-const useOnce = <Args extends Array<unknown>, Return>(
-  cb: (...args: Args) => Return,
-  ...args: Args
-) => {
-  const alreadyRun = useRef(false)
-  const result = useRef<Return>()
-
-  if (!alreadyRun.current) {
-    result.current = cb(...args)
-    alreadyRun.current = true
-  }
-
-  return result.current
-}
-
-const useCleanup = (cb: (() => void) | undefined) => {
-  useEffect(() => cb, [cb])
-}
-
 const useAddCommandPage = (name: string, component: () => ReactNode) => {
   const { addCommandPage } = useCommandPagesContext()
   const registerPage = useCallback(() => addCommandPage(name, component), [addCommandPage])
 
-  const cleanup = useOnce(registerPage)
+  const cleanup = useRunOnce(registerPage)
   useCleanup(cleanup)
 }
 

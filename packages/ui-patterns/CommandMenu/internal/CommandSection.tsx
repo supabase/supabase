@@ -8,13 +8,13 @@ type ICommandSection = {
   commands: Array<ICommand>
 }
 
-const toSectionId = (str: string) => str.toLowerCase().replace(/\s+/g, '-')
+const toSectionId_ = (str: string) => str.toLowerCase().replace(/\s+/g, '-')
 
 const section$new = (name: ICommandSectionName, id?: string): ICommandSection => ({
-  id: id ?? toSectionId(name),
+  id: id ?? toSectionId_(name),
   name,
   commands: [],
 })
 
-export { section$new, toSectionId }
+export { section$new, toSectionId_ }
 export type { ICommandSection, ICommandSectionName }
