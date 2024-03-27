@@ -31,6 +31,8 @@ This will need a direct connection to your database and you can find the connect
 
 You will also need to ensure that ipv6 is supported by your replication destination.
 
+If you would prefer not to use the `postgres` user, then you can run `CREATE ROLE <user> WITH REPLICATION;` using the `postgres` user.
+
 </Admonition>
 
 ```sql

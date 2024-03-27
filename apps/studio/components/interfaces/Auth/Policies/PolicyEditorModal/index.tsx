@@ -231,9 +231,7 @@ const PolicyEditorModal = ({
             onSelectBack={onViewEditor}
             onSelectSave={onReviewSave}
           />
-        ) : (
-          <div />
-        )}
+        ) : null}
       </div>
     </Modal>
   )

@@ -11,7 +11,7 @@ export const SQLEditorAIAssistantPreview = () => {
       <div className="mb-4 flex flex-col gap-y-2">
         <Markdown
           className="text-foreground-light max-w-full"
-          content="When using the [SQL Editor](http://supabase.com/project/_/sql) you'll have access to a new and improved AI Assistant which you can use to help you write your queries."
+          content="When using the [SQL Editor](http://supabase.com/project/_/sql) you'll have access to a new and improved conversational AI Assistant which you can use to help you write your queries."
         />
         <Markdown
           className="text-foreground-light max-w-full"
@@ -31,13 +31,13 @@ export const SQLEditorAIAssistantPreview = () => {
           <li>
             <Markdown
               className="text-foreground-light"
-              content={`Replace the existing single-input UI with a side panel where you can have a full conversation.`}
+              content={`Replace the existing single-input UI with a side panel where you can have a full, contextual conversation.`}
             />
           </li>
           <li>
             <Markdown
               className="text-foreground-light"
-              content={`Supabase Assistant will iteratively generate SQL from your natural language prompts.`}
+              content={`The Assistant will iteratively generate SQL from your natural language prompts.`}
             />
           </li>
         </ul>

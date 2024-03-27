@@ -1,12 +1,11 @@
 import type { PostgresColumn, PostgresRelationship, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { QueryKey, useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
 import { find, isUndefined } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import { parseSupaTable, SupabaseGrid, SupaTable } from 'components/grid'
 import { ERROR_PRIMARY_KEY_NOTFOUND } from 'components/grid/constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -311,4 +310,4 @@ const TableGridEditor = ({
   )
 }
 
-export default observer(TableGridEditor)
+export default TableGridEditor

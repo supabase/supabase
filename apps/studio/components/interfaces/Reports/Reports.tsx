@@ -193,7 +193,7 @@ const Reports = () => {
   /*
    * handleChartSelection()
    *
-   * Handler for the chart behaviour
+   * Handler for the chart behavior
    */
   function handleChartSelection({ metric, value }: any) {
     if (value) {
@@ -351,7 +351,7 @@ const Reports = () => {
         <div className="flex items-center space-x-2">
           {hasEdits && (
             <div className="hidden xl:inline-block">
-              <Badge color="green">There are unsaved changes</Badge>
+              <Badge variant="brand">There are unsaved changes</Badge>
             </div>
           )}
           {hasEdits && (

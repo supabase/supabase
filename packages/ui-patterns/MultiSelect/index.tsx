@@ -43,6 +43,9 @@ interface Props {
  * input base + standard
  */
 
+/**
+ * @deprecated To be replaced with MultiSelectV2
+ */
 export default function MultiSelect({
   options,
   value,
@@ -126,7 +129,7 @@ export default function MultiSelect({
       <div
         className={[
           'form-control form-control--multi-select',
-          'border border-strong bg-studio',
+          'border border-strong bg-control',
           'multi-select relative block w-full space-x-1 overflow-auto rounded',
           `${error !== undefined ? 'border-red-800 bg-red-100' : ''}`,
         ].join(' ')}

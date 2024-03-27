@@ -1,7 +1,6 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
@@ -175,4 +174,4 @@ const RestartServerButton = () => {
   )
 }
 
-export default observer(RestartServerButton)
+export default RestartServerButton

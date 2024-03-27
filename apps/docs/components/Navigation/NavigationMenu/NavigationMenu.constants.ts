@@ -592,7 +592,7 @@ export const auth = {
           items: [
             {
               name: 'SAML 2.0',
-              url: '/guides/auth/sso/auth-sso-saml',
+              url: '/guides/auth/enterprise-sso/auth-sso-saml',
             },
           ],
         },
@@ -700,6 +700,12 @@ export const database: NavMenuConstant = {
         {
           name: 'Connecting to your database',
           url: '/guides/database/connecting-to-postgres',
+          items: [
+            {
+              name: 'Serverless Drivers',
+              url: '/guides/database/connecting-to-postgres/serverless-drivers',
+            },
+          ],
         },
         { name: 'Importing data', url: '/guides/database/import-data' },
         { name: 'Securing your data', url: '/guides/database/secure-data' },
@@ -1253,10 +1259,6 @@ export const realtime: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Throttling messages',
-          url: '/guides/realtime/guides/client-side-throttling',
-        },
-        {
           name: 'Subscribing to Database Changes',
           url: '/guides/realtime/subscribing-to-database-changes',
         },
@@ -1421,6 +1423,15 @@ export const ai = {
       ],
     },
     {
+      name: 'Search',
+      url: undefined,
+      items: [
+        { name: 'Semantic search', url: '/guides/ai/semantic-search' },
+        { name: 'Keyword search', url: '/guides/ai/keyword-search' },
+        { name: 'Hybrid search', url: '/guides/ai/hybrid-search' },
+      ],
+    },
+    {
       name: 'JavaScript Examples',
       url: undefined,
       items: [
@@ -1485,6 +1496,10 @@ export const ai = {
           url: '/guides/ai/examples/image-search-openai-clip',
         },
         {
+          name: 'Semantic search with Amazon Titan',
+          url: '/guides/ai/examples/semantic-image-search-amazon-titan',
+        },
+        {
           name: 'Building ChatGPT Plugins',
           url: '/guides/ai/examples/building-chatgpt-plugins',
         },
@@ -1513,6 +1528,10 @@ export const ai = {
         {
           name: 'Roboflow',
           url: '/guides/ai/integrations/roboflow',
+        },
+        {
+          name: 'Amazon Bedrock',
+          url: '/guides/ai/integrations/amazon-bedrock',
         },
       ],
     },
@@ -1754,6 +1773,10 @@ export const platform: NavMenuConstant = {
         {
           name: 'High RAM Usage',
           url: '/guides/platform/exhaust-ram',
+        },
+        {
+          name: 'High Swap Usage',
+          url: '/guides/platform/exhaust-swap',
         },
       ],
     },

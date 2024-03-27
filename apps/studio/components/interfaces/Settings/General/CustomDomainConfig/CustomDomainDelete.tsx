@@ -1,13 +1,12 @@
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, IconExternalLink, IconTrash } from 'ui'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 import Panel from 'components/ui/Panel'
 import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
 import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
+import { Button, IconExternalLink, IconTrash } from 'ui'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 export type CustomDomainDeleteProps = {
   projectRef?: string
@@ -88,4 +87,4 @@ const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProp
   )
 }
 
-export default observer(CustomDomainDelete)
+export default CustomDomainDelete

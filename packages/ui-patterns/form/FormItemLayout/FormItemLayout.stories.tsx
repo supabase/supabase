@@ -84,13 +84,11 @@ export const Primary: Story = {
             name="username"
             control={form.control}
             render={({ field }) => (
-              <FormItem_Shadcn_>
-                <FormItemLayout {...args}>
-                  <FormControl_Shadcn_>
-                    <Input placeholder="mildtomato" {...field} />
-                  </FormControl_Shadcn_>
-                </FormItemLayout>
-              </FormItem_Shadcn_>
+              <FormItemLayout {...args}>
+                <FormControl_Shadcn_>
+                  <Input placeholder="mildtomato" {...field} />
+                </FormControl_Shadcn_>
+              </FormItemLayout>
             )}
           />
           <Button size="small" type="primary" htmlType="submit">
@@ -138,20 +136,18 @@ export const withSelect: Story = {
             control={form.control}
             render={({ field }) => (
               <FormItemLayout {...args}>
-                <FormItem_Shadcn_>
-                  <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl_Shadcn_>
-                      <SelectTrigger_Shadcn_>
-                        <SelectValue_Shadcn_ placeholder="Select a verified email to display" />
-                      </SelectTrigger_Shadcn_>
-                    </FormControl_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectItem_Shadcn_ value="m@example.com">m@example.com</SelectItem_Shadcn_>
-                      <SelectItem_Shadcn_ value="m@google.com">m@google.com</SelectItem_Shadcn_>
-                      <SelectItem_Shadcn_ value="m@support.com">m@support.com</SelectItem_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
-                </FormItem_Shadcn_>
+                <Select_Shadcn_ onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl_Shadcn_>
+                    <SelectTrigger_Shadcn_>
+                      <SelectValue_Shadcn_ placeholder="Select a verified email to display" />
+                    </SelectTrigger_Shadcn_>
+                  </FormControl_Shadcn_>
+                  <SelectContent_Shadcn_>
+                    <SelectItem_Shadcn_ value="m@example.com">m@example.com</SelectItem_Shadcn_>
+                    <SelectItem_Shadcn_ value="m@google.com">m@google.com</SelectItem_Shadcn_>
+                    <SelectItem_Shadcn_ value="m@support.com">m@support.com</SelectItem_Shadcn_>
+                  </SelectContent_Shadcn_>
+                </Select_Shadcn_>
               </FormItemLayout>
             )}
           />
@@ -201,11 +197,9 @@ export const withLayoutChange: Story = {
             control={form.control}
             render={({ field }) => (
               <FormItemLayout {...args}>
-                <FormItem_Shadcn_>
-                  <FormControl_Shadcn_>
-                    <Input placeholder="mildtomato" {...field} />
-                  </FormControl_Shadcn_>
-                </FormItem_Shadcn_>
+                <FormControl_Shadcn_>
+                  <Input placeholder="mildtomato" {...field} />
+                </FormControl_Shadcn_>
               </FormItemLayout>
             )}
           />
@@ -251,30 +245,28 @@ export const withCalendar: Story = {
             control={form.control}
             render={({ field }) => (
               <FormItemLayout {...args}>
-                <FormItem_Shadcn_ className="flex flex-col">
-                  <Popover_Shadcn_>
-                    <PopoverTrigger_Shadcn_ asChild>
-                      <FormControl_Shadcn_>
-                        <Button
-                          icon={<CalendarIcon className="text-foreground-muted" size={16} />}
-                          type={'default'}
-                          className={cn(!field.value && 'text-muted-foreground', 'justify-start')}
-                        >
-                          {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
-                        </Button>
-                      </FormControl_Shadcn_>
-                    </PopoverTrigger_Shadcn_>
-                    <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
-                        initialFocus
-                      />
-                    </PopoverContent_Shadcn_>
-                  </Popover_Shadcn_>
-                </FormItem_Shadcn_>
+                <Popover_Shadcn_>
+                  <PopoverTrigger_Shadcn_ asChild>
+                    <FormControl_Shadcn_>
+                      <Button
+                        icon={<CalendarIcon className="text-foreground-muted" size={16} />}
+                        type={'default'}
+                        className={cn(!field.value && 'text-muted-foreground', 'justify-start')}
+                      >
+                        {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}
+                      </Button>
+                    </FormControl_Shadcn_>
+                  </PopoverTrigger_Shadcn_>
+                  <PopoverContent_Shadcn_ className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      disabled={(date) => date > new Date() || date < new Date('1900-01-01')}
+                      initialFocus
+                    />
+                  </PopoverContent_Shadcn_>
+                </Popover_Shadcn_>
               </FormItemLayout>
             )}
           />
