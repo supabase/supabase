@@ -12,7 +12,7 @@ It's most useful for:
 - Full-feature demos without collecting personal information
 - Temporary or throw-away accounts
 
-<Admonition type="note" label="Difference between an anonymous user and the anon key">
+<Admonition type="note" label="Anonymous user vs the anon key">
 
 Calling `supabase.auth.signInAnonymously()` creates an anonymous user. It's just like a regular user, except the user can't access their account if they sign out, clear browsing data, or use another device.
 
@@ -136,7 +136,8 @@ We are working on adding the ability to automatically cleanup anonymous users th
 
 ```sql
 -- deletes anonymous users created more than 30 days ago
-delete from auth.users where is_anonymous is true and created_at < now() - interval '30 days';
+delete from auth.users
+where is_anonymous is true and created_at < now() - interval '30 days';
 ```
 
 ## Resources
