@@ -2,31 +2,31 @@ import { useRegisterCommands } from '../api/hooks/commandsHooks'
 import { useRegisterNewPage, useSetPage } from '../api/hooks/pagesHooks'
 import type { ICommand, UseCommandOptions } from '../api/types'
 
-const DOCS_SEARCH_COMMANDS = {
-  PAGE_NAME: 'docs-search',
+const DOCS_AI_COMMANDS = {
+  PAGE_NAME: 'docs-ai',
   SECTION_NAME: 'Docs',
 }
 
-const DocsSearchInterface = () => <></>
+const DocsAiInterface = () => <></>
 
 const identity = <T,>(x: T) => x
 
-const useDocsSearchCommands = ({
+const useDocsAiCommands = ({
   modify = identity,
   orderingOptions,
 }: { modify?: (command: ICommand) => ICommand; orderingOptions?: UseCommandOptions } = {}) => {
   const setCommandPage = useSetPage()
-  useRegisterNewPage(DOCS_SEARCH_COMMANDS.PAGE_NAME, DocsSearchInterface)
+  useRegisterNewPage(DOCS_AI_COMMANDS.PAGE_NAME, DocsAiInterface)
 
   useRegisterCommands(
-    DOCS_SEARCH_COMMANDS.SECTION_NAME,
+    DOCS_AI_COMMANDS.SECTION_NAME,
     [
       {
-        id: 'search-docs',
-        name: 'Search docs',
+        id: 'ai-docs',
+        name: 'Ask Supabase AI',
         action: () => {
           console.log('你都是给点反应啊')
-          setCommandPage(DOCS_SEARCH_COMMANDS.PAGE_NAME)
+          setCommandPage(DOCS_AI_COMMANDS.PAGE_NAME)
         },
       },
     ].map(modify),
@@ -34,4 +34,4 @@ const useDocsSearchCommands = ({
   )
 }
 
-export { useDocsSearchCommands }
+export { useDocsAiCommands }

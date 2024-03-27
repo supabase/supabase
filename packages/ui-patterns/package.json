@@ -18,6 +18,7 @@
     "react-tooltip": "*",
     "reactflow": "*",
     "tsconfig": "*",
+    "valtio": "*",
     "ui": "*"
   },
   "devDependencies": {

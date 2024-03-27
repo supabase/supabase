@@ -1,48 +1,24 @@
-import {
-  type ReactNode,
-  type Dispatch,
-  type SetStateAction,
-  createContext,
-  useContext,
-} from 'react'
+import { createContext, useContext } from 'react'
 
-import { type ICommandSection } from './CommandSection'
+import { type ICommandsState } from '../internal/state/commandsState'
+import { type IPagesState } from '../internal/state/pagesState'
+import { type IViewState } from '../internal/state/viewState'
+import { type IQueryState } from '../internal/state/queryState'
 
-type InternalCommandsContext = {
-  commandSections: Array<ICommandSection>
-  setCommandSections: Dispatch<SetStateAction<Array<ICommandSection>>>
-}
+const CommandContext = createContext<
+  | {
+      commandsState: ICommandsState
+      pagesState: IPagesState
+      queryState: IQueryState
+      viewState: IViewState
+    }
+  | undefined
+>(undefined)
 
-const CommandSectionsContext = createContext<InternalCommandsContext | undefined>(undefined)
-
-const useCommandSectionsContext = () => {
-  const ctx = useContext(CommandSectionsContext)
-  if (!ctx) throw Error('`useCommandSectionsContext` must be used within a matching provider')
+const useCommandContext = () => {
+  const ctx = useContext(CommandContext)
+  if (!ctx) throw Error('`useCommandContext` must be used within a `CommandProvider`')
   return ctx
 }
 
-type ICommandPageName = string
-
-type InternalPagesContext = {
-  commandPages: Record<ICommandPageName, () => ReactNode>
-  addCommandPage: (name: ICommandPageName, component: () => ReactNode) => () => void
-  pageStack: Array<ICommandPageName>
-  appendPageStack: (page: ICommandPageName) => void
-  popPageStack: () => void
-}
-
-const CommandPagesContext = createContext<InternalPagesContext | undefined>(undefined)
-
-const useCommandPagesContext = () => {
-  const ctx = useContext(CommandPagesContext)
-  if (!ctx) throw Error('`useCommandPagesContext` must be used within a matching provider')
-  return ctx
-}
-
-export {
-  CommandPagesContext,
-  CommandSectionsContext,
-  useCommandPagesContext,
-  useCommandSectionsContext,
-}
-export type { ICommandPageName }
+export { CommandContext, useCommandContext }

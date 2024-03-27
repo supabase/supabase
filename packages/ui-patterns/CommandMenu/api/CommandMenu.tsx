@@ -3,7 +3,8 @@ import { type PropsWithChildren, forwardRef } from 'react'
 
 import { Dialog, DialogContent, cn } from 'ui'
 
-import { useCommandPagesContext } from '../internal/Context'
+import { usePageComponent } from './hooks/pagesHooks'
+import { useCommandMenuVisible, useToggleCommandMenu } from './hooks/viewHooks'
 
 const CommandWrapper = forwardRef<
   React.ElementRef<typeof CommandPrimitive>,
@@ -21,20 +22,17 @@ const CommandWrapper = forwardRef<
 CommandWrapper.displayName = CommandPrimitive.displayName
 
 const PageSwitch = ({ children }: PropsWithChildren) => {
-  const { commandPages, pageStack } = useCommandPagesContext()
-  const currentPage = pageStack.at(-1)
+  const PageComponent = usePageComponent()
 
-  if (currentPage && currentPage in commandPages) {
-    const Component = commandPages[currentPage]
-    return <Component />
-  }
-
-  return <CommandWrapper>{children}</CommandWrapper>
+  return PageComponent ? <PageComponent /> : <CommandWrapper>{children}</CommandWrapper>
 }
 
-const CommandMenu = ({ children, open }: PropsWithChildren<{ open: boolean }>) => {
+const CommandMenu = ({ children }: PropsWithChildren) => {
+  const open = useCommandMenuVisible()
+  const toggleOpen = useToggleCommandMenu()
+
   return (
-    <Dialog open={open}>
+    <Dialog open={open} onOpenChange={toggleOpen}>
       <DialogContent className="overflow-hidden p-0 shadow-lg">
         <PageSwitch>{children}</PageSwitch>
       </DialogContent>

@@ -12,7 +12,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState, type PropsWithChildren } from 'react'
 import { PortalToast, PromoToast, TabsProvider } from 'ui'
-import { CommandProvider, commandMenuView as commandMenuView_ } from 'ui-patterns/CommandMenu'
+import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
@@ -24,7 +24,6 @@ import { useRootQueryClient } from '~/lib/fetch/queryClient'
 import { LOCAL_STORAGE_KEYS, remove } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
 import { AppPropsWithLayout } from '~/types'
-import { useSnapshot } from 'valtio'
 
 /**
  * Preview builds don't need to be statically generated to optimize performance.
@@ -98,7 +97,6 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   const telemetryProps = useTelemetryProps()
   const { consentValue, hasAcceptedConsent } = useConsent()
   const queryClient = useRootQueryClient()
-  const commandMenuView = useSnapshot(commandMenuView_)
 
   useThemeSandbox()
 
@@ -234,7 +232,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                       <PortalToast />
                       <PromoToast />
                       <Component {...pageProps} />
-                      {commandMenuView.init && <DocsCommandMenu open={commandMenuView.open} />}
+                      <DocsCommandMenu />
                     </SiteLayout>
                   </div>
                 </TabsProvider>
