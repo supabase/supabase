@@ -1,0 +1,50 @@
+name: Auto Label PRs
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+jobs:
+  check-external:
+    runs-on: ubuntu-latest
+    outputs:
+      result: ${{ steps.is-member.outputs.result }}
+    steps:
+    - name: Get deps
+      run: |
+        sudo apt-get update && sudo apt-get install -y jq
+    - name: Get org members
+      id: is-member
+      env:
+        GH_ORG: supabase
+        GH_USER: ${{ github.event.pull_request.user.login }}
+        GH_TOKEN: ${{ secrets.GH_ORG_MEMBERSHIP_PAT }}
+      run: |
+        gh api /orgs/supabase/members/$GH_USER
+    - if: failure()
+      name: is-member
+      run: |
+        echo "User is not a member of Supabase org"
+        echo "result=false" >> $GH_OUTPUT
+    - if: success()
+      run: |
+        echo "User is a member of Supabase org, not applying labels"
+    - name: Label contributor
+      id: label-contributor
+      if:  ${{ steps.is-member.outputs.result == 'false' }}
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        USERNAME: ${{ github.event.pull_request.user.login }}
+        GH_REPO: ${{ github.repository }}
+        NUMBER: ${{ github.event.pull_request.number }}
+        LABELS: contributor
+      run: |
+        gh pr edit $NUMBER --add-label $LABELS
+    - uses: actions/checkout@v4
+      if:  ${{ steps.is-member.outputs.result == 'false' }}
+    - name: Label PR
+      if:  ${{ steps.is-member.outputs.result == 'false' }}
+      uses: actions/labeler@v5
+    
+    
+
+
+      
