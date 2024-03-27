@@ -4,4 +4,4 @@ export { CommandMenu } from './api/CommandMenu'
 export { CommandProvider } from './api/CommandProvider'
 export { useCommands } from './api/useCommands'
 
-export type { ICommand } from './api/types'
+export * from './api/types'

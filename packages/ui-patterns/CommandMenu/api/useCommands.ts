@@ -61,3 +61,4 @@ const appendCommands = (
 }
 
 export { useCommands }
+export type { UseCommandOptions }
