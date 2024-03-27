@@ -1,10 +1,12 @@
-import Editor, { Monaco, OnChange, OnMount } from '@monaco-editor/react'
+import Editor, { Monaco, OnChange, OnMount, useMonaco } from '@monaco-editor/react'
 import type { editor } from 'monaco-editor'
-import { MutableRefObject, useRef } from 'react'
+import { MutableRefObject, useEffect, useRef } from 'react'
 import { cn } from 'ui'
 
 import { Markdown } from 'components/interfaces/Markdown'
 import { noop } from 'lodash'
+import { formatQuery } from 'data/sql/format-sql-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 // [Joshen] Is there a way we can just have one single MonacoEditor component that's shared across the dashboard?
 // Feels like we're creating multiple copies of Editor
@@ -42,6 +44,8 @@ const RLSCodeEditor = ({
   monacoRef,
 }: RLSCodeEditorProps) => {
   const hasValue = useRef<any>()
+  const monaco = useMonaco()
+  const { project } = useProjectContext()
 
   const options: editor.IStandaloneEditorConstructionOptions = {
     tabSize: 2,
@@ -102,6 +106,42 @@ const RLSCodeEditor = ({
 
     onChange()
   }
+
+  async function formatPgsql(value: any) {
+    try {
+      const formatted = await formatQuery({
+        projectRef: project?.ref!,
+        connectionString: project?.connectionString,
+        sql: value,
+      })
+      return formatted
+    } catch (error) {
+      console.error('formatPgsql error:', error)
+      return value
+    }
+  }
+
+  useEffect(() => {
+    if (monaco) {
+      // Enable pgsql format
+      const formatprovider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
+        async provideDocumentFormattingEdits(model: any) {
+          const value = model.getValue()
+          const formatted = await formatPgsql(value)
+          return [
+            {
+              range: model.getFullModelRange(),
+              text: formatted.result.trim(),
+            },
+          ]
+        },
+      })
+
+      return () => {
+        formatprovider.dispose()
+      }
+    }
+  }, [monaco])
 
   return (
     <>

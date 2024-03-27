@@ -103,10 +103,12 @@ export const AIPolicyEditorPanel = memo(function ({
   const monacoOneRef = useRef<Monaco | null>(null)
   const editorOneRef = useRef<IStandaloneCodeEditor | null>(null)
   const [expOneLineCount, setExpOneLineCount] = useState(1)
+  const [expOneContentHeight, setExpOneContentHeight] = useState(0)
 
   const monacoTwoRef = useRef<Monaco | null>(null)
   const editorTwoRef = useRef<IStandaloneCodeEditor | null>(null)
   const [expTwoLineCount, setExpTwoLineCount] = useState(1)
+  const [expTwoContentHeight, setExpTwoContentHeight] = useState(0)
 
   // Use chat id because useChat doesn't have a reset function to clear all messages
   const [chatId, setChatId] = useState(uuidv4())
@@ -552,7 +554,7 @@ export const AIPolicyEditorPanel = memo(function ({
                           className={`py-1 relative ${incomingChange ? 'hidden' : 'block'}`}
                           style={{
                             height:
-                              expOneLineCount <= 5 ? `${8 + expOneLineCount * 20}px` : '108px',
+                              expOneContentHeight <= 100 ? `${8 + expOneContentHeight}px` : '108px',
                           }}
                         >
                           <RLSCodeEditor
@@ -563,6 +565,7 @@ export const AIPolicyEditorPanel = memo(function ({
                             monacoRef={monacoOneRef as any}
                             lineNumberStart={6}
                             onChange={() => {
+                              setExpOneContentHeight(editorOneRef.current?.getContentHeight() ?? 0)
                               setExpOneLineCount(
                                 editorOneRef.current?.getModel()?.getLineCount() ?? 1
                               )
@@ -598,7 +601,9 @@ export const AIPolicyEditorPanel = memo(function ({
                               className={`py-1 relative ${incomingChange ? 'hidden' : 'block'}`}
                               style={{
                                 height:
-                                  expTwoLineCount <= 5 ? `${8 + expTwoLineCount * 20}px` : '108px',
+                                  expTwoContentHeight <= 100
+                                    ? `${8 + expTwoContentHeight}px`
+                                    : '108px',
                               }}
                             >
                               <RLSCodeEditor
@@ -609,6 +614,9 @@ export const AIPolicyEditorPanel = memo(function ({
                                 monacoRef={monacoTwoRef as any}
                                 lineNumberStart={7 + expOneLineCount}
                                 onChange={() => {
+                                  setExpTwoContentHeight(
+                                    editorTwoRef.current?.getContentHeight() ?? 0
+                                  )
                                   setExpTwoLineCount(
                                     editorTwoRef.current?.getModel()?.getLineCount() ?? 1
                                   )
