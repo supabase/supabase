@@ -24,6 +24,7 @@ import {
   IconExternalLink,
 } from 'ui'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
+import { Restriction } from '../Restriction'
 import PlanUpdateSidePanel from './PlanUpdateSidePanel'
 
 const Subscription = () => {
@@ -54,6 +55,9 @@ const Subscription = () => {
   return (
     <>
       <ScaffoldSection>
+        <div className="col-span-12 pb-2">
+          <Restriction />
+        </div>
         <ScaffoldSectionDetail>
           <div className="sticky space-y-6 top-12">
             <p className="text-base m-0">Subscription Plan</p>

@@ -14,6 +14,7 @@ import { useSelectedOrganization } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import Link from 'next/link'
 import { Button, IconExternalLink, IconInfo, Listbox } from 'ui'
+import { Restriction } from '../BillingSettings/Restriction'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
 import Compute from './Compute'
@@ -160,7 +161,7 @@ const Usage = () => {
         </div>
       </ScaffoldContainer>
 
-      {selectedProjectRef && (
+      {selectedProjectRef ? (
         <ScaffoldContainer className="mt-5">
           <InformationBox
             title="Usage filtered by project"
@@ -191,6 +192,10 @@ const Usage = () => {
             hideCollapse
             icon={<IconInfo />}
           />
+        </ScaffoldContainer>
+      ) : (
+        <ScaffoldContainer id="restriction" className="mt-5">
+          <Restriction />
         </ScaffoldContainer>
       )}
 

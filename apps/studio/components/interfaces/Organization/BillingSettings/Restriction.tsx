@@ -22,7 +22,8 @@ export const Restriction = () => {
     )
   )
 
-  if (!isSuccessOrgUsage || !isSuccessSubscription) {
+  // don't show any alerts until everything has been fetched
+  if (!isSuccessOrgUsage || !isSuccessSubscription || !org) {
     return null
   }
 
@@ -43,19 +44,23 @@ export const Restriction = () => {
   }
 
   return (
-    <div className="pt-4">
+    <>
       {shownAlert === 'exceededLimits' && (
         <Alert_Shadcn_ variant="destructive">
           <AlertCircle strokeWidth={2} />
-          <AlertTitle_Shadcn_>
-            Your organization's usage has exceeded its included quota
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
-            Your projects can become unresponsive or enter read-only mode.{' '}
-            {subscription.plan.id === 'free'
-              ? 'Please upgrade to the Pro plan to ensure that your projects remain available.'
-              : 'Please disable spend cap to ensure that your projects remain available.'}
-            <Button key="upgrade-button" asChild type="default" className="ml-8">
+          <div className="flex flex-row items-center justify-between">
+            <div>
+              <AlertTitle_Shadcn_>
+                Your organization's usage has exceeded its included quota
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                Your projects can become unresponsive or enter read-only mode.{' '}
+                {subscription.plan.id === 'free'
+                  ? 'Please upgrade to the Pro plan to ensure that your projects remain available.'
+                  : 'Please disable spend cap to ensure that your projects remain available.'}
+              </AlertDescription_Shadcn_>
+            </div>
+            <Button key="upgrade-button" asChild type="default">
               <Link
                 href={`/org/${org?.slug}/billing?panel=${
                   subscription.plan.id === 'free' ? 'subscriptionPlan' : 'costControl'
@@ -64,110 +69,97 @@ export const Restriction = () => {
                 {subscription.plan.id === 'free' ? 'Upgrade plan' : 'Change spend cap'}
               </Link>
             </Button>
-          </AlertDescription_Shadcn_>
+          </div>
         </Alert_Shadcn_>
       )}
       {shownAlert === 'gracePeriod' && (
         <Alert_Shadcn_ variant="warning">
           <AlertTriangle strokeWidth={2} />
-          <AlertTitle_Shadcn_>The quota has been surpassed</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
-            <p>
-              Your organization has surpassed its plan’s quota. Service restrictions will apply if
-              your usage is above your quota after your grace period. If Service Restrictions are
-              active, your projects will no longer be able to serve requests.
-            </p>
-            <p>
-              Your grace period ends on{' '}
-              {dayjs(org.restriction_data['grace_period_end']).format('DD MMM YYYY')}.
-            </p>
-            <p>
-              Reduce your usage below your plan’s quota or{' '}
-              <a
-                className="cursor-pointer underline"
-                onClick={(e) => {
-                  e.preventDefault()
-                  snap.setPanelKey('subscriptionPlan')
-                }}
-              >
-                upgrade your plan
-              </a>
-              .{/* [Learn More Button] (links to future doc page) */}
-            </p>
-            <p>
-              Please refer to our documentation to{' '}
-              <a className="cursor-pointer underline">learn more about restrictions</a>.
-            </p>
-          </AlertDescription_Shadcn_>
+          <div className="flex flex-row items-center justify-between">
+            <div>
+              <AlertTitle_Shadcn_>The quota has been surpassed</AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                <p>
+                  Your organization has surpassed its plan’s quota. Service restrictions will apply
+                  if your usage is above your quota after your grace period. If Service Restrictions
+                  are active, your projects will no longer be able to serve requests.
+                </p>
+                <p>
+                  Your grace period ends on{' '}
+                  {dayjs(org.restriction_data['grace_period_end']).format('DD MMM YYYY')}.
+                </p>
+                <p>Reduce your usage below your plan’s quota or upgrade your plan.</p>
+                <p>
+                  Please refer to our documentation to{' '}
+                  <a className="cursor-pointer underline">learn more about restrictions</a>.
+                </p>
+              </AlertDescription_Shadcn_>
+            </div>
+            <Button key="upgrade-button" asChild type="default">
+              <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
+            </Button>
+          </div>
         </Alert_Shadcn_>
       )}
       {shownAlert === 'gracePeriodOver' && (
         <Alert_Shadcn_ variant="warning">
           <AlertTriangle strokeWidth={2} />
-          <AlertTitle_Shadcn_>
-            The quota has been surpassed and grace period is over
-          </AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
-            <p>
-              You have exceeded your plan’s quota in the past and your grace period ended on{' '}
-              {dayjs(org.restriction_data['grace_period_end']).format('DD MMM YYYY')}. Service
-              restrictions will apply if your usage is above your quota.
-            </p>
-            <p>
-              If Service Restrictions are active, your projects will no longer be able to serve
-              requests.
-            </p>
-            <p>
-              Reduce your usage below your plan’s quota{' '}
-              <a
-                className="cursor-pointer underline"
-                onClick={(e) => {
-                  e.preventDefault()
-                  snap.setPanelKey('subscriptionPlan')
-                }}
-              >
-                upgrade your plan
-              </a>
-              .
-            </p>
-            <p>
-              Please refer to our documentation to{' '}
-              <a className="cursor-pointer underline">learn more about restrictions</a>.
-            </p>
-          </AlertDescription_Shadcn_>
+          <div className="flex flex-row items-center justify-between">
+            <div>
+              <AlertTitle_Shadcn_>
+                The quota has been surpassed and grace period is over
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                <p>
+                  You have exceeded your plan’s quota in the past and your grace period ended on{' '}
+                  {dayjs(org.restriction_data['grace_period_end']).format('DD MMM YYYY')}. Service
+                  restrictions will apply if your usage is above your quota.
+                </p>
+                <p>
+                  If Service Restrictions are active, your projects will no longer be able to serve
+                  requests.
+                </p>
+                <p>Reduce your usage below your plan’s quota upgrade your plan.</p>
+                <p>
+                  Please refer to our documentation to{' '}
+                  <a className="cursor-pointer underline">learn more about restrictions</a>.
+                </p>
+              </AlertDescription_Shadcn_>
+            </div>
+            <Button key="upgrade-button" asChild type="default">
+              <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
+            </Button>
+          </div>
         </Alert_Shadcn_>
       )}
       {shownAlert === 'restricted' && (
         <Alert_Shadcn_ variant="destructive">
           <AlertCircle strokeWidth={2} />
-          <AlertTitle_Shadcn_>All services are restricted</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
-            <p>
-              Your services are currently restricted. Your projects are not able to serve requests.
-            </p>
-            <p>
-              You have exceeded your plan’s quota and your grace period ended on{' '}
-              {dayjs(org.restriction_data['grace_period_end']).format('DD MMM YYYY')}.
-            </p>
-            <p>
-              <a
-                className="cursor-pointer underline"
-                onClick={(e) => {
-                  e.preventDefault()
-                  snap.setPanelKey('subscriptionPlan')
-                }}
-              >
-                Upgrade
-              </a>{' '}
-              to lift restrictions or wait until your quota refills.
-            </p>
-            <p>
-              Please refer to our documentation to{' '}
-              <a className="cursor-pointer underline">learn more about restrictions</a>.
-            </p>
-          </AlertDescription_Shadcn_>
+          <div className="flex flex-row items-center justify-between">
+            <div>
+              <AlertTitle_Shadcn_>All services are restricted</AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
+                <p>
+                  Your services are currently restricted. Your projects are not able to serve
+                  requests.
+                </p>
+                <p>
+                  You have exceeded your plan’s quota and your grace period ended on{' '}
+                  {dayjs(org.restriction_data['grace_period_end']).format('DD MMM YYYY')}.
+                </p>
+                <p>Upgrade to lift restrictions or wait until your quota refills.</p>
+                <p>
+                  Please refer to our documentation to{' '}
+                  <a className="cursor-pointer underline">learn more about restrictions</a>.
+                </p>
+              </AlertDescription_Shadcn_>
+            </div>
+            <Button key="upgrade-button" asChild type="default">
+              <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
+            </Button>
+          </div>
         </Alert_Shadcn_>
       )}
-    </div>
+    </>
   )
 }
