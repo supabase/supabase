@@ -1,21 +1,18 @@
 import React from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRightIcon } from '@heroicons/react/outline'
 import { IconEdit2, cn } from 'ui'
-import { useBreakpoint } from 'common'
 import { WeekDayProps } from './Releases/data'
 import { DayLink } from './Releases/components'
 
 const LW11Day1 = ({ day, className }: { day: WeekDayProps; className?: string }) => {
-  const isMobile = useBreakpoint(639)
-
   return (
     <div
+      id={day.id}
       className={cn(
-        `group relative overflow-hidden flex-1 flex flex-col justify-end
-        bg-surface-100/10 border border-dashed border-[#14191B] text-[#8B9092]
-        rounded-xl p-4 gap-4 md:gap-6 text-2xl bg-contain shadow-lg`,
+        `group relative overflow-hidden flex-1 flex flex-col justify-end scroll-mt-16
+        bg-[#0e1010] border border-[#14191B] text-[#8B9092]
+        rounded-xl p-4 gap-4 md:gap-6 text-2xl shadow-lg`,
         className
       )}
     >

@@ -114,8 +114,8 @@ export default function LaunchWeekIndex({ meetups }: Props) {
       >
         <DefaultLayout>
           <LW11StickyNav />
-          <LW11Header />
-          <MainStage />
+          <LW11Header className="pb-20 z-0" />
+          <MainStage className="relative -mt-20 z-10" />
           <BuildStage />
           <SectionContainer id="meetups" className="scroll-mt-[66px]">
             <LW11Meetups meetups={meetups} />

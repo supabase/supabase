@@ -3,6 +3,7 @@ import { cn } from 'ui'
 import LabelBadge from './LabelBadge'
 import LaunchWeekPrizeCard from './LaunchWeekPrizeCard'
 import Image from 'next/image'
+import PrizeActions from './Releases/PrizeActions'
 
 export default function LaunchWeekPrizeSection({ className }: { className?: string }) {
   return (
@@ -14,33 +15,40 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
       )}
     >
       <h2 className="w-full text-sm font-mono uppercase tracking-[1px]">Awards</h2>
-      <p>Stay tuned on Launch Week X's final day to find out if you're one of the lucky winners.</p>
+      <p className="text-2xl text-foreground-lighter">Get your winning ticket</p>
       <div className="w-full pt-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mx-auto h-auto text-[#EDEDED]">
           <LaunchWeekPrizeCard
             className="col-span-full md:col-span-2"
             contentClassName="flex flex-col justify-between"
             content={
-              <>
-                <div className="p-4 md:p-6 flex flex-col flex-shrink gap-2 text-sm items-start">
-                  <LabelBadge text="10 keyboards" />
-                  <p className="text-lg text-[#8B9092] max-w-lg">
-                    Limited-edition{' '}
-                    <span className="text-[#EDEDED]">62-Key ISO Mechanical Keyboard</span>
-                  </p>
+              <div className="w-full h-auto lg:min-h-[400px] flex flex-col lg:flex-row items-stretch rounded-lg overflow-hidden">
+                <div className="relative w-full pl-4 xl:px-4 pt-4 lg:w-2/3 border-b border-muted aspect-[3/1] top-0 -bottom-8 overflow-hidden">
+                  <Image
+                    src="/images/launchweek/11_ga/airpods-max-alpha.png"
+                    alt="Supabase GA Week AirPod Max prize"
+                    draggable={false}
+                    width={300}
+                    height={300}
+                    className="absolute p-2 object-cover scale-50 lg:scale-100 lg:object-top w-[90%] h-full overflow-visible opacity-50"
+                  />
                 </div>
-                <div className="px-4 mt-10 w-full">
-                  <div className="relative w-full aspect-[3.078/1]">
-                    <Image
-                      src="/images/launchweek/lwx/swag/lwx_keyboard.png"
-                      fill
-                      quality={100}
-                      alt="/images/launchweek/lwx/swag/lwx_keyboard.png"
-                      className="h-full w-full block"
-                    />
+                <div className="flex flex-col lg:w-1/2 gap-1 p-4 md:p-8 lg:pl-0 lg:h-full">
+                  <div className="flex flex-col gap-2 flex-grow">
+                    <LabelBadge text="5 sets" />
+                    <p className="xl:mt-4">Win AirPods Max</p>
+                    <p className="text-foreground-lighter text-sm">
+                      Secure your ticket to enter our random prize pool, and amplify your odds by
+                      sharing. Or if you dont leave anything up for chance - join our Hackathon and
+                      showcase your creations. With luck or skill, you could snag these top-tier
+                      headphones!
+                    </p>
+                  </div>
+                  <div className="w-full mt-3 md:mt-6">
+                    <PrizeActions />
                   </div>
                 </div>
-              </>
+              </div>
             }
           />
           <div className="w-full flex flex-col gap-4 items-stretch">
@@ -48,8 +56,8 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
               className="flex-grow"
               content={
                 <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
-                  <LabelBadge text="20 t-shirts" />
-                  Launch Week X T-Shirt
+                  <LabelBadge text="30 t-shirts" />
+                  <p>Supabase GA T-shirts</p>
                 </div>
               }
             />
@@ -58,16 +66,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
               content={
                 <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
                   <LabelBadge text="25 caps" />
-                  Launch Week X Cap
-                </div>
-              }
-            />
-            <LaunchWeekPrizeCard
-              className="flex-grow"
-              content={
-                <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
-                  <LabelBadge text="50 stickers" />
-                  <p>Launch Week X Stickers</p>
+                  <p>Supabase GA Cap</p>
                 </div>
               }
             />

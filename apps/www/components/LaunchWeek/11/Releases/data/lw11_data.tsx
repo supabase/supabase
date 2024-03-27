@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { PRODUCT_NAMES, products } from 'shared-data/products'
+import { products } from 'shared-data/products'
 
 type StepLinkType = 'productHunt' | 'video' | 'docs' | 'xSpace' | 'blog' | 'podcast'
 
