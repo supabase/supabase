@@ -111,7 +111,7 @@ Depending on your application requirements, data conflicts can arise when an ano
 
 ## Abuse prevention and rate limits
 
-Since anonymous users are stored in your database, bad actors can abuse the endpoint to increase your database size drastically. It is strongly recommended to [enable silent captcha or turnstile](/dashboard/project/_/settings/auth) to prevent abuse for anonymous sign-ins. There is also an IP-based rate limit for anonymous sign-ins at 30 requests per hour which can be configured in your [dashboard](/dashboard/project/_/auth/rate-limits). You can refer to the full list of rate limits [here](/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention).
+Since anonymous users are stored in your database, bad actors can abuse the endpoint to increase your database size drastically. It is strongly recommended to [enable silent captcha or turnstile](/docs/guides/auth/auth-captcha) to prevent abuse for anonymous sign-ins. There is also an IP-based rate limit for anonymous sign-ins at 30 requests per hour which can be configured in your [dashboard](/dashboard/project/_/auth/rate-limits). You can refer to the full list of rate limits [here](/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention).
 
 ## Automatic cleanup
 
