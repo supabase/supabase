@@ -10,15 +10,14 @@ import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useOrgUsageQuery } from 'data/usage/org-usage-query'
 import { useSelectedOrganization } from 'hooks'
 import { TIME_PERIODS_BILLING, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import Link from 'next/link'
-import { Alert, Button, IconExternalLink, IconInfo, Listbox } from 'ui'
+import { Button, IconExternalLink, IconInfo, Listbox } from 'ui'
 import Activity from './Activity'
 import Bandwidth from './Bandwidth'
-import SizeAndCounts from './SizeAndCounts'
 import Compute from './Compute'
+import SizeAndCounts from './SizeAndCounts'
 import TotalUsage from './TotalUsage'
 
 const Usage = () => {
@@ -35,8 +34,6 @@ const Usage = () => {
     isError: isErrorSubscription,
     isSuccess: isSuccessSubscription,
   } = useOrgSubscriptionQuery({ orgSlug: slug })
-
-  const { data: usage } = useOrgUsageQuery({ orgSlug: slug })
 
   const orgProjects = projects?.filter((project) => project.organization_id === organization?.id)
 
@@ -93,13 +90,6 @@ const Usage = () => {
   const selectedProject = selectedProjectRef
     ? orgProjects?.find((it) => it.ref === selectedProjectRef)
     : undefined
-
-  const hasExceededAnyLimits = Boolean(
-    usage?.usages.find(
-      (metric) =>
-        !metric.unlimited && metric.capped && metric.usage > (metric?.pricing_free_units ?? 0)
-    )
-  )
 
   return (
     <>
@@ -169,32 +159,6 @@ const Usage = () => {
           )}
         </div>
       </ScaffoldContainer>
-
-      {!selectedProject && subscription && hasExceededAnyLimits && (
-        <ScaffoldContainer className="mt-5">
-          <Alert
-            withIcon
-            variant="danger"
-            title="Your organization's usage has exceeded its included quota"
-            actions={[
-              <Button key="upgrade-button" asChild type="default" className="ml-8">
-                <Link
-                  href={`/org/${slug}/billing?panel=${
-                    subscription.plan.id === 'free' ? 'subscriptionPlan' : 'costControl'
-                  }`}
-                >
-                  {subscription.plan.id === 'free' ? 'Upgrade plan' : 'Change spend cap'}
-                </Link>
-              </Button>,
-            ]}
-          >
-            Your projects can become unresponsive or enter read-only mode.{' '}
-            {subscription.plan.id === 'free'
-              ? 'Please upgrade to the Pro plan to ensure that your projects remain available.'
-              : 'Please disable spend cap to ensure that your projects remain available.'}
-          </Alert>
-        </ScaffoldContainer>
-      )}
 
       {selectedProjectRef && (
         <ScaffoldContainer className="mt-5">
