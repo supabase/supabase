@@ -31,8 +31,9 @@ import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutati
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import FormField from '../AuthProvidersForm/FormField'
 import Link from 'next/link'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import FormField from '../AuthProvidersForm/FormField'
 
 // Use a const string to represent no chars option. Represented as empty string on the backend side.
 const NO_REQUIRED_CHARACTERS = 'NO_REQUIRED_CHARS'
@@ -205,42 +206,6 @@ const BasicAuthSettingsForm = () => {
                     }
                     disabled={!canUpdateConfig}
                   />
-                  {values.EXTERNAL_ANONYMOUS_USERS_ENABLED ? (
-                    <>
-                      {!values.SECURITY_CAPTCHA_ENABLED}
-                      <Alert_Shadcn_ className="flex w-full items-center justify-between">
-                        <IconAlertCircle strokeWidth={1.5} />
-                        <AlertTitle_Shadcn_>
-                          <p className="!leading-tight">
-                            Enable captcha to prevent abuse for anonymous sign-ins
-                          </p>
-                        </AlertTitle_Shadcn_>
-                      </Alert_Shadcn_>
-                      <Alert_Shadcn_
-                        className="flex w-full items-center justify-between"
-                        variant="warning"
-                      >
-                        <IconAlertCircle strokeWidth={1.5} />
-                        <div>
-                          <AlertTitle_Shadcn_>
-                            <p className="!leading-tight">
-                              Enabling anonymous sign-ins may compromise your existing Row Level
-                              Security policies
-                            </p>
-                          </AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_>
-                            Review your{' '}
-                            <Link
-                              href={`/project/${projectRef}/auth/policies`}
-                              className="underline"
-                            >
-                              Row Level Security policies
-                            </Link>
-                          </AlertDescription_Shadcn_>
-                        </div>
-                      </Alert_Shadcn_>
-                    </>
-                  ) : null}
                   <Toggle
                     id="EXTERNAL_ANONYMOUS_USERS_ENABLED"
                     size="small"
@@ -255,6 +220,57 @@ const BasicAuthSettingsForm = () => {
                     }
                     disabled={!canUpdateConfig}
                   />
+                  {values.EXTERNAL_ANONYMOUS_USERS_ENABLED && (
+                    <div className="flex flex-col gap-y-2">
+                      <Alert_Shadcn_
+                        className="flex w-full items-center justify-between"
+                        variant="warning"
+                      >
+                        <WarningIcon />
+                        <div>
+                          <AlertTitle_Shadcn_>
+                            Anonymous users will use the{' '}
+                            <code className="text-xs">authenticated</code> role when signing in
+                          </AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_>
+                            As a result, anonymous users will be subjected to RLS policies that
+                            apply to the <code className="text-xs">public</code> and{' '}
+                            <code className="text-xs">authenticated</code> roles. We strongly advise{' '}
+                            <Link
+                              href={`/project/${projectRef}/auth/policies`}
+                              className="text-foreground underline"
+                            >
+                              reviewing your RLS policies
+                            </Link>{' '}
+                            to ensure that access to your data is restricted where required.
+                          </AlertDescription_Shadcn_>
+                        </div>
+                      </Alert_Shadcn_>
+                      {!values.SECURITY_CAPTCHA_ENABLED && (
+                        <Alert_Shadcn_>
+                          <WarningIcon />
+                          <AlertTitle_Shadcn_>
+                            We highly recommend{' '}
+                            <span
+                              tabIndex={1}
+                              className="cursor-pointer underline"
+                              onClick={() => {
+                                const el = document.getElementById('enable-captcha')
+                                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                              }}
+                            >
+                              enabling captcha
+                            </span>{' '}
+                            for anonymous sign-ins
+                          </AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_>
+                            This will prevent potential abuse on sign-ins which may bloat your
+                            database and incur costs for monthly active users (MAU)
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
+                      )}
+                    </div>
+                  )}
                 </FormSectionContent>
               </FormSection>
               <FormSection header={<FormSectionLabel>Passwords</FormSectionLabel>}>
@@ -362,7 +378,10 @@ const BasicAuthSettingsForm = () => {
                   />
                 </FormSectionContent>
               </FormSection>
-              <FormSection header={<FormSectionLabel>Bot and Abuse Protection</FormSectionLabel>}>
+              <FormSection
+                id="enable-captcha"
+                header={<FormSectionLabel>Bot and Abuse Protection</FormSectionLabel>}
+              >
                 <FormSectionContent loading={isLoading}>
                   <Toggle
                     id="SECURITY_CAPTCHA_ENABLED"

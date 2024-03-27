@@ -38,7 +38,7 @@ const PolicyRow = ({
 
   // TODO(km): Simple check for roles that allow authenticated access.
   // In the future, we'll use splinter to return proper warnings for policies that allow anonymous user access.
-  const mayAllowAnonymousUserAccess =
+  const appliesToAnonymousUsers =
     authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED &&
     (policy.roles.includes('authenticated') || policy.roles.includes('public'))
 
@@ -52,8 +52,8 @@ const PolicyRow = ({
         <div className="flex items-center space-x-4">
           <p className="font-mono text-xs text-foreground-light">{policy.command}</p>
           <p className="text-sm text-foreground">{policy.name}</p>
-          {mayAllowAnonymousUserAccess ? (
-            <Badge color={'yellow'}>{'May allow anonymous user access'}</Badge>
+          {appliesToAnonymousUsers ? (
+            <Badge color="yellow">Applies to anonymous users</Badge>
           ) : null}
         </div>
         <div className="flex items-center space-x-2">
