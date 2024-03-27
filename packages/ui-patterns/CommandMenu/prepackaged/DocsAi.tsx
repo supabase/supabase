@@ -25,7 +25,6 @@ const useDocsAiCommands = ({
         id: 'ai-docs',
         name: 'Ask Supabase AI',
         action: () => {
-          console.log('你都是给点反应啊')
           setCommandPage(DOCS_AI_COMMANDS.PAGE_NAME)
         },
       },

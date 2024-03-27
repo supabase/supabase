@@ -3,11 +3,14 @@ import { proxy } from 'valtio'
 import { type ICommand } from '../Command'
 import { type ICommandSectionName, type ICommandSection, section$new } from '../CommandSection'
 
-type OrderSectionInstruction = (sections: Array<ICommandSection>, section: ICommandSection) => void
+type OrderSectionInstruction = (
+  sections: Array<ICommandSection>,
+  idx: number
+) => Array<ICommandSection>
 type OrderCommandsInstruction = (
   commands: Array<ICommand>,
   commandsToInsert: Array<ICommand>
-) => void
+) => Array<ICommand>
 type UseCommandOptions = {
   orderSection?: OrderSectionInstruction
   orderCommands?: OrderCommandsInstruction
@@ -30,17 +33,20 @@ const initCommandsState = () => {
       if (editIndex === -1) editIndex = state.commandSections.length
       state.commandSections[editIndex] ??= section$new(sectionName)
 
-      options?.orderSection?.(state.commandSections, state.commandSections[editIndex])
+      state.commandSections =
+        options?.orderSection?.(state.commandSections, editIndex) ?? state.commandSections
 
       if (options?.orderCommands) {
-        options.orderCommands(state.commandSections[editIndex].commands, commands)
+        state.commandSections[editIndex].commands = options.orderCommands(
+          state.commandSections[editIndex].commands,
+          commands
+        )
       } else {
         state.commandSections[editIndex].commands.push(...commands)
       }
 
-      const closedOverCurrSection = state.commandSections[editIndex]
       return () => {
-        const idx = state.commandSections.indexOf(closedOverCurrSection)
+        const idx = state.commandSections.findIndex((section) => section.name === sectionName)
         if (idx) {
           const filteredCommands = state.commandSections[idx].commands.filter(
             (command) => !commands.includes(command)

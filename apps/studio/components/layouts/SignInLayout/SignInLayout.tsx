@@ -26,13 +26,24 @@ const SignInLayout = ({
   logoLinkToMarketingSite = false,
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
-  useRegisterCommands('Signin', [
+  useRegisterCommands(
+    'Signin',
+    [
+      {
+        id: 'signin',
+        name: 'testtesttest',
+        action: () => alert('aha!'),
+      },
+    ],
     {
-      id: 'signin',
-      name: 'testtesttest',
-      action: () => alert('aha!'),
-    },
-  ])
+      orderSection: (sections, idx) => {
+        if (idx > 0) {
+          ;[sections[idx], sections[idx - 1]] = [sections[idx - 1], sections[idx]]
+        }
+        return sections
+      },
+    }
+  )
   const router = useRouter()
   const queryClient = useQueryClient()
   const { resolvedTheme } = useTheme()
