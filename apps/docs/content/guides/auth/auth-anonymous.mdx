@@ -118,7 +118,7 @@ Since anonymous users are stored in your database, bad actors can abuse the endp
 We are working on adding the ability to automatically cleanup anonymous users that were created more than 30 days ago. However, you can delete anonymous users from your project by running:
 
 ```sql
--- deletes anonymous users that were created more than 30 days ago
+-- deletes anonymous users created more than 30 days ago
 delete from auth.users where is_anonymous is true and created_at < now() - interval '30 days';
 ```
 
