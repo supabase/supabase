@@ -70,6 +70,7 @@ const DiffEditor = dynamic(
 
 interface AIPolicyEditorPanelProps {
   visible: boolean
+  searchString?: string
   selectedPolicy?: PostgresPolicy
   onSelectCancel: () => void
 }
@@ -79,6 +80,7 @@ interface AIPolicyEditorPanelProps {
  */
 export const AIPolicyEditorPanel = memo(function ({
   visible,
+  searchString,
   selectedPolicy,
   onSelectCancel,
 }: AIPolicyEditorPanelProps) {
@@ -529,6 +531,7 @@ export const AIPolicyEditorPanel = memo(function ({
                   ) : (
                     <>
                       <PolicyDetailsV2
+                        searchString={searchString}
                         isEditing={selectedPolicy !== undefined}
                         form={form}
                         onUpdateCommand={(command: string) => {

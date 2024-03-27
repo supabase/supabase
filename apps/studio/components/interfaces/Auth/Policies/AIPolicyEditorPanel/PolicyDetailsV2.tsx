@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useTablesQuery } from 'data/tables/tables-query'
@@ -20,19 +21,22 @@ import {
   Select_Shadcn_,
 } from 'ui'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
-import { useRouter } from 'next/router'
 
 interface PolicyDetailsV2Props {
+  searchString?: string
   isEditing: boolean
   form: any
   onUpdateCommand: (command: string) => void
 }
 
-export const PolicyDetailsV2 = ({ isEditing, form, onUpdateCommand }: PolicyDetailsV2Props) => {
+export const PolicyDetailsV2 = ({
+  searchString,
+  isEditing,
+  form,
+  onUpdateCommand,
+}: PolicyDetailsV2Props) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
-  const router = useRouter()
-  const searchTableId = router.query.search as string
 
   const { data: tables, isSuccess: isSuccessTables } = useTablesQuery({
     projectRef: project?.ref,
@@ -58,15 +62,19 @@ export const PolicyDetailsV2 = ({ isEditing, form, onUpdateCommand }: PolicyDeta
     .sort((a, b) => a.name.localeCompare(b.name))
 
   useEffect(() => {
-    if (!isEditing && isSuccessTables && tables.length > 0) form.setValue('table', tables[0].name)
-  }, [isEditing, isSuccessTables, tables])
-
-  useEffect(() => {
-    const table = tables?.find((table) => table.id.toString() === searchTableId)
-    if (table) {
-      form.setValue('table', table.name)
+    if (!isEditing) {
+      const table = tables?.find(
+        (table) =>
+          table.schema === snap.selectedSchemaName &&
+          (table.id.toString() === searchString || table.name === searchString)
+      )
+      if (table) {
+        form.setValue('table', table.name)
+      } else if (isSuccessTables && tables.length > 0) {
+        form.setValue('table', tables[0].name)
+      }
     }
-  }, [form, searchTableId, tables])
+  }, [isEditing, form, searchString, tables, isSuccessTables])
 
   return (
     <>
