@@ -111,6 +111,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     MAILER_SUBJECTS_RECOVERY: 'Reset Your Password',
     MAILER_SUBJECTS_EMAIL_CHANGE: 'Confirm Email Change',
     MAILER_SUBJECTS_MAGIC_LINK: 'Your Magic Link',
+    MAILER_SUBJECTS_REAUTHENTICATION: 'Confirm Reauthentication',
     MAILER_TEMPLATES_INVITE: null,
     MAILER_TEMPLATES_INVITE_CONTENT:
       '<h2>You have been invited</h2>\n\n<p>You have been invited to create a user on {{ .SiteURL }}. Follow this link to accept the invite:</p>\n<p><a href="{{ .ConfirmationURL }}">Accept the invite</a></p>',
@@ -126,6 +127,9 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     MAILER_TEMPLATES_MAGIC_LINK: null,
     MAILER_TEMPLATES_MAGIC_LINK_CONTENT:
       '<h2>Magic Link</h2>\n\n<p>Follow this link to login:</p>\n<p><a href="{{ .ConfirmationURL }}">Log In</a></p>',
+    MAILER_TEMPLATES_REAUTHENTICATION: null,
+    MAILER_TEMPLATES_REAUTHENTICATION_CONTENT:
+      '<h2>Confirm reauthentication</h2> <p>Enter the code: {{ .Token }}</p>',
     PASSWORD_MIN_LENGTH: 6,
     SMTP_SENDER_NAME: null,
     SMS_AUTOCONFIRM: false,
