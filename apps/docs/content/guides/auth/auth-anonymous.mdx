@@ -28,7 +28,7 @@ See the [Access control section](#access-control) for more details.
 
 </Admonition>
 
-<Admonition type="note" label="Self hosting">
+<Admonition type="note" label="Self hosting and local development">
 
 For self-hosting, you can update your project configuration using the files and environment variables provided. See the [self-hosting docs](/docs/guides/self-hosting#configuration) for more details.
 
@@ -54,7 +54,7 @@ const { data, error } = await supabase.auth.signInAnonymously()
 </TabPanel>
 </Tabs>
 
-## Convert the anonymous user to a permanent user
+## Convert an anonymous user to a permanent user
 
 Converting an anonymous user to a permanent user requires linking an identity to the user.
 
@@ -106,7 +106,7 @@ An anonymous user assumes the `authenticated` role just like a permanent user. Y
 create policy "Only permanent users can post to the news feed"
 on news_feed for insert
 to authenticated
-with check ( auth.jwt()->>'is_anonymous' = false );
+with check ((auth.jwt()->>'is_anonymous')::boolean is false );
 
 create policy "Anonymous and permanent users can view the news feed"
 on news_feed for select
@@ -114,7 +114,7 @@ to authenticated
 using ( true );
 ```
 
-## Conflict Resolution
+## Resolving identity conflicts
 
 Depending on your application requirements, data conflicts can arise when an anonymous user is converted to a permanent user. For example, in the context of an e-commerce application, an anonymous user would be allowed to add items to the shopping cart without signing up / signing in. When they decide to sign-in to an existing account, you will need to decide how you want to resolve data conflicts in the shopping cart:
 
