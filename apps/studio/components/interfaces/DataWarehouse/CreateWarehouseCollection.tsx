@@ -38,6 +38,7 @@ export const CreateWarehouseCollectionModal = (props: Props) => {
             e.preventDefault()
             try {
               const formData = new FormData(e.target as HTMLFormElement)
+              console.log(formData)
               const values = {
                 name: formData.get('name') as string,
               }
@@ -45,7 +46,7 @@ export const CreateWarehouseCollectionModal = (props: Props) => {
               toast.success(`Collection ${values.name} created`)
             } catch (error) {
               console.error(error)
-              toast.error(`Failed to create table. Check the console for more details.`)
+              toast.error(`Failed to create collection. Check the console for more details.`)
             } finally {
               setIsOpen(false)
             }
@@ -54,7 +55,7 @@ export const CreateWarehouseCollectionModal = (props: Props) => {
           <div className="py-4">
             <Modal.Content>
               <div className="space-y-6">
-                <Input required layout="horizontal" label="Collection name" id="name" />
+                <Input required layout="horizontal" label="Collection name" id="name" name="name"/>
               </div>
             </Modal.Content>
           </div>

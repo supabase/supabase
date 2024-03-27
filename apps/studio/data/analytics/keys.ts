@@ -1,5 +1,6 @@
 export const analyticsKeys = {
   // warehouse
+  warehouseQuery: (projectRef: string, query: string) => ["projects", projectRef, "warehouse", "query", query] as const,
   warehouseTenant: (projectRef: string) => ["projects", projectRef, "warehouse", "tenant"] as const,
   warehouseCollections: (projectRef: string) => ["projects", projectRef, "warehouse", "collections"] as const,
   warehouseCollectionsCreate: (projectRef: string) => ["projects", projectRef, "warehouse", "collections", "create"] as const,

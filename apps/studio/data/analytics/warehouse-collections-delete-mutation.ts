@@ -1,25 +1,21 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { collectionKeys } from './keys'
+import { analyticsKeys } from './keys'
+import { del } from 'data/fetchers'
 
 type DeleteCollectionArgs = {
   projectRef: string
+  collectionToken: string
 }
-type DeleteCollectionPayload = {
-  id: string
-}
-export function useDeleteCollection({ projectRef }: DeleteCollectionArgs) {
+export function useDeleteCollection({ projectRef, collectionToken }: DeleteCollectionArgs) {
   const queryClient = useQueryClient()
   const mutation = useMutation({
-    mutationFn: async (payload: DeleteCollectionPayload) => {
-      // To do: Implement the collection deletion logic here
+    mutationFn: async () => {
+      const resp = await del(`/platform/projects/${projectRef}/analytics/warehouse/collections/${collectionToken}`, {})
 
-      // mock delay
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      const keysToInvalidate = collectionKeys.list(projectRef)
+      const keysToInvalidate = analyticsKeys.warehouseCollections(projectRef)
       queryClient.invalidateQueries(keysToInvalidate)
     },
-    mutationKey: collectionKeys.create(projectRef),
+    mutationKey: analyticsKeys.warehouseCollections(projectRef),
   })
 
   return mutation
