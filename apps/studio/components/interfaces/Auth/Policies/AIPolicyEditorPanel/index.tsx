@@ -70,6 +70,7 @@ const DiffEditor = dynamic(
 
 interface AIPolicyEditorPanelProps {
   visible: boolean
+  searchString?: string
   selectedPolicy?: PostgresPolicy
   onSelectCancel: () => void
 }
@@ -79,6 +80,7 @@ interface AIPolicyEditorPanelProps {
  */
 export const AIPolicyEditorPanel = memo(function ({
   visible,
+  searchString,
   selectedPolicy,
   onSelectCancel,
 }: AIPolicyEditorPanelProps) {
@@ -121,7 +123,7 @@ export const AIPolicyEditorPanel = memo(function ({
   const [debugThread, setDebugThread] = useState<MessageWithDebug[]>([])
   const [assistantVisible, setAssistantPanel] = useState<boolean>(false)
   const [isAssistantChatInputEmpty, setIsAssistantChatInputEmpty] = useState<boolean>(true)
-  const [incomingChange, setIncomingChange] = useState<string | undefined>(undefined)
+  const [incomingChange, setIncomingChange] = useState<string>()
   // Used for confirmation when closing the panel with unsaved changes
   const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState<boolean>(false)
 
@@ -522,13 +524,14 @@ export const AIPolicyEditorPanel = memo(function ({
                       <RLSCodeEditor
                         id="rls-sql-policy"
                         defaultValue={''}
-                        editorRef={editorOneRef}
                         placeholder={placeholder}
+                        editorRef={editorOneRef}
                       />
                     </div>
                   ) : (
                     <>
                       <PolicyDetailsV2
+                        searchString={searchString}
                         isEditing={selectedPolicy !== undefined}
                         form={form}
                         onUpdateCommand={(command: string) => {
@@ -683,6 +686,20 @@ export const AIPolicyEditorPanel = memo(function ({
                         htmlType="submit"
                         loading={isExecuting || isUpdating}
                         disabled={isExecuting || isUpdating || incomingChange !== undefined}
+                        onClick={() => {
+                          if (isAiAssistantEnabled) {
+                            const sql = editorOneRef.current?.getValue().trim()
+                            if (!sql) return onSelectCancel()
+                            executeMutation({
+                              sql: sql,
+                              projectRef: selectedProject?.ref,
+                              connectionString: selectedProject?.connectionString,
+                              handleError: (error) => {
+                                throw error
+                              },
+                            })
+                          }
+                        }}
                       >
                         Save policy
                       </Button>
@@ -726,26 +743,34 @@ export const AIPolicyEditorPanel = memo(function ({
                     >
                       <ScrollArea className="h-full w-full">
                         <PolicyTemplates
+                          table={table}
                           selectedPolicy={selectedPolicy}
                           selectedTemplate={selectedDiff}
                           onSelectTemplate={(value) => {
-                            form.setValue('name', value.name)
-                            form.setValue('behavior', 'permissive')
-                            form.setValue('command', value.command.toLowerCase())
-                            form.setValue('roles', value.roles.join(', ') ?? '')
-
-                            setUsing(`  ${value.definition}`)
-                            setCheck(`  ${value.check}`)
-                            setExpOneLineCount(1)
-                            setExpTwoLineCount(1)
-                            setFieldError(undefined)
-
-                            if (!['update', 'all'].includes(value.command.toLowerCase())) {
-                              setShowCheckBlock(false)
-                            } else if (value.check.length > 0) {
-                              setShowCheckBlock(true)
+                            if (isAiAssistantEnabled) {
+                              updateEditorWithCheckForDiff({
+                                id: value.id,
+                                content: value.statement,
+                              })
                             } else {
-                              setShowCheckBlock(false)
+                              form.setValue('name', value.name)
+                              form.setValue('behavior', 'permissive')
+                              form.setValue('command', value.command.toLowerCase())
+                              form.setValue('roles', value.roles.join(', ') ?? '')
+
+                              setUsing(`  ${value.definition}`)
+                              setCheck(`  ${value.check}`)
+                              setExpOneLineCount(1)
+                              setExpTwoLineCount(1)
+                              setFieldError(undefined)
+
+                              if (!['update', 'all'].includes(value.command.toLowerCase())) {
+                                setShowCheckBlock(false)
+                              } else if (value.check.length > 0) {
+                                setShowCheckBlock(true)
+                              } else {
+                                setShowCheckBlock(false)
+                              }
                             }
                           }}
                         />
