@@ -45,6 +45,7 @@ const GenerateSQL = () => {
   const { submit, reset, messages, isResponding, hasError } = useAiChat({
     messageTemplate,
     setIsLoading,
+    aiVariant: 'default' || 'support',
   })
 
   const inputRef = useAutoInputFocus()

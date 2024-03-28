@@ -30,8 +30,6 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from './../../lib/utils'
 import { useRouter } from 'next/router'
-import Telemetry from 'lib/telemetry'
-import { useTelemetryProps } from 'common'
 
 const defaultQuestions = [
   'How do I get started with Supabase?',
@@ -152,8 +150,6 @@ export function useAiChat({
   const [isInputDisabled, setIsInputDisabled] = useState(false)
   const [submittedFeedback, setSubmittedFeedback] = useState<boolean | null>(null)
 
-  const telemetryProps = useTelemetryProps()
-
   useEffect(() => {
 
     const isFeedbackSectionShown = messages.some(
@@ -196,16 +192,6 @@ export function useAiChat({
         },
       })
     }
-
-    Telemetry.sendEvent(
-      {
-        category: 'support_ai_agent',
-        action: 'first_prompt_clicked',
-        label: feedback,
-      },
-      telemetryProps,
-      router
-    )
   }
 
   const showSupportForm = (submittedFeedback: true | false) => {
@@ -247,16 +233,6 @@ export function useAiChat({
         },
       })
     }
-
-    Telemetry.sendEvent(
-      {
-        category: 'support_ai_agent',
-        action: 'second_prompt_clicked',
-        label: submittedFeedback,
-      },
-      telemetryProps,
-      router
-    )
   }
 
   const submit = useCallback(
