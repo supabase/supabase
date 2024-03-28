@@ -73,7 +73,6 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
-  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
   useEffect(() => {
     if (search) setSearchString(search)

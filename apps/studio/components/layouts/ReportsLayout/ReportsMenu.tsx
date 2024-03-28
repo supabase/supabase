@@ -108,6 +108,11 @@ const ReportsMenu = () => {
           key: 'query-performance',
           url: `/project/${ref}/reports/query-performance`,
         },
+        {
+          name: 'Project Linter',
+          key: 'linter',
+          url: `/project/${ref}/reports/linter`,
+        },
       ],
     },
   ]

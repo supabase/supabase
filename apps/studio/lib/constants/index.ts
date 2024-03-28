@@ -48,6 +48,8 @@ export const LOCAL_STORAGE_KEYS = {
   PGBOUNCER_IPV6_DEPRECATION_WARNING: 'pgbouncer-ipv6-deprecation-warning-dismissed',
   VERCEL_IPV6_DEPRECATION_WARNING: 'vercel-ipv6-deprecation-warning-dismissed',
   PGBOUNCER_DEPRECATION_WARNING: 'pgbouncer-deprecation-warning-dismissed',
+
+  PROJECT_LINT_IGNORE_LIST: 'supabase-project-lint-ignore-list',
 }
 
 export const OPT_IN_TAGS = {
