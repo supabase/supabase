@@ -1,5 +1,5 @@
-import jsonLogic from 'json-logic-js'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import jsonLogic from 'json-logic-js'
 
 export interface Organization {
   id: number
@@ -10,6 +10,8 @@ export interface Organization {
   stripe_customer_id?: string
   opt_in_tags: string[]
   subscription_id?: string | null
+  restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
+  restriction_data: Record<string, never>
 }
 
 /**
