@@ -18,17 +18,17 @@ export default function Ticket() {
   const sharePage = !!params.username
   const ticketType = hasSecretTicket ? 'secret' : platinum ? 'platinum' : 'regular'
 
-  const fallbackImg = `/images/launchweek/11/tickets/lw11_ticket_${ticketType}.png`
+  const fallbackImg = `/images/launchweek/11/tickets/shape/lw11_ticket_${ticketType}.png`
 
   const ticketBg = {
     regular: {
-      background: `/images/launchweek/11/tickets/lw11_ticket_regular_darker.png`,
+      background: `/images/launchweek/11/tickets/shape/lw11_ticket_regular.png`,
     },
     platinum: {
-      background: `/images/launchweek/11/tickets/lw11_ticket_platinum.png`,
+      background: `/images/launchweek/11/tickets/shape/lw11_ticket_platinum.png`,
     },
     secret: {
-      background: `/images/launchweek/11/tickets/lw11_ticket_gold.png`,
+      background: `/images/launchweek/11/tickets/shape/lw11_ticket_purple.png`,
     },
   }
 

@@ -80,19 +80,20 @@ export async function handler(req: Request) {
     // Get ticket data
     const { data, error } = await supabaseAdminClient
       .from(LW_MATERIALIZED_VIEW)
-      .select('name, ticketNumber, sharedOnTwitter, sharedOnLinkedIn, metadata')
+      .select('name, ticketNumber, sharedOnTwitter, sharedOnLinkedIn, metadata, secret')
       .eq('username', username)
       .maybeSingle()
 
     if (error) console.log('fetch error', error.message)
     if (!data) throw new Error(error?.message ?? 'user not found')
-    const { name, ticketNumber, metadata } = data
+    const { name, ticketNumber, metadata, secret } = data
 
     const platinum = (!!data?.sharedOnTwitter && !!data?.sharedOnLinkedIn) ?? false
-    if (assumePlatinum && !platinum) return await fetch(`${STORAGE_URL}/assets/golden_no_meme.png`)
+    if (assumePlatinum && !platinum)
+      return await fetch(`${STORAGE_URL}/assets/platinum_no_meme.jpg`)
 
     // Generate image and upload to storage.
-    const ticketType = data.metadata?.hasSecretTicket ? 'secret' : platinum ? 'platinum' : 'regular'
+    const ticketType = secret ? 'secret' : platinum ? 'platinum' : 'regular'
 
     const fontData = await font
     const monoFontData = await mono_font
@@ -121,17 +122,17 @@ export async function handler(req: Request) {
     const BACKGROUND = {
       regular: {
         OG: `${STORAGE_URL}/assets/backgrounds/regular/${BG_NUMBER}.png`,
-        BG: `${STORAGE_URL}/assets/lw11_ticket_regular_darker.png`,
+        BG: `${STORAGE_URL}/assets/shape/lw11_ticket_regular.png?t=as`,
         LOGO: `${STORAGE_URL}/assets/lw11_logo_white.svg`,
       },
       platinum: {
         OG: `${STORAGE_URL}/assets/backgrounds/platinum/${BG_NUMBER}.png`,
-        BG: `${STORAGE_URL}/assets/lw11_ticket_platinum.png`,
+        BG: `${STORAGE_URL}/assets/shape/lw11_ticket_platinum.png?t=as`,
         LOGO: `${STORAGE_URL}/assets/lw11_logo_black.svg`,
       },
       secret: {
         OG: `${STORAGE_URL}/assets/backgrounds/secret/${BG_NUMBER}.png`,
-        BG: `${STORAGE_URL}/assets/lw11_ticket_gold.png?t=a`,
+        BG: `${STORAGE_URL}/assets/shape/lw11_ticket_purple.png?t=c`,
         LOGO: `${STORAGE_URL}/assets/lw11_logo_white.svg`,
       },
     }
@@ -182,7 +183,7 @@ export async function handler(req: Request) {
                 margin: 0,
                 borderRadius: '26px',
                 // border: `1px solid blue`,
-                boxShadow: '0px 4px 45px rgba(0, 0, 0, 0.1)',
+                // boxShadow: '0px 4px 45px rgba(0, 0, 0, 0.1)',
               }}
             >
               <img
@@ -195,7 +196,7 @@ export async function handler(req: Request) {
                   zIndex: '1',
                   margin: 0,
                   borderRadius: '26px',
-                  border: `1px solid ${STYLING_CONGIF[ticketType].BORDER}`,
+                  // border: `1px solid ${STYLING_CONGIF[ticketType].BORDER}`,
                   // boxShadow: '0px 0px 50px rgba(0, 0, 0, 0.25)',
                 }}
                 src={BACKGROUND[ticketType].BG}
@@ -300,7 +301,7 @@ export async function handler(req: Request) {
                   margin: '0',
                 }}
               >
-                April 11th
+                April 15
               </p>
               <p
                 style={{
