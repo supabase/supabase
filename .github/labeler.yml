@@ -1,0 +1,15 @@
+teams/cli:
+- changed-files:
+  - any-glob-to-any-file: 'docker/**/*'
+
+team/docs:
+- changed-files:
+  - any-glob-to-any-file: 'app/docs/**/*'
+
+teams/frontend:
+- changed-files:
+  - any-glob-to-any-file: 'apps/studio/**/*'
+
+teams/website:
+- changed-files:
+  - any-glob-to-any-file: 'apps/www/**/*'
