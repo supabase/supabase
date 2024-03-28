@@ -149,31 +149,8 @@ const MembersView = ({ searchString }: MembersViewProps) => {
               ]}
               body={[
                 ...filteredMembers.map((x, i: number) => {
-                  const [memberRoleId] = x.role_ids ?? []
-                  const role = (roles || []).find((role) => role.id === memberRoleId)
                   const memberIsUser = x.primary_email == profile?.primary_email
-                  const memberIsPendingInvite = !!x.invited_id
-                  const canRemoveRole = rolesRemovable.includes(memberRoleId)
-                  const disableRoleEdit = !canRemoveRole || memberIsUser || memberIsPendingInvite
                   const isEmailUser = x.username === x.primary_email
-
-                  const validateSelectedRoleToChange = (roleId: any) => {
-                    if (!role || role.id === roleId) return
-
-                    const selectedRole = (roles || []).find((role) => role.id === roleId)
-                    const canAddRole = rolesAddable.includes(selectedRole?.id ?? -1)
-
-                    if (!canAddRole) {
-                      return toast.error(
-                        `You do not have permission to update this team member to ${
-                          selectedRole!.name
-                        }`
-                      )
-                    }
-
-                    setUserRoleChangeModalVisible(true)
-                    setSelectedMember({ ...x, oldRoleId: role.id, newRoleId: roleId })
-                  }
 
                   return (
                     <Fragment key={`member-row-${i}`}>
@@ -231,57 +208,16 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                         )}
 
                         <Table.td>
-                          {isLoadingRoles ? (
-                            <div className="w-[140px]">
-                              <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
-                            </div>
-                          ) : role !== undefined ? (
-                            <Tooltip_Shadcn_>
-                              <TooltipTrigger_Shadcn_ asChild className="w-[140px]">
-                                <div>
-                                  <Listbox
-                                    className={disableRoleEdit ? 'pointer-events-none' : ''}
-                                    disabled={disableRoleEdit}
-                                    value={role.id}
-                                    onChange={validateSelectedRoleToChange}
-                                  >
-                                    {roles.map((r: any) => (
-                                      <Listbox.Option
-                                        key={r.id}
-                                        value={r.id}
-                                        label={r.name}
-                                        disabled={disableRoleEdit}
-                                        className="w-36"
-                                      >
-                                        {r.name}
-                                      </Listbox.Option>
-                                    ))}
-                                  </Listbox>
-                                </div>
-                              </TooltipTrigger_Shadcn_>
-                              {memberIsPendingInvite ? (
-                                <TooltipContent_Shadcn_ side="bottom">
-                                  Role can only be changed after the user has accepted the invite
-                                </TooltipContent_Shadcn_>
-                              ) : !memberIsUser && !canRemoveRole ? (
-                                <TooltipContent_Shadcn_ side="bottom">
-                                  You need additional permissions to manage this team member
-                                </TooltipContent_Shadcn_>
-                              ) : null}
-                            </Tooltip_Shadcn_>
-                          ) : (
-                            <div className="flex items-center space-x-2">
-                              <p className="text-sm text-foreground-light">Invalid role</p>
-                              <Tooltip_Shadcn_>
-                                <TooltipTrigger_Shadcn_ asChild>
-                                  <AlertCircle size={16} strokeWidth={1.5} />
-                                </TooltipTrigger_Shadcn_>
-                                <TooltipContent_Shadcn_ side="bottom">
-                                  This user has an invalid role, please reach out to us via support
-                                </TooltipContent_Shadcn_>
-                              </Tooltip_Shadcn_>
-                            </div>
-                          )}
+                          {x.role_ids.map((id) => {
+                            const role = (roles ?? []).find((role) => role.id === id)
+                            return (
+                              <div key={`role-${id}`} className="flex items-center gap-x-2">
+                                <span>{role?.name}</span>
+                                <span>•</span>
+                                <span>All projects</span>
+                              </div>
+                            )
+                          })}
                         </Table.td>
 
                         <Table.td>
