@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="298" height="431" fill="none">
-  <g clip-path="url(#a)">
+  <g clipPath="url(#a)">
     <g filter="url(#b)">
       <rect width="307.934" height="248.203" x="13.289" y="205.863" fill="#1C1C1C" rx="12"/>
       <rect width="307.434" height="247.703" x="13.539" y="206.113" stroke="#2E2E2E" stroke-width=".5" rx="11.75"/>

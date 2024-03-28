@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="390" height="430" fill="none">
-  <g clip-path="url(#a)">
+  <g clipPath="url(#a)">
     <path fill="url(#b)" d="M-100 382.609 195.471 221l294.337 161.609H-100Z"/>
     <mask id="d" width="369" height="410" x="11" y="11" maskUnits="userSpaceOnUse" style="mask-type:alpha">
       <path fill="url(#c)" d="M11 11.602h368.546v409.176H11z"/>

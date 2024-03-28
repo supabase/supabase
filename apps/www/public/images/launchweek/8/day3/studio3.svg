@@ -1,5 +1,5 @@
 <svg width="1371" height="400" viewBox="0 0 1371 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g clip-path="url(#clip0_2851_170187)">
+<g clipPath="url(#clip0_2851_170187)">
 <rect x="1.25781" y="1" width="1368" height="398" fill="#030A0C"/>
 <g opacity="0.3" filter="url(#filter0_f_2851_170187)">
 <ellipse cx="1234.57" cy="52.5791" rx="462.848" ry="274.353" fill="url(#paint0_linear_2851_170187)"/>
@@ -58,7 +58,7 @@
 <circle cx="588.635" cy="259.117" r="1.01265" transform="rotate(-32.2269 588.635 259.117)" fill="#CACBDC" fill-opacity="0.05"/>
 <circle cx="593.947" cy="239.938" r="1.01265" transform="rotate(-32.2269 593.947 239.938)" fill="#CACBDC" fill-opacity="0.05"/>
 <circle cx="586.217" cy="207.512" r="1.01265" transform="rotate(-32.2269 586.217 207.512)" fill="#CACBDC" fill-opacity="0.05"/>
-<g clip-path="url(#clip1_2851_170187)">
+<g clipPath="url(#clip1_2851_170187)">
 <g filter="url(#filter9_b_2851_170187)">
 <rect x="604.926" y="32.0664" width="733.34" height="339.359" rx="13.88" fill="url(#paint1_linear_2851_170187)" fill-opacity="0.2"/>
 <rect x="605.176" y="32.3164" width="732.84" height="338.859" rx="13.63" stroke="#DBB4E3" stroke-opacity="0.1" stroke-width="0.5"/>

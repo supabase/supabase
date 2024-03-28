@@ -1,5 +1,5 @@
 <svg width="856" height="889" viewBox="0 0 856 889" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g clip-path="url(#clip0_2004_43259)">
+<g clipPath="url(#clip0_2004_43259)">
 <g filter="url(#filter0_b_2004_43259)">
 <rect width="864.004" height="609.235" rx="11.3322" transform="matrix(0.999279 -0.105656 0.36466 0.936882 16.7344 420.909)" fill="url(#paint0_radial_2004_43259)"/>
 <rect x="0.681969" y="0.415613" width="863.004" height="608.235" rx="10.8322" transform="matrix(0.999279 -0.105656 0.36466 0.936882 16.5833 421.007)" stroke="url(#paint1_linear_2004_43259)"/>
@@ -365,7 +365,7 @@
 <rect width="306.204" height="10.0289" rx="5.01443" transform="matrix(0.994522 -0.104528 0.348081 0.937464 571.047 310.548)" fill="#D9D9D9" fill-opacity="0.08"/>
 <rect width="206.577" height="10.0289" rx="5.01443" transform="matrix(0.994522 -0.104528 0.348081 0.937464 630.008 319.949)" fill="#D9D9D9" fill-opacity="0.08"/>
 <rect width="183.933" height="19.3422" rx="9.67109" transform="matrix(0.994522 -0.104528 0.348081 0.937464 608.012 239.164)" fill="#D9D9D9" fill-opacity="0.08"/>
-<g clip-path="url(#clip1_2004_43259)">
+<g clipPath="url(#clip1_2004_43259)">
 <path d="M781.163 228.812L784.105 230.637M784.105 230.637L782.689 232.92M784.105 230.637L774.3 231.668" stroke="#C5C5C5" stroke-opacity="0.09" stroke-linecap="round" stroke-linejoin="round"/>
 </g>
 <rect width="39.5219" height="14.2985" rx="7.14924" transform="matrix(0.994522 -0.104528 0.348081 0.937464 611.578 241.245)" fill="#C5C5C5" fill-opacity="0.09"/>
