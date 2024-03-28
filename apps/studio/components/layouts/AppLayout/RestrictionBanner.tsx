@@ -28,12 +28,15 @@ export const RestrictrionBanner = () => {
       style={{ height: '44px' }}
     >
       <p className="text-sm">
-        {currentOrg.restriction_status === 'grace_period' &&
-          `Projects in this organization are over quota. You are given a grace period, and service restriction will kick in on ${dayjs(currentOrg.restriction_data['grace_period_end']).format('DD MMM YYYY')}`}
-        {currentOrg.restriction_status === 'grace_period_over' &&
-          `Projects in this organization are over quota. Your grace period is over and you will be restricted if you are above limit. Service restriction will kick in on ${dayjs(currentOrg.restriction_data['grace_period_end']).format('DD MMM YYYY')}`}
-        {currentOrg.restriction_status === 'restricted' &&
-          'Projects in this organization are over quota and restricted.'}
+        <a href={`/org/${currentOrg.slug}/billing`}>
+          {' '}
+          {currentOrg.restriction_status === 'grace_period' &&
+            `Your organization has exceeded its quota. You are given a grace period until ${dayjs(currentOrg.restriction_data['grace_period_end']).format('DD MMM, YYYY')}`}
+          {currentOrg.restriction_status === 'grace_period_over' &&
+            `Your grace period is over and your project will not be able to serve requests when you used up your quota.`}
+          {currentOrg.restriction_status === 'restricted' &&
+            'Your organization has used up its quota. Your project is unable to serve any requests.'}
+        </a>
       </p>
     </div>
   )

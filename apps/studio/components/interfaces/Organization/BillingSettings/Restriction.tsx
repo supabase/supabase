@@ -76,22 +76,18 @@ export const Restriction = () => {
         <Alert_Shadcn_ variant="warning">
           <AlertTriangle strokeWidth={2} />
           <div className="flex flex-row items-center justify-between">
-            <div>
-              <AlertTitle_Shadcn_>The quota has been surpassed</AlertTitle_Shadcn_>
+            <div className="mr-3">
+              <AlertTitle_Shadcn_>Your grace period has started.</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
                 <p>
-                  Your organization has surpassed its plan’s quota. Service restrictions will apply
-                  if your usage is above your quota after your grace period. If Service Restrictions
-                  are active, your projects will no longer be able to serve requests.
+                  Your organization is over its quota. You can continue with projects until your
+                  grace period ends on{' '}
+                  {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}. After
+                  that, requests that go over your quota will no longer be served.
                 </p>
                 <p>
-                  Your grace period ends on{' '}
-                  {dayjs(org.restriction_data['grace_period_end']).format('DD MMM YYYY')}.
-                </p>
-                <p>Reduce your usage below your plan’s quota or upgrade your plan.</p>
-                <p>
-                  Please refer to our documentation to{' '}
-                  <a className="cursor-pointer underline">learn more about restrictions</a>.
+                  Lower your usage or upgrade your plan. For details on service restrictions, check{' '}
+                  <a className="cursor-pointer underline">our documentation</a>.
                 </p>
               </AlertDescription_Shadcn_>
             </div>
@@ -105,24 +101,18 @@ export const Restriction = () => {
         <Alert_Shadcn_ variant="warning">
           <AlertTriangle strokeWidth={2} />
           <div className="flex flex-row items-center justify-between">
-            <div>
-              <AlertTitle_Shadcn_>
-                The quota has been surpassed and grace period is over
-              </AlertTitle_Shadcn_>
+            <div className="mr-3">
+              <AlertTitle_Shadcn_>Your grace period is over.</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
                 <p>
                   You have exceeded your plan’s quota in the past and your grace period ended on{' '}
-                  {dayjs(org.restriction_data['grace_period_end']).format('DD MMM YYYY')}. Service
-                  restrictions will apply if your usage is above your quota.
+                  {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}. Service
+                  restrictions will apply if your usage is above your quota. If service restrictions
+                  are active, your projects will no longer be able to serve requests.
                 </p>
                 <p>
-                  If Service Restrictions are active, your projects will no longer be able to serve
-                  requests.
-                </p>
-                <p>Reduce your usage below your plan’s quota upgrade your plan.</p>
-                <p>
-                  Please refer to our documentation to{' '}
-                  <a className="cursor-pointer underline">learn more about restrictions</a>.
+                  Stay below your plan’s quota upgrade your plan. For details on service
+                  restrictions, check <a className="cursor-pointer underline">our documentation</a>.
                 </p>
               </AlertDescription_Shadcn_>
             </div>
@@ -136,22 +126,16 @@ export const Restriction = () => {
         <Alert_Shadcn_ variant="destructive">
           <AlertCircle strokeWidth={2} />
           <div className="flex flex-row items-center justify-between">
-            <div>
-              <AlertTitle_Shadcn_>All services are restricted</AlertTitle_Shadcn_>
+            <div className="mr-3">
+              <AlertTitle_Shadcn_>All services are restricted.</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
                 <p>
-                  Your services are currently restricted. Your projects are not able to serve
-                  requests.
-                </p>
-                <p>
-                  You have exceeded your plan’s quota and your grace period ended on{' '}
-                  {dayjs(org.restriction_data['grace_period_end']).format('DD MMM YYYY')}.
+                  Your projects are not able to serve requests to{' '}
+                  <a className="cursor-pointer underline">service restrictions</a>. You have
+                  exceeded your plan’s quota and your grace period ended on{' '}
+                  {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}.
                 </p>
                 <p>Upgrade to lift restrictions or wait until your quota refills.</p>
-                <p>
-                  Please refer to our documentation to{' '}
-                  <a className="cursor-pointer underline">learn more about restrictions</a>.
-                </p>
               </AlertDescription_Shadcn_>
             </div>
             <Button key="upgrade-button" asChild type="default">
