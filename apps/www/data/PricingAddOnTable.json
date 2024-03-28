@@ -42,7 +42,7 @@
           {
             "key": "poolerConnections",
             "title": "Connections: Pooler (recommended)",
-            "value": "200"
+            "value": "400"
           }
         ]
       },
@@ -61,7 +61,7 @@
           {
             "key": "poolerConnections",
             "title": "Connections: Pooler (recommended)",
-            "value": "200"
+            "value": "600"
           }
         ]
       },
@@ -80,7 +80,7 @@
           {
             "key": "poolerConnections",
             "title": "Connections: Pooler (recommended)",
-            "value": "300"
+            "value": "800"
           }
         ]
       },
@@ -99,7 +99,7 @@
           {
             "key": "poolerConnections",
             "title": "Connections: Pooler (recommended)",
-            "value": "700"
+            "value": "1,000"
           }
         ]
       },
@@ -118,7 +118,7 @@
           {
             "key": "poolerConnections",
             "title": "Connections: Pooler (recommended)",
-            "value": "1500"
+            "value": "1,500"
           }
         ]
       },
@@ -137,7 +137,7 @@
           {
             "key": "poolerConnections",
             "title": "Connections: Pooler (recommended)",
-            "value": "3000"
+            "value": "3,000"
           }
         ]
       },
@@ -156,7 +156,7 @@
           {
             "key": "poolerConnections",
             "title": "Connections: Pooler (recommended)",
-            "value": "6000"
+            "value": "6,000"
           }
         ]
       },
@@ -175,7 +175,7 @@
           {
             "key": "poolerConnections",
             "title": "Connections: Pooler (recommended)",
-            "value": "9000"
+            "value": "9,000"
           }
         ]
       },
