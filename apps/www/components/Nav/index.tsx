@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useTheme } from 'next-themes'
-import { useWindowSize } from 'react-use'
+import { useWindowSize, useLockBodyScroll } from 'react-use'
 
 import { Button, cn } from 'ui'
 import {
@@ -34,6 +34,7 @@ const Nav = (props: Props) => {
   const router = useRouter()
   const { width } = useWindowSize()
   const [open, setOpen] = useState(false)
+  const [dropdownToggle, setDropdownToggle] = useState(false)
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
 
@@ -55,6 +56,16 @@ const Nav = (props: Props) => {
   React.useEffect(() => {
     if (width >= 1024) setOpen(false)
   }, [width])
+
+  const handleDropdownToggleOnEnter = () => {
+    setDropdownToggle(true)
+  }
+
+  const handleDropdownToggleOnLeave = () => {
+    setDropdownToggle(false)
+  }
+
+  useLockBodyScroll(dropdownToggle)
 
   if (props.hideNavbar) {
     return null
@@ -127,11 +138,17 @@ const Nav = (props: Props) => {
                     {menu.primaryNav.map((menuItem) =>
                       menuItem.hasDropdown ? (
                         <NavigationMenuItem className="text-sm font-medium" key={menuItem.title}>
-                          <NavigationMenuTrigger className="bg-transparent text-foreground hover:text-brand-link data-[state=open]:!text-brand-link data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground p-2 h-auto">
+                          <NavigationMenuTrigger
+                            className="bg-transparent text-foreground hover:text-brand-link data-[state=open]:!text-brand-link data-[radix-collection-item]:focus-visible:ring-2 data-[radix-collection-item]:focus-visible:ring-foreground-lighter data-[radix-collection-item]:focus-visible:text-foreground p-2 h-auto"
+                            onMouseEnter={handleDropdownToggleOnEnter}
+                            onMouseLeave={handleDropdownToggleOnLeave}
+                          >
                             {menuItem.title}
                           </NavigationMenuTrigger>
                           <NavigationMenuContent
                             className={cn('rounded-xl', menuItem.dropdownContainerClassName)}
+                            onMouseEnter={handleDropdownToggleOnEnter}
+                            onMouseLeave={handleDropdownToggleOnLeave}
                           >
                             {menuItem.dropdown}
                           </NavigationMenuContent>
