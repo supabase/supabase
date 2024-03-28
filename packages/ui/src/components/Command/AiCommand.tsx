@@ -30,6 +30,8 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { cn } from './../../lib/utils'
 import { useRouter } from 'next/router'
+import Telemetry from 'lib/telemetry'
+import { useTelemetryProps } from 'common'
 
 const defaultQuestions = [
   'How do I get started with Supabase?',
@@ -40,7 +42,9 @@ const defaultQuestions = [
   'How do I set up authentication?',
 ]
 
-const supportQuestions = ['What is the problem you are having?']
+const supportQuestions = [
+  "Hello! Before connecting you with support, could you tell me what the issue is? Let's see if we can find a solution together.",
+]
 
 export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
@@ -60,7 +64,7 @@ export interface Message {
   content: string
   status: MessageStatus
   supportFirstPrompt?: boolean
-  supportSecondPrompt?: string
+  supportSecondPrompt?: boolean
 }
 
 interface NewMessageAction {
@@ -125,21 +129,47 @@ export interface UseAiChatOptions {
 export function useAiChat({
   messageTemplate = (message) => message,
   setIsLoading,
-}: UseAiChatOptions) {
+  aiVariant,
+}: UseAiChatOptions & { aiVariant: string }) {
   const eventSourceRef = useRef<SSE>()
 
   const [isResponding, setIsResponding] = useState(false)
   const [hasError, setHasError] = useState(false)
 
-  const [messages, dispatchMessage] = useReducer(messageReducer, [])
+  const initialMessagesState = aiVariant === 'support' ? [{
+    role: MessageRole.Assistant,
+    content: supportQuestions[0],
+    status: MessageStatus.Complete,
+  }] : [];
+
+  const [messages, dispatchMessage] = useReducer(messageReducer, initialMessagesState);
+
 
   const router = useRouter()
+
   const projectRef = router.query.ref
 
   const [isInputDisabled, setIsInputDisabled] = useState(false)
-  const [submittedFeedback, setSubmittedFeedback] = useState<'yes' | 'no' | null>(null)
+  const [submittedFeedback, setSubmittedFeedback] = useState<boolean | null>(null)
 
-  const handleFeedback = (feedback: 'yes' | 'no') => {
+  const telemetryProps = useTelemetryProps()
+
+  useEffect(() => {
+
+    const isFeedbackSectionShown = messages.some(
+      (message) =>
+        message.supportFirstPrompt === true ||
+        message.supportSecondPrompt === true ||
+        message.status === MessageStatus.Pending
+    )
+
+
+    if (isFeedbackSectionShown) {
+      setIsInputDisabled(isFeedbackSectionShown)
+    } 
+  }, [messages])
+
+  const answerIsHelpful = (feedback: true | false) => {
     dispatchMessage({
       type: 'update',
       message: {
@@ -147,50 +177,47 @@ export function useAiChat({
       },
     })
 
-    if (feedback === 'no') {
+    if (feedback === false) {
       dispatchMessage({
         type: 'update',
         message: {
-          supportSecondPrompt: 'no',
+          supportSecondPrompt: true,
         },
       })
     } else {
       setIsInputDisabled(true)
       dispatchMessage({
-        type: 'update',
-        message: {
-          supportSecondPrompt: undefined,
-        },
-      })
-      dispatchMessage({
         type: 'new',
         message: {
           status: MessageStatus.Complete,
           role: MessageRole.Assistant,
+          supportSecondPrompt: false,
           content: 'Great to hear I could help you resolve your issue!',
         },
       })
     }
+
+    Telemetry.sendEvent(
+      {
+        category: 'support_ai_agent',
+        action: 'first_prompt_clicked',
+        label: feedback,
+      },
+      telemetryProps,
+      router
+    )
   }
 
-  const handleSubmittedFeedback = (
-    submittedFeedback: 'Ask another question' | 'Please get me in touch with Supabase Support'
-  ) => {
+  const showSupportForm = (submittedFeedback: true | false) => {
     dispatchMessage({
       type: 'update',
       message: {
         supportFirstPrompt: false,
+        supportSecondPrompt: false,
       },
     })
 
-    dispatchMessage({
-      type: 'update',
-      message: {
-        supportSecondPrompt: undefined,
-      },
-    })
-
-    if (submittedFeedback === 'Please get me in touch with Supabase Support') {
+    if (submittedFeedback === true) {
       setIsInputDisabled(true)
       dispatchMessage({
         type: 'new',
@@ -207,9 +234,10 @@ export function useAiChat({
         const queryParams = projectRef
           ? `?ref=${projectRef}&firstReply=${userFirstReply}`
           : `?firstReply=${userFirstReply}`
-        window.open(`/dashboard/support/new${queryParams}`, '_blank')
-      }, 3000)
+        window.open(`/dashboard/support/new${queryParams}`, '_blank') 
+      }, 1000)
     } else {
+      setIsInputDisabled(false)
       dispatchMessage({
         type: 'new',
         message: {
@@ -219,6 +247,16 @@ export function useAiChat({
         },
       })
     }
+
+    Telemetry.sendEvent(
+      {
+        category: 'support_ai_agent',
+        action: 'second_prompt_clicked',
+        label: submittedFeedback,
+      },
+      telemetryProps,
+      router
+    )
   }
 
   const submit = useCallback(
@@ -273,10 +311,11 @@ export function useAiChat({
 
           if (e.data === '[DONE]') {
             setIsResponding(false)
+            setIsInputDisabled(false)
             dispatchMessage({
               type: 'update',
               message: {
-                supportFirstPrompt: true,
+                supportFirstPrompt: aiVariant === 'support' ? true : false,
                 status: MessageStatus.Complete,
               },
             })
@@ -335,9 +374,9 @@ export function useAiChat({
     messages,
     isResponding,
     hasError,
-    handleFeedback,
+    answerIsHelpful,
     submittedFeedback,
-    handleSubmittedFeedback,
+    showSupportForm,
     isInputDisabled,
   }
 }
@@ -415,12 +454,13 @@ const AiCommand = () => {
     messages,
     isResponding,
     hasError,
-    handleFeedback,
+    answerIsHelpful,
     submittedFeedback,
-    handleSubmittedFeedback,
+    showSupportForm,
     isInputDisabled,
   } = useAiChat({
     setIsLoading,
+    aiVariant,
   })
 
   const inputRef = useAutoInputFocus()
@@ -457,9 +497,22 @@ const AiCommand = () => {
 
   const questions = aiVariant === 'support' ? supportQuestions : defaultQuestions
 
+  const bottomRef = useRef<HTMLDivElement>(null)
+  // try to scroll on each rerender to the bottom
+
+  useEffect(() => {
+    if (isResponding == true) {
+      if (bottomRef.current) {
+        setTimeout(() => {
+          bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
+        }, 777)
+      }
+    }
+  })
+
   return (
     <div onClick={(e) => e.stopPropagation()}>
-      <div className={cn('relative mb-[145px] py-4 max-h-[720px]')}>
+      <div className={cn('relative mb-[145px] py-4')}>
         {!hasError &&
           messages.map((message, index) => {
             switch (message.role) {
@@ -476,12 +529,14 @@ const AiCommand = () => {
                     >
                       <IconUser strokeWidth={1.5} size={16} />
                     </div>
-                    <div className="prose text-foreground-lighter">{message.content}</div>
+                    <div className="prose max-w-none text-foreground-lighter">
+                      {message.content}
+                    </div>
                   </div>
                 )
               case MessageRole.Assistant:
                 return (
-                  <div key={index} className="px-4 [overflow-anchor:none] mb-[150px]">
+                  <div key={index} className="px-4 [overflow-anchor:none] mb-[25px]">
                     <div className="flex gap-6 [overflow-anchor:none] mb-6">
                       <AiIconChat
                         loading={
@@ -497,7 +552,7 @@ const AiCommand = () => {
                             remarkPlugins={[remarkGfm]}
                             components={markdownComponents}
                             linkTarget="_blank"
-                            className="prose dark:prose-dark"
+                            className="prose max-w-none dark:prose-dark"
                             transformLinkUri={(href) => {
                               const supabaseUrl = new URL('https://supabase.com')
                               const linkUrl = new URL(href, 'https://supabase.com')
@@ -520,10 +575,10 @@ const AiCommand = () => {
                       aiVariant === 'support' && (
                         <div className="flex items-center justify-center mt-4 space-x-2">
                           <p className="prose dark:prose-dark">Was this answer helpful?</p>
-                          <Button size="tiny" type="default" onClick={() => handleFeedback('yes')}>
+                          <Button size="tiny" type="default" onClick={() => answerIsHelpful(true)}>
                             Yes
                           </Button>
-                          <Button size="tiny" type="default" onClick={() => handleFeedback('no')}>
+                          <Button size="tiny" type="default" onClick={() => answerIsHelpful(false)}>
                             No
                           </Button>
                         </div>
@@ -531,27 +586,15 @@ const AiCommand = () => {
 
                     {message.status === MessageStatus.Complete &&
                       message.supportFirstPrompt === false &&
-                      message.supportSecondPrompt !== undefined &&
+                      message.supportSecondPrompt === true &&
                       aiVariant === 'support' && (
                         <div className="flex items-center justify-center mt-4 space-x-2">
                           <p className="prose dark:prose-dark">I'm sorry to hear that.</p>
-                          <Button
-                            size="tiny"
-                            type="default"
-                            onClick={() => handleSubmittedFeedback('Ask another question')}
-                          >
+                          <Button size="tiny" type="default" onClick={() => showSupportForm(false)}>
                             Ask another question
                           </Button>
-                          <Button
-                            size="tiny"
-                            type="default"
-                            onClick={() =>
-                              handleSubmittedFeedback(
-                                'Contact Support'
-                              )
-                            }
-                          >
-                            Please get me in touch with Supabase Support
+                          <Button size="tiny" type="default" onClick={() => showSupportForm(true)}>
+                            Contact Support
                           </Button>
                         </div>
                       )}
@@ -561,7 +604,7 @@ const AiCommand = () => {
           })}
 
         {messages.length === 0 && !hasError && (
-          <CommandGroup heading={aiVariant !== 'support' ? 'Examples' : 'Support AI Bot'}>
+          <CommandGroup heading={aiVariant !== 'support' ? 'Examples' : 'Support AI Agent'}>
             {questions.map((question) => {
               const key = question.replace(/\s+/g, '_')
 
@@ -594,6 +637,7 @@ const AiCommand = () => {
             </Button>
           </div>
         )}
+        <div ref={bottomRef} className="h-1" />
 
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
@@ -602,12 +646,13 @@ const AiCommand = () => {
         <Input
           className="bg-alternative rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40"
           inputRef={inputRef}
-          autoFocus
           placeholder={
             isLoading || isResponding ? 'Waiting on an answer...' : 'Ask Supabase AI a question...'
           }
           value={search}
           disabled={isInputDisabled}
+          autoFocus
+          onFocus={(e) => e.currentTarget.select()}
           actions={
             <>
               {!isLoading && !isResponding ? (

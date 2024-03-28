@@ -8,7 +8,6 @@ import {
   IconActivity,
   IconBookOpen,
   IconHelpCircle,
-  IconMail,
   IconMessageCircle,
   IconTool,
   Popover,
@@ -19,11 +18,34 @@ import {
 } from 'ui'
 import { HelpCircle } from 'lucide-react'
 import { COMMAND_ROUTES } from '@ui/components/Command/Command.constants'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { useFlag, useSelectedOrganization } from 'hooks'
 
 const HelpPopover = () => {
   const router = useRouter()
   const projectRef = router.query.ref
-  const { setIsOpen, setAiVariant, setPages } = useCommandMenu()
+  const { setIsOpen, setAiVariant, setPages, isOpen } = useCommandMenu()
+
+  const enableAIBotSupport = useFlag('enableaibotsupport')
+
+  const selectedOrg = useSelectedOrganization()
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrg?.slug })
+  const isFreeOrg = subscription?.plan?.id === 'free'
+
+  const openSupportContactModal = () => {
+    if (isFreeOrg && enableAIBotSupport) {
+      setAiVariant('support')
+      setPages([COMMAND_ROUTES.AI])
+      setIsOpen(true)
+    } else {
+      setAiVariant('default')
+      setIsOpen(true)
+    }
+  }
+
+  if (isOpen == false) {
+    setAiVariant('default')
+  }
 
   return (
     <Popover_Shadcn_>
@@ -92,11 +114,7 @@ const HelpPopover = () => {
             <Button
               type="default"
               icon={<HelpCircle size={15} strokeWidth={2.5} className="text-light" />}
-              onClick={() => {
-                setAiVariant('support')
-                setPages([COMMAND_ROUTES.AI])
-                setIsOpen(true)
-              }}
+              onClick={openSupportContactModal}
             >
               Contact Support
             </Button>
