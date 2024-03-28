@@ -181,9 +181,16 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                 >
                   <div className="flex items-center justify-between">
                     <p className="text-sm">{role.name}</p>
-                    <Button type="default" onClick={() => onRemoveRole(role)}>
-                      Remove role
-                    </Button>
+                    <div className="flex items-center gap-x-2">
+                      {role.projects.length > 0 && (
+                        <Button type="default" onClick={() => onUpdateRole(role, [])}>
+                          Apply to all projects
+                        </Button>
+                      )}
+                      <Button type="default" onClick={() => onRemoveRole(role)}>
+                        Remove role
+                      </Button>
+                    </div>
                   </div>
                   <MultiSelectV2
                     options={(projects ?? []).map((project) => {
