@@ -30,7 +30,7 @@
     "@octokit/plugin-paginate-graphql": "^4.0.0",
     "@radix-ui/react-accordion": "^1.1.2",
     "@supabase/auth-helpers-react": "^0.4.2",
-    "@supabase/supabase-js": "^2.39.3",
+    "@supabase/supabase-js": "^2.41.1",
     "@tailwindcss/container-queries": "^0.1.1",
     "@tanstack/react-query": "^5.13.4",
     "common": "*",
