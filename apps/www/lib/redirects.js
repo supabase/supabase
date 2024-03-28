@@ -2403,4 +2403,9 @@ module.exports = [
     source: '/docs/guides/auth/sso/auth-sso-saml',
     destination: '/guides/auth/enterprise-sso/auth-sso-saml',
   },
+  {
+    permanent: true,
+    source: '/contact/mfa',
+    destination: '/docs/guides/auth/auth-mfa',
+  },
 ]

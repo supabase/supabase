@@ -70,6 +70,7 @@ const DiffEditor = dynamic(
 
 interface AIPolicyEditorPanelProps {
   visible: boolean
+  searchString?: string
   selectedPolicy?: PostgresPolicy
   onSelectCancel: () => void
 }
@@ -79,6 +80,7 @@ interface AIPolicyEditorPanelProps {
  */
 export const AIPolicyEditorPanel = memo(function ({
   visible,
+  searchString,
   selectedPolicy,
   onSelectCancel,
 }: AIPolicyEditorPanelProps) {
@@ -101,13 +103,16 @@ export const AIPolicyEditorPanel = memo(function ({
   const monacoOneRef = useRef<Monaco | null>(null)
   const editorOneRef = useRef<IStandaloneCodeEditor | null>(null)
   const [expOneLineCount, setExpOneLineCount] = useState(1)
+  const [expOneContentHeight, setExpOneContentHeight] = useState(0)
 
   const monacoTwoRef = useRef<Monaco | null>(null)
   const editorTwoRef = useRef<IStandaloneCodeEditor | null>(null)
   const [expTwoLineCount, setExpTwoLineCount] = useState(1)
+  const [expTwoContentHeight, setExpTwoContentHeight] = useState(0)
 
   // Use chat id because useChat doesn't have a reset function to clear all messages
   const [chatId, setChatId] = useState(uuidv4())
+  const [tabId, setTabId] = useState<'templates' | 'conversation'>('templates')
 
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
   const placeholder = generatePlaceholder(selectedPolicy)
@@ -121,7 +126,7 @@ export const AIPolicyEditorPanel = memo(function ({
   const [debugThread, setDebugThread] = useState<MessageWithDebug[]>([])
   const [assistantVisible, setAssistantPanel] = useState<boolean>(false)
   const [isAssistantChatInputEmpty, setIsAssistantChatInputEmpty] = useState<boolean>(true)
-  const [incomingChange, setIncomingChange] = useState<string | undefined>(undefined)
+  const [incomingChange, setIncomingChange] = useState<string>()
   // Used for confirmation when closing the panel with unsaved changes
   const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState<boolean>(false)
 
@@ -306,8 +311,13 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     const { name, table, behavior, command, roles } = data
-    const using = editorOneRef.current?.getValue().trim() ?? undefined
-    const check = editorTwoRef.current?.getValue().trim() ?? undefined
+    let using = editorOneRef.current?.getValue().trim() ?? undefined
+    let check = editorTwoRef.current?.getValue().trim()
+
+    // [Terry] b/c editorOneRef will be the check statement in this scenario
+    if (command === 'insert') {
+      check = using
+    }
 
     if (command === 'insert' && (check === undefined || check.length === 0)) {
       return setFieldError('Please provide a SQL expression for the WITH CHECK statement')
@@ -517,13 +527,14 @@ export const AIPolicyEditorPanel = memo(function ({
                       <RLSCodeEditor
                         id="rls-sql-policy"
                         defaultValue={''}
-                        editorRef={editorOneRef}
                         placeholder={placeholder}
+                        editorRef={editorOneRef}
                       />
                     </div>
                   ) : (
                     <>
                       <PolicyDetailsV2
+                        searchString={searchString}
                         isEditing={selectedPolicy !== undefined}
                         form={form}
                         onUpdateCommand={(command: string) => {
@@ -543,7 +554,7 @@ export const AIPolicyEditorPanel = memo(function ({
                           className={`py-1 relative ${incomingChange ? 'hidden' : 'block'}`}
                           style={{
                             height:
-                              expOneLineCount <= 5 ? `${8 + expOneLineCount * 20}px` : '108px',
+                              expOneContentHeight <= 100 ? `${8 + expOneContentHeight}px` : '108px',
                           }}
                         >
                           <RLSCodeEditor
@@ -554,9 +565,20 @@ export const AIPolicyEditorPanel = memo(function ({
                             monacoRef={monacoOneRef as any}
                             lineNumberStart={6}
                             onChange={() => {
+                              setExpOneContentHeight(editorOneRef.current?.getContentHeight() ?? 0)
                               setExpOneLineCount(
                                 editorOneRef.current?.getModel()?.getLineCount() ?? 1
                               )
+                            }}
+                            onMount={() => {
+                              setTimeout(() => {
+                                setExpOneContentHeight(
+                                  editorOneRef.current?.getContentHeight() ?? 0
+                                )
+                                setExpOneLineCount(
+                                  editorOneRef.current?.getModel()?.getLineCount() ?? 1
+                                )
+                              }, 200)
                             }}
                           />
                         </div>
@@ -589,7 +611,9 @@ export const AIPolicyEditorPanel = memo(function ({
                               className={`py-1 relative ${incomingChange ? 'hidden' : 'block'}`}
                               style={{
                                 height:
-                                  expTwoLineCount <= 5 ? `${8 + expTwoLineCount * 20}px` : '108px',
+                                  expTwoContentHeight <= 100
+                                    ? `${8 + expTwoContentHeight}px`
+                                    : '108px',
                               }}
                             >
                               <RLSCodeEditor
@@ -600,9 +624,22 @@ export const AIPolicyEditorPanel = memo(function ({
                                 monacoRef={monacoTwoRef as any}
                                 lineNumberStart={7 + expOneLineCount}
                                 onChange={() => {
+                                  setExpTwoContentHeight(
+                                    editorTwoRef.current?.getContentHeight() ?? 0
+                                  )
                                   setExpTwoLineCount(
                                     editorTwoRef.current?.getModel()?.getLineCount() ?? 1
                                   )
+                                }}
+                                onMount={() => {
+                                  setTimeout(() => {
+                                    setExpTwoContentHeight(
+                                      editorTwoRef.current?.getContentHeight() ?? 0
+                                    )
+                                    setExpTwoLineCount(
+                                      editorTwoRef.current?.getModel()?.getLineCount() ?? 1
+                                    )
+                                  }, 200)
                                 }}
                               />
                             </div>
@@ -660,7 +697,10 @@ export const AIPolicyEditorPanel = memo(function ({
                     {error !== undefined && (
                       <QueryError
                         error={error}
-                        onSelectDebug={onSelectDebug}
+                        onSelectDebug={() => {
+                          setTabId('conversation')
+                          onSelectDebug()
+                        }}
                         open={errorPanelOpen}
                         setOpen={setErrorPanelOpen}
                       />
@@ -678,6 +718,20 @@ export const AIPolicyEditorPanel = memo(function ({
                         htmlType="submit"
                         loading={isExecuting || isUpdating}
                         disabled={isExecuting || isUpdating || incomingChange !== undefined}
+                        onClick={() => {
+                          if (isAiAssistantEnabled) {
+                            const sql = editorOneRef.current?.getValue().trim()
+                            if (!sql) return onSelectCancel()
+                            executeMutation({
+                              sql: sql,
+                              projectRef: selectedProject?.ref,
+                              connectionString: selectedProject?.connectionString,
+                              handleError: (error) => {
+                                throw error
+                              },
+                            })
+                          }
+                        }}
                       >
                         Save policy
                       </Button>
@@ -693,11 +747,16 @@ export const AIPolicyEditorPanel = memo(function ({
                     'bg-studio'
                   )}
                 >
-                  <Tabs_Shadcn_ defaultValue="templates" className="flex flex-col h-full w-full">
+                  <Tabs_Shadcn_
+                    value={tabId}
+                    defaultValue="templates"
+                    className="flex flex-col h-full w-full"
+                  >
                     <TabsList_Shadcn_ className="flex gap-4 px-content pt-2">
                       <TabsTrigger_Shadcn_
                         key="templates"
                         value="templates"
+                        onClick={() => setTabId('templates')}
                         className="px-0 data-[state=active]:bg-transparent"
                       >
                         Templates
@@ -706,6 +765,7 @@ export const AIPolicyEditorPanel = memo(function ({
                         <TabsTrigger_Shadcn_
                           key="conversation"
                           value="conversation"
+                          onClick={() => setTabId('conversation')}
                           className="px-0 data-[state=active]:bg-transparent"
                         >
                           Assistant
@@ -721,26 +781,34 @@ export const AIPolicyEditorPanel = memo(function ({
                     >
                       <ScrollArea className="h-full w-full">
                         <PolicyTemplates
+                          table={table}
                           selectedPolicy={selectedPolicy}
                           selectedTemplate={selectedDiff}
                           onSelectTemplate={(value) => {
-                            form.setValue('name', value.name)
-                            form.setValue('behavior', 'permissive')
-                            form.setValue('command', value.command.toLowerCase())
-                            form.setValue('roles', value.roles.join(', ') ?? '')
-
-                            setUsing(`  ${value.definition}`)
-                            setCheck(`  ${value.check}`)
-                            setExpOneLineCount(1)
-                            setExpTwoLineCount(1)
-                            setFieldError(undefined)
-
-                            if (!['update', 'all'].includes(value.command.toLowerCase())) {
-                              setShowCheckBlock(false)
-                            } else if (value.check.length > 0) {
-                              setShowCheckBlock(true)
+                            if (isAiAssistantEnabled) {
+                              updateEditorWithCheckForDiff({
+                                id: value.id,
+                                content: value.statement,
+                              })
                             } else {
-                              setShowCheckBlock(false)
+                              form.setValue('name', value.name)
+                              form.setValue('behavior', 'permissive')
+                              form.setValue('command', value.command.toLowerCase())
+                              form.setValue('roles', value.roles.join(', ') ?? '')
+
+                              setUsing(`  ${value.definition}`)
+                              setCheck(`  ${value.check}`)
+                              setExpOneLineCount(1)
+                              setExpTwoLineCount(1)
+                              setFieldError(undefined)
+
+                              if (!['update', 'all'].includes(value.command.toLowerCase())) {
+                                setShowCheckBlock(false)
+                              } else if (value.check.length > 0) {
+                                setShowCheckBlock(true)
+                              } else {
+                                setShowCheckBlock(false)
+                              }
                             }
                           }}
                         />

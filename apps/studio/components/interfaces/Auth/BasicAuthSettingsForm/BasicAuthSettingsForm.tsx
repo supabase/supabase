@@ -31,6 +31,8 @@ import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutati
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
+import Link from 'next/link'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import FormField from '../AuthProvidersForm/FormField'
 
 // Use a const string to represent no chars option. Represented as empty string on the backend side.
@@ -41,18 +43,20 @@ const LOWER_UPPER_DIGITS_SYMBOLS = LOWER_UPPER_DIGITS + ':!@#$%^&*()_+-=[]{};\'\
 
 const schema = object({
   DISABLE_SIGNUP: boolean().required(),
+  EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean().required(),
   SECURITY_MANUAL_LINKING_ENABLED: boolean().required(),
   SITE_URL: string().required('Must have a Site URL'),
   SECURITY_CAPTCHA_ENABLED: boolean().required(),
   SECURITY_CAPTCHA_SECRET: string().when('SECURITY_CAPTCHA_ENABLED', {
     is: true,
-    then: string().required('Must have a Captcha secret'),
+    then: (schema) => schema.required('Must have a Captcha secret'),
   }),
   SECURITY_CAPTCHA_PROVIDER: string().when('SECURITY_CAPTCHA_ENABLED', {
     is: true,
-    then: string()
-      .oneOf(['hcaptcha', 'turnstile'])
-      .required('Captcha provider must be either hcaptcha or turnstile'),
+    then: (schema) =>
+      schema
+        .oneOf(['hcaptcha', 'turnstile'])
+        .required('Captcha provider must be either hcaptcha or turnstile'),
   }),
   SESSIONS_TIMEBOX: number().min(0, 'Must be a positive number'),
   SESSIONS_INACTIVITY_TIMEOUT: number().min(0, 'Must be a positive number'),
@@ -101,6 +105,7 @@ const BasicAuthSettingsForm = () => {
 
   const INITIAL_VALUES = {
     DISABLE_SIGNUP: !authConfig?.DISABLE_SIGNUP,
+    EXTERNAL_ANONYMOUS_USERS_ENABLED: authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED,
     SECURITY_MANUAL_LINKING_ENABLED: authConfig?.SECURITY_MANUAL_LINKING_ENABLED || false,
     SITE_URL: authConfig?.SITE_URL,
     SECURITY_CAPTCHA_ENABLED: authConfig?.SECURITY_CAPTCHA_ENABLED || false,
@@ -202,6 +207,71 @@ const BasicAuthSettingsForm = () => {
                     }
                     disabled={!canUpdateConfig}
                   />
+                  <Toggle
+                    id="EXTERNAL_ANONYMOUS_USERS_ENABLED"
+                    size="small"
+                    label="Allow anonymous sign-ins"
+                    layout="flex"
+                    descriptionText={
+                      <Markdown
+                        extLinks
+                        className="[&>p>a]:text-foreground-light [&>p>a]:transition-all [&>p>a]:hover:text-foreground [&>p>a]:hover:decoration-brand"
+                        content="Enable [anonymous sign-ins](https://supabase.com/docs/guides/auth/auth-anonymous) for your project."
+                      />
+                    }
+                    disabled={!canUpdateConfig}
+                  />
+                  {values.EXTERNAL_ANONYMOUS_USERS_ENABLED && (
+                    <div className="flex flex-col gap-y-2">
+                      <Alert_Shadcn_
+                        className="flex w-full items-center justify-between"
+                        variant="warning"
+                      >
+                        <WarningIcon />
+                        <div>
+                          <AlertTitle_Shadcn_>
+                            Anonymous users will use the{' '}
+                            <code className="text-xs">authenticated</code> role when signing in
+                          </AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_>
+                            As a result, anonymous users will be subjected to RLS policies that
+                            apply to the <code className="text-xs">public</code> and{' '}
+                            <code className="text-xs">authenticated</code> roles. We strongly advise{' '}
+                            <Link
+                              href={`/project/${projectRef}/auth/policies`}
+                              className="text-foreground underline"
+                            >
+                              reviewing your RLS policies
+                            </Link>{' '}
+                            to ensure that access to your data is restricted where required.
+                          </AlertDescription_Shadcn_>
+                        </div>
+                      </Alert_Shadcn_>
+                      {!values.SECURITY_CAPTCHA_ENABLED && (
+                        <Alert_Shadcn_>
+                          <WarningIcon />
+                          <AlertTitle_Shadcn_>
+                            We highly recommend{' '}
+                            <span
+                              tabIndex={1}
+                              className="cursor-pointer underline"
+                              onClick={() => {
+                                const el = document.getElementById('enable-captcha')
+                                if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+                              }}
+                            >
+                              enabling captcha
+                            </span>{' '}
+                            for anonymous sign-ins
+                          </AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_>
+                            This will prevent potential abuse on sign-ins which may bloat your
+                            database and incur costs for monthly active users (MAU)
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
+                      )}
+                    </div>
+                  )}
                 </FormSectionContent>
               </FormSection>
               <FormSection header={<FormSectionLabel>Passwords</FormSectionLabel>}>
@@ -309,7 +379,10 @@ const BasicAuthSettingsForm = () => {
                   />
                 </FormSectionContent>
               </FormSection>
-              <FormSection header={<FormSectionLabel>Bot and Abuse Protection</FormSectionLabel>}>
+              <FormSection
+                id="enable-captcha"
+                header={<FormSectionLabel>Bot and Abuse Protection</FormSectionLabel>}
+              >
                 <FormSectionContent loading={isLoading}>
                   <Toggle
                     id="SECURITY_CAPTCHA_ENABLED"

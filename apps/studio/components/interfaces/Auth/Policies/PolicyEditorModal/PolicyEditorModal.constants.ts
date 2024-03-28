@@ -23,7 +23,7 @@ export const getGeneralPolicyTemplates = (schema: string, table: string): Policy
       'This policy gives read access to your table for all users via the SELECT operation.',
     statement: `
 create policy "Enable read access for all users"
-on ${schema}.${table}
+on "${schema}"."${table}"
 for select using (true);`.trim(),
     name: 'Enable read access for all users',
     definition: 'true',

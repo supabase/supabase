@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useTablesQuery } from 'data/tables/tables-query'
@@ -13,6 +14,7 @@ import {
   Input_Shadcn_,
   RadioGroupLargeItem_Shadcn_,
   RadioGroup_Shadcn_,
+  ScrollArea,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
@@ -22,12 +24,18 @@ import {
 import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
 
 interface PolicyDetailsV2Props {
+  searchString?: string
   isEditing: boolean
   form: any
   onUpdateCommand: (command: string) => void
 }
 
-export const PolicyDetailsV2 = ({ isEditing, form, onUpdateCommand }: PolicyDetailsV2Props) => {
+export const PolicyDetailsV2 = ({
+  searchString,
+  isEditing,
+  form,
+  onUpdateCommand,
+}: PolicyDetailsV2Props) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
@@ -55,8 +63,19 @@ export const PolicyDetailsV2 = ({ isEditing, form, onUpdateCommand }: PolicyDeta
     .sort((a, b) => a.name.localeCompare(b.name))
 
   useEffect(() => {
-    if (!isEditing && isSuccessTables && tables.length > 0) form.setValue('table', tables[0].name)
-  }, [isEditing, isSuccessTables, tables])
+    if (!isEditing) {
+      const table = tables?.find(
+        (table) =>
+          table.schema === snap.selectedSchemaName &&
+          (table.id.toString() === searchString || table.name === searchString)
+      )
+      if (table) {
+        form.setValue('table', table.name)
+      } else if (isSuccessTables && tables.length > 0) {
+        form.setValue('table', tables[0].name)
+      }
+    }
+  }, [isEditing, form, searchString, tables, isSuccessTables])
 
   return (
     <>
@@ -102,11 +121,17 @@ export const PolicyDetailsV2 = ({ isEditing, form, onUpdateCommand }: PolicyDeta
                     </SelectTrigger_Shadcn_>
                     <SelectContent_Shadcn_>
                       <SelectGroup_Shadcn_>
-                        {(tables ?? []).map((table) => (
-                          <SelectItem_Shadcn_ key={table.id} value={table.name} className="text-sm">
-                            {table.name}
-                          </SelectItem_Shadcn_>
-                        ))}
+                        <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>
+                          {(tables ?? []).map((table) => (
+                            <SelectItem_Shadcn_
+                              key={table.id}
+                              value={table.name}
+                              className="text-sm"
+                            >
+                              {table.name}
+                            </SelectItem_Shadcn_>
+                          ))}
+                        </ScrollArea>
                       </SelectGroup_Shadcn_>
                     </SelectContent_Shadcn_>
                   </Select_Shadcn_>
