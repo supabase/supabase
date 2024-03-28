@@ -100,8 +100,6 @@ const LW11Background = ({ className }: { className?: string }) => {
   function animate(clock?: number) {
     if (!isBrowser) return
 
-    // c?.clearRect(0, 0, size.w, size.h)
-
     for (let i = 0; i < dotsArray.length; i++) {
       dotsArray[i].update(c, clock)
     }
