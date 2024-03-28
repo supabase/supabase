@@ -199,11 +199,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "lwx_tickets_id_fkey"
-            columns: ["id"]
+            foreignKeyName: 'lwx_tickets_id_fkey'
+            columns: ['id']
             isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
+            referencedRelation: 'users'
+            referencedColumns: ['id']
           },
         ]
       }
