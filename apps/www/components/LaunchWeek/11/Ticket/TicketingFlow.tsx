@@ -1,12 +1,12 @@
 import React from 'react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
-import Link from 'next/link'
 import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
 import { cn } from 'ui'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import { LW11_DATE, LW11_LAUNCH_DATE } from '~/lib/constants'
 import useWinningChances from '../../hooks/useWinningChances'
+import useLwGame from '../../hooks/useLwGame'
 
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -16,8 +16,6 @@ import TicketForm from './TicketForm'
 import CountdownComponent from '../Countdown'
 import TicketPresence from './TicketPresence'
 import TicketActions from './TicketActions'
-import useLwGame from '../../hooks/useLwGame'
-import GALogo from '../GALogo'
 
 const LWGame = dynamic(() => import('./LW11Game'))
 

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import anime from 'animejs'
+import { useWindowSize } from 'react-use'
 import { isBrowser } from 'common'
-import { debounce } from 'lodash'
 import { Dot } from './Dot'
 import { cn } from 'ui'
 
 const defaultConfig = {
-  dotGrid: 20,
+  dotGrid: 40,
   percentageLarge: 0.995,
   percentageAnimated: 0.95,
   randomizeLargeDots: 3,
@@ -24,8 +24,9 @@ const defaultConfig = {
 const LW11Background = ({ className }: { className?: string }) => {
   const canvasRef = React.useRef<HTMLCanvasElement>(null)
   const [size, setSize] = useState({ w: 1200, h: 800 })
-  const [config, setConfig] = useState(defaultConfig)
+  const [config] = useState(defaultConfig)
   const [hasInitialized, setHasInitialized] = useState(false)
+  const Window = useWindowSize()
 
   const DOT_AREA = config.dotGrid
   let c = canvasRef.current?.getContext('2d')
@@ -33,13 +34,15 @@ const LW11Background = ({ className }: { className?: string }) => {
 
   function init() {
     if (!c) return
+
     setHasInitialized(true)
     c = canvasRef.current?.getContext('2d')!
     c.clearRect(0, 0, size.w, size.h)
     dotsArray = []
-
     const GRID_COLS = Math.floor(size.w / DOT_AREA)
     const GRID_ROWS = Math.floor(size.h / DOT_AREA)
+
+    console.log(c, size, GRID_COLS, GRID_ROWS)
 
     for (let i = 0; i < GRID_COLS; i++) {
       for (let j = 0; j < GRID_ROWS; j++) {
@@ -94,74 +97,10 @@ const LW11Background = ({ className }: { className?: string }) => {
     animate(0)
   }
 
-  // const handleSetConfig = (name: string, value: any) => {
-  //   setConfig((prevConfig: any) => ({ ...prevConfig, [name]: value }))
-  // }
-
-  // async function initGUI() {
-  //   // if (!isSandbox) return
-  //   const dat = await import('dat.gui')
-  //   const gui = new dat.GUI()
-  //   gui.width = 200
-
-  //   gui
-  //     .add(config, 'dotGrid')
-  //     .name('Dot area (px)')
-  //     .onChange((v) => handleSetConfig('dotGrid', v))
-  //   gui
-  //     .add(config, 'percentageLarge')
-  //     .name('Large dots %')
-  //     .onChange((v) => handleSetConfig('percentageLarge', v))
-  //   gui
-  //     .add(config, 'percentageAnimated')
-  //     .name('Animatedd dots %')
-  //     .onChange((v) => handleSetConfig('percentageAnimated', v))
-  //   gui
-  //     .add(config, 'randomizeLargeDots')
-  //     .name('Large Dots size (px)')
-  //     .onChange((v) => handleSetConfig('randomizeLargeDots', v))
-  //   gui
-  //     .add(config, 'randomizeSmallDots')
-  //     .name('Small Dots size (px)')
-  //     .onChange((v) => handleSetConfig('randomizeSmallDots', v))
-  //   gui
-  //     .add(config, 'minSpeed')
-  //     .name('Min Speed')
-  //     .onChange((v) => handleSetConfig('minSpeed', v))
-  //   gui
-  //     .add(config, 'maxSpeed')
-  //     .name('Max Speed')
-  //     .onChange((v) => handleSetConfig('maxSpeed', v))
-  //   gui
-  //     .add(config, 'minOscillation')
-  //     .name('Min Oscillation (px)')
-  //     .onChange((v) => handleSetConfig('minOscillation', v))
-  //   gui
-  //     .add(config, 'maxOscillation')
-  //     .name('Max Oscillation (px)')
-  //     .onChange((v) => handleSetConfig('maxOscillation', v))
-  //   gui
-  //     .add(config, 'minDelay')
-  //     .name('Min Delay (ms)')
-  //     .onChange((v) => handleSetConfig('minDelay', v))
-  //   gui
-  //     .add(config, 'maxDelay')
-  //     .name('Max Delay (ms)')
-  //     .onChange((v) => handleSetConfig('maxDelay', v))
-  //   gui
-  //     .add(config, 'minDuration')
-  //     .name('Min Duration (ms)')
-  //     .onChange((v) => handleSetConfig('minDuration', v))
-  //   gui
-  //     .add(config, 'maxDuration')
-  //     .name('Max Duration (ms)')
-  //     .onChange((v) => handleSetConfig('maxDuration', v))
-  // }
-
   function animate(clock?: number) {
     if (!isBrowser) return
 
-    c?.clearRect(0, 0, size.w, size.h)
+    // c?.clearRect(0, 0, size.w, size.h)
 
     for (let i = 0; i < dotsArray.length; i++) {
       dotsArray[i].update(c, clock)
@@ -204,22 +143,19 @@ const LW11Background = ({ className }: { className?: string }) => {
   }
 
   function resize() {
-    setSize({ w: canvasRef.current?.clientWidth!, h: canvasRef.current?.clientHeight! })
+    console.log('resizing')
+    setSize({ w: Window.width, h: Window.height })
     init()
   }
 
   useEffect(() => {
     if (!isBrowser) return
-    const handleDebouncedResize = debounce(() => resize(), 100)
-    window.addEventListener('resize', handleDebouncedResize)
-
-    return () => window?.removeEventListener('resize', handleDebouncedResize)
-  }, [])
+    resize()
+  }, [Window])
 
   useEffect(() => {
     resize()
     init()
-    // initGUI()
   }, [])
 
   !hasInitialized && init()
