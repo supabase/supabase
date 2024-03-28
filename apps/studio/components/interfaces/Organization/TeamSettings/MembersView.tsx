@@ -31,6 +31,7 @@ import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
 import MemberActions from './MemberActions'
 import RolesHelperModal from './RolesHelperModal/RolesHelperModal'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
+import { useProjectsQuery } from 'data/projects/projects-query'
 
 interface SelectedMember extends OrganizationMember {
   oldRoleId: number
@@ -47,6 +48,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
 
   const { profile } = useProfile()
   const { data: permissions } = usePermissionsQuery()
+  const { data: projects } = useProjectsQuery()
   const {
     data: members,
     error: membersError,
@@ -210,11 +212,30 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                         <Table.td>
                           {x.role_ids.map((id) => {
                             const role = (roles ?? []).find((role) => role.id === id)
+                            const projectsApplied = projects?.map((p) => p.name) ?? []
                             return (
                               <div key={`role-${id}`} className="flex items-center gap-x-2">
                                 <span>{role?.name}</span>
                                 <span>•</span>
-                                <span>All projects</span>
+                                <Tooltip_Shadcn_>
+                                  <TooltipTrigger_Shadcn_ asChild>
+                                    <span className="text-foreground">All projects</span>
+                                  </TooltipTrigger_Shadcn_>
+                                  <TooltipContent_Shadcn_
+                                    side="bottom"
+                                    className="flex flex-col gap-y-1"
+                                  >
+                                    {projectsApplied
+                                      ?.slice(0, 2)
+                                      .map((name) => <span key={name}>{name}</span>)}
+                                    {projectsApplied.length > 2 && (
+                                      <span>
+                                        And {projectsApplied.length - 2} other project
+                                        {projectsApplied.length > 4 ? 's' : ''}
+                                      </span>
+                                    )}
+                                  </TooltipContent_Shadcn_>
+                                </Tooltip_Shadcn_>
                               </div>
                             )
                           })}
