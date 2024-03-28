@@ -69,7 +69,7 @@ const MetaFaviconsPagesRouter = ({
       <meta name="msapplication-square310x310logo" content={`${basePath}${route}/mstile-310x310.png`} />
       <meta name="theme-color" content={`#${themeColor}`} />
       <link rel="shortcut icon" href={`${basePath}${route}/favicon.ico`} />
-      <link rel="icon" type="image/png" href={`${basePath}${route}/favicon.ico`} />
+      <link rel="icon" type="image/x-icon" href={`${basePath}${route}/favicon.ico`} />
       <link rel="apple-touch-icon" href={`${basePath}${route}/favicon.ico`} />
       {includeRssXmlFeed && (
         <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />
