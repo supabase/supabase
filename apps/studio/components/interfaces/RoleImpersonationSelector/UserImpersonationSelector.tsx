@@ -137,7 +137,9 @@ interface UserRowProps {
 
 const UserImpersonatingRow = ({ user, onClick, isImpersonating = false }: UserRowProps) => {
   const avatarUrl = getAvatarUrl(user)
-  const displayName = getDisplayName(user, user.email ?? user.phone ?? user.id ?? 'Unknown')
+  const displayName =
+    getDisplayName(user, user.email ?? user.phone ?? user.id ?? 'Unknown') +
+    (user.is_anonymous ? ' (anonymous)' : '')
 
   return (
     <div className="flex items-center gap-3 py-2 text-foreground">
@@ -173,7 +175,9 @@ interface UserRowProps {
 
 const UserRow = ({ user, onClick, isImpersonating = false }: UserRowProps) => {
   const avatarUrl = getAvatarUrl(user)
-  const displayName = getDisplayName(user, user.email ?? user.phone ?? user.id ?? 'Unknown')
+  const displayName =
+    getDisplayName(user, user.email ?? user.phone ?? user.id ?? 'Unknown') +
+    (user.is_anonymous ? ' (anonymous)' : '')
 
   return (
     <div className="flex items-center justify-between py-2 text-foreground">
