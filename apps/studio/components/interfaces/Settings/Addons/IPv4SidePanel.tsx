@@ -1,23 +1,22 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import clsx from 'clsx'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonRemoveMutation } from 'data/subscriptions/project-addon-remove-mutation'
 import { useProjectAddonUpdateMutation } from 'data/subscriptions/project-addon-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import type { AddonVariantId } from 'data/subscriptions/types'
+import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { formatCurrency } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
-import { Alert, Button, IconExternalLink, Radio, SidePanel } from 'ui'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { AddonVariantId } from 'data/subscriptions/types'
-import { formatCurrency } from 'lib/helpers'
+import { Alert, Button, IconExternalLink, Radio, SidePanel, cn } from 'ui'
 
 const IPv4SidePanel = () => {
-  const { ui } = useStore()
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const organization = useSelectedOrganization()
@@ -40,34 +39,20 @@ const IPv4SidePanel = () => {
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { mutate: updateAddon, isLoading: isUpdating } = useProjectAddonUpdateMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully enabled IPv4`,
-      })
+      toast.success(`Successfully enabled IPv4`)
       onClose()
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to enable IPv4: ${error.message}`,
-      })
+      toast.error(`Unable to enable IPv4: ${error.message}`)
     },
   })
   const { mutate: removeAddon, isLoading: isRemoving } = useProjectAddonRemoveMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully disabled IPv4.`,
-      })
+      toast.success(`Successfully disabled IPv4.`)
       onClose()
     },
     onError: (error) => {
-      ui.setNotification({
-        error,
-        category: 'error',
-        message: `Unable to disable IPv4: ${error.message}`,
-      })
+      toast.error(`Unable to disable IPv4: ${error.message}`)
     },
   })
   const isSubmitting = isUpdating || isRemoving
@@ -120,26 +105,24 @@ const IPv4SidePanel = () => {
       onCancel={onClose}
       onConfirm={onConfirm}
       loading={isLoading || isSubmitting}
-      disabled={true}
-      tooltip="Temporarily disabled while we are migrating to IPv6, please check back later."
-      /*disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateIPv4}
+      disabled={isFreePlan || isLoading || !hasChanges || isSubmitting || !canUpdateIPv4}
       tooltip={
         isFreePlan
           ? 'Unable to enable IPv4 on a free plan'
           : !canUpdateIPv4
             ? 'You do not have permission to update IPv4'
             : undefined
-      }*/
+      }
       header={
         <div className="flex items-center justify-between">
-          <h4>IPv4 address</h4>
+          <h4>Dedicated IPv4 address</h4>
           <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
             <Link
               href="https://supabase.com/docs/guides/platform/ipv4-address"
               target="_blank"
               rel="noreferrer"
             >
-              About IPv4 deprecation
+              About dedicated IPv4 addresses
             </Link>
           </Button>
         </div>
@@ -149,17 +132,19 @@ const IPv4SidePanel = () => {
         <div className="py-6 space-y-4">
           <p className="text-sm">
             Direct connections to the database only work if your client is able to resolve IPv6
-            addresses from January 26th. Enabling the IPv4 add-on allows you to directly connect to
-            your database via a IPv4 address. If you are connecting via our connection pooler, you
-            do not need this add-on as our pooler resolves to IPv4 addresses. You can check your
-            connection info in your{' '}
+            addresses. Enabling the dedicated IPv4 add-on allows you to directly connect to your
+            database via a IPv4 address.
+          </p>
+          <p className="text-sm">
+            If you are connecting via our connection pooler, you do not need this add-on as our
+            pooler resolves to IPv4 addresses. You can check your connection info in your{' '}
             <Link href={`/project/${projectRef}/settings/database`} className="text-brand">
               project database settings
             </Link>
             .
           </p>
 
-          <div className={clsx('!mt-8 pb-4', isFreePlan && 'opacity-75')}>
+          <div className={cn('!mt-8 pb-4', isFreePlan && 'opacity-75')}>
             <Radio.Group
               type="large-cards"
               size="tiny"
@@ -215,7 +200,7 @@ const IPv4SidePanel = () => {
                 >
                   <div className="w-full group">
                     <div className="border-b border-default px-4 py-2 group-hover:border-control">
-                      <p className="text-sm">IPv4 address</p>
+                      <p className="text-sm">Dedicated IPv4 address</p>
                     </div>
                     <div className="px-4 py-2">
                       <p className="text-foreground-light">

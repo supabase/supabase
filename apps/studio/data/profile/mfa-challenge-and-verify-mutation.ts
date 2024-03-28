@@ -1,4 +1,4 @@
-import { AuthMFAVerifyResponse, MFAChallengeAndVerifyParams } from '@supabase/supabase-js'
+import type { AuthMFAVerifyResponse, MFAChallengeAndVerifyParams } from '@supabase/supabase-js'
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { auth } from 'lib/gotrue'
 import { profileKeys } from './keys'

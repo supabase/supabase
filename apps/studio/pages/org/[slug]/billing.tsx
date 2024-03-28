@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { BillingSettings } from 'components/interfaces/Organization'
 import { OrganizationLayout } from 'components/layouts'
-import Loading from 'components/ui/Loading'
+import { Loading } from 'components/ui/Loading'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { useSelectedOrganization } from 'hooks'
 import { useEffect } from 'react'
@@ -9,7 +9,7 @@ import {
   ORG_SETTINGS_PANEL_KEYS,
   useOrgSettingsPageStateSnapshot,
 } from 'state/organization-settings'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const OrgBillingSettings: NextPageWithLayout = () => {
   const { panel } = useParams()

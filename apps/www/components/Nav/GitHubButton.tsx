@@ -1,10 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from 'ui'
-import { Octokit } from 'octokit'
 
 const GitHubButton = () => {
-  const [stars, setStars] = useState<string>('60.8')
-  const octokit = new Octokit()
+  const [stars, setStars] = useState<string>('63')
 
   const kFormatter = (num: number) => {
     const kFormat = num / 1000
@@ -17,6 +15,8 @@ const GitHubButton = () => {
 
   useEffect(() => {
     async function fetchOctoData() {
+      const { Octokit } = await import('@octokit/core')
+      const octokit = new Octokit()
       const res = await octokit.request('GET /repos/{org}/{repo}', {
         org: 'supabase',
         repo: 'supabase',

@@ -2,6 +2,7 @@ import { createHash } from 'crypto'
 import { ObjectExpression } from 'estree'
 import { readFile } from 'fs/promises'
 import GithubSlugger from 'github-slugger'
+import matter from 'gray-matter'
 import { Content, Root } from 'mdast'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { MdxjsEsm, mdxFromMarkdown } from 'mdast-util-mdx'
@@ -118,15 +119,28 @@ export function parseHeading(heading: string): { heading: string; customAnchor?:
  * It extracts metadata, strips it of all JSX,
  * and splits it into sub-sections based on criteria.
  */
-export function processMdxForSearch(content: string): ProcessedMdx {
-  const checksum = createHash('sha256').update(content).digest('base64')
+export function processMdxForSearch(_content: string, options?: { yaml?: boolean }): ProcessedMdx {
+  const checksum = createHash('sha256').update(_content).digest('base64')
+
+  let frontmatter: Record<string, unknown> = {}
+  let content = _content
+  if (options?.yaml) {
+    const parsed = matter(_content)
+    frontmatter = parsed.data
+    content = parsed.content
+  }
 
   const mdxTree = fromMarkdown(content, {
     extensions: [mdxjs()],
     mdastExtensions: [mdxFromMarkdown()],
   })
 
-  const meta = extractMetaExport(mdxTree)
+  let meta: Record<string, unknown>
+  if (options?.yaml) {
+    meta = frontmatter
+  } else {
+    meta = extractMetaExport(mdxTree)
+  }
 
   const serializableMeta: Json = meta && JSON.parse(JSON.stringify(meta))
 
@@ -194,15 +208,16 @@ export class MarkdownLoader extends BaseLoader {
 
   constructor(
     source: string,
-    public filePath: string
+    public filePath: string,
+    public options?: { yaml?: boolean }
   ) {
-    const path = filePath.replace(/^pages/, '').replace(/\.mdx?$/, '')
+    const path = filePath.replace(/^(pages|content)/, '').replace(/\.mdx?$/, '')
     super(source, path)
   }
 
   async load() {
     const contents = await readFile(this.filePath, 'utf8')
-    return [new MarkdownSource(this.source, this.path, contents)]
+    return [new MarkdownSource(this.source, this.path, contents, this.options)]
   }
 }
 
@@ -212,13 +227,14 @@ export class MarkdownSource extends BaseSource {
   constructor(
     source: string,
     path: string,
-    public contents: string
+    public contents: string,
+    public options?: { yaml?: boolean }
   ) {
     super(source, path)
   }
 
   process() {
-    const { checksum, meta, sections } = processMdxForSearch(this.contents)
+    const { checksum, meta, sections } = processMdxForSearch(this.contents, this.options)
 
     this.checksum = checksum
     this.meta = meta

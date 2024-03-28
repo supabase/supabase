@@ -1,18 +1,17 @@
-import { observer } from 'mobx-react-lite'
-
 import {
   AccountInformation,
   AnalyticsSettings,
   ThemeSettings,
+  ThemeSettingsOld,
 } from 'components/interfaces/Account/Preferences'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { AccountLayout } from 'components/layouts'
 import AlertError from 'components/ui/AlertError'
 import Panel from 'components/ui/Panel'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useIsFeatureEnabled } from 'hooks'
+import { useFlag, useIsFeatureEnabled } from 'hooks'
 import { useProfile } from 'lib/profile'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const User: NextPageWithLayout = () => {
   return (
@@ -38,10 +37,12 @@ User.getLayout = (page) => (
 
 export default User
 
-const ProfileCard = observer(() => {
+const ProfileCard = () => {
   const profileUpdateEnabled = useIsFeatureEnabled('profile:update')
 
   const { profile, error, isLoading, isError, isSuccess } = useProfile()
+
+  const experimentalThemeEnabled = useFlag('enableExperimentalTheme')
 
   return (
     <article className="max-w-4xl p-4">
@@ -68,13 +69,11 @@ const ProfileCard = observer(() => {
         </>
       )}
 
-      <section>
-        <ThemeSettings />
-      </section>
+      <section>{experimentalThemeEnabled ? <ThemeSettings /> : <ThemeSettingsOld />}</section>
 
       <section>
         <AnalyticsSettings />
       </section>
     </article>
   )
-})
+}

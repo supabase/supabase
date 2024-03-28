@@ -1,13 +1,16 @@
-import Editor, { OnChange, OnMount } from '@monaco-editor/react'
-import { editor } from 'monaco-editor'
-import { MutableRefObject, useRef } from 'react'
+import Editor, { Monaco, OnChange, OnMount, useMonaco } from '@monaco-editor/react'
+import type { editor } from 'monaco-editor'
+import { MutableRefObject, useEffect, useRef } from 'react'
 import { cn } from 'ui'
 
-import { alignEditor } from 'components/ui/CodeEditor'
 import { Markdown } from 'components/interfaces/Markdown'
+import { noop } from 'lodash'
+import { formatQuery } from 'data/sql/format-sql-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 // [Joshen] Is there a way we can just have one single MonacoEditor component that's shared across the dashboard?
-// Feels like we're creating multiple copies of Editor
+// Feels like we're creating multiple copies of Editor. I'm keen to make this one the defacto as well so lets make sure
+// this component does not have RLS specific logic
 
 interface RLSCodeEditorProps {
   id: string
@@ -17,7 +20,14 @@ interface RLSCodeEditorProps {
   className?: string
   value?: string
   placeholder?: string
+  readOnly?: boolean
+
+  lineNumberStart?: number
+  onChange?: () => void
+  onMount?: () => void
+
   editorRef: MutableRefObject<editor.IStandaloneCodeEditor | null>
+  monacoRef?: MutableRefObject<Monaco>
 }
 
 const RLSCodeEditor = ({
@@ -27,18 +37,41 @@ const RLSCodeEditor = ({
   className,
   value,
   placeholder,
+  readOnly = false,
+
+  lineNumberStart,
+  onChange = noop,
+  onMount: _onMount = noop,
+
   editorRef,
+  monacoRef,
 }: RLSCodeEditorProps) => {
   const hasValue = useRef<any>()
+  const monaco = useMonaco()
+  const { project } = useProjectContext()
+
+  const options: editor.IStandaloneEditorConstructionOptions = {
+    tabSize: 2,
+    fontSize: 13,
+    readOnly,
+    minimap: { enabled: false },
+    wordWrap: 'on' as const,
+    contextmenu: true,
+    lineNumbers:
+      lineNumberStart !== undefined ? (num) => (num + lineNumberStart).toString() : undefined,
+    glyphMargin: undefined,
+    lineNumbersMinChars: 4,
+    folding: undefined,
+    scrollBeyondLastLine: false,
+  }
 
   const onMount: OnMount = async (editor, monaco) => {
     editorRef.current = editor
-    alignEditor(editor)
+    if (monacoRef !== undefined) monacoRef.current = monaco
 
     hasValue.current = editor.createContextKey('hasValue', false)
-
     const placeholderEl = document.querySelector('.monaco-placeholder') as HTMLElement | null
-    if (placeholderEl) placeholderEl.style.display = 'block'
+    if (placeholderEl && placeholder !== undefined) placeholderEl.style.display = 'block'
 
     editor.addCommand(
       monaco.KeyCode.Tab,
@@ -60,9 +93,11 @@ const RLSCodeEditor = ({
     )
 
     editor.focus()
+
+    _onMount()
   }
 
-  const onChange: OnChange = (value) => {
+  const onChangeContent: OnChange = (value) => {
     hasValue.current.set((value ?? '').length > 0)
 
     const placeholderEl = document.querySelector('.monaco-placeholder') as HTMLElement | null
@@ -73,22 +108,45 @@ const RLSCodeEditor = ({
         placeholderEl.style.display = 'none'
       }
     }
+
+    onChange()
   }
 
-  const options = {
-    tabSize: 2,
-    fontSize: 13,
-    readOnly: false,
-    minimap: { enabled: false },
-    wordWrap: 'on' as const,
-    fixedOverflowWidgets: true,
-    contextmenu: true,
-    lineNumbers: undefined,
-    glyphMargin: undefined,
-    lineNumbersMinChars: 4,
-    folding: undefined,
-    scrollBeyondLastLine: false,
+  async function formatPgsql(value: any) {
+    try {
+      const formatted = await formatQuery({
+        projectRef: project?.ref!,
+        connectionString: project?.connectionString,
+        sql: value,
+      })
+      return formatted
+    } catch (error) {
+      console.error('formatPgsql error:', error)
+      return value
+    }
   }
+
+  useEffect(() => {
+    if (monaco) {
+      // Enable pgsql format
+      const formatprovider = monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
+        async provideDocumentFormattingEdits(model: any) {
+          const value = model.getValue()
+          const formatted = await formatPgsql(value)
+          return [
+            {
+              range: model.getFullModelRange(),
+              text: formatted.result.trim(),
+            },
+          ]
+        },
+      })
+
+      return () => {
+        formatprovider.dispose()
+      }
+    }
+  }, [monaco])
 
   return (
     <>
@@ -102,11 +160,11 @@ const RLSCodeEditor = ({
         defaultValue={defaultValue ?? undefined}
         options={options}
         onMount={onMount}
-        onChange={onChange}
+        onChange={onChangeContent}
       />
       {placeholder !== undefined && (
         <div
-          className="monaco-placeholder absolute top-[3px] left-[57px] text-sm pointer-events-none font-mono [&>div>p]:text-foreground-lighter [&>div>p]:!m-0 tracking-tighter"
+          className="monaco-placeholder absolute top-[0px] left-[57px] text-sm pointer-events-none font-mono [&>div>p]:text-foreground-lighter [&>div>p]:!m-0 tracking-tighter"
           style={{ display: 'none' }}
         >
           <Markdown content={placeholder} />

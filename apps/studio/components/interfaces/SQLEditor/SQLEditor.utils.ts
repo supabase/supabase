@@ -1,9 +1,11 @@
-// @ts-ignore
-import { NEW_SQL_SNIPPET_SKELETON, destructiveSqlRegex } from './SQLEditor.constants'
-import { SqlSnippets, UserContent } from 'types'
-import { DiffType } from './SQLEditor.types'
+import {
+  NEW_SQL_SNIPPET_SKELETON,
+  destructiveSqlRegex,
+  sqlAiDisclaimerComment,
+} from './SQLEditor.constants'
+import type { SqlSnippets, UserContent } from 'types'
+import { ContentDiff, DiffType } from './SQLEditor.types'
 import { removeCommentsFromSql } from 'lib/helpers'
-import { stripIndent } from 'common-tags'
 
 export const createSqlSnippetSkeleton = ({
   id,
@@ -62,17 +64,46 @@ export function checkDestructiveQuery(sql: string) {
   return destructiveSqlRegex.some((regex) => regex.test(removeCommentsFromSql(sql)))
 }
 
-export const generateMigrationCliCommand = (id: string, name: string, isNpx = false) => stripIndent`
-  ${isNpx ? 'npx ' : ''}supabase snippets download ${id} |
-      ${isNpx ? 'npx ' : ''}supabase migration new ${name}
+export const generateMigrationCliCommand = (id: string, name: string, isNpx = false) => `
+${isNpx ? 'npx ' : ''}supabase snippets download ${id} |
+${isNpx ? 'npx ' : ''}supabase migration new ${name}
 `
 
-export const generateSeedCliCommand = (id: string, isNpx = false) => stripIndent`
-  ${isNpx ? 'npx ' : ''}supabase snippets download ${id} >> \\
-      supabase/seed.sql
+export const generateSeedCliCommand = (id: string, isNpx = false) => `
+${isNpx ? 'npx ' : ''}supabase snippets download ${id} >> \\
+  supabase/seed.sql
 `
 
-export const generateFileCliCommand = (id: string, name: string, isNpx = false) => stripIndent`
-  ${isNpx ? 'npx ' : ''}supabase snippets download ${id} > \\
-      ${name}.sql
+export const generateFileCliCommand = (id: string, name: string, isNpx = false) => `
+${isNpx ? 'npx ' : ''}supabase snippets download ${id} > \\
+  ${name}.sql
 `
+
+export const compareAsModification = (sqlDiff: ContentDiff) => {
+  return {
+    original: sqlDiff.original,
+    modified: `${sqlAiDisclaimerComment}\n\n${sqlDiff.modified}`,
+  }
+}
+
+export const compareAsAddition = (sqlDiff: ContentDiff) => {
+  const formattedOriginal = sqlDiff.original.replace(sqlAiDisclaimerComment, '').trim()
+  const formattedModified = sqlDiff.modified.replace(sqlAiDisclaimerComment, '').trim()
+  const newModified =
+    sqlAiDisclaimerComment +
+    '\n\n' +
+    (formattedOriginal ? formattedOriginal + '\n\n' : '') +
+    formattedModified
+
+  return {
+    original: sqlDiff.original,
+    modified: newModified,
+  }
+}
+
+export const compareAsNewSnippet = (sqlDiff: ContentDiff) => {
+  return {
+    original: '',
+    modified: sqlDiff.modified,
+  }
+}

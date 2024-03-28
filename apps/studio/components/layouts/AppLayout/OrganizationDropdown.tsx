@@ -14,6 +14,7 @@ import {
   CommandInput_Shadcn_,
   CommandItem_Shadcn_,
   CommandList_Shadcn_,
+  CommandSeparator_Shadcn_,
   Command_Shadcn_,
   IconCheck,
   IconCode,
@@ -46,7 +47,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
   }
 
   return (
-    <div className="flex items-center px-2">
+    <div className="flex items-center px-2 py-1">
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <PopoverTrigger_Shadcn_ asChild>
           <div className="flex items-center space-x-2 cursor-pointer">
@@ -59,7 +60,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
             >
               <div className="flex items-center space-x-2">
                 <p className={isNewNav ? 'text-sm' : 'text-xs'}>{orgName}</p>
-                {isSuccess && <Badge color="scale">{subscription?.plan.name}</Badge>}
+                {isSuccess && <Badge variant="default">{subscription?.plan.name}</Badge>}
               </div>
             </Button>
           </div>
@@ -80,7 +81,7 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
                     return (
                       <CommandItem_Shadcn_
                         key={org.slug}
-                        value={`${org.name} - ${org.slug}`}
+                        value={`${org.name.replaceAll('"', '')} - ${org.slug}`}
                         className="cursor-pointer w-full"
                         onSelect={() => {
                           setOpen(false)
@@ -98,21 +99,24 @@ const OrganizationDropdown = ({ isNewNav = false }: OrganizationDropdownProps) =
                 </ScrollArea>
               </CommandGroup_Shadcn_>
               {organizationCreationEnabled && (
-                <CommandGroup_Shadcn_ className="border-t">
-                  <CommandItem_Shadcn_
-                    className="cursor-pointer w-full"
-                    onSelect={(e) => {
-                      setOpen(false)
-                      router.push(`/new`)
-                    }}
-                    onClick={() => setOpen(false)}
-                  >
-                    <Link href="/new" className="flex items-center gap-2 w-full">
-                      <IconPlus size={14} strokeWidth={1.5} />
-                      <p>New organization</p>
-                    </Link>
-                  </CommandItem_Shadcn_>
-                </CommandGroup_Shadcn_>
+                <>
+                  <CommandSeparator_Shadcn_ />
+                  <CommandGroup_Shadcn_>
+                    <CommandItem_Shadcn_
+                      className="cursor-pointer w-full"
+                      onSelect={(e) => {
+                        setOpen(false)
+                        router.push(`/new`)
+                      }}
+                      onClick={() => setOpen(false)}
+                    >
+                      <Link href="/new" className="flex items-center gap-2 w-full">
+                        <IconPlus size={14} strokeWidth={1.5} />
+                        <p>New organization</p>
+                      </Link>
+                    </CommandItem_Shadcn_>
+                  </CommandGroup_Shadcn_>
+                </>
               )}
             </CommandList_Shadcn_>
           </Command_Shadcn_>

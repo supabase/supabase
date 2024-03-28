@@ -1,12 +1,19 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+
+import { useParams } from 'common'
+import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
+import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
+import type { StorageBucket } from 'components/interfaces/Storage/Storage.types'
+import { DeleteBucketModal } from 'components/to-be-cleaned/Storage'
+import { EmptyBucketModal } from 'components/to-be-cleaned/Storage/EmptyBucketModal'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
+import { useBucketsQuery } from 'data/storage/buckets-query'
+import { useCheckPermissions, useSelectedProject } from 'hooks'
 import {
-  Alert,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
@@ -14,16 +21,7 @@ import {
   IconEdit,
   Menu,
 } from 'ui'
-
-import CreateBucketModal from 'components/interfaces/Storage/CreateBucketModal'
-import EditBucketModal from 'components/interfaces/Storage/EditBucketModal'
-import { StorageBucket } from 'components/interfaces/Storage/Storage.types'
-import { DeleteBucketModal } from 'components/to-be-cleaned/Storage'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useBucketsQuery } from 'data/storage/buckets-query'
-import { useCheckPermissions, useSelectedProject } from 'hooks'
 import BucketRow from './BucketRow'
-import { EmptyBucketModal } from 'components/to-be-cleaned/Storage/EmptyBucketModal'
 
 const StorageMenu = () => {
   const router = useRouter()
@@ -121,9 +119,12 @@ const StorageMenu = () => {
               <>
                 {buckets.length === 0 && (
                   <div className="px-2">
-                    <Alert title="No buckets available">
-                      Buckets that you create will appear here
-                    </Alert>
+                    <Alert_Shadcn_>
+                      <AlertTitle_Shadcn_>No buckets available</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        Buckets that you create will appear here
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
                   </div>
                 )}
                 {buckets.map((bucket, idx: number) => {
@@ -181,4 +182,4 @@ const StorageMenu = () => {
   )
 }
 
-export default observer(StorageMenu)
+export default StorageMenu

@@ -39,7 +39,6 @@ To see how to Contribute, visit [Getting Started](./DEVELOPERS.md)
 - [Email Support](https://supabase.com/docs/support#business-support). Best for: problems with your database or infrastructure.
 - [Discord](https://discord.supabase.com). Best for: sharing your applications and hanging out with the community.
 
-
 ## How it works
 
 Supabase is a combination of open source tools. We’re building the features of Firebase using enterprise-grade, open source products. If the tools and communities exist, with an MIT, Apache 2, or equivalent open license, we will use and support that tool. If the tool doesn't exist, we build and open source it ourselves. Supabase is not a 1-to-1 mapping of Firebase. Our aim is to give developers a Firebase-like developer experience using open source tools.
@@ -49,7 +48,7 @@ Supabase is a combination of open source tools. We’re building the features of
 Supabase is a [hosted platform](https://supabase.com/dashboard). You can sign up and start using Supabase without installing anything.
 You can also [self-host](https://supabase.com/docs/guides/hosting/overview) and [develop locally](https://supabase.com/docs/guides/local-development).
 
-![Architecture](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.png)
+![Architecture](apps/docs/public/img/supabase-architecture.svg)
 
 - [Postgres](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
 - [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.

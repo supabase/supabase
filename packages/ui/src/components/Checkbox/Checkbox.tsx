@@ -1,13 +1,10 @@
-import React, { useEffect, useState } from 'react'
-import { FormLayout } from '../../lib/Layout/FormLayout'
-import { CheckboxContext } from './CheckboxContext'
-// @ts-ignore
-import CheckboxStyles from './Checkbox.module.css'
+import React from 'react'
 
-import defaultTheme from '../../lib/theme/defaultTheme'
-
-import { useFormContext } from '../Form/FormContext'
+import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
 import styleHandler from '../../lib/theme/styleHandler'
+import { useFormContext } from '../Form/FormContext'
+import CheckboxStyles from './Checkbox.module.css'
+import { CheckboxContext } from './CheckboxContext'
 
 export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   afterLabel?: string

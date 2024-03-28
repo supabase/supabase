@@ -6,18 +6,7 @@ import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
-import {
-  Alert,
-  Button,
-  Form,
-  IconExternalLink,
-  IconMaximize2,
-  IconMinimize2,
-  IconTerminal,
-  Input,
-  Modal,
-  Toggle,
-} from 'ui'
+import toast from 'react-hot-toast'
 
 import {
   FormActions,
@@ -33,13 +22,24 @@ import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useEdgeFunctionQuery } from 'data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from 'data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from 'data/edge-functions/edge-functions-update-mutation'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
+import {
+  Alert,
+  Button,
+  Form,
+  IconExternalLink,
+  IconMaximize2,
+  IconMinimize2,
+  IconTerminal,
+  Input,
+  Modal,
+  Toggle,
+} from 'ui'
 import CommandRender from '../CommandRender'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
 
 const EdgeFunctionDetails = () => {
   const router = useRouter()
-  const { ui } = useStore()
   const { ref: projectRef, functionSlug } = useParams()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showInstructions, setShowInstructions] = useState(false)
@@ -50,10 +50,7 @@ const EdgeFunctionDetails = () => {
   const { mutateAsync: updateEdgeFunction, isLoading: isUpdating } = useEdgeFunctionUpdateMutation()
   const { mutate: deleteEdgeFunction, isLoading: isDeleting } = useEdgeFunctionDeleteMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully deleted "${selectedFunction?.name}"`,
-      })
+      toast.success(`Successfully deleted "${selectedFunction?.name}"`)
       router.push(`/project/${projectRef}/functions`)
     },
   })
@@ -90,7 +87,7 @@ const EdgeFunctionDetails = () => {
         payload: values,
       })
       resetForm({ values, initialValues: values })
-      ui.setNotification({ category: 'success', message: `Successfully updated edge function` })
+      toast.success(`Successfully updated edge function`)
     } catch (error) {}
   }
 

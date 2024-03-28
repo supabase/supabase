@@ -1,11 +1,13 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
-import { observer } from 'mobx-react-lite'
+import { Columns } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import SchemaSelector from 'components/ui/SchemaSelector'
@@ -23,8 +25,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   IconCheck,
-  IconColumns,
   IconEdit,
+  IconEye,
   IconMoreVertical,
   IconPlus,
   IconSearch,
@@ -38,15 +40,15 @@ interface TableListProps {
   onAddTable: () => void
   onEditTable: (table: any) => void
   onDeleteTable: (table: any) => void
-  onOpenTable: (table: any) => void
 }
 
 const TableList = ({
   onAddTable = noop,
   onEditTable = noop,
   onDeleteTable = noop,
-  onOpenTable = noop,
 }: TableListProps) => {
+  const router = useRouter()
+  const { ref } = useParams()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
 
@@ -97,7 +99,7 @@ const TableList = ({
 
   return (
     <div className="space-y-4">
-      <h3 className="mb-1 text-xl text-foreground">Database Tables</h3>
+      <h3 className="text-xl text-foreground">Database Tables</h3>
 
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
@@ -241,7 +243,7 @@ const TableList = ({
                         {(x.live_rows_estimate ?? x.live_row_count).toLocaleString()}
                       </Table.td>
                       <Table.td className="hidden text-right xl:table-cell">
-                        <code className="text-sm">{x.size}</code>
+                        <code className="text-xs">{x.size}</code>
                       </Table.td>
                       <Table.td className="hidden xl:table-cell text-center">
                         {(realtimePublication?.tables ?? []).find(
@@ -259,13 +261,15 @@ const TableList = ({
                       <Table.td>
                         <div className="flex justify-end gap-2">
                           <Button
+                            asChild
                             type="default"
-                            iconRight={<IconColumns />}
+                            iconRight={<Columns size={14} className="text-foreground-light" />}
                             className="whitespace-nowrap hover:border-gray-500"
                             style={{ paddingTop: 3, paddingBottom: 3 }}
-                            onClick={() => onOpenTable(x)}
                           >
-                            {x.columns?.length} columns
+                            <Link href={`/project/${ref}/database/tables/${x.id}`}>
+                              {x.columns?.length} columns
+                            </Link>
                           </Button>
 
                           {!isLocked && (
@@ -303,6 +307,16 @@ const TableList = ({
                                       </Tooltip.Portal>
                                     )}
                                   </Tooltip.Root>
+                                </DropdownMenuItem>
+
+                                <DropdownMenuItem
+                                  className="flex items-center space-x-2"
+                                  onClick={() =>
+                                    router.push(`/project/${project?.ref}/editor/${x.id}`)
+                                  }
+                                >
+                                  <IconEye size="tiny" />
+                                  <p>View table</p>
                                 </DropdownMenuItem>
 
                                 <DropdownMenuItem
@@ -349,4 +363,4 @@ const TableList = ({
   )
 }
 
-export default observer(TableList)
+export default TableList

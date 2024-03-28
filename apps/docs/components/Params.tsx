@@ -1,3 +1,5 @@
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
+
 type IParamProps = any
 
 const Param = ({ name, isOptional, type, description, children }: IParamProps) => {
@@ -18,7 +20,9 @@ const Param = ({ name, isOptional, type, description, children }: IParamProps) =
         </span>
         <span className="text-foreground-muted text-xs">{type ?? 'no type'}</span>
       </div>
-      {description && <p className="text-sm text-foreground-lighter m-0">{description} </p>}
+      {description && (
+        <ReactMarkdown className="text-sm text-foreground-lighter m-0">{description}</ReactMarkdown>
+      )}
       {children}
     </div>
   )

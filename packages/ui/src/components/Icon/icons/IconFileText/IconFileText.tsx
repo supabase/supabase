@@ -9,5 +9,12 @@
     return <IconBase icon={FileText} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { fileText } from 'lucide-react'
+  */
   export default IconFileText
   

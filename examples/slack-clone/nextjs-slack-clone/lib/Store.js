@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
-import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs'
+import { createClient } from '@supabase/supabase-js'
 
-export const supabase = createPagesBrowserClient()
+export const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+)
 
 /**
  * @param {number} channelId the currently selected Channel
@@ -23,38 +26,28 @@ export const useStore = (props) => {
     // Listen for new and deleted messages
     const messageListener = supabase
       .channel('public:messages')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'messages' },
-        (payload) => handleNewMessage(payload.new)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, (payload) =>
+        handleNewMessage(payload.new)
       )
-      .on(
-        'postgres_changes',
-        { event: 'DELETE', schema: 'public', table: 'messages' },
-        (payload) => handleDeletedMessage(payload.old)
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'messages' }, (payload) =>
+        handleDeletedMessage(payload.old)
       )
       .subscribe()
     // Listen for changes to our users
     const userListener = supabase
       .channel('public:users')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'users' },
-        (payload) => handleNewOrUpdatedUser(payload.new)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'users' }, (payload) =>
+        handleNewOrUpdatedUser(payload.new)
       )
       .subscribe()
     // Listen for new and deleted channels
     const channelListener = supabase
       .channel('public:channels')
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'channels' },
-        (payload) => handleNewChannel(payload.new)
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'channels' }, (payload) =>
+        handleNewChannel(payload.new)
       )
-      .on(
-        'postgres_changes',
-        { event: 'DELETE', schema: 'public', table: 'channels' },
-        (payload) => handleDeletedChannel(payload.old)
+      .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'channels' }, (payload) =>
+        handleDeletedChannel(payload.old)
       )
       .subscribe()
     // Cleanup on unmount
@@ -152,20 +145,6 @@ export const fetchUser = async (userId, setState) => {
 }
 
 /**
- * Fetch all roles for the current user
- * @param {function} setState Optionally pass in a hook or callback to set the state
- */
-export const fetchUserRoles = async (setState) => {
-  try {
-    let { data } = await supabase.from('user_roles').select(`*`)
-    if (setState) setState(data)
-    return data
-  } catch (error) {
-    console.log('error', error)
-  }
-}
-
-/**
  * Fetch all messages and their authors
  * @param {number} channelId
  * @param {function} setState Optionally pass in a hook or callback to set the state
@@ -191,7 +170,10 @@ export const fetchMessages = async (channelId, setState) => {
  */
 export const addChannel = async (slug, user_id) => {
   try {
-    let { data } = await supabase.from('channels').insert([{ slug, created_by: user_id }]).select()
+    let { data } = await supabase
+      .from('channels')
+      .insert([{ slug, created_by: user_id }])
+      .select()
     return data
   } catch (error) {
     console.log('error', error)
@@ -206,7 +188,10 @@ export const addChannel = async (slug, user_id) => {
  */
 export const addMessage = async (message, channel_id, user_id) => {
   try {
-    let { data } = await supabase.from('messages').insert([{ message, channel_id, user_id }]).select()
+    let { data } = await supabase
+      .from('messages')
+      .insert([{ message, channel_id, user_id }])
+      .select()
     return data
   } catch (error) {
     console.log('error', error)

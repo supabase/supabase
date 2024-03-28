@@ -1,4 +1,4 @@
-import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw, ThemeImage, cn } from 'ui'
+import { Badge, IconCode, IconFastForward, IconGlobe, IconRefreshCcw, cn } from 'ui'
 import UseCaseExamples from 'data/products/functions/usecase-examples'
 import Solutions from 'data/Solutions'
 import { NextSeo } from 'next-seo'
@@ -11,6 +11,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import ScrollableCodeBlock from '~/components/ScrollableCodeBlock'
 import FunctionsUsecases from '~/components/Sections/FunctionsUsecases'
 import ProductHeader from '~/components/Sections/ProductHeader'
+import { ThemeImage } from 'ui-patterns/ThemeImage'
 
 const featureBlocks = [
   {
@@ -21,7 +22,7 @@ const featureBlocks = [
   },
   {
     title: 'Global',
-    description: 'Deployed to 29 regions worldwide',
+    description: 'Deploy worldwide for maximum resiliency and low latency',
     highlightLines: '8',
     icon: <IconGlobe strokeWidth={1.5} />,
   },
@@ -262,10 +263,10 @@ serve(async (req) => {
                 <div className="col-span-12 mt-0 flex lg:col-span-6 xl:col-span-12 xl:mb-8">
                   <p className="text-foreground-light m-0">Libraries coming soon:</p>
                   <div className="ml-1 space-x-1">
-                    <Badge dot={false}>Python</Badge>
-                    <Badge dot={false}>Dart</Badge>
-                    <Badge dot={false}>C#</Badge>
-                    <Badge dot={false}>Kotlin</Badge>
+                    <Badge>Python</Badge>
+                    <Badge>Dart</Badge>
+                    <Badge>C#</Badge>
+                    <Badge>Kotlin</Badge>
                   </div>
                 </div>
                 <div

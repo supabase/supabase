@@ -22,7 +22,7 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
     {
       label: 'Database',
       icon: 'database',
-      href: '/guides/database',
+      href: '/guides/database/overview',
       level: 'database',
     },
     {
@@ -264,7 +264,7 @@ export const gettingstarted: NavMenuConstant = {
       ],
     },
     {
-      name: 'Web app tutorials',
+      name: 'Web app demos',
       items: [
         {
           name: 'Next.js',
@@ -492,6 +492,12 @@ export const PhoneLoginsItems = [
     isDarkMode: true,
     hasLightIcon: true,
   },
+  {
+    name: 'Textlocal SMS Login (Community Supported)',
+    icon: '/docs/img/icons/textlocal-icon',
+    url: '/guides/auth/phone-login/textlocal',
+    linkDescription: 'Textlocal is a cloud-based SMS platform offering bulk messaging services.',
+  },
 ]
 
 export const auth = {
@@ -522,6 +528,7 @@ export const auth = {
       name: 'Authentication',
       url: undefined,
       items: [
+        { name: 'Anonymous Sign-Ins', url: '/guides/auth/auth-anonymous' },
         { name: 'Email Login', url: '/guides/auth/auth-email' },
         {
           name: 'Passwordless Login',
@@ -586,7 +593,7 @@ export const auth = {
           items: [
             {
               name: 'SAML 2.0',
-              url: '/guides/auth/sso/auth-sso-saml',
+              url: '/guides/auth/enterprise-sso/auth-sso-saml',
             },
           ],
         },
@@ -606,6 +613,10 @@ export const auth = {
         {
           name: 'Column Level Security',
           url: '/guides/auth/column-level-security',
+        },
+        {
+          name: 'Custom Claims & RBAC',
+          url: '/guides/auth/custom-claims-and-role-based-access-control-rbac',
         },
       ],
     },
@@ -657,20 +668,20 @@ export const auth = {
       items: [
         {
           name: 'Part One: JWTs',
-          url: '/learn/auth-deep-dive/auth-deep-dive-jwts',
+          url: '/guides/auth/auth-deep-dive/auth-deep-dive-jwts',
         },
         {
           name: 'Part Two: Row Level Security',
-          url: '/learn/auth-deep-dive/auth-row-level-security',
+          url: '/guides/auth/auth-deep-dive/auth-row-level-security',
         },
         {
           name: 'Part Three: Policies',
-          url: '/learn/auth-deep-dive/auth-policies',
+          url: '/guides/auth/auth-deep-dive/auth-policies',
         },
-        { name: 'Part Four: GoTrue', url: '/learn/auth-deep-dive/auth-gotrue' },
+        { name: 'Part Four: GoTrue', url: '/guides/auth/auth-deep-dive/auth-gotrue' },
         {
           name: 'Part Five: Google OAuth',
-          url: '/learn/auth-deep-dive/auth-google-oauth',
+          url: '/guides/auth/auth-deep-dive/auth-google-oauth',
         },
       ],
     },
@@ -680,9 +691,9 @@ export const auth = {
 export const database: NavMenuConstant = {
   icon: 'database',
   title: 'Database',
-  url: '/guides/database',
+  url: '/guides/database/overview',
   items: [
-    { name: 'Overview', url: '/guides/database' },
+    { name: 'Overview', url: '/guides/database/overview' },
     {
       name: 'Fundamentals',
       url: undefined,
@@ -690,6 +701,12 @@ export const database: NavMenuConstant = {
         {
           name: 'Connecting to your database',
           url: '/guides/database/connecting-to-postgres',
+          items: [
+            {
+              name: 'Serverless Drivers',
+              url: '/guides/database/connecting-to-postgres/serverless-drivers',
+            },
+          ],
         },
         { name: 'Importing data', url: '/guides/database/import-data' },
         { name: 'Securing your data', url: '/guides/database/secure-data' },
@@ -755,6 +772,10 @@ export const database: NavMenuConstant = {
           url: '/guides/database/postgres/roles',
         },
         { name: 'Managing secrets with Vault', url: '/guides/database/vault' },
+        {
+          name: 'Superuser Access and Unsupported Operations',
+          url: '/guides/database/postgres/roles-superuser',
+        },
       ],
     },
     {
@@ -836,7 +857,7 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'pg_net: Async Networking',
-          url: '/guides/database/extensions/pgnet',
+          url: '/guides/database/extensions/pg_net',
         },
         {
           name: 'pg_plan_filter: Restrict Total Cost',
@@ -941,6 +962,10 @@ export const database: NavMenuConstant = {
         {
           name: 'Print PostgreSQL Version',
           url: '/guides/database/postgres/which-version-of-postgres',
+        },
+        {
+          name: 'Replicating from Supabase to External Postgres',
+          url: '/guides/database/postgres/setup-replication-external',
         },
       ],
     },
@@ -1111,6 +1136,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/debugging',
         },
         {
+          name: 'Logging and Using Headers',
+          url: '/guides/functions/functions-headers',
+        },
+        {
           name: 'Testing your Edge Functions',
           url: '/guides/functions/unit-test',
         },
@@ -1179,6 +1208,10 @@ export const functions: NavMenuConstant = {
           name: 'Hugging Face',
           url: '/guides/ai/examples/huggingface-image-captioning',
         },
+        {
+          name: 'Monitoring with Sentry',
+          url: '/guides/functions/examples/sentry-monitoring',
+        },
         { name: 'OpenAI API', url: '/guides/ai/examples/openai' },
         {
           name: 'Sending Emails with Resend',
@@ -1226,10 +1259,6 @@ export const realtime: NavMenuConstant = {
       name: 'Guides',
       url: undefined,
       items: [
-        {
-          name: 'Throttling messages',
-          url: '/guides/realtime/guides/client-side-throttling',
-        },
         {
           name: 'Subscribing to Database Changes',
           url: '/guides/realtime/subscribing-to-database-changes',
@@ -1395,6 +1424,15 @@ export const ai = {
       ],
     },
     {
+      name: 'Search',
+      url: undefined,
+      items: [
+        { name: 'Semantic search', url: '/guides/ai/semantic-search' },
+        { name: 'Keyword search', url: '/guides/ai/keyword-search' },
+        { name: 'Hybrid search', url: '/guides/ai/hybrid-search' },
+      ],
+    },
+    {
       name: 'JavaScript Examples',
       url: undefined,
       items: [
@@ -1459,6 +1497,10 @@ export const ai = {
           url: '/guides/ai/examples/image-search-openai-clip',
         },
         {
+          name: 'Semantic search with Amazon Titan',
+          url: '/guides/ai/examples/semantic-image-search-amazon-titan',
+        },
+        {
           name: 'Building ChatGPT Plugins',
           url: '/guides/ai/examples/building-chatgpt-plugins',
         },
@@ -1487,6 +1529,10 @@ export const ai = {
         {
           name: 'Roboflow',
           url: '/guides/ai/integrations/roboflow',
+        },
+        {
+          name: 'Amazon Bedrock',
+          url: '/guides/ai/integrations/amazon-bedrock',
         },
       ],
     },
@@ -1572,6 +1618,15 @@ export const platform: NavMenuConstant = {
       ],
     },
     {
+      name: 'Logging and observability',
+      url: undefined,
+      items: [
+        { name: 'Logging', url: '/guides/platform/logs' },
+        { name: 'Metrics', url: '/guides/platform/metrics' },
+        { name: 'Monitoring with Sentry', url: '/guides/platform/sentry-monitoring' },
+      ],
+    },
+    {
       name: 'Platform Management',
       url: undefined,
       items: [
@@ -1586,8 +1641,6 @@ export const platform: NavMenuConstant = {
           name: 'HTTP Status Codes',
           url: '/guides/platform/http-status-codes',
         },
-        { name: 'Logging', url: '/guides/platform/logs' },
-        { name: 'Metrics', url: '/guides/platform/metrics' },
         {
           name: 'Migrating and Upgrading',
           url: '/guides/platform/migrating-and-upgrading-projects',
@@ -1626,6 +1679,10 @@ export const platform: NavMenuConstant = {
           name: 'Enterprise Billing',
           url: '/guides/platform/enterprise-billing',
         },
+        {
+          name: 'Billing FAQ',
+          url: '/guides/platform/billing-faq',
+        },
       ],
     },
     {
@@ -1642,6 +1699,24 @@ export const platform: NavMenuConstant = {
           url: '/guides/platform/sso/gsuite',
         },
         { name: 'SSO with Okta', url: '/guides/platform/sso/okta' },
+      ],
+    },
+    {
+      name: 'Terraform',
+      url: undefined,
+      items: [
+        {
+          name: 'Terraform Provider',
+          url: '/guides/platform/terraform',
+        },
+        {
+          name: 'Terraform Tutorial',
+          url: '/guides/platform/terraform/tutorial',
+        },
+        {
+          name: 'Reference',
+          url: '/guides/platform/terraform/reference',
+        },
       ],
     },
     {
@@ -1699,6 +1774,10 @@ export const platform: NavMenuConstant = {
         {
           name: 'High RAM Usage',
           url: '/guides/platform/exhaust-ram',
+        },
+        {
+          name: 'High Swap Usage',
+          url: '/guides/platform/exhaust-swap',
         },
       ],
     },
@@ -2114,3 +2193,9 @@ export const references = [
     ],
   },
 ]
+
+export const navDataForMdx = {
+  nativeMobileLoginItems: NativeMobileLoginItems,
+  phoneLoginsItems: PhoneLoginsItems,
+  socialLoginItems: SocialLoginItems,
+}
