@@ -23,9 +23,9 @@ interface Props {
 
 const generateOgs = async (users: UserData[]) => {
   users?.map(async (user) => {
-    const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lwx-ticket?username=${encodeURIComponent(
+    const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw11-ticket?username=${encodeURIComponent(
       user.username ?? ''
-    )}${!!user.golden ? '&platinum=true' : ''}`
+    )}${!!user.platinum ? '&platinum=true' : ''}`
     return await fetch(ogImageUrl)
   })
 }
@@ -33,8 +33,8 @@ const generateOgs = async (users: UserData[]) => {
 export default function TicketsPage({ users }: Props) {
   const ref = useRef(null)
   const PAGE_COUNT = 20
-  const TITLE = '#SupaLaunchWeek X Tickets'
-  const DESCRIPTION = 'Supabase Launch Week X | 11-15 December 2023'
+  const TITLE = '#SupaLaunchWeek Tickets'
+  const DESCRIPTION = 'Supabase Launch Week | 15-19 April 2024'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/lwx/lwx-og.jpg`
 
   const { resolvedTheme, setTheme } = useTheme()
@@ -52,7 +52,7 @@ export default function TicketsPage({ users }: Props) {
   const loadUsers = async (offset: number) => {
     const from = offset * PAGE_COUNT
     return await supabase!
-      .from('lwx_tickets_golden')
+      .from('lw11_tickets_platinum')
       .select('*')
       .range(from, from + PAGE_COUNT - 1)
       .order('createdAt', { ascending: false })
@@ -122,14 +122,14 @@ export default function TicketsPage({ users }: Props) {
                 viewport={{ once: true, margin: '-150px' }}
                 transition={{ type: 'spring', bounce: 0, delay: 0.2 }}
               >
-                <h2 className="text-4xl">Launch Week X tickets</h2>
+                <h2 className="text-4xl">Launch Week tickets</h2>
                 <p className="text-foreground-light">
-                  Join us on Launch Week X's final day <br className="hidden md:inline-block" /> and
+                  Join us on Launch Week's final day <br className="hidden md:inline-block" /> and
                   find out if you are one of the lucky winners.
                 </p>
                 <div className="mt-1">
                   <Button asChild type="outline" size="medium">
-                    <Link href="/launch-week">Go to Launch Week X</Link>
+                    <Link href="/launch-week">Go to Launch Week</Link>
                   </Button>
                 </div>
               </motion.div>
@@ -151,19 +151,19 @@ export default function TicketsPage({ users }: Props) {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  let { data: lwx_tickets, error } = await supabase
-    .from('lwx_tickets_golden')
+  let { data: lw11_tickets, error } = await supabase
+    .from('lw11_tickets_platinum')
     .select('*')
 
     .order('createdAt', { ascending: false })
     .limit(20)
 
   // Generate og images of not present
-  generateOgs(lwx_tickets as any[])
+  generateOgs(lw11_tickets as any[])
 
   return {
     props: {
-      users: lwx_tickets,
+      users: lw11_tickets,
     },
   }
 }

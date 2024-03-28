@@ -7,8 +7,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-const STORAGE_URL =
-  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw11_ga'
+const STORAGE_URL = 'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw11'
 
 // Load custom font
 const FONT_URL = `${STORAGE_URL}/assets/font/CircularStd-Book.otf`
@@ -17,8 +16,8 @@ const font = fetch(new URL(FONT_URL, import.meta.url)).then((res) => res.arrayBu
 const mono_font = fetch(new URL(MONO_FONT_URL, import.meta.url)).then((res) => res.arrayBuffer())
 // const BUCKET_FOLDER_VERSION = 'v1'
 
-const LW_TABLE = 'lw11_ga_tickets'
-const LW_MATERIALIZED_VIEW = 'lw11_ga_tickets_golden'
+const LW_TABLE = 'lw11_tickets'
+const LW_MATERIALIZED_VIEW = 'lw11_tickets_platinum'
 
 const STYLING_CONGIF = {
   regular: {
@@ -123,17 +122,17 @@ export async function handler(req: Request) {
       regular: {
         OG: `${STORAGE_URL}/assets/backgrounds/regular/${BG_NUMBER}.png`,
         BG: `${STORAGE_URL}/assets/lw11_ticket_regular_darker.png`,
-        LOGO: `${STORAGE_URL}/assets/lw11_ga_logo_white.svg`,
+        LOGO: `${STORAGE_URL}/assets/lw11_logo_white.svg`,
       },
       platinum: {
         OG: `${STORAGE_URL}/assets/backgrounds/platinum/${BG_NUMBER}.png`,
         BG: `${STORAGE_URL}/assets/lw11_ticket_platinum.png`,
-        LOGO: `${STORAGE_URL}/assets/lw11_ga_logo_black.svg`,
+        LOGO: `${STORAGE_URL}/assets/lw11_logo_black.svg`,
       },
       secret: {
         OG: `${STORAGE_URL}/assets/backgrounds/secret/${BG_NUMBER}.png`,
         BG: `${STORAGE_URL}/assets/lw11_ticket_gold.png?t=a`,
-        LOGO: `${STORAGE_URL}/assets/lw11_ga_logo_white.svg`,
+        LOGO: `${STORAGE_URL}/assets/lw11_logo_white.svg`,
       },
     }
 
@@ -342,7 +341,7 @@ export async function handler(req: Request) {
     // Upload image to storage.
     const { error: storageError } = await supabaseAdminClient.storage
       .from('images')
-      .upload(`lw11_ga/og/${ticketType}/${username}.png`, generatedTicketImage.body!, {
+      .upload(`lw11/og/${ticketType}/${username}.png`, generatedTicketImage.body!, {
         contentType: 'image/png',
         // cacheControl: `${60 * 60 * 24 * 7}`,
         cacheControl: `0`,
@@ -351,20 +350,6 @@ export async function handler(req: Request) {
       })
 
     if (storageError) throw new Error(`storageError: ${storageError.message}`)
-
-    // Generate og image
-    fetch('https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw11_ga-ticket-og', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization:
-          'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9idWxkYW5ycHRsb2t0eGNmZnZuIiwicm9sZSI6ImFub24iLCJpYXQiOjE2OTIyNjkzMjYsImV4cCI6MjAwNzg0NTMyNn0.1S6qpBbHtEmGuMsIx5UOhRiFd4YbVv-yLTrLk6tVGmM',
-      },
-      body: JSON.stringify({
-        username,
-        platinum,
-      }),
-    }).catch((err) => console.log('generate og err', err))
 
     const NEW_TIMESTAMP = new Date()
 

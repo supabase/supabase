@@ -33,7 +33,7 @@ interface Props {
 export default function UsernamePage({ user, ogImageUrl }: Props) {
   const { username, ticketNumber, name } = user
 
-  const TITLE = `${name ? name + '’s' : 'Get your'} Supabase GA Week ticket`
+  const TITLE = `${name ? name + '’s' : 'Get your'} Supabase Launch Week ticket`
   const DESCRIPTION = ``
   const OG_URL = `${SITE_URL}/tickets/${username}`
 
@@ -95,7 +95,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
                 <h1 className="text-2xl font-mono">
                   {name}'s
                   <br />
-                  GA Week Ticket
+                  Launch Week Ticket
                 </h1>
                 <span className="text-foreground-lighter">
                   Claim your own ticket and share it for a chance to win.
@@ -103,7 +103,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
               </div>
               <Button type="secondary" asChild>
                 <Link href={`${SITE_URL}${username ? '?referral=' + username : ''}`}>
-                  Join GA Week
+                  Join Launch Week
                 </Link>
               </Button>
             </SectionContainer>
@@ -124,7 +124,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   let user
 
   fetch(
-    `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw11-ga-og?username=${encodeURIComponent(
+    `https://obuldanrptloktxcffvn.supabase.co/functions/v1/lw11-og?username=${encodeURIComponent(
       username ?? ''
     )}`
   )
@@ -132,17 +132,17 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   // fetch a specific user
   if (username) {
     const { data } = await supabase!
-      .from('lw11_ga_tickets_golden')
-      .select('name, username, ticketNumber, metadata, golden, secret')
+      .from('lw11_tickets_platinum')
+      .select('name, username, ticketNumber, metadata, platinum, secret')
       .eq('username', username)
       .single()
 
     user = data
   }
 
-  const ticketType = user?.secret ? 'secret' : user?.golden ? 'platinum' : 'regular'
+  const ticketType = user?.secret ? 'secret' : user?.platinum ? 'platinum' : 'regular'
 
-  const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw11_ga/og/${ticketType}/${username}.png`
+  const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw11/og/${ticketType}/${username}.png`
 
   return {
     props: {

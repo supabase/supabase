@@ -84,7 +84,14 @@ const TicketingFlow = () => {
                       !isGameMode && !hasTicket && 'opacity-100 visible'
                     )}
                   >
-                    <GALogo className="w-24 md:w-44 aspect-[1.83/1] h-auto min-h-16 md:min-h-24" />
+                    <div className="flex flex-col gap-2">
+                      <h2 className="text-foreground text-3xl md:text-4xl">Special Announcement</h2>
+                      <CountdownComponent
+                        date={LW11_LAUNCH_DATE}
+                        showCard={false}
+                        className="[*]:text-xl"
+                      />
+                    </div>
                     <p className="text-foreground-lighter text-xl md:text-2xl">
                       Supabase is{' '}
                       <strong className="font-normal text-foreground">
@@ -94,9 +101,8 @@ const TicketingFlow = () => {
                       explore all the features that come with it.
                     </p>
                     <div className="flex flex-col gap-1 font-mono uppercase text-sm">
-                      <p>Supabase GA Week</p>
+                      <p>Supabase Launch Week 11</p>
                       <p className="-mb-1">{LW11_DATE}</p>
-                      <CountdownComponent date={LW11_LAUNCH_DATE} showCard={false} />
                     </div>
                     <TicketForm />
                     <TicketPresence />
@@ -142,7 +148,7 @@ const TicketingFlow = () => {
                       <div className="w-full h-auto text-center md:text-left border border-muted flex flex-col md:flex-row items-stretch rounded-lg bg-surface-100 mt-2 md:mt-8 overflow-hidden">
                         <div className="hidden md:block relative h-full w-full md:w-1/3 top-0 -bottom-8 overflow-visible">
                           <Image
-                            src="/images/launchweek/11_ga/airpods-max-alpha.png"
+                            src="/images/launchweek/11/airpods-max-alpha.png"
                             alt="Supabase GA Week AirPod Max prize"
                             width={300}
                             height={300}

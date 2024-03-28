@@ -39,18 +39,18 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
     // Listen to realtime changes
     if (supabase && !realtimeChannel) {
       const channel = supabase
-        .channel('lw11_ga_meetups')
+        .channel('lw11_meetups')
         .on(
           'postgres_changes',
           {
             event: '*',
             schema: 'public',
-            table: 'lw11_ga_meetups',
+            table: 'lw11_meetups',
             filter: undefined,
           },
           async () => {
             const { data: newMeets } = await supabase
-              .from('lw11_ga_meetups')
+              .from('lw11_meetups')
               .select('*')
               .neq('isPublished', false)
             console.log('newMeets', newMeets)

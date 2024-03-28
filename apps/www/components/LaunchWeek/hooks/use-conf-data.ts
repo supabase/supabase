@@ -9,6 +9,7 @@ export type UserData = {
   ticketNumber?: number
   username?: string
   name?: string
+  platinum?: boolean
   golden?: boolean
   referrals?: number
   bg_image_id?: number

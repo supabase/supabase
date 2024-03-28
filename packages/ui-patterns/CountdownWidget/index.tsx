@@ -1,3 +1,4 @@
+import { cn } from 'ui/src/lib/utils'
 import CountdownStep from './CountdownStep'
 
 interface CountdownWidgetProps {
@@ -6,6 +7,7 @@ interface CountdownWidgetProps {
   minutes?: string
   seconds?: string
   showCard?: boolean
+  className?: string
 }
 
 export function CountdownWidget({
@@ -14,13 +16,14 @@ export function CountdownWidget({
   minutes,
   seconds,
   showCard = true,
+  className,
 }: CountdownWidgetProps) {
   const Colon = () => <span className="text-xs mx-px">:</span>
 
   const showItem = (item: string | undefined) => item !== undefined && item !== '0'
 
   return (
-    <div className="flex gap-1 items-center">
+    <div className={cn('flex gap-1 items-center', className)}>
       {days !== undefined && days !== '0' ? (
         <>
           <CountdownStep value={days} unit="d" showCard={showCard} />

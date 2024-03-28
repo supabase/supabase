@@ -5,9 +5,11 @@ import { CountdownWidget } from 'ui-patterns/CountdownWidget'
 const CountdownComponent = ({
   date,
   showCard = true,
+  className,
 }: {
   date: string | number | Date
   showCard?: boolean
+  className?: string
 }) => {
   if (!date) return null
 
@@ -24,6 +26,7 @@ const CountdownComponent = ({
           minutes={minutes}
           seconds={seconds}
           showCard={showCard}
+          className={className}
         />
       )
     }

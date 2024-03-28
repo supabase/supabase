@@ -27,7 +27,7 @@ export default function TicketForm() {
       // const hasSecretTicket = localStorage.getItem('lw11_secret') === 'true'
 
       await supabase
-        .from('lw11_ga_tickets')
+        .from('lw11_tickets')
         .insert({
           email,
           name,
@@ -45,7 +45,7 @@ export default function TicketForm() {
             return supabase.auth.signOut()
           }
           const { data } = await supabase
-            .from('lw11_ga_tickets_golden')
+            .from('lw11_tickets_platinum')
             .select('*')
             .eq('username', username)
             .single()
@@ -69,15 +69,15 @@ export default function TicketForm() {
                 {
                   event: 'UPDATE',
                   schema: 'public',
-                  table: 'lw11_ga_tickets',
+                  table: 'lw11_tickets',
                   filter: `username=eq.${username}`,
                 },
                 (payload: any) => {
-                  const golden = !!payload.new.sharedOnTwitter && !!payload.new.sharedOnLinkedIn
+                  const platinum = !!payload.new.sharedOnTwitter && !!payload.new.sharedOnLinkedIn
                   const secret = !!payload.new.gameWonAt
                   setUserData({
                     ...payload.new,
-                    golden,
+                    platinum,
                     secret,
                   })
                 }

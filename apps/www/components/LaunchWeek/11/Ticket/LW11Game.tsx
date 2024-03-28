@@ -90,7 +90,7 @@ const LWXGame = ({ setIsGameMode }: Props) => {
     if (supabase) {
       if (user.id) {
         await supabase
-          .from('lw11_ga_tickets')
+          .from('lw11_tickets')
           .update({ gameWonAt: new Date() })
           .eq('username', user.username)
           .then((res) => {

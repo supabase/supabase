@@ -41,7 +41,7 @@ const LW11 = () => {
     'regular'
   )
   const [ticketNumber, setTicketNumber] = useState<string>('001')
-  const STORAGE_PATH = `lw11_ga/assets/backgrounds/${activeTicketType}/${ticketNumber}`
+  const STORAGE_PATH = `lw11/assets/backgrounds/${activeTicketType}/${ticketNumber}`
   const [uploadState, setUploadState] = useState('initial')
   const [ogImagePath, setOgImagePath] = useState(
     `${process.env.NEXT_PUBLIC_MISC_USE_URL}/storage/v1/object/public/${STORAGE_BUCKET}/${STORAGE_PATH}.png`

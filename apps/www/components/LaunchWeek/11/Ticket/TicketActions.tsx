@@ -14,7 +14,7 @@ export default function TicketActions() {
   const isTablet = useBreakpoint(1280)
   const downloadLink = useRef<HTMLAnchorElement>()
   const hasSecretTicket = metadata?.hasSecretTicket
-  const link = `${SITE_URL}/tickets/${username}?lw=ga${
+  const link = `${SITE_URL}/tickets/${username}?lw=11${
     hasSecretTicket ? '&secret=true' : golden ? `&platinum=true` : ''
   }`
   const permalink = encodeURIComponent(link)
@@ -27,7 +27,7 @@ export default function TicketActions() {
   )}`
   const params = useParams()
   const sharePage = !!params.username
-  const LW_TABLE = 'lw11_ga_tickets'
+  const LW_TABLE = 'lw11_tickets'
 
   useEffect(() => {
     setImgReady(false)
