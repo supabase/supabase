@@ -56,6 +56,15 @@ const { data, error } = await supabase.auth.signInAnonymously()
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+Call the [`signInAnonymously()`](/docs/reference/kotlin/auth-signinanonymously) method:
+
+```kotlin
+supabase.auth.signInAnonymously()
+```
+
+</TabPanel>
 </Tabs>
 
 ## Convert an anonymous user to a permanent user
@@ -80,6 +89,17 @@ const { data, error } = await supabase.auth.updateUser({ email: 'example@email.c
 ```
 
 </TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+You can use the [`modifyUser()`](/docs/reference/kotlin/auth-updateuser) method to link an email or phone identity to the anonymous user.
+
+```kotlin
+supabase.auth.modifyUser {
+    email = "example@email.com"
+}
+```
+
+</TabPanel>
 </Tabs>
 
 ### Link an OAuth identity
@@ -97,6 +117,15 @@ You can use the [`linkIdentity()`](/docs/reference/javascript/auth-linkidentity)
 
 ```js
 const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+You can use the [`linkIdentity()`](/docs/reference/kotlin/auth-linkidentity) method to link an oauth identity to the anonymous user.
+
+```kotlin
+supabase.auth.linkIdentity(Google)
 ```
 
 </TabPanel>
