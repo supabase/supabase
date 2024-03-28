@@ -2,17 +2,20 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button, cn } from 'ui'
-import { LOCAL_STORAGE_KEYS, isBrowser } from 'common'
-import PromoBg from './PromoBg'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import CountdownComponent from '../../layout/banners/LW11CountdownBanner/Countdown'
 import announcement from '../../layout/banners/data/Announcement.json'
+import { useTheme } from 'next-themes'
 
-const LW11bg =
+const LW11BGDark =
   'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw11/assets/backgrounds/regular/001.png'
+const LW11BGLight =
+  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw11/assets/backgrounds/platinum/001.png'
 
 const PromoToast = () => {
   const [visible, setVisible] = useState(false)
-  const siteUrl = isBrowser && window.location.origin
+  const { resolvedTheme } = useTheme()
+  const bgImage = resolvedTheme?.includes('dark') ? LW11BGDark : LW11BGLight
 
   useEffect(() => {
     const shouldHide =
@@ -29,9 +32,7 @@ const PromoToast = () => {
     localStorage?.setItem(LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST, 'true')
   }
 
-  if (!visible) {
-    return null
-  }
+  if (!visible) return null
 
   return (
     <div
@@ -48,7 +49,7 @@ const PromoToast = () => {
 
       <div className="relative z-10 flex items-center space-x-2">
         <Button asChild type="secondary">
-          <Link target="_blank" rel="noreferrer" href={`${siteUrl}/launch-week`}>
+          <Link target="_blank" rel="noreferrer" href="https://supabase.com/launch-week">
             Claim your ticket
           </Link>
         </Button>
@@ -57,7 +58,7 @@ const PromoToast = () => {
         </Button>
       </div>
       <Image
-        src={LW11bg}
+        src={bgImage}
         alt=""
         fill
         sizes="100%"

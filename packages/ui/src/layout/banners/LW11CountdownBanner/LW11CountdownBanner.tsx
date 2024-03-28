@@ -15,7 +15,7 @@ export function LW11CountdownBanner() {
   if (isLaunchWeekPage || isHomePage) return null
 
   return (
-    <div className="relative w-full p-2 flex items-center group justify-center text-foreground bg-surface-100 border-b border-muted transition-colors overflow-hidden">
+    <div className="relative w-full p-2 flex items-center group justify-center text-foreground bg-alternative border-b border-muted transition-colors overflow-hidden">
       <div className="relative z-10 flex items-center justify-center">
         <div
           className={cn(
