@@ -1,4 +1,4 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
+import { AlertCircle, Check, User, X } from 'lucide-react'
 import Image from 'next/legacy/image'
 import { Fragment, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -19,14 +19,13 @@ import { useProfile } from 'lib/profile'
 import {
   Badge,
   Button,
-  IconAlertCircle,
-  IconCheck,
   IconLoader,
-  IconUser,
-  IconX,
   Listbox,
   Loading,
   Modal,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 import { getUserDisplayName, isInviteExpired } from '../Organization.utils'
 import MemberActions from './MemberActions'
@@ -81,7 +80,6 @@ const MembersView = ({ searchString }: MembersViewProps) => {
     permissions ?? []
   )
 
-  // [Joshen] Proactively adding this, can be removed once infra API changes are in
   const showMfaEnabledColumn = allMembers.some(
     (member) => member.gotrue_id !== undefined && member.mfa_enabled !== undefined
   )
@@ -135,10 +133,10 @@ const MembersView = ({ searchString }: MembersViewProps) => {
             <Table
               head={[
                 <Table.th key="header-user">User</Table.th>,
-                <Table.th key="header-status"></Table.th>,
+                <Table.th key="header-status" className="w-24" />,
                 ...(showMfaEnabledColumn
                   ? [
-                      <Table.th key="header-mfa" className="text-center">
+                      <Table.th key="header-mfa" className="text-center w-32">
                         Enabled MFA
                       </Table.th>,
                     ]
@@ -147,7 +145,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                   <span>Role</span>
                   <RolesHelperModal />
                 </Table.th>,
-                <Table.th key="header-action"></Table.th>,
+                <Table.th key="header-action" />,
               ]}
               body={[
                 ...filteredMembers.map((x, i: number) => {
@@ -185,11 +183,11 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                             <div>
                               {x.invited_id ? (
                                 <span className="flex p-2 border-2 rounded-full border-strong">
-                                  <IconUser size={20} strokeWidth={2} />
+                                  <User size={20} strokeWidth={2} />
                                 </span>
                               ) : isEmailUser ? (
                                 <div className="w-[40px] h-[40px] bg-surface-100 border border-overlay rounded-full text-foreground-lighter flex items-center justify-center">
-                                  <IconUser strokeWidth={1.5} />
+                                  <User size={20} strokeWidth={1.5} />
                                 </div>
                               ) : (
                                 <Image
@@ -224,9 +222,9 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                           <Table.td>
                             <div className="flex items-center justify-center">
                               {x.mfa_enabled ? (
-                                <IconCheck className="text-brand" strokeWidth={2} />
+                                <Check className="text-brand" strokeWidth={2} size={20} />
                               ) : (
-                                <IconX className="text-foreground-light" strokeWidth={1.5} />
+                                <X className="text-foreground-light" strokeWidth={1.5} size={20} />
                               )}
                             </div>
                           </Table.td>
@@ -238,8 +236,8 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                               <IconLoader className="animate-spin" size={16} strokeWidth={1.5} />
                             </div>
                           ) : role !== undefined ? (
-                            <Tooltip.Root delayDuration={0}>
-                              <Tooltip.Trigger className="w-[140px]" asChild>
+                            <Tooltip_Shadcn_>
+                              <TooltipTrigger_Shadcn_ asChild className="w-[140px]">
                                 <div>
                                   <Listbox
                                     className={disableRoleEdit ? 'pointer-events-none' : ''}
@@ -260,71 +258,32 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                                     ))}
                                   </Listbox>
                                 </div>
-                              </Tooltip.Trigger>
+                              </TooltipTrigger_Shadcn_>
                               {memberIsPendingInvite ? (
-                                <Tooltip.Portal>
-                                  <Tooltip.Content side="bottom">
-                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                    <div
-                                      className={[
-                                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                                        'border border-background', //border
-                                      ].join(' ')}
-                                    >
-                                      <span className="text-xs text-foreground">
-                                        Role can only be changed after the user has accepted the
-                                        invite
-                                      </span>
-                                    </div>
-                                  </Tooltip.Content>
-                                </Tooltip.Portal>
+                                <TooltipContent_Shadcn_ side="bottom">
+                                  Role can only be changed after the user has accepted the invite
+                                </TooltipContent_Shadcn_>
                               ) : !memberIsUser && !canRemoveRole ? (
-                                <Tooltip.Portal>
-                                  <Tooltip.Content side="bottom">
-                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                    <div
-                                      className={[
-                                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                                        'border border-background', //border
-                                      ].join(' ')}
-                                    >
-                                      <span className="text-xs text-foreground">
-                                        You need additional permissions to manage this team member
-                                      </span>
-                                    </div>
-                                  </Tooltip.Content>
-                                </Tooltip.Portal>
-                              ) : (
-                                <></>
-                              )}
-                            </Tooltip.Root>
+                                <TooltipContent_Shadcn_ side="bottom">
+                                  You need additional permissions to manage this team member
+                                </TooltipContent_Shadcn_>
+                              ) : null}
+                            </Tooltip_Shadcn_>
                           ) : (
                             <div className="flex items-center space-x-2">
                               <p className="text-sm text-foreground-light">Invalid role</p>
-                              <Tooltip.Root delayDuration={0}>
-                                <Tooltip.Trigger>
-                                  <IconAlertCircle size={16} strokeWidth={1.5} />
-                                </Tooltip.Trigger>
-                                <Tooltip.Portal>
-                                  <Tooltip.Content side="bottom">
-                                    <Tooltip.Arrow className="radix-tooltip-arrow" />
-                                    <div
-                                      className={[
-                                        'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                                        'border border-background', //border
-                                      ].join(' ')}
-                                    >
-                                      <span className="text-xs text-foreground">
-                                        This user has an invalid role, please reach out to us via
-                                        support
-                                      </span>
-                                    </div>
-                                  </Tooltip.Content>
-                                </Tooltip.Portal>
-                              </Tooltip.Root>
+                              <Tooltip_Shadcn_>
+                                <TooltipTrigger_Shadcn_ asChild>
+                                  <AlertCircle size={16} strokeWidth={1.5} />
+                                </TooltipTrigger_Shadcn_>
+                                <TooltipContent_Shadcn_ side="bottom">
+                                  This user has an invalid role, please reach out to us via support
+                                </TooltipContent_Shadcn_>
+                              </Tooltip_Shadcn_>
                             </div>
                           )}
                         </Table.td>
+
                         <Table.td>
                           {!memberIsUser && <MemberActions member={x} roles={roles} />}
                         </Table.td>
@@ -337,7 +296,7 @@ const MembersView = ({ searchString }: MembersViewProps) => {
                       <Table.tr key="no-results" className="bg-panel-secondary-light">
                         <Table.td colSpan={12}>
                           <div className="flex items-center space-x-3 opacity-75">
-                            <IconAlertCircle size={16} strokeWidth={2} />
+                            <AlertCircle size={16} strokeWidth={2} />
                             <p className="text-foreground-light">
                               No users matched the search query "{searchString}"
                             </p>

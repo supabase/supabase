@@ -1,5 +1,5 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { MoreVertical, Trash } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 
@@ -18,12 +18,14 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconMoreHorizontal,
-  IconTrash,
   Modal,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
+import { UpdateRolesPanel } from './UpdateRolesPanel/UpdateRolesPanel'
 
 interface MemberActionsProps {
   member: OrganizationMember
@@ -32,6 +34,8 @@ interface MemberActionsProps {
 
 const MemberActions = ({ member, roles }: MemberActionsProps) => {
   const { slug } = useParams()
+  const [showAccessModal, setShowAccessModal] = useState(false)
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
   const organizationMembersDeletionEnabled = useIsFeatureEnabled('organization_members:delete')
 
   const selectedOrganization = useSelectedOrganization()
@@ -42,7 +46,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     permissions ?? []
   )
 
-  const isPendingInviteAcceptance = member.invited_id
+  const isPendingInviteAcceptance = !!member.invited_id
 
   const roleId = member.role_ids?.[0] ?? -1
   const canRemoveMember = rolesRemovable.includes((member?.role_ids ?? [-1])[0])
@@ -52,8 +56,6 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
   const canRevokeInvite = useCheckPermissions(PermissionAction.DELETE, 'user_invites', {
     resource: { role_id: roleId },
   })
-
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
   const { mutate: deleteOrganizationMember, isLoading: isDeletingMember } =
     useOrganizationMemberDeleteMutation({
@@ -110,26 +112,14 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
   if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
     return (
       <div className="flex items-center justify-end">
-        <Tooltip.Root delayDuration={0}>
-          <Tooltip.Trigger asChild>
-            <Button type="text" icon={<IconMoreHorizontal />} />
-          </Tooltip.Trigger>
-          <Tooltip.Portal>
-            <Tooltip.Content side="bottom">
-              <Tooltip.Arrow className="radix-tooltip-arrow" />
-              <div
-                className={[
-                  'rounded bg-alternative py-1 px-2 leading-none shadow', // background
-                  'border border-background', //border
-                ].join(' ')}
-              >
-                <span className="text-xs text-foreground">
-                  You need additional permissions to manage this team member
-                </span>
-              </div>
-            </Tooltip.Content>
-          </Tooltip.Portal>
-        </Tooltip.Root>
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_ asChild>
+            <Button type="text" icon={<MoreVertical size={18} />} />
+          </TooltipTrigger_Shadcn_>
+          <TooltipContent_Shadcn_ side="bottom">
+            You need additional permissions to manage this team member
+          </TooltipContent_Shadcn_>
+        </Tooltip_Shadcn_>
       </div>
     )
   }
@@ -138,11 +128,33 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
 
   return (
     <>
-      <div className="flex items-center justify-end">
+      <div className="flex items-center justify-end gap-x-2">
+        <Tooltip_Shadcn_>
+          <TooltipTrigger_Shadcn_ asChild>
+            <Button
+              type="default"
+              disabled={isPendingInviteAcceptance || !canRemoveMember}
+              onClick={() => setShowAccessModal(true)}
+            >
+              Manage access
+            </Button>
+          </TooltipTrigger_Shadcn_>
+          {!canRemoveMember && (
+            <TooltipContent_Shadcn_ side="bottom">
+              You need additional permissions to manage this team member
+            </TooltipContent_Shadcn_>
+          )}
+          {isPendingInviteAcceptance && (
+            <TooltipContent_Shadcn_ side="bottom">
+              Role can only be changed after the user has accepted the invite
+            </TooltipContent_Shadcn_>
+          )}
+        </Tooltip_Shadcn_>
+
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="text" disabled={isLoading} loading={isLoading}>
-              <IconMoreHorizontal />
+            <Button type="text" className="px-1" disabled={isLoading} loading={isLoading}>
+              <MoreVertical size={18} />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent side="bottom" align="end">
@@ -157,8 +169,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
                       </div>
                     </DropdownMenuItem>
                   )}
-                  {/* canResendInvite && isExpired */}
-                  {true && (
+                  {canResendInvite && (
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={() => handleResendInvite(member)}>
@@ -178,7 +189,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
                       setIsDeleteModalOpen(true)
                     }}
                   >
-                    <IconTrash size={16} />
+                    <Trash size={16} />
                     <p>Remove member</p>
                   </DropdownMenuItem>
                 )
@@ -203,6 +214,12 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
           </p>
         </Modal.Content>
       </ConfirmationModal>
+
+      <UpdateRolesPanel
+        visible={showAccessModal}
+        member={member}
+        onClose={() => setShowAccessModal(false)}
+      />
     </>
   )
 }
