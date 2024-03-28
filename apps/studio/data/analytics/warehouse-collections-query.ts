@@ -38,14 +38,3 @@ export const useWarehouseCollectionsQuery = (
       enabled: !!projectRef || enabled,
     }
   )
-
-const collectionsMock = [
-  {
-    id: 'web_analytics',
-    name: 'web_analytics',
-  },
-  {
-    id: 'usage',
-    name: 'usage',
-  },
-] as const
