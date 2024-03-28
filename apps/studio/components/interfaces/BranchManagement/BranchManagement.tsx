@@ -33,6 +33,7 @@ import {
   PullRequestsEmptyState,
 } from './EmptyStates'
 import Overview from './Overview'
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 
 const BranchManagement = () => {
   const router = useRouter()
@@ -113,6 +114,12 @@ const BranchManagement = () => {
     },
   })
 
+  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+    onSuccess: () => {
+      toast.success('Successfully updated branch')
+    },
+  })
+
   const { mutate: disableBranching, isLoading: isDisabling } = useBranchesDisableMutation({
     onSuccess: () => {
       toast.success('Successfully disabled branching for project')
@@ -138,6 +145,11 @@ const BranchManagement = () => {
     if (projectRef == undefined) return console.error('Project ref is required')
     if (!previewBranches) return console.error('No branches available')
     disableBranching({ projectRef, branchIds: previewBranches?.map((branch) => branch.id) })
+  }
+
+  const onUpdateBranchPeristentMode = (branch: Branch) => {
+    if (projectRef == undefined) return console.error('Project ref is required')
+    updateBranch({ id: branch.id, projectRef, persistent: !branch.persistent })
   }
 
   if (!hasBranchEnabled) return <BranchingEmptyState />
@@ -262,6 +274,7 @@ const BranchManagement = () => {
                       onViewAllBranches={() => setView('branches')}
                       onSelectCreateBranch={() => setShowCreateBranch(true)}
                       onSelectDeleteBranch={setSelectedBranchToDelete}
+                      onSelectPersistentMode={onUpdateBranchPeristentMode}
                       generateCreatePullRequestURL={generateCreatePullRequestURL}
                     />
                   )}
@@ -278,6 +291,7 @@ const BranchManagement = () => {
                               branch={branch}
                               generateCreatePullRequestURL={generateCreatePullRequestURL}
                               onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
+                              onSelectPersistentMode={() => onUpdateBranchPeristentMode(branch)}
                             />
                           )
                         })
@@ -312,6 +326,7 @@ const BranchManagement = () => {
                               branch={branch}
                               generateCreatePullRequestURL={generateCreatePullRequestURL}
                               onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
+                              onSelectPersistentMode={() => onUpdateBranchPeristentMode(branch)}
                             />
                           )
                         })}
