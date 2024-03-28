@@ -61,10 +61,10 @@ Simply clone this repo locally and proceed to the next section.
 
 ### Required configuration
 
-Copy the `.env.local.example` file into a file named `.env.local` in the root directory of the example:
+Copy the `.env.example` file into a file named `.env.local` in the root directory of the example:
 
 ```bash
-cp .env.local.example .env.local
+cp .env.example .env.local
 ```
 
 Set your Supabase details from [step 3](#3-get-the-url-and-key) above:
