@@ -11,6 +11,6 @@
   },
   "devDependencies": {
     "@types/pg-format": "^1.0.1",
-    "typescript": "^5.2.2"
+    "typescript": "^5.4.3"
   }
 }
