@@ -49,6 +49,11 @@ export const useWarehouseQueryQuery = <TData = WarehouseQueryData>(
     ({ signal }) => getWarehouseQuery({ projectRef, sql }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
+      staleTime: Infinity,
+      // 15 mins cache time
+      cacheTime: 15 * 60 * 1000,
+      refetchOnMount: false,
+      refetchInterval: false,
       ...options,
     }
   )
