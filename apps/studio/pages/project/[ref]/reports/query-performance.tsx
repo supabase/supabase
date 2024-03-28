@@ -6,6 +6,9 @@ import ReactMarkdown from 'react-markdown'
 import {
   Accordion,
   Button,
+  AccordionContent_Shadcn_,
+  Accordion_Shadcn_,
+  AccordionItem_Shadcn_,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
@@ -22,6 +25,7 @@ import {
 } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
+import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportQueryPerformanceTableRow from 'components/interfaces/Reports/ReportQueryPerformanceTableRow'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
@@ -35,6 +39,10 @@ import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useFlag } from 'hooks'
 import type { NextPageWithLayout } from 'types'
+import { Sparkles } from 'lucide-react'
+import EnableExtensionModal from 'components/interfaces/Database/Extensions/EnableExtensionModal'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { Extension } from 'components/interfaces/Database/Extensions/Extensions'
 
 type QueryPerformancePreset = 'time' | 'frequent' | 'slowest'
 
@@ -43,6 +51,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const [showResetgPgStatStatements, setShowResetgPgStatStatements] = useState(false)
+  const [showConfirmEnableModal, setShowConfirmEnableModal] = useState(false)
 
   const tableIndexEfficiencyEnabled = useFlag('tableIndexEfficiency')
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
@@ -72,6 +81,13 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     queryPerformanceQuery.runQuery()
     queryHitRate.runQuery()
   }
+
+  const { data: extensions, isLoading: areExtensionsLoading } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+  console.log({ extensions })
+  const ext_hypopg = extensions?.find((extension) => extension.name === 'hypopg') as any
 
   const checkAlert = (
     <div className="w-5 h-5 text-brand-1400 text-brand flex items-center justify-center">
@@ -226,7 +242,36 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
           }
         }}
       />
+      <Accordion_Shadcn_ type="single" collapsible>
+        <AccordionItem_Shadcn_ value="1" className="border-none">
+          <AccordionTrigger className="px-4 bg-white ">
+            <div className="flex items-center gap-2">
+              <Sparkles strokeWidth={1} size={15} />
+              <span>Index advisor</span>
+            </div>
+          </AccordionTrigger>
+          <AccordionContent_Shadcn_ className="bg-white p-4 border-t">
+            <div>
+              <div>step 1, enable Hypopg </div>
+              <div>
+                Hypopg is {ext_hypopg?.installed_version ? 'enabled' : 'not enabled'}
+                {!ext_hypopg?.installed_version && (
+                  <Button onClick={() => setShowConfirmEnableModal(true)}>Enable Hypopg</Button>
+                )}
+              </div>
 
+              <div>
+                step 2, expand the <code>SELECT</code> queries below to see index suggestions
+              </div>
+              <EnableExtensionModal
+                visible={showConfirmEnableModal}
+                extension={extensions?.find((extension) => extension.name === 'hypopg') as any}
+                onCancel={() => setShowConfirmEnableModal(false)}
+              />
+            </div>
+          </AccordionContent_Shadcn_>
+        </AccordionItem_Shadcn_>
+      </Accordion_Shadcn_>
       <div className="flex flex-col">
         <Tabs
           type="underlined"
@@ -359,6 +404,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
               <ReactMarkdown className={helperTextClassNames}>
                 {SlowestExecutionHelperText}
               </ReactMarkdown>
+
               <div className="thin-scrollbars max-w-full overflow-auto min-h-[800px]">
                 <QueryPerformanceFilterBar onRefreshClick={handleRefresh} isLoading={isLoading} />
                 <Table

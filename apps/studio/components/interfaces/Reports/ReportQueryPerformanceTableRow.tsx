@@ -1,7 +1,18 @@
 import Table from 'components/to-be-cleaned/Table'
 import React from 'react'
-import { cn } from 'ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  cn,
+} from 'ui'
 import { Editor } from '@monaco-editor/react'
+import { isIndexSuggestionNeeded } from './Reports.utils'
+import { Sparkle, Sparkles } from 'lucide-react'
 
 type Props = {
   sql: string
@@ -11,7 +22,8 @@ type Props = {
 
 const ReportQueryPerformanceTableRow = ({ sql, colSpan, children }: Props) => {
   const [expanded, setExpanded] = React.useState(false)
-
+  console.log({ sql })
+  const suggestIndex = isIndexSuggestionNeeded(sql)
   return (
     <>
       <Table.tr onClick={() => setExpanded(!expanded)}>{children}</Table.tr>
@@ -40,6 +52,26 @@ const ReportQueryPerformanceTableRow = ({ sql, colSpan, children }: Props) => {
                   wordWrap: 'on',
                 }}
               />
+
+              {suggestIndex && (
+                <div className="p-4">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button type="text" className="bg-yellow-50">
+                        <span className="flex items-center gap-2 px-3">
+                          <Sparkles strokeWidth={1} size={15} /> View index suggestions
+                        </span>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className={cn('sm:max-w-5xl p-0')}>
+                      <DialogHeader className="pb-0">
+                        <DialogTitle>View suggestions</DialogTitle>
+                        <DialogDescription>Speed up your queries with indexes</DialogDescription>
+                      </DialogHeader>
+                    </DialogContent>
+                  </Dialog>
+                </div>
+              )}
             </div>
           </td>
         )}
