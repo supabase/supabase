@@ -45,6 +45,11 @@ export const useWarehouseTenantQuery = <TData = WarehouseTenantData>(
     ({ signal }) => getWarehouseTenant({ projectRef }, signal),
     {
       enabled: enabled && typeof projectRef !== 'undefined',
+      staleTime: Infinity,
+      // 2H mins cache time
+      cacheTime: 120 * 60 * 1000,
+      refetchOnMount: false,
+      refetchInterval: false,
       ...options,
     }
   )
