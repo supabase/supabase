@@ -22,7 +22,7 @@ This is different from the `anon` API key which does not create a user and can b
 
 </Admonition>
 
-To get started, [enable anonymous sign-ins](/dashboard/project/_/auth/providers) for your Supabase Project.
+To get started, [enable anonymous sign-ins](/dashboard/project/_/settings/auth) for your Supabase Project.
 
 <Admonition type="caution">
 
@@ -108,7 +108,7 @@ An anonymous user assumes the `authenticated` role just like a permanent user. Y
 
 ```sql
 create policy "Only permanent users can post to the news feed"
-on news_feed for insert
+on news_feed as restrictive for insert
 to authenticated
 with check ((auth.jwt()->>'is_anonymous')::boolean is false );
 
@@ -117,6 +117,12 @@ on news_feed for select
 to authenticated
 using ( true );
 ```
+
+<Admonition variant="note" label="Use restrictive policies">
+
+RLS policies are permissive by default, which means that they are combined using an "OR" operator when multiple policies are applied. It is important to construct restrictive policies to ensure that the checks for an anonymous user are always enforced when combined with other policies.
+
+</Admonition>
 
 ## Resolving identity conflicts
 
