@@ -18,6 +18,16 @@ const Job: NextPage = ({ data }: any) => {
   const meta_title = 'Careers | Supabase'
   const meta_description = 'Help build software developers love'
 
+  const [formData, setFormData] = useState({})
+
+  const handleTextFormData = (question: string, value: string) => {
+    setFormData({ ...formData, [question]: value })
+  }
+
+  const handleFileFormData = (question: string, value: any) => {
+    setFormData({ ...formData, [question]: value })
+  }
+
   function decodeHtml(html: string): string {
     const entityMap: Record<string, string> = {
       '&amp;': '&',
@@ -34,8 +44,6 @@ const Job: NextPage = ({ data }: any) => {
       return entityMap[match] || match
     })
   }
-
-  console.log(data)
 
   return (
     <>
@@ -71,7 +79,10 @@ const Job: NextPage = ({ data }: any) => {
             allow="autoplay; modestbranding; encrypted-media"
             allowFullScreen
           />
-          <div className='application' dangerouslySetInnerHTML={{ __html: decodeHtml(data.content) }} />
+          <div
+            className="application"
+            dangerouslySetInnerHTML={{ __html: decodeHtml(data.content) }}
+          />
         </div>
         <div
           id="application"
@@ -97,7 +108,7 @@ const Job: NextPage = ({ data }: any) => {
                           {question.required ? <span className="ml-1 text-red-900">*</span> : null}
                         </div>
                       }
-                      onChange={() => {}}
+                      onChange={(e) => handleTextFormData(item.name, e.target.value)}
                       required={question.required}
                     />
                   )
@@ -112,6 +123,7 @@ const Job: NextPage = ({ data }: any) => {
                           {question.required ? <span className="ml-1 text-red-900">*</span> : null}
                         </div>
                       }
+                      onChange={(e) => handleFileFormData(item.name, e.target.files[0])}
                       type="file"
                       required={question.required}
                     />
@@ -124,7 +136,10 @@ const Job: NextPage = ({ data }: any) => {
                         {question.label}
                         {question.required ? <span className="ml-1 text-red-900">*</span> : null}
                       </div>
-                      <TextArea key={i} />
+                      <TextArea
+                        key={i}
+                        onChange={(e) => handleTextFormData(item.name, e.target.value)}
+                      />
                     </div>
                   )
                 }
