@@ -75,8 +75,8 @@ export const Restriction = () => {
       {shownAlert === 'gracePeriod' && (
         <Alert_Shadcn_ variant="warning">
           <AlertTriangle strokeWidth={2} />
-          <div className="flex flex-row items-center justify-between">
-            <div className="mr-3">
+          <div className="flex flex-row items-center justify-between gap-3">
+            <div>
               <AlertTitle_Shadcn_>Your grace period has started.</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
                 <p>
@@ -100,8 +100,8 @@ export const Restriction = () => {
       {shownAlert === 'gracePeriodOver' && (
         <Alert_Shadcn_ variant="warning">
           <AlertTriangle strokeWidth={2} />
-          <div className="flex flex-row items-center justify-between">
-            <div className="mr-3">
+          <div className="flex flex-row items-center justify-between gap-3">
+            <div>
               <AlertTitle_Shadcn_>Your grace period is over.</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
                 <p>
@@ -125,15 +125,16 @@ export const Restriction = () => {
       {shownAlert === 'restricted' && (
         <Alert_Shadcn_ variant="destructive">
           <AlertCircle strokeWidth={2} />
-          <div className="flex flex-row items-center justify-between">
-            <div className="mr-3">
+          <div className="flex flex-row items-center justify-between gap-3">
+            <div>
               <AlertTitle_Shadcn_>All services are restricted.</AlertTitle_Shadcn_>
               <AlertDescription_Shadcn_>
                 <p>
                   Your projects are not able to serve requests to{' '}
                   <a className="cursor-pointer underline">service restrictions</a>. You have
                   exceeded your plan’s quota and your grace period ended on{' '}
-                  {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}.
+                  {/* there's a non-breaking space between each date segment so that the dates are always in the same line */}
+                  {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}.
                 </p>
                 <p>Upgrade to lift restrictions or wait until your quota refills.</p>
               </AlertDescription_Shadcn_>
