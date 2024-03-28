@@ -182,10 +182,7 @@ const LW11 = () => {
         upsert: true,
       })
 
-    console.log(imageData, imageError)
-
     if (imageData) {
-      console.log('uploaded image', imageData)
       setOgImagePath(imageData.path)
       setUploadState(`success: ${imageData.path}`)
     }
@@ -195,7 +192,6 @@ const LW11 = () => {
   const record = (e: any) => {
     e.preventDefault()
     if (!ctx || !canvas || !canvasSnapRef) return
-    console.log('Capture image', ctx)
     setUploadState('recording')
     const chunks: any = []
     const stream = canvas.captureStream() // grab our canvas MediaStream
