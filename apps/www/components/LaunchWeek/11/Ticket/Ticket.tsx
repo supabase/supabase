@@ -12,11 +12,11 @@ export default function Ticket() {
   const ticketRef = useRef<HTMLDivElement>(null)
   const { userData: user, showCustomizationForm, setShowCustomizationForm } = useConfData()
   const isMobile = useBreakpoint()
-  const { golden = false, bg_image_id: bgImageId = '1', metadata, secret: hasSecretTicket } = user
+  const { platinum = false, bg_image_id: bgImageId = '1', secret: hasSecretTicket } = user
   const [imageHasLoaded, setImageHasLoaded] = useState(false)
   const params = useParams()
   const sharePage = !!params.username
-  const ticketType = hasSecretTicket ? 'secret' : golden ? 'platinum' : 'regular'
+  const ticketType = hasSecretTicket ? 'secret' : platinum ? 'platinum' : 'regular'
 
   const fallbackImg = `/images/launchweek/11/tickets/lw11_ticket_${ticketType}.png`
 

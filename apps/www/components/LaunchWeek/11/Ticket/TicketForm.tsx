@@ -24,7 +24,6 @@ export default function TicketForm() {
       const username = session.user.user_metadata.user_name
       const name = session.user.user_metadata.full_name
       const email = session.user.email
-      // const hasSecretTicket = localStorage.getItem('lw11_secret') === 'true'
 
       await supabase
         .from('lw11_tickets')
@@ -33,7 +32,6 @@ export default function TicketForm() {
           name,
           username,
           referred_by: router.query?.referral ?? null,
-          // ...(hasSecretTicket && { gameWonAt: new Date() }),
         })
         .eq('email', email)
         .select()

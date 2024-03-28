@@ -3,8 +3,8 @@ import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 
 export default function TicketProfile({ className }: { className?: string }) {
   const { userData: user } = useConfData()
-  const { username, name, metadata, golden, secret: hasSecretTicket } = user
-  const hasLightTicket = golden
+  const { username, name, metadata, platinum, secret: hasSecretTicket } = user
+  const hasLightTicket = platinum
 
   const HAS_ROLE = !!metadata?.role
   const HAS_COMPANY = !!metadata?.company

@@ -44,5 +44,6 @@ export const LW11_DATE = 'Apr 15-19 / 8am PT'
 export const LW11_LAUNCH_DATE = '2024-04-15T08:00:00.000-08:00'
 export const TWEET_TEXT = ''
 export const TWEET_TEXT_GOLDEN = ``
+export const TWEET_TEXT_PLATINUM = ``
 export const TWEET_TEXT_SECRET = ``
 export const SITE_NAME = 'Supabase'

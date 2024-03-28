@@ -33,7 +33,7 @@ interface Props {
 export default function UsernamePage({ user, ogImageUrl }: Props) {
   const { username, ticketNumber, name } = user
 
-  const TITLE = `${name ? name + '’s' : 'Get your'} Supabase Launch Week ticket`
+  const TITLE = `${name ? name + '’s' : 'Get your'} Supabase ticket`
   const DESCRIPTION = ``
   const OG_URL = `${SITE_URL}/tickets/${username}`
 
