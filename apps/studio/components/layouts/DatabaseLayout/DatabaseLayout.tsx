@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import { type PropsWithChildren, useEffect } from 'react'
 
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
@@ -8,11 +8,21 @@ import { useSelectedProject, withAuth } from 'hooks'
 import { ProjectLayout } from '../'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
 
+import { useRegisterCommands } from 'ui-patterns/CommandMenu'
+
 export interface DatabaseLayoutProps {
   title?: string
 }
 
 const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) => {
+  useRegisterCommands('Database', [
+    {
+      id: 'database-test',
+      name: 'Test database-specific command',
+      action: () => alert('databasessssss!!!!'),
+    },
+  ])
+
   const project = useSelectedProject()
 
   const router = useRouter()

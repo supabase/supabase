@@ -7,6 +7,7 @@ import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
+
 import {
   Button,
   DropdownMenu,
@@ -23,7 +24,7 @@ import {
   cn,
   themes,
 } from 'ui'
-import { useCommandMenu } from 'ui-patterns/Cmdk'
+import { useOpenCommandMenu } from 'ui-patterns/CommandMenu'
 
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useSignOut } from 'lib/auth'
@@ -51,7 +52,6 @@ const NavigationBar = () => {
   const { project } = useProjectContext()
   const { theme, setTheme } = useTheme()
   const { ref: projectRef } = useParams()
-  const { setIsOpen } = useCommandMenu()
   const snap = useAppStateSnapshot()
 
   const signOut = useSignOut()
@@ -59,6 +59,7 @@ const NavigationBar = () => {
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
+  const setCommandMenuOpen = useOpenCommandMenu()
 
   const {
     projectAuthAll: authEnabled,
@@ -189,7 +190,7 @@ const NavigationBar = () => {
             <NavigationIconButton
               size="tiny"
               onClick={() => {
-                setIsOpen(true)
+                setCommandMenuOpen(true)
                 snap.setNavigationPanelOpen(false)
               }}
               type="text"

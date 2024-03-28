@@ -12,10 +12,11 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState, type PropsWithChildren } from 'react'
 import { PortalToast, TabsProvider } from 'ui'
-import { CommandMenuProvider } from 'ui-patterns/Cmdk'
+import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
+import { DocsCommandMenu } from '~/components/CommandMenu'
 import SiteLayout from '~/layouts/SiteLayout'
 import { BUILD_PREVIEW_HTML, IS_PLATFORM, IS_PREVIEW } from '~/lib/constants'
 import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
@@ -224,16 +225,17 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
         <AuthContainer>
           <SignOutHandler>
             <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-              <CommandMenuProvider site="docs">
+              <CommandProvider>
                 <TabsProvider>
                   <div className="h-screen flex flex-col">
                     <SiteLayout>
                       <PortalToast />
                       <Component {...pageProps} />
+                      <DocsCommandMenu />
                     </SiteLayout>
                   </div>
                 </TabsProvider>
-              </CommandMenuProvider>
+              </CommandProvider>
             </ThemeProvider>
           </SignOutHandler>
         </AuthContainer>
