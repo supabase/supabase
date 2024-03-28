@@ -1,5 +1,5 @@
 import { useRouter } from 'next/router'
-import { PropsWithChildren } from 'react'
+import { type PropsWithChildren, useEffect } from 'react'
 
 import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProductMenu } from 'components/ui/ProductMenu'
@@ -10,6 +10,8 @@ import Link from 'next/link'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_ } from 'ui'
 import { ProjectLayout } from '../'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
+
+import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 
 export interface DatabaseLayoutProps {
   title?: string

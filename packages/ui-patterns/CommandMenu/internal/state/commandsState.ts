@@ -47,9 +47,10 @@ const initCommandsState = () => {
 
       return () => {
         const idx = state.commandSections.findIndex((section) => section.name === sectionName)
-        if (idx) {
+        console.log(state.commandSections, idx)
+        if (idx !== -1) {
           const filteredCommands = state.commandSections[idx].commands.filter(
-            (command) => !commands.includes(command)
+            (command) => !commands.map((cmd) => cmd.id).includes(command.id)
           )
           if (!filteredCommands.length) {
             state.commandSections.splice(idx)
