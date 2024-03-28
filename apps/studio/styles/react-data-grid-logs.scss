@@ -15,7 +15,7 @@
 
   .rdg-row {
     &.rdg-row--focused {
-      @apply border-r border-brand;
+      @apply border-r border-brand bg-background-surface-300;
       border-right-width: 4px;
     }
 

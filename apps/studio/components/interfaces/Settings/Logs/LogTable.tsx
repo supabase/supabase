@@ -35,6 +35,7 @@ import LogSelection, { LogSelectionProps } from './LogSelection'
 import type { LogData, QueryType } from './Logs.types'
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
+import { motion } from 'framer-motion'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -50,6 +51,8 @@ interface Props {
   onRun?: () => void
   onSave?: () => void
   hasEditorValue?: boolean
+  hideHeader?: boolean
+  maxHeight?: string
 }
 type LogMap = { [id: string]: LogData }
 
@@ -70,6 +73,8 @@ const LogTable = ({
   onRun,
   onSave,
   hasEditorValue,
+  hideHeader = false,
+  maxHeight,
 }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
@@ -81,10 +86,7 @@ const LogTable = ({
 
   // move timestamp to the first column
   function getFirstRow() {
-    if (!firstRow) return {}
-
-    const { timestamp, ...rest } = firstRow || {}
-    return { timestamp, ...rest }
+    return firstRow || {}
   }
 
   const columnNames = Object.keys(getFirstRow() || {})
@@ -175,10 +177,16 @@ const LogTable = ({
     }
   }, [stringData])
 
+  if (!queryType) {
+    hideHeader = true
+  }
+
   // [Joshen] Hmm quite hacky now, but will do
-  const maxHeight = !queryType ? 'calc(100vh - 42px - 10rem)' : 'calc(100vh - 42px - 3rem)'
+  const _maxHeight =
+    maxHeight || (!queryType ? 'calc(100vh - 42px - 10rem)' : 'calc(100vh - 42px - 3rem)')
 
   const logDataRows = useMemo(() => {
+    console.log('DEBUG: ', hasId, hasTimestamp, logMap, dedupedData)
     if (hasId && hasTimestamp) {
       return Object.values(logMap).sort((a, b) => b.timestamp - a.timestamp)
     } else {
@@ -329,8 +337,8 @@ const LogTable = ({
 
   return (
     <>
-      <section className={'flex w-full flex-col ' + (!queryType ? '' : '')} style={{ maxHeight }}>
-        {!queryType && <LogsExplorerTableHeader />}
+      <section className={'flex w-full flex-col h-full'} style={{ maxHeight: _maxHeight }}>
+        {!hideHeader && <LogsExplorerTableHeader />}
         <div className={`flex h-full flex-row ${!queryType ? 'border-l border-r' : ''}`}>
           <DataGrid
             style={{ height: '100%' }}
@@ -350,7 +358,7 @@ const LogTable = ({
               [
                 'font-mono tracking-tight',
                 isEqual(row, focusedLog)
-                  ? '!bg-border-stronger rdg-row--focused'
+                  ? 'rdg-row--focused'
                   : ' !bg-studio hover:!bg-surface-100 cursor-pointer',
               ].join(' ')
             }
@@ -373,14 +381,15 @@ const LogTable = ({
             }}
           />
           {logDataRows.length > 0 ? (
-            <div
-              className={
-                queryType
-                  ? 'flex w-1/2 flex-col'
-                  : focusedLog
-                    ? 'flex w-1/2 flex-col'
-                    : 'hidden w-0'
-              }
+            <motion.div
+              variants={{
+                hidden: { width: 0 },
+                visible: { width: '50%' },
+              }}
+              initial="hidden"
+              animate={focusedLog ? 'visible' : 'hidden'}
+              exit="hidden"
+              transition={{ duration: 0.2 }}
             >
               <LogSelection
                 projectRef={projectRef}
@@ -389,7 +398,7 @@ const LogTable = ({
                 queryType={queryType}
                 params={params}
               />
-            </div>
+            </motion.div>
           ) : null}
         </div>
       </section>
