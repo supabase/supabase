@@ -33,7 +33,9 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
     }
   }, [orgUsage])
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: selectedOrganization?.slug })
+  const { data: subscription } = useOrgSubscriptionQuery({
+    orgSlug: selectedOrganization?.slug,
+  })
 
   const projectHasNoLimits = subscription?.usage_billing_enabled === true
 
@@ -77,7 +79,7 @@ const LayoutHeader = ({ customHeaderComponents, breadcrumbs = [], headerBorder =
                 {showOverUsageBadge && (
                   <div className="ml-2">
                     <Link href={`/org/${selectedOrganization?.slug}/usage`}>
-                      <Badge color="red">Exceeding usage limits</Badge>
+                      <Badge variant="destructive">Exceeding usage limits</Badge>
                     </Link>
                   </div>
                 )}

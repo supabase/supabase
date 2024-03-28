@@ -1,5 +1,4 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import { observer } from 'mobx-react-lite'
 import Image from 'next/legacy/image'
 import { Fragment, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -213,7 +212,9 @@ const MembersView = ({ searchString }: MembersViewProps) => {
 
                         <Table.td>
                           {x.invited_id && x.invited_at && (
-                            <Badge color={isInviteExpired(x.invited_at) ? 'red' : 'yellow'}>
+                            <Badge
+                              variant={isInviteExpired(x.invited_at) ? 'destructive' : 'warning'}
+                            >
                               {isInviteExpired(x.invited_at) ? 'Expired' : 'Invited'}
                             </Badge>
                           )}
@@ -408,4 +409,4 @@ const MembersView = ({ searchString }: MembersViewProps) => {
   )
 }
 
-export default observer(MembersView)
+export default MembersView

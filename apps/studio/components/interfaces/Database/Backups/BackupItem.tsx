@@ -57,7 +57,7 @@ const BackupItem = ({ index, isHealthy, backup, projectRef, onSelectBackup }: Ba
           )}
         </div>
       )
-    return <Badge color="yellow">Backup In Progress...</Badge>
+    return <Badge variant="warning">Backup In Progress...</Badge>
   }
 
   const generateBackupName = (backup: any) => {

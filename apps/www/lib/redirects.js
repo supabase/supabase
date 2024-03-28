@@ -2078,6 +2078,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/realtime/guides/client-side-throttling',
+    destination: '/docs/guides/realtime/quotas',
+  },
+  {
+    permanent: true,
     source: '/docs/guides/database/extensions/pgcron',
     destination: '/docs/guides/database/extensions/pg_cron',
   },
@@ -2392,5 +2397,15 @@ module.exports = [
     permanent: true,
     source: '/docs/learn/auth-deep-dive/auth-google-oauth',
     destination: '/docs/guides/auth/auth-deep-dive/auth-google-oauth',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/sso/auth-sso-saml',
+    destination: '/guides/auth/enterprise-sso/auth-sso-saml',
+  },
+  {
+    permanent: true,
+    source: '/contact/mfa',
+    destination: '/docs/guides/auth/auth-mfa',
   },
 ]
