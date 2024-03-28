@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 import { databaseKeys } from './keys'
 import { ExecuteSqlData, useExecuteSqlQuery } from 'data/sql/execute-sql-query'
+import { ResponseError } from 'types'
 
 export type SchemasVariables = {
   projectRef?: string
