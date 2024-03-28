@@ -26,6 +26,7 @@ import {
 } from 'ui'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
 import { RolesAccessMatrix } from './RolesAccessMatrix'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 interface UpdateRolesPanelProps {
   visible: boolean
@@ -45,6 +46,17 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const [roleConfiguration, setRoleConfiguration] = useState<
     { id: number; name: string; projects: string[] }[]
   >([])
+
+  // [Joshen] If any roles are applied to ALL projects, or there are overlapping projects across roles
+  const hasMoreThanOneRoleForAllProjects =
+    roleConfiguration.some((r) => r.projects.length === 0) && roleConfiguration.length > 1
+  const selectedProjectsAcrossRoles = roleConfiguration.reduce((obj, item) => {
+    return obj.concat(item.projects)
+  }, [] as string[])
+  const hasOverlappingProjects =
+    new Set(selectedProjectsAcrossRoles).size !== selectedProjectsAcrossRoles.length
+  const canSaveRoles =
+    roleConfiguration.length > 0 && !hasOverlappingProjects && !hasMoreThanOneRoleForAllProjects
 
   const availableRoles = data?.roles ?? []
   const appliedRoles = member.role_ids
@@ -68,7 +80,16 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
     setRoleConfiguration(roleConfiguration.filter((r) => r.id !== role.id))
   }
 
-  const canSaveRoles = roleConfiguration.length > 0
+  const onUpdateRole = (role: Role, projects: string[]) => {
+    const updatedConfiguration = roleConfiguration.map((r) => {
+      if (role.id === r.id) {
+        return { ...r, projects }
+      } else {
+        return r
+      }
+    })
+    setRoleConfiguration(updatedConfiguration)
+  }
 
   useEffect(() => {
     // [Joshen] This is an assumption for the structure
@@ -96,11 +117,11 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
         <div className={cn('flex flex-col grow', showRolesAccessMatrix ? 'w-[48%]' : 'w-full')}>
           <SheetHeader className={cn('py-3 flex flex-row justify-between items-center border-b')}>
             <p>Manage access for team member</p>
-            <Tooltip_Shadcn_ delayDuration={200}>
+            <Tooltip_Shadcn_ delayDuration={100}>
               <TooltipTrigger_Shadcn_ asChild>
                 <button
                   aria-expanded={showRolesAccessMatrix}
-                  aria-controls="ai-chat-assistant"
+                  aria-controls="show-roles-matrix"
                   className={cn(
                     !showRolesAccessMatrix ? 'text-foreground-lighter' : 'text-light',
                     'mt-1 hover:text-foreground transition'
@@ -115,7 +136,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                 </button>
               </TooltipTrigger_Shadcn_>
               <TooltipContent_Shadcn_ side="left">
-                {showRolesAccessMatrix ? 'Hide' : 'Show'} roles access rules
+                {showRolesAccessMatrix ? 'Hide' : 'Show'} role permissions
               </TooltipContent_Shadcn_>
             </Tooltip_Shadcn_>
           </SheetHeader>
@@ -124,8 +145,22 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
             <p className="text-sm">
               Assign roles to each project under {organization?.name} for {member.username}
             </p>
+
+            {(hasOverlappingProjects || hasMoreThanOneRoleForAllProjects) && (
+              <Alert_Shadcn_ variant="warning">
+                <WarningIcon />
+                <AlertTitle_Shadcn_>
+                  Members cannot be assigned multiple roles on a project
+                </AlertTitle_Shadcn_>
+                <AlertDescription_Shadcn_>
+                  Ensure that the member has at most one role assigned for each project
+                </AlertDescription_Shadcn_>
+              </Alert_Shadcn_>
+            )}
+
             {roleConfiguration.length === 0 && (
               <Alert_Shadcn_>
+                <WarningIcon />
                 <AlertTitle_Shadcn_>
                   Team members need to be assigned at least one role
                 </AlertTitle_Shadcn_>
@@ -134,7 +169,11 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             )}
+
             {roleConfiguration.map((role) => {
+              const selectedProjects =
+                roleConfiguration.find((r) => r.id === role.id)?.projects ?? []
+
               return (
                 <div
                   key={role.name}
@@ -155,10 +194,10 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
                         disabled: false,
                       }
                     })}
-                    value={[]}
+                    value={selectedProjects}
                     placeholder="All projects"
                     searchPlaceholder="Search for a project"
-                    onChange={(roles) => {}}
+                    onChange={(projects) => onUpdateRole(role, projects)}
                   />
                 </div>
               )
