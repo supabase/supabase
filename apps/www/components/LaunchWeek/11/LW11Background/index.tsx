@@ -42,8 +42,6 @@ const LW11Background = ({ className }: { className?: string }) => {
     const GRID_COLS = Math.floor(size.w / DOT_AREA)
     const GRID_ROWS = Math.floor(size.h / DOT_AREA)
 
-    console.log(c, size, GRID_COLS, GRID_ROWS)
-
     for (let i = 0; i < GRID_COLS; i++) {
       for (let j = 0; j < GRID_ROWS; j++) {
         const isLarge = Math.random() > config.percentageLarge
@@ -141,7 +139,6 @@ const LW11Background = ({ className }: { className?: string }) => {
   }
 
   function resize() {
-    console.log('resizing')
     setSize({ w: Window.width, h: Window.height })
     init()
   }

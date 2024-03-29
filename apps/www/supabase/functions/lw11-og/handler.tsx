@@ -282,7 +282,7 @@ export async function handler(req: Request) {
                 width: TICKET_POS_LEFT - OG_PADDING_X,
                 alignItems: 'flex-start',
                 fontFamily: '"SourceCodePro"',
-                fontSize: 30,
+                fontSize: 34,
                 textTransform: 'uppercase',
                 letterSpacing: '0.35rem',
                 lineHeight: '120%',
@@ -310,7 +310,7 @@ export async function handler(req: Request) {
                   color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
                 }}
               >
-                8AM PT
+                7AM PT
               </p>
             </div>
           </div>

@@ -4,7 +4,6 @@ import { GetStaticProps, GetStaticPaths } from 'next'
 import Link from 'next/link'
 import Error from 'next/error'
 import dynamic from 'next/dynamic'
-import { useTheme } from 'next-themes'
 import { Session } from '@supabase/supabase-js'
 import { Button } from 'ui'
 import { SITE_URL } from '~/lib/constants'
@@ -37,9 +36,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
   const DESCRIPTION = ``
   const OG_URL = `${SITE_URL}/tickets/${username}`
 
-  const [session, setSession] = useState<Session | null>(null)
-  const { resolvedTheme, setTheme } = useTheme()
-  const [initialDarkMode] = useState(resolvedTheme?.includes('dark'))
+  const [session] = useState<Session | null>(null)
 
   const [ticketState, setTicketState] = useState<TicketState>('ticket')
 
