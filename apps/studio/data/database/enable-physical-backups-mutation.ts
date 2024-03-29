@@ -9,7 +9,7 @@ export type EnablePhysicalBackupsVariables = {
 }
 
 export async function enablePhysicalBackups({ ref }: EnablePhysicalBackupsVariables) {
-  const { data, error } = await post('/v0/database/{ref}/backups/enable-physical-backups', {
+  const { data, error } = await post('/platform/database/{ref}/backups/enable-physical-backups', {
     params: { path: { ref } },
   })
   if (error) throw error
