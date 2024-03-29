@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 
+import { SelectValue } from '@ui/components/shadcn/ui/select'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { CodeEditor } from 'components/ui/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -13,20 +14,16 @@ import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import {
   Button,
   Input,
-  Listbox,
-  Select,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   SelectValue_Shadcn_,
   Select_Shadcn_,
   SidePanel,
-  cn,
 } from 'ui'
 import MultiSelect, { MultiSelectOption } from 'ui-patterns/MultiSelect'
-import { INDEX_TYPES } from './Indexes.constants'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { SelectLabel, SelectValue } from '@ui/components/shadcn/ui/select'
+import { INDEX_TYPES } from './Indexes.constants'
 
 interface CreateIndexSidePanelProps {
   visible: boolean
@@ -123,6 +120,8 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
     setSelectedIndexType(INDEX_TYPES[0].value)
   }, [selectedEntity])
 
+  const isSelectEntityDisabled = entityTypes.length === 0
+
   return (
     <SidePanel
       size="large"
@@ -154,35 +153,39 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
             </Select_Shadcn_>
           </FormItemLayout>
 
-          {entityTypes.length === 0 ? (
-            <div className="space-y-2">
-              <p className="text-sm text-foreground-light leading-4">Select a table</p>
-              <Input
-                disabled
-                placeholder="No tables available in schema"
-                descriptionText="Create a table in this schema via the Table or SQL editor first"
-              />
-            </div>
-          ) : (
-            <FormItemLayout label="Select a table" name="select-table" isReactForm={false}>
-              <Select_Shadcn_
-                value={selectedEntity}
-                onValueChange={setSelectedEntity}
-                name="select-table"
-              >
-                <SelectTrigger_Shadcn_ size="small">
-                  <SelectValue placeholder="Choose a table">{selectedEntity}</SelectValue>
-                </SelectTrigger_Shadcn_>
-                <SelectContent_Shadcn_>
-                  {(entityTypes ?? []).map((entity) => (
-                    <SelectItem_Shadcn_ key={entity.name} value={entity.name}>
-                      {entity.name}
-                    </SelectItem_Shadcn_>
-                  ))}
-                </SelectContent_Shadcn_>
-              </Select_Shadcn_>
-            </FormItemLayout>
-          )}
+          <FormItemLayout
+            label="Select a table"
+            name="select-table"
+            description={
+              isSelectEntityDisabled &&
+              'Create a table in this schema via the Table or SQL editor first'
+            }
+            isReactForm={false}
+          >
+            <Select_Shadcn_
+              disabled={isSelectEntityDisabled}
+              value={selectedEntity}
+              onValueChange={setSelectedEntity}
+              name="select-table"
+            >
+              <SelectTrigger_Shadcn_ size="small">
+                <SelectValue
+                  placeholder={
+                    isSelectEntityDisabled ? 'No tables available in schema' : 'Choose a table'
+                  }
+                >
+                  {selectedEntity}
+                </SelectValue>
+              </SelectTrigger_Shadcn_>
+              <SelectContent_Shadcn_>
+                {(entityTypes ?? []).map((entity) => (
+                  <SelectItem_Shadcn_ key={entity.name} value={entity.name}>
+                    {entity.name}
+                  </SelectItem_Shadcn_>
+                ))}
+              </SelectContent_Shadcn_>
+            </Select_Shadcn_>
+          </FormItemLayout>
 
           {selectedEntity && (
             <FormItemLayout label="Select up to 32 columns" isReactForm={false}>
