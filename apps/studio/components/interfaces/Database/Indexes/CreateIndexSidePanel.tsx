@@ -228,7 +228,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
                       <>
                         <SelectItem_Shadcn_ key={index.name} value={index.value}>
                           <div className="flex flex-col gap-0.5">
-                            <span className="font-mono">{index.name}</span>
+                            <span>{index.name}</span>
                             {index.description.split('\n').map((x, idx) => (
                               <span
                                 className="text-foreground-lighter group-focus:text-foreground-light group-data-[state=checked]:text-foreground-light"
