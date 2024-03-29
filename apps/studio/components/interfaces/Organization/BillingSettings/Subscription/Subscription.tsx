@@ -13,6 +13,7 @@ import SparkBar from 'components/ui/SparkBar'
 import { useOrganizationBillingSubscriptionCancelSchedule } from 'data/subscriptions/org-subscription-cancel-schedule-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useFlag } from 'hooks'
+import { ExternalLink } from 'lucide-react'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import {
   Alert,
@@ -21,7 +22,6 @@ import {
   Alert_Shadcn_,
   Button,
   IconCalendar,
-  IconExternalLink,
 } from 'ui'
 import ProjectUpdateDisabledTooltip from '../ProjectUpdateDisabledTooltip'
 import { Restriction } from '../Restriction'
@@ -60,14 +60,14 @@ const Subscription = () => {
         </div>
         <ScaffoldSectionDetail>
           <div className="sticky space-y-6 top-12">
-            <p className="text-base m-0">Subscription Plan</p>
+            <p className="text-foreground text-base m-0">Subscription Plan</p>
             <div className="space-y-2">
               <p className="text-sm text-foreground-light m-0">More information</p>
               <div>
                 <Link href="https://supabase.com/pricing" target="_blank" rel="noreferrer">
                   <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                     <p className="text-sm m-0">Pricing</p>
-                    <IconExternalLink size={16} strokeWidth={1.5} />
+                    <ExternalLink size={16} strokeWidth={1.5} />
                   </div>
                 </Link>
               </div>
