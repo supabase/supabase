@@ -1,24 +1,17 @@
-import { useEffect, useState, useRef } from 'react'
+import { useState, useRef } from 'react'
 import { SITE_URL } from '~/lib/constants'
-import useConfData from '../../hooks/use-conf-data'
 import { IconCheck, IconCopy, cn } from 'ui'
+import useConfData from '../../hooks/use-conf-data'
 
 export default function TicketCopy({ sharePage }: { sharePage: boolean }) {
   const { userData } = useConfData()
-  const { username, golden, metadata } = userData
-  const [copyEnabled, setCopyEnabled] = useState(false)
+  const { username, platinum, secret } = userData
   const [copied, setCopied] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
-  const hasSecretTicket = metadata?.hasSecretTicket
+  const hasSecretTicket = secret
   const url = `${SITE_URL}/tickets/${username}?lw=11${
-    hasSecretTicket ? '&secret=true' : golden ? `&platinum=true` : ''
+    hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''
   }`
-
-  useEffect(() => {
-    if (navigator.clipboard) {
-      setCopyEnabled(true)
-    }
-  }, [])
 
   return (
     <div
