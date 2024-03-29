@@ -528,6 +528,7 @@ export const auth = {
       name: 'Authentication',
       url: undefined,
       items: [
+        { name: 'Anonymous Sign-Ins', url: '/guides/auth/auth-anonymous' },
         { name: 'Email Login', url: '/guides/auth/auth-email' },
         {
           name: 'Passwordless Login',

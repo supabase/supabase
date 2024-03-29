@@ -226,7 +226,7 @@ functions:
 
   - id: sign-up
     title: 'signUp()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.signUp'
+    $ref: '@supabase/auth-js.GoTrueClient.signUp'
     notes: |
       - By default, the user needs to verify their email address before logging in. To turn this off, disable **Confirm email** in [your project](/dashboard/project/_/auth/providers).
       - **Confirm email** determines if users need to confirm their email address after signing up.
@@ -313,7 +313,7 @@ functions:
 
   - id: on-auth-state-change
     title: 'onAuthStateChange()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.onAuthStateChange'
+    $ref: '@supabase/auth-js.GoTrueClient.onAuthStateChange'
     notes: |
       - Subscribes to important events occurring on the user's session.
       - Use on the frontend/client. It is less useful on the server.
@@ -506,9 +506,39 @@ functions:
           })
           ```
 
+  - id: sign-in-anonymously
+    title: 'signInAnonymously()'
+    $ref: '@supabase/auth-js.GoTrueClient.signInAnonymously'
+    notes: |
+      - Returns an anonymous user
+      - It is recommended to set up captcha for anonymous sign-ins to prevent abuse. You can pass in the captcha token in the `options` param.
+    examples:
+      - id: sign-in-anonymously
+        name: Create an anonymous user
+        isSpotlight: true
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.signInAnonymously({
+            options: {
+              captchaToken
+            }
+          });
+          ```
+      - id: sign-in-anonymously-with-user-metadata
+        name: Create an anonymous user with custom user metadata
+        isSpotlight: false
+        code: |
+          ```js
+          const { data, error } = await supabase.auth.signInAnonymously({
+            options: {
+              data
+            }
+          })
+          ```
+
   - id: sign-in-with-password
     title: 'signInWithPassword()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithPassword'
     notes: |
       - Requires either an email and password or a phone number and password.
     examples:
@@ -534,7 +564,7 @@ functions:
           ```
   - id: sign-in-with-otp
     title: 'signInWithOtp()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOtp'
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithOtp'
     notes: |
       - Requires either an email or phone number.
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
@@ -584,7 +614,7 @@ functions:
           ```
   - id: sign-in-with-oauth
     title: 'signInWithOAuth()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithOAuth'
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithOAuth'
     notes: |
       - This method is used for signing in using a third-party provider.
       - Supabase supports many different [third-party providers](/docs/guides/auth#configure-third-party-providers).
@@ -654,7 +684,7 @@ functions:
 
   - id: sign-in-with-id-token
     title: 'signInWithIdToken'
-    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithIdToken'
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithIdToken'
     examples:
       - id: sign-in-with-id-token
         name: 'Sign In using ID Token'
@@ -667,7 +697,7 @@ functions:
           ```
   - id: sign-in-with-sso
     title: 'signInWithSSO()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.signInWithSSO'
+    $ref: '@supabase/auth-js.GoTrueClient.signInWithSSO'
     notes: |
       - Before you can call this method you need to [establish a connection](/docs/guides/auth/sso/auth-sso-saml#managing-saml-20-connections) to an identity provider. Use the [CLI commands](/docs/reference/cli/supabase-sso) to do this.
       - If you've associated an email domain to the identity provider, you can use the `domain` property to start a sign-in flow.
@@ -711,7 +741,7 @@ functions:
           ```
   - id: sign-out
     title: 'signOut()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.signOut'
+    $ref: '@supabase/auth-js.GoTrueClient.signOut'
     notes: |
       - In order to use the `signOut()` method, the user needs to be signed in first.
       - By default, `signOut()` uses the global scope, which signs out all other sessions that the user is logged into as well.
@@ -726,7 +756,7 @@ functions:
           ```
   - id: verify-otp
     title: 'verifyOtp()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.verifyOtp'
+    $ref: '@supabase/auth-js.GoTrueClient.verifyOtp'
     notes: |
       - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `email`, `recovery`, `invite` or `email_change` (`signup` and `magiclink` types are deprecated).
       - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up / sign-in a user.
@@ -755,7 +785,7 @@ functions:
           ```
   - id: get-session
     title: 'getSession()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.getSession'
+    $ref: '@supabase/auth-js.GoTrueClient.getSession'
     notes: |
       - This method retrieves the current local session (i.e local storage).
       - The session contains a signed JWT and unencoded session data.
@@ -771,7 +801,7 @@ functions:
           ```
   - id: start-auto-refresh
     title: 'startAutoRefresh()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.startAutoRefresh'
+    $ref: '@supabase/auth-js.GoTrueClient.startAutoRefresh'
     notes: |
       - Only useful in non-browser environments such as React Native or Electron.
       - The Supabase Auth library automatically starts and stops proactively refreshing the session when a tab is focused or not.
@@ -796,7 +826,7 @@ functions:
           ```
   - id: stop-auto-refresh
     title: 'stopAutoRefresh()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.stopAutoRefresh'
+    $ref: '@supabase/auth-js.GoTrueClient.stopAutoRefresh'
     notes: |
       - Only useful in non-browser environments such as React Native or Electron.
       - The Supabase Auth library automatically starts and stops proactively refreshing the session when a tab is focused or not.
@@ -821,7 +851,7 @@ functions:
           ```
   - id: get-user
     title: 'getUser()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.getUser'
+    $ref: '@supabase/auth-js.GoTrueClient.getUser'
     notes: |
       - This method fetches the user object from the database instead of local session.
       - This method is useful for checking if the user is authorized because it validates the user's access token JWT on the server.
@@ -843,7 +873,7 @@ functions:
           ```
   - id: update-user
     title: 'updateUser()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
+    $ref: '@supabase/auth-js.GoTrueClient.updateUser'
     notes: |
       - In order to use the `updateUser()` method, the user needs to be signed in first.
       - By default, email updates sends a confirmation link to both the user's current and new email.
@@ -902,7 +932,7 @@ functions:
           ```
   - id: get-user-identities
     title: 'getUserIdentities()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.getUserIdentities'
+    $ref: '@supabase/auth-js.GoTrueClient.getUserIdentities'
     notes: |
       - The user needs to be signed in to call `getUserIdentities()`.
     examples:
@@ -915,7 +945,7 @@ functions:
           ```
   - id: link-identity
     title: 'linkIdentity()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.linkIdentity'
+    $ref: '@supabase/auth-js.GoTrueClient.linkIdentity'
     notes: |
       - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
       - The user needs to be signed in to call `linkIdentity()`.
@@ -930,7 +960,7 @@ functions:
           ```
   - id: unlink-identity
     title: 'unlinkIdentity()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.unlinkIdentity'
+    $ref: '@supabase/auth-js.GoTrueClient.unlinkIdentity'
     notes: |
       - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
       - The user needs to be signed in to call `unlinkIdentity()`.
@@ -955,7 +985,7 @@ functions:
           ```
   - id: send-password-reauthentication
     title: 'reauthenticate()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.reauthenticate'
+    $ref: '@supabase/auth-js.GoTrueClient.reauthenticate'
     notes: |
       - This method is used together with `updateUser()` when a user's password needs to be updated.
       - If you require your user to reauthenticate before updating their password, you need to enable the **Secure password change** option in your [project's email provider settings](/dashboard/project/_/auth/providers).
@@ -972,7 +1002,7 @@ functions:
           ```
   - id: resend-email-or-phone-otps
     title: 'resend()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.resend'
+    $ref: '@supabase/auth-js.GoTrueClient.resend'
     notes: |
       - Resends a signup confirmation, email change or phone change email to the user.
       - Passwordless sign-ins can be resent by calling the `signInWithOtp()` method again.
@@ -1026,7 +1056,7 @@ functions:
           ```
   - id: set-session
     title: 'setSession()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.setSession'
+    $ref: '@supabase/auth-js.GoTrueClient.setSession'
     notes: |
       - `setSession()` takes in a refresh token and uses it to get a new session.
       - The refresh token can only be used once to obtain a new session.
@@ -1046,7 +1076,7 @@ functions:
           ```
   - id: refresh-session
     title: 'refreshSession()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.refreshSession'
+    $ref: '@supabase/auth-js.GoTrueClient.refreshSession'
     notes: |
       - This method will refresh and return a new session whether the current one is expired or not.
     examples:
@@ -1069,7 +1099,7 @@ functions:
 
   - id: exchange-code-for-session
     title: 'exchangeCodeForSession()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.exchangeCodeForSession'
+    $ref: '@supabase/auth-js.GoTrueClient.exchangeCodeForSession'
     notes: |
       - Used when `flowType` is set to `pkce` in client options.
     examples:
@@ -1090,7 +1120,7 @@ functions:
       Having a 2nd TOTP factor for recovery frees the user of the burden of having to store their recovery codes somewhere. It also reduces the attack surface since multiple recovery codes are usually generated compared to just having 1 backup TOTP factor.
   - id: mfa-enroll
     title: 'mfa.enroll()'
-    $ref: '@supabase/gotrue-js.GoTrueMFAApi.enroll'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.enroll'
     notes: |
       - Currently, `totp` is the only supported `factorType`. The returned `id` should be used to create a challenge.
       - To create a challenge, see [`mfa.challenge()`](/docs/reference/javascript/auth-mfa-challenge).
@@ -1118,7 +1148,7 @@ functions:
           ```
   - id: mfa-challenge
     title: 'mfa.challenge()'
-    $ref: '@supabase/gotrue-js.GoTrueMFAApi.challenge'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.challenge'
     notes: |
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before creating a challenge.
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify).
@@ -1134,7 +1164,7 @@ functions:
           ```
   - id: mfa-verify
     title: 'mfa.verify()'
-    $ref: '@supabase/gotrue-js.GoTrueMFAApi.verify'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.verify'
     notes: |
       - To verify a challenge, please [create a challenge](/docs/reference/javascript/auth-mfa-challenge) first.
     examples:
@@ -1151,7 +1181,7 @@ functions:
           ```
   - id: mfa-challenge-and-verify
     title: 'mfa.challengeAndVerify()'
-    $ref: '@supabase/gotrue-js.GoTrueMFAApi.challengeAndVerify'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.challengeAndVerify'
     notes: |
       - An [enrolled factor](/docs/reference/javascript/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
       - Executes [`mfa.challenge()`](/docs/reference/javascript/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/javascript/auth-mfa-verify) in a single step.
@@ -1168,7 +1198,7 @@ functions:
           ```
   - id: mfa-unenroll
     title: 'mfa.unenroll()'
-    $ref: '@supabase/gotrue-js.GoTrueMFAApi.unenroll'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.unenroll'
     examples:
       - id: unenroll-a-factor
         name: Unenroll a factor
@@ -1181,7 +1211,7 @@ functions:
           ```
   - id: mfa-get-authenticator-assurance-level
     title: 'mfa.getAuthenticatorAssuranceLevel()'
-    $ref: '@supabase/gotrue-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
+    $ref: '@supabase/auth-js.GoTrueMFAApi.getAuthenticatorAssuranceLevel'
     notes: |
       - Authenticator Assurance Level (AAL) is the measure of the strength of an authentication mechanism.
       - In Supabase, having an AAL of `aal1` refers to having the 1st factor of authentication such as an email and password or OAuth sign-in while `aal2` refers to the 2nd factor of authentication such as a time-based, one-time-password (TOTP).
@@ -1221,7 +1251,7 @@ functions:
 
   - id: get-user-by-id
     title: 'getUserById()'
-    $ref: '@supabase/gotrue-js.GoTrueAdminApi.getUserById'
+    $ref: '@supabase/auth-js.GoTrueAdminApi.getUserById'
     notes: |
       - Fetches the user object from the database based on the user's id.
       - The `getUserById()` method requires the user's id which maps to the `auth.users.id` column.
@@ -1236,7 +1266,7 @@ functions:
 
   - id: list-users
     title: 'listUsers()'
-    $ref: '@supabase/gotrue-js.GoTrueAdminApi.listUsers'
+    $ref: '@supabase/auth-js.GoTrueAdminApi.listUsers'
     notes: |
       - Defaults to return 50 users per page.
     examples:
@@ -1259,7 +1289,7 @@ functions:
           ```
   - id: create-user
     title: 'createUser()'
-    $ref: '@supabase/gotrue-js.GoTrueAdminApi.createUser'
+    $ref: '@supabase/auth-js.GoTrueAdminApi.createUser'
     notes: |
       - To confirm the user's email address or phone number, set `email_confirm` or `phone_confirm` to true. Both arguments default to false.
       - `createUser()` will not send a confirmation email to the user. You can use [`inviteUserByEmail()`](/docs/reference/javascript/auth-admin-inviteuserbyemail) if you want to send them an email invite instead.
@@ -1296,7 +1326,7 @@ functions:
           ```
   - id: delete-user
     title: 'deleteUser()'
-    $ref: '@supabase/gotrue-js.GoTrueAdminApi.deleteUser'
+    $ref: '@supabase/auth-js.GoTrueAdminApi.deleteUser'
     notes: |
       - The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
     examples:
@@ -1312,7 +1342,7 @@ functions:
 
   - id: invite-user-by-email
     title: 'inviteUserByEmail()'
-    $ref: '@supabase/gotrue-js.GoTrueAdminApi.inviteUserByEmail'
+    $ref: '@supabase/auth-js.GoTrueAdminApi.inviteUserByEmail'
     notes: |
       - Sends an invite link to the user's email address.
       - The `inviteUserByEmail()` method is typically used by administrators to invite users to join the application.
@@ -1328,7 +1358,7 @@ functions:
 
   - id: reset-password-for-email
     title: 'resetPasswordForEmail()'
-    $ref: '@supabase/gotrue-js.GoTrueClient.resetPasswordForEmail'
+    $ref: '@supabase/auth-js.GoTrueClient.resetPasswordForEmail'
     notes: |
       - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
       - The `resetPasswordForEmail()` only sends a password reset link to the user's email.
@@ -1386,7 +1416,7 @@ functions:
 
   - id: generate-link
     title: 'generateLink()'
-    $ref: '@supabase/gotrue-js.GoTrueAdminApi.generateLink'
+    $ref: '@supabase/auth-js.GoTrueAdminApi.generateLink'
     notes: |
       - The following types can be passed into `generateLink()`: `signup`, `magiclink`, `invite`, `recovery`, `email_change_current`, `email_change_new`, `phone_change`.
       - `generateLink()` only generates the email link for `email_change_email` if the **Secure email change** is enabled in your project's [email auth provider settings](/dashboard/project/_/auth/providers).
@@ -1455,7 +1485,7 @@ functions:
 
   - id: update-user-by-id
     title: 'updateUserById()'
-    $ref: '@supabase/gotrue-js.GoTrueAdminApi.updateUserById'
+    $ref: '@supabase/auth-js.GoTrueAdminApi.updateUserById'
     examples:
       - id: updates-a-users-email
         name: Updates a user's email
@@ -1519,7 +1549,7 @@ functions:
           ```
   - id: mfa-list-factors
     title: 'mfa.listFactors()'
-    $ref: '@supabase/gotrue-js.GoTrueAdminMFAApi.listFactors'
+    $ref: '@supabase/auth-js.GoTrueAdminMFAApi.listFactors'
     examples:
       - id: list-factors
         name: List all factors for a user
@@ -1530,7 +1560,7 @@ functions:
           ```
   - id: mfa-delete-factor
     title: 'mfa.deleteFactor()'
-    $ref: '@supabase/gotrue-js.GoTrueAdminMFAApi.deleteFactor'
+    $ref: '@supabase/auth-js.GoTrueAdminMFAApi.deleteFactor'
     examples:
       - id: delete-factor
         name: Delete a factor for a user
