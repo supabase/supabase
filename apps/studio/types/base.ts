@@ -88,7 +88,7 @@ export interface ResponseFailure {
 export type SupaResponse<T> = T | ResponseFailure
 
 export interface ResponseError {
-  code?: number | string
+  code?: number
   message: string
   requestId?: string
 }
