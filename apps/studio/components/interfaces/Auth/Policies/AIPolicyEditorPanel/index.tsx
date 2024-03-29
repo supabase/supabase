@@ -843,22 +843,20 @@ export const AIPolicyEditorPanel = memo(function ({
 
       <ConfirmationModal
         visible={isClosingPolicyEditorPanel}
-        header="Discard changes"
-        buttonLabel="Discard"
-        onSelectCancel={() => {
+        title="Discard changes"
+        confirmLabel="Discard"
+        onCancel={() => {
           setIsClosingPolicyEditorPanel(false)
         }}
-        onSelectConfirm={() => {
+        onConfirm={() => {
           onSelectCancel()
           setIsClosingPolicyEditorPanel(false)
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            Are you sure you want to close the editor? Any unsaved changes on your policy and
-            conversations with the Assistant will be lost.
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to close the editor? Any unsaved changes on your policy and
+          conversations with the Assistant will be lost.
+        </p>
       </ConfirmationModal>
     </>
   )

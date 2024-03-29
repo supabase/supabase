@@ -85,12 +85,12 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
                     .find((item: any) => item.name === extension.name)
                     ?.link.startsWith('/guides')
                     ? siteUrl === 'http://localhost:8082'
-                      ? `http://localhost:3001/docs${
-                          extensions.find((item: any) => item.name === extension.name)?.link
-                        }`
-                      : `https://supabase.com/docs${
-                          extensions.find((item: any) => item.name === extension.name)?.link
-                        }`
+                      ? `http://localhost:3001/docs${extensions.find(
+                          (item: any) => item.name === extension.name
+                        )?.link}`
+                      : `https://supabase.com/docs${extensions.find(
+                          (item: any) => item.name === extension.name
+                        )?.link}`
                     : extensions.find((item: any) => item.name === extension.name)?.link ?? ''
                 }
                 className="max-w-[85%] cursor-default zans"
@@ -139,17 +139,15 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
       />
       <ConfirmationModal
         visible={isDisableModalOpen}
-        header="Confirm to disable extension"
-        buttonLabel="Disable"
-        buttonLoadingLabel="Disabling"
-        onSelectCancel={() => setIsDisableModalOpen(false)}
-        onSelectConfirm={() => onConfirmDisable()}
+        title="Confirm to disable extension"
+        confirmLabel="Disable"
+        confirmLabelLoading="Disabling"
+        onCancel={() => setIsDisableModalOpen(false)}
+        onConfirm={() => onConfirmDisable()}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            Are you sure you want to turn OFF the "{extension.name}" extension?
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to turn OFF the "{extension.name}" extension?
+        </p>
       </ConfirmationModal>
     </>
   )

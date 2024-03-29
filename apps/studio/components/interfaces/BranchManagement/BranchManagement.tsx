@@ -344,44 +344,28 @@ const BranchManagement = () => {
       />
 
       <ConfirmationModal
-        danger
+        variant={'destructive'}
         size="medium"
         loading={isDisabling}
         visible={showDisableBranching}
-        header="Confirm disable branching for project"
-        buttonLabel="Confirm disable branching"
-        buttonLoadingLabel="Disabling branching..."
-        onSelectConfirm={() => onConfirmDisableBranching()}
-        onSelectCancel={() => setShowDisableBranching(false)}
+        title="Confirm disable branching for project"
+        confirmLabel="Confirm disable branching"
+        confirmLabelLoading="Disabling branching..."
+        onConfirm={() => onConfirmDisableBranching()}
+        onCancel={() => setShowDisableBranching(false)}
+        alert={{
+          title: 'This action cannot be undone',
+          description:
+            'All database preview branches will be removed upon disabling branching. You may still re-enable branching again thereafter, but your existing preview branches will not be restored.',
+        }}
       >
-        <Modal.Content>
-          <div className="py-6">
-            <Alert_Shadcn_ variant="warning">
-              <IconAlertTriangle strokeWidth={2} />
-              <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                All database preview branches will be removed upon disabling branching. You may
-                still re-enable branching again thereafter, but your existing preview branches will
-                not be restored.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-            <ul className="mt-4 space-y-5">
-              <li className="flex gap-3">
-                <div>
-                  <strong className="text-sm">Before you disable branching, consider:</strong>
-                  <ul className="space-y-2 mt-2 text-sm text-foreground-light">
-                    <li className="list-disc ml-6">
-                      Your project no longer requires database previews.
-                    </li>
-                    <li className="list-disc ml-6">
-                      None of your database previews are currently being used in any app.
-                    </li>
-                  </ul>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </Modal.Content>
+        <p className="text-sm">Before you disable branching, consider:</p>
+        <ul className="space-y-2 mt-2 text-sm text-foreground-light">
+          <li className="list-disc ml-6">Your project no longer requires database previews.</li>
+          <li className="list-disc ml-6">
+            None of your database previews are currently being used in any app.
+          </li>
+        </ul>
       </ConfirmationModal>
 
       <CreateBranchModal visible={showCreateBranch} onClose={() => setShowCreateBranch(false)} />

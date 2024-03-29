@@ -267,13 +267,13 @@ const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeade
       <ConfirmationModal
         visible={showEnableRealtime}
         loading={isTogglingRealtime}
-        header={`${isRealtimeEnabled ? 'Disable' : 'Enable'} realtime for ${table.name}`}
-        buttonLabel={`${isRealtimeEnabled ? 'Disable' : 'Enable'} realtime`}
-        buttonLoadingLabel={`${isRealtimeEnabled ? 'Disabling' : 'Enabling'} realtime`}
-        onSelectCancel={() => setShowEnableRealtime(false)}
-        onSelectConfirm={() => toggleRealtime()}
+        title={`${isRealtimeEnabled ? 'Disable' : 'Enable'} realtime for ${table.name}`}
+        confirmLabel={`${isRealtimeEnabled ? 'Disable' : 'Enable'} realtime`}
+        confirmLabelLoading={`${isRealtimeEnabled ? 'Disabling' : 'Enabling'} realtime`}
+        onCancel={() => setShowEnableRealtime(false)}
+        onConfirm={() => toggleRealtime()}
       >
-        <Modal.Content className="py-4 space-y-2">
+        <div className="space-y-2">
           <p className="text-sm">
             Once realtime has been {isRealtimeEnabled ? 'disabled' : 'enabled'}, the table will{' '}
             {isRealtimeEnabled ? 'no longer ' : ''}broadcast any changes to authorized subscribers.
@@ -287,7 +287,7 @@ const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeade
               settings.
             </p>
           )}
-        </Modal.Content>
+        </div>
       </ConfirmationModal>
 
       <ConfirmModal
