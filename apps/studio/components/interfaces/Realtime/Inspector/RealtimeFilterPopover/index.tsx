@@ -216,7 +216,6 @@ export const RealtimeFilterPopover = ({ config, onChangeConfig }: RealtimeFilter
           setOpen(false)
         }}
       >
-        <p className="text-sm text-foreground"></p>
         <p className="text-sm text-foreground-light">
           The realtime inspector will clear currently collected messages and start listening for new
           messages matching the updated filters.
