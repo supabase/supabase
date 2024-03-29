@@ -85,7 +85,7 @@ functions:
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/reference/auth/config#site_url) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
         - When both **Confirm email** and **Confirm phone** (even when phone provider is disabled) are enabled in [your project](/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
         - When either **Confirm email** or **Confirm phone** (even when phone provider is disabled) is disabled, the error message, `User already registered` is returned.
@@ -168,7 +168,7 @@ functions:
       - If the user doesn't exist, `signInWithOTP()` will signup the user instead. To restrict this behavior, you can set `shouldCreateUser` to `false`.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/reference/auth/config#site_url).
+      - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls).
       - See [redirect URLs and wildcards](/docs/guides/auth#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
       - Magic links and OTPs share the same implementation. To send users a one-time code instead of a magic link, [modify the magic link email template](/dashboard/project/_/auth/templates) to include `{{ .Token }}` instead of `{{ .ConfirmationURL }}`.
       - When using magic links, specify a `redirectTo` that matches a configured url scheme in your iOS app, so Supabase can correctly redirect back to your app.
@@ -227,7 +227,7 @@ functions:
         name: Sign in using a third-party provider with redirect
         isSpotlight: false
         description: |
-          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/reference/auth/config#site_url). It does not redirect the user immediately after invoking this method.
+          - When the third-party provider successfully authenticates the user, the provider redirects the user to the URL specified in the `redirectTo` parameter. This parameter defaults to the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls). It does not redirect the user immediately after invoking this method.
           - See [redirect URLs and wildcards](/docs/guides/auth/overview#redirect-urls-and-wildcards) to add additional redirect URLs to your project.
           - getOAuthSignInURL() provides the URL which needs to be opened in a SFSafariViewController instance.
           - The redirectTo URL needs to be setup correctly in your project under Authentication -> URL Configuration -> Redirect URLs.
@@ -374,6 +374,34 @@ functions:
               ]
             )
           )
+          ```
+  - id: get-user-identities
+    title: 'userIdentities()'
+    notes: |
+      - The user needs to be signed in to call `userIdentities()`.
+    examples:
+      - id: get-user-identities
+        name: Returns a list of identities linked to the user
+        isSpotlight: true
+        code: |
+          ```swift
+          let identities = try await supabase.auth.userIdentities()
+          ```
+  - id: send-password-reauthentication
+    title: 'reauthenticate()'
+    notes: |
+      - This method is used together with `update(user:)` when a user's password needs to be updated.
+      - If you require your user to reauthenticate before updating their password, you need to enable the **Secure password change** option in your [project's email provider settings](/dashboard/project/_/auth/providers).
+      - A user is only require to reauthenticate before updating their password if **Secure password change** is enabled and the user **hasn't recently signed in**. A user is deemed recently signed in if the session was created in the last 24 hours.
+      - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
+    examples:
+      - id: send-reauthentication-nonce
+        name: Send reauthentication nonce
+        description: Sends a reauthentication nonce to the user's email or phone number.
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.reauthenticate()
           ```
   - id: resend-email-or-phone-otps
     title: "resend()"
@@ -1318,8 +1346,8 @@ functions:
 
           let country: Country = try await supabase.database
             .from("countries")
-            // use `returning: .representation` to return the created object.
-            .insert(Country(id: 1, name: "Denmark"), returning: .representation)
+            .insert(Country(id: 1, name: "Denmark"))
+            .select()
             // specify you want a single value returned, otherwise it returns a list.
             .single() 
             .execute()
@@ -1438,8 +1466,9 @@ functions:
 
           let country: Country = try await supabase.database
             .from("countries")
-            .update(["name": "Australia"], returning: .representation)
+            .update(["name": "Australia"])
             .eq("id", value: 1)
+            .select()
              // If you know this query should return a single object, append a `single()` modifier to it.
             .single()
             .execute()
@@ -1497,10 +1526,10 @@ functions:
                   street: "Melrose Place",
                   postcode: "90210"
                 )
-              ),
-              returning: .representation
+              )
             )
             .eq("address->postcode", value: "90210")
+            .select()
             .execute()
             .value
           ```
@@ -3247,8 +3276,9 @@ functions:
             .upload(
               path: "public/\(fileName)",
               file: fileData,
-              fileOptions: FileOptions(
+              options: FileOptions(
                 cacheControl: "3600",
+                contentType: "image/png",
                 upsert: false
               )
             )
@@ -3274,8 +3304,9 @@ functions:
             .update(
               path: "public/\(fileName)",
               file: fileData,
-              fileOptions: FileOptions(
+              options: FileOptions(
                 cacheControl: "3600",
+                contentType: "image/png",
                 upsert: true
               )
             )
@@ -3366,6 +3397,25 @@ functions:
           ```
         note: |
           You can also sepcify a `String` in the `download` parameter to define the file name for the downloaded asset.
+
+  - id: from-create-signed-urls
+    title: from.createSignedUrls()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: create-signed-urls
+        name: Create Signed URLs
+        isSpotlight: true
+        code: |
+          ```swift
+          let urls = try await supabase
+            .storage
+            .from("avatars")
+            .createSignedURLs(paths: ["folder/avatar1.png", "folder/avatar2.png"], expiresIn: 60)
+          ```
 
   - id: from-get-public-url
     title: from.getPublicUrl()

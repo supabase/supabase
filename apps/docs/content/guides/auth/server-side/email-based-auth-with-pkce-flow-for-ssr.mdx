@@ -79,6 +79,7 @@ Create a new file at `src/routes/auth/confirm/+server.ts` and populate with the 
 
 ```ts src/routes/auth/confirm/+server.ts
 import { redirect } from '@sveltejs/kit'
+import { type EmailOtpType } from '@supabase/supabase-js'
 
 export const GET = async (event) => {
   const {
@@ -86,7 +87,7 @@ export const GET = async (event) => {
     locals: { supabase },
   } = event
   const token_hash = url.searchParams.get('token_hash') as string
-  const type = url.searchParams.get('type') as string
+  const type = url.searchParams.get('type') as EmailOtpType | null
   const next = url.searchParams.get('next') ?? '/'
 
   if (token_hash && type) {

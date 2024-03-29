@@ -1,24 +1,21 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
-import { useParams } from 'common/hooks'
-import { PolicyEditorModal, PolicyTableRow } from 'components/interfaces/Auth/Policies'
 import { isEmpty } from 'lodash'
+import { HelpCircle } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { IconHelpCircle } from 'ui'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
-import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useParams } from 'common'
+import { PolicyTableRow } from 'components/interfaces/Auth/Policies'
 import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/to-be-cleaned/NoSearchResults'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import InformationBox from 'components/ui/InformationBox'
-import { useDatabasePolicyCreateMutation } from 'data/database-policies/database-policy-create-mutation'
 import { useDatabasePolicyDeleteMutation } from 'data/database-policies/database-policy-delete-mutation'
-import { useDatabasePolicyUpdateMutation } from 'data/database-policies/database-policy-update-mutation'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 
 interface PoliciesProps {
   tables: PostgresTable[]
@@ -37,16 +34,10 @@ const Policies = ({
   const { ref } = useParams()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
-  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
-  const [selectedSchemaAndTable, setSelectedSchemaAndTable] = useState<any>({})
   const [selectedTableToToggleRLS, setSelectedTableToToggleRLS] = useState<any>({})
-  const [RLSEditorWithAIShown, showRLSEditorWithAI] = useState(false)
-  const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy | {}>({})
   const [selectedPolicyToDelete, setSelectedPolicyToDelete] = useState<any>({})
 
-  const { mutateAsync: createDatabasePolicy } = useDatabasePolicyCreateMutation()
-  const { mutateAsync: updateDatabasePolicy } = useDatabasePolicyUpdateMutation()
   const { mutate: updateTable } = useTableUpdateMutation({
     onError: (error) => {
       toast.error(`Failed to toggle RLS: ${error.message}`)
@@ -64,14 +55,6 @@ const Policies = ({
     },
   })
 
-  const closePolicyEditorModal = useCallback(() => {
-    setSelectedPolicyToEdit({})
-    setSelectedSchemaAndTable({})
-    if (RLSEditorWithAIShown) {
-      showRLSEditorWithAI(false)
-    }
-  }, [RLSEditorWithAIShown])
-
   const closeConfirmModal = () => {
     setSelectedPolicyToDelete({})
     setSelectedTableToToggleRLS({})
@@ -81,27 +64,13 @@ const Policies = ({
     setSelectedTableToToggleRLS(table)
   }
 
-  const onSelectCreatePolicy = (table: any) => {
-    setSelectedSchemaAndTable({ schema: table.schema, table: table.name })
-  }
-
   const onSelectEditPolicy = (policy: any) => {
-    if (isAiAssistantEnabled) {
-      onSelectEditPolicyAI(policy)
-    } else {
-      setSelectedPolicyToEdit(policy)
-      setSelectedSchemaAndTable({ schema: policy.schema, table: policy.table })
-    }
+    onSelectEditPolicyAI(policy)
   }
 
   const onSelectDeletePolicy = (policy: any) => {
     setSelectedPolicyToDelete(policy)
   }
-
-  const onSavePolicySuccess = useCallback(async () => {
-    toast.success('Policy successfully saved!')
-    closePolicyEditorModal()
-  }, [closePolicyEditorModal])
 
   // Methods that involve some API
   const onToggleRLS = async () => {
@@ -117,46 +86,6 @@ const Policies = ({
       schema: (selectedTableToToggleRLS as PostgresTable).schema,
       payload: payload,
     })
-  }
-
-  const onCreatePolicy = useCallback(
-    async (payload: any) => {
-      if (!project) {
-        console.error('Project is required')
-        return true
-      }
-
-      try {
-        await createDatabasePolicy({
-          projectRef: project.ref,
-          connectionString: project.connectionString,
-          payload,
-        })
-        return false
-      } catch (error) {
-        return true
-      }
-    },
-    [project]
-  )
-
-  const onUpdatePolicy = async (payload: any) => {
-    if (!project) {
-      console.error('Project is required')
-      return true
-    }
-
-    try {
-      await updateDatabasePolicy({
-        projectRef: project.ref,
-        connectionString: project.connectionString,
-        id: payload.id,
-        payload,
-      })
-      return false
-    } catch (error) {
-      return true
-    }
   }
 
   const onDeletePolicy = async () => {
@@ -182,7 +111,7 @@ const Policies = ({
           <div className="space-y-4">
             <InformationBox
               title="What are policies?"
-              icon={<IconHelpCircle strokeWidth={2} />}
+              icon={<HelpCircle size={14} strokeWidth={2} />}
               description={
                 <div className="space-y-2">
                   <p className="text-sm">
@@ -216,7 +145,6 @@ const Policies = ({
                 table={table}
                 isLocked={isLocked}
                 onSelectToggleRLS={onSelectToggleRLS}
-                onSelectCreatePolicy={onSelectCreatePolicy}
                 onSelectEditPolicy={onSelectEditPolicy}
                 onSelectDeletePolicy={onSelectDeletePolicy}
               />
@@ -226,18 +154,6 @@ const Policies = ({
           <NoSearchResults />
         ) : null}
       </div>
-
-      <PolicyEditorModal
-        showAssistantPreview
-        visible={!isEmpty(selectedSchemaAndTable)}
-        schema={selectedSchemaAndTable.schema}
-        table={selectedSchemaAndTable.table}
-        selectedPolicyToEdit={selectedPolicyToEdit}
-        onSelectCancel={closePolicyEditorModal}
-        onCreatePolicy={onCreatePolicy}
-        onUpdatePolicy={onUpdatePolicy}
-        onSaveSuccess={onSavePolicySuccess}
-      />
 
       <ConfirmModal
         danger

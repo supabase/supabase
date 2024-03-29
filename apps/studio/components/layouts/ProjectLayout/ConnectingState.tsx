@@ -45,7 +45,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
           <div className="flex flex-col space-y-4 lg:flex-row lg:items-center lg:space-y-0 lg:space-x-6">
             <h1 className="text-3xl">{project.name}</h1>
             <div>
-              <Badge color="brand">
+              <Badge variant="brand">
                 <div className="flex items-center gap-2">
                   <IconLoader className="animate-spin" size={12} />
                   <span>Connecting to project</span>

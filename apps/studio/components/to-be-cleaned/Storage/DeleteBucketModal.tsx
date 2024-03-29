@@ -89,7 +89,7 @@ const DeleteBucketModal = ({ visible = false, bucket, onClose }: DeleteBucketMod
         title: 'You cannot recover this bucket once deleted.',
         description: 'All bucket data will be lost.',
       }}
-      confirmLabel={`Delete bucket ${bucket?.name}`}
+      confirmLabel="Delete bucket"
     />
   )
 }

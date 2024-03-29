@@ -32,9 +32,7 @@ const MadeForDevelopers = () => {
                       <FeatureColumn title={feature.name} text={feature.description} />
                       {feature.badge && (
                         <div className="mb-4 block">
-                          <Badge dot color="blue">
-                            {feature.badge}
-                          </Badge>
+                          <Badge dot>{feature.badge}</Badge>
                         </div>
                       )}
                       {feature.badge ? (

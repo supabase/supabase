@@ -143,7 +143,7 @@ hideToc: true
         @override
         Widget build(BuildContext context) {
           return Scaffold(
-            body: FutureBuilder<List<Map<String, dynamic>>>(
+            body: FutureBuilder(
               future: _future,
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
