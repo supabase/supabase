@@ -18,6 +18,7 @@ import { useSelectedOrganization } from 'hooks'
 import Telemetry from 'lib/telemetry'
 import { useTelemetryProps } from 'common'
 import { useRouter } from 'next/router'
+import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 const QueryError = ({
   error,
@@ -30,6 +31,7 @@ const QueryError = ({
   setOpen: Dispatch<SetStateAction<boolean>>
   onSelectDebug: () => void
 }) => {
+  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
   const formattedError =
     (error?.formattedError?.split('\n') ?? [])?.filter((x: string) => x.length > 0) ?? []
 
@@ -74,7 +76,7 @@ const QueryError = ({
                   {open ? 'Hide error details' : 'Show error details'}
                 </Button>
               </CollapsibleTrigger_Shadcn_>
-              {!hasHipaaAddon && (
+              {!hasHipaaAddon && isAiAssistantEnabled && (
                 <Button
                   size={'tiny'}
                   type="default"
