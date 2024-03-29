@@ -1,4 +1,4 @@
-import { AuthClient, navigatorLock } from '@supabase/auth-js'
+import { GoTrueClient, navigatorLock } from '@supabase/gotrue-js'
 
 export const STORAGE_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'supabase.dashboard.auth.token'
 export const AUTH_DEBUG_KEY =
@@ -100,7 +100,7 @@ const logIndexedDB = (message: string, ...args: any[]) => {
   })()
 }
 
-export const gotrueClient = new AuthClient({
+export const gotrueClient = new GoTrueClient({
   url: process.env.NEXT_PUBLIC_GOTRUE_URL,
   storageKey: STORAGE_KEY,
   detectSessionInUrl: true,
