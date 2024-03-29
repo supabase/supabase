@@ -21,6 +21,7 @@ import { AWS_REGIONS, AWS_REGIONS_DEFAULT, AWS_REGIONS_KEYS, BASE_PATH } from 'l
 import { AVAILABLE_REPLICA_REGIONS, AWS_REGIONS_VALUES } from './InstanceConfiguration.constants'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
+import { ExternalLink } from 'lucide-react'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
 
@@ -154,6 +155,11 @@ const DeployNewReplicaPanel = ({
                 ? 'Physical backups are currently being enabled'
                 : 'Physical backups are required to deploy replicas'}
             </AlertTitle_Shadcn_>
+            {refetchInterval === false && (
+              <AlertDescription_Shadcn_ className="mb-2">
+                Physical backups are used under the hood to spin up read replicas for your project.
+              </AlertDescription_Shadcn_>
+            )}
             <AlertDescription_Shadcn_>
               {refetchInterval !== false
                 ? 'This warning will go away once physical backups have been enabled - check back in a few minutes!'
@@ -164,7 +170,7 @@ const DeployNewReplicaPanel = ({
                 You may start deploying read replicas thereafter once this is completed.
               </AlertDescription_Shadcn_>
             ) : (
-              <AlertDescription_Shadcn_ className="mt-2">
+              <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
                 <Button
                   type="default"
                   loading={isEnabling}
@@ -174,6 +180,15 @@ const DeployNewReplicaPanel = ({
                   }}
                 >
                   Enable physical backups
+                </Button>
+                <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                  <a
+                    href="https://supabase.com/docs/guides/platform/read-replicas#how-are-read-replicas-made"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Documentation
+                  </a>
                 </Button>
               </AlertDescription_Shadcn_>
             )}
