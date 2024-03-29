@@ -88,7 +88,7 @@ export default function IndexPage() {
           </div>
         </SectionContainer>
       </div>
-      <ParagraphSection {...data.introSection} hasStickyTitle />
+      <ParagraphSection {...data.companySection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
       <FeaturesSection {...data.principlesSection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
@@ -100,17 +100,15 @@ export default function IndexPage() {
       <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.integrationsSection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
-      <ParagraphSection {...data.pricingSection} hasStickyTitle />
-      <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.openSourceSection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.communitySection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.pricingSection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
-      <ParagraphSection {...data.fundingSection} hasStickyTitle />
-      <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.enterpriseSection} hasStickyTitle />
+      <SectionContainer className="!py-0 border-b" children={null} />
+      <ParagraphSection {...data.fundingSection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.missionSection} hasStickyTitle />
       <CTABanner />

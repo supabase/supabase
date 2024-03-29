@@ -22,7 +22,7 @@ export const data = {
       { title: 'Our mission', link: '#mission' },
     ],
   },
-  introSection: {
+  companySection: {
     id: 'company',
     title: 'Company',
     paragraph: '01',
