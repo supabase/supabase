@@ -190,7 +190,7 @@ const OrganizationProjects = ({
         {organization?.restriction_status === 'restricted' && (
           <div>
             <Button asChild type="danger">
-              <Link href={`/org/${organization.slug}/billing`}>Restricted</Link>
+              <Link href={`/org/${organization.slug}/billing`}>Services Restricted</Link>
             </Button>
           </div>
         )}
