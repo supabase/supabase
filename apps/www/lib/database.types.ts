@@ -1,62 +1,8 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
-export type Database = {
+export interface Database {
   public: {
     Tables: {
-      dpa_downloads: {
-        Row: {
-          contact_email: string
-          created_at: string | null
-          document: string | null
-          id: number
-          updated_at: string | null
-        }
-        Insert: {
-          contact_email: string
-          created_at?: string | null
-          document?: string | null
-          id?: number
-          updated_at?: string | null
-        }
-        Update: {
-          contact_email?: string
-          created_at?: string | null
-          document?: string | null
-          id?: number
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
-      lwx_meetups: {
-        Row: {
-          created_at: string | null
-          display_info: string | null
-          id: number
-          isLive: boolean
-          link: string | null
-          start_at: string | null
-          title: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          display_info?: string | null
-          id?: number
-          isLive?: boolean
-          link?: string | null
-          start_at?: string | null
-          title?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          display_info?: string | null
-          id?: number
-          isLive?: boolean
-          link?: string | null
-          start_at?: string | null
-          title?: string | null
-        }
-        Relationships: []
-      }
       partner_contacts: {
         Row: {
           company: string
@@ -118,7 +64,7 @@ export type Database = {
           description: string
           developer: string
           docs: string | null
-          featured: boolean | null
+          featured: boolean
           id: number
           images: string[] | null
           logo: string
@@ -139,7 +85,7 @@ export type Database = {
           description: string
           developer: string
           docs?: string | null
-          featured?: boolean | null
+          featured?: boolean
           id?: number
           images?: string[] | null
           logo: string
@@ -160,7 +106,7 @@ export type Database = {
           description?: string
           developer?: string
           docs?: string | null
-          featured?: boolean | null
+          featured?: boolean
           id?: number
           images?: string[] | null
           logo?: string
@@ -176,38 +122,13 @@ export type Database = {
           {
             foreignKeyName: 'partners_contact_fkey'
             columns: ['contact']
-            isOneToOne: false
             referencedRelation: 'partner_contacts'
             referencedColumns: ['id']
           },
         ]
       }
     }
-    Views: {
-      lwx_tickets_golden: {
-        Row: {
-          createdAt: string | null
-          golden: boolean | null
-          id: string | null
-          metadata: Json | null
-          name: string | null
-          referrals: number | null
-          sharedOnLinkedIn: string | null
-          sharedOnTwitter: string | null
-          ticketNumber: number | null
-          username: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: 'lwx_tickets_id_fkey'
-            columns: ['id']
-            isOneToOne: true
-            referencedRelation: 'users'
-            referencedColumns: ['id']
-          },
-        ]
-      }
-    }
+    Views: {}
     Functions: {}
     Enums: {
       partner_type: 'technology' | 'expert'
@@ -217,77 +138,3 @@ export type Database = {
     }
   }
 }
-
-type PublicSchema = Database[Extract<keyof Database, 'public'>]
-
-export type Tables<
-  PublicTableNameOrOptions extends
-    | keyof (PublicSchema['Tables'] & PublicSchema['Views'])
-    | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof (Database[PublicTableNameOrOptions['schema']]['Tables'] &
-        Database[PublicTableNameOrOptions['schema']]['Views'])
-    : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? (Database[PublicTableNameOrOptions['schema']]['Tables'] &
-      Database[PublicTableNameOrOptions['schema']]['Views'])[TableName] extends {
-      Row: infer R
-    }
-    ? R
-    : never
-  : PublicTableNameOrOptions extends keyof (PublicSchema['Tables'] & PublicSchema['Views'])
-    ? (PublicSchema['Tables'] & PublicSchema['Views'])[PublicTableNameOrOptions] extends {
-        Row: infer R
-      }
-      ? R
-      : never
-    : never
-
-export type TablesInsert<
-  PublicTableNameOrOptions extends keyof PublicSchema['Tables'] | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
-    : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
-      Insert: infer I
-    }
-    ? I
-    : never
-  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
-    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
-        Insert: infer I
-      }
-      ? I
-      : never
-    : never
-
-export type TablesUpdate<
-  PublicTableNameOrOptions extends keyof PublicSchema['Tables'] | { schema: keyof Database },
-  TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicTableNameOrOptions['schema']]['Tables']
-    : never = never,
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicTableNameOrOptions['schema']]['Tables'][TableName] extends {
-      Update: infer U
-    }
-    ? U
-    : never
-  : PublicTableNameOrOptions extends keyof PublicSchema['Tables']
-    ? PublicSchema['Tables'][PublicTableNameOrOptions] extends {
-        Update: infer U
-      }
-      ? U
-      : never
-    : never
-
-export type Enums<
-  PublicEnumNameOrOptions extends keyof PublicSchema['Enums'] | { schema: keyof Database },
-  EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-    ? keyof Database[PublicEnumNameOrOptions['schema']]['Enums']
-    : never = never,
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
-  ? Database[PublicEnumNameOrOptions['schema']]['Enums'][EnumName]
-  : PublicEnumNameOrOptions extends keyof PublicSchema['Enums']
-    ? PublicSchema['Enums'][PublicEnumNameOrOptions]
-    : never

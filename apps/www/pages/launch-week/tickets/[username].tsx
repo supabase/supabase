@@ -142,7 +142,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     user = data
   }
 
-  const ticketType = (user?.metadata as any).hasSecretTicket
+  const ticketType = user?.metadata?.hasSecretTicket
     ? 'secret'
     : user?.golden
       ? 'platinum'
