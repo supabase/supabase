@@ -19,10 +19,10 @@
     "common": "*",
     "config": "*",
     "dayjs": "^1.11.10",
-    "eslint-config-next": "^14.1.0",
+    "eslint-config-next": "^14.1.4",
     "lodash": "^4.17.21",
     "lucide-react": "^0.338.0",
-    "next": "^14.0.3",
+    "next": "^14.1.4",
     "openai": "^4.20.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -38,7 +38,7 @@
     "@types/react": "^18.2.24",
     "@types/react-dom": "^18.2.8",
     "autoprefixer": "^10.4.14",
-    "nextjs-node-loader": "^1.1.5-alpha.0",
+    "nextjs-node-loader": "^1.1.5",
     "postcss": "^8.4.31",
     "typescript": "^5.4.3"
   }
