@@ -203,8 +203,8 @@ const DeployNewReplicaPanel = ({
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
               <span>
-                If you'd like to spin up another read replica, please drop an existing replica
-                first.
+                This is to ensure that read replicas can keep up with the primary databases'
+                activities.
               </span>
               <div className="flex items-center gap-x-2 mt-3">
                 <Button asChild type="default">
