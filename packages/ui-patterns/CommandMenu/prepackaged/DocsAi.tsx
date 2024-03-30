@@ -7,14 +7,14 @@ const DOCS_AI_COMMANDS = {
   SECTION_NAME: 'Docs',
 }
 
-const DocsAiInterface = () => <></>
+const DocsAiInterface = () => <h1>Docs AI</h1>
 
 const identity = <T,>(x: T) => x
 
 const useDocsAiCommands = ({
   modify = identity,
-  orderingOptions,
-}: { modify?: (command: ICommand) => ICommand; orderingOptions?: UseCommandOptions } = {}) => {
+  options,
+}: { modify?: (command: ICommand) => ICommand; options?: UseCommandOptions } = {}) => {
   const setCommandPage = useSetPage()
   useRegisterNewPage(DOCS_AI_COMMANDS.PAGE_NAME, DocsAiInterface)
 
@@ -29,7 +29,7 @@ const useDocsAiCommands = ({
         },
       },
     ].map(modify),
-    orderingOptions
+    options
   )
 }
 

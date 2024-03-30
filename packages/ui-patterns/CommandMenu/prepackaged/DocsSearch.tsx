@@ -7,14 +7,14 @@ const DOCS_SEARCH_COMMANDS = {
   SECTION_NAME: 'Docs',
 }
 
-const DocsSearchInterface = () => <></>
+const DocsSearchInterface = () => <h1>Docs search</h1>
 
 const identity = <T,>(x: T) => x
 
 const useDocsSearchCommands = ({
   modify = identity,
-  orderingOptions,
-}: { modify?: (command: ICommand) => ICommand; orderingOptions?: UseCommandOptions } = {}) => {
+  options,
+}: { modify?: (command: ICommand) => ICommand; options?: UseCommandOptions } = {}) => {
   const setCommandPage = useSetPage()
   useRegisterNewPage(DOCS_SEARCH_COMMANDS.PAGE_NAME, DocsSearchInterface)
 
@@ -25,12 +25,11 @@ const useDocsSearchCommands = ({
         id: 'search-docs',
         name: 'Search docs',
         action: () => {
-          console.log('你都是给点反应啊')
           setCommandPage(DOCS_SEARCH_COMMANDS.PAGE_NAME)
         },
       },
     ].map(modify),
-    orderingOptions
+    options
   )
 }
 
