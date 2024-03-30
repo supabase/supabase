@@ -102,6 +102,7 @@ export async function handler(req: Request) {
     const HAS_ROLE = !!metadata?.role
     const HAS_COMPANY = !!metadata?.company
     const HAS_LOCATION = !!metadata?.location
+    const HAS_AVATAR = !metadata?.hideAvatar
     const HAS_NO_META = !HAS_ROLE && !HAS_COMPANY && !HAS_LOCATION
     const OG_WIDTH = 1200
     const OG_HEIGHT = 628
@@ -111,13 +112,14 @@ export async function handler(req: Request) {
     const TICKET_RATIO = 396 / 613
     const TICKET_HEIGHT = TICKET_WIDTH / TICKET_RATIO
     const TICKET_POS_TOP = OG_PADDING_Y
-    const TICKET_POS_LEFT = 500
+    const TICKET_POS_LEFT = 470
     const TICKET_PADDING_X = 40
     const TICKET_PADDING_Y = 40
     const LOGO_WIDTH = 160
     const LOGO_RATIO = 145 / 79
     // Select one of 30 pre generated bg images base on ticket number
     const BG_NUMBER = `000${(ticketNumber % 30) + 1}`.slice(-3)
+    const profileImg = `https://github.com/${username}.png?size=100`
 
     const BACKGROUND = {
       regular: {
@@ -220,6 +222,22 @@ export async function handler(req: Request) {
                   marginBottom: '10px',
                 }}
               >
+                {HAS_AVATAR && (
+                  <img
+                    width={90}
+                    height={90}
+                    style={{
+                      top: 0,
+                      left: 0,
+                      zIndex: '1',
+                      marginBottom: 10,
+                      borderRadius: '100%',
+                      border: `1px solid ${STYLING_CONGIF[ticketType].BORDER}`,
+                      // boxShadow: '0px 0px 50px rgba(0, 0, 0, 0.25)',
+                    }}
+                    src={profileImg}
+                  />
+                )}
                 <p
                   style={{
                     color: STYLING_CONGIF[ticketType].TICKET_FOREGROUND,
