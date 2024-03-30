@@ -18,6 +18,7 @@ export type UserData = {
     company?: string
     location?: string
     hasSecretTicket?: boolean
+    hideAvatar?: boolean
   }
   sharedOnTwitter?: string
   sharedOnLinkedIn?: string

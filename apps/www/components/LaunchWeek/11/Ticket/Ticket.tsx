@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { IconEdit2, IconX, cn } from 'ui'
 import Tilt from 'vanilla-tilt'
+import { useBreakpoint, useParams } from 'common'
 
 import Panel from '~/components/Panel'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import TicketProfile from './TicketProfile'
-import { useBreakpoint, useParams } from 'common'
+import TicketCustomizationForm from './TicketCustomizationForm'
 
 export default function Ticket() {
   const ticketRef = useRef<HTMLDivElement>(null)
@@ -51,7 +52,7 @@ export default function Ticket() {
   return (
     <div
       ref={ticketRef}
-      className="w-auto h-auto flex justify-center rounded-xl overflow-hidden will-change-transform"
+      className="relative w-auto h-auto flex justify-center rounded-xl overflow-hidden will-change-transform"
       style={{ transformStyle: 'preserve-3d', transform: 'perspective(1000px)' }}
     >
       <Panel
@@ -62,19 +63,6 @@ export default function Ticket() {
         shimmerToColor="hsl(var(--background-default))"
         style={{ transform: 'translateZ(-10px)' }}
       >
-        {/* Edit hover button */}
-        {!sharePage && (
-          <>
-            <button
-              className="absolute z-40 inset-0 w-full h-full outline-none"
-              onClick={handleCustomizeTicket}
-            />
-            <div className="hidden md:flex opacity-0 translate-y-3 group-hover/ticket:opacity-100 group-hover/ticket:translate-y-0 transition-all absolute z-30 inset-0 m-auto w-10 h-10 rounded-full items-center justify-center bg-[#020405] border shadow-lg text-foreground">
-              {!showCustomizationForm ? <IconEdit2 className="w-4" /> : <IconX className="w-4" />}
-            </div>
-          </>
-        )}
-
         <TicketProfile className="absolute inset-0 h-full p-6 top-20 bottom-20 z-30 flex flex-col justify-between w-full flex-1 overflow-hidden" />
         <Image
           src={ticketBg[ticketType].background}
@@ -92,7 +80,22 @@ export default function Ticket() {
           priority
           quality={100}
         />
+        {/* Edit hover button */}
+        {!sharePage && (
+          <>
+            <button
+              className="absolute z-40 inset-0 w-full h-full outline-none"
+              onClick={handleCustomizeTicket}
+            />
+            <div className="hidden md:flex opacity-0 translate-y-3 group-hover/ticket:opacity-100 group-hover/ticket:translate-y-0 transition-all absolute z-30 inset-0 m-auto w-10 h-10 rounded-full items-center justify-center bg-[#020405] border shadow-lg text-foreground">
+              {!showCustomizationForm ? <IconEdit2 className="w-4" /> : <IconX className="w-4" />}
+            </div>
+          </>
+        )}
       </Panel>
+      {!sharePage && (
+        <TicketCustomizationForm className="absolute inset-0 top-auto z-40 order-last md:order-first" />
+      )}
     </div>
   )
 }

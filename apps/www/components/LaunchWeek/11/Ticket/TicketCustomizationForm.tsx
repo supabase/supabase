@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Button, IconCheck, Input, cn } from 'ui'
+import { Button, Checkbox, IconCheck, Input, cn } from 'ui'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { useBreakpoint, useDebounce } from 'common'
 import { useKey } from 'react-use'
@@ -15,6 +15,7 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
   const defaultFormValues = {
     role: user.metadata?.role,
     company: user.metadata?.company,
+    hideAvatar: !!user.metadata?.hideAvatar,
   }
   const [formData, setFormData] = useState(defaultFormValues)
   const [formState, setFormState] = useState<'idle' | 'saved' | 'saving' | 'error'>('idle')
@@ -24,8 +25,11 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
 
   useKey('Escape', () => setShowCustomizationForm && setShowCustomizationForm(false))
 
-  const handleInputChange = (name: string, value: string) => {
+  const handleInputChange = (name: string, value: string | boolean) => {
+    console.log('name', name, 'value', value)
     setFormData((prev) => ({ ...prev, [name]: value }))
+
+    console.log('formData', formData)
   }
 
   const handleFormSubmit = async () => {
@@ -57,8 +61,8 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
   return (
     <form
       className={cn(
-        'w-full grid grid-cols-1 md:grid-cols-3 gap-2 max-w-[300px] md:max-w-none mx-auto -mt-10 transition-all opacity-0 translate-y-3',
-        (isMobile || showCustomizationForm) && 'opacity-100 translate-y-0',
+        'w-full rounded-t-2xl bg-alternative border p-4 flex flex-col gap-2 mx-auto transition-all opacity-0 translate-y-full text-foreground-light',
+        (isMobile || showCustomizationForm) && 'opacity-100 translate-y-0 duration-300',
         isMobile && 'mt-2',
         className
       )}
@@ -66,7 +70,7 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
       onSubmit={(e) => e.preventDefault()}
     >
       <Input
-        className="[&_input]:border-background"
+        // className="[&_input]:border-background"
         size="small"
         type="text"
         placeholder="role (optional)"
@@ -82,13 +86,13 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
             className={cn(
               'w-3',
               IS_SAVING && 'text-background-surface-300',
-              !!formData.role ? 'text-brand' : 'text-background-surface-300'
+              !!formData.role ? 'text-brand' : 'text-foreground-lighter'
             )}
           />
         }
       />
       <Input
-        className="[&_input]:border-background"
+        // className="[&_input]:border-background"
         size="small"
         type="text"
         placeholder="company (optional)"
@@ -104,22 +108,33 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
             className={cn(
               'w-3',
               IS_SAVING && 'text-background-surface-300',
-              !!formData.company ? 'text-brand' : 'text-background-surface-300'
+              !!formData.company ? 'text-brand' : 'text-foreground-lighter'
             )}
           />
         }
       />
-      <div className="flex items-center justify-center md:justify-end gap-2">
-        {IS_SAVED && (
-          <span className="hidden md:inline opacity-0 animate-fade-in text-xs text-foreground-light">
-            Saved
-          </span>
-        )}
-        {HAS_ERROR && (
-          <span className="hidden md:inline opacity-0 animate-fade-in text-xs text-foreground">
-            Something went wrong
-          </span>
-        )}
+      <Checkbox
+        name="hideAVatar"
+        label="Hide avatar"
+        checked={formData.hideAvatar}
+        onChange={(event) => {
+          console.log(event)
+          handleInputChange('hideAvatar', event.target.checked)
+        }}
+      />
+      <div className="flex items-center justify-center md:justify-between gap-2 mt-2">
+        <div className="hidden md:inline opacity-0 animate-fade-in text-xs text-foreground-light">
+          {IS_SAVED && (
+            <span className="hidden md:inline opacity-0 animate-fade-in text-xs text-foreground-light">
+              Saved
+            </span>
+          )}
+          {HAS_ERROR && (
+            <span className="hidden md:inline opacity-0 animate-fade-in text-xs text-foreground-light">
+              Something went wrong
+            </span>
+          )}
+        </div>
         <Button
           type="outline"
           size="tiny"
