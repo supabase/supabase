@@ -93,6 +93,7 @@ export default function Ticket() {
           </>
         )}
       </Panel>
+      <div className="absolute top-0 left-auto right-auto mx-auto w-[20%] aspect-square -translate-y-[65%] bg-[#060809] z-40 rounded-b-[100px]" />
       {!sharePage && (
         <TicketCustomizationForm className="absolute inset-0 top-auto z-40 order-last md:order-first" />
       )}
