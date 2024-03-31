@@ -7,23 +7,6 @@ import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from 'ui'
 
 const REGEXP_ONLY_CHARS = '^[a-zA-Z]+$'
 
-export function InputOTPDemo() {
-  return (
-    <InputOTP maxLength={6} pattern={REGEXP_ONLY_CHARS}>
-      <InputOTPGroup>
-        <InputOTPSlot index={0} />
-        <InputOTPSlot index={1} />
-        <InputOTPSlot index={2} />
-      </InputOTPGroup>
-      <InputOTPSeparator />
-      <InputOTPGroup>
-        <InputOTPSlot index={3} />
-        <InputOTPSlot index={4} />
-        <InputOTPSlot index={5} />
-      </InputOTPGroup>
-    </InputOTP>
-  )
-}
 const COMPLIMENTS = [
   'Congratulations!',
   'You won!',
@@ -39,50 +22,25 @@ interface Props {
 
 const LWXGame = ({ setIsGameMode }: Props) => {
   const { supabase, userData: user } = useConfData()
-  const word =
+  const phrase =
     process.env.NEXT_PUBLIC_LWX_GAME_WORD ?? 'supabase_is_going_into_general_availability'
-  const phrase = 'supabase_is_going_into_general_availability'
   const inputRef = useRef(null)
-  const winningWord = word?.split('')
   const winningPhrase = phrase?.split('_').map((word) => word.split(''))
   const phraseLength = phrase?.replaceAll('_', '').split('').length
-  const [currentWord, setCurrentWord] = useState<string[]>(Array(winningWord.length))
   const [gameState, setGameState] = useState<'playing' | 'winner' | 'loading'>('playing')
   const [hasKeyDown, setHasKeyDown] = useState(false)
-  const [attempts, setAttempts] = useState(1)
   const [value, setValue] = useState('')
-  // const hasWon = currentWord.join('') === winningWord.join('').replaceAll('_', '')
   const hasWon = gameState === 'winner'
   const winningCompliment = useMemo(
     () => COMPLIMENTS[Math.floor(Math.random() * COMPLIMENTS.length)],
     []
   )
 
-  const searchAndAddToCurrentWord = (key: string) => {
-    setAttempts(attempts + 1)
-
-    for (let index = 0; index < winningWord?.length; index++) {
-      const isAlreadyPresent = key === currentWord[index]
-      if (isAlreadyPresent) return
-
-      const isMatch = key === winningWord[index]
-
-      if (isMatch) {
-        const newCurrentWord = currentWord
-        newCurrentWord[index] = key
-
-        setCurrentWord(newCurrentWord)
-        if (hasWon) setGameState('winner')
-      }
-    }
-  }
-
   function onKeyDown(event: KeyboardEvent) {
     const newKey = event.key.toLocaleLowerCase()
 
     if (!(event.metaKey || event.ctrlKey) && VALID_KEYS.includes(newKey)) {
       setHasKeyDown(true)
-      searchAndAddToCurrentWord(newKey)
     }
 
     setTimeout(() => {
@@ -133,13 +91,11 @@ const LWXGame = ({ setIsGameMode }: Props) => {
 
   function handleIndexCount(word_idx: number, char_idx: number) {
     let index = -1
+
     for (let i = 0; i < word_idx + 1; i++) {
       const word = winningPhrase[i]
-
       for (let j = 0; j < word.length; j++) {
-        if (i < word_idx || j <= char_idx) {
-          index++
-        }
+        if (i < word_idx || j <= char_idx) index++
       }
     }
 
@@ -198,6 +154,7 @@ const LWXGame = ({ setIsGameMode }: Props) => {
           pattern={REGEXP_ONLY_CHARS}
           autoFocus
           containerClassName="flex-wrap justify-center gap-y-4"
+          inputMode="text"
           value={value}
           onChange={(e) => {
             // @ts-ignore
@@ -234,44 +191,6 @@ const LWXGame = ({ setIsGameMode }: Props) => {
             </>
           ))}
         </InputOTP>
-        {/* {winningWord.map((letter, i) => {
-          const isSpace = letter === '_'
-          const isMatch = isSpace || letter === currentWord[i]
-
-          return (
-            <div
-              key={`${currentWord[i]}-${i}`}
-              className={cn(
-                'w-6 md:w-14 aspect-square bg-[#06080930] backdrop-blur-sm flex items-center hover:border-strong justify-center uppercase border rounded-sm md:rounded-lg transition-colors',
-                isMatch && 'border-stronger bg-foreground text-[#060809]',
-                hasWon && 'animate-pulse !border-foreground',
-                hasKeyDown && 'border-strong',
-                isSpace && '!opacity-0'
-              )}
-            >
-              {currentWord[i]}
-            </div>
-          )
-        })} */}
-        {/* {winningWord.map((letter, i) => {
-          const isSpace = letter === '_'
-          const isMatch = isSpace || letter === currentWord[i]
-
-          return (
-            <div
-              key={`${currentWord[i]}-${i}`}
-              className={cn(
-                'w-6 md:w-14 aspect-square bg-[#06080930] backdrop-blur-sm flex items-center hover:border-strong justify-center uppercase border rounded-sm md:rounded-lg transition-colors',
-                isMatch && 'border-stronger bg-foreground text-[#060809]',
-                hasWon && 'animate-pulse !border-foreground',
-                hasKeyDown && 'border-strong',
-                isSpace && '!opacity-0'
-              )}
-            >
-              {currentWord[i]}
-            </div>
-          )
-        })} */}
       </div>
       <form onSubmit={handleClaimTicket} className="flex flex-col items-center h-10">
         <Button
