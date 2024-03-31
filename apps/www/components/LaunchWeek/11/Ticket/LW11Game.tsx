@@ -1,9 +1,29 @@
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, cn } from 'ui'
 import { SITE_ORIGIN } from '~/lib/constants'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { VALID_KEYS } from '~/components/LaunchWeek/hooks/useLwGame'
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from 'ui'
 
+const REGEXP_ONLY_CHARS = '^[a-zA-Z]+$'
+
+export function InputOTPDemo() {
+  return (
+    <InputOTP maxLength={6} pattern={REGEXP_ONLY_CHARS}>
+      <InputOTPGroup>
+        <InputOTPSlot index={0} />
+        <InputOTPSlot index={1} />
+        <InputOTPSlot index={2} />
+      </InputOTPGroup>
+      <InputOTPSeparator />
+      <InputOTPGroup>
+        <InputOTPSlot index={3} />
+        <InputOTPSlot index={4} />
+        <InputOTPSlot index={5} />
+      </InputOTPGroup>
+    </InputOTP>
+  )
+}
 const COMPLIMENTS = [
   'Congratulations!',
   'You won!',
@@ -21,12 +41,18 @@ const LWXGame = ({ setIsGameMode }: Props) => {
   const { supabase, userData: user } = useConfData()
   const word =
     process.env.NEXT_PUBLIC_LWX_GAME_WORD ?? 'supabase_is_going_into_general_availability'
+  const phrase = 'supabase_is_going_into_general_availability'
+  const inputRef = useRef(null)
   const winningWord = word?.split('')
+  const winningPhrase = phrase?.split('_').map((word) => word.split(''))
+  const phraseLength = phrase?.replaceAll('_', '').split('').length
   const [currentWord, setCurrentWord] = useState<string[]>(Array(winningWord.length))
   const [gameState, setGameState] = useState<'playing' | 'winner' | 'loading'>('playing')
   const [hasKeyDown, setHasKeyDown] = useState(false)
   const [attempts, setAttempts] = useState(1)
-  const hasWon = currentWord.join('') === winningWord.join('').replaceAll('_', '')
+  const [value, setValue] = useState('')
+  // const hasWon = currentWord.join('') === winningWord.join('').replaceAll('_', '')
+  const hasWon = gameState === 'winner'
   const winningCompliment = useMemo(
     () => COMPLIMENTS[Math.floor(Math.random() * COMPLIMENTS.length)],
     []
@@ -105,6 +131,21 @@ const LWXGame = ({ setIsGameMode }: Props) => {
     }
   }
 
+  function handleIndexCount(word_idx: number, char_idx: number) {
+    let index = -1
+    for (let i = 0; i < word_idx + 1; i++) {
+      const word = winningPhrase[i]
+
+      for (let j = 0; j < word.length; j++) {
+        if (i < word_idx || j <= char_idx) {
+          index++
+        }
+      }
+    }
+
+    return index
+  }
+
   if (gameState === 'loading')
     return (
       <div className="relative w-full mt-[100px] md:mt-44 lg:mt-32 xl:mt-32 2xl:mt-[120px] flex flex-col items-center gap-6 text-foreground">
@@ -151,7 +192,49 @@ const LWXGame = ({ setIsGameMode }: Props) => {
         </div>
       </div>
       <div className="flex items-center justify-center gap-2 flex-wrap font-mono min-h-[100px]">
-        {winningWord.map((letter, i) => {
+        <InputOTP
+          ref={inputRef}
+          maxLength={phraseLength}
+          pattern={REGEXP_ONLY_CHARS}
+          autoFocus
+          containerClassName="flex-wrap justify-center gap-y-4"
+          value={value}
+          onChange={(e) => {
+            // @ts-ignore
+            const index = inputRef.current?.dataset.inputOtpMss
+            const valueAtPhraseIndex = phrase?.replaceAll('_', '').split('')[index]
+            const currentVal = e.split('')[e.length - 1]
+            const isMatch = valueAtPhraseIndex === currentVal
+
+            if (isMatch) {
+              setValue(e)
+            }
+          }}
+          onComplete={() => setGameState('winner')}
+        >
+          {winningPhrase.map((word, w_idx) => (
+            <>
+              <InputOTPGroup key={`${word.join('')}-${w_idx}`}>
+                {word.map((_, c_idx) => {
+                  // index is sum of every letter of every previous word + index of current wo
+                  const currentIndex = handleIndexCount(w_idx, c_idx)
+                  return (
+                    <InputOTPSlot
+                      className={cn(
+                        hasWon && 'border-foreground-light animate-pulse',
+                        hasKeyDown && 'border-strong'
+                      )}
+                      key={`otp-${currentIndex}`}
+                      index={currentIndex}
+                    />
+                  )
+                })}
+              </InputOTPGroup>
+              {w_idx !== winningPhrase.length - 1 && <InputOTPSeparator className="mx-1" />}
+            </>
+          ))}
+        </InputOTP>
+        {/* {winningWord.map((letter, i) => {
           const isSpace = letter === '_'
           const isMatch = isSpace || letter === currentWord[i]
 
@@ -169,7 +252,26 @@ const LWXGame = ({ setIsGameMode }: Props) => {
               {currentWord[i]}
             </div>
           )
-        })}
+        })} */}
+        {/* {winningWord.map((letter, i) => {
+          const isSpace = letter === '_'
+          const isMatch = isSpace || letter === currentWord[i]
+
+          return (
+            <div
+              key={`${currentWord[i]}-${i}`}
+              className={cn(
+                'w-6 md:w-14 aspect-square bg-[#06080930] backdrop-blur-sm flex items-center hover:border-strong justify-center uppercase border rounded-sm md:rounded-lg transition-colors',
+                isMatch && 'border-stronger bg-foreground text-[#060809]',
+                hasWon && 'animate-pulse !border-foreground',
+                hasKeyDown && 'border-strong',
+                isSpace && '!opacity-0'
+              )}
+            >
+              {currentWord[i]}
+            </div>
+          )
+        })} */}
       </div>
       <form onSubmit={handleClaimTicket} className="flex flex-col items-center h-10">
         <Button

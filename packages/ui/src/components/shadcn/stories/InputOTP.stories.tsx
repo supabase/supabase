@@ -1,5 +1,5 @@
 import { Meta } from '@storybook/react'
-import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from '../ui/input-otp'
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot } from 'ui'
 
 const meta: Meta = {
   title: 'shadcn/InputOTP',

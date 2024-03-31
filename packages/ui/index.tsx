@@ -84,6 +84,7 @@ export * from './src/components/shadcn/ui/toaster'
 export * from './src/components/shadcn/ui/separator'
 export * from './src/components/shadcn/ui/sheet'
 export * from './src/components/shadcn/ui/badge'
+export * from './src/components/shadcn/ui/input-otp'
 
 export {
   Command as Command_Shadcn_,
