@@ -83,7 +83,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
         }}
       >
         <DefaultLayout>
-          <div className="-mt-[65px]">
+          <div className="relative -mt-[65px]">
             <SectionContainer className="relative z-10 flex flex-col justify-around items-center gap-2 md:gap-10 !px-2 !mx-auto md:min-h-[auto]">
               <div className="w-full min-h-[400px] pt-24 flex items-center">
                 <LW11TicketContainer />
