@@ -14,6 +14,8 @@ export type InfraMonitoringVariables = {
     | 'ram_usage'
     | 'disk_io_consumption'
     | 'swap_usage'
+    | 'supavisor_egress'
+    | 'supavisor_ingress'
   startDate?: string
   endDate?: string
   interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
