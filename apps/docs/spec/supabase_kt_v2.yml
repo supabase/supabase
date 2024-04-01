@@ -2905,7 +2905,6 @@ functions:
           ```
   - id: sign-in-anonymously
     title: 'signInAnonymously()'
-    $ref: '@supabase/auth-js.GoTrueClient.signInAnonymously'
     notes: |
       - Creates an anonymous user.
       - The user can be retrieved by calling `supabase.auth.currentUserOrNull()`.
