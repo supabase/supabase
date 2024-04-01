@@ -37,7 +37,7 @@ const SchemasPage: NextPageWithLayout = () => {
             <div className="h-[34px] w-[260px] bg-foreground-lighter rounded shimmering-loader" />
           )}
 
-          {isError && <AlertError error={error} subject="Failed to retrieve schemas" />}
+          {isError && <AlertError error={error as any} subject="Failed to retrieve schemas" />}
 
           {isSuccess && (
             <SchemaSelector
