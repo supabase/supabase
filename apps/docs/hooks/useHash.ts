@@ -1,29 +1,33 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect } from 'react';
 
 const useHash = () => {
-  const [hash, setHash] = useState(() =>
-    typeof window !== 'undefined' ? window.location.hash.split('#')[1] : undefined
-  )
-
-  const hashChangeHandler = useCallback(() => {
-    setHash(window.location.hash.split('#')[1])
-  }, [])
-
-  useEffect(() => {
-    window.addEventListener('hashchange', hashChangeHandler)
-    return () => {
-      window.removeEventListener('hashchange', hashChangeHandler)
+ const [hash, setHash] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      return url.hash.substring(1); // Removes the leading '#'
     }
-  }, [])
+    return undefined;
+ });
 
-  const updateHash = useCallback(
-    (newHash) => {
-      if (newHash !== hash) window.location.hash = newHash
-    },
-    [hash]
-  )
+ const hashChangeHandler = useCallback(() => {
+    const url = new URL(window.location.href);
+    setHash(url.hash.substring(1));
+ }, []);
 
-  return [hash, updateHash]
-}
+ useEffect(() => {
+    window.addEventListener('hashchange', hashChangeHandler);
+    return () => {
+      window.removeEventListener('hashchange', hashChangeHandler);
+    };
+ }, [hashChangeHandler]); //included dependancy.
 
-export default useHash
+ const updateHash = useCallback((newHash) => {
+    if (newHash !== hash) {
+      window.location.hash = newHash;
+    }
+ }, [hash]); //included dependancy.
+
+ return [hash, updateHash];
+};
+
+export default useHash;
