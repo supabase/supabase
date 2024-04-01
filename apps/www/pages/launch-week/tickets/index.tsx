@@ -34,7 +34,7 @@ export default function TicketsPage({ users }: Props) {
   const ref = useRef(null)
   const PAGE_COUNT = 20
   const TITLE = 'Supabase Special Event | Tickets'
-  const DESCRIPTION = 'Supabase Launch Week | 15-19 April 2024'
+  const DESCRIPTION = 'Supabase Launch Week | 15-19 April'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/lwx/lwx-og.jpg`
 
   const { resolvedTheme, setTheme } = useTheme()

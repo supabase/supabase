@@ -13,7 +13,7 @@ import TicketingFlow from '~/components/LaunchWeek/11/Ticket/TicketingFlow'
 export default function LaunchWeekIndex() {
   const { query } = useRouter()
 
-  const TITLE = 'Supabase Special Event | 15-19 April 2024'
+  const TITLE = 'Supabase Special Event | 15-19 April'
   const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/lw11/lw11-og.jpg`
 
