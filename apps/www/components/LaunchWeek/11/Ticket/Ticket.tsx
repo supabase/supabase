@@ -8,12 +8,18 @@ import Panel from '~/components/Panel'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import TicketProfile from './TicketProfile'
 import TicketCustomizationForm from './TicketCustomizationForm'
+import TicketNumber from './TicketNumber'
 
 export default function Ticket() {
   const ticketRef = useRef<HTMLDivElement>(null)
   const { userData: user, showCustomizationForm, setShowCustomizationForm } = useConfData()
   const isMobile = useBreakpoint()
-  const { platinum = false, bg_image_id: bgImageId = '1', secret: hasSecretTicket } = user
+  const {
+    platinum = false,
+    bg_image_id: bgImageId = '1',
+    secret: hasSecretTicket,
+    ticketNumber,
+  } = user
   const [imageHasLoaded, setImageHasLoaded] = useState(false)
   const params = useParams()
   const sharePage = !!params.username
@@ -63,6 +69,12 @@ export default function Ticket() {
         shimmerToColor="hsl(var(--background-default))"
         style={{ transform: 'translateZ(-10px)' }}
       >
+        <TicketNumber
+          number={ticketNumber}
+          platinum={platinum}
+          secret={hasSecretTicket}
+          className="absolute z-20 top-8 left-6"
+        />
         <TicketProfile className="absolute inset-0 h-full p-6 top-20 bottom-20 z-30 flex flex-col justify-between w-full flex-1 overflow-hidden" />
         <Image
           src={ticketBg[ticketType].background}

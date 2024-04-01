@@ -21,20 +21,20 @@ const LW_MATERIALIZED_VIEW = 'lw11_tickets_platinum'
 
 const STYLING_CONGIF = {
   regular: {
-    BACKGROUND: '#f1f1f1',
-    FOREGROUND: '#11181C',
-    FOREGROUND_LIGHT: '#6c7277',
-    TICKET_FOREGROUND: '#F8F9FA',
-    TICKET_FOREGROUND_LIGHT: '#8B9092',
-    BORDER: '#4e4e4e',
-  },
-  platinum: {
     BACKGROUND: '#060809',
     FOREGROUND: '#F8F9FA',
     FOREGROUND_LIGHT: '#8B9092',
+    TICKET_FOREGROUND: '#F8F9FA',
+    TICKET_FOREGROUND_LIGHT: '#8B9092',
+    BORDER: '#303030',
+  },
+  platinum: {
+    BACKGROUND: '#f1f1f1',
+    FOREGROUND: '#11181C',
+    FOREGROUND_LIGHT: '#6c7277',
     TICKET_FOREGROUND: '#11181C',
     TICKET_FOREGROUND_LIGHT: '#6c7277',
-    BORDER: '#adadad',
+    BORDER: '#303030',
   },
   secret: {
     BACKGROUND: '#060809',
@@ -42,7 +42,7 @@ const STYLING_CONGIF = {
     FOREGROUND_LIGHT: '#8B9092',
     TICKET_FOREGROUND: '#F8F9FA',
     TICKET_FOREGROUND_LIGHT: '#F8F9FA',
-    BORDER: '#959595',
+    BORDER: '#303030',
   },
 }
 
@@ -98,7 +98,7 @@ export async function handler(req: Request) {
     const fontData = await font
     const monoFontData = await mono_font
     const numDigits = `${Number(ticketNumber)}`.length
-    const prefix = `00000000`.slice(numDigits)
+    // const prefix = `00000000`.slice(numDigits)
     const HAS_ROLE = !!metadata?.role
     const HAS_COMPANY = !!metadata?.company
     const HAS_LOCATION = !!metadata?.location
@@ -112,36 +112,30 @@ export async function handler(req: Request) {
     const TICKET_RATIO = 396 / 613
     const TICKET_HEIGHT = TICKET_WIDTH / TICKET_RATIO
     const TICKET_POS_TOP = OG_PADDING_Y
-    const TICKET_POS_LEFT = 520
+    const TICKET_POS_LEFT = 470
     const TICKET_PADDING_X = 40
     const TICKET_PADDING_Y = 40
-    const LOGO_WIDTH = 40
-    // const LOGO_RATIO = 581 / 113
-    const LOGO_RATIO = 436 / 449
+    const LOGO_WIDTH = 160
+    const LOGO_RATIO = 145 / 79
     // Select one of 30 pre generated bg images base on ticket number
     const BG_NUMBER = `000${(ticketNumber % 30) + 1}`.slice(-3)
     const profileImg = `https://github.com/${username}.png?size=100`
-    const DISPLAY_NAME = name ?? username
 
     const BACKGROUND = {
       regular: {
-        OG: `${STORAGE_URL}/assets/backgrounds/platinum/${BG_NUMBER}.png`,
-        BG: `${STORAGE_URL}/assets/shape/v2/lw11_ticket_regular.png?t=1`,
-        // LOGO: `${STORAGE_URL}/assets/lw11_logo_white.svg`,
-        // LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-wordmark--light.png`,
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png`,
+        OG: `${STORAGE_URL}/assets/backgrounds/regular/${BG_NUMBER}.png`,
+        BG: `${STORAGE_URL}/assets/shape/lw11_ticket_regular.png?t=as`,
+        LOGO: `${STORAGE_URL}/assets/lw11_logo_white.svg`,
       },
       platinum: {
-        OG: `${STORAGE_URL}/assets/backgrounds/regular/${BG_NUMBER}.png`,
-        BG: `${STORAGE_URL}/assets/shape/v2/lw11_ticket_platinum.png?t=1`,
-        // LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-wordmark--dark.png`,
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png`,
+        OG: `${STORAGE_URL}/assets/backgrounds/platinum/${BG_NUMBER}.png`,
+        BG: `${STORAGE_URL}/assets/shape/lw11_ticket_platinum.png?t=as`,
+        LOGO: `${STORAGE_URL}/assets/lw11_logo_black.svg`,
       },
       secret: {
         OG: `${STORAGE_URL}/assets/backgrounds/secret/${BG_NUMBER}.png`,
-        BG: `${STORAGE_URL}/assets/shape/v2/lw11_ticket_purple.png?t=1`,
-        // LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-wordmark--dark.png`,
-        LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png`,
+        BG: `${STORAGE_URL}/assets/shape/lw11_ticket_purple.png?t=c`,
+        LOGO: `${STORAGE_URL}/assets/lw11_logo_white.svg`,
       },
     }
 
@@ -190,6 +184,8 @@ export async function handler(req: Request) {
                 height: TICKET_HEIGHT,
                 margin: 0,
                 borderRadius: '26px',
+                // border: `1px solid blue`,
+                // boxShadow: '0px 4px 45px rgba(0, 0, 0, 0.1)',
               }}
             >
               <img
@@ -202,33 +198,11 @@ export async function handler(req: Request) {
                   zIndex: '1',
                   margin: 0,
                   borderRadius: '26px',
+                  // border: `1px solid ${STYLING_CONGIF[ticketType].BORDER}`,
+                  // boxShadow: '0px 0px 50px rgba(0, 0, 0, 0.25)',
                 }}
                 src={BACKGROUND[ticketType].BG}
               />
-
-              {/* Ticket No  */}
-              <p
-                style={{
-                  display: 'flex',
-                  justifyContent: 'flex-start',
-                  position: 'absolute',
-                  top: TICKET_PADDING_Y + 15,
-                  left: TICKET_PADDING_X,
-                  textAlign: 'left',
-                  width: '50%',
-                  color: STYLING_CONGIF[ticketType].TICKET_FOREGROUND_LIGHT,
-                  margin: '0',
-                  marginBottom: '5',
-                  fontFamily: '"SourceCodePro"',
-                  fontSize: '16',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.35rem',
-                  lineHeight: '120%',
-                  opacity: 0.65,
-                }}
-              >
-                {`NO ${prefix}${ticketNumber}`}
-              </p>
 
               {/* Name & username */}
               <div
@@ -246,7 +220,6 @@ export async function handler(req: Request) {
                   textOverflow: 'clip',
                   textAlign: 'left',
                   marginBottom: '10px',
-                  paddingBottom: '10px',
                 }}
               >
                 {HAS_AVATAR && (
@@ -260,6 +233,7 @@ export async function handler(req: Request) {
                       marginBottom: 10,
                       borderRadius: '100%',
                       border: `1px solid ${STYLING_CONGIF[ticketType].BORDER}`,
+                      // boxShadow: '0px 0px 50px rgba(0, 0, 0, 0.25)',
                     }}
                     src={profileImg}
                   />
@@ -273,12 +247,9 @@ export async function handler(req: Request) {
                     lineHeight: '105%',
                     display: 'flex',
                     marginBottom: '6px',
-                    paddingBottom: '6px',
-                    overflow: 'hidden',
-                    maxHeight: '200px',
                   }}
                 >
-                  {DISPLAY_NAME}
+                  {name ?? username}
                 </p>
 
                 <div
@@ -288,9 +259,6 @@ export async function handler(req: Request) {
                     display: 'flex',
                     fontSize: '32',
                     margin: '0',
-                    overflow: 'hidden',
-                    maxHeight: '90px',
-                    paddingBottom: '6px',
                   }}
                 >
                   {HAS_NO_META && username && `@${username}`}
@@ -299,6 +267,27 @@ export async function handler(req: Request) {
                 </div>
               </div>
             </div>
+            {/* Ticket No  */}
+            {/* <p
+              style={{
+                display: 'flex',
+                position: 'absolute',
+                bottom: TICKET_PADDING_Y,
+                left: TICKET_PADDING_X + TICKET_POS_LEFT,
+                width: '50%',
+                color: STYLING_CONGIF[ticketType].TICKET_FOREGROUND_LIGHT,
+                margin: '0',
+                marginBottom: '5',
+                fontFamily: '"SourceCodePro"',
+                fontSize: '23',
+                textTransform: 'uppercase',
+                letterSpacing: '0.35rem',
+                lineHeight: '120%',
+                // border: '1px solid white',
+              }}
+            >
+              {`NO ${prefix}${ticketNumber}`}
+            </p> */}
 
             <div
               style={{
@@ -310,20 +299,14 @@ export async function handler(req: Request) {
                 flexDirection: 'column',
                 width: TICKET_POS_LEFT - OG_PADDING_X,
                 alignItems: 'flex-start',
-                justifyContent: 'center',
-                letterSpacing: '0.15rem',
-                lineHeight: '110%',
+                fontFamily: '"SourceCodePro"',
+                fontSize: 34,
+                textTransform: 'uppercase',
+                letterSpacing: '0.35rem',
+                lineHeight: '120%',
               }}
             >
-              <div
-                style={{
-                  display: 'flex',
-                  position: 'absolute',
-                  top: 10,
-                  left: 0,
-                  marginBottom: '40',
-                }}
-              >
+              <div style={{ display: 'flex', marginBottom: '40' }}>
                 <img
                   src={BACKGROUND[ticketType].LOGO}
                   width={LOGO_WIDTH}
@@ -333,42 +316,19 @@ export async function handler(req: Request) {
 
               <p
                 style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  marginBottom: 60,
-                  fontSize: 48,
-                  color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
+                  margin: '0',
                 }}
               >
-                <span
-                  style={{
-                    display: 'flex',
-                    margin: 0,
-                    color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
-                  }}
-                >
-                  Join us for a
-                </span>
-                <span
-                  style={{
-                    display: 'flex',
-                    margin: 0,
-                    color: STYLING_CONGIF[ticketType].FOREGROUND,
-                  }}
-                >
-                  Special Event
-                </span>
+                April 15
               </p>
               <p
                 style={{
-                  margin: '0',
-                  fontFamily: '"SourceCodePro"',
-                  fontSize: 26,
-                  textTransform: 'uppercase',
+                  display: 'flex',
+                  margin: 0,
                   color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
                 }}
               >
-                April 15-19 / 7AM PT
+                7AM PT
               </p>
             </div>
           </div>

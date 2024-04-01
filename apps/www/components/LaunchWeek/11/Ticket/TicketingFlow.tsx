@@ -78,12 +78,14 @@ const TicketingFlow = () => {
                     animate={animate}
                     exit={exit}
                     className={cn(
-                      'w-full min-h-[400px] max-w-2xl mx-auto flex flex-col justify-center gap-4 md:gap-8 transition-all opacity-0 invisible',
+                      'w-full min-h-[400px] max-w-2xl mx-auto flex flex-col justify-center gap-4 md:gap-8 lg:gap-12 transition-all opacity-0 invisible',
                       !isGameMode && !hasTicket && 'opacity-100 visible'
                     )}
                   >
                     <div className="flex flex-col gap-2">
-                      <h2 className="text-foreground text-3xl md:text-4xl">Special Announcement</h2>
+                      <h2 className="text-foreground-lighter text-3xl md:text-4xl">
+                        Join us for a<span className="block text-foreground">Special Event</span>
+                      </h2>
                       <CountdownComponent
                         date={LW11_LAUNCH_DATE}
                         showCard={false}
@@ -91,15 +93,10 @@ const TicketingFlow = () => {
                       />
                     </div>
                     <p className="text-foreground-lighter text-xl md:text-2xl">
-                      Supabase is{' '}
-                      <strong className="font-normal text-foreground">
-                        officially launching into General Availability
-                      </strong>
-                      .<br className="hidden sm:block" /> Join us in this major milestone and
-                      explore all the features that come with it.
+                      Celebrate a major milestone with us and explore all the features that come
+                      with it.
                     </p>
                     <div className="flex flex-col gap-1 font-mono uppercase text-sm">
-                      <p>Supabase Launch Week 11</p>
                       <p className="-mb-1">{LW11_DATE}</p>
                     </div>
                     <TicketForm />
