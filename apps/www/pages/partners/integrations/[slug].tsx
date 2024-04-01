@@ -16,7 +16,7 @@ import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabaseMisc'
-import { Partner } from '~/types/partners'
+import type { Partner } from '~/types/partners'
 import Error404 from '../../404'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 

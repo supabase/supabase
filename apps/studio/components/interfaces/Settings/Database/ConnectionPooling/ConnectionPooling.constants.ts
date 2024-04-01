@@ -3,8 +3,8 @@
 
 export const POOLING_OPTIMIZATIONS = {
   ci_nano: {
-    maxClientConn: 100,
-    poolSize: 10,
+    maxClientConn: 200,
+    poolSize: 15,
   },
   ci_micro: {
     maxClientConn: 200,

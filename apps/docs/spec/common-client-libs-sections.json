@@ -424,6 +424,13 @@
         "type": "function"
       },
       {
+        "id": "sign-in-anonymously",
+        "title": "Create an anonymous user",
+        "slug": "auth-signinanonymously",
+        "product": "auth",
+        "type": "function"
+      },
+      {
         "id": "sign-in-with-password",
         "title": "Sign in a user",
         "slug": "auth-signinwithpassword",

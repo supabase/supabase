@@ -71,9 +71,7 @@ export const ConnectionPooling = () => {
   const poolingOptimizations =
     POOLING_OPTIMIZATIONS[
       (computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS) ??
-      project?.infra_compute_size === 'nano'
-        ? 'ci_nano'
-        : 'ci_micro'
+        (project?.infra_compute_size === 'nano' ? 'ci_nano' : 'ci_micro')
     ]
   const defaultPoolSize = poolingOptimizations.poolSize ?? 15
   const defaultMaxClientConn = poolingOptimizations.maxClientConn ?? 200

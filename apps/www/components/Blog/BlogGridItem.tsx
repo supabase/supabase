@@ -2,8 +2,8 @@ import authors from 'lib/authors.json'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
-import Author from '~/types/author'
-import PostTypes from '~/types/post'
+import type Author from '~/types/author'
+import type PostTypes from '~/types/post'
 import dayjs from 'dayjs'
 
 interface Props {
