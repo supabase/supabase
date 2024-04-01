@@ -339,14 +339,19 @@ group by
 having
     count(1) > 1)`.trim()
 
+// Array of all lint rules we handle right now.
+export const LINT_TYPES = [
+  'unindexed_foreign_keys',
+  'auth_users_exposed',
+  'no_primary_key',
+  'unused_index',
+  'multiple_permissive_policies',
+  'auth_rls_initplan',
+] as const
+export type LINT_TYPES = (typeof LINT_TYPES)[number]
+
 export type Lint = {
-  name:
-    | 'unindexed_foreign_keys'
-    | 'auth_users_exposed'
-    | 'no_primary_key'
-    | 'unused_index'
-    | 'multiple_permissive_policies'
-    | 'auth_rls_initplan'
+  name: LINT_TYPES
   level: 'ERROR' | 'WARN' | 'INFO'
   facing: string
   description: string
