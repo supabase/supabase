@@ -27,7 +27,7 @@ const Hero = () => {
                     <AnnouncementBadge
                       url="/launch-week"
                       badge="Claim your ticket"
-                      announcement="Supabase GA Week"
+                      announcement="Special Announcement"
                     />
                   </div>
                   <h1 className="text-foreground text-4xl sm:text-5xl sm:leading-none lg:text-7xl">

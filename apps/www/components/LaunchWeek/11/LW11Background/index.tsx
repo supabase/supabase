@@ -7,7 +7,7 @@ import { cn } from 'ui'
 
 const defaultConfig = {
   dotGrid: 40,
-  percentageLarge: 0.995,
+  percentageLarge: 0.975,
   percentageAnimated: 0.95,
   randomizeLargeDots: 3,
   randomizeSmallDots: 0.5,

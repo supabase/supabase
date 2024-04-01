@@ -78,7 +78,7 @@ const TicketingFlow = () => {
                     animate={animate}
                     exit={exit}
                     className={cn(
-                      'w-full min-h-[400px] max-w-2xl mx-auto flex flex-col justify-center gap-4 md:gap-8 lg:gap-12 transition-all opacity-0 invisible',
+                      'w-full min-h-[400px] max-w-2xl mx-auto flex flex-col justify-center gap-4 md:gap-8 lg:gap-12 opacity-0 invisible',
                       !isGameMode && !hasTicket && 'opacity-100 visible'
                     )}
                   >
@@ -86,11 +86,6 @@ const TicketingFlow = () => {
                       <h2 className="text-foreground-lighter text-3xl md:text-4xl">
                         Join us for a<span className="block text-foreground">Special Event</span>
                       </h2>
-                      <CountdownComponent
-                        date={LW11_LAUNCH_DATE}
-                        showCard={false}
-                        className="[*]:text-xl"
-                      />
                     </div>
                     <p className="text-foreground-lighter text-xl md:text-2xl">
                       Celebrate a major milestone with us and explore all the features that come
@@ -98,6 +93,11 @@ const TicketingFlow = () => {
                     </p>
                     <div className="flex flex-col gap-1 font-mono uppercase text-sm">
                       <p className="-mb-1">{LW11_DATE}</p>
+                      <CountdownComponent
+                        date={LW11_LAUNCH_DATE}
+                        showCard={false}
+                        className="[*]:text-xl"
+                      />
                     </div>
                     <TicketForm />
                     <TicketPresence />

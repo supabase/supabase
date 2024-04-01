@@ -50,7 +50,6 @@ const LWXGame = ({ setIsGameMode }: Props) => {
 
   useEffect(() => {
     window.addEventListener('keydown', onKeyDown)
-
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [onKeyDown])
 
@@ -153,9 +152,10 @@ const LWXGame = ({ setIsGameMode }: Props) => {
           maxLength={phraseLength}
           pattern={REGEXP_ONLY_CHARS}
           autoFocus
-          containerClassName="flex-wrap justify-center gap-y-4"
+          containerClassName="flex-wrap justify-center gap-y-4 max-w-screen"
           inputMode="text"
           value={value}
+          spellCheck={false}
           onChange={(e) => {
             // @ts-ignore
             const index = inputRef.current?.dataset.inputOtpMss
@@ -178,6 +178,7 @@ const LWXGame = ({ setIsGameMode }: Props) => {
                   return (
                     <InputOTPSlot
                       className={cn(
+                        // 'h-6 w-6 sm:h-10 sm:w-10',
                         hasWon && 'border-foreground-light animate-pulse',
                         hasKeyDown && 'border-strong'
                       )}
@@ -221,9 +222,8 @@ const LWXGame = ({ setIsGameMode }: Props) => {
         <div className="flex items-center gap-2 text-foreground-muted">
           <Button
             type="outline"
-            onClick={() => null}
-            disabled
-            className="pointer-events-none"
+            onClick={() => setIsGameMode(false)}
+            className="opacity-50"
             size="tiny"
           >
             Esc

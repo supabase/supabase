@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Checkbox, IconCheck, Input, cn } from 'ui'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { useBreakpoint, useDebounce } from 'common'
@@ -58,6 +58,10 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
 
   const debouncedChangeHandler = useDebounce(handleFormSubmit, 1200)
 
+  useEffect(() => {
+    return () => setShowCustomizationForm && setShowCustomizationForm(false)
+  }, [])
+
   return (
     <form
       className={cn(
@@ -78,6 +82,9 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
         onChange={(event) => {
           handleInputChange('role', event.target.value)
         }}
+        onFocus={() =>
+          !showCustomizationForm && setShowCustomizationForm && setShowCustomizationForm(true)
+        }
         disabled={IS_SAVING}
         maxLength={25}
         icon={
@@ -101,6 +108,9 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
         onChange={(event) => {
           handleInputChange('company', event.target.value)
         }}
+        onFocus={() =>
+          !showCustomizationForm && setShowCustomizationForm && setShowCustomizationForm(true)
+        }
         disabled={IS_SAVING}
         icon={
           <IconCheck
