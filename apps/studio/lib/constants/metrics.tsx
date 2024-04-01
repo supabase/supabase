@@ -41,7 +41,7 @@ export const METRIC_CATEGORIES = {
   SUPAVISOR: {
     label: 'Supavisor',
     icon: <ServerIcon size={16} />,
-    key: 'instance',
+    key: 'supavisor',
   },
 }
 
