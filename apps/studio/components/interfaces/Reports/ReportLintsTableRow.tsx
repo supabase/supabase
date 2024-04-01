@@ -129,18 +129,14 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
               <TooltipTrigger_Shadcn_ asChild>
                 <Button
                   type="text"
+                  size="small"
                   className="px-1"
                   onClick={(event) => {
                     event.stopPropagation()
                     setSelectedLint(lint)
                   }}
-                >
-                  {isIgnored ? (
-                    <EyeIcon size={16} strokeWidth={1} />
-                  ) : (
-                    <EyeOff size={16} strokeWidth={1} />
-                  )}
-                </Button>
+                  icon={isIgnored ? <EyeIcon strokeWidth={1} /> : <EyeOff strokeWidth={1} />}
+                />
               </TooltipTrigger_Shadcn_>
               <TooltipContent_Shadcn_ side="bottom">
                 {isIgnored ? 'Unignore problem' : 'Ignore problem'}
