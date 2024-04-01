@@ -94,9 +94,10 @@ export const Restriction = () => {
               <Button asChild key="upgrade-button" type="default">
                 <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
               </Button>
-              <Button asChild type="default" icon={<ExternalLink size={14} />}>
+              {/* [Joshen] TODO update once docs are live */}
+              {/* <Button asChild type="default" icon={<ExternalLink size={14} />}>
                 <a href="https://supabase.com/docs">About service restrictions</a>
-              </Button>
+              </Button> */}
             </div>
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>
@@ -119,9 +120,10 @@ export const Restriction = () => {
               <Button key="upgrade-button" asChild type="default">
                 <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
               </Button>
-              <Button asChild type="default" icon={<ExternalLink size={14} />}>
+              {/* [Joshen] TODO update once docs are live */}
+              {/* <Button asChild type="default" icon={<ExternalLink size={14} />}>
                 <a href="https://supabase.com/docs">About service restrictions</a>
-              </Button>
+              </Button> */}
             </div>
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>
@@ -143,9 +145,10 @@ export const Restriction = () => {
               <Button key="upgrade-button" asChild type="default">
                 <Link href={`/org/${org?.slug}/billing?panel=subscriptionPlan`}>Upgrade plan</Link>
               </Button>
-              <Button asChild type="default" icon={<ExternalLink size={14} />}>
+              {/* [Joshen] TODO update once docs are live */}
+              {/* <Button asChild type="default" icon={<ExternalLink size={14} />}>
                 <a href="https://supabase.com/docs">About service restrictions</a>
-              </Button>
+              </Button> */}
             </div>
           </AlertDescription_Shadcn_>
         </Alert_Shadcn_>
