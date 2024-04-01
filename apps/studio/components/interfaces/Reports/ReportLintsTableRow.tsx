@@ -1,8 +1,9 @@
 import { Eye, EyeIcon, EyeOff, HelpCircle, Table2 } from 'lucide-react'
 import { useState } from 'react'
 
+import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
-import { Lint } from 'data/lint/lint-query'
+import { LINT_TYPES, Lint } from 'data/lint/lint-query'
 import { useLocalStorageQuery } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import {
@@ -13,10 +14,8 @@ import {
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
 } from 'ui'
-import { getHumanReadableTitle } from './ReportLints.utils'
 import { Markdown } from '../Markdown'
-import { useParams } from 'common'
-import Link from 'next/link'
+import { LintCTA, getHumanReadableTitle } from './ReportLints.utils'
 
 type ReportLintsTableRowProps = {
   lint: Lint
@@ -24,56 +23,33 @@ type ReportLintsTableRowProps = {
 
 const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
   const { ref } = useParams()
-  const [seletectdLint, setSelectedLint] = useState<Lint | null>(null)
+  const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
 
-  const [lintIgnoreList, setLintIgnoreList] = useLocalStorageQuery(
+  const [lintIgnoreList, setLintIgnoreList] = useLocalStorageQuery<string[]>(
     LOCAL_STORAGE_KEYS.PROJECT_LINT_IGNORE_LIST,
-    ''
+    []
   )
-  const isIgnored = lintIgnoreList.split(',').includes(lint.cache_key)
+  const isIgnored = lintIgnoreList.includes(lint.cache_key)
 
-  function toggleLintIgnore(lint: Lint) {
-    const currentIgnoreList = lintIgnoreList ? lintIgnoreList.split(',') : []
+  // if the lint type can't be handled (there's no CTA text defined), don't render it
+  if (!LINT_TYPES.includes(lint.name)) {
+    return null
+  }
+
+  const toggleLintIgnore = () => {
+    let currentIgnoreList = []
     const cacheKey = lint.cache_key
 
     // Check if the cacheKey exists in the array and ignore or unignore it
-    const index = currentIgnoreList.indexOf(cacheKey)
+    const index = lintIgnoreList.indexOf(cacheKey)
     if (index !== -1) {
-      currentIgnoreList.splice(index, 1)
+      currentIgnoreList = lintIgnoreList.filter((l) => l !== cacheKey)
     } else {
-      currentIgnoreList.push(cacheKey)
+      currentIgnoreList = lintIgnoreList.concat(cacheKey)
     }
-    const ignoreString = currentIgnoreList.join(',')
-    setLintIgnoreList(ignoreString)
+    setLintIgnoreList(currentIgnoreList)
+    setSelectedLint(null)
   }
-
-  const ctaUrl =
-    lint.name === 'unused_index'
-      ? `/project/${ref}/database/indexes?schema=${lint.metadata?.schema}&table=${lint.metadata?.name}`
-      : lint.name === 'no_primary_key'
-        ? `/project/${ref}/editor`
-        : lint.name === 'auth_users_exposed'
-          ? `/project/${ref}/editor`
-          : lint.name === 'multiple_permissive_policies'
-            ? `/project/${ref}/auth/policies?schema=${lint.metadata?.schema}&search=${lint.metadata?.name}`
-            : lint.name === 'unindexed_foreign_keys'
-              ? `/project/${ref}/database/indexes?schema=${lint.metadata?.schema}`
-              : lint.name === 'auth_rls_initplan'
-                ? `/project/${ref}/auth/policies`
-                : '/'
-
-  const ctaText =
-    lint.name === 'unused_index'
-      ? 'View index'
-      : lint.name === 'no_primary_key'
-        ? 'View table'
-        : lint.name === 'auth_users_exposed'
-          ? 'View table'
-          : lint.name === 'multiple_permissive_policies' || lint.name === 'auth_rls_initplan'
-            ? 'View policies'
-            : lint.name === 'unindexed_foreign_keys'
-              ? 'Create an index'
-              : undefined
 
   return (
     <>
@@ -141,13 +117,7 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
         </Table.td>
         <Table.td>
           <div className="flex items-center justify-end gap-x-2">
-            {ctaText !== undefined && (
-              <Button asChild type="default">
-                <Link href={ctaUrl} target="_blank" rel="noreferrer">
-                  {ctaText}
-                </Link>
-              </Button>
-            )}
+            <LintCTA title={lint.name} projectRef={ref!} metadata={lint.metadata} />
             <Tooltip_Shadcn_>
               <TooltipTrigger_Shadcn_ asChild>
                 <Button
@@ -175,9 +145,9 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
       <Modal
         size="small"
         alignFooter="right"
-        visible={seletectdLint !== null}
+        visible={selectedLint !== null}
         onCancel={() => setSelectedLint(null)}
-        onConfirm={() => toggleLintIgnore(lint)}
+        onConfirm={() => toggleLintIgnore()}
         header={<h3>Confirm to {isIgnored ? 'unignore' : 'ignore'} this lint</h3>}
       >
         <div className="py-4">

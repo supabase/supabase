@@ -1,16 +1,15 @@
-import { partition } from 'lodash'
+import { partition, sortBy } from 'lodash'
 import { Check, ExternalLink, Loader } from 'lucide-react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { FilterPopover } from 'components/interfaces/AuditLogs'
 import ReportLintsTableRow from 'components/interfaces/Reports/ReportLintsTableRow'
 import { ReportsLayout } from 'components/layouts'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
-import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
-import { useLocalStorageQuery } from 'hooks'
+import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { useLocalStorageQuery, useSelectedProject } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import type { NextPageWithLayout } from 'types'
 import {
@@ -22,32 +21,38 @@ import {
 } from 'ui'
 
 const ProjectLints: NextPageWithLayout = () => {
-  const { project } = useProjectContext()
+  const project = useSelectedProject()
   const [filters, setFilters] = useState({
     levels: [] as string[],
     types: [] as string[],
   })
-  const [lintIgnoreList] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.PROJECT_LINT_IGNORE_LIST, '')
+  const [lintIgnoreList] = useLocalStorageQuery<string[]>(
+    LOCAL_STORAGE_KEYS.PROJECT_LINT_IGNORE_LIST,
+    []
+  )
 
-  const {
-    data: lints,
-    isLoading,
-    isRefetching,
-    refetch,
-  } = useProjectLintsQuery({
+  const { data, isLoading, isRefetching, refetch } = useProjectLintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  const [ignoredLints, activeLints] = partition(lints ?? [], (lint) =>
-    lintIgnoreList.split(',').includes(lint.cache_key)
+  // sort the lints by level, ERROR should be at the top.
+  const lints = sortBy(data || [], (lint) => {
+    if (lint.level === 'ERROR') return 0
+    if (lint.level === 'WARN') return 1
+    if (lint.level === 'INFO') return 2
+    return 3
+  })
+
+  const [ignoredLints, activeLints] = partition(lints, (lint) =>
+    lintIgnoreList.includes(lint.cache_key)
   )
-  const filteredLints =
-    filters.levels.length > 0 || filters.types.length > 0
-      ? (activeLints ?? [])
-          .filter((x) => (filters.levels.length > 0 ? filters.levels.includes(x.level) : x))
-          .filter((x) => (filters.types.length > 0 ? filters.types.includes(x.name) : x))
-      : activeLints ?? []
+  const filteredLints = useMemo(() => {
+    return activeLints
+      .filter((x) => (filters.levels.length > 0 ? filters.levels.includes(x.level) : x))
+      .filter((x) => (filters.types.length > 0 ? filters.types.includes(x.name) : x))
+  }, [activeLints, filters.levels, filters.types])
+
   const warnLintsCount = activeLints.filter((x) => x.level === 'WARN').length
   const errorLintsCount = activeLints.filter((x) => x.level === 'ERROR').length
 
@@ -135,9 +140,7 @@ const ProjectLints: NextPageWithLayout = () => {
                   <LoadingLine loading={isLoading || isRefetching} />
                 </Table.td>
               </Table.tr>,
-              ...((lints ?? []).filter(
-                (lint: Lint) => !lintIgnoreList.split(',').includes(lint.cache_key)
-              ).length === 0
+              ...(activeLints.length === 0
                 ? [
                     <Table.tr key="empty-state">
                       <Table.td colSpan={6} className="p-3 py-12">
@@ -163,7 +166,7 @@ const ProjectLints: NextPageWithLayout = () => {
                       <Table.tr key="empty-state">
                         <Table.td colSpan={6} className="p-3 py-12">
                           <p className="text-foreground-light">
-                            No problems found based on the selected filteres
+                            No problems found based on the selected filters
                           </p>
                         </Table.td>
                       </Table.tr>,
@@ -204,7 +207,7 @@ const ProjectLints: NextPageWithLayout = () => {
                         </Table.tr>
                       ) : (
                         <>
-                          {ignoredLints.map((lint: Lint) => {
+                          {ignoredLints.map((lint) => {
                             return <ReportLintsTableRow key={lint.cache_key} lint={lint} />
                           })}
                         </>
