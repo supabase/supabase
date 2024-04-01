@@ -144,7 +144,7 @@ const TicketingFlow = () => {
                         <div className="hidden md:block relative h-full w-full md:w-1/3 top-0 -bottom-8 overflow-visible">
                           <Image
                             src="/images/launchweek/11/airpods-max-alpha.png"
-                            alt="Supabase GA Week AirPod Max prize"
+                            alt="Supabase AirPod Max prize"
                             width={300}
                             height={300}
                             className="absolute p-2 object-cover object-left-top w-full h-[200px] overflow-visible opacity-50"
@@ -155,7 +155,7 @@ const TicketingFlow = () => {
                           <p className="">Win AirPods Max</p>
                           {hasPlatinumTicket ? (
                             <p className="text-foreground-light text-sm">
-                              Stay tuned until the end of GA week to find out the lucky winners.
+                              Stay tuned until the end of Launch Week to find out the lucky winners.
                             </p>
                           ) : (
                             <p className="text-foreground-light text-sm">

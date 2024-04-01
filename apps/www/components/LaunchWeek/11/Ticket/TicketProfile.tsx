@@ -28,7 +28,7 @@ export default function TicketProfile({ className }: { className?: string }) {
             alt={`${username} github image`}
             width={60}
             height={60}
-            className="min-w-14 w-14 h-14 rounded-full overflow-hidden border border-muted mb-3"
+            className="min-w-14 w-14 h-14 rounded-full overflow-hidden border border-muted/40 mb-3"
           />
         )}
         <p className={cn('text-4xl leading-[105%]')}>{name || username || 'Your Name'}</p>

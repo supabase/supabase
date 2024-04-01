@@ -37,15 +37,18 @@ const PromoToast = () => {
   return (
     <div
       className={cn(
-        'opacity-0 translate-y-3 transition-all grid gap-2 fixed z-50 bottom-4 right-4 sm:bottom-8 sm:right-8 w-[calc(100vw-2rem)] sm:w-[320px] bg-alternative hover:bg-alternative border border-default rounded p-6 shadow-lg overflow-hidden',
+        'opacity-0 translate-y-3 transition-all grid gap-3 fixed z-50 bottom-4 right-4 sm:bottom-8 sm:right-8 w-[calc(100vw-2rem)] sm:w-[320px] bg-alternative hover:bg-alternative border border-default rounded p-6 shadow-lg overflow-hidden',
         visible && 'opacity-100 translate-y-0'
       )}
     >
-      <div className="relative z-10 text-foreground flex flex-col text-base w-full font-mono">
-        <p>Supabase GA Week</p>
-        <span className="text-sm leading-4 text-foreground-lighter uppercase">15-19 April</span>
+      <p className="relative z-10 text-foreground flex flex-col text-2xl w-full leading-7">
+        <span className="text-foreground-lighter">Join us for a</span>
+        <span>Special Event</span>
+      </p>
+      <div className="relative z-10 text-foreground-lighter uppercase flex flex-col text-sm w-full font-mono mb-2">
+        <span>APRIL 15-19 / 7AM PT</span>
+        {/* <CountdownComponent date={new Date(announcement.launchDate)} showCard={false} /> */}
       </div>
-      <CountdownComponent date={new Date(announcement.launchDate)} showCard={false} />
 
       <div className="relative z-10 flex items-center space-x-2">
         <Button asChild type="secondary">
