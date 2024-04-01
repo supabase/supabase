@@ -5,6 +5,7 @@ import type { IntegrationProjectConnection } from 'data/integrations/integration
 import type { ProjectInfo } from 'data/projects/projects-query'
 import type { ResourceWarning } from 'data/usage/resource-warnings-query'
 import { BASE_PATH } from 'lib/constants'
+import InlineSVG from 'react-inlinesvg'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
 
@@ -43,22 +44,22 @@ const ProjectCard = ({
             <span className="text-sm lowercase text-foreground-light">{desc}</span>
             <div className="flex items-center space-x-1.5">
               {isVercelIntegrated && (
-                <div className="w-fit p-1 border rounded-md flex items-center border-controler">
-                  <img
+                <div className="w-fit p-1 border rounded-md flex items-center text-black dark:text-white">
+                  <InlineSVG
                     src={`${BASE_PATH}/img/icons/vercel-icon.svg`}
-                    alt="Vercel Icon"
+                    title="Vercel Icon"
                     className="w-3"
                   />
                 </div>
               )}
               {isBranchingEnabled && (
-                <div className="w-fit p-1 border rounded-md flex items-center border-controler">
+                <div className="w-fit p-1 border rounded-md flex items-center">
                   <GitBranch size={12} strokeWidth={1.5} />
                 </div>
               )}
               {isGithubIntegrated && (
                 <>
-                  <div className="w-fit p-1 border rounded-md flex items-center border-controler">
+                  <div className="w-fit p-1 border rounded-md flex items-center">
                     <Github size={12} strokeWidth={1.5} />
                   </div>
                   <p className="text-xs !ml-2 text-foreground-light">{githubRepository}</p>
