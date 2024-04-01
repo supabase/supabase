@@ -85,13 +85,23 @@ export const handle: Handle = async ({ event, resolve }) => {
   })
 
   /**
-   * A convenience helper so we can just call await getSession() instead const { data: { session } } = await supabase.auth.getSession()
+   * Unlike `supabase.auth.getSession`, which is unsafe on the server because it
+   * doesn't validate the JWT, this function validates the JWT by first calling
+   * `getUser` and aborts early if the JWT signature is invalid.
    */
-  event.locals.getSession = async () => {
+  event.locals.safeGetSession = async () => {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser()
+    if (error) {
+      return { session: null, user: null }
+    }
+
     const {
       data: { session },
     } = await event.locals.supabase.auth.getSession()
-    return session
+    return { session, user }
   }
 
   return resolve(event, {
@@ -104,9 +114,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 <GetSessionWarning />
 
-In this case, the session information from `getSession` is supplied to the Supabase client so it can retrieve the auth token. This is safe, since the auth token signature will be revalidated on the Auth server. But you shouldn't trust the unsigned data that is stored alongside the JWT.
-
-If you are using TypeScript the compiler might complain about `event.locals.supabase` and `event.locals.getSession`, this can be fixed by updating your `src/app.d.ts` with the content below:
+If you are using TypeScript the compiler might complain about `event.locals.supabase` and `event.locals.safeGetSession`, this can be fixed by updating your `src/app.d.ts` with the content below:
 
 ```ts src/app.d.ts
 // src/app.d.ts
@@ -117,10 +125,11 @@ declare global {
   namespace App {
     interface Locals {
       supabase: SupabaseClient
-      getSession(): Promise<Session | null>
+      safeGetSession(): Promise<{ session: Session | null; user: User | null }>
     }
     interface PageData {
       session: Session | null
+      user: User | null
     }
     // interface Error {}
     // interface Platform {}
@@ -134,9 +143,12 @@ Create a new `src/routes/+layout.server.ts` file to handle the session on the se
 // src/routes/+layout.server.ts
 import type { LayoutServerLoad } from './$types'
 
-export const load: LayoutServerLoad = async ({ locals: { getSession } }) => {
+export const load: LayoutServerLoad = async ({ locals: { safeGetSession } }) => {
+  const { session, user } = await safeGetSession()
+
   return {
-    session: await getSession(),
+    session,
+    user,
   }
 }
 ```
@@ -170,6 +182,11 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
     },
   })
 
+  /**
+   * It's fine to use `getSession` here, because on the client, `getSession` is
+   * safe, and on the server, it reads `session` from the `LayoutData`, which
+   * safely checked the session using `safeGetSession`.
+   */
   const {
     data: { session },
   } = await supabase.auth.getSession()
@@ -259,8 +276,8 @@ Create a `src/routes/+page.server.ts` file that will return our website URL to b
 import { redirect } from '@sveltejs/kit'
 import type { PageServerLoad } from './$types'
 
-export const load: PageServerLoad = async ({ url, locals: { getSession } }) => {
-  const session = await getSession()
+export const load: PageServerLoad = async ({ url, locals: { safeGetSession } }) => {
+  const { session } = await safeGetSession()
 
   // if the user is already logged in return them to the account page
   if (session) {
@@ -419,8 +436,8 @@ and handle all our form actions through the `actions` object.
 import { fail, redirect } from '@sveltejs/kit'
 import type { Actions, PageServerLoad } from './$types'
 
-export const load: PageServerLoad = async ({ locals: { supabase, getSession } }) => {
-  const session = await getSession()
+export const load: PageServerLoad = async ({ locals: { supabase, safeGetSession } }) => {
+  const { session } = await safeGetSession()
 
   if (!session) {
     throw redirect(303, '/')
@@ -436,14 +453,14 @@ export const load: PageServerLoad = async ({ locals: { supabase, getSession } })
 }
 
 export const actions: Actions = {
-  update: async ({ request, locals: { supabase, getSession } }) => {
+  update: async ({ request, locals: { supabase, safeGetSession } }) => {
     const formData = await request.formData()
     const fullName = formData.get('fullName') as string
     const username = formData.get('username') as string
     const website = formData.get('website') as string
     const avatarUrl = formData.get('avatarUrl') as string
 
-    const session = await getSession()
+    const { session } = await safeGetSession()
 
     const { error } = await supabase.from('profiles').upsert({
       id: session?.user.id,
@@ -470,8 +487,8 @@ export const actions: Actions = {
       avatarUrl,
     }
   },
-  signout: async ({ locals: { supabase, getSession } }) => {
-    const session = await getSession()
+  signout: async ({ locals: { supabase, safeGetSession } }) => {
+    const { session } = await safeGetSession()
     if (session) {
       await supabase.auth.signOut()
       throw redirect(303, '/')
