@@ -59,6 +59,12 @@ Projects on the Pro plan and above have auto-scaling Disk Storage.
 
 Disk Storage expands automatically when the database reaches 90% of the disk size. The disk is expanded to be 50% larger (e.g., 8GB -> 12GB). Auto-scaling can only take place once every 6 hours. If within those 6 hours you reach 95% of the disk space, your project will enter read-only mode.
 
+<Admonition type="note">
+
+The automatic resize operation will add an additional 50% capped to a maximum of 200GB. If 50% of your current usage is more than 200GB then only 200GB will be added to your disk (e.g. a size of 1500GB will resize to 1700GB).
+
+</Admonition>
+
 The Disk Storage Size can also be manually expanded on the [Database settings page](https://supabase.com/dashboard/project/_/settings/database). The maximum default you can expand the Disk Storage to is 200GB. If you wish to manually expand it to any more than 200GB, please [contact us](https://supabase.com/dashboard/support/new) to discuss expanding the 200GB limit.
 
 <Admonition type="note">
