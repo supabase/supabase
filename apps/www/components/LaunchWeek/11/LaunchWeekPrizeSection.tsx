@@ -57,7 +57,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
               content={
                 <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
                   <LabelBadge text="30 t-shirts" />
-                  <p>Supabase GA T-shirts</p>
+                  <p>Supabase T-shirts</p>
                 </div>
               }
             />
@@ -65,8 +65,8 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
               className="flex-grow"
               content={
                 <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
-                  <LabelBadge text="25 caps" />
-                  <p>Supabase GA Cap</p>
+                  <LabelBadge text="25 pins" />
+                  <p>Supabase Pins</p>
                 </div>
               }
             />
