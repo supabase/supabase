@@ -82,6 +82,7 @@ export const USAGE_CATEGORIES: CategoryMeta[] = [
           { key: EgressType.DATABASE, name: 'Database Egress', color: 'green' },
           { key: EgressType.STORAGE, name: 'Storage Egress', color: 'blue' },
           { key: EgressType.REALTIME, name: 'Realtime Egress', color: 'orange' },
+          { key: EgressType.FUNCTIONS, name: 'Functions Egress', color: 'purple' },
         ],
         name: 'Total Egress',
         unit: 'bytes',
