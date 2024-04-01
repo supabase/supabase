@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { isArray } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import Table from 'components/to-be-cleaned/Table'
@@ -36,6 +36,7 @@ import {
 import DowngradeModal from './DowngradeModal'
 import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
+import UpgradeSurveyModal from './UpgradeModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
 
@@ -44,7 +45,10 @@ const PlanUpdateSidePanel = () => {
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
 
+  const originalPlanRef = useRef<string>()
+
   const [showExitSurvey, setShowExitSurvey] = useState(false)
+  const [showUpgradeSurvey, setShowUpgradeSurvey] = useState(false)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [showDowngradeError, setShowDowngradeError] = useState(false)
   const [selectedTier, setSelectedTier] = useState<'tier_free' | 'tier_pro' | 'tier_team'>()
@@ -69,7 +73,9 @@ const PlanUpdateSidePanel = () => {
     snap.setPanelKey(undefined)
   }
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
+    orgSlug: slug,
+  })
   const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
   const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
@@ -79,6 +85,7 @@ const PlanUpdateSidePanel = () => {
         setSelectedTier(undefined)
         onClose()
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+        setShowUpgradeSurvey(true)
       },
       onError: (error) => {
         toast.error(`Unable to update subscription: ${error.message}`)
@@ -126,6 +133,12 @@ const PlanUpdateSidePanel = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
+
+  useEffect(() => {
+    if (visible && isSuccessSubscription) {
+      originalPlanRef.current = subscription.plan.id
+    }
+  }, [visible, isSuccessSubscription])
 
   const onConfirmDowngrade = () => {
     setSelectedTier(undefined)
@@ -556,6 +569,16 @@ const PlanUpdateSidePanel = () => {
         subscription={subscription}
         onClose={(success?: boolean) => {
           setShowExitSurvey(false)
+          if (success) onClose()
+        }}
+      />
+
+      <UpgradeSurveyModal
+        visible={showUpgradeSurvey}
+        originalPlan={originalPlanRef.current}
+        subscription={subscription}
+        onClose={(success?: boolean) => {
+          setShowUpgradeSurvey(false)
           if (success) onClose()
         }}
       />
