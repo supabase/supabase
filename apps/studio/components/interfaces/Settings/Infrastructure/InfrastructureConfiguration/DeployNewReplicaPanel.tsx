@@ -41,13 +41,13 @@ const DeployNewReplicaPanel = ({
   const { ref: projectRef } = useParams()
   const project = useSelectedProject()
   const org = useSelectedOrganization()
-  const [refetchInterval, setRefetchInterval] = useState<number | boolean>(false)
+  const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
 
   const { data } = useReadReplicasQuery({ projectRef })
   const { data: backups } = useBackupsQuery(
     { projectRef },
     {
-      refetchInterval: refetchInterval as any,
+      refetchInterval,
       refetchOnWindowFocus: false,
       onSuccess: (data) => {
         if (data.walg_enabled) setRefetchInterval(false)
