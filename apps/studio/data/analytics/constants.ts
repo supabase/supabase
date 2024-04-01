@@ -10,6 +10,8 @@ export type DataPoint = {
 
 export interface AnalyticsData {
   data: DataPoint[]
+  format: string
+  total: number
   yAxisLimit: number
   hasNoData?: boolean
 }
