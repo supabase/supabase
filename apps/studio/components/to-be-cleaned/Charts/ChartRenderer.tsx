@@ -91,7 +91,7 @@ const Header = ({
       }
     >
       {title}
-      <span className="text-lg">{format}</span>
+      {format !== 'bytes' && <span className="text-lg">{format}</span>}
     </h5>
   )
   const date = (
