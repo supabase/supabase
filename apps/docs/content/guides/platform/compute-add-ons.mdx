@@ -6,18 +6,25 @@ description: "Learn about your project's instance and additional add-ons."
 
 Every project on the Supabase Platform comes with its own dedicated Postgres instance running inside a virtual machine (VM). The following table describes the base instance with additional compute add-ons available if you need extra performance when scaling up Supabase.
 
-| Plan   | Hourly Price USD | Monthly Price USD | CPU                     | Memory | Connections: Direct | Connections: Pooler | Recommended Maximum DB Size |
-| ------ | ---------------- | ----------------- | ----------------------- | ------ | ------------------- | ------------------- | --------------------------- |
-| Micro  | $0.01344         | ~$10              | 2-core ARM (shared)     | 1 GB   | 60                  | 200                 | 10GB                        |
-| Small  | $0.0206          | ~$15              | 2-core ARM (shared)     | 2 GB   | 90                  | 200                 | 50GB                        |
-| Medium | $0.0822          | ~$60              | 2-core ARM (shared)     | 4 GB   | 120                 | 200                 | 100GB                       |
-| Large  | $0.1517          | ~$110             | 2-core ARM (dedicated)  | 8 GB   | 160                 | 300                 | 200GB                       |
-| XL     | $0.2877          | ~$210             | 4-core ARM (dedicated)  | 16 GB  | 240                 | 700                 | 500GB                       |
-| 2XL    | $0.562           | ~$410             | 8-core ARM (dedicated)  | 32 GB  | 380                 | 1500                | 1TB                         |
-| 4XL    | $1.32            | ~$960             | 16-core ARM (dedicated) | 64 GB  | 480                 | 3000                | 2TB                         |
-| 8XL    | $2.562           | ~$1,870           | 32-core ARM (dedicated) | 128 GB | 490                 | 6000                | 4TB                         |
-| 12XL   | $3.836           | ~$2,800           | 48-core ARM (dedicated) | 192 GB | 500                 | 9000                | 6TB                         |
-| 16XL   | $5.12            | ~$3,730           | 64-core ARM (dedicated) | 256 GB | 500                 | 12,000              | 10TB                        |
+<Admonition type="note">
+
+Free plan resources subject to changes.
+
+</Admonition>
+
+| Plan        | Hourly Price USD | Monthly Price USD | CPU                     | Memory       | Connections: Direct | Connections: Pooler | Recommended Maximum DB Size |
+| ----------- | ---------------- | ----------------- | ----------------------- | ------------ | ------------------- | ------------------- | --------------------------- |
+| Nano (free) | $0               | $0                | Shared                  | Up to 0.5 GB | 60                  | 200                 | 500MB                       |
+| Micro       | $0.01344         | ~$10              | 2-core ARM (shared)     | 1 GB         | 60                  | 200                 | 10GB                        |
+| Small       | $0.0206          | ~$15              | 2-core ARM (shared)     | 2 GB         | 90                  | 200                 | 50GB                        |
+| Medium      | $0.0822          | ~$60              | 2-core ARM (shared)     | 4 GB         | 120                 | 200                 | 100GB                       |
+| Large       | $0.1517          | ~$110             | 2-core ARM (dedicated)  | 8 GB         | 160                 | 300                 | 200GB                       |
+| XL          | $0.2877          | ~$210             | 4-core ARM (dedicated)  | 16 GB        | 240                 | 700                 | 500GB                       |
+| 2XL         | $0.562           | ~$410             | 8-core ARM (dedicated)  | 32 GB        | 380                 | 1500                | 1TB                         |
+| 4XL         | $1.32            | ~$960             | 16-core ARM (dedicated) | 64 GB        | 480                 | 3000                | 2TB                         |
+| 8XL         | $2.562           | ~$1,870           | 32-core ARM (dedicated) | 128 GB       | 490                 | 6000                | 4TB                         |
+| 12XL        | $3.836           | ~$2,800           | 48-core ARM (dedicated) | 192 GB       | 500                 | 9000                | 6TB                         |
+| 16XL        | $5.12            | ~$3,730           | 64-core ARM (dedicated) | 256 GB       | 500                 | 12,000              | 10TB                        |
 
 Number of connections above are recommended values.
 
@@ -45,18 +52,19 @@ When considering compute upgrades, assess whether your bottlenecks are hardware-
 
 SSD Disks are attached to your servers and the disk performance depends on the compute add-on of your instance. Disk IO refers to two metrics: throughput (Megabits per Second) and IOPS (Input/Output Operations per Second). Disk throughput is capped at 1,048 Mbps and IOPS is capped at 3,000 IOPS for all compute add-ons.
 
-| Plan   | Baseline Disk Throughput | Baseline IOPS |
-| ------ | ------------------------ | ------------- |
-| Micro  | 87 Mbps                  | 500 IOPS      |
-| Small  | 174 Mbps                 | 1,000 IOPS    |
-| Medium | 347 Mbps                 | 2,000 IOPS    |
-| Large  | 630 Mbps                 | 3,000 IOPS    |
-| XL     | 1,048 Mbps               | 3,000 IOPS    |
-| 2XL    | 1,048 Mbps               | 3,000 IOPS    |
-| 4XL    | 1,048 Mbps               | 3,000 IOPS    |
-| 8XL    | 1,048 Mbps               | 3,000 IOPS    |
-| 12XL   | 1,048 Mbps               | 3,000 IOPS    |
-| 16XL   | 1,048 Mbps               | 3,000 IOPS    |
+| Plan        | Baseline Disk Throughput | Baseline IOPS |
+| ----------- | ------------------------ | ------------- |
+| Nano (free) | 43 Mbps                  | 250 IOPS      |
+| Micro       | 87 Mbps                  | 500 IOPS      |
+| Small       | 174 Mbps                 | 1,000 IOPS    |
+| Medium      | 347 Mbps                 | 2,000 IOPS    |
+| Large       | 630 Mbps                 | 3,000 IOPS    |
+| XL          | 1,048 Mbps               | 3,000 IOPS    |
+| 2XL         | 1,048 Mbps               | 3,000 IOPS    |
+| 4XL         | 1,048 Mbps               | 3,000 IOPS    |
+| 8XL         | 1,048 Mbps               | 3,000 IOPS    |
+| 12XL        | 1,048 Mbps               | 3,000 IOPS    |
+| 16XL        | 1,048 Mbps               | 3,000 IOPS    |
 
 [Contact us](https://supabase.com/contact/enterprise) if you require a plan with higher disk throughput and IOPS.
 
@@ -74,18 +82,19 @@ If you're unsure of how much throughput or IOPS your application requires, you c
 
 The maximum number of replication slots and WAL senders depends on your compute add-on plan, as follows:
 
-| Plan   | Max Replication Slots | Max WAL Senders |
-| ------ | --------------------- | --------------- |
-| Micro  | 5                     | 5               |
-| Small  | 5                     | 5               |
-| Medium | 5                     | 5               |
-| Large  | 8                     | 8               |
-| XL     | 24                    | 24              |
-| 2XL    | 80                    | 80              |
-| 4XL    | 80                    | 80              |
-| 8XL    | 80                    | 80              |
-| 12XL   | 80                    | 80              |
-| 16XL   | 80                    | 80              |
+| Plan        | Max Replication Slots | Max WAL Senders |
+| ----------- | --------------------- | --------------- |
+| Nano (free) | 5                     | 5               |
+| Micro       | 5                     | 5               |
+| Small       | 5                     | 5               |
+| Medium      | 5                     | 5               |
+| Large       | 8                     | 8               |
+| XL          | 24                    | 24              |
+| 2XL         | 80                    | 80              |
+| 4XL         | 80                    | 80              |
+| 8XL         | 80                    | 80              |
+| 12XL        | 80                    | 80              |
+| 16XL        | 80                    | 80              |
 
 <Admonition type="caution">
 
