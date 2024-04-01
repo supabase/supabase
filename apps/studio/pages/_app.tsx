@@ -139,8 +139,18 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
+  useEffect(() => {
+    // APRIL FOOLS STUFF
+    function trackMouse(event: MouseEvent) {
+      document.documentElement.style.setProperty('--cursorXPos', `${event.clientX}px`)
+      document.documentElement.style.setProperty('--cursorYPos', `${event.clientY}px`)
+    }
+    document.addEventListener('mousemove', trackMouse)
+  }, [])
+
   return (
     <QueryClientProvider client={queryClient}>
+<<<<<<< Updated upstream
       <Hydrate state={pageProps.dehydratedState}>
         <AuthContainer>
           <ProfileProvider>
@@ -168,15 +178,47 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                   </RouteValidationWrapper>
                 </TooltipProvider>
               </PageTelemetry>
+=======
+      <div id="april-fools-theme">
+        <Hydrate state={pageProps.dehydratedState}>
+          <AuthContainer>
+            <ProfileProvider>
+              <FlagProvider>
+                <Head>
+                  <title>Supabase</title>
+                  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                </Head>
+                <Favicons />
 
-              <HCaptchaLoadedStore />
-              <Toaster />
-              <PortalToast />
-              {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
-            </FlagProvider>
-          </ProfileProvider>
-        </AuthContainer>
-      </Hydrate>
+                <PageTelemetry>
+                  <TooltipProvider>
+                    <RouteValidationWrapper>
+                      <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+                        <AppBannerContextProvider>
+                          <CommandMenuWrapper>
+                            <AppBannerWrapper>
+                              <FeaturePreviewContextProvider>
+                                {getLayout(<Component {...pageProps} />)}
+                                <FeaturePreviewModal />
+                              </FeaturePreviewContextProvider>
+                            </AppBannerWrapper>
+                          </CommandMenuWrapper>
+                        </AppBannerContextProvider>
+                      </ThemeProvider>
+                    </RouteValidationWrapper>
+                  </TooltipProvider>
+                </PageTelemetry>
+>>>>>>> Stashed changes
+
+                <HCaptchaLoadedStore />
+                <Toaster />
+                <PortalToast />
+                {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
+              </FlagProvider>
+            </ProfileProvider>
+          </AuthContainer>
+        </Hydrate>
+      </div>
     </QueryClientProvider>
   )
 }
