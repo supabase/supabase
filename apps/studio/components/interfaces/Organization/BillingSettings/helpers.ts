@@ -23,3 +23,29 @@ export const billingMetricUnit = (pricingMetric: PricingMetric) => {
     return null
   }
 }
+
+export const generateUpgradeReasons = (originalPlan?: string, upgradedPlan?: string) => {
+  const reasons = [
+    'Current plan limits are not enough for me',
+    'I want better customer support from Supabase',
+    'I am migrating from a previous project',
+  ]
+
+  if (originalPlan === undefined || upgradedPlan === undefined) {
+    reasons.push('None of the above')
+    return reasons
+  }
+
+  if (originalPlan === 'free' && upgradedPlan === 'pro') {
+    reasons.push('Need more compute')
+    reasons.push(
+      'I want access to additional features like daily backups, cost control, Custom Domain and PITR'
+    )
+  } else if (upgradedPlan === 'team') {
+    reasons.push('I want access to SOC2 and HIPAA compliance')
+  }
+
+  reasons.push('None of the above')
+
+  return reasons
+}

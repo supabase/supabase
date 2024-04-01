@@ -67,7 +67,7 @@ const PaymentMethods = () => {
       <ScaffoldSection>
         <ScaffoldSectionDetail>
           <div className="sticky space-y-2 top-12">
-            <p className="text-base m-0">Payment methods</p>
+            <p className="text-foreground text-base m-0">Payment Methods</p>
             <p className="text-sm text-foreground-light mb-2 pr-4 m-0">
               After adding a payment method, make sure to mark it as active to use it for billing.
               You can remove unused cards.
