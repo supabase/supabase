@@ -41,6 +41,10 @@ export interface paths {
     /** Send exit survey to HubSpot */
     post: operations['SendExitSurveyController_sendExitSurvey']
   }
+  '/platform/feedback/upgrade': {
+    /** Send upgrade survey to survey_responses table */
+    post: operations['SendUpgradeSurveyController_sendUpgradeSurvey']
+  }
   '/platform/signup': {
     /** Sign up with email and password */
     post: operations['SignUpController_signUp']
@@ -1866,6 +1870,13 @@ export interface components {
       reasons: string
       additionalFeedback?: string
       exitAction?: string
+    }
+    SendUpgradeSurveyBody: {
+      orgSlug?: string
+      prevPlan?: string
+      currentPlan?: string
+      reasons: string[]
+      additionalFeedback?: string
     }
     SignUpBody: {
       email: string
@@ -5664,6 +5675,25 @@ export interface operations {
         }
       }
       /** @description Failed to send exit survey */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Send upgrade survey to survey_responses table */
+  SendUpgradeSurveyController_sendUpgradeSurvey: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SendUpgradeSurveyBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['SendFeedbackResponse']
+        }
+      }
+      /** @description Failed to send upgrade survey */
       500: {
         content: never
       }
