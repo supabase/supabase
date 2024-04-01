@@ -29,7 +29,7 @@ interface Props {
 export default function LaunchWeekIndex({ meetups }: Props) {
   const { query } = useRouter()
 
-  const TITLE = 'Supabase Launch Week | 15-19 April 2024'
+  const TITLE = 'Supabase Special Event | 15-19 April 2024'
   const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
   const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/lw11/lw11-og.jpg`
 
