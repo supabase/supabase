@@ -1,10 +1,9 @@
-import { QueryClient, UseQueryOptions } from '@tanstack/react-query'
 import pgMeta from '@supabase/pg-meta'
+import { QueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 
-import { databaseKeys } from './keys'
 import { ExecuteSqlData, useExecuteSqlQuery } from 'data/sql/execute-sql-query'
-import { ResponseError } from 'types'
+import { databaseKeys } from './keys'
 
 export type SchemasVariables = {
   projectRef?: string
