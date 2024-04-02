@@ -1,4 +1,3 @@
-import Divider from 'components/ui/Divider'
 import { makeAutoObservable, runInAction } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import Link from 'next/link'

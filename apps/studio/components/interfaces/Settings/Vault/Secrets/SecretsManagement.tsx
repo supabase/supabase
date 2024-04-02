@@ -6,7 +6,6 @@ import { Fragment, useEffect, useState } from 'react'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Divider from 'components/ui/Divider'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { useCheckPermissions } from 'hooks'
 import type { VaultSecret } from 'types'

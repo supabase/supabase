@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { Button, IconCheck, IconExternalLink, IconMail, IconSearch, Input, Separator } from 'ui'
 
-import Divider from 'components/ui/Divider'
 import { CATEGORY_OPTIONS } from './Support.constants'
 import { useProfile } from 'lib/profile'
 

@@ -1,4 +1,3 @@
-import Divider from 'components/ui/Divider'
 import { BASE_PATH } from 'lib/constants'
 import { useTheme } from 'next-themes'
 import Head from 'next/head'

@@ -27,7 +27,6 @@ import z from 'zod'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
-import Divider from 'components/ui/Divider'
 import { FormActions } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
