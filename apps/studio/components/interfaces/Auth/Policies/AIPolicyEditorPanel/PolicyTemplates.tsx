@@ -83,10 +83,15 @@ export const PolicyTemplates = ({
                   icon={
                     <div className="min-w-16">
                       <Badge
-                        className="!rounded font-mono"
+                        className={cn(
+                          '!rounded font-mono',
+                          template.command === 'UPDATE'
+                            ? 'bg-blue-400 text-blue-900 border border-blue-800'
+                            : ''
+                        )}
                         variant={
                           template.command === 'ALL'
-                            ? 'default'
+                            ? 'outline'
                             : template.command === 'SELECT'
                               ? 'brand'
                               : template.command === 'UPDATE'
