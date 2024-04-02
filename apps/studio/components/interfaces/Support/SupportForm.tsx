@@ -34,6 +34,7 @@ import {
   IconX,
   Input,
   Listbox,
+  Separator,
 } from 'ui'
 import MultiSelect from 'ui-patterns/MultiSelect'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
@@ -532,7 +533,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
               </div>
             )}
 
-            <Divider light />
+            <Separator />
 
             {!isDisabled ? (
               <>

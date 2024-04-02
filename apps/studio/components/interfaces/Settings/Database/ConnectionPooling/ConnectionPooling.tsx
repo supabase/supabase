@@ -21,6 +21,7 @@ import {
   IconExternalLink,
   Input_Shadcn_,
   Listbox,
+  Separator,
 } from 'ui'
 import z from 'zod'
 
@@ -198,7 +199,7 @@ export const ConnectionPooling = () => {
                   <ShimmeringLoader className="h-4 w-1/3 col-span-4" delayIndex={i} />
                   <ShimmeringLoader className="h-8 w-full col-span-8" delayIndex={i} />
                 </div>
-                <Divider light />
+                <Separator />
               </Fragment>
             ))}
 

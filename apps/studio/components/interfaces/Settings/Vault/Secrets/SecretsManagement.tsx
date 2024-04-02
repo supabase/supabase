@@ -10,7 +10,16 @@ import Divider from 'components/ui/Divider'
 import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
 import { useCheckPermissions } from 'hooks'
 import type { VaultSecret } from 'types'
-import { Button, IconExternalLink, IconLoader, IconSearch, IconX, Input, Listbox } from 'ui'
+import {
+  Button,
+  IconExternalLink,
+  IconLoader,
+  IconSearch,
+  IconX,
+  Input,
+  Listbox,
+  Separator,
+} from 'ui'
 import AddNewSecretModal from './AddNewSecretModal'
 import DeleteSecretModal from './DeleteSecretModal'
 import EditSecretModal from './EditSecretModal'
@@ -172,7 +181,7 @@ const SecretsManagement = () => {
                       onSelectEdit={setSelectedSecretToEdit}
                       onSelectRemove={setSelectedSecretToRemove}
                     />
-                    {idx !== secrets.length - 1 && <Divider light />}
+                    {idx !== secrets.length - 1 && <Separator />}
                   </Fragment>
                 )
               })}

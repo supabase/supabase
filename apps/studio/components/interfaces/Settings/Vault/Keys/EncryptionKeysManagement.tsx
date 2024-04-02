@@ -26,6 +26,7 @@ import {
   Input,
   Listbox,
   Modal,
+  Separator,
 } from 'ui'
 
 const DEFAULT_KEY_NAME = 'No description provided'
@@ -263,7 +264,7 @@ const EncryptionKeysManagement = () => {
                         </Tooltip.Root>
                       </div>
                     </div>
-                    {idx !== keys.length - 1 && <Divider light />}
+                    {idx !== keys.length - 1 && <Separator />}
                   </Fragment>
                 )
               })}

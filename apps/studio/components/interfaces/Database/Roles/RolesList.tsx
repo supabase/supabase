@@ -2,7 +2,17 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
 import { useState } from 'react'
-import { Badge, Button, IconPlus, IconSearch, IconX, Input } from 'ui'
+import {
+  Badge,
+  Button,
+  IconPlus,
+  IconSearch,
+  IconX,
+  Input,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms'
@@ -16,6 +26,7 @@ import DeleteRoleModal from './DeleteRoleModal'
 import RoleRow from './RoleRow'
 import RoleRowSkeleton from './RoleRowSkeleton'
 import { SUPABASE_ROLES } from './Roles.constants'
+import { Plus } from 'lucide-react'
 
 type SUPABASE_ROLE = (typeof SUPABASE_ROLES)[number]
 
@@ -115,8 +126,8 @@ const RolesList = () => {
             </div>
           </div>
           <div className="flex items-center space-x-6">
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_>
                 <div className="w-42">
                   <SparkBar
                     type="horizontal"
@@ -126,12 +137,12 @@ const RolesList = () => {
                     value={totalActiveConnections}
                     barClass={
                       maxConnectionLimit === 0 || maxConnectionLimit === undefined
-                        ? 'bg-control'
+                        ? 'bg-foreground'
                         : totalActiveConnections > 0.9 * maxConnectionLimit
-                          ? 'bg-red-800'
+                          ? 'bg-destructive'
                           : totalActiveConnections > 0.75 * maxConnectionLimit
-                            ? 'bg-amber-900'
-                            : 'bg-green-800'
+                            ? 'bg-warning'
+                            : undefined
                     }
                     labelTop={
                       Number.isInteger(maxConnectionLimit)
@@ -141,49 +152,33 @@ const RolesList = () => {
                     labelBottom="Active connections"
                   />
                 </div>
-              </Tooltip.Trigger>
-              <Tooltip.Content align="start" side="bottom">
-                <Tooltip.Arrow className="radix-tooltip-arrow" />
-                <div
-                  className={[
-                    'rounded bg-alternative py-1 px-2 leading-none shadow',
-                    'border border-background space-y-1',
-                  ].join(' ')}
-                >
-                  <p className="text-xs text-foreground-light pr-2">Connections by roles:</p>
-                  {rolesWithActiveConnections.map((role) => (
-                    <div key={role.id} className="text-xs text-foreground">
-                      {role.name}: {role.active_connections}
-                    </div>
-                  ))}
-                </div>
-              </Tooltip.Content>
-            </Tooltip.Root>
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="bottom" align="start">
+                <p className="text-xs text-foreground-light">Connections by roles:</p>
+                {rolesWithActiveConnections.map((role) => (
+                  <div key={role.id} className="text-xs text-foreground">
+                    {role.name}: {role.active_connections}
+                  </div>
+                ))}
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
                 <Button
                   type="primary"
                   disabled={!canUpdateRoles}
-                  icon={<IconPlus size="tiny" />}
+                  icon={<Plus />}
                   onClick={() => setIsCreatingRole(true)}
                 >
                   Add role
                 </Button>
-              </Tooltip.Trigger>
+              </TooltipTrigger_Shadcn_>
               {!canUpdateRoles && (
                 <Tooltip.Content align="start" side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background text-xs',
-                    ].join(' ')}
-                  >
-                    You need additional permissions to add a new role
-                  </div>
+                  You need additional permissions to add a new role
                 </Tooltip.Content>
               )}
-            </Tooltip.Root>
+            </Tooltip_Shadcn_>
           </div>
         </div>
 

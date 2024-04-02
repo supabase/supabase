@@ -121,7 +121,7 @@ const UserDropdown = ({
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button type="text" loading={isLoading} className="hover:border-gray-500 flex">
+          <Button type="text" loading={isLoading} className="hover:border-muted flex">
             <IconMoreVertical />
           </Button>
         </DropdownMenuTrigger>
