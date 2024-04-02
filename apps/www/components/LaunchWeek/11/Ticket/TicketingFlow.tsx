@@ -110,16 +110,12 @@ const TicketingFlow = () => {
                     exit={exit}
                     className="w-full flex-1 min-h-[400px] flex flex-col xl:flex-row items-center xl:justify-center xl:items-center gap-8 md:gap-10 xl:gap-20 text-foreground text-center md:text-left"
                   >
-                    <div className="w-full lg:w-auto h-full mt-3 md:mt-6 xl:mt-0 max-w-2xl flex flex-col items-center">
+                    <div className="w-full lg:w-auto h-full mt-3 md:mt-6 xl:mt-0 max-w-lg flex flex-col items-center">
                       <TicketContainer />
                     </div>
                     <div className="order-first xl:h-full w-full max-w-lg gap-3 flex flex-col items-center justify-center xl:items-start xl:justify-start text-center xl:text-left">
                       {}
-                      {hasSecretTicket && (
-                        <Badge className="border-[#FF1ADA50] bg-[#FF1ADA10] text-[#e036f6]">
-                          Secret ticket
-                        </Badge>
-                      )}
+                      {hasSecretTicket && <Badge variant="outline">Secret ticket</Badge>}
                       {hasPlatinumTicket ? (
                         <div>
                           <p className="text-2xl mb-1">Thanks for sharing!</p>
