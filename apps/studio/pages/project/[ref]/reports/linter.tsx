@@ -92,6 +92,7 @@ const ProjectLints: NextPageWithLayout = () => {
                   { name: 'No primary key', value: 'no_primary_key' },
                   { name: 'Unused index', value: 'unused_index' },
                   { name: 'Multiple permissive policies', value: 'multiple_permissive_policies' },
+                  { name: 'Auth RLS Initialization Plan', value: 'auth_rls_initplan' },
                 ]}
                 labelKey="name"
                 valueKey="value"
