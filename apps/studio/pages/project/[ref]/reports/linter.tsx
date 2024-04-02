@@ -108,7 +108,7 @@ const ProjectLints: NextPageWithLayout = () => {
           </div>
           <div className="flex items-center gap-x-2">
             <Button asChild type="default" icon={<ExternalLink />}>
-              <a href="/" target="_blank" rel="noreferrer">
+              <a href="https://supabase.github.io/splinter" target="_blank" rel="noreferrer">
                 Documentation
               </a>
             </Button>
