@@ -224,35 +224,30 @@ const UserDropdown = ({
 
       <ConfirmationModal
         visible={isDeleteModalOpen}
-        header="Confirm to delete"
-        buttonLabel="Delete"
-        buttonLoadingLabel="Delete"
-        onSelectCancel={() => setIsDeleteModalOpen(false)}
-        onSelectConfirm={() => {
+        title="Confirm to delete"
+        confirmLabel="Delete"
+        onCancel={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
           handleDelete()
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            This is permanent! Are you sure you want to delete user {user.email}?
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          This is permanent! Are you sure you want to delete user {user.email}?
+        </p>
       </ConfirmationModal>
 
       <ConfirmationModal
         visible={isDeleteFactorsModalOpen}
-        header="Confirm to delete"
-        buttonLabel="Delete"
-        onSelectCancel={() => setIsDeleteFactorsModalOpen(false)}
-        onSelectConfirm={() => {
+        title="Confirm to delete"
+        confirmLabel="Delete"
+        onCancel={() => setIsDeleteFactorsModalOpen(false)}
+        onConfirm={() => {
           handleDeleteFactors()
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            This is permanent! Are you sure you want to delete the user's MFA factors?
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          This is permanent! Are you sure you want to delete the user's MFA factors?
+        </p>
       </ConfirmationModal>
     </>
   )
