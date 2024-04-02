@@ -298,7 +298,7 @@ export const withEditEntity: Story = {
 export const withMultiSelect: Story = {
   args: {
     className: 'w-[420px] h-[520px]',
-    multiSelect: true,
+    multiselect: true,
     data: {
       name: 'basic tree',
       children: [

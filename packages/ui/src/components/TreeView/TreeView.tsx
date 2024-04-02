@@ -64,9 +64,7 @@ const TreeViewItem = forwardRef<
 
     useEffect(() => {
       if (isEditing) {
-        console.log('useEffect with inputRef.current?.focus()')
         inputRef.current?.focus()
-        // formRef.current?.focus()
       }
     }, [isEditing])
 
@@ -161,9 +159,6 @@ const TreeViewItem = forwardRef<
         <form autoFocus onSubmit={handleSubmit} className={cn(!isEditing && 'hidden')}>
           <Input
             ref={inputRef}
-            onFocus={(e) => {
-              console.log('input focussed')
-            }}
             onChange={(e) => {
               setLocalValueState(e.target.value)
             }}
