@@ -3,11 +3,13 @@ import { products } from 'shared-data'
 type HomeMenuIcon = {
   width?: number
   height?: number
+  className?: string
 }
-export function IconMenuHome({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuHome({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
       width={width}
       height={height}
       viewBox="0 0 16 16"
@@ -23,10 +25,11 @@ export function IconMenuHome({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuGraphQL({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuGraphQL({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
       width={width}
       height={height}
       viewBox="0 0 16 16"
@@ -42,10 +45,11 @@ export function IconMenuGraphQL({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuApi({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuApi({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
       width={width}
       height={height}
       viewBox="0 0 16 16"
@@ -77,7 +81,7 @@ export function IconMenuApi({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuAuth({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuAuth({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       viewBox="0 0 16 16"
@@ -96,10 +100,11 @@ export function IconMenuAuth({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuDevCli({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuDevCli({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
       width={width}
       height={height}
       viewBox="0 0 16 16"
@@ -115,10 +120,11 @@ export function IconMenuDevCli({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuCli({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuCli({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
       width={width}
       height={height}
       viewBox="0 0 16 16"
@@ -132,7 +138,7 @@ export function IconMenuCli({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuCsharp({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuCsharp({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       viewBox="0 0 16 16"
@@ -151,10 +157,11 @@ export function IconMenuCsharp({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuDatabase({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuDatabase({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
       width={width}
       height={width}
       viewBox="0 0 16 16"
@@ -170,7 +177,7 @@ export function IconMenuDatabase({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuRestApis({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuRestApis({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       viewBox="0 0 16 16"
@@ -189,10 +196,11 @@ export function IconMenuRestApis({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuEdgeFunctions({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuEdgeFunctions({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
       width={width}
       height={height}
       viewBox="0 0 16 16"
@@ -208,7 +216,7 @@ export function IconMenuEdgeFunctions({ width = 16, height = 16 }: HomeMenuIcon)
   )
 }
 
-export function IconMenuExtensions({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuExtensions({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       viewBox="0 0 16 16"
@@ -227,7 +235,7 @@ export function IconMenuExtensions({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuFlutter({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuFlutter({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       viewBox="0 0 16 16"
@@ -246,10 +254,11 @@ export function IconMenuFlutter({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuGettingStarted({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuGettingStarted({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
       width={width}
       height={height}
       viewBox="0 0 16 16"
@@ -265,10 +274,11 @@ export function IconMenuGettingStarted({ width = 16, height = 16 }: HomeMenuIcon
   )
 }
 
-export function IconMenuIntegrations({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuIntegrations({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
       width={width}
       height={height}
       viewBox="0 0 16 16"
@@ -284,7 +294,7 @@ export function IconMenuIntegrations({ width = 16, height = 16 }: HomeMenuIcon) 
   )
 }
 
-export function IconMenuJavascript({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuJavascript({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       width={width}
@@ -303,7 +313,7 @@ export function IconMenuJavascript({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuPlatform({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuPlatform({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       viewBox="0 0 16 16"
@@ -322,7 +332,7 @@ export function IconMenuPlatform({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuPython({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuPython({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       viewBox="0 0 16 16"
@@ -341,10 +351,11 @@ export function IconMenuPython({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuRealtime({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuRealtime({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
       width={width}
       height={height}
       viewBox="0 0 16 16"
@@ -360,10 +371,11 @@ export function IconMenuRealtime({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuResources({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuResources({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
       width={width}
       height={height}
       viewBox="0 0 16 16"
@@ -379,7 +391,7 @@ export function IconMenuResources({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuSelfHosting({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuSelfHosting({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       viewBox="0 0 16 16"
@@ -398,7 +410,7 @@ export function IconMenuSelfHosting({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuStorage({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuStorage({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       viewBox="0 0 16 16"
@@ -417,7 +429,7 @@ export function IconMenuStorage({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuAI({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuAI({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       width={width}
@@ -437,7 +449,7 @@ export function IconMenuAI({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuSwift({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuSwift({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       viewBox="0 0 16 16"
@@ -456,10 +468,11 @@ export function IconMenuSwift({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuKotlin({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuKotlin({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
+      className={className}
       viewBox="0 0 16 16"
       width={width}
       height={height}
@@ -475,7 +488,7 @@ export function IconMenuKotlin({ width = 16, height = 16 }: HomeMenuIcon) {
   )
 }
 
-export function IconMenuStatus({ width = 16, height = 16 }: HomeMenuIcon) {
+export function IconMenuStatus({ width = 16, height = 16, className }: HomeMenuIcon) {
   return (
     <svg
       width={width}
