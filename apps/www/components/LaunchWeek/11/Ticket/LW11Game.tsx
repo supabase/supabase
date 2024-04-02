@@ -22,8 +22,7 @@ interface Props {
 
 const LWXGame = ({ setIsGameMode }: Props) => {
   const { supabase, userData: user } = useConfData()
-  const phrase =
-    process.env.NEXT_PUBLIC_LWX_GAME_WORD ?? 'supabase_is_going_into_general_availability'
+  const phrase = process.env.NEXT_PUBLIC_LWX_GAME_WORD ?? 'its_just_postgres'
   const inputRef = useRef(null)
   const winningPhrase = phrase?.split('_').map((word) => word.split(''))
   const phraseLength = phrase?.replaceAll('_', '').split('').length

@@ -2,7 +2,7 @@ import React from 'react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
-import { cn } from 'ui'
+import { Badge, cn } from 'ui'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import { LW11_DATE, LW11_LAUNCH_DATE } from '~/lib/constants'
 import useWinningChances from '../../hooks/useWinningChances'
@@ -26,7 +26,7 @@ const TicketingFlow = () => {
   const isLoading = !isGameMode && ticketState === 'loading'
   const isRegistering = !isGameMode && ticketState === 'registration'
   const hasTicket = !isGameMode && ticketState === 'ticket'
-  const hasPlatinumTicket = userData.golden
+  const hasPlatinumTicket = userData.platinum
   const hasSecretTicket = userData.secret
 
   const transition = DEFAULT_TRANSITION
@@ -114,33 +114,48 @@ const TicketingFlow = () => {
                       <TicketContainer />
                     </div>
                     <div className="order-first xl:h-full w-full max-w-lg gap-3 flex flex-col items-center justify-center xl:items-start xl:justify-start text-center xl:text-left">
-                      {hasSecretTicket ? (
-                        <p className="text-2xl lg:text-3xl flex flex-col">
-                          <span className="text-[#8B9092]">You found the secret ticket.</span>
-                          <span>Share it with the community.</span>
-                        </p>
-                      ) : hasPlatinumTicket ? (
-                        <p className="text-2xl lg:text-3xl">
-                          <span className="text-[#8B9092]">Congrats!</span> You maximized your
-                          chances and have a platinum ticket.
-                        </p>
+                      {}
+                      {hasSecretTicket && (
+                        <Badge className="border-[#FF1ADA50] bg-[#FF1ADA10] text-[#e036f6]">
+                          Secret ticket
+                        </Badge>
+                      )}
+                      {hasPlatinumTicket ? (
+                        <div>
+                          <p className="text-2xl mb-1">Thanks for sharing!</p>
+                          <p className="text-[#8B9092]">
+                            Join on April 15-19 to celebrate a major milestone with us and explore
+                            all the features that come with it.
+                          </p>
+                        </div>
                       ) : winningChances !== 2 ? (
-                        <>
-                          <p className="text-2xl lg:text-3xl">You're in!</p>
-                          <p className="text-xl text-[#8B9092]">
+                        <div>
+                          {!hasSecretTicket && (
+                            <p className="text-2xl mb-1">@{userData.username}, you're in!</p>
+                          )}
+                          <p className="text-[#8B9092]">
                             Now share your ticket to have a chance of winning limited swag.
                           </p>
-                        </>
+                        </div>
                       ) : (
-                        <p className="text-2xl lg:text-3xl">
-                          <span className="text-[#8B9092]">Just one more.</span>{' '}
-                          <span>Keep sharing to increase your chances.</span>
-                        </p>
+                        <div>
+                          <p className="text-2xl mb-1">@{userData.username}, almost there!</p>
+                          <p className="text-[#8B9092]">
+                            Keep sharing to max out your chances of winning.
+                          </p>
+                        </div>
                       )}
-                      <CountdownComponent date={LW11_LAUNCH_DATE} showCard={false} />
-                      {!hasPlatinumTicket && <TicketPresence />}
-                      <div className="w-full h-auto text-center md:text-left border border-muted flex flex-col md:flex-row items-stretch rounded-lg bg-surface-100 mt-2 md:mt-8 overflow-hidden">
-                        <div className="hidden md:block relative h-full w-full md:w-1/3 top-0 -bottom-8 overflow-visible">
+                      <div className="w-full my-3">
+                        <TicketActions />
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="font-mono text-foreground-lighter text-xs leading-3">
+                          Starts in:
+                        </span>
+                        <CountdownComponent date={LW11_LAUNCH_DATE} showCard={false} />
+                      </div>
+                      <div className="w-full h-auto text-center md:text-left border border-muted flex flex-col md:flex-row items-stretch rounded-lg bg-surface-100 my-2 md:mb-8 overflow-hidden">
+                        <div className="hidden md:block relative h-full w-full min-h-[140px] md:w-1/3 top-0 -bottom-8 overflow-visible">
                           <Image
                             src="/images/launchweek/11/airpods-max-alpha.png"
                             alt="Supabase AirPod Max prize"
@@ -149,24 +164,17 @@ const TicketingFlow = () => {
                             className="absolute p-2 object-cover object-left-top w-full h-[200px] overflow-visible opacity-50"
                           />
                         </div>
-                        <div className="flex flex-col md:w-2/3 gap-1 p-3">
+                        <div className="flex flex-col justify-center md:w-2/3 gap-1 p-3">
                           <p className="text-sm text-foreground-lighter">5 sets</p>
                           <p className="">Win AirPods Max</p>
-                          {hasPlatinumTicket ? (
-                            <p className="text-foreground-light text-sm">
-                              Stay tuned until the end of Launch Week to find out the lucky winners.
-                            </p>
-                          ) : (
-                            <p className="text-foreground-light text-sm">
-                              Grow your chances of winning limited edition swag by sharing on all
-                              channels.
-                            </p>
-                          )}
-                          <div className="w-full mt-3 md:mt-6">
-                            <TicketActions />
-                          </div>
+                          <p className="text-foreground-light text-sm">
+                            Grow your chances of winning limited edition swag by sharing on{' '}
+                            <span className="text-foreground">X</span> and{' '}
+                            <span className="text-foreground">Linkedin</span>.
+                          </p>
                         </div>
                       </div>
+                      {!hasPlatinumTicket && <TicketPresence />}
                     </div>
                   </m.div>
                 )}
