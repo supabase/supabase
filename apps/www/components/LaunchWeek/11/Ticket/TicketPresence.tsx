@@ -4,7 +4,7 @@ import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import solutions from '~/data/Solutions'
 import { cn } from 'ui'
 
-const TicketPresence = () => {
+const TicketPresence = (props: { className?: string }) => {
   const { supabase, ticketState } = useConfData()
   const hasTicket = ticketState === 'ticket'
   const [realtimeChannel, setRealtimeChannel] = useState<ReturnType<
@@ -48,8 +48,8 @@ const TicketPresence = () => {
     <div
       className={cn(
         'text-foreground-muted text-xs flex items-center transition-opacity',
-        hasTicket && 'text-sm opacity-80'
-        // lowTraffic && 'opacity-0'
+        hasTicket && 'text-sm opacity-80',
+        props.className
       )}
     >
       <svg

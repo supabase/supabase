@@ -133,6 +133,7 @@ export default function TicketForm() {
   ) : (
     <div className="flex flex-col gap-10 items-start justify-center relative z-20">
       <Button
+        // block
         type="secondary"
         disabled={formState === 'loading' || Boolean(session)}
         onClick={handleGithubSignIn}

@@ -78,7 +78,7 @@ const TicketingFlow = () => {
                     animate={animate}
                     exit={exit}
                     className={cn(
-                      'w-full min-h-[400px] max-w-2xl mx-auto flex flex-col justify-center gap-4 md:gap-8 lg:gap-12 opacity-0 invisible',
+                      'w-full min-h-[400px] sm:max-w-lg mx-auto flex flex-col justify-center gap-4 md:gap-8 lg:gap-12 opacity-0 invisible',
                       !isGameMode && !hasTicket && 'opacity-100 visible'
                     )}
                   >
@@ -86,21 +86,23 @@ const TicketingFlow = () => {
                       <h2 className="text-foreground-lighter text-3xl md:text-4xl">
                         Join us for a<span className="block text-foreground">Special Event</span>
                       </h2>
+                      <p className="text-foreground-lighter text-xl md:text-2xl">
+                        Celebrate a major milestone with us and explore all the features that come
+                        with it.
+                      </p>
                     </div>
-                    <p className="text-foreground-lighter text-xl md:text-2xl">
-                      Celebrate a major milestone with us and explore all the features that come
-                      with it.
-                    </p>
-                    <div className="flex flex-col gap-1 font-mono uppercase text-sm">
-                      <p className="-mb-1">{LW11_DATE}</p>
-                      <CountdownComponent
-                        date={LW11_LAUNCH_DATE}
-                        showCard={false}
-                        className="[*]:text-xl"
-                      />
+                    <div className="w-full p-4 md:pr-8 sm:-mx-4 rounded-lg border bg-alternative flex flex-col xs:flex-row gap-4 justify-between">
+                      <div className="flex flex-col gap-1 font-mono uppercase text-sm flex-1">
+                        <p className="-mb-1">{LW11_DATE}</p>
+                        <CountdownComponent
+                          date={LW11_LAUNCH_DATE}
+                          showCard={false}
+                          className="[&_*]:leading-4"
+                        />
+                      </div>
+                      <TicketForm />
                     </div>
-                    <TicketForm />
-                    <TicketPresence />
+                    <TicketPresence className="mt-4 md:mt-8 lg:mt-12" />
                   </m.div>
                 )}
                 {hasTicket && (
