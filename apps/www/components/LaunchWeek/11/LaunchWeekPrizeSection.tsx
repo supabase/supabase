@@ -39,7 +39,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                     <p className="xl:mt-4">Win AirPods Max</p>
                     <p className="text-foreground-lighter text-sm">
                       Secure your ticket to enter our random prize pool, and amplify your odds by
-                      sharing. Or if you dont leave anything up for chance - join our Hackathon and
+                      sharing. Or if you don't leave anything up for chance - join our Hackathon and
                       showcase your creations. With luck or skill, you could snag these top-tier
                       headphones!
                     </p>

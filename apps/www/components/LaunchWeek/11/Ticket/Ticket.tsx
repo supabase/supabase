@@ -73,7 +73,7 @@ export default function Ticket() {
           number={ticketNumber}
           platinum={platinum}
           secret={hasSecretTicket}
-          className="absolute z-20 top-8 left-6"
+          className="absolute z-20 top-6 left-6"
         />
         <TicketProfile className="absolute inset-0 h-full p-6 top-20 bottom-20 z-30 flex flex-col justify-between w-full flex-1 overflow-hidden" />
         <Image

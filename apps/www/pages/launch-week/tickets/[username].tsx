@@ -71,7 +71,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
           ],
         }}
       />
-      <FaviconImports />
+      {/* <FaviconImports /> */}
       <ConfDataContext.Provider
         value={{
           supabase,
@@ -84,25 +84,26 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
       >
         <DefaultLayout>
           <div className="relative -mt-[65px]">
-            <SectionContainer className="relative z-10 flex flex-col justify-around items-center gap-2 md:gap-10 !px-2 !mx-auto md:min-h-[auto]">
-              <div className="w-full min-h-[400px] pt-24 flex items-center">
+            <SectionContainer className="relative !pt-8 lg:!pt-10 z-10 flex flex-col xl:flex-row items-center xl:justify-center xl:items-center gap-8 md:gap-10 xl:gap-20 text-foreground text-center md:text-left">
+              <div className="w-auto min-h-[400px] pt-24 flex items-center">
                 <LW11TicketContainer />
               </div>
-              <div className="flex flex-col items-center justify-center text-center gap-2 max-w-lg">
-                <h1 className="text-2xl font-mono">
+              <div className="flex flex-col items-center justify-center xl:justify-start xl:items-start gap-4 text-foreground text-center md:text-left max-w-sm">
+                <h1 className="text-2xl">
                   {name}'s
                   <br />
-                  Launch Week Ticket
+                  Event Ticket
                 </h1>
-                <span className="text-foreground-lighter">
-                  Claim your own ticket and share it for a chance to win.
+                <span className="text-foreground-lighter mb-2">
+                  Join @{username} for a Special Supabase Event and create your ticket for a chance
+                  to win swag.
                 </span>
+                <Button type="alternative" asChild>
+                  <Link href={`${SITE_URL}${username ? '?referral=' + username : ''}`}>
+                    Claim your ticket
+                  </Link>
+                </Button>
               </div>
-              <Button type="secondary" asChild>
-                <Link href={`${SITE_URL}${username ? '?referral=' + username : ''}`}>
-                  Join Launch Week
-                </Link>
-              </Button>
             </SectionContainer>
             <LW11Background className="absolute z-0 top-0 left-0 right-0 w-full flex items-center justify-center opacity-20" />
           </div>

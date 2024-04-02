@@ -68,7 +68,7 @@ const TicketPresence = (props: { className?: string }) => {
         />
       </svg>
       {onlineUsers.length} {isSingular ? 'person is' : 'people are'}{' '}
-      {hasTicket ? 'customizing' : 'generating'} their ticket
+      {hasTicket ? 'customizing' : 'generating'} their ticket right now
     </div>
   )
 }

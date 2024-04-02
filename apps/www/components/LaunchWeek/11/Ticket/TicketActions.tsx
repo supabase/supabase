@@ -8,12 +8,11 @@ import { useBreakpoint } from 'common'
 
 export default function TicketActions() {
   const { userData, supabase } = useConfData()
-  const { platinum, username, metadata } = userData
+  const { platinum, username, secret: hasSecretTicket } = userData
   const [_imgReady, setImgReady] = useState(false)
   const [_loading, setLoading] = useState(false)
   const isTablet = useBreakpoint(1280)
   const downloadLink = useRef<HTMLAnchorElement>()
-  const hasSecretTicket = metadata?.hasSecretTicket
   const link = `${SITE_URL}/tickets/${username}?lw=11${
     hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''
   }`

@@ -8,6 +8,7 @@ interface CountdownWidgetProps {
   seconds?: string
   showCard?: boolean
   className?: string
+  size?: 'small' | 'large'
 }
 
 export function CountdownWidget({
@@ -17,8 +18,10 @@ export function CountdownWidget({
   seconds,
   showCard = true,
   className,
+  size,
 }: CountdownWidgetProps) {
-  const Colon = () => <span className="text-xs mx-px">:</span>
+  const isLarge = size === 'large'
+  const Colon = () => <span className={cn('text-xs mx-px', isLarge && 'text-lg')}>:</span>
 
   const showItem = (item: string | undefined) => item !== undefined && item !== '0'
 
@@ -26,24 +29,24 @@ export function CountdownWidget({
     <div className={cn('flex gap-1 items-center', className)}>
       {days !== undefined && days !== '0' ? (
         <>
-          <CountdownStep value={days} unit="d" showCard={showCard} />
+          <CountdownStep value={days} unit="d" showCard={showCard} size={size} />
           <Colon />
         </>
       ) : null}
       {hours !== undefined ? (
         <>
-          <CountdownStep value={hours} unit="h" showCard={showCard} />
+          <CountdownStep value={hours} unit="h" showCard={showCard} size={size} />
           <Colon />
         </>
       ) : null}
       {minutes !== undefined ? (
         <>
-          <CountdownStep value={minutes} unit="m" showCard={showCard} />
+          <CountdownStep value={minutes} unit="m" showCard={showCard} size={size} />
           {seconds !== undefined && <Colon />}
         </>
       ) : null}
       {seconds !== undefined ? (
-        <CountdownStep value={seconds} unit="s" showCard={showCard} />
+        <CountdownStep value={seconds} unit="s" showCard={showCard} size={size} />
       ) : null}
     </div>
   )

@@ -122,7 +122,10 @@ const LWXGame = ({ setIsGameMode }: Props) => {
     )
 
   return (
-    <div className="flex flex-col items-center text-center gap-12 md:gap-16 max-w-6xl">
+    <form
+      onSubmit={handleClaimTicket}
+      className="flex flex-col items-center text-center gap-12 md:gap-16 max-w-6xl"
+    >
       <div className="flex flex-col items-center h-10 text-foreground-light">
         <div
           className={cn(
@@ -193,7 +196,7 @@ const LWXGame = ({ setIsGameMode }: Props) => {
           ))}
         </InputOTP>
       </div>
-      <form onSubmit={handleClaimTicket} className="flex flex-col items-center h-10">
+      <div className="flex flex-col items-center h-10">
         <Button
           type="secondary"
           onClick={() => null}
@@ -205,7 +208,7 @@ const LWXGame = ({ setIsGameMode }: Props) => {
         >
           Claim secret ticket
         </Button>
-      </form>
+      </div>
       <div className="flex gap-4 md:gap-10 items-center h-10 text-xs text-foreground-lighter">
         <div className="flex items-center gap-2">
           <Button
@@ -231,7 +234,7 @@ const LWXGame = ({ setIsGameMode }: Props) => {
           <span>Exit</span>
         </div>
       </div>
-    </div>
+    </form>
   )
 }
 

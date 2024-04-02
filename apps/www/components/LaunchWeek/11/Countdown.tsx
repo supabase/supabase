@@ -6,10 +6,12 @@ const CountdownComponent = ({
   date,
   showCard = true,
   className,
+  size = 'small',
 }: {
   date: string | number | Date
   showCard?: boolean
   className?: string
+  size?: 'small' | 'large'
 }) => {
   if (!date) return null
 
@@ -27,6 +29,7 @@ const CountdownComponent = ({
           seconds={seconds}
           showCard={showCard}
           className={className}
+          size={size}
         />
       )
     }

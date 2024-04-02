@@ -83,7 +83,7 @@ export default function LaunchWeekIndex() {
           ],
         }}
       />
-      <FaviconImports />
+      {/* <FaviconImports /> */}
       <ConfDataContext.Provider
         value={{
           supabase,

@@ -98,7 +98,7 @@ export async function handler(req: Request) {
     const fontData = await font
     const monoFontData = await mono_font
     const numDigits = `${Number(ticketNumber)}`.length
-    const prefix = `00000000`.slice(numDigits)
+    const prefix = `0000000`.slice(numDigits)
     const HAS_ROLE = !!metadata?.role
     const HAS_COMPANY = !!metadata?.company
     const HAS_LOCATION = !!metadata?.location
@@ -127,20 +127,16 @@ export async function handler(req: Request) {
       regular: {
         OG: `${STORAGE_URL}/assets/backgrounds/platinum/${BG_NUMBER}.png`,
         BG: `${STORAGE_URL}/assets/shape/v2/lw11_ticket_regular.png?t=1`,
-        // LOGO: `${STORAGE_URL}/assets/lw11_logo_white.svg`,
-        // LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-wordmark--light.png`,
         LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png`,
       },
       platinum: {
         OG: `${STORAGE_URL}/assets/backgrounds/regular/${BG_NUMBER}.png`,
         BG: `${STORAGE_URL}/assets/shape/v2/lw11_ticket_platinum.png?t=1`,
-        // LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-wordmark--dark.png`,
         LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png`,
       },
       secret: {
         OG: `${STORAGE_URL}/assets/backgrounds/secret/${BG_NUMBER}.png`,
         BG: `${STORAGE_URL}/assets/shape/v2/lw11_ticket_purple.png?t=1`,
-        // LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-wordmark--dark.png`,
         LOGO: `${STORAGE_URL}/assets/supabase/supabase-logo-icon.png`,
       },
     }
@@ -212,7 +208,7 @@ export async function handler(req: Request) {
                   display: 'flex',
                   justifyContent: 'flex-start',
                   position: 'absolute',
-                  top: TICKET_PADDING_Y + 15,
+                  top: TICKET_PADDING_Y,
                   left: TICKET_PADDING_X,
                   textAlign: 'left',
                   width: '50%',
@@ -220,7 +216,7 @@ export async function handler(req: Request) {
                   margin: '0',
                   marginBottom: '5',
                   fontFamily: '"SourceCodePro"',
-                  fontSize: '16',
+                  fontSize: '20',
                   textTransform: 'uppercase',
                   letterSpacing: '0.35rem',
                   lineHeight: '120%',
