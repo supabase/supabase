@@ -1,6 +1,5 @@
 import { compact, isObject, isString, map } from 'lodash'
-// @ts-ignore
-import MarkdownTable from 'markdown-table'
+import { markdownTable } from 'markdown-table'
 import { useRouter } from 'next/router'
 import { useMemo, useRef } from 'react'
 import { CSVLink } from 'react-csv'
@@ -90,7 +89,7 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
         return temp
       })
       const table = [columns].concat(rows)
-      const markdownData = MarkdownTable(table)
+      const markdownData = markdownTable(table)
 
       copyToClipboard(markdownData, () => {
         toast.success('Copied results to clipboard')

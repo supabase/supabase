@@ -79,7 +79,7 @@ const PublicationsTableItem = ({ table, selectedPublication }: PublicationsTable
       <Table.td className="px-4 py-3 pr-2">
         <div className="flex justify-end gap-2">
           {enabledForAllTables ? (
-            <Badge color="scale">
+            <Badge>
               <span>Enabled</span>
               <span className="hidden lg:inline-block">&nbsp;for all tables</span>
             </Badge>

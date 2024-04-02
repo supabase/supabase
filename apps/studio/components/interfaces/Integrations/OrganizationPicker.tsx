@@ -78,7 +78,7 @@ const OrganizationPicker = ({
                 {selectedOrg?.name ? selectedOrg?.name : 'Choose an organization'}
               </span>
               {selectedOrg && configurationId && installed[selectedOrg.slug] && (
-                <Badge color="scale">Integration Installed</Badge>
+                <Badge>Integration Installed</Badge>
               )}
             </div>
           </Button>
@@ -113,9 +113,7 @@ const OrganizationPicker = ({
                     >
                       <span className="truncate">{org.name}</span>{' '}
                       {configurationId && installed[org.slug] && (
-                        <Badge color="scale" className="!flex-none">
-                          Integration Installed
-                        </Badge>
+                        <Badge className="!flex-none">Integration Installed</Badge>
                       )}
                     </CommandItem_Shadcn_>
                   )
