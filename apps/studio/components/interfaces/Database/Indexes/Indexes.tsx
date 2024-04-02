@@ -1,6 +1,6 @@
 import { partition, sortBy } from 'lodash'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
@@ -30,15 +30,18 @@ import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 import CreateIndexSidePanel from './CreateIndexSidePanel'
+import { useParams } from 'common'
 
 const Indexes = () => {
+  const { project } = useProjectContext()
+  const { schema: urlSchema, table } = useParams()
+
   const [search, setSearch] = useState('')
   const [selectedSchema, setSelectedSchema] = useState('public')
   const [showCreateIndex, setShowCreateIndex] = useState(false)
   const [selectedIndex, setSelectedIndex] = useState<DatabaseIndex>()
   const [selectedIndexToDelete, setSelectedIndexToDelete] = useState<DatabaseIndex>()
 
-  const { project } = useProjectContext()
   const {
     data: allIndexes,
     refetch: refetchIndexes,
@@ -92,6 +95,17 @@ const Indexes = () => {
       sql: `drop index if exists "${index.name}"`,
     })
   }
+
+  useEffect(() => {
+    if (urlSchema !== undefined) {
+      const schema = schemas?.find((s) => s.name === urlSchema)
+      if (schema !== undefined) setSelectedSchema(schema.name)
+    }
+  }, [urlSchema, isSuccessSchemas])
+
+  useEffect(() => {
+    if (table !== undefined) setSearch(table)
+  }, [table])
 
   return (
     <>
@@ -264,48 +278,41 @@ const Indexes = () => {
       <CreateIndexSidePanel visible={showCreateIndex} onClose={() => setShowCreateIndex(false)} />
 
       <ConfirmationModal
-        danger
+        variant="warning"
         size="medium"
         loading={isExecuting}
         visible={selectedIndexToDelete !== undefined}
-        header={
+        title={
           <>
             Confirm to delete index <code className="text-sm">{selectedIndexToDelete?.name}</code>
           </>
         }
-        buttonLabel="Confirm delete"
-        buttonLoadingLabel="Deleting..."
-        onSelectConfirm={() =>
+        confirmLabel="Confirm delete"
+        confirmLabelLoading="Deleting..."
+        onConfirm={() =>
           selectedIndexToDelete !== undefined ? onConfirmDeleteIndex(selectedIndexToDelete) : {}
         }
-        onSelectCancel={() => setSelectedIndexToDelete(undefined)}
+        onCancel={() => setSelectedIndexToDelete(undefined)}
+        alert={{
+          title: 'This action cannot be undone',
+          description:
+            'Deleting an index that is still in use will cause queries to slow down, and in some cases causing significant performance issues.',
+        }}
       >
-        <Modal.Content>
-          <div className="py-6">
-            <Alert_Shadcn_ variant="warning">
-              <IconAlertTriangle strokeWidth={2} />
-              <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                Deleting an index that is still in use will cause queries to slow down, and in some
-                cases causing significant performance issues.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-            <ul className="mt-4 space-y-5">
-              <li className="flex gap-3">
-                <div>
-                  <strong className="text-sm">Before deleting this index, consider:</strong>
-                  <ul className="space-y-2 mt-2 text-sm text-foreground-light">
-                    <li className="list-disc ml-6">This index is no longer in use</li>
-                    <li className="list-disc ml-6">
-                      The table which the index is on is not currently in use, as dropping an index
-                      requires a short exclusive access lock on the table.
-                    </li>
-                  </ul>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </Modal.Content>
+        <ul className="mt-4 space-y-5">
+          <li className="flex gap-3">
+            <div>
+              <strong className="text-sm">Before deleting this index, consider:</strong>
+              <ul className="space-y-2 mt-2 text-sm text-foreground-light">
+                <li className="list-disc ml-6">This index is no longer in use</li>
+                <li className="list-disc ml-6">
+                  The table which the index is on is not currently in use, as dropping an index
+                  requires a short exclusive access lock on the table.
+                </li>
+              </ul>
+            </div>
+          </li>
+        </ul>
       </ConfirmationModal>
     </>
   )

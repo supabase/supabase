@@ -375,6 +375,34 @@ functions:
             )
           )
           ```
+  - id: get-user-identities
+    title: 'userIdentities()'
+    notes: |
+      - The user needs to be signed in to call `userIdentities()`.
+    examples:
+      - id: get-user-identities
+        name: Returns a list of identities linked to the user
+        isSpotlight: true
+        code: |
+          ```swift
+          let identities = try await supabase.auth.userIdentities()
+          ```
+  - id: send-password-reauthentication
+    title: 'reauthenticate()'
+    notes: |
+      - This method is used together with `update(user:)` when a user's password needs to be updated.
+      - If you require your user to reauthenticate before updating their password, you need to enable the **Secure password change** option in your [project's email provider settings](/dashboard/project/_/auth/providers).
+      - A user is only require to reauthenticate before updating their password if **Secure password change** is enabled and the user **hasn't recently signed in**. A user is deemed recently signed in if the session was created in the last 24 hours.
+      - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
+    examples:
+      - id: send-reauthentication-nonce
+        name: Send reauthentication nonce
+        description: Sends a reauthentication nonce to the user's email or phone number.
+        isSpotlight: true
+        code: |
+          ```swift
+          try await supabase.auth.reauthenticate()
+          ```
   - id: resend-email-or-phone-otps
     title: "resend()"
     notes: |
@@ -1318,8 +1346,8 @@ functions:
 
           let country: Country = try await supabase.database
             .from("countries")
-            // use `returning: .representation` to return the created object.
-            .insert(Country(id: 1, name: "Denmark"), returning: .representation)
+            .insert(Country(id: 1, name: "Denmark"))
+            .select()
             // specify you want a single value returned, otherwise it returns a list.
             .single() 
             .execute()
@@ -1438,8 +1466,9 @@ functions:
 
           let country: Country = try await supabase.database
             .from("countries")
-            .update(["name": "Australia"], returning: .representation)
+            .update(["name": "Australia"])
             .eq("id", value: 1)
+            .select()
              // If you know this query should return a single object, append a `single()` modifier to it.
             .single()
             .execute()
@@ -1497,10 +1526,10 @@ functions:
                   street: "Melrose Place",
                   postcode: "90210"
                 )
-              ),
-              returning: .representation
+              )
             )
             .eq("address->postcode", value: "90210")
+            .select()
             .execute()
             .value
           ```
@@ -3368,6 +3397,25 @@ functions:
           ```
         note: |
           You can also sepcify a `String` in the `download` parameter to define the file name for the downloaded asset.
+
+  - id: from-create-signed-urls
+    title: from.createSignedUrls()
+    notes: |
+      - RLS policy permissions required:
+        - `buckets` table permissions: none
+        - `objects` table permissions: `select`
+      - Refer to the [Storage guide](/docs/guides/storage/security/access-control) on how access control works
+    examples:
+      - id: create-signed-urls
+        name: Create Signed URLs
+        isSpotlight: true
+        code: |
+          ```swift
+          let urls = try await supabase
+            .storage
+            .from("avatars")
+            .createSignedURLs(paths: ["folder/avatar1.png", "folder/avatar2.png"], expiresIn: 60)
+          ```
 
   - id: from-get-public-url
     title: from.getPublicUrl()

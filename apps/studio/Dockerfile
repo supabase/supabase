@@ -8,7 +8,7 @@
 #    docker builder prune
 #    docker build . -f studio/Dockerfile --target production -t studio:latest --no-cache
 
-FROM node:18-slim as base
+FROM node:20-slim as base
 
 # Fixes issues with Sentry CLI and SSL certificates during build
 # TODO: Git is added because it's needed to build libpg, remove it once they publish a binary on the S3 bucket
@@ -27,7 +27,7 @@ WORKDIR /app
 FROM base as turbo
 COPY . .
 
-RUN npx turbo@1.12.3 prune --scope=studio --docker
+RUN npx turbo@1.30.0 prune --scope=studio --docker
 
 # Install dev dependencies (only if needed)
 FROM base as deps
@@ -56,5 +56,5 @@ COPY --from=builder /app/apps/studio/.next/standalone ./
 COPY --from=builder /app/apps/studio/.next/static ./apps/studio/.next/static
 EXPOSE 3000
 ENTRYPOINT ["docker-entrypoint.sh"]
-HEALTHCHECK --interval=5s --timeout=5s --retries=3 CMD node -e "require('http').get('http://localhost:3000/api/profile', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+HEALTHCHECK --interval=5s --timeout=5s --retries=3 CMD node -e "fetch('http://localhost:3000/api/profile').then((r) => {if (r.status !== 200) throw new Error(r.status)})"
 CMD ["node", "apps/studio/server.js"]
