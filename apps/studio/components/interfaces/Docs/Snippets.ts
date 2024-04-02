@@ -710,7 +710,7 @@ let { data, error } = await supabase.auth.resetPasswordForEmail(email)
       code: `
       curl -X PUT '${endpoint}/auth/v1/user' \\
 -H "apikey: ${apiKey}" \\
--H "Authorization: Bearer <USERS-ACCESS-TOKEN>" \\
+-H "Authorization: Bearer USER_TOKEN" \\
 -H "Content-Type: application/json" \\
 -d '{
   "email": "someone@email.com",
