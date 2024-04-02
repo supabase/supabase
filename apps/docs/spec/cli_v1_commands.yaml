@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.151.1
+  version: 1.153.1
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -10,6 +10,8 @@ info:
   description: |
     Supabase CLI provides you with tools to develop your application locally, and deploy your application to the Supabase platform.
   tags:
+    - id: quick-start
+      title: Quick Start
     - id: local-dev
       title: Local Development
     - id: management-api
@@ -1541,9 +1543,8 @@ commands:
     flags:
       - id: name
         name: --name <string>
-        description: |
-          Name that will be used to store token in your settings, defaults to built-in token name generator
-        default_value: ''
+        description: Name that will be used to store token in your settings
+        default_value: built-in token name generator
       - id: no-browser
         name: --no-browser
         description: Do not open browser automatically
@@ -2320,9 +2321,13 @@ commands:
     usage: supabase init [flags]
     subcommands: []
     flags:
+      - id: force
+        name: --force
+        description: Overwrite existing supabase/config.toml.
+        default_value: 'false'
       - id: use-orioledb
         name: --use-orioledb
-        description: Use OrioleDB storage engine for Postgres
+        description: Use OrioleDB storage engine for Postgres.
         default_value: 'false'
       - id: with-intellij-settings
         name: --with-intellij-settings
@@ -3437,3 +3442,16 @@ commands:
         description: enable experimental features
         required: true
         default_value: 'false'
+  - id: supabase-bootstrap
+    title: supabase bootstrap
+    summary: Bootstrap a Supabase project from a starter template
+    tags:
+      - quick-start
+    links: []
+    usage: supabase bootstrap [template] [flags]
+    subcommands: []
+    flags:
+      - id: password
+        name: -p, --password <string>
+        description: Password to your remote Postgres database.
+        default_value: ''
