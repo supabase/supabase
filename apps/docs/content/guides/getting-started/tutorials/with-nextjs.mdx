@@ -259,7 +259,7 @@ Create a `middleware.js` file at the project root and another one within the `ut
 <CH.Code className="min-h-[30rem]">
 
 ```jsx middleware.js
-import { updateSession } from '@/utils/supabase/middleware'
+import { updateSession } from './utils/supabase/middleware'
 
 export async function middleware(request) {
   // update user's auth session
