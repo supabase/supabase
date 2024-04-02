@@ -107,26 +107,22 @@ const BackupsList = () => {
       </div>
       <ConfirmationModal
         size="medium"
-        buttonLabel="Confirm restore"
-        buttonLoadingLabel="Restoring"
+        confirmLabel="Confirm restore"
+        confirmLabelLoading="Restoring"
         visible={selectedBackup !== undefined}
-        header="Confirm to restore from backup"
+        title="Confirm to restore from backup"
         loading={isRestoring || isSuccessBackup}
-        onSelectCancel={() => setSelectedBackup(undefined)}
-        onSelectConfirm={() => {
+        onCancel={() => setSelectedBackup(undefined)}
+        onConfirm={() => {
           if (selectedBackup === undefined) return console.error('Backup required')
           restoreFromBackup({ ref: projectRef, backup: selectedBackup })
         }}
       >
-        <Modal.Content>
-          <div className="pt-6 pb-5">
-            <p>
-              Are you sure you want to restore from
-              {dayjs(selectedBackup?.inserted_at).format('DD MMM YYYY')}? This will destroy any new
-              data written since this backup was made.
-            </p>
-          </div>
-        </Modal.Content>
+        <p>
+          Are you sure you want to restore from
+          {dayjs(selectedBackup?.inserted_at).format('DD MMM YYYY')}? This will destroy any new data
+          written since this backup was made.
+        </p>
       </ConfirmationModal>
     </>
   )

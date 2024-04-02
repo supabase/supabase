@@ -349,35 +349,24 @@ const SideBarContent = () => {
       </div>
 
       <ConfirmationModal
-        header="Confirm to delete query"
-        buttonLabel={`Delete ${selectedQueries.length.toLocaleString()} quer${selectedQueries.length > 1 ? 'ies' : 'y'}`}
-        buttonLoadingLabel="Deleting query"
+        title="Confirm to delete query"
+        confirmLabel={`Delete ${selectedQueries.length.toLocaleString()} quer${selectedQueries.length > 1 ? 'ies' : 'y'}`}
+        confirmLabelLoading="Deleting query"
         size="medium"
         loading={isDeleting}
         visible={showDeleteModal}
-        onSelectConfirm={onConfirmDelete}
-        onSelectCancel={() => setShowDeleteModal(false)}
-        danger
+        onConfirm={onConfirmDelete}
+        onCancel={() => setShowDeleteModal(false)}
+        variant={'destructive'}
+        alert={{
+          title: 'This action cannot be undone',
+          description: 'The selected SQL snippets cannot be recovered once deleted',
+        }}
       >
-        <Modal.Content>
-          <div className="my-6">
-            <div className="text-sm text-foreground-light grid gap-4">
-              <div className="grid gap-y-4">
-                <Alert_Shadcn_ variant="destructive">
-                  <WarningIcon />
-                  <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    The selected SQL snippets cannot be recovered once deleted
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
-                <p>
-                  Are you sure you want to delete the selected {selectedQueries.length} quer
-                  {selectedQueries.length > 1 ? 'ies' : 'y'}?
-                </p>
-              </div>
-            </div>
-          </div>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to delete the selected {selectedQueries.length} quer
+          {selectedQueries.length > 1 ? 'ies' : 'y'}?
+        </p>
       </ConfirmationModal>
     </>
   )
