@@ -5,15 +5,13 @@ import { ReactNode, forwardRef } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Admonition,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  DialogContent,
-  DialogSectionSeparator,
-  DialogSection,
-  DialogTitle,
   Dialog,
+  DialogContent,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
@@ -21,15 +19,10 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
-  IconAlertCircle,
   Input_Shadcn_,
   cn,
 } from 'ui'
-import {
-  DIALOG_PADDING_X_SMALL,
-  DIALOG_PADDING_Y_SMALL,
-  DialogHeader,
-} from 'ui/src/components/shadcn/ui/dialog'
+import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
 
 export interface TextConfirmModalProps {

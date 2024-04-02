@@ -244,22 +244,19 @@ export const BranchRow = ({
             </DropdownMenu>
 
             <ConfirmationModal
-              danger
+              variant={'destructive'}
               visible={showConfirmResetModal}
-              buttonLabel="Reset branch"
-              header="Confirm branch reset"
+              confirmLabel="Reset branch"
+              title="Confirm branch reset"
               loading={isResetting}
-              onSelectCancel={() => {
+              onCancel={() => {
                 setShowConfirmResetModal(false)
               }}
-              onSelectConfirm={onConfirmReset}
+              onConfirm={onConfirmReset}
             >
-              <Modal.Content>
-                <p className="py-4 text-sm text-foreground-light">
-                  Are you sure you want to reset the "{branch.name}" branch? All data will be
-                  deleted.
-                </p>
-              </Modal.Content>
+              <p className="text-sm text-foreground-light">
+                Are you sure you want to reset the "{branch.name}" branch? All data will be deleted.
+              </p>
             </ConfirmationModal>
           </div>
         )}
