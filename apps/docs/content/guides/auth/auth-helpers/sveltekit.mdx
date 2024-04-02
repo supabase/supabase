@@ -11,6 +11,20 @@ We generally recommend using the new `@supabase/ssr` package instead of `auth-he
 
 </Admonition>
 
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light border-b mt-8 pb-2"
+  >
+  
+  <Accordion.Item
+        header="See legacy docs"
+        id="legacy-docs"
+      >
+
 This submodule provides convenience helpers for implementing user authentication in [SvelteKit](https://kit.svelte.dev/) applications.
 
 ## Configuration
@@ -1966,3 +1980,7 @@ export const GET: RequestHandler = withAuth(async ({ session, getSupabaseClient 
 
 - [Auth Helpers Source code](https://github.com/supabase/auth-helpers)
 - [SvelteKit example](https://github.com/supabase/auth-helpers/tree/main/examples/sveltekit)
+
+</Accordion.Item>
+
+</Accordion>
