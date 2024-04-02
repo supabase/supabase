@@ -56,7 +56,7 @@ const FilterPopover = ({
                   defaultChecked: activeOptions.includes(option[valueKey]),
                 }
               })}
-            ></Checkbox.Group>
+            />
           </div>
           <div className="flex items-center justify-end gap-2 border-t border-overlay bg-surface-200 py-2 px-3">
             <Button

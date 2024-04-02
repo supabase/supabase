@@ -231,7 +231,7 @@ await supabase.auth.signInWithOAuth({
 
 <TabPanel id="server" label="Server">
 
-In the server, you need to handle the redirect to the SSO provider's authentication endpoint. The `signInWithOAuth` method returns the endpoint URL, which you can redirect to.
+In the server, you need to handle the redirect to the OAuth provider's authentication endpoint. The `signInWithOAuth` method returns the endpoint URL, which you can redirect to.
 
 ```js
 const { data, error } = await supabase.auth.signInWithOAuth({
