@@ -656,7 +656,7 @@ let { data, error } = await supabase.auth.admin.inviteUserByEmail('someone@email
     bash: {
       language: 'bash',
       code: `
-curl -X POST '${endpoint}/auth/v1/authorize?provider=github' \\
+curl -X GET '${endpoint}/auth/v1/authorize?provider=github' \\
 -H "apikey: ${apiKey}" \\
 -H "Authorization: Bearer USER_TOKEN" \\
 -H "Content-Type: application/json"
