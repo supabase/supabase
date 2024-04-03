@@ -40,7 +40,7 @@ const TicketingFlow = () => {
     <>
       <SectionContainer className="relative !pt-8 lg:!pt-20 gap-5 h-full flex-1">
         <div className="relative z-10 flex flex-col h-full">
-          <h1 className="sr-only">Supabase General Availability Week | {LW11_DATE}</h1>
+          <h1 className="sr-only">Supabase Special Announcement | {LW11_DATE}</h1>
           <div className="relative z-10 w-full h-full flex flex-col justify-center gap-5 md:gap-10">
             <LazyMotion features={domAnimation}>
               <AnimatePresence mode="wait" key={ticketState}>

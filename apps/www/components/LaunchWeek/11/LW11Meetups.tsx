@@ -86,7 +86,7 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
         <p className="text-base xl:max-w-md mb-2">
           Celebrate{' '}
           <strong className="font-normal text-foreground-light">
-            Supabase General Availability Week
+            Supabase Special Announcement
           </strong>{' '}
           at our live community-driven meetups. Network with the community, listen to tech talks and
           grab some swag.
