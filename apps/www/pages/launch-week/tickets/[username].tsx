@@ -34,7 +34,8 @@ interface Props {
 export default function UsernamePage({ user, ogImageUrl }: Props) {
   const { username, ticketNumber, name } = user
 
-  const TITLE = `${name ? name + '’s' : 'Get your'} ticket`
+  const DISPLAY_NAME = name || username
+  const TITLE = `${DISPLAY_NAME ? DISPLAY_NAME.split(' ')[0] + '’s' : 'Get your'} ticket`
   const DESCRIPTION = ``
   const OG_URL = `${SITE_URL}/tickets/${username}`
 
@@ -99,11 +100,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
                 <LW11TicketContainer />
               </div>
               <div className="flex flex-col items-center justify-center xl:justify-start xl:items-start gap-4 text-foreground text-center md:text-left max-w-sm">
-                <h1 className="text-2xl">
-                  {name}'s
-                  <br />
-                  Ticket
-                </h1>
+                <h1 className="text-2xl">{DISPLAY_NAME?.split(' ')[0]}'s Ticket</h1>
                 <span className="text-foreground-lighter mb-2">
                   Join @{username} for a Special Announcement and create your ticket for a chance to
                   win swag.
