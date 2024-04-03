@@ -105,7 +105,13 @@ const ConfirmationModal = forwardRef<
             </>
           )}
           <div className="flex gap-2 px-5 pt-5">
-            <Button size="medium" block type="default" disabled={loading}>
+            <Button
+              size="medium"
+              block
+              type="default"
+              disabled={loading}
+              onClick={() => onCancel()}
+            >
               {cancelLabel}
             </Button>
 
