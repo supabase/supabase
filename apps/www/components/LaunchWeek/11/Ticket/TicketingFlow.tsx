@@ -78,7 +78,7 @@ const TicketingFlow = () => {
                     animate={animate}
                     exit={exit}
                     className={cn(
-                      'w-full min-h-[400px] max-w-sm mx-auto flex flex-col justify-center gap-8 lg:gap-12 opacity-0 invisible',
+                      'w-full min-h-[400px] max-w-md mx-auto flex flex-col justify-center gap-8 lg:gap-12 opacity-0 invisible',
                       !isGameMode && !hasTicket && 'opacity-100 visible'
                     )}
                   >
