@@ -103,16 +103,3 @@ export default function LaunchWeekIndex() {
     </>
   )
 }
-<<<<<<< HEAD
-=======
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  const { data: meetups } = await supabase!.from('lwx_meetups').select('*')
-
-  return {
-    props: {
-      meetups: meetups?.sort((a, b) => (new Date(a.start_at!) > new Date(b.start_at!) ? 1 : -1)),
-    },
-  }
-}
->>>>>>> origin
