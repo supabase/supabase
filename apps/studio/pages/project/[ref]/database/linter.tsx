@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react'
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { FilterPopover } from 'components/interfaces/AuditLogs'
 import ReportLintsTableRow from 'components/interfaces/Reports/ReportLintsTableRow'
-import { ReportsLayout } from 'components/layouts'
+import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
@@ -225,6 +225,6 @@ const ProjectLints: NextPageWithLayout = () => {
   )
 }
 
-ProjectLints.getLayout = (page) => <ReportsLayout title="Linter">{page}</ReportsLayout>
+ProjectLints.getLayout = (page) => <DatabaseLayout title="Linter">{page}</DatabaseLayout>
 
 export default ProjectLints
