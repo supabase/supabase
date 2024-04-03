@@ -5,6 +5,7 @@ import { Button, IconLinkedinSolid, IconTwitterX, cn } from 'ui'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { useParams } from '~/hooks/useParams'
 import { useBreakpoint } from 'common'
+import dayjs from 'dayjs'
 
 export default function TicketActions() {
   const { userData, supabase } = useConfData()
@@ -15,7 +16,7 @@ export default function TicketActions() {
   const downloadLink = useRef<HTMLAnchorElement>()
   const link = `${SITE_URL}/tickets/${username}?lw=11${
     hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''
-  }`
+  }&t=${dayjs(new Date()).format('DHHmmss')}`
   const permalink = encodeURIComponent(link)
   const text = hasSecretTicket ? TWEET_TEXT_SECRET : platinum ? TWEET_TEXT_PLATINUM : TWEET_TEXT
   const encodedText = encodeURIComponent(text)
