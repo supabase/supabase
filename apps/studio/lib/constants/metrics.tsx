@@ -1,16 +1,10 @@
-import {
-  ActivityIcon,
-  ArchiveIcon,
-  DatabaseIcon,
-  ServerIcon,
-  KeyIcon,
-  HeartIcon,
-} from 'lucide-react'
+import { Auth, Realtime, Storage } from 'icons'
+import { ActivityIcon, DatabaseIcon, ServerIcon, HeartIcon } from 'lucide-react'
 
 export const METRIC_CATEGORIES = {
   API: {
     label: 'All API usage',
-    icon: <ActivityIcon />,
+    icon: <ActivityIcon size={16} />,
     key: 'api',
   },
   API_DATABASE: {
@@ -20,17 +14,17 @@ export const METRIC_CATEGORIES = {
   },
   API_AUTH: {
     label: 'Auth API',
-    icon: <KeyIcon size={16} />,
+    icon: <Auth size={16} />,
     key: 'api_auth',
   },
   API_STORAGE: {
     label: 'Storage API',
-    icon: <ArchiveIcon size={16} />,
+    icon: <Storage size={16} />,
     key: 'api_storage',
   },
   API_REALTIME: {
     label: 'Realtime API',
-    icon: '',
+    icon: <Realtime size={16} />,
     key: 'api_realtime',
   },
   INSTANCE: {
