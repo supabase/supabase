@@ -25,7 +25,7 @@
     "@next/bundle-analyzer": "^14.1.4",
     "@next/mdx": "^14.1.4",
     "@octokit/auth-app": "^6.0.3",
-    "@octokit/core": "^5.0.2",
+    "@octokit/core": "^5.1.0",
     "@octokit/graphql": "^7.0.2",
     "@octokit/plugin-paginate-graphql": "^4.0.0",
     "@radix-ui/react-accordion": "^1.1.2",

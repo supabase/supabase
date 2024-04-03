@@ -41,14 +41,7 @@ export default function Config() {
               <div>{content}</div>
             </div>
           </div>
-          <div className="md:col-span-3">
-            <div className="sticky overflow-auto max-h-[calc(100vh-60px-5rem)] pb-3 top-32 border-l">
-              <span className="block font-mono text-xs uppercase text-foreground pl-5 mb-4">
-                On this page
-              </span>
-              <GuidesTableOfContents list={tocList} />
-            </div>
-          </div>
+          <GuidesTableOfContents />
         </div>
       </MainSkeleton>
     </>
