@@ -29,7 +29,7 @@ export function LW11CountdownBanner() {
             <Countdown date={new Date(announcement.launchDate)} showCard={false} />
           </div>
           <Button size="tiny" type="default" className="px-2 !leading-none text-xs" asChild>
-            <Link href={`${siteUrl}/launch-week`}>Claim your ticket</Link>
+            <Link href={`${siteUrl}/special-announcement`}>Claim your ticket</Link>
           </Button>
         </div>
       </div>
