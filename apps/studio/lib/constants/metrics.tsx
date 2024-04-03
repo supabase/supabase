@@ -5,12 +5,13 @@ import {
   ServerIcon,
   KeyIcon,
   HeartIcon,
+  MousePointerClickIcon,
 } from 'lucide-react'
 
 export const METRIC_CATEGORIES = {
   API: {
     label: 'All API usage',
-    icon: <ActivityIcon />,
+    icon: <ActivityIcon size={16} />,
     key: 'api',
   },
   API_DATABASE: {
@@ -30,7 +31,7 @@ export const METRIC_CATEGORIES = {
   },
   API_REALTIME: {
     label: 'Realtime API',
-    icon: '',
+    icon: <MousePointerClickIcon size={16} />,
     key: 'api_realtime',
   },
   INSTANCE: {
