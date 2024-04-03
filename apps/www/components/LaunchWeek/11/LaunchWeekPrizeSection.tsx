@@ -30,7 +30,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                     draggable={false}
                     width={300}
                     height={300}
-                    className="absolute p-2 object-cover scale-50 lg:scale-100 lg:object-top w-[90%] h-full overflow-visible opacity-50"
+                    className="absolute p-2 object-cover scale-50 lg:scale-100 lg:object-top w-[90%] h-full overflow-visible opacity-50 pointer-events-none"
                   />
                 </div>
                 <div className="flex flex-col lg:w-1/2 gap-1 p-4 md:p-8 lg:pl-0 lg:h-full">

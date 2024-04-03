@@ -157,7 +157,8 @@ const TicketingFlow = () => {
                             alt="Supabase AirPod Max prize"
                             width={300}
                             height={300}
-                            className="absolute p-2 object-cover object-left-top w-full h-[200px] overflow-visible opacity-50"
+                            draggable={false}
+                            className="absolute p-2 object-cover object-left-top w-full h-[200px] overflow-visible opacity-50 pointer-events-none"
                           />
                         </div>
                         <div className="flex flex-col justify-center md:w-2/3 gap-1 p-3">
