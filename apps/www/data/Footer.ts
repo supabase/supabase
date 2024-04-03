@@ -33,7 +33,7 @@ const footerData = [
         url: '/pricing',
       },
       {
-        text: 'Launch Week X',
+        text: 'Launch Week',
         url: '/launch-week',
       },
     ],
