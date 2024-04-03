@@ -9,6 +9,7 @@ import supabase from '~/lib/supabaseMisc'
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import TicketingFlow from '~/components/LaunchWeek/11/Ticket/TicketingFlow'
+import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 
 export default function LaunchWeekIndex() {
   const { query } = useRouter()
@@ -67,6 +68,8 @@ export default function LaunchWeekIndex() {
     if (!session) return setTicketState('registration')
   }, [session, userData])
 
+  const applicationName = 'Supabase'
+
   return (
     <>
       <NextSeo
@@ -82,6 +85,12 @@ export default function LaunchWeekIndex() {
             },
           ],
         }}
+      />
+      <MetaFaviconsPagesRouter
+        applicationName={applicationName}
+        includeManifest
+        includeMsApplicationConfig
+        includeRssXmlFeed
       />
       {/* <FaviconImports /> */}
       <ConfDataContext.Provider

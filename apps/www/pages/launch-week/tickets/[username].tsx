@@ -14,6 +14,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LW11Background from '~/components/LaunchWeek/11/LW11Background'
+import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 
 const LW11TicketContainer = dynamic(
   () => import('~/components/LaunchWeek/11/Ticket/TicketContainer')
@@ -54,6 +55,8 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
     }
   }, [])
 
+  const applicationName = 'Supabase'
+
   return (
     <>
       <NextSeo
@@ -70,6 +73,12 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
             },
           ],
         }}
+      />
+      <MetaFaviconsPagesRouter
+        applicationName={applicationName}
+        includeManifest
+        includeMsApplicationConfig
+        includeRssXmlFeed
       />
       {/* <FaviconImports /> */}
       <ConfDataContext.Provider
@@ -92,11 +101,11 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
                 <h1 className="text-2xl">
                   {name}'s
                   <br />
-                  Event Ticket
+                  Ticket
                 </h1>
                 <span className="text-foreground-lighter mb-2">
-                  Join @{username} for a Special Supabase Event and create your ticket for a chance
-                  to win swag.
+                  Join @{username} for a Special Announcement and create your ticket for a chance to
+                  win swag.
                 </span>
                 <Button type="alternative" asChild>
                   <Link href={`${SITE_URL}${username ? '?referral=' + username : ''}`}>

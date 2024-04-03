@@ -112,7 +112,7 @@ export async function handler(req: Request) {
     const TICKET_RATIO = 396 / 613
     const TICKET_HEIGHT = TICKET_WIDTH / TICKET_RATIO
     const TICKET_POS_TOP = OG_PADDING_Y
-    const TICKET_POS_LEFT = 530
+    const TICKET_POS_LEFT = 540
     const TICKET_PADDING_X = 40
     const TICKET_PADDING_Y = 40
     const LOGO_WIDTH = 40
