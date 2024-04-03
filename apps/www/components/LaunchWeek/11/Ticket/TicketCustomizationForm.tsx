@@ -66,7 +66,7 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
     <form
       className={cn(
         'w-full rounded-t-2xl bg-alternative border p-4 flex flex-col gap-2 mx-auto transition-all opacity-0 translate-y-full text-foreground-light',
-        (isMobile || showCustomizationForm) && 'opacity-100 translate-y-0 duration-300',
+        showCustomizationForm && 'opacity-100 translate-y-0 duration-300',
         isMobile && 'mt-2',
         className
       )}

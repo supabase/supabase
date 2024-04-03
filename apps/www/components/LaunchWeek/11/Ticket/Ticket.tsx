@@ -99,7 +99,7 @@ export default function Ticket() {
               className="absolute z-40 inset-0 w-full h-full outline-none"
               onClick={handleCustomizeTicket}
             />
-            <div className="hidden md:flex opacity-0 translate-y-3 group-hover/ticket:opacity-100 group-hover/ticket:translate-y-0 transition-all absolute z-30 inset-0 m-auto w-10 h-10 rounded-full items-center justify-center bg-[#020405] border shadow-lg text-foreground">
+            <div className="flex md:translate-y-3 opacity-100 md:opacity-0 group-hover/ticket:opacity-100 group-hover/ticket:md:translate-y-0 transition-all absolute z-30 right-4 top-4 md:inset-0 m-auto w-10 h-10 rounded-full items-center justify-center bg-[#020405] border shadow-lg text-foreground">
               {!showCustomizationForm ? <IconEdit2 className="w-4" /> : <IconX className="w-4" />}
             </div>
           </>
