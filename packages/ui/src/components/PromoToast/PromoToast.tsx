@@ -43,7 +43,7 @@ const PromoToast = () => {
     >
       <p className="relative z-10 text-foreground flex flex-col text-2xl w-full leading-7">
         <span className="text-foreground-lighter">Join us for a</span>
-        <span>Special Event</span>
+        <span>Special Announcement</span>
       </p>
       <div className="relative z-10 text-foreground-lighter uppercase flex flex-col text-sm w-full font-mono mb-2">
         <span>APRIL 15-19 / 7AM PT</span>

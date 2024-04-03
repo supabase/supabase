@@ -112,7 +112,7 @@ export async function handler(req: Request) {
     const TICKET_RATIO = 396 / 613
     const TICKET_HEIGHT = TICKET_WIDTH / TICKET_RATIO
     const TICKET_POS_TOP = OG_PADDING_Y
-    const TICKET_POS_LEFT = 520
+    const TICKET_POS_LEFT = 530
     const TICKET_PADDING_X = 40
     const TICKET_PADDING_Y = 40
     const LOGO_WIDTH = 40
@@ -332,7 +332,8 @@ export async function handler(req: Request) {
                   display: 'flex',
                   flexDirection: 'column',
                   marginBottom: 60,
-                  fontSize: 48,
+                  fontSize: 38,
+                  letterSpacing: '0',
                   color: STYLING_CONGIF[ticketType].FOREGROUND_LIGHT,
                 }}
               >
