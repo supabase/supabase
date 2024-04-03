@@ -46,40 +46,32 @@ const DeleteEnumeratedTypeModal = ({
 
   return (
     <ConfirmationModal
-      danger
+      variant={'destructive'}
       size="medium"
       loading={isDeleting}
       visible={visible}
-      header={
+      title={
         <>
           Confirm to delete enumerated type{' '}
           <code className="text-sm">{selectedEnumeratedType?.name}</code>
         </>
       }
-      buttonLabel="Confirm delete"
-      buttonLoadingLabel="Deleting..."
-      onSelectConfirm={() => onConfirmDeleteType()}
-      onSelectCancel={onClose}
+      confirmLabel="Confirm delete"
+      confirmLabelLoading="Deleting..."
+      onCancel={onClose}
+      onConfirm={() => onConfirmDeleteType()}
+      alert={{
+        title: 'This action cannot be undone',
+        description:
+          'You will need to re-create the enumerated type if you want to revert the deletion.',
+      }}
     >
-      <Modal.Content>
-        <div className="py-6">
-          <Alert_Shadcn_ variant="warning">
-            <IconAlertTriangle strokeWidth={2} />
-            <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              You will need to re-create the enumerated type if you want to revert the deletion.
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-          <div className="mt-4">
-            <strong className="text-sm">Before deleting this enumerated type, consider:</strong>
-            <ul className="space-y-2 mt-2 text-sm text-foreground-light">
-              <li className="list-disc ml-6">
-                This enumerated type is no longer in use in any tables or functions
-              </li>
-            </ul>
-          </div>
-        </div>
-      </Modal.Content>
+      <p className="text-sm">Before deleting this enumerated type, consider:</p>
+      <ul className="space-y-2 mt-2 text-sm text-foreground-light">
+        <li className="list-disc ml-6">
+          This enumerated type is no longer in use in any tables or functions
+        </li>
+      </ul>
     </ConfirmationModal>
   )
 }

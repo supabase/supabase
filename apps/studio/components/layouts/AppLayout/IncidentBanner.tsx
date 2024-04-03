@@ -1,5 +1,5 @@
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
-import { IconExternalLink } from 'ui'
 
 const IncidentBanner = () => {
   return (
@@ -8,7 +8,7 @@ const IncidentBanner = () => {
         <p className="text-sm font-medium">
           We are currently investigating a technical issue, follow status.supabase.com for updates
         </p>
-        <IconExternalLink size={16} strokeWidth={2} />
+        <ExternalLink size={16} strokeWidth={2} />
       </div>
     </Link>
   )

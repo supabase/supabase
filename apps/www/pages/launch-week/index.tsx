@@ -132,7 +132,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
   return {
     props: {
-      meetups: meetups?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1)),
+      meetups: meetups?.sort((a, b) => (new Date(a.start_at!) > new Date(b.start_at!) ? 1 : -1)),
     },
   }
 }

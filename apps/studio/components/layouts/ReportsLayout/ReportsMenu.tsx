@@ -108,6 +108,11 @@ const ReportsMenu = () => {
           key: 'query-performance',
           url: `/project/${ref}/reports/query-performance`,
         },
+        {
+          name: 'Project Linter',
+          key: 'linter',
+          url: `/project/${ref}/reports/linter`,
+        },
       ],
     },
   ]
@@ -282,13 +287,14 @@ const ReportsMenu = () => {
             }}
           />
           <ConfirmationModal
-            header="Delete custom report"
-            buttonLabel="Delete report"
-            buttonLoadingLabel="Deleting report"
+            title="Delete custom report"
+            confirmLabel="Delete report"
+            confirmLabelLoading="Deleting report"
             size="medium"
             loading={deleteReport.isLoading}
             visible={deleteModalOpen}
-            onSelectConfirm={async () => {
+            onCancel={() => setDeleteModalOpen(false)}
+            onConfirm={async () => {
               if (selectedReport) {
                 if (!selectedReport.id) return
                 await deleteReport.mutateAsync({
@@ -300,17 +306,12 @@ const ReportsMenu = () => {
               }
               setDeleteModalOpen(false)
             }}
-            onSelectCancel={() => setDeleteModalOpen(false)}
           >
-            <Modal.Content>
-              <div className="my-6">
-                <div className="text-sm text-foreground-light grid gap-4">
-                  <div className="grid gap-1">
-                    <p>Are you sure you want to delete '{selectedReport?.name}'?</p>
-                  </div>
-                </div>
+            <div className="text-sm text-foreground-light grid gap-4">
+              <div className="grid gap-1">
+                <p>Are you sure you want to delete '{selectedReport?.name}'?</p>
               </div>
-            </Modal.Content>
+            </div>
           </ConfirmationModal>
           <CreateReportModal
             visible={showNewReportModal}

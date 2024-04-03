@@ -136,20 +136,18 @@ const ResultsDropdown = ({ id }: ResultsDropdownProps) => {
       />
 
       <DropdownMenuContent side="bottom" align="start">
-        <>
-          <DropdownMenuItem onClick={onDownloadCSV} className="space-x-2">
-            <IconDownload size="tiny" />
-            <p>Download CSV</p>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={onCopyAsMarkdown} className="space-x-2">
-            <IconClipboard size="tiny" />
-            <p>Copy as markdown</p>
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={onCopyAsJSON} className="space-x-2">
-            <IconClipboard size="tiny" />
-            <p>Copy as JSON</p>
-          </DropdownMenuItem>
-        </>
+        <DropdownMenuItem onClick={onDownloadCSV} className="space-x-2">
+          <IconDownload size="tiny" />
+          <p>Download CSV</p>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={onCopyAsMarkdown} className="space-x-2">
+          <IconClipboard size="tiny" />
+          <p>Copy as markdown</p>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={onCopyAsJSON} className="space-x-2">
+          <IconClipboard size="tiny" />
+          <p>Copy as JSON</p>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

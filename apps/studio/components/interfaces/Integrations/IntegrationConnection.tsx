@@ -137,29 +137,26 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
         />
 
         <ConfirmationModal
-          danger
+          variant="destructive"
           size={type === 'GitHub' && isBranchingEnabled ? 'medium' : 'small'}
           visible={isOpen}
-          header={`Confirm to delete ${type} connection`}
-          buttonLabel="Delete connection"
-          onSelectCancel={onCancel}
-          onSelectConfirm={onConfirm}
+          title={`Confirm to delete ${type} connection`}
+          confirmLabel="Delete connection"
+          onCancel={onCancel}
+          onConfirm={onConfirm}
+          alert={
+            type === 'GitHub' && isBranchingEnabled
+              ? {
+                  title: 'Branching will be disabled for this project',
+                  description: ` Deleting this GitHub connection will remove all preview branches on this project,
+                and also disable branching for ${project.name}`,
+                }
+              : {}
+          }
         >
-          <Modal.Content className="py-4 flex flex-col gap-y-4">
-            {type === 'GitHub' && isBranchingEnabled && (
-              <Alert_Shadcn_ variant="warning">
-                <WarningIcon />
-                <AlertTitle_Shadcn_>Branching will be disabled for this project</AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  Deleting this GitHub connection will remove all preview branches on this project,
-                  and also disable branching for {project.name}
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
-            )}
-            <p className="text-sm text-foreground-light">
-              This action cannot be undone. Are you sure you want to delete this {type} connection?
-            </p>
-          </Modal.Content>
+          <p className="text-sm text-foreground-light">
+            This action cannot be undone. Are you sure you want to delete this {type} connection?
+          </p>
         </ConfirmationModal>
       </>
     )

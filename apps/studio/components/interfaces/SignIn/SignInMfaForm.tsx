@@ -1,4 +1,4 @@
-import type { AuthError } from '@supabase/gotrue-js'
+import type { AuthError } from '@supabase/auth-js'
 import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'

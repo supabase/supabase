@@ -405,20 +405,18 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         ) : null}
         <ConfirmationModal
           visible={isClosingPanel}
-          header="Discard changes"
-          buttonLabel="Discard"
-          onSelectCancel={() => setIsClosingPanel(false)}
-          onSelectConfirm={() => {
+          title="Discard changes"
+          confirmLabel="Discard"
+          onCancel={() => setIsClosingPanel(false)}
+          onConfirm={() => {
             setIsClosingPanel(false)
             setVisible(!visible)
           }}
         >
-          <Modal.Content>
-            <p className="py-4 text-sm text-foreground-light">
-              There are unsaved changes. Are you sure you want to close the panel? Your changes will
-              be lost.
-            </p>
-          </Modal.Content>
+          <p className="text-sm text-foreground-light">
+            There are unsaved changes. Are you sure you want to close the panel? Your changes will
+            be lost.
+          </p>
         </ConfirmationModal>
       </SheetContent>
     </Sheet>

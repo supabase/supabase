@@ -22,6 +22,7 @@ interface RLSCodeEditorProps {
   placeholder?: string
   readOnly?: boolean
 
+  disableTabToUsePlaceholder?: boolean
   lineNumberStart?: number
   onChange?: () => void
   onMount?: () => void
@@ -39,6 +40,7 @@ const RLSCodeEditor = ({
   placeholder,
   readOnly = false,
 
+  disableTabToUsePlaceholder = false,
   lineNumberStart,
   onChange = noop,
   onMount: _onMount = noop,
@@ -50,6 +52,7 @@ const RLSCodeEditor = ({
   const monaco = useMonaco()
   const { project } = useProjectContext()
 
+  const placeholderId = `monaco-placeholder-${id}`
   const options: editor.IStandaloneEditorConstructionOptions = {
     tabSize: 2,
     fontSize: 13,
@@ -70,27 +73,31 @@ const RLSCodeEditor = ({
     if (monacoRef !== undefined) monacoRef.current = monaco
 
     hasValue.current = editor.createContextKey('hasValue', false)
-    const placeholderEl = document.querySelector('.monaco-placeholder') as HTMLElement | null
-    if (placeholderEl && placeholder !== undefined) placeholderEl.style.display = 'block'
+    const placeholderEl = document.getElementById(placeholderId) as HTMLElement | null
+    if (placeholderEl && placeholder !== undefined && (value ?? '').trim().length === 0) {
+      placeholderEl.style.display = 'block'
+    }
 
-    editor.addCommand(
-      monaco.KeyCode.Tab,
-      () => {
-        editor.executeEdits('source', [
-          {
-            // @ts-ignore
-            identifier: 'add-placeholder',
-            range: new monaco.Range(1, 1, 1, 1),
-            text: (placeholder ?? '')
-              .split('\n\n')
-              .join('\n')
-              .replaceAll('*', '')
-              .replaceAll('&nbsp;', ''),
-          },
-        ])
-      },
-      '!hasValue'
-    )
+    if (!disableTabToUsePlaceholder) {
+      editor.addCommand(
+        monaco.KeyCode.Tab,
+        () => {
+          editor.executeEdits('source', [
+            {
+              // @ts-ignore
+              identifier: 'add-placeholder',
+              range: new monaco.Range(1, 1, 1, 1),
+              text: (placeholder ?? '')
+                .split('\n\n')
+                .join('\n')
+                .replaceAll('*', '')
+                .replaceAll('&nbsp;', ''),
+            },
+          ])
+        },
+        '!hasValue'
+      )
+    }
 
     editor.focus()
 
@@ -100,7 +107,7 @@ const RLSCodeEditor = ({
   const onChangeContent: OnChange = (value) => {
     hasValue.current.set((value ?? '').length > 0)
 
-    const placeholderEl = document.querySelector('.monaco-placeholder') as HTMLElement | null
+    const placeholderEl = document.getElementById(placeholderId) as HTMLElement | null
     if (placeholderEl) {
       if (!value) {
         placeholderEl.style.display = 'block'
@@ -148,6 +155,13 @@ const RLSCodeEditor = ({
     }
   }, [monaco])
 
+  useEffect(() => {
+    if (value !== undefined && value.trim().length > 0) {
+      const placeholderEl = document.getElementById(placeholderId) as HTMLElement | null
+      if (placeholderEl) placeholderEl.style.display = 'none'
+    }
+  }, [value])
+
   return (
     <>
       <Editor
@@ -164,6 +178,7 @@ const RLSCodeEditor = ({
       />
       {placeholder !== undefined && (
         <div
+          id={placeholderId}
           className="monaco-placeholder absolute top-[0px] left-[57px] text-sm pointer-events-none font-mono [&>div>p]:text-foreground-lighter [&>div>p]:!m-0 tracking-tighter"
           style={{ display: 'none' }}
         >
