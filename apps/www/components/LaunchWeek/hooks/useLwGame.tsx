@@ -30,12 +30,11 @@ export const VALID_KEYS = [
   'z',
 ]
 
-const useLwGame = (showCustomizationForm?: boolean) => {
+const useLwGame = (disabled?: boolean) => {
   const [isGameMode, setIsGameMode] = useState(false)
-  const { ticketState } = useConfData()
 
   function onKeyDown(event: KeyboardEvent) {
-    if (showCustomizationForm) return
+    if (disabled) return
 
     if (event.key === 'Escape') {
       setIsGameMode(false)
@@ -49,10 +48,10 @@ const useLwGame = (showCustomizationForm?: boolean) => {
   }
 
   useEffect(() => {
-    if (!showCustomizationForm) window.addEventListener('keydown', onKeyDown)
+    if (!disabled) window.addEventListener('keydown', onKeyDown)
 
     return () => window.removeEventListener('keydown', onKeyDown)
-  }, [showCustomizationForm])
+  }, [disabled])
 
   return { isGameMode, setIsGameMode }
 }

@@ -21,7 +21,7 @@ const LWGame = dynamic(() => import('./LW11Game'))
 
 const TicketingFlow = () => {
   const { ticketState, userData, showCustomizationForm } = useConfData()
-  const { isGameMode, setIsGameMode } = useLwGame(showCustomizationForm)
+  const { isGameMode, setIsGameMode } = useLwGame(ticketState !== 'ticket' || showCustomizationForm)
 
   const isLoading = !isGameMode && ticketState === 'loading'
   const isRegistering = !isGameMode && ticketState === 'registration'
@@ -101,7 +101,6 @@ const TicketingFlow = () => {
                       />
                     </div>
                     <TicketForm />
-                    {/* <TicketPresence className="mt-4 md:mt-8 lg:mt-12" /> */}
                   </m.div>
                 )}
                 {hasTicket && (
@@ -116,7 +115,6 @@ const TicketingFlow = () => {
                       <TicketContainer />
                     </div>
                     <div className="order-first xl:h-full w-full max-w-lg gap-3 flex flex-col items-center justify-center xl:items-start xl:justify-start text-center xl:text-left">
-                      {}
                       {hasSecretTicket && <Badge variant="outline">Secret ticket</Badge>}
                       {hasPlatinumTicket ? (
                         <div>
