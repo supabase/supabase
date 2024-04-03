@@ -83,7 +83,9 @@ const TicketingFlow = () => {
                     )}
                   >
                     <div className="flex flex-col gap-2">
-                      <h2 className="text-foreground text-2xl">Join us for a Special Event</h2>
+                      <h2 className="text-foreground text-2xl">
+                        Join us for a Special Announcement
+                      </h2>
                       <p className="text-foreground-lighter text-lg">
                         Celebrate a major milestone with us and explore all the features that come
                         with it.

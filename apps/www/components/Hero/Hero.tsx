@@ -26,7 +26,7 @@ const Hero = () => {
                   <div className="z-40 w-full flex justify-center mb-8 lg:mb-8">
                     <AnnouncementBadge
                       url="/launch-week"
-                      badge="Special Event"
+                      badge="Special Announcement"
                       announcement="Claim your ticket"
                     />
                   </div>

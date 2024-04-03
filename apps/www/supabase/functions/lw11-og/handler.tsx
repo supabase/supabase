@@ -352,7 +352,7 @@ export async function handler(req: Request) {
                     color: STYLING_CONGIF[ticketType].FOREGROUND,
                   }}
                 >
-                  Special Event
+                  Special Announcement
                 </span>
               </p>
               <p
