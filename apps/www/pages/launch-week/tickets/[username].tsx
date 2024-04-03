@@ -9,6 +9,12 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const username = params?.username?.toString() || null
   const redirectUrl = `/special-announcement/tickets/${username}`
 
+  if (!username || process.env.npm_lifecycle_event === 'build') {
+    return {
+      notFound: true,
+    }
+  }
+
   return {
     redirect: {
       permanent: false,

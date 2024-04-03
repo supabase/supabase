@@ -7,6 +7,13 @@ export default function LaunchWeekIndex() {
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const redirectUrl = `/special-announcement`
+
+  if (process.env.npm_lifecycle_event === 'build') {
+    return {
+      notFound: true,
+    }
+  }
+
   return {
     redirect: {
       permanent: false,
