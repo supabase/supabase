@@ -85,7 +85,13 @@ function Feedback() {
   const showNo = unanswered || isNo
 
   async function sendFeedbackVote(response: Response) {
-    const { error } = await supabase.from('feedback').insert({ vote: response, page: pathname })
+    const { error } = await supabase.from('feedback').insert({
+      vote: response,
+      page: pathname,
+      metadata: {
+        query: Object.fromEntries(new URLSearchParams(window.location.search).entries()),
+      },
+    })
     if (error) console.error(error)
   }
 
