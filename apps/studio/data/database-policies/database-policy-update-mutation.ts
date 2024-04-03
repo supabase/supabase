@@ -10,10 +10,10 @@ export type DatabasePolicyUpdateVariables = {
   connectionString?: string
   id: number
   payload: {
-    name: string
-    definition: string
-    check: string
-    roles: string[]
+    name?: string
+    definition?: string
+    check?: string
+    roles?: string[]
   }
 }
 

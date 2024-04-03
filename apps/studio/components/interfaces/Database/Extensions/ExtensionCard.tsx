@@ -139,17 +139,15 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
       />
       <ConfirmationModal
         visible={isDisableModalOpen}
-        header="Confirm to disable extension"
-        buttonLabel="Disable"
-        buttonLoadingLabel="Disabling"
-        onSelectCancel={() => setIsDisableModalOpen(false)}
-        onSelectConfirm={() => onConfirmDisable()}
+        title="Confirm to disable extension"
+        confirmLabel="Disable"
+        confirmLabelLoading="Disabling"
+        onCancel={() => setIsDisableModalOpen(false)}
+        onConfirm={() => onConfirmDisable()}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            Are you sure you want to turn OFF the "{extension.name}" extension?
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to turn OFF the "{extension.name}" extension?
+        </p>
       </ConfirmationModal>
     </>
   )

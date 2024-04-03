@@ -13,7 +13,6 @@ import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import { usePermissionsQuery } from 'data/permissions/permissions-query'
 import { ProjectInfo, useProjectsQuery } from 'data/projects/projects-query'
 import { ResourceWarning, useResourceWarningsQuery } from 'data/usage/resource-warnings-query'
-import { useSelectedOrganization } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
 import { makeRandomString } from 'lib/helpers'
 import type { Organization, ResponseError } from 'types'
@@ -113,7 +112,7 @@ type OrganizationProjectsProps = {
 }
 
 const OrganizationProjects = ({
-  organization: { name, slug },
+  organization,
   projects,
   overdueInvoices,
   resourceWarnings,
@@ -126,7 +125,6 @@ const OrganizationProjects = ({
   rewriteHref,
   search,
 }: OrganizationProjectsProps) => {
-  const organization = useSelectedOrganization()
   const isEmpty = !projects || projects.length === 0
   const sortedProjects = [...(projects || [])].sort((a, b) => a.name.localeCompare(b.name))
   const filteredProjects =
@@ -164,14 +162,35 @@ const OrganizationProjects = ({
   if (search.length > 0 && filteredProjects.length === 0) return null
 
   return (
-    <div className="space-y-3" key={makeRandomString(5)}>
+    <div className="space-y-3" key={organization.id}>
       <div className="flex space-x-4 items-center">
-        <h4 className="text-lg flex items-center">{name}</h4>
+        <h4 className="text-lg flex items-center">{organization.name}</h4>
 
         {!!overdueInvoices.length && (
           <div>
             <Button asChild type="danger">
-              <Link href={`/org/${slug}/invoices`}>Outstanding Invoices</Link>
+              <Link href={`/org/${organization.slug}/invoices`}>Outstanding Invoices</Link>
+            </Button>
+          </div>
+        )}
+        {organization?.restriction_status === 'grace_period' && (
+          <div>
+            <Button asChild type="warning">
+              <Link href={`/org/${organization.slug}/billing`}>Grace Period</Link>
+            </Button>
+          </div>
+        )}
+        {organization?.restriction_status === 'grace_period_over' && (
+          <div>
+            <Button asChild type="warning">
+              <Link href={`/org/${organization.slug}/billing`}>Grace Period Over</Link>
+            </Button>
+          </div>
+        )}
+        {organization?.restriction_status === 'restricted' && (
+          <div>
+            <Button asChild type="danger">
+              <Link href={`/org/${organization.slug}/billing`}>Services Restricted</Link>
             </Button>
           </div>
         )}
@@ -199,7 +218,7 @@ const OrganizationProjects = ({
               />
             </div>
           ) : isEmpty ? (
-            <NoProjectsState slug={slug} />
+            <NoProjectsState slug={organization.slug} />
           ) : (
             filteredProjects?.map((project) => (
               <ProjectCard

@@ -179,7 +179,7 @@ const TableEditor = ({
         const payload = {
           name: tableFields.name.trim(),
           schema: snap.selectedSchemaName,
-          comment: tableFields.comment,
+          comment: tableFields.comment?.trim(),
           ...(!isNewRecord && { rls_enabled: tableFields.isRLSEnabled }),
         }
         const configuration = {
@@ -191,8 +191,11 @@ const TableEditor = ({
           existingForeignKeyRelations: foreignKeys,
           primaryKey,
         }
+        const columns = tableFields.columns.map((column) => {
+          return { ...column, name: column.name.trim() }
+        })
 
-        saveChanges(payload, tableFields.columns, fkRelations, isNewRecord, configuration, resolve)
+        saveChanges(payload, columns, fkRelations, isNewRecord, configuration, resolve)
       } else {
         resolve()
       }
@@ -399,18 +402,16 @@ const TableEditor = ({
 
         <ConfirmationModal
           visible={rlsConfirmVisible}
-          header="Turn off Row Level Security"
-          buttonLabel="Confirm"
+          title="Turn off Row Level Security"
+          confirmLabel="Confirm"
           size="medium"
-          onSelectCancel={() => setRlsConfirmVisible(false)}
-          onSelectConfirm={() => {
+          onCancel={() => setRlsConfirmVisible(false)}
+          onConfirm={() => {
             onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
             setRlsConfirmVisible(false)
           }}
         >
-          <Modal.Content>
-            <RLSDisableModalContent />
-          </Modal.Content>
+          <RLSDisableModalContent />
         </ConfirmationModal>
       </SidePanel.Content>
 

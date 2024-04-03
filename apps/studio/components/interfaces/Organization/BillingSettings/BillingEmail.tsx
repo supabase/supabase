@@ -52,7 +52,7 @@ const BillingEmail = () => {
     <ScaffoldSection>
       <ScaffoldSectionDetail>
         <div className="sticky space-y-2 top-12">
-          <p className="text-base m-0">Email Recipient</p>
+          <p className="text-foreground text-base m-0">Email Recipient</p>
           <p className="text-sm text-foreground-light m-0">
             All billing correspondence will go to this email
           </p>
