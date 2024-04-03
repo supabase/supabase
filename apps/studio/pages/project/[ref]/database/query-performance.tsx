@@ -127,7 +127,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const helperTextClassNames = 'prose text-sm max-w-2xl text-foreground-light'
 
   return (
-    <div className="p-4 py-3">
+    <div className="px-5 py-3">
       <ReportHeader title="Query Performance" isLoading={isLoading} onRefresh={handleRefresh} />
       {tableIndexEfficiencyEnabled && (
         <Accordion
