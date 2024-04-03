@@ -8,13 +8,14 @@ import { Session } from '@supabase/supabase-js'
 import { Button } from 'ui'
 import { SITE_URL } from '~/lib/constants'
 import supabase from '~/lib/supabaseMisc'
+import dayjs from 'dayjs'
+import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 
 // import FaviconImports from '~/components/LaunchWeek/11/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LW11Background from '~/components/LaunchWeek/11/LW11Background'
-import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 
 const LW11TicketContainer = dynamic(
   () => import('~/components/LaunchWeek/11/Ticket/TicketContainer')
@@ -33,7 +34,7 @@ interface Props {
 export default function UsernamePage({ user, ogImageUrl }: Props) {
   const { username, ticketNumber, name } = user
 
-  const TITLE = `${name ? name + '’s' : 'Get your'} Supabase ticket`
+  const TITLE = `${name ? name + '’s' : 'Get your'} ticket`
   const DESCRIPTION = ``
   const OG_URL = `${SITE_URL}/tickets/${username}`
 
@@ -149,7 +150,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   const ticketType = user?.secret ? 'secret' : user?.platinum ? 'platinum' : 'regular'
 
-  const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw11/og/${ticketType}/${username}.png`
+  const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw11/og/${ticketType}/${username}.png?t=${dayjs(new Date()).format('DHHmmss')}`
 
   return {
     props: {
