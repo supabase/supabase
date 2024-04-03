@@ -2408,14 +2408,4 @@ module.exports = [
     source: '/contact/mfa',
     destination: '/docs/guides/auth/auth-mfa',
   },
-  {
-    permanent: true,
-    source: '/dashboard/project/:slug/reports/linter',
-    destination: '/dashboard/project/:slug/database/linter',
-  },
-  {
-    permanent: true,
-    source: '/dashboard/project/:slug/reports/query-performance',
-    destination: '/dashboard/project/:slug/database/query-performance',
-  },
 ]
