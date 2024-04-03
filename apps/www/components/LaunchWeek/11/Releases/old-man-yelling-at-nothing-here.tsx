@@ -129,15 +129,15 @@ export default function LaunchWeekIndex({ meetups }: Props) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
-  const { data: meetups } = await supabase!
-    .from('lw11_meetups')
-    .select('*')
-    .neq('isPublished', false)
+// export const getServerSideProps: GetServerSideProps = async () => {
+//   const { data: meetups } = await supabase!
+//     .from('lw11_meetups')
+//     .select('*')
+//     .neq('isPublished', false)
 
-  return {
-    props: {
-      meetups: meetups?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1)),
-    },
-  }
-}
+//   return {
+//     props: {
+//       meetups: meetups?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1)),
+//     },
+//   }
+// }
