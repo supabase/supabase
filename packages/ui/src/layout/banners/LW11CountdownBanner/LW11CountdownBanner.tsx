@@ -8,8 +8,9 @@ import { isBrowser } from 'common'
 export function LW11CountdownBanner() {
   const router = useRouter()
   const isHomePage = router.pathname === '/'
-  const isLaunchWeekPage = router.pathname === '/launch-week'
-  const isLaunchWeekSection = router.pathname.includes('launch-week')
+  const isLaunchWeekPage = router.pathname === '/special-announcement'
+  const isLaunchWeekSection =
+    router.pathname.includes('launch-week') || router.pathname.includes('special-announcement')
   const siteUrl = isBrowser && window.location.origin
 
   if (isLaunchWeekPage || isHomePage) return null

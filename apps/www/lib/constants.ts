@@ -33,6 +33,12 @@ export const SITE_URL =
     : process.env.NEXT_PUBLIC_VERCEL_URL
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/launch-week`
       : 'http://localhost:3000/launch-week'
+export const SPECIAL_ANNOUNCEMENT_URL =
+  process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
+    ? 'https://supabase.com/special-announcement'
+    : process.env.NEXT_PUBLIC_VERCEL_URL
+      ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/special-announcement`
+      : 'http://localhost:3000/special-announcement'
 export const SITE_ORIGIN = new URL(SITE_URL).origin
 export const TWITTER_USER_NAME = 'supabase'
 export const LW7_DATE = 'April 10th 2023'

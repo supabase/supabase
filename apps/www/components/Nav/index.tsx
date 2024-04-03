@@ -38,9 +38,10 @@ const Nav = (props: Props) => {
   const isUserLoading = useIsUserLoading()
 
   const isHomePage = router.pathname === '/'
-  const isLaunchWeekPage = router.pathname.includes('launch-week')
+  const isSpecialAnnouncementPage = router.pathname.includes('special-announcement')
+  const isLaunchWeekPage = router.pathname.includes('launch-week') || isSpecialAnnouncementPage
   const isLaunchWeekXPage = router.pathname === '/launch-week/x'
-  const isLaunchWeekGAPage = router.pathname === '/launch-week'
+  const isLaunchWeek11Page = router.pathname === '/special-announcement'
   const showLaunchWeekNavMode = isLaunchWeekPage && !open
 
   React.useEffect(() => {
@@ -112,15 +113,18 @@ const Nav = (props: Props) => {
                     />
                   </Link>
 
-                  {!isLaunchWeekGAPage && isLaunchWeekPage && !isLaunchWeekXPage && (
-                    <Link
-                      href="/launch-week"
-                      as="/launch-week"
-                      className="hidden ml-2 xl:block font-mono text-sm uppercase leading-4 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
-                    >
-                      Launch Week
-                    </Link>
-                  )}
+                  {!isSpecialAnnouncementPage &&
+                    !isLaunchWeek11Page &&
+                    isLaunchWeekPage &&
+                    !isLaunchWeekXPage && (
+                      <Link
+                        href="/launch-week"
+                        as="/launch-week"
+                        className="hidden ml-2 xl:block font-mono text-sm uppercase leading-4 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
+                      >
+                        Launch Week
+                      </Link>
+                    )}
                 </div>
                 <NavigationMenu
                   delayDuration={0}

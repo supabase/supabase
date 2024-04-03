@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { SITE_URL } from '~/lib/constants'
+import { SPECIAL_ANNOUNCEMENT_URL } from '~/lib/constants'
 import { IconCheck, IconCopy, cn } from 'ui'
 import useConfData from '../../hooks/use-conf-data'
 
@@ -9,7 +9,7 @@ export default function TicketCopy({ sharePage }: { sharePage: boolean }) {
   const [copied, setCopied] = useState(false)
   const buttonRef = useRef<HTMLButtonElement>(null)
   const hasSecretTicket = secret
-  const url = `${SITE_URL}/tickets/${username}?lw=11${
+  const url = `${SPECIAL_ANNOUNCEMENT_URL}/tickets/${username}?lw=11${
     hasSecretTicket ? '&secret=true' : platinum ? `&platinum=true` : ''
   }`
 
