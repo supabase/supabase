@@ -3,19 +3,22 @@ import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { authKeys } from './keys'
 import type { components } from 'data/api'
+import { executeSql } from 'data/sql/execute-sql-query'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 export type UsersVariables = {
   projectRef?: string
   page?: number
   keywords?: string
-  verified?: 'verified' | 'unverified'
+  filter?: 'verified' | 'unverified' | 'anonymous'
+  connectionString: string
 }
 
 export const USERS_PAGE_LIMIT = 10
 export type User = components['schemas']['UserBody']
 
 export async function getUsers(
-  { projectRef, page = 1, keywords = '', verified }: UsersVariables,
+  { projectRef, page = 1, keywords = '', filter, connectionString }: UsersVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('Project ref is required')
@@ -27,7 +30,14 @@ export async function getUsers(
     offset: offset.toString(),
     keywords,
   }
-  if (verified) query.verified = verified
+
+  if (filter === 'anonymous') {
+    const data = await getAnonUsers({ projectRef, page, signal, connectionString })
+
+    return data
+  }
+
+  if (filter === 'verified') query.verified = 'verified'
 
   const { data, error } = await get(`/platform/auth/{ref}/users`, {
     params: {
@@ -41,15 +51,51 @@ export async function getUsers(
   return data
 }
 
+export async function getAnonUsers({
+  projectRef,
+  page = 1,
+  signal,
+  connectionString,
+}: {
+  projectRef: string
+  connectionString: string
+  page?: number
+  signal?: AbortSignal
+}) {
+  const limit = USERS_PAGE_LIMIT
+  const offset = (page - 1) * 10
+
+  const res = await executeSql({
+    projectRef,
+    connectionString,
+    sql: `SELECT * FROM auth.users WHERE is_anonymous IS true LIMIT ${limit} OFFSET ${offset}`,
+  })
+
+  return {
+    total: res.result.length,
+    users: res.result,
+  }
+}
+
 export type UsersData = Awaited<ReturnType<typeof getUsers>>
 export type UsersError = ResponseError
 
 export const useUsersQuery = <TData = UsersData>(
-  { projectRef, page, keywords, verified }: UsersVariables,
+  { projectRef, page, keywords, filter, connectionString }: UsersVariables,
   { enabled = true, ...options }: UseQueryOptions<UsersData, UsersError, TData> = {}
 ) =>
   useQuery<UsersData, UsersError, TData>(
-    authKeys.users(projectRef, { page, keywords, verified }),
-    ({ signal }) => getUsers({ projectRef, page, keywords, verified }, signal),
+    authKeys.users(projectRef, { page, keywords, filter }),
+    ({ signal }) =>
+      getUsers(
+        {
+          projectRef,
+          page,
+          keywords,
+          filter,
+          connectionString,
+        },
+        signal
+      ),
     { enabled: enabled && typeof projectRef !== 'undefined', ...options }
   )
