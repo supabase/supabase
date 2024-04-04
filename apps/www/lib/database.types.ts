@@ -57,6 +57,36 @@ export type Database = {
         }
         Relationships: []
       }
+      lw11_meetups: {
+        Row: {
+          created_at: string | null
+          display_info: string | null
+          id: number
+          isLive: boolean
+          link: string | null
+          start_at: string | number
+          title: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          display_info?: string | null
+          id?: number
+          isLive?: boolean
+          link?: string | null
+          start_at?: string | number
+          title?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          display_info?: string | null
+          id?: number
+          isLive?: boolean
+          link?: string | null
+          start_at?: string | number
+          title?: string | null
+        }
+        Relationships: []
+      }
       partner_contacts: {
         Row: {
           company: string
@@ -200,6 +230,30 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: 'lwx_tickets_id_fkey'
+            columns: ['id']
+            isOneToOne: true
+            referencedRelation: 'users'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      lw11_tickets_platinum: {
+        Row: {
+          createdAt: string | null
+          platinum: boolean | null
+          id: string | null
+          metadata: Json | null
+          name: string | null
+          referrals: number | null
+          sharedOnLinkedIn: string | null
+          sharedOnTwitter: string | null
+          ticketNumber: number | null
+          username: string | null
+          secret: boolean | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'lw11_tickets_id_fkey'
             columns: ['id']
             isOneToOne: true
             referencedRelation: 'users'
