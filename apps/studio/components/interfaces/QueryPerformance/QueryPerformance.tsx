@@ -1,14 +1,11 @@
 import { useRouter } from 'next/router'
 
-import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
+import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import { Tabs } from 'ui'
 import { Markdown } from '../Markdown'
 import ReportQueryPerformanceTableRow from '../Reports/ReportQueryPerformanceTableRow'
-import { PRESET_CONFIG } from '../Reports/Reports.constants'
-import { useQueryPerformanceQuery } from '../Reports/Reports.queries'
-import { Presets } from '../Reports/Reports.types'
-import { queriesFactory } from '../Reports/Reports.utils'
+import { PresetHookResult } from '../Reports/Reports.utils'
 import { QueryPerformanceFilterBar } from './QueryPerformanceFilterBar'
 import { QueryPerformanceLoadingRow } from './QueryPerformanceLoadingRow'
 import { ResetAnalysisNotice } from './ResetAnalysisNotice'
@@ -32,29 +29,16 @@ const SlowestExecutionHelperText = `This table lists queries ordered by their ma
 Look for queries with high or mean execution times as these are often good candidates for optimization.
 `
 
-export const QueryPerformance = () => {
+interface QueryPerformanceProps {
+  queryHitRate: PresetHookResult
+  queryPerformanceQuery: DbQueryHook<any>
+}
+
+export const QueryPerformance = ({
+  queryHitRate,
+  queryPerformanceQuery,
+}: QueryPerformanceProps) => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
-
-  const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
-  const hooks = queriesFactory(config.queries, projectRef ?? 'default')
-  const queryHitRate = hooks.queryHitRate()
-
-  const searchQuery = (router.query.search as string) || ''
-  const orderBy = (router.query.sort as 'lat_desc' | 'lat_asc') || 'lat_desc'
-  const presetMap = {
-    time: 'mostTimeConsuming',
-    frequent: 'mostFrequentlyInvoked',
-    slowest: 'slowestExecutionTime',
-  } as const
-  const preset = presetMap[router.query.preset as QueryPerformancePreset] || 'mostTimeConsuming'
-
-  const queryPerformanceQuery = useQueryPerformanceQuery({
-    searchQuery,
-    orderBy,
-    preset,
-  })
-
   const isLoading = [queryPerformanceQuery.isLoading, queryHitRate.isLoading].every(
     (value) => value
   )
@@ -87,7 +71,7 @@ export const QueryPerformance = () => {
             className="max-w-full [&>p]:mt-0 [&>p]:m-0 space-y-2"
           />
           <ResetAnalysisNotice handleRefresh={handleRefresh} />
-          <div className="thin-scrollbars max-w-full overflow-auto min-h-[800px]">
+          <div className="thin-scrollbars max-w-full overflow-auto">
             <QueryPerformanceFilterBar onRefreshClick={handleRefresh} isLoading={isLoading} />
             <Table
               className="table-fixed"
@@ -138,7 +122,7 @@ export const QueryPerformance = () => {
             className="max-w-full [&>p]:mt-0 [&>p]:m-0 space-y-2"
           />
           <ResetAnalysisNotice handleRefresh={handleRefresh} />
-          <div className="thin-scrollbars max-w-full overflow-auto min-h-[800px]">
+          <div className="thin-scrollbars max-w-full overflow-auto">
             <QueryPerformanceFilterBar onRefreshClick={handleRefresh} isLoading={isLoading} />
             <Table
               head={
@@ -200,7 +184,7 @@ export const QueryPerformance = () => {
             className="max-w-full [&>p]:mt-0 [&>p]:m-0 space-y-2"
           />
           <ResetAnalysisNotice handleRefresh={handleRefresh} />
-          <div className="thin-scrollbars max-w-full overflow-auto min-h-[800px]">
+          <div className="thin-scrollbars max-w-full overflow-auto">
             <QueryPerformanceFilterBar onRefreshClick={handleRefresh} isLoading={isLoading} />
             <Table
               head={

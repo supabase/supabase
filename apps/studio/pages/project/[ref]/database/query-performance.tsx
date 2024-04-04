@@ -26,6 +26,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
 
   const orderBy = (router.query.sort as 'lat_desc' | 'lat_asc') || 'lat_desc'
   const searchQuery = (router.query.search as string) || ''
+  const roles = router.query.roles || []
   const presetMap = {
     time: 'mostTimeConsuming',
     frequent: 'mostFrequentlyInvoked',
@@ -37,6 +38,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     searchQuery,
     orderBy,
     preset,
+    roles: typeof roles === 'string' ? [roles] : roles,
   })
 
   const isLoading = [queryPerformanceQuery.isLoading, queryHitRate.isLoading].every(
@@ -56,7 +58,10 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
             />
 
             {tableIndexEfficiencyEnabled && <IndexEfficiencyNotice isLoading={isLoading} />}
-            <QueryPerformance />
+            <QueryPerformance
+              queryHitRate={queryHitRate}
+              queryPerformanceQuery={queryPerformanceQuery}
+            />
           </div>
         </ScaffoldSection>
       </ScaffoldContainer>
