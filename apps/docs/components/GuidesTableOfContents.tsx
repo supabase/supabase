@@ -38,9 +38,11 @@ const formatTOCHeader = (content: string) => {
 }
 
 const GuidesTableOfContents = ({
+  className,
   overrideToc,
   video,
 }: {
+  className?: string
   overrideToc?: Array<{ text: string; link: string; level: number }>
   video?: string
 }) => {
@@ -85,36 +87,27 @@ const GuidesTableOfContents = ({
   const tocVideoPreview = `http://img.youtube.com/vi/${video}/0.jpg`
 
   return (
-    <div
-      className={cn(
-        'col-span-3 self-start',
-        'border-overlay bg-background',
-        'thin-scrollbar overflow-y-auto hidden md:block md:col-span-3 px-2',
-        'sticky top-[calc(var(--mobile-header-height,40px)+2rem)] lg:top-[calc(var(--desktop-header-height,60px)+2rem)]'
+    <div className={cn('border-l', 'thin-scrollbar overflow-y-auto', 'px-2', className)}>
+      {video && (
+        <div className="relative mb-6 pl-5">
+          <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} />
+        </div>
       )}
-    >
-      <div className="border-l">
-        {video && (
-          <div className="relative mb-6 pl-5">
-            <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} />
-          </div>
-        )}
-        <Feedback key={pathname} />
-        <span className="block font-mono text-xs uppercase text-foreground px-5 mb-6">
-          On this page
-        </span>
-        <ul className="toc-menu list-none pl-5 text-[0.8rem] grid gap-2">
-          {displayedList.map((item, i) => (
-            <li key={`${item.level}-${i}`} className={item.level === 3 ? 'ml-4' : ''}>
-              <a
-                href={`#${formatSlug(item.link)}`}
-                className="text-foreground-lighter hover:text-brand-link transition-colors"
-                dangerouslySetInnerHTML={{ __html: formatTOCHeader(removeAnchor(item.text)) }}
-              />
-            </li>
-          ))}
-        </ul>
-      </div>
+      <Feedback key={pathname} />
+      <span className="block font-mono text-xs uppercase text-foreground px-5 mb-6">
+        On this page
+      </span>
+      <ul className="toc-menu list-none pl-5 text-[0.8rem] grid gap-2">
+        {displayedList.map((item, i) => (
+          <li key={`${item.level}-${i}`} className={item.level === 3 ? 'ml-4' : ''}>
+            <a
+              href={`#${formatSlug(item.link)}`}
+              className="text-foreground-lighter hover:text-brand-link transition-colors"
+              dangerouslySetInnerHTML={{ __html: formatTOCHeader(removeAnchor(item.text)) }}
+            />
+          </li>
+        ))}
+      </ul>
     </div>
   )
 }

@@ -5,6 +5,8 @@ import { NextSeo } from 'next-seo'
 import { useRouter } from 'next/router'
 import { type FC } from 'react'
 
+import { cn } from 'ui'
+
 import components from '~/components'
 import { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
@@ -136,7 +138,15 @@ const Layout: FC<Props> = (props) => {
               </article>
             </div>
             {!props.hideToc && !props.meta?.hide_table_of_contents && (
-              <GuidesTableOfContents video={props.meta?.tocVideo} />
+              <GuidesTableOfContents
+                video={props.meta?.tocVideo}
+                className={cn(
+                  'col-span-3 self-start',
+                  'hidden md:block md:col-span-3',
+                  'sticky top-[calc(var(--mobile-header-height,40px)+2rem)] lg:top-[calc(var(--desktop-header-height,60px)+2rem)]',
+                  'max-h-[calc(100vh-60px-5rem)]'
+                )}
+              />
             )}
           </div>
         </LayoutMainContent>

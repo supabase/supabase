@@ -1,7 +1,7 @@
 import Head from 'next/head'
 import ReactMarkdown from 'react-markdown'
 
-import { CodeBlock } from 'ui'
+import { CodeBlock, cn } from 'ui'
 
 import { Heading } from '~/components/CustomHTMLElements'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
@@ -43,7 +43,15 @@ export default function Config() {
               <div>{content}</div>
             </div>
           </div>
-          <GuidesTableOfContents />
+          <GuidesTableOfContents
+            overrideToc={tocList}
+            className={cn(
+              'col-span-3 self-start',
+              'hidden md:block md:col-span-3',
+              'sticky top-[calc(var(--mobile-header-height,40px)+2rem)] lg:top-[calc(var(--desktop-header-height,60px)+2rem)]',
+              'max-h-[calc(100vh-60px-5rem)]'
+            )}
+          />
         </div>
       </MainSkeleton>
     </>

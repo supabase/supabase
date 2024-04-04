@@ -50,7 +50,7 @@ export default function ProjectLinterDocs({
     <Layout menuId={MenuId.Database} meta={meta} editLink={editLink}>
       <MDXRemote {...intro} components={components} />
       <Heading tag="h2">Available lints</Heading>
-      <Tabs listClassNames="flex flex-wrap gap-2 [&>button]:!m-0">
+      <Tabs listClassNames="flex flex-wrap gap-2 [&>button]:!m-0" queryGroup="lint">
         {lints.map((lint) => (
           <Tabs.Panel
             key={lint.path}
@@ -88,7 +88,9 @@ const urlTransform: (lints: Array<{ path: string }>) => UrlTransformFunction = (
     const section = lints.find(({ path }) => path === relativePath)
 
     if (section) {
-      return `#${relativePath}`
+      const url = new URL(window.location.href)
+      url.searchParams.set('lint', relativePath)
+      return url.toString()
     }
 
     // If we don't have this page in our docs, link to GitHub repo
