@@ -344,6 +344,16 @@ const nextConfig = {
         destination: '/project/:ref/sql/new',
         permanent: true,
       },
+      {
+        permanent: true,
+        source: '/project/:ref/reports/linter',
+        destination: '/project/:ref/database/linter',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/reports/query-performance',
+        destination: '/project/:ref/database/query-performance',
+      },
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
             {

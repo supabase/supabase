@@ -5,7 +5,7 @@ import { useMemo, useState } from 'react'
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { FilterPopover } from 'components/interfaces/AuditLogs'
 import ReportLintsTableRow from 'components/interfaces/Reports/ReportLintsTableRow'
-import { ReportsLayout } from 'components/layouts'
+import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
@@ -61,9 +61,9 @@ const ProjectLints: NextPageWithLayout = () => {
       <ScaffoldSection>
         <div className="col-span-12 flex items-center justify-between">
           <div className="flec flex-col gap-y-1">
-            <h3 className="text-xl text-foreground">Project Linter</h3>
+            <h3 className="text-xl text-foreground">Database Linter</h3>
             <div className="text-sm text-foreground-lighter">
-              Identify common schema problems in your project's database
+              Identify common schema problems in your database
             </div>
           </div>
         </div>
@@ -148,13 +148,13 @@ const ProjectLints: NextPageWithLayout = () => {
                         {isLoading ? (
                           <div className="flex items-center gap-x-2">
                             <Loader className="animate-spin" size={12} />
-                            <p className="text-foreground-light">Checking project for issues...</p>
+                            <p className="text-foreground-light">Checking database for issues...</p>
                           </div>
                         ) : (
                           <div className="flex items-center gap-x-2">
                             <Check size={12} />
                             <p className="text-foreground-light">
-                              No issues have been found for this project
+                              No issues have been found for this database
                             </p>
                           </div>
                         )}
@@ -198,10 +198,10 @@ const ProjectLints: NextPageWithLayout = () => {
                               {isLoading ? (
                                 <>
                                   <Loader className="animate-spin" size={12} />
-                                  Checking for project issues
+                                  Checking for database issues
                                 </>
                               ) : (
-                                'No issues have been found for this project'
+                                'No issues have been found for this database'
                               )}
                             </p>
                           </Table.td>
@@ -225,6 +225,6 @@ const ProjectLints: NextPageWithLayout = () => {
   )
 }
 
-ProjectLints.getLayout = (page) => <ReportsLayout title="Linter">{page}</ReportsLayout>
+ProjectLints.getLayout = (page) => <DatabaseLayout title="Linter">{page}</DatabaseLayout>
 
 export default ProjectLints
