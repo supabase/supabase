@@ -380,3 +380,10 @@ This prevents the policy `( auth.uid() = user_id )` from running for any `anon` 
 | Test                                                                                          | Before (ms) | After (ms) | % Improvement | Change                                                                                                                           |
 | --------------------------------------------------------------------------------------------- | ----------- | ---------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | [test6-To-role](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test6-To-role) | 170         | < 0.1      | 99.78%        | <details className="cursor-pointer">Before:<br/>No `TO` policy<br/><br/>After:<br/>`TO authenticated` (anon accessing)</details> |
+
+## More resources
+
+- [Testing your database](/docs/guides/database/testing)
+- [Row Level Security and Supabase Auth](/docs/guides/auth/row-level-security)
+- [RLS Guide and Best Practices](https://github.com/orgs/supabase/discussions/14576)
+- Community repo on testing RLS using [pgTAP and dbdev](https://github.com/usebasejump/supabase-test-helpers/tree/main)
