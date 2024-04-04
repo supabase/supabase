@@ -57,13 +57,19 @@ export default function TicketActions() {
       if (social === 'twitter') {
         await supabase
           .from(LW_TABLE)
-          .update({ sharedOnTwitter: 'now', metadata: { ...metadata, hasSharedSecret: true } })
+          .update({
+            sharedOnTwitter: 'now',
+            metadata: { ...metadata, hasSharedSecret: hasSecretTicket },
+          })
           .eq('username', username)
         // window.open(tweetUrl, '_blank')
       } else if (social === 'linkedin') {
         await supabase
           .from(LW_TABLE)
-          .update({ sharedOnLinkedIn: 'now', metadata: { ...metadata, hasSharedSecret: true } })
+          .update({
+            sharedOnLinkedIn: 'now',
+            metadata: { ...metadata, hasSharedSecret: hasSecretTicket },
+          })
           .eq('username', username)
         // window.open(linkedInUrl, '_blank')
       }
