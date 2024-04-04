@@ -16,6 +16,7 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useRouter } from 'next/router'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import type { NextPageWithLayout } from 'types'
 import {
@@ -64,17 +65,13 @@ const onFilterTables = (
 }
 
 const AuthPoliciesPage: NextPageWithLayout = () => {
-  const { search, schema } = useParams()
+  const router = useRouter()
+  const { search: searchString, schema } = useParams()
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
-  const [searchString, setSearchString] = useState<string>('')
 
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
-
-  useEffect(() => {
-    if (search) setSearchString(search)
-  }, [search])
 
   useEffect(() => {
     if (schema) snap.setSelectedSchemaName(schema)
@@ -129,16 +126,27 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               showError={false}
               selectedSchemaName={snap.selectedSchemaName}
               onSelectSchema={(schema: string) => {
-                snap.setSelectedSchemaName(schema)
-                setSearchString('')
+                const url = new URL(document.URL)
+                url.searchParams.delete('search')
+                url.searchParams.set('schema', schema)
+                router.push(url)
               }}
             />
             <Input
               size="small"
               placeholder="Filter tables and policies"
               className="block w-64 text-sm placeholder-border-muted"
-              value={searchString}
-              onChange={(e) => setSearchString(e.target.value)}
+              value={searchString || ''}
+              onChange={(e) => {
+                const str = e.target.value
+                const url = new URL(document.URL)
+                if (str === '') {
+                  url.searchParams.delete('search')
+                } else {
+                  url.searchParams.set('search', e.target.value)
+                }
+                router.push(url)
+              }}
               icon={<IconSearch size="tiny" />}
             />
           </div>
