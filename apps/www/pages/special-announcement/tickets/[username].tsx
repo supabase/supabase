@@ -9,7 +9,6 @@ import { Button } from 'ui'
 import { SITE_URL, SPECIAL_ANNOUNCEMENT_URL } from '~/lib/constants'
 import supabase from '~/lib/supabaseMisc'
 import dayjs from 'dayjs'
-import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -56,8 +55,6 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
     }
   }, [])
 
-  const applicationName = 'Supabase'
-
   return (
     <>
       <NextSeo
@@ -74,12 +71,6 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
             },
           ],
         }}
-      />
-      <MetaFaviconsPagesRouter
-        applicationName={applicationName}
-        includeManifest
-        includeMsApplicationConfig
-        includeRssXmlFeed
       />
       <ConfDataContext.Provider
         value={{
@@ -144,7 +135,6 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   }
 
   const ticketType = user?.secret ? 'secret' : user?.platinum ? 'platinum' : 'regular'
-
   const ogImageUrl = `https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw11/og/${ticketType}/${username}.png?t=${dayjs(new Date()).format('DHHmmss')}`
 
   return {

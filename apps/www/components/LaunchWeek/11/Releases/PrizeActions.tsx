@@ -4,13 +4,11 @@ import { Button } from 'ui'
 export default function PrizeActions() {
   return (
     <div className="w-full gap-2 flex items-center">
-      <Button onClick={() => null} type="secondary" size="tiny">
-        Claim your ticket
+      <Button onClick={() => null} type="secondary" size="tiny" asChild>
+        <Link href="/special-announcement">Claim your ticket</Link>
       </Button>
-      <Button onClick={() => null} type="default" size="tiny" asChild>
-        <Link href="/blog/supabase-hackathon-lw11" target="_blank">
-          Join Hackathon
-        </Link>
+      <Button onClick={() => null} type="default" size="tiny" disabled>
+        Hackathon coming soon
       </Button>
     </div>
   )

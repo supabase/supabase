@@ -2,14 +2,12 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { Session } from '@supabase/supabase-js'
-import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
+import { SITE_ORIGIN, SPECIAL_ANNOUNCEMENT_URL } from '~/lib/constants'
 import supabase from '~/lib/supabaseMisc'
 
-// import FaviconImports from '~/components/LaunchWeek/11/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import TicketingFlow from '~/components/LaunchWeek/11/Ticket/TicketingFlow'
-import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 
 export default function LaunchWeekIndex() {
   const { query } = useRouter()
@@ -68,8 +66,6 @@ export default function LaunchWeekIndex() {
     if (!session) return setTicketState('registration')
   }, [session, userData])
 
-  const applicationName = 'Supabase'
-
   return (
     <>
       <NextSeo
@@ -78,7 +74,7 @@ export default function LaunchWeekIndex() {
         openGraph={{
           title: TITLE,
           description: DESCRIPTION,
-          url: SITE_URL,
+          url: SPECIAL_ANNOUNCEMENT_URL,
           images: [
             {
               url: OG_IMAGE,
@@ -86,13 +82,6 @@ export default function LaunchWeekIndex() {
           ],
         }}
       />
-      <MetaFaviconsPagesRouter
-        applicationName={applicationName}
-        includeManifest
-        includeMsApplicationConfig
-        includeRssXmlFeed
-      />
-      {/* <FaviconImports /> */}
       <ConfDataContext.Provider
         value={{
           supabase,
