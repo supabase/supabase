@@ -214,8 +214,10 @@ const ReportsMenu = () => {
             </AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_ className="text-xs">
               <p className="mb-2">They can now be found in the menu under the database section.</p>
-              <Button type="default" size="tiny" onClick={() => {}}>
-                Head over to Database
+              <Button asChild type="default" size="tiny">
+                <Link href={`/project/${ref}/database/query-performance`}>
+                  Head over to Database
+                </Link>
               </Button>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
