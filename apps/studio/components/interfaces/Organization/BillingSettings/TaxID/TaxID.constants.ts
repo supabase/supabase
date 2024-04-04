@@ -156,13 +156,6 @@ export const TAX_IDS: TaxId[] = [
     vatPrefix: 'CY',
   },
   {
-    name: 'CY VAT',
-    code: 'eu_vat',
-    country: 'Cyprus',
-    placeholder: 'CY12345678Z',
-    vatPrefix: 'CY',
-  },
-  {
     name: 'CZ VAT',
     code: 'eu_vat',
     country: 'Czech Republic',
@@ -186,7 +179,7 @@ export const TAX_IDS: TaxId[] = [
   {
     name: 'DO RCN',
     code: 'do_rcn',
-    country: 'Dominian Republic',
+    country: 'Dominican Republic',
     placeholder: '123-4567890-1',
   },
   {
