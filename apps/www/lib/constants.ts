@@ -51,5 +51,5 @@ export const LW11_LAUNCH_DATE = '2024-04-15T07:00:00.000-08:00'
 export const TWEET_TEXT = '👁️⚡👁️'
 export const TWEET_TEXT_GOLDEN = `👁️⚡👁️`
 export const TWEET_TEXT_PLATINUM = `👁️⚡👁️`
-export const TWEET_TEXT_SECRET = `Found a secret @supabase ticket. Guess the word at supabase.com/launch-week to get yours:`
+export const TWEET_TEXT_SECRET = `Just found a secret @supabase ticket. \n\nGuess the word at supabase.com/special-announcement to find yours:`
 export const SITE_NAME = 'Supabase'
