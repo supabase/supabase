@@ -4,17 +4,19 @@ import { type ResponseError } from '~/types/fetch'
 import { post } from './fetchWrappers'
 
 type SendFeedbackVariables = {
+  title: string
   message: string
+  isHelpful: boolean
   pathname?: string
 }
 
-export async function sendFeedback({ message, pathname }: SendFeedbackVariables) {
-  const { data, error } = await post('/platform/feedback/send', {
+export async function sendFeedback({ message, pathname, title, isHelpful }: SendFeedbackVariables) {
+  const { data, error } = await post('/platform/feedback/docs', {
     body: {
-      message,
-      category: 'Feedback',
-      tags: ['docs-feedback'],
-      pathname,
+      page: pathname,
+      isHelpful,
+      title,
+      feedback: message,
     },
   })
   if (error) throw Error(`Couldn't send feedback`, { cause: error })
