@@ -8,8 +8,12 @@ import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import CardButton from 'components/ui/CardButton'
 import CopyButton from 'components/ui/CopyButton'
 import NoSearchResults from 'components/ui/NoSearchResults'
-import { getGeneralPolicyTemplates } from '../PolicyEditorModal/PolicyEditorModal.constants'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
+import {
+  getGeneralPolicyTemplates,
+  getRealtimePolicyTemplates,
+} from '../PolicyEditorModal/PolicyEditorModal.constants'
+import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
 
 interface PolicyTemplatesProps {
   table: string
@@ -26,10 +30,16 @@ export const PolicyTemplates = ({
 }: PolicyTemplatesProps) => {
   const [search, setSearch] = useState('')
   const state = useTableEditorStateSnapshot()
-  const templates = getGeneralPolicyTemplates(
-    state.selectedSchemaName,
-    table.length > 0 ? table : 'table_name'
-  )
+
+  let templates: PolicyTemplate[] = []
+  if (state.selectedSchemaName === 'realtime') {
+    templates = getRealtimePolicyTemplates(table.length > 0 ? table : 'table_name')
+  } else {
+    templates = getGeneralPolicyTemplates(
+      state.selectedSchemaName,
+      table.length > 0 ? table : 'table_name'
+    )
+  }
 
   const baseTemplates =
     selectedPolicy !== undefined

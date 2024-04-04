@@ -1,10 +1,8 @@
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { partition } from 'lodash'
 import { useEffect, useState } from 'react'
 
 import { useParams } from 'common'
-import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Policies } from 'components/interfaces/Auth/Policies'
 import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
 import { AuthLayout } from 'components/layouts'
@@ -86,8 +84,9 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const [protectedSchemas] = partition(schemas, (schema) =>
-    EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
+  // don't mark "realtime" schema as protected, it's ok to update it
+  const protectedSchemas = (schemas || []).filter(
+    (schema) => schema.name !== 'realtime' && EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
   const selectedSchema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
   const isLocked = protectedSchemas.some((s) => s.id === selectedSchema?.id)

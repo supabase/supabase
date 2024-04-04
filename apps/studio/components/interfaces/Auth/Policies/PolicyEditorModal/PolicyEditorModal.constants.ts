@@ -173,3 +173,109 @@ for select using (
     roles: [],
   },
 ]
+
+export const getRealtimePolicyTemplates = (table: string): PolicyTemplate[] => {
+  if (table === 'broadcasts') {
+    return [
+      {
+        id: 'policy-broadcast-1',
+        preview: false,
+        templateName: 'Enable read access to broadcasts for authenticated users only',
+        description:
+          'This policy gives read access to broadcasts for all authenticated users only.',
+        statement: `
+  create policy "Enable read access for broadcasts for authenticated users only"
+  on realtime.broadcasts for select
+  to authenticated
+  using ( true );`.trim(),
+        name: 'Enable read access for broadcasts for authenticated users only',
+        definition: 'true',
+        check: '',
+        command: 'SELECT',
+        roles: ['authenticated'],
+      },
+      {
+        id: 'policy-broadcast-2',
+        preview: false,
+        templateName: 'Enable update access to broadcasts for authenticated users only',
+        description:
+          'This policy gives update access to broadcasts for all authenticated users only.',
+        statement: `
+        create policy "Enable update access for broadcasts for authenticated users only"
+ON realtime.broadcasts for update
+TO authenticated
+using ( true )
+with check ( true );`.trim(),
+        name: 'Enable update access for broadcasts for authenticated users only',
+        definition: 'true',
+        check: 'true',
+        command: 'UPDATE',
+        roles: ['authenticated'],
+      },
+    ]
+  }
+
+  if (table === 'presences') {
+    return [
+      {
+        id: 'policy-presences-1',
+        preview: false,
+        templateName: 'Enable read access to presences for authenticated users only',
+        description: 'This policy gives read access to presences for all authenticated users only.',
+        statement: `
+  create policy "Enable read access for presences for authenticated users only"
+  on realtime.presences for select
+  to authenticated
+  using ( true );`.trim(),
+        name: 'Enable read access for presences for authenticated users only',
+        definition: 'true',
+        check: '',
+        command: 'SELECT',
+        roles: ['authenticated'],
+      },
+      {
+        id: 'policy-presences-2',
+        preview: false,
+        templateName: 'Enable update access to presences for authenticated users only',
+        description:
+          'This policy gives update access to presences for all authenticated users only.',
+        statement: `
+        create policy "Enable update access for presences for authenticated users only"
+ON realtime.presences for update
+TO authenticated
+using ( true )
+with check ( true );
+  ;`.trim(),
+        name: 'Enable read access for presences for authenticated users only',
+        definition: 'true',
+        check: 'true',
+        command: 'UPDATE',
+        roles: ['authenticated'],
+      },
+    ]
+  }
+
+  if (table === 'channels') {
+    return [
+      {
+        id: 'policy-channels-1',
+        preview: false,
+        templateName: 'Enable read access to all channels for authenticated users only',
+        description:
+          'This policy gives read access to all channels for all authenticated users only.',
+        statement: `
+  create policy "Enable read access for all channels for authenticated users only"
+  on realtime.channels for select
+  to authenticated
+  using ( true );`.trim(),
+        name: 'Enable read access for all channels for authenticated users only',
+        definition: 'true',
+        check: '',
+        command: 'SELECT',
+        roles: ['authenticated'],
+      },
+    ]
+  }
+
+  return []
+}
