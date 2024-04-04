@@ -1,20 +1,16 @@
 import { MDXProvider } from '@mdx-js/react'
+import 'katex/dist/katex.min.css'
+import { ExternalLink } from 'lucide-react'
 import { NextSeo } from 'next-seo'
-import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/router'
-import { FC, useEffect, useRef, useState } from 'react'
-
-import { IconExternalLink, cn } from 'ui'
-import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+import { type FC } from 'react'
 
 import components from '~/components'
 import { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
-import { Feedback } from '~/components/Feedback'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { MainSkeleton } from '~/layouts/MainSkeleton'
-import 'katex/dist/katex.min.css'
 
 interface Props {
   meta: {
@@ -37,10 +33,6 @@ interface Props {
 }
 
 const Layout: FC<Props> = (props) => {
-  const pathname = usePathname()
-
-  const articleRef = useRef()
-
   const { asPath } = useRouter()
   const router = useRouter()
 
@@ -136,7 +128,7 @@ const Layout: FC<Props> = (props) => {
                     `}
                         className="text-sm transition flex items-center gap-1 text-scale-1000 hover:text-scale-1200 w-fit"
                       >
-                        Edit this page on GitHub <IconExternalLink size={14} strokeWidth={1.5} />
+                        Edit this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
                       </a>
                     </div>
                   </div>

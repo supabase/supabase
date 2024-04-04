@@ -1,15 +1,14 @@
-import { useState, type FC, useEffect } from 'react'
-
-import { TAB_CHANGE_EVENT_NAME } from '@ui/lib/events'
-
-import { useRerenderOnEvt } from '~/hooks/useManualRerender'
-import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
-import { removeAnchor } from './CustomHTMLElements/CustomHTMLElements.utils'
-import useHash from '~/hooks/useHash'
 import { usePathname } from 'next/navigation'
-import { Feedback } from './Feedback'
+import { useEffect, useState } from 'react'
+
+import { cn, TAB_CHANGE_EVENT_NAME } from 'ui'
 import { ExpandableVideo } from 'ui-patterns'
-import { cn } from 'ui'
+
+import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
+import useHash from '~/hooks/useHash'
+import { useRerenderOnEvt } from '~/hooks/useManualRerender'
+import { removeAnchor } from './CustomHTMLElements/CustomHTMLElements.utils'
+import { Feedback } from './Feedback'
 
 const formatSlug = (slug: string) => {
   // [Joshen] We will still provide support for headers declared like this:

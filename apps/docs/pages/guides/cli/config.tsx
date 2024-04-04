@@ -1,12 +1,14 @@
-import specFile from '~/spec/cli_v1_config.yaml' assert { type: 'yml' }
-import { Parameter } from '~/lib/refGenerator/refTypes'
-import ReactMarkdown from 'react-markdown'
-import GuidesTableOfContents from '~/components/GuidesTableOfContents'
-import { Heading } from '~/components/CustomHTMLElements'
 import Head from 'next/head'
+import ReactMarkdown from 'react-markdown'
+
 import { CodeBlock } from 'ui'
-import { MainSkeleton } from '~/layouts/MainSkeleton'
+
+import { Heading } from '~/components/CustomHTMLElements'
+import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { MainSkeleton } from '~/layouts/MainSkeleton'
+import { Parameter } from '~/lib/refGenerator/refTypes'
+import specFile from '~/spec/cli_v1_config.yaml' assert { type: 'yml' }
 
 // Parameters are grouped on the page by tag
 const tocList = []
