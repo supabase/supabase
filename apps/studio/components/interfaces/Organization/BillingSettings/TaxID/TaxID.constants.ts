@@ -531,7 +531,7 @@ export const TAX_IDS: TaxId[] = [
   {
     name: 'UY RUC',
     code: 'uy_ruc',
-    country: 'Urugay',
+    country: 'Uruguay',
     placeholder: '123456789012',
   },
   {
