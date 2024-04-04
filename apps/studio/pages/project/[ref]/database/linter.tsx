@@ -3,7 +3,6 @@ import { Check, ExternalLink, Loader } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
-import { FilterPopover } from 'components/interfaces/AuditLogs'
 import ReportLintsTableRow from 'components/interfaces/Reports/ReportLintsTableRow'
 import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
@@ -20,6 +19,7 @@ import {
   Button,
   LoadingLine,
 } from 'ui'
+import { FilterPopover } from 'components/ui/FilterPopover'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()

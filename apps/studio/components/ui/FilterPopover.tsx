@@ -13,7 +13,7 @@ interface FilterPopoverProps {
 // [Joshen] Form + Checkbox.Group doesn't seem to work properly RE form state
 // hence why the manual implementation here as a workaround
 
-const FilterPopover = ({
+export const FilterPopover = ({
   options = [],
   activeOptions = [],
   valueKey,
@@ -104,5 +104,3 @@ const FilterPopover = ({
     </Popover>
   )
 }
-
-export default FilterPopover
