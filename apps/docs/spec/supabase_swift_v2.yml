@@ -129,6 +129,29 @@ functions:
             redirectTo: URL(string: "https://example.com/welcome")!
           )
           ```
+  - id: sign-in-anonymously
+    title: "signInAnonymously()"
+    notes: |
+      - Returns an anonymous user
+      - It is recommended to set up captcha for anonymous sign-ins to prevent abuse. You can pass in the captcha token in the `options` param.
+    examples:
+      - id: sign-in-anonymously
+        name: Create an anonymous user
+        isSpotlight: true
+        code: |
+          ```swift
+          let session = try await supabase.auth.signInAnonymously(captchaToken: captchaToken)
+          ```
+      - id: sign-in-anonymously-with-user-metadata
+        name: Create an anonymous user with custom user metadata
+        isSpotlight: false
+        code: |
+          ```swift
+          let session = try await supabase.auth.signInAnonymously(
+            data: customData,
+            captchaToken: captchaToken
+          )
+          ```
   - id: sign-in-with-password
     title: "signInWithPassword()"
     notes: |
@@ -376,7 +399,7 @@ functions:
           )
           ```
   - id: get-user-identities
-    title: 'userIdentities()'
+    title: "userIdentities()"
     notes: |
       - The user needs to be signed in to call `userIdentities()`.
     examples:
@@ -388,7 +411,7 @@ functions:
           let identities = try await supabase.auth.userIdentities()
           ```
   - id: send-password-reauthentication
-    title: 'reauthenticate()'
+    title: "reauthenticate()"
     notes: |
       - This method is used together with `update(user:)` when a user's password needs to be updated.
       - If you require your user to reauthenticate before updating their password, you need to enable the **Secure password change** option in your [project's email provider settings](/dashboard/project/_/auth/providers).
