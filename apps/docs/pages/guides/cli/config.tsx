@@ -1,12 +1,14 @@
-import specFile from '~/spec/cli_v1_config.yaml' assert { type: 'yml' }
-import { Parameter } from '~/lib/refGenerator/refTypes'
-import ReactMarkdown from 'react-markdown'
-import GuidesTableOfContents from '~/components/GuidesTableOfContents'
-import { Heading } from '~/components/CustomHTMLElements'
 import Head from 'next/head'
-import { CodeBlock } from 'ui'
-import { MainSkeleton } from '~/layouts/MainSkeleton'
+import ReactMarkdown from 'react-markdown'
+
+import { CodeBlock, cn } from 'ui'
+
+import { Heading } from '~/components/CustomHTMLElements'
+import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
+import { MainSkeleton } from '~/layouts/MainSkeleton'
+import { Parameter } from '~/lib/refGenerator/refTypes'
+import specFile from '~/spec/cli_v1_config.yaml' assert { type: 'yml' }
 
 // Parameters are grouped on the page by tag
 const tocList = []
@@ -41,14 +43,15 @@ export default function Config() {
               <div>{content}</div>
             </div>
           </div>
-          <div className="md:col-span-3">
-            <div className="sticky overflow-auto max-h-[calc(100vh-60px-5rem)] pb-3 top-32 border-l">
-              <span className="block font-mono text-xs uppercase text-foreground pl-5 mb-4">
-                On this page
-              </span>
-              <GuidesTableOfContents list={tocList} />
-            </div>
-          </div>
+          <GuidesTableOfContents
+            overrideToc={tocList}
+            className={cn(
+              'col-span-3 self-start',
+              'hidden md:block md:col-span-3',
+              'sticky top-[calc(var(--mobile-header-height,40px)+2rem)] lg:top-[calc(var(--desktop-header-height,60px)+2rem)]',
+              'max-h-[calc(100vh-60px-5rem)]'
+            )}
+          />
         </div>
       </MainSkeleton>
     </>

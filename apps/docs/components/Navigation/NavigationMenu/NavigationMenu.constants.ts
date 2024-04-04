@@ -794,7 +794,14 @@ export const database: NavMenuConstant = {
           name: 'Query optimization',
           url: '/guides/database/query-optimization',
         },
-        { name: 'Debugging and monitoring', url: '/guides/database/inspect' },
+        {
+          name: 'Database linter',
+          url: '/guides/database/database-linter',
+        },
+        {
+          name: 'Debugging and monitoring',
+          url: '/guides/database/inspect',
+        },
         {
           name: 'Debugging performance issues',
           url: '/guides/database/debugging-performance',
