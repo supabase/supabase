@@ -81,7 +81,6 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
      */
 
     function handleChange(e: CustomEvent) {
-      console.log('handle change')
       if (
         e.detail.queryGroup &&
         e.detail.queryGroup === queryGroup &&
@@ -119,9 +118,6 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
       url.searchParams.set(queryGroup, id)
       window.history.replaceState(undefined, '', url)
     }
-
-    console.log('click!')
-    console.log(currentTarget)
 
     currentTarget.dispatchEvent(
       new CustomEvent(TAB_CHANGE_EVENT_NAME, { bubbles: true, detail: { queryGroup, id } })
