@@ -64,8 +64,6 @@ const Nav = (props: Props) => {
 
   const showDarkLogo = isLaunchWeekPage || resolvedTheme?.includes('dark')! || isHomePage
 
-  console.log('latestPosts Nav', props.latestPosts)
-
   return (
     <>
       <div
