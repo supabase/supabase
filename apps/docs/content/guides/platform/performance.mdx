@@ -175,21 +175,7 @@ You can pair the information available from `pg_stat_statements` with the detail
 
 ## Optimizing the number of connections
 
-By default, the number of connections allowed to Postgres and Supavisor is configured based on the resources available to the database.
-
-| Compute Add-on | Postgresql connections | Supavisor connections |
-| -------------- | ---------------------- | --------------------- |
-| Nano (free)    | 60                     | 200                   |
-| Micro          | 60                     | 200                   |
-| Small          | 90                     | 200                   |
-| Medium         | 120                    | 200                   |
-| Large          | 160                    | 300                   |
-| XL             | 240                    | 700                   |
-| 2XL            | 380                    | 1500                  |
-| 4XL            | 480                    | 3000                  |
-| 8XL            | 490                    | 6000                  |
-| 12XL           | 500                    | 9000                  |
-| 16XL           | 500                    | 12000                 |
+The default connection limits for Postgres and Supavisor is based on your compute size. See the default connection numbers in the [Compute Add-ons](/docs/guides/platform/compute-add-ons) section.
 
 If the number of connections is insufficient, you will receive the following error upon connecting to the DB:
 

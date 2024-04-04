@@ -1,41 +1,40 @@
+import { ChevronDown, Edit2, Plus, Trash } from 'lucide-react'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import React from 'react'
+import toast from 'react-hot-toast'
+
 import { CreateReportModal } from 'components/interfaces/Reports/Reports.CreateReportModal'
 import { UpdateCustomReportModal } from 'components/interfaces/Reports/Reports.UpdateModal'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { useContentInsertMutation } from 'data/content/content-insert-mutation'
 import { Content, useContentQuery } from 'data/content/content-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { useIsFeatureEnabled, useSelectedProject } from 'hooks'
-import { uuidv4 } from 'lib/helpers'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import React from 'react'
-import toast from 'react-hot-toast'
 import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconEdit2,
-  IconPlus,
-  IconTrash,
   Menu,
-  Modal,
   cn,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 const ReportsMenu = () => {
   const router = useRouter()
-  const insertReport = useContentInsertMutation()
+  const { id } = router.query
+  const project = useSelectedProject()
   const deleteReport = useContentDeleteMutation()
   const updateReport = useContentUpsertMutation()
+  const storageEnabled = useIsFeatureEnabled('project_storage:all')
 
-  const project = useSelectedProject()
-  const { id } = router.query
   const pageKey = (id || router.pathname.split('/')[4]) as string
   const ref = project?.ref ?? 'default'
 
@@ -43,8 +42,6 @@ const ReportsMenu = () => {
   const [showNewReportModal, setShowNewReportModal] = React.useState(false)
   const [showUpdateReportModal, setShowUpdateReportModal] = React.useState(false)
   const [selectedReport, setSelectedReport] = React.useState<Content>()
-
-  const storageEnabled = useIsFeatureEnabled('project_storage:all')
 
   const { data: content, isLoading } = useContentQuery(ref)
 
@@ -103,57 +100,9 @@ const ReportsMenu = () => {
           key: 'database',
           url: `/project/${ref}/reports/database`,
         },
-        {
-          name: 'Query Performance',
-          key: 'query-performance',
-          url: `/project/${ref}/reports/query-performance`,
-        },
-        {
-          name: 'Project Linter',
-          key: 'linter',
-          url: `/project/${ref}/reports/linter`,
-        },
       ],
     },
   ]
-
-  async function createCustomReport({ name, description }: { name: string; description?: string }) {
-    try {
-      if (!ref) return
-
-      const res = await insertReport.mutateAsync({
-        projectRef: ref,
-        payload: {
-          id: uuidv4(),
-          type: 'report',
-          name,
-          description: description || '',
-          visibility: 'project',
-          content: {
-            schema_version: 1,
-            period_start: {
-              time_period: '7d',
-              date: '',
-            },
-            period_end: {
-              time_period: 'today',
-              date: '',
-            },
-            interval: '1d',
-            layout: [],
-          },
-        },
-      })
-      toast.success('New report created')
-
-      const newReportId = res[0].id
-      setShowNewReportModal(false)
-      router.push(`/project/${ref}/reports/${newReportId}`)
-    } catch (error) {
-      toast.error(`Failed to create report. Check console for more details.`)
-      console.error(error)
-    }
-  }
 
   return (
     <Menu type="pills" className="mt-6">
@@ -164,7 +113,7 @@ const ReportsMenu = () => {
           <ShimmeringLoader className="w-1/2" />
         </div>
       ) : (
-        <div className="flex flex-col px-2">
+        <div className="flex flex-col px-2 gap-y-6">
           <div className="flex px-2">
             <Button
               type="default"
@@ -172,13 +121,14 @@ const ReportsMenu = () => {
               onClick={() => {
                 setShowNewReportModal(true)
               }}
-              icon={<IconPlus size="tiny" />}
+              icon={<Plus size={12} />}
             >
               New custom report
             </Button>
           </div>
+
           {reportMenuItems.length > 0 ? (
-            <div className="mt-6">
+            <div>
               <Menu.Group title={'Your custom reports'} />
               {reportMenuItems.map((item, idx) => (
                 <Link
@@ -197,7 +147,7 @@ const ReportsMenu = () => {
                       <Button
                         type="text"
                         className="px-1 opacity-50 hover:opacity-100"
-                        icon={<IconChevronDown size="tiny" strokeWidth={2} />}
+                        icon={<ChevronDown size={12} strokeWidth={2} />}
                       />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-52 *:space-x-2">
@@ -208,7 +158,7 @@ const ReportsMenu = () => {
                           setShowUpdateReportModal(true)
                         }}
                       >
-                        <IconEdit2 size="tiny" />
+                        <Edit2 size={12} />
                         <div>Rename</div>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
@@ -219,7 +169,7 @@ const ReportsMenu = () => {
                           setDeleteModalOpen(true)
                         }}
                       >
-                        <IconTrash size="tiny" />
+                        <Trash size={12} />
                         <div>Delete</div>
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -228,8 +178,9 @@ const ReportsMenu = () => {
               ))}
             </div>
           ) : null}
-          {menuItems.map((item, idx) => (
-            <div className="mt-6" key={item.key + '-menu-group'}>
+
+          {menuItems.map((item) => (
+            <div key={item.key + '-menu-group'}>
               {item.items ? (
                 <>
                   <Menu.Group title={item.title} />
@@ -255,6 +206,22 @@ const ReportsMenu = () => {
               ) : null}
             </div>
           ))}
+
+          {/* [Joshen] Temp notice while we shift some pages on 040424 - can probably remove in 3 months perhaps */}
+          <Alert_Shadcn_>
+            <AlertTitle_Shadcn_ className="text-sm">
+              Query Performance and Project Linter reports have been shifted
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_ className="text-xs">
+              <p className="mb-2">They can now be found in the menu under the database section.</p>
+              <Button asChild type="default" size="tiny">
+                <Link href={`/project/${ref}/database/query-performance`}>
+                  Head over to Database
+                </Link>
+              </Button>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+
           <UpdateCustomReportModal
             onSubmit={async (newVals) => {
               try {
@@ -286,6 +253,7 @@ const ReportsMenu = () => {
               description: selectedReport?.description || '',
             }}
           />
+
           <ConfirmationModal
             title="Delete custom report"
             confirmLabel="Delete report"
@@ -313,6 +281,7 @@ const ReportsMenu = () => {
               </div>
             </div>
           </ConfirmationModal>
+
           <CreateReportModal
             visible={showNewReportModal}
             onCancel={() => {

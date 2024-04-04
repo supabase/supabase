@@ -26,7 +26,8 @@
     "@react-three/fiber": "^7.0.29",
     "@supabase/auth-helpers-react": "^0.4.2",
     "@supabase/auth-ui-react": "^0.4.5",
-    "@supabase/supabase-js": "^2.39.3",
+    "animejs": "^3.2.2",
+    "@supabase/supabase-js": "^2.41.1",
     "classnames": "^2.3.1",
     "cobe": "^0.6.2",
     "common": "*",
@@ -70,6 +71,7 @@
     "yup": "^1.4.0"
   },
   "devDependencies": {
+    "@types/animejs": "^3.1.12",
     "@types/classnames": "^2.3.1",
     "@types/dat.gui": "^0.7.10",
     "@types/mdx-js__react": "^1.5.6",
