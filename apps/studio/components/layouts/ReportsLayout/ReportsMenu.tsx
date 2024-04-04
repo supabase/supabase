@@ -31,7 +31,6 @@ const ReportsMenu = () => {
   const router = useRouter()
   const { id } = router.query
   const project = useSelectedProject()
-  const insertReport = useContentInsertMutation()
   const deleteReport = useContentDeleteMutation()
   const updateReport = useContentUpsertMutation()
   const storageEnabled = useIsFeatureEnabled('project_storage:all')
@@ -208,6 +207,7 @@ const ReportsMenu = () => {
             </div>
           ))}
 
+          {/* [Joshen] Temp notice while we shift some pages on 040424 - can probably remove in 3 months perhaps */}
           <Alert_Shadcn_>
             <AlertTitle_Shadcn_ className="text-sm">
               Query Performance and Project Linter reports have been shifted
