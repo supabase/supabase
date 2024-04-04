@@ -54,7 +54,7 @@ export const QueryPerformanceFilterBar = ({
     <>
       <div className="flex justify-between items-center">
         <form
-          className="py-3 flex gap-4"
+          className="py-3 flex gap-x-2"
           id="log-panel-search"
           onSubmit={(e) => {
             e.preventDefault()
