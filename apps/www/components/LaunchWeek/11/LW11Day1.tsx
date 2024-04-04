@@ -1,7 +1,6 @@
 import React from 'react'
-import Link from 'next/link'
-import { ArrowRightIcon } from '@heroicons/react/outline'
-import { IconEdit2, cn } from 'ui'
+import { cn } from 'ui'
+import { ExpandableVideo } from 'ui-patterns'
 import { WeekDayProps } from './Releases/data'
 import { DayLink } from './Releases/components'
 
@@ -26,8 +25,16 @@ const LW11Day1 = ({ day, className }: { day: WeekDayProps; className?: string })
         >
           {day.dd}, {day.date}
         </div>
+        <div className="md:max-w-sm flex flex-col gap-4">
+          <ExpandableVideo
+            videoId=""
+            imgUrl={day.videoThumbnail}
+            imgOverlayText="Watch announcement"
+          />
+          <p className="text-sm text-foreground">Supabase is ready for production use.</p>
+        </div>
         {!!day.links && (
-          <ul className="flex-1 h-full w-full justify-end grid grid-cols-2 md:flex flex-col gap-1">
+          <ul className="flex-1 h-full w-full justify-end xs:grid grid-cols-2 lg:grid-cols-3 flex flex-col gap-1">
             {day.links?.map((link) => (
               <li key={link.href}>
                 <DayLink {...link} />

@@ -15,7 +15,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
       )}
     >
       <h2 className="w-full text-sm font-mono uppercase tracking-[1px]">Awards</h2>
-      <p className="text-2xl text-foreground-lighter">Get your winning ticket</p>
+      <p className="text-2xl text-foreground-lighter">Generate your ticket for a chance to win.</p>
       <div className="w-full pt-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mx-auto h-auto text-[#EDEDED]">
           <LaunchWeekPrizeCard

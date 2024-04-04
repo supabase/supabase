@@ -47,6 +47,7 @@ export interface WeekDayProps {
   d: number
   dd: string
   links?: StepLink[]
+  videoId?: string
   videoThumbnail?: string
   blog: string
   steps: StepProps[] | []
@@ -66,6 +67,17 @@ const days: WeekDayProps[] = [
     hasCountdown: true,
     date: '15 April',
     published_at: '2024-04-15T08:00:00.000-08:00',
+    videoThumbnail: '/images/launchweek/copple-placeholder.jpg',
+    links: [
+      {
+        type: 'blog',
+        href: '#',
+      },
+      {
+        type: 'xSpace',
+        href: '',
+      },
+    ],
     description: (
       <>
         <p className="text-foreground">Our products are now ready for production use.</p>{' '}
@@ -81,10 +93,10 @@ const days: WeekDayProps[] = [
         title: 'Database',
         description: 'Fully portable Postgres Database',
         links: [
-          {
-            type: 'podcast',
-            href: '#',
-          },
+          // {
+          //   type: 'podcast',
+          //   href: '#',
+          // },
           {
             type: 'docs',
             href: 'https://supabase.com/docs/guides/database/overview',
@@ -96,10 +108,10 @@ const days: WeekDayProps[] = [
         title: 'Auth',
         description: 'User management out of the box',
         links: [
-          {
-            type: 'podcast',
-            href: '#',
-          },
+          // {
+          //   type: 'podcast',
+          //   href: '#',
+          // },
           {
             type: 'docs',
             href: 'https://supabase.com/docs/guides/auth',
@@ -111,10 +123,10 @@ const days: WeekDayProps[] = [
         title: 'Storage',
         description: 'Serverless storage for any media',
         links: [
-          {
-            type: 'podcast',
-            href: '#',
-          },
+          // {
+          //   type: 'podcast',
+          //   href: '#',
+          // },
           {
             type: 'docs',
             href: 'https://supabase.com/docs/guides/storage',
@@ -126,10 +138,10 @@ const days: WeekDayProps[] = [
         title: 'Edge Functions',
         description: 'Deploy code globally on the edge',
         links: [
-          {
-            type: 'podcast',
-            href: '#',
-          },
+          // {
+          //   type: 'podcast',
+          //   href: '#',
+          // },
           {
             type: 'docs',
             href: 'https://supabase.com/docs/guides/functions',
@@ -141,10 +153,10 @@ const days: WeekDayProps[] = [
         title: 'Realtime',
         description: 'Syncronize and broadcast events',
         links: [
-          {
-            type: 'podcast',
-            href: '#',
-          },
+          // {
+          //   type: 'podcast',
+          //   href: '#',
+          // },
           {
             type: 'docs',
             href: 'https://supabase.com/docs/guides/realtime',
@@ -156,10 +168,10 @@ const days: WeekDayProps[] = [
         title: 'Vector',
         description: 'AI toolkit to manage embeddings',
         links: [
-          {
-            type: 'podcast',
-            href: '#',
-          },
+          // {
+          //   type: 'podcast',
+          //   href: '#',
+          // },
           {
             type: 'docs',
             href: 'https://supabase.com/docs/guides/ai',

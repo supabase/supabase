@@ -2,6 +2,8 @@ import React from 'react'
 import { TextLink, cn } from 'ui'
 
 const HackathonCallout = ({ className }: { className?: string }) => {
+  // const isLive = false
+
   return (
     <div
       className={cn(

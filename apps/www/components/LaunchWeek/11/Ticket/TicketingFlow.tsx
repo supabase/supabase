@@ -28,6 +28,7 @@ const TicketingFlow = () => {
   const hasTicket = !isGameMode && ticketState === 'ticket'
   const hasPlatinumTicket = userData.platinum
   const hasSecretTicket = userData.secret
+  const metadata = userData?.metadata
 
   const transition = DEFAULT_TRANSITION
   const initial = INITIAL_BOTTOM
@@ -118,7 +119,13 @@ const TicketingFlow = () => {
                       {hasSecretTicket && <Badge variant="outline">Secret ticket</Badge>}
                       {hasPlatinumTicket ? (
                         <div>
-                          <p className="text-2xl mb-1">Thanks for sharing!</p>
+                          {hasSecretTicket && !metadata?.hasSharedSecret ? (
+                            <p className="text-2xl mb-1">
+                              Share again to boost your chance of winning!
+                            </p>
+                          ) : (
+                            <p className="text-2xl mb-1">Thanks for sharing!</p>
+                          )}
                           <p className="text-[#8B9092]">
                             Join on April 15-19 to celebrate a major milestone with us and explore
                             all the features that come with it.
@@ -130,7 +137,8 @@ const TicketingFlow = () => {
                             <p className="text-2xl mb-1">@{userData.username}, you're in!</p>
                           )}
                           <p className="text-[#8B9092]">
-                            Now share your ticket to have a chance of winning limited swag.
+                            Now share your ticket to have a chance of winning AirPods Max and other
+                            limited swag.
                           </p>
                         </div>
                       ) : (

@@ -14,7 +14,7 @@ import dayjs from 'dayjs'
 
 export default function TicketActions() {
   const { userData, supabase } = useConfData()
-  const { platinum, username, secret: hasSecretTicket } = userData
+  const { platinum, username, metadata, secret: hasSecretTicket } = userData
   const [_imgReady, setImgReady] = useState(false)
   const [_loading, setLoading] = useState(false)
   const isTablet = useBreakpoint(1280)
@@ -55,10 +55,16 @@ export default function TicketActions() {
 
     setTimeout(async () => {
       if (social === 'twitter') {
-        await supabase.from(LW_TABLE).update({ sharedOnTwitter: 'now' }).eq('username', username)
+        await supabase
+          .from(LW_TABLE)
+          .update({ sharedOnTwitter: 'now', metadata: { ...metadata, hasSharedSecret: true } })
+          .eq('username', username)
         // window.open(tweetUrl, '_blank')
       } else if (social === 'linkedin') {
-        await supabase.from(LW_TABLE).update({ sharedOnLinkedIn: 'now' }).eq('username', username)
+        await supabase
+          .from(LW_TABLE)
+          .update({ sharedOnLinkedIn: 'now', metadata: { ...metadata, hasSharedSecret: true } })
+          .eq('username', username)
         // window.open(linkedInUrl, '_blank')
       }
     })
