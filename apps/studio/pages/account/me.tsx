@@ -5,6 +5,7 @@ import {
   AnalyticsSettings,
   ThemeSettingsOld,
   ThemeSettings,
+  AccountDeletion,
 } from 'components/interfaces/Account/Preferences'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { AccountLayout } from 'components/layouts'
@@ -75,6 +76,10 @@ const ProfileCard = observer(() => {
 
       <section>
         <AnalyticsSettings />
+      </section>
+
+      <section>
+        <AccountDeletion />
       </section>
     </article>
   )
