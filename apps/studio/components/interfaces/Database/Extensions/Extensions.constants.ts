@@ -12,6 +12,7 @@ export const HIDDEN_EXTENSIONS = [
   'pg_visibility',
   'pgstattuple',
   'supabase_vault',
+  'supautils',
   'intagg',
   'xml2',
   'pg_tle',

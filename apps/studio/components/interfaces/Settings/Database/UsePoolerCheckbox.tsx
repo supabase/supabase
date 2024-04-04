@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
   Badge,
@@ -20,6 +21,7 @@ import { useProjectSettingsQuery } from 'data/config/project-settings-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
+import Link from 'next/link'
 
 interface UsePoolerCheckboxInterface {
   id: string
@@ -36,6 +38,7 @@ export const UsePoolerCheckbox = ({
   onCheckedChange,
   onSelectPoolingMode,
 }: UsePoolerCheckboxInterface) => {
+  const router = useRouter()
   const [open, setOpen] = useState(false)
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
@@ -46,6 +49,7 @@ export const UsePoolerCheckbox = ({
   const { data: settings, isSuccess: isSuccessSettings } = useProjectSettingsQuery({ projectRef })
   const { data: pgBouncerStatus } = usePgBouncerStatus({ projectRef: projectRef })
 
+  const isDatabaseSettingsPage = router.pathname.endsWith('/settings/database')
   const readReplicasEnabled = project?.is_read_replicas_enabled
   const poolingConfiguration = readReplicasEnabled
     ? data?.find((x) => x.identifier === state.selectedDatabaseId)
@@ -116,22 +120,31 @@ export const UsePoolerCheckbox = ({
                                   <div className="px-2 text-xs flex flex-col gap-y-2">
                                     <p>
                                       To use transaction mode, change the pool mode in the{' '}
-                                      <span
-                                        tabIndex={0}
-                                        className="underline hover:text-foreground cursor-pointer transition"
-                                        onClick={() => {
-                                          const el = document.getElementById('connection-pooler')
-                                          if (el) {
-                                            setOpen(false)
-                                            el.scrollIntoView({
-                                              behavior: 'smooth',
-                                              block: 'center',
-                                            })
-                                          }
-                                        }}
-                                      >
-                                        pooling configuration settings
-                                      </span>{' '}
+                                      {isDatabaseSettingsPage ? (
+                                        <span
+                                          tabIndex={0}
+                                          className="underline hover:text-foreground cursor-pointer transition"
+                                          onClick={() => {
+                                            const el = document.getElementById('connection-pooler')
+                                            if (el) {
+                                              setOpen(false)
+                                              el.scrollIntoView({
+                                                behavior: 'smooth',
+                                                block: 'center',
+                                              })
+                                            }
+                                          }}
+                                        >
+                                          pooling configuration settings
+                                        </span>
+                                      ) : (
+                                        <Link
+                                          href={`/project/${projectRef}/settings/database#connection-pooler`}
+                                          className="underline hover:text-foreground"
+                                        >
+                                          pooling configuration settings
+                                        </Link>
+                                      )}{' '}
                                       to use transaction mode first.
                                     </p>
                                     <p>
@@ -161,9 +174,9 @@ export const UsePoolerCheckbox = ({
                 )}
               </div>
               <div className="flex items-center gap-x-1">
-                {isSuccess && checked && <Badge color="scale">Supavisor</Badge>}
+                {isSuccess && checked && <Badge>Supavisor</Badge>}
                 {isSuccessSettings && (
-                  <Badge color="scale">
+                  <Badge>
                     {checked
                       ? 'Resolves to IPv4'
                       : resolvesToIpV6
@@ -171,7 +184,9 @@ export const UsePoolerCheckbox = ({
                         : 'Will resolve to IPv6'}
                   </Badge>
                 )}
-                {pgBouncerStatus?.active && <Badge color="amber">PgBouncer pending removal</Badge>}
+                {pgBouncerStatus?.active && (
+                  <Badge variant="warning">PgBouncer pending removal</Badge>
+                )}
               </div>
             </div>
           </div>

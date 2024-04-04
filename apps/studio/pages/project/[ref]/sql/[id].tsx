@@ -1,6 +1,5 @@
 import { useMonaco } from '@monaco-editor/react'
 import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 
@@ -24,7 +23,7 @@ import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
   const monaco = useMonaco()
-  const { id, ref } = useParams()
+  const { id, ref, content } = useParams()
 
   const { project } = useProjectContext()
   const snap = useSqlEditorStateSnapshot()
@@ -104,11 +103,11 @@ const SqlEditor: NextPageWithLayout = () => {
   }
 
   useEffect(() => {
-    if (id === 'new' && appSnap.dashboardHistory.sql !== undefined) {
+    if (id === 'new' && appSnap.dashboardHistory.sql !== undefined && content === undefined) {
       const snippet = snippets.find((snippet) => snippet.id === appSnap.dashboardHistory.sql)
       if (snippet !== undefined) router.push(`/project/${ref}/sql/${appSnap.dashboardHistory.sql}`)
     }
-  }, [id, snippets])
+  }, [id, snippets, content])
 
   // Enable pgsql format
   useEffect(() => {
@@ -158,4 +157,4 @@ const SqlEditor: NextPageWithLayout = () => {
 
 SqlEditor.getLayout = (page) => <SQLEditorLayout title="SQL">{page}</SQLEditorLayout>
 
-export default observer(SqlEditor)
+export default SqlEditor

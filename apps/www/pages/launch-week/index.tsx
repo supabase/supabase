@@ -7,7 +7,6 @@ import { Session } from '@supabase/supabase-js'
 import { SITE_ORIGIN, SITE_URL } from '~/lib/constants'
 import supabase from '~/lib/supabaseMisc'
 
-import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -102,7 +101,6 @@ export default function LaunchWeekIndex({ meetups, latestPosts }: Props) {
           ],
         }}
       />
-      <FaviconImports />
       <ConfDataContext.Provider
         value={{
           supabase,

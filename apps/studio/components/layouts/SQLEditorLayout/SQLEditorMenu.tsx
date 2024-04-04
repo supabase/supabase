@@ -1,11 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { partition } from 'lodash'
 import { Plus } from 'lucide-react'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
+
+import { useParams } from 'common'
+import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
+import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
+import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
+import { useCheckPermissions, useSelectedProject } from 'hooks'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -17,6 +25,7 @@ import {
   Tooltip_Shadcn_,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import {
   InnerSideBarEmptyPanel,
   InnerSideBarFilterSearchInput,
@@ -28,20 +37,10 @@ import {
   InnerSideMenuItem,
   InnerSideMenuSeparator,
 } from 'ui-patterns/InnerSideMenu'
-
-import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
-import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useSelectedProject } from 'hooks'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import QueryItem from './QueryItem'
 import { selectItemsInRange } from './SQLEditorLayout.utils'
 
-const SideBarContent = observer(() => {
+const SideBarContent = () => {
   const { ref, id: activeId } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
@@ -274,6 +273,7 @@ const SideBarContent = observer(() => {
                         <QueryItem
                           key={tabInfo.id}
                           tabInfo={tabInfo}
+                          onDeleteQuery={postDeleteCleanup}
                           hasQueriesSelected={selectedQueries.length > 0}
                         />
                       ))}
@@ -349,38 +349,27 @@ const SideBarContent = observer(() => {
       </div>
 
       <ConfirmationModal
-        header="Confirm to delete query"
-        buttonLabel={`Delete ${selectedQueries.length.toLocaleString()} quer${selectedQueries.length > 1 ? 'ies' : 'y'}`}
-        buttonLoadingLabel="Deleting query"
+        title="Confirm to delete query"
+        confirmLabel={`Delete ${selectedQueries.length.toLocaleString()} quer${selectedQueries.length > 1 ? 'ies' : 'y'}`}
+        confirmLabelLoading="Deleting query"
         size="medium"
         loading={isDeleting}
         visible={showDeleteModal}
-        onSelectConfirm={onConfirmDelete}
-        onSelectCancel={() => setShowDeleteModal(false)}
-        danger
+        onConfirm={onConfirmDelete}
+        onCancel={() => setShowDeleteModal(false)}
+        variant={'destructive'}
+        alert={{
+          title: 'This action cannot be undone',
+          description: 'The selected SQL snippets cannot be recovered once deleted',
+        }}
       >
-        <Modal.Content>
-          <div className="my-6">
-            <div className="text-sm text-foreground-light grid gap-4">
-              <div className="grid gap-y-4">
-                <Alert_Shadcn_ variant="destructive">
-                  <WarningIcon />
-                  <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    The selected SQL snippets cannot be recovered once deleted
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
-                <p>
-                  Are you sure you want to delete the selected {selectedQueries.length} quer
-                  {selectedQueries.length > 1 ? 'ies' : 'y'}?
-                </p>
-              </div>
-            </div>
-          </div>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to delete the selected {selectedQueries.length} quer
+          {selectedQueries.length > 1 ? 'ies' : 'y'}?
+        </p>
       </ConfirmationModal>
     </>
   )
-})
+}
 
 export default SideBarContent

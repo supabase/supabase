@@ -12,7 +12,6 @@ import supabase from '~/lib/supabaseMisc'
 import { getNavLatestPosts } from '~/lib/posts'
 import PostTypes from '~/types/post'
 
-import FaviconImports from '~/components/LaunchWeek/X/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
@@ -113,7 +112,7 @@ export default function TicketsPage({ users, latestPosts }: Props) {
           ],
         }}
       />
-      <FaviconImports />
+      {/* <FaviconImports /> */}
       <DefaultLayout latestPosts={latestPosts}>
         <div>
           <SectionContainer className="z-10">

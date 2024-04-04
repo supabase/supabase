@@ -86,7 +86,6 @@ const parseValue = (originalValue: any, format: string) => {
   try {
     if (
       originalValue === null ||
-      (Array.isArray(originalValue) && originalValue.length === 0) ||
       (typeof originalValue === 'string' && originalValue.length === 0)
     ) {
       return originalValue

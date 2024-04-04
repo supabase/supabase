@@ -1,7 +1,13 @@
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+
+import Panel from 'components/ui/Panel'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
+import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-domains-activate-mutation'
+import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
+import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -12,13 +18,6 @@ import {
   Modal,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-
-import Panel from 'components/ui/Panel'
-import { useProjectApiQuery } from 'data/config/project-api-query'
-import { useCheckCNAMERecordMutation } from 'data/custom-domains/check-cname-mutation'
-import { useCustomDomainActivateMutation } from 'data/custom-domains/custom-domains-activate-mutation'
-import { useCustomDomainDeleteMutation } from 'data/custom-domains/custom-domains-delete-mutation'
-import type { CustomDomainResponse } from 'data/custom-domains/custom-domains-query'
 
 export type CustomDomainActivateProps = {
   projectRef?: string
@@ -148,23 +147,21 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
         size="small"
         loading={isCheckingRecord || isActivating}
         visible={isActivateConfirmModalVisible}
-        header={
-          <div>
+        title={
+          <>
             Are you sure you want to activate the custom domain{' '}
             <code className="text-sm">{customDomain.hostname}</code> for the project?
-          </div>
+          </>
         }
-        buttonLabel="Activate"
-        buttonLoadingLabel="Activating"
-        onSelectCancel={() => setIsActivateConfirmModalVisible(false)}
-        onSelectConfirm={onActivateCustomDomain}
+        confirmLabel="Activate"
+        confirmLabelLoading="Activating"
+        onCancel={() => setIsActivateConfirmModalVisible(false)}
+        onConfirm={onActivateCustomDomain}
       >
-        <Modal.Content className="py-3">
-          <p className="text-sm">The existing Supabase subdomain will be deactivated.</p>
-        </Modal.Content>
+        <p className="text-sm">The existing Supabase subdomain will be deactivated.</p>
       </ConfirmationModal>
     </>
   )
 }
 
-export default observer(CustomDomainActivate)
+export default CustomDomainActivate

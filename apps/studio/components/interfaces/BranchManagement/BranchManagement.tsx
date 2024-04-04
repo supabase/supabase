@@ -12,7 +12,6 @@ import { useBranchDeleteMutation } from 'data/branches/branch-delete-mutation'
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
 import { Branch, useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useGitHubPullRequestsQuery } from 'data/integrations/github-pull-requests-query'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import {
   AlertDescription_Shadcn_,
@@ -92,25 +91,9 @@ const BranchManagement = () => {
     new Date(a.updated_at) < new Date(b.updated_at) ? 1 : -1
   )
   const branchesWithPRs = previewBranches.filter((branch) => branch.pr_number !== undefined)
-  const prNumbers =
-    branches !== undefined
-      ? (branchesWithPRs.map((branch) => branch.pr_number).filter(Boolean) as number[])
-      : undefined
 
   const githubConnection = connections?.find((connection) => connection.project.ref === projectRef)
   const repo = githubConnection?.repository.name ?? ''
-
-  const {
-    data: allPullRequests,
-    error: pullRequestsError,
-    isLoading: isLoadingPullRequests,
-    isError: isErrorPullRequests,
-    isSuccess: isSuccessPullRequests,
-  } = useGitHubPullRequestsQuery({
-    connectionId: githubConnection?.id,
-    prNumbers,
-  })
-  const pullRequests = allPullRequests ?? []
 
   const isError = isErrorConnections || isErrorBranches
   const isLoading = isLoadingConnections || isLoadingBranches
@@ -276,7 +259,6 @@ const BranchManagement = () => {
                       repo={repo}
                       mainBranch={mainBranch}
                       previewBranches={previewBranches}
-                      pullRequests={pullRequests}
                       onViewAllBranches={() => setView('branches')}
                       onSelectCreateBranch={() => setShowCreateBranch(true)}
                       onSelectDeleteBranch={setSelectedBranchToDelete}
@@ -287,38 +269,23 @@ const BranchManagement = () => {
                     <BranchManagementSection
                       header={`${branchesWithPRs.length} branches with pull requests found`}
                     >
-                      {isLoadingPullRequests && <BranchLoader />}
-                      {isErrorPullRequests && (
-                        <AlertError
-                          error={pullRequestsError}
-                          subject="Failed to retrieve GitHub pull requests"
-                        />
-                      )}
-                      {isSuccessPullRequests && (
-                        <>
-                          {branchesWithPRs.length > 0 ? (
-                            branchesWithPRs.map((branch) => {
-                              const pullRequest = pullRequests?.find(
-                                (pr) => pr.branch === branch.git_branch && pr.repo === repo
-                              )
-                              return (
-                                <BranchRow
-                                  key={branch.id}
-                                  repo={repo}
-                                  branch={branch}
-                                  pullRequest={pullRequest}
-                                  generateCreatePullRequestURL={generateCreatePullRequestURL}
-                                  onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
-                                />
-                              )
-                            })
-                          ) : (
-                            <PullRequestsEmptyState
-                              url={generateCreatePullRequestURL()}
-                              hasBranches={previewBranches.length > 0}
+                      {branchesWithPRs.length > 0 ? (
+                        branchesWithPRs.map((branch) => {
+                          return (
+                            <BranchRow
+                              key={branch.id}
+                              repo={repo}
+                              branch={branch}
+                              generateCreatePullRequestURL={generateCreatePullRequestURL}
+                              onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
                             />
-                          )}
-                        </>
+                          )
+                        })
+                      ) : (
+                        <PullRequestsEmptyState
+                          url={generateCreatePullRequestURL()}
+                          hasBranches={previewBranches.length > 0}
+                        />
                       )}
                     </BranchManagementSection>
                   )}
@@ -338,15 +305,11 @@ const BranchManagement = () => {
                       )}
                       {isSuccessBranches &&
                         previewBranches.map((branch) => {
-                          const pullRequest = pullRequests?.find(
-                            (pr) => pr.branch === branch.git_branch && pr.repo === repo
-                          )
                           return (
                             <BranchRow
                               key={branch.id}
                               repo={repo}
                               branch={branch}
-                              pullRequest={pullRequest}
                               generateCreatePullRequestURL={generateCreatePullRequestURL}
                               onSelectDeleteBranch={() => setSelectedBranchToDelete(branch)}
                             />
@@ -374,51 +337,35 @@ const BranchManagement = () => {
         alert={{ title: 'You cannot recover this branch once deleted' }}
         text={
           <>
-            This will delete your database preview branch
+            This will delete your database preview branch{' '}
             <span className="text-bold text-foreground">{selectedBranchToDelete?.name}</span>.
           </>
         }
       />
 
       <ConfirmationModal
-        danger
+        variant={'destructive'}
         size="medium"
         loading={isDisabling}
         visible={showDisableBranching}
-        header="Confirm disable branching for project"
-        buttonLabel="Confirm disable branching"
-        buttonLoadingLabel="Disabling branching..."
-        onSelectConfirm={() => onConfirmDisableBranching()}
-        onSelectCancel={() => setShowDisableBranching(false)}
+        title="Confirm disable branching for project"
+        confirmLabel="Confirm disable branching"
+        confirmLabelLoading="Disabling branching..."
+        onConfirm={() => onConfirmDisableBranching()}
+        onCancel={() => setShowDisableBranching(false)}
+        alert={{
+          title: 'This action cannot be undone',
+          description:
+            'All database preview branches will be removed upon disabling branching. You may still re-enable branching again thereafter, but your existing preview branches will not be restored.',
+        }}
       >
-        <Modal.Content>
-          <div className="py-6">
-            <Alert_Shadcn_ variant="warning">
-              <IconAlertTriangle strokeWidth={2} />
-              <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                All database preview branches will be removed upon disabling branching. You may
-                still re-enable branching again thereafter, but your existing preview branches will
-                not be restored.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-            <ul className="mt-4 space-y-5">
-              <li className="flex gap-3">
-                <div>
-                  <strong className="text-sm">Before you disable branching, consider:</strong>
-                  <ul className="space-y-2 mt-2 text-sm text-foreground-light">
-                    <li className="list-disc ml-6">
-                      Your project no longer requires database previews.
-                    </li>
-                    <li className="list-disc ml-6">
-                      None of your database previews are currently being used in any app.
-                    </li>
-                  </ul>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </Modal.Content>
+        <p className="text-sm">Before you disable branching, consider:</p>
+        <ul className="space-y-2 mt-2 text-sm text-foreground-light">
+          <li className="list-disc ml-6">Your project no longer requires database previews.</li>
+          <li className="list-disc ml-6">
+            None of your database previews are currently being used in any app.
+          </li>
+        </ul>
       </ConfirmationModal>
 
       <CreateBranchModal visible={showCreateBranch} onClose={() => setShowCreateBranch(false)} />

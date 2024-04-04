@@ -1,14 +1,15 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { GitPullRequest } from 'lucide-react'
+import { GitPullRequest, RefreshCw, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { PropsWithChildren, ReactNode } from 'react'
+import { PropsWithChildren, ReactNode, useState } from 'react'
+import toast from 'react-hot-toast'
 import { useInView } from 'react-intersection-observer'
 
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBranchQuery } from 'data/branches/branch-query'
+import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
 import type { Branch } from 'data/branches/branches-query'
-import type { GitHubPullRequest } from 'data/integrations/github-pull-requests-query'
 import {
   Badge,
   Button,
@@ -20,8 +21,9 @@ import {
   IconExternalLink,
   IconMoreVertical,
   IconShield,
-  IconTrash,
+  Modal,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BranchStatusBadge from './BranchStatusBadge'
 
 interface BranchManagementSectionProps {
@@ -76,7 +78,6 @@ interface BranchRowProps {
   repo: string
   branch: Branch
   isMain?: boolean
-  pullRequest?: GitHubPullRequest
   generateCreatePullRequestURL?: (branchName?: string) => string
   onSelectDeleteBranch: () => void
 }
@@ -85,7 +86,6 @@ export const BranchRow = ({
   branch,
   isMain = false,
   repo,
-  pullRequest,
   generateCreatePullRequestURL,
   onSelectDeleteBranch,
 }: BranchRowProps) => {
@@ -114,6 +114,23 @@ export const BranchRow = ({
     }
   )
 
+  const [showConfirmResetModal, setShowConfirmResetModal] = useState(false)
+
+  const { mutate, isLoading: isResetting } = useBranchResetMutation({
+    onSuccess() {
+      toast.success('Success! Please allow a few seconds for the branch to reset.')
+      setShowConfirmResetModal(false)
+    },
+  })
+
+  function onConfirmReset() {
+    if (!projectRef) {
+      throw new Error('Invalid project reference')
+    }
+
+    mutate({ id: branch.id, projectRef })
+  }
+
   return (
     <div className="w-full flex items-center justify-between px-6 py-2.5" ref={ref}>
       <div className="flex items-center gap-x-4">
@@ -127,7 +144,7 @@ export const BranchRow = ({
             {branch.name}
           </Link>
         </Button>
-        {isActive && <Badge color="slate">Current</Badge>}
+        {isActive && <Badge>Current</Badge>}
         <BranchStatusBadge
           status={
             branch.status === 'CREATING_PROJECT' ? data?.status ?? branch.status : branch.status
@@ -138,10 +155,10 @@ export const BranchRow = ({
         </p>
       </div>
       <div className="flex items-center gap-x-8">
-        {pullRequest !== undefined && (
+        {branch.pr_number !== undefined && (
           <div className="flex items-center">
             <Link
-              href={pullRequest.url}
+              href={`https://github.com/${repo}/pull/${branch.pr_number}`}
               target="_blank"
               rel="noreferrer"
               className="text-xs transition text-foreground-lighter mr-4 hover:text-foreground"
@@ -158,9 +175,9 @@ export const BranchRow = ({
                 passHref
                 target="_blank"
                 rel="noreferer"
-                href={`http://github.com/${pullRequest.target.repo}/tree/${pullRequest.target.branch}`}
+                href={`http://github.com/${repo}/tree/${branch.git_branch}`}
               >
-                {pullRequest.target.branch}
+                {branch.git_branch}
               </Link>
             </Button>
           </div>
@@ -193,7 +210,11 @@ export const BranchRow = ({
                 passHref
                 target="_blank"
                 rel="noreferrer"
-                href={pullRequest?.url ?? createPullRequestURL}
+                href={
+                  branch.pr_number !== undefined
+                    ? `https://github.com/${repo}/pull/${branch.pr_number}`
+                    : createPullRequestURL
+                }
               >
                 {branch.pr_number !== undefined ? 'View Pull Request' : 'Create Pull Request'}
               </Link>
@@ -205,14 +226,38 @@ export const BranchRow = ({
               <DropdownMenuContent className="p-0 w-56" side="bottom" align="end">
                 <DropdownMenuItem
                   className="gap-x-2"
+                  onSelect={() => setShowConfirmResetModal(true)}
+                  onClick={() => setShowConfirmResetModal(true)}
+                >
+                  <RefreshCw size={14} />
+                  Reset Branch
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="gap-x-2"
                   onSelect={() => onSelectDeleteBranch?.()}
                   onClick={() => onSelectDeleteBranch?.()}
                 >
-                  <IconTrash size="tiny" />
-                  <p>Delete branch</p>
+                  <Trash2 size={14} />
+                  Delete branch
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+
+            <ConfirmationModal
+              variant={'destructive'}
+              visible={showConfirmResetModal}
+              confirmLabel="Reset branch"
+              title="Confirm branch reset"
+              loading={isResetting}
+              onCancel={() => {
+                setShowConfirmResetModal(false)
+              }}
+              onConfirm={onConfirmReset}
+            >
+              <p className="text-sm text-foreground-light">
+                Are you sure you want to reset the "{branch.name}" branch? All data will be deleted.
+              </p>
+            </ConfirmationModal>
           </div>
         )}
       </div>

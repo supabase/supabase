@@ -1,4 +1,3 @@
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { ReactElement } from 'react'
 
@@ -67,4 +66,4 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
   )
 }
 
-export default withAuth(observer(DocsLayout))
+export default withAuth(DocsLayout)

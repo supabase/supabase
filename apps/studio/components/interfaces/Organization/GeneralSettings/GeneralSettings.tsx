@@ -1,11 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 
+import { useParams } from 'common'
 import NoProjectsOnPaidOrgInfo from 'components/interfaces/Billing/NoProjectsOnPaidOrgInfo'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import {
@@ -23,8 +22,8 @@ import { Collapsible, Form, IconChevronRight, Input, Toggle, cn } from 'ui'
 import OrganizationDeletePanel from './OrganizationDeletePanel'
 
 const GeneralSettings = () => {
-  const queryClient = useQueryClient()
   const { slug } = useParams()
+  const queryClient = useQueryClient()
   const [open, setOpen] = useState(false)
   const selectedOrganization = useSelectedOrganization()
   const { name, opt_in_tags } = selectedOrganization ?? {}
@@ -199,4 +198,4 @@ const GeneralSettings = () => {
   )
 }
 
-export default observer(GeneralSettings)
+export default GeneralSettings

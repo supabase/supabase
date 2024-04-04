@@ -11,7 +11,7 @@ export default function LaunchHero() {
           <div className="flex flex-col gap-3">
             <h3 className="text-foreground text-4xl tracking-tight">Launch Week Hackathon</h3>
             <div>
-              <Badge color="red">Closed</Badge>
+              <Badge variant="destructive">Closed</Badge>
             </div>
             <h4 className="text-foreground-light text-xl">
               Submissions close Sunday 21st Aug 23:59 (PT).

@@ -1,4 +1,4 @@
-import type { AuthError } from '@supabase/gotrue-js'
+import type { AuthError } from '@supabase/auth-js'
 import type { Factor } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
 import Link from 'next/link'
@@ -12,7 +12,6 @@ import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useMfaChallengeAndVerifyMutation } from 'data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaListFactorsQuery } from 'data/profile/mfa-list-factors-query'
-import { useStore } from 'hooks'
 import { useSignOut } from 'lib/auth'
 import { getReturnToPath } from 'lib/gotrue'
 import Telemetry from 'lib/telemetry'
@@ -23,7 +22,6 @@ const signInSchema = object({
 })
 
 const SignInMfaForm = () => {
-  const { ui } = useStore()
   const queryClient = useQueryClient()
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
@@ -61,10 +59,7 @@ const SignInMfaForm = () => {
   }, [factors?.totp, isSuccessFactors, router, queryClient])
 
   const onSignIn = async ({ code }: { code: string }) => {
-    const toastId = ui.setNotification({
-      category: 'loading',
-      message: `Signing in...`,
-    })
+    const toastId = toast.loading('Signing in...')
     if (selectedFactor) {
       await mfaChallengeAndVerify(
         { factorId: selectedFactor.id, code, refreshFactors: false },

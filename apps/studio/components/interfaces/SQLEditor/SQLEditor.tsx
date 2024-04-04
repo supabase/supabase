@@ -1,12 +1,33 @@
 import type { Monaco } from '@monaco-editor/react'
 import { useChat } from 'ai/react'
-import { useParams, useTelemetryProps } from 'common'
 import { AnimatePresence, motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import { format } from 'sql-formatter'
+
+import { useParams, useTelemetryProps } from 'common'
+import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
+import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
+import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
+import type { SqlSnippet } from 'data/content/sql-snippets-query'
+import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { useFormatQueryMutation } from 'data/sql/format-sql-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { isError } from 'data/utils/error-check'
+import { useFlag, useLocalStorageQuery, useSelectedOrganization, useSelectedProject } from 'hooks'
+import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
+import Telemetry from 'lib/telemetry'
+import { useAppStateSnapshot } from 'state/app-state'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
+import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import {
   AiIconAnimation,
   IconCornerDownLeft,
@@ -20,33 +41,6 @@ import {
   cn,
 } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
-
-import { useSqlEditMutation } from 'data/ai/sql-edit-mutation'
-import { useSqlGenerateMutation } from 'data/ai/sql-generate-mutation'
-import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
-import type { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useFormatQueryMutation } from 'data/sql/format-sql-query'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { isError } from 'data/utils/error-check'
-import {
-  useFlag,
-  useLocalStorageQuery,
-  useSelectedOrganization,
-  useSelectedProject,
-  useStore,
-} from 'hooks'
-import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
-import Telemetry from 'lib/telemetry'
-import { useAppStateSnapshot } from 'state/app-state'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
-import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useIsSQLEditorAiAssistantEnabled } from '../App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from '../Billing/Subscription/Subscription.utils'
 import AISchemaSuggestionPopover from './AISchemaSuggestionPopover'
@@ -89,7 +83,6 @@ export function useSqlEditor() {
 }
 
 const SQLEditor = () => {
-  const { ui } = useStore()
   const { ref, id: urlId } = useParams()
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
@@ -395,13 +388,10 @@ const SQLEditor = () => {
         snap.addNeedsSaving(snippet.id!)
         router.push(`/project/${ref}/sql/${snippet.id}`)
       } catch (error: any) {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to create new query: ${error.message}`,
-        })
+        toast.error(`Failed to create new query: ${error.message}`)
       }
     },
-    [profile?.id, project?.id, ref, router, snap, ui]
+    [profile?.id, project?.id, ref, router, snap]
   )
 
   const updateEditorWithCheckForDiff = ({
@@ -742,11 +732,9 @@ const SQLEditor = () => {
 
                                     // If this was an edit and AI returned the same SQL as before
                                     if (currentSql && formattedSql.trim() === currentSql.trim()) {
-                                      ui.setNotification({
-                                        category: 'error',
-                                        message:
-                                          'Unable to edit SQL. Try adding more details to your prompt.',
-                                      })
+                                      toast.error(
+                                        'Unable to edit SQL. Try adding more details to your prompt.'
+                                      )
                                       return
                                     }
 
@@ -756,16 +744,9 @@ const SQLEditor = () => {
                                     })
                                     setSelectedDiffType(DiffType.Modification)
 
-                                    if (title) {
-                                      setPendingTitle(title)
-                                    }
+                                    if (title) setPendingTitle(title)
                                   } catch (error: unknown) {
-                                    if (isError(error)) {
-                                      ui.setNotification({
-                                        category: 'error',
-                                        message: error.message,
-                                      })
-                                    }
+                                    if (isError(error)) toast.error(error.message)
                                   }
                                 }
                               }}
