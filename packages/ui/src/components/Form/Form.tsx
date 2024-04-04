@@ -66,6 +66,7 @@ export default function Form({ validate, ...props }: Props) {
         values={formik.values}
         errors={formik.errors}
         formContextOnChange={formik.handleChange}
+        setFieldValue={formik.setFieldValue}
         handleBlur={formik.handleBlur}
         touched={formik.touched}
         fieldLevelValidation={handleFieldLevelValidation}

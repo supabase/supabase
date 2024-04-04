@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
@@ -9,6 +9,7 @@ import {
   Form,
   IconAlertCircle,
   Toggle,
+  Input,
 } from 'ui'
 import { boolean, object, string } from 'yup'
 
@@ -24,10 +25,15 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions } from 'hooks'
 import SchemaFunctionSelector from './SchemaFunctionSelector'
+import HookSelector from './HookSelector'
 
 const schema = object({
   HOOKS_CUSTOM_ACCESS_TOKEN_ENABLED: boolean(),
-  HOOKS_CUSTOM_ACCESS_TOKEN_URI: string(),
+  HOOKS_CUSTOM_ACCESS_TOKEN_URI: string().url(),
+  HOOKS_SEND_SMS_ENABLED: boolean(),
+  HOOKS_SEND_SMS_URI: string().url(),
+  HOOKS_SEND_EMAIL_ENABLED: boolean(),
+  HOOKS_SEND_EMAIL_URI: string().url(),
 })
 
 const formId = 'auth-basic-hooks-form'
@@ -48,6 +54,10 @@ const BasicHooksConfig = () => {
   const INITIAL_VALUES = {
     HOOK_CUSTOM_ACCESS_TOKEN_ENABLED: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_ENABLED || false,
     HOOK_CUSTOM_ACCESS_TOKEN_URI: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_URI || '',
+    HOOK_SEND_SMS_ENABLED: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_ENABLED || false,
+    HOOK_SEND_SMS_URI: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_URI || '',
+    HOOK_SEND_EMAIL_ENABLED: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_ENABLED || false,
+    HOOK_SEND_EMAIL_URI: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_URI || '',
   }
 
   const onSubmit = (values: any, { resetForm }: any) => {
@@ -55,6 +65,14 @@ const BasicHooksConfig = () => {
 
     if (payload.HOOK_CUSTOM_ACCESS_TOKEN_URI === '') {
       payload.HOOK_CUSTOM_ACCESS_TOKEN_URI = null
+    }
+
+    if (payload.HOOK_SEND_SMS_URI === '') {
+      payload.HOOK_SEND_SMS_URI = null
+    }
+
+    if (payload.HOOK_SEND_EMAIL_URI === '') {
+      payload.HOOK_SEND_EMAIL_URI = null
     }
 
     updateAuthConfig(
@@ -95,8 +113,8 @@ const BasicHooksConfig = () => {
         return (
           <>
             <FormHeader
-              title="Auth Hooks (Beta)"
-              description="Use PostgreSQL functions to customize the behavior of Supabase Auth to meet your needs."
+              title="Auth Hooks"
+              description="Use Postgres functions or HTTP endpoints to customize the behavior of Supabase Auth to meet your needs."
             />
             <FormPanel
               disabled={true}
@@ -121,22 +139,39 @@ const BasicHooksConfig = () => {
                 header={<FormSectionLabel>Customize Access Token (JWT) Claims</FormSectionLabel>}
               >
                 <FormSectionContent loading={isLoading}>
-                  <SchemaFunctionSelector
-                    id="HOOK_CUSTOM_ACCESS_TOKEN_URI"
-                    descriptionText="Select the function to be called by Supabase Auth each time a new JWT is created. It should return the claims you wish to be present in the JWT."
+                  <HookSelector
+                    uriId={'HOOK_CUSTOM_ACCESS_TOKEN_URI'}
+                    enabledId={'HOOK_CUSTOM_ACCESS_TOKEN_ENABLED'}
+                    descriptionTextPostgres="Select the function to be called by Supabase Auth each time a new JWT is created. It should return the claims you wish to be present in the JWT."
+                    descriptionTextWeb="Supabase Auth will send a HTTP POST request to this URL each time a new JWT is created. It should return the claims you wish to be present in the JWT."
                     values={values}
                     setFieldValue={setFieldValue}
-                    disabled={!canUpdateConfig}
                   />
-                  {values.HOOK_CUSTOM_ACCESS_TOKEN_URI && (
-                    <Toggle
-                      id="HOOK_CUSTOM_ACCESS_TOKEN_ENABLED"
-                      size="medium"
-                      label="Enable hook"
-                      layout="flex"
-                      disabled={!canUpdateConfig}
-                    />
-                  )}
+                </FormSectionContent>
+              </FormSection>
+
+              <FormSection header={<FormSectionLabel>Send SMS Hook</FormSectionLabel>}>
+                <FormSectionContent loading={isLoading}>
+                  <HookSelector
+                    uriId="HOOK_SEND_SMS_URI"
+                    enabledId="HOOK_SEND_SMS_ENABLED"
+                    descriptionTextPostgres="Select the function to be called by Supabase Auth each time an SMS message needs to be sent."
+                    descriptionTextWeb="Supabase Auth will send a HTTP POST request to this URL each time an SMS message needs to be sent."
+                    values={values}
+                    setFieldValue={setFieldValue}
+                  />
+                </FormSectionContent>
+              </FormSection>
+              <FormSection header={<FormSectionLabel>Send Email Hook</FormSectionLabel>}>
+                <FormSectionContent loading={isLoading}>
+                  <HookSelector
+                    uriId="HOOK_SEND_EMAIL_URI"
+                    enabledId="HOOK_SEND_EMAIL_ENABLED"
+                    descriptionTextPostgres="Select the function to be called by Supabase Auth each time an email message needs to be sent."
+                    descriptionTextWeb="Supabase Auth will send a HTTP POST request to this URL each time an email message needs to be sent."
+                    values={values}
+                    setFieldValue={setFieldValue}
+                  />
                 </FormSectionContent>
               </FormSection>
               <div className="border-t border-muted"></div>

@@ -25,7 +25,8 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
-import SchemaFunctionSelector from './SchemaFunctionSelector'
+
+import HookSelector from './HookSelector'
 
 const schema = object({
   HOOKS_MFA_VERIFICATION_ATTEMPT_ENABLED: boolean(),
@@ -149,22 +150,15 @@ const EnterpriseHooksConfig = () => {
               <div className={isTeamsEnterprisePlan ? '' : 'opacity-50'}>
                 <FormSection header={<FormSectionLabel>MFA Verification Attempt</FormSectionLabel>}>
                   <FormSectionContent loading={isLoading}>
-                    <SchemaFunctionSelector
-                      id="HOOK_MFA_VERIFICATION_ATTEMPT_URI"
-                      descriptionText="Select the function to be called by Supabase Auth each time a user tries to verify an MFA factor. Return a decision on whether to reject the attempt and future ones, or to allow the user to keep trying."
+                    <HookSelector
+                      uriId="HOOK_MFA_VERIFICATION_ATTEMPT_URI"
+                      enabledId="HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED"
+                      descriptionTextPostgres="Select the function to be called by Supabase Auth each time a user tries to verify an MFA factor. Return a decision on whether to reject the attempt and future ones, or to allow the user to keep trying."
+                      descriptionTextWeb="Supabase Auth will send a HTTP POST request to this URL each time a user tries to verify an MFA factor. Return a decision on whether to reject the attempt and future ones, or to allow the user to keep trying."
                       values={values}
                       setFieldValue={setFieldValue}
                       disabled={!canUpdateConfig || !isTeamsEnterprisePlan}
                     />
-                    {values.HOOK_MFA_VERIFICATION_ATTEMPT_URI && (
-                      <Toggle
-                        id="HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED"
-                        size="small"
-                        label="Enable hook"
-                        layout="flex"
-                        disabled={!canUpdateConfig || !isTeamsEnterprisePlan}
-                      />
-                    )}
                   </FormSectionContent>
                 </FormSection>
                 <div className="border-t border-muted"></div>
@@ -173,22 +167,15 @@ const EnterpriseHooksConfig = () => {
                   header={<FormSectionLabel>Password Verification Attempt</FormSectionLabel>}
                 >
                   <FormSectionContent loading={isLoading}>
-                    <SchemaFunctionSelector
-                      id="HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI"
-                      descriptionText="Select the function to be called by Supabase Auth each time a user tries to sign in with a password. Return a decision whether to allow the user to reject the attempt, or to allow the user to keep trying."
+                    <HookSelector
+                      uriId="HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI"
+                      enabledId="HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED"
+                      descriptionTextPostgres="Select the function to be called by Supabase Auth each time a user tries to sign in with a password. Return a decision whether to allow the user to reject the attempt, or to allow the user to keep trying."
+                      descriptionTextWeb="Supabase Auth will send a HTTP POST request to this URL each time a user tries to sign in with a password. Return a decision whether to allow the user to reject the attempt, or to allow the user to keep trying."
                       values={values}
                       setFieldValue={setFieldValue}
                       disabled={!canUpdateConfig || !isTeamsEnterprisePlan}
                     />
-                    {values.HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI && (
-                      <Toggle
-                        id="HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED"
-                        size="small"
-                        label="Enable hook"
-                        layout="flex"
-                        disabled={!canUpdateConfig || !isTeamsEnterprisePlan}
-                      />
-                    )}
                   </FormSectionContent>
                 </FormSection>
               </div>
