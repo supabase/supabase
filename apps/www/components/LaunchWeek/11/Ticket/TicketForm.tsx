@@ -5,7 +5,6 @@ import { SITE_ORIGIN } from '~/lib/constants'
 import { Button, IconCheckCircle } from 'ui'
 
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
-import TicketPresence from './TicketPresence'
 
 type FormState = 'default' | 'loading' | 'error'
 

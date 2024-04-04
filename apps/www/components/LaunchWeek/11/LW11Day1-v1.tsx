@@ -1,7 +1,8 @@
 import React from 'react'
 import Link from 'next/link'
 import { ArrowRightIcon } from '@heroicons/react/outline'
-import { IconEdit2, cn } from 'ui'
+import { cn } from 'ui'
+import { Edit } from 'lucide-react'
 import { WeekDayProps } from './Releases/data'
 import { DayLink } from './Releases/components'
 
@@ -29,7 +30,7 @@ const LW11Day1 = ({ day, className }: { day: WeekDayProps; className?: string })
           href={day.blog}
           className="relative group/link flex items-center gap-2 text-sm translate-x-0 !ease-[.24,0,.22,.99] duration-200 hover:-translate-x-6 transition-transform hover:cursor-pointer"
         >
-          <IconEdit2 className="w-4 min-w-4 group-hover/link:opacity-0 transition-opacity" />
+          <Edit className="w-4 min-w-4 group-hover/link:opacity-0 transition-opacity" />
           <span>Blog post</span>
           <ArrowRightIcon className="w-4 opacity-0 group-hover/link:opacity-100 transition-opacity" />
         </Link>
