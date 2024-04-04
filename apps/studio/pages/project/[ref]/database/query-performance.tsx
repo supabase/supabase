@@ -6,7 +6,6 @@ import ReactMarkdown from 'react-markdown'
 import { useParams } from 'common'
 import { QueryPerformanceFilterBar } from 'components/interfaces/QueryPerformance/QueryPerformanceFilterBar'
 import { QueryPerformanceLoadingRow } from 'components/interfaces/QueryPerformance/QueryPerformanceLoadingRow'
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import ReportQueryPerformanceTableRow from 'components/interfaces/Reports/ReportQueryPerformanceTableRow'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
@@ -16,6 +15,7 @@ import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
+import { FormHeader } from 'components/ui/Forms'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { useFlag } from 'hooks'
 import type { NextPageWithLayout } from 'types'
@@ -82,7 +82,6 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
 
   const headerText = (
     <p className="whitespace-pre-wrap prose text-sm max-w-2xl text-foreground-light">
-      Identify the queries that consume the most time and database resources.
       {'\n\n'}It relies on the <code>pg_stat_statements</code> table. Read more about{' '}
       <Link
         href="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
@@ -116,7 +115,12 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     <ScaffoldContainer>
       <ScaffoldSection>
         <div className="col-span-12">
-          <ReportHeader title="Query Performance" isLoading={isLoading} onRefresh={handleRefresh} />
+          <FormHeader
+            className="!mb-0"
+            title="Query Performance"
+            description="Identify the queries that consume the most time and database resources."
+          />
+
           {tableIndexEfficiencyEnabled && (
             <Accordion
               openBehaviour="multiple"
