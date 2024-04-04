@@ -145,7 +145,8 @@ const TicketingFlow = () => {
                         <div>
                           <p className="text-2xl mb-1">@{userData.username}, almost there!</p>
                           <p className="text-[#8B9092]">
-                            Keep sharing to max out your chances of winning.
+                            Keep sharing to max out your chances of winning winning AirPods Max and
+                            other limited swag.
                           </p>
                         </div>
                       )}
