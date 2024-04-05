@@ -60,8 +60,6 @@ PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 
 Create a new `hooks.server.js` file in the root of your project and populate with the following to retrieve the user session.
 
-The session information from `getSession` is supplied to the Supabase client so it can retrieve the auth token. This is safe, since the auth token signature will be revalidated on the Auth server. But you shouldn't trust the unsigned data that is stored alongside the auth token:
-
 <GetSessionWarning />
 
 ```js src/hooks.server.js
@@ -77,15 +75,23 @@ export const handle = async ({ event, resolve }) => {
   })
 
   /**
-   * a little helper that is written for convenience so that instead
-   * of calling `const { data: { session } } = await supabase.auth.getSession()`
-   * you just call this `await getSession()`
+   * Unlike `supabase.auth.getSession`, which is unsafe on the server because it
+   * doesn't validate the JWT, this function validates the JWT by first calling
+   * `getUser` and aborts early if the JWT signature is invalid.
    */
-  event.locals.getSession = async () => {
+  event.locals.safeGetSession = async () => {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser()
+    if (error) {
+      return { session: null, user: null }
+    }
+
     const {
       data: { session },
     } = await event.locals.supabase.auth.getSession()
-    return session
+    return { session, user }
   }
 
   return resolve(event, {
@@ -116,15 +122,23 @@ export const handle: Handle = async ({ event, resolve }) => {
   })
 
   /**
-   * a little helper that is written for convenience so that instead
-   * of calling `const { data: { session } } = await supabase.auth.getSession()`
-   * you just call this `await getSession()`
+   * Unlike `supabase.auth.getSession`, which is unsafe on the server because it
+   * doesn't validate the JWT, this function validates the JWT by first calling
+   * `getUser` and aborts early if the JWT signature is invalid.
    */
-  event.locals.getSession = async () => {
+  event.locals.safeGetSession = async () => {
+    const {
+      data: { user },
+      error,
+    } = await supabase.auth.getUser()
+    if (error) {
+      return { session: null, user: null }
+    }
+
     const {
       data: { session },
     } = await event.locals.supabase.auth.getSession()
-    return session
+    return { session, user }
   }
 
   return resolve(event, {
@@ -203,17 +217,18 @@ In order to get the most out of TypeScript and it's intellisense, you should imp
 ```ts src/app.d.ts
 // src/app.d.ts
 
-import { SupabaseClient, Session } from '@supabase/supabase-js'
+import { SupabaseClient, Session, User } from '@supabase/supabase-js'
 import { Database } from './DatabaseDefinitions'
 
 declare global {
   namespace App {
     interface Locals {
       supabase: SupabaseClient<Database>
-      getSession(): Promise<Session | null>
+      safeGetSession(): Promise<{ session: Session | null; user: User | null }>
     }
     interface PageData {
       session: Session | null
+      user: User | null
     }
     // interface Error {}
     // interface Platform {}
@@ -248,9 +263,12 @@ To make the session available across the UI, including pages and layouts, it is 
 
 ```js src/routes/+layout.server.js
 // src/routes/+layout.server.js
-export const load = async ({ locals: { getSession } }) => {
+export const load = async ({ locals: { safeGetSession } }) => {
+  const { session, user } = await safeGetSession()
+
   return {
-    session: await getSession(),
+    session,
+    user,
   }
 }
 ```
@@ -260,9 +278,12 @@ export const load = async ({ locals: { getSession } }) => {
 
 ```ts src/routes/+layout.server.ts
 // src/routes/+layout.server.ts
-export const load = async ({ locals: { getSession } }) => {
+export const load = async ({ locals: { safeGetSession } }) => {
+  const { session, user } = await safeGetSession()
+
   return {
-    session: await getSession(),
+    session,
+    user,
   }
 }
 ```
@@ -298,6 +319,11 @@ export const load = async ({ fetch, data, depends }) => {
     serverSession: data.session,
   })
 
+  /**
+   * It's fine to use `getSession` here, because on the client, `getSession` is
+   * safe, and on the server, it reads `session` from the `LayoutData`, which
+   * safely checked the session using `safeGetSession`.
+   */
   const {
     data: { session },
   } = await supabase.auth.getSession()
@@ -326,6 +352,11 @@ export const load = async ({ fetch, data, depends }) => {
     serverSession: data.session,
   })
 
+  /**
+   * It's fine to use `getSession` here, because on the client, `getSession` is
+   * safe, and on the server, it reads `session` from the `LayoutData`, which
+   * safely checked the session using `safeGetSession`.
+   */
   const {
     data: { session },
   } = await supabase.auth.getSession()
@@ -546,8 +577,8 @@ Wrap an API Route to check that the user has a valid session. If they're not log
 // src/routes/api/protected-route/+server.ts
 import { json, error } from '@sveltejs/kit'
 
-export const GET = async ({ locals: { supabase, getSession } }) => {
-  const session = await getSession()
+export const GET = async ({ locals: { supabase, safeGetSession } }) => {
+  const { session } = await safeGetSession()
   if (!session) {
     // the user is not signed in
     throw error(401, { message: 'Unauthorized' })
@@ -569,8 +600,8 @@ Wrap an Action to check that the user has a valid session. If they're not logged
 import { error, fail } from '@sveltejs/kit'
 
 export const actions = {
-  createPost: async ({ request, locals: { supabase, getSession } }) => {
-    const session = await getSession()
+  createPost: async ({ request, locals: { supabase, safeGetSession } }) => {
+    const { session } = await safeGetSession()
 
     if (!session) {
       // the user is not signed in
@@ -629,15 +660,21 @@ async function supabase({ event, resolve }) {
   })
 
   /**
-   * a little helper that is written for convenience so that instead
-   * of calling `const { data: { session } } = await supabase.auth.getSession()`
-   * you just call this `await getSession()`
+   * Unlike `supabase.auth.getSession`, which is unsafe on the server because it
+   * doesn't validate the JWT, this function validates the JWT by first calling
+   * `getUser` and aborts early if the JWT signature is invalid.
    */
-  event.locals.getSession = async () => {
+  event.locals.safeGetSession = async () => {
+    const {
+      data: { user },
+      error,
+    } = await event.locals.supabase.auth.getUser()
+    if (error) return { session: null, user: null }
+
     const {
       data: { session },
     } = await event.locals.supabase.auth.getSession()
-    return session
+    return { session, user }
   }
 
   return resolve(event, {
@@ -650,7 +687,7 @@ async function supabase({ event, resolve }) {
 async function authorization({ event, resolve }) {
   // protect requests to all routes that start with /protected-routes
   if (event.url.pathname.startsWith('/protected-routes') && event.request.method === 'GET') {
-    const session = await event.locals.getSession()
+    const { session } = await event.locals.safeGetSession()
     if (!session) {
       // the user is not signed in
       redirect(303, '/')
@@ -659,7 +696,7 @@ async function authorization({ event, resolve }) {
 
   // protect POST requests to all routes that start with /protected-posts
   if (event.url.pathname.startsWith('/protected-posts') && event.request.method === 'POST') {
-    const session = await event.locals.getSession()
+    const { session } = await event.locals.safeGetSession()
     if (!session) {
       // the user is not signed in
       throw error(303, '/')
@@ -691,15 +728,21 @@ async function supabase({ event, resolve }) {
   })
 
   /**
-   * a little helper that is written for convenience so that instead
-   * of calling `const { data: { session } } = await supabase.auth.getSession()`
-   * you just call this `await getSession()`
+   * Unlike `supabase.auth.getSession`, which is unsafe on the server because it
+   * doesn't validate the JWT, this function validates the JWT by first calling
+   * `getUser` and aborts early if the JWT signature is invalid.
    */
-  event.locals.getSession = async () => {
+  event.locals.safeGetSession = async () => {
+    const {
+      data: { user },
+      error,
+    } = await event.locals.supabase.auth.getUser()
+    if (error) return { session: null, user: null }
+
     const {
       data: { session },
     } = await event.locals.supabase.auth.getSession()
-    return session
+    return { session, user }
   }
 
   return resolve(event, {
@@ -712,7 +755,7 @@ async function supabase({ event, resolve }) {
 async function authorization({ event, resolve }) {
   // protect requests to all routes that start with /protected-routes
   if (event.url.pathname.startsWith('/protected-routes') && event.request.method === 'GET') {
-    const session = await event.locals.getSession()
+    const { session } = await event.locals.safeGetSession()
     if (!session) {
       // the user is not signed in
       redirect(303, '/')
@@ -721,7 +764,7 @@ async function authorization({ event, resolve }) {
 
   // protect POST requests to all routes that start with /protected-posts
   if (event.url.pathname.startsWith('/protected-posts') && event.request.method === 'POST') {
-    const session = await event.locals.getSession()
+    const { session } = await event.locals.safeGetSession()
     if (!session) {
       // the user is not signed in
       throw error(303, '/')
@@ -910,15 +953,21 @@ export const handle: Handle = async ({ event, resolve }) => {
   })
 
   /**
-   * a little helper that is written for convenience so that instead
-   * of calling `const { data: { session } } = await supabase.auth.getSession()`
-   * you just call this `await getSession()`
+   * Unlike `supabase.auth.getSession`, which is unsafe on the server because it
+   * doesn't validate the JWT, this function validates the JWT by first calling
+   * `getUser` and aborts early if the JWT signature is invalid.
    */
-  event.locals.getSession = async () => {
+  event.locals.safeGetSession = async () => {
+    const {
+      data: { user },
+      error,
+    } = await event.locals.supabase.auth.getUser()
+    if (error) return { session: null, user: null }
+
     const {
       data: { session },
     } = await event.locals.supabase.auth.getSession()
-    return session
+    return { session, user }
   }
 
   return resolve(event, {
@@ -1069,17 +1118,18 @@ declare namespace App {
 
 ```ts src/app.d.ts
 // src/app.d.ts
-import { SupabaseClient, Session } from '@supabase/supabase-js'
+import { SupabaseClient, Session, User } from '@supabase/supabase-js'
 import { Database } from './DatabaseDefinitions'
 
 declare global {
   namespace App {
     interface Locals {
       supabase: SupabaseClient<Database>
-      getSession(): Promise<Session | null>
+      safeGetSession(): Promise<{ session: Session | null; user: User | null }>
     }
     interface PageData {
       session: Session | null
+      user: User | null
     }
     // interface Error {}
     // interface Platform {}
@@ -1210,7 +1260,7 @@ import type { RequestHandler } from './$types'
 import { json, error } from '@sveltejs/kit'
 
 export const GET: RequestHandler = async ({ locals: { supabase, getSession } }) => {
-  const session = await getSession()
+  const { session } = await getSession()
   if (!session) {
     // the user is not signed in
     throw error(401, { message: 'Unauthorized' })
