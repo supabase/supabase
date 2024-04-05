@@ -39,7 +39,7 @@ npm install
 In order to get the file picker to work you must first prebuild the project before running it.
 
 ```bash
-expo prebuild
+npm run prebuild
 ```
 
 ### 5. Run the application
