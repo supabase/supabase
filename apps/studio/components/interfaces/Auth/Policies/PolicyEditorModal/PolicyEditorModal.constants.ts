@@ -173,3 +173,244 @@ for select using (
     roles: [],
   },
 ]
+
+export const getRealtimePolicyTemplates = (
+  table: string,
+  templateData?: Record<string, string>
+): PolicyTemplate[] => {
+  if (table === 'broadcasts') {
+    const results = [
+      {
+        id: 'policy-broadcast-1',
+        preview: false,
+        templateName: 'Enable listening to broadcasts for authenticated users only',
+        description: 'This policy enables listening to broadcasts for authenticated users only.',
+        statement: `
+  create policy "Enable listening to broadcasts for authenticated users only"
+  on realtime.broadcasts for select
+  to authenticated
+  using ( true );`.trim(),
+        name: 'Enable listening to broadcasts for authenticated users only',
+        definition: 'true',
+        check: '',
+        command: 'SELECT',
+        roles: ['authenticated'],
+      },
+      {
+        id: 'policy-broadcast-2',
+        preview: false,
+        templateName: 'Enable pushing broadcasts for authenticated users only',
+        description: 'This policy enables pushing broadcasts for authenticated users only.',
+        statement: `
+        create policy "Enable pushing broadcasts for authenticated users only"
+ON realtime.broadcasts for update
+TO authenticated
+using ( true )
+with check ( true );`.trim(),
+        name: 'Enable pushing broadcasts for authenticated users only',
+        definition: 'true',
+        check: 'true',
+        command: 'UPDATE',
+        roles: ['authenticated'],
+      },
+    ] as PolicyTemplate[]
+
+    if (templateData && templateData['channelId']) {
+      results.push(
+        {
+          id: 'policy-broadcast-3',
+          preview: false,
+          templateName: 'Enable listening to broadcasts from a specific channel',
+          description: 'This policy enables listening to broadcasts from a specific channel.',
+          statement: `
+    create policy "Enable listening to broadcasts from a specific channel"
+    on realtime.broadcasts for select
+    using ( channel_id = ${templateData['channelId']} );`.trim(),
+          name: 'Enable listening to broadcasts from a specific channel',
+          definition: `channel_id = ${templateData['channelId']}`,
+          check: '',
+          command: 'SELECT',
+          roles: [],
+        },
+        {
+          id: 'policy-broadcast-2',
+          preview: false,
+          templateName: 'Enable pushing broadcasts to specific channel',
+          description: 'This policy enables pushing broadcasts to specific channel.',
+          statement: `
+          create policy "Enable pushing broadcasts to specific channel"
+  ON realtime.broadcasts for update
+  using ( channel_id = ${templateData['channelId']} )
+  with check ( channel_id = ${templateData['channelId']} );`.trim(),
+          name: 'Enable pushing broadcasts to specific channel',
+          definition: `channel_id = ${templateData['channelId']}`,
+          check: `channel_id = ${templateData['channelId']}`,
+          command: 'UPDATE',
+          roles: [],
+        }
+      )
+    }
+
+    return results
+  }
+
+  if (table === 'presences') {
+    const results = [
+      {
+        id: 'policy-presences-1',
+        preview: false,
+        templateName: 'Enable listening to presences on all channels for authenticated users only',
+        description:
+          'This policy enables listening to presences on all channels for all authenticated users only.',
+        statement: `
+  create policy "Enable listening to presences on all channels for authenticated users only"
+  on realtime.presences for select
+  to authenticated
+  using ( true );`.trim(),
+        name: 'Enable listening to presences on all channels for authenticated users only',
+        definition: 'true',
+        check: '',
+        command: 'SELECT',
+        roles: ['authenticated'],
+      },
+      {
+        id: 'policy-presences-2',
+        preview: false,
+        templateName: 'Enable broadcasting presences on all channels for authenticated users only',
+        description:
+          'This policy enables broadcasting presences on all channels for all authenticated users only.',
+        statement: `
+        create policy "Enable broadcasting presences on all channels for authenticated users only"
+ON realtime.presences for update
+TO authenticated
+using ( true )
+with check ( true );
+  ;`.trim(),
+        name: 'Enable broadcasting presences on all channels for authenticated users only',
+        definition: 'true',
+        check: 'true',
+        command: 'UPDATE',
+        roles: ['authenticated'],
+      },
+    ] as PolicyTemplate[]
+
+    if (templateData && templateData['channelId']) {
+      results.push(
+        {
+          id: 'policy-presences-3',
+          preview: false,
+          templateName: 'Enable listening to presences from a specific channel',
+          description: 'This policy enables listening to presences from a specific channel.',
+          statement: `
+    create policy "Enable listening to presences from a specific channel"
+    on realtime.presences for select
+    using ( channel_id = ${templateData['channelId']} );`.trim(),
+          name: 'Enable listening to presences from a specific channel',
+          definition: `channel_id = ${templateData['channelId']}`,
+          check: '',
+          command: 'SELECT',
+          roles: [],
+        },
+        {
+          id: 'policy-presences-4',
+          preview: false,
+          templateName: 'Enable broadcasting presences to a specific channel',
+          description: 'This policy enables broadcasting presences to a specific channel.',
+          statement: `
+        create policy "Enable broadcasting presences to a specific channel"
+ON realtime.presences for update
+using ( channel_id = ${templateData['channelId']} )
+with check ( channel_id = ${templateData['channelId']} );
+  ;`.trim(),
+          name: 'Enable broadcasting presences to a specific channel',
+          definition: `channel_id = ${templateData['channelId']}`,
+          check: `channel_id = ${templateData['channelId']}`,
+          command: 'UPDATE',
+          roles: [],
+        }
+      )
+    }
+
+    return results
+  }
+
+  if (table === 'channels') {
+    const results = [
+      {
+        id: 'policy-channels-1',
+        preview: false,
+        templateName: 'Enable read access to all channels for authenticated users only',
+        description:
+          'This policy gives read access to all channels for all authenticated users only.',
+        statement: `
+  create policy "Enable read access for all channels for authenticated users only"
+  on realtime.channels for select
+  to authenticated
+  using ( true );`.trim(),
+        name: 'Enable read access for all channels for authenticated users only',
+        definition: 'true',
+        check: '',
+        command: 'SELECT',
+        roles: ['authenticated'],
+      },
+      {
+        id: 'policy-channels-2',
+        preview: false,
+        templateName: 'Enable update access to all channels for authenticated users only',
+        description:
+          'This policy gives update access to all channels for all authenticated users only.',
+        statement: `
+        create policy "Enable update access to all channels for authenticated users only"
+ON realtime.broadcasts for update
+TO authenticated
+using ( true )
+with check ( true );`.trim(),
+        name: 'Enable update access to all channels for authenticated users only',
+        definition: 'true',
+        check: 'true',
+        command: 'UPDATE',
+        roles: ['authenticated'],
+      },
+    ] as PolicyTemplate[]
+
+    if (templateData && templateData['channelId']) {
+      results.push(
+        {
+          id: 'policy-channels-3',
+          preview: false,
+          templateName: 'Enable read access to specific channel',
+          description: 'This policy gives read access to specific channel.',
+          statement: `
+  create policy "Enable read access to specific channel"
+  on realtime.channels for select
+  using ( channel_id = ${templateData['channelId']} );`.trim(),
+          name: 'Enable read access to specific channel',
+          definition: `channel_id = ${templateData['channelId']}`,
+          check: '',
+          command: 'SELECT',
+          roles: [],
+        },
+        {
+          id: 'policy-channels-4',
+          preview: false,
+          templateName: 'Enable update access to specific channel',
+          description: 'This policy gives update access to specific channel.',
+          statement: `
+        create policy "Enable update access to specific channel"
+ON realtime.channels for update
+using ( channel_id = ${templateData['channelId']} )
+with check ( channel_id = ${templateData['channelId']} );`.trim(),
+          name: 'Enable update access to specific channel',
+          definition: `channel_id = ${templateData['channelId']}`,
+          check: `channel_id = ${templateData['channelId']}`,
+          command: 'UPDATE',
+          roles: [],
+        }
+      )
+    }
+
+    return results
+  }
+
+  return []
+}
