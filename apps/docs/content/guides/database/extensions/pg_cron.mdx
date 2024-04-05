@@ -72,6 +72,18 @@ Reach out to [Supabase Support](https://supabase.com/support) if you're unsure i
 
 ## Examples
 
+### Run a stored procedure every 5 seconds
+
+You can use '[1-59] seconds' to schedule a job based on an interval:
+
+```sql
+select cron.schedule (
+    'website-latency', -- name of the cron job
+    '5 seconds', 
+    'call ping_website()'
+);
+```
+
 ### Delete data every week
 
 Delete old data on Saturday at 3:30am (GMT):
