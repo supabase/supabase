@@ -1,10 +1,9 @@
 import { useState, useRef } from 'react'
 import { SPECIAL_ANNOUNCEMENT_URL } from '~/lib/constants'
-import { cn } from 'ui'
 import { Check, Copy } from 'lucide-react'
 import useConfData from '../../hooks/use-conf-data'
 
-export default function TicketCopy({ sharePage }: { sharePage: boolean }) {
+export default function TicketCopy() {
   const { userData } = useConfData()
   const { username, platinum, secret } = userData
   const [copied, setCopied] = useState(false)
@@ -15,9 +14,7 @@ export default function TicketCopy({ sharePage }: { sharePage: boolean }) {
   }`
 
   return (
-    <div
-      className={cn('h-full w-full overflow-hidden max-w-screen', sharePage ? 'w-auto' : 'w-full')}
-    >
+    <div className="h-full w-full">
       <button
         type="button"
         name="Copy"
