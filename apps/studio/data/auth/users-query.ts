@@ -1,7 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
-import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { authKeys } from './keys'
 
@@ -17,7 +16,7 @@ export const USERS_PAGE_LIMIT = 10
 export type User = components['schemas']['UserBody']
 
 export async function getUsers(
-  { projectRef, page = 1, keywords = '', filter, connectionString }: UsersVariables,
+  { projectRef, page = 1, keywords = '', filter }: UsersVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('Project ref is required')
