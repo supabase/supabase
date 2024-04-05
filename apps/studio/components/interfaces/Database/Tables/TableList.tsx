@@ -99,8 +99,6 @@ const TableList = ({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-xl text-foreground">Database Tables</h3>
-
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <SchemaSelector

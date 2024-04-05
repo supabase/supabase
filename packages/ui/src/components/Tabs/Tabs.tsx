@@ -81,7 +81,11 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
      */
 
     function handleChange(e: CustomEvent) {
-      if (e.detail.queryGroup === queryGroup && tabIds.includes(e.detail.id)) {
+      if (
+        e.detail.queryGroup &&
+        e.detail.queryGroup === queryGroup &&
+        tabIds.includes(e.detail.id)
+      ) {
         setActiveTab(e.detail.id)
         setGroupActiveId?.(e.detail.id)
       }
@@ -113,10 +117,11 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
       const url = new URL(document.location.href)
       url.searchParams.set(queryGroup, id)
       window.history.replaceState(undefined, '', url)
-      currentTarget.dispatchEvent(
-        new CustomEvent(TAB_CHANGE_EVENT_NAME, { bubbles: true, detail: { queryGroup, id } })
-      )
     }
+
+    currentTarget.dispatchEvent(
+      new CustomEvent(TAB_CHANGE_EVENT_NAME, { bubbles: true, detail: { queryGroup, id } })
+    )
 
     onClick?.(id)
     if (id !== active) {

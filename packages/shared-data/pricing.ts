@@ -112,7 +112,7 @@ export const pricing: Pricing = {
       {
         title: 'Bandwidth',
         tooltips: {
-          main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions) in GB throughout your billing period.',
+          main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor) in GB throughout your billing period.',
         },
         plans: {
           free: '5 GB included',

@@ -45,7 +45,7 @@ export const StorageReport: NextPageWithLayout = () => {
 
   return (
     <ReportPadding>
-      <ReportHeader title="Storage" isLoading={report.isLoading} onRefresh={report.refresh} />
+      <ReportHeader title="Storage" />
       <div className="w-full flex flex-col gap-1">
         <div>
           <DatePickers

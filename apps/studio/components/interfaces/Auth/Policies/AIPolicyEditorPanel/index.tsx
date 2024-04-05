@@ -551,14 +551,20 @@ export const AIPolicyEditorPanel = memo(function ({
                         />
 
                         <div
-                          className={`py-1 relative ${incomingChange ? 'hidden' : 'block'}`}
+                          className={`mt-1 relative ${incomingChange ? 'hidden' : 'block'}`}
                           style={{
                             height:
                               expOneContentHeight <= 100 ? `${8 + expOneContentHeight}px` : '108px',
                           }}
                         >
                           <RLSCodeEditor
+                            disableTabToUsePlaceholder
                             id="rls-exp-one-editor"
+                            placeholder={
+                              command === 'insert'
+                                ? '-- Provide a SQL expression for the with check statement'
+                                : '-- Provide a SQL expression for the using statement'
+                            }
                             defaultValue={command === 'insert' ? check : using}
                             value={command === 'insert' ? check : using}
                             editorRef={editorOneRef}
@@ -608,7 +614,7 @@ export const AIPolicyEditorPanel = memo(function ({
                         {showCheckBlock && (
                           <>
                             <div
-                              className={`py-1 relative ${incomingChange ? 'hidden' : 'block'}`}
+                              className={`mt-1 relative ${incomingChange ? 'hidden' : 'block'}`}
                               style={{
                                 height:
                                   expTwoContentHeight <= 100
@@ -617,7 +623,9 @@ export const AIPolicyEditorPanel = memo(function ({
                               }}
                             >
                               <RLSCodeEditor
+                                disableTabToUsePlaceholder
                                 id="rls-exp-two-editor"
+                                placeholder="-- Provide a SQL expression for the with check statement"
                                 defaultValue={check}
                                 value={check}
                                 editorRef={editorTwoRef}

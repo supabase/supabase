@@ -91,6 +91,18 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/types`,
           items: [],
         },
+        {
+          name: 'Query Performance',
+          key: 'query-performance',
+          url: `/project/${ref}/database/query-performance`,
+          items: [],
+        },
+        {
+          name: 'Database Linter',
+          key: 'linter',
+          url: `/project/${ref}/database/linter`,
+          items: [],
+        },
       ],
     },
   ]
