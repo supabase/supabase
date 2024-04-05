@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { Dispatch, SetStateAction, useEffect, useState } from 'react'
 import {
   Button,
   IconEye,
@@ -17,7 +17,7 @@ import {
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import CSVButton from 'components/ui/CSVButton'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
-import { Filters, LogSearchCallback, LogTemplate, PREVIEWER_DATEPICKER_HELPERS } from '.'
+import { Filters, LogSearchCallback, LogTemplate, LogsOrder, PREVIEWER_DATEPICKER_HELPERS } from '.'
 import DatePickers from './Logs.DatePickers'
 import { FILTER_OPTIONS, LogsTableName } from './Logs.constants'
 import LogsFilterPopover from './LogsFilterPopover'
@@ -42,6 +42,8 @@ interface PreviewFilterPanelProps {
   onFiltersChange: (filters: Filters) => void
   filters: Filters
   onSelectedDatabaseChange: (id: string) => void
+  logsOrder: LogsOrder
+  setLogsOrder: Dispatch<SetStateAction<LogsOrder>>
 }
 
 /**
@@ -65,6 +67,8 @@ const PreviewFilterPanel = ({
   filters,
   table,
   onSelectedDatabaseChange,
+  logsOrder,
+  setLogsOrder,
 }: PreviewFilterPanelProps) => {
   const router = useRouter()
   const [search, setSearch] = useState('')
@@ -172,6 +176,23 @@ const PreviewFilterPanel = ({
           from={defaultFromValue}
           helpers={PREVIEWER_DATEPICKER_HELPERS}
         />
+
+        <div className="flex items-center">
+          <Button
+            type={logsOrder === 'latest-first' ? 'secondary' : 'default'}
+            onClick={() => setLogsOrder('latest-first')}
+            className="rounded-r-none"
+          >
+            Latest first
+          </Button>
+          <Button
+            type={logsOrder === 'oldest-first' ? 'secondary' : 'default'}
+            onClick={() => setLogsOrder('oldest-first')}
+            className="rounded-l-none"
+          >
+            Oldest first
+          </Button>
+        </div>
 
         {FILTER_OPTIONS[table] !== undefined && (
           <div className="flex items-center">
