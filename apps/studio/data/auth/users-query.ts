@@ -1,15 +1,16 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import type { components } from 'data/api'
 import { get, handleError } from 'data/fetchers'
+import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
 import { authKeys } from './keys'
-import type { components } from 'data/api'
 
 export type UsersVariables = {
   projectRef?: string
+  connectionString?: string
   page?: number
   keywords?: string
   filter?: 'verified' | 'unverified' | 'anonymous'
-  connectionString: string
 }
 
 export const USERS_PAGE_LIMIT = 10
@@ -34,7 +35,6 @@ export async function getUsers(
     offset: offset.toString(),
     keywords,
     anonymous: filter === 'anonymous',
-    verified: filter === 'verified' ? 'verified' : undefined,
   }
 
   if (filter === 'verified') query.verified = 'verified'
