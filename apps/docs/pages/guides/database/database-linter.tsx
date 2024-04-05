@@ -33,11 +33,11 @@ const meta = {
 const editLink = 'https://github.com/supabase/splinter/tree/main/docs'
 
 const markdownIntro = `
-You can use the Project Linter to check your database for issues such as missing indexes and improperly set-up RLS policies.
+You can use the Database Linter to check your database for issues such as missing indexes and improperly set-up RLS policies.
 
 ## Using the linter
 
-In the dashboard, navigate to [Database Linter](/dashboard/project/_/database/linter) under Database. The linter runs automatically. You can also manually rerun it after you're resolved issues, or ignore individual lints.
+In the dashboard, navigate to [Database Linter](/dashboard/project/_/database/linter) under Database. The linter runs automatically. You can also manually rerun it after you've resolved issues.
 `.trim()
 
 const getBasename = (path: string) => path.split('/').at(-1).replace(/\.md$/, '')
