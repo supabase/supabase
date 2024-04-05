@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Button, Checkbox, Popover } from 'ui'
+import { Button, Checkbox, Popover, ScrollArea } from 'ui'
 
 interface FilterPopoverProps {
   options: any[]
@@ -13,7 +13,7 @@ interface FilterPopoverProps {
 // [Joshen] Form + Checkbox.Group doesn't seem to work properly RE form state
 // hence why the manual implementation here as a workaround
 
-const FilterPopover = ({
+export const FilterPopover = ({
   options = [],
   activeOptions = [],
   valueKey,
@@ -39,24 +39,26 @@ const FilterPopover = ({
       overlay={
         <>
           <div className="space-y-4 px-3 py-3 min-w-[170px]">
-            <Checkbox.Group
-              id="projects"
-              onChange={(event) => {
-                const value = event.target.value
-                if (selectedOptions.includes(value)) {
-                  setSelectedOptions(selectedOptions.filter((x) => x !== value))
-                } else {
-                  setSelectedOptions(selectedOptions.concat(value))
-                }
-              }}
-              options={options.map((option) => {
-                return {
-                  value: option[valueKey],
-                  label: option[labelKey],
-                  defaultChecked: activeOptions.includes(option[valueKey]),
-                }
-              })}
-            />
+            <ScrollArea className={options.length > 7 ? 'h-[205px]' : ''}>
+              <Checkbox.Group
+                id="projects"
+                onChange={(event) => {
+                  const value = event.target.value
+                  if (selectedOptions.includes(value)) {
+                    setSelectedOptions(selectedOptions.filter((x) => x !== value))
+                  } else {
+                    setSelectedOptions(selectedOptions.concat(value))
+                  }
+                }}
+                options={options.map((option) => {
+                  return {
+                    value: option[valueKey],
+                    label: option[labelKey],
+                    defaultChecked: activeOptions.includes(option[valueKey]),
+                  }
+                })}
+              />
+            </ScrollArea>
           </div>
           <div className="flex items-center justify-end gap-2 border-t border-overlay bg-surface-200 py-2 px-3">
             <Button
@@ -102,5 +104,3 @@ const FilterPopover = ({
     </Popover>
   )
 }
-
-export default FilterPopover

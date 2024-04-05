@@ -3,11 +3,11 @@ import { Check, ExternalLink, Loader } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
-import { FilterPopover } from 'components/interfaces/AuditLogs'
 import ReportLintsTableRow from 'components/interfaces/Reports/ReportLintsTableRow'
 import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
+import { FormHeader } from 'components/ui/Forms'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
 import { useLocalStorageQuery, useSelectedProject } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
@@ -19,6 +19,7 @@ import {
   Button,
   LoadingLine,
 } from 'ui'
+import { FilterPopover } from 'components/ui/FilterPopover'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -59,13 +60,12 @@ const ProjectLints: NextPageWithLayout = () => {
   return (
     <ScaffoldContainer>
       <ScaffoldSection>
-        <div className="col-span-12 flex items-center justify-between">
-          <div className="flec flex-col gap-y-1">
-            <h3 className="text-xl text-foreground">Database Linter</h3>
-            <div className="text-sm text-foreground-lighter">
-              Identify common schema problems in your database
-            </div>
-          </div>
+        <div className="col-span-12">
+          <FormHeader
+            className="!mb-0"
+            title="Database Linter"
+            description="Identify common schema problems in your database."
+          />
         </div>
 
         <div className="col-span-12 flex items-center justify-between">
