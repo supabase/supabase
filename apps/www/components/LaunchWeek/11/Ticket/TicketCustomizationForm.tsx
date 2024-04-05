@@ -88,15 +88,15 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
         onFocus={() =>
           !showCustomizationForm && setShowCustomizationForm && setShowCustomizationForm(true)
         }
-        disabled={IS_SAVING}
+        inputClassName={cn(IS_SAVING && 'text-foreground-lighter')}
         maxLength={25}
         icon={
           <Check
             strokeWidth={2}
             className={cn(
               'w-3',
-              IS_SAVING && 'text-background-surface-300',
-              !!formData.role ? 'text-brand' : 'text-foreground-lighter'
+              !!formData.role ? 'text-brand' : 'text-foreground-lighter',
+              IS_SAVING && 'text-background-surface-300'
             )}
           />
         }
@@ -113,14 +113,14 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
         onFocus={() =>
           !showCustomizationForm && setShowCustomizationForm && setShowCustomizationForm(true)
         }
-        disabled={IS_SAVING}
+        inputClassName={cn(IS_SAVING && 'text-foreground-lighter')}
         icon={
           <Check
             strokeWidth={2}
             className={cn(
               'w-3',
-              IS_SAVING && 'text-background-surface-300',
-              !!formData.company ? 'text-brand' : 'text-foreground-lighter'
+              !!formData.company ? 'text-brand' : 'text-foreground-lighter',
+              IS_SAVING && 'text-background-surface-300'
             )}
           />
         }
