@@ -9,6 +9,7 @@ import {
   LogSearchCallback,
   LogTable,
   LogTemplate,
+  LogsOrder,
   LogsTableName,
   QueryType,
   ensureNoTimestampConflict,
@@ -55,6 +56,7 @@ export const LogsPreviewer = ({
   const router = useRouter()
   const { s, ite, its, db } = useParams()
   const [showChart, setShowChart] = useState(true)
+  const [logsOrder, setLogsOrder] = useState<LogsOrder>('latest-first')
   const { project } = useProjectContext()
   const organization = useSelectedOrganization()
   const state = useDatabaseSelectorStateSnapshot()
@@ -216,6 +218,8 @@ export const LogsPreviewer = ({
             })
           }
         }}
+        logsOrder={logsOrder}
+        setLogsOrder={setLogsOrder}
       />
       {children}
       <div
@@ -253,6 +257,7 @@ export const LogsPreviewer = ({
             onHistogramToggle={() => setShowChart(!showChart)}
             params={params}
             error={error}
+            logsOrder={logsOrder}
           />
         </LoadingOpacity>
         {!error && (
