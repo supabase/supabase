@@ -1,19 +1,19 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useRouter } from 'next/router'
 
 import { BackupsList } from 'components/interfaces/Database'
+import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { FormHeader } from 'components/ui/Forms'
 import InformationBox from 'components/ui/InformationBox'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useBackupsQuery } from 'data/database/backups-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import type { NextPageWithLayout } from 'types'
-import { IconInfo, Tabs } from 'ui'
-import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
+import { IconInfo } from 'ui'
 
 const DatabaseScheduledBackups: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -36,7 +36,7 @@ const DatabaseScheduledBackups: NextPageWithLayout = () => {
       <ScaffoldSection>
         <div className="col-span-12">
           <div className="space-y-6">
-            <h3 className="text-xl text-foreground">Database Backups</h3>
+            <FormHeader className="!mb-0" title="Database Backups" />
 
             <DatabaseBackupsNav active="scheduled" projRef={ref} />
             <div className="space-y-8">

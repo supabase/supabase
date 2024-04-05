@@ -1,8 +1,8 @@
 import Head from 'next/head'
 import type { PropsWithChildren } from 'react'
 
-import Divider from 'components/ui/Divider'
 import { BASE_PATH } from 'lib/constants'
+import { Separator } from 'ui'
 
 const VercelIntegrationLayout = ({ children }: PropsWithChildren<{}>) => {
   return (
@@ -27,7 +27,7 @@ const VercelIntegrationLayout = ({ children }: PropsWithChildren<{}>) => {
             </div>
           </div>
         </div>
-        <Divider light />
+        <Separator />
         <div className="flex-grow overflow-y-auto">
           <div className="max-w-7xl h-full mx-auto px-4 sm:px-6">
             <div className="max-w-xl h-full mx-auto py-10">{children}</div>
