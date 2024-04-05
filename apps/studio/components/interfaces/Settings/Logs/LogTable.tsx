@@ -32,7 +32,7 @@ import DefaultPreviewColumnRenderer from './LogColumnRenderers/DefaultPreviewCol
 import FunctionsEdgeColumnRender from './LogColumnRenderers/FunctionsEdgeColumnRender'
 import FunctionsLogsColumnRender from './LogColumnRenderers/FunctionsLogsColumnRender'
 import LogSelection, { LogSelectionProps } from './LogSelection'
-import type { LogData, QueryType } from './Logs.types'
+import type { LogData, LogsOrder, QueryType } from './Logs.types'
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 
@@ -50,6 +50,7 @@ interface Props {
   onRun?: () => void
   onSave?: () => void
   hasEditorValue?: boolean
+  logsOrder?: LogsOrder
 }
 type LogMap = { [id: string]: LogData }
 
@@ -70,6 +71,7 @@ const LogTable = ({
   onRun,
   onSave,
   hasEditorValue,
+  logsOrder = 'latest-first',
 }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
@@ -180,11 +182,15 @@ const LogTable = ({
 
   const logDataRows = useMemo(() => {
     if (hasId && hasTimestamp) {
+      if (logsOrder === 'oldest-first')
+        return Object.values(logMap).sort((a, b) => a.timestamp - b.timestamp)
+
+      // using latest-first order by default
       return Object.values(logMap).sort((a, b) => b.timestamp - a.timestamp)
     } else {
       return dedupedData
     }
-  }, [stringData])
+  }, [stringData, logsOrder])
 
   const RowRenderer = useCallback<(key: Key, props: RenderRowProps<LogData, unknown>) => ReactNode>(
     (key, props) => {
