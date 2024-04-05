@@ -3,8 +3,6 @@ import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { authKeys } from './keys'
 import type { components } from 'data/api'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 export type UsersVariables = {
   projectRef?: string
@@ -25,16 +23,18 @@ export async function getUsers(
 
   const limit = USERS_PAGE_LIMIT
   const offset = (page - 1) * 10
-  const query: { limit: string; offset: string; keywords: string; verified?: string } = {
+  const query: {
+    limit: string
+    offset: string
+    keywords: string
+    verified?: string
+    anonymous?: boolean
+  } = {
     limit: limit.toString(),
     offset: offset.toString(),
     keywords,
-  }
-
-  if (filter === 'anonymous') {
-    const data = await getAnonUsers({ projectRef, page, signal, connectionString })
-
-    return data
+    anonymous: filter === 'anonymous',
+    verified: filter === 'verified' ? 'verified' : undefined,
   }
 
   if (filter === 'verified') query.verified = 'verified'
@@ -49,32 +49,6 @@ export async function getUsers(
 
   if (error) throw handleError(error)
   return data
-}
-
-export async function getAnonUsers({
-  projectRef,
-  page = 1,
-  signal,
-  connectionString,
-}: {
-  projectRef: string
-  connectionString: string
-  page?: number
-  signal?: AbortSignal
-}) {
-  const limit = USERS_PAGE_LIMIT
-  const offset = (page - 1) * 10
-
-  const res = await executeSql({
-    projectRef,
-    connectionString,
-    sql: `SELECT * FROM auth.users WHERE is_anonymous IS true LIMIT ${limit} OFFSET ${offset}`,
-  })
-
-  return {
-    total: res.result.length,
-    users: res.result,
-  }
 }
 
 export type UsersData = Awaited<ReturnType<typeof getUsers>>
