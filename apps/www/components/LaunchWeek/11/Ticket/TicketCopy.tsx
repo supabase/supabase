@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react'
 import { SPECIAL_ANNOUNCEMENT_URL } from '~/lib/constants'
-import { IconCheck, IconCopy, cn } from 'ui'
+import { cn } from 'ui'
+import { Check, Copy } from 'lucide-react'
 import useConfData from '../../hooks/use-conf-data'
 
 export default function TicketCopy({ sharePage }: { sharePage: boolean }) {
@@ -15,7 +16,7 @@ export default function TicketCopy({ sharePage }: { sharePage: boolean }) {
 
   return (
     <div
-      className={cn('h-full w-full overflow-hidden max-w-full', sharePage ? 'w-auto' : 'w-full')}
+      className={cn('h-full w-full overflow-hidden max-w-screen', sharePage ? 'w-auto' : 'w-full')}
     >
       <button
         type="button"
@@ -32,11 +33,7 @@ export default function TicketCopy({ sharePage }: { sharePage: boolean }) {
         className="w-full h-full flex justify-center md:justify-start items-center gap-2 relative text-foreground-light hover:text-foreground text-xs"
       >
         <div className="w-4 min-w-4 flex-shrink-0">
-          {copied ? (
-            <IconCheck size={14} strokeWidth={1.5} />
-          ) : (
-            <IconCopy size={14} strokeWidth={1.5} />
-          )}
+          {copied ? <Check size={14} strokeWidth={1.5} /> : <Copy size={14} strokeWidth={1.5} />}
         </div>
         <span className="truncate">{url}</span>
       </button>

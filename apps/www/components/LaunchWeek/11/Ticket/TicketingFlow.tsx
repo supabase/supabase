@@ -180,7 +180,7 @@ const TicketingFlow = () => {
                           </p>
                         </div>
                       </div>
-                      {!hasPlatinumTicket && <TicketPresence />}
+                      <TicketPresence />
                     </div>
                   </m.div>
                 )}
