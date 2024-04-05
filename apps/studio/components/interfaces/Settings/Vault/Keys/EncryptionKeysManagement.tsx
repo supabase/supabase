@@ -8,7 +8,6 @@ import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import Divider from 'components/ui/Divider'
 import { usePgSodiumKeyCreateMutation } from 'data/pg-sodium-keys/pg-sodium-key-create-mutation'
 import { usePgSodiumKeyDeleteMutation } from 'data/pg-sodium-keys/pg-sodium-key-delete-mutation'
 import { usePgSodiumKeysQuery } from 'data/pg-sodium-keys/pg-sodium-keys-query'
@@ -26,6 +25,7 @@ import {
   Input,
   Listbox,
   Modal,
+  Separator,
 } from 'ui'
 
 const DEFAULT_KEY_NAME = 'No description provided'
@@ -263,7 +263,7 @@ const EncryptionKeysManagement = () => {
                         </Tooltip.Root>
                       </div>
                     </div>
-                    {idx !== keys.length - 1 && <Divider light />}
+                    {idx !== keys.length - 1 && <Separator />}
                   </Fragment>
                 )
               })}

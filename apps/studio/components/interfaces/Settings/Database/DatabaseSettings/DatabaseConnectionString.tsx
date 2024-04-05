@@ -7,8 +7,6 @@ import {
   CollapsibleContent_Shadcn_,
   CollapsibleTrigger_Shadcn_,
   Collapsible_Shadcn_,
-  IconChevronDown,
-  IconExternalLink,
   Input,
   Separator,
   Tabs,
@@ -34,6 +32,7 @@ import {
   getConnectionStrings,
   getPoolerTld,
 } from './DatabaseSettings.utils'
+import { ChevronDown, ExternalLink } from 'lucide-react'
 
 const CONNECTION_TYPES = [
   { id: 'uri', label: 'URI' },
@@ -174,7 +173,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
           appearance === 'minimal' && 'border-0 shadow-none'
         )}
         bodyClassName={cn(appearance === 'minimal' && 'bg-transparent')}
-        headerClasses={cn(appearance === 'minimal' && 'bg-transparent')}
+        titleClasses={cn(appearance === 'minimal' && 'bg-transparent')}
         title={
           <div
             ref={connectionStringsRef}
@@ -198,7 +197,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
                 )}
               >
                 {readReplicasEnabled && <DatabaseSelector />}
-                <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+                <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
                   <a href="https://supabase.com/docs/guides/database/connecting-to-postgres">
                     Documentation
                   </a>
@@ -261,7 +260,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
                     <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                       How to connect to a different database or switch to another user
                     </p>
-                    <IconChevronDown
+                    <ChevronDown
                       className="transition-transform duration-200"
                       strokeWidth={1.5}
                       size={14}
@@ -319,7 +318,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
                       <p className="text-xs text-foreground-light group-hover:text-foreground transition">
                         Connecting to SQL Alchemy
                       </p>
-                      <IconChevronDown
+                      <ChevronDown
                         className="transition-transform duration-200"
                         strokeWidth={1.5}
                         size={14}
