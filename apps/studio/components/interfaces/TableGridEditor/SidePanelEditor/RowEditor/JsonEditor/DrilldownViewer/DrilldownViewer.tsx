@@ -72,7 +72,7 @@ const DrilldownViewer = ({ jsonData = {} }: DrilldownViewerProps) => {
   }
 
   return (
-    <div className="border border-x-0 border-t-0 border-gray-500">
+    <div className="border border-x-0 border-t-0 border-muted">
       <div className="h-10 px-3 flex-initial flex items-center justify-between">
         <DrilldownBreadCrumbs
           breadcrumbs={breadCrumbs}
@@ -80,7 +80,7 @@ const DrilldownViewer = ({ jsonData = {} }: DrilldownViewerProps) => {
           resetBreadcrumbs={resetBreadcrumbs}
         />
       </div>
-      <div className="flex items-stretch flex-auto justify-between border-t border-gray-500">
+      <div className="flex items-stretch flex-auto justify-between border-t border-muted">
         <DrilldownPane
           pane={1}
           jsonData={jsonPane1}
