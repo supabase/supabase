@@ -1,24 +1,28 @@
-import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
+import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import { CH } from '@code-hike/mdx/components'
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
-import { GetStaticPaths, GetStaticProps } from 'next'
-import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote'
-import { serialize } from 'next-mdx-remote/serialize'
-import { NextSeo } from 'next-seo'
+import { ChevronLeft, ExternalLink } from 'lucide-react'
+import { type GetStaticPaths, type GetStaticProps } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { Dispatch, SetStateAction, useState } from 'react'
+import { MDXRemote, type MDXRemoteSerializeResult } from 'next-mdx-remote'
+import { serialize } from 'next-mdx-remote/serialize'
+import { NextSeo } from 'next-seo'
+import { type Dispatch, type SetStateAction, useState } from 'react'
 import remarkGfm from 'remark-gfm'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/swiper.min.css'
-import { Admonition, Button, IconChevronLeft, IconExternalLink } from 'ui'
+
+import { useBreakpoint } from 'common'
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+import { Admonition, Button } from 'ui'
+import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+
 import ImageModal from '~/components/ImageModal'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabaseMisc'
 import type { Partner } from '~/types/partners'
 import Error404 from '../../404'
-import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 
 /**
  * Returns custom components so that the markdown converts to a nice looking html.
@@ -48,12 +52,9 @@ function Partner({
   overview: MDXRemoteSerializeResult<Record<string, unknown>, Record<string, unknown>>
 }) {
   const [focusedImage, setFocusedImage] = useState<string | null>(null)
+  const isNarrow = useBreakpoint('lg')
 
   if (!partner) return <Error404 />
-
-  const videoThumbnail = partner.video
-    ? `http://img.youtube.com/vi/${partner.video}/0.jpg`
-    : undefined
 
   return (
     <>
@@ -97,7 +98,7 @@ function Partner({
               href="/partners/integrations"
               className="text-foreground hover:text-foreground-lighter flex cursor-pointer items-center transition-colors"
             >
-              <IconChevronLeft style={{ padding: 0 }} />
+              <ChevronLeft width={14} height={14} />
               Back
             </Link>
 
@@ -174,7 +175,9 @@ function Partner({
               </SectionContainer>
             </div>
 
-            <div className="grid lg:grid-cols-8 lg:space-x-12">
+            <div className="grid gap-y-12 lg:grid-cols-8 lg:space-x-12">
+              {isNarrow && <PartnerDetails partner={partner} />}
+
               <div className="lg:col-span-5 overflow-hidden">
                 <h2
                   className="text-foreground"
@@ -188,75 +191,7 @@ function Partner({
                 </div>
               </div>
 
-              <div className="lg:col-span-3 order-first lg:order-last">
-                <div className="sticky top-20">
-                  <h2
-                    className="text-foreground"
-                    style={{ fontSize: '1.5rem', marginBottom: '1rem' }}
-                  >
-                    Details
-                  </h2>
-
-                  {partner.video && (
-                    <div className="mb-6">
-                      <ExpandableVideo
-                        videoId={partner.video}
-                        imgUrl={videoThumbnail}
-                        imgOverlayText="Watch an introductory video"
-                        triggerContainerClassName="w-full"
-                      />
-                    </div>
-                  )}
-
-                  <div className="text-foreground divide-y">
-                    {partner.type === 'technology' && (
-                      <div className="flex items-center justify-between py-2">
-                        <span className="text-foreground-lighter">Developer</span>
-                        <span className="text-foreground">{partner.developer}</span>
-                      </div>
-                    )}
-
-                    <div className="flex items-center justify-between py-2">
-                      <span className="text-lighter">Category</span>
-                      <Link
-                        href={`/partners/integrations#${partner.category.toLowerCase()}`}
-                        className="text-brand hover:underline transition-colors"
-                      >
-                        {partner.category}
-                      </Link>
-                    </div>
-
-                    <div className="flex items-center justify-between py-2">
-                      <span className="text-foreground-lighter">Website</span>
-                      <a
-                        href={partner.website}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-brand hover:underline transition-colors"
-                      >
-                        {new URL(partner.website).host}
-                      </a>
-                    </div>
-
-                    {partner.type === 'technology' && partner.docs && (
-                      <div className="flex items-center justify-between py-2">
-                        <span className="text-foreground-lighter">Documentation</span>
-                        <a
-                          href={partner.docs}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-brand hover:underline transition-colors"
-                        >
-                          <span className="flex items-center space-x-1">
-                            <span>Learn</span>
-                            <IconExternalLink size="small" />
-                          </span>
-                        </a>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
+              {!isNarrow && <PartnerDetails partner={partner} />}
             </div>
             {partner.call_to_action_link && (
               <div className="bg-background hover:border-default-control border-default rounded-2xl border p-10 drop-shadow-sm max-w-5xl mx-auto mt-12">
@@ -276,6 +211,84 @@ function Partner({
         </SectionContainer>
       </DefaultLayout>
     </>
+  )
+}
+
+const PartnerDetails = ({ partner }: { partner: Partner }) => {
+  const videoThumbnail = partner.video
+    ? `http://img.youtube.com/vi/${partner.video}/0.jpg`
+    : undefined
+
+  return (
+    <div className="lg:col-span-3">
+      <div className="sticky top-20 flex flex-col gap-8">
+        <h2 className="text-foreground" style={{ fontSize: '1.5rem', marginBottom: '1rem' }}>
+          Details
+        </h2>
+
+        {partner.video && (
+          <div className="mb-6">
+            <ExpandableVideo
+              videoId={partner.video}
+              imgUrl={videoThumbnail}
+              imgOverlayText="Watch an introductory video"
+              triggerContainerClassName="w-full"
+            />
+          </div>
+        )}
+
+        <div className="text-foreground divide-y">
+          {partner.type === 'technology' && (
+            <div className="flex items-center justify-between py-2">
+              <span className="text-foreground-lighter">Developer</span>
+              <span className="text-foreground">{partner.developer}</span>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between py-2">
+            <span className="text-lighter">Category</span>
+            <Link
+              href={`/partners/integrations#${partner.category.toLowerCase()}`}
+              className="text-brand hover:underline transition-colors"
+            >
+              {partner.category}
+            </Link>
+          </div>
+
+          <div className="flex items-center justify-between py-2">
+            <span className="text-foreground-lighter">Website</span>
+            <a
+              href={partner.website}
+              target="_blank"
+              rel="noreferrer"
+              className="text-brand hover:underline transition-colors"
+            >
+              {new URL(partner.website).host}
+            </a>
+          </div>
+
+          {partner.type === 'technology' && partner.docs && (
+            <div className="flex items-center justify-between py-2">
+              <span className="text-foreground-lighter">Documentation</span>
+              <a
+                href={partner.docs}
+                target="_blank"
+                rel="noreferrer"
+                className="text-brand hover:underline transition-colors"
+              >
+                <span className="flex items-center space-x-1">
+                  <span>Learn</span>
+                  <ExternalLink width={14} height={14} />
+                </span>
+              </a>
+            </div>
+          )}
+        </div>
+        <p className="text-foreground-light text-sm">
+          Third-party integrations and docs are managed by Supabase partners.
+        </p>
+      </div>
+    </div>
   )
 }
 
