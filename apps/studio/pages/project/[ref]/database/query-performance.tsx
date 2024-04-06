@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
 import { IndexEfficiencyNotice } from 'components/interfaces/QueryPerformance/IndexEfficiencyNotice'
-import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
+// import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
@@ -12,6 +12,8 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms'
 import { useFlag } from 'hooks'
 import type { NextPageWithLayout } from 'types'
+import { QueryPerformance } from 'components/interfaces/QueryPerformanceV2/QueryPerformance'
+import { QUERY_PERFORMANCE_REPORT_TYPES } from 'components/interfaces/QueryPerformanceV2/QueryPerformance.constants'
 
 type QueryPerformancePreset = 'time' | 'frequent' | 'slowest'
 
@@ -28,11 +30,12 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
   const searchQuery = (router.query.search as string) || ''
   const roles = router.query.roles || []
   const presetMap = {
-    time: 'mostTimeConsuming',
-    frequent: 'mostFrequentlyInvoked',
-    slowest: 'slowestExecutionTime',
+    [QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING]: 'mostTimeConsuming',
+    [QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT]: 'mostFrequentlyInvoked',
+    [QUERY_PERFORMANCE_REPORT_TYPES.SLOWEST_EXECUTION]: 'slowestExecutionTime',
   } as const
-  const preset = presetMap[router.query.preset as QueryPerformancePreset] || 'mostTimeConsuming'
+  const preset =
+    presetMap[router.query.preset as QUERY_PERFORMANCE_REPORT_TYPES] || 'mostTimeConsuming'
 
   const queryPerformanceQuery = useQueryPerformanceQuery({
     searchQuery,
@@ -41,31 +44,21 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
     roles: typeof roles === 'string' ? [roles] : roles,
   })
 
-  const isLoading = [queryPerformanceQuery.isLoading, queryHitRate.isLoading].every(
-    (value) => value
-  )
-
   return (
-    <>
-      <ScaffoldContainer>
-        <ScaffoldSection>
-          <div className="col-span-12 flex flex-col gap-y-4">
-            <FormHeader
-              className="!mb-0"
-              title="Query Performance"
-              description="Identify queries that consume the most time and database resources via the `pg_stat_statements` table"
-              docsUrl="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
-            />
+    <div className="h-full flex flex-col">
+      <FormHeader
+        className="py-4 px-6 !mb-0"
+        title="Query Performance"
+        // description="Identify queries that consume the most time and database resources via the `pg_stat_statements` table"
+        docsUrl="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
+      />
 
-            {tableIndexEfficiencyEnabled && <IndexEfficiencyNotice isLoading={isLoading} />}
-            <QueryPerformance
-              queryHitRate={queryHitRate}
-              queryPerformanceQuery={queryPerformanceQuery}
-            />
-          </div>
-        </ScaffoldSection>
-      </ScaffoldContainer>
-    </>
+      {/* {tableIndexEfficiencyEnabled && <IndexEfficiencyNotice isLoading={isLoading} />} */}
+
+      {/* <QueryPerformance queryHitRate={queryHitRate} queryPerformanceQuery={queryPerformanceQuery} /> */}
+
+      <QueryPerformance queryHitRate={queryHitRate} queryPerformanceQuery={queryPerformanceQuery} />
+    </div>
   )
 }
 

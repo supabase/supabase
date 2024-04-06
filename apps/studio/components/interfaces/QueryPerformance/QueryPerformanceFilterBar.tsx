@@ -76,7 +76,7 @@ export const QueryPerformanceFilterBar = ({
   const ButtonIcon = sortByValue === 'lat_desc' ? ArrowDown : ArrowUp
 
   return (
-    <div className="flex justify-between items-center mb-3">
+    <div className="flex justify-between items-center">
       <div className="flex items-center gap-x-4">
         <div className="flex items-center gap-x-2">
           <p className="text-xs prose">Filter by</p>
