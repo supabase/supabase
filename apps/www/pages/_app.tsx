@@ -1,24 +1,32 @@
-import '../../../packages/ui/build/css/themes/light.css'
-import '../../../packages/ui/build/css/themes/dark.css'
-import '../styles/index.css'
+import '@code-hike/mdx/styles'
 import 'config/code-hike.scss'
+import '../styles/index.css'
 
-import { useEffect } from 'react'
+import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 'common'
+import { DefaultSeo } from 'next-seo'
 import { AppProps } from 'next/app'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
-import { DefaultSeo } from 'next-seo'
+import { useEffect } from 'react'
+import { PortalToast, themes } from 'ui'
+import { CommandMenuProvider } from 'ui-patterns/Cmdk'
+import { useConsent } from 'ui-patterns/ConsentToast'
 
-import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from 'lib/constants'
-import Meta from '~/components/Favicons'
+import MetaFaviconsPagesRouter, {
+  DEFAULT_FAVICON_ROUTE,
+  DEFAULT_FAVICON_THEME_COLOR,
+} from 'common/MetaFavicons/pages-router'
+import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import { post } from '~/lib/fetchWrapper'
-import PortalToast from 'ui/src/layout/PortalToast'
-import { AuthProvider, ThemeProvider, useConsent, useTelemetryProps } from 'common'
+import supabase from '~/lib/supabase'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
   const { consentValue, hasAcceptedConsent } = useConsent()
+
+  useThemeSandbox()
 
   function handlePageTelemetry(route: string) {
     return post(`${API_URL}/telemetry/page`, {
@@ -59,14 +67,33 @@ export default function App({ Component, pageProps }: AppProps) {
   const site_title = `${APP_NAME} | The Open Source Firebase Alternative`
   const { basePath, pathname } = useRouter()
 
-  const forceDarkMode = pathname === '/' || router.pathname.startsWith('/launch-week')
+  const isSpecialAnnouncementPage = router.pathname.startsWith('/special-announcement')
+  const forceDarkMode =
+    pathname === '/' || router.pathname.startsWith('/launch-week') || isSpecialAnnouncementPage
+
+  let applicationName = 'Supabase'
+  let faviconRoute = DEFAULT_FAVICON_ROUTE
+  let themeColor = DEFAULT_FAVICON_THEME_COLOR
+
+  if (router.asPath && router.asPath.includes('/launch-week/x')) {
+    applicationName = 'Supabase LWX'
+    faviconRoute = 'images/launchweek/lwx/favicon'
+    themeColor = 'FFFFFF'
+  }
 
   return (
     <>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       </Head>
-      <Meta />
+      <MetaFaviconsPagesRouter
+        applicationName={applicationName}
+        route={faviconRoute}
+        themeColor={themeColor}
+        includeManifest
+        includeMsApplicationConfig
+        includeRssXmlFeed
+      />
       <DefaultSeo
         title={site_title}
         description={DEFAULT_META_DESCRIPTION}
@@ -89,18 +116,22 @@ export default function App({ Component, pageProps }: AppProps) {
           cardType: 'summary_large_image',
         }}
       />
-      <AuthProvider>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-          forcedTheme={forceDarkMode ? 'dark' : undefined}
-        >
-          <PortalToast />
-          <Component {...pageProps} />
-        </ThemeProvider>
-      </AuthProvider>
+      <SessionContextProvider supabaseClient={supabase}>
+        <AuthProvider>
+          <ThemeProvider
+            themes={themes.map((theme) => theme.value)}
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+            forcedTheme={forceDarkMode ? 'dark' : undefined}
+          >
+            <CommandMenuProvider site="website">
+              <PortalToast />
+              <Component {...pageProps} />
+            </CommandMenuProvider>
+          </ThemeProvider>
+        </AuthProvider>
+      </SessionContextProvider>
     </>
   )
 }

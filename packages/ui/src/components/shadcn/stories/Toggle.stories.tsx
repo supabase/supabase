@@ -1,7 +1,6 @@
 import { Meta } from '@storybook/react'
-import { Toggle } from '@ui/components/shadcn/ui/toggle'
-import { Bold, Italic } from 'lucide-react'
-import { Underline } from 'lucide-react'
+import { Bold, Italic, Underline } from 'lucide-react'
+import { Toggle } from '../ui/toggle'
 
 const meta: Meta = {
   title: 'shadcn/Toggle',

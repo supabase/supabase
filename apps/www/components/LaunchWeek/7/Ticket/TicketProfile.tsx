@@ -63,7 +63,7 @@ export default function TicketProfile({
               styles.name,
               { [styles['name-blank']]: !username },
               { [styles['name-golden']]: golden }
-            )} dark:text-white text-center`}
+            )} text-foreground text-center`}
           >
             <div
               className={`${cn(styles.skeleton, styles.wrapper, {
@@ -71,7 +71,7 @@ export default function TicketProfile({
               })} text-3xl sm:text-4xl bg-gradient-to-r from-[#F8F9FA] via-[#F8F9FA] to-[#F8F9FA60] bg-clip-text text-transparent text-center`}
             >
               {name || username || 'Your Name'}
-              <p>{name && <p className="gradient-text-scale-100 text-sm">@{username}</p>}</p>
+              <p>{name && <p className="gradient-text-100 text-sm">@{username}</p>}</p>
             </div>
           </p>
         ) : (

@@ -1,0 +1,170 @@
+---
+id: 'billing-faq'
+title: 'Billing FAQ'
+description: 'This documentation covers frequently asked questions around subscription plans, payments, invoices and billing in general'
+subtitle: 'This documentation covers frequently asked questions around subscription plans, payments, invoices and billing in general'
+---
+
+## Organizations and projects
+
+#### What are organizations and projects?
+
+The Supabase Platform has "organizations" and "projects". An organization may contain multiple projects. Each project is a dedicated Supabase instance with all of its sub-services including Storage, Auth, Functions and Realtime.
+Each organization only has a single subscription with a single plan (Free, Pro, Team or Enterprise). Project addons such as [Compute](https://supabase.com/docs/guides/platform/compute-add-ons), [Custom Domains](https://supabase.com/docs/guides/platform/custom-domains) and [PITR](https://supabase.com/docs/guides/platform/backups#point-in-time-recovery) are configured per project and are added to your organization subscription.
+Read more on [how billing is organized](https://supabase.com/docs/guides/platform/org-based-billing#how-billing-is-organized).
+
+#### How many free projects can I have?
+
+You are entitled to two active free projects. Paused projects do not count towards your quota. Note that within an organization, we count the free project limits from all members that are either Owner or Admin. If you’ve got another organization member with the Admin or Owner role that has already exhausted their free project quota, you won’t be able to launch another free project in that organization. You can create simply create another free plan organization or change the role of the affected member in your [organization’s team settings](https://supabase.com/dashboard/org/_/team).
+
+#### Can I mix free and paid projects in a single organization?
+
+The subscription plan is set on the organization level and it is not possible to mix paid and non-paid projects inside a single organization. However, you can have a paid and a free organization and make use of the [self-serve project transfers](https://supabase.com/docs/guides/platform/project-transfer) to organize your projects. All projects in an organization benefit from the subscription plan. If your organization is on the Pro plan, all projects within the organization benefit from no project pausing, automated backups and so on.
+
+#### Can I transfer my projects to another organization?
+
+Yes, you can transfer your projects to another organization. You can find instructions on how to transfer your projects [here](https://supabase.com/docs/guides/platform/project-transfer).
+
+#### Can I transfer my credits to another organization?
+
+Yes, you can transfer the credits to another organization. Please submit a [support ticket](https://supabase.help).
+
+## Pricing
+
+See the [Pricing page](https://supabase.com/pricing) for details.
+
+#### Are there any charges for paused projects?
+
+No, we do not charge for paused projects. Compute hours are only counted for active instances. Paused projects do not incur any compute usage charges.
+
+#### How are multiple projects billed under a paid organization?
+
+We provide a dedicated server for every Supabase project. Each paid organization comes with $10 in Compute Credits to cover one project on the default instance size. Additional projects start at ~$10 a month (billed hourly). See how billing for compute works [here](https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute).
+
+Running 3 projects in a Pro plan organization on the default micro instance:
+
+- $25 Pro plan
+- $30 for 3 projects on the default compute instance size
+- $10 Compute credits
+  ⇒ $45 / month
+
+Refer to our docs on [how billing works](https://supabase.com/docs/guides/platform/org-based-billing) for more [examples](https://supabase.com/docs/guides/platform/org-based-billing#billing-examples) and insights.
+
+#### How does compute billing work?
+
+Each Supabase project is a dedicated VM and Postgres database. By default, your instance runs on the Micro compute instance. You have the option to upgrade your compute size in your [Project settings](https://supabase.com/dashboard/project/_/settings/addons). See [Compute Add-ons](https://supabase.com/docs/guides/platform/compute-add-ons) for available options.
+
+When you change your compute size, there are no immediate upfront charges. Instead, you will be billed based on the compute runtime hours during your billing cycle reset.
+
+If you launch additional instances on your paid plan, we will add the corresponding compute hours to your final invoice.
+
+If you upgrade your project to a larger instance for 10 hours and then downgrade, you’ll only pay for the larger instance for the 10 hours of usage at the end of your billing cycle. You can see your current compute usage on your [organization’s usage page](https://supabase.com/dashboard/org/_/usage).
+
+Read more on [how billing for compute works](https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute).
+
+#### What is unified egress and how is it billed?
+
+Unified egress refers to the total egress quota available to each organization. This quota can be utilized for various purposes such as Storage, Realtime, Auth, Functions, Supavisor and Database. Each plan includes a specific egress quota, and any additional usage beyond that quota is billed accordingly.
+
+To learn more about unified egress and its details, please refer to the information provided [here](https://supabase.com/docs/guides/platform/org-based-billing#:~:text=running%20any%20projects.-,Unified%20egress,-%23).
+
+## Plans and subscriptions
+
+#### How do I change my subscription plan?
+
+Change your subscription plan in your [organization's billing settings](https://supabase.com/dashboard/org/_/billing). To upgrade to an Enterprise plan, complete the [Enterprise request form](https://forms.supabase.com/enterprise).
+
+#### What happens if I cancel my subscription?
+
+The organization is given credits for unused time on the subscription plan or addons. The credits will not expire and can be used again in the future.
+
+#### I mistakenly upgraded the wrong organization and then downgraded it. Could you please issue a refund?
+
+We can transfer the amount as credits to another organization of your choice. You can use these credits to upgrade the organization, or if you have already upgraded, the credits will be used to pay the next month's invoice. Please create a [support ticket](https://supabase.help) for this case.
+
+## Quotas and spend caps
+
+#### What will happen when I exceed the free plan quota?
+
+When you exceed the Free plan quota, we will monitor and notify you about the exceeding limits. It is important to take action at this point. If you continue to exceed the limits without reducing your usage, we will pause your projects. To avoid project pausing, you have two options: reduce your usage or upgrade to a paid plan.
+
+#### What will happen when I exceed the Pro plan quota and have the spend cap on?
+
+When you exceed the Pro plan quota, we will monitor and notify you about the exceeding limits. To unblock yourself, you can simply toggle off your spend cap in your [organization’s billing settings](https://supabase.com/dashboard/org/_/billing) to pay for over-usage beyond the Pro plans limits. If you continue to exceed the limits without reducing your usage or turning off the spend cap, we will pause your projects.
+
+#### How do I scale beyond the limits of my Pro plan?
+
+The Pro plan has a spend cap enabled by default to keep costs under control. If you want to scale beyond the plans included quota, ~~simply~~ switch off the spend cap to pay for additional usage beyond the plans included limits. You can toggle the spend cap in the [organization's billing settings](https://supabase.com/dashboard/org/_/billing). Read more about the [spend cap](https://supabase.com/docs/guides/platform/spend-cap).
+
+## Reports and invoices
+
+#### Where do I find my invoices?
+
+You can find all invoices from your organization on your [organization’s invoices page](https://supabase.com/dashboard/org/_/invoices).
+
+#### Where can I see a breakdown of usage?
+
+You can find the breakdown of your usage on your [organization’s usage page](https://supabase.com/dashboard/org/_/usage).
+
+#### Where can I check my credit balance?
+
+You can check your Credit balance on the [organization’s billing page](https://supabase.com/dashboard/org/_/billing). Credits will be used on future invoices before charging your payment method. If you have enough credits to cover an invoice, there is no charge at all.
+
+#### Can I include the VAT number?
+
+You can update your VAT number in the Tax ID section of your [organization’s billing page](https://supabase.com/dashboard/org/_/billing).
+
+#### Can I change the details of an existing invoice?
+
+Any changes made to your billing details will only be reflected in your upcoming invoices. Our payment provider cannot regenerate previous invoices. Therefore, please make sure to update the billing details before the upcoming invoices are finalized.
+
+## Payments and billing cycle
+
+#### What payment methods are available?
+
+We accept credit card payments only. If you cannot pay via credit card, we do offer alternatives for larger upfront payments. Please create a [support ticket](https://supabase.help) in case you’re interested.
+
+#### What currency can I pay in?
+
+All our invoices are issued in USD, but you can pay in any currency as long as your credit card provider allows charging in USD after conversion.
+
+#### Can I change the payment method?
+
+Yes, you will have to add the new payment method before being allowed to remove the old one.
+This can be done from your dashboard on the [organization’s billing page](https://supabase.com/dashboard/org/_/billing).
+
+#### When are payments taken?
+
+Payments are taken at the beginning of each billing cycle. You will be charged once a month. You can see the current billing cycle and upcoming invoice in your [organization's billing settings](https://supabase.com/dashboard/org/_/billing). The subscription plan, custom domain and PITR addons are charged upfront, whereas usage-charges, including compute, are charged in hindsight based on your usage.
+
+#### Where can I change my billing details?
+
+You can update your billing details on the [organization’s billing page](https://supabase.com/dashboard/org/_/billing).
+Please note that any changes made to your billing details will only be reflected in your upcoming invoices. Our payment provider cannot regenerate previous invoices.
+
+#### What happens if I am unable to make the payment?
+
+When an invoice becomes overdue, we will pause your projects and downgrade your organization to the Free plan. You will be able to restore your projects once you have paid all outstanding invoices.
+
+#### Why am I overdue?
+
+We were unable to charge your payment method. This likely means that the payment was not successfully processed with the credit card on your account profile.
+You can be overdue when
+
+- A card is expired
+- The bank declined the payment.
+- There was no card on record - No payment method was added.
+  To rectify, you can add a new payment method by navigating to your [organization’s billing page](https://supabase.com/dashboard/org/_/billing).
+  If you are facing any issues, please raise a [support ticket](https://supabase.help).
+
+#### Can I delay my payment?
+
+No, you cannot delay your payment.
+
+#### Can I get a refund of my unused credits?
+
+No, we do not provide refunds. Please refer to our [Terms of Service](https://supabase.com/terms#:~:text=5.-,Fees%20and%20Taxes.,-1.%20Fees.).
+
+#### What do I do if my bill looks wrong?
+
+Please submit a [support ticket](https://supabase.help) through the dashboard. Select the affected organization and provide the invoice number for us to look at your case.

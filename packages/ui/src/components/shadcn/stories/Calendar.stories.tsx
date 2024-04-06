@@ -1,24 +1,6 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { Meta } from '@storybook/react'
-import { Button } from '@ui/components/shadcn/ui/button'
-import { Calendar } from '@ui/components/shadcn/ui/calendar'
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@ui/components/shadcn/ui/form'
-import { Popover, PopoverContent, PopoverTrigger } from '@ui/components/shadcn/ui/popover'
-import { toast } from '@ui/components/shadcn/ui/use-toast'
-import { cn } from '@ui/lib/utils'
-import { format } from 'date-fns'
-import { CalendarIcon } from 'lucide-react'
 import * as React from 'react'
-import { useForm } from 'react-hook-form'
-import * as z from 'zod'
+import { Calendar } from '../ui/calendar'
 
 const meta: Meta = {
   title: 'shadcn/Calendar',
@@ -73,7 +55,7 @@ export const Default = () => {
 //                       variant={'outline'}
 //                       className={cn(
 //                         'w-[240px] pl-3 text-left font-normal',
-//                         !field.value && 'text-muted-foreground'
+//                         !field.value && 'text-foreground-muted'
 //                       )}
 //                     >
 //                       {field.value ? format(field.value, 'PPP') : <span>Pick a date</span>}

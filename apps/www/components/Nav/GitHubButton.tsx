@@ -1,14 +1,12 @@
 import React, { useEffect, useState } from 'react'
 import { Button } from 'ui'
-import { Octokit } from 'octokit'
 
 const GitHubButton = () => {
-  const [stars, setStars] = useState<string>('56')
-  const octokit = new Octokit()
+  const [stars, setStars] = useState<string>('63')
 
   const kFormatter = (num: number) => {
     const kFormat = num / 1000
-    const decimals = kFormat.toString().split('.')[1]
+    const decimals = kFormat.toFixed(2).split('.')[1]
     const firstDecimal = decimals.split('')[0]
     const showDecimals = firstDecimal !== '0'
 
@@ -17,6 +15,8 @@ const GitHubButton = () => {
 
   useEffect(() => {
     async function fetchOctoData() {
+      const { Octokit } = await import('@octokit/core')
+      const octokit = new Octokit()
       const res = await octokit.request('GET /repos/{org}/{repo}', {
         org: 'supabase',
         repo: 'supabase',
@@ -30,7 +30,7 @@ const GitHubButton = () => {
 
   return (
     <Button
-      className="hidden group lg:flex text-foreground-light hover:text-foreground-strong"
+      className="hidden group lg:flex text-foreground-light hover:text-foreground"
       type="text"
       asChild
     >

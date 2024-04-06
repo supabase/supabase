@@ -1,8 +1,8 @@
+import * as Dialog from '@radix-ui/react-dialog'
+import * as Tooltip from '@radix-ui/react-tooltip'
 import React from 'react'
 import { Button } from '../../../index'
-import * as Dialog from '@radix-ui/react-dialog'
 import styleHandler from '../../lib/theme/styleHandler'
-import * as Tooltip from '@radix-ui/react-tooltip'
 
 export type SidePanelProps = RadixProps & CustomProps
 
@@ -24,7 +24,7 @@ interface CustomProps {
   children?: React.ReactNode
   header?: string | React.ReactNode
   visible: boolean
-  size?: 'medium' | 'large' | 'xlarge' | 'xxlarge'
+  size?: 'medium' | 'large' | 'xlarge' | 'xxlarge' | 'xxxlarge' | 'xxxxlarge'
   loading?: boolean
   align?: 'right' | 'left'
   hideFooter?: boolean
@@ -90,11 +90,11 @@ const SidePanel = ({
                 <Tooltip.Arrow className="radix-tooltip-arrow" />
                 <div
                   className={[
-                    'rounded bg-scale-100 py-1 px-2 leading-none shadow',
-                    'border border-scale-200',
+                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                    'border border-background',
                   ].join(' ')}
                 >
-                  <span className="text-xs text-scale-1200">{tooltip}</span>
+                  <span className="text-xs text-foreground">{tooltip}</span>
                 </div>
               </Tooltip.Content>
             </Tooltip.Portal>

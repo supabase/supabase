@@ -3,7 +3,7 @@ import RefSubLayout from '~/layouts/ref/RefSubLayout'
 
 interface Props {}
 
-const RefHeaderSection: React.FC<Props> = (props) => {
+const RefHeaderSection: React.FC<React.PropsWithChildren<Props>> = (props) => {
   return (
     <>
       <RefSubLayout.EducationRow>

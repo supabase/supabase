@@ -7,7 +7,7 @@
       "~/*": ["./*"],
       "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
     },
-    "target": "es2015",
+    "target": "ES2021",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,

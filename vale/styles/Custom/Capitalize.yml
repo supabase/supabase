@@ -1,0 +1,11 @@
+extends: substitution
+message: "Captalize this to make it a proper noun: '%s' -> '%s'"
+link: 'https://developers.google.com/style/word-list'
+level: warning
+ignorecase: false
+action:
+  name: replace
+swap:
+  auth hooks?: Auth Hooks?
+  edge functions?: Edge Functions?
+  'role[- ]?based access control': Role-Based Access Control

@@ -1,4 +1,4 @@
-import { GoTrueClient, navigatorLock } from '@supabase/gotrue-js'
+import { AuthClient, navigatorLock } from '@supabase/auth-js'
 
 export const STORAGE_KEY = process.env.NEXT_PUBLIC_STORAGE_KEY || 'supabase.dashboard.auth.token'
 export const AUTH_DEBUG_KEY =
@@ -17,13 +17,13 @@ const persistedDebug =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' &&
   globalThis?.localStorage?.getItem(AUTH_DEBUG_PERSISTED_KEY) === 'true'
 
-const navigatorLockEnabled = !!(
+const shouldEnableNavigatorLock =
   process.env.NEXT_PUBLIC_IS_PLATFORM === 'true' &&
-  !(globalThis?.localStorage?.getItem(AUTH_NAVIGATOR_LOCK_DISABLED_KEY) === 'true') &&
-  globalThis?.navigator?.locks
-)
+  !(globalThis?.localStorage?.getItem(AUTH_NAVIGATOR_LOCK_DISABLED_KEY) === 'true')
 
-if (!globalThis?.navigator?.locks) {
+const navigatorLockEnabled = !!(shouldEnableNavigatorLock && globalThis?.navigator?.locks)
+
+if (shouldEnableNavigatorLock && !globalThis?.navigator?.locks) {
   console.warn('This browser does not support the Navigator Locks API. Please update it.')
 }
 
@@ -100,7 +100,7 @@ const logIndexedDB = (message: string, ...args: any[]) => {
   })()
 }
 
-export const gotrueClient = new GoTrueClient({
+export const gotrueClient = new AuthClient({
   url: process.env.NEXT_PUBLIC_GOTRUE_URL,
   storageKey: STORAGE_KEY,
   detectSessionInUrl: true,

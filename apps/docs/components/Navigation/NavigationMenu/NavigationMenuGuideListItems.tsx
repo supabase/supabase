@@ -1,11 +1,13 @@
+import * as Accordion from '@radix-ui/react-accordion'
+import { ChevronLeft } from 'lucide-react'
 import { useTheme } from 'next-themes'
-import Image from 'next/image'
+import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useEffect, useRef } from 'react'
-import { IconChevronLeft } from '~/../../packages/ui'
-import * as Accordion from '@radix-ui/react-accordion'
+
 import HomeMenuIconPicker from './HomeMenuIconPicker'
+import { getPathWithoutHash } from './NavigationMenu.utils'
 
 const HeaderLink = React.memo(function HeaderLink(props: {
   title: string
@@ -19,7 +21,7 @@ const HeaderLink = React.memo(function HeaderLink(props: {
       className={[
         ' ',
         !props.title && 'capitalize',
-        props.url === router.asPath ? 'text-brand' : 'hover:text-brand text-scale-1200',
+        props.url === router.asPath ? 'text-brand' : 'hover:text-brand text-foreground',
       ].join(' ')}
     >
       {props.title ?? props.id}
@@ -30,13 +32,13 @@ const HeaderLink = React.memo(function HeaderLink(props: {
 const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any) {
   const router = useRouter()
   const { resolvedTheme } = useTheme()
-  const activeItem = props.subItem.url === router.asPath
+  const activeItem = props.subItem.url === getPathWithoutHash(router.asPath)
   const activeItemRef = useRef(null)
 
   const LinkContainer = (props) => {
     return (
-      <Link href={props.url} passHref>
-        <a className={props.className}>{props.children}</a>
+      <Link href={props.url} className={props.className}>
+        {props.children}
       </Link>
     )
   }
@@ -54,8 +56,8 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
     <>
       {props.subItemIndex === 0 && (
         <>
-          <div className="h-px w-full bg-scale-500 my-3"></div>
-          <span className="font-mono text-xs uppercase text-scale-1200 font-medium tracking-wider">
+          <div className="h-px w-full bg-border my-3"></div>
+          <span className="font-mono text-xs uppercase text-foreground font-medium tracking-wider">
             {props.parent.name}
           </span>
         </>
@@ -69,7 +71,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
               'cursor-pointer transition text-sm',
               activeItem
                 ? 'text-brand font-medium'
-                : 'hover:text-scale-1200 dark:hover:text-scale-1100 text-scale-1000',
+                : 'hover:text-foreground text-foreground-lighter',
             ].join(' ')}
             parent={props.subItem.parent}
           >
@@ -78,7 +80,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                 alt={props.subItem.name + router.basePath}
                 src={
                   `${router.basePath}` +
-                  `${props.subItem.icon}${resolvedTheme !== 'dark' ? '-light' : ''}.svg`
+                  `${props.subItem.icon}${!resolvedTheme?.includes('dark') ? '-light' : ''}.svg`
                 }
                 width={15}
                 height={15}
@@ -93,17 +95,16 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
             {props.subItem.items.map((subSubItem) => {
               return (
                 <li key={props.subItem.name}>
-                  <Link href={`${subSubItem.url}`} passHref>
-                    <a
-                      className={[
-                        'cursor-pointer transition text-sm',
-                        subSubItem.url === router.asPath
-                          ? 'text-brand'
-                          : 'hover:text-brand text-scale-1000',
-                      ].join(' ')}
-                    >
-                      {subSubItem.name}
-                    </a>
+                  <Link
+                    href={`${subSubItem.url}`}
+                    className={[
+                      'cursor-pointer transition text-sm',
+                      subSubItem.url === getPathWithoutHash(router.asPath)
+                        ? 'text-brand'
+                        : 'hover:text-brand text-foreground-lighter',
+                    ].join(' ')}
+                  >
+                    {subSubItem.name}
                   </Link>
                 </li>
               )
@@ -120,25 +121,19 @@ const ContentLink = React.memo(function ContentLink(props: any) {
 
   return (
     <li className="mb-1.5">
-      <Link href={props.url} passHref>
-        <a
-          className={[
-            'cursor-pointer transition text-sm',
-            props.url === router.asPath
-              ? 'text-brand'
-              : 'hover:text-scale-1200 dark:hover:text-scale-1100 text-scale-1000',
-          ].join(' ')}
-        >
-          {props.icon && (
-            <Image
-              alt={props.icon}
-              width={12}
-              height={12}
-              src={`${router.basePath}${props.icon}`}
-            />
-          )}
-          {props.name}
-        </a>
+      <Link
+        href={props.url}
+        className={[
+          'cursor-pointer transition text-sm',
+          props.url === router.asPath
+            ? 'text-brand-link'
+            : 'hover:text-foreground text-foreground-lighter',
+        ].join(' ')}
+      >
+        {props.icon && (
+          <Image alt={props.icon} width={12} height={12} src={`${router.basePath}${props.icon}`} />
+        )}
+        {props.name}
       </Link>
     </li>
   )
@@ -149,29 +144,26 @@ const Content = (props) => {
 
   return (
     <ul className={['relative w-full flex flex-col gap-0 pb-5'].join(' ')}>
-      <Link href={`${menu.parent ?? '/'}`} passHref>
-        <a
-          className={[
-            'flex items-center gap-1 text-xs group mb-3',
-            'text-base transition-all duration-200 text-brand hover:text-brand-600 hover:cursor-pointer ',
-          ].join(' ')}
-        >
-          <div className="relative w-2">
-            <div className="transition-all ease-out ml-0 group-hover:-ml-1">
-              <IconChevronLeft size={10} strokeWidth={3} />
-            </div>
+      <Link
+        href={`${menu.parent ?? '/'}`}
+        className={[
+          'flex items-center gap-1 text-xs group mb-3',
+          'text-base transition-all duration-200 text-brand-link hover:text-brand-600 hover:cursor-pointer ',
+        ].join(' ')}
+      >
+        <div className="relative w-2">
+          <div className="transition-all ease-out ml-0 group-hover:-ml-1">
+            <ChevronLeft size={10} strokeWidth={3} />
           </div>
-          <span>Back to Home</span>
-        </a>
+        </div>
+        <span>Back to Home</span>
       </Link>
 
-      <Link href={menu.url ?? ''} passHref>
-        <a>
-          <div className="flex items-center gap-3 my-3 text-brand">
-            <HomeMenuIconPicker icon={menu.icon} />
-            <HeaderLink title={menu.title} url={menu.url} id={id} />
-          </div>
-        </a>
+      <Link href={menu.url ?? ''}>
+        <div className="flex items-center gap-3 my-3 text-brand-link">
+          <HomeMenuIconPicker icon={menu.icon} />
+          <HeaderLink title={menu.title} url={menu.url} id={id} />
+        </div>
       </Link>
 
       {menu.items.map((x) => {

@@ -1,4 +1,4 @@
-import { PrivacySettings } from 'ui'
+import { PrivacySettings } from 'ui-patterns/PrivacySettings'
 
 const footerData = [
   {
@@ -33,8 +33,8 @@ const footerData = [
         url: '/pricing',
       },
       {
-        text: 'Launch Week 8',
-        url: '/launch-week',
+        text: 'Special Announcement',
+        url: '/special-announcement',
       },
     ],
   },
@@ -75,11 +75,11 @@ const footerData = [
       },
       {
         text: 'SOC2',
-        url: 'https://forms.supabase.com/soc2',
+        url: '/security',
       },
       {
         text: 'HIPAA',
-        url: 'https://forms.supabase.com/hipaa',
+        url: 'https://forms.supabase.com/hipaa2',
       },
     ],
   },

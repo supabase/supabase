@@ -1,0 +1,90 @@
+---
+id: 'examples-cloudflare-turnstile'
+title: 'CAPTCHA support with Cloudflare Turnstile'
+description: 'Protecting Forms with Cloudflare Turnstile.'
+video: 'https://www.youtube.com/v/OwW0znboh60'
+---
+
+<div class="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/OwW0znboh60"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+[Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/) is a friendly, free CAPTCHA replacement, and it works seamlessly with Supabase Edge Functions to protect your forms. [View on GitHub](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/cloudflare-turnstile).
+
+## Setup
+
+- Follow these steps to set up a new site: https://developers.cloudflare.com/turnstile/get-started/
+- Add the Cloudflare Turnstile widget to your site: https://developers.cloudflare.com/turnstile/get-started/client-side-rendering/
+
+## Code
+
+Create a new function in your project:
+
+```bash
+supabase functions new cloudflare-turnstile
+```
+
+And add the code to the `index.ts` file:
+
+```ts index.ts
+import { corsHeaders } from '../_shared/cors.ts'
+
+console.log('Hello from Cloudflare Trunstile!')
+
+function ips(req: Request) {
+  return req.headers.get('x-forwarded-for')?.split(/\s*,\s*/)
+}
+
+Deno.serve(async (req) => {
+  // This is needed if you're planning to invoke your function from a browser.
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
+  const { token } = await req.json()
+  const clientIps = ips(req) || ['']
+  const ip = clientIps[0]
+
+  // Validate the token by calling the
+  // "/siteverify" API endpoint.
+  let formData = new FormData()
+  formData.append('secret', Deno.env.get('CLOUDFLARE_SECRET_KEY') ?? '')
+  formData.append('response', token)
+  formData.append('remoteip', ip)
+
+  const url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
+  const result = await fetch(url, {
+    body: formData,
+    method: 'POST',
+  })
+
+  const outcome = await result.json()
+  console.log(outcome)
+  if (outcome.success) {
+    return new Response('success', { headers: corsHeaders })
+  }
+  return new Response('failure', { headers: corsHeaders })
+})
+```
+
+## Deploy the server-side validation Edge Functions
+
+- https://developers.cloudflare.com/turnstile/get-started/server-side-validation/
+
+```bash
+supabase functions deploy cloudflare-turnstile
+supabase secrets set CLOUDFLARE_SECRET_KEY=your_secret_key
+```
+
+## Invoke the function from your site
+
+```js
+const { data, error } = await supabase.functions.invoke('cloudflare-turnstile', {
+  body: { token },
+})
+```

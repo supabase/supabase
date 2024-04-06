@@ -1,9 +1,8 @@
 import * as Yup from 'yup'
-import Link from 'next/link'
 import { useState } from 'react'
 import { Button, Form, IconDownload, Input } from 'ui'
 
-import supabase from '~/lib/supabase'
+import supabase from '~/lib/supabaseMisc'
 import CTABanner from 'components/CTABanner/index'
 import Layout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -30,7 +29,7 @@ const DPA = () => {
 
       resetForm()
       setFormSubmitted(true)
-      window.open('https://supabase.com/downloads/docs/Supabase+DPA+230907.pdf', '_blank')
+      window.open('https://supabase.com/downloads/docs/Supabase+DPA+231211.pdf', '_blank')
     } catch (error: any) {
       setError(error.message)
     }

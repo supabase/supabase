@@ -1,0 +1,878 @@
+---
+title: 'Creating a Supabase client for SSR'
+description: 'Configure Supabase client to use Cookies'
+sidebar_label: 'Creating a client'
+---
+
+### Install Supabase packages
+
+The `ssr` package configures Supabase to use Cookies, which is required for server-side languages and frameworks.
+
+```bash
+npm install @supabase/ssr @supabase/supabase-js
+```
+
+### Set environment variables
+
+<Tabs scrollable size="small" type="underlined" defaultActiveId="nextjs" queryGroup="framework">
+
+<TabPanel id="nextjs" label="Next.js">
+
+Create a `.env.local` file in your project root directory. You can get your `SUPABASE_URL` and `SUPABASE_ANON_KEY` from inside [your Supabase project's dashboard](https://supabase.com/dashboard/project/_/settings/api).
+
+```bash .env.local
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+</TabPanel>
+<TabPanel id="sveltekit" label="SvelteKit">
+
+Create a `.env.local` file in your project root directory. You can get your `SUPABASE_URL` and `SUPABASE_ANON_KEY` from inside [your Supabase project's dashboard](https://supabase.com/dashboard/project/_/settings/api).
+
+```bash .env.local
+PUBLIC_SUPABASE_URL=your_supabase_project_url
+PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+</TabPanel>
+<TabPanel id="astro" label="Astro">
+
+Create a `.env` file in your project root directory. You can get your `SUPABASE_URL` and `SUPABASE_ANON_KEY` from inside [your Supabase project's dashboard](https://supabase.com/dashboard/project/_/settings/api).
+
+```bash .env
+PUBLIC_SUPABASE_URL=your_supabase_project_url
+PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+</TabPanel>
+<TabPanel id="remix" label="Remix">
+
+Create a `.env` file in your project root directory. You can get your `SUPABASE_URL` and `SUPABASE_ANON_KEY` from inside [your Supabase project's dashboard](https://supabase.com/dashboard/project/_/settings/api).
+
+```bash .env
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+</TabPanel>
+<TabPanel id="express" label="Express">
+
+Create a `.env` file in your project root directory. You can get your `SUPABASE_URL` and `SUPABASE_ANON_KEY` from inside [your Supabase project's dashboard](https://supabase.com/dashboard/project/_/settings/api).
+
+```bash .env
+SUPABASE_URL=your_supabase_project_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+Install [dotenv](https://www.npmjs.com/package/dotenv)
+
+```bash
+npm i dotenv
+```
+
+and initialize it
+
+```js app.js
+const express = require("express")
+const dotenv = require("dotenv")
+dotenv.config()
+...
+```
+
+</TabPanel>
+</Tabs>
+
+### Creating a client
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="nextjs"
+  queryGroup="framework"
+>
+<TabPanel id="nextjs" label="Next.js">
+
+Creating a Supabase client with the `ssr` package automatically configures it to use cookies. This means your user's session is available throughout the entire Next.js stack - client, server, App Router, Pages Router. It just works!
+
+<Admonition type="note">
+
+For the client utility functions, it is recommended to create them in a separate `/utils/supabase` folder. That way, you can import them as `client` into any component or page that needs access to Supabase. For further information, you can look at the [Next.js Auth Guide](/docs/guides/auth/server-side/nextjs).
+
+</Admonition>
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="client-component"
+  queryGroup="environment"
+>
+<TabPanel id="client-component" label="Client Component">
+
+```ts page.tsx
+"use client";
+
+import { createBrowserClient } from '@supabase/ssr'
+
+export default function Page () {
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+  return ...
+}
+```
+
+</TabPanel>
+
+<TabPanel id="server-component" label="Server Component">
+
+<Admonition type="note">
+
+Server Components only have read access to cookies. Check the `Middleware` tab for an example of refreshing expired sessions before loading a Server Component route.
+
+</Admonition>
+
+```ts page.tsx
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+
+export default async function Page () {
+  const cookieStore = cookies()
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+      },
+    }
+  )
+
+  return ...
+}
+```
+
+</TabPanel>
+
+<TabPanel id="middleware" label="Middleware">
+
+<Admonition type="note">
+
+Server Components only have read access to cookies. This `Middleware` example can be used to refresh expired sessions before loading Server Component routes.
+
+</Admonition>
+
+```ts middleware.ts
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
+
+export async function middleware(request: NextRequest) {
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return request.cookies.get(name)?.value
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value,
+            ...options,
+          })
+        },
+        remove(name: string, options: CookieOptions) {
+          request.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
+          })
+          response.cookies.set({
+            name,
+            value: '',
+            ...options,
+          })
+        },
+      },
+    }
+  )
+
+  await supabase.auth.getUser()
+
+  return response
+}
+
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
+}
+```
+
+</TabPanel>
+
+<TabPanel id="route-handler" label="Route Handler">
+
+```ts route.ts
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+
+export async function POST(request: Request) {
+  const cookieStore = cookies()
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return cookieStore.get(name)?.value
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          cookieStore.set({ name, value, ...options })
+        },
+        remove(name: string, options: CookieOptions) {
+          cookieStore.set({ name, value: '', ...options })
+        },
+      },
+    }
+  )
+
+  return ...
+}
+```
+
+</TabPanel>
+
+<TabPanel id="server-action" label="Server Action">
+
+```ts page.tsx
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
+import { cookies } from 'next/headers'
+
+export default async function Page () {
+  const serverAction = async () => {
+    'use server'
+
+    const cookieStore = cookies()
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          get(name: string) {
+            return cookieStore.get(name)?.value
+          },
+          set(name: string, value: string, options: CookieOptions) {
+            cookieStore.set({ name, value, ...options })
+          },
+          remove(name: string, options: CookieOptions) {
+            cookieStore.set({ name, value: '', ...options })
+          },
+        },
+      }
+    )
+  }
+
+  return ...
+}
+```
+
+</TabPanel>
+
+<TabPanel id="get-server-side-props" label="getServerSideProps">
+
+```ts index.tsx
+import { type GetServerSidePropsContext } from 'next'
+import { createServerClient, type CookieOptions, serialize } from '@supabase/ssr'
+
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return context.req.cookies[name];
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          context.res.appendHeader(
+            "Set-Cookie",
+            serialize(name, value, options)
+          );
+        },
+        remove(name: string, options: CookieOptions) {
+          context.res.appendHeader("Set-Cookie", serialize(name, "", options));
+        },
+      },
+    }
+  )
+
+  return {...}
+}
+```
+
+</TabPanel>
+
+<TabPanel id="get-static-props" label="getStaticProps">
+
+The `getStaticProps` function gets executed at build time, rather than per request. At build time,
+there is no user, session or cookies. Therefore, we can use the standard `createClient` function
+from `supabase-js`.
+
+```ts page.tsx
+import { createClient } from '@supabase/supabase-js'
+
+export const getStaticProps = async () => {
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  )
+
+  return {...}
+}
+```
+
+</TabPanel>
+
+<TabPanel id="api-route" label="API Route">
+
+```ts index.tsx
+import { createServerClient, type CookieOptions, serialize } from "@supabase/ssr"
+import { type NextApiRequest, type NextApiResponse } from "next"
+
+export default async function handler(
+  req: NextApiRequest,
+  res: NextApiResponse
+) {
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        get(name: string) {
+          return req.cookies[name];
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          res.setHeader("Set-Cookie", serialize(name, value, options));
+        },
+        remove(name: string, options: CookieOptions) {
+          res.setHeader("Set-Cookie", serialize(name, "", options));
+        },
+      },
+    }
+  )
+
+  res.send(...)
+}
+```
+
+</TabPanel>
+
+<TabPanel id="pages-component" label="Pages Component">
+
+```ts index.tsx
+import { createBrowserClient } from "@supabase/ssr"
+
+export default function Index () {
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  )
+
+  return ...
+}
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
+<TabPanel id="sveltekit" label="SvelteKit">
+
+Creating a Supabase client with the `ssr` package automatically configures it to use Cookies. This means your user's session is available throughout the entire SvelteKit stack - page, layout, server, hooks.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="hooks"
+  queryGroup="environment"
+>
+<TabPanel id="hooks" label="Hooks">
+
+<Admonition type="note">
+
+API routes, server layout load and form actions can now access the supabase client from the `event` object due to this hook.
+
+</Admonition>
+
+```ts hooks.server.ts
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
+import { createServerClient } from '@supabase/ssr'
+import type { Handle } from '@sveltejs/kit'
+
+export const handle: Handle = async ({ event, resolve }) => {
+  event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+    cookies: {
+      get: (key) => event.cookies.get(key),
+      /**
+       * Note: You have to add the `path` variable to the
+       * set and remove method due to sveltekit's cookie API
+       * requiring this to be set, setting the path to an empty string
+       * will replicate previous/standard behaviour (https://kit.svelte.dev/docs/types#public-types-cookies)
+       */
+      set: (key, value, options) => {
+        event.cookies.set(key, value, { ...options, path: '/' })
+      },
+      remove: (key, options) => {
+        event.cookies.delete(key, { ...options, path: '/' })
+      },
+    },
+  })
+
+  /**
+   * Unlike `supabase.auth.getSession`, which is unsafe on the server because it
+   * doesn't validate the JWT, this function validates the JWT by first calling
+   * `getUser` and aborts early if the JWT signature is invalid.
+   */
+  event.locals.safeGetSession = async () => {
+    const {
+      data: { user },
+      error,
+    } = await event.locals.supabase.auth.getUser()
+    if (error) {
+      return { session: null, user: null }
+    }
+
+    const {
+      data: { session },
+    } = await event.locals.supabase.auth.getSession()
+    return { session, user }
+  }
+
+  return resolve(event, {
+    filterSerializedResponseHeaders(name) {
+      return name === 'content-range'
+    },
+  })
+}
+```
+
+</TabPanel>
+
+<TabPanel id="layout" label="Root Layout Load">
+
+<Admonition type="note">
+
+Page components can get access to the supabase client from the `data` object due to this load function.
+
+</Admonition>
+
+```ts +layout.ts
+import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
+import type { LayoutLoad } from './$types'
+import { createBrowserClient, isBrowser, parse } from '@supabase/ssr'
+
+export const load: LayoutLoad = async ({ fetch, data, depends }) => {
+  depends('supabase:auth')
+
+  const supabase = createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+    global: {
+      fetch,
+    },
+    cookies: {
+      get(key) {
+        if (!isBrowser()) {
+          return JSON.stringify(data.session)
+        }
+
+        const cookie = parse(document.cookie)
+        return cookie[key]
+      },
+    },
+  })
+
+  /**
+   * It's fine to use `getSession` here, because on the client, `getSession` is
+   * safe, and on the server, it reads `session` from the `LayoutData`, which
+   * safely checked the session using `safeGetSession`.
+   */
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  return { supabase, session }
+}
+```
+
+</TabPanel>
+
+<TabPanel id="layout-server" label="Root Server Layout">
+
+```ts +layout.server.ts
+import type { LayoutServerLoad } from './$types'
+
+export const load: LayoutServerLoad = async ({ locals: { safeGetSession } }) => {
+  const { session, user } = await safeGetSession()
+
+  return {
+    session,
+    user,
+  }
+}
+```
+
+</TabPanel>
+
+<TabPanel id="page-component" label="Page Component">
+
+```svelte +page.svelte
+<script>
+  export let data
+  let { supabase } = data
+  $: ({ supabase } = data)
+
+  ...
+</script>
+
+....
+```
+
+</TabPanel>
+
+<TabPanel id="api-route" label="API route">
+
+```ts +server.ts
+import { redirect } from '@sveltejs/kit';
+
+export const GET = async (event) => {
+	const { url, locals: { supabase } } = event
+	...
+}
+```
+
+</TabPanel>
+
+<TabPanel id="form-actions" label="Form actions">
+
+```ts +page.server.ts
+import type { Actions } from './$types'
+
+export const actions: Actions = {
+	default: async (event) => {
+    const { request, url, locals: { supabase } } = event
+		const formData = await request.formData()
+		const email = formData.get('email') as string
+		const password = formData.get('password') as string
+    ...
+	}
+}
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
+<TabPanel id="astro" label="Astro">
+
+By default, Astro apps are static. This means the requests for data happen at build time, rather than when the user requests a page. At build time, there is no user, session or cookies. Therefore, we need to configure Astro for Server-side Rendering (SSR) if you want data to be fetched dynamically per request.
+
+```js astro.config.mjs
+import { defineConfig } from 'astro/config'
+
+export default defineConfig({
+  output: 'server',
+})
+```
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="astro-server"
+  queryGroup="environment"
+>
+<TabPanel id="astro-server" label="Server">
+
+```ts index.astro
+---
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
+
+const supabase = createServerClient(
+  import.meta.env.PUBLIC_SUPABASE_URL,
+  import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+  {
+    cookies: {
+      get(key: string) {
+        return Astro.cookies.get(key)?.value;
+      },
+      set(key: string, value: string, options: CookieOptions) {
+        Astro.cookies.set(key, value, options);
+      },
+      remove(key: string, options) {
+        Astro.cookies.delete(key, options);
+      },
+    },
+  }
+);
+---
+```
+
+</TabPanel>
+
+<TabPanel id="astro-browser" label="Browser">
+
+```html index.astro
+<script>
+  const supabase = createBrowserClient(
+    import.meta.env.PUBLIC_SUPABASE_URL,
+    import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+  );
+</script>
+```
+
+</TabPanel>
+
+<TabPanel id="astro-server-endpoint" label="Server Endpoint">
+
+```ts route.ts
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import type { APIContext } from "astro";
+
+export async function GET(context: APIContext) {
+  const supabase = createServerClient(
+    import.meta.env.PUBLIC_SUPABASE_URL,
+    import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+    {
+      cookies: {
+        get(key: string) {
+          return context.cookies.get(key)?.value;
+        },
+        set(key: string, value: string, options: CookieOptions) {
+          context.cookies.set(key, value, options);
+        },
+        remove(key: string, options) {
+          context.cookies.delete(key, options);
+        },
+      },
+    }
+  );
+
+  return ...
+}
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
+<TabPanel id="remix" label="Remix">
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="remix-loader"
+  queryGroup="environment"
+>
+<TabPanel id="remix-loader" label="Loader">
+
+```ts _index.tsx
+import { type LoaderFunctionArgs } from '@remix-run/node'
+import { createServerClient, parse, serialize } from '@supabase/ssr'
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const cookies = parse(request.headers.get('Cookie') ?? '')
+  const headers = new Headers()
+
+  const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
+    cookies: {
+      get(key) {
+        return cookies[key]
+      },
+      set(key, value, options) {
+        headers.append('Set-Cookie', serialize(key, value, options))
+      },
+      remove(key, options) {
+        headers.append('Set-Cookie', serialize(key, '', options))
+      },
+    },
+  })
+
+  return new Response('...', {
+    headers,
+  })
+}
+```
+
+</TabPanel>
+
+<TabPanel id="remix-action" label="Action">
+
+```ts _index.tsx
+import { type ActionFunctionArgs } from '@remix-run/node'
+import { createServerClient, parse, serialize } from '@supabase/ssr'
+
+export async function action({ request }: ActionFunctionArgs) {
+  const cookies = parse(request.headers.get('Cookie') ?? '')
+  const headers = new Headers()
+
+  const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
+    cookies: {
+      get(key) {
+        return cookies[key]
+      },
+      set(key, value, options) {
+        headers.append('Set-Cookie', serialize(key, value, options))
+      },
+      remove(key, options) {
+        headers.append('Set-Cookie', serialize(key, '', options))
+      },
+    },
+  })
+
+  return new Response('...', {
+    headers,
+  })
+}
+```
+
+</TabPanel>
+
+<TabPanel id="remix-component" label="Component">
+
+```ts _index.tsx
+import { type LoaderFunctionArgs } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+import { createBrowserClient } from "@supabase/ssr";
+
+export async function loader({}: LoaderFunctionArgs) {
+  return {
+    env: {
+      SUPABASE_URL: process.env.SUPABASE_URL!,
+      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY!,
+    },
+  };
+}
+
+export default function Index() {
+  const { env } = useLoaderData<typeof loader>();
+
+  const supabase = createBrowserClient(env.SUPABASE_URL, env.SUPABASE_ANON_KEY);
+
+  return ...
+}
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
+
+<TabPanel id="express" label="Express">
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="server-client"
+  queryGroup="environment"
+>
+<TabPanel id="server-client" label="Server Client">
+
+```ts lib/supabase.js
+const { createServerClient } = require('@supabase/ssr')
+
+exports.createClient = (context) => {
+  return createServerClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY, {
+    cookies: {
+      get: (key) => {
+        const cookies = context.req.cookies
+        const cookie = cookies[key] ?? ''
+        return decodeURIComponent(cookie)
+      },
+      set: (key, value, options) => {
+        if (!context.res) return
+        context.res.cookie(key, encodeURIComponent(value), {
+          ...options,
+          sameSite: 'Lax',
+          httpOnly: true,
+        })
+      },
+      remove: (key, options) => {
+        if (!context.res) return
+        context.res.cookie(key, '', { ...options, httpOnly: true })
+      },
+    },
+  })
+}
+```
+
+</TabPanel>
+<TabPanel id="express-route" label="Route">
+
+```ts app.js
+const express = require("express")
+const dotenv = require("dotenv")
+
+const { createClient } = require("./lib/supabase")
+
+const app = express()
+
+app.post("/hello-world", async function (req, res, next) {
+  const { email, emailConfirm } = req.body
+  ...
+
+  const supabase = createClient({ req, res })
+})
+```
+
+</TabPanel>
+</Tabs>
+
+</TabPanel>
+</Tabs>
+
+## Next steps
+
+- Implement [Authentication using Email and Password](/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr)
+- Implement [Authentication using OAuth](/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr)
+- [Learn more about SSR](/docs/guides/auth/server-side-rendering)

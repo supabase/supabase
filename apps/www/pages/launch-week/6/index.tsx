@@ -34,7 +34,7 @@ const constellation = [
 ]
 
 export default function launchweek() {
-  const { theme, setTheme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const title = 'Launch Week 6'
   const description = 'Supabase Launch Week 6 | 12-18 Dec 2022'
   const liveDay = null
@@ -169,16 +169,14 @@ export default function launchweek() {
             )}
           >
             <div className="flex justify-center">
-              {/* <img
-                src="/images/launchweek/launchweek-logo--light.svg"
-                className="flex w-40 dark:hidden lg:w-80"
-              /> */}
               <img
                 src="/images/launchweek/launchweek-logo--dark.svg"
                 className="w-40 flex lg:w-80"
               />
             </div>
-            <p className="text-scale-1100 text-sm text-center">Dec 12 – 16 at 6 AM PT | 9 AM ET</p>
+            <p className="text-foreground-light text-sm text-center">
+              Dec 12 – 16 at 6 AM PT | 9 AM ET
+            </p>
           </div>
         </SectionContainer>
         <div
@@ -249,12 +247,7 @@ export default function launchweek() {
           <div className="border border-[#2E2E2E] rounded-2xl text-sm px-5 py-4 flex flex-col sm:flex-row justify-between items-center">
             <div className="relative flex items-center mb-4 sm:mb-0">
               <div className="flex min-w-[150px]">
-                <img
-                  // src={`/images/launchweek/${isDarkMode ? 'outro.svg' : 'outro-light.svg'}`}
-                  src={`/images/launchweek/outro.svg`}
-                  width={110}
-                  height={80}
-                ></img>
+                <img src={`/images/launchweek/outro.svg`} width={110} height={80}></img>
               </div>
               <div className="flex flex-col lg:flex-row ml-8 sm:ml-10">
                 <span className="text-white mr-2">Wrap Up</span>
@@ -309,9 +302,7 @@ export default function launchweek() {
                     <div
                       className="absolute group-hover/day1:scale-105 opacity-60 group-hover/day1:opacity-100 w-full h-full -z-10 transition-all duration-500"
                       style={{
-                        background: `radial-gradient(650px 150px at 50% 100%, ${
-                          theme === 'dark' ? '#103633' : '#b8e8e7'
-                        }, transparent)`,
+                        background: `radial-gradient(650px 150px at 50% 100%, #103633, transparent)`,
                       }}
                     ></div>
                     <div
@@ -355,9 +346,7 @@ export default function launchweek() {
                       <div
                         className="top-0 absolute group-hover/2:scale-105 opacity-60 group-hover/2:opacity-100 w-full h-full -z-10 transition-all duration-500"
                         style={{
-                          background: `radial-gradient(90% 130px at 80% 0px, ${
-                            theme === 'dark' ? '#103633' : '#b8e8e7'
-                          }, transparent)`,
+                          background: `radial-gradient(90% 130px at 80% 0px, #103633, transparent)`,
                         }}
                       ></div>
                       <div className="flex items-center justify-between flex-col-reverse lg:flex-row lg:justify-start gap-2 text-white">
@@ -374,9 +363,7 @@ export default function launchweek() {
                       <div
                         className="top-0 absolute group-hover/3:scale-105 opacity-60 group-hover/3:opacity-100 w-full h-full -z-10 transition-all duration-500"
                         style={{
-                          background: `radial-gradient(90% 130px at 50% 0px, ${
-                            theme === 'dark' ? '#103633' : '#b8e8e7'
-                          }, transparent)`,
+                          background: `radial-gradient(90% 130px at 50% 0px, #103633, transparent)`,
                         }}
                       ></div>
                       <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -413,26 +400,18 @@ export default function launchweek() {
                     >
                       <div className="absolute top-0 right-0 w-full h-full -z-20 ">
                         <Image
-                          src={
-                            theme === 'dark'
-                              ? '/images/launchweek/mfa-dark.png'
-                              : '/images/launchweek/mfa-light.png'
-                          }
-                          layout="fill"
-                          objectFit="cover"
+                          src={'/images/launchweek/mfa-dark.png'}
+                          fill
+                          className="object-cover"
                           quality={100}
                           priority
                         />
                       </div>
                       <div className="absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover:opacity-100 duration-500 transition-all">
                         <Image
-                          src={
-                            // isDarkMode
-                            '/images/launchweek/mfa-dark-hover.png'
-                            // : '/images/launchweek/mfa-light-hover.png'
-                          }
-                          layout="fill"
-                          objectFit="cover"
+                          src={'/images/launchweek/mfa-dark-hover.png'}
+                          fill
+                          className="object-cover"
                           quality={100}
                         />
                       </div>
@@ -472,31 +451,21 @@ export default function launchweek() {
                         className={`absolute top-0 right-0 w-full h-full -z-20 ${styles.wrappers}`}
                       >
                         <Image
-                          src={
-                            theme === 'dark'
-                              ? '/images/launchweek/wrappers-visual.svg'
-                              : '/images/launchweek/wrappers-visual-light.svg'
-                          }
-                          layout="fill"
-                          objectFit="cover"
+                          src={'/images/launchweek/wrappers-visual.svg'}
+                          fill
                           quality={100}
                           priority
-                          className="left-16"
+                          className="left-16 object-cover"
                         />
                       </div>
                       <div
                         className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day4:opacity-100 duration-500 transition-all ${styles.wrappers}`}
                       >
                         <Image
-                          src={
-                            theme === 'dark'
-                              ? '/images/launchweek/wrappers-visual-hover.svg'
-                              : '/images/launchweek/wrappers-visual-hover-light.svg'
-                          }
-                          layout="fill"
-                          objectFit="cover"
+                          src={'/images/launchweek/wrappers-visual-hover.svg'}
+                          fill
                           quality={100}
-                          className="test"
+                          className="test object-cover"
                         />
                       </div>
                       <div className="flex items-center flex-col-reverse lg:flex-row text-white">
@@ -539,31 +508,21 @@ export default function launchweek() {
                           className={`absolute top-0 right-0 w-full h-full -z-20 ${styles.wrappers}`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/vault-visual.svg'
-                                : '/images/launchweek/vault-visual-light.svg'
-                            }
-                            layout="fill"
-                            objectFit="cover"
+                            src={'/images/launchweek/vault-visual.svg'}
+                            fill
                             quality={100}
                             priority
-                            className="left-16"
+                            className="left-16 object-cover"
                           />
                         </div>
                         <div
                           className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step1:opacity-100 duration-500 transition-all ${styles.wrappers}`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/vault-visual-hover.svg'
-                                : '/images/launchweek/vault-visual-hover-light.svg'
-                            }
-                            layout="fill"
-                            objectFit="cover"
+                            src={'/images/launchweek/vault-visual-hover.svg'}
+                            fill
                             quality={100}
-                            className="test"
+                            className="test object-cover"
                           />
                         </div>
                         <div className="flex items-center flex-col-reverse lg:flex-row">
@@ -579,31 +538,21 @@ export default function launchweek() {
                       >
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/TCE-visual.svg'
-                                : '/images/launchweek/TCE-visual-light.svg'
-                            }
-                            layout="fill"
-                            objectFit="cover"
+                            src={'/images/launchweek/TCE-visual.svg'}
+                            fill
                             quality={100}
                             priority
-                            className="left-16"
+                            className="left-16 object-cover"
                           />
                         </div>
                         <div
                           className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/TCE-visual-hover.svg'
-                                : '/images/launchweek/TCE-visual-hover-light.svg'
-                            }
-                            layout="fill"
-                            objectFit="cover"
+                            src={'/images/launchweek/TCE-visual-hover.svg'}
+                            fill
                             quality={100}
-                            className="test"
+                            className="test object-cover"
                           />
                         </div>
                         <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -624,31 +573,21 @@ export default function launchweek() {
                           className={`absolute top-0 right-0 w-full h-full -z-20 ${styles.community_wrappers}`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/community-visual.svg'
-                                : '/images/launchweek/community-visual-light.svg'
-                            }
-                            layout="fill"
-                            objectFit="cover"
+                            src={'/images/launchweek/community-visual.svg'}
+                            fill
                             quality={100}
                             priority
-                            className="left-16"
+                            className="left-16 object-cover"
                           />
                         </div>
                         <div
                           className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/community:opacity-100 duration-500 transition-all ${styles.community_wrappers}`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/community-visual-hover.svg'
-                                : '/images/launchweek/community-visual-light-hover.svg'
-                            }
-                            layout="fill"
-                            objectFit="cover"
+                            src={'/images/launchweek/community-visual-hover.svg'}
+                            fill
                             quality={100}
-                            className="test"
+                            className="test object-cover"
                           />
                         </div>
                         <div className="flex items-center flex-col-reverse lg:flex-row">
@@ -729,31 +668,21 @@ export default function launchweek() {
                       >
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/PgGraphql-visual.svg'
-                                : '/images/launchweek/PgGraphql-visual-light.svg'
-                            }
-                            layout="fill"
-                            objectFit="cover"
+                            src={'/images/launchweek/PgGraphql-visual.svg'}
+                            fill
                             quality={100}
                             priority
-                            className="left-16"
+                            className="left-16 object-cover"
                           />
                         </div>
                         <div
                           className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/PgGraphql-visual-hover.svg'
-                                : '/images/launchweek/PgGraphql-visual-hover-light.svg'
-                            }
-                            layout="fill"
-                            objectFit="cover"
+                            src={'/images/launchweek/PgGraphql-visual-hover.svg'}
+                            fill
                             quality={100}
-                            className="test"
+                            className="test object-cover"
                           />
                         </div>
                         <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -772,31 +701,21 @@ export default function launchweek() {
                       >
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/custom-domains-visual.svg'
-                                : '/images/launchweek/custom-domains-visual-light.svg'
-                            }
-                            layout="fill"
-                            objectFit="cover"
+                            src={'/images/launchweek/custom-domains-visual.svg'}
+                            fill
                             quality={100}
                             priority
-                            className="left-16"
+                            className="left-16 object-cover"
                           />
                         </div>
                         <div
                           className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/custom-domains-visual-hover.svg'
-                                : '/images/launchweek/custom-domains-visual-hover-light.svg'
-                            }
-                            layout="fill"
-                            objectFit="cover"
+                            src={'/images/launchweek/custom-domains-visual-hover.svg'}
+                            fill
                             quality={100}
-                            className="test"
+                            className="test object-cover"
                           />
                         </div>
                         <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -815,31 +734,21 @@ export default function launchweek() {
                       >
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/PITR-visual.svg'
-                                : '/images/launchweek/PITR-visual-light.svg'
-                            }
-                            layout="fill"
-                            objectFit="cover"
+                            src={'/images/launchweek/PITR-visual.svg'}
+                            fill
                             quality={100}
                             priority
-                            className="left-16"
+                            className="left-16 object-cover"
                           />
                         </div>
                         <div
                           className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/PITR-visual-hover.svg'
-                                : '/images/launchweek/PITR-visual-hover-light.svg'
-                            }
-                            layout="fill"
-                            objectFit="cover"
+                            src={'/images/launchweek/PITR-visual-hover.svg'}
+                            fill
                             quality={100}
-                            className="test"
+                            className="test object-cover"
                           />
                         </div>
                         <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -858,31 +767,21 @@ export default function launchweek() {
                       >
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/pg_crdt-visual.svg'
-                                : '/images/launchweek/pg_crdt-visual-light.svg'
-                            }
-                            layout="fill"
-                            objectFit="cover"
+                            src={'/images/launchweek/pg_crdt-visual.svg'}
+                            fill
                             quality={100}
                             priority
-                            className="left-16"
+                            className="left-16 object-cover"
                           />
                         </div>
                         <div
                           className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/pg_crdt-visual-hover.svg'
-                                : '/images/launchweek/pg_crdt-visual-hover-light.svg'
-                            }
-                            layout="fill"
-                            objectFit="cover"
+                            src={'/images/launchweek/pg_crdt-visual-hover.svg'}
+                            fill
                             quality={100}
-                            className="test"
+                            className="test object-cover"
                           />
                         </div>
                         <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -901,31 +800,21 @@ export default function launchweek() {
                       >
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/postgres-visual.svg'
-                                : '/images/launchweek/postgres-visual-light.svg'
-                            }
-                            layout="fill"
-                            objectFit="cover"
+                            src={'/images/launchweek/postgres-visual.svg'}
+                            fill
                             quality={100}
                             priority
-                            className="left-16"
+                            className="left-16 object-cover"
                           />
                         </div>
                         <div
                           className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/postgres-visual-hover.svg'
-                                : '/images/launchweek/postgres-visual-hover-light.svg'
-                            }
-                            layout="fill"
-                            objectFit="cover"
+                            src={'/images/launchweek/postgres-visual-hover.svg'}
+                            fill
                             quality={100}
-                            className="test"
+                            className="test object-cover"
                           />
                         </div>
                         <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -944,31 +833,21 @@ export default function launchweek() {
                       >
                         <div className={`absolute top-0 right-0 w-full h-full -z-20`}>
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/PostgREST11-visual.svg'
-                                : '/images/launchweek/PostgREST11-visual-light.svg'
-                            }
-                            layout="fill"
-                            objectFit="cover"
+                            src={'/images/launchweek/PostgREST11-visual.svg'}
+                            fill
                             quality={100}
                             priority
-                            className="left-16"
+                            className="left-16 object-cover"
                           />
                         </div>
                         <div
                           className={`absolute top-0 right-0 w-full h-full -z-10 opacity-0 group-hover/day5step2:opacity-100 duration-500 transition-all`}
                         >
                           <Image
-                            src={
-                              theme === 'dark'
-                                ? '/images/launchweek/PostgREST11-visual-hover.svg'
-                                : '/images/launchweek/PostgREST11-visual-hover-light.svg'
-                            }
-                            layout="fill"
-                            objectFit="cover"
+                            src={'/images/launchweek/PostgREST11-visual-hover.svg'}
+                            fill
                             quality={100}
-                            className="test"
+                            className="test object-cover"
                           />
                         </div>
                         <div className="flex flex-col items-center gap-2 min-w-[300px]">
@@ -1079,7 +958,7 @@ export default function launchweek() {
                 rel="noopener noreferrer"
                 className="self-end mb-4"
               >
-                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-[#121212] w-fit relative max-w-[250px]">
+                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-background w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
                     className="absolute top-[16px] right-[10px] text-brand"
@@ -1094,11 +973,11 @@ export default function launchweek() {
                 rel="noopener noreferrer"
                 className="mb-4 w-fit"
               >
-                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-[#121212] w-fit relative max-w-[250px]">
+                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-background w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
                     className="absolute top-[16px] right-[10px] text-brand"
-                  ></img>
+                  />
                   <h3 className="text-white">Super UI</h3>
                   <p className="text-slate-1000 text-xs">Previous Best Overall Project Runner Up</p>
                 </div>
@@ -1109,7 +988,7 @@ export default function launchweek() {
                 rel="noopener noreferrer"
                 className="self-end mb-4"
               >
-                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-[#121212] w-fit relative max-w-[250px]">
+                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-background w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
                     className="absolute top-[16px] right-[10px] text-brand"
@@ -1124,7 +1003,7 @@ export default function launchweek() {
                 rel="noopener noreferrer"
                 className="mb-4 w-fit"
               >
-                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-[#121212] w-fit relative max-w-[250px]">
+                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-background w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
                     className="absolute top-[16px] right-[10px] text-brand"
@@ -1139,7 +1018,7 @@ export default function launchweek() {
                 rel="noopener noreferrer"
                 className="self-end"
               >
-                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-[#121212] w-fit relative max-w-[250px]">
+                <div className="border border-[#2E2E2E] rounded-xl pl-5 pr-9 py-4 bg-background w-fit relative max-w-[250px]">
                   <img
                     src="/images/launchweek/link.svg"
                     className="absolute top-[16px] right-[10px] text-brand"
@@ -1177,7 +1056,7 @@ export default function launchweek() {
                     <div className="absolute -inset-0.5 bg-brand-600 rounded-full opacity-75 group-hover:opacity-100 group-hover:blur-sm transition duration-500"></div>
                     <a href={creator.link} target="_blank" rel="noopener">
                       <img
-                        className="relative rounded-full w-12 h-12 border border-[#2E2E2E] border-brand hover:shadow-md"
+                        className="relative rounded-full w-12 h-12 border border-brand hover:shadow-md"
                         src={creator.profile_picture}
                       />
                     </a>
@@ -1187,24 +1066,21 @@ export default function launchweek() {
             })}
           </div>
           <div className="flex-1">
-            <Badge
-              className={`!bg-transparent !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-[#DFFFF1] !border-[#DFFFF1] h-fit relative mb-4 ${
-                true
-                  ? 'after:absolute after:rounded-full after:bg-white after:w-full after:h-full after:top-0 after:right-0 after:bottom-0 after:left-0 after:bg-gradient-to-br  text-transparent !border-[#163837] after:from-[#14292c] after:to-[#141516] after:border-[#1f3536] after:-z-10'
-                  : ''
-              }`}
-            >
+            <Badge className="!bg-transparent !py-1 !px-4 text-transparent bg-clip-text bg-gradient-to-r from-white to-[#DFFFF1] h-fit relative mb-4 after:absolute after:rounded-full after:bg-white after:w-full after:h-full after:top-0 after:right-0 after:bottom-0 after:left-0 after:bg-gradient-to-br !border-[#163837] after:from-[#14292c] after:to-[#141516] after:border-[#1f3536] after:-z-10">
               Shipped
             </Badge>
             <h2 className="text-3xl text-white mb-2">The Supabase Content Storm</h2>
             <p className="text-slate-900 md:max-w-[80%] mb-16">
               We worked with more than 30 content creators from around the world to drop a mountain
               of content simultaneously!
-              <a rel="noopener" target="_blank" href="/blog/the-supabase-content-storm">
-                <div className="text-brand flex items-center mt-2">
-                  See all the content
-                  <IconExternalLink size="small" className="inline-block ml-1" />
-                </div>
+              <a
+                rel="noopener"
+                target="_blank"
+                href="/blog/the-supabase-content-storm"
+                className="text-brand flex items-center mt-2"
+              >
+                See all the content
+                <IconExternalLink size="small" className="inline-block ml-1" />
               </a>
             </p>
             {activeCreator !== null && (

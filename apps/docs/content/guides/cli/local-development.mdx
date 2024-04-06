@@ -1,0 +1,489 @@
+---
+id: 'local-development'
+title: 'Local Development'
+description: 'How to use Supabase on your local development machine.'
+subtitle: 'How to use Supabase on your local development machine.'
+video: 'https://www.youtube-nocookie.com/v/vyHyYpvjaks'
+tocVideo: 'vyHyYpvjaks'
+---
+
+Supabase is a flexible platform that lets you decide how you want to build your projects. You can use the Dashboard directly to get up and running quickly, or use a proper local setup. We suggest you work locally and deploy your changes to a linked project on the [Supabase Platform](https://app.supabase.io/).
+
+Doing things directly on the platform via the [Dashboard](https://app.supabase.io/) is fine when you're getting started, but it's a good idea to move to a proper local workflow before you get too far. Working locally, generating migrations as you change your tables, and applying those migrations to a linked project on the [Platform](https://app.supabase.io/) keeps everything nicely organized as you grow.
+
+## Why develop locally?
+
+The Dashboard provides a wide range of features for setting up your project: creating tables, adding columns, changing existing columns, creating views, setting up RLS policies, and more. Given all of the Dashboard's capabilities, you might question the need to work locally. Here's a few advantages to working this way:
+
+1. **Faster Development**: Developing locally allows you to work without any network latency or internet disruptions.
+
+2. **Easier Collaboration**: Developing locally can make it easier to collaborate with others on the same project.
+
+3. **Cost-Effective**: Supabase provides a generous free plan and gives you two free projects to get started. But what if you need more than two? When you develop locally, you can spin up unlimited local projects and link them with live projects when you're ready to launch.
+
+4. **Configuration in code**: If you directly change your tables via the Dashboard, none of that gets captured in code. If you follow these local development practices, you'll store all of your table schemas in code.
+
+5. **Work offline**: Need to work from a train? A plane? An automobile? No problem. Developing your project locally allows you to work offline.
+
+## Log in to the Supabase CLI
+
+Log in if you are planning to deploy your project to the Supabase Platform. This step is optional and is not required to use the Supabase CLI.
+
+<CH.Code>
+
+```bash Terminal
+supabase login
+```
+
+```bash NPX
+npx supabase login
+```
+
+</CH.Code>
+
+## Initialize your project
+
+Create a new folder for your project and start a new git repository:
+
+```bash
+# create your project folder
+mkdir your-project
+
+# move into the new folder
+cd your-project
+
+# start a new git repository — important, don't skip this step
+git init
+```
+
+## Start Supabase services
+
+[Initialize](/docs/reference/cli/usage#supabase-init) Supabase to set up the configuration for developing your project locally:
+
+```bash
+supabase init
+```
+
+Make sure Docker is running.
+
+<Admonition type="note">
+
+There are a number of different projects available to download Docker from:
+
+- [Docker Desktop](https://docs.docker.com/get-docker/) (macOS, Windows, Linux)
+- [Rancher Desktop](https://rancherdesktop.io/) (macOS, Windows, Linux)
+- [OrbStack](https://orbstack.dev/) (macOS)
+- [colima](https://github.com/abiosoft/colima) (macOS)
+
+</Admonition>
+
+The [start](/docs/reference/cli/usage#supabase-start) command uses Docker to start the Supabase [services](/docs/guides/getting-started/architecture).
+This command may take a while to run if this is the first time using the CLI.
+
+```bash
+supabase start
+```
+
+Once all of the Supabase services are running, you'll see output containing your local Supabase credentials. It should look like this, with urls and keys that you'll use in your local project:
+
+```
+
+Started supabase local development setup.
+
+         API URL: http://localhost:54321
+          DB URL: postgresql://postgres:postgres@localhost:54322/postgres
+      Studio URL: http://localhost:54323
+    Inbucket URL: http://localhost:54324
+        anon key: eyJh......
+service_role key: eyJh......
+
+```
+
+You can use the [`supabase stop`](/docs/reference/cli/usage#supabase-stop) command at any time to stop all services (without resetting your local database). Use `supabase stop --no-backup` to stop all services and reset your local database.
+
+## Access your project's services
+
+You can now visit your local Dashboard at [http://localhost:54323](http://localhost:54323), and access the database directly with any Postgres client via `postgresql://postgres:postgres@localhost:54322/postgres`.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="postgres"
+  queryGroup="access-method"
+>
+<TabPanel id="postgres" label="Postgres">
+
+```sh
+# Default URL:
+postgresql://postgres:postgres@localhost:54322/postgres
+```
+
+The local Postgres instance can be accessed through [`psql`](https://www.postgresql.org/docs/current/app-psql.html)
+or any other Postgres client, such as [pgadmin](https://www.pgadmin.org/).
+
+For example:
+
+```bash
+psql 'postgresql://postgres:postgres@localhost:54322/postgres'
+```
+
+<Admonition type="note">
+
+To access the database from an edge function in your local Supabase setup, replace `localhost` with `host.docker.internal`.
+
+</Admonition>
+
+</TabPanel>
+<TabPanel id="kong" label="API Gateway">
+
+```sh
+# Default URL:
+http://localhost:54321
+```
+
+If you are accessing these services without the client libraries, you may need to pass the client keys as an `Authorization` header.
+Learn more about [JWT headers](/docs/learn/auth-deep-dive/auth-deep-dive-jwts).
+
+```sh
+curl 'http://localhost:54321/rest/v1/' \
+    -H "apikey: <anon key>" \
+    -H "Authorization: Bearer <anon key>"
+
+http://localhost:54321/rest/v1/           # REST (PostgREST)
+http://localhost:54321/realtime/v1/       # Realtime
+http://localhost:54321/storage/v1/        # Storage
+http://localhost:54321/auth/v1/           # Auth (GoTrue)
+```
+
+<Admonition type="note">
+
+`<anon key>` is provided when you run the command `supabase start`.
+
+</Admonition>
+
+</TabPanel>
+</Tabs>
+
+## Database migrations
+
+Database changes are managed through "migrations." Database migrations are a common way of tracking changes to your database over time.
+
+<div className="video-container">
+  <iframe
+    src="https://www.youtube-nocookie.com/embed/Kx5nHBmIxyQ"
+    frameBorder="1"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen
+  ></iframe>
+</div>
+
+For this guide, we'll create a table called `employees` and see how we can make changes to it.
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Create your first migration file">
+
+      To get started, generate a [new migration](https://supabase.com/docs/reference/cli/supabase-migration-new) to store the SQL needed to create our `employees` table
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+```bash
+supabase migration new create_employees_table
+```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Add the SQL to your migration file">
+      This creates a new migration: supabase/migrations/\<timestamp\>
+        _create_employees_table.sql.
+
+        To that file, add the SQL to create this `employees` table
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```sql
+
+create table
+employees (
+id bigint primary key generated always as identity,
+name text,
+email text,
+created_at timestamptz default now()
+);
+
+````
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+
+
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Apply your migration">
+      Now that you have a migration file, you can run this migration and create the `employees` table.
+
+      Use the `reset` command here to reset the database to the current migrations
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```bash
+supabase db reset
+````
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Modify your employees table">
+      Now you can visit your new `employees` table in the Dashboard.
+
+      Next, modify your `employees` table by adding a column for department. Create a new migration file for that.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```bash
+      supabase migration new add_department_to_employees_table
+
+````
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Add a new column to your table">
+      This creates a new migration file: supabase/migrations/\<timestamp\>
+        _add_department_to_employees_table.sql.
+
+        To that file, add the SQL to create a new department column
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```sql
+alter table
+  if exists public.employees add department text default 'Hooli';
+````
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+### Add sample data
+
+Now that you are managing your database with migrations scripts, it would be great have some seed data to use every time you reset the database.
+
+For this, you can use the seed script in `supabase/seed.sql`. This file was automatically created when you ran [`supabase init`](/docs/reference/cli/usage#supabase-init)) at the beginning.
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Populate your table">
+      Insert data into your `employees` table with your `supabase/seed.sql` file.
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```sql
+
+-- in supabase/seed.sql
+insert into
+public.employees (name)
+values
+('Erlich Bachman'),
+('Richard Hendricks'),
+('Monica Hall');
+
+````
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={2}>
+    <StepHikeCompact.Details title="Reset your database">
+      Reset your database (apply current migrations), and populate with seed data
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```bash
+supabase db reset
+````
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+You should now see the `employees` table, along with your seed data in the Dashboard! All of your database changes are captured in code, and you can reset to a known state at any time, complete with seed data.
+
+### Diffing changes
+
+This workflow is great if you know SQL and are comfortable creating tables and columns. If not, you can still use the Dashboard to create tables and columns, and then use the CLI to diff your changes and create migrations.
+
+Create a new table called `cities`, with columns `id`, `name` and `population`. To see the corresponding SQL for this, you can use the `supabase db diff --schema public` command. This will show you the SQL that will be run to create the table and columns. The output of `supabase db diff` will look something like this:
+
+```
+Diffing schemas: public
+Finished supabase db diff on branch main.
+
+create table "public"."cities" (
+    "id" bigint primary key generated always as identity,
+    "name" text,
+    "population" bigint
+);
+
+```
+
+Alternately, you can view your table definitions directly from the Table Editor:
+
+![SQL Definition](/docs/img/guides/cli/sql-definitions.png)
+
+You can then copy this SQL into a new migration file, and run `supabase db reset` to apply the changes.
+
+The last step is deploying these changes to a live Supabase project.
+
+## Deploy your project
+
+You've been developing your project locally, making changes to your tables via migrations. It's time to deploy your project to the Supabase Platform and start scaling up to millions of users! Head over to [Supabase](https://supabase.com/dashboard) and create a new project to deploy to.
+
+### Link your project
+
+Associate your project with your remote project using [`supabase link`](/docs/reference/cli/usage#supabase-link).
+
+```bash
+supabase link --project-ref <project-id>
+# You can get <project-id> from your project's dashboard URL: https://supabase.com/dashboard/project/<project-id>
+
+supabase db pull
+# Capture any changes that you have made to your remote database before you went through the steps above
+# If you have not made any changes to the remote database, skip this step
+```
+
+`supabase/migrations` is now populated with a migration in `<timestamp>_remote_schema.sql`.
+This migration captures any changes required for your local database to match the schema of your remote Supabase project.
+
+Review the generated migration file and once happy, apply the changes to your local instance:
+
+```bash
+# To apply the new migration to your local database:
+supabase migration up
+
+# To reset your local database completely:
+supabase db reset
+```
+
+<Admonition type="note">
+
+There are a few commands required to link your project. We are in the process of consolidating these commands into a single command. Bear with us!
+
+</Admonition>
+
+### Deploy database changes
+
+Deploy any local database migrations using [`db push`](/docs/reference/cli/usage#supabase-db-push):
+
+```sh
+supabase db push
+```
+
+Visiting your live project on [Supabase](https://supabase.com/dashboard), you'll see a new `employees` table, complete with the `department` column you added in the second migration above.
+
+### Deploy Edge Functions
+
+If your project uses Edge Functions, you can deploy these using [`functions deploy`](/docs/reference/cli/usage#supabase-functions-deploy):
+
+```sh
+supabase functions deploy <function_name>
+```
+
+### Use Auth locally
+
+To use Auth locally, update your project's `supabase/config.toml` file that gets created after running `supabase init`. Add any providers you want, and set enabled to `true`.
+
+```bash supabase/config.toml
+[auth.external.github]
+enabled = true
+client_id = "env(SUPABASE_AUTH_GITHUB_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_GITHUB_SECRET)"
+redirect_uri = "http://localhost:54321/auth/v1/callback"
+```
+
+As a best practice, any secret values should be loaded from environment variables. You can add them to `.env` file in your project's root directory for the CLI to automatically substitute them.
+
+```bash .env
+SUPABASE_AUTH_GITHUB_CLIENT_ID="redacted"
+SUPABASE_AUTH_GITHUB_SECRET="redacted"
+```
+
+For these changes to take effect, you need to run `supabase stop` and `supabase start` again.
+
+If you have additional triggers or RLS policies defined on your `auth` schema, you can pull them as a migration file locally.
+
+```bash
+supabase db pull --schema auth
+```
+
+### Sync storage buckets
+
+Your RLS policies on storage buckets can be pulled locally by specifying `storage` schema. For example,
+
+```bash
+supabase db pull --schema storage
+```
+
+The buckets and objects themselves are rows in the storage schema so they won't be pulled automatically.
+
+### Local logging
+
+Local logs rely on the Supabase Analytics Server, and are not enabled by default. To enable this, edit your `supabase/config.toml` file and set `enabled` to `true`.
+
+```bash supabase/config.toml
+[analytics]
+# Set enabled to true to see logs in the Logs Explorer
+enabled = true
+port = 54327
+vector_port = 54328
+# Configure one of the supported backends: `postgres`, `bigquery`.
+backend = "postgres"
+```
+
+<Admonition type="note">
+
+For advanced logs analysis using the Logs Explorer, it is advised to use the BigQuery backend instead of the default Postgres backend. Read about the steps [here](/docs/reference/self-hosting-analytics/introduction#bigquery).
+
+</Admonition>
+
+Logs will be directed to the Analytics server instead of the docker logging driver. All logs will be stored in the local database under the `_analytics` schema.
+
+## Limitations and considerations
+
+The local development environment is not as feature-complete as the Supabase Platform. Here are some of the differences:
+
+- You cannot update your project settings in the Dashboard. This must be done using the local config file.
+- The CLI version determines the local version of Studio used, so make sure you keep your local [Supabase CLI up to date](https://github.com/supabase/cli#getting-started). We're constantly adding new features and bug fixes.

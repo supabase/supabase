@@ -1,0 +1,103 @@
+---
+id: 'compute-add-ons'
+title: 'Compute Add-ons'
+description: "Learn about your project's instance and additional add-ons."
+---
+
+Every project on the Supabase Platform comes with its own dedicated Postgres instance running inside a virtual machine (VM). The following table describes the base instance with additional compute add-ons available if you need extra performance when scaling up Supabase.
+
+<Admonition type="note">
+
+Free plan resources subject to changes.
+
+</Admonition>
+
+| Plan        | Hourly Price USD | Monthly Price USD | CPU                     | Memory       | Connections: Direct | Connections: Pooler | Recommended Maximum DB Size |
+| ----------- | ---------------- | ----------------- | ----------------------- | ------------ | ------------------- | ------------------- | --------------------------- |
+| Nano (free) | $0               | $0                | Shared                  | Up to 0.5 GB | 60                  | 200                 | 500MB                       |
+| Micro       | $0.01344         | ~$10              | 2-core ARM (shared)     | 1 GB         | 60                  | 200                 | 10GB                        |
+| Small       | $0.0206          | ~$15              | 2-core ARM (shared)     | 2 GB         | 90                  | 400                 | 50GB                        |
+| Medium      | $0.0822          | ~$60              | 2-core ARM (shared)     | 4 GB         | 120                 | 600                 | 100GB                       |
+| Large       | $0.1517          | ~$110             | 2-core ARM (dedicated)  | 8 GB         | 160                 | 800                 | 200GB                       |
+| XL          | $0.2877          | ~$210             | 4-core ARM (dedicated)  | 16 GB        | 240                 | 1,000               | 500GB                       |
+| 2XL         | $0.562           | ~$410             | 8-core ARM (dedicated)  | 32 GB        | 380                 | 1,500               | 1TB                         |
+| 4XL         | $1.32            | ~$960             | 16-core ARM (dedicated) | 64 GB        | 480                 | 3,000               | 2TB                         |
+| 8XL         | $2.562           | ~$1,870           | 32-core ARM (dedicated) | 128 GB       | 490                 | 6,000               | 4TB                         |
+| 12XL        | $3.836           | ~$2,800           | 48-core ARM (dedicated) | 192 GB       | 500                 | 9,000               | 6TB                         |
+| 16XL        | $5.12            | ~$3,730           | 64-core ARM (dedicated) | 256 GB       | 500                 | 12,000              | 10TB                        |
+
+Number of connections above are recommended values.
+
+<Admonition type="note" label="Recommended Database Size">
+
+The database sizes recommended for each instance are intended purely as a guide and recommendation to ensure performance is optimal, these sizes are not enforced.
+
+The performance of your database is impacted by many factors, some of them being the resources available to it or the size of the data contained within it. See the [shared responsibility model](https://supabase.com/docs/guides/platform/shared-responsibility-model) for more information.
+
+</Admonition>
+
+We charge hourly for additional compute based on your usage. Read more about [usage-based billing for compute](/docs/guides/platform/org-based-billing#usage-based-billing-for-compute).
+
+Compute sizes can be changed in [the dashboard here by selecting your project](https://supabase.com/dashboard/project/_/settings/addons?panel=computeInstance). [Contact us](https://supabase.com/contact/enterprise) if you require a custom plan.
+
+## Dedicated vs. shared CPU
+
+All Postgres instances on Supabase are dedicated applications running inside dedicated virtual machines. However, the underlying hardware resources, for example the physical CPU, may be shared between multiple VMs, but appear to the OS as if it is a dedicated hardware CPU. This is commonly referred to as a vCPU (virtual CPU). Cloud providers use these shared hardware resources to save cost—you can upgrade to a larger compute add-on to guarantee a dedicated physical CPU for your instance.
+
+## Compute upgrades [#upgrades]
+
+When considering compute upgrades, assess whether your bottlenecks are hardware-constrained or software-constrained. For example, you may want to look into [optimizing the number of connections](/docs/guides/platform/performance#optimizing-the-number-of-connections) or [examining query performance](/docs/guides/platform/performance#examining-query-performance). When you're happy with your Postgres instance's performance, then you can focus on additional compute resources. For example, you can load test your application in staging to understand your compute requirements. You can also start out on a smaller tier, [create a report](https://supabase.com/dashboard/project/_/reports) in the Dashboard to monitor your CPU utilization, and upgrade later as needed
+
+## Disk IO
+
+SSD Disks are attached to your servers and the disk performance depends on the compute add-on of your instance. Disk IO refers to two metrics: throughput (Megabits per Second) and IOPS (Input/Output Operations per Second). Disk throughput is capped at 1,048 Mbps and IOPS is capped at 3,000 IOPS for all compute add-ons.
+
+| Plan        | Baseline Disk Throughput | Baseline IOPS |
+| ----------- | ------------------------ | ------------- |
+| Nano (free) | 43 Mbps                  | 250 IOPS      |
+| Micro       | 87 Mbps                  | 500 IOPS      |
+| Small       | 174 Mbps                 | 1,000 IOPS    |
+| Medium      | 347 Mbps                 | 2,000 IOPS    |
+| Large       | 630 Mbps                 | 3,000 IOPS    |
+| XL          | 1,048 Mbps               | 3,000 IOPS    |
+| 2XL         | 1,048 Mbps               | 3,000 IOPS    |
+| 4XL         | 1,048 Mbps               | 3,000 IOPS    |
+| 8XL         | 1,048 Mbps               | 3,000 IOPS    |
+| 12XL        | 1,048 Mbps               | 3,000 IOPS    |
+| 16XL        | 1,048 Mbps               | 3,000 IOPS    |
+
+[Contact us](https://supabase.com/contact/enterprise) if you require a plan with higher disk throughput and IOPS.
+
+### Bursting and disk IO budget
+
+Smaller compute instances can burst up to 1,048 Mbps and 3,000 IOPS for 30 minutes in a day. Beyond that, the performance reverts to the baseline. For example, the micro plan can burst up to 1,048 Mbps for 30 minutes a day and reverts to the baseline performance of 87 Mbps. Your disk IO budget gets replenished throughout the day.
+
+If you need consistent disk performance, choose the XL or larger compute add-on which has the same baseline and maximum disk throughput and IOPS.
+
+If you're unsure of how much throughput or IOPS your application requires, you can load test your project and inspect these [metrics in the Dashboard](https://supabase.com/dashboard/project/_/reports). If the `Disk IO % consumed` stat is more than 1%, it indicates that your workload has burst beyond the baseline IO throughput during the day. If this metric goes to 100%, the workload has used up all available disk IO budget and will revert to baseline performance. Projects that use any disk IO budget are good candidates for upgrading to a larger compute add-on with higher baseline throughput.
+
+## Postgres replication slots and WAL senders
+
+[Replication Slots](https://postgresqlco.nf/doc/en/param/max_replication_slots) and [WAL Senders](https://postgresqlco.nf/doc/en/param/max_wal_senders/) are used to enable [Postgres Replication](/docs/guides/database/replication).
+
+The maximum number of replication slots and WAL senders depends on your compute add-on plan, as follows:
+
+| Plan        | Max Replication Slots | Max WAL Senders |
+| ----------- | --------------------- | --------------- |
+| Nano (free) | 5                     | 5               |
+| Micro       | 5                     | 5               |
+| Small       | 5                     | 5               |
+| Medium      | 5                     | 5               |
+| Large       | 8                     | 8               |
+| XL          | 24                    | 24              |
+| 2XL         | 80                    | 80              |
+| 4XL         | 80                    | 80              |
+| 8XL         | 80                    | 80              |
+| 12XL        | 80                    | 80              |
+| 16XL        | 80                    | 80              |
+
+<Admonition type="caution">
+
+As mentioned in the Postgres [documentation](https://postgresqlco.nf/doc/en/param/max_replication_slots/), setting `max_replication_slots` to a lower value than the current number of replication slots will prevent the server from starting. If you are downgrading your compute add-on, please ensure that you are using fewer slots than the maximum number of replication slots available for the new compute add-on.
+
+</Admonition>

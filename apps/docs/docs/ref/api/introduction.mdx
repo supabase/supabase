@@ -7,7 +7,7 @@ hideTitle: true
 <div className="flex items-start gap-6 not-prose" id="introduction">
   <img src="/docs/img/icons/menu/reference-api.svg" className="w-8 h-8 rounded" />
   <div className="flex flex-col gap-2">
-    <h1 className="text-3xl text-scale-1200 m-0">Management API</h1>
+    <h1 className="text-3xl text-foreground m-0">Management API</h1>
   </div>
 </div>
 
@@ -35,7 +35,11 @@ hideTitle: true
 
       ## Rate limits
 
-      The API is currently subject to our fair-use policy. In the future, are likely to introduce rate limits.
+      The rate limit for Management API is 60 requests per one minute per user, and applies cumulatively across all requests made with your personal access tokens.
+
+      If you exceed this limit, all Management API calls for the next minute will be blocked, resulting in a HTTP 429 response.
+
+      The Management API is subject to our fair-use policy.
       All resources created via the API are subject to the pricing detailed on our [Pricing](https://supabase.com/pricing) pages.
 
     </RefSubLayout.Details>

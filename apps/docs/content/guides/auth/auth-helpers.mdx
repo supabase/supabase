@@ -1,0 +1,52 @@
+---
+id: 'index'
+title: 'Auth Helpers'
+description: 'Server-Side Auth guides and utilities for working with Supabase.'
+sidebar_label: 'Overview'
+---
+
+<Admonition type="caution">
+
+We generally recommend using the new `@supabase/ssr` package instead of `auth-helpers`. `@supabase/ssr` takes the core concepts of the Auth Helpers package and makes them available to any server framework. Check out the [migration doc](/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers) to learn more.
+
+</Admonition>
+
+Working with server-side frameworks is slightly different to client-side frameworks. In this section we cover the various ways of handling server-side authentication and demonstrate how to use the Supabase helper-libraries to make the process more seamless.
+
+<div className="container" style={{ padding: 0 }}>
+  <div className="grid md:grid-cols-12 gap-4">
+    {/* Next.js */}
+    <div className="col-span-6">
+      <ButtonCard
+        to={'/guides/auth/auth-helpers/nextjs'}
+        title={'Next.js'}
+        description={'Helpers for authenticating users in Next.js applications.'}
+      />
+    </div>
+    {/* SvelteKit */}
+    <div className="col-span-6">
+      <ButtonCard
+        to={'/guides/auth/auth-helpers/sveltekit'}
+        title={'SvelteKit'}
+        description={'Helpers for authenticating users in SvelteKit applications.'}
+      />
+    </div>
+    {/* Remix */}
+    <div className="col-span-6">
+      <ButtonCard
+        to={'/guides/auth/auth-helpers/remix'}
+        title={'Remix'}
+        description={'Helpers for authenticating users in Remix applications.'}
+      />
+    </div>
+  </div>
+</div>
+
+## Status
+
+The Auth Helpers are in `beta`. They are usable in their current state, but it's likely that there will be breaking changes.
+
+## Additional links
+
+- [Source code](https://github.com/supabase/auth-helpers)
+- [Known bugs and issues](https://github.com/supabase/auth-helpers/issues)

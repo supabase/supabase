@@ -56,21 +56,21 @@ const Card = (props: Props) => {
       target="_blank"
       className="relative flex transform flex-col overflow-hidden rounded-md shadow-lg transition hover:-translate-y-1 hover:shadow-2xl"
     >
-      <div className="dark:bg-dark-800 flex-shrink-0">
-        <img className="h-64 w-full object-cover" src={imgUrl} alt={title} />
+      <div className="flex-shrink-0">
+        <img className="h-64 w-full text-foreground-light object-cover" src={imgUrl} alt={title} />
       </div>
-      <div className="dark:bg-scale-300 flex flex-1 flex-col justify-between bg-white p-8">
+      <div className="bg-surface-100 flex flex-1 flex-col justify-between p-8">
         <div className="flex-1">
           {/* {icons && (
             <div className="-mt-12 mb-6 flex -space-x-3">
               {iconMarkup}
             </div>
           )} */}
-          <p className="font-base dark:text-dark-300 text-sm capitalize text-gray-600">{type}</p>
+          <p className="font-base text-foreground-lighter text-sm capitalize">{type}</p>
           <div className="mt-2 flex h-32 flex-col justify-between">
             {/* {logoUrl && <img src={logoUrl} className="h-9 my-4" />} */}
-            {title && <p className="text-xl text-gray-900 dark:text-white">{title}</p>}
-            <p className="dark:text-dark-400 mt-3 text-base text-gray-500">
+            {title && <p className="text-xl text-foreground">{title}</p>}
+            <p className="text-foreground-lighter mt-3 text-base">
               {type !== 'Project Example' ? postMeta.publishDate : description}
             </p>
           </div>
@@ -82,8 +82,8 @@ const Card = (props: Props) => {
               <img className="h-10 w-10 rounded-full" src={postMeta.avatarUrl} alt="" />
             </div>
             <div className="ml-3">
-              <p className="text-sm font-medium text-gray-900 dark:text-white">{postMeta.name}</p>
-              <div className="dark:text-dark-100 flex space-x-1 text-sm text-gray-500">
+              <p className="text-sm font-medium text-foreground">{postMeta.name}</p>
+              <div className="text-foreground-lighter flex space-x-1 text-sm">
                 <time dateTime="2020-03-16">{postMeta.publishDate}</time>
                 <span aria-hidden="true">&middot;</span>
                 <span>{postMeta.readLength} min read</span>

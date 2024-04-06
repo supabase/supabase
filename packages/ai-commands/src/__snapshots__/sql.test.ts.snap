@@ -1,0 +1,48 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`debug fix order of operations 1`] = `
+"create table departments (
+  id bigint primary key generated always as identity,
+  name text
+);
+
+create table employees (
+  id bigint primary key generated always as identity,
+  name text,
+  email text,
+  department_id bigint references departments (id)
+);"
+`;
+
+exports[`debug fix typos 1`] = `
+"select
+  *
+from
+  employees;"
+`;
+
+exports[`edit add length constraint 1`] = `
+"create table employees (
+  id bigint primary key generated always as identity,
+  name text check (length(name) >= 4),
+  email text
+);"
+`;
+
+exports[`generate single table with specified columns 1`] = `
+"create table employees (
+  id bigint primary key generated always as identity,
+  name text,
+  email text,
+  position text
+);"
+`;
+
+exports[`rls chat select policy using table definition 1`] = `
+{
+  "checkExpression": undefined,
+  "command": "select",
+  "table": "todos",
+  "usingExpression": "user_id = auth.uid ()",
+}
+`;

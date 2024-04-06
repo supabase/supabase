@@ -1,0 +1,166 @@
+---
+title: 'Use Supabase with SvelteKit'
+subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a SvelteKit app.'
+breadcrumb: 'Framework Quickstarts'
+hideToc: true
+---
+
+<StepHikeCompact>
+
+  <StepHikeCompact.Step step={1}>
+    <StepHikeCompact.Details title="Set up a Supabase project with sample data">
+
+    [Create a new project](https://supabase.com/dashboard) in the Supabase Dashboard.
+
+    After your project is ready, create a table in your Supabase database using the [SQL Editor](https://supabase.com/dashboard/project/_/sql) in the Dashboard. Use the following SQL statement to create a `countries` table with some sample data.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+     ```sql SQL_EDITOR
+     -- Create the table
+     CREATE TABLE countries (
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(255) NOT NULL
+     );
+     -- Insert some sample data into the table
+     INSERT INTO countries (name) VALUES ('United States');
+     INSERT INTO countries (name) VALUES ('Canada');
+     INSERT INTO countries (name) VALUES ('Mexico');
+     ````
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={2}>
+
+    <StepHikeCompact.Details title="Create a SvelteKit app">
+
+    Create a SvelteKit app using the `npm create` command.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      npm create svelte@latest myapp
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={3}>
+    <StepHikeCompact.Details title="Install the Supabase client library">
+
+    The fastest way to get started is to use the `supabase-js` client library which provides a convenient interface for working with Supabase from a SvelteKit app.
+
+    Navigate to the SvelteKit app and install `supabase-js`.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      cd myapp && npm install @supabase/supabase-js
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={4}>
+    <StepHikeCompact.Details title="Create the Supabase client">
+
+    Create a `/src/lib` directory in your SvelteKit app, create a file called `supabaseClient.js` and add the following code to initialize the Supabase client with your project URL and public API (anon) key:
+
+    <ProjectConfigVariables variable="url" />
+    <ProjectConfigVariables variable="anonKey" />
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```js src/lib/supabaseClient.js
+        import { createClient } from '@supabase/supabase-js'
+
+        export const supabase = createClient('https://<project>.supabase.co', '<your-anon-key>')
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={5}>
+    <StepHikeCompact.Details title="Query data from the app">
+
+    Use `load` method to fetch the data server-side and display the query results as a simple list.
+
+    Create `+page.server.js` file in the `routes` directory with the following code.
+
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+
+
+      ```js src/routes/+page.server.js
+        import { supabase } from "$lib/supabaseClient";
+
+        export async function load() {
+          const { data } = await supabase.from("countries").select();
+          return {
+            countries: data ?? [],
+          };
+        }
+      ```
+
+    </StepHikeCompact.Code>
+
+    <StepHikeCompact.Details title="">
+
+    Replace the existing content in your `+page.svelte` file in the `routes` directory with the following code.
+
+    </StepHikeCompact.Details>
+    <StepHikeCompact.Code>
+
+
+      ```svelte src/routes/+page.svelte
+        <script>
+          export let data;
+        </script>
+
+        <ul>
+          {#each data.countries as country}
+            <li>{country.name}</li>
+          {/each}
+        </ul>
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+
+  <StepHikeCompact.Step step={6}>
+    <StepHikeCompact.Details title="Start the app">
+
+    Start the app and go to http://localhost:5173 in a browser and you should see the list of countries.
+
+    </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+
+      ```bash Terminal
+      npm run dev
+      ```
+
+    </StepHikeCompact.Code>
+
+  </StepHikeCompact.Step>
+</StepHikeCompact>
+
+## Next steps
+
+- Set up [Auth](/docs/guides/auth) for your app
+- [Insert more data](/docs/guides/database/import-data) into your database
+- Upload and serve static files using [Storage](/docs/guides/storage)
