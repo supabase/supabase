@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
-import { IconEdit2, IconX, cn } from 'ui'
+import { cn } from 'ui'
+import { Pencil, X } from 'lucide-react'
 import Tilt from 'vanilla-tilt'
 import { useBreakpoint, useParams } from 'common'
 
@@ -100,7 +101,7 @@ export default function Ticket() {
               onClick={handleCustomizeTicket}
             />
             <div className="flex md:translate-y-3 opacity-100 md:opacity-0 group-hover/ticket:opacity-100 group-hover/ticket:md:translate-y-0 transition-all absolute z-30 right-4 top-4 md:inset-0 m-auto w-10 h-10 rounded-full items-center justify-center bg-[#020405] border shadow-lg text-foreground">
-              {!showCustomizationForm ? <IconEdit2 className="w-4" /> : <IconX className="w-4" />}
+              {!showCustomizationForm ? <Pencil className="w-4" /> : <X className="w-4" />}
             </div>
           </>
         )}
