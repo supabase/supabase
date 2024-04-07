@@ -23,14 +23,22 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
             contentClassName="flex flex-col justify-between"
             content={
               <div className="w-full h-auto lg:min-h-[400px] flex flex-col lg:flex-row items-stretch rounded-lg overflow-hidden">
-                <div className="relative w-full pl-4 xl:px-4 pt-4 lg:w-2/3 border-b lg:border-none border-muted aspect-[3/1] top-0 -bottom-8 overflow-hidden">
+                <div className="relative w-full pl-4 xl:px-4 lg:w-2/3 border-b lg:border-none border-muted aspect-[3/1] top-0 md:-bottom-8 overflow-hidden">
                   <Image
                     src="/images/launchweek/11/airpods-max-alpha.png"
                     alt="Supabase AirPod Max prize"
                     draggable={false}
                     width={300}
                     height={300}
-                    className="absolute p-2 object-cover scale-50 lg:scale-100 lg:object-top w-[90%] h-full overflow-visible opacity-50 pointer-events-none"
+                    className="hidden md:block absolute object-cover scale-50 lg:scale-100 lg:object-top w-[90%] h-full opacity-50 pointer-events-none"
+                  />
+                  <Image
+                    src="/images/launchweek/11/airpods-max-alpha-crop.png"
+                    alt="Supabase AirPod Max prize"
+                    draggable={false}
+                    width={300}
+                    height={300}
+                    className="md:hidden absolute mx-auto object-cover inset-x-0 lg:object-top w-auto h-full opacity-50 pointer-events-none"
                   />
                 </div>
                 <div className="flex flex-col lg:w-1/2 gap-1 p-4 md:p-8 lg:pl-0 lg:h-full">
