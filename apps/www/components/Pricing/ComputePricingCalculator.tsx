@@ -26,7 +26,7 @@ const plans = [
   },
 ]
 
-const findIntanceValueByColumn = (instance: any, column: string) =>
+const findInstanceValueByColumn = (instance: any, column: string) =>
   instance.columns?.find((col: any) => col.key === column)?.value
 
 const parsePrice = (price: string) => parseInt(price?.toString().replace('$', '').replace(',', ''))
@@ -34,18 +34,19 @@ const parsePrice = (price: string) => parseInt(price?.toString().replace('$', ''
 const ComputePricingCalculator = () => {
   const computeInstances = pricingAddOn.database.rows
   const priceSteps = computeInstances.map((instance) =>
-    parsePrice(findIntanceValueByColumn(instance, 'pricing'))
+    parsePrice(findInstanceValueByColumn(instance, 'pricing'))
   )
   // Base discount credits that come with every paid plan
   const COMPUTE_CREDITS = 10
 
   const [activePlan, setActivePlan] = useState(plans[0])
   const [activeInstances, setActiveInstances] = useState([{ ...computeInstances[0], position: 0 }])
+  const [computeCredits, setComputeCredits] = useState(0)
   // Final calculated price: plan cost + compute aggregate - compute credits
-  const [activePrice, setActivePrice] = useState(activePlan.price + priceSteps[0] - COMPUTE_CREDITS)
+  const [activePrice, setActivePrice] = useState(activePlan.price + priceSteps[0] - computeCredits)
 
   useEffect(() => {
-    setActivePrice(activePlan.price + priceSteps[0] - COMPUTE_CREDITS)
+    setActivePrice(activePlan.price + priceSteps[0] - computeCredits)
   }, [])
 
   const handleUpdateInstance = (position: number, value: number[]) => {
@@ -64,22 +65,38 @@ const ComputePricingCalculator = () => {
   const calculateComputeAggregate = (price: number) => {
     activeInstances.map(
       (activeInstance: any) =>
-        (price += parsePrice(findIntanceValueByColumn(activeInstance, 'pricing')))
+        (price += parsePrice(findInstanceValueByColumn(activeInstance, 'pricing')))
     )
 
     return price
+  }
+
+  const applyCredits = () => {
+    if (
+      activeInstances.some(
+        (instance) => parsePrice(findInstanceValueByColumn(instance, 'pricing')) > 0
+      )
+    ) {
+      setComputeCredits(COMPUTE_CREDITS)
+    } else {
+      setComputeCredits(0)
+    }
   }
 
   const calculatePrice = () => {
     let aggregatePrice = 0
     const computeAggregate = calculateComputeAggregate(aggregatePrice)
 
-    return setActivePrice(computeAggregate + activePlan.price - COMPUTE_CREDITS)
+    return setActivePrice(computeAggregate + activePlan.price - computeCredits)
   }
 
   useEffect(() => {
+    applyCredits()
+  }, [activeInstances])
+
+  useEffect(() => {
     calculatePrice()
-  }, [activeInstances, activePlan])
+  }, [activeInstances, activePlan, computeCredits])
 
   const removeInstance = (position: number) => {
     const newArray = activeInstances
@@ -95,8 +112,8 @@ const ComputePricingCalculator = () => {
   const findSliderComputeValue = (activeInstance: any) => {
     // find index of compute based on active compute name
     const selectedCompute = computeInstances
-      .map((compute) => findIntanceValueByColumn(compute, 'plan'))
-      .indexOf(findIntanceValueByColumn(activeInstance, 'plan'))
+      .map((compute) => findInstanceValueByColumn(compute, 'plan'))
+      .indexOf(findInstanceValueByColumn(activeInstance, 'plan'))
 
     return [selectedCompute + 1]
   }
@@ -113,7 +130,7 @@ const ComputePricingCalculator = () => {
       </div>
       <div className="flex items-center justify-between">
         <span className="text-foreground-muted">Compute Credits</span>
-        <span className="text-light font-mono">- ${COMPUTE_CREDITS}</span>
+        <span className="text-light font-mono">- ${computeCredits}</span>
       </div>
     </div>
   )
@@ -239,20 +256,20 @@ const ComputePricingCalculator = () => {
                   <Badge
                     className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
                     variant={
-                      findIntanceValueByColumn(activeInstance, 'plan') ===
-                      findIntanceValueByColumn(computeInstances[0], 'plan')
+                      findInstanceValueByColumn(activeInstance, 'plan') ===
+                      findInstanceValueByColumn(computeInstances[0], 'plan')
                         ? 'default'
                         : 'brand'
                     }
                   >
-                    {findIntanceValueByColumn(activeInstance, 'plan')}
+                    {findInstanceValueByColumn(activeInstance, 'plan')}
                   </Badge>
                   <p className="text-xs text-foreground-lighter">
                     Project {activeInstance.position + 1}
                   </p>
                 </div>
                 <span className="leading-3 text-sm">
-                  {findIntanceValueByColumn(activeInstance, 'pricing')}
+                  {findInstanceValueByColumn(activeInstance, 'pricing')}
                 </span>
               </div>
               <Slider_Shadcn_
@@ -267,10 +284,10 @@ const ComputePricingCalculator = () => {
               <div className="flex items-center justify-between text-sm">
                 <div className="w-full flex items-center gap-2">
                   <span className="text-lighter text-xs md:text-[13px]">
-                    {findIntanceValueByColumn(activeInstance, 'memory')} RAM /{' '}
-                    {findIntanceValueByColumn(activeInstance, 'cpu')} CPU / Connections: Direct{' '}
-                    {findIntanceValueByColumn(activeInstance, 'directConnections')}, Pooler{' '}
-                    {findIntanceValueByColumn(activeInstance, 'poolerConnections')}
+                    {findInstanceValueByColumn(activeInstance, 'memory')} RAM /{' '}
+                    {findInstanceValueByColumn(activeInstance, 'cpu')} CPU / Connections: Direct{' '}
+                    {findInstanceValueByColumn(activeInstance, 'directConnections')}, Pooler{' '}
+                    {findInstanceValueByColumn(activeInstance, 'poolerConnections')}
                   </span>
                 </div>
                 <div className="flex items-center gap-2">
