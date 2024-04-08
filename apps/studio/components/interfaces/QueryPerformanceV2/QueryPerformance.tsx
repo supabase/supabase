@@ -18,7 +18,7 @@ import {
 } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { Markdown } from '../Markdown'
-import { QueryPerformanceFilterBar } from '../QueryPerformance/QueryPerformanceFilterBar'
+import { QueryPerformanceFilterBar } from './QueryPerformanceFilterBar'
 import { PresetHookResult } from '../Reports/Reports.utils'
 import { QUERY_PERFORMANCE_REPORT_TYPES } from './QueryPerformance.constants'
 import { QueryPerformanceGrid } from './QueryPerformanceGrid'
