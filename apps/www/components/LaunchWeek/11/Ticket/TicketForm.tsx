@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react'
 import { SupabaseClient } from '@supabase/supabase-js'
 import { useRouter } from 'next/router'
 import { SITE_ORIGIN } from '~/lib/constants'
-import { Button, IconCheckCircle } from 'ui'
+import { Button } from 'ui'
+import { CheckCircle } from 'lucide-react'
 
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 
@@ -136,7 +137,7 @@ export default function TicketForm() {
         type="alternative"
         disabled={formState === 'loading' || Boolean(session)}
         onClick={handleGithubSignIn}
-        iconLeft={session && <IconCheckCircle />}
+        iconLeft={session && <CheckCircle />}
         loading={formState === 'loading'}
         className="px-4 h-auto !py-1.5"
       >

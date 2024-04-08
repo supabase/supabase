@@ -7,10 +7,12 @@ import { useEffect, useReducer } from 'react'
 const useRerenderOnEvt = (event: string, listeningElem?: Document | Window | HTMLElement) => {
   const [, rerender] = useReducer((state) => !state, true)
 
+  const elem = listeningElem ?? window
+
   useEffect(() => {
-    ;(listeningElem ?? window).addEventListener(event, rerender)
-    return () => (listeningElem ?? window).removeEventListener(event, rerender)
-  }, [event, listeningElem, rerender])
+    elem.addEventListener(event, rerender)
+    return () => elem.removeEventListener(event, rerender)
+  }, [elem, event, rerender])
 }
 
 export { useRerenderOnEvt }
