@@ -70,34 +70,28 @@ import { sequence } from '@sveltejs/kit/hooks'
 
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public'
 
-import type { Database } from '../types/supabase'
-
 const supabase: Handle = async ({ event, resolve }) => {
   /**
    * Creates a Supabase client specific to this server request.
    *
    * The Supabase client gets the Auth token from the request cookies.
    */
-  event.locals.supabase = createServerClient<Database>(
-    PUBLIC_SUPABASE_URL,
-    PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        get: (key) => event.cookies.get(key),
-        /**
-         * SvelteKit's cookies API requires `path` to be explicitly set in
-         * the cookie options. Setting `path` to `/` replicates previous/
-         * standard behavior.
-         */
-        set: (key, value, options) => {
-          event.cookies.set(key, value, { ...options, path: '/' })
-        },
-        remove: (key, options) => {
-          event.cookies.delete(key, { ...options, path: '/' })
-        },
+  event.locals.supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+    cookies: {
+      get: (key) => event.cookies.get(key),
+      /**
+       * SvelteKit's cookies API requires `path` to be explicitly set in
+       * the cookie options. Setting `path` to `/` replicates previous/
+       * standard behavior.
+       */
+      set: (key, value, options) => {
+        event.cookies.set(key, value, { ...options, path: '/' })
       },
-    }
-  )
+      remove: (key, options) => {
+        event.cookies.delete(key, { ...options, path: '/' })
+      },
+    },
+  })
 
   /**
    * Unlike `supabase.auth.getSession()`, which returns the session _without_
@@ -211,7 +205,6 @@ import { createBrowserClient, createServerClient, isBrowser, parse } from '@supa
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/public'
 
 import type { LayoutLoad } from './$types'
-import type { Database } from '../../types/supabase'
 
 export const load: LayoutLoad = async ({ data, depends, fetch }) => {
   /**
@@ -221,7 +214,7 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
   depends('supabase:auth')
 
   const supabase = isBrowser()
-    ? createBrowserClient<Database>(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+    ? createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
         global: {
           fetch,
         },
@@ -232,7 +225,7 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
           },
         },
       })
-    : createServerClient<Database>(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+    : createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
         global: {
           fetch,
         },
@@ -243,11 +236,20 @@ export const load: LayoutLoad = async ({ data, depends, fetch }) => {
         },
       })
 
+  /**
+   * It's fine to use `getSession` here, because on the client, `getSession` is
+   * safe, and on the server, it reads `session` from the `LayoutData`, which
+   * safely checked the session using `safeGetSession`.
+   */
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
-  return { session: data.session, supabase, user }
+  return { session, supabase, user }
 }
 ```
 
@@ -317,6 +319,8 @@ Set up a listener for Auth events on the client, to handle session refreshes and
 <StepHikeCompact.Details title="Create your first page">
 
 Create your first page. This example page calls Supabase from the server to get a list of countries from the database.
+
+This is an example of a public page that uses publicly readable data.
 
 To populate your database, run the [countries quickstart](/dashboard/project/_/sql/3ab7f123-675a-4342-a5d3-d342ed115a4b) from your dashboard.
 
@@ -484,13 +488,12 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
   if (token_hash && type) {
     const { error } = await supabase.auth.verifyOtp({ type, token_hash })
     if (!error) {
-      console.log('LOGIC HERE')
       redirectTo.searchParams.delete('next')
       return redirect(307, redirectTo)
     }
   }
 
-  redirectTo.pathname = '/login/error'
+  redirectTo.pathname = '/auth/error'
   return redirect(307, redirectTo)
 }
 ```
