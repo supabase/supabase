@@ -108,6 +108,7 @@ export const RealtimePolicies = () => {
                   setChannelDataForPolicy({
                     table: table,
                     templateData: {
+                      channelName: channel.name,
                       channelId: `${channel.id}`,
                     },
                   })
@@ -118,6 +119,7 @@ export const RealtimePolicies = () => {
                   setChannelDataForPolicy({
                     table: policy.table,
                     templateData: {
+                      channelName: channel.name,
                       channelId: `${channel.id}`,
                     },
                   })

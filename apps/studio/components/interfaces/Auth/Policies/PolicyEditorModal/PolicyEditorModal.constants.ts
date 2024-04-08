@@ -383,9 +383,9 @@ with check ( true );`.trim(),
           statement: `
   create policy "Enable read access to specific channel"
   on realtime.channels for select
-  using ( channel_id = ${templateData['channelId']} );`.trim(),
+  using ( name = '${templateData['channelName']}' );`.trim(),
           name: 'Enable read access to specific channel',
-          definition: `channel_id = ${templateData['channelId']}`,
+          definition: `name = '${templateData['channelName']}'`,
           check: '',
           command: 'SELECT',
           roles: [],
@@ -398,11 +398,11 @@ with check ( true );`.trim(),
           statement: `
         create policy "Enable update access to specific channel"
 ON realtime.channels for update
-using ( channel_id = ${templateData['channelId']} )
-with check ( channel_id = ${templateData['channelId']} );`.trim(),
+using ( 'name = ${templateData['channelName']}' )
+with check ( 'name = ${templateData['channelName']}' );`.trim(),
           name: 'Enable update access to specific channel',
-          definition: `channel_id = ${templateData['channelId']}`,
-          check: `channel_id = ${templateData['channelId']}`,
+          definition: `name = '${templateData['channelName']}'`,
+          check: `name = '${templateData['channelName']}'`,
           command: 'UPDATE',
           roles: [],
         }

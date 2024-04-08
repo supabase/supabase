@@ -1,12 +1,12 @@
 import Panel from 'components/ui/Panel'
-import { IconArchive } from 'ui'
+import { Antenna } from 'lucide-react'
 
 export const RealtimePoliciesPlaceholder = () => (
   <Panel
     title={[
       <div key="storagePlaceholder" className="flex w-full items-center justify-between">
         <div className="flex items-center space-x-4">
-          <IconArchive size="small" />
+          <Antenna className="w-4 h-4" />
           <h4>Channel policies</h4>
         </div>
       </div>,
