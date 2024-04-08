@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { GitPullRequest, RefreshCw, Trash2 } from 'lucide-react'
+import { Clock, GitPullRequest, Infinity, RefreshCw, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren, ReactNode, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -18,11 +18,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   IconArrowRight,
-  IconClock,
   IconExternalLink,
   IconMoreVertical,
   IconShield,
-  Modal,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BranchStatusBadge from './BranchStatusBadge'
@@ -141,7 +139,13 @@ export const BranchRow = ({
           asChild
           type="default"
           className="max-w-[300px]"
-          icon={isMain && <IconShield strokeWidth={2} className="text-amber-900" />}
+          icon={
+            isMain ? (
+              <IconShield strokeWidth={2} className="text-amber-900" />
+            ) : branch.persistent ? (
+              <Infinity size={16} />
+            ) : null
+          }
         >
           <Link href={`/project/${branch.project_ref}/branches`} title={branch.name}>
             {branch.name}
@@ -158,34 +162,6 @@ export const BranchRow = ({
         </p>
       </div>
       <div className="flex items-center gap-x-8">
-        {branch.pr_number !== undefined && (
-          <div className="flex items-center">
-            <Link
-              href={`https://github.com/${repo}/pull/${branch.pr_number}`}
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs transition text-foreground-lighter mr-4 hover:text-foreground"
-            >
-              #{branch.pr_number}
-            </Link>
-            <div className="flex items-center gap-x-2 bg-brand-500 px-3 py-1 rounded-full">
-              <GitPullRequest size={14} />
-              <p className="text-xs">Open</p>
-            </div>
-            <IconArrowRight className="mx-1 text-foreground-light" strokeWidth={1.5} size={16} />
-            <Button asChild type="default">
-              <Link
-                passHref
-                target="_blank"
-                rel="noreferer"
-                href={`http://github.com/${repo}/tree/${branch.git_branch}`}
-              >
-                {branch.git_branch}
-              </Link>
-            </Button>
-          </div>
-        )}
-
         {isMain ? (
           <div className="flex items-center gap-x-2">
             <Button asChild type="default" iconRight={<IconExternalLink />}>
@@ -208,31 +184,44 @@ export const BranchRow = ({
           </div>
         ) : (
           <div className="flex items-center gap-x-2">
-            <p className="text-lg text-bold">{branch.persistent ? '∞' : '⏵'}</p>
-
-            <Button asChild type="default" iconRight={<IconExternalLink />}>
-              <Link
-                passHref
-                target="_blank"
-                rel="noreferrer"
-                href={
-                  branch.pr_number !== undefined
-                    ? `https://github.com/${repo}/pull/${branch.pr_number}`
-                    : createPullRequestURL
-                }
-              >
-                {branch.pr_number !== undefined ? 'View Pull Request' : 'Create Pull Request'}
-              </Link>
-            </Button>
+            {branch.pr_number === undefined ? (
+              <Button asChild type="default" iconRight={<IconExternalLink />}>
+                <Link passHref target="_blank" rel="noreferrer" href={createPullRequestURL}>
+                  Create Pull Request
+                </Link>
+              </Button>
+            ) : (
+              <div className="flex items-center">
+                <Link
+                  href={`https://github.com/${repo}/pull/${branch.pr_number}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-x-2 transition px-3 py-1 rounded-full bg-background-surface-400 hover:text-foreground"
+                >
+                  <GitPullRequest size={14} />#{branch.pr_number}
+                </Link>
+                <IconArrowRight
+                  className="mx-1 text-foreground-light"
+                  strokeWidth={1.5}
+                  size={16}
+                />
+                <Button asChild type="default">
+                  <Link
+                    passHref
+                    target="_blank"
+                    rel="noreferer"
+                    href={`http://github.com/${repo}/tree/${branch.git_branch}`}
+                  >
+                    {branch.git_branch}
+                  </Link>
+                </Button>
+              </div>
+            )}
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button type="text" icon={<IconMoreVertical />} className="px-1" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="p-0 w-56" side="bottom" align="end">
-                <DropdownMenuItem className="gap-x-2" onClick={() => onSelectPersistentMode?.()}>
-                  <IconClock size="tiny" />
-                  <p>{branch.persistent ? 'Change to ephemeral' : 'Change to persistent'}</p>
-                </DropdownMenuItem>
                 <DropdownMenuItem
                   className="gap-x-2"
                   onSelect={() => setShowConfirmResetModal(true)}
@@ -240,6 +229,17 @@ export const BranchRow = ({
                 >
                   <RefreshCw size={14} />
                   Reset Branch
+                </DropdownMenuItem>
+                <DropdownMenuItem className="gap-x-2" onClick={() => onSelectPersistentMode?.()}>
+                  {branch.persistent ? (
+                    <>
+                      <Clock size={14} /> Switch to ephemeral
+                    </>
+                  ) : (
+                    <>
+                      <Infinity size={14} className="scale-110" /> Switch to long-lived
+                    </>
+                  )}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="gap-x-2"
