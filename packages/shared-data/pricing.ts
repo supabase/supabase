@@ -294,6 +294,19 @@ export const pricing: Pricing = {
         usage_based: false,
       },
       {
+        title: 'Content Delivery Network',
+        tooltips: {
+          main: 'Assets in Storage are automatically cached on a CDN. With Smart CDN caching enabled, the CDN cache is automatically re-validated when the underlying asset changes. CDN caching is enabled across all plans and assets in the paid plans are cached via the Smart CDN.',
+        },
+        plans: {
+          free: 'Basic CDN',
+          pro: 'Smart CDN',
+          team: 'Smart CDN',
+          enterprise: 'Smart CDN',
+        },
+        usage_based: false,
+      },
+      {
         title: 'Image Transformations',
         tooltips: {
           main: 'We count all images that were transformed in the billing period, ignoring any transformations.\nUsage example: You transform one image with four different size transformations and another image with just a single transformation. It counts as two, as only two images were transformed.\nBilling is based on the count of (origin) images that used transformations throughout the billing period. Resets every billing cycle.',
