@@ -1,19 +1,16 @@
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { IndexEfficiencyNotice } from 'components/interfaces/QueryPerformance/IndexEfficiencyNotice'
-// import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
+import { QueryPerformance } from 'components/interfaces/QueryPerformanceV2/QueryPerformance'
+import { QUERY_PERFORMANCE_REPORT_TYPES } from 'components/interfaces/QueryPerformanceV2/QueryPerformance.constants'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import { useQueryPerformanceQuery } from 'components/interfaces/Reports/Reports.queries'
 import { Presets } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import { DatabaseLayout } from 'components/layouts'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import { FormHeader } from 'components/ui/Forms'
 import { useFlag } from 'hooks'
 import type { NextPageWithLayout } from 'types'
-import { QueryPerformance } from 'components/interfaces/QueryPerformanceV2/QueryPerformance'
-import { QUERY_PERFORMANCE_REPORT_TYPES } from 'components/interfaces/QueryPerformanceV2/QueryPerformance.constants'
 
 type QueryPerformancePreset = 'time' | 'frequent' | 'slowest'
 

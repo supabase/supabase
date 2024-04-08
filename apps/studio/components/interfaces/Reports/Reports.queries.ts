@@ -3,24 +3,19 @@ import { Presets } from './Reports.types'
 import useDbQuery from 'hooks/analytics/useDbQuery'
 
 type QueryPerformanceQueryOpts = {
-  searchQuery: string
   preset: 'mostFrequentlyInvoked' | 'mostTimeConsuming' | 'slowestExecutionTime' | 'queryHitRate'
-  orderBy: string | 'lat_asc' | 'lat_desc'
+  searchQuery?: string
+  orderBy?: string | 'lat_asc' | 'lat_desc'
   roles?: string[]
 }
 export const useQueryPerformanceQuery = ({
   preset,
-  orderBy,
-  searchQuery,
+  orderBy = 'lat_desc',
+  searchQuery = '',
   roles,
 }: QueryPerformanceQueryOpts) => {
   const queryPerfQueries = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const baseSQL = queryPerfQueries.queries[preset]
-
-  if (orderBy !== 'lat_asc' && orderBy !== 'lat_desc') {
-    // Default to lat_desc if not specified or invalid
-    orderBy = 'lat_desc'
-  }
 
   const whereSql = [
     roles !== undefined && roles.length > 0

@@ -23,29 +23,14 @@ import { QUERY_PERFORMANCE_REPORT_TYPES } from './QueryPerformance.constants'
 import { QueryPerformanceGrid } from './QueryPerformanceGrid'
 import { useRouter } from 'next/router'
 import { useParams } from 'common'
+import { useQueryPerformanceQuery } from '../Reports/Reports.queries'
+import ShimmerLine from 'components/ui/ShimmerLine'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 interface QueryPerformanceProps {
   queryHitRate: PresetHookResult
   queryPerformanceQuery: DbQueryHook<any>
 }
-
-const QUERY_PERFORMANCE_TABS = [
-  {
-    id: QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING,
-    label: 'Time Consuming',
-    description: 'Lists queries ordered by their cumulative total execution time.',
-  },
-  {
-    id: QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT,
-    label: 'Most frequent',
-    description: 'Lists queries in order of their execution count',
-  },
-  {
-    id: QUERY_PERFORMANCE_REPORT_TYPES.SLOWEST_EXECUTION,
-    label: 'Slowest execution',
-    description: 'Lists queries ordered by their maximum execution time',
-  },
-]
 
 export const QueryPerformance = ({
   queryHitRate,
@@ -67,6 +52,49 @@ export const QueryPerformance = ({
     queryPerformanceQuery.runQuery()
     queryHitRate.runQuery()
   }
+
+  const { data: mostTimeConsumingQueries, isLoading: isLoadingMTC } = useQueryPerformanceQuery({
+    preset: 'mostTimeConsuming',
+  })
+  const { data: mostFrequentlyInvoked, isLoading: isLoadingMFI } = useQueryPerformanceQuery({
+    preset: 'mostFrequentlyInvoked',
+  })
+  const { data: slowestExecutionTime, isLoading: isLoadingMMF } = useQueryPerformanceQuery({
+    preset: 'slowestExecutionTime',
+  })
+
+  const QUERY_PERFORMANCE_TABS = [
+    {
+      id: QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING,
+      label: 'Most time consuming',
+      description: 'Lists queries ordered by their cumulative total execution time.',
+      isLoading: isLoadingMTC,
+      max:
+        (mostTimeConsumingQueries ?? []).length > 0
+          ? Math.max(...(mostTimeConsumingQueries ?? []).map((x: any) => x.total_time)).toFixed(2)
+          : undefined,
+    },
+    {
+      id: QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT,
+      label: 'Most frequent',
+      description: 'Lists queries in order of their execution count',
+      isLoading: isLoadingMFI,
+      max:
+        (mostFrequentlyInvoked ?? []).length > 0
+          ? Math.max(...(mostFrequentlyInvoked ?? []).map((x: any) => x.calls)).toFixed(2)
+          : undefined,
+    },
+    {
+      id: QUERY_PERFORMANCE_REPORT_TYPES.SLOWEST_EXECUTION,
+      label: 'Slowest execution',
+      description: 'Lists queries ordered by their maximum execution time',
+      isLoading: isLoadingMMF,
+      max:
+        (slowestExecutionTime ?? []).length > 0
+          ? Math.max(...(slowestExecutionTime ?? []).map((x: any) => x.max_time)).toFixed(2)
+          : undefined,
+    },
+  ]
 
   return (
     <>
@@ -101,7 +129,16 @@ export const QueryPerformance = ({
                   <TooltipContent_Shadcn_ side="bottom">{tab.description}</TooltipContent_Shadcn_>
                 </Tooltip_Shadcn_>
               </div>
-              <p className="text-xs text-foreground-lighter">No data yet</p>
+              {tab.isLoading ? (
+                <ShimmeringLoader className="w-32 pt-1" />
+              ) : tab.max === undefined ? (
+                <p className="text-xs text-foreground-lighter">No data yet</p>
+              ) : (
+                <p className="text-xs text-foreground-lighter">
+                  {Number(tab.max).toLocaleString()}
+                  {tab.id !== QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT ? 'ms' : ' calls'}
+                </p>
+              )}
             </TabsTrigger_Shadcn_>
           ))}
         </TabsList_Shadcn_>
