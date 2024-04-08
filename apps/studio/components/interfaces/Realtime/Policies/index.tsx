@@ -75,7 +75,6 @@ export const RealtimePolicies = () => {
   }
 
   const groupedPolicies = formatPoliciesForRealtime(channels, realtimePolicies)
-  console.log(groupedPolicies)
   const ungroupedPolicies = groupedPolicies.find((gr) => gr.name === 'Ungrouped')
 
   return (
