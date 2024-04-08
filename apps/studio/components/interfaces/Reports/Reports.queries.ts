@@ -2,15 +2,28 @@ import { PRESET_CONFIG } from './Reports.constants'
 import { Presets } from './Reports.types'
 import useDbQuery from 'hooks/analytics/useDbQuery'
 
+export type QueryPerformanceSort = {
+  column:
+    | 'total_time'
+    | 'prop_total_time'
+    | 'calls'
+    | 'avg_rows'
+    | 'max_time'
+    | 'mean_time'
+    | 'min_time'
+  order: 'asc' | 'desc'
+}
+
 type QueryPerformanceQueryOpts = {
   preset: 'mostFrequentlyInvoked' | 'mostTimeConsuming' | 'slowestExecutionTime' | 'queryHitRate'
   searchQuery?: string
-  orderBy?: string | 'lat_asc' | 'lat_desc'
+  orderBy?: QueryPerformanceSort
   roles?: string[]
 }
+
 export const useQueryPerformanceQuery = ({
   preset,
-  orderBy = 'lat_desc',
+  orderBy = { column: 'total_time', order: 'desc' },
   searchQuery = '',
   roles,
 }: QueryPerformanceQueryOpts) => {
@@ -28,7 +41,8 @@ export const useQueryPerformanceQuery = ({
 
   // [Joshen] TODO: Support ordering on more columns
   // calls, total_time, prop_total_time, avg_rows, max_time, mean_time, min_time
-  const orderBySql = orderBy === 'lat_asc' ? 'ORDER BY total_time asc' : 'ORDER BY total_time desc'
+  // const orderBySql = orderBy === 'lat_asc' ? 'ORDER BY total_time asc' : 'ORDER BY total_time desc'
+  const orderBySql = `ORDER BY ${orderBy.column} ${orderBy.order}`
 
   const sql = baseSQL.sql([], whereSql, orderBySql)
 

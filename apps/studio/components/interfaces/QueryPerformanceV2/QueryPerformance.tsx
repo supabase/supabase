@@ -1,6 +1,7 @@
 import { HelpCircle } from 'lucide-react'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
+import { useRouter } from 'next/router'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -21,10 +22,8 @@ import { QueryPerformanceFilterBar } from '../QueryPerformance/QueryPerformanceF
 import { PresetHookResult } from '../Reports/Reports.utils'
 import { QUERY_PERFORMANCE_REPORT_TYPES } from './QueryPerformance.constants'
 import { QueryPerformanceGrid } from './QueryPerformanceGrid'
-import { useRouter } from 'next/router'
 import { useParams } from 'common'
 import { useQueryPerformanceQuery } from '../Reports/Reports.queries'
-import ShimmerLine from 'components/ui/ShimmerLine'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 interface QueryPerformanceProps {
