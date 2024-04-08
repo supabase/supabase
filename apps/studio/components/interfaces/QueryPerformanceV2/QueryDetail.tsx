@@ -3,6 +3,8 @@ import {
   QUERY_PERFORMANCE_REPORTS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
+import { format } from 'sql-formatter'
+import { useEffect, useState } from 'react'
 
 interface QueryDetailProps {
   reportType: QUERY_PERFORMANCE_REPORT_TYPES
@@ -11,20 +13,35 @@ interface QueryDetailProps {
 
 export const QueryDetail = ({ reportType, selectedRow }: QueryDetailProps) => {
   const report = QUERY_PERFORMANCE_REPORTS[reportType]
+  const [query, setQuery] = useState(selectedRow?.['query'])
+
+  useEffect(() => {
+    if (selectedRow !== undefined) {
+      try {
+        const formattedQuery = format(selectedRow['query'], {
+          language: 'postgresql',
+          keywordCase: 'lower',
+        })
+        setQuery(formattedQuery)
+      } catch (err) {
+        setQuery(selectedRow['query'])
+      }
+    }
+  }, [selectedRow])
 
   return (
     <div className="flex flex-col gap-y-8 divide-y">
       <div className="px-4 flex flex-col gap-y-2">
         <p className="text-sm">Query pattern</p>
         <CodeBlock
-          value={selectedRow['query']}
+          hideLineNumbers
+          value={query}
           language="sql"
           className={cn(
             'max-w-full max-h-[310px]',
             '!py-3 !px-3.5 prose dark:prose-dark transition',
             '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
           )}
-          hideLineNumbers
         />
       </div>
       <div className="py-4 px-4 flex flex-col gap-y-1">
