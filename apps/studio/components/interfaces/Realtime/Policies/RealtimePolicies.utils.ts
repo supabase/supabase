@@ -38,29 +38,31 @@ export const formatPoliciesForRealtime = (
 
 const formatStoragePolicies = (channels: RealtimeChannel[], policies: PostgresPolicy[]) => {
   const formattedPolicies = policies.map((policy) => {
-    const { definition: policyDefinition, check: policyCheck } = policy
+    try {
+      const { definition: policyDefinition, check: policyCheck } = policy
 
-    const channelId =
-      policyDefinition !== null
-        ? extractChannelIdFromDefinition(policyDefinition)
-        : extractChannelIdFromDefinition(policyCheck)
+      const channelId =
+        policyDefinition !== null
+          ? extractChannelIdFromDefinition(policyDefinition)
+          : extractChannelIdFromDefinition(policyCheck)
 
-    const channelName =
-      policyDefinition !== null
-        ? extractChannelNameFromDefinition(policyDefinition)
-        : extractChannelNameFromDefinition(policyCheck)
+      const channelName =
+        policyDefinition !== null
+          ? extractChannelNameFromDefinition(policyDefinition)
+          : extractChannelNameFromDefinition(policyCheck)
 
-    const foundChannel = channels.find(
-      (channel) => channel.id === channelId || channel.name === channelName
-    )
-    if (foundChannel) {
-      // [JOSHEN TODO] We cannot override definition here anymore cause we're gonna be using the auth editor
-      // const definition = policyDefinition !== null ? policyDefinition : policyCheck
-      return {
-        ...policy,
-        channel: foundChannel.name,
+      const foundChannel = channels.find(
+        (channel) => channel.id === channelId || channel.name === channelName
+      )
+      if (foundChannel) {
+        // [JOSHEN TODO] We cannot override definition here anymore cause we're gonna be using the auth editor
+        // const definition = policyDefinition !== null ? policyDefinition : policyCheck
+        return {
+          ...policy,
+          channel: foundChannel.name,
+        }
       }
-    }
+    } catch {}
 
     return { ...policy, channel: 'Ungrouped' }
   })
@@ -69,9 +71,9 @@ const formatStoragePolicies = (channels: RealtimeChannel[], policies: PostgresPo
 }
 
 const extractChannelIdFromDefinition = (definition: string | null) => {
-  const definitionSegments = definition?.split(' AND ') ?? []
+  const definitionSegments = definition?.replace('(', '').replace(')', '').split(' AND ') ?? []
   const [channelDefinition] = definitionSegments.filter((segment) => segment.includes('channel_id'))
-  return channelDefinition ? +channelDefinition.split("'")[1] : null
+  return channelDefinition ? +channelDefinition.split('=')[1] : null
 }
 
 const extractChannelNameFromDefinition = (definition: string | null) => {

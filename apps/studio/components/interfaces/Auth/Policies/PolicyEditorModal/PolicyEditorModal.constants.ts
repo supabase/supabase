@@ -233,7 +233,7 @@ with check ( true );`.trim(),
           roles: [],
         },
         {
-          id: 'policy-broadcast-2',
+          id: 'policy-broadcast-4',
           preview: false,
           templateName: 'Enable pushing broadcasts to specific channel',
           description: 'This policy enables pushing broadcasts to specific channel.',
@@ -314,15 +314,15 @@ with check ( true );
         {
           id: 'policy-presences-4',
           preview: false,
-          templateName: 'Enable broadcasting presences to a specific channel',
-          description: 'This policy enables broadcasting presences to a specific channel.',
+          templateName: 'Enable publishing presence to a specific channel',
+          description: 'This policy enables publishing presence to a specific channel.',
           statement: `
-        create policy "Enable broadcasting presences to a specific channel"
+        create policy "Enable publishing presence to a specific channel"
 ON realtime.presences for update
 using ( channel_id = ${templateData['channelId']} )
 with check ( channel_id = ${templateData['channelId']} );
   ;`.trim(),
-          name: 'Enable broadcasting presences to a specific channel',
+          name: 'Enable publishing presence to a specific channel',
           definition: `channel_id = ${templateData['channelId']}`,
           check: `channel_id = ${templateData['channelId']}`,
           command: 'UPDATE',

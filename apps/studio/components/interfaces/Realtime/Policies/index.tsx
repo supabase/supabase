@@ -105,6 +105,7 @@ export const RealtimePolicies = () => {
                 channel={channel}
                 policies={policies}
                 onSelectPolicyAdd={(table) => {
+                  setSelectedPolicyToEdit(undefined)
                   setChannelDataForPolicy({
                     table: table,
                     templateData: {
