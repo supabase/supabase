@@ -92,90 +92,96 @@ const days: WeekDayProps[] = [
         icon: products.database.icon[16],
         title: 'Database',
         description: 'Fully portable Postgres Database',
+        url: 'https://supabase.com/docs/guides/database/overview',
         links: [
           // {
           //   type: 'podcast',
           //   href: '#',
           // },
-          {
-            type: 'docs',
-            href: 'https://supabase.com/docs/guides/database/overview',
-          },
+          // {
+          //   type: 'docs',
+          //   href: 'https://supabase.com/docs/guides/database/overview',
+          // },
         ],
       },
       {
         icon: products.authentication.icon[16],
         title: 'Auth',
         description: 'User management out of the box',
+        url: 'https://supabase.com/docs/guides/auth',
         links: [
           // {
           //   type: 'podcast',
           //   href: '#',
           // },
-          {
-            type: 'docs',
-            href: 'https://supabase.com/docs/guides/auth',
-          },
+          // {
+          //   type: 'docs',
+          //   href: 'https://supabase.com/docs/guides/auth',
+          // },
         ],
       },
       {
         icon: products.storage.icon[16],
         title: 'Storage',
         description: 'Serverless storage for any media',
+        url: 'https://supabase.com/docs/guides/storage',
         links: [
           // {
           //   type: 'podcast',
           //   href: '#',
           // },
-          {
-            type: 'docs',
-            href: 'https://supabase.com/docs/guides/storage',
-          },
+          // {
+          //   type: 'docs',
+          //   href: 'https://supabase.com/docs/guides/storage',
+          // },
         ],
       },
       {
         icon: products.functions.icon[16],
         title: 'Edge Functions',
         description: 'Deploy code globally on the edge',
+        url: 'https://supabase.com/docs/guides/functions',
         links: [
           // {
           //   type: 'podcast',
           //   href: '#',
           // },
-          {
-            type: 'docs',
-            href: 'https://supabase.com/docs/guides/functions',
-          },
+          // {
+          //   type: 'docs',
+          //   href: 'https://supabase.com/docs/guides/functions',
+          // },
         ],
       },
       {
         icon: products.realtime.icon[16],
         title: 'Realtime',
         description: 'Syncronize and broadcast events',
+        url: 'https://supabase.com/docs/guides/realtime',
         links: [
           // {
           //   type: 'podcast',
           //   href: '#',
           // },
-          {
-            type: 'docs',
-            href: 'https://supabase.com/docs/guides/realtime',
-          },
+          // {
+          //   type: 'docs',
+          //   href: 'https://supabase.com/docs/guides/realtime',
+          // },
         ],
       },
       {
         icon: products.vector.icon[16],
         title: 'Vector',
         description: 'AI toolkit to manage embeddings',
+        url: 'https://supabase.com/docs/guides/ai',
         links: [
           // {
           //   type: 'podcast',
           //   href: '#',
           // },
-          {
-            type: 'docs',
-            href: 'https://supabase.com/docs/guides/ai',
-          },
+          // {
+          //   type: 'docs',
+          //   href: 'https://supabase.com/docs/guides/ai',
+          // },
         ],
       },
     ],

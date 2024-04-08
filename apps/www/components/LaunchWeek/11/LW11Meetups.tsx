@@ -93,7 +93,7 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
         </p>
         <TextLink label="Read more about meetups" hasChevron url="/blog/community-meetups-lw11" />
       </div>
-      <div className="col-span-1 xl:col-span-6 xl:col-start-7 w-full max-w-4xl flex flex-wrap gap-x-3 gap-y-1">
+      <div className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl flex flex-wrap gap-x-3 gap-y-1">
         {meets &&
           meets
             ?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1))
@@ -128,7 +128,7 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
               )
             })}
       </div>
-      <div className="col-span-1 xl:col-span-6 xl:col-start-7 w-full max-w-4xl text-sm flex-1">
+      <div className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl text-sm flex-1">
         {activeMeetup?.display_info}
       </div>
     </div>

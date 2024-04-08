@@ -20,7 +20,7 @@ const Footer = (props: Props) => {
   const { resolvedTheme } = useTheme()
   const { pathname } = useRouter()
 
-  const isLaunchWeek = pathname.includes('launch-week') || pathname.includes('special-announcement')
+  const isLaunchWeek = pathname.includes('/launch-week') || pathname.includes('/ga-week')
   const forceDark = isLaunchWeek || pathname === '/'
 
   if (props.hideFooter) {
