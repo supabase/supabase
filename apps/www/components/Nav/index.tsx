@@ -38,8 +38,8 @@ const Nav = (props: Props) => {
   const isUserLoading = useIsUserLoading()
 
   const isHomePage = router.pathname === '/'
-  const isGAWeekPage = router.pathname.includes('ga-week')
-  const isLaunchWeekPage = router.pathname.includes('launch-week') || isGAWeekPage
+  const isGAWeekSection = router.pathname.includes('/ga-week')
+  const isLaunchWeekPage = router.pathname.includes('launch-week') || isGAWeekSection
   const isLaunchWeekXPage = router.pathname === '/launch-week/x'
   const isLaunchWeek11Page = router.pathname === '/ga-week'
   const showLaunchWeekNavMode = isLaunchWeekPage && !open
@@ -70,7 +70,10 @@ const Nav = (props: Props) => {
         <LW11CountdownBanner />
       </Announcement>
       <div
-        className={cn('sticky top-0 z-40 transform', isLaunchWeekXPage && 'relative')}
+        className={cn(
+          'sticky top-0 z-40 transform',
+          isLaunchWeekXPage || (isLaunchWeek11Page && 'relative')
+        )}
         style={{ transform: 'translate3d(0,0,999px)' }}
       >
         <div
@@ -113,7 +116,7 @@ const Nav = (props: Props) => {
                     />
                   </Link>
 
-                  {!isGAWeekPage &&
+                  {!isGAWeekSection &&
                     !isLaunchWeek11Page &&
                     isLaunchWeekPage &&
                     !isLaunchWeekXPage && (

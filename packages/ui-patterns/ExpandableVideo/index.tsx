@@ -1,7 +1,8 @@
 import { useBreakpoint } from 'common'
 import Image from 'next/image'
 import React, { ReactNode } from 'react'
-import { IconPlay, Modal } from 'ui'
+import { Modal } from 'ui'
+import { Play } from 'lucide-react'
 
 interface ExpandableVideoProps {
   videoId: string
@@ -52,7 +53,7 @@ export function ExpandableVideo({
                 before:content[''] before:-z-10 before:absolute before:inset-0 before:bg-black before:opacity-30 hover:before:opacity-50 before:transition-opacity
               `}
       >
-        <IconPlay strokeWidth={2} size="small" />
+        <Play strokeWidth={2} size="small" className="w-5 h-5" />
         <p className="text-sm">{imgOverlayText ?? 'Watch video guide'}</p>
       </div>
       <Image
