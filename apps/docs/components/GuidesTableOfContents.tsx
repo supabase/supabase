@@ -80,7 +80,7 @@ const GuidesTableOfContents = ({
      * useRerenderOnEvt below will guarantee rerender on change
      */
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [overrideToc, window.location.href])
+  }, [overrideToc, typeof window !== 'undefined' && window.location.href])
 
   useEffect(() => {
     if (hash && displayedList.length > 0) {
