@@ -15,7 +15,6 @@ import {
   Checkbox_Shadcn_,
   Form_Shadcn_,
   Label_Shadcn_,
-  Modal,
   ScrollArea,
   Sheet,
   SheetContent,
@@ -70,6 +69,7 @@ const DiffEditor = dynamic(
 
 interface AIPolicyEditorPanelProps {
   visible: boolean
+  templateData?: Record<string, string>
   searchString?: string
   selectedPolicy?: PostgresPolicy
   onSelectCancel: () => void
@@ -80,6 +80,7 @@ interface AIPolicyEditorPanelProps {
  */
 export const AIPolicyEditorPanel = memo(function ({
   visible,
+  templateData,
   searchString,
   selectedPolicy,
   onSelectCancel,
@@ -790,6 +791,7 @@ export const AIPolicyEditorPanel = memo(function ({
                       <ScrollArea className="h-full w-full">
                         <PolicyTemplates
                           table={table}
+                          templateData={templateData}
                           selectedPolicy={selectedPolicy}
                           selectedTemplate={selectedDiff}
                           onSelectTemplate={(value) => {

@@ -17,6 +17,7 @@ import { PolicyTemplate } from '../PolicyTemplates/PolicyTemplates.constants'
 
 interface PolicyTemplatesProps {
   table: string
+  templateData?: Record<string, string>
   selectedPolicy?: PostgresPolicy
   selectedTemplate?: string
   onSelectTemplate: (template: any) => void
@@ -24,6 +25,7 @@ interface PolicyTemplatesProps {
 
 export const PolicyTemplates = ({
   table,
+  templateData,
   selectedPolicy,
   selectedTemplate,
   onSelectTemplate,
@@ -33,7 +35,7 @@ export const PolicyTemplates = ({
 
   let templates: PolicyTemplate[] = []
   if (state.selectedSchemaName === 'realtime') {
-    templates = getRealtimePolicyTemplates(table.length > 0 ? table : 'table_name')
+    templates = getRealtimePolicyTemplates(table.length > 0 ? table : 'table_name', templateData)
   } else {
     templates = getGeneralPolicyTemplates(
       state.selectedSchemaName,
