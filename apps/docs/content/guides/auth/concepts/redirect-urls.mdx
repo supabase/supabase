@@ -62,13 +62,13 @@ const getURL = () => {
     process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
     'http://localhost:3000/'
   // Check if the URL starts with 'http://' or 'https://'
-  const isHTTP = /^https?:\/\//.test(url);
+  const isHTTP = /^https?:\/\//.test(url)
   // If it doesn't start with 'http://' or 'https://', prepend 'https://'
   if (!isHTTP) {
-    url = `https://${url}`;
+    url = `https://${url}`
   }
   // Make sure to include a trailing `/`.
-  url = url.endsWith('/') ? url : `${url}/`;
+  url = url.endsWith('/') ? url : `${url}/`
   return url
 }
 
