@@ -2408,4 +2408,14 @@ module.exports = [
     source: '/contact/mfa',
     destination: '/docs/guides/auth/auth-mfa',
   },
+  {
+    permanent: false,
+    source: '/launch-week',
+    destination: '/special-announcement',
+  },
+  {
+    permanent: false,
+    source: '/launch-week/tickets/:path*',
+    destination: '/special-announcement/tickets/:path*',
+  },
 ]

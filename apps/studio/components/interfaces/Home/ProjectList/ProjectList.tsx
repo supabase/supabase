@@ -245,7 +245,7 @@ const OrganizationProjects = ({
 
 const NoProjectsState = ({ slug }: { slug: string }) => {
   return (
-    <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+    <div className="col-span-4 space-y-4 rounded-lg border border-dashed p-6 text-center">
       <div className="space-y-1">
         <p>No projects</p>
         <p className="text-sm text-foreground-light">Get started by creating a new project.</p>
