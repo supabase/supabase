@@ -83,7 +83,7 @@ export const PolicyTemplates = ({
                   title={template.name}
                   titleClass="text-sm"
                   className={cn(
-                    'transition',
+                    'transition w-full',
                     template.id === selectedTemplate
                       ? '!border-stronger bg-surface-200 hover:!border-stronger'
                       : ''

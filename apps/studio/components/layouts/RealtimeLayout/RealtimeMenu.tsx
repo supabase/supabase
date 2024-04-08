@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useParams } from 'common'
-import { useCheckPermissions, useSelectedProject } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { Edit } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Menu } from 'ui'
@@ -12,9 +12,6 @@ import { CreateChannelModal } from './CreateChannelModal'
 export const RealtimeMenu = () => {
   const router = useRouter()
   const { ref } = useParams()
-  const project = useSelectedProject()
-
-  const isBranch = project?.parent_project_ref !== undefined
 
   const [showCreateChannelModal, setShowCreateChannelModal] = useState(false)
   // service api key is required for creating a new channel
@@ -29,11 +26,7 @@ export const RealtimeMenu = () => {
           <Button
             block
             type="default"
-            icon={
-              <div className="text-foreground-lighter">
-                <Edit />
-              </div>
-            }
+            icon={<Edit className="text-foreground-lighter" />}
             disabled={!canCreateChannels}
             style={{ justifyContent: 'start' }}
             onClick={() => setShowCreateChannelModal(true)}
@@ -41,7 +34,7 @@ export const RealtimeMenu = () => {
             New permanent channel
           </Button>
         </div>
-        <div className="">
+        <div>
           <Link href={`/project/${ref}/realtime/inspector`} legacyBehavior>
             <Menu.Item rounded active={page === 'inspector'}>
               <p className="truncate">Inspector</p>
