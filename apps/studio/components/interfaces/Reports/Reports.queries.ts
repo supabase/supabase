@@ -26,6 +26,8 @@ export const useQueryPerformanceQuery = ({
     .filter((x) => x.length > 0)
     .join(' OR ')
 
+  // [Joshen] TODO: Support ordering on more columns
+  // calls, total_time, prop_total_time, avg_rows, max_time, mean_time, min_time
   const orderBySql = orderBy === 'lat_asc' ? 'ORDER BY total_time asc' : 'ORDER BY total_time desc'
 
   const sql = baseSQL.sql([], whereSql, orderBySql)

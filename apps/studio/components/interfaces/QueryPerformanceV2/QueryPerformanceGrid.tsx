@@ -1,5 +1,6 @@
+import { X } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import DataGrid, { Column, RenderRowProps, Row } from 'react-data-grid'
+import DataGrid, { Column } from 'react-data-grid'
 
 import { useParams } from 'common'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
@@ -12,13 +13,12 @@ import {
   cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
+import { IndexSuggestion } from './IndexSuggestion'
+import { QueryDetail } from './QueryDetail'
 import {
   QUERY_PERFORMANCE_REPORTS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
-import { X } from 'lucide-react'
-import { QueryDetail } from './QueryDetail'
-import { IndexSuggestion } from './IndexSuggestion'
 
 interface QueryPerformanceGridProps {
   queryPerformanceQuery: DbQueryHook<any>
@@ -28,6 +28,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   const showIndexSuggestions = true
   const { preset } = useParams()
   const { isLoading } = queryPerformanceQuery
+
   const [view, setView] = useState<'details' | 'suggestion'>('details')
   const [selectedRow, setSelectedRow] = useState<number>()
   const reportType =
