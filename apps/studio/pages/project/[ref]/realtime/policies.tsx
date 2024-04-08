@@ -1,4 +1,4 @@
-import { RealtimePolicies } from 'components/interfaces/Realtime/Policies/StoragePolicies'
+import { RealtimePolicies } from 'components/interfaces/Realtime/Policies'
 import type { NextPageWithLayout } from 'types'
 
 import RealtimeLayout from 'components/layouts/RealtimeLayout/RealtimeLayout'
