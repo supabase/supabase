@@ -1,0 +1,24 @@
+name: Automatically stale issue and PRs
+on:
+  schedule:
+    - cron: '30 1 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close Stale Issues
+        uses: actions/stale@v9.0.0
+        with:
+          days-before-pr-close: 30
+          days-before-issue-stale: 30
+          days-before-issue-close: 10
+          stale-issue-message: 'After 30 days of inactivity, this issue has been marked as stale. This issue will be auto-closed in 10 days. Comment, assign or remove the stale label to prevent this.'
+          stale-issue-label: stale
+          close-issue-label: staled
+          close-pr-label: staled
+          any-of-labels: contributor
+          exempt-issue-labels: dnc, needs-analysis
+          exempt-pr-labels: dnc
+          exempt-all-assignees: true
+          exempt-draft-pr: false
