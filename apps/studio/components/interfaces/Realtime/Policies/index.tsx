@@ -48,11 +48,7 @@ export const RealtimePolicies = () => {
     undefined
   )
 
-  const {
-    data: policiesData,
-    refetch,
-    isLoading: isLoadingPolicies,
-  } = useDatabasePoliciesQuery({
+  const { data: policiesData, isLoading: isLoadingPolicies } = useDatabasePoliciesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     schema: 'realtime',
@@ -63,7 +59,6 @@ export const RealtimePolicies = () => {
 
   const { mutate: deleteDatabasePolicy } = useDatabasePolicyDeleteMutation({
     onSuccess: async () => {
-      await refetch()
       toast.success('Successfully deleted policy!')
       setSelectedPolicyToDelete(undefined)
     },

@@ -195,9 +195,9 @@ export const AIPolicyEditorPanel = memo(function ({
   }, [chatMessages, debugThread])
 
   const { mutate: executeMutation, isLoading: isExecuting } = useExecuteSqlMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
       // refresh all policies
-      queryClient.invalidateQueries(databasePoliciesKeys.list(ref))
+      await queryClient.invalidateQueries(databasePoliciesKeys.list(ref))
       toast.success('Successfully created new policy')
       onSelectCancel()
     },
