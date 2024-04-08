@@ -4,12 +4,14 @@ import { get, handleError } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { authKeys } from './keys'
 
+type Filter = 'verified' | 'unverified' | 'anonymous'
+
 export type UsersVariables = {
   projectRef?: string
   connectionString?: string
   page?: number
   keywords?: string
-  filter?: 'verified' | 'unverified' | 'anonymous'
+  filter?: Filter
 }
 
 export const USERS_PAGE_LIMIT = 10
@@ -27,16 +29,16 @@ export async function getUsers(
     limit: string
     offset: string
     keywords: string
-    verified?: string
-    anonymous?: boolean
+    verified?: Filter
   } = {
     limit: limit.toString(),
     offset: offset.toString(),
     keywords,
-    anonymous: filter === 'anonymous',
   }
 
-  if (filter === 'verified') query.verified = 'verified'
+  if (filter) {
+    query.verified = filter
+  }
 
   const { data, error } = await get(`/platform/auth/{ref}/users`, {
     params: {
