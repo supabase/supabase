@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Checkbox, IconCheck, Input, cn } from 'ui'
+import { Button, Checkbox, Input, cn } from 'ui'
+import { Check } from 'lucide-react'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import { useBreakpoint, useDebounce } from 'common'
 import { useKey } from 'react-use'
@@ -26,10 +27,7 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
   useKey('Escape', () => setShowCustomizationForm && setShowCustomizationForm(false))
 
   const handleInputChange = (name: string, value: string | boolean) => {
-    console.log('name', name, 'value', value)
     setFormData((prev) => ({ ...prev, [name]: value }))
-
-    console.log('formData', formData)
   }
 
   const handleFormSubmit = async () => {
@@ -65,16 +63,21 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
   return (
     <form
       className={cn(
-        'w-full rounded-t-2xl bg-alternative border p-4 flex flex-col gap-2 mx-auto transition-all opacity-0 translate-y-full text-foreground-light',
+        'w-full rounded-xl bg-alternative border p-4 flex flex-col gap-2 mx-auto transition-all opacity-0 translate-y-full text-foreground-light',
         showCustomizationForm && 'opacity-100 translate-y-0 duration-300',
         isMobile && 'mt-2',
         className
       )}
-      onChange={() => debouncedChangeHandler()}
-      onSubmit={(e) => e.preventDefault()}
+      onChange={(e) => {
+        e.preventDefault()
+        debouncedChangeHandler()
+      }}
+      onSubmit={(e) => {
+        e.preventDefault()
+        handleFormSubmit()
+      }}
     >
       <Input
-        // className="[&_input]:border-background"
         size="small"
         type="text"
         placeholder="role (optional)"
@@ -85,21 +88,20 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
         onFocus={() =>
           !showCustomizationForm && setShowCustomizationForm && setShowCustomizationForm(true)
         }
-        disabled={IS_SAVING}
+        inputClassName={cn(IS_SAVING && 'text-foreground-lighter')}
         maxLength={25}
         icon={
-          <IconCheck
+          <Check
             strokeWidth={2}
             className={cn(
               'w-3',
-              IS_SAVING && 'text-background-surface-300',
-              !!formData.role ? 'text-brand' : 'text-foreground-lighter'
+              !!formData.role ? 'text-brand' : 'text-foreground-lighter',
+              IS_SAVING && 'text-background-surface-300'
             )}
           />
         }
       />
       <Input
-        // className="[&_input]:border-background"
         size="small"
         type="text"
         placeholder="company (optional)"
@@ -111,14 +113,14 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
         onFocus={() =>
           !showCustomizationForm && setShowCustomizationForm && setShowCustomizationForm(true)
         }
-        disabled={IS_SAVING}
+        inputClassName={cn(IS_SAVING && 'text-foreground-lighter')}
         icon={
-          <IconCheck
+          <Check
             strokeWidth={2}
             className={cn(
               'w-3',
-              IS_SAVING && 'text-background-surface-300',
-              !!formData.company ? 'text-brand' : 'text-foreground-lighter'
+              !!formData.company ? 'text-brand' : 'text-foreground-lighter',
+              IS_SAVING && 'text-background-surface-300'
             )}
           />
         }
@@ -128,7 +130,6 @@ const TicketCustomizationForm = ({ className }: { className?: string }) => {
         label="Hide avatar"
         checked={formData.hideAvatar}
         onChange={(event) => {
-          console.log(event)
           handleInputChange('hideAvatar', event.target.checked)
         }}
       />

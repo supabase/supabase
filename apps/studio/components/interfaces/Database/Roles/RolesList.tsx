@@ -3,6 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { partition, sortBy } from 'lodash'
 import { Plus, Search, X } from 'lucide-react'
 import { useState } from 'react'
+import { Badge, Button, Input } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import NoSearchResults from 'components/ui/NoSearchResults'
@@ -10,7 +11,6 @@ import SparkBar from 'components/ui/SparkBar'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { useCheckPermissions } from 'hooks'
-import { Badge, Button, Input } from 'ui'
 import CreateRolePanel from './CreateRolePanel'
 import DeleteRoleModal from './DeleteRoleModal'
 import RoleRow from './RoleRow'
@@ -118,12 +118,12 @@ const RolesList = () => {
                   value={totalActiveConnections}
                   barClass={
                     maxConnectionLimit === 0 || maxConnectionLimit === undefined
-                      ? 'bg-control'
+                      ? 'bg-foreground'
                       : totalActiveConnections > 0.9 * maxConnectionLimit
-                        ? 'bg-red-800'
+                        ? 'bg-destructive'
                         : totalActiveConnections > 0.75 * maxConnectionLimit
-                          ? 'bg-amber-900'
-                          : 'bg-green-800'
+                          ? 'bg-warning'
+                          : undefined
                   }
                   labelTop={
                     Number.isInteger(maxConnectionLimit)

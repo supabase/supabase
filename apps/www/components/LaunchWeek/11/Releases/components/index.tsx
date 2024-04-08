@@ -1,12 +1,6 @@
 import { useEffect, useState } from 'react'
-import {
-  IconDocumentation,
-  IconMicSolid,
-  IconMusic,
-  IconProductHunt,
-  IconYoutubeSolid,
-  cn,
-} from 'ui'
+import { IconDocumentation, IconMicSolid, IconProductHunt, IconYoutubeSolid, cn } from 'ui'
+import { Music } from 'lucide-react'
 
 import Link from 'next/link'
 import { StepLink } from '../data/lw11_data'
@@ -43,7 +37,7 @@ export const DayLink = ({ type, icon, text, href = '', className }: DayLink) => 
       text: 'Watch video',
     },
     podcast: {
-      icon: IconMusic,
+      icon: Music,
       text: 'Podcast',
     },
     xSpace: {
