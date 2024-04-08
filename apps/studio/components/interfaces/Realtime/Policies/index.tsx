@@ -120,6 +120,12 @@ export const RealtimePolicies = () => {
                 }}
                 onSelectPolicyEdit={(policy) => {
                   setSelectedPolicyToEdit(policy)
+                  setChannelDataForPolicy({
+                    table: policy.table,
+                    templateData: {
+                      channelId: `${channel.id}`,
+                    },
+                  })
                   showPolicyEditor(true)
                 }}
                 onSelectPolicyDelete={(policy) => setSelectedPolicyToDelete(policy)}
@@ -139,6 +145,10 @@ export const RealtimePolicies = () => {
                 policy={policy}
                 onSelectPolicyEdit={() => {
                   setSelectedPolicyToEdit(policy)
+                  setChannelDataForPolicy({
+                    table: policy.table,
+                    templateData: {},
+                  })
                   showPolicyEditor(true)
                 }}
                 onSelectPolicyDelete={(policy) => setSelectedPolicyToDelete(policy)}
