@@ -63,10 +63,6 @@ export const QueryPerformance = ({
   )
   const [showResetgPgStatStatements, setShowResetgPgStatStatements] = useState(false)
 
-  const isLoading = [queryPerformanceQuery.isLoading, queryHitRate.isLoading].every(
-    (value) => value
-  )
-
   const handleRefresh = async () => {
     queryPerformanceQuery.runQuery()
     queryHitRate.runQuery()
@@ -112,7 +108,7 @@ export const QueryPerformance = ({
       </Tabs_Shadcn_>
 
       <div className="px-6 py-3 bg-surface-200">
-        <QueryPerformanceFilterBar onRefreshClick={handleRefresh} isLoading={isLoading} />
+        <QueryPerformanceFilterBar queryPerformanceQuery={queryPerformanceQuery} />
       </div>
 
       <QueryPerformanceGrid queryPerformanceQuery={queryPerformanceQuery} />

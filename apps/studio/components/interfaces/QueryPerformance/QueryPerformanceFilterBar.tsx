@@ -14,13 +14,12 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { TextSearchPopover } from './TextSearchPopover'
+import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 
 export const QueryPerformanceFilterBar = ({
-  isLoading,
-  onRefreshClick,
+  queryPerformanceQuery,
 }: {
-  isLoading: boolean
-  onRefreshClick: () => void
+  queryPerformanceQuery: DbQueryHook<any>
 }) => {
   const router = useRouter()
   const { project } = useProjectContext()
@@ -35,6 +34,7 @@ export const QueryPerformanceFilterBar = ({
     query: '',
   })
 
+  const { isLoading, isRefetching } = queryPerformanceQuery
   const { data, isLoading: isLoadingRoles } = useDatabaseRolesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -117,16 +117,16 @@ export const QueryPerformanceFilterBar = ({
       <Button
         type="default"
         size="tiny"
-        onClick={onRefreshClick}
-        disabled={isLoading ? true : false}
+        onClick={() => queryPerformanceQuery.runQuery()}
+        disabled={isLoading || isRefetching}
         icon={
           <RefreshCw
             size={12}
-            className={`text-foreground-light ${isLoading ? 'animate-spin' : ''}`}
+            className={`text-foreground-light ${isLoading || isRefetching ? 'animate-spin' : ''}`}
           />
         }
       >
-        {isLoading ? 'Refreshing' : 'Refresh'}
+        Refresh
       </Button>
     </div>
   )

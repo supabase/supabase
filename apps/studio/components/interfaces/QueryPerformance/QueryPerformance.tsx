@@ -10,8 +10,6 @@ import { QueryPerformanceFilterBar } from './QueryPerformanceFilterBar'
 import { QueryPerformanceLoadingRow } from './QueryPerformanceLoadingRow'
 import { ResetAnalysisNotice } from './ResetAnalysisNotice'
 
-type QueryPerformancePreset = 'time' | 'frequent' | 'slowest'
-
 const panelClassNames = 'text-sm max-w-none flex flex-col gap-4'
 
 const TimeConsumingHelperText = `This table lists queries ordered by their cumulative total execution time.
@@ -39,9 +37,6 @@ export const QueryPerformance = ({
   queryPerformanceQuery,
 }: QueryPerformanceProps) => {
   const router = useRouter()
-  const isLoading = [queryPerformanceQuery.isLoading, queryHitRate.isLoading].every(
-    (value) => value
-  )
 
   const handleRefresh = async () => {
     queryPerformanceQuery.runQuery()
@@ -72,7 +67,7 @@ export const QueryPerformance = ({
           />
           <ResetAnalysisNotice handleRefresh={handleRefresh} />
           <div className="thin-scrollbars max-w-full overflow-auto">
-            <QueryPerformanceFilterBar onRefreshClick={handleRefresh} isLoading={isLoading} />
+            <QueryPerformanceFilterBar queryPerformanceQuery={queryPerformanceQuery} />
             <Table
               className="table-fixed"
               head={
@@ -123,7 +118,7 @@ export const QueryPerformance = ({
           />
           <ResetAnalysisNotice handleRefresh={handleRefresh} />
           <div className="thin-scrollbars max-w-full overflow-auto">
-            <QueryPerformanceFilterBar onRefreshClick={handleRefresh} isLoading={isLoading} />
+            <QueryPerformanceFilterBar queryPerformanceQuery={queryPerformanceQuery} />
             <Table
               head={
                 <>
@@ -185,7 +180,7 @@ export const QueryPerformance = ({
           />
           <ResetAnalysisNotice handleRefresh={handleRefresh} />
           <div className="thin-scrollbars max-w-full overflow-auto">
-            <QueryPerformanceFilterBar onRefreshClick={handleRefresh} isLoading={isLoading} />
+            <QueryPerformanceFilterBar queryPerformanceQuery={queryPerformanceQuery} />
             <Table
               head={
                 <>

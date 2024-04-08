@@ -13,14 +13,14 @@ export const QueryDetail = ({ reportType, selectedRow }: QueryDetailProps) => {
   const report = QUERY_PERFORMANCE_REPORTS[reportType]
 
   return (
-    <div className="h-full overflow-auto pt-2 flex flex-col gap-y-8 divide-y">
+    <div className="flex flex-col gap-y-8 divide-y">
       <div className="px-4 flex flex-col gap-y-2">
         <p className="text-sm">Query pattern</p>
         <CodeBlock
           value={selectedRow['query']}
           language="sql"
           className={cn(
-            'max-h-[310px]',
+            'max-w-full max-h-[310px]',
             '!py-3 !px-3.5 prose dark:prose-dark transition',
             '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
           )}
