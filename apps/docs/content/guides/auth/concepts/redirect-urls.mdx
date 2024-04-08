@@ -7,7 +7,7 @@ subtitle: 'Set up redirect urls with Supabase Auth.'
 
 ## Overview
 
-When using [passwordless sign-ins](/docs/reference/javascript/auth-signinwithotp) or [third-party providers](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect), the Supabase client library methods provide a `redirectTo` parameter to specify where to redirect the user to after authentication. By default, the user will be redirected to the [`SITE_URL`](/docs/reference/auth/config#site_url) but you can modify the `SITE_URL` or add additional redirect URLs to the [allow list](https://supabase.com/dashboard/project/_/auth/url-configuration). Once you've added necessary URLs to the allow list, you can specify the URL you want the user to be redirected to in the `redirectTo` parameter.
+When using [passwordless sign-ins](/docs/reference/javascript/auth-signinwithotp) or [third-party providers](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect), the Supabase client library methods provide a `redirectTo` parameter to specify where to redirect the user to after authentication. By default, the user will be redirected to the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls) but you can modify the `SITE_URL` or add additional redirect URLs to the [allow list](https://supabase.com/dashboard/project/_/auth/url-configuration). Once you've added necessary URLs to the allow list, you can specify the URL you want the user to be redirected to in the `redirectTo` parameter.
 
 ## Use wildcards in redirect URLs
 
@@ -81,3 +81,16 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 For mobile applications you can use deep linking URIs. For example, for your `SITE_URL` you can specify something like `com.supabase://login-callback/` and for additional redirect URLs something like `com.supabase.staging://login-callback/` if needed.
 
 Read more about deep linking and find code examples for different frameworks [here](/docs/guides/auth/native-mobile-deep-linking).
+
+## Error Handling
+
+When authentication fails, the user will still be redirected to the redirect URL provided. However, the error details will be returned as query fragments in the URL. You can parse these query fragments and show a custom error message to the user. For example:
+
+```js
+const params = new URLSearchParams(window.location.hash.slice())
+
+if (params.get('error_code').startsWith('4')) {
+  // show error message if error is a 4xx error
+  window.alert(params.get('error_description'))
+}
+```

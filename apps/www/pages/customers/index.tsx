@@ -8,7 +8,7 @@ import { generateRss } from '~/lib/rss'
 import { getSortedPosts } from '~/lib/posts'
 
 import DefaultLayout from '~/components/Layouts/Default'
-import PostTypes from '~/types/post'
+import type PostTypes from '~/types/post'
 import { motion } from 'framer-motion'
 import styles from './customers.module.css'
 import Link from 'next/link'

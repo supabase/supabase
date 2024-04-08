@@ -173,21 +173,19 @@ const PublicationsList = ({ onSelectPublication = noop }: PublicationsListProps)
 
       <ConfirmationModal
         visible={toggleListenEventValue !== null}
-        header={`Confirm to toggle sending ${toggleListenEventValue?.event.event.toLowerCase()} events`}
-        buttonLabel="Confirm"
-        buttonLoadingLabel="Updating"
-        onSelectCancel={() => setToggleListenEventValue(null)}
-        onSelectConfirm={() => {
+        title={`Confirm to toggle sending ${toggleListenEventValue?.event.event.toLowerCase()} events`}
+        confirmLabel="Confirm"
+        confirmLabelLoading="Updating"
+        onCancel={() => setToggleListenEventValue(null)}
+        onConfirm={() => {
           toggleListenEvent()
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            Are you sure you want to {toggleListenEventValue?.currentStatus ? 'stop' : 'start'}{' '}
-            sending {toggleListenEventValue?.event.event.toLowerCase()} events for{' '}
-            {toggleListenEventValue?.publication.name}?
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to {toggleListenEventValue?.currentStatus ? 'stop' : 'start'}{' '}
+          sending {toggleListenEventValue?.event.event.toLowerCase()} events for{' '}
+          {toggleListenEventValue?.publication.name}?
+        </p>
       </ConfirmationModal>
     </>
   )

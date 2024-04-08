@@ -112,7 +112,7 @@ export const pricing: Pricing = {
       {
         title: 'Bandwidth',
         tooltips: {
-          main: 'Billing is based on the total sum of outgoing traffic (includes Database, Storage, Realtime, Auth) in GB throughout your billing period.',
+          main: 'Billing is based on the total sum of all outgoing traffic (includes Database, Storage, Realtime, Auth, API, Edge Functions, Supavisor) in GB throughout your billing period.',
         },
         plans: {
           free: '5 GB included',
@@ -290,6 +290,19 @@ export const pricing: Pricing = {
           pro: '50 GB',
           team: '50 GB',
           enterprise: 'Custom',
+        },
+        usage_based: false,
+      },
+      {
+        title: 'Content Delivery Network',
+        tooltips: {
+          main: 'Assets in Storage are automatically cached on a CDN. With Smart CDN caching enabled, the CDN cache is automatically re-validated when the underlying asset changes. CDN caching is enabled across all plans and assets in the paid plans are cached via the Smart CDN.',
+        },
+        plans: {
+          free: 'Basic CDN',
+          pro: 'Smart CDN',
+          team: 'Smart CDN',
+          enterprise: 'Smart CDN',
         },
         usage_based: false,
       },

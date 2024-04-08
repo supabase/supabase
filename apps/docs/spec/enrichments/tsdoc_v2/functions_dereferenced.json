@@ -7,6 +7,330 @@
   "originalName": "",
   "children": [
     {
+      "id": 63,
+      "name": "FunctionRegion",
+      "kind": 8,
+      "kindString": "Enumeration",
+      "flags": {},
+      "children": [
+        {
+          "id": 64,
+          "name": "Any",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/types.ts",
+              "line": 45,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "any"
+          },
+          "defaultValue": "\"any\""
+        },
+        {
+          "id": 65,
+          "name": "ApNortheast1",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/types.ts",
+              "line": 46,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "ap-northeast-1"
+          },
+          "defaultValue": "\"ap-northeast-1\""
+        },
+        {
+          "id": 66,
+          "name": "ApNortheast2",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/types.ts",
+              "line": 47,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "ap-northeast-2"
+          },
+          "defaultValue": "\"ap-northeast-2\""
+        },
+        {
+          "id": 67,
+          "name": "ApSouth1",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/types.ts",
+              "line": 48,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "ap-south-1"
+          },
+          "defaultValue": "\"ap-south-1\""
+        },
+        {
+          "id": 68,
+          "name": "ApSoutheast1",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/types.ts",
+              "line": 49,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "ap-southeast-1"
+          },
+          "defaultValue": "\"ap-southeast-1\""
+        },
+        {
+          "id": 69,
+          "name": "ApSoutheast2",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/types.ts",
+              "line": 50,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "ap-southeast-2"
+          },
+          "defaultValue": "\"ap-southeast-2\""
+        },
+        {
+          "id": 70,
+          "name": "CaCentral1",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/types.ts",
+              "line": 51,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "ca-central-1"
+          },
+          "defaultValue": "\"ca-central-1\""
+        },
+        {
+          "id": 71,
+          "name": "EuCentral1",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/types.ts",
+              "line": 52,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "eu-central-1"
+          },
+          "defaultValue": "\"eu-central-1\""
+        },
+        {
+          "id": 72,
+          "name": "EuWest1",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/types.ts",
+              "line": 53,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "eu-west-1"
+          },
+          "defaultValue": "\"eu-west-1\""
+        },
+        {
+          "id": 73,
+          "name": "EuWest2",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/types.ts",
+              "line": 54,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "eu-west-2"
+          },
+          "defaultValue": "\"eu-west-2\""
+        },
+        {
+          "id": 74,
+          "name": "EuWest3",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/types.ts",
+              "line": 55,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "eu-west-3"
+          },
+          "defaultValue": "\"eu-west-3\""
+        },
+        {
+          "id": 75,
+          "name": "SaEast1",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/types.ts",
+              "line": 56,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "sa-east-1"
+          },
+          "defaultValue": "\"sa-east-1\""
+        },
+        {
+          "id": 76,
+          "name": "UsEast1",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/types.ts",
+              "line": 57,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "us-east-1"
+          },
+          "defaultValue": "\"us-east-1\""
+        },
+        {
+          "id": 77,
+          "name": "UsWest1",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/types.ts",
+              "line": 58,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "us-west-1"
+          },
+          "defaultValue": "\"us-west-1\""
+        },
+        {
+          "id": 78,
+          "name": "UsWest2",
+          "kind": 16,
+          "kindString": "Enumeration Member",
+          "flags": {},
+          "sources": [
+            {
+              "fileName": "src/types.ts",
+              "line": 59,
+              "character": 2
+            }
+          ],
+          "type": {
+            "type": "literal",
+            "value": "us-west-2"
+          },
+          "defaultValue": "\"us-west-2\""
+        }
+      ],
+      "groups": [
+        {
+          "title": "Enumeration Members",
+          "kind": 16,
+          "children": [
+            64,
+            65,
+            66,
+            67,
+            68,
+            69,
+            70,
+            71,
+            72,
+            73,
+            74,
+            75,
+            76,
+            77,
+            78
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "fileName": "src/types.ts",
+          "line": 44,
+          "character": 12
+        }
+      ]
+    },
+    {
       "id": 1,
       "name": "FunctionsClient",
       "kind": 128,
@@ -22,7 +346,7 @@
           "sources": [
             {
               "fileName": "src/FunctionsClient.ts",
-              "line": 16,
+              "line": 18,
               "character": 2
             }
           ],
@@ -71,7 +395,7 @@
                           "sources": [
                             {
                               "fileName": "src/FunctionsClient.ts",
-                              "line": 23,
+                              "line": 26,
                               "character": 6
                             }
                           ],
@@ -161,7 +485,7 @@
                           "sources": [
                             {
                               "fileName": "src/FunctionsClient.ts",
-                              "line": 22,
+                              "line": 25,
                               "character": 6
                             }
                           ],
@@ -181,6 +505,351 @@
                             "package": "typescript",
                             "name": "Record"
                           }
+                        },
+                        {
+                          "id": 13,
+                          "name": "region",
+                          "kind": 1024,
+                          "kindString": "Property",
+                          "flags": {
+                            "isOptional": true
+                          },
+                          "sources": [
+                            {
+                              "fileName": "src/FunctionsClient.ts",
+                              "line": 27,
+                              "character": 6
+                            }
+                          ],
+                          "type": {
+                            "type": "reference",
+                            "id": 63,
+                            "name": "FunctionRegion",
+                            "dereferenced": {
+                              "id": 63,
+                              "name": "FunctionRegion",
+                              "kind": 8,
+                              "kindString": "Enumeration",
+                              "flags": {},
+                              "children": [
+                                {
+                                  "id": 64,
+                                  "name": "Any",
+                                  "kind": 16,
+                                  "kindString": "Enumeration Member",
+                                  "flags": {},
+                                  "sources": [
+                                    {
+                                      "fileName": "src/types.ts",
+                                      "line": 45,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "literal",
+                                    "value": "any"
+                                  },
+                                  "defaultValue": "\"any\""
+                                },
+                                {
+                                  "id": 65,
+                                  "name": "ApNortheast1",
+                                  "kind": 16,
+                                  "kindString": "Enumeration Member",
+                                  "flags": {},
+                                  "sources": [
+                                    {
+                                      "fileName": "src/types.ts",
+                                      "line": 46,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "literal",
+                                    "value": "ap-northeast-1"
+                                  },
+                                  "defaultValue": "\"ap-northeast-1\""
+                                },
+                                {
+                                  "id": 66,
+                                  "name": "ApNortheast2",
+                                  "kind": 16,
+                                  "kindString": "Enumeration Member",
+                                  "flags": {},
+                                  "sources": [
+                                    {
+                                      "fileName": "src/types.ts",
+                                      "line": 47,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "literal",
+                                    "value": "ap-northeast-2"
+                                  },
+                                  "defaultValue": "\"ap-northeast-2\""
+                                },
+                                {
+                                  "id": 67,
+                                  "name": "ApSouth1",
+                                  "kind": 16,
+                                  "kindString": "Enumeration Member",
+                                  "flags": {},
+                                  "sources": [
+                                    {
+                                      "fileName": "src/types.ts",
+                                      "line": 48,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "literal",
+                                    "value": "ap-south-1"
+                                  },
+                                  "defaultValue": "\"ap-south-1\""
+                                },
+                                {
+                                  "id": 68,
+                                  "name": "ApSoutheast1",
+                                  "kind": 16,
+                                  "kindString": "Enumeration Member",
+                                  "flags": {},
+                                  "sources": [
+                                    {
+                                      "fileName": "src/types.ts",
+                                      "line": 49,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "literal",
+                                    "value": "ap-southeast-1"
+                                  },
+                                  "defaultValue": "\"ap-southeast-1\""
+                                },
+                                {
+                                  "id": 69,
+                                  "name": "ApSoutheast2",
+                                  "kind": 16,
+                                  "kindString": "Enumeration Member",
+                                  "flags": {},
+                                  "sources": [
+                                    {
+                                      "fileName": "src/types.ts",
+                                      "line": 50,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "literal",
+                                    "value": "ap-southeast-2"
+                                  },
+                                  "defaultValue": "\"ap-southeast-2\""
+                                },
+                                {
+                                  "id": 70,
+                                  "name": "CaCentral1",
+                                  "kind": 16,
+                                  "kindString": "Enumeration Member",
+                                  "flags": {},
+                                  "sources": [
+                                    {
+                                      "fileName": "src/types.ts",
+                                      "line": 51,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "literal",
+                                    "value": "ca-central-1"
+                                  },
+                                  "defaultValue": "\"ca-central-1\""
+                                },
+                                {
+                                  "id": 71,
+                                  "name": "EuCentral1",
+                                  "kind": 16,
+                                  "kindString": "Enumeration Member",
+                                  "flags": {},
+                                  "sources": [
+                                    {
+                                      "fileName": "src/types.ts",
+                                      "line": 52,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "literal",
+                                    "value": "eu-central-1"
+                                  },
+                                  "defaultValue": "\"eu-central-1\""
+                                },
+                                {
+                                  "id": 72,
+                                  "name": "EuWest1",
+                                  "kind": 16,
+                                  "kindString": "Enumeration Member",
+                                  "flags": {},
+                                  "sources": [
+                                    {
+                                      "fileName": "src/types.ts",
+                                      "line": 53,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "literal",
+                                    "value": "eu-west-1"
+                                  },
+                                  "defaultValue": "\"eu-west-1\""
+                                },
+                                {
+                                  "id": 73,
+                                  "name": "EuWest2",
+                                  "kind": 16,
+                                  "kindString": "Enumeration Member",
+                                  "flags": {},
+                                  "sources": [
+                                    {
+                                      "fileName": "src/types.ts",
+                                      "line": 54,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "literal",
+                                    "value": "eu-west-2"
+                                  },
+                                  "defaultValue": "\"eu-west-2\""
+                                },
+                                {
+                                  "id": 74,
+                                  "name": "EuWest3",
+                                  "kind": 16,
+                                  "kindString": "Enumeration Member",
+                                  "flags": {},
+                                  "sources": [
+                                    {
+                                      "fileName": "src/types.ts",
+                                      "line": 55,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "literal",
+                                    "value": "eu-west-3"
+                                  },
+                                  "defaultValue": "\"eu-west-3\""
+                                },
+                                {
+                                  "id": 75,
+                                  "name": "SaEast1",
+                                  "kind": 16,
+                                  "kindString": "Enumeration Member",
+                                  "flags": {},
+                                  "sources": [
+                                    {
+                                      "fileName": "src/types.ts",
+                                      "line": 56,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "literal",
+                                    "value": "sa-east-1"
+                                  },
+                                  "defaultValue": "\"sa-east-1\""
+                                },
+                                {
+                                  "id": 76,
+                                  "name": "UsEast1",
+                                  "kind": 16,
+                                  "kindString": "Enumeration Member",
+                                  "flags": {},
+                                  "sources": [
+                                    {
+                                      "fileName": "src/types.ts",
+                                      "line": 57,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "literal",
+                                    "value": "us-east-1"
+                                  },
+                                  "defaultValue": "\"us-east-1\""
+                                },
+                                {
+                                  "id": 77,
+                                  "name": "UsWest1",
+                                  "kind": 16,
+                                  "kindString": "Enumeration Member",
+                                  "flags": {},
+                                  "sources": [
+                                    {
+                                      "fileName": "src/types.ts",
+                                      "line": 58,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "literal",
+                                    "value": "us-west-1"
+                                  },
+                                  "defaultValue": "\"us-west-1\""
+                                },
+                                {
+                                  "id": 78,
+                                  "name": "UsWest2",
+                                  "kind": 16,
+                                  "kindString": "Enumeration Member",
+                                  "flags": {},
+                                  "sources": [
+                                    {
+                                      "fileName": "src/types.ts",
+                                      "line": 59,
+                                      "character": 2
+                                    }
+                                  ],
+                                  "type": {
+                                    "type": "literal",
+                                    "value": "us-west-2"
+                                  },
+                                  "defaultValue": "\"us-west-2\""
+                                }
+                              ],
+                              "groups": [
+                                {
+                                  "title": "Enumeration Members",
+                                  "kind": 16,
+                                  "children": [
+                                    64,
+                                    65,
+                                    66,
+                                    67,
+                                    68,
+                                    69,
+                                    70,
+                                    71,
+                                    72,
+                                    73,
+                                    74,
+                                    75,
+                                    76,
+                                    77,
+                                    78
+                                  ]
+                                }
+                              ],
+                              "sources": [
+                                {
+                                  "fileName": "src/types.ts",
+                                  "line": 44,
+                                  "character": 12
+                                }
+                              ]
+                            }
+                          }
                         }
                       ],
                       "groups": [
@@ -189,7 +858,8 @@
                           "kind": 1024,
                           "children": [
                             8,
-                            7
+                            7,
+                            13
                           ]
                         }
                       ]
@@ -207,7 +877,7 @@
           ]
         },
         {
-          "id": 15,
+          "id": 17,
           "name": "fetch",
           "kind": 1024,
           "kindString": "Property",
@@ -217,28 +887,28 @@
           "sources": [
             {
               "fileName": "src/FunctionsClient.ts",
-              "line": 14,
+              "line": 16,
               "character": 12
             }
           ],
           "type": {
             "type": "reflection",
             "declaration": {
-              "id": 16,
+              "id": 18,
               "name": "__type",
               "kind": 65536,
               "kindString": "Type literal",
               "flags": {},
               "signatures": [
                 {
-                  "id": 17,
+                  "id": 19,
                   "name": "__type",
                   "kind": 4096,
                   "kindString": "Call signature",
                   "flags": {},
                   "parameters": [
                     {
-                      "id": 18,
+                      "id": 20,
                       "name": "input",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -262,7 +932,7 @@
                       }
                     },
                     {
-                      "id": 19,
+                      "id": 21,
                       "name": "init",
                       "kind": 32768,
                       "kindString": "Parameter",
@@ -297,7 +967,7 @@
           }
         },
         {
-          "id": 14,
+          "id": 15,
           "name": "headers",
           "kind": 1024,
           "kindString": "Property",
@@ -307,7 +977,7 @@
           "sources": [
             {
               "fileName": "src/FunctionsClient.ts",
-              "line": 13,
+              "line": 14,
               "character": 12
             }
           ],
@@ -329,7 +999,352 @@
           }
         },
         {
-          "id": 13,
+          "id": 16,
+          "name": "region",
+          "kind": 1024,
+          "kindString": "Property",
+          "flags": {
+            "isProtected": true
+          },
+          "sources": [
+            {
+              "fileName": "src/FunctionsClient.ts",
+              "line": 15,
+              "character": 12
+            }
+          ],
+          "type": {
+            "type": "reference",
+            "id": 63,
+            "name": "FunctionRegion",
+            "dereferenced": {
+              "id": 63,
+              "name": "FunctionRegion",
+              "kind": 8,
+              "kindString": "Enumeration",
+              "flags": {},
+              "children": [
+                {
+                  "id": 64,
+                  "name": "Any",
+                  "kind": 16,
+                  "kindString": "Enumeration Member",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/types.ts",
+                      "line": 45,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "literal",
+                    "value": "any"
+                  },
+                  "defaultValue": "\"any\""
+                },
+                {
+                  "id": 65,
+                  "name": "ApNortheast1",
+                  "kind": 16,
+                  "kindString": "Enumeration Member",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/types.ts",
+                      "line": 46,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "literal",
+                    "value": "ap-northeast-1"
+                  },
+                  "defaultValue": "\"ap-northeast-1\""
+                },
+                {
+                  "id": 66,
+                  "name": "ApNortheast2",
+                  "kind": 16,
+                  "kindString": "Enumeration Member",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/types.ts",
+                      "line": 47,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "literal",
+                    "value": "ap-northeast-2"
+                  },
+                  "defaultValue": "\"ap-northeast-2\""
+                },
+                {
+                  "id": 67,
+                  "name": "ApSouth1",
+                  "kind": 16,
+                  "kindString": "Enumeration Member",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/types.ts",
+                      "line": 48,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "literal",
+                    "value": "ap-south-1"
+                  },
+                  "defaultValue": "\"ap-south-1\""
+                },
+                {
+                  "id": 68,
+                  "name": "ApSoutheast1",
+                  "kind": 16,
+                  "kindString": "Enumeration Member",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/types.ts",
+                      "line": 49,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "literal",
+                    "value": "ap-southeast-1"
+                  },
+                  "defaultValue": "\"ap-southeast-1\""
+                },
+                {
+                  "id": 69,
+                  "name": "ApSoutheast2",
+                  "kind": 16,
+                  "kindString": "Enumeration Member",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/types.ts",
+                      "line": 50,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "literal",
+                    "value": "ap-southeast-2"
+                  },
+                  "defaultValue": "\"ap-southeast-2\""
+                },
+                {
+                  "id": 70,
+                  "name": "CaCentral1",
+                  "kind": 16,
+                  "kindString": "Enumeration Member",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/types.ts",
+                      "line": 51,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "literal",
+                    "value": "ca-central-1"
+                  },
+                  "defaultValue": "\"ca-central-1\""
+                },
+                {
+                  "id": 71,
+                  "name": "EuCentral1",
+                  "kind": 16,
+                  "kindString": "Enumeration Member",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/types.ts",
+                      "line": 52,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "literal",
+                    "value": "eu-central-1"
+                  },
+                  "defaultValue": "\"eu-central-1\""
+                },
+                {
+                  "id": 72,
+                  "name": "EuWest1",
+                  "kind": 16,
+                  "kindString": "Enumeration Member",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/types.ts",
+                      "line": 53,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "literal",
+                    "value": "eu-west-1"
+                  },
+                  "defaultValue": "\"eu-west-1\""
+                },
+                {
+                  "id": 73,
+                  "name": "EuWest2",
+                  "kind": 16,
+                  "kindString": "Enumeration Member",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/types.ts",
+                      "line": 54,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "literal",
+                    "value": "eu-west-2"
+                  },
+                  "defaultValue": "\"eu-west-2\""
+                },
+                {
+                  "id": 74,
+                  "name": "EuWest3",
+                  "kind": 16,
+                  "kindString": "Enumeration Member",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/types.ts",
+                      "line": 55,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "literal",
+                    "value": "eu-west-3"
+                  },
+                  "defaultValue": "\"eu-west-3\""
+                },
+                {
+                  "id": 75,
+                  "name": "SaEast1",
+                  "kind": 16,
+                  "kindString": "Enumeration Member",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/types.ts",
+                      "line": 56,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "literal",
+                    "value": "sa-east-1"
+                  },
+                  "defaultValue": "\"sa-east-1\""
+                },
+                {
+                  "id": 76,
+                  "name": "UsEast1",
+                  "kind": 16,
+                  "kindString": "Enumeration Member",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/types.ts",
+                      "line": 57,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "literal",
+                    "value": "us-east-1"
+                  },
+                  "defaultValue": "\"us-east-1\""
+                },
+                {
+                  "id": 77,
+                  "name": "UsWest1",
+                  "kind": 16,
+                  "kindString": "Enumeration Member",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/types.ts",
+                      "line": 58,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "literal",
+                    "value": "us-west-1"
+                  },
+                  "defaultValue": "\"us-west-1\""
+                },
+                {
+                  "id": 78,
+                  "name": "UsWest2",
+                  "kind": 16,
+                  "kindString": "Enumeration Member",
+                  "flags": {},
+                  "sources": [
+                    {
+                      "fileName": "src/types.ts",
+                      "line": 59,
+                      "character": 2
+                    }
+                  ],
+                  "type": {
+                    "type": "literal",
+                    "value": "us-west-2"
+                  },
+                  "defaultValue": "\"us-west-2\""
+                }
+              ],
+              "groups": [
+                {
+                  "title": "Enumeration Members",
+                  "kind": 16,
+                  "children": [
+                    64,
+                    65,
+                    66,
+                    67,
+                    68,
+                    69,
+                    70,
+                    71,
+                    72,
+                    73,
+                    74,
+                    75,
+                    76,
+                    77,
+                    78
+                  ]
+                }
+              ],
+              "sources": [
+                {
+                  "fileName": "src/types.ts",
+                  "line": 44,
+                  "character": 12
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": 14,
           "name": "url",
           "kind": 1024,
           "kindString": "Property",
@@ -339,7 +1354,7 @@
           "sources": [
             {
               "fileName": "src/FunctionsClient.ts",
-              "line": 12,
+              "line": 13,
               "character": 12
             }
           ],
@@ -349,7 +1364,7 @@
           }
         },
         {
-          "id": 23,
+          "id": 25,
           "name": "invoke",
           "kind": 2048,
           "kindString": "Method",
@@ -357,13 +1372,13 @@
           "sources": [
             {
               "fileName": "src/FunctionsClient.ts",
-              "line": 44,
+              "line": 49,
               "character": 8
             }
           ],
           "signatures": [
             {
-              "id": 24,
+              "id": 26,
               "name": "invoke",
               "kind": 4096,
               "kindString": "Call signature",
@@ -373,7 +1388,7 @@
               },
               "typeParameter": [
                 {
-                  "id": 25,
+                  "id": 27,
                   "name": "T",
                   "kind": 131072,
                   "kindString": "Type parameter",
@@ -386,7 +1401,7 @@
               ],
               "parameters": [
                 {
-                  "id": 26,
+                  "id": 28,
                   "name": "functionName",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -400,7 +1415,7 @@
                   }
                 },
                 {
-                  "id": 27,
+                  "id": 29,
                   "name": "options",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -410,10 +1425,10 @@
                   },
                   "type": {
                     "type": "reference",
-                    "id": 28,
+                    "id": 30,
                     "name": "FunctionInvokeOptions",
                     "dereferenced": {
-                      "id": 28,
+                      "id": 30,
                       "name": "FunctionInvokeOptions",
                       "kind": 4194304,
                       "kindString": "Type alias",
@@ -421,21 +1436,21 @@
                       "sources": [
                         {
                           "fileName": "src/types.ts",
-                          "line": 44,
+                          "line": 62,
                           "character": 12
                         }
                       ],
                       "type": {
                         "type": "reflection",
                         "declaration": {
-                          "id": 29,
+                          "id": 31,
                           "name": "__type",
                           "kind": 65536,
                           "kindString": "Type literal",
                           "flags": {},
                           "children": [
                             {
-                              "id": 35,
+                              "id": 38,
                               "name": "body",
                               "kind": 1024,
                               "kindString": "Property",
@@ -448,7 +1463,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/types.ts",
-                                  "line": 56,
+                                  "line": 78,
                                   "character": 2
                                 }
                               ],
@@ -517,7 +1532,7 @@
                               }
                             },
                             {
-                              "id": 30,
+                              "id": 32,
                               "name": "headers",
                               "kind": 1024,
                               "kindString": "Property",
@@ -530,14 +1545,14 @@
                               "sources": [
                                 {
                                   "fileName": "src/types.ts",
-                                  "line": 48,
+                                  "line": 66,
                                   "character": 2
                                 }
                               ],
                               "type": {
                                 "type": "reflection",
                                 "declaration": {
-                                  "id": 31,
+                                  "id": 33,
                                   "name": "__type",
                                   "kind": 65536,
                                   "kindString": "Type literal",
@@ -545,19 +1560,19 @@
                                   "sources": [
                                     {
                                       "fileName": "src/types.ts",
-                                      "line": 48,
+                                      "line": 66,
                                       "character": 12
                                     }
                                   ],
                                   "indexSignature": {
-                                    "id": 32,
+                                    "id": 34,
                                     "name": "__index",
                                     "kind": 8192,
                                     "kindString": "Index signature",
                                     "flags": {},
                                     "parameters": [
                                       {
-                                        "id": 33,
+                                        "id": 35,
                                         "name": "key",
                                         "kind": 32768,
                                         "flags": {},
@@ -576,7 +1591,7 @@
                               }
                             },
                             {
-                              "id": 34,
+                              "id": 36,
                               "name": "method",
                               "kind": 1024,
                               "kindString": "Property",
@@ -589,7 +1604,7 @@
                               "sources": [
                                 {
                                   "fileName": "src/types.ts",
-                                  "line": 52,
+                                  "line": 70,
                                   "character": 2
                                 }
                               ],
@@ -618,6 +1633,354 @@
                                   }
                                 ]
                               }
+                            },
+                            {
+                              "id": 37,
+                              "name": "region",
+                              "kind": 1024,
+                              "kindString": "Property",
+                              "flags": {
+                                "isOptional": true
+                              },
+                              "comment": {
+                                "shortText": "The Region to invoke the function in."
+                              },
+                              "sources": [
+                                {
+                                  "fileName": "src/types.ts",
+                                  "line": 74,
+                                  "character": 2
+                                }
+                              ],
+                              "type": {
+                                "type": "reference",
+                                "id": 63,
+                                "name": "FunctionRegion",
+                                "dereferenced": {
+                                  "id": 63,
+                                  "name": "FunctionRegion",
+                                  "kind": 8,
+                                  "kindString": "Enumeration",
+                                  "flags": {},
+                                  "children": [
+                                    {
+                                      "id": 64,
+                                      "name": "Any",
+                                      "kind": 16,
+                                      "kindString": "Enumeration Member",
+                                      "flags": {},
+                                      "sources": [
+                                        {
+                                          "fileName": "src/types.ts",
+                                          "line": 45,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "literal",
+                                        "value": "any"
+                                      },
+                                      "defaultValue": "\"any\""
+                                    },
+                                    {
+                                      "id": 65,
+                                      "name": "ApNortheast1",
+                                      "kind": 16,
+                                      "kindString": "Enumeration Member",
+                                      "flags": {},
+                                      "sources": [
+                                        {
+                                          "fileName": "src/types.ts",
+                                          "line": 46,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "literal",
+                                        "value": "ap-northeast-1"
+                                      },
+                                      "defaultValue": "\"ap-northeast-1\""
+                                    },
+                                    {
+                                      "id": 66,
+                                      "name": "ApNortheast2",
+                                      "kind": 16,
+                                      "kindString": "Enumeration Member",
+                                      "flags": {},
+                                      "sources": [
+                                        {
+                                          "fileName": "src/types.ts",
+                                          "line": 47,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "literal",
+                                        "value": "ap-northeast-2"
+                                      },
+                                      "defaultValue": "\"ap-northeast-2\""
+                                    },
+                                    {
+                                      "id": 67,
+                                      "name": "ApSouth1",
+                                      "kind": 16,
+                                      "kindString": "Enumeration Member",
+                                      "flags": {},
+                                      "sources": [
+                                        {
+                                          "fileName": "src/types.ts",
+                                          "line": 48,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "literal",
+                                        "value": "ap-south-1"
+                                      },
+                                      "defaultValue": "\"ap-south-1\""
+                                    },
+                                    {
+                                      "id": 68,
+                                      "name": "ApSoutheast1",
+                                      "kind": 16,
+                                      "kindString": "Enumeration Member",
+                                      "flags": {},
+                                      "sources": [
+                                        {
+                                          "fileName": "src/types.ts",
+                                          "line": 49,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "literal",
+                                        "value": "ap-southeast-1"
+                                      },
+                                      "defaultValue": "\"ap-southeast-1\""
+                                    },
+                                    {
+                                      "id": 69,
+                                      "name": "ApSoutheast2",
+                                      "kind": 16,
+                                      "kindString": "Enumeration Member",
+                                      "flags": {},
+                                      "sources": [
+                                        {
+                                          "fileName": "src/types.ts",
+                                          "line": 50,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "literal",
+                                        "value": "ap-southeast-2"
+                                      },
+                                      "defaultValue": "\"ap-southeast-2\""
+                                    },
+                                    {
+                                      "id": 70,
+                                      "name": "CaCentral1",
+                                      "kind": 16,
+                                      "kindString": "Enumeration Member",
+                                      "flags": {},
+                                      "sources": [
+                                        {
+                                          "fileName": "src/types.ts",
+                                          "line": 51,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "literal",
+                                        "value": "ca-central-1"
+                                      },
+                                      "defaultValue": "\"ca-central-1\""
+                                    },
+                                    {
+                                      "id": 71,
+                                      "name": "EuCentral1",
+                                      "kind": 16,
+                                      "kindString": "Enumeration Member",
+                                      "flags": {},
+                                      "sources": [
+                                        {
+                                          "fileName": "src/types.ts",
+                                          "line": 52,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "literal",
+                                        "value": "eu-central-1"
+                                      },
+                                      "defaultValue": "\"eu-central-1\""
+                                    },
+                                    {
+                                      "id": 72,
+                                      "name": "EuWest1",
+                                      "kind": 16,
+                                      "kindString": "Enumeration Member",
+                                      "flags": {},
+                                      "sources": [
+                                        {
+                                          "fileName": "src/types.ts",
+                                          "line": 53,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "literal",
+                                        "value": "eu-west-1"
+                                      },
+                                      "defaultValue": "\"eu-west-1\""
+                                    },
+                                    {
+                                      "id": 73,
+                                      "name": "EuWest2",
+                                      "kind": 16,
+                                      "kindString": "Enumeration Member",
+                                      "flags": {},
+                                      "sources": [
+                                        {
+                                          "fileName": "src/types.ts",
+                                          "line": 54,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "literal",
+                                        "value": "eu-west-2"
+                                      },
+                                      "defaultValue": "\"eu-west-2\""
+                                    },
+                                    {
+                                      "id": 74,
+                                      "name": "EuWest3",
+                                      "kind": 16,
+                                      "kindString": "Enumeration Member",
+                                      "flags": {},
+                                      "sources": [
+                                        {
+                                          "fileName": "src/types.ts",
+                                          "line": 55,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "literal",
+                                        "value": "eu-west-3"
+                                      },
+                                      "defaultValue": "\"eu-west-3\""
+                                    },
+                                    {
+                                      "id": 75,
+                                      "name": "SaEast1",
+                                      "kind": 16,
+                                      "kindString": "Enumeration Member",
+                                      "flags": {},
+                                      "sources": [
+                                        {
+                                          "fileName": "src/types.ts",
+                                          "line": 56,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "literal",
+                                        "value": "sa-east-1"
+                                      },
+                                      "defaultValue": "\"sa-east-1\""
+                                    },
+                                    {
+                                      "id": 76,
+                                      "name": "UsEast1",
+                                      "kind": 16,
+                                      "kindString": "Enumeration Member",
+                                      "flags": {},
+                                      "sources": [
+                                        {
+                                          "fileName": "src/types.ts",
+                                          "line": 57,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "literal",
+                                        "value": "us-east-1"
+                                      },
+                                      "defaultValue": "\"us-east-1\""
+                                    },
+                                    {
+                                      "id": 77,
+                                      "name": "UsWest1",
+                                      "kind": 16,
+                                      "kindString": "Enumeration Member",
+                                      "flags": {},
+                                      "sources": [
+                                        {
+                                          "fileName": "src/types.ts",
+                                          "line": 58,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "literal",
+                                        "value": "us-west-1"
+                                      },
+                                      "defaultValue": "\"us-west-1\""
+                                    },
+                                    {
+                                      "id": 78,
+                                      "name": "UsWest2",
+                                      "kind": 16,
+                                      "kindString": "Enumeration Member",
+                                      "flags": {},
+                                      "sources": [
+                                        {
+                                          "fileName": "src/types.ts",
+                                          "line": 59,
+                                          "character": 2
+                                        }
+                                      ],
+                                      "type": {
+                                        "type": "literal",
+                                        "value": "us-west-2"
+                                      },
+                                      "defaultValue": "\"us-west-2\""
+                                    }
+                                  ],
+                                  "groups": [
+                                    {
+                                      "title": "Enumeration Members",
+                                      "kind": 16,
+                                      "children": [
+                                        64,
+                                        65,
+                                        66,
+                                        67,
+                                        68,
+                                        69,
+                                        70,
+                                        71,
+                                        72,
+                                        73,
+                                        74,
+                                        75,
+                                        76,
+                                        77,
+                                        78
+                                      ]
+                                    }
+                                  ],
+                                  "sources": [
+                                    {
+                                      "fileName": "src/types.ts",
+                                      "line": 44,
+                                      "character": 12
+                                    }
+                                  ]
+                                }
+                              }
                             }
                           ],
                           "groups": [
@@ -625,16 +1988,17 @@
                               "title": "Properties",
                               "kind": 1024,
                               "children": [
-                                35,
-                                30,
-                                34
+                                38,
+                                32,
+                                36,
+                                37
                               ]
                             }
                           ],
                           "sources": [
                             {
                               "fileName": "src/types.ts",
-                              "line": 44,
+                              "line": 62,
                               "character": 36
                             }
                           ]
@@ -650,11 +2014,11 @@
                 "typeArguments": [
                   {
                     "type": "reference",
-                    "id": 58,
+                    "id": 61,
                     "typeArguments": [
                       {
                         "type": "reference",
-                        "id": 25,
+                        "id": 27,
                         "name": "T"
                       }
                     ],
@@ -669,7 +2033,7 @@
           ]
         },
         {
-          "id": 20,
+          "id": 22,
           "name": "setAuth",
           "kind": 2048,
           "kindString": "Method",
@@ -677,13 +2041,13 @@
           "sources": [
             {
               "fileName": "src/FunctionsClient.ts",
-              "line": 35,
+              "line": 40,
               "character": 2
             }
           ],
           "signatures": [
             {
-              "id": 21,
+              "id": 23,
               "name": "setAuth",
               "kind": 4096,
               "kindString": "Call signature",
@@ -693,7 +2057,7 @@
               },
               "parameters": [
                 {
-                  "id": 22,
+                  "id": 24,
                   "name": "token",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -727,37 +2091,38 @@
           "title": "Properties",
           "kind": 1024,
           "children": [
+            17,
             15,
-            14,
-            13
+            16,
+            14
           ]
         },
         {
           "title": "Methods",
           "kind": 2048,
           "children": [
-            23,
-            20
+            25,
+            22
           ]
         }
       ],
       "sources": [
         {
           "fileName": "src/FunctionsClient.ts",
-          "line": 11,
+          "line": 12,
           "character": 13
         }
       ]
     },
     {
-      "id": 36,
+      "id": 39,
       "name": "FunctionsError",
       "kind": 128,
       "kindString": "Class",
       "flags": {},
       "children": [
         {
-          "id": 37,
+          "id": 40,
           "name": "constructor",
           "kind": 512,
           "kindString": "Constructor",
@@ -771,14 +2136,14 @@
           ],
           "signatures": [
             {
-              "id": 38,
+              "id": 41,
               "name": "new FunctionsError",
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 39,
+                  "id": 42,
                   "name": "message",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -789,7 +2154,7 @@
                   }
                 },
                 {
-                  "id": 40,
+                  "id": 43,
                   "name": "name",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -801,7 +2166,7 @@
                   "defaultValue": "'FunctionsError'"
                 },
                 {
-                  "id": 41,
+                  "id": 44,
                   "name": "context",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -816,7 +2181,7 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 36,
+                "id": 39,
                 "name": "FunctionsError"
               },
               "overwrites": {
@@ -831,7 +2196,7 @@
           }
         },
         {
-          "id": 42,
+          "id": 45,
           "name": "context",
           "kind": 1024,
           "kindString": "Property",
@@ -854,14 +2219,14 @@
           "title": "Constructors",
           "kind": 512,
           "children": [
-            37
+            40
           ]
         },
         {
           "title": "Properties",
           "kind": 1024,
           "children": [
-            42
+            45
           ]
         }
       ],
@@ -883,30 +2248,30 @@
       "extendedBy": [
         {
           "type": "reference",
-          "id": 43,
+          "id": 46,
           "name": "FunctionsFetchError"
         },
         {
           "type": "reference",
-          "id": 48,
+          "id": 51,
           "name": "FunctionsHttpError"
         },
         {
           "type": "reference",
-          "id": 53,
+          "id": 56,
           "name": "FunctionsRelayError"
         }
       ]
     },
     {
-      "id": 43,
+      "id": 46,
       "name": "FunctionsFetchError",
       "kind": 128,
       "kindString": "Class",
       "flags": {},
       "children": [
         {
-          "id": 44,
+          "id": 47,
           "name": "constructor",
           "kind": 512,
           "kindString": "Constructor",
@@ -920,14 +2285,14 @@
           ],
           "signatures": [
             {
-              "id": 45,
+              "id": 48,
               "name": "new FunctionsFetchError",
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 46,
+                  "id": 49,
                   "name": "context",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -940,24 +2305,24 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 43,
+                "id": 46,
                 "name": "FunctionsFetchError"
               },
               "overwrites": {
                 "type": "reference",
-                "id": 38,
+                "id": 41,
                 "name": "FunctionsError.constructor"
               }
             }
           ],
           "overwrites": {
             "type": "reference",
-            "id": 37,
+            "id": 40,
             "name": "FunctionsError.constructor"
           }
         },
         {
-          "id": 47,
+          "id": 50,
           "name": "context",
           "kind": 1024,
           "kindString": "Property",
@@ -975,7 +2340,7 @@
           },
           "inheritedFrom": {
             "type": "reference",
-            "id": 42,
+            "id": 45,
             "name": "FunctionsError.context"
           }
         }
@@ -985,14 +2350,14 @@
           "title": "Constructors",
           "kind": 512,
           "children": [
-            44
+            47
           ]
         },
         {
           "title": "Properties",
           "kind": 1024,
           "children": [
-            47
+            50
           ]
         }
       ],
@@ -1006,20 +2371,20 @@
       "extendedTypes": [
         {
           "type": "reference",
-          "id": 36,
+          "id": 39,
           "name": "FunctionsError"
         }
       ]
     },
     {
-      "id": 48,
+      "id": 51,
       "name": "FunctionsHttpError",
       "kind": 128,
       "kindString": "Class",
       "flags": {},
       "children": [
         {
-          "id": 49,
+          "id": 52,
           "name": "constructor",
           "kind": 512,
           "kindString": "Constructor",
@@ -1033,14 +2398,14 @@
           ],
           "signatures": [
             {
-              "id": 50,
+              "id": 53,
               "name": "new FunctionsHttpError",
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 51,
+                  "id": 54,
                   "name": "context",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1053,24 +2418,24 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 48,
+                "id": 51,
                 "name": "FunctionsHttpError"
               },
               "overwrites": {
                 "type": "reference",
-                "id": 38,
+                "id": 41,
                 "name": "FunctionsError.constructor"
               }
             }
           ],
           "overwrites": {
             "type": "reference",
-            "id": 37,
+            "id": 40,
             "name": "FunctionsError.constructor"
           }
         },
         {
-          "id": 52,
+          "id": 55,
           "name": "context",
           "kind": 1024,
           "kindString": "Property",
@@ -1088,7 +2453,7 @@
           },
           "inheritedFrom": {
             "type": "reference",
-            "id": 42,
+            "id": 45,
             "name": "FunctionsError.context"
           }
         }
@@ -1098,14 +2463,14 @@
           "title": "Constructors",
           "kind": 512,
           "children": [
-            49
+            52
           ]
         },
         {
           "title": "Properties",
           "kind": 1024,
           "children": [
-            52
+            55
           ]
         }
       ],
@@ -1119,20 +2484,20 @@
       "extendedTypes": [
         {
           "type": "reference",
-          "id": 36,
+          "id": 39,
           "name": "FunctionsError"
         }
       ]
     },
     {
-      "id": 53,
+      "id": 56,
       "name": "FunctionsRelayError",
       "kind": 128,
       "kindString": "Class",
       "flags": {},
       "children": [
         {
-          "id": 54,
+          "id": 57,
           "name": "constructor",
           "kind": 512,
           "kindString": "Constructor",
@@ -1146,14 +2511,14 @@
           ],
           "signatures": [
             {
-              "id": 55,
+              "id": 58,
               "name": "new FunctionsRelayError",
               "kind": 16384,
               "kindString": "Constructor signature",
               "flags": {},
               "parameters": [
                 {
-                  "id": 56,
+                  "id": 59,
                   "name": "context",
                   "kind": 32768,
                   "kindString": "Parameter",
@@ -1166,24 +2531,24 @@
               ],
               "type": {
                 "type": "reference",
-                "id": 53,
+                "id": 56,
                 "name": "FunctionsRelayError"
               },
               "overwrites": {
                 "type": "reference",
-                "id": 38,
+                "id": 41,
                 "name": "FunctionsError.constructor"
               }
             }
           ],
           "overwrites": {
             "type": "reference",
-            "id": 37,
+            "id": 40,
             "name": "FunctionsError.constructor"
           }
         },
         {
-          "id": 57,
+          "id": 60,
           "name": "context",
           "kind": 1024,
           "kindString": "Property",
@@ -1201,7 +2566,7 @@
           },
           "inheritedFrom": {
             "type": "reference",
-            "id": 42,
+            "id": 45,
             "name": "FunctionsError.context"
           }
         }
@@ -1211,14 +2576,14 @@
           "title": "Constructors",
           "kind": 512,
           "children": [
-            54
+            57
           ]
         },
         {
           "title": "Properties",
           "kind": 1024,
           "children": [
-            57
+            60
           ]
         }
       ],
@@ -1232,13 +2597,13 @@
       "extendedTypes": [
         {
           "type": "reference",
-          "id": 36,
+          "id": 39,
           "name": "FunctionsError"
         }
       ]
     },
     {
-      "id": 28,
+      "id": 30,
       "name": "FunctionInvokeOptions",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -1246,21 +2611,21 @@
       "sources": [
         {
           "fileName": "src/types.ts",
-          "line": 44,
+          "line": 62,
           "character": 12
         }
       ],
       "type": {
         "type": "reflection",
         "declaration": {
-          "id": 29,
+          "id": 31,
           "name": "__type",
           "kind": 65536,
           "kindString": "Type literal",
           "flags": {},
           "children": [
             {
-              "id": 35,
+              "id": 38,
               "name": "body",
               "kind": 1024,
               "kindString": "Property",
@@ -1273,7 +2638,7 @@
               "sources": [
                 {
                   "fileName": "src/types.ts",
-                  "line": 56,
+                  "line": 78,
                   "character": 2
                 }
               ],
@@ -1342,7 +2707,7 @@
               }
             },
             {
-              "id": 30,
+              "id": 32,
               "name": "headers",
               "kind": 1024,
               "kindString": "Property",
@@ -1355,14 +2720,14 @@
               "sources": [
                 {
                   "fileName": "src/types.ts",
-                  "line": 48,
+                  "line": 66,
                   "character": 2
                 }
               ],
               "type": {
                 "type": "reflection",
                 "declaration": {
-                  "id": 31,
+                  "id": 33,
                   "name": "__type",
                   "kind": 65536,
                   "kindString": "Type literal",
@@ -1370,19 +2735,19 @@
                   "sources": [
                     {
                       "fileName": "src/types.ts",
-                      "line": 48,
+                      "line": 66,
                       "character": 12
                     }
                   ],
                   "indexSignature": {
-                    "id": 32,
+                    "id": 34,
                     "name": "__index",
                     "kind": 8192,
                     "kindString": "Index signature",
                     "flags": {},
                     "parameters": [
                       {
-                        "id": 33,
+                        "id": 35,
                         "name": "key",
                         "kind": 32768,
                         "flags": {},
@@ -1401,7 +2766,7 @@
               }
             },
             {
-              "id": 34,
+              "id": 36,
               "name": "method",
               "kind": 1024,
               "kindString": "Property",
@@ -1414,7 +2779,7 @@
               "sources": [
                 {
                   "fileName": "src/types.ts",
-                  "line": 52,
+                  "line": 70,
                   "character": 2
                 }
               ],
@@ -1443,6 +2808,354 @@
                   }
                 ]
               }
+            },
+            {
+              "id": 37,
+              "name": "region",
+              "kind": 1024,
+              "kindString": "Property",
+              "flags": {
+                "isOptional": true
+              },
+              "comment": {
+                "shortText": "The Region to invoke the function in."
+              },
+              "sources": [
+                {
+                  "fileName": "src/types.ts",
+                  "line": 74,
+                  "character": 2
+                }
+              ],
+              "type": {
+                "type": "reference",
+                "id": 63,
+                "name": "FunctionRegion",
+                "dereferenced": {
+                  "id": 63,
+                  "name": "FunctionRegion",
+                  "kind": 8,
+                  "kindString": "Enumeration",
+                  "flags": {},
+                  "children": [
+                    {
+                      "id": 64,
+                      "name": "Any",
+                      "kind": 16,
+                      "kindString": "Enumeration Member",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/types.ts",
+                          "line": 45,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": "any"
+                      },
+                      "defaultValue": "\"any\""
+                    },
+                    {
+                      "id": 65,
+                      "name": "ApNortheast1",
+                      "kind": 16,
+                      "kindString": "Enumeration Member",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/types.ts",
+                          "line": 46,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": "ap-northeast-1"
+                      },
+                      "defaultValue": "\"ap-northeast-1\""
+                    },
+                    {
+                      "id": 66,
+                      "name": "ApNortheast2",
+                      "kind": 16,
+                      "kindString": "Enumeration Member",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/types.ts",
+                          "line": 47,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": "ap-northeast-2"
+                      },
+                      "defaultValue": "\"ap-northeast-2\""
+                    },
+                    {
+                      "id": 67,
+                      "name": "ApSouth1",
+                      "kind": 16,
+                      "kindString": "Enumeration Member",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/types.ts",
+                          "line": 48,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": "ap-south-1"
+                      },
+                      "defaultValue": "\"ap-south-1\""
+                    },
+                    {
+                      "id": 68,
+                      "name": "ApSoutheast1",
+                      "kind": 16,
+                      "kindString": "Enumeration Member",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/types.ts",
+                          "line": 49,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": "ap-southeast-1"
+                      },
+                      "defaultValue": "\"ap-southeast-1\""
+                    },
+                    {
+                      "id": 69,
+                      "name": "ApSoutheast2",
+                      "kind": 16,
+                      "kindString": "Enumeration Member",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/types.ts",
+                          "line": 50,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": "ap-southeast-2"
+                      },
+                      "defaultValue": "\"ap-southeast-2\""
+                    },
+                    {
+                      "id": 70,
+                      "name": "CaCentral1",
+                      "kind": 16,
+                      "kindString": "Enumeration Member",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/types.ts",
+                          "line": 51,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": "ca-central-1"
+                      },
+                      "defaultValue": "\"ca-central-1\""
+                    },
+                    {
+                      "id": 71,
+                      "name": "EuCentral1",
+                      "kind": 16,
+                      "kindString": "Enumeration Member",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/types.ts",
+                          "line": 52,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": "eu-central-1"
+                      },
+                      "defaultValue": "\"eu-central-1\""
+                    },
+                    {
+                      "id": 72,
+                      "name": "EuWest1",
+                      "kind": 16,
+                      "kindString": "Enumeration Member",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/types.ts",
+                          "line": 53,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": "eu-west-1"
+                      },
+                      "defaultValue": "\"eu-west-1\""
+                    },
+                    {
+                      "id": 73,
+                      "name": "EuWest2",
+                      "kind": 16,
+                      "kindString": "Enumeration Member",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/types.ts",
+                          "line": 54,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": "eu-west-2"
+                      },
+                      "defaultValue": "\"eu-west-2\""
+                    },
+                    {
+                      "id": 74,
+                      "name": "EuWest3",
+                      "kind": 16,
+                      "kindString": "Enumeration Member",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/types.ts",
+                          "line": 55,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": "eu-west-3"
+                      },
+                      "defaultValue": "\"eu-west-3\""
+                    },
+                    {
+                      "id": 75,
+                      "name": "SaEast1",
+                      "kind": 16,
+                      "kindString": "Enumeration Member",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/types.ts",
+                          "line": 56,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": "sa-east-1"
+                      },
+                      "defaultValue": "\"sa-east-1\""
+                    },
+                    {
+                      "id": 76,
+                      "name": "UsEast1",
+                      "kind": 16,
+                      "kindString": "Enumeration Member",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/types.ts",
+                          "line": 57,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": "us-east-1"
+                      },
+                      "defaultValue": "\"us-east-1\""
+                    },
+                    {
+                      "id": 77,
+                      "name": "UsWest1",
+                      "kind": 16,
+                      "kindString": "Enumeration Member",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/types.ts",
+                          "line": 58,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": "us-west-1"
+                      },
+                      "defaultValue": "\"us-west-1\""
+                    },
+                    {
+                      "id": 78,
+                      "name": "UsWest2",
+                      "kind": 16,
+                      "kindString": "Enumeration Member",
+                      "flags": {},
+                      "sources": [
+                        {
+                          "fileName": "src/types.ts",
+                          "line": 59,
+                          "character": 2
+                        }
+                      ],
+                      "type": {
+                        "type": "literal",
+                        "value": "us-west-2"
+                      },
+                      "defaultValue": "\"us-west-2\""
+                    }
+                  ],
+                  "groups": [
+                    {
+                      "title": "Enumeration Members",
+                      "kind": 16,
+                      "children": [
+                        64,
+                        65,
+                        66,
+                        67,
+                        68,
+                        69,
+                        70,
+                        71,
+                        72,
+                        73,
+                        74,
+                        75,
+                        76,
+                        77,
+                        78
+                      ]
+                    }
+                  ],
+                  "sources": [
+                    {
+                      "fileName": "src/types.ts",
+                      "line": 44,
+                      "character": 12
+                    }
+                  ]
+                }
+              }
             }
           ],
           "groups": [
@@ -1450,16 +3163,17 @@
               "title": "Properties",
               "kind": 1024,
               "children": [
-                35,
-                30,
-                34
+                38,
+                32,
+                36,
+                37
               ]
             }
           ],
           "sources": [
             {
               "fileName": "src/types.ts",
-              "line": 44,
+              "line": 62,
               "character": 36
             }
           ]
@@ -1467,7 +3181,7 @@
       }
     },
     {
-      "id": 58,
+      "id": 61,
       "name": "FunctionsResponse",
       "kind": 4194304,
       "kindString": "Type alias",
@@ -1481,7 +3195,7 @@
       ],
       "typeParameter": [
         {
-          "id": 59,
+          "id": 62,
           "name": "T",
           "kind": 131072,
           "kindString": "Type parameter",
@@ -1499,22 +3213,29 @@
   ],
   "groups": [
     {
+      "title": "Enumerations",
+      "kind": 8,
+      "children": [
+        63
+      ]
+    },
+    {
       "title": "Classes",
       "kind": 128,
       "children": [
         1,
-        36,
-        43,
-        48,
-        53
+        39,
+        46,
+        51,
+        56
       ]
     },
     {
       "title": "Type Aliases",
       "kind": 4194304,
       "children": [
-        28,
-        58
+        30,
+        61
       ]
     }
   ],

@@ -528,6 +528,7 @@ export const auth = {
       name: 'Authentication',
       url: undefined,
       items: [
+        { name: 'Anonymous Sign-Ins', url: '/guides/auth/auth-anonymous' },
         { name: 'Email Login', url: '/guides/auth/auth-email' },
         {
           name: 'Passwordless Login',
@@ -592,7 +593,7 @@ export const auth = {
           items: [
             {
               name: 'SAML 2.0',
-              url: '/guides/auth/sso/auth-sso-saml',
+              url: '/guides/auth/enterprise-sso/auth-sso-saml',
             },
           ],
         },
@@ -793,7 +794,14 @@ export const database: NavMenuConstant = {
           name: 'Query optimization',
           url: '/guides/database/query-optimization',
         },
-        { name: 'Debugging and monitoring', url: '/guides/database/inspect' },
+        {
+          name: 'Database linter',
+          url: '/guides/database/database-linter',
+        },
+        {
+          name: 'Debugging and monitoring',
+          url: '/guides/database/inspect',
+        },
         {
           name: 'Debugging performance issues',
           url: '/guides/database/debugging-performance',
@@ -917,8 +925,16 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/wrappers/overview',
         },
         {
+          name: 'Connecting to Auth0',
+          url: '/guides/database/extensions/wrappers/auth0',
+        },
+        {
           name: 'Connecting to Airtable',
           url: '/guides/database/extensions/wrappers/airtable',
+        },
+        {
+          name: 'Connecting to AWS Cognito',
+          url: '/guides/database/extensions/wrappers/cognito',
         },
         {
           name: 'Connecting to AWS S3',
@@ -939,6 +955,14 @@ export const database: NavMenuConstant = {
         {
           name: 'Connecting to Logflare',
           url: '/guides/database/extensions/wrappers/logflare',
+        },
+        {
+          name: 'Connecting to MSSQL',
+          url: '/guides/database/extensions/wrappers/mssql',
+        },
+        {
+          name: 'Connecting to Redis',
+          url: '/guides/database/extensions/wrappers/redis',
         },
         {
           name: 'Connecting to Stripe',
@@ -1259,10 +1283,6 @@ export const realtime: NavMenuConstant = {
       url: undefined,
       items: [
         {
-          name: 'Throttling messages',
-          url: '/guides/realtime/guides/client-side-throttling',
-        },
-        {
           name: 'Subscribing to Database Changes',
           url: '/guides/realtime/subscribing-to-database-changes',
         },
@@ -1411,7 +1431,6 @@ export const ai = {
           url: '/guides/ai/vector-indexes',
           items: vectorIndexItems,
         },
-        { name: 'Hybrid search', url: '/guides/ai/hybrid-search' },
         {
           name: 'Engineering for scale',
           url: '/guides/ai/engineering-for-scale',
@@ -1425,6 +1444,15 @@ export const ai = {
           name: 'RAG with Permissions',
           url: '/guides/ai/rag-with-permissions',
         },
+      ],
+    },
+    {
+      name: 'Search',
+      url: undefined,
+      items: [
+        { name: 'Semantic search', url: '/guides/ai/semantic-search' },
+        { name: 'Keyword search', url: '/guides/ai/keyword-search' },
+        { name: 'Hybrid search', url: '/guides/ai/hybrid-search' },
       ],
     },
     {
@@ -1492,6 +1520,10 @@ export const ai = {
           url: '/guides/ai/examples/image-search-openai-clip',
         },
         {
+          name: 'Semantic search with Amazon Titan',
+          url: '/guides/ai/examples/semantic-image-search-amazon-titan',
+        },
+        {
           name: 'Building ChatGPT Plugins',
           url: '/guides/ai/examples/building-chatgpt-plugins',
         },
@@ -1520,6 +1552,10 @@ export const ai = {
         {
           name: 'Roboflow',
           url: '/guides/ai/integrations/roboflow',
+        },
+        {
+          name: 'Amazon Bedrock',
+          url: '/guides/ai/integrations/amazon-bedrock',
         },
       ],
     },
@@ -1761,6 +1797,10 @@ export const platform: NavMenuConstant = {
         {
           name: 'High RAM Usage',
           url: '/guides/platform/exhaust-ram',
+        },
+        {
+          name: 'High Swap Usage',
+          url: '/guides/platform/exhaust-swap',
         },
       ],
     },

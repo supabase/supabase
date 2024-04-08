@@ -377,7 +377,7 @@ const RowHeader = ({ table, sorts, filters }: RowHeaderProps) => {
           </Button>
         )}
       </div>
-      <div className="h-[20px] border-r border-gray-700" />
+      <div className="h-[20px] border-r border-strong" />
       <div className="flex items-center gap-2">
         <Button
           type="primary"

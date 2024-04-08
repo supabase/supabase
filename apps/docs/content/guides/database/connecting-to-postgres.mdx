@@ -374,3 +374,36 @@ Connection pooler logs are found [here](https://supabase.com/dashboard/project/_
 
 - Terminating with reason :client_termination when state was :busy
   This error happens when the client terminates the connection before the connection with the database is completed.
+
+## Finding your database hostname
+
+Your database’s hostname is crucial for establishing a direct connection. It resolves to the underlying IP address of your database. To find your hostname, navigate to your [Database Settings](/dashboard/project/_/settings/database).
+
+Note that the pooler (connection pooler) has a different IP than your database. To reveal the database host and direct connection string, hide the pooler connection string.
+
+Example hostname: `db.<PROJECT_REF>.supabase.co`
+
+## Managing your IP address
+
+To determine your current IP address, you can use an IP address [lookup website](https://whatismyipaddress.com/hostname-ip) or the terminal command:
+
+```shell
+nslookup db.<PROJECT_REF>.supabase.co
+```
+
+This command queries the domain name servers to find the IP address of the given hostname.
+
+Example IPv6 Address: `2a05:d014:1c06:5f0c:d7a9:8616:bee2:30df`
+
+### IPv6 address
+
+Upon project creation, a static IPv6 address is assigned. This address might change when:
+
+- A project is paused or resumed.
+- The database is upgraded.
+
+### IPv4 address
+
+Opting for the static [IPv4 add-on](https://supabase.com/docs/guides/platform/ipv4-address) provides a more stable connection address. The IPv4 address remains constant unless the project is paused or resumed.
+
+Unlike the IPv6 address, upgrading your database doesn't affect the IPv4 address.
