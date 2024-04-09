@@ -21,7 +21,7 @@
   },
   "overrides": {
     "@supabase/supabase-js": {
-      "@supabase/realtime-js": "^2.10.0-next.5"
+      "@supabase/realtime-js": "^2.10.0-next.6"
     }
   },
   "devDependencies": {

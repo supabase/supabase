@@ -2,15 +2,26 @@
 import { createClient } from '@/utils/supabase/client'
 import { redirect } from 'next/navigation'
 import { SubmitButton } from './submit-button'
+import { useEffect, useState } from 'react'
 
 export default function CreateRoomModal() {
+  const supabase = createClient()
+  const [emails, setEmails] = useState<{ email: string; user_id: string }[] | undefined>([])
+  useEffect(() => {
+    supabase
+      .from('profiles')
+      .select('*')
+      .then((res) => setEmails(res.data as { email: string; user_id: string }[]))
+  }, [])
+
   const createRoom = async (formData: FormData) => {
     const name = formData.get('name') as string
-    const supabase = createClient()
+    const ids = formData.getAll('emails[]')
     await supabase.auth.getUser()
     const token = (await supabase.auth.getSession()).data.session!.access_token
     supabase.realtime.setAuth(token)
-    supabase.realtime.createChannel(name)
+    await supabase.realtime.createChannel(name)
+    await supabase.from('rooms_users').insert(ids.map((user_id) => ({ user_id, name })))
     return redirect(`/protected`)
   }
 
@@ -28,14 +39,19 @@ export default function CreateRoomModal() {
           name="name"
           placeholder="room_1"
         />
-        <label className="text-md" htmlFor="email">
-          Invited Users (comma separated)
-        </label>
-        <input
-          className="rounded-md px-4 py-2 bg-inherit border mb-6"
-          name="name"
-          placeholder="a@a.com, b@b.com"
-        />
+        {emails && (
+          <div className="flex flex-col">
+            {emails?.map(({ email, user_id }) => (
+              <div key={`container_${email}`}>
+                <input key={`label_${email}`} type="checkbox" name="emails[]" value={user_id} />
+
+                <label key={email} htmlFor="emails[]">
+                  {email}
+                </label>
+              </div>
+            ))}
+          </div>
+        )}
         <SubmitButton
           formAction={createRoom}
           className="border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-2"
