@@ -1,4 +1,4 @@
-const escapeDoubleQuotes = (str: string) => str.replaceAll('"', '\\"')
+const escapeAttributeSelector = (str: string) => encodeURIComponent(str)
 
-export { escapeDoubleQuotes }
+export { escapeAttributeSelector }
 export { toSectionId_ as toSectionId } from '../internal/CommandSection'

@@ -4,17 +4,14 @@ import {
   type HTMLAttributes,
   type PropsWithChildren,
 } from 'react'
+import { useQuery } from './hooks/queryHooks'
 
 interface TextHighlighterProps
-  extends DetailedHTMLProps<HTMLAttributes<HTMLSpanElement>, HTMLSpanElement> {
-  query: string
-}
+  extends DetailedHTMLProps<HTMLAttributes<HTMLSpanElement>, HTMLSpanElement> {}
 
-const TextHighlighter = ({
-  children,
-  query,
-  ...props
-}: PropsWithChildren<TextHighlighterProps>) => {
+const TextHighlighter = ({ children, ...props }: PropsWithChildren<TextHighlighterProps>) => {
+  const query = useQuery()
+
   const child = Children.toArray(children)[0]
   if (typeof child !== 'string') return child
 

@@ -6,19 +6,7 @@ import { Button, Command_Shadcn_, Dialog, DialogContent, cn } from 'ui'
 
 import { useCurrentPage, usePageComponent, usePopPage } from './hooks/pagesHooks'
 import { useQuery, useSetQuery } from './hooks/queryHooks'
-import { useCommandMenuVisible, useSetCommandMenuOpen } from './hooks/viewHooks'
-
-const commandWrapperClasses = cn(
-  'flex h-full w-full flex-col overflow-hidden',
-  '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
-  '[&_[cmdk-item]_svg]:h-5',
-  '[&_[cmdk-item]_svg]:w-5',
-  '[&_[cmdk-item]_svg]:stroke-1',
-  '[&_[cmdk-input-wrapper]_svg]:h-5',
-  '[&_[cmdk-input-wrapper]_svg]:w-5',
-
-  '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0'
-)
+import { useCommandMenuSize, useCommandMenuVisible, useSetCommandMenuOpen } from './hooks/viewHooks'
 
 const CommandWrapper = forwardRef<
   React.ElementRef<typeof Command_Shadcn_>,
@@ -81,6 +69,8 @@ const CommandMenu = ({ children }: PropsWithChildren) => {
   const open = useCommandMenuVisible()
   const setOpen = useSetCommandMenuOpen()
 
+  const size = useCommandMenuSize()
+
   const page = useCurrentPage()
   const popPage = usePopPage()
   const animateBounce = useAnimateOnChange(page, 126)
@@ -97,7 +87,7 @@ const CommandMenu = ({ children }: PropsWithChildren) => {
           e.preventDefault()
           return query ? setQuery('') : page ? popPage() : setOpen(false)
         }}
-        size={'large'}
+        size={size}
         className={cn(
           '!bg-overlay/90 backdrop-filter backdrop-blur-sm',
           '!border-overlay/90',

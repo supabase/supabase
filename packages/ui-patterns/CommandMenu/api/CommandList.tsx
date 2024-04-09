@@ -2,19 +2,18 @@ import { forwardRef, useRef } from 'react'
 
 import { CommandList_Shadcn_, cn } from 'ui'
 
-import { useCommands } from './hooks/commandsHooks'
-import { useQuery } from './hooks/queryHooks'
 import { CommandItem, type ICommand } from '../internal/Command'
 import { CommandEmpty } from '../internal/CommandEmpty'
 import { CommandGroup } from '../internal/CommandGroup'
-import { TextHighlighter } from '../internal/TextHighlighter'
+import { useCommands } from './hooks/commandsHooks'
+import { useQuery } from './hooks/queryHooks'
+import { TextHighlighter } from './TextHighlighter'
 
 const CommandList = forwardRef<
   React.ElementRef<typeof CommandList_Shadcn_>,
   React.ComponentPropsWithoutRef<typeof CommandList_Shadcn_>
 >(({ className, ...props }, ref) => {
   const commandSections = useCommands()
-  const query = useQuery()
 
   const innerRef = useRef<HTMLDivElement | undefined>(undefined)
   const setInnerRef = (elem: HTMLDivElement) => (innerRef.current = elem)
@@ -38,7 +37,7 @@ const CommandList = forwardRef<
 
             return (
               <CommandItem key={command.id} command={command}>
-                <TextHighlighter query={query}>{command.name}</TextHighlighter>
+                <TextHighlighter>{command.name}</TextHighlighter>
               </CommandItem>
             )
           })}

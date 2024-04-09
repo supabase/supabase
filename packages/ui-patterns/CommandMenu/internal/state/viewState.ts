@@ -1,11 +1,15 @@
 import { proxy } from 'valtio'
 
+type DialogSize = 'small' | 'tiny' | 'medium' | 'large' | 'xlarge' | 'xxlarge' | 'xxxlarge'
+
 type IViewState = {
   initiated: boolean
   init: () => void
   open: boolean
   setOpen: (open: boolean) => void
   toggleOpen: () => void
+  size: DialogSize
+  setSize: (size: DialogSize) => void
 }
 
 const initViewState = () => {
@@ -21,9 +25,11 @@ const initViewState = () => {
       state.init()
       state.open = !state.open
     },
+    size: 'large',
+    setSize: (size) => (state.size = size),
   })
   return state
 }
 
 export { initViewState }
-export type { IViewState }
+export type { DialogSize, IViewState }

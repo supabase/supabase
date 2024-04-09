@@ -23,13 +23,9 @@ const CommandEmpty = ({
   useMemo(() => {
     if (!query) setRender(false)
     setTimeout(() => {
-      console.log(query)
-      console.log(listRef?.current?.querySelector('[cmdk-item]'))
       setRender(!listRef?.current?.querySelector('[cmdk-item]'))
     })
   }, [query])
-
-  console.log('render', render)
 
   return (
     render && (

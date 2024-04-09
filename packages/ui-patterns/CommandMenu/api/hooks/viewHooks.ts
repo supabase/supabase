@@ -1,6 +1,8 @@
+import { useLayoutEffect, useRef } from 'react'
 import { useSnapshot } from 'valtio'
 
 import { useCommandContext } from '../../internal/Context'
+import { type DialogSize } from '../../internal/state/viewState'
 
 const useCommandMenuInitiated = () => {
   const { viewState } = useCommandContext()
@@ -26,9 +28,29 @@ const useToggleCommandMenu = () => {
   return toggleOpen
 }
 
+const useCommandMenuSize = () => {
+  const { viewState } = useCommandContext()
+  const { size } = useSnapshot(viewState)
+  return size
+}
+
+const useSetCommandMenuSize = (newSize: DialogSize) => {
+  const { viewState } = useCommandContext()
+  const { setSize, size } = useSnapshot(viewState)
+
+  const originalSize = useRef(size)
+
+  useLayoutEffect(() => {
+    setSize(newSize)
+    return () => setSize(originalSize.current)
+  }, [setSize])
+}
+
 export {
   useCommandMenuInitiated,
   useCommandMenuVisible,
   useSetCommandMenuOpen,
   useToggleCommandMenu,
+  useCommandMenuSize,
+  useSetCommandMenuSize,
 }

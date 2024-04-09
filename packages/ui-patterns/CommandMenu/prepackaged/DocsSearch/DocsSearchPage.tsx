@@ -15,11 +15,10 @@ import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
 import { Button, CommandGroup_Shadcn_, CommandItem_Shadcn_, CommandList_Shadcn_, cn } from 'ui'
 import { CommandInput } from '../../api/CommandInput'
 import { CommandWrapper } from '../../api/CommandMenu'
+import { TextHighlighter } from '../../api/TextHighlighter'
 import { useSetCommandMenuOpen } from '../../api/hooks/viewHooks'
 import { useQuery, useSetQuery } from '../../api/hooks/queryHooks'
-import { escapeDoubleQuotes } from '../../api/utils'
-
-import { TextHighlighter } from '../../internal/TextHighlighter'
+import { escapeAttributeSelector } from '../../api/utils'
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH
 const NUMBER_SOURCES = 2
@@ -286,7 +285,7 @@ const DocsSearchPage = () => {
         }
         break
       case PageType.GithubDiscussion:
-        window.open(link, '_blank')
+        window.open(link, '_blank', 'noreferrer,noopener')
         setIsOpen(false)
         break
       default:
@@ -419,13 +418,13 @@ const DocsSearchPage = () => {
               <CommandGroup_Shadcn_
                 heading=""
                 key={`${page.path}-group`}
-                value={`${escapeDoubleQuotes(page.title)}-group-index-${i}`}
+                value={`${escapeAttributeSelector(page.title)}-group-index-${i}`}
                 forceMount={true}
                 className="overflow-hidden py-3 px-2 text-border-strong [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:pb-1.5 [&_[cmdk-group-heading]]:text-sm [&_[cmdk-group-heading]]:font-normal [&_[cmdk-group-heading]]:text-foreground-muted"
               >
                 <CommandItem_Shadcn_
                   key={`${page.path}-item`}
-                  value={`${escapeDoubleQuotes(page.title)}-item-index-${i}`}
+                  value={`${escapeAttributeSelector(page.title)}-item-index-${i}`}
                   onSelect={() => {
                     openLink(page.type, formatPageUrl(page))
                   }}
@@ -453,12 +452,10 @@ const DocsSearchPage = () => {
                   <div className="grow flex gap-3 items-center">
                     <IconContainer>{getPageIcon(page)}</IconContainer>
                     <div className="flex flex-col gap-0">
-                      <TextHighlighter query={query}>{page.title}</TextHighlighter>
+                      <TextHighlighter>{page.title}</TextHighlighter>
                       {(page.description || page.subtitle) && (
                         <div className="text-xs text-foreground-muted">
-                          <TextHighlighter query={query}>
-                            {page.description || page.subtitle}
-                          </TextHighlighter>
+                          <TextHighlighter>{page.description || page.subtitle}</TextHighlighter>
                         </div>
                       )}
                     </div>
@@ -494,24 +491,19 @@ const DocsSearchPage = () => {
                           openLink(page.type, formatSectionUrl(page, section))
                         }}
                         key={`${page.path}__${section.heading}-item`}
-                        value={`${escapeDoubleQuotes(
-                          page.title
-                        )}__${escapeDoubleQuotes(section.heading)}-item-index-${i}`}
+                        value={`${escapeAttributeSelector(page.title)}__${escapeAttributeSelector(section.heading)}-item-index-${i}`}
                         forceMount={true}
                       >
                         <div className="grow flex gap-3 items-center">
                           <IconContainer>{getPageSectionIcon(page)}</IconContainer>
                           <div className="flex flex-col gap-2">
                             <cite>
-                              <TextHighlighter
-                                className="not-italic text-xs rounded-full px-2 py-1 bg-overlay-hover text-foreground"
-                                query={query}
-                              >
+                              <TextHighlighter className="not-italic text-xs rounded-full px-2 py-1 bg-overlay-hover text-foreground">
                                 {page.title}
                               </TextHighlighter>
                             </cite>
                             {section.heading && (
-                              <TextHighlighter query={query}>{section.heading}</TextHighlighter>
+                              <TextHighlighter>{section.heading}</TextHighlighter>
                             )}
                           </div>
                         </div>
