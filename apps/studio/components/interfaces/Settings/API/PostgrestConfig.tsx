@@ -52,7 +52,7 @@ const PostgrestConfig = () => {
     })
   }
 
-  const permanentSchema = ['public', 'storage']
+  const permanentSchema = ['storage']
   const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
   const schema =
     schemas
