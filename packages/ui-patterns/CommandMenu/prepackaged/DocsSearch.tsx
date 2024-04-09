@@ -1,5 +1,5 @@
 import { useRegisterCommands } from '../api/hooks/commandsHooks'
-import { useRegisterNewPage, useSetPage } from '../api/hooks/pagesHooks'
+import { useRegisterPage, useSetPage } from '../api/hooks/pagesHooks'
 import type { ICommand, UseCommandOptions } from '../api/types'
 
 const DOCS_SEARCH_COMMANDS = {
@@ -16,7 +16,7 @@ const useDocsSearchCommands = ({
   options,
 }: { modify?: (command: ICommand) => ICommand; options?: UseCommandOptions } = {}) => {
   const setCommandPage = useSetPage()
-  useRegisterNewPage(DOCS_SEARCH_COMMANDS.PAGE_NAME, DocsSearchInterface)
+  useRegisterPage(DOCS_SEARCH_COMMANDS.PAGE_NAME, DocsSearchInterface)
 
   useRegisterCommands(
     DOCS_SEARCH_COMMANDS.SECTION_NAME,

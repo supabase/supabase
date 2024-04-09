@@ -31,11 +31,11 @@ const usePopPage = () => {
   return popPageStack
 }
 
-const useRegisterNewPage = (name: ICommandPageName, component: PageComponent) => {
+const useRegisterPage = (name: ICommandPageName, component: PageComponent) => {
   const { pagesState } = useCommandContext()
   const { registerNewPage } = useSnapshot(pagesState)
 
   useEffect(() => registerNewPage(name, component), [registerNewPage])
 }
 
-export { useCurrentPage, useRegisterNewPage, useSetPage, usePopPage, usePageComponent }
+export { useCurrentPage, useRegisterPage, useSetPage, usePopPage, usePageComponent }
