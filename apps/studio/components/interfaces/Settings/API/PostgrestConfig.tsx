@@ -74,6 +74,7 @@ const PostgrestConfig = () => {
           id: x.id,
           value: x.name,
           name: x.name,
+          disabled: false,
         }
       }) ?? []
 
