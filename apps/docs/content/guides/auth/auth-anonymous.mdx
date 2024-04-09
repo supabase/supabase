@@ -172,7 +172,7 @@ await supabase.auth.linkIdentity(OAuthProvider.google);
 You can use the [`linkIdentity()`](/docs/reference/swift/auth-linkidentity) method to link an oauth identity to the anonymous user.
 
 ```swift
-try await supabase.auth.linkIdentity(provider: "google")
+try await supabase.auth.linkIdentity(provider: .google)
 ```
 
 </TabPanel>
