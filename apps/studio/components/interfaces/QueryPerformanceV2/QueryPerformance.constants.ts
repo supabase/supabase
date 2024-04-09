@@ -32,6 +32,4 @@ export const QUERY_PERFORMANCE_REPORTS = {
     { id: 'min_time', name: 'Min time', description: undefined, minWidth: undefined },
     { id: 'total_time', name: 'Total time', description: 'latency', minWidth: 180 },
   ],
-}
-
-export type QueryPerformancePreset = 'time' | 'frequent' | 'slowest'
+} as const

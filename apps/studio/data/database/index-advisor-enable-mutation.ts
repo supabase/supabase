@@ -1,4 +1,4 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
 import { executeSql } from 'data/sql/execute-sql-query'
@@ -11,7 +11,7 @@ export type IndexAdvisorEnableVariables = {
   connectionString?: string
 }
 
-export async function enableDatabaseWebhooks({
+export async function enableIndexAdvisor({
   projectRef,
   connectionString,
 }: IndexAdvisorEnableVariables) {
@@ -161,7 +161,7 @@ begin
 
         --raise notice '%', plan_final;
 
-        -- Idenfity referenced indexes in new plan
+        -- Identify referenced indexes in new plan
         execute format(
             'select
                 coalesce(array_agg(hypopg_get_indexdef(indexrelid) order by indrelid, indkey::text), $i\${}$i$::text[])
@@ -212,7 +212,7 @@ $$;
   return result
 }
 
-type IndexAdvisorEnableData = Awaited<ReturnType<typeof enableDatabaseWebhooks>>
+type IndexAdvisorEnableData = Awaited<ReturnType<typeof enableIndexAdvisor>>
 
 export const useIndexAdvisorEnableMutation = ({
   onSuccess,
@@ -223,7 +223,7 @@ export const useIndexAdvisorEnableMutation = ({
   'mutationFn'
 > = {}) => {
   return useMutation<IndexAdvisorEnableData, ResponseError, IndexAdvisorEnableVariables>(
-    (vars) => enableDatabaseWebhooks(vars),
+    (vars) => enableIndexAdvisor(vars),
     {
       async onSuccess(data, variables, context) {
         await onSuccess?.(data, variables, context)

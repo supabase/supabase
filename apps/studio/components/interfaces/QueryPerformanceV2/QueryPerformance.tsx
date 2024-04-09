@@ -1,8 +1,9 @@
 import { HelpCircle } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { useRouter } from 'next/router'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
@@ -17,14 +18,13 @@ import {
   cn,
 } from 'ui'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { Markdown } from '../Markdown'
-import { QueryPerformanceFilterBar } from './QueryPerformanceFilterBar'
+import { useQueryPerformanceQuery } from '../Reports/Reports.queries'
 import { PresetHookResult } from '../Reports/Reports.utils'
 import { QUERY_PERFORMANCE_REPORT_TYPES } from './QueryPerformance.constants'
+import { QueryPerformanceFilterBar } from './QueryPerformanceFilterBar'
 import { QueryPerformanceGrid } from './QueryPerformanceGrid'
-import { useParams } from 'common'
-import { useQueryPerformanceQuery } from '../Reports/Reports.queries'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 interface QueryPerformanceProps {
   queryHitRate: PresetHookResult
@@ -38,16 +38,12 @@ export const QueryPerformance = ({
   const router = useRouter()
   const { preset } = useParams()
   const { project } = useProjectContext()
-  const [page, setPage] = useState<
-    | QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING
-    | QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT
-    | QUERY_PERFORMANCE_REPORT_TYPES.SLOWEST_EXECUTION
-  >(
+  const [page, setPage] = useState<QUERY_PERFORMANCE_REPORT_TYPES>(
     (preset as QUERY_PERFORMANCE_REPORT_TYPES) ?? QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING
   )
   const [showResetgPgStatStatements, setShowResetgPgStatStatements] = useState(false)
 
-  const handleRefresh = async () => {
+  const handleRefresh = () => {
     queryPerformanceQuery.runQuery()
     queryHitRate.runQuery()
   }
