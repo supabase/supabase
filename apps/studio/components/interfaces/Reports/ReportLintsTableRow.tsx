@@ -33,6 +33,7 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
 
   // if the lint type can't be handled (there's no CTA text defined), don't render it
   if (!LINT_TYPES.includes(lint.name)) {
+    console.log('Unhandled lint type:', lint.name)
     return null
   }
 
