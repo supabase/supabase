@@ -16,8 +16,9 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks'
-import { Form, IconAlertCircle, Input, InputNumber } from 'ui'
-import MultiSelect from 'ui-patterns/MultiSelect'
+import { Form, Input, InputNumber } from 'ui'
+import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
+import { AlertCircle } from 'lucide-react'
 
 const PostgrestConfig = () => {
   const { ref: projectRef } = useParams()
@@ -112,7 +113,7 @@ const PostgrestConfig = () => {
             >
               {isError ? (
                 <div className="flex items-center justify-center py-8 space-x-2">
-                  <IconAlertCircle size={16} strokeWidth={1.5} />
+                  <AlertCircle size={16} strokeWidth={1.5} />
                   <p className="text-sm text-foreground-light">Failed to retrieve API settings</p>
                 </div>
               ) : (
@@ -120,40 +121,26 @@ const PostgrestConfig = () => {
                   <FormSection header={<FormSectionLabel>Exposed schemas</FormSectionLabel>}>
                     <FormSectionContent loading={false}>
                       {schema.length >= 1 && (
-                        <MultiSelect
-                          disabled={!canUpdatePostgrestConfig}
-                          options={schema}
-                          descriptionText={
-                            <>
-                              The schemas to expose in your API. Tables, views and stored procedures
-                              in these schemas will get API endpoints.
-                              <code className="text-xs">public</code> and{' '}
-                              <code className="text-xs">storage</code> are protected by default.
-                            </>
-                          }
-                          emptyMessage={
-                            <>
-                              <IconAlertCircle strokeWidth={2} />
-                              <div className="flex flex-col mt-2 text-center">
-                                <p className="text-sm align-center">
-                                  No schema available to choose
-                                </p>
-                                <p className="text-xs opacity-50">
-                                  New schemas you create will appear here
-                                </p>
-                              </div>
-                            </>
-                          }
-                          // value must be passed as array of strings
-                          value={(values?.db_schema ?? '').replace(/ /g, '').split(',')}
-                          // onChange returns array of strings
-                          onChange={(event) => {
-                            let updatedValues: any = values
-                            updatedValues.db_schema = event.join(', ')
-                            resetForm({ values: updatedValues, initialValues: updatedValues })
-                            updateConfig({ ...updatedValues })
-                          }}
-                        />
+                        <div className="grid gap-2">
+                          <MultiSelectV2
+                            options={schema}
+                            disabled={!canUpdatePostgrestConfig}
+                            value={(values?.db_schema ?? '').replace(/ /g, '').split(',')}
+                            placeholder="No schema available to choose. New ones will appear here."
+                            searchPlaceholder="Search for a schema"
+                            onChange={(event) => {
+                              let updatedValues: any = values
+                              updatedValues.db_schema = event.join(', ')
+                              resetForm({ values: updatedValues, initialValues: updatedValues })
+                              updateConfig({ ...updatedValues })
+                            }}
+                          />
+                          <p className="text-foreground-lighter text-sm">
+                            The schemas to expose in your API. Tables, views and stored procedures
+                            in these schemas will get API endpoints. The
+                            <code className="text-xs">storage</code> schema is protected by default.
+                          </p>
+                        </div>
                       )}
                     </FormSectionContent>
                   </FormSection>
