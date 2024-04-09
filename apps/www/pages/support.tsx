@@ -1,9 +1,11 @@
+import { Command, Search } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import Typed from 'typed.js'
-import { Button, ButtonProps, cn, IconCommand, IconSearch } from 'ui'
+import { Button, ButtonProps, cn } from 'ui'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import Panel from '~/components/Panel'
@@ -14,6 +16,7 @@ import data from '~/data/support'
 const Index = () => {
   const router = useRouter()
   const typerRef = useRef(null)
+  const setCommandMenuOpen = useSetCommandMenuOpen()
 
   useEffect(() => {
     const typed = new Typed(typerRef.current, {
@@ -52,7 +55,7 @@ const Index = () => {
               {data.hero.h1}
             </h1>
             <p className="h1 tracking-[-1px]">{data.hero.title}</p>
-            {/* <SearchButton className="mx-auto w-full max-w-lg">
+            <button className="mx-auto w-full max-w-lg" onClick={() => setCommandMenuOpen(true)}>
               <div
                 className="
                   flex
@@ -69,7 +72,7 @@ const Index = () => {
                   rounded"
               >
                 <div className="flex items-center flex-1 space-x-2">
-                  <IconSearch className="text-foreground-light" size={18} strokeWidth={2} />
+                  <Search className="text-foreground-light" size={18} strokeWidth={2} />
                   <p
                     ref={typerRef}
                     className="text-foreground-lighter text-sm group-hover:text-foreground-light transition"
@@ -77,12 +80,12 @@ const Index = () => {
                 </div>
                 <div className="flex items-center h-full space-x-1">
                   <div className="hidden text-foreground-lighter md:flex items-center justify-center h-5 w-10 border rounded bg-surface-300 border-foreground-lighter/30 gap-1">
-                    <IconCommand size={12} strokeWidth={1.5} />
+                    <Command size={12} strokeWidth={1.5} />
                     <span className="text-[12px]">K</span>
                   </div>
                 </div>
               </div>
-            </SearchButton> */}
+            </button>
           </SectionContainer>
         </div>
         <SectionContainer className="text grid gap-5 md:grid-cols-2 xl:grid-cols-3 max-w-7xl !pb-8">
