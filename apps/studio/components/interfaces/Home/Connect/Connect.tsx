@@ -157,7 +157,7 @@ const Connect = () => {
 
   return (
     <>
-      <Dialog open={true}>
+      <Dialog>
         <DialogTrigger asChild>
           <Button type="primary">
             <span className="flex items-center gap-2 px-3">
