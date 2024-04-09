@@ -101,7 +101,7 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
             )}
             {lint.remediation && (
               <p className="text-foreground-light max-w-full leading-relaxed">
-                You can read more about this lint rule and the best ways to remedy it{' '}
+                You can read more about this lint rule and ways to remedy it{' '}
                 <a
                   className="underline text-foreground-light transition-all hover:text-foreground hover:decoration-brand"
                   href={lint.remediation}
