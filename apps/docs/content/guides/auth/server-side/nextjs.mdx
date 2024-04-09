@@ -812,11 +812,11 @@ Since this is an API route, use the Supabase client from `@/utils/supabase/api.t
 
 <CH.Code>
 
-```ts pages/api/auth/confirm.tsx
+```ts pages/api/auth/confirm.ts
 import { type EmailOtpType } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import { createClient } from '@/utils/supabase/api'
+import createClient from '@/utils/supabase/api'
 
 function stringOrFirstString(item: string | string[] | undefined) {
   return Array.isArray(item) ? item[0] : item
@@ -869,7 +869,7 @@ export default function ErrorPage() {
 
 If you use dynamic server-side rendering, you can serve a page to authenticated users only by checking for the user data in `getServerSideProps`. Unauthenticated users will be redirected to the home page.
 
-Since you're calling Supabse from `getServerSideProps`, use the client from `@/utils/supabase/server-props.ts`.
+Since you're calling Supabase from `getServerSideProps`, use the client from `@/utils/supabase/server-props.ts`.
 
 <Admonition type="danger">
 

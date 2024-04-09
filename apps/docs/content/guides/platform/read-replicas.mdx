@@ -51,10 +51,11 @@ A project needs to satisfy these requirements to deploy a Read Replica:
    - Support for projects on Fly.io is coming.
 1. Running on at least a [Small compute add-on](/docs/guides/platform/compute-add-ons).
    - Read Replicas are currently placed on the same compute instance as the database to make sure they can keep up with the Primary's activities.
-1. Using [physical backups](/docs/guides/platform/backups#point-in-time-recovery)
-   - Physical backups are automatically enabled if using [PITR](/docs/guides/platform/backups#point-in-time-recovery)
 1. Running on Postgres 15.
    - For projects running on older versions of PostgreSQL, you will need to [upgrade to the latest platform version](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade).
+1. Using [physical backups](/docs/guides/platform/backups#point-in-time-recovery)
+   - Physical backups are automatically enabled if using [PITR](/docs/guides/platform/backups#point-in-time-recovery)
+   - If you're not using PITR, you'll be able to switch to physical backups as part of the Read Replica setup process. Note that physical backups can't be downloaded from the dashboard in the way logical backups can.
 
 ## Getting started
 

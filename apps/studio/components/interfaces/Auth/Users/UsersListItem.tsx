@@ -40,7 +40,9 @@ const UserListItem = ({
         <span className="text-foreground">{!user.phone ? '-' : user.phone}</span>
       </Table.td>
       <Table.td className="table-cell">
-        <span className="capitalize text-foreground">{user?.raw_app_meta_data?.provider}</span>
+        <span className="capitalize text-foreground">
+          {user.is_anonymous ? 'Anonymous' : user?.raw_app_meta_data?.provider}
+        </span>
       </Table.td>
       <Table.td className="table-cell">
         <span className="text-foreground">{createdAt?.format('DD MMM, YYYY HH:mm')}</span>

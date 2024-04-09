@@ -5,6 +5,7 @@ import { UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import { Swiper, SwiperSlide } from 'swiper/react'
 
 import 'swiper/swiper.min.css'
+import { cn } from 'ui'
 
 interface Props {
   users: UserData[]
@@ -24,10 +25,10 @@ export function TicketBrickWallSlider({ users, reverse, speed = 50000, animate }
   return (
     <div className="relative h-auto w-full m-0 overflow-hidden mb-2.5">
       <div
-        className={[
+        className={cn(
           'flex swiper-transition-linear ticket-brick-swiper',
-          reverse && '-translate-x-20 w-[calc(100vw+400px)]',
-        ].join(' ')}
+          reverse && '-translate-x-20 w-[calc(100vw+400px)]'
+        )}
       >
         <Swiper
           centeredSlides={true}
@@ -64,12 +65,11 @@ export function TicketBrickWallSlider({ users, reverse, speed = 50000, animate }
                         '/images/launchweek/8/lw8-ticket-empty.jpg'
                       }
                       alt={user.username ?? ''}
-                      layout="fill"
-                      objectFit="cover"
-                      objectPosition="center"
+                      fill
+                      sizes="100%"
                       placeholder="blur"
                       blurDataURL="/images/launchweek/8/lw8-ticket-empty.jpg"
-                      className="absolute inset-[1px] rounded-md md:rounded-lg"
+                      className="absolute inset-[1px] rounded-md md:rounded-lg object-cover object-center"
                     />
                   </div>
                 </div>

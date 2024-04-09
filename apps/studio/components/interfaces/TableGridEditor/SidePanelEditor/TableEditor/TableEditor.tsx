@@ -402,18 +402,16 @@ const TableEditor = ({
 
         <ConfirmationModal
           visible={rlsConfirmVisible}
-          header="Turn off Row Level Security"
-          buttonLabel="Confirm"
+          title="Turn off Row Level Security"
+          confirmLabel="Confirm"
           size="medium"
-          onSelectCancel={() => setRlsConfirmVisible(false)}
-          onSelectConfirm={() => {
+          onCancel={() => setRlsConfirmVisible(false)}
+          onConfirm={() => {
             onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
             setRlsConfirmVisible(false)
           }}
         >
-          <Modal.Content>
-            <RLSDisableModalContent />
-          </Modal.Content>
+          <RLSDisableModalContent />
         </ConfirmationModal>
       </SidePanel.Content>
 

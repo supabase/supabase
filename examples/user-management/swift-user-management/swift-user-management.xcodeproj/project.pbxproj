@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7922C77F2BBED449007F611D /* DotEnv.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7922C77E2BBED449007F611D /* DotEnv.swift */; };
 		79A039A22B2B89FF0031D573 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 79A039A12B2B89FF0031D573 /* Assets.xcassets */; };
 		79A039A52B2B89FF0031D573 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 79A039A42B2B89FF0031D573 /* Preview Assets.xcassets */; };
 		79A039B62B2B8A6F0031D573 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = 79A039AB2B2B8A6E0031D573 /* Models.swift */; };
@@ -21,6 +22,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		7922C77E2BBED449007F611D /* DotEnv.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DotEnv.swift; sourceTree = "<group>"; };
 		79A0399A2B2B89FF0031D573 /* swift-user-management.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "swift-user-management.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		79A039A12B2B89FF0031D573 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		79A039A42B2B89FF0031D573 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
@@ -69,6 +71,7 @@
 				79A039B22B2B8A6F0031D573 /* AppView.swift */,
 				79A039A12B2B89FF0031D573 /* Assets.xcassets */,
 				79A039B42B2B8A6F0031D573 /* AuthView.swift */,
+				7922C77E2BBED449007F611D /* DotEnv.swift */,
 				79A039AC2B2B8A6F0031D573 /* AvatarImage.swift */,
 				79A039C32B2B8B0A0031D573 /* Info.plist */,
 				79A039AB2B2B8A6E0031D573 /* Models.swift */,
@@ -96,6 +99,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 79A039A82B2B89FF0031D573 /* Build configuration list for PBXNativeTarget "swift-user-management" */;
 			buildPhases = (
+				7922C77D2BBED225007F611D /* ShellScript */,
 				79A039962B2B89FF0031D573 /* Sources */,
 				79A039972B2B89FF0031D573 /* Frameworks */,
 				79A039982B2B89FF0031D573 /* Resources */,
@@ -160,6 +164,29 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		7922C77D2BBED225007F611D /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${SRCROOT}/scripts/dotenv.sh",
+				"${SRCROOT}/.env",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(SRCROOT)/swift-user-management/DotEnv.swift",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n${SRCROOT}/scripts/dotenv.sh ${SRCROOT}/.env > ${SRCROOT}/swift-user-management/DotEnv.swift\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		79A039962B2B89FF0031D573 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -170,6 +197,7 @@
 				79A039B92B2B8A6F0031D573 /* Supabase.swift in Sources */,
 				79A039BC2B2B8A6F0031D573 /* SwiftUIHelpers.swift in Sources */,
 				79A039B72B2B8A6F0031D573 /* AvatarImage.swift in Sources */,
+				7922C77F2BBED449007F611D /* DotEnv.swift in Sources */,
 				79A039BD2B2B8A6F0031D573 /* AppView.swift in Sources */,
 				79A039BE2B2B8A6F0031D573 /* AuthView.swift in Sources */,
 				79A039BA2B2B8A6F0031D573 /* UserManagementApp.swift in Sources */,

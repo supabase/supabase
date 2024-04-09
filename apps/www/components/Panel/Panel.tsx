@@ -12,6 +12,7 @@ interface Props {
   hasInnerShimmer?: boolean
   shimmerFromColor?: string
   shimmerToColor?: string
+  style?: any
   hasMotion?: boolean
 }
 
@@ -26,6 +27,7 @@ const Panel = ({
   shimmerToColor,
   hasMotion = false,
   children,
+  style,
 }: PropsWithChildren<Props>) => {
   const outerRef = useRef(null)
   const innerRef = useRef(null)
@@ -85,6 +87,7 @@ const Panel = ({
         outerClassName
       )}
       {...(hasMotion ? { whileHover: 'hover', animate: 'initial' } : undefined)}
+      style={style}
     >
       <div
         className={cn(

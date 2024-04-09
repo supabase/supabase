@@ -187,21 +187,19 @@ const PolicyEditorModal = ({
       <div>
         <ConfirmationModal
           visible={isClosingPolicyEditorModal}
-          header="Discard changes"
-          buttonLabel="Discard"
-          onSelectCancel={() => setIsClosingPolicyEditorModal(false)}
-          onSelectConfirm={() => {
+          title="Discard changes"
+          confirmLabel="Discard"
+          onCancel={() => setIsClosingPolicyEditorModal(false)}
+          onConfirm={() => {
             onSelectCancel()
             setIsClosingPolicyEditorModal(false)
             setIsDirty(false)
           }}
         >
-          <Modal.Content>
-            <p className="py-4 text-sm text-foreground-light">
-              There are unsaved changes. Are you sure you want to close the editor? Your changes
-              will be lost.
-            </p>
-          </Modal.Content>
+          <p className="text-sm text-foreground-light">
+            There are unsaved changes. Are you sure you want to close the editor? Your changes will
+            be lost.
+          </p>
         </ConfirmationModal>
         {view === POLICY_MODAL_VIEWS.SELECTION ? (
           <PolicySelection

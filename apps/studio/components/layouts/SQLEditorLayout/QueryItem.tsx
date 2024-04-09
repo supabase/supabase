@@ -28,6 +28,7 @@ import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { QueryItemActions } from './QueryItemActions'
+import { Eye, Unlock } from 'lucide-react'
 
 export interface QueryItemProps {
   tabInfo: SqlSnippet
@@ -188,58 +189,50 @@ const QueryItem = ({
         onComplete={() => setRenameModalOpen(false)}
       />
       <ConfirmationModal
-        header="Confirm to delete query"
-        buttonLabel="Delete query"
-        buttonLoadingLabel="Deleting query"
+        title="Confirm to delete query"
+        confirmLabel="Delete query"
+        confirmLabelLoading="Deleting query"
         size="medium"
         loading={isDeleting}
         visible={deleteModalOpen}
-        onSelectConfirm={onConfirmDelete}
-        onSelectCancel={() => setDeleteModalOpen(false)}
+        variant={'destructive'}
+        onCancel={() => setDeleteModalOpen(false)}
+        onConfirm={onConfirmDelete}
+        alert={
+          visibility === 'project'
+            ? {
+                title: 'This SQL snippet will be lost forever',
+                description:
+                  'Deleting this query will remove it for all members of the project team.',
+              }
+            : {}
+        }
       >
-        <Modal.Content className="my-6 grid gap-1 text-sm text-foreground-light grid gap-4">
-          {visibility === 'project' && (
-            <Alert_Shadcn_ variant="destructive">
-              <CriticalIcon />
-              <AlertTitle_Shadcn_>This SQL snippet will be lost forever</AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_>
-                Deleting this query will remove it for all members of the project team.
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          )}
-          <p>Are you sure you want to delete '{name}'?</p>
-        </Modal.Content>
+        <p className="text-sm">Are you sure you want to delete '{name}'?</p>
       </ConfirmationModal>
       <ConfirmationModal
-        header="Confirm sharing query"
+        title="Confirm sharing query"
         size="medium"
-        buttonLabel="Share query"
-        buttonLoadingLabel="Sharing query"
+        confirmLabel="Share query"
+        confirmLabelLoading="Sharing query"
         visible={shareModalOpen}
-        onSelectConfirm={onConfirmShare}
-        onSelectCancel={() => setShareModalOpen(false)}
+        onCancel={() => setShareModalOpen(false)}
+        onConfirm={onConfirmShare}
+        alert={{
+          title: 'This SQL query will become public to all team members',
+          description: 'Anyone with access to the project can view it',
+        }}
       >
-        <Modal.Content className="my-6 text-sm text-foreground-light grid gap-4 grid gap-1">
-          <Alert_Shadcn_ variant="warning">
-            <WarningIcon />
-            <AlertTitle_Shadcn_>
-              This SQL query will become public to all team members
-            </AlertTitle_Shadcn_>
-            <AlertDescription_Shadcn_>
-              Anyone with access to the project can view it
-            </AlertDescription_Shadcn_>
-          </Alert_Shadcn_>
-          <ul className="mt-4 space-y-5">
-            <li className="flex gap-3">
-              <IconEye />
-              <span>Project members will have read-only access to this query.</span>
-            </li>
-            <li className="flex gap-3">
-              <IconUnlock />
-              <span>Anyone will be able to duplicate it to their personal snippets.</span>
-            </li>
-          </ul>
-        </Modal.Content>
+        <ul className="text-sm text-foreground-light space-y-5">
+          <li className="flex gap-3">
+            <Eye />
+            <span>Project members will have read-only access to this query.</span>
+          </li>
+          <li className="flex gap-3">
+            <Unlock />
+            <span>Anyone will be able to duplicate it to their personal snippets.</span>
+          </li>
+        </ul>
       </ConfirmationModal>
       <DownloadSnippetModal
         id={id as string}

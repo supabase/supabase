@@ -1,3 +1,5 @@
+import 'swiper/swiper.min.css'
+
 import { useState, useEffect } from 'react'
 import { GetServerSideProps } from 'next'
 import dynamic from 'next/dynamic'
@@ -14,12 +16,8 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import { LaunchWeekLogoHeader } from '~/components/LaunchWeek/8/LaunchWeekLogoHeader'
 import { Meetup } from '~/components/LaunchWeek/8/LW8Meetups'
 import LW8CalloutsSection from '~/components/LaunchWeek/8/LW8CalloutsSection'
+import AnimatedParticles from '~/components/LaunchWeek/8/AnimatedParticles/ParticlesCanvas'
 
-import 'swiper/swiper.min.css'
-
-const AnimatedParticles = dynamic(
-  () => import('~/components/LaunchWeek/8/AnimatedParticles/ParticlesCanvas')
-)
 const LW8Releases = dynamic(() => import('~/components/LaunchWeek/8/Releases'))
 const LW8Meetups = dynamic(() => import('~/components/LaunchWeek/8/LW8Meetups'))
 const LWArchive = dynamic(() => import('~/components/LaunchWeek/8/LWArchive'))
@@ -145,7 +143,9 @@ export default function TicketHome({ users, meetups }: Props) {
                     <Image
                       src="/images/launchweek/8/stars.svg"
                       alt="starts background"
-                      className="opacity-70 object-cover pointer-events-none"
+                      width={600}
+                      height={600}
+                      className="absolute inset-0 opacity-70 object-cover pointer-events-none w-auto h-auto"
                       draggable={false}
                     />
                   </div>
