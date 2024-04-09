@@ -6,6 +6,8 @@
     "start": "next start"
   },
   "dependencies": {
+    "@supabase/auth-helpers-nextjs": "^0.9.0",
+    "@supabase/realtime-js": "^2.10.0-next.5",
     "@supabase/ssr": "latest",
     "@supabase/supabase-js": "latest",
     "autoprefixer": "10.4.17",
@@ -19,7 +21,7 @@
   },
   "overrides": {
     "@supabase/supabase-js": {
-      "@supabase/realtime-js": "^2.10.0-next.2"
+      "@supabase/realtime-js": "^2.10.0-next.5"
     }
   },
   "devDependencies": {

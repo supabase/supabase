@@ -1,34 +1,22 @@
-import { createClient } from "@/utils/supabase/server";
-import { redirect } from "next/navigation";
-import { SubmitButton } from "./submit-button";
+'use client'
+import { createClient } from '@/utils/supabase/client'
+import { redirect } from 'next/navigation'
+import { SubmitButton } from './submit-button'
 
 export default function CreateRoomModal() {
-  const signUp = async (formData: FormData) => {
-    "use server";
-
-    const name = formData.get("name") as string;
-    const supabase = createClient();
-    // await supabase.auth.getUser();
-    // const token = (await supabase.auth.getSession()).data.session!.access_token;
-    // console.log(token);
-    // supabase.realtime.setAuth(token);
-    // console.log(await supabase.realtime.createChannel(name));
-    // const { error } = await supabase.auth.signUp({
-    //   email,
-    //   password,
-    //   options: {
-    //     emailRedirectTo: `${origin}/auth/callback`,
-    //   },
-    // });
-
-    return redirect(`/protected?show=false`);
-  };
+  const createRoom = async (formData: FormData) => {
+    const name = formData.get('name') as string
+    const supabase = createClient()
+    await supabase.auth.getUser()
+    const token = (await supabase.auth.getSession()).data.session!.access_token
+    supabase.realtime.setAuth(token)
+    supabase.realtime.createChannel(name)
+    return redirect(`/protected`)
+  }
 
   const close = async () => {
-    "use server";
-
-    return redirect(`/protected?show=false`);
-  };
+    return redirect(`/protected`)
+  }
   return (
     <div className="fixed top-0 left-0 right-0 flex flex-col h-full w-full justify-center items-center align-middle gap-2 z-10 bg-[#000000AA]">
       <form className="flex flex-col sm:max-w-md gap-2 text-foreground bg-background rounded-md p-4">
@@ -49,14 +37,14 @@ export default function CreateRoomModal() {
           placeholder="a@a.com, b@b.com"
         />
         <SubmitButton
-          formAction={close}
+          formAction={createRoom}
           className="border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-2"
           pendingText="Creating"
         >
           Create Room
         </SubmitButton>
         <SubmitButton
-          formAction={signUp}
+          formAction={close}
           className="border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-2"
           pendingText="Closing"
         >
@@ -64,5 +52,5 @@ export default function CreateRoomModal() {
         </SubmitButton>
       </form>
     </div>
-  );
+  )
 }
