@@ -1,93 +1,161 @@
-<a href="https://demo-nextjs-with-supabase.vercel.app/">
-  <img alt="Next.js and Supabase Starter Kit - the fastest way to build apps with Next.js and Supabase" src="https://demo-nextjs-with-supabase.vercel.app/opengraph-image.png">
-  <h1 align="center">Next.js and Supabase Starter Kit</h1>
-</a>
+# Supaslack
 
-<p align="center">
- The fastest way to build apps with Next.js and Supabase
-</p>
+Example application on how you can use Realtime Authorization feature to limit access to Realtime Channels and limit access to the Broadcast feature.
 
-<p align="center">
-  <a href="#features"><strong>Features</strong></a> ·
-  <a href="#demo"><strong>Demo</strong></a> ·
-  <a href="#deploy-to-vercel"><strong>Deploy to Vercel</strong></a> ·
-  <a href="#clone-and-run-locally"><strong>Clone and run locally</strong></a> ·
-  <a href="#feedback-and-issues"><strong>Feedback and issues</strong></a>
-  <a href="#more-supabase-examples"><strong>More Examples</strong></a>
-</p>
-<br/>
+Read more and provide feedback at our [Github Discussion](https://github.com/orgs/supabase/discussions/22484)
 
-## Features
+## Objective
 
-- Works across the entire [Next.js](https://nextjs.org) stack
-  - App Router
-  - Pages Router
-  - Middleware
-  - Client
-  - Server
-  - It just works!
-- supabase-ssr. A package to configure Supabase Auth to use cookies
-- Styling with [Tailwind CSS](https://tailwindcss.com)
-- Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
-  - Environment variables automatically assigned to Vercel project
+Build a chat system using Realtime broadcast where users can create rooms and invite existing users to a room.
 
-## Demo
+Each room will have a set number of users that will be restricted by using RLS rules applied to realtime.channels, realtime.broadcast and realtime.presence.
 
-You can view a fully working demo at [demo-nextjs-with-supabase.vercel.app](https://demo-nextjs-with-supabase.vercel.app/).
+## Run it
 
-## Deploy to Vercel
+```sh
+npm i
+npm run dev
+```
 
-Vercel deployment will guide you through creating a Supabase account and project.
+> Please do note that currently we're overriding the dependecy for realtime to use the `next` version.
 
-After installation of the Supabase integration, all relevant environment variables will be assigned to the project so the deployment is fully functioning.
+## How it looks
+In this scenario both users are able to access it:
+![Both users were able to connect](./chat_success.png)
+And here one of the user does not have access because their RLS rules made the user be denied access
+![Both users were able to connect](./chat_unauthorized.png)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&project-name=nextjs-with-supabase&repository-name=nextjs-with-supabase&demo-title=nextjs-with-supabase&demo-description=This%20starter%20configures%20Supabase%20Auth%20to%20use%20cookies%2C%20making%20the%20user's%20session%20available%20throughout%20the%20entire%20Next.js%20app%20-%20Client%20Components%2C%20Server%20Components%2C%20Route%20Handlers%2C%20Server%20Actions%20and%20Middleware.&demo-url=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2F&external-id=https%3A%2F%2Fgithub.com%2Fvercel%2Fnext.js%2Ftree%2Fcanary%2Fexamples%2Fwith-supabase&demo-image=https%3A%2F%2Fdemo-nextjs-with-supabase.vercel.app%2Fopengraph-image.png&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6)
+## Schema
 
-The above will also clone the Starter kit to your GitHub, you can clone that locally and develop locally.
+We're taking advantage of protected schemas to feed data to our application, namely realtime.channels and auth.users so we can easily have cascading changes if a channel / user is deleted.
 
-If you wish to just develop locally and not deploy to Vercel, [follow the steps below](#clone-and-run-locally).
+We also need realtime.profiles with a trigger so we have a way to offer a public email to be used to invite people to the chat room.
 
-## Clone and run locally
+![Schema used by our demo application](./schema.png)
 
-1. You'll first need a Supabase project which can be made [via the Supabase dashboard](https://database.new)
+## Database Setup
+### Trigger
+To actually add entries to our profile table we setup a function and a trigger to add an entry whenever a new user is created:
 
-2. Create a Next.js app using the Supabase Starter template npx command
+```sql
+create or replace function insert_user () returns trigger as
+$$
+  BEGIN
+    INSERT INTO public.profiles (user_id, email) VALUES (NEW.id, NEW.email); RETURN NEW;
+  END;
+$$ language plpgsql;
 
-   ```bash
-   npx create-next-app -e with-supabase
-   ```
+create or replace trigger "on_new_auth_create_profile"
+after insert on auth.users for each row
+execute function insert_user ();
 
-3. Use `cd` to change into the app's directory
+grant execute on function insert_user () to supabase_auth_admin;
+```
 
-   ```bash
-   cd name-of-new-app
-   ```
+### RLS Rules
+We do have a lot of rules setup so we will detail them with schema.table in the section below.
 
-4. Rename `.env.local.example` to `.env.local` and update the following:
+The most noteworthy one will be the realtime.broadcast as it will be the one used to limit access to rooms by checking if an entry for a given room name and user id exists in the table public.rooms_users.
 
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
-   ```
+> ⚠️ All the rules here are not the most secure, you should check your use case and refine them!
+#### public.profiles
+```sql
+create policy "authenticated users can view all profiles"
+on "public"."profiles"
+as PERMISSIVE for SELECT
+to authenticated
+using ( true );
 
-   Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://app.supabase.com/project/_/settings/api)
+create policy "authenticated user can insert profile"
+on "public"."profiles"
+as PERMISSIVE for INSERT
+to supabase_auth_admin
+with check ( true );
 
-5. You can now run the Next.js local development server:
+```
+#### public.rooms_users
+```sql
+create policy "authenticated users can read rooms_users"
+on "public"."rooms_users"
+as PERMISSIVE for SELECT
+to authenticated
+using ( true );
 
-   ```bash
-   npm run dev
-   ```
+create policy "authenticated can add rooms_users"
+on "public"."rooms_users"
+as PERMISSIVE for INSERT
+to authenticated
+with check ( true );
+```
+#### realtime.channels
+```sql
+create policy "authenticated users can see all channels"
+on "realtime"."channels"
+as PERMISSIVE for SELECT
+to authenticated
+using ( true );
 
-   The starter kit should now be running on [localhost:3000](http://localhost:3000/).
+create policy "authenticated can create channel"
+on "realtime"."channels"
+as PERMISSIVE for INSERT
+to authenticated
+with check ( true );
+```
 
-> Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+#### realtime.presence
+```sql
+create policy "authenticated users can see all presences"
+on "realtime"."presences"
+as PERMISSIVE for SELECT
+to authenticated
+using ( true );
 
-## Feedback and issues
+create policy "authenticated can track presences"
+on "realtime"."presences"
+as PERMISSIVE for UPDATE
+to authenticated
+using ( true );
+```
+#### realtime.broadcasts
+```sql
+create policy "authenticated user in room can access"
+on "realtime"."broadcasts"
+as PERMISSIVE for SELECT
+to authenticated
+using (
+  EXISTS (
+    SELECT ru.user_id
+    FROM rooms_users ru
+    WHERE ru.user_id = auth.uid()
+    AND ru.name = realtime.channel_name()
+  )
+);
 
-Please file feedback and issues over on the [Supabase GitHub org](https://github.com/supabase/supabase/issues/new/choose).
+create policy "authenticated user in room can broadcast"
+on "realtime"."broadcasts"
+as PERMISSIVE for UPDATE
+to authenticated
+using (
+  EXISTS (
+    SELECT ru.user_id
+    FROM rooms_users ru
+    WHERE ru.user_id = auth.uid()
+    AND ru.name = realtime.channel_name()
+  )
+);
+```
 
-## More Supabase examples
+## Coding concerns
+### Need to create channels
+At the moment if you are using Realtime channels you would just connect and go. If you want your channel to respect the RLS rules setup above you will need to preemptively create the channel that will be used before connecting.
 
-- [Next.js Subscription Payments Starter](https://github.com/vercel/nextjs-subscription-payments)
-- [Cookie-based Auth and the Next.js 13 App Router (free course)](https://youtube.com/playlist?list=PL5S4mPUpp4OtMhpnp93EFSo42iQ40XjbF)
-- [Supabase Auth and the Next.js App Router](https://github.com/supabase/supabase/tree/master/examples/auth/nextjs)
+This can be done with a quick API call:
+```ts
+await supabase.realtime.createChannel(name)
+```
+You can check this code at the [create-room-modal.tsx](components/create-room-modal.tsx) component.
+
+### Connecting to broadcast is essentially the same
+The biggest difference from the previous way of work was really the requirement of creating the channel, other than that you can connect as usual to your Realtime channel which might fail to connect if it does not respect the RLS rules set by you.
+
+You can check this code at the [protected/page.tsx](app/protected/page.tsx).
