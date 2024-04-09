@@ -1,3 +1,4 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { Clock, GitPullRequest, Infinity, RefreshCw, Trash2 } from 'lucide-react'
@@ -9,6 +10,7 @@ import { useInView } from 'react-intersection-observer'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBranchQuery } from 'data/branches/branch-query'
 import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import type { Branch } from 'data/branches/branches-query'
 import {
   Badge,
@@ -79,7 +81,6 @@ interface BranchRowProps {
   isMain?: boolean
   generateCreatePullRequestURL?: (branchName?: string) => string
   onSelectDeleteBranch: () => void
-  onSelectPersistentMode: () => void
 }
 
 export const BranchRow = ({
@@ -88,7 +89,6 @@ export const BranchRow = ({
   repo,
   generateCreatePullRequestURL,
   onSelectDeleteBranch,
-  onSelectPersistentMode,
 }: BranchRowProps) => {
   const { ref: projectRef } = useParams()
   const isActive = projectRef === branch?.project_ref
@@ -115,6 +115,20 @@ export const BranchRow = ({
     }
   )
 
+  const [showBranchModeSwitch, setShowBranchModeSwitch] = useState(false)
+
+  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+    onSuccess() {
+      toast.success('Successfully updated branch')
+      setShowBranchModeSwitch(false)
+    },
+  })
+
+  const onUpdateBranchPersistentMode = () => {
+    if (projectRef == undefined) return console.error('Project ref is required')
+    updateBranch({ id: branch.id, projectRef, persistent: !branch.persistent })
+  }
+
   const [showConfirmResetModal, setShowConfirmResetModal] = useState(false)
 
   const { mutate, isLoading: isResetting } = useBranchResetMutation({
@@ -135,22 +149,45 @@ export const BranchRow = ({
   return (
     <div className="w-full flex items-center justify-between px-6 py-2.5" ref={ref}>
       <div className="flex items-center gap-x-4">
-        <Button
-          asChild
-          type="default"
-          className="max-w-[300px]"
-          icon={
-            isMain ? (
-              <IconShield strokeWidth={2} className="text-amber-900" />
-            ) : branch.persistent ? (
-              <Infinity size={16} />
-            ) : null
-          }
-        >
-          <Link href={`/project/${branch.project_ref}/branches`} title={branch.name}>
-            {branch.name}
-          </Link>
-        </Button>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger asChild>
+            <Button
+              asChild
+              type="default"
+              className="max-w-[300px]"
+              icon={
+                isMain ? (
+                  <IconShield strokeWidth={2} className="text-amber-900" />
+                ) : branch.persistent ? (
+                  <Infinity size={16} />
+                ) : null
+              }
+            >
+              <Link href={`/project/${branch.project_ref}/branches`} title={branch.name}>
+                {branch.name}
+              </Link>
+            </Button>
+          </Tooltip.Trigger>
+          {branch.persistent && (
+            <Tooltip.Portal>
+              <Tooltip.Content side="top">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                    'border border-background',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-foreground">
+                    {branch.name} is a persistent branch and will remain active even after the
+                    underlying PR is closed
+                  </span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          )}
+        </Tooltip.Root>
+
         {isActive && <Badge>Current</Badge>}
         <BranchStatusBadge
           status={
@@ -230,14 +267,18 @@ export const BranchRow = ({
                   <RefreshCw size={14} />
                   Reset Branch
                 </DropdownMenuItem>
-                <DropdownMenuItem className="gap-x-2" onClick={() => onSelectPersistentMode?.()}>
+                <DropdownMenuItem
+                  className="gap-x-2"
+                  onSelect={() => setShowBranchModeSwitch(true)}
+                  onClick={() => setShowBranchModeSwitch(true)}
+                >
                   {branch.persistent ? (
                     <>
                       <Clock size={14} /> Switch to ephemeral
                     </>
                   ) : (
                     <>
-                      <Infinity size={14} className="scale-110" /> Switch to long-lived
+                      <Infinity size={14} className="scale-110" /> Switch to persistent
                     </>
                   )}
                 </DropdownMenuItem>
@@ -265,6 +306,27 @@ export const BranchRow = ({
             >
               <p className="text-sm text-foreground-light">
                 Are you sure you want to reset the "{branch.name}" branch? All data will be deleted.
+              </p>
+            </ConfirmationModal>
+            <ConfirmationModal
+              variant={'default'}
+              visible={showBranchModeSwitch}
+              confirmLabel={branch.persistent ? 'Switch to ephemeral' : 'Switch to persistent'}
+              title={`Confirm branch mode switch`}
+              loading={isUpdating}
+              onCancel={() => {
+                setShowBranchModeSwitch(false)
+              }}
+              onConfirm={onUpdateBranchPersistentMode}
+            >
+              <p className="text-sm text-foreground-light">
+                Are you sure you want to switch the branch "{branch.name}" to{' '}
+                {branch.persistent ? 'ephemeral' : 'persistent'} mode?
+                <br />
+                <br />
+                {branch.persistent
+                  ? 'Ephemeral branches will be deleted once the underlying PR closes.'
+                  : 'Persistent branches will remain active even after the underlying PR is closed.'}
               </p>
             </ConfirmationModal>
           </div>
