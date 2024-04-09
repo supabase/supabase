@@ -96,7 +96,9 @@ In the SQL editor, you can choose if you want to run the query on the Primary or
 
 When Read Replicas are deployed, an API load balancer becomes available for the project. An endpoint for it is provisioned and can be found [here](https://supabase.com/dashboard/project/_/settings/api).
 
-The load balancer uses a round-robin strategy to route `GET` requests to any of the API endpoints available, including that of the Primary database. Non-`GET` requests can also be sent through this endpoint. They are immediately redirected to the Primary database.
+The load balancer uses a round-robin strategy to route read-only requests (i.e. HTTP GET requests) to any of the API endpoints available, including that of the Primary database. Write requests (e.g. HTTP POST, PUT, or DELETE requests) can also be sent through this endpoint, in which case they are immediately redirected to the Primary database. Supabase client libraries automatically handle indicating that a given request is read-only (e.g. `select` requests), by sending it using the HTTP GET verb. Postgres function calls (`rpc` requests) are by default assumed to involve writes and target the Primary database only; the RPC call can be sent as a GET request (e.g. using [the `get: true` option](https://github.com/supabase/postgrest-js/pull/529) for the supabase-js library) to have it load-balanced between all servers.
+
+Targeting a read-replica with a request that involves a write will result in an error being returned.
 
 Similar to the Read Replica API endpoints, only requests to the REST API are available for now. Support for other Supabase products will become available once Read Replica support has been completed for them.
 
