@@ -771,7 +771,7 @@ functions:
           );
 
           // unlink the google identity
-          await supabase.auth.unlinkIdentity(identities.first);
+          await supabase.auth.unlinkIdentity(googleIdentity);
           ```
   - id: send-password-reauthentication
     title: 'reauthenticate()'
