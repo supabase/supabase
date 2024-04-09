@@ -1,8 +1,6 @@
 import React from 'react'
-import { LWX_DATE } from '~/lib/constants'
 import TicketNumber from './TicketNumber'
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
-import Image from 'next/image'
 import { cn } from 'ui'
 
 export default function TicketFooter() {

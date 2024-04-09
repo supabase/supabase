@@ -8,6 +8,7 @@ import { Session } from '@supabase/supabase-js'
 import { Button } from 'ui'
 import { SITE_URL, SPECIAL_ANNOUNCEMENT_URL } from '~/lib/constants'
 import supabase from '~/lib/supabaseMisc'
+import supabaseMiscAdmin from '~/lib/supabaseMiscAdmin'
 import dayjs from 'dayjs'
 
 import DefaultLayout from '~/components/Layouts/Default'
@@ -83,7 +84,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
         }}
       >
         <DefaultLayout>
-          <div className="relative -mt-[65px]">
+          <div className="relative -mt-[65px] overflow-hidden">
             <SectionContainer className="relative !pt-8 lg:!pt-10 z-10 flex flex-col xl:flex-row items-center xl:justify-center xl:items-center gap-8 md:gap-10 xl:gap-20 text-foreground text-center md:text-left">
               <div className="w-auto min-h-[400px] pt-24 flex items-center">
                 <LW11TicketContainer />
@@ -125,7 +126,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   // fetch a specific user
   if (username) {
-    const { data } = await supabase!
+    const { data } = await supabaseMiscAdmin!
       .from('lw11_tickets_platinum')
       .select('name, username, ticketNumber, metadata, platinum, secret')
       .eq('username', username)

@@ -9,6 +9,7 @@ import NoPermission from 'components/ui/NoPermission'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import type { NextPageWithLayout } from 'types'
+import { FormHeader } from 'components/ui/Forms'
 
 // [Joshen] Technically, best that we have these as separate URLs
 // makes it easier to manage state, but foresee that this page might
@@ -40,9 +41,7 @@ const DatabaseReplication: NextPageWithLayout = () => {
     <ScaffoldContainer>
       <ScaffoldSection>
         <div className="col-span-12">
-          <div className="mb-4">
-            <h3 className="mb-1 text-xl text-foreground">Database Replications</h3>
-          </div>
+          <FormHeader title="Database Replications" />
           {selectedPublication === undefined ? (
             <PublicationsList onSelectPublication={setSelectedPublicationId} />
           ) : (

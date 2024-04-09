@@ -11,7 +11,7 @@ This repo will demonstrate how to:
 
 ## Getting Started
 
-Before running this app, you need to create a Supabase project and copy [your credentials](https://supabase.io/docs/guides/with-flutter#get-the-api-keys) to `Supabase.swift`. 
+Run `cp .env.example .env` and fill in [your credentials](https://supabase.io/docs/guides/with-flutter#get-the-api-keys).
 
 Run the application in a device or simulator using Xcode.
 

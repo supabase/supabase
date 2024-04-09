@@ -172,10 +172,7 @@ const PaymentMethods = () => {
                                   {canUpdatePaymentMethods && !isActive ? (
                                     <DropdownMenu>
                                       <DropdownMenuTrigger asChild>
-                                        <Button
-                                          type="outline"
-                                          className="hover:border-gray-500 px-1"
-                                        >
+                                        <Button type="outline" className="hover:border-muted px-1">
                                           <IconMoreHorizontal />
                                         </Button>
                                       </DropdownMenuTrigger>

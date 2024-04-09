@@ -160,14 +160,22 @@ const TicketingFlow = () => {
                         <CountdownComponent date={LW11_LAUNCH_DATE} showCard={false} />
                       </div>
                       <div className="w-full h-auto text-center md:text-left border border-muted flex flex-col md:flex-row items-stretch rounded-lg bg-surface-100 my-2 md:mb-8 overflow-hidden">
-                        <div className="hidden md:block relative h-full w-full min-h-[140px] md:w-1/3 top-0 -bottom-8 overflow-visible">
+                        <div className="relative h-full w-full aspect-[4/1] border-b md:border-b-0 md:aspect-auto md:min-h-[140px] md:w-1/3 top-0 -bottom-8 overflow-visible">
                           <Image
                             src="/images/launchweek/11/airpods-max-alpha.png"
                             alt="Supabase AirPod Max prize"
                             width={300}
                             height={300}
                             draggable={false}
-                            className="absolute p-2 object-cover object-left-top w-full h-[200px] overflow-visible opacity-50 pointer-events-none"
+                            className="hidden md:block absolute p-2 object-cover object-left-top w-full h-[200px] overflow-visible opacity-50 pointer-events-none"
+                          />
+                          <Image
+                            src="/images/launchweek/11/airpods-max-alpha-crop.png"
+                            alt="Supabase AirPod Max prize"
+                            draggable={false}
+                            width={300}
+                            height={300}
+                            className="md:hidden absolute mx-auto object-cover inset-x-0 lg:object-top w-auto h-full opacity-50 pointer-events-none"
                           />
                         </div>
                         <div className="flex flex-col justify-center md:w-2/3 gap-1 p-3">
@@ -180,7 +188,7 @@ const TicketingFlow = () => {
                           </p>
                         </div>
                       </div>
-                      {!hasPlatinumTicket && <TicketPresence />}
+                      <TicketPresence />
                     </div>
                   </m.div>
                 )}

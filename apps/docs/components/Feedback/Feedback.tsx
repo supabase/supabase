@@ -10,7 +10,7 @@ import {
   useState,
 } from 'react'
 
-import { useIsLoggedIn } from 'common'
+import { type Database, useIsLoggedIn } from 'common'
 import { Button, cn } from 'ui'
 
 import { useSendFeedbackMutation } from '~/lib/fetch/feedback'
@@ -76,7 +76,7 @@ function Feedback() {
   const pathname = usePathname()
   const sendTelemetryEvent = useSendTelemetryEvent()
   const { mutate: sendFeedbackComment } = useSendFeedbackMutation()
-  const supabase = useSupabaseClient()
+  const supabase = useSupabaseClient<Database>()
 
   const unanswered = state.type === 'unanswered'
   const isYes = 'response' in state && state.response === 'yes'
@@ -117,8 +117,14 @@ function Feedback() {
     }, 100)
   }
 
-  async function handleSubmit({ page, comment }: FeedbackFields) {
-    sendFeedbackComment({ message: comment, pathname: page })
+  async function handleSubmit({ page, comment, title }: FeedbackFields) {
+    sendFeedbackComment({
+      message: comment,
+      pathname: page,
+      title,
+      // @ts-expect-error -- can't click this button without having a state.response
+      isHelpful: state.response === 'yes',
+    })
     setModalOpen(false)
     refocusButton()
   }
@@ -184,14 +190,12 @@ function Feedback() {
           )}
         >
           <span className="text-foreground-light">Thanks for your feedback!</span>
-          {/**
           <FeedbackButton
             ref={feedbackButtonRef}
             onClick={() => setModalOpen(true)}
             isYes={isYes}
             visible={!unanswered}
           />
-          */}
         </div>
       </div>
       <FeedbackModal

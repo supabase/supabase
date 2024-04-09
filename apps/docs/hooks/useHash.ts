@@ -30,7 +30,7 @@ const useHash = () => {
     [hash]
   )
 
-  return [hash, updateHash]
+  return [hash, updateHash] as const
 }
 
 export default useHash

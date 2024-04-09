@@ -1346,7 +1346,7 @@ functions:
     notes: |
       - Sends an invite link to the user's email address.
       - The `inviteUserByEmail()` method is typically used by administrators to invite users to join the application.
-      - Note that PKCE is not supported when using `inviteUserByEmail`. This is because the browser initiating the invite is often different from the browser acecpting the invite which makes it difficult to provide the security guarantees required of the PKCE flow.
+      - Note that PKCE is not supported when using `inviteUserByEmail`. This is because the browser initiating the invite is often different from the browser accepting the invite which makes it difficult to provide the security guarantees required of the PKCE flow.
     examples:
       - id: invite-a-user
         name: Invite a user
