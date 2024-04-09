@@ -503,10 +503,10 @@ Partial search is particularly useful when you want to find matches on substring
 
 ### Implementing partial search
 
-You can use the `:*` syntax with to_tsquery(). Here's an example that searches for any book titles beginning with "Lit":
+You can use the `:*` syntax with `to_tsquery()`. Here's an example that searches for any book titles beginning with "Lit":
 
 ```sql
-SELECT title FROM books WHERE to_tsvector(title) @@ to_tsquery('Lit:*');
+select title from books where to_tsvector(title) @@ to_tsquery('Lit:*');
 ```
 
 ### Extending functionality with RPC
@@ -525,12 +525,13 @@ After creating this function, you can invoke it from your application using the 
 <TabPanel id="sql" label="SQL">
 
 ```sql
-CREATE OR REPLACE FUNCTION search_books_by_title_prefix(prefix text)
-RETURNS SETOF books AS $$
-BEGIN
-  RETURN QUERY SELECT * FROM books WHERE to_tsvector('english', title) @@ to_tsquery(prefix || ':*');
-END;
-$$ LANGUAGE plpgsql;
+create or replace function search_books_by_title_prefix(prefix text)
+return setof books AS $$
+begin
+  return query
+  select * from books where to_tsvector('english', title) @@ to_tsquery(prefix || ':*');
+end;
+$$ language plpgsql;
 ```
 
 </TabPanel>
@@ -558,7 +559,7 @@ val result = supabase.postgrest.rpc("search_books_by_title_prefix", rpcParams)
 </TabPanel>
 </Tabs>
 
-This function takes a prefix parameter and returns all books where the title contains a word starting with that prefix. The `:*` operator is used to denote a prefix match in the to_tsquery() function.
+This function takes a prefix parameter and returns all books where the title contains a word starting with that prefix. The `:*` operator is used to denote a prefix match in the `to_tsquery()` function.
 
 ## Handling spaces in queries
 
