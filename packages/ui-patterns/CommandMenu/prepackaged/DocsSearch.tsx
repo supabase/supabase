@@ -1,3 +1,5 @@
+import { Book } from 'lucide-react'
+
 import { useRegisterCommands } from '../api/hooks/commandsHooks'
 import { useRegisterPage, useSetPage } from '../api/hooks/pagesHooks'
 import type { ICommand, UseCommandOptions } from '../api/types'
@@ -23,10 +25,11 @@ const useDocsSearchCommands = ({
     [
       {
         id: 'search-docs',
-        name: 'Search docs',
+        name: 'Search the docs',
         action: () => {
           setCommandPage(DOCS_SEARCH_COMMANDS.PAGE_NAME)
         },
+        icon: () => <Book />,
       },
     ].map(modify),
     options

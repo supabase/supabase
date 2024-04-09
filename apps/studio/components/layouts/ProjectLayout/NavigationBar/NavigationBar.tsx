@@ -24,7 +24,7 @@ import {
   cn,
   themes,
 } from 'ui'
-import { useOpenCommandMenu } from 'ui-patterns/CommandMenu'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 import { useIsAPIDocsSidePanelEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useSignOut } from 'lib/auth'
@@ -59,7 +59,7 @@ const NavigationBar = () => {
   const navLayoutV2 = useFlag('navigationLayoutV2')
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const [userDropdownOpen, setUserDropdownOpenState] = useState(false)
-  const setCommandMenuOpen = useOpenCommandMenu()
+  const setCommandMenuOpen = useSetCommandMenuOpen()
 
   const {
     projectAuthAll: authEnabled,

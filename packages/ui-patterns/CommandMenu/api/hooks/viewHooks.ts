@@ -14,7 +14,7 @@ const useCommandMenuVisible = () => {
   return open
 }
 
-const useOpenCommandMenu = () => {
+const useSetCommandMenuOpen = () => {
   const { viewState } = useCommandContext()
   const { setOpen } = useSnapshot(viewState)
   return setOpen
@@ -26,4 +26,9 @@ const useToggleCommandMenu = () => {
   return toggleOpen
 }
 
-export { useCommandMenuInitiated, useCommandMenuVisible, useOpenCommandMenu, useToggleCommandMenu }
+export {
+  useCommandMenuInitiated,
+  useCommandMenuVisible,
+  useSetCommandMenuOpen,
+  useToggleCommandMenu,
+}

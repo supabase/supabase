@@ -1,4 +1,5 @@
-import { forwardRef } from 'react'
+import { useRouter } from 'next/navigation'
+import { type PropsWithChildren, type ReactNode, forwardRef } from 'react'
 
 import { CommandItem_Shadcn_, cn } from 'ui'
 
@@ -7,9 +8,12 @@ type ICommand = IActionCommand | IRouteCommand
 type IBaseCommand = {
   id: string
   name: string
+  badge?: () => ReactNode
+  className?: string
+  forceMount?: boolean
+  icon?: () => ReactNode
   keywords?: Array<string>
   shortcut?: string
-  forceMount?: boolean
 }
 
 type IActionCommand = IBaseCommand & {
@@ -20,13 +24,87 @@ type IRouteCommand = IBaseCommand & {
   route: `/${string}`
 }
 
+const isActionCommand = (command: ICommand): command is IActionCommand => 'action' in command
+const isRouteCommand = (command: ICommand): command is IRouteCommand => 'route' in command
+
+interface CommandItemProps extends React.ComponentPropsWithoutRef<typeof CommandItem_Shadcn_> {
+  command: ICommand
+}
+
 const CommandItem = forwardRef<
   React.ElementRef<typeof CommandItem_Shadcn_>,
-  React.ComponentPropsWithoutRef<typeof CommandItem_Shadcn_>
->(({ className, ...props }, ref) => (
-  <CommandItem_Shadcn_ ref={ref} className={cn(className)} {...props} />
-))
+  PropsWithChildren<CommandItemProps>
+>(({ children, className, command: _command, ...props }, ref) => {
+  const router = useRouter()
+
+  const command = _command as ICommand // strip the readonly applied from the proxy
+
+  return (
+    <CommandItem_Shadcn_
+      ref={ref}
+      forceMount={command.forceMount}
+      onSelect={
+        isActionCommand(command)
+          ? command.action
+          : isRouteCommand(command)
+            ? () => router.push(command.route)
+            : () => {}
+      }
+      className={cn(
+        'cursor-default',
+        'select-none',
+        'items-center',
+        'rounded-md',
+        'text-sm',
+        'group',
+        'py-3',
+        'text-foreground-light',
+        'relative',
+        'flex',
+        isRouteCommand(command)
+          ? `
+  bg-transparent
+  border
+  border-overlay/90
+  px-5
+  transition-all
+  outline-none
+  aria-selected:border-overlay
+  aria-selected:bg-overlay-hover/90
+  aria-selected:shadow-sm
+  aria-selected:scale-[100.3%]
+  data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
+          : isRouteCommand(command)
+            ? `
+  px-2
+  transition-all
+  outline-none
+  aria-selected:bg-overlay-hover/90
+  data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
+            : `
+  px-2
+  aria-selected:bg-overlay-hover/80
+  aria-selected:backdrop-filter
+  aria-selected:backdrop-blur-md
+  data-[disabled]:pointer-events-none
+  data-[disabled]:opacity-50
+  `,
+        className,
+        command.className
+      )}
+      {...props}
+    >
+      <div className="w-full flex flex-row justify-between items-center">
+        <div className="flex flex-row gap-2 flex-grow items-center">
+          {command.icon?.()}
+          {children}
+        </div>
+        {command.badge?.()}
+      </div>
+    </CommandItem_Shadcn_>
+  )
+})
 CommandItem.displayName = CommandItem_Shadcn_.displayName
 
-export { CommandItem }
+export { CommandItem, isActionCommand, isRouteCommand }
 export type { ICommand }

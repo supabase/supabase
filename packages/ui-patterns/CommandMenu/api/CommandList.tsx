@@ -1,35 +1,47 @@
-import { useRouter } from 'next/navigation'
-import { forwardRef } from 'react'
+import { forwardRef, useRef } from 'react'
 
 import { CommandList_Shadcn_, cn } from 'ui'
 
 import { useCommands } from './hooks/commandsHooks'
-import { CommandItem } from '../internal/Command'
+import { useQuery } from './hooks/queryHooks'
+import { CommandItem, type ICommand } from '../internal/Command'
 import { CommandEmpty } from '../internal/CommandEmpty'
 import { CommandGroup } from '../internal/CommandGroup'
+import { TextHighlighter } from '../internal/TextHighlighter'
 
 const CommandList = forwardRef<
   React.ElementRef<typeof CommandList_Shadcn_>,
   React.ComponentPropsWithoutRef<typeof CommandList_Shadcn_>
 >(({ className, ...props }, ref) => {
   const commandSections = useCommands()
-  const router = useRouter()
+  const query = useQuery()
+
+  const innerRef = useRef<HTMLDivElement | undefined>(undefined)
+  const setInnerRef = (elem: HTMLDivElement) => (innerRef.current = elem)
+
+  const setRef = (elem: HTMLDivElement) => {
+    if (ref) typeof ref === 'function' ? ref(elem) : (ref.current = elem)
+    setInnerRef(elem)
+  }
 
   return (
-    <CommandList_Shadcn_ ref={ref} className={cn(className)} {...props}>
-      {/* Need to check for length because there's a bug in cmdk when only force-mounted items are left. */}
-      {!commandSections.length && <CommandEmpty>No results found.</CommandEmpty>}
+    <CommandList_Shadcn_
+      ref={setRef}
+      className={cn('overflow-y-auto overflow-x-hidden bg-transparent', className)}
+      {...props}
+    >
+      <CommandEmpty listRef={innerRef}>No results found.</CommandEmpty>
       {commandSections.map((section) => (
         <CommandGroup key={section.id} heading={section.name} forceMount={section.forceMount}>
-          {section.commands.map((command) => (
-            <CommandItem
-              key={command.id}
-              forceMount={command.forceMount}
-              onSelect={'action' in command ? command.action : () => router.push(command.route)}
-            >
-              {command.name}
-            </CommandItem>
-          ))}
+          {section.commands.map((_command) => {
+            const command = _command as ICommand // strip the readonly applied from the proxy
+
+            return (
+              <CommandItem key={command.id} command={command}>
+                <TextHighlighter query={query}>{command.name}</TextHighlighter>
+              </CommandItem>
+            )
+          })}
         </CommandGroup>
       ))}
     </CommandList_Shadcn_>

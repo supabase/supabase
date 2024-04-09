@@ -8,6 +8,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import {
+  AiIconAnimation,
   Button,
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -16,7 +17,6 @@ import {
   Input_Shadcn_,
   cn,
 } from 'ui'
-import { AiIcon } from 'ui-patterns/Cmdk'
 import * as z from 'zod'
 
 import { useLocalStorageQuery, useSelectedOrganization } from 'hooks'
@@ -182,7 +182,10 @@ export const AiAssistantPanel = ({
               <FormItem_Shadcn_>
                 <FormControl_Shadcn_>
                   <div className="relative">
-                    <AiIcon className="absolute top-2 left-3 [&>div>div]:border-black dark:[&>div>div]:border-white" />
+                    <AiIconAnimation
+                      allowHoverEffect
+                      className="absolute top-2 left-3 [&>div>div]:border-black dark:[&>div>div]:border-white"
+                    />
                     <Input_Shadcn_
                       {...field}
                       autoComplete="off"

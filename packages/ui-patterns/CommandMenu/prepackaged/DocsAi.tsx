@@ -2,6 +2,8 @@ import { useRegisterCommands } from '../api/hooks/commandsHooks'
 import { useRegisterPage, useSetPage } from '../api/hooks/pagesHooks'
 import type { ICommand, UseCommandOptions } from '../api/types'
 
+import { AiIconAnimation } from 'ui'
+
 const DOCS_AI_COMMANDS = {
   PAGE_NAME: 'docs-ai',
   SECTION_NAME: 'Docs',
@@ -16,6 +18,7 @@ const useDocsAiCommands = ({
   options,
 }: { modify?: (command: ICommand) => ICommand; options?: UseCommandOptions } = {}) => {
   const setCommandPage = useSetPage()
+
   useRegisterPage(DOCS_AI_COMMANDS.PAGE_NAME, DocsAiInterface)
 
   useRegisterCommands(
@@ -27,6 +30,8 @@ const useDocsAiCommands = ({
         action: () => {
           setCommandPage(DOCS_AI_COMMANDS.PAGE_NAME)
         },
+        icon: () => <AiIconAnimation />,
+        className: 'text-brand',
       },
     ].map(modify),
     options

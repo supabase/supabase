@@ -1,10 +1,11 @@
+import { User } from 'lucide-react'
+import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useSignOut } from 'lib/auth'
 import { useProfile } from 'lib/profile'
-import { useTheme } from 'next-themes'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,17 +17,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuShortcut,
   DropdownMenuTrigger,
-  IconUser,
 } from 'ui'
-import { useCommandMenu } from 'ui-patterns/Cmdk'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 
 const UserSettingsDropdown = () => {
   const signOut = useSignOut()
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const { profile } = useProfile()
-  /* const { setIsOpen: setCommandMenuOpen } = useCommandMenu() */
   const { theme, setTheme } = useTheme()
+  const setCommandMenuOpen = useSetCommandMenuOpen()
 
   const onClickLogout = async () => {
     await signOut()
@@ -40,7 +40,7 @@ const UserSettingsDropdown = () => {
           id="user-settings-dropdown"
           className="flex items-center justify-center border font-bold rounded-full h-7 w-7 text-foreground-light bg-surface-100"
         >
-          {profile?.first_name ? profile?.first_name?.[0] : <IconUser size={14} strokeWidth={2} />}
+          {profile?.first_name ? profile?.first_name?.[0] : <User size={14} strokeWidth={2} />}
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-60">
@@ -65,7 +65,7 @@ const UserSettingsDropdown = () => {
           </DropdownMenuItem>
 
           <DropdownMenuSeparator />
-          {/* <DropdownMenuItem
+          <DropdownMenuItem
             className="cursor-pointer"
             onSelect={() => {
               setOpen(false)
@@ -74,7 +74,7 @@ const UserSettingsDropdown = () => {
           >
             <span>Command menu</span>
             <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
-          </DropdownMenuItem> */}
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuLabel>Theme</DropdownMenuLabel>
           <DropdownMenuRadioGroup

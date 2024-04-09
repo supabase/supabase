@@ -6,7 +6,7 @@ import { FC } from 'react'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { Button, IconCommand, IconGitHub, IconSearch } from 'ui'
 
-import { useOpenCommandMenu } from 'ui-patterns/CommandMenu'
+import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 const TopNavBar: FC = () => {
@@ -15,7 +15,7 @@ const TopNavBar: FC = () => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
 
-  const setCommandMenuOpen = useOpenCommandMenu()
+  const setCommandMenuOpen = useSetCommandMenuOpen()
 
   return (
     <nav

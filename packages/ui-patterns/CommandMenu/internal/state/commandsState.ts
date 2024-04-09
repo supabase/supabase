@@ -19,7 +19,7 @@ type UseCommandOptions = {
 
 type ICommandsState = {
   commandSections: Array<ICommandSection>
-  registerNewSection: (
+  registerSection: (
     sectionName: ICommandSectionName,
     commands: Array<ICommand>,
     options?: UseCommandOptions
@@ -29,7 +29,7 @@ type ICommandsState = {
 const initCommandsState = () => {
   const state: ICommandsState = proxy({
     commandSections: [],
-    registerNewSection: (sectionName, commands, options) => {
+    registerSection: (sectionName, commands, options) => {
       let editIndex = state.commandSections.findIndex((section) => section.name === sectionName)
       if (editIndex === -1) editIndex = state.commandSections.length
       state.commandSections[editIndex] ??= section$new(sectionName)

@@ -16,9 +16,9 @@ const useRegisterCommands = (
   options?: UseCommandOptions
 ) => {
   const { commandsState } = useCommandContext()
-  const { registerNewSection } = useSnapshot(commandsState)
+  const { registerSection } = useSnapshot(commandsState)
 
-  useEffect(() => registerNewSection(sectionName, commands, options), [registerNewSection])
+  useEffect(() => registerSection(sectionName, commands, options), [registerSection])
 }
 
 export { useCommands, useRegisterCommands }

@@ -1,13 +1,43 @@
-import { forwardRef } from 'react'
+import { type PropsWithChildren, type RefObject, useMemo, useState } from 'react'
 
-import { CommandEmpty_Shadcn_ } from 'ui'
+import { cn } from 'ui'
 
-const CommandEmpty = forwardRef<
-  React.ElementRef<typeof CommandEmpty_Shadcn_>,
-  React.ComponentPropsWithoutRef<typeof CommandEmpty_Shadcn_>
->((props, ref) => (
-  <CommandEmpty_Shadcn_ ref={ref} className="py-6 text-center text-sm" {...props} />
-))
-CommandEmpty.displayName = CommandEmpty_Shadcn_.displayName
+import { useQuery } from '../api/hooks/queryHooks'
+
+/**
+ * Hacking a bug around cmdk where the empty state will show even when there
+ * are force-mounted items.
+ */
+const CommandEmpty = ({
+  children,
+  className,
+  listRef,
+  ...props
+}: PropsWithChildren<{
+  className?: string
+  listRef: RefObject<HTMLDivElement | undefined>
+}>) => {
+  const query = useQuery()
+
+  const [render, setRender] = useState(false)
+  useMemo(() => {
+    if (!query) setRender(false)
+    setTimeout(() => {
+      console.log(query)
+      console.log(listRef?.current?.querySelector('[cmdk-item]'))
+      setRender(!listRef?.current?.querySelector('[cmdk-item]'))
+    })
+  }, [query])
+
+  console.log('render', render)
+
+  return (
+    render && (
+      <div className={cn('py-6 text-center text-sm text-foreground-muted', className)} {...props}>
+        {children}
+      </div>
+    )
+  )
+}
 
 export { CommandEmpty }

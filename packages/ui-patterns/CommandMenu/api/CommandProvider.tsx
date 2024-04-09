@@ -33,7 +33,10 @@ const CommandShortcut = () => {
 
   useEffect(() => {
     const handleKeydown = (evt: KeyboardEvent) => {
-      if (evt.key === 'k' && evt.metaKey) toggleOpen()
+      if (evt.key === 'k' && evt.metaKey) {
+        evt.preventDefault()
+        toggleOpen()
+      }
     }
 
     document.addEventListener('keydown', handleKeydown)
