@@ -1,8 +1,7 @@
-import { partition, sortBy } from 'lodash'
+import { sortBy } from 'lodash'
 import { Check, ExternalLink, Loader } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
-import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { getHumanReadableTitle } from 'components/interfaces/Reports/ReportLints.utils'
 import ReportLintsTableRow from 'components/interfaces/Reports/ReportLintsTableRow'
 import { DatabaseLayout } from 'components/layouts'
@@ -11,16 +10,9 @@ import Table from 'components/to-be-cleaned/Table'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms'
 import { LINT_TYPES, useProjectLintsQuery } from 'data/lint/lint-query'
-import { useLocalStorageQuery, useSelectedProject } from 'hooks'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useSelectedProject } from 'hooks'
 import type { NextPageWithLayout } from 'types'
-import {
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  Accordion_Shadcn_,
-  Button,
-  LoadingLine,
-} from 'ui'
+import { Button, LoadingLine } from 'ui'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -28,10 +20,10 @@ const ProjectLints: NextPageWithLayout = () => {
     levels: [] as string[],
     types: [] as string[],
   })
-  const [lintIgnoreList] = useLocalStorageQuery<string[]>(
-    LOCAL_STORAGE_KEYS.PROJECT_LINT_IGNORE_LIST,
-    []
-  )
+  // const [lintIgnoreList] = useLocalStorageQuery<string[]>(
+  //   LOCAL_STORAGE_KEYS.PROJECT_LINT_IGNORE_LIST,
+  //   []
+  // )
 
   const { data, isLoading, isRefetching, refetch } = useProjectLintsQuery({
     projectRef: project?.ref,
@@ -46,9 +38,10 @@ const ProjectLints: NextPageWithLayout = () => {
     return 3
   })
 
-  const [ignoredLints, activeLints] = partition(lints, (lint) =>
-    lintIgnoreList.includes(lint.cache_key)
-  )
+  const activeLints = lints
+  // const [ignoredLints, activeLints] = partition(lints, (lint) =>
+  //   lintIgnoreList.includes(lint.cache_key)
+  // )
   const filteredLints = useMemo(() => {
     return activeLints
       .filter((x) => (filters.levels.length > 0 ? filters.levels.includes(x.level) : x))
@@ -137,7 +130,7 @@ const ProjectLints: NextPageWithLayout = () => {
               <Table.th key="header-type" className="py-2">
                 Problem
               </Table.th>,
-              <Table.th key="header-expand" className="py-2 text-right"></Table.th>,
+              // <Table.th key="header-expand" className="py-2 text-right"></Table.th>,
             ]}
             body={[
               <Table.tr key="loader">
@@ -183,7 +176,7 @@ const ProjectLints: NextPageWithLayout = () => {
           />
         </div>
 
-        {ignoredLints.length > 0 && (
+        {/* {ignoredLints.length > 0 && (
           <div className="col-span-12 flex flex-col text-sm max-w-none gap-8 py-4">
             <Accordion_Shadcn_ type="single" collapsible>
               <AccordionItem_Shadcn_ value="1" className="border-none">
@@ -223,7 +216,7 @@ const ProjectLints: NextPageWithLayout = () => {
               </AccordionItem_Shadcn_>
             </Accordion_Shadcn_>
           </div>
-        )}
+        )} */}
       </ScaffoldSection>
     </ScaffoldContainer>
   )
