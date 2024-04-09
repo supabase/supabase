@@ -402,7 +402,7 @@ select
         c.relname,
         array_agg(p.polname order by p.polname)
     ) as detail,
-    'https://supabase.github.io/splinter/0007_policy_exists_rls_disabled' as remediation,
+    'https://supabase.com/docs/guides/database/database-linter?lint=0007_policy_exists_rls_disabled' as remediation,
     jsonb_build_object(
         'schema', n.nspname,
         'name', c.relname,
@@ -441,7 +441,7 @@ select
         n.nspname,
         c.relname
     ) as detail,
-    'https://supabase.github.io/splinter/0008_rls_enabled_no_policy' as remediation,
+    'https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy' as remediation,
     jsonb_build_object(
         'schema', n.nspname,
         'name', c.relname,
@@ -482,7 +482,7 @@ select
         c.relname,
         array_agg(pi.indexname order by pi.indexname)
     ) as detail,
-    'https://supabase.github.io/splinter/0009_duplicate_index' as remediation,
+    'https://supabase.com/docs/guides/database/database-linter?lint=0009_duplicate_index' as remediation,
     jsonb_build_object(
         'schema', n.nspname,
         'name', c.relname,
@@ -532,7 +532,7 @@ select
         n.nspname,
         c.relname
     ) as detail,
-    'https://supabase.github.io/splinter/0010_security_definer_view' as remediation,
+    'https://supabase.com/docs/guides/database/database-linter?lint=0010_security_definer_view' as remediation,
     jsonb_build_object(
         'schema', n.nspname,
         'name', c.relname,
@@ -571,7 +571,7 @@ select
         n.nspname,
         p.proname
     ) as detail,
-    'https://supabase.github.io/splinter/0011_function_search_path_mutable' as remediation,
+    'https://supabase.com/docs/guides/database/database-linter?lint=0011_function_search_path_mutable' as remediation,
     jsonb_build_object(
         'schema', n.nspname,
         'name', p.proname,
@@ -605,7 +605,7 @@ select
         n.nspname,
         c.relname
     ) as detail,
-    'https://supabase.github.io/splinter/0013_rls_disabled_in_public' as remediation,
+    'https://supabase.com/docs/guides/database/database-linter?lint=0013_rls_disabled_in_public' as remediation,
     jsonb_build_object(
         'schema', n.nspname,
         'name', c.relname,
