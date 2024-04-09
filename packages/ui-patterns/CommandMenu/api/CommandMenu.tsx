@@ -1,25 +1,17 @@
-import { Command as CommandPrimitive } from 'cmdk'
-import { type PropsWithChildren, forwardRef, useEffect } from 'react'
+import { type PropsWithChildren, forwardRef } from 'react'
 
-import { Dialog, DialogContent, cn } from 'ui'
+import { Command_Shadcn_, Dialog, DialogContent, cn } from 'ui'
 
 import { usePageComponent } from './hooks/pagesHooks'
 import { useCommandMenuVisible, useToggleCommandMenu } from './hooks/viewHooks'
 
 const CommandWrapper = forwardRef<
-  React.ElementRef<typeof CommandPrimitive>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive>
+  React.ElementRef<typeof Command_Shadcn_>,
+  React.ComponentPropsWithoutRef<typeof Command_Shadcn_>
 >(({ className, ...props }, ref) => (
-  <CommandPrimitive
-    ref={ref}
-    className={cn(
-      'flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground',
-      className
-    )}
-    {...props}
-  />
+  <Command_Shadcn_ ref={ref} className={cn(className)} {...props} />
 ))
-CommandWrapper.displayName = CommandPrimitive.displayName
+CommandWrapper.displayName = Command_Shadcn_.displayName
 
 const PageSwitch = ({ children }: PropsWithChildren) => {
   const PageComponent = usePageComponent()
@@ -33,7 +25,7 @@ const CommandMenu = ({ children }: PropsWithChildren) => {
 
   return (
     <Dialog open={open} onOpenChange={toggleOpen}>
-      <DialogContent className="overflow-hidden p-0 shadow-lg">
+      <DialogContent>
         <PageSwitch>{children}</PageSwitch>
       </DialogContent>
     </Dialog>

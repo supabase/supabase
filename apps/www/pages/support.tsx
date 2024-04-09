@@ -4,7 +4,6 @@ import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import Typed from 'typed.js'
 import { Button, ButtonProps, cn, IconCommand, IconSearch } from 'ui'
-import { SearchButton } from 'ui-patterns/Cmdk'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import Panel from '~/components/Panel'
@@ -53,7 +52,7 @@ const Index = () => {
               {data.hero.h1}
             </h1>
             <p className="h1 tracking-[-1px]">{data.hero.title}</p>
-            <SearchButton className="mx-auto w-full max-w-lg">
+            {/* <SearchButton className="mx-auto w-full max-w-lg">
               <div
                 className="
                   flex
@@ -83,7 +82,7 @@ const Index = () => {
                   </div>
                 </div>
               </div>
-            </SearchButton>
+            </SearchButton> */}
           </SectionContainer>
         </div>
         <SectionContainer className="text grid gap-5 md:grid-cols-2 xl:grid-cols-3 max-w-7xl !pb-8">

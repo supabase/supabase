@@ -10,7 +10,7 @@ import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { PortalToast, themes } from 'ui'
-import { CommandMenuProvider } from 'ui-patterns/Cmdk'
+import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
 import MetaFaviconsPagesRouter, {
@@ -123,10 +123,10 @@ export default function App({ Component, pageProps }: AppProps) {
             disableTransitionOnChange
             forcedTheme={forceDarkMode ? 'dark' : undefined}
           >
-            <CommandMenuProvider site="website">
+            <CommandProvider>
               <PortalToast />
               <Component {...pageProps} />
-            </CommandMenuProvider>
+            </CommandProvider>
           </ThemeProvider>
         </AuthProvider>
       </SessionContextProvider>

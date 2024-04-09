@@ -1,7 +1,6 @@
-import { Command as CommandPrimitive } from 'cmdk'
 import { forwardRef } from 'react'
 
-import { cn } from 'ui'
+import { CommandItem_Shadcn_, cn } from 'ui'
 
 type ICommand = IActionCommand | IRouteCommand
 
@@ -22,19 +21,12 @@ type IRouteCommand = IBaseCommand & {
 }
 
 const CommandItem = forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Item>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
+  React.ElementRef<typeof CommandItem_Shadcn_>,
+  React.ComponentPropsWithoutRef<typeof CommandItem_Shadcn_>
 >(({ className, ...props }, ref) => (
-  <CommandPrimitive.Item
-    ref={ref}
-    className={cn(
-      'relative flex cursor-default select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none aria-selected:bg-brand-200 aria-selected:text-brand data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-      className
-    )}
-    {...props}
-  />
+  <CommandItem_Shadcn_ ref={ref} className={cn(className)} {...props} />
 ))
-CommandItem.displayName = CommandPrimitive.Item.displayName
+CommandItem.displayName = CommandItem_Shadcn_.displayName
 
 export { CommandItem }
 export type { ICommand }

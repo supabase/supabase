@@ -1,8 +1,7 @@
-import { Command as CommandPrimitive } from 'cmdk'
 import { useRouter } from 'next/navigation'
 import { forwardRef } from 'react'
 
-import { cn } from 'ui'
+import { CommandList_Shadcn_, cn } from 'ui'
 
 import { useCommands } from './hooks/commandsHooks'
 import { CommandItem } from '../internal/Command'
@@ -10,21 +9,18 @@ import { CommandEmpty } from '../internal/CommandEmpty'
 import { CommandGroup } from '../internal/CommandGroup'
 
 const CommandList = forwardRef<
-  React.ElementRef<typeof CommandPrimitive.List>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.List>
+  React.ElementRef<typeof CommandList_Shadcn_>,
+  React.ComponentPropsWithoutRef<typeof CommandList_Shadcn_>
 >(({ className, ...props }, ref) => {
   const commandSections = useCommands()
   const router = useRouter()
 
   return (
-    <CommandPrimitive.List
-      ref={ref}
-      className={cn('max-h-[300px] overflow-y-auto overflow-x-hidden', className)}
-      {...props}
-    >
-      <CommandEmpty>No results found.</CommandEmpty>
+    <CommandList_Shadcn_ ref={ref} className={cn(className)} {...props}>
+      {/* Need to check for length because there's a bug in cmdk when only force-mounted items are left. */}
+      {!commandSections.length && <CommandEmpty>No results found.</CommandEmpty>}
       {commandSections.map((section) => (
-        <CommandGroup key={section.id} heading={section.name}>
+        <CommandGroup key={section.id} heading={section.name} forceMount={section.forceMount}>
           {section.commands.map((command) => (
             <CommandItem
               key={command.id}
@@ -36,9 +32,9 @@ const CommandList = forwardRef<
           ))}
         </CommandGroup>
       ))}
-    </CommandPrimitive.List>
+    </CommandList_Shadcn_>
   )
 })
-CommandList.displayName = CommandPrimitive.List.displayName
+CommandList.displayName = CommandList_Shadcn_.displayName
 
 export { CommandList }

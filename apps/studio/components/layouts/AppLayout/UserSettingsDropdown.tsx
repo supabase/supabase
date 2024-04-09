@@ -25,7 +25,7 @@ const UserSettingsDropdown = () => {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const { profile } = useProfile()
-  const { setIsOpen: setCommandMenuOpen } = useCommandMenu()
+  /* const { setIsOpen: setCommandMenuOpen } = useCommandMenu() */
   const { theme, setTheme } = useTheme()
 
   const onClickLogout = async () => {
@@ -65,7 +65,7 @@ const UserSettingsDropdown = () => {
           </DropdownMenuItem>
 
           <DropdownMenuSeparator />
-          <DropdownMenuItem
+          {/* <DropdownMenuItem
             className="cursor-pointer"
             onSelect={() => {
               setOpen(false)
@@ -74,7 +74,7 @@ const UserSettingsDropdown = () => {
           >
             <span>Command menu</span>
             <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
-          </DropdownMenuItem>
+          </DropdownMenuItem> */}
           <DropdownMenuSeparator />
           <DropdownMenuLabel>Theme</DropdownMenuLabel>
           <DropdownMenuRadioGroup

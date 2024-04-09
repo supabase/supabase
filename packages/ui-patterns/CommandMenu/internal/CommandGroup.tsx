@@ -1,21 +1,13 @@
-import { Command as CommandPrimitive } from 'cmdk'
 import { forwardRef } from 'react'
 
-import { cn } from 'ui'
+import { CommandGroup_Shadcn_, cn } from 'ui'
 
 const CommandGroup = forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Group>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Group>
+  React.ElementRef<typeof CommandGroup_Shadcn_>,
+  React.ComponentPropsWithoutRef<typeof CommandGroup_Shadcn_>
 >(({ className, ...props }, ref) => (
-  <CommandPrimitive.Group
-    ref={ref}
-    className={cn(
-      'overflow-hidden p-1 text-foreground [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:py-1.5 [&_[cmdk-group-heading]]:text-xs [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground',
-      className
-    )}
-    {...props}
-  />
+  <CommandGroup_Shadcn_ ref={ref} className={cn(className)} {...props} />
 ))
-CommandGroup.displayName = CommandPrimitive.Group.displayName
+CommandGroup.displayName = CommandGroup_Shadcn_.displayName
 
 export { CommandGroup }

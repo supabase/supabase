@@ -1,12 +1,13 @@
-import { Command as CommandPrimitive } from 'cmdk'
 import { forwardRef } from 'react'
 
+import { CommandEmpty_Shadcn_ } from 'ui'
+
 const CommandEmpty = forwardRef<
-  React.ElementRef<typeof CommandPrimitive.Empty>,
-  React.ComponentPropsWithoutRef<typeof CommandPrimitive.Empty>
+  React.ElementRef<typeof CommandEmpty_Shadcn_>,
+  React.ComponentPropsWithoutRef<typeof CommandEmpty_Shadcn_>
 >((props, ref) => (
-  <CommandPrimitive.Empty ref={ref} className="py-6 text-center text-sm" {...props} />
+  <CommandEmpty_Shadcn_ ref={ref} className="py-6 text-center text-sm" {...props} />
 ))
-CommandEmpty.displayName = CommandPrimitive.Empty.displayName
+CommandEmpty.displayName = CommandEmpty_Shadcn_.displayName
 
 export { CommandEmpty }

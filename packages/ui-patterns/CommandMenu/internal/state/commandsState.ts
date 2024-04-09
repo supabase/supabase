@@ -12,6 +12,7 @@ type OrderCommandsInstruction = (
   commandsToInsert: Array<ICommand>
 ) => Array<ICommand>
 type UseCommandOptions = {
+  forceMountSection?: boolean
   orderSection?: OrderSectionInstruction
   orderCommands?: OrderCommandsInstruction
 }
@@ -32,6 +33,8 @@ const initCommandsState = () => {
       let editIndex = state.commandSections.findIndex((section) => section.name === sectionName)
       if (editIndex === -1) editIndex = state.commandSections.length
       state.commandSections[editIndex] ??= section$new(sectionName)
+
+      if (options?.forceMountSection) state.commandSections[editIndex].forceMount = true
 
       state.commandSections =
         options?.orderSection?.(state.commandSections, editIndex) ?? state.commandSections
