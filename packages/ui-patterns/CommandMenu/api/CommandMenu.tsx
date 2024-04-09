@@ -8,6 +8,18 @@ import { useCurrentPage, usePageComponent, usePopPage } from './hooks/pagesHooks
 import { useQuery, useSetQuery } from './hooks/queryHooks'
 import { useCommandMenuVisible, useSetCommandMenuOpen } from './hooks/viewHooks'
 
+const commandWrapperClasses = cn(
+  'flex h-full w-full flex-col overflow-hidden',
+  '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
+  '[&_[cmdk-item]_svg]:h-5',
+  '[&_[cmdk-item]_svg]:w-5',
+  '[&_[cmdk-item]_svg]:stroke-1',
+  '[&_[cmdk-input-wrapper]_svg]:h-5',
+  '[&_[cmdk-input-wrapper]_svg]:w-5',
+
+  '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0'
+)
+
 const CommandWrapper = forwardRef<
   React.ElementRef<typeof Command_Shadcn_>,
   React.ComponentPropsWithoutRef<typeof Command_Shadcn_>
@@ -102,4 +114,4 @@ const CommandMenu = ({ children }: PropsWithChildren) => {
   )
 }
 
-export { CommandMenu }
+export { CommandMenu, CommandWrapper }
