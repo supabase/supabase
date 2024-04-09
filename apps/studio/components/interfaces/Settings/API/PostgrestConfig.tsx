@@ -19,11 +19,12 @@ import { useCheckPermissions } from 'hooks'
 import { Form, Input, InputNumber } from 'ui'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
 import { AlertCircle } from 'lucide-react'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 const PostgrestConfig = () => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
-  const { data: schemas } = useSchemasQuery({
+  const { data: schemas, isLoading: isLoadingSchemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -119,31 +120,40 @@ const PostgrestConfig = () => {
               ) : (
                 <>
                   <FormSection header={<FormSectionLabel>Exposed schemas</FormSectionLabel>}>
-                    <FormSectionContent loading={false}>
-                      {schema.length >= 1 && (
-                        <div className="grid gap-2">
-                          <MultiSelectV2
-                            options={schema}
-                            disabled={!canUpdatePostgrestConfig}
-                            value={(values?.db_schema ?? '').replace(/ /g, '').split(',')}
-                            placeholder="No schema available to choose. New ones will appear here."
-                            searchPlaceholder="Search for a schema"
-                            onChange={(event) => {
-                              let updatedValues: any = values
-                              updatedValues.db_schema = event.join(', ')
-                              resetForm({ values: updatedValues, initialValues: updatedValues })
-                              updateConfig({ ...updatedValues })
-                            }}
-                          />
-                          <p className="text-foreground-lighter text-sm">
-                            The schemas to expose in your API. Tables, views and stored procedures
-                            in these schemas will get API endpoints. The
-                            <code className="text-xs">storage</code> schema is protected by default.
-                          </p>
-                        </div>
-                      )}
-                    </FormSectionContent>
+                    {isLoadingSchemas ? (
+                      <div className="col-span-12 flex flex-col gap-2 lg:col-span-7">
+                        <ShimmeringLoader />
+                        <ShimmeringLoader className="w-3/4" />
+                      </div>
+                    ) : (
+                      <FormSectionContent loading={false}>
+                        {schema.length >= 1 && (
+                          <div className="grid gap-2">
+                            <MultiSelectV2
+                              options={schema}
+                              disabled={!canUpdatePostgrestConfig}
+                              value={(values?.db_schema ?? '').replace(/ /g, '').split(',')}
+                              placeholder="No schema available to choose. New ones will appear here."
+                              searchPlaceholder="Search for a schema"
+                              onChange={(event) => {
+                                let updatedValues: any = values
+                                updatedValues.db_schema = event.join(', ')
+                                resetForm({ values: updatedValues, initialValues: updatedValues })
+                                updateConfig({ ...updatedValues })
+                              }}
+                            />
+                            <p className="text-foreground-lighter text-sm">
+                              The schemas to expose in your API. Tables, views and stored procedures
+                              in these schemas will get API endpoints. The
+                              <code className="text-xs">storage</code> schema is protected by
+                              default.
+                            </p>
+                          </div>
+                        )}
+                      </FormSectionContent>
+                    )}
                   </FormSection>
+
                   <FormSection header={<FormSectionLabel>Extra search path</FormSectionLabel>}>
                     <FormSectionContent loading={false}>
                       <Input
