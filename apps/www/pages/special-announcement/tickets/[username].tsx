@@ -8,6 +8,7 @@ import { Session } from '@supabase/supabase-js'
 import { Button } from 'ui'
 import { SITE_URL, SPECIAL_ANNOUNCEMENT_URL } from '~/lib/constants'
 import supabase from '~/lib/supabaseMisc'
+import supabaseMiscAdmin from '~/lib/supabaseMiscAdmin'
 import dayjs from 'dayjs'
 
 import DefaultLayout from '~/components/Layouts/Default'
@@ -125,7 +126,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
   // fetch a specific user
   if (username) {
-    const { data } = await supabase!
+    const { data } = await supabaseMiscAdmin!
       .from('lw11_tickets_platinum')
       .select('name, username, ticketNumber, metadata, platinum, secret')
       .eq('username', username)
