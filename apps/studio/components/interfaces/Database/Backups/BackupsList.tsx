@@ -18,6 +18,7 @@ import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import BackupItem from './BackupItem'
 import BackupsEmpty from './BackupsEmpty'
+import { BeakerIcon } from '@heroicons/react/24/solid'
 
 const BackupsList = () => {
   const router = useRouter()
@@ -105,6 +106,7 @@ const BackupsList = () => {
           </>
         )}
       </div>
+      <BeakerIcon className="h-6 w-6 text-blue-500" />
       <ConfirmationModal
         size="medium"
         confirmLabel="Confirm restore"
