@@ -16,10 +16,18 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks'
-import { Form, Input, InputNumber } from 'ui'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Form,
+  Input,
+  InputNumber,
+} from 'ui'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, Info } from 'lucide-react'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import ReactMarkdown from 'react-markdown'
 
 const PostgrestConfig = () => {
   const { ref: projectRef } = useParams()
@@ -54,7 +62,6 @@ const PostgrestConfig = () => {
     })
   }
 
-  const permanentSchema = ['storage']
   const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
   const schema =
     schemas
@@ -67,9 +74,13 @@ const PostgrestConfig = () => {
           id: x.id,
           value: x.name,
           name: x.name,
-          disabled: indexOf(permanentSchema, x.name) >= 0 ? true : false,
         }
       }) ?? []
+
+  const isPublicSchemaEnabled = config?.db_schema
+    .split(',')
+    .map((name) => name.trim())
+    .includes('public')
 
   return (
     <Form id={formId} initialValues={initialValues} validate={() => {}} onSubmit={updateConfig}>
@@ -144,10 +155,24 @@ const PostgrestConfig = () => {
                             />
                             <p className="text-foreground-lighter text-sm">
                               The schemas to expose in your API. Tables, views and stored procedures
-                              in these schemas will get API endpoints. The
-                              <code className="text-xs">storage</code> schema is protected by
-                              default.
+                              in these schemas will get API endpoints.
                             </p>
+
+                            {!isPublicSchemaEnabled && (
+                              <Alert_Shadcn_ variant="default">
+                                <Info className="h-4 w-4" />
+                                <AlertTitle_Shadcn_>
+                                  <ReactMarkdown>The `public` schema is not exposed</ReactMarkdown>
+                                </AlertTitle_Shadcn_>
+                                <AlertDescription_Shadcn_ className="flex flex-col gap-3">
+                                  <ReactMarkdown>
+                                    API endpoints will not be created for the `public` schema. You
+                                    will not be able to make `supabase-js` or `postgrest-js` calls
+                                    to these tables and views.
+                                  </ReactMarkdown>
+                                </AlertDescription_Shadcn_>
+                              </Alert_Shadcn_>
+                            )}
                           </div>
                         )}
                       </FormSectionContent>
