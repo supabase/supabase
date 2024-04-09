@@ -497,6 +497,78 @@ val data = supabase.from("books").select {
 
 Notice how searching for `big` includes results with the word `bigger` (or `biggest`, etc).
 
+## Partial search
+
+Partial search is particularly useful when you want to find matches on substrings within your data.
+
+### Implementing partial search
+
+You can use the `:*` syntax with `to_tsquery()`. Here's an example that searches for any book titles beginning with "Lit":
+
+```sql
+select title from books where to_tsvector(title) @@ to_tsquery('Lit:*');
+```
+
+### Extending functionality with RPC
+
+To make the partial search functionality accessible through the API, you can wrap the search logic in a stored procedure.
+
+After creating this function, you can invoke it from your application using the SDK for your platform. Here's an example:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="language"
+>
+<TabPanel id="sql" label="SQL">
+
+```sql
+create or replace function search_books_by_title_prefix(prefix text)
+return setof books AS $$
+begin
+  return query
+  select * from books where to_tsvector('english', title) @@ to_tsquery(prefix || ':*');
+end;
+$$ language plpgsql;
+```
+
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.rpc('search_books_by_title_prefix', { prefix: 'Lit' })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase.rpc('search_books_by_title_prefix', params: { 'prefix': 'Lit' });
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val rpcParams = mapOf("prefix" to "Lit")
+val result = supabase.postgrest.rpc("search_books_by_title_prefix", rpcParams)
+```
+
+</TabPanel>
+</Tabs>
+
+This function takes a prefix parameter and returns all books where the title contains a word starting with that prefix. The `:*` operator is used to denote a prefix match in the `to_tsquery()` function.
+
+## Handling spaces in queries
+
+When you want the search term to include a phrase or multiple words, you can concatenate words using a `+` as a placeholder for space:
+
+```sql
+select * from search_books_by_title_prefix('Little+Puppy');
+```
+
 ## Creating indexes
 
 Now that we have Full Text Search working, let's create an `index`. This will allow Postgres to "build" the documents pre-emptively so that they
