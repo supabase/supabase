@@ -563,7 +563,9 @@ alter table notes enable row level security;
 revoke all on table notes from authenticated;
 revoke all on table notes from anon;
 
-grant all (id, note) on table notes to authenticated;
+grant all (note) on table notes to authenticated;
+grant select (id) on table notes to authenticated;
+grant delete on table notes to authenticated;
 
 create policy "Users can access and modify their own notes"
 on notes
