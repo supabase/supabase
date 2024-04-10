@@ -15,7 +15,7 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { QueryPerformanceSort } from '../Reports/Reports.queries'
-import { IndexSuggestion } from './IndexSuggestion'
+import { QueryIndexes } from './QueryIndexes'
 import { QueryDetail } from './QueryDetail'
 import {
   QUERY_PERFORMANCE_REPORTS,
@@ -27,9 +27,6 @@ interface QueryPerformanceGridProps {
 }
 
 export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformanceGridProps) => {
-  // [Joshen] This will come in another PR to integrate index advisor
-  const showIndexSuggestions = false
-
   const router = useRouter()
   const { preset } = useParams()
   const { isLoading } = queryPerformanceQuery
@@ -38,7 +35,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
     ? ({ column: router.query.sort, order: router.query.order } as QueryPerformanceSort)
     : undefined
 
-  const [view, setView] = useState<'details' | 'suggestion'>('details')
+  const [view, setView] = useState<'details' | 'indexes'>('details')
   const [sort, setSort] = useState<QueryPerformanceSort | undefined>(defaultSortValue)
   const [selectedRow, setSelectedRow] = useState<number>()
   const reportType =
@@ -82,6 +79,11 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
     return result
   })
 
+  // [Joshen] This will come in another PR to integrate index advisor
+  const selectedQuery =
+    selectedRow !== undefined ? queryPerformanceQuery.data[selectedRow]['query'] : undefined
+  const showIndexSuggestions = (selectedQuery ?? '').trim().toLowerCase().startsWith('select')
+
   const onSortChange = (column: string) => {
     let updatedSort = undefined
 
@@ -121,7 +123,10 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
         headerRowHeight={36}
         onSelectedCellChange={(props) => {
           const { rowIdx } = props
-          if (rowIdx >= 0) setSelectedRow(rowIdx)
+          if (rowIdx >= 0) {
+            setSelectedRow(rowIdx)
+            if (!props.row.query.trim().toLowerCase().startsWith('select')) setView('details')
+          }
         }}
         columns={columns}
         rows={queryPerformanceQuery?.data ?? []}
@@ -161,8 +166,8 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
             onClick={() => setSelectedRow(undefined)}
           />
           <Tabs_Shadcn_
+            value={view}
             className="flex flex-col h-full"
-            defaultValue={view}
             onValueChange={(value: any) => setView(value)}
           >
             <TabsList_Shadcn_ className="px-4 flex gap-x-4">
@@ -170,14 +175,14 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
                 Query details
               </TabsTrigger_Shadcn_>
               {showIndexSuggestions && (
-                <TabsTrigger_Shadcn_ value="suggestion" className="text-xs px-0">
-                  Index suggestion
+                <TabsTrigger_Shadcn_ value="indexes" className="text-xs px-0">
+                  Indexes
                 </TabsTrigger_Shadcn_>
               )}
             </TabsList_Shadcn_>
             <TabsContent_Shadcn_
               value="details"
-              className="mt-0 pt-4 flex-grow min-h-0 overflow-y-auto"
+              className="mt-0 pt-0 flex-grow min-h-0 overflow-y-auto"
             >
               <QueryDetail
                 reportType={reportType}
@@ -185,10 +190,10 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               />
             </TabsContent_Shadcn_>
             <TabsContent_Shadcn_
-              value="suggestion"
-              className="mt-0 pt-4 flex-grow min-h-0 overflow-y-auto"
+              value="indexes"
+              className="mt-0 pt-0 flex-grow min-h-0 overflow-y-auto"
             >
-              <IndexSuggestion />
+              <QueryIndexes selectedRow={queryPerformanceQuery.data[selectedRow]} />
             </TabsContent_Shadcn_>
           </Tabs_Shadcn_>
         </div>

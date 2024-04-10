@@ -1,8 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-hot-toast'
 
 import { executeSql } from 'data/sql/execute-sql-query'
 import type { ResponseError } from 'types'
+import { sqlKeys } from 'data/sql/keys'
 
 // [Joshen] This is just temporary while we wait for Index Advisor to be baked into the image itself
 
@@ -222,10 +223,13 @@ export const useIndexAdvisorEnableMutation = ({
   UseMutationOptions<IndexAdvisorEnableData, ResponseError, IndexAdvisorEnableVariables>,
   'mutationFn'
 > = {}) => {
+  const queryClient = useQueryClient()
   return useMutation<IndexAdvisorEnableData, ResponseError, IndexAdvisorEnableVariables>(
     (vars) => enableIndexAdvisor(vars),
     {
       async onSuccess(data, variables, context) {
+        const { projectRef } = variables
+        queryClient.invalidateQueries(sqlKeys.query(projectRef, ['index-advisor-function-check']))
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

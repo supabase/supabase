@@ -5,6 +5,7 @@ import {
 } from './QueryPerformance.constants'
 import { format } from 'sql-formatter'
 import { useEffect, useState } from 'react'
+import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
 
 interface QueryDetailProps {
   reportType: QUERY_PERFORMANCE_REPORT_TYPES
@@ -30,8 +31,8 @@ export const QueryDetail = ({ reportType, selectedRow }: QueryDetailProps) => {
   }, [selectedRow])
 
   return (
-    <div className="flex flex-col gap-y-8 divide-y">
-      <div className="px-4 flex flex-col gap-y-2">
+    <QueryPanelContainer>
+      <QueryPanelSection>
         <p className="text-sm">Query pattern</p>
         <CodeBlock
           hideLineNumbers
@@ -43,8 +44,8 @@ export const QueryDetail = ({ reportType, selectedRow }: QueryDetailProps) => {
             '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
           )}
         />
-      </div>
-      <div className="py-4 px-4 flex flex-col gap-y-1">
+      </QueryPanelSection>
+      <QueryPanelSection className="gap-y-1">
         {report
           .filter((x) => x.id !== 'query')
           .map((x) => {
@@ -59,7 +60,7 @@ export const QueryDetail = ({ reportType, selectedRow }: QueryDetailProps) => {
               </div>
             )
           })}
-      </div>
-    </div>
+      </QueryPanelSection>
+    </QueryPanelContainer>
   )
 }
