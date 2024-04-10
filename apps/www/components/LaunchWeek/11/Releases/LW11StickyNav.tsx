@@ -68,7 +68,7 @@ const LWXStickyNav: FC = () => {
 
   return (
     <div className="absolute inset-0 pointer-events-none w-full h-full">
-      <nav className="sticky z-30 top-0 bg-[#06080999] backdrop-blur-sm pointer-events-auto w-full border-t border-b border-[#111718] h-[60px] flex items-center">
+      <nav className="sticky z-30 top-0 bg-surface-100 dark:bg-[#06080999] backdrop-blur-sm pointer-events-auto w-full border-t border-b dark:border-[#111718] h-[60px] flex items-center">
         <SectionContainer className="!max-w-none !py-0 lg:!container flex items-center justify-between font-mono gap-4 md:gap-8 text-sm">
           <div className="flex items-center gap-4 md:gap-8">
             <ul className="lwx-sticky-nav hidden md:flex items-center gap-2 md:gap-4 text-foreground-muted">
@@ -98,7 +98,7 @@ const LWXStickyNav: FC = () => {
           <div>
             <Link
               href="#ticket"
-              className="flex items-center gap-2 text-xs text-foreground-lighter hover:text-foreground transition-colors"
+              className="flex items-center gap-2 text-xs text-foreground-light hover:text-foreground transition-colors"
             >
               {hasTicket ? `${DISPLAY_NAME}'s ticket` : 'Claim ticket'}
               <Image
@@ -107,7 +107,7 @@ const LWXStickyNav: FC = () => {
                 width={24}
                 height={24}
                 aria-hidden
-                className="w-auto h-4"
+                className="w-auto h-4 shadow"
               />
             </Link>
           </div>

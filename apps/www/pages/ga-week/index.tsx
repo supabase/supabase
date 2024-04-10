@@ -64,16 +64,6 @@ export default function GAWeekIndex({ meetups }: Props) {
   }, [supabase])
 
   useEffect(() => {
-    document.body.classList.add('bg-[#060809]')
-
-    return () => {
-      if (document.body.classList.contains('bg-[#060809]')) {
-        document.body.classList.remove('bg-[#060809]')
-      }
-    }
-  }, [])
-
-  useEffect(() => {
     if (session?.user) {
       if (userData?.id) {
         return setTicketState('ticket')
@@ -111,7 +101,7 @@ export default function GAWeekIndex({ meetups }: Props) {
           setShowCustomizationForm,
         }}
       >
-        <DefaultLayout>
+        <DefaultLayout className="bg-default dark:bg-[#060809]">
           <LW11StickyNav />
           <LW11Header className="pb-20 z-0" />
           <MainStage className="relative -mt-20 z-10" />

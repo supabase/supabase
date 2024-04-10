@@ -17,7 +17,7 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
   return (
     <section
       id={day.id}
-      className="lwx-nav-anchor border-b py-8 first:border-t border-[#111718] text-[#575E61] scroll-mt-16 grid grid-cols-1 gap-4 md:grid-cols-3"
+      className="lwx-nav-anchor border-b py-8 first:border-t dark:border-[#111718] text-foreground dark:text-[#575E61] scroll-mt-16 grid grid-cols-1 gap-4 md:grid-cols-3"
     >
       {/* Day title and links */}
       <div
@@ -26,7 +26,7 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
       >
         <div
           className={cn(
-            'text-sm inline uppercase font-mono text-foreground-muted tracking-[0.1rem]',
+            'text-sm inline uppercase font-mono dark:text-foreground-muted tracking-[0.1rem]',
             day.shipped && 'text-foreground'
           )}
         >
@@ -96,8 +96,8 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
           <div
             className={cn(
               `min-h-[210px] group aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-end
-              bg-surface-100/10 border border-dashed border-[#14191B] text-[#8B9092]
-              rounded-xl p-4 sm:p-6 md:p-8 text-2xl bg-contain shadow-lg`,
+              bg-surface-100/10 border border-dashed border-strong dark:border-[#14191B] dark:text-[#8B9092]
+              rounded-xl p-4 sm:p-6 md:p-8 text-2xl bg-contain`,
               cssGroup
             )}
           >

@@ -12,7 +12,7 @@ const LW11Day1 = ({ day, className }: { day: WeekDayProps; className?: string })
   return (
     <section
       id={day.id}
-      className="lwx-nav-anchor border-b py-8 first:border-t border-[#111718] text-[#575E61] scroll-mt-16 grid grid-cols-1 gap-4 md:grid-cols-3"
+      className="lwx-nav-anchor border-b py-8 first:border-t dark:border-[#111718] dark:text-[#575E61] scroll-mt-16 grid grid-cols-1 gap-4 md:grid-cols-3"
     >
       {/* Day title and links */}
       <div

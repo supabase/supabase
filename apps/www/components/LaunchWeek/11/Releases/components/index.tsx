@@ -58,7 +58,7 @@ export const DayLink = ({ type, icon, text, href = '', className }: DayLink) => 
 
   const Component = type === 'video' ? 'div' : Link
 
-  const Asd = ({ component: Comp, ...props }: any) => (
+  const Trigger = ({ component: Comp, ...props }: any) => (
     <Comp
       className={cn(
         'py-1 flex gap-2 items-center hover:text-foreground transition-colors text-sm',
@@ -74,9 +74,9 @@ export const DayLink = ({ type, icon, text, href = '', className }: DayLink) => 
   )
 
   if (type === 'video')
-    return <ExpandableVideo videoId={href} trigger={<Asd component={Component} />} />
+    return <ExpandableVideo videoId={href} trigger={<Trigger component={Component} />} />
 
-  return <Asd href={href} target={isTargetBlank() ? '_blank' : '_self'} component={Component} />
+  return <Trigger href={href} target={isTargetBlank() ? '_blank' : '_self'} component={Component} />
 }
 
 export default {

@@ -40,7 +40,6 @@ const TicketingFlow = () => {
   const isInView = useInView(sectionRef)
 
   useEffect(() => {
-    console.log('isInView', isInView)
     if (!isInView) setIsGameMode(false)
 
     return () => setIsGameMode(false)

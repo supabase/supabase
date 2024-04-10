@@ -80,16 +80,12 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
   if (!isMounted) return null
 
   return (
-    <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8 text-[#EDEDED]">
-      <div className="mb-4 col-span-1 xl:col-span-4 flex flex-col max-w-lg text-[#575E61]">
+    <div className="max-w-7xl mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8 text-foreground-lighter">
+      <div className="mb-4 col-span-1 xl:col-span-4 flex flex-col max-w-lg">
         <h2 className="text-sm font-mono uppercase tracking-[1px] mb-4">Community meetups</h2>
         <p className="text-base xl:max-w-md mb-2">
-          Celebrate{' '}
-          <strong className="font-normal text-foreground-light">
-            Supabase Special Announcement
-          </strong>{' '}
-          at our live community-driven meetups. Network with the community, listen to tech talks and
-          grab some swag.
+          Join our live community-driven meetups to celebrate GA Week with the community, listen to
+          tech talks and grab some swag.
         </p>
         <TextLink label="Read more about meetups" hasChevron url="/blog/community-meetups-lw11" />
       </div>
@@ -114,8 +110,8 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
                   title={liveNow ? 'Live now' : undefined}
                   className={cn(
                     'h-10 group inline-flex items-center flex-wrap text-4xl',
-                    'hover:text-[#EDEDED] !leading-none transition-colors',
-                    meetup.id === activeMeetup.id ? 'text-[#EDEDED]' : 'text-[#575E61]',
+                    'text-foreground-muted dark:text-foreground-muted/50 hover:!text-foreground !leading-none transition-colors',
+                    meetup.id === activeMeetup.id && '!text-foreground',
                     liveNow && 'text-[#B0B0B0]'
                   )}
                 >
