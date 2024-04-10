@@ -108,6 +108,26 @@ const { data: profile } = await supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+// This will return nothing while the user is logged out
+let profiles: [Profile] = try await supabase.from("profiles")
+  .select("id, username, avatar_url, website")
+  .execute()
+  .value
+
+// After the user is logged in, this will only return
+// the logged-in user's data - in this case a single row
+try await supabase.auth.signInWithOTP(email: email)
+let profile: Profile = try await supabase.from("profiles")
+  .select("id, username, avatar_url, website")
+  .single()
+  .execute()
+  .value
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -164,6 +184,20 @@ const { data, error } = await supabase.auth.signUp({
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+try await supabase.auth.signUp(
+  email: "example@email.com",
+  password: "example-password",
+  data: [
+    "first_name": .string("John"),
+    "age": .integer(27),
+  ]
+)
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -196,6 +230,14 @@ const {
   data: { user },
 } = await supabase.auth.getUser()
 let metadata = user.user_metadata
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let user = try await supabase.auth.user()
+let metadata = user.userMetadata
 ```
 
 </TabPanel>
