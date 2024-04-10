@@ -10,13 +10,12 @@ jobs:
       - name: Close Stale Issues
         uses: actions/stale@v9.0.0
         with:
-          days-before-pr-close: 30
+          days-before-pr-stale: 30
+          days-before-pr-close: 7
           days-before-issue-stale: 30
-          days-before-issue-close: 10
-          stale-issue-message: 'After 30 days of inactivity, this issue has been marked as stale. This issue will be auto-closed in 10 days. Comment, assign or remove the stale label to prevent this.'
-          stale-issue-label: stale
-          close-issue-label: staled
-          close-pr-label: staled
+          days-before-issue-close: 7
+          stale-pr-message: 'This pull request has been inactive for 30 days and will be closed in another week. If you want to give it another month, leave a comment, assign it to someone, or remove a `Stale` label.'
+          stale-issue-message: 'This issue has been inactive for 30 days and will be closed in another week. If you want to give it another month, leave a comment, assign it to someone, or remove a `Stale` label.'
           any-of-labels: contributor
           exempt-issue-labels: dnc, needs-analysis
           exempt-pr-labels: dnc
