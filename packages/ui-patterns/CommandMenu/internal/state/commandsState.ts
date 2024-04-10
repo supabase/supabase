@@ -3,25 +3,23 @@ import { proxy } from 'valtio'
 import { type ICommand } from '../Command'
 import { type ICommandSectionName, type ICommandSection, section$new } from '../CommandSection'
 
-type OrderSectionInstruction = (
-  sections: Array<ICommandSection>,
-  idx: number
-) => Array<ICommandSection>
+type OrderSectionInstruction = (sections: ICommandSection[], idx: number) => ICommandSection[]
 type OrderCommandsInstruction = (
-  commands: Array<ICommand>,
-  commandsToInsert: Array<ICommand>
+  commands: ICommand[],
+  commandsToInsert: ICommand[]
 ) => Array<ICommand>
 type UseCommandOptions = {
+  deps?: any[]
   forceMountSection?: boolean
   orderSection?: OrderSectionInstruction
   orderCommands?: OrderCommandsInstruction
 }
 
 type ICommandsState = {
-  commandSections: Array<ICommandSection>
+  commandSections: ICommandSection[]
   registerSection: (
     sectionName: ICommandSectionName,
-    commands: Array<ICommand>,
+    commands: ICommand[],
     options?: UseCommandOptions
   ) => () => void
 }
@@ -50,7 +48,6 @@ const initCommandsState = () => {
 
       return () => {
         const idx = state.commandSections.findIndex((section) => section.name === sectionName)
-        console.log(state.commandSections, idx)
         if (idx !== -1) {
           const filteredCommands = state.commandSections[idx].commands.filter(
             (command) => !commands.map((cmd) => cmd.id).includes(command.id)

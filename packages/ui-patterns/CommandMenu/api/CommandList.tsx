@@ -14,6 +14,7 @@ const CommandList = forwardRef<
   React.ComponentPropsWithoutRef<typeof CommandList_Shadcn_>
 >(({ className, ...props }, ref) => {
   const commandSections = useCommands()
+  const query = useQuery()
 
   const innerRef = useRef<HTMLDivElement | undefined>(undefined)
   const setInnerRef = (elem: HTMLDivElement) => (innerRef.current = elem)
@@ -32,15 +33,17 @@ const CommandList = forwardRef<
       <CommandEmpty listRef={innerRef}>No results found.</CommandEmpty>
       {commandSections.map((section) => (
         <CommandGroup key={section.id} heading={section.name} forceMount={section.forceMount}>
-          {section.commands.map((_command) => {
-            const command = _command as ICommand // strip the readonly applied from the proxy
+          {section.commands
+            .filter((command) => !command.defaultHidden || query)
+            .map((_command) => {
+              const command = _command as ICommand // strip the readonly applied from the proxy
 
-            return (
-              <CommandItem key={command.id} command={command}>
-                <TextHighlighter>{command.name}</TextHighlighter>
-              </CommandItem>
-            )
-          })}
+              return (
+                <CommandItem key={command.id} command={command}>
+                  <TextHighlighter>{command.name}</TextHighlighter>
+                </CommandItem>
+              )
+            })}
         </CommandGroup>
       ))}
     </CommandList_Shadcn_>

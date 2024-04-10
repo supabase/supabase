@@ -2,6 +2,7 @@ import { useRouter } from 'next/navigation'
 import { type PropsWithChildren, type ReactNode, forwardRef } from 'react'
 
 import { CommandItem_Shadcn_, cn } from 'ui'
+import { useSetCommandMenuOpen } from '../api/hooks/viewHooks'
 
 type ICommand = IActionCommand | IRouteCommand
 
@@ -12,8 +13,18 @@ type IBaseCommand = {
   className?: string
   forceMount?: boolean
   icon?: () => ReactNode
+  /**
+   * Curerntly unused
+   */
   keywords?: Array<string>
+  /**
+   * Currently unused
+   */
   shortcut?: string
+  /**
+   * Whether the item should be hidden until searched
+   */
+  defaultHidden?: boolean
 }
 
 type IActionCommand = IBaseCommand & {
@@ -71,6 +82,7 @@ const CommandItem = forwardRef<
   PropsWithChildren<CommandItemProps>
 >(({ children, className, command: _command, ...props }, ref) => {
   const router = useRouter()
+  const setIsOpen = useSetCommandMenuOpen()
 
   const command = _command as ICommand // strip the readonly applied from the proxy
 
@@ -82,7 +94,10 @@ const CommandItem = forwardRef<
         isActionCommand(command)
           ? command.action
           : isRouteCommand(command)
-            ? () => router.push(command.route)
+            ? () => {
+                router.push(command.route)
+                setIsOpen(false)
+              }
             : () => {}
       }
       className={cn(

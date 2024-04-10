@@ -1,4 +1,4 @@
-import { type ComponentType, type ReactNode } from 'react'
+import { type ReactNode } from 'react'
 import { proxy } from 'valtio'
 
 type ICommandPageName = string

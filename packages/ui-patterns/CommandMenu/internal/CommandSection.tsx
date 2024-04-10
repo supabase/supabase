@@ -5,7 +5,7 @@ type ICommandSectionName = string
 type ICommandSection = {
   id: string
   name: ICommandSectionName
-  forceMount: boolean
+  forceMount?: boolean
   commands: Array<ICommand>
 }
 

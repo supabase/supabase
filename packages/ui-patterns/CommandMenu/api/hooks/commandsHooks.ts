@@ -1,8 +1,8 @@
+import { useEffect, useReducer, useRef } from 'react'
 import { useSnapshot } from 'valtio'
-
-import type { ICommand, ICommandSectionName, UseCommandOptions } from '../types'
 import { useCommandContext } from '../../internal/Context'
-import { useEffect } from 'react'
+import type { ICommand, ICommandSectionName, UseCommandOptions } from '../types'
+import { isEqual } from 'lodash'
 
 const useCommands = () => {
   const { commandsState } = useCommandContext()
@@ -12,13 +12,21 @@ const useCommands = () => {
 
 const useRegisterCommands = (
   sectionName: ICommandSectionName,
-  commands: Array<ICommand>,
+  commands: ICommand[],
   options?: UseCommandOptions
 ) => {
   const { commandsState } = useCommandContext()
   const { registerSection } = useSnapshot(commandsState)
 
-  useEffect(() => registerSection(sectionName, commands, options), [registerSection])
+  const [rerenderFlag, toggleRerenderFlag] = useReducer((flag) => (flag === 0 ? 1 : 0), 0)
+  const prevDeps = useRef(options?.deps)
+
+  if (!isEqual(prevDeps.current, options?.deps)) {
+    prevDeps.current = options?.deps
+    toggleRerenderFlag()
+  }
+
+  useEffect(() => registerSection(sectionName, commands, options), [registerSection, rerenderFlag])
 }
 
 export { useCommands, useRegisterCommands }
