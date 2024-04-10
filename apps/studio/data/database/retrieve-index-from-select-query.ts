@@ -16,6 +16,8 @@ export type GetInvolvedIndexesFromSelectQueryResponse = {
   table: string
 }
 
+// [Joshen] This is experimental - hence why i'm chucking a create or replace query like this here
+
 export async function getInvolvedIndexesInSelectQuery({
   projectRef,
   connectionString,
@@ -27,13 +29,49 @@ export async function getInvolvedIndexesInSelectQuery({
     const { result } = await executeSql({
       projectRef,
       connectionString,
-      sql: `explain (format json, analyze) ${query};`,
+      sql: `
+CREATE OR REPLACE FUNCTION explain_query(query TEXT) RETURNS JSONB AS $$
+DECLARE
+    explain_result JSONB;
+    prepared_statement_name TEXT := 'query_to_explain';
+    n_args INT;
+BEGIN
+    -- Disallow multiple statements
+    IF query ILIKE '%;%' THEN
+        RAISE EXCEPTION 'Query must not contain a semicolon';
+    END IF;
+
+    -- Construct the parameterized query
+    EXECUTE 'PREPARE ' || prepared_statement_name || ' AS ' || query;
+
+    -- Detect how many arguments are present in the prepared statement
+    SELECT COALESCE(array_length(parameter_types, 1), 0)
+    INTO n_args
+    FROM pg_prepared_statements
+    WHERE name = prepared_statement_name
+    LIMIT 1;
+
+    -- Construct the EXECUTE statement with parameters using dynamic SQL construction
+    IF n_args > 0 THEN
+        EXECUTE 'EXPLAIN (FORMAT JSON) EXECUTE ' || prepared_statement_name || '(' || quote_literal($1) || ')' INTO explain_result;
+    ELSE
+        EXECUTE 'EXPLAIN (FORMAT JSON) EXECUTE ' || prepared_statement_name INTO explain_result;
+    END IF;
+
+    -- Deallocate the prepared statement
+    EXECUTE 'DEALLOCATE ' || prepared_statement_name;
+
+    -- Return the explain result
+    RETURN explain_result;
+END;
+$$ LANGUAGE plpgsql;
+select explain_query('${query}') as plans;
+`.trim(),
     })
 
-    const plans = result[0]['QUERY PLAN']?.[0]?.['Plan']?.['Plans'] ?? []
-    const involvedIndexes = plans
-      .filter((plan: any) => 'Index Name' in plan)
-      .map((plan: any) => `'${plan['Index Name']}'`)
+    const involvedIndexes = result[0].plans
+      .filter((plan: any) => 'Index Name' in plan['Plan'])
+      .map((plan: any) => `'${plan['Plan']['Index Name']}'`)
 
     if (involvedIndexes.length === 0) return []
 
@@ -42,6 +80,7 @@ export async function getInvolvedIndexesInSelectQuery({
       connectionString,
       sql: `select schemaname as schema, tablename as table, indexname as name from pg_indexes where indexname in (${involvedIndexes.join(', ')});`,
     })
+
     return indexResult as GetInvolvedIndexesFromSelectQueryResponse[]
   } catch (err) {
     return []

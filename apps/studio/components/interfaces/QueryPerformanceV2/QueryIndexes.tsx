@@ -1,4 +1,4 @@
-import { Lightbulb } from 'lucide-react'
+import { Check, Lightbulb, Table, Table2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
@@ -28,10 +28,19 @@ interface QueryIndexesProps {
   selectedRow: any
 }
 
+// [Joshen] There's several more UX things we can do to help ease the learning curve of indexes I think
+// e.g understanding "costs", what numbers of "costs" are actually considered insignificant
+
 export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
+  // [Joshen] TODO implement this logic once the linter rules are in
+  const isLinterWarning = false
   const { project } = useProjectContext()
 
-  const { data, isSuccess, isLoading, isError } = useGetIndexesFromSelectQuery({
+  const {
+    data: usedIndexes,
+    isSuccess,
+    isLoading,
+  } = useGetIndexesFromSelectQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     query: selectedRow?.['query'],
@@ -108,22 +117,37 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
       <QueryPanelSection>
         <div>
           <p className="text-sm">Indexes in use</p>
-          <p className="text-sm text-foreground-light">This query is using the following indexes</p>
+          <p className="text-sm text-foreground-light">
+            This query is using the following index{(usedIndexes ?? []).length > 1 ? 's' : ''}:
+          </p>
         </div>
         {isLoading && <GenericSkeletonLoader />}
         {isSuccess && (
-          <>
-            {data.length === 0 && (
+          <div>
+            {usedIndexes.length === 0 && (
               <div className="border rounded border-dashed flex items-center justify-center py-4">
                 <p className="text-sm text-foreground-light">
                   No indexes are involved in this query
                 </p>
               </div>
             )}
-            {data.map((index) => {
-              return <div key={index.name}>{index.name}</div>
+            {usedIndexes.map((index) => {
+              return (
+                <div
+                  key={index.name}
+                  className="flex items-center gap-x-4 bg-surface-100 border first:rounded-tl first:rounded-tr border-b-0 last:border-b last:rounded-b px-2 py-2"
+                >
+                  <div className="flex items-center gap-x-2">
+                    <Table2 size={14} className="text-foreground-light" />
+                    <span className="text-xs font-mono text-foreground-light">
+                      {index.schema}.{index.table}
+                    </span>
+                  </div>
+                  <span className="text-xs font-mono">{index.name}</span>
+                </div>
+              )
             })}
-          </>
+          </div>
         )}
       </QueryPanelSection>
 
@@ -149,30 +173,40 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
               {isSuccessIndexAdvisorResult && (
                 <>
                   {(index_statements ?? []).length === 0 ? (
-                    <Alert_Shadcn_>
-                      <AlertTitle_Shadcn_>No suggested indexes</AlertTitle_Shadcn_>
+                    <Alert_Shadcn_ className="[&>svg]:rounded-full">
+                      <Check />
+                      <AlertTitle_Shadcn_>This query is fully optimized</AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
-                        The selected query cannot be further optimised
+                        Queries that can be optimised with an index will show here
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   ) : (
                     <>
-                      <Alert_Shadcn_
-                        variant="default"
-                        className="border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand"
-                      >
-                        <Lightbulb />
-                        <AlertTitle_Shadcn_>
-                          We have {index_statements.length} index recommendation
-                          {index_statements.length > 1 ? 's' : ''}
-                        </AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_>
-                          You can improve this query's performance by{' '}
-                          <span className="text-brand">{totalImprovement.toFixed(2)}%</span> by
-                          adding the following recommended{' '}
-                          {index_statements.length > 1 ? 'indexes' : 'index'}
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
+                      {isLinterWarning ? (
+                        <Alert_Shadcn_
+                          variant="default"
+                          className="border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand"
+                        >
+                          <Lightbulb />
+                          <AlertTitle_Shadcn_>
+                            We have {index_statements.length} index recommendation
+                            {index_statements.length > 1 ? 's' : ''}
+                          </AlertTitle_Shadcn_>
+                          <AlertDescription_Shadcn_>
+                            You can improve this query's performance by{' '}
+                            <span className="text-brand">{totalImprovement.toFixed(2)}%</span> by
+                            adding the following suggested{' '}
+                            {index_statements.length > 1 ? 'indexes' : 'index'}
+                          </AlertDescription_Shadcn_>
+                        </Alert_Shadcn_>
+                      ) : (
+                        <p className="text-sm text-foreground-light">
+                          Creating the following {index_statements.length > 1 ? 'indexes' : 'index'}{' '}
+                          on <code className="text-xs">public.files</code> can improve this query's
+                          performance by{' '}
+                          <span className="text-brand">{totalImprovement.toFixed(2)}%</span>:
+                        </p>
+                      )}
                       <CodeBlock
                         hideLineNumbers
                         value={index_statements.join(';\n') + ';'}
@@ -183,6 +217,11 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
                           '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
                         )}
                       />
+                      <p className="text-sm text-foreground-light">
+                        This suggestion serves to prevent your queries from slowing down as your
+                        application grows, and hence the index may not be used immediately after
+                        it's created. (e.g If your table is still small at this time)
+                      </p>
                     </>
                   )}
                 </>
@@ -190,24 +229,24 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
             </>
           )}
         </div>
-        {isSuccessIndexAdvisorResult && (
+        {hasIndexRecommendation && (
           <div className="flex flex-col gap-y-2">
             <p className="text-sm">Query costs</p>
             <div className="pt-4 border rounded-md flex flex-col gap-y-3">
               <div className="px-4 flex items-center justify-between">
                 <QueryPanelScoreSection
                   className="w-1/2"
-                  name="Start up cost"
-                  description="An estimate of how long it will take to fetch the first row"
-                  before={startup_cost_before}
-                  after={startup_cost_after}
-                />
-                <QueryPanelScoreSection
-                  className="w-1/2"
                   name="Total cost"
                   description="An estimate of how long it will take to return all the rows (Includes start up cost)"
                   before={total_cost_before}
                   after={total_cost_after}
+                />
+                <QueryPanelScoreSection
+                  className="w-1/2"
+                  name="Start up cost"
+                  description="An estimate of how long it will take to fetch the first row"
+                  before={startup_cost_before}
+                  after={startup_cost_after}
                 />
               </div>
 
