@@ -2,7 +2,7 @@ import React from 'react'
 
 interface Props {
   title: string | React.ReactNode
-  features: { label: string; paragraph: string }[]
+  features: { label: string; paragraph: React.ReactNode }[]
 }
 
 function GlobalPresenceSection({ title, features }: Props) {

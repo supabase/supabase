@@ -226,8 +226,18 @@ export default (isMobile?: boolean) => ({
       {
         id: 'ci',
         label: 'Continuous Integration',
-        paragraph:
-          'Use the Supabase CLI with Github actions to preview and deploy your functions along with the rest of your application',
+        paragraph: (
+          <>
+            Use the{' '}
+            <Link
+              href="https://supabase.com/docs/guides/functions/cicd-workflow"
+              className="underline"
+            >
+              Supabase CLI with Github actions
+            </Link>{' '}
+            to preview and deploy your functions along with the rest of your application
+          </>
+        ),
         className: '',
         image: <CI />,
       },
@@ -244,15 +254,25 @@ export default (isMobile?: boolean) => ({
     features: [
       {
         label: 'Global presence',
-        paragraph: "Edge functions run globally or can be pinned to your database's proximity.",
+        paragraph: (
+          <>
+            Edge functions run globally or can be{' '}
+            <Link
+              href="https://supabase.com/docs/guides/functions/regional-invocation"
+              className="underline"
+            >
+              pinned to your database's proximity
+            </Link>
+          </>
+        ),
       },
       {
         label: 'Automatic scaling',
-        paragraph: 'Seamlessly scale with usage without any manual tuning. ',
+        paragraph: 'Seamlessly scale with usage without any manual tuning',
       },
       {
         label: 'Secure',
-        paragraph: 'Scale with confidence with SSL, Firewall and DDOS protection built in.',
+        paragraph: 'Scale with confidence with SSL, Firewall and DDOS protection built in',
       },
     ],
   },
