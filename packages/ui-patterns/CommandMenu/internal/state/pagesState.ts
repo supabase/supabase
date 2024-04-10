@@ -19,7 +19,10 @@ const initPagesState = () => {
     pageStack: [],
     registerNewPage: (name, component) => {
       state.commandPages[name] = component
-      return () => delete state.commandPages.name
+      return () => {
+        state.pageStack = state.pageStack.filter((page) => page !== name)
+        delete state.commandPages[name]
+      }
     },
     appendPageStack: (name) => state.pageStack.at(-1) !== name && state.pageStack.push(name),
     popPageStack: () => state.pageStack.pop(),

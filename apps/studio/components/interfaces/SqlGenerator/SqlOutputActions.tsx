@@ -20,7 +20,7 @@ import { useCheckPermissions } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { createSqlSnippetSkeleton } from '../../../SQLEditor/SQLEditor.utils'
+import { createSqlSnippetSkeleton } from '../SQLEditor/SQLEditor.utils'
 import { formatTitle } from './GenerateSql.utils'
 
 const useSaveGeneratedSql = () => {
