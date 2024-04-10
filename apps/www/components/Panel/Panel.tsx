@@ -12,6 +12,7 @@ interface Props {
   hasInnerShimmer?: boolean
   shimmerFromColor?: string
   shimmerToColor?: string
+  style?: any
   hasMotion?: boolean
   style?: any
 }

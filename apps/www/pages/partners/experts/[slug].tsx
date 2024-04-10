@@ -10,7 +10,7 @@ import { IconChevronLeft, IconExternalLink } from 'ui'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import supabase from '~/lib/supabaseMisc'
-import { Partner } from '~/types/partners'
+import type { Partner } from '~/types/partners'
 import Error404 from '../../404'
 
 function Partner({

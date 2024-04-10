@@ -41,6 +41,14 @@ export interface paths {
     /** Send exit survey to HubSpot */
     post: operations['SendExitSurveyController_sendExitSurvey']
   }
+  '/platform/feedback/upgrade': {
+    /** Send upgrade survey to survey_responses table */
+    post: operations['SendUpgradeSurveyController_sendUpgradeSurvey']
+  }
+  '/platform/feedback/docs': {
+    /** Send feedback on docs */
+    post: operations['SendDocsFeedbackController_sendDocsFeedback']
+  }
   '/platform/signup': {
     /** Sign up with email and password */
     post: operations['SignUpController_signUp']
@@ -99,6 +107,10 @@ export interface paths {
   '/platform/database/{ref}/backups': {
     /** Gets project backups */
     get: operations['BackupsController_getBackups']
+  }
+  '/platform/database/{ref}/backups/enable-physical-backups': {
+    /** Enable usage of physical backups */
+    post: operations['BackupsController_enablePhysicalBackup']
   }
   '/platform/database/{ref}/backups/download': {
     /** Download project backup */
@@ -822,14 +834,6 @@ export interface paths {
     /** Get GitHub connection branch */
     get: operations['GitHubBranchesController_getConnectionBranch']
   }
-  '/platform/integrations/github/pull-requests/{connectionId}': {
-    /** List GitHub connection pull requests */
-    get: operations['GitHubPullRequestsController_getConnectionPullRequests']
-  }
-  '/platform/integrations/github/pull-requests/{connectionId}/{branchName}': {
-    /** List GitHub pull requests for a specific branch */
-    get: operations['GitHubPullRequestsController_validateConnectionBranch']
-  }
   '/platform/integrations/github/repositories': {
     /** Gets GitHub repositories for user */
     get: operations['GitHubRepositoriesController_listRepositories']
@@ -1019,6 +1023,10 @@ export interface paths {
   '/v0/database/{ref}/backups': {
     /** Gets project backups */
     get: operations['BackupsController_getBackups']
+  }
+  '/v0/database/{ref}/backups/enable-physical-backups': {
+    /** Enable usage of physical backups */
+    post: operations['BackupsController_enablePhysicalBackup']
   }
   '/v0/database/{ref}/backups/download': {
     /** Download project backup */
@@ -1468,6 +1476,13 @@ export interface paths {
      */
     patch: operations['BranchController_updateBranch']
   }
+  '/v1/branches/{branch_id}/reset': {
+    /**
+     * Resets a database branch
+     * @description Resets the specified database branch
+     */
+    post: operations['BranchController_resetBranch']
+  }
   '/v1/projects': {
     /**
      * List all projects
@@ -1639,6 +1654,18 @@ export interface paths {
     get: operations['V1AuthConfigController_getV1AuthConfig']
     /** Updates a project's auth config */
     patch: operations['V1AuthConfigController_updateV1AuthConfig']
+  }
+  '/v1/projects/{ref}/config/auth/third-party-auth': {
+    /** Lists all third-party auth integrations */
+    get: operations['ThirdPartyAuthController_listTPAForProject']
+    /** Creates a new third-party auth integration */
+    post: operations['ThirdPartyAuthController_createTPAForProject']
+  }
+  '/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}': {
+    /** Get a third-party integration */
+    get: operations['ThirdPartyAuthController_getTPAForProject']
+    /** Removes a third-party auth integration */
+    delete: operations['ThirdPartyAuthController_deleteTPAForProject']
   }
   '/v1/projects/{ref}/config/auth/sso/providers': {
     /** Lists all SSO providers */
@@ -1860,6 +1887,19 @@ export interface components {
       additionalFeedback?: string
       exitAction?: string
     }
+    SendUpgradeSurveyBody: {
+      orgSlug?: string
+      prevPlan?: string
+      currentPlan?: string
+      reasons: string[]
+      additionalFeedback?: string
+    }
+    SendDocsFeedbackBody: {
+      page: string
+      isHelpful: boolean
+      title: string
+      feedback: string
+    }
     SignUpBody: {
       email: string
       password: string
@@ -1899,11 +1939,13 @@ export interface components {
       MAILER_SUBJECTS_RECOVERY: string
       MAILER_SUBJECTS_EMAIL_CHANGE: string
       MAILER_SUBJECTS_MAGIC_LINK: string
+      MAILER_SUBJECTS_REAUTHENTICATION: string
       MAILER_TEMPLATES_INVITE_CONTENT: string
       MAILER_TEMPLATES_CONFIRMATION_CONTENT: string
       MAILER_TEMPLATES_RECOVERY_CONTENT: string
       MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: string
       MAILER_TEMPLATES_MAGIC_LINK_CONTENT: string
+      MAILER_TEMPLATES_REAUTHENTICATION_CONTENT: string
       MFA_MAX_ENROLLED_FACTORS: number
       URI_ALLOW_LIST: string
       EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean
@@ -1959,6 +2001,8 @@ export interface components {
       HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI: string
       HOOK_CUSTOM_ACCESS_TOKEN_ENABLED: boolean
       HOOK_CUSTOM_ACCESS_TOKEN_URI: string
+      HOOK_SEND_SMS_ENABLED: boolean
+      HOOK_SEND_SMS_URI: string
       EXTERNAL_APPLE_ENABLED: boolean
       EXTERNAL_APPLE_CLIENT_ID: string
       EXTERNAL_APPLE_SECRET: string
@@ -2042,7 +2086,9 @@ export interface components {
       MAILER_SUBJECTS_RECOVERY?: string
       MAILER_SUBJECTS_EMAIL_CHANGE?: string
       MAILER_SUBJECTS_MAGIC_LINK?: string
+      MAILER_SUBJECTS_REAUTHENTICATION?: string
       MAILER_TEMPLATES_INVITE_CONTENT?: string
+      MAILER_TEMPLATES_REAUTHENTICATION_CONTENT?: string
       MAILER_TEMPLATES_CONFIRMATION_CONTENT?: string
       MAILER_TEMPLATES_RECOVERY_CONTENT?: string
       MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT?: string
@@ -2107,6 +2153,8 @@ export interface components {
       HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI?: string
       HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean
       HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
+      HOOK_SEND_SMS_ENABLED?: boolean
+      HOOK_SEND_SMS_URI?: string
       EXTERNAL_APPLE_ENABLED?: boolean
       EXTERNAL_APPLE_CLIENT_ID?: string
       EXTERNAL_APPLE_SECRET?: string
@@ -2207,6 +2255,7 @@ export interface components {
       updated_at?: string
       is_sso_user?: boolean
       deleted_at?: string
+      is_anonymous?: boolean
     }
     UsersResponse: {
       total: number
@@ -2263,14 +2312,17 @@ export interface components {
       migrated_at: string | null
     }
     OrganizationResponse: {
+      /** @enum {string|null} */
+      restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
       id: number
       slug: string
       name: string
-      billing_email: string
+      billing_email: string | null
       is_owner: boolean
-      stripe_customer_id: string
-      subscription_id?: string
+      stripe_customer_id: string | null
+      subscription_id: string | null
       opt_in_tags: string[]
+      restriction_data: Record<string, never>
     }
     GetOrganizationByFlyOrganizationIdResponse: {
       slug: string
@@ -2788,7 +2840,7 @@ export interface components {
       payment_method_card_details?: components['schemas']['PaymentMethodCardDetails']
       billing_via_partner: boolean
       /** @enum {string} */
-      billing_partner: 'fly'
+      billing_partner: 'fly' | 'aws'
       scheduled_plan_change: components['schemas']['ScheduledPlanChange'] | null
       customer_balance: number
       nano_enabled: boolean
@@ -4565,6 +4617,7 @@ export interface components {
       branch_name?: string
       git_branch?: string
       reset_on_push?: boolean
+      persistent?: boolean
     }
     BranchResponse: {
       id: string
@@ -4575,10 +4628,17 @@ export interface components {
       git_branch?: string
       pr_number?: number
       reset_on_push: boolean
+      persistent: boolean
       /** @enum {string} */
       status: 'CREATING_PROJECT' | 'RUNNING_MIGRATIONS' | 'MIGRATIONS_PASSED' | 'MIGRATIONS_FAILED'
       created_at: string
       updated_at: string
+    }
+    BranchDeleteResponse: {
+      message: string
+    }
+    BranchResetResponse: {
+      message: string
     }
     V1DatabaseResponse: {
       /** @description Database host */
@@ -4604,6 +4664,19 @@ export interface components {
        */
       created_at: string
       database?: components['schemas']['V1DatabaseResponse']
+      /** @enum {string} */
+      status:
+        | 'ACTIVE_HEALTHY'
+        | 'ACTIVE_UNHEALTHY'
+        | 'COMING_UP'
+        | 'GOING_DOWN'
+        | 'INACTIVE'
+        | 'INIT_FAILED'
+        | 'REMOVED'
+        | 'RESTORING'
+        | 'UNKNOWN'
+        | 'UPGRADING'
+        | 'PAUSING'
     }
     V1CreateProjectBody: {
       /** @description Database password */
@@ -4925,11 +4998,13 @@ export interface components {
       mailer_subjects_invite: string | null
       mailer_subjects_magic_link: string | null
       mailer_subjects_recovery: string | null
+      mailer_subjects_reauthentication: string | null
       mailer_templates_confirmation_content: string | null
       mailer_templates_email_change_content: string | null
       mailer_templates_invite_content: string | null
       mailer_templates_magic_link_content: string | null
       mailer_templates_recovery_content: string | null
+      mailer_templates_reauthentication_content: string | null
       mfa_max_enrolled_factors: number | null
       password_hibp_enabled: boolean | null
       password_min_length: number | null
@@ -5001,11 +5076,13 @@ export interface components {
       mailer_subjects_recovery?: string
       mailer_subjects_email_change?: string
       mailer_subjects_magic_link?: string
+      mailer_subjects_reauthentication?: string
       mailer_templates_invite_content?: string
       mailer_templates_confirmation_content?: string
       mailer_templates_recovery_content?: string
       mailer_templates_email_change_content?: string
       mailer_templates_magic_link_content?: string
+      mailer_templates_reauthentication_content?: string
       mfa_max_enrolled_factors?: number
       uri_allow_list?: string
       external_anonymous_users_enabled?: boolean
@@ -5066,6 +5143,8 @@ export interface components {
       hook_password_verification_attempt_uri?: string
       hook_custom_access_token_enabled?: boolean
       hook_custom_access_token_uri?: string
+      hook_custom_sms_provider_enabled?: boolean
+      hook_custom_sms_provider_uri?: string
       external_apple_enabled?: boolean
       external_apple_client_id?: string
       external_apple_secret?: string
@@ -5130,6 +5209,22 @@ export interface components {
       external_zoom_enabled?: boolean
       external_zoom_client_id?: string
       external_zoom_secret?: string
+    }
+    CreateThirdPartyAuthBody: {
+      oidc_issuer_url?: string
+      jwks_url?: string
+      custom_jwks?: Record<string, never>
+    }
+    ThirdPartyAuth: {
+      id: string
+      type: string
+      oidc_issuer_url?: string | null
+      jwks_url?: string | null
+      custom_jwks?: unknown
+      resolved_jwks?: unknown
+      inserted_at: string
+      updated_at: string
+      resolved_at?: string | null
     }
     AttributeValue: {
       default?: Record<string, never> | number | string | boolean
@@ -5650,6 +5745,44 @@ export interface operations {
       }
     }
   }
+  /** Send upgrade survey to survey_responses table */
+  SendUpgradeSurveyController_sendUpgradeSurvey: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SendUpgradeSurveyBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['SendFeedbackResponse']
+        }
+      }
+      /** @description Failed to send upgrade survey */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Send feedback on docs */
+  SendDocsFeedbackController_sendDocsFeedback: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SendDocsFeedbackBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['SendFeedbackResponse']
+        }
+      }
+      /** @description Failed to send feedback for docs */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Sign up with email and password */
   SignUpController_signUp: {
     requestBody: {
@@ -5870,7 +6003,13 @@ export interface operations {
     parameters: {
       path: {
         ref: string
-        template: 'confirmation' | 'email-change' | 'invite' | 'magic-link' | 'recovery'
+        template:
+          | 'confirmation'
+          | 'email-change'
+          | 'invite'
+          | 'magic-link'
+          | 'recovery'
+          | 'reauthentication'
       }
     }
     responses: {
@@ -5981,6 +6120,24 @@ export interface operations {
         }
       }
       /** @description Failed to get project backups */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Enable usage of physical backups */
+  BackupsController_enablePhysicalBackup: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to enable usage of physical backups */
       500: {
         content: never
       }
@@ -11079,52 +11236,6 @@ export interface operations {
       }
     }
   }
-  /** List GitHub connection pull requests */
-  GitHubPullRequestsController_getConnectionPullRequests: {
-    parameters: {
-      query: {
-        pr_number: number[]
-      }
-      path: {
-        connectionId: number
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>[]
-        }
-      }
-      /** @description Failed to list GitHub connection pull requests */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** List GitHub pull requests for a specific branch */
-  GitHubPullRequestsController_validateConnectionBranch: {
-    parameters: {
-      query?: {
-        per_page?: number
-        page?: number
-      }
-      path: {
-        connectionId: number
-        branchName: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>[]
-        }
-      }
-      /** @description Failed to validate GitHub connection branch */
-      500: {
-        content: never
-      }
-    }
-  }
   /** Gets GitHub repositories for user */
   GitHubRepositoriesController_listRepositories: {
     responses: {
@@ -11176,7 +11287,13 @@ export interface operations {
     parameters: {
       path: {
         ref: string
-        template: 'confirmation' | 'email-change' | 'invite' | 'magic-link' | 'recovery'
+        template:
+          | 'confirmation'
+          | 'email-change'
+          | 'invite'
+          | 'magic-link'
+          | 'recovery'
+          | 'reauthentication'
       }
     }
     responses: {
@@ -11845,7 +11962,9 @@ export interface operations {
     }
     responses: {
       200: {
-        content: never
+        content: {
+          'application/json': components['schemas']['BranchDeleteResponse']
+        }
       }
       /** @description Failed to delete database branch */
       500: {
@@ -11876,6 +11995,29 @@ export interface operations {
         }
       }
       /** @description Failed to update database branch */
+      500: {
+        content: never
+      }
+    }
+  }
+  /**
+   * Resets a database branch
+   * @description Resets the specified database branch
+   */
+  BranchController_resetBranch: {
+    parameters: {
+      path: {
+        /** @description Branch ID */
+        branch_id: string
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['BranchResetResponse']
+        }
+      }
+      /** @description Failed to reset database branch */
       500: {
         content: never
       }
@@ -12829,6 +12971,89 @@ export interface operations {
       }
       /** @description Failed to update project's auth config */
       500: {
+        content: never
+      }
+    }
+  }
+  /** Lists all third-party auth integrations */
+  ThirdPartyAuthController_listTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth'][]
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Creates a new third-party auth integration */
+  ThirdPartyAuthController_createTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateThirdPartyAuthBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Get a third-party integration */
+  ThirdPartyAuthController_getTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        tpa_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Removes a third-party auth integration */
+  ThirdPartyAuthController_deleteTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        tpa_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ThirdPartyAuth']
+        }
+      }
+      403: {
         content: never
       }
     }

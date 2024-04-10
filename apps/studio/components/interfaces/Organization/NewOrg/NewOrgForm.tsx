@@ -173,7 +173,6 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
     <>
       <form onSubmit={handleSubmit}>
         <Panel
-          hideHeaderStyling
           title={
             <div key="panel-title">
               <h4>Create a new organization</h4>
@@ -361,7 +360,7 @@ const NewOrgForm = ({ onPaymentMethodReset }: NewOrgFormProps) => {
                       icon={<IconEdit2 />}
                       onClick={() => resetPaymentMethod()}
                       disabled={newOrgLoading}
-                      className="hover:border-gray-500"
+                      className="hover:border-muted"
                     />
                   </div>
                 </div>

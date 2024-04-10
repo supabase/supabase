@@ -11,11 +11,11 @@ import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState, type PropsWithChildren } from 'react'
-import { PortalToast, TabsProvider } from 'ui'
+import { PortalToast, PromoToast, TabsProvider } from 'ui'
 import { CommandMenuProvider } from 'ui-patterns/Cmdk'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
-import Favicons from '~/components/Favicons'
+import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import SiteLayout from '~/layouts/SiteLayout'
 import { BUILD_PREVIEW_HTML, IS_PLATFORM, IS_PREVIEW } from '~/lib/constants'
 import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
@@ -217,7 +217,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
   return (
     <ShortcutPreviewBuild>
       <QueryClientProvider client={queryClient}>
-        <Favicons />
+        <MetaFaviconsPagesRouter applicationName="Supabase Docs" />
         <Head>
           <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         </Head>
@@ -229,6 +229,7 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
                   <div className="h-screen flex flex-col">
                     <SiteLayout>
                       <PortalToast />
+                      <PromoToast />
                       <Component {...pageProps} />
                     </SiteLayout>
                   </div>

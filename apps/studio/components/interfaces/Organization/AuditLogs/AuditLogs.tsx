@@ -17,11 +17,12 @@ import {
   IconUser,
 } from 'ui'
 
-import { FilterPopover, LogDetailsPanel } from 'components/interfaces/AuditLogs'
+import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { DatePicker } from 'components/ui/DatePicker'
+import { FilterPopover } from 'components/ui/FilterPopover'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import {
   AuditLog,

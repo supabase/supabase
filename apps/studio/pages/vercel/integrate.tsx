@@ -1,4 +1,3 @@
-import Divider from 'components/ui/Divider'
 import { makeAutoObservable, runInAction } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import Link from 'next/link'
@@ -25,7 +24,7 @@ import {
   VERCEL_DEFAULT_EXTERNAL_ID,
   VERCEL_INTEGRATION_CONFIGS,
 } from 'lib/vercelConfigs'
-import { Button, IconChevronRight, IconPlusCircle, IconX, Listbox, Select } from 'ui'
+import { Button, IconChevronRight, IconPlusCircle, IconX, Listbox, Select, Separator } from 'ui'
 
 interface IVercelIntegrationStore {
   code: string
@@ -441,7 +440,7 @@ const ProjectLinks = observer(() => {
         <h4 className="text-lg">Link Vercel to Supabase</h4>
         <p>Choose which of your Vercel projects to link to your existing Supabase projects.</p>
       </div>
-      <Divider light />
+      <Separator />
       <div className="space-y-2">
         <div className="flex justify-between">
           <p className="text-foreground-light">Vercel Projects</p>
@@ -449,7 +448,7 @@ const ProjectLinks = observer(() => {
           <p className="text-foreground-light">Supabase Projects</p>
         </div>
         <ProjectLinkList />
-        <Divider light />
+        <Separator />
         <div className="flex justify-end py-4">{displayButton()}</div>
       </div>
     </div>

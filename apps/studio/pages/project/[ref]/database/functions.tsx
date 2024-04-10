@@ -6,6 +6,7 @@ import { CreateFunction, DeleteFunction } from 'components/interfaces/Database'
 import FunctionsList from 'components/interfaces/Database/Functions/FunctionsList/FunctionsList'
 import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { FormHeader } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import type { NextPageWithLayout } from 'types'
@@ -42,7 +43,7 @@ const FunctionsPage: NextPageWithLayout = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <div className="col-span-12">
-            <h3 className=" mb-4 text-xl text-foreground">Database Functions</h3>
+            <FormHeader title="Database Functions" />
             <FunctionsList
               createFunction={createFunction}
               editFunction={editFunction}

@@ -92,8 +92,8 @@ export const generateCreateColumnPayload = (
   const payload: CreateColumnPayload = {
     tableId,
     isIdentity,
-    name: field.name,
-    comment: field.comment,
+    name: field.name.trim(),
+    comment: field.comment?.trim(),
     type: field.isArray ? `${field.format}[]` : field.format,
     check: field.check?.trim() || undefined,
     isUnique: field.isUnique,
