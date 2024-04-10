@@ -34,7 +34,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
       role="tab"
     >
       <div className="flex flex-col py-4">
-        <p className="font-mono text-sm uppercase">{label}</p>
+        <h3 className="font-mono text-sm uppercase">{label}</h3>
         <div
           className={cn(
             'text-foreground-lighter text-sm inline-block overflow-hidden transition-all',

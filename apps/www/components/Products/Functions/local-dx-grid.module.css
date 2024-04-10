@@ -4,7 +4,7 @@
     'ecosystem   ci    ';
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 1280px) {
   .local-dx-grid {
     grid-template-areas:
       'localDX     parity     ecosystem'

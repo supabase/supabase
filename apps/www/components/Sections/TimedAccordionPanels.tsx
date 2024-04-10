@@ -53,14 +53,14 @@ const TimedPanel = ({
     >
       <Panel outerClassName="w-full h-full mb-4" innerClassName="p-4">
         <div className="relative z-10 flex flex-col h-full justify-between">
-          <p
+          <h3
             className={cn(
               'font-mono text-sm uppercase transition-colors',
               isActive && 'text-foreground'
             )}
           >
             {label}
-          </p>
+          </h3>
           <p
             className={cn(
               'pt-2 text-foreground-lighter text-sm max-w-[220px] md:opacity-0 transition-opacity lg:opacity-100',

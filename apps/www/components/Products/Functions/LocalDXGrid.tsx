@@ -12,7 +12,7 @@ export default function LocalDXGrid() {
   return (
     <div
       className={cn(
-        'h-auto flex flex-col md:grid grid-cols-2 lg:grid-cols-3 gap-5 lg:flex-row',
+        'h-auto flex flex-col md:grid grid-cols-2 xl:grid-cols-3 gap-5 xl:flex-row',
         styles['local-dx-grid']
       )}
     >
@@ -31,20 +31,20 @@ const Content = ({ card }: { card: any }) => {
       key={card.label}
       outerClassName="w-full group"
       innerClassName={cn(
-        'relative flex flex-col min-h-[300px] lg:min-h-[300px]',
-        isHoriz && 'lg:flex-row lg:items-end'
+        'relative flex flex-col min-h-[300px] xl:min-h-[300px]',
+        isHoriz && 'xl:flex-row xl:items-end'
       )}
       style={{ gridArea: card.id }}
     >
       <div
         className={cn(
           'relative flex-[1_1_0] h-full w-full inline-flex items-center',
-          isHoriz && 'lg:order-last flex-1 h-full'
+          isHoriz && 'xl:order-last flex-1 h-full'
         )}
       >
         {card.image}
       </div>
-      <div className={cn('flex flex-col gap-1 p-4 lg:p-6 lg:!pt-0', isHoriz && 'lg:w-2/5')}>
+      <div className={cn('flex flex-col gap-1 p-4 xl:p-6 xl:!pt-0', isHoriz && 'xl:w-2/5')}>
         <h3 className="text-foreground">{card.label}</h3>
         <div className={cn('flex-1 flex flex-col justify-between gap-2', isHoriz && 'flex-auto')}>
           <p className="text-sm text-foreground-lighter">{card.paragraph}</p>

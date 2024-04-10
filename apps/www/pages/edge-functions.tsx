@@ -50,11 +50,11 @@ function EdgeFunctions() {
           footer={<HighlightColumns highlights={pageData.highlightsSection.highlights} />}
         />
         <div className="overflow-hidden">
-          <SectionContainer className="flex flex-col gap-4 lg:gap-8 !pb-0">
+          <SectionContainer className="flex flex-col gap-4 lg:gap-8 !pb-0" id="examples">
             <ExamplesCarousel {...pageData.examplesSection} />
           </SectionContainer>
         </div>
-        <SectionContainer className="flex flex-col gap-4">
+        <SectionContainer className="flex flex-col gap-4" id="developer-experience">
           <div>
             <h2 className="h2">{pageData.localDXsection.title}</h2>
             <p className="text-foreground-lighter lg:w-1/2">{pageData.localDXsection.paragraph}</p>
@@ -63,17 +63,17 @@ function EdgeFunctions() {
             <LocalDXGrid />
           </div>
         </SectionContainer>
-        <SectionContainer className="flex flex-col gap-4 lg:gap-8">
+        <SectionContainer className="flex flex-col gap-4 lg:gap-8" id="global-presence">
           <GlobalPresenceSection {...pageData.globalPresenceSection} />
         </SectionContainer>
         <div className="overflow-hidden">
-          <SectionContainer className="flex flex-col gap-4 lg:gap-8">
+          <SectionContainer className="flex flex-col gap-4 lg:gap-8" id="observability">
             <h2 className="h2">{pageData.o11y.title}</h2>
             <TimedAccordionPanels {...pageData.o11y} />
           </SectionContainer>
         </div>
         <div className="overflow-hidden">
-          <SectionContainer className="flex flex-col gap-4 lg:gap-8">
+          <SectionContainer className="flex flex-col gap-4 lg:gap-8" id="integrates-with-supabase">
             <h2 className="h2">{pageData.integratesWithSupabase.title}</h2>
             <TimedAccordionSection tabs={pageData.integratesWithSupabase.useCases} />
           </SectionContainer>

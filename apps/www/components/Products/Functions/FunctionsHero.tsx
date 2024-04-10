@@ -191,7 +191,7 @@ const FunctionsHero = () => {
           2xl:left-[32%] 2xl:w-[40%] 2xl:top-[3%]
         "
       >
-        <CopyToClipboard text="supabase functions new hello && supabase functions deploy hello">
+        <CopyToClipboard text="supabase functions new <function-name> && supabase functions deploy <function-name>">
           <button
             onClick={handleCopy}
             className="w-full px-3 py-2 group hover:border-strong flex gap-1 sm:gap-2 items-center bg-alternative rounded-xl border"
