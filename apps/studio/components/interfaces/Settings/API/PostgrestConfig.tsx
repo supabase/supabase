@@ -16,18 +16,12 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Form,
-  Input,
-  InputNumber,
-} from 'ui'
+import { AlertCircle } from 'lucide-react'
+import { Form, Input, InputNumber } from 'ui'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
-import { AlertCircle, Info } from 'lucide-react'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import ReactMarkdown from 'react-markdown'
+
+import PublicSchemaNotEnabledAlert from './PublicSchemaNotEnabledAlert'
 
 const PostgrestConfig = () => {
   const { ref: projectRef } = useParams()
@@ -160,18 +154,7 @@ const PostgrestConfig = () => {
                             </p>
 
                             {!isPublicSchemaEnabled && (
-                              <Alert_Shadcn_ variant="default">
-                                <Info className="h-4 w-4" />
-                                <AlertTitle_Shadcn_>
-                                  <ReactMarkdown>The `public` schema is not exposed</ReactMarkdown>
-                                </AlertTitle_Shadcn_>
-                                <AlertDescription_Shadcn_ className="flex flex-col gap-3">
-                                  <ReactMarkdown>
-                                    You will not be able to query tables and views in the `public`
-                                    schema via postgREST or supabase-js.
-                                  </ReactMarkdown>
-                                </AlertDescription_Shadcn_>
-                              </Alert_Shadcn_>
+                              <PublicSchemaNotEnabledAlert context="settings" />
                             )}
                           </div>
                         )}

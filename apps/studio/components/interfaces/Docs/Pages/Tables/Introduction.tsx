@@ -7,6 +7,7 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { Info } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
+import PublicSchemaNotEnabledAlert from '../../../Settings/API/PublicSchemaNotEnabledAlert'
 
 interface IntroductionProps {
   selectedLang: 'bash' | 'js'
@@ -32,30 +33,7 @@ const Introduction = ({ selectedLang }: IntroductionProps) => {
             database role for a request are available for querying.
           </p>
 
-          {!isPublicSchemaEnabled && (
-            <Alert_Shadcn_ variant="default">
-              <Info className="h-4 w-4" />
-              <AlertTitle_Shadcn_ className="!-mt-3">
-                <ReactMarkdown>The `public` schema is not exposed</ReactMarkdown>
-              </AlertTitle_Shadcn_>
-              <AlertDescription_Shadcn_ className="flex flex-col gap-3 !-mt-6">
-                <ReactMarkdown>
-                  You will not be able to query tables and views in the `public` schema via
-                  postgREST or supabase-js.
-                </ReactMarkdown>
-                <div>
-                  <Button asChild type="default" className="inline-block">
-                    <Link
-                      href={`/project/${projectRef}/settings/api#postgrest-config`}
-                      className="!no-underline !hover:bg-surface-100 !text-foreground"
-                    >
-                      View schema settings
-                    </Link>
-                  </Button>
-                </div>
-              </AlertDescription_Shadcn_>
-            </Alert_Shadcn_>
-          )}
+          {!isPublicSchemaEnabled && <PublicSchemaNotEnabledAlert context="docs" />}
         </article>
       </div>
 
