@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
-import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
+import { AnimatePresence, m, LazyMotion, domAnimation, useInView } from 'framer-motion'
 import { Badge, cn } from 'ui'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
 import { LW11_DATE, LW11_LAUNCH_DATE, LW11_LAUNCH_DATE_END } from '~/lib/constants'
@@ -19,6 +19,7 @@ import TicketActions from './TicketActions'
 const LWGame = dynamic(() => import('./LW11Game'))
 
 const TicketingFlow = () => {
+  const sectionRef = useRef<HTMLDivElement>(null)
   const { ticketState, userData, showCustomizationForm } = useConfData()
   const { isGameMode, setIsGameMode } = useLwGame(ticketState !== 'ticket' || showCustomizationForm)
 
@@ -36,9 +37,18 @@ const TicketingFlow = () => {
 
   const winningChances = useWinningChances()
 
+  const isInView = useInView(sectionRef)
+
+  useEffect(() => {
+    console.log('isInView', isInView)
+    if (!isInView) setIsGameMode(false)
+
+    return () => setIsGameMode(false)
+  }, [isInView])
+
   return (
     <>
-      <SectionContainer className="relative !pt-8 lg:!pt-20 gap-5 h-full flex-1">
+      <SectionContainer ref={sectionRef} className="relative !pt-8 lg:!pt-20 gap-5 h-full flex-1">
         <div className="relative z-10 flex flex-col h-full">
           <h1 className="sr-only">Supabase Special Announcement | {LW11_DATE}</h1>
           <div className="relative z-10 w-full h-full flex flex-col justify-center gap-5 md:gap-10">
@@ -156,7 +166,7 @@ const TicketingFlow = () => {
                     </div>
                   </m.div>
                 )}
-                {!showCustomizationForm && isGameMode && (
+                {isInView && !showCustomizationForm && isGameMode && (
                   <m.div
                     key="ticket"
                     initial={initial}
