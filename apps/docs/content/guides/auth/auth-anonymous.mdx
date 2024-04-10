@@ -34,7 +34,7 @@ See the [Access control section](#access-control) for more details.
 
 <Admonition type="note" label="Self hosting and local development">
 
-For self-hosting, you can update your project configuration using the files and environment variables provided. See the [self-hosting docs](/docs/guides/self-hosting#configuration) for more details.
+For self-hosting, you can update your project configuration using the files and environment variables provided. See the [local development docs](/docs/guides/cli/config) for more details.
 
 </Admonition>
 
@@ -53,6 +53,15 @@ Call the [`signInAnonymously()`](/docs/reference/javascript/auth-signinanonymous
 
 ```js
 const { data, error } = await supabase.auth.signInAnonymously()
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Flutter">
+
+Call the [`signInAnonymously()`](/docs/reference/dart/auth-signinanonymously) method:
+
+```dart
+await supabase.auth.signInAnonymously();
 ```
 
 </TabPanel>
@@ -89,6 +98,15 @@ const { data, error } = await supabase.auth.updateUser({ email: 'example@email.c
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Flutter">
+
+You can use the [`updateUser()`](/docs/reference/dart/auth-updateuser) method to link an email or phone identity to the anonymous user.
+
+```dart
+await supabase.auth.updateUser(UserAttributes(email: 'example@email.com'));
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 You can use the [`modifyUser()`](/docs/reference/kotlin/auth-updateuser) method to link an email or phone identity to the anonymous user.
@@ -117,6 +135,15 @@ You can use the [`linkIdentity()`](/docs/reference/javascript/auth-linkidentity)
 
 ```js
 const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Flutter">
+
+You can use the [`linkIdentity()`](/docs/reference/dart/auth-linkidentity) method to link an OAuth identity to the anonymous user.
+
+```dart
+await supabase.auth.linkIdentity(OAuthProvider.google);
 ```
 
 </TabPanel>

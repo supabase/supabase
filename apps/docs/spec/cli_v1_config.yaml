@@ -399,6 +399,17 @@ parameters:
       - name: 'Auth Server configuration'
         link: 'https://supabase.com/docs/reference/auth'
 
+  - id: 'auth.enable_anonymous_sign_ins'
+    title: 'auth.enable_anonymous_sign_ins'
+    tags: ['auth']
+    required: false
+    default: 'false'
+    description: |
+      Allow/disallow anonymous sign-ins to your project.
+    links:
+      - name: 'Auth Server configuration'
+        link: 'https://supabase.com/docs/reference/auth'
+
   - id: 'auth.email.enable_signup'
     title: 'auth.email.enable_signup'
     tags: ['auth']
