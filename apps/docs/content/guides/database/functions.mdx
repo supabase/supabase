@@ -300,8 +300,28 @@ final data = await supabase
 </TabPanel>
 <TabPanel id="swift" label="Swift">
 
+Using `Encodable` type:
+
 ```swift
-try await supabase.rpc("add_planet", params: ["name": "Jakku"]).execute()
+struct Planet: Encodable {
+  let name: String
+}
+
+try await supabase.rpc(
+  "add_planet",
+  params: Planet(name: "Jakku")
+)
+.execute()
+```
+
+Using `AnyJSON` convenience` type:
+
+```swift
+try await supabase.rpc(
+  "add_planet",
+  params: ["name": AnyJSON.string("Jakku")]
+)
+.execute()
 ```
 
 </TabPanel>
