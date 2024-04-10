@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
+import { QueryPerformance as QueryPerformanceV1 } from 'components/interfaces/QueryPerformance/QueryPerformance'
 import { QueryPerformance } from 'components/interfaces/QueryPerformanceV2/QueryPerformance'
 import { QUERY_PERFORMANCE_REPORT_TYPES } from 'components/interfaces/QueryPerformanceV2/QueryPerformance.constants'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
@@ -14,10 +15,12 @@ import { DatabaseLayout } from 'components/layouts'
 import { FormHeader } from 'components/ui/Forms'
 import { useFlag } from 'hooks'
 import type { NextPageWithLayout } from 'types'
+import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
+  const enableQueryPerformanceV2 = useFlag('queryPerformanceV2')
 
   // [Joshen] Has been false on configcat for a long time
   const tableIndexEfficiencyEnabled = useFlag('tableIndexEfficiency')
@@ -47,16 +50,37 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
 
   return (
     <div className="h-full flex flex-col">
-      <FormHeader
-        className="py-4 px-6 !mb-0"
-        title="Query Performance"
-        docsUrl="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
-      />
-
       {/* [Joshen] Need to double check what this is about and if it's still relevant */}
       {/* {tableIndexEfficiencyEnabled && <IndexEfficiencyNotice isLoading={isLoading} />} */}
 
-      <QueryPerformance queryHitRate={queryHitRate} queryPerformanceQuery={queryPerformanceQuery} />
+      {enableQueryPerformanceV2 ? (
+        <>
+          <FormHeader
+            className="py-4 px-6 !mb-0"
+            title="Query Performance"
+            docsUrl="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
+          />
+          <QueryPerformance
+            queryHitRate={queryHitRate}
+            queryPerformanceQuery={queryPerformanceQuery}
+          />
+        </>
+      ) : (
+        <ScaffoldContainer>
+          <ScaffoldSection className="!grid-cols-1">
+            <FormHeader
+              className="!mb-0"
+              title="Query Performance"
+              description="Identify queries that consume the most time and database resources via the `pg_stat_statements` table"
+              docsUrl="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
+            />
+            <QueryPerformanceV1
+              queryHitRate={queryHitRate}
+              queryPerformanceQuery={queryPerformanceQuery}
+            />
+          </ScaffoldSection>
+        </ScaffoldContainer>
+      )}
     </div>
   )
 }

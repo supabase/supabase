@@ -1,4 +1,4 @@
-import { HelpCircle } from 'lucide-react'
+import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
@@ -25,8 +25,6 @@ import { PresetHookResult } from '../Reports/Reports.utils'
 import { QUERY_PERFORMANCE_REPORT_TYPES } from './QueryPerformance.constants'
 import { QueryPerformanceFilterBar } from './QueryPerformanceFilterBar'
 import { QueryPerformanceGrid } from './QueryPerformanceGrid'
-
-import { InformationCircleIcon } from '@heroicons/react/16/solid'
 
 interface QueryPerformanceProps {
   queryHitRate: PresetHookResult
