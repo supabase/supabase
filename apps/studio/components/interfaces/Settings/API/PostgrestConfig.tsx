@@ -106,7 +106,7 @@ const PostgrestConfig = () => {
           <>
             <FormPanel
               disabled={true}
-              header={<p>API settings</p>}
+              header="API settings"
               footer={
                 <div className="flex px-8 py-4">
                   <FormActions

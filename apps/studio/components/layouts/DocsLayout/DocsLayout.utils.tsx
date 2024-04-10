@@ -32,43 +32,44 @@ export const generateDocsMenu = (
           : []),
       ],
     },
-    ...(flags?.isPublicSchemaEnabled
-      ? [
-          {
-            title: 'Tables and Views',
-            items: [
-              {
-                name: 'Introduction',
-                key: 'tables-intro',
-                url: `/project/${ref}/api?page=tables-intro`,
+
+    {
+      title: 'Tables and Views',
+      items: [
+        {
+          name: 'Introduction',
+          key: 'tables-intro',
+          url: `/project/${ref}/api?page=tables-intro`,
+          items: [],
+        },
+        ...(flags?.isPublicSchemaEnabled
+          ? tables.sort().map((table) => {
+              return {
+                name: table,
+                key: table,
+                url: `/project/${ref}/api?resource=${table}`,
                 items: [],
-              },
-              ...tables.sort().map((table) => {
-                return {
-                  name: table,
-                  key: table,
-                  url: `/project/${ref}/api?resource=${table}`,
-                  items: [],
-                }
-              }),
-            ],
-          },
-          {
-            title: 'Stored Procedures',
-            items: [
-              {
-                name: 'Introduction',
-                key: 'rpc-intro',
-                url: `/project/${ref}/api?page=rpc-intro`,
-                items: [],
-              },
-              ...functions.map((fn) => {
-                return { name: fn, key: fn, url: `/project/${ref}/api?rpc=${fn}`, items: [] }
-              }),
-            ],
-          },
-        ]
-      : []),
+              }
+            })
+          : []),
+      ],
+    },
+    {
+      title: 'Stored Procedures',
+      items: [
+        {
+          name: 'Introduction',
+          key: 'rpc-intro',
+          url: `/project/${ref}/api?page=rpc-intro`,
+          items: [],
+        },
+        ...(flags?.isPublicSchemaEnabled
+          ? functions.map((fn) => {
+              return { name: fn, key: fn, url: `/project/${ref}/api?rpc=${fn}`, items: [] }
+            })
+          : []),
+      ],
+    },
 
     {
       title: 'GraphQL',
