@@ -130,6 +130,8 @@ const TimedAccordionSection = ({ tabs, intervalDuration = 25, updateFrequency = 
   }, [progress])
 
   const handleTabClick = (tabIndex: number) => {
+    // Disable trigger if tab is already active
+    if (tabIndex === activeTab) return
     restartInterval(tabIndex)
   }
 
