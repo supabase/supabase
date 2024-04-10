@@ -1,6 +1,8 @@
 {
   "private": true,
-  "node": ">=20.0.0",
+  "engines" : {
+    "node": ">=20.0.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
