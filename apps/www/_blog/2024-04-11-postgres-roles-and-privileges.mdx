@@ -21,7 +21,7 @@ Let's first understand some basic concepts which will be used throughout the res
 
 ## Database Object
 
-A database object is any entity created in the database. Tables, foreign tables, views, materialized views, types, domains, operators, functions, triggers etc. are database objects. Objects allow operations on them which vary for each object. For example, you can *select* data from a table and you can *execute* a function.
+A database object is any entity created in the database. Tables, foreign tables, views, materialized views, types, domains, operators, functions, triggers etc. are database objects. Objects allow operations on them which vary for each object. For example, you can _select_ data from a table and you can _execute_ a function.
 
 ## Privilege
 
@@ -149,7 +149,7 @@ So, let’s switch to the `postgres` user connection and grant `junior_dev` the 
 ```bash
 # as postgres
 postgres=> grant create on schema public to junior_dev;
-GRANT 
+GRANT
 ```
 
 Let’s check the permissions again:
@@ -265,7 +265,7 @@ postgres=> select * from public.apps;
 (1 row)
 ```
 
-Another option in the above example would have been for `junior_dev` to grant the *privilege to grant the `select` privilege* to the `postgres` role. The `postgres` role would then have been able to grant the `select` privilege to `senior_dev`. To try this, let’s revoke the previously granted privilege to `senior_dev` first:
+Another option in the above example would have been for `junior_dev` to grant the _privilege to grant the `select` privilege_ to the `postgres` role. The `postgres` role would then have been able to grant the `select` privilege to `senior_dev`. To try this, let’s revoke the previously granted privilege to `senior_dev` first:
 
 ```bash
 # as junior_dev
@@ -487,7 +487,7 @@ Since `junior_dev` and `senior_dev` users do not have `create` privilege on the 
 postgres=> grant developers to junior_dev;
 GRANT ROLE
 postgres=> grant developers to senior_dev;
-GRANT ROLE 
+GRANT ROLE
 ```
 
 The `grant <group> to <user>` is another variant of the `grant` command but should be mentally read as `add <user> to <group>`.
@@ -618,7 +618,7 @@ There are two special roles which play an important part in how roles and privil
 
 ### Superuser
 
-A `superuser` is a role with the `superuser` attribute set. A `superuser` is like a root user on the *nix OSes. It is very powerful and bypasses all privilege checks except authentication during login. For this reason, you should avoid working with this role as much as possible. Only superusers can create other `superuser` roles.
+A `superuser` is a role with the `superuser` attribute set. A `superuser` is like a root user on the \*nix OSes. It is very powerful and bypasses all privilege checks except authentication during login. For this reason, you should avoid working with this role as much as possible. Only superusers can create other `superuser` roles.
 
 ### Public
 
@@ -629,7 +629,7 @@ A `superuser` is a role with the `superuser` attribute set. A `superuser` is lik
 - `execute` - ability to execute functions.
 - `usage` - ability to use an object like a domain, language or type.
 
-The `public` role can’t be deleted, but its privileges can be revoked. 
+The `public` role can’t be deleted, but its privileges can be revoked.
 
 Privileges of a role are union of three sets of privileges:
 
