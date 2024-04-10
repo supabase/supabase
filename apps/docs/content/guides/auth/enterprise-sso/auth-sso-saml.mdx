@@ -129,7 +129,7 @@ CREATE POLICY "View organization settings."
   ON organization_settings
   AS RESTRICTIVE
   USING (
-    sso_provider_id = auth.jwt()#>>'{amr,0,provider}'
+    sso_provider_id = (select auth.jwt()#>>'{amr,0,provider}')
   );
 ```
 
