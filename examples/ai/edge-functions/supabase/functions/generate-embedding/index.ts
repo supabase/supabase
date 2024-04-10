@@ -22,14 +22,10 @@ Deno.serve(async (req) => {
   const { content, id } = payload.record;
 
   // Generate embedding
-  console.log(`Start: Generating embedding for row #${id}`);
-
   const embedding = await model.run(content, {
     mean_pool: true,
     normalize: true,
   });
-
-  console.log(`Completed: Generating embedding for row #${id}`);
 
   // Store in DB
   const { error } = await supabase.from("embeddings").update({ embedding }).eq(

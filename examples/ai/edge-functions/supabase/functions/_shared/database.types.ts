@@ -57,7 +57,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      query_embeddings: {
+        Args: {
+          embedding: string
+          match_threshold: number
+        }
+        Returns: {
+          content: string
+          embedding: string | null
+          id: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
