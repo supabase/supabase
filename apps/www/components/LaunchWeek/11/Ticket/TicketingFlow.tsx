@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
 import { Badge, cn } from 'ui'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
-import { LW11_DATE, LW11_LAUNCH_DATE } from '~/lib/constants'
+import { LW11_DATE, LW11_LAUNCH_DATE, LW11_LAUNCH_DATE_END } from '~/lib/constants'
 import useWinningChances from '../../hooks/useWinningChances'
 import useLwGame from '../../hooks/useLwGame'
 
@@ -14,7 +14,6 @@ import TicketContainer from '~/components/LaunchWeek/11/Ticket/TicketContainer'
 import LW11Background from '../LW11Background'
 import TicketForm from './TicketForm'
 import CountdownComponent from '../Countdown'
-import TicketPresence from './TicketPresence'
 import TicketActions from './TicketActions'
 
 const LWGame = dynamic(() => import('./LW11Game'))
@@ -84,18 +83,14 @@ const TicketingFlow = () => {
                     )}
                   >
                     <div className="flex flex-col gap-2">
-                      <h2 className="text-foreground text-2xl">
-                        Join us for a Special Announcement
-                      </h2>
-                      <p className="text-foreground-lighter text-lg">
-                        Celebrate a major milestone with us and explore all the features that come
-                        with it.
-                      </p>
+                      <h2 className="text-foreground text-2xl">Claim your ticket</h2>
                     </div>
-                    <div className="flex flex-col gap-1 font-mono uppercase text-sm">
-                      <p className="-mb-1">{LW11_DATE}</p>
+                    <div className="flex flex-col gap-1 font-mono text-sm">
+                      <span className="font-mono text-foreground-lighter text-xs leading-3">
+                        Time to participate
+                      </span>
                       <CountdownComponent
-                        date={LW11_LAUNCH_DATE}
+                        date={LW11_LAUNCH_DATE_END}
                         showCard={false}
                         className="[&_*]:leading-4"
                         size="large"
@@ -127,8 +122,7 @@ const TicketingFlow = () => {
                             <p className="text-2xl mb-1">Thanks for sharing!</p>
                           )}
                           <p className="text-[#8B9092]">
-                            Join on April 15-19 to celebrate a major milestone with us and explore
-                            all the features that come with it.
+                            Stay tuned after GA Week to find out if you're a lucky winner.
                           </p>
                         </div>
                       ) : winningChances !== 2 ? (
@@ -155,40 +149,10 @@ const TicketingFlow = () => {
                       </div>
                       <div className="flex flex-col">
                         <span className="font-mono text-foreground-lighter text-xs leading-3">
-                          Starts in:
+                          Time to participate
                         </span>
-                        <CountdownComponent date={LW11_LAUNCH_DATE} showCard={false} />
+                        <CountdownComponent date={LW11_LAUNCH_DATE_END} showCard={false} />
                       </div>
-                      <div className="w-full h-auto text-center md:text-left border border-muted flex flex-col md:flex-row items-stretch rounded-lg bg-surface-100 my-2 md:mb-8 overflow-hidden">
-                        <div className="relative h-full w-full aspect-[4/1] border-b md:border-b-0 md:aspect-auto md:min-h-[140px] md:w-1/3 top-0 -bottom-8 overflow-visible">
-                          <Image
-                            src="/images/launchweek/11/airpods-max-alpha.png"
-                            alt="Supabase AirPod Max prize"
-                            width={300}
-                            height={300}
-                            draggable={false}
-                            className="hidden md:block absolute p-2 object-cover object-left-top w-full h-[200px] overflow-visible opacity-50 pointer-events-none"
-                          />
-                          <Image
-                            src="/images/launchweek/11/airpods-max-alpha-crop.png"
-                            alt="Supabase AirPod Max prize"
-                            draggable={false}
-                            width={300}
-                            height={300}
-                            className="md:hidden absolute mx-auto object-cover inset-x-0 lg:object-top w-auto h-full opacity-50 pointer-events-none"
-                          />
-                        </div>
-                        <div className="flex flex-col justify-center md:w-2/3 gap-1 p-3">
-                          <p className="text-sm text-foreground-lighter">5 sets</p>
-                          <p className="">Win AirPods Max</p>
-                          <p className="text-foreground-light text-sm">
-                            Grow your chances of winning limited edition swag by sharing on{' '}
-                            <span className="text-foreground">X</span> and{' '}
-                            <span className="text-foreground">Linkedin</span>.
-                          </p>
-                        </div>
-                      </div>
-                      <TicketPresence />
                     </div>
                   </m.div>
                 )}

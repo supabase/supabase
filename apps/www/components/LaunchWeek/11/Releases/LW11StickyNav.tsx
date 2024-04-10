@@ -5,8 +5,17 @@ import { cn } from 'ui'
 import { isBrowser } from 'common'
 
 import SectionContainer from '~/components/Layouts/SectionContainer'
+import useConfData from '../../hooks/use-conf-data'
+import Image from 'next/image'
 
 const LWXStickyNav: FC = () => {
+  const { ticketState, userData } = useConfData()
+  const hasPlatinumTicket = userData.platinum
+  const hasSecretTicket = userData.secret
+  const hasTicket = ticketState === 'ticket'
+  const USER = userData?.name || userData?.username
+  const DISPLAY_NAME = USER && USER.split(' ')[0]
+
   const OFFSET = 66
   const anchors = useRef<NodeListOf<HTMLHeadingElement> | null>(null)
   const links = useRef<NodeListOf<HTMLHeadingElement> | null>(null)
@@ -48,6 +57,15 @@ const LWXStickyNav: FC = () => {
     }
   }, [])
 
+  function getTicketIcon() {
+    const getImgPath = (type: string) =>
+      `/images/launchweek/11/tickets/icon/ticket-icon-${type}.png`
+
+    if (hasSecretTicket) return getImgPath('secret')
+    if (hasPlatinumTicket) return getImgPath('platinum')
+    return getImgPath('regular')
+  }
+
   return (
     <div className="absolute inset-0 pointer-events-none w-full h-full">
       <nav className="sticky z-30 top-0 bg-[#06080999] backdrop-blur-sm pointer-events-auto w-full border-t border-b border-[#111718] h-[60px] flex items-center">
@@ -77,7 +95,22 @@ const LWXStickyNav: FC = () => {
               </li>
             </ul>
           </div>
-          <div></div>
+          <div>
+            <Link
+              href="#ticket"
+              className="flex items-center gap-2 text-xs text-foreground-lighter hover:text-foreground transition-colors"
+            >
+              {hasTicket ? `${DISPLAY_NAME}'s ticket` : 'Claim ticket'}
+              <Image
+                src={getTicketIcon()}
+                alt=""
+                width={24}
+                height={24}
+                aria-hidden
+                className="w-auto h-4"
+              />
+            </Link>
+          </div>
         </SectionContainer>
       </nav>
     </div>

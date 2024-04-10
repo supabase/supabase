@@ -12,7 +12,12 @@ const LW11Header = ({ className }: { className?: string }) => {
           Join us in this major milestone and explore all the features that come with it.
         </p>
       </SectionContainer>
-      <LW11Background className="absolute z-0 inset-0 w-full flex items-center justify-center opacity-100 transition-opacity aspect-video pointer-events-none" />
+      <div className="absolute z-0 inset-0 w-full h-full overflow-hidden pointer-events-none">
+        <div className="absolute z-0 inset-0 w-full aspect-video">
+          <LW11Background className="absolute z-0 inset-0 w-full flex items-center justify-center opacity-100 transition-opacity h-full" />
+        </div>
+        <div className="absolute inset-0 bg-[linear-gradient(to_top,#060809)_0%,transparent_100%)]" />
+      </div>
     </div>
   )
 }

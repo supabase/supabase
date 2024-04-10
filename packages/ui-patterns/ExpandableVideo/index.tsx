@@ -59,9 +59,8 @@ export function ExpandableVideo({
       <Image
         src={imgUrl ?? '/images/blur.png'}
         alt={imgAltText ?? 'Video guide preview'}
-        layout="fill"
-        objectFit="cover"
-        className="absolute inset-0"
+        fill
+        className="absolute inset-0 object-cover"
       />
     </div>
   )

@@ -7,7 +7,6 @@ import { Session } from '@supabase/supabase-js'
 import { SITE_ORIGIN, SPECIAL_ANNOUNCEMENT_URL } from '~/lib/constants'
 import supabase from '~/lib/supabaseMisc'
 
-// import FaviconImports from '~/components/LaunchWeek/11/FaviconImports'
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -18,6 +17,7 @@ import MainStage from '~/components/LaunchWeek/11/Releases/MainStage'
 
 const BuildStage = dynamic(() => import('~/components/LaunchWeek/11/Releases/BuildStage'))
 const LW11Meetups = dynamic(() => import('~/components/LaunchWeek/11/LW11Meetups'))
+const TicketingFlow = dynamic(() => import('~/components/LaunchWeek/11/Ticket/TicketingFlow'))
 const LaunchWeekPrizeSection = dynamic(
   () => import('~/components/LaunchWeek/11/LaunchWeekPrizeSection')
 )
@@ -99,7 +99,6 @@ export default function GAWeekIndex({ meetups }: Props) {
           ],
         }}
       />
-      {/* <FaviconImports /> */}
       <ConfDataContext.Provider
         value={{
           supabase,
@@ -120,7 +119,10 @@ export default function GAWeekIndex({ meetups }: Props) {
           <SectionContainer id="meetups" className="scroll-mt-[66px]">
             <LW11Meetups meetups={meetups} />
           </SectionContainer>
-          <SectionContainer className="lg:pb-40">
+          <SectionContainer className="!pb-8" id="ticket">
+            <TicketingFlow />
+          </SectionContainer>
+          <SectionContainer className="lg:pb-40" id="awards">
             <LaunchWeekPrizeSection />
           </SectionContainer>
         </DefaultLayout>
