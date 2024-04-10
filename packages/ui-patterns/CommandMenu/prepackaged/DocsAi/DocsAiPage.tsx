@@ -1,17 +1,7 @@
 import { AlertTriangle, CornerDownLeft, User } from 'lucide-react'
-import type OpenAI from 'openai'
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { SSE } from 'sse.js'
 
 import {
   AiIconAnimation,
@@ -23,12 +13,14 @@ import {
   markdownComponents,
 } from 'ui'
 
-import { AiWarning } from '../AiWarning'
+import { AiWarning } from '../ai'
 
 import { CommandWrapper } from '../../api/CommandMenu'
 import { useQuery, useSetQuery } from '../../api/hooks/queryHooks'
 import { useHistoryKeys } from '../../api/hooks/useHistoryKeys'
 import { useSetCommandMenuSize } from '../../api/hooks/viewHooks'
+import { MessageRole, MessageStatus, useAiChat } from '../ai'
+import { generateCommandClassNames } from '../../internal/Command'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -38,283 +30,6 @@ const questions = [
   'How do I listen to changes in a table?',
   'How do I set up authentication?',
 ]
-
-export const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
-
-export enum MessageRole {
-  User = 'user',
-  Assistant = 'assistant',
-}
-
-export enum MessageStatus {
-  Pending = 'pending',
-  InProgress = 'in-progress',
-  Complete = 'complete',
-}
-
-export interface Message {
-  role: MessageRole
-  content: string
-  status: MessageStatus
-}
-
-interface NewMessageAction {
-  type: 'new'
-  message: Message
-}
-
-interface UpdateMessageAction {
-  type: 'update'
-  index: number
-  message: Partial<Message>
-}
-
-interface AppendContentAction {
-  type: 'append-content'
-  index: number
-  content: string
-}
-
-interface ResetAction {
-  type: 'reset'
-}
-
-type MessageAction = NewMessageAction | UpdateMessageAction | AppendContentAction | ResetAction
-
-function messageReducer(state: Message[], messageAction: MessageAction) {
-  let current = [...state]
-  const { type } = messageAction
-
-  switch (type) {
-    case 'new': {
-      const { message } = messageAction
-      current.push(message)
-      break
-    }
-    case 'update': {
-      const { index, message } = messageAction
-      if (current[index]) {
-        Object.assign(current[index], message)
-      }
-      break
-    }
-    case 'append-content': {
-      const { index, content } = messageAction
-      if (current[index]) {
-        current[index].content += content
-      }
-      break
-    }
-    case 'reset': {
-      current = []
-      break
-    }
-    default: {
-      throw new Error(`Unknown message action '${type}'`)
-    }
-  }
-
-  return current
-}
-
-export interface UseAiChatOptions {
-  messageTemplate?: (message: string) => string
-  setIsLoading?: Dispatch<SetStateAction<boolean>>
-}
-
-export function useAiChat({
-  messageTemplate = (message) => message,
-  setIsLoading,
-}: UseAiChatOptions) {
-  const eventSourceRef = useRef<SSE>()
-
-  const [isResponding, setIsResponding] = useState(false)
-  const [hasError, setHasError] = useState(false)
-
-  const [currentMessageIndex, setCurrentMessageIndex] = useState(1)
-  const [messages, dispatchMessage] = useReducer(messageReducer, [])
-
-  const submit = useCallback(
-    async (query: string) => {
-      dispatchMessage({
-        type: 'new',
-        message: {
-          status: MessageStatus.Complete,
-          role: MessageRole.User,
-          content: query,
-        },
-      })
-      dispatchMessage({
-        type: 'new',
-        message: {
-          status: MessageStatus.Pending,
-          role: MessageRole.Assistant,
-          content: '',
-        },
-      })
-      setIsResponding(false)
-      setHasError(false)
-      setIsLoading?.(true)
-
-      const eventSource = new SSE(`${BASE_PATH}/api/ai/docs`, {
-        headers: {
-          apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        payload: JSON.stringify({
-          messages: messages
-            .filter(({ status }) => status === MessageStatus.Complete)
-            .map(({ role, content }) => ({ role, content }))
-            .concat({ role: MessageRole.User, content: messageTemplate(query) }),
-        }),
-      })
-
-      function handleError<T>(err: T) {
-        setIsLoading?.(false)
-        setIsResponding(false)
-        setHasError(true)
-        console.error(err)
-      }
-
-      eventSource.addEventListener('error', handleError)
-      eventSource.addEventListener('message', (e: MessageEvent) => {
-        try {
-          setIsLoading?.(false)
-
-          if (e.data === '[DONE]') {
-            setIsResponding(false)
-            dispatchMessage({
-              type: 'update',
-              index: currentMessageIndex,
-              message: {
-                status: MessageStatus.Complete,
-              },
-            })
-            setCurrentMessageIndex((x) => x + 2)
-            return
-          }
-
-          dispatchMessage({
-            type: 'update',
-            index: currentMessageIndex,
-            message: {
-              status: MessageStatus.InProgress,
-            },
-          })
-
-          setIsResponding(true)
-
-          const completionChunk: OpenAI.Chat.Completions.ChatCompletionChunk = JSON.parse(e.data)
-          const [
-            {
-              delta: { content },
-            },
-          ] = completionChunk.choices
-
-          if (content) {
-            dispatchMessage({
-              type: 'append-content',
-              index: currentMessageIndex,
-              content,
-            })
-          }
-        } catch (err) {
-          handleError(err)
-        }
-      })
-
-      eventSource.stream()
-
-      eventSourceRef.current = eventSource
-
-      setIsLoading?.(true)
-    },
-    [currentMessageIndex, messages, messageTemplate]
-  )
-
-  function reset() {
-    eventSourceRef.current?.close()
-    eventSourceRef.current = undefined
-    setIsResponding(false)
-    setHasError(false)
-    dispatchMessage({
-      type: 'reset',
-    })
-  }
-
-  return {
-    submit,
-    reset,
-    messages,
-    isResponding,
-    hasError,
-  }
-}
-
-/**
- * Perform a one-off query to AI based on a snapshot of messages
- */
-export function queryAi(messages: Message[], timeout = 0) {
-  return new Promise<string>((resolve, reject) => {
-    const eventSource = new SSE(`${BASE_PATH}/api/ai/docs`, {
-      headers: {
-        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
-        Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      payload: JSON.stringify({
-        messages: messages.map(({ role, content }) => ({ role, content })),
-      }),
-    })
-
-    let timeoutId: number | undefined
-
-    function handleError<T>(err: T) {
-      if (timeoutId) {
-        clearTimeout(timeoutId)
-      }
-      console.error(err)
-      reject(err)
-    }
-
-    if (timeout > 0) {
-      timeoutId = window.setTimeout(() => {
-        handleError(new Error('AI query timed out'))
-      }, timeout)
-    }
-
-    let answer = ''
-
-    eventSource.addEventListener('error', handleError)
-    eventSource.addEventListener('message', (e: MessageEvent) => {
-      try {
-        if (e.data === '[DONE]') {
-          if (timeoutId) {
-            clearTimeout(timeoutId)
-          }
-          resolve(answer)
-          return
-        }
-
-        const completionChunk: OpenAI.Chat.Completions.ChatCompletionChunk = JSON.parse(e.data)
-        const [
-          {
-            delta: { content },
-          },
-        ] = completionChunk.choices
-
-        if (content) {
-          answer += content
-        }
-      } catch (err) {
-        handleError(err)
-      }
-    })
-
-    eventSource.stream()
-  })
-}
 
 const DocsAiPage = () => {
   const query = useQuery()
@@ -432,21 +147,7 @@ const DocsAiPage = () => {
               const key = question.replace(/\s+/g, '_')
               return (
                 <CommandItem_Shadcn_
-                  className={cn(
-                    'cursor-default',
-                    'select-none',
-                    'items-center',
-                    'rounded-md',
-                    'text-sm',
-                    'group',
-                    'py-3',
-                    'text-foreground-light',
-                    'relative',
-                    'flex gap-2',
-                    'px-2',
-                    'aria-selected:bg-overlay-hover/80 aria-selected:backdrop-filter aria-selected:backdrop-blur-md',
-                    'data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                  )}
+                  className={generateCommandClassNames(false)}
                   onSelect={() => {
                     if (!query) {
                       handleSubmit(question)

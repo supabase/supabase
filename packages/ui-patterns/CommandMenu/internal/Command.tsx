@@ -27,6 +27,41 @@ type IRouteCommand = IBaseCommand & {
 const isActionCommand = (command: ICommand): command is IActionCommand => 'action' in command
 const isRouteCommand = (command: ICommand): command is IRouteCommand => 'route' in command
 
+const generateCommandClassNames = (isLink: boolean) =>
+  cn(
+    'cursor-default',
+    'select-none',
+    'items-center gap-2',
+    'rounded-md',
+    'text-sm',
+    'group',
+    'py-3',
+    'text-foreground-light',
+    'relative',
+    'flex',
+    isLink
+      ? `
+bg-transparent
+border
+border-overlay/90
+px-2
+transition-all
+outline-none
+aria-selected:border-overlay
+aria-selected:bg-overlay-hover/90
+aria-selected:shadow-sm
+aria-selected:scale-[100.3%]
+data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
+      : `
+px-2
+aria-selected:bg-overlay-hover/80
+aria-selected:backdrop-filter
+aria-selected:backdrop-blur-md
+data-[disabled]:pointer-events-none
+data-[disabled]:opacity-50
+`
+  )
+
 interface CommandItemProps extends React.ComponentPropsWithoutRef<typeof CommandItem_Shadcn_> {
   command: ICommand
 }
@@ -51,44 +86,7 @@ const CommandItem = forwardRef<
             : () => {}
       }
       className={cn(
-        'cursor-default',
-        'select-none',
-        'items-center',
-        'rounded-md',
-        'text-sm',
-        'group',
-        'py-3',
-        'text-foreground-light',
-        'relative',
-        'flex',
-        isRouteCommand(command)
-          ? `
-  bg-transparent
-  border
-  border-overlay/90
-  px-5
-  transition-all
-  outline-none
-  aria-selected:border-overlay
-  aria-selected:bg-overlay-hover/90
-  aria-selected:shadow-sm
-  aria-selected:scale-[100.3%]
-  data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
-          : isRouteCommand(command)
-            ? `
-  px-2
-  transition-all
-  outline-none
-  aria-selected:bg-overlay-hover/90
-  data-[disabled]:pointer-events-none data-[disabled]:opacity-50`
-            : `
-  px-2
-  aria-selected:bg-overlay-hover/80
-  aria-selected:backdrop-filter
-  aria-selected:backdrop-blur-md
-  data-[disabled]:pointer-events-none
-  data-[disabled]:opacity-50
-  `,
+        generateCommandClassNames(isRouteCommand(command)),
         className,
         command.className
       )}
@@ -106,5 +104,5 @@ const CommandItem = forwardRef<
 })
 CommandItem.displayName = CommandItem_Shadcn_.displayName
 
-export { CommandItem, isActionCommand, isRouteCommand }
+export { CommandItem, generateCommandClassNames, isActionCommand, isRouteCommand }
 export type { ICommand }

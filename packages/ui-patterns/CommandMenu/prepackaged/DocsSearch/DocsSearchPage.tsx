@@ -18,7 +18,7 @@ import { CommandWrapper } from '../../api/CommandMenu'
 import { TextHighlighter } from '../../api/TextHighlighter'
 import { useSetCommandMenuOpen } from '../../api/hooks/viewHooks'
 import { useQuery, useSetQuery } from '../../api/hooks/queryHooks'
-import { escapeAttributeSelector } from '../../api/utils'
+import { escapeAttributeSelector, generateCommandClassNames } from '../../api/utils'
 
 const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH
 const NUMBER_SOURCES = 2
@@ -429,25 +429,7 @@ const DocsSearchPage = () => {
                     openLink(page.type, formatPageUrl(page))
                   }}
                   forceMount={true}
-                  className={cn(
-                    'cursor-default',
-                    'select-none',
-                    'items-center',
-                    'rounded-md',
-                    'text-sm',
-                    'group',
-                    'py-3',
-                    'text-foreground-light',
-                    'relative',
-                    'flex',
-                    'bg-transparent',
-                    'border border-overlay/90',
-                    'px-5',
-                    'transition-all',
-                    'outline-none',
-                    'aria-selected:border-overlay aria-selected:bg-overlay-hover/90 aria-selected:shadow-sm aria-selected:scale-[100.3%]',
-                    'data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                  )}
+                  className={generateCommandClassNames(true)}
                 >
                   <div className="grow flex gap-3 items-center">
                     <IconContainer>{getPageIcon(page)}</IconContainer>
@@ -467,26 +449,7 @@ const DocsSearchPage = () => {
                   <div className="border-l border-default ml-3 pt-3">
                     {page.sections.map((section, i) => (
                       <CommandItem_Shadcn_
-                        className={cn(
-                          'cursor-default',
-                          'select-none',
-                          'items-center',
-                          'rounded-md',
-                          'text-sm',
-                          'group',
-                          'py-3',
-                          'text-foreground-light',
-                          'relative',
-                          'flex',
-                          'bg-transparent',
-                          'border border-overlay/90',
-                          'px-5',
-                          'transition-all',
-                          'outline-none',
-                          'aria-selected:border-overlay aria-selected:bg-overlay-hover/90 aria-selected:shadow-sm aria-selected:scale-[100.3%]',
-                          'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
-                          'ml-3 mb-3'
-                        )}
+                        className={cn(generateCommandClassNames(true), 'ml-3 mb-3')}
                         onSelect={() => {
                           openLink(page.type, formatSectionUrl(page, section))
                         }}
@@ -521,25 +484,7 @@ const DocsSearchPage = () => {
               const key = question.replace(/\s+/g, '_')
               return (
                 <CommandItem_Shadcn_
-                  className={cn(
-                    'cursor-default',
-                    'select-none',
-                    'items-center',
-                    'gap-3',
-                    'rounded-md',
-                    'text-sm',
-                    'group',
-                    'py-3',
-                    'text-foreground-light',
-                    'relative',
-                    'flex',
-                    'bg-transparent',
-                    'px-5',
-                    'transition-all',
-                    'outline-none',
-                    'aria-selected:border-overlay aria-selected:bg-overlay-hover/90 aria-selected:shadow-sm aria-selected:scale-[100.3%]',
-                    'data-[disabled]:pointer-events-none data-[disabled]:opacity-50'
-                  )}
+                  className={generateCommandClassNames(false)}
                   disabled={hasResults}
                   onSelect={() => {
                     if (!query) {
