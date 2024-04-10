@@ -167,9 +167,8 @@ const PostgrestConfig = () => {
                                 </AlertTitle_Shadcn_>
                                 <AlertDescription_Shadcn_ className="flex flex-col gap-3">
                                   <ReactMarkdown>
-                                    API endpoints will not be created for the `public` schema. You
-                                    will not be able to make `supabase-js` or `postgrest-js` calls
-                                    to these tables and views.
+                                    You will not be able to query tables and views in the `public`
+                                    schema via postgREST or supabase-js.
                                   </ReactMarkdown>
                                 </AlertDescription_Shadcn_>
                               </Alert_Shadcn_>
