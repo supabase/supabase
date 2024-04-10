@@ -126,7 +126,7 @@ Future<void> signInWithEmail() async {
 </TabPanel>
 <TabPanel id="swift" label="Swift">
 
-When your user signs in, call [signInWithPassword()](/docs/reference/swift/auth-signinwithpassword) with their email address and password:
+When your user signs in, call [signIn(email:password:)](/docs/reference/swift/auth-signinwithpassword) with their email address and password:
 
 ```swift
 try await supabase.auth.signIn(
@@ -185,7 +185,7 @@ Future<void> signOut() async {
 </TabPanel>
 <TabPanel id="swift" label="Swift">
 
-When your user signs out, call [signOut()](/docs/reference/swift/auth-signout) to remove them from the browser session and any objects from localStorage:
+When your user signs out, call [signOut()](/docs/reference/swift/auth-signout) to remove the session from the local storage:
 
 ```swift
 try await supabase.auth.signOut()
