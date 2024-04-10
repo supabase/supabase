@@ -1,14 +1,7 @@
 import 'swiper/css'
 
 import React, { useState, useEffect, useRef } from 'react'
-import {
-  AnimatePresence,
-  LazyMotion,
-  domAnimation,
-  m,
-  useAnimation,
-  useInView,
-} from 'framer-motion'
+import { LazyMotion, domAnimation, m, useAnimation, useInView } from 'framer-motion'
 import { cn } from 'ui'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import Panel from '../Panel'
@@ -70,22 +63,20 @@ const TimedPanel = ({
             {paragraph}
           </p>
         </div>
-        <AnimatePresence>
+        <div
+          className={cn(
+            'absolute h-[calc(100%-150px)] mt-14 inset-0 m-auto flex items-center justify-center transition-opacity',
+            isActive ? 'opacity-100' : 'opacity-25'
+          )}
+        >
           <div
             className={cn(
-              'absolute h-[calc(100%-150px)] mt-14 inset-0 m-auto flex items-center justify-center transition-opacity',
-              isActive ? 'opacity-100' : 'opacity-25'
+              'absolute z-20 w-full h-full inset-0 bg-gradient-to-r from-transparent to-background-surface-100 transition-opacity pointer-events-none',
+              isActive && 'opacity-0'
             )}
-          >
-            <div
-              className={cn(
-                'absolute z-20 w-full h-full inset-0 bg-gradient-to-r from-transparent to-background-surface-100 transition-opacity pointer-events-none',
-                isActive && 'opacity-0'
-              )}
-            />
-            <Image isActive={isActive} isInView={isInView} />
-          </div>
-        </AnimatePresence>
+          />
+          <Image isActive={isActive} isInView={isInView} />
+        </div>
       </Panel>
       {!isSm && isActive && (
         <div className="opacity-0 animate-fade-in absolute bottom-0 w-full h-[1px] bg-border-strong group-hover:opacity-100 rounded-full overflow-hidden">
@@ -154,7 +145,7 @@ const TimedAccordionPanels = ({ panels, intervalDuration = 10, updateFrequency =
       clearInterval(progressInterval)
       setProgress(0)
     }
-  }, [activeTab, controls, isInView])
+  }, [isInView])
 
   useEffect(() => {
     if (progress >= 100.9) {
@@ -163,6 +154,8 @@ const TimedAccordionPanels = ({ panels, intervalDuration = 10, updateFrequency =
   }, [progress])
 
   const handleTabClick = (tabIndex: number) => {
+    // Disable trigger if tab is already active
+    if (tabIndex === activeTab) return
     restartInterval(tabIndex)
   }
 
