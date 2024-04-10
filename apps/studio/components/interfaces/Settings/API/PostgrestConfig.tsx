@@ -149,6 +149,13 @@ const PostgrestConfig = () => {
                               searchPlaceholder="Search for a schema"
                               onChange={(event) => {
                                 let updatedValues: any = values
+                                // If "public" exists in the array, move it to the beginning
+                                const index = event.indexOf('public')
+                                if (index !== -1) {
+                                  event.splice(index, 1) // remove public from current position
+                                  event.unshift('public') // add public to the beginning
+                                }
+
                                 updatedValues.db_schema = event.join(', ')
                                 resetForm({ values: updatedValues, initialValues: updatedValues })
                                 updateConfig({ ...updatedValues })

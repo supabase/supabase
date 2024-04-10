@@ -10,17 +10,20 @@ import { useIsFeatureEnabled, useSelectedProject, withAuth } from 'hooks'
 import { PROJECT_STATUS } from 'lib/constants'
 import { ProjectLayout } from '../'
 import { generateDocsMenu } from './DocsLayout.utils'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 
 function DocsLayout({ title, children }: { title: string; children: ReactElement }) {
   const router = useRouter()
   const { ref } = useParams()
   const selectedProject = useSelectedProject()
+  const projectRef = selectedProject?.ref ?? 'default'
   const isPaused = selectedProject?.status === PROJECT_STATUS.INACTIVE
 
   const { data, isLoading, error } = useOpenAPISpecQuery(
     { projectRef: ref },
     { enabled: !isPaused }
   )
+  const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
 
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
   const hideMenu = isNewAPIDocsEnabled && router.pathname.endsWith('/graphiql')
@@ -43,9 +46,13 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
     )
   }
 
-  const projectRef = selectedProject?.ref ?? 'default'
   const tableNames = (data?.tables ?? []).map((table: any) => table.name)
   const functionNames = (data?.functions ?? []).map((fn: any) => fn.name)
+
+  const isPublicSchemaEnabled = (config?.db_schema
+    .split(',')
+    .map((name) => name.trim())
+    .includes('public') || false) as boolean
 
   return (
     <ProjectLayout
@@ -56,7 +63,10 @@ function DocsLayout({ title, children }: { title: string; children: ReactElement
         !hideMenu && (
           <ProductMenu
             page={getPage()}
-            menu={generateDocsMenu(projectRef, tableNames, functionNames, { authEnabled })}
+            menu={generateDocsMenu(projectRef, tableNames, functionNames, {
+              authEnabled,
+              isPublicSchemaEnabled,
+            })}
           />
         )
       }

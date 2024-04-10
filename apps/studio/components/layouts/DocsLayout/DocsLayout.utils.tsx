@@ -7,7 +7,7 @@ export const generateDocsMenu = (
   ref: string,
   tables: string[],
   functions: string[],
-  flags?: { authEnabled: boolean }
+  flags?: { authEnabled: boolean; isPublicSchemaEnabled: boolean }
 ): ProductMenuGroup[] => {
   return [
     {
@@ -32,39 +32,44 @@ export const generateDocsMenu = (
           : []),
       ],
     },
-    {
-      title: 'Tables and Views',
-      items: [
-        {
-          name: 'Introduction',
-          key: 'tables-intro',
-          url: `/project/${ref}/api?page=tables-intro`,
-          items: [],
-        },
-        ...tables.sort().map((table) => {
-          return {
-            name: table,
-            key: table,
-            url: `/project/${ref}/api?resource=${table}`,
-            items: [],
-          }
-        }),
-      ],
-    },
-    {
-      title: 'Stored Procedures',
-      items: [
-        {
-          name: 'Introduction',
-          key: 'rpc-intro',
-          url: `/project/${ref}/api?page=rpc-intro`,
-          items: [],
-        },
-        ...functions.map((fn) => {
-          return { name: fn, key: fn, url: `/project/${ref}/api?rpc=${fn}`, items: [] }
-        }),
-      ],
-    },
+    ...(flags?.isPublicSchemaEnabled
+      ? [
+          {
+            title: 'Tables and Views',
+            items: [
+              {
+                name: 'Introduction',
+                key: 'tables-intro',
+                url: `/project/${ref}/api?page=tables-intro`,
+                items: [],
+              },
+              ...tables.sort().map((table) => {
+                return {
+                  name: table,
+                  key: table,
+                  url: `/project/${ref}/api?resource=${table}`,
+                  items: [],
+                }
+              }),
+            ],
+          },
+          {
+            title: 'Stored Procedures',
+            items: [
+              {
+                name: 'Introduction',
+                key: 'rpc-intro',
+                url: `/project/${ref}/api?page=rpc-intro`,
+                items: [],
+              },
+              ...functions.map((fn) => {
+                return { name: fn, key: fn, url: `/project/${ref}/api?rpc=${fn}`, items: [] }
+              }),
+            ],
+          },
+        ]
+      : []),
+
     {
       title: 'GraphQL',
       items: [
