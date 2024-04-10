@@ -674,7 +674,7 @@ supabase
 let myChannel = await supabase.channel("db-changes")
 
 let messageChanges = await myChannel.postgresChange(AnyAction.self, schema: "public", table: "messages")
-let userChanges = await myChannel.postgresChange(InsertAction.self, schema: "public", table: "users") 
+let userChanges = await myChannel.postgresChange(InsertAction.self, schema: "public", table: "users")
 
 await myChannel.subscribe()
 ```

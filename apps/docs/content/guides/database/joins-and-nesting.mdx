@@ -267,8 +267,8 @@ let teams [Team] = try await supabase
   .from("teams")
   .select(
     """
-      id, 
-      team_name, 
+      id,
+      team_name,
       users ( id, name )
     """
   )

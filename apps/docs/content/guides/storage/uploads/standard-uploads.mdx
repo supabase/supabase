@@ -111,7 +111,7 @@ let supabase = SupabaseClient(supabaseURL: URL(string: "your_project_url")!, sup
 
 try await supabase.storage.from("bucket_name")
   .upload(
-    path: "file_path", 
+    path: "file_path",
     file: file,
     options: FileOptions(
       upsert: true
@@ -158,7 +158,7 @@ let supabase = SupabaseClient(supabaseURL: URL(string: "your_project_url")!, sup
 
 try await supabase.storage.from("bucket_name")
   .upload(
-    path: "file_path", 
+    path: "file_path",
     file: file,
     options: FileOptions(
       contentType: "image/jpeg"

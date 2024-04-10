@@ -245,7 +245,7 @@ struct Response: Codable {
   let lat: Double
   let long: Double
   let distance: Double
-  
+
   enum CodingKeys: String, CodingKey {
     case id, name, lat, long
     case distance = "dist_meters"
@@ -253,7 +253,7 @@ struct Response: Codable {
 }
 
 let response: Response = try await supabase.rpc(
-  "nearby_restaurants", 
+  "nearby_restaurants",
   params: [
     "lat": 40.807313,
     "long": -73.946713
