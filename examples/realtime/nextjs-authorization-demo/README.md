@@ -6,9 +6,9 @@ Read more and provide feedback at our [Github Discussion](https://github.com/org
 
 ## Objective
 
-Build a chat system using Realtime broadcast where users can create rooms and invite existing users to a room.
+Build a chat system using Realtime Broadcast with Authorizated Channels where users can create rooms and invite existing users to a room.
 
-Each room will have a set number of users that will be restricted by using RLS rules applied to realtime.channels, realtime.broadcast and realtime.presence.
+Each room restricts the number of users authorized by applying RLS policies applied to `public` schema tables you'll be creating and the auto-generated `realtime` schema tables.
 
 ## Run it
 
@@ -29,28 +29,12 @@ And here one of the user does not have access because their RLS rules made the u
 
 We're taking advantage of protected schemas to feed data to our application, namely realtime.channels and auth.users so we can easily have cascading changes if a channel / user is deleted.
 
-We also need realtime.profiles with a trigger so we have a way to offer a public email to be used to invite people to the chat room.
+We also need public.profiles with a trigger so we have a way to offer a public email to be used to invite people to the chat room.
 
 ![Schema used by our demo application](./schema.png)
 
 ## Database Setup
-### Trigger
-To actually add entries to our profile table we setup a function and a trigger to add an entry whenever a new user is created:
 
-```sql
-create or replace function insert_user () returns trigger as
-$$
-  BEGIN
-    INSERT INTO public.profiles (user_id, email) VALUES (NEW.id, NEW.email); RETURN NEW;
-  END;
-$$ language plpgsql;
-
-create or replace trigger "on_new_auth_create_profile"
-after insert on auth.users for each row
-execute function insert_user ();
-
-grant execute on function insert_user () to supabase_auth_admin;
-```
 
 ### RLS Rules
 We do have a lot of rules setup so we will detail them with schema.table in the section below.
@@ -60,13 +44,23 @@ The most noteworthy one will be the realtime.broadcast as it will be the one use
 > ⚠️ All the rules here are not the most secure, you should check your use case and refine them!
 #### public.profiles
 ```sql
+create table public.profiles (
+  email text not null,
+  user_id bigint references auth.users (id)
+);
+create table public.rooms_users (
+  name bigint references auth.channels (name),
+  user_id bigint references auth.users (id),
+  created_at timestamp with time zone default current_timestamp
+);
+
 create policy "authenticated users can view all profiles"
 on "public"."profiles"
 as PERMISSIVE for SELECT
 to authenticated
 using ( true );
 
-create policy "authenticated user can insert profile"
+create policy "supabase_auth_admin user can insert profile"
 on "public"."profiles"
 as PERMISSIVE for INSERT
 to supabase_auth_admin
@@ -145,9 +139,30 @@ using (
 );
 ```
 
+### Trigger
+To actually add entries to our profile table we setup a function and a trigger to add an entry whenever a new user is created:
+
+```sql
+create or replace function insert_user () returns trigger as
+$$
+  BEGIN
+    INSERT INTO public.profiles (user_id, email) VALUES (NEW.id, NEW.email); RETURN NEW;
+  END;
+$$ language plpgsql;
+
+create or replace trigger "on_new_auth_create_profile"
+after insert on auth.users for each row
+execute function insert_user ();
+
+grant execute on function insert_user () to supabase_auth_admin;
+```
+
 ## Coding concerns
 ### Need to create channels
-At the moment if you are using Realtime channels you would just connect and go. If you want your channel to respect the RLS rules setup above you will need to preemptively create the channel that will be used before connecting.
+At the moment Realtime Channels are public and anyone with an Anon token and a valid JWT would be able to listen to any Channel.
+If you want your channel to respect the RLS rules setup above you will need to preemptively create the channel that will be used before connecting.
+
+> ⚠️ This will also impact access to `postgres_changes` channels on connect.
 
 This can be done with a quick API call:
 ```ts
@@ -155,7 +170,26 @@ await supabase.realtime.createChannel(name)
 ```
 You can check this code at the [create-room-modal.tsx](components/create-room-modal.tsx) component.
 
+Also we're using the `next` version which we need to override in our [package.json](package.json):
+```js
+// ...
+"overrides": {
+    "@supabase/supabase-js": {
+      "@supabase/realtime-js": "^2.10.0-next.6"
+    }
+  },
+// ...
+```
+
+Or you could use a curl command:
+```sh
+curl -v -X POST 'https://<project_ref>.supabase.co/realtime/v1/api/channels'\
+ --header 'apikey: <anon_token>'\
+ --header 'authorization: Bearer <access_token>' \
+ --header 'Content-Type: application/json'\
+ --data-raw '{ "name": "<channel name>" }'
+```
 ### Connecting to broadcast is essentially the same
-The biggest difference from the previous way of work was really the requirement of creating the channel, other than that you can connect as usual to your Realtime channel which might fail to connect if it does not respect the RLS rules set by you.
+The biggest difference from the previous way of work was really the requirement of creating the channel mentioned above, other than that you can connect as usual to your Realtime channel which will run the new check and either succeed or fail to connect.
 
 You can check this code at the [protected/page.tsx](app/protected/page.tsx).
