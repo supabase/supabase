@@ -1,25 +1,26 @@
-# Supaslack
+# SupaSecureSlack
 
 Example application on how you can use Realtime Authorization feature to limit access to Realtime [Channels](https://supabase.com/docs/guides/realtime/concepts#channels) and limit access to the [Broadcast](https://supabase.com/docs/guides/realtime/broadcast) feature.
 
-Read more and provide feedback at our [Github Discussion](https://github.com/orgs/supabase/discussions/22484)
+You can provide feedback on our [Github Discussion](https://github.com/orgs/supabase/discussions/22484).
 
 ## Objective
 
-Build a chat system using Realtime Broadcast with Authorizated Channels where users can create rooms and invite existing users to a room.
+Build a chat system using Realtime Broadcast with Authorized Channels where users can create rooms and invite existing users to a room.
 
 Each room restricts the number of users authorized by applying RLS policies applied to `public` schema tables you'll be creating and the auto-generated `realtime` schema tables.
 
-## Run it
+## Run It
 
-```sh
-npm i
-npm run dev
-```
+1. Create a `.env.local` file with the required variables by running `cp .env.example .env.local`.
+2. [Create a new Supabase project](https://supabase.com/dashboard/new/_).
+3. Refer to the [Database Setup](#database-setup) section to create the necessary tables and policies.
+4. Copy the project's `URL` and `anon` API key from your project's [API Settings](https://supabase.com/dashboard/project/_/settings/api), and paste them into your `.env.local`.
+5. `npm install`
+6. `npm run dev`
 
-> Please do note that currently we're overriding the dependecy for realtime to use the `next` version.
+## How It Looks
 
-## How it looks
 In this scenario both users are able to access it:
 ![Both users were able to connect](./chat_success.png)
 And here one of the user does not have access because their RLS rules made the user be denied access
@@ -27,150 +28,184 @@ And here one of the user does not have access because their RLS rules made the u
 
 ## Schema
 
-We're taking advantage of protected schemas to feed data to our application, namely realtime.channels and auth.users so we can easily have cascading changes if a channel / user is deleted.
+We're taking advantage of Supabase's protected schemas to feed data to our application, namely `realtime.channels` and `auth.users`, so we can easily have cascading changes if a Channel / user is deleted.
 
-We also need public.profiles with a trigger so we have a way to offer a public email to be used to invite people to the chat room.
+We also need `public.profiles` with a trigger so we have a way to offer a public email to be used to invite people to the chat room.
+
+Here's an overview of the two `public` tables we'll be creating for this demo:
 
 ![Schema used by our demo application](./schema.png)
 
 ## Database Setup
 
+### Create Tables
 
-### RLS Rules
-We do have a lot of rules setup so we will detail them with schema.table in the section below.
+#### `public.profiles`
 
-The most noteworthy one will be the realtime.broadcast as it will be the one used to limit access to rooms by checking if an entry for a given room name and user id exists in the table public.rooms_users.
-
-> ⚠️ All the rules here are not the most secure, you should check your use case and refine them!
-#### public.profiles
 ```sql
-create table public.profiles (
-  email text not null,
-  user_id bigint references auth.users (id)
+CREATE TABLE public.profiles (
+  email text NOT NULL,
+  user_id uuid REFERENCES auth.users (id)
 );
-create table public.rooms_users (
-  name bigint references auth.channels (name),
-  user_id bigint references auth.users (id),
-  created_at timestamp with time zone default current_timestamp
+```
+
+#### `public.rooms_users`
+
+```sql
+CREATE TABLE public.rooms_users (
+  name text REFERENCES realtime.channels (name),
+  user_id uuid REFERENCES auth.users (id),
+  created_at timestamptz DEFAULT CURRENT_TIMESTAMP
 );
-
-create policy "authenticated users can view all profiles"
-on "public"."profiles"
-as PERMISSIVE for SELECT
-to authenticated
-using ( true );
-
-create policy "supabase_auth_admin user can insert profile"
-on "public"."profiles"
-as PERMISSIVE for INSERT
-to supabase_auth_admin
-with check ( true );
-
-```
-#### public.rooms_users
-```sql
-create policy "authenticated users can read rooms_users"
-on "public"."rooms_users"
-as PERMISSIVE for SELECT
-to authenticated
-using ( true );
-
-create policy "authenticated can add rooms_users"
-on "public"."rooms_users"
-as PERMISSIVE for INSERT
-to authenticated
-with check ( true );
-```
-#### realtime.channels
-```sql
-create policy "authenticated users can see all channels"
-on "realtime"."channels"
-as PERMISSIVE for SELECT
-to authenticated
-using ( true );
-
-create policy "authenticated can create channel"
-on "realtime"."channels"
-as PERMISSIVE for INSERT
-to authenticated
-with check ( true );
 ```
 
-#### realtime.presence
-```sql
-create policy "authenticated users can see all presences"
-on "realtime"."presences"
-as PERMISSIVE for SELECT
-to authenticated
-using ( true );
+### Create RLS Policies
 
-create policy "authenticated can track presences"
-on "realtime"."presences"
-as PERMISSIVE for UPDATE
-to authenticated
-using ( true );
-```
-#### realtime.broadcasts
+We do have a lot of RLS policies to set up so we will group them by `schema.table` below.
+
+The most noteworthy ones are the policies created for `realtime.broadcasts` table as they will limit access to rooms by checking if an entry for a given room name and user id exists in the `public.rooms_users` table.
+
+> ⚠️ All the RLS policies here are meant for this demo. You may refer to them but make sure that your policies are tailored to your use case and secure your application.
+
+#### `public.profiles`
+
 ```sql
-create policy "authenticated user in room can access"
-on "realtime"."broadcasts"
-as PERMISSIVE for SELECT
-to authenticated
-using (
+CREATE POLICY "authenticated users can view all profiles"
+ON "public"."profiles"
+AS PERMISSIVE FOR SELECT
+TO authenticated
+USING (true);
+
+CREATE POLICY "supabase_auth_admin user can insert profile"
+ON "public"."profiles"
+AS PERMISSIVE FOR INSERT
+TO supabase_auth_admin
+WITH CHECK (true);
+```
+
+#### `public.rooms_users`
+
+```sql
+CREATE POLICY "authenticated users can read rooms_users"
+ON "public"."rooms_users"
+AS PERMISSIVE FOR SELECT
+TO authenticated
+USING (TRUE);
+
+CREATE POLICY "authenticated can add rooms_users"
+ON "public"."rooms_users"
+AS PERMISSIVE FOR INSERT
+TO authenticated
+WITH CHECK (TRUE);
+```
+
+#### `realtime.channels`
+
+```sql
+CREATE POLICY "authenticated users can see all channels"
+ON "realtime"."channels"
+AS PERMISSIVE FOR SELECT
+TO authenticated
+USING (TRUE);
+
+CREATE POLICY "authenticated can create channel"
+ON "realtime"."channels"
+AS PERMISSIVE FOR INSERT
+TO authenticated
+WITH CHECK (TRUE);
+```
+
+#### `realtime.presences`
+
+```sql
+CREATE POLICY "authenticated users can see all presences"
+ON "realtime"."presences"
+AS PERMISSIVE FOR SELECT
+TO authenticated
+USING (TRUE);
+
+CREATE POLICY "authenticated can track presences"
+ON "realtime"."presences"
+AS PERMISSIVE FOR UPDATE
+TO authenticated
+USING (TRUE);
+```
+
+#### `realtime.broadcasts`
+
+```sql
+CREATE POLICY "authenticated user can enter room"
+ON "realtime"."broadcasts"
+AS PERMISSIVE FOR SELECT
+TO authenticated
+USING (
   EXISTS (
-    SELECT ru.user_id
-    FROM rooms_users ru
-    WHERE ru.user_id = auth.uid()
-    AND ru.name = realtime.channel_name()
+    SELECT
+      ru.user_id
+    FROM
+      rooms_users ru
+    WHERE
+      ru.user_id = auth.uid()
+      AND ru.name = realtime.channel_name()
   )
 );
 
-create policy "authenticated user in room can broadcast"
-on "realtime"."broadcasts"
-as PERMISSIVE for UPDATE
-to authenticated
-using (
+CREATE POLICY "authenticated user can broadcast in room"
+ON "realtime"."broadcasts"
+AS PERMISSIVE FOR UPDATE
+TO authenticated
+USING (
   EXISTS (
-    SELECT ru.user_id
-    FROM rooms_users ru
-    WHERE ru.user_id = auth.uid()
-    AND ru.name = realtime.channel_name()
+    SELECT
+      ru.user_id
+    FROM
+      rooms_users ru
+    WHERE
+      ru.user_id = auth.uid()
+      AND ru.name = realtime.channel_name()
   )
 );
 ```
 
-### Trigger
-To actually add entries to our profile table we setup a function and a trigger to add an entry whenever a new user is created:
+### Create Database Function and Trigger
+
+We need to create a database function and trigger to add an entry to `public.profiles` whenever a new user is created:
 
 ```sql
-create or replace function insert_user () returns trigger as
+CREATE OR REPLACE FUNCTION insert_user () RETURNS TRIGGER AS
 $$
   BEGIN
     INSERT INTO public.profiles (user_id, email) VALUES (NEW.id, NEW.email); RETURN NEW;
   END;
-$$ language plpgsql;
+$$ LANGUAGE plpgsql;
 
-create or replace trigger "on_new_auth_create_profile"
-after insert on auth.users for each row
-execute function insert_user ();
+CREATE OR REPLACE TRIGGER "on_new_auth_create_profile"
+AFTER INSERT ON auth.users FOR EACH ROW
+EXECUTE FUNCTION insert_user ();
 
-grant execute on function insert_user () to supabase_auth_admin;
+GRANT EXECUTE ON FUNCTION insert_user () TO supabase_auth_admin;
 ```
 
-## Coding concerns
-### Need to create channels
-At the moment Realtime Channels are public and anyone with an Anon token and a valid JWT would be able to listen to any Channel.
-If you want your channel to respect the RLS rules setup above you will need to preemptively create the channel that will be used before connecting.
+## Coding Concerns
 
-> ⚠️ This will also impact access to `postgres_changes` channels on connect.
+### Create Channels Requirement
 
-This can be done with a quick API call:
+Before Realtime Authorization, Realtime Broadcast and Presence Channels were exposed to any client with a valid JWT, such as `anon` token.
+
+If you want your Channel secured and adhere to RLS policies then you will need to create the Channel before allowing your clients to connect to the Channel.
+
+> ⚠️ This will also impact access to `postgres_changes` Channels on connect.
+
+You can create a Channel by making the following method call:
+
 ```ts
 await supabase.realtime.createChannel(name)
 ```
+
 You can check this code at the [create-room-modal.tsx](components/create-room-modal.tsx) component.
 
-Also we're using the `next` version which we need to override in our [package.json](package.json):
+Also we're using the `next` version of `@supabase/realtime-js` which we need to override in `@supabase/supabase-js` in our [package.json](package.json):
+
 ```js
 // ...
 "overrides": {
@@ -181,15 +216,18 @@ Also we're using the `next` version which we need to override in our [package.js
 // ...
 ```
 
-Or you could use a curl command:
+Or you can make a `POST` request to your project's `/realtime/v1/api/channels` endpoint:
+
 ```sh
 curl -v -X POST 'https://<project_ref>.supabase.co/realtime/v1/api/channels'\
  --header 'apikey: <anon_token>'\
- --header 'authorization: Bearer <access_token>' \
+ --header 'Authorization: Bearer <access_token>' \
  --header 'Content-Type: application/json'\
  --data-raw '{ "name": "<channel name>" }'
 ```
-### Connecting to broadcast is essentially the same
-The biggest difference from the previous way of work was really the requirement of creating the channel mentioned above, other than that you can connect as usual to your Realtime channel which will run the new check and either succeed or fail to connect.
+
+### Connecting to Broadcast is Essentially the Same
+
+The biggest difference between Broadcast and Broadcast Authorization is the latter's requirement of creating the Channel before clients subscribe to the Channel. Other than that, your clients can connect to Realtime Channel as they normally would and Realtime server will check RLS policies on client connect.
 
 You can check this code at the [protected/page.tsx](app/protected/page.tsx).
