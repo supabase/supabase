@@ -38,7 +38,7 @@ function EdgeFunctions() {
           url: `https://supabase.com/edge-functions`,
           images: [
             {
-              url: `https://supabase.com${basePath}/images/product/database/database-og.jpg`,
+              url: `https://supabase.com${basePath}/images/product/functions/functions-og.jpg`,
             },
           ],
         }}
