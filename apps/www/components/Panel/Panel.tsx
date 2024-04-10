@@ -14,7 +14,6 @@ interface Props {
   shimmerToColor?: string
   style?: any
   hasMotion?: boolean
-  style?: any
 }
 
 const Panel = ({
