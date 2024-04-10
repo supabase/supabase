@@ -1,4 +1,4 @@
-import { HelpCircle } from 'lucide-react'
+import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
@@ -101,25 +101,32 @@ export const QueryPerformance = ({
           router.push({ ...router, query: { ...rest, preset: value } })
         }}
       >
-        <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end')}>
+        <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10')}>
           {QUERY_PERFORMANCE_TABS.map((tab) => (
             <TabsTrigger_Shadcn_
               key={tab.id}
               value={tab.id}
               className={cn(
-                'px-6 py-3 border-b-0 flex flex-col items-start !shadow-none border-strong border-t',
+                'group',
+                'relative',
+                'px-6 py-3 border-b-0 flex flex-col items-start !shadow-none border-default border-t',
                 'even:border-x last:border-r even:!border-x-strong last:!border-r-strong',
-                tab.id === page ? '!bg-surface-200' : '!bg-surface-100'
+                tab.id === page ? '!bg-surface-200' : '!bg-surface-200/[33%]',
+                'hover:!bg-surface-100',
+                'data-[state=active]:!bg-surface-200',
+                'hover:text-foreground-light',
+                'transition'
               )}
             >
+              {tab.id === page && (
+                <div className="absolute top-0 left-0 w-full h-[1px] bg-foreground"></div>
+              )}
+
               <div className="flex items-center gap-x-2">
-                <p>{tab.label}</p>
+                <span className="">{tab.label}</span>
                 <Tooltip_Shadcn_>
                   <TooltipTrigger_Shadcn_ asChild>
-                    <HelpCircle
-                      size={14}
-                      className="text-foreground-light hover:text-foreground transition"
-                    />
+                    <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
                   </TooltipTrigger_Shadcn_>
                   <TooltipContent_Shadcn_ side="bottom">{tab.description}</TooltipContent_Shadcn_>
                 </Tooltip_Shadcn_>
@@ -127,19 +134,25 @@ export const QueryPerformance = ({
               {tab.isLoading ? (
                 <ShimmeringLoader className="w-32 pt-1" />
               ) : tab.max === undefined ? (
-                <p className="text-xs text-foreground-lighter">No data yet</p>
+                <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
+                  No data yet
+                </span>
               ) : (
-                <p className="text-xs text-foreground-lighter">
+                <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
                   {Number(tab.max).toLocaleString()}
                   {tab.id !== QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT ? 'ms' : ' calls'}
-                </p>
+                </span>
+              )}
+
+              {tab.id === page && (
+                <div className="absolute bottom-0 left-0 w-full h-[1px] bg-surface-200"></div>
               )}
             </TabsTrigger_Shadcn_>
           ))}
         </TabsList_Shadcn_>
       </Tabs_Shadcn_>
 
-      <div className="px-6 py-3 bg-surface-200">
+      <div className="px-6 py-3 bg-surface-200 border-t -mt-px">
         <QueryPerformanceFilterBar queryPerformanceQuery={queryPerformanceQuery} />
       </div>
 

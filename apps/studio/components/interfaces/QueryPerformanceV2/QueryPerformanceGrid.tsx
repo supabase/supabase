@@ -7,6 +7,9 @@ import { useParams } from 'common'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import {
   Button,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
@@ -115,89 +118,95 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
   }, [preset])
 
   return (
-    <div className="relative flex flex-grow bg-black/20 min-h-0">
-      <DataGrid
-        style={{ height: '100%' }}
-        className={cn('flex-1 flex-grow h-full')}
-        rowHeight={44}
-        headerRowHeight={36}
-        onSelectedCellChange={(props) => {
-          const { rowIdx } = props
-          if (rowIdx >= 0) {
-            setSelectedRow(rowIdx)
-            if (!props.row.query.trim().toLowerCase().startsWith('select')) setView('details')
-          }
-        }}
-        columns={columns}
-        rows={queryPerformanceQuery?.data ?? []}
-        rowClass={(_, idx) => {
-          const isSelected = idx === selectedRow
-          return [
-            `${isSelected ? 'bg-surface-100' : 'bg-transparent'} cursor-pointer`,
-            `${isSelected ? '[&>div:first-child]:border-l-4 [&>div]:border-l-white' : ''}`,
-            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
-            '[&>.rdg-cell:first-child>div]:ml-4',
-          ].join(' ')
-        }}
-        renderers={{
-          noRowsFallback: isLoading ? (
-            <div className="absolute top-14 px-6 w-full">
-              <GenericSkeletonLoader />
-            </div>
-          ) : (
-            <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-              <TextSearch />
-              <div className="text-center">
-                <p>No queries detected yet</p>
-                <p className="text-foreground-light">
-                  There are no queries actively running that meet the criteria
-                </p>
+    <ResizablePanelGroup
+      direction="horizontal"
+      className="relative flex flex-grow bg-alternative min-h-0"
+      autoSaveId="query-performance-layout-v1"
+    >
+      <ResizablePanel defaultSize={1}>
+        <DataGrid
+          style={{ height: '100%' }}
+          className={cn('flex-1 flex-grow h-full')}
+          rowHeight={44}
+          headerRowHeight={36}
+          onSelectedCellChange={(props) => {
+            const { rowIdx } = props
+            if (rowIdx >= 0) setSelectedRow(rowIdx)
+          }}
+          columns={columns}
+          rows={queryPerformanceQuery?.data ?? []}
+          rowClass={(_, idx) => {
+            const isSelected = idx === selectedRow
+            return [
+              `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
+              `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
+              '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+              '[&>.rdg-cell:first-child>div]:ml-4',
+            ].join(' ')
+          }}
+          renderers={{
+            noRowsFallback: isLoading ? (
+              <div className="absolute top-14 px-6 w-full">
+                <GenericSkeletonLoader />
               </div>
-            </div>
-          ),
-        }}
-      />
+            ) : (
+              <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
+                <TextSearch className="text-foreground-muted" strokeWidth={1} />
+                <div className="text-center">
+                  <p className="text-foreground">No queries detected yet</p>
+                  <p className="text-foreground-light">
+                    There are no queries actively running that meet the criteria
+                  </p>
+                </div>
+              </div>
+            ),
+          }}
+        />
+      </ResizablePanel>
       {selectedRow !== undefined && (
-        <div className="w-[500px] pt-2 bg-studio border-l shadow-lg">
-          <Button
-            type="text"
-            className="absolute top-2 right-2 px-1"
-            icon={<X size={14} />}
-            onClick={() => setSelectedRow(undefined)}
-          />
-          <Tabs_Shadcn_
-            value={view}
-            className="flex flex-col h-full"
-            onValueChange={(value: any) => setView(value)}
-          >
-            <TabsList_Shadcn_ className="px-4 flex gap-x-4">
-              <TabsTrigger_Shadcn_ value="details" className="text-xs px-0">
-                Query details
-              </TabsTrigger_Shadcn_>
-              {showIndexSuggestions && (
-                <TabsTrigger_Shadcn_ value="indexes" className="text-xs px-0">
-                  Indexes
+        <>
+          <ResizableHandle withHandle />
+          <ResizablePanel defaultSize={25} maxSize={40} minSize={25} className="bg-studio border-t">
+            <Button
+              type="text"
+              className="absolute top-3 right-3 px-1"
+              icon={<X size={14} />}
+              onClick={() => setSelectedRow(undefined)}
+            />
+            <Tabs_Shadcn_
+              value={view}
+              className="flex flex-col h-full"
+              onValueChange={(value: any) => setView(value)}
+            >
+              <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[46px]">
+                <TabsTrigger_Shadcn_ value="details" className="px-0 pb-0 h-full text-xs">
+                  Query details
                 </TabsTrigger_Shadcn_>
-              )}
-            </TabsList_Shadcn_>
-            <TabsContent_Shadcn_
-              value="details"
-              className="mt-0 pt-0 flex-grow min-h-0 overflow-y-auto"
-            >
-              <QueryDetail
-                reportType={reportType}
-                selectedRow={queryPerformanceQuery.data[selectedRow]}
-              />
-            </TabsContent_Shadcn_>
-            <TabsContent_Shadcn_
-              value="indexes"
-              className="mt-0 pt-0 flex-grow min-h-0 overflow-y-auto"
-            >
-              <QueryIndexes selectedRow={queryPerformanceQuery.data[selectedRow]} />
-            </TabsContent_Shadcn_>
-          </Tabs_Shadcn_>
-        </div>
+                {showIndexSuggestions && (
+                  <TabsTrigger_Shadcn_ value="suggestion" className="px-0 pb-0 h-full text-xs">
+                    Index suggestion
+                  </TabsTrigger_Shadcn_>
+                )}
+              </TabsList_Shadcn_>
+              <TabsContent_Shadcn_
+                value="details"
+                className="mt-0 flex-grow min-h-0 overflow-y-auto"
+              >
+                <QueryDetail
+                  reportType={reportType}
+                  selectedRow={queryPerformanceQuery.data[selectedRow]}
+                />
+              </TabsContent_Shadcn_>
+              <TabsContent_Shadcn_
+                value="suggestion"
+                className="mt-0 flex-grow min-h-0 overflow-y-auto"
+              >
+                <QueryIndexes selectedRow={queryPerformanceQuery.data[selectedRow]} />
+              </TabsContent_Shadcn_>
+            </Tabs_Shadcn_>
+          </ResizablePanel>
+        </>
       )}
-    </div>
+    </ResizablePanelGroup>
   )
 }

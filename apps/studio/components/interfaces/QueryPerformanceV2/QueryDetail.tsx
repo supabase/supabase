@@ -45,6 +45,7 @@ export const QueryDetail = ({ reportType, selectedRow }: QueryDetailProps) => {
           )}
         />
       </QueryPanelSection>
+      <div className="border-t" />
       <QueryPanelSection className="gap-y-1">
         {report
           .filter((x) => x.id !== 'query')
