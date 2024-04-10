@@ -2,11 +2,13 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useIndexAdvisorEnableMutation } from 'data/database/index-advisor-enable-mutation'
-import { Button } from 'ui'
+import { ExternalLink } from 'lucide-react'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { Markdown } from '../Markdown'
 
 export const IndexAdvisorDisabledState = () => {
   const { project } = useProjectContext()
-  const { data: extensions, isLoading: isLoadingExtensions } = useDatabaseExtensionsQuery({
+  const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -38,10 +40,34 @@ export const IndexAdvisorDisabledState = () => {
   }
 
   return (
-    <div className="border rounded-md p-2">
-      <Button type="default" onClick={() => onEnableIndexAdvisor()}>
-        Enable index advisor
-      </Button>
-    </div>
+    <Alert_Shadcn_>
+      <AlertTitle_Shadcn_>
+        Get index suggestions to improve your query performance
+      </AlertTitle_Shadcn_>
+      <AlertDescription_Shadcn_ className="tracking-tight">
+        <Markdown content="The `index_advisor` extension can help in recommending database indexes to reduce the costs of your query." />
+      </AlertDescription_Shadcn_>
+      <AlertDescription_Shadcn_ className="mt-3">
+        <div className="flex items-center gap-x-2">
+          <Button
+            type="default"
+            disabled={isEnabling}
+            loading={isEnabling}
+            onClick={() => onEnableIndexAdvisor()}
+          >
+            Enable index advisor
+          </Button>
+          <Button asChild type="default" icon={<ExternalLink />}>
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="https://github.com/olirice/index_advisor/tree/main"
+            >
+              Documentation
+            </a>
+          </Button>
+        </div>
+      </AlertDescription_Shadcn_>
+    </Alert_Shadcn_>
   )
 }

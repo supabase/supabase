@@ -1,7 +1,7 @@
 import { ArrowDown, ArrowUp, TextSearch, X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import DataGrid, { Column } from 'react-data-grid'
+import { useEffect, useRef, useState } from 'react'
+import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 
 import { useParams } from 'common'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
@@ -18,8 +18,8 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { QueryPerformanceSort } from '../Reports/Reports.queries'
-import { QueryIndexes } from './QueryIndexes'
 import { QueryDetail } from './QueryDetail'
+import { QueryIndexes } from './QueryIndexes'
 import {
   QUERY_PERFORMANCE_REPORTS,
   QUERY_PERFORMANCE_REPORT_TYPES,
@@ -30,6 +30,7 @@ interface QueryPerformanceGridProps {
 }
 
 export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformanceGridProps) => {
+  const gridRef = useRef<DataGridHandle>(null)
   const router = useRouter()
   const { preset } = useParams()
   const { isLoading } = queryPerformanceQuery
@@ -82,9 +83,8 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
     return result
   })
 
-  // [Joshen] This will come in another PR to integrate index advisor
   const selectedQuery =
-    selectedRow !== undefined ? queryPerformanceQuery.data[selectedRow]['query'] : undefined
+    selectedRow !== undefined ? queryPerformanceQuery.data?.[selectedRow]['query'] : undefined
   const showIndexSuggestions = (selectedQuery ?? '').trim().toLowerCase().startsWith('select')
 
   const onSortChange = (column: string) => {
@@ -125,14 +125,11 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
     >
       <ResizablePanel defaultSize={1}>
         <DataGrid
+          ref={gridRef}
           style={{ height: '100%' }}
           className={cn('flex-1 flex-grow h-full')}
           rowHeight={44}
           headerRowHeight={36}
-          onSelectedCellChange={(props) => {
-            const { rowIdx } = props
-            if (rowIdx >= 0) setSelectedRow(rowIdx)
-          }}
           columns={columns}
           rows={queryPerformanceQuery?.data ?? []}
           rowClass={(_, idx) => {
@@ -145,6 +142,24 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
             ].join(' ')
           }}
           renderers={{
+            renderRow(idx, props) {
+              return (
+                <Row
+                  {...props}
+                  onClick={() => {
+                    if (typeof idx === 'number' && idx >= 0) {
+                      setSelectedRow(idx)
+                      gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+
+                      const selectedQuery = queryPerformanceQuery.data[idx]['query']
+                      if (!(selectedQuery ?? '').trim().toLowerCase().startsWith('select')) {
+                        setView('details')
+                      }
+                    }
+                  }}
+                />
+              )
+            },
             noRowsFallback: isLoading ? (
               <div className="absolute top-14 px-6 w-full">
                 <GenericSkeletonLoader />
@@ -166,7 +181,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
       {selectedRow !== undefined && (
         <>
           <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={25} maxSize={40} minSize={25} className="bg-studio border-t">
+          <ResizablePanel defaultSize={30} maxSize={45} minSize={30} className="bg-studio border-t">
             <Button
               type="text"
               className="absolute top-3 right-3 px-1"
@@ -194,14 +209,14 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               >
                 <QueryDetail
                   reportType={reportType}
-                  selectedRow={queryPerformanceQuery.data[selectedRow]}
+                  selectedRow={queryPerformanceQuery.data?.[selectedRow]}
                 />
               </TabsContent_Shadcn_>
               <TabsContent_Shadcn_
                 value="suggestion"
                 className="mt-0 flex-grow min-h-0 overflow-y-auto"
               >
-                <QueryIndexes selectedRow={queryPerformanceQuery.data[selectedRow]} />
+                <QueryIndexes selectedRow={queryPerformanceQuery.data?.[selectedRow]} />
               </TabsContent_Shadcn_>
             </Tabs_Shadcn_>
           </ResizablePanel>

@@ -1,10 +1,28 @@
+import { Lightbulb } from 'lucide-react'
+import toast from 'react-hot-toast'
+
+import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useGetIndexesFromSelectQuery } from 'data/database/retrieve-index-from-select-query'
-import { GenericSkeletonLoader } from 'ui-patterns'
-import { QueryPanelContainer, QueryPanelSection } from './QueryPanel'
+import AlertError from 'components/ui/AlertError'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import { useGetIndexAdvisorResult } from 'data/database/retrieve-index-advisor-result-query'
+import { useGetIndexesFromSelectQuery } from 'data/database/retrieve-index-from-select-query'
+import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useExecuteSqlQuery } from 'data/sql/execute-sql-query'
+import {
+  AccordionContent_Shadcn_,
+  AccordionItem_Shadcn_,
+  Accordion_Shadcn_,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  CodeBlock,
+  cn,
+} from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns'
 import { IndexAdvisorDisabledState } from './IndexAdvisorDisabledState'
+import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
 
 interface QueryIndexesProps {
   selectedRow: any
@@ -37,8 +55,56 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
     hypopgExtension !== undefined &&
     hypopgExtension.installed_version !== null
 
+  const {
+    data: indexAdvisorResult,
+    error: indexAdvisorError,
+    refetch,
+    isError: isErrorIndexAdvisorResult,
+    isSuccess: isSuccessIndexAdvisorResult,
+    isLoading: isLoadingIndexAdvisorResult,
+  } = useGetIndexAdvisorResult(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      query: selectedRow?.['query'],
+    },
+    { enabled: isIndexAdvisorAvailable }
+  )
+
+  const {
+    index_statements,
+    startup_cost_after,
+    startup_cost_before,
+    total_cost_after,
+    total_cost_before,
+  } = indexAdvisorResult ?? { index_statements: [], total_cost_after: 0, total_cost_before: 0 }
+  const hasIndexRecommendation = isSuccessIndexAdvisorResult && index_statements.length > 0
+  const totalImprovement = isSuccessIndexAdvisorResult
+    ? ((total_cost_before - total_cost_after) / total_cost_before) * 100
+    : 0
+
+  const { mutate: execute, isLoading: isExecuting } = useExecuteSqlMutation({
+    onSuccess: async () => {
+      await refetch()
+      toast.success(`Successfully created index`)
+    },
+    onError: (error) => {
+      toast.error(`Failed to create index: ${error.message}`)
+    },
+  })
+
+  const createIndex = () => {
+    if (index_statements.length === 0) return
+
+    execute({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      sql: index_statements.join(';\n') + ';',
+    })
+  }
+
   return (
-    <QueryPanelContainer>
+    <QueryPanelContainer className="h-full">
       <QueryPanelSection>
         <div>
           <p className="text-sm">Indexes in use</p>
@@ -61,14 +127,142 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
         )}
       </QueryPanelSection>
 
-      <QueryPanelSection>
-        <p className="text-sm">Index suggestion</p>
-        {isLoadingChecks ? (
-          <GenericSkeletonLoader />
-        ) : !isIndexAdvisorAvailable ? (
-          <IndexAdvisorDisabledState />
-        ) : null}
+      <div className="border-t" />
+
+      <QueryPanelSection className="flex flex-col gap-y-6">
+        <div className="flex flex-col gap-y-2">
+          <p className="text-sm">Index suggestion</p>
+          {isLoadingChecks ? (
+            <GenericSkeletonLoader />
+          ) : !isIndexAdvisorAvailable ? (
+            <IndexAdvisorDisabledState />
+          ) : (
+            <>
+              {isLoadingIndexAdvisorResult && <GenericSkeletonLoader />}
+              {isErrorIndexAdvisorResult && (
+                <AlertError
+                  ref={project?.ref}
+                  error={indexAdvisorError}
+                  subject="Failed to retrieve result from index advisor"
+                />
+              )}
+              {isSuccessIndexAdvisorResult && (
+                <>
+                  {(index_statements ?? []).length === 0 ? (
+                    <Alert_Shadcn_>
+                      <AlertTitle_Shadcn_>No suggested indexes</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        The selected query cannot be further optimised
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  ) : (
+                    <>
+                      <Alert_Shadcn_
+                        variant="default"
+                        className="border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand"
+                      >
+                        <Lightbulb />
+                        <AlertTitle_Shadcn_>
+                          We have {index_statements.length} index recommendation
+                          {index_statements.length > 1 ? 's' : ''}
+                        </AlertTitle_Shadcn_>
+                        <AlertDescription_Shadcn_>
+                          You can improve this query's performance by{' '}
+                          <span className="text-brand">{totalImprovement.toFixed(2)}%</span> by
+                          adding the following recommended{' '}
+                          {index_statements.length > 1 ? 'indexes' : 'index'}
+                        </AlertDescription_Shadcn_>
+                      </Alert_Shadcn_>
+                      <CodeBlock
+                        hideLineNumbers
+                        value={index_statements.join(';\n') + ';'}
+                        language="sql"
+                        className={cn(
+                          'max-w-full max-h-[310px]',
+                          '!py-3 !px-3.5 prose dark:prose-dark transition',
+                          '[&>code]:m-0 [&>code>span]:flex [&>code>span]:flex-wrap'
+                        )}
+                      />
+                    </>
+                  )}
+                </>
+              )}
+            </>
+          )}
+        </div>
+        {isSuccessIndexAdvisorResult && (
+          <div className="flex flex-col gap-y-2">
+            <p className="text-sm">Query costs</p>
+            <div className="pt-4 border rounded-md flex flex-col gap-y-3">
+              <div className="px-4 flex items-center justify-between">
+                <QueryPanelScoreSection
+                  className="w-1/2"
+                  name="Start up cost"
+                  description="An estimate of how long it will take to fetch the first row"
+                  before={startup_cost_before}
+                  after={startup_cost_after}
+                />
+                <QueryPanelScoreSection
+                  className="w-1/2"
+                  name="Total cost"
+                  description="An estimate of how long it will take to return all the rows (Includes start up cost)"
+                  before={total_cost_before}
+                  after={total_cost_after}
+                />
+              </div>
+
+              <Accordion_Shadcn_ collapsible type="single" className="border-t">
+                <AccordionItem_Shadcn_ value="1">
+                  <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition [&[data-state=open]]:text-foreground">
+                    What units are cost in?
+                  </AccordionTrigger>
+                  <AccordionContent_Shadcn_ className="px-4 text-foreground-light">
+                    Costs are in an arbitrary unit, and do not represent a unit of time. The units
+                    are anchored (by default) to a single sequential page read costing 1.0 units.
+                  </AccordionContent_Shadcn_>
+                </AccordionItem_Shadcn_>
+                <AccordionItem_Shadcn_ value="2" className="border-b-0">
+                  <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition [&[data-state=open]]:text-foreground">
+                    How should I prioritize start up and total cost?
+                  </AccordionTrigger>
+                  <AccordionContent_Shadcn_ className="px-4 text-foreground-light [&>div]:space-y-2">
+                    <p>This depends on the expected size of the result set from the query.</p>
+                    <p>
+                      For queries that return a small number or rows, the startup cost is more
+                      critical and minimizing startup cost can lead to faster response times,
+                      especially in interactive applications.
+                    </p>
+                    <p>
+                      For queries that return a large number of rows, the total cost becomes more
+                      important, and optimizing it will help in efficiently using resources and
+                      reducing overall query execution time.
+                    </p>
+                  </AccordionContent_Shadcn_>
+                </AccordionItem_Shadcn_>
+              </Accordion_Shadcn_>
+            </div>
+          </div>
+        )}
       </QueryPanelSection>
+
+      {hasIndexRecommendation && (
+        <div className="border-t py-3 flex items-center justify-between px-4">
+          <div className="flex flex-col gap-y-1 text-sm">
+            <span>Apply index to database</span>
+            <span className="text-xs text-foreground-light">
+              This will run the SQL that is shown above
+            </span>
+          </div>
+          <Button
+            disabled={isExecuting}
+            loading={isExecuting}
+            type="primary"
+            onClick={() => createIndex()}
+          >
+            Create index
+          </Button>
+        </div>
+      )}
     </QueryPanelContainer>
   )
 }

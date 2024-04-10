@@ -6,6 +6,7 @@ import type { ResponseError } from 'types'
 import { sqlKeys } from 'data/sql/keys'
 
 // [Joshen] This is just temporary while we wait for Index Advisor to be baked into the image itself
+// [Joshen] Need to fix this shit
 
 export type IndexAdvisorEnableVariables = {
   projectRef: string
@@ -162,7 +163,7 @@ begin
 
         --raise notice '%', plan_final;
 
-        -- Identify referenced indexes in new plan
+        -- Idenfity referenced indexes in new plan
         execute format(
             'select
                 coalesce(array_agg(hypopg_get_indexdef(indexrelid) order by indrelid, indkey::text), $i\${}$i$::text[])
@@ -208,7 +209,12 @@ begin
 end;
 $$;
 `
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['enable-index-advisor'],
+  })
 
   return result
 }
