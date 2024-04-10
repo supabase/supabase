@@ -3,13 +3,24 @@ import Link from 'next/link'
 
 import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
 import GeneratingTypes from 'components/interfaces/Docs/GeneratingTypes'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
+import { Info } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
 
 interface IntroductionProps {
   selectedLang: 'bash' | 'js'
 }
 
 const Introduction = ({ selectedLang }: IntroductionProps) => {
-  const { ref } = useParams()
+  const { ref: projectRef } = useParams()
+
+  const { data: config } = useProjectPostgrestConfigQuery({ projectRef })
+
+  const isPublicSchemaEnabled = config?.db_schema
+    .split(',')
+    .map((name) => name.trim())
+    .includes('public')
 
   return (
     <>
@@ -20,6 +31,31 @@ const Introduction = ({ selectedLang }: IntroductionProps) => {
             All views and tables in the <code>public</code> schema and accessible by the active
             database role for a request are available for querying.
           </p>
+
+          {!isPublicSchemaEnabled && (
+            <Alert_Shadcn_ variant="default">
+              <Info className="h-4 w-4" />
+              <AlertTitle_Shadcn_ className="!-mt-3">
+                <ReactMarkdown>The `public` schema is not exposed</ReactMarkdown>
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_ className="flex flex-col gap-3 !-mt-6">
+                <ReactMarkdown>
+                  You will not be able to query tables and views in the `public` schema via
+                  postgREST or supabase-js.
+                </ReactMarkdown>
+                <div>
+                  <Button asChild type="default" className="inline-block">
+                    <Link
+                      href={`/project/${projectRef}/settings/api#postgrest-config`}
+                      className="!no-underline !hover:bg-surface-100 !text-foreground"
+                    >
+                      View schema settings
+                    </Link>
+                  </Button>
+                </div>
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          )}
         </article>
       </div>
 
@@ -56,7 +92,7 @@ const Introduction = ({ selectedLang }: IntroductionProps) => {
             If you still want to use GraphQL, you can. Supabase provides you with a full Postgres
             database, so as long as your middleware can connect to the database then you can still
             use the tools you love. You can find the database connection details{' '}
-            <Link href={`/project/${ref}/settings/database`}>in the settings.</Link>
+            <Link href={`/project/${projectRef}/settings/database`}>in the settings.</Link>
           </p>
         </article>
         <article className="code">
