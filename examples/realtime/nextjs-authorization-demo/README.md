@@ -1,6 +1,6 @@
 # Supaslack
 
-Example application on how you can use Realtime Authorization feature to limit access to Realtime Channels and limit access to the Broadcast feature.
+Example application on how you can use Realtime Authorization feature to limit access to Realtime [Channels](https://supabase.com/docs/guides/realtime/concepts#channels) and limit access to the [Broadcast](https://supabase.com/docs/guides/realtime/broadcast) feature.
 
 Read more and provide feedback at our [Github Discussion](https://github.com/orgs/supabase/discussions/22484)
 
