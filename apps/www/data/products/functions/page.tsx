@@ -184,7 +184,11 @@ export default (isMobile?: boolean) => ({
     paragraph: (
       <>
         Edge Functions are developed using{' '}
-        <Link href="https://deno.com/" className="underline" target="_blank">
+        <Link
+          href="https://deno.com/"
+          className="underline hover:text-foreground-light transition-colors"
+          target="_blank"
+        >
           Deno
         </Link>
         , an open source JavaScript runtime that ensures maximum power and flexibility. Migrate in
@@ -206,7 +210,10 @@ export default (isMobile?: boolean) => ({
         paragraph: (
           <>
             The open source{' '}
-            <Link href="/" className="underline hover:text-foreground-light">
+            <Link
+              href="https://github.com/supabase/edge-runtime/"
+              className="underline hover:text-foreground-light transition-colors"
+            >
               Edge runtime
             </Link>{' '}
             runs your functions locally during development and the same runtime powers functions in
@@ -231,7 +238,7 @@ export default (isMobile?: boolean) => ({
             Use the{' '}
             <Link
               href="https://supabase.com/docs/guides/functions/cicd-workflow"
-              className="underline"
+              className="underline hover:text-foreground-light transition-colors"
             >
               Supabase CLI with Github actions
             </Link>{' '}
@@ -259,7 +266,7 @@ export default (isMobile?: boolean) => ({
             Edge functions run globally or can be{' '}
             <Link
               href="https://supabase.com/docs/guides/functions/regional-invocation"
-              className="underline"
+              className="underline hover:text-foreground-light transition-colors"
             >
               pinned to your database's proximity
             </Link>
@@ -329,7 +336,10 @@ export default (isMobile?: boolean) => ({
         paragraph: (
           <>
             Edge Functions are designed to work seamlessly with{' '}
-            <Link href="https://supabase.com/docs/guides/functions/auth" className="underline">
+            <Link
+              href="https://supabase.com/docs/guides/functions/auth"
+              className="underline hover:text-foreground-light transition-colors"
+            >
               Supabase Auth
             </Link>
           </>
@@ -343,7 +353,7 @@ export default (isMobile?: boolean) => ({
             Edge Functions are designed to work seamlessly with{' '}
             <Link
               href="https://supabase.com/docs/guides/functions/storage-caching"
-              className="underline"
+              className="underline hover:text-foreground-light transition-colors"
             >
               Supabase Storage
             </Link>
