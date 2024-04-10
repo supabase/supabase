@@ -31,7 +31,7 @@ export const QueryDetail = ({ reportType, selectedRow }: QueryDetailProps) => {
 
   return (
     <div className="flex flex-col gap-y-8 divide-y">
-      <div className="px-4 flex flex-col gap-y-2">
+      <div className="px-5 flex flex-col gap-y-2">
         <p className="text-sm">Query pattern</p>
         <CodeBlock
           hideLineNumbers
@@ -44,7 +44,7 @@ export const QueryDetail = ({ reportType, selectedRow }: QueryDetailProps) => {
           )}
         />
       </div>
-      <div className="py-4 px-4 flex flex-col gap-y-1">
+      <div className="py-4 px-5 flex flex-col gap-y-1">
         {report
           .filter((x) => x.id !== 'query')
           .map((x) => {
