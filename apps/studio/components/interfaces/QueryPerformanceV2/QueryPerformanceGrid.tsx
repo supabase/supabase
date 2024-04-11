@@ -73,7 +73,9 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
       renderCell: (props) => {
         const value = props.row?.[col.id]
         const isTime = col.name.includes('time')
-        const formattedValue = isTime ? `${value.toFixed(2)}ms` : String(value)
+        const formattedValue = isTime
+          ? `${Number(value.toFixed(2)).toLocaleString()}ms`
+          : value.toLocaleString()
         return (
           <div className="flex flex-col justify-center font-mono text-xs">
             <p>{formattedValue}</p>

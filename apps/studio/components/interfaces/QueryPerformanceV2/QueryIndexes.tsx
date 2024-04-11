@@ -242,7 +242,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
           <>
             <div className="flex flex-col gap-y-2">
               <p className="text-sm">Query costs</p>
-              <div className="pt-4 border rounded-md flex flex-col gap-y-3 bg-surface-100">
+              <div className="border rounded-md flex flex-col bg-surface-100">
                 <QueryPanelScoreSection
                   name="Total cost of query"
                   description="An estimate of how long it will take to return all the rows (Includes start up cost)"
@@ -253,6 +253,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
                   <CollapsibleContent_Shadcn_ asChild className="pb-3">
                     <QueryPanelScoreSection
                       hideArrowMarkers
+                      className="border-t"
                       name="Start up cost"
                       description="An estimate of how long it will take to fetch the first row"
                       before={startup_cost_before}

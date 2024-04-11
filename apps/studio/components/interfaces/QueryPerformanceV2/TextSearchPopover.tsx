@@ -61,7 +61,7 @@ export const TextSearchPopover = ({ name, value = '', onSaveText }: TextSearchPo
               setOpen(false)
             }}
           >
-            Save
+            Apply search
           </Button>
         </div>
       </PopoverContent_Shadcn_>

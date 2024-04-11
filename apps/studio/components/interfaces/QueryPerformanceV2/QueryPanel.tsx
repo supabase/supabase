@@ -32,7 +32,7 @@ export const QueryPanelScoreSection = ({
   after?: number
   hideArrowMarkers?: boolean
 }) => (
-  <div className={cn('px-4 flex', className)}>
+  <div className={cn('py-4 px-4 flex', className)}>
     <div className="flex gap-x-2 w-48">
       <span className="text-sm">{name}</span>
       <Tooltip_Shadcn_>
