@@ -47,7 +47,7 @@ postgres://[USER].[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@[REGION-SUBDOMAIN].pooler.s
 
 Where `USER` is the user to connect as. `YOUR-PROJECT-REF` is a string uniquely identifying your project. `YOUR-PASSWORD` is the database password for the `USER` user and `REGION-SUBDOMAIN` is the subdomain where your database is hosted.
 
-Use the `[psql` command line tool](https://www.postgresql.org/download/) to connect to the database:
+Use the [`psql` command line tool](https://www.postgresql.org/download/) to connect to the database:
 
 ```bash
 ➜ psql postgres://postgres.[YOUR-PROJECT-REF]:[YOUR-PASSWORD]@[REGION-SUBDOMAIN].pooler.supabase.com:5432/postgres
@@ -104,7 +104,7 @@ postgres=> select current_role;
 (1 row)
 ```
 
-For the rest of the post, open three terminals and login in each with `junior_dev`, `senior_dev` and `postgres` to easily switch between them. Each executed command will list at the beginning the user it should be executed as, for example:
+For the rest of the post, open three terminals and login each with `junior_dev`, `senior_dev` and `postgres` to easily switch between them. Each executed command will list at the beginning the user it should be executed as, for example:
 
 ```bash
 # as junior_dev
@@ -172,9 +172,11 @@ postgres=> \dn+ public
 (1 row)
 ```
 
-This time we see a new line in the access privileges column: `junior_dev=C/pg_database_owner`. This line has the format `<grantee role>=<privilege abbreviations>/<grantor role>`. `C` is a privilege abbreviation for the `create` privilege as listed in the [privileges abbreviations table](https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE). In short, the `junior_dev` role now has the `create` privilege on the `public` schema. `junior_dev` should now be able to create the table:
+This time we see a new line in the access privileges column: 
+
 
 <aside>
+
 💡 The grantor in the above case is `pg_database_owner` which is a role which owns the `public` schema. `pg_database_owner` has the owner of the current database as the only member, which is `postgres` in our case.
 
 </aside>
