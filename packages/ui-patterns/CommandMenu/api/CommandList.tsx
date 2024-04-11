@@ -31,21 +31,25 @@ const CommandList = forwardRef<
       {...props}
     >
       <CommandEmpty listRef={innerRef}>No results found.</CommandEmpty>
-      {commandSections.map((section) => (
-        <CommandGroup key={section.id} heading={section.name} forceMount={section.forceMount}>
-          {section.commands
-            .filter((command) => !command.defaultHidden || query)
-            .map((_command) => {
-              const command = _command as ICommand // strip the readonly applied from the proxy
+      {commandSections.map((section) => {
+        if (section.commands.every((command) => command.defaultHidden) && !query) return null
 
-              return (
-                <CommandItem key={command.id} command={command}>
-                  <TextHighlighter>{command.name}</TextHighlighter>
-                </CommandItem>
-              )
-            })}
-        </CommandGroup>
-      ))}
+        return (
+          <CommandGroup key={section.id} heading={section.name} forceMount={section.forceMount}>
+            {section.commands
+              .filter((command) => !command.defaultHidden || query)
+              .map((_command) => {
+                const command = _command as ICommand // strip the readonly applied from the proxy
+
+                return (
+                  <CommandItem key={command.id} command={command}>
+                    <TextHighlighter>{command.name}</TextHighlighter>
+                  </CommandItem>
+                )
+              })}
+          </CommandGroup>
+        )
+      })}
     </CommandList_Shadcn_>
   )
 })

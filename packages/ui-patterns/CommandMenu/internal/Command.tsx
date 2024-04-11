@@ -13,6 +13,7 @@ type IBaseCommand = {
   className?: string
   forceMount?: boolean
   icon?: () => ReactNode
+  value?: string
   /**
    * Curerntly unused
    */
@@ -98,6 +99,7 @@ const CommandItem = forwardRef<
               }
             : () => {}
       }
+      value={command.value}
       className={cn(
         generateCommandClassNames(isRouteCommand(command)),
         className,
