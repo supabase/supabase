@@ -28,13 +28,15 @@ const Extensions = () => {
   const extensions =
     filterString.length === 0
       ? data ?? []
-      : (data ?? []).filter((ext) => ext.name.includes(filterString))
-  const extensionsWithoutHidden = extensions.filter(
-    (ext: any) => !HIDDEN_EXTENSIONS.includes(ext.name)
-  )
+      : (data ?? []).filter((ext) =>
+          // if the filter string contains pg, ignore it since some of the extensions may be listed without the
+          // pg prefix (pgvector is listed as vector)
+          ext.name.includes(filterString.replace('pg', ''))
+        )
+  const extensionsWithoutHidden = extensions.filter((ext) => !HIDDEN_EXTENSIONS.includes(ext.name))
   const [enabledExtensions, disabledExtensions] = partition(
     extensionsWithoutHidden,
-    (ext: any) => !isNull(ext.installed_version)
+    (ext) => !isNull(ext.installed_version)
   )
 
   const canUpdateExtensions = useCheckPermissions(

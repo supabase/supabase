@@ -19,6 +19,8 @@ Set up Magic Link logins for your Supabase application.
 
 When using Magic Links in [the PKCE Flow](/blog/supabase-auth-sso-pkce#introducing-pkce), keep in mind that links can only be opened from the same browser that they are sent from (as defined in the PKCE spec). Consequently, a magic link sent from Chrome on Desktop will be invalid if used on a Mobile Device.
 
+The same applies for Magic Links in mobile devices. Magic Links can only be opened on the device they are sent from.
+
 </Admonition>
 
 <Tabs
@@ -77,6 +79,19 @@ Future<void> signInWithEmail() async {
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+When your user signs in, call [signInWithOTP()](/docs/reference/swift/auth-signinwithotp) with their email address:
+
+```swift
+try await supabase.auth.signInWithOTP(
+  email: "example@email.com",
+  redirectTo: URL(string: "https://example.com/welcome"),
+  // set this to false if you do not want the user to be automatically signed up
+  shouldCreateUser: false
+)
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 To start the sign in process call [signInWith(OTP)](/docs/reference/kotlin/auth-signinwithotp) with their email address:
@@ -117,6 +132,14 @@ When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to
 Future<void> signOut() async {
   await supabase.auth.signOut();
 }
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+When your user signs out, call [signOut()](/docs/reference/swift/auth-signout) to remove them from the local storage:
+
+```swift
+try await supabase.auth.signOut()
 ```
 
 </TabPanel>

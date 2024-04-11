@@ -65,6 +65,15 @@ await supabase.auth.signInAnonymously();
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Call the [`signInAnonymously()`](/docs/reference/swift/auth-signinanonymously) method:
+
+```swift
+let session = try await supabase.auth.signInAnonymously()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 Call the [`signInAnonymously()`](/docs/reference/kotlin/auth-signinanonymously) method:
@@ -107,6 +116,17 @@ await supabase.auth.updateUser(UserAttributes(email: 'example@email.com'));
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+You can use the [`updateUser()`](/docs/reference/swift/auth-updateuser) method to link an email or phone identity to the anonymous user.
+
+```swift
+try await supabase.auth.updateUser(
+  user: UserAttributes(email: "example@email.com")
+)
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 You can use the [`modifyUser()`](/docs/reference/kotlin/auth-updateuser) method to link an email or phone identity to the anonymous user.
@@ -144,6 +164,15 @@ You can use the [`linkIdentity()`](/docs/reference/dart/auth-linkidentity) metho
 
 ```dart
 await supabase.auth.linkIdentity(OAuthProvider.google);
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+You can use the [`linkIdentity()`](/docs/reference/swift/auth-linkidentity) method to link an OAuth identity to the anonymous user.
+
+```swift
+try await supabase.auth.linkIdentity(provider: .google)
 ```
 
 </TabPanel>
