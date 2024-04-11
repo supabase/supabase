@@ -97,10 +97,7 @@ export const CommandDialog = ({
           animateBounce ? 'scale-[101.5%]' : 'scale-100'
         )}
       >
-        <ErrorBoundary
-          FallbackComponent={CommandError}
-          onError={(error, info) => console.log({ error, info })}
-        >
+        <ErrorBoundary FallbackComponent={CommandError}>
           <Command
             className={[
               '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
