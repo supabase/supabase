@@ -171,9 +171,9 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
               <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
                 <TextSearch className="text-foreground-muted" strokeWidth={1} />
                 <div className="text-center">
-                  <p className="text-foreground">No queries detected yet</p>
+                  <p className="text-foreground">No queries detected</p>
                   <p className="text-foreground-light">
-                    There are no queries actively running that meet the criteria
+                    There are no actively running queries that match the criteria
                   </p>
                 </div>
               </div>

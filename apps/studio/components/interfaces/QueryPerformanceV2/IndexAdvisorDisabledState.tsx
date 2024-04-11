@@ -1,8 +1,9 @@
+import { ExternalLink } from 'lucide-react'
+
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 import { useIndexAdvisorEnableMutation } from 'data/database/index-advisor-enable-mutation'
-import { ExternalLink } from 'lucide-react'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { Markdown } from '../Markdown'
 
@@ -44,7 +45,7 @@ export const IndexAdvisorDisabledState = () => {
       <AlertTitle_Shadcn_>
         Get index suggestions to improve your query performance
       </AlertTitle_Shadcn_>
-      <AlertDescription_Shadcn_ className="tracking-tight">
+      <AlertDescription_Shadcn_>
         <Markdown content="The `index_advisor` extension can help in recommending database indexes to reduce the costs of your query." />
       </AlertDescription_Shadcn_>
       <AlertDescription_Shadcn_ className="mt-3">

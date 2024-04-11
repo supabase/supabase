@@ -1,4 +1,4 @@
-import { Check, Lightbulb, Table, Table2 } from 'lucide-react'
+import { Check, Lightbulb, Table2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
@@ -125,9 +125,13 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
         {isSuccess && (
           <div>
             {usedIndexes.length === 0 && (
-              <div className="border rounded border-dashed flex items-center justify-center py-4">
+              <div className="border rounded border-dashed flex flex-col items-center justify-center py-4 px-20 gap-y-1">
                 <p className="text-sm text-foreground-light">
                   No indexes are involved in this query
+                </p>
+                <p className="text-center text-xs text-foreground-lighter">
+                  Indexes may not necessarily be used if they incur a higher cost when executing the
+                  query
                 </p>
               </div>
             )}
@@ -175,9 +179,9 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
                   {(index_statements ?? []).length === 0 ? (
                     <Alert_Shadcn_ className="[&>svg]:rounded-full">
                       <Check />
-                      <AlertTitle_Shadcn_>This query is fully optimized</AlertTitle_Shadcn_>
+                      <AlertTitle_Shadcn_>This query is optimized</AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
-                        Queries that can be optimised with an index will show here
+                        Suggestions for indexes to optimize queries will show here
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   ) : (
@@ -229,7 +233,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
             </>
           )}
         </div>
-        {hasIndexRecommendation && (
+        {isIndexAdvisorAvailable && hasIndexRecommendation && (
           <div className="flex flex-col gap-y-2">
             <p className="text-sm">Query costs</p>
             <div className="pt-4 border rounded-md flex flex-col gap-y-3">
@@ -258,6 +262,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
                   <AccordionContent_Shadcn_ className="px-4 text-foreground-light">
                     Costs are in an arbitrary unit, and do not represent a unit of time. The units
                     are anchored (by default) to a single sequential page read costing 1.0 units.
+                    They do, however, serve as a predictor of higher execution times.
                   </AccordionContent_Shadcn_>
                 </AccordionItem_Shadcn_>
                 <AccordionItem_Shadcn_ value="2" className="border-b-0">
@@ -284,7 +289,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
         )}
       </QueryPanelSection>
 
-      {hasIndexRecommendation && (
+      {isIndexAdvisorAvailable && hasIndexRecommendation && (
         <div className="border-t py-3 flex items-center justify-between px-4">
           <div className="flex flex-col gap-y-1 text-sm">
             <span>Apply index to database</span>

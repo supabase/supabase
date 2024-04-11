@@ -47,13 +47,13 @@ begin
     query := trim(
         regexp_replace(
             regexp_replace(
-                regexp_replace(query,'\/\*.+\*\/', '', 'g'),
-            '--[^\r\n]*', ' ', 'g'),
-        '\s+', ' ', 'g')
+                regexp_replace(query,'\\/\\*.+\\*\\/', '', 'g'),
+            '--[^\\r\\n]*', ' ', 'g'),
+        '\\s+', ' ', 'g')
     );
 
     -- Remove trailing semicolon
-    query := regexp_replace(query, ';\s*$', '');
+    query := regexp_replace(query, ';\\s*$', '');
 
     begin
         -- Disallow multiple statements
