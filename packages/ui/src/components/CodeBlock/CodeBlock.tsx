@@ -16,6 +16,7 @@ import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
 
 import { useState } from 'react'
 import { useTheme } from 'next-themes'
+import { Check, Copy } from 'lucide-react'
 
 export interface CodeBlockProps {
   title?: string
@@ -146,7 +147,8 @@ export const CodeBlock = ({
               <CopyToClipboard text={value || children}>
                 <Button
                   type="default"
-                  icon={copied ? <IconCheck /> : <IconCopy />}
+                  className="px-1.5"
+                  icon={copied ? <Check /> : <Copy />}
                   onClick={() => handleCopy()}
                 >
                   {copied ? 'Copied' : ''}
