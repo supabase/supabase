@@ -30,7 +30,7 @@ const Introduction = ({ selectedLang }: IntroductionProps) => {
             database role for a request are available for querying.
           </p>
 
-          {!isPublicSchemaEnabled && <PublicSchemaNotEnabledAlert context="docs" />}
+          {!isPublicSchemaEnabled && <PublicSchemaNotEnabledAlert />}
         </article>
       </div>
 

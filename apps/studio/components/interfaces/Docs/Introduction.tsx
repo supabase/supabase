@@ -26,7 +26,7 @@ export default function Introduction({ autoApiService, selectedLang }: Props) {
       <article className="code">
         <CodeSnippet selectedLang={selectedLang} snippet={Snippets.init(autoApiService.endpoint)} />
 
-        {!isPublicSchemaEnabled && <PublicSchemaNotEnabledAlert context="docs" />}
+        {!isPublicSchemaEnabled && <PublicSchemaNotEnabledAlert />}
       </article>
     </div>
   )
