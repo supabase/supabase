@@ -108,7 +108,6 @@ export default function IndexPage() {
       <ParagraphSection {...data.securitySection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
       <GaPerformanceSection {...data.performanceSection} hasStickyTitle />
-      <ParagraphSection {...data.performanceSection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.reliabilitySection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />

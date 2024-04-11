@@ -37,24 +37,24 @@ Many customers have been running production applications on Supabase for the pas
   highlightsSection: {
     highlights: [
       {
-        number: '45.000+',
-        text: 'weekly active Databases',
+        number: '1M+',
+        text: 'total databases launched',
       },
       {
         number: '100.000+',
         text: 'active projects',
       },
       {
+        number: '1B',
+        text: 'PostgREST requests per day',
+      },
+      {
         number: '10M',
-        text: 'magical milestone here',
+        text: 'edfe function requests per day',
       },
       {
-        number: '7',
-        text: 'products',
-      },
-      {
-        number: '80+',
-        text: 'team members in 20+ countries',
+        number: '+65K',
+        text: 'GitHub stars',
       },
     ],
   },
