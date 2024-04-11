@@ -10,10 +10,10 @@ with foreign_keys as (
         ct.conname as fkey_name,
         ct.conkey col_attnums
     from
-        pg_constraint ct
-        join pg_class cl -- fkey owning table
+        pg_catalog.pg_constraint ct
+        join pg_catalog.pg_class cl -- fkey owning table
             on ct.conrelid = cl.oid
-        left join pg_depend d
+        left join pg_catalog.pg_depend d
             on d.objid = cl.oid
             and d.deptype = 'e'
     where
@@ -29,7 +29,7 @@ index_ as (
         indexrelid::regclass as index_,
         string_to_array(indkey::text, ' ')::smallint[] as col_attnums
     from
-        pg_index
+        pg_catalog.pg_index
     where
         indisvalid
 )
@@ -42,7 +42,6 @@ select
         'Table \`%s.%s\` has a foreign key \`%s\` without a covering index. This can lead to suboptimal query performance.',
         fk.schema_,
         fk.table_,
-        fk.table_,
         fk.fkey_name
     ) as detail,
     'https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys' as remediation,
@@ -53,7 +52,7 @@ select
         'fkey_name', fk.fkey_name,
         'fkey_columns', fk.col_attnums
     ) as metadata,
-    format('0001_unindexed_foreign_keys_%s_%s_%s', fk.schema_, fk.table_, fk.fkey_name) as cache_key
+    format('unindexed_foreign_keys_%s_%s_%s', fk.schema_, fk.table_, fk.fkey_name) as cache_key
 from
     foreign_keys fk
     left join index_ idx
@@ -61,6 +60,9 @@ from
         and fk.col_attnums = idx.col_attnums
 where
     idx.index_ is null
+    and fk.schema_::text not in (
+        'pg_catalog', 'information_schema', 'auth', 'extensions', 'graphql', 'graphql_public', 'net', 'pgsodium', 'storage', 'supabase_functions', 'vault'
+    )
 order by
     fk.table_,
     fk.fkey_name)
@@ -84,17 +86,25 @@ select
     ) as metadata,
     format('auth_users_exposed_%s_%s', 'public', c.relname) as cache_key
 from
-    pg_depend d
-    join pg_rewrite r
+    -- Identify the oid for auth.users
+  pg_catalog.pg_class auth_users_pg_class
+    join pg_catalog.pg_namespace auth_users_pg_namespace
+    on auth_users_pg_class.relnamespace = auth_users_pg_namespace.oid
+    and auth_users_pg_class.relname = 'users'
+    and auth_users_pg_namespace.nspname = 'auth'
+  -- Depends on auth.users
+    join pg_catalog.pg_depend d
+      on d.refobjid = auth_users_pg_class.oid
+    join pg_catalog.pg_rewrite r
         on r.oid = d.objid
-    join pg_class c
+    join pg_catalog.pg_class c
         on c.oid = r.ev_class
-    join pg_namespace n
+    join pg_catalog.pg_namespace n
         on n.oid = c.relnamespace
+    join pg_catalog.pg_class pg_class_auth_users
+        on d.refobjid = pg_class_auth_users.oid
 where
-    d.refobjid = 'auth.users'::regclass
-    and d.deptype = 'n'
-    and c.relkind in ('v', 'm') -- v for view, m for materialized view
+    d.deptype = 'n'
     and n.nspname = 'public'
     and (
       pg_catalog.has_table_privilege('anon', c.oid, 'SELECT')
@@ -102,6 +112,43 @@ where
     )
     -- Exclude self
     and c.relname <> '0002_auth_users_exposed'
+    -- There are 3 insecure configurations
+    and
+    (
+        -- Materialized views don't support RLS so this is insecure by default
+        (c.relkind in ('m')) -- m for materialized view
+        or
+        -- Standard View, accessible to anon or authenticated that is security_definer
+        (
+            c.relkind = 'v' -- v for view
+            -- Exclude security invoker views 
+            and not (
+                lower(coalesce(c.reloptions::text,'{}'))::text[]
+                && array[
+                    'security_invoker=1',
+                    'security_invoker=true',
+                    'security_invoker=yes',
+                    'security_invoker=on'
+                ]
+            )
+        )
+        or
+        -- Standard View, security invoker, but no RLS enabled on auth.users
+        (
+            c.relkind in ('v') -- v for view
+            -- is security invoker 
+            and (
+                lower(coalesce(c.reloptions::text,'{}'))::text[]
+                && array[
+                    'security_invoker=1',
+                    'security_invoker=true',
+                    'security_invoker=yes',
+                    'security_invoker=on'
+                ]
+            )
+            and not pg_class_auth_users.relrowsecurity 
+        )
+    )
 group by
     c.relname, c.oid)
 union all
@@ -151,12 +198,12 @@ with policies as (
         qual,
         with_check
     from
-        pg_policy pa
-        join pg_class pc
+        pg_catalog.pg_policy pa
+        join pg_catalog.pg_class pc
             on pa.polrelid = pc.oid
-        join pg_namespace nsp
+        join pg_catalog.pg_namespace nsp
             on pc.relnamespace = nsp.oid
-        join pg_policies pb
+        join pg_catalog.pg_policies pb
             on pc.relname = pb.tablename
             and nsp.nspname = pb.schemaname
             and pa.polname = pb.policyname
@@ -182,6 +229,9 @@ from
     policies
 where
     is_rls_active
+    and schema_::text not in (
+        'pg_catalog', 'information_schema', 'auth', 'extensions', 'graphql', 'graphql_public', 'net', 'pgsodium', 'storage', 'supabase_functions', 'vault'
+    )
     and (
         (
             -- Example: auth.uid()
@@ -210,7 +260,7 @@ select
         pgc.relname
     ) as detail,
     'https://supabase.com/docs/guides/database/database-linter?lint=0004_no_primary_key' as remediation,
-     jsonb_build_object(
+      jsonb_build_object(
         'schema', pgns.nspname,
         'name', pgc.relname,
         'type', 'table'
@@ -221,15 +271,15 @@ select
         pgc.relname
     ) as cache_key
 from
-    pg_class pgc
-    join pg_namespace pgns
+    pg_catalog.pg_class pgc
+    join pg_catalog.pg_namespace pgns
         on pgns.oid = pgc.relnamespace
-    left join pg_index pgi
+    left join pg_catalog.pg_index pgi
         on pgi.indrelid = pgc.oid
 where
     pgc.relkind = 'r' -- regular tables
     and pgns.nspname not in (
-        'pg_catalog', 'information_schema', 'auth', 'storage', 'vault', 'pgsodium'
+        'pg_catalog', 'information_schema', 'auth', 'extensions', 'graphql', 'graphql_public', 'net', 'pgsodium', 'storage', 'supabase_functions', 'vault'
     )
 group by
     pgc.oid,
@@ -272,7 +322,7 @@ where
     and not pi.indisunique
     and not pi.indisprimary
     and psui.schemaname not in (
-        'pg_catalog', 'information_schema', 'auth', 'storage', 'vault', 'pgsodium'
+        'pg_catalog', 'information_schema', 'auth', 'net', 'pgsodium', 'storage', 'supabase_functions', 'vault'
     ))
 union all
 (
@@ -326,7 +376,7 @@ from
 where
     c.relkind = 'r' -- regular tables
     and n.nspname not in (
-        'pg_catalog', 'information_schema', 'auth', 'storage', 'vault', 'pgsodium'
+        'pg_catalog', 'information_schema', 'auth', 'extensions', 'graphql', 'graphql_public', 'net', 'pgsodium', 'storage', 'supabase_functions', 'vault'
     )
     and r.rolname not like 'pg_%'
     and r.rolname not like 'supabase%admin'
@@ -337,16 +387,256 @@ group by
     r.rolname,
     act.cmd
 having
-    count(1) > 1)`.trim()
+    count(1) > 1)
+union all
+(
+select
+    'policy_exists_rls_disabled' as name,
+    'INFO' as level,
+    'EXTERNAL' as facing,
+    'Detects cases where row level security (RLS) policies have been created, but RLS has not been enabled for the underlying table.' as description,
+    format(
+        'Table \`%s.%s\` has RLS policies but RLS is not enabled on the table. Policies include %s.',
+        n.nspname,
+        c.relname,
+        array_agg(p.polname order by p.polname)
+    ) as detail,
+    'https://supabase.com/docs/guides/database/database-linter?lint=0007_policy_exists_rls_disabled' as remediation,
+    jsonb_build_object(
+        'schema', n.nspname,
+        'name', c.relname,
+        'type', 'table'
+    ) as metadata,
+    format(
+        'policy_exists_rls_disabled_%s_%s',
+        n.nspname,
+        c.relname
+    ) as cache_key
+from
+    pg_catalog.pg_policy p
+    join pg_catalog.pg_class c
+        on p.polrelid = c.oid
+    join pg_catalog.pg_namespace n
+        on c.relnamespace = n.oid
+where
+    c.relkind = 'r' -- regular tables
+    and n.nspname not in (
+        'pg_catalog', 'information_schema', 'auth', 'extensions', 'graphql', 'graphql_public', 'net', 'pgsodium', 'storage', 'supabase_functions', 'vault'
+    )
+    -- RLS is disabled
+    and not c.relrowsecurity
+group by
+    n.nspname,
+    c.relname)
+union all
+(
+select
+    'rls_enabled_no_policy' as name,
+    'INFO' as level,
+    'EXTERNAL' as facing,
+    'Detects cases where row level security (RLS) has been enabled on a table but no RLS policies have been created.' as description,
+    format(
+        'Table \`%s.%s\` has RLS enabled, but no policies exist',
+        n.nspname,
+        c.relname
+    ) as detail,
+    'https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy' as remediation,
+    jsonb_build_object(
+        'schema', n.nspname,
+        'name', c.relname,
+        'type', 'table'
+    ) as metadata,
+    format(
+        'rls_enabled_no_policy_%s_%s',
+        n.nspname,
+        c.relname
+    ) as cache_key
+from
+    pg_catalog.pg_class c
+    left join pg_catalog.pg_policy p
+        on p.polrelid = c.oid
+    join pg_catalog.pg_namespace n
+        on c.relnamespace = n.oid
+where
+    c.relkind = 'r' -- regular tables
+    and n.nspname not in (
+        'pg_catalog', 'information_schema', 'auth', 'extensions', 'graphql', 'graphql_public', 'net', 'pgsodium', 'storage', 'supabase_functions', 'vault'
+    )
+    -- RLS is enabled
+    and c.relrowsecurity
+    and p.polname is null
+group by
+    n.nspname,
+    c.relname)
+union all
+(
+select
+    'duplicate_index' as name,
+    'WARN' as level,
+    'EXTERNAL' as facing,
+    'Detects cases where two ore more identical indexes exist.' as description,
+    format(
+        'Table \`%s.%s\` has identical indexes %s. Drop all except one of them',
+        n.nspname,
+        c.relname,
+        array_agg(pi.indexname order by pi.indexname)
+    ) as detail,
+    'https://supabase.com/docs/guides/database/database-linter?lint=0009_duplicate_index' as remediation,
+    jsonb_build_object(
+        'schema', n.nspname,
+        'name', c.relname,
+        'type', case
+            when c.relkind = 'r' then 'table'
+            when c.relkind = 'm' then 'materialized view'
+            else 'ERROR'
+        end,
+        'indexes', array_agg(pi.indexname order by pi.indexname)
+    ) as metadata,
+    format(
+        'duplicate_index_%s_%s_%s',
+        n.nspname,
+        c.relname,
+        array_agg(pi.indexname order by pi.indexname)
+    ) as cache_key
+from
+    pg_catalog.pg_indexes pi
+    join pg_catalog.pg_namespace n
+        on n.nspname  = pi.schemaname
+    join pg_catalog.pg_class c
+        on pi.tablename = c.relname
+        and n.oid = c.relnamespace
+where
+    c.relkind in ('r', 'm') -- tables and materialized views
+    and n.nspname not in (
+        'pg_catalog', 'information_schema', 'auth', 'extensions', 'graphql', 'graphql_public', 'net', 'pgsodium', 'storage', 'supabase_functions', 'vault'
+    )
+group by
+    n.nspname,
+    c.relkind,
+    c.relname,
+    replace(pi.indexdef, pi.indexname, '')
+having
+    count(*) > 1)
+union all
+(
+select
+    'security_definer_view' as name,
+    'WARN' as level,
+    'EXTERNAL' as facing,
+    'Detects views that are SECURITY DEFINER meaning that they ignore row level security (RLS) policies.' as description,
+    format(
+        'View \`%s.%s\` is SECURITY DEFINER',
+        n.nspname,
+        c.relname
+    ) as detail,
+    'https://supabase.com/docs/guides/database/database-linter?lint=0010_security_definer_view' as remediation,
+    jsonb_build_object(
+        'schema', n.nspname,
+        'name', c.relname,
+        'type', 'view'
+    ) as metadata,
+    format(
+        'security_definer_view_%s_%s',
+        n.nspname,
+        c.relname
+    ) as cache_key
+from
+    pg_catalog.pg_class c
+    join pg_catalog.pg_namespace n
+        on n.oid = c.relnamespace
+where
+    c.relkind = 'v'
+    and n.nspname = 'public'
+  and not (
+    lower(coalesce(c.reloptions::text,'{}'))::text[]
+    && array[
+      'security_invoker=1',
+      'security_invoker=true',
+      'security_invoker=yes',
+      'security_invoker=on'
+    ]
+  ))
+union all
+(
+select
+    'function_search_path_mutable' as name,
+    'WARN' as level,
+    'EXTERNAL' as facing,
+    'Detects functions with a mutable search_path parameter which could fail to execute successfully for some roles.' as description,
+    format(
+        'Function \`%s.%s\` has a role mutable search_path',
+        n.nspname,
+        p.proname
+    ) as detail,
+    'https://supabase.com/docs/guides/database/database-linter?lint=0011_function_search_path_mutable' as remediation,
+    jsonb_build_object(
+        'schema', n.nspname,
+        'name', p.proname,
+        'type', 'function'
+    ) as metadata,
+    format(
+        'function_search_path_mutable_%s_%s_%s',
+        n.nspname,
+        p.proname,
+        md5(p.prosrc) -- required when function is polymorphic
+    ) as cache_key
+from
+    pg_catalog.pg_proc p
+    join pg_catalog.pg_namespace n
+        on p.pronamespace = n.oid
+where
+    n.nspname not in (
+        'pg_catalog', 'information_schema', 'auth', 'extensions', 'graphql', 'graphql_public', 'net', 'pgsodium', 'storage', 'supabase_functions', 'vault'
+    )
+    -- Search path not set to ''
+    and not coalesce(p.proconfig, '{}') && array['search_path=""'])
+union all
+(
+select
+    'rls_disabled_in_public' as name,
+    'ERROR' as level,
+    'EXTERNAL' as facing,
+    'Detects cases where row level security (RLS) has not been enabled on a table in the \`public\` schema.' as description,
+    format(
+        'Table \`%s.%s\` is public, but RLS has not been enabled.',
+        n.nspname,
+        c.relname
+    ) as detail,
+    'https://supabase.com/docs/guides/database/database-linter?lint=0013_rls_disabled_in_public' as remediation,
+    jsonb_build_object(
+        'schema', n.nspname,
+        'name', c.relname,
+        'type', 'table'
+    ) as metadata,
+    format(
+        'rls_disabled_in_public_%s_%s',
+        n.nspname,
+        c.relname
+    ) as cache_key
+from
+    pg_catalog.pg_class c
+    join pg_catalog.pg_namespace n
+        on c.relnamespace = n.oid
+where
+    c.relkind = 'r' -- regular tables
+    and n.nspname = 'public'
+    -- RLS is disabled
+    and not c.relrowsecurity)`.trim()
 
 // Array of all lint rules we handle right now.
 export const LINT_TYPES = [
   'unindexed_foreign_keys',
   'auth_users_exposed',
+  'auth_rls_initplan',
   'no_primary_key',
   'unused_index',
   'multiple_permissive_policies',
-  'auth_rls_initplan',
+  'policy_exists_rls_disabled',
+  'rls_enabled_no_policy',
+  'duplicate_index',
+  'security_definer_view',
+  'function_search_path_mutable',
+  'rls_disabled_in_public',
 ] as const
 export type LINT_TYPES = (typeof LINT_TYPES)[number]
 

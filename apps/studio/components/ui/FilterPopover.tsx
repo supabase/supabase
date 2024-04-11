@@ -40,9 +40,10 @@ export const FilterPopover = ({
       header={<div className="prose text-xs">Select {name.toLowerCase()}</div>}
       overlay={
         <>
-          <div className="space-y-4 px-3 py-3 min-w-[170px]">
+          <div className="space-y-4 min-w-[170px]">
             <ScrollArea className={options.length > 7 ? 'h-[205px]' : ''}>
               <Checkbox.Group
+                className="px-3 py-3"
                 id="projects"
                 onChange={(event) => {
                   const value = event.target.value
