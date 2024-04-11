@@ -4992,7 +4992,7 @@ functions:
           })
           ```
       - id: regional-invocation
-        name: Invoke in a particular region
+        name: Invoking a Function in the UsEast1 region
         description: |
           You can also set the region to use when invoking a function.
         isSpotlight: true
@@ -5005,13 +5005,6 @@ functions:
             region: FunctionRegion.UsEast1
           })
           ```
-        notes: |
-          - Available regions are:
-          - Any (default)
-          - ApNortheast1, ApNortheast2, ApSouth1, ApSoutheast1,
-          - ApSoutheast2, CaCentral1, EuCentral1, EuWest1,
-          - EuWest2, EuWest3, SaEast1,
-          - UsEast1, UsWest1, UsWest2
 
       - id: calling-with-get-verb
         name: Calling with GET HTTP verb
