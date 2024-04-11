@@ -7,18 +7,26 @@ const useGenerateSqlCommand = () => {
   const { setShowGenerateSqlModal } = useAppStateSnapshot()
   const setQuery = useSetQuery()
 
-  useRegisterCommands('Experimental', [
-    {
-      id: 'generate-sql',
-      name: 'Generate SQL with Supabase AI',
-      action: () => {
-        setShowGenerateSqlModal(true)
-        setQuery('')
+  useRegisterCommands(
+    'Experimental',
+    [
+      {
+        id: 'generate-sql',
+        name: 'Generate SQL with Supabase AI',
+        action: () => {
+          setShowGenerateSqlModal(true)
+          setQuery('')
+        },
+        icon: () => <AiIconAnimation allowHoverEffect />,
+        badge: () => <BadgeExperimental />,
       },
-      icon: () => <AiIconAnimation allowHoverEffect />,
-      badge: () => <BadgeExperimental />,
-    },
-  ])
+    ],
+    {
+      orderSection: (sections, idx) => {
+        return [sections[idx], ...sections.slice(0, idx), ...sections.slice(idx + 1)]
+      },
+    }
+  )
 }
 
 export { useGenerateSqlCommand }

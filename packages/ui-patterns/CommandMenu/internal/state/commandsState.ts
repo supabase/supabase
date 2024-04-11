@@ -10,6 +10,7 @@ type OrderCommandsInstruction = (
 ) => Array<ICommand>
 type UseCommandOptions = {
   deps?: any[]
+  enabled?: boolean
   forceMountSection?: boolean
   orderSection?: OrderSectionInstruction
   orderCommands?: OrderCommandsInstruction
@@ -34,9 +35,6 @@ const initCommandsState = () => {
 
       if (options?.forceMountSection) state.commandSections[editIndex].forceMount = true
 
-      state.commandSections =
-        options?.orderSection?.(state.commandSections, editIndex) ?? state.commandSections
-
       if (options?.orderCommands) {
         state.commandSections[editIndex].commands = options.orderCommands(
           state.commandSections[editIndex].commands,
@@ -46,6 +44,9 @@ const initCommandsState = () => {
         state.commandSections[editIndex].commands.push(...commands)
       }
 
+      state.commandSections =
+        options?.orderSection?.(state.commandSections, editIndex) ?? state.commandSections
+
       return () => {
         const idx = state.commandSections.findIndex((section) => section.name === sectionName)
         if (idx !== -1) {
@@ -53,7 +54,7 @@ const initCommandsState = () => {
             (command) => !commands.map((cmd) => cmd.id).includes(command.id)
           )
           if (!filteredCommands.length) {
-            state.commandSections.splice(idx)
+            state.commandSections.splice(idx, 1)
           } else {
             state.commandSections[idx].commands = filteredCommands
           }

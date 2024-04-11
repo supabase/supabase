@@ -29,12 +29,17 @@ const useRegisterCommands = (
   const [rerenderFlag, toggleRerenderFlag] = useReducer((flag) => (flag === 0 ? 1 : 0), 0)
   const prevDeps = useRef(options?.deps)
 
+  const enabled = options?.enabled || options?.enabled === undefined
+
   if (!isEqual(prevDeps.current, options?.deps)) {
     prevDeps.current = options?.deps
     toggleRerenderFlag()
   }
 
-  useEffect(() => registerSection(sectionName, commands, options), [registerSection, rerenderFlag])
+  useEffect(
+    () => (enabled ? registerSection(sectionName, commands, options) : undefined),
+    [registerSection, enabled, rerenderFlag]
+  )
 }
 
 export { useCommands, useRegisterCommands }

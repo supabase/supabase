@@ -5,7 +5,6 @@ import { useSetCommandMenuOpen } from '../api/hooks/viewHooks'
 import type { UseCommandOptions } from '../api/types'
 import { PageType } from '../api/utils'
 import { themes } from 'ui/src/components/ThemeProvider/themes'
-import { useSetQuery } from '../api/hooks/queryHooks'
 import { Monitor, MonitorDot, Moon, Sun } from 'lucide-react'
 
 const THEME_SWITCHER_PAGE_NAME = 'switch-theme'
