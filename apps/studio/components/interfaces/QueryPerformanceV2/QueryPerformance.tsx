@@ -116,8 +116,7 @@ export const QueryPerformance = ({
               key={tab.id}
               value={tab.id}
               className={cn(
-                'group',
-                'relative',
+                'group relative',
                 'px-6 py-3 border-b-0 flex flex-col items-start !shadow-none border-default border-t',
                 'even:border-x last:border-r even:!border-x-strong last:!border-r-strong',
                 tab.id === page ? '!bg-surface-200' : '!bg-surface-200/[33%]',
@@ -128,7 +127,7 @@ export const QueryPerformance = ({
               )}
             >
               {tab.id === page && (
-                <div className="absolute top-0 left-0 w-full h-[1px] bg-foreground"></div>
+                <div className="absolute top-0 left-0 w-full h-[1px] bg-foreground" />
               )}
 
               <div className="flex items-center gap-x-2">
