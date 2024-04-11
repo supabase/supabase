@@ -9,6 +9,8 @@ import { data } from '../data/ga'
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '../components/Layouts/SectionContainer'
 import ReactMarkdown from 'react-markdown'
+import Image from 'next/image'
+import GaPerformanceSection from '../components/GA/GaPerformanceSection'
 
 const ParagraphSection = dynamic(() => import('~/components/Sections/ParagraphSection'))
 const FeaturesSection = dynamic(() => import('~/components/Sections/FeaturesSection'))
@@ -38,8 +40,19 @@ export default function IndexPage() {
         }}
       />
       <div className="bg-alternative border-b border-muted">
-        <SectionContainer className="text-center space-y-4 !pb-0">
-          <p className="text-sm text-brand md:text-base">{data.hero.publishedAt}</p>
+        <SectionContainer className="text-center flex flex-col items-center space-y-4 !pb-0">
+          <Image
+            src="/images/ga/supabase-ga-visual.png"
+            alt="GA logo"
+            className="w-auto h-52 -my-10"
+            width={1200}
+            height={1200}
+            priority
+            quality={100}
+          />
+          {data.hero.publishedAt && (
+            <p className="text-sm text-brand md:text-base">{data.hero.publishedAt}</p>
+          )}
           <h1 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1.1px]">
             {data.hero.title}
           </h1>
@@ -94,6 +107,7 @@ export default function IndexPage() {
       <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.securitySection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
+      <GaPerformanceSection {...data.performanceSection} hasStickyTitle />
       <ParagraphSection {...data.performanceSection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.reliabilitySection} hasStickyTitle />

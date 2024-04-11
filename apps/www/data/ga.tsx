@@ -1,12 +1,9 @@
 export const data = {
   hero: {
-    title: (
-      <>
-        Supabase has reached <br className="hidden sm:block" /> General Availability
-      </>
-    ),
-    paragraph: "Today, we're officially going out of our Beta program.",
-    publishedAt: '15 April 2024',
+    title: <>General Availability</>,
+    paragraph: 'Published 15 April 2024',
+    // publishedAt: '15 April 2024',
+    publishedAt: null,
     sections: [
       { title: 'Company', link: '#company' },
       { title: 'Core Principles', link: '#principles' },
@@ -27,11 +24,14 @@ export const data = {
     title: 'Company',
     paragraph: '01',
     content: `
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Today Supabase, the Postgres Developer Platform, graduates to General Availability. 
 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+We have <wow numbers> customers, projects, database created, etc. Just since the beginning of 2024, we have <more wow numbers>.
 
-Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+![Supabase GitHub stars growth vs Redis](/images/ga/supabase-gh-stars-redis.jpg)
+
+Many customers have been running production applications on Supabase for the past several years. Supabase may be new to General Availability but we are not new to running demanding production applications.
+
 `,
   },
   highlightsSection: {
