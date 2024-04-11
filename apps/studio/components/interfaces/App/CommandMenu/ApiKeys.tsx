@@ -1,5 +1,6 @@
 import { useParams } from 'common'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useProjectByRef } from 'hooks'
 import { copyToClipboard } from 'lib/helpers'
 import { Key } from 'lucide-react'
 import { useMemo } from 'react'
@@ -13,7 +14,7 @@ import {
   useSetPage,
 } from 'ui-patterns/CommandMenu'
 
-const API_KEYS_PAGE_NAME = 'api-keys'
+const API_KEYS_PAGE_NAME = 'API Keys'
 
 const useApiKeysCommands = () => {
   const setIsOpen = useSetCommandMenuOpen()
@@ -21,6 +22,7 @@ const useApiKeysCommands = () => {
 
   const { ref } = useParams()
   const { data: settings } = useProjectApiQuery({ projectRef: ref }, { enabled: !!ref })
+  const project = useProjectByRef(ref)
 
   const anonKey = settings?.autoApiService?.defaultApiKey ?? undefined
   const serviceKey = settings?.autoApiService?.serviceApiKey ?? undefined
@@ -28,26 +30,28 @@ const useApiKeysCommands = () => {
   const commands = useMemo(
     () =>
       [
-        anonKey && {
-          id: 'anon-key',
-          name: 'Copy anonymous API key',
-          action: () => {
-            copyToClipboard(anonKey ?? '')
-            setIsOpen(false)
+        project &&
+          anonKey && {
+            id: 'anon-key',
+            name: `Copy anonymous API key for project ${project?.name}`,
+            action: () => {
+              copyToClipboard(anonKey ?? '')
+              setIsOpen(false)
+            },
+            badge: () => <Badge>Public</Badge>,
+            icon: () => <Key />,
           },
-          badge: () => <Badge>Public</Badge>,
-          icon: () => <Key />,
-        },
-        serviceKey && {
-          id: 'service-key',
-          name: 'Copy service API key',
-          action: () => {
-            copyToClipboard(serviceKey ?? '')
-            setIsOpen(false)
+        project &&
+          serviceKey && {
+            id: 'service-key',
+            name: `Copy service API key for project ${project?.name}`,
+            action: () => {
+              copyToClipboard(serviceKey ?? '')
+              setIsOpen(false)
+            },
+            badge: () => <Badge variant="destructive">Secret</Badge>,
+            icon: () => <Key />,
           },
-          badge: () => <Badge variant="destructive">Secret</Badge>,
-          icon: () => <Key />,
-        },
         !(anonKey || serviceKey) && {
           id: 'api-keys-project-settings',
           name: 'See API keys in Project Settings',
@@ -55,7 +59,7 @@ const useApiKeysCommands = () => {
           icon: () => <Key />,
         },
       ].filter(Boolean) as ICommand[],
-    [anonKey, serviceKey, ref, setIsOpen]
+    [anonKey, serviceKey, project, ref, setIsOpen]
   )
 
   useRegisterPage(

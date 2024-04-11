@@ -7,7 +7,7 @@ import { PageType } from '../../api/utils'
 import { DocsSearchPage } from './DocsSearchPage'
 
 const DOCS_SEARCH_COMMANDS = {
-  PAGE_NAME: 'docs-search',
+  PAGE_NAME: 'Docs search',
   SECTION_NAME: 'Docs',
 }
 

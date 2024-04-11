@@ -26,7 +26,6 @@ import ProjectPausedState from './ProjectPausedState'
 import RestoringState from './RestoringState'
 import { UpgradingState } from './UpgradingState'
 import { ResizableHandle, ResizablePanelGroup, ResizablePanel, cn } from 'ui'
-import { useAppStateSnapshot } from 'state/app-state'
 
 // [Joshen] This is temporary while we unblock users from managing their project
 // if their project is not responding well for any reason. Eventually needs a bit of an overhaul

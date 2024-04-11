@@ -8,7 +8,7 @@ import { PageType } from '../../api/utils'
 import { DocsAiPage } from './DocsAiPage'
 
 const DOCS_AI_COMMANDS = {
-  PAGE_NAME: 'docs-ai',
+  PAGE_NAME: 'Ask Supabase AI',
   SECTION_NAME: 'Docs',
 }
 

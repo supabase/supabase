@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash'
-import { useEffect, useReducer, useRef } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { useSnapshot } from 'valtio'
 
 import type { ICommand, ICommandSectionName, UseCommandOptions } from '../types'
@@ -21,25 +21,46 @@ const useCommands = () => {
 const useRegisterCommands = (
   sectionName: ICommandSectionName,
   commands: ICommand[],
-  options?: UseCommandOptions
+  options: UseCommandOptions = {}
 ) => {
   const { commandsState } = useCommandContext()
   const { registerSection } = useSnapshot(commandsState)
 
-  const [rerenderFlag, toggleRerenderFlag] = useReducer((flag) => (flag === 0 ? 1 : 0), 0)
   const prevDeps = useRef(options?.deps)
+  options.enabled ??= true
+  const prevEnabled = useRef<boolean | undefined>(options.enabled)
 
-  const enabled = options?.enabled || options?.enabled === undefined
+  const unsubscribe = useRef<() => void>()
 
-  if (!isEqual(prevDeps.current, options?.deps)) {
-    prevDeps.current = options?.deps
-    toggleRerenderFlag()
-  }
+  /**
+   * The double useMemo / useEffect subscription is to handle a pair of
+   * intersecting side effects:
+   *
+   * 1. useMemo ensures that the updates to state happen synchronously
+   * 2. useEffect ensures that the first render (which sometimes happens as a
+   *    pair of renders, with the second ignoring the refs set by the first)
+   *    doesn't leave dangling subscriptions.
+   */
+  useMemo(() => {
+    if (!isEqual(prevDeps.current, options.deps) || prevEnabled.current !== options.enabled) {
+      unsubscribe.current?.()
 
-  useEffect(
-    () => (enabled ? registerSection(sectionName, commands, options) : undefined),
-    [registerSection, enabled, rerenderFlag]
-  )
+      unsubscribe.current = options.enabled
+        ? registerSection(sectionName, commands, options)
+        : undefined
+
+      prevDeps.current = options.deps
+      prevEnabled.current = options.enabled
+    }
+  }, [registerSection, sectionName, commands, options])
+
+  useEffect(() => {
+    unsubscribe.current = options.enabled
+      ? registerSection(sectionName, commands, options)
+      : undefined
+
+    return () => unsubscribe.current?.()
+  }, [])
 }
 
 export { useCommands, useRegisterCommands }

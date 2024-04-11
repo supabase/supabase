@@ -31,6 +31,7 @@ const initCommandsState = () => {
     registerSection: (sectionName, commands, options) => {
       let editIndex = state.commandSections.findIndex((section) => section.name === sectionName)
       if (editIndex === -1) editIndex = state.commandSections.length
+
       state.commandSections[editIndex] ??= section$new(sectionName)
 
       if (options?.forceMountSection) state.commandSections[editIndex].forceMount = true
@@ -65,8 +66,13 @@ const initCommandsState = () => {
   return state
 }
 
+/**
+ * [Charis] This may be a premature optimization, but since this runs so many
+ * times, I'm doing this imperatively to cut down on array initialization.
+ * Haven't actually measured, YOLO.
+ */
 const orderSectionFirst = (sections: ICommandSection[], idx: number) => {
-  const result = Array.from({ length: sections.length })
+  const result = Array.from({ length: sections.length }) satisfies ICommandSection[]
 
   result[0] = sections[idx]
 

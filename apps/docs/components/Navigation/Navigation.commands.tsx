@@ -11,7 +11,7 @@ const navCommands = [
   {
     id: 'nav-database',
     name: 'Go to Database',
-    route: '/guides/database',
+    route: '/guides/database/overview',
     icon: () => <ArrowRight />,
   },
   {

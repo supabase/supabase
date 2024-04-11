@@ -1,4 +1,4 @@
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, ArrowLeft } from 'lucide-react'
 import { type PropsWithChildren, forwardRef, useEffect, useState } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
@@ -7,28 +7,52 @@ import { Button, Command_Shadcn_, Dialog, DialogContent, cn } from 'ui'
 import { useCurrentPage, usePageComponent, usePopPage } from './hooks/pagesHooks'
 import { useQuery, useSetQuery } from './hooks/queryHooks'
 import { useCommandMenuSize, useCommandMenuVisible, useSetCommandMenuOpen } from './hooks/viewHooks'
+import { PageType } from './utils'
+
+const Breadcrumb = () => {
+  const currPage = useCurrentPage()
+  const popPage = usePopPage()
+
+  if (!currPage) return
+
+  return (
+    <div className="flex items-center gap-2 mt-2 ml-2 text-xs text-foreground-muted">
+      <button onClick={popPage}>
+        <ArrowLeft width={12} height={12} />
+      </button>
+      {currPage.name}
+    </div>
+  )
+}
 
 const CommandWrapper = forwardRef<
   React.ElementRef<typeof Command_Shadcn_>,
   React.ComponentPropsWithoutRef<typeof Command_Shadcn_>
->(({ className, ...props }, ref) => (
-  <Command_Shadcn_
-    ref={ref}
-    className={cn(
-      'flex h-full w-full flex-col overflow-hidden',
-      '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
-      '[&_[cmdk-item]_svg]:h-5',
-      '[&_[cmdk-item]_svg]:w-5',
-      '[&_[cmdk-item]_svg]:stroke-1',
-      '[&_[cmdk-input-wrapper]_svg]:h-5',
-      '[&_[cmdk-input-wrapper]_svg]:w-5',
+>(({ children, className, ...props }, ref) => {
+  const currPage = useCurrentPage()
 
-      '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0',
-      className
-    )}
-    {...props}
-  />
-))
+  return (
+    <Command_Shadcn_
+      ref={ref}
+      className={cn(
+        'flex h-full w-full flex-col overflow-hidden',
+        '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
+        '[&_[cmdk-item]_svg]:h-5',
+        '[&_[cmdk-item]_svg]:w-5',
+        '[&_[cmdk-item]_svg]:stroke-1',
+        '[&_[cmdk-input-wrapper]_svg]:h-5',
+        '[&_[cmdk-input-wrapper]_svg]:w-5',
+
+        '[&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0',
+        className
+      )}
+      {...props}
+    >
+      {currPage?.type === PageType.Commands && <Breadcrumb />}
+      {children}
+    </Command_Shadcn_>
+  )
+})
 CommandWrapper.displayName = Command_Shadcn_.displayName
 
 const CommandError = ({ resetErrorBoundary }: { resetErrorBoundary: () => void }) => {

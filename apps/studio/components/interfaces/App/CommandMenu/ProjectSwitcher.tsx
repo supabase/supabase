@@ -9,7 +9,7 @@ import {
   useSetQuery,
 } from 'ui-patterns/CommandMenu'
 
-const PROJECT_SWITCHER_PAGE_NAME = 'switch-project'
+const PROJECT_SWITCHER_PAGE_NAME = 'Swith project'
 
 const useProjectSwitchCommand = () => {
   const setPage = useSetPage()

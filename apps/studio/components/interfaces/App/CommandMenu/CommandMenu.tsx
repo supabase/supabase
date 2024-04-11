@@ -7,11 +7,15 @@ import { useThemeSwitcherCommands } from 'ui-patterns/CommandMenu/prepackaged/Th
 import { useBranchCommands } from 'components/interfaces/BranchManagement/BranchCommands'
 import { useApiKeysCommands } from './ApiKeys'
 import { useProjectSwitchCommand } from './ProjectSwitcher'
+import { useLayoutNavCommands } from 'components/layouts/useLayoutNavCommands'
+import { useApiUrlCommand } from './ApiUrl'
 
 const StudioCommandMenu = () => {
   useApiKeysCommands()
+  useApiUrlCommand()
   useProjectSwitchCommand()
   useBranchCommands()
+  useLayoutNavCommands()
   useDocsSearchCommands()
   useDocsAiCommands()
   useSupportCommands()

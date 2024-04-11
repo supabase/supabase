@@ -1,3 +1,4 @@
+import { useParams } from 'next/navigation'
 import { useAppStateSnapshot } from 'state/app-state'
 import { AiIconAnimation } from 'ui'
 
@@ -11,6 +12,13 @@ import {
 const useGenerateSqlCommand = () => {
   const { setShowGenerateSqlModal } = useAppStateSnapshot()
   const setQuery = useSetQuery()
+
+  /**
+   * The modal only exists in ProjectLayout because it needs access to
+   * project context if sending the schema. TODO: Find a way to generalize this
+   * and move it back to main layout.
+   */
+  const ref = useParams()?.ref
 
   useRegisterCommands(
     'Experimental',
@@ -27,6 +35,7 @@ const useGenerateSqlCommand = () => {
       },
     ],
     {
+      enabled: !!ref,
       orderSection: orderSectionFirst,
     }
   )

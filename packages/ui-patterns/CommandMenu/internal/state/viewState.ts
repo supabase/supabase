@@ -8,6 +8,8 @@ type IViewState = {
   open: boolean
   setOpen: (open: boolean) => void
   toggleOpen: () => void
+  isNavigating: boolean
+  setIsNavigating: (isNavigating: boolean) => void
   size: DialogSize
   setSize: (size: DialogSize) => void
 }
@@ -25,6 +27,8 @@ const initViewState = () => {
       state.init()
       state.open = !state.open
     },
+    isNavigating: false,
+    setIsNavigating: (isNavigating) => (state.isNavigating = isNavigating),
     size: 'large',
     setSize: (size) => (state.size = size),
   })

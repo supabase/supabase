@@ -9,7 +9,7 @@ import {
   useSetPage,
 } from 'ui-patterns/CommandMenu'
 
-const SWITCH_BRANCH_PAGE_NAME = 'switch-branch'
+const SWITCH_BRANCH_PAGE_NAME = 'Switch branch'
 
 const useBranchCommands = () => {
   const setPage = useSetPage()

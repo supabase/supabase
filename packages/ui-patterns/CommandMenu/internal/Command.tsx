@@ -2,8 +2,7 @@ import { useRouter } from 'next/navigation'
 import { type PropsWithChildren, type ReactNode, forwardRef } from 'react'
 
 import { CommandItem_Shadcn_, cn } from 'ui'
-import { useSetCommandMenuOpen } from '../api/hooks/viewHooks'
-import { useSetQuery } from '../api/hooks/queryHooks'
+import { useSetCommandMenuOpen, useSetIsCommandNavigating } from '../api/hooks/viewHooks'
 
 type ICommand = IActionCommand | IRouteCommand
 
@@ -82,8 +81,8 @@ const CommandItem = forwardRef<
   PropsWithChildren<CommandItemProps>
 >(({ children, className, command: _command, ...props }, ref) => {
   const router = useRouter()
+  const setIsNavigating = useSetIsCommandNavigating()
   const setIsOpen = useSetCommandMenuOpen()
-  const setQuery = useSetQuery()
 
   const command = _command as ICommand // strip the readonly applied from the proxy
 
@@ -97,17 +96,8 @@ const CommandItem = forwardRef<
           : isRouteCommand(command)
             ? () => {
                 command.route.startsWith('http')
-                  ? window.open(command.route, '_blank', 'noreferrer,noopener')
-                  : router.push(command.route)
-                /**
-                 * Hacky arbitrary timeout to await navigation.
-                 *
-                 * Can probably do a transition in newer versions of Next.js.
-                 */
-                setTimeout(() => {
-                  setIsOpen(false)
-                  setQuery('')
-                }, 100)
+                  ? (window.open(command.route, '_blank', 'noreferrer,noopener'), setIsOpen(false))
+                  : (router.push(command.route), setIsNavigating(true))
               }
             : () => {}
       }

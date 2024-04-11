@@ -7,7 +7,7 @@ import { PageType } from '../api/utils'
 import { themes } from 'ui/src/components/ThemeProvider/themes'
 import { Monitor, MonitorDot, Moon, Sun } from 'lucide-react'
 
-const THEME_SWITCHER_PAGE_NAME = 'switch-theme'
+const THEME_SWITCHER_PAGE_NAME = 'Switch theme'
 
 const useThemeSwitcherCommands = ({ options }: { options?: UseCommandOptions } = {}) => {
   const setIsOpen = useSetCommandMenuOpen()

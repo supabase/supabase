@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef } from 'react'
+import { useEffect, useMemo, useReducer, useRef } from 'react'
 import { useSnapshot } from 'valtio'
 
 import { useCommandContext } from '../../internal/Context'
@@ -15,8 +15,15 @@ const useCurrentPage = () => {
   const { commandPages, pageStack } = useSnapshot(pagesState)
 
   const topOfStack = pageStack.at(-1)
+  const result = useMemo(
+    () =>
+      topOfStack && commandPages[topOfStack]
+        ? { ...commandPages[topOfStack], name: topOfStack }
+        : undefined,
+    [commandPages, topOfStack]
+  )
 
-  return topOfStack ? commandPages[topOfStack] : undefined
+  return result
 }
 
 const usePageComponent = () => {
@@ -45,26 +52,46 @@ const usePopPage = () => {
   return popPageStack
 }
 
+const EMPTY_ARRAY = [] as any[]
+
 const useRegisterPage = (
   name: ICommandPageName,
   definition: PageDefinition,
-  { deps = [], enabled = true }: { deps?: any[]; enabled?: boolean } = {}
+  { deps = EMPTY_ARRAY, enabled = true }: { deps?: any[]; enabled?: boolean } = {}
 ) => {
   const { pagesState } = useCommandContext()
   const { registerNewPage } = useSnapshot(pagesState)
 
-  const [rerenderFlag, toggleRerenderFlag] = useReducer((flag) => (flag === 0 ? 1 : 0), 0)
   const prevDeps = useRef(deps)
+  const prevEnabled = useRef(enabled)
 
-  if (!isEqual(prevDeps.current, deps)) {
-    prevDeps.current = deps
-    toggleRerenderFlag()
-  }
+  const unsubscribe = useRef<() => void>()
 
-  useEffect(
-    () => (enabled ? registerNewPage(name, definition) : undefined),
-    [registerNewPage, enabled, rerenderFlag]
-  )
+  /**
+   * The double useMemo / useEffect subscription is to handle a pair of
+   * intersecting side effects:
+   *
+   * 1. useMemo ensures that the updates to state happen synchronously
+   * 2. useEffect ensures that the first render (which sometimes happens as a
+   *    pair of renders, with the second ignoring the refs set by the first)
+   *    doesn't leave dangling subscriptions.
+   */
+  useMemo(() => {
+    if (!isEqual(prevDeps.current, deps) || prevEnabled.current !== enabled) {
+      unsubscribe.current?.()
+
+      unsubscribe.current = enabled ? registerNewPage(name, definition) : undefined
+
+      prevDeps.current = deps
+      prevEnabled.current = enabled
+    }
+  }, [registerNewPage, name, definition, deps, enabled])
+
+  useEffect(() => {
+    unsubscribe.current = enabled ? registerNewPage(name, definition) : undefined
+
+    return () => unsubscribe.current?.()
+  }, [])
 }
 
 export { useCurrentPage, useRegisterPage, useSetPage, usePopPage, usePageComponent }
