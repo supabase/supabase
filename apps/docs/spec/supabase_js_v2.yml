@@ -4991,6 +4991,28 @@ functions:
             method: 'DELETE'
           })
           ```
+      - id: regional-invocation
+        name: Invoke in a particular region
+        description: |
+          You can also set the region to use when invoking a function.
+        isSpotlight: true
+        code: |
+          ```js
+          import { createClient, FunctionRegion } from '@supabase/supabase-js'
+
+          const { data, error } = await supabase.functions.invoke('hello', {
+            body: { foo: 'bar' },
+            region: FunctionRegion.US_EAST_1
+          })
+          ```
+        notes: |
+          - Available regions are:
+          - Any (default)
+          - ApNortheast1, ApNortheast2, ApSouth1, ApSoutheast1,
+          - ApSoutheast2, CaCentral1, EuCentral1, EuWest1,
+          - EuWest2, EuWest3, SaEast1,
+          - UsEast1, UsWest1, UsWest2
+
       - id: calling-with-get-verb
         name: Calling with GET HTTP verb
         description: |
@@ -5004,6 +5026,39 @@ functions:
             },
             method: 'GET'
           })
+          ```
+  - id: invoke-regional
+    title: invoke()
+    description: |
+      Invoke a Supabase Edge Function in a particular region.
+    $ref: '@supabase/functions-js.FunctionsClient.invoke'
+    notes: |
+      - Requires an Authorization header.
+      - You can specify the region to use when invoking a function.
+      - You can also set it globally using `supabase.setRegion()`.
+      - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
+      - When you pass in a body to your function, we automatically attach the Content-Type header for `Blob`, `ArrayBuffer`, `File`, `FormData` and `String`. If it doesn't match any of these types we assume the payload is `json`, serialise it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
+      - Responses are automatically parsed as `json`, `blob` and `form-data` depending on the `Content-Type` header sent by your function. Responses are parsed as `text` by default.
+    examples:
+      - id: listen-to-broadcast
+        name: Listen to broadcast messages
+        isSpotlight: true
+        code: |
+          ```js
+          supabase
+            .channel('room1')
+            .on('broadcast', { event: 'cursor-pos' }, payload => {
+              console.log('Cursor position received!', payload)
+            })
+            .subscribe((status) => {
+              if (status === 'SUBSCRIBED') {
+                channel.send({
+                  type: 'broadcast',
+                  event: 'cursor-pos',
+                  payload: { x: Math.random(), y: Math.random() },
+                })
+              }
+            })
           ```
 
   - id: subscribe
