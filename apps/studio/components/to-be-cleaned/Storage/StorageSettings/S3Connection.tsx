@@ -169,7 +169,7 @@ export const S3Connection = () => {
                   <Label_Shadcn_ htmlFor="description">Description</Label_Shadcn_>
                   <Input
                     autoComplete="off"
-                    placeholder="My test key"
+                    placeholder="Key description"
                     type="text"
                     name="description"
                     required
