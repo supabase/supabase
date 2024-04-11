@@ -1,0 +1,47 @@
+{
+  "name": "design-system",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "contentlayer build && tsc --noEmit"
+  },
+  "dependencies": {
+    "contentlayer": "0.3.4",
+    "jotai": "^2.8.0",
+    "lucide-react": "^0.338.0",
+    "markdown-wasm": "^1.2.0",
+    "next": "14.1.4",
+    "next-contentlayer": "0.3.4",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-wrap-balancer": "^1.1.0",
+    "rehype-autolink-headings": "^7.1.0",
+    "rehype-pretty-code": "^0.6.0",
+    "rehype-slug": "^6.0.0",
+    "remark": "^14.0.3",
+    "remark-code-import": "^1.2.0",
+    "remark-gfm": "^3.0.1",
+    "ui": "*",
+    "unist-util-visit": "^5.0.0"
+  },
+  "devDependencies": {
+    "@shikijs/compat": "^1.1.7",
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "autoprefixer": "^10.0.1",
+    "config": "*",
+    "eslint": "^8",
+    "eslint-config-next": "14.1.4",
+    "mdast-util-toc": "^6.1.1",
+    "postcss": "^8",
+    "shiki": "^1.1.7",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5",
+    "unist-builder": "3.0.0"
+  }
+}
