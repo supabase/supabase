@@ -38,7 +38,5 @@ interface ResetAction {
 
 type MessageAction = NewMessageAction | UpdateMessageAction | AppendContentAction | ResetAction
 
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
-
-export { BASE_PATH, MessageRole, MessageStatus }
+export { MessageRole, MessageStatus }
 export type { Message, MessageAction }

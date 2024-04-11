@@ -1,5 +1,6 @@
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useSelectedProject } from 'hooks'
+import { Forward, GitBranch } from 'lucide-react'
 import {
   PageType,
   orderSectionFirst,
@@ -36,6 +37,7 @@ const useBranchCommands = () => {
             id: `branch-${branch.id}`,
             name: branch.name,
             route: `/project/${branch.project_ref}`,
+            icon: () => <Forward />,
           })),
         },
       ],
@@ -51,6 +53,7 @@ const useBranchCommands = () => {
         name: 'Switch branch',
         value: 'Switch branch, Change branch, Select branch',
         action: () => setPage(SWITCH_BRANCH_PAGE_NAME),
+        icon: () => <GitBranch />,
       },
     ],
     { enabled: isBranchingEnabled, orderSection: orderSectionFirst }

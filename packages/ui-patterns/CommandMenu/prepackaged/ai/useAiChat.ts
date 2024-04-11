@@ -9,7 +9,8 @@ import {
 } from 'react'
 import { SSE } from 'sse.js'
 
-import { BASE_PATH, type Message, type MessageAction, MessageRole, MessageStatus } from './utils'
+import { type Message, type MessageAction, MessageRole, MessageStatus } from './utils'
+import { BASE_PATH } from '../shared/constants'
 
 const messageReducer = (state: Message[], messageAction: MessageAction) => {
   let current = [...state]

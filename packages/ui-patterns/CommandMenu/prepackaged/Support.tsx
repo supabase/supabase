@@ -3,8 +3,7 @@ import { useRegisterCommands } from '../api/hooks/commandsHooks'
 import { type ICommand } from '../internal/Command'
 import { useSetCommandMenuOpen } from '../api/hooks/viewHooks'
 import { useMemo } from 'react'
-
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH
+import { BASE_PATH } from './shared/constants'
 
 const useSupportCommands = () => {
   const setOpen = useSetCommandMenuOpen()

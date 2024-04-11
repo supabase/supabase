@@ -19,8 +19,8 @@ import { TextHighlighter } from '../../api/TextHighlighter'
 import { useSetCommandMenuOpen } from '../../api/hooks/viewHooks'
 import { useQuery, useSetQuery } from '../../api/hooks/queryHooks'
 import { escapeAttributeSelector, generateCommandClassNames } from '../../api/utils'
+import { BASE_PATH } from '../shared/constants'
 
-const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH
 const NUMBER_SOURCES = 2
 const FUNCTIONS_URL = '/functions/v1/'
 

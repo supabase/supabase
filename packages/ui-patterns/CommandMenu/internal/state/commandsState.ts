@@ -65,11 +65,21 @@ const initCommandsState = () => {
   return state
 }
 
-const orderSectionFirst = (sections: ICommandSection[], idx: number) => [
-  sections[idx],
-  ...sections.slice(0, idx),
-  ...sections.slice(idx),
-]
+const orderSectionFirst = (sections: ICommandSection[], idx: number) => {
+  const result = Array.from({ length: sections.length })
+
+  result[0] = sections[idx]
+
+  let j = 1
+  for (let i = 0; i < idx; i++) {
+    result[j++] = sections[i]
+  }
+  for (let i = idx + 1; i < sections.length; i++) {
+    result[j++] = sections[i]
+  }
+
+  return result
+}
 
 export { initCommandsState, orderSectionFirst }
 export type { ICommandsState, UseCommandOptions }
