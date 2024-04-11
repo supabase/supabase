@@ -1,4 +1,5 @@
 import { LINT_TYPES, Lint } from 'data/lint/lint-query'
+import { Book, Key, LinkIcon, Lock, User } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 
@@ -20,6 +21,26 @@ export function getHumanReadableTitle(title: LINT_TYPES) {
       return 'Unused Index'
     case 'multiple_permissive_policies':
       return 'Multiple Permissive Policies'
+    default:
+      assertUnreachable(title)
+      throw new Error('This case should never be reached')
+  }
+}
+
+export function getLintIcon(title: LINT_TYPES) {
+  switch (title) {
+    case 'unindexed_foreign_keys':
+      return <Key size={15} strokeWidth={1.5} />
+    case 'auth_users_exposed':
+      return <User size={15} strokeWidth={1.5} />
+    case 'auth_rls_initplan':
+      return <Lock size={15} strokeWidth={1.5} />
+    case 'no_primary_key':
+      return <Key size={15} strokeWidth={1.5} />
+    case 'unused_index':
+      return <LinkIcon size={15} strokeWidth={1.5} />
+    case 'multiple_permissive_policies':
+      return <LinkIcon size={15} strokeWidth={1.5} />
     default:
       assertUnreachable(title)
       throw new Error('This case should never be reached')

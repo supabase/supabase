@@ -15,7 +15,7 @@ import {
   Tooltip_Shadcn_,
 } from 'ui'
 import { Markdown } from '../Markdown'
-import { LintCTA, getHumanReadableTitle } from './ReportLints.utils'
+import { LintCTA, getHumanReadableTitle, getLintIcon } from './ReportLints.utils'
 
 type ReportLintsTableRowProps = {
   lint: Lint
@@ -68,7 +68,10 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
         <Table.td className="flex flex-col gap-y-2">
           <div>
             <div className="flex items-center gap-x-2">
-              <p className="text-foreground">{getHumanReadableTitle(lint.name)}</p>
+              <span className="text-foreground flex items-center gap-2">
+                {getLintIcon(lint.name)}
+                {getHumanReadableTitle(lint.name)}
+              </span>
               <Tooltip_Shadcn_>
                 <TooltipTrigger_Shadcn_ asChild>
                   <HelpCircle size={14} />
@@ -81,12 +84,12 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
 
             {(lint.metadata?.type === 'table' || lint.metadata?.type === 'view') && (
               <div className="flex items-center gap-x-4 text-xs py-1">
-                {lint.metadata?.schema && (
+                {/* {lint.metadata?.schema && (
                   <div className="flex items-center gap-x-1">
                     <p className="text-foreground-lighter">schema</p>
                     <p className="text-foreground font-mono">{lint.metadata?.schema}</p>
                   </div>
-                )}
+                )} */}
                 <div className="flex items-center gap-x-1">
                   {lint.metadata?.type === 'table' && (
                     <Table2 size={15} strokeWidth={1.5} className="text-foreground-lighter" />
@@ -94,7 +97,9 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
                   {lint.metadata?.type === 'view' && (
                     <Eye size={15} strokeWidth={1.5} className="text-foreground-lighter" />
                   )}
-                  <p className="text-foreground font-mono">{lint.metadata?.name}</p>
+                  <div className="text-foreground font-mono">
+                    {lint.metadata?.schema}.{lint.metadata?.name}
+                  </div>
                 </div>
               </div>
             )}
