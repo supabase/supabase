@@ -52,7 +52,7 @@ export async function executeSql(
     },
     body: { query: sql },
     headers: Object.fromEntries(headers),
-  })
+  } as any)
 
   if (error) {
     if (
