@@ -7,6 +7,7 @@ interface FilterPopoverProps {
   valueKey: string
   labelKey: string
   name: string
+  variant?: 'rectangular' | 'rounded'
   onSaveFilters: (options: string[]) => void
 }
 
@@ -19,6 +20,7 @@ export const FilterPopover = ({
   valueKey,
   labelKey,
   name,
+  variant = 'rectangular',
   onSaveFilters,
 }: FilterPopoverProps) => {
   const [open, setOpen] = useState(false)
@@ -88,6 +90,7 @@ export const FilterPopover = ({
         asChild
         type={activeOptions.length > 0 ? 'default' : 'dashed'}
         onClick={() => setOpen(false)}
+        className={variant === 'rounded' ? 'rounded-full' : ''}
       >
         <div>
           <span>{name}</span>
