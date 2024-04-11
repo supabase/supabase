@@ -62,7 +62,7 @@ export const IndexAdvisorDisabledState = () => {
             <a
               target="_blank"
               rel="noreferrer"
-              href="https://github.com/olirice/index_advisor/tree/main"
+              href="https://supabase.com/docs/guides/database/extensions/index_advisor"
             >
               Documentation
             </a>
