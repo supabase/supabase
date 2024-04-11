@@ -1,6 +1,12 @@
 import { useBranchesQuery } from 'data/branches/branches-query'
 import { useSelectedProject } from 'hooks'
-import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
+import {
+  PageType,
+  orderSectionFirst,
+  useRegisterCommands,
+  useRegisterPage,
+  useSetPage,
+} from 'ui-patterns/CommandMenu'
 
 const SWITCH_BRANCH_PAGE_NAME = 'switch-branch'
 
@@ -47,7 +53,7 @@ const useBranchCommands = () => {
         action: () => setPage(SWITCH_BRANCH_PAGE_NAME),
       },
     ],
-    { enabled: isBranchingEnabled }
+    { enabled: isBranchingEnabled, orderSection: orderSectionFirst }
   )
 }
 

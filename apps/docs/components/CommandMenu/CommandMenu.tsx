@@ -4,6 +4,7 @@ import { useDocsSearchCommands } from 'ui-patterns/CommandMenu/prepackaged/DocsS
 import { useSupportCommands } from 'ui-patterns/CommandMenu/prepackaged/Support'
 import { useThemeSwitcherCommands } from 'ui-patterns/CommandMenu/prepackaged/ThemeSwitcher'
 import { useQuickstartCommands } from './Quickstarts'
+import { useDocsNavCommands } from '../Navigation/Navigation.commands'
 
 const DocsCommandMenu = () => {
   useDocsSearchCommands({
@@ -11,6 +12,7 @@ const DocsCommandMenu = () => {
     options: { forceMountSection: true },
   })
   useDocsAiCommands({ modify: (command) => ({ ...command, forceMount: true }) })
+  useDocsNavCommands()
   useQuickstartCommands()
   useSupportCommands()
   useThemeSwitcherCommands()

@@ -65,5 +65,11 @@ const initCommandsState = () => {
   return state
 }
 
-export { initCommandsState }
+const orderSectionFirst = (sections: ICommandSection[], idx: number) => [
+  sections[idx],
+  ...sections.slice(0, idx),
+  ...sections.slice(idx),
+]
+
+export { initCommandsState, orderSectionFirst }
 export type { ICommandsState, UseCommandOptions }

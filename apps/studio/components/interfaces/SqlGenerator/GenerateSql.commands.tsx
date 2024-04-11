@@ -1,7 +1,12 @@
 import { useAppStateSnapshot } from 'state/app-state'
 import { AiIconAnimation } from 'ui'
 
-import { BadgeExperimental, useRegisterCommands, useSetQuery } from 'ui-patterns/CommandMenu'
+import {
+  BadgeExperimental,
+  orderSectionFirst,
+  useRegisterCommands,
+  useSetQuery,
+} from 'ui-patterns/CommandMenu'
 
 const useGenerateSqlCommand = () => {
   const { setShowGenerateSqlModal } = useAppStateSnapshot()
@@ -22,9 +27,7 @@ const useGenerateSqlCommand = () => {
       },
     ],
     {
-      orderSection: (sections, idx) => {
-        return [sections[idx], ...sections.slice(0, idx), ...sections.slice(idx + 1)]
-      },
+      orderSection: orderSectionFirst,
     }
   )
 }
