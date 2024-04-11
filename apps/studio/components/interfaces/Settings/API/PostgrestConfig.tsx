@@ -30,26 +30,35 @@ import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 import Link from 'next/link'
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
 
 const PostgrestConfig = () => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
+
   const { data: schemas, isLoading: isLoadingSchemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
   const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
+
   const { mutate: updatePostgrestConfig, isLoading: isUpdating } =
     useProjectPostgrestConfigUpdateMutation({
       onSuccess: () => {
         toast.success('Successfully saved settings')
       },
     })
+
   const canUpdatePostgrestConfig = useCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_postgrest'
   )
+
+  const { data: extensions } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const formId = 'project-postgres-config'
   const initialValues = { db_schema: '', max_rows: '', db_extra_search_path: '' }
@@ -85,16 +94,19 @@ const PostgrestConfig = () => {
     .map((name) => name.trim())
     .includes('public')
 
-  const isGraphqlPublicSchemaEnabled = config?.db_schema
-    .split(',')
-    .map((name) => name.trim())
-    .includes('graphql_public')
+  // const isGraphqlPublicSchemaEnabled = config?.db_schema
+  //   .split(',')
+  //   .map((name) => name.trim())
+  //   .includes('graphql_public')
+
+  const isGraphqlExtensionEnabled =
+    (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
 
   return (
     <Form id={formId} initialValues={initialValues} validate={() => {}} onSubmit={updateConfig}>
       {({ handleReset, resetForm, values, initialValues }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
-
+        console.log('schemas', config?.db_schema)
         // [Alaister] although this "technically" is breaking the rules of React hooks
         // it won't error because the hooks are always rendered in the same order
         // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -105,9 +117,11 @@ const PostgrestConfig = () => {
               max_rows: config.max_rows,
               db_extra_search_path: config.db_extra_search_path ?? '',
             }
+
             resetForm({ values, initialValues: values })
           }
         }, [config])
+        //}, [config])
 
         return (
           <>
@@ -155,6 +169,7 @@ const PostgrestConfig = () => {
                               placeholder="No schema available to choose. New ones will appear here."
                               searchPlaceholder="Search for a schema"
                               onChange={(event) => {
+                                //debugger
                                 let updatedValues: any = values
                                 updatedValues.db_schema = event.join(', ')
                                 resetForm({ values: updatedValues, initialValues: updatedValues })
@@ -177,7 +192,7 @@ const PostgrestConfig = () => {
                                     You will not be able to query tables and views in the{' '}
                                     <code>public</code> schema via supabase-js or HTTP clients.
                                   </p>
-                                  {isGraphqlPublicSchemaEnabled && (
+                                  {isGraphqlExtensionEnabled && (
                                     <div className="grid gap-3 mt-2">
                                       <div>
                                         Tables in the <code>public</code> schema are still exposed
@@ -186,7 +201,6 @@ const PostgrestConfig = () => {
                                       <p>
                                         <Button asChild type="default">
                                           <Link
-                                            target="_blank"
                                             href={`/project/${projectRef}/database/extensions`}
                                             className="!no-underline !hover:bg-surface-100 !text-foreground"
                                           >
