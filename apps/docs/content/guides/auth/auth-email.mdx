@@ -58,6 +58,19 @@ Future<void> signUpNewUser() async {
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+To sign up the user, call [signUp()](/docs/reference/swift/auth-signup) with their email address and password:
+
+```swift
+let response = try await supabase.auth.signUp(
+  email: "example@email.com",
+  password: "example-password",
+  redirectTo: URL(string: "https://example.com/welcome")
+)
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 To sign up the user, call [signUpWith(Email)](/docs/reference/kotlin/auth-signup) with their email address and password:
@@ -111,6 +124,18 @@ Future<void> signInWithEmail() async {
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+When your user signs in, call [signIn(email:password:)](/docs/reference/swift/auth-signinwithpassword) with their email address and password:
+
+```swift
+try await supabase.auth.signIn(
+  email: "example@email.com",
+  password: "example-password"
+)
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(Email)](/docs/reference/kotlin/auth-signinwithpassword) with their email address and password:
@@ -155,6 +180,15 @@ When your user signs out, call [signOut()](/docs/reference/dart/auth-signout) to
 Future<void> signOut() async {
    await supabase.auth.signOut();
 }
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+When your user signs out, call [signOut()](/docs/reference/swift/auth-signout) to remove the session from the local storage:
+
+```swift
+try await supabase.auth.signOut()
 ```
 
 </TabPanel>

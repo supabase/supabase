@@ -1,6 +1,6 @@
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
@@ -58,38 +58,47 @@ export const QueryPerformance = ({
     preset: 'slowestExecutionTime',
   })
 
-  const QUERY_PERFORMANCE_TABS = [
-    {
-      id: QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING,
-      label: 'Most time consuming',
-      description: 'Lists queries ordered by their cumulative total execution time.',
-      isLoading: isLoadingMTC,
-      max:
-        (mostTimeConsumingQueries ?? []).length > 0
-          ? Math.max(...(mostTimeConsumingQueries ?? []).map((x: any) => x.total_time)).toFixed(2)
-          : undefined,
-    },
-    {
-      id: QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT,
-      label: 'Most frequent',
-      description: 'Lists queries in order of their execution count',
-      isLoading: isLoadingMFI,
-      max:
-        (mostFrequentlyInvoked ?? []).length > 0
-          ? Math.max(...(mostFrequentlyInvoked ?? []).map((x: any) => x.calls)).toFixed(2)
-          : undefined,
-    },
-    {
-      id: QUERY_PERFORMANCE_REPORT_TYPES.SLOWEST_EXECUTION,
-      label: 'Slowest execution',
-      description: 'Lists queries ordered by their maximum execution time',
-      isLoading: isLoadingMMF,
-      max:
-        (slowestExecutionTime ?? []).length > 0
-          ? Math.max(...(slowestExecutionTime ?? []).map((x: any) => x.max_time)).toFixed(2)
-          : undefined,
-    },
-  ]
+  const QUERY_PERFORMANCE_TABS = useMemo(() => {
+    return [
+      {
+        id: QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING,
+        label: 'Most time consuming',
+        description: 'Lists queries ordered by their cumulative total execution time.',
+        isLoading: isLoadingMTC,
+        max:
+          (mostTimeConsumingQueries ?? []).length > 0
+            ? Math.max(...(mostTimeConsumingQueries ?? []).map((x: any) => x.total_time)).toFixed(2)
+            : undefined,
+      },
+      {
+        id: QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT,
+        label: 'Most frequent',
+        description: 'Lists queries in order of their execution count',
+        isLoading: isLoadingMFI,
+        max:
+          (mostFrequentlyInvoked ?? []).length > 0
+            ? Math.max(...(mostFrequentlyInvoked ?? []).map((x: any) => x.calls)).toFixed(2)
+            : undefined,
+      },
+      {
+        id: QUERY_PERFORMANCE_REPORT_TYPES.SLOWEST_EXECUTION,
+        label: 'Slowest execution',
+        description: 'Lists queries ordered by their maximum execution time',
+        isLoading: isLoadingMMF,
+        max:
+          (slowestExecutionTime ?? []).length > 0
+            ? Math.max(...(slowestExecutionTime ?? []).map((x: any) => x.max_time)).toFixed(2)
+            : undefined,
+      },
+    ]
+  }, [
+    isLoadingMFI,
+    isLoadingMMF,
+    isLoadingMTC,
+    mostFrequentlyInvoked,
+    mostTimeConsumingQueries,
+    slowestExecutionTime,
+  ])
 
   return (
     <>
@@ -127,7 +136,7 @@ export const QueryPerformance = ({
                   <TooltipTrigger_Shadcn_ asChild>
                     <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
                   </TooltipTrigger_Shadcn_>
-                  <TooltipContent_Shadcn_ side="bottom">{tab.description}</TooltipContent_Shadcn_>
+                  <TooltipContent_Shadcn_ side="top">{tab.description}</TooltipContent_Shadcn_>
                 </Tooltip_Shadcn_>
               </div>
               {tab.isLoading ? (

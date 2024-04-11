@@ -6,7 +6,6 @@ import type { ResponseError } from 'types'
 import { sqlKeys } from 'data/sql/keys'
 
 // [Joshen] This is just temporary while we wait for Index Advisor to be baked into the image itself
-// [Joshen] Need to fix this shit
 
 export type IndexAdvisorEnableVariables = {
   projectRef: string
