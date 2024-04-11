@@ -1,0 +1,16 @@
+{
+  "name": "@supabase/pg-meta",
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "Supabase",
+  "main": "./src/index.ts",
+  "repository": "supabase/supabase",
+  "dependencies": {
+    "pg-format": "^1.0.4",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/pg-format": "^1.0.1",
+    "typescript": "^5.4.3"
+  }
+}

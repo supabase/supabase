@@ -33,8 +33,8 @@ const footerData = [
         url: '/pricing',
       },
       {
-        text: 'Launch Week X',
-        url: '/launch-week',
+        text: 'Special Announcement',
+        url: '/special-announcement',
       },
     ],
   },
@@ -96,7 +96,7 @@ const footerData = [
       },
       {
         text: 'Contributing',
-        url: '/docs/handbook/contributing',
+        url: 'https://github.com/supabase/supabase/blob/master/CONTRIBUTING.md',
       },
       {
         text: 'Open Source',

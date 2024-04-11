@@ -6,7 +6,6 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
-import Divider from 'components/ui/Divider'
 import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { getProjectAuthConfig } from 'data/auth/auth-config-query'
@@ -34,6 +33,7 @@ import {
   IconX,
   Input,
   Listbox,
+  Separator,
 } from 'ui'
 import MultiSelect from 'ui-patterns/MultiSelect'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
@@ -532,7 +532,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
               </div>
             )}
 
-            <Divider light />
+            <Separator />
 
             {!isDisabled ? (
               <>

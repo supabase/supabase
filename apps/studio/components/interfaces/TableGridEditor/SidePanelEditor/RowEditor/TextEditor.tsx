@@ -53,7 +53,7 @@ export const TextEditor = ({
           <TwoOptionToggle
             options={['view', 'edit']}
             activeOption={view}
-            borderOverride="border-gray-500"
+            borderOverride="border-muted"
             onClickOption={setView}
           />
         </div>

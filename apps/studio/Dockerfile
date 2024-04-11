@@ -27,7 +27,7 @@ WORKDIR /app
 FROM base as turbo
 COPY . .
 
-RUN npx turbo@1.30.0 prune --scope=studio --docker
+RUN npx turbo@1.13.2 prune --scope=studio --docker
 
 # Install dev dependencies (only if needed)
 FROM base as deps

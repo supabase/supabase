@@ -277,6 +277,18 @@ const SmtpForm = () => {
                 }
               >
                 <FormSectionContent loading={isLoading}>
+                  {values['SMTP_HOST'] && values['SMTP_HOST'].endsWith('.gmail.com') && (
+                    <Alert_Shadcn_ variant="warning">
+                      <IconAlertTriangle strokeWidth={2} />
+                      <AlertTitle_Shadcn_>Check your SMTP provider</AlertTitle_Shadcn_>
+                      <AlertDescription_Shadcn_>
+                        Not all SMTP providers are designed for the email sending required by
+                        Supabase Auth. It looks like the SMTP provider you entered is designed for
+                        sending personal email messages and not for sending transactional messages.
+                        Although you can ignore this warning, email deliverability may be impacted.
+                      </AlertDescription_Shadcn_>
+                    </Alert_Shadcn_>
+                  )}
                   <Input
                     name="SMTP_HOST"
                     placeholder="your.smtp.host.com"

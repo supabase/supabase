@@ -1,8 +1,9 @@
 # Supabase Flutter User Management
 
-This repo is a quick sample of how you can get started building apps using Flutter and Supabase. You can find a step by step guide of how to build out this app in the [Quickstart: Flutter  guide](https://supabase.io/docs/guides/with-flutter). 
+This repo is a quick sample of how you can get started building apps using Flutter and Supabase. You can find a step by step guide of how to build out this app in the [Quickstart: Flutter guide](https://supabase.io/docs/guides/with-flutter).
 
 This repo will demonstrate how to:
+
 - sign users in with Supabase Auth using [magic link](https://supabase.io/docs/reference/dart/auth-signin#sign-in-with-magic-link)
 - store and retrieve data with [Supabase database](https://supabase.io/docs/guides/database)
 - store image files in [Supabase storage](https://supabase.io/docs/guides/storage)
@@ -11,16 +12,18 @@ This repo will demonstrate how to:
 
 ## Getting Started
 
-Before running this app, you need to create a Supabase project and copy [your credentials](https://supabase.io/docs/guides/with-flutter#get-the-api-keys) to `main.dart`. 
+Rename `.env.example` to `.env` and fill in [your Supabase credentials](https://supabase.io/docs/guides/with-flutter#get-the-api-keys).
 
-You can run this app on iOS, Android or the Web. 
+You can run this app on iOS, Android or the Web.
 
 To run this application, simply run the following for iOS or Android
+
 ```bash
 flutter run
 ```
 
 Or for web, run the following command to launch it on `localhost:3000`
+
 ```bash
 flutter run -d web-server --web-hostname localhost --web-port 3000
 ```

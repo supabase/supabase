@@ -189,7 +189,39 @@ functions:
           final Session? session = res.session;
           final User? user = res.user;
           ```
-
+  - id: sign-in-anonymously
+    title: 'signInAnonymously()'
+    description: |
+      Creates an anonymous user.
+    notes: |
+      - Returns an anonymous user
+      - It is recommended to set up captcha for anonymous sign-ins to prevent abuse. You can pass in the captcha token in the `options` param.
+    params:
+      - name: data
+        isOptional: true
+        type: Map<String, dynamic>
+        description: The user's metadata to be stored in the user's object.
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification.
+    examples:
+      - id: sign-in-anonymously
+        name: Create an anonymous user
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.signInAnonymously();
+          ```
+      - id: sign-in-anonymously-with-user-metadata
+        name: Create an anonymous user with custom user metadata
+        isSpotlight: false
+        code: |
+          ```dart
+          await supabase.auth.signInAnonymously(
+            data: {'hello': 'world'},
+          );
+          ```
   - id: sign-in-with-password
     title: 'signInWithPassword()'
     description: |
@@ -658,6 +690,88 @@ functions:
             email: 'example@email.com',
             nonce: '123456',
           ));
+          ```
+  - id: get-user-identities
+    title: 'getUserIdentities()'
+    description: |
+      Gets all the identities linked to a user.
+    notes: |
+      - The user needs to be signed in to call `getUserIdentities()`.
+    examples:
+      - id: get-user-identities
+        name: Returns a list of identities linked to the user
+        isSpotlight: true
+        code: |
+          ```dart
+          final identities = await supabase.auth.getUserIdentities();
+          ```
+  - id: link-identity
+    title: 'linkIdentity()'
+    description: |
+      Links an oauth identity to an existing user. This method supports the PKCE flow.
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `linkIdentity()`.
+      - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
+    params:
+      - name: provider
+        isOptional: false
+        type: OAuthProvider
+        description: The provider to link the identity to.
+      - name: redirectTo
+        isOptional: true
+        type: String
+        description: The URL to redirect the user to after they sign in with the third-party provider.
+      - name: scopes
+        isOptional: true
+        type: String
+        description: A list of scopes to request from the third-party provider.
+      - name: authScreenLaunchMode
+        isOptional: true
+        type: LaunchMode
+        description: The launch mode for the auth screen. Defaults to `LaunchMode.platformDefault`.
+      - name: queryParams
+        isOptional: true
+        type: Map<String, String>
+        description: Additional query parameters to be passed to the OAuth flow.
+    examples:
+      - id: link-identity
+        name: Link an identity to a user
+        isSpotlight: true
+        code: |
+          ```dart
+          await supabase.auth.linkIdentity(OAuthProvider.google);
+          ```
+  - id: unlink-identity
+    title: 'unlinkIdentity()'
+    description: |
+      Unlinks an identity from a user by deleting it. The user will no longer be able to sign in with that identity once it's unlinked.
+    params:
+      - name: identity
+        isOptional: false
+        type: UserIdentity
+        description: The user identity to unlink.
+    notes: |
+      - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/settings/auth).
+      - The user needs to be signed in to call `unlinkIdentity()`.
+      - The user must have at least 2 identities in order to unlink an identity.
+      - The identity to be unlinked must belong to the user.
+    examples:
+      - id: unlink-identity
+        name: Unlink an identity
+        isSpotlight: true
+        code: |
+          ```dart
+          // retrieve all identites linked to a user
+          final identities = await supabase.auth.getUserIdentities();
+
+          // find the google identity 
+          final googleIdentity = identities.firstWhere(
+            (element) => element.provider == 'google',
+          );
+
+          // unlink the google identity
+          await supabase.auth.unlinkIdentity(googleIdentity);
           ```
   - id: send-password-reauthentication
     title: 'reauthenticate()'
