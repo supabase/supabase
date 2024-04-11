@@ -128,7 +128,7 @@ export const QueryPerformance = ({
                   <TooltipTrigger_Shadcn_ asChild>
                     <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
                   </TooltipTrigger_Shadcn_>
-                  <TooltipContent_Shadcn_ side="bottom">{tab.description}</TooltipContent_Shadcn_>
+                  <TooltipContent_Shadcn_ side="top">{tab.description}</TooltipContent_Shadcn_>
                 </Tooltip_Shadcn_>
               </div>
               {tab.isLoading ? (
