@@ -6,25 +6,19 @@ subtitle: 'Learn about the compatibility of Supabase Storage with S3.'
 sidebar_label: 'S3'
 ---
 
-Supabase Storage introduces S3 compatibility.
-This means you can use any S3 client to interact with your Storage product.
+Supabase Storage introduces S3 compatibility. You can use any S3 client to interact with your Storage product.
 
 <Admonition type="note">
-The S3 protocol is currently in Open Beta. If you encounter any issues, please let us know.
+
+The S3 protocol is currently in Open Beta. If you encounter any issues or have feature requests, contact us.
 
 </Admonition>
 
-The most commonly used API endpoints are implemented which will cover most of the use cases, you can find the list of implemented operations below with their status.
+## Implemented endpoints
 
-More endpoints will be implemented in the future, but if you have a specific need, please let us know.
+The most commonly used endpoints are implemented, and more will be added. Implemented S3 endpoints are marked with ✅ in the following tables.
 
-### Implemented operations
-Below is the table of implemented S3 API features. Refer to the Feature column to review which features have been implemented (✅) and have not been implemented (❌).
-
-
-## Bucket operations
-
-The following tables are related to bucket-level operations.
+### Bucket operations
 
 | API Name                                                                           | Feature                                                                                                                                                                                                                                                                                                                                                                                                           |
 |------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -40,7 +34,7 @@ The following tables are related to bucket-level operations.
 | ❌ [PutBucketCors](https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutBucketCors.html)                                                   | ❌ Checksums:<br/> ❌ x-amz-sdk-checksum-algorithm<br/> ❌ x-amz-checksum-algorithm<br/>❌ Bucket Owner:<br/> ❌ x-amz-expected-bucket-owner                                                                                                                                                                                                                                                                               |
 | ❌ [PutBucketLifecycleConfiguration](https://docs.aws.amazon.com/AmazonS3/latest/API/API_PutBucketLifecycleConfiguration.html)               | ❌ Checksums:<br/> ❌ x-amz-sdk-checksum-algorithm<br/> ❌ x-amz-checksum-algorithm<br/>❌ Bucket Owner:<br/> ❌ x-amz-expected-bucket-owner                                                                                                                                                                                                                                                                          |
 
-## Object Operations
+### Object operations
 
 | API Name                                                                           | Feature                                                                                                                                                                                                                                                                                                                                                                                                           |
 |------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

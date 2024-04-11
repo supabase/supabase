@@ -11,24 +11,24 @@ You have two options to authenticate with Supabase Storage S3:
 - Using the generated S3 credentials from your project settings (Intended exclusively for server-side use)
 - Using a Session Token, which will allow you to authenticate with a user JWT token and provide limited access via RLS
 
-## S3 Credentials
-<Admonition type="note">
-Keep these credentials secure, they will provide full access to all S3 operations across all buckets (Bypassing any RLS policies)
-In a future release we will provide a way to limit the access of these credentials using RLS.
+## S3 credentials
+
+<Admonition type="danger">
+
+Keep these credentials secure. They provide full access to all S3 operations across all buckets, bypassing RLS policies.
+
 </Admonition>
 
 To authenticate with S3 on the server, you need to generate a pair of credentials (Access Key ID and Secret Access Key) from your [project settings](https://supabase.com/dashboard/project/_/settings/storage).
 
-You can use these credentials to authenticate with Supabase Storage S3 as any other S3-compatible service.
+You can use these credentials to authenticate with Supabase Storage S3 using any S3-compatible service.
 
 <img alt="Storage S3 Credentials" src="/docs/img/storage/s3-credentials.png" width="100%" />
 
-
 **Region**: The region is the same as the region you selected during project creation.
-**Endpoint**: `https://project_ref.supabase.co/storage/v1/s3`
+**Endpoint**: `https://<PROJECT_REF>.supabase.co/storage/v1/s3`
 
-
-Example using the `aws-sdk` library:
+For example, using the `aws-sdk` library:
 
 ```javascript
 import { S3Client } from '@aws-sdk/client-s3';
@@ -46,18 +46,17 @@ const client = new S3Client({
 
 ## Session Token
 
-When using the Session Token mechanism, you will be able to authenticate with a user JWT token and provide limited access via RLS.
-This is very powerful because you can initialize the S3Client on the server scoped to a specific user or use the S3 client directly from the client-side without the need for a server.
+When using the Session Token mechanism, you can to authenticate with a user JWT token and provide limited access via RLS. You can initialize the S3 client on the server scoped to a specific user, or use the S3 client directly from the client side.
 
-All S3 operations will be performed scoped by the authenticated user provided in `session_token` it will be subject to any RLS policies that you have applied to the Storage Schema.
+All S3 operations performed with the Session Token are scoped to the token user. RLS policies on the Storage Schema are respected.
 
-To authenticate with S3 using a Session Token, you will always use the following credentials:
+To authenticate with S3 using a Session Token, use the following credentials:
 
 - access_key_id: `project-ref`
 - access_secret_key: `anonKey`
 - session_token: `valid jwt token`
 
-Here is an example configuration using the `aws-sdk` library:
+For example, using the `aws-sdk` library:
 
 ```javascript
 import { S3Client } from '@aws-sdk/client-s3';
