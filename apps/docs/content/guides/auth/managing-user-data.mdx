@@ -67,11 +67,11 @@ create policy "Public profiles are viewable by everyone."
 
 create policy "Users can insert their own profile."
   on profiles for insert
-  with check ( auth.uid() = id );
+  with check ( (select auth.uid()) = id );
 
 create policy "Users can update own profile."
   on profiles for update
-  using ( auth.uid() = id );
+  using ( (select auth.uid()) = id );
 ```
 
 ## Private access
@@ -81,7 +81,7 @@ If the data should only be _readable_ by the user who owns the data, we just nee
 ```sql
 create policy "Profiles are viewable by users who created them."
   on profiles for select
-  using ( auth.uid() = id );
+  using ( (select auth.uid()) = id );
 ```
 
 The nice thing about this pattern? We can now query this table via the API and we don't need to include data filters in our API queries - the Policies will handle that for us:

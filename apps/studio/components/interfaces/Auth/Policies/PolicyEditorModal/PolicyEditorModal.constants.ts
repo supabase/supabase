@@ -57,13 +57,13 @@ with check (true);`.trim(),
 create policy "Enable update for users based on email"
 on "${schema}"."${table}"
 for update using (
-  auth.jwt() ->> 'email' = email
+  (select auth.jwt()) ->> 'email' = email
 ) with check (
-  auth.jwt() ->> 'email' = email
+  (select auth.jwt()) ->> 'email' = email
 );`.trim(),
     name: 'Enable update for users based on email',
-    definition: `auth.jwt() ->> 'email' = email`,
-    check: `auth.jwt() ->> 'email' = email`,
+    definition: `(select auth.jwt()) ->> 'email' = email`,
+    check: `(select auth.jwt()) ->> 'email' = email`,
     command: 'UPDATE',
     roles: [],
   },
@@ -77,10 +77,10 @@ for update using (
 create policy "Enable delete for users based on user_id"
 on "${schema}"."${table}"
 for delete using (
-  auth.uid() = user_id
+  (select auth.uid()) = user_id
 );`.trim(),
     name: 'Enable delete for users based on user_id',
-    definition: 'auth.uid() = user_id',
+    definition: '(select auth.uid()) = user_id',
     check: '',
     command: 'DELETE',
     roles: [],
@@ -95,11 +95,11 @@ for delete using (
 create policy "Enable insert for users based on user_id"
 on "${schema}"."${table}"
 for insert with check (
-  auth.uid() = user_id
+  (select auth.uid()) = user_id
 );`.trim(),
     name: 'Enable insert for users based on user_id',
     definition: '',
-    check: 'auth.uid() = user_id',
+    check: '(select auth.uid()) = user_id',
     command: 'INSERT',
     roles: [],
   },
@@ -115,12 +115,12 @@ Assuming 2 tables called \`teams\` and \`members\`, you can query both tables in
     statement: `
 create policy "Members can update team details if they belong to the team"
 on teams for update using (
-  auth.uid() in (
+  (select auth.uid()) in (
     select user_id from members where team_id = id
   )
 );
 `.trim(),
-    definition: `auth.uid() in (select user_id from members where team_id = id)`,
+    definition: `(select auth.uid()) in (select user_id from members where team_id = id)`,
     check: '',
     command: 'UPDATE',
     roles: [],
