@@ -30,7 +30,7 @@ export async function getInvolvedIndexesInSelectQuery({
       projectRef,
       connectionString,
       sql: `
-CREATE OR REPLACE FUNCTION explain_query(query TEXT) RETURNS JSONB AS $$
+CREATE OR REPLACE FUNCTION pg_temp.explain_query(query TEXT) RETURNS JSONB AS $$
 DECLARE
     explain_result JSONB;
     prepared_statement_name TEXT := 'query_to_explain';
@@ -65,7 +65,7 @@ BEGIN
     RETURN explain_result;
 END;
 $$ LANGUAGE plpgsql;
-select explain_query('${query}') as plans;
+select pg_temp.explain_query('${query}') as plans;
 `.trim(),
     })
 
