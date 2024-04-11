@@ -20,6 +20,18 @@ export function getHumanReadableTitle(title: LINT_TYPES) {
       return 'Unused Index'
     case 'multiple_permissive_policies':
       return 'Multiple Permissive Policies'
+    case 'function_search_path_mutable':
+      return 'Function Search Path Mutable'
+    case 'rls_enabled_no_policy':
+      return 'RLS Enabled No Policy'
+    case 'policy_exists_rls_disabled':
+      return 'Policy Exists RLS Disabled'
+    case 'rls_disabled_in_public':
+      return 'RLS Disabled in Public'
+    case 'security_definer_view':
+      return 'Security Definer View'
+    case 'duplicate_index':
+      return 'Duplicate Index'
     default:
       assertUnreachable(title)
       throw new Error('This case should never be reached')
@@ -85,6 +97,18 @@ export const LintCTA = ({
           </Link>
         </Button>
       )
+    case 'duplicate_index':
+      return (
+        <Button asChild type="default">
+          <Link
+            href={`/project/${projectRef}/database/indexes?schema=${metadata?.schema}&table=${metadata?.name}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            View index
+          </Link>
+        </Button>
+      )
     case 'multiple_permissive_policies':
       return (
         <Button asChild type="default">
@@ -97,6 +121,58 @@ export const LintCTA = ({
           </Link>
         </Button>
       )
+    case 'function_search_path_mutable':
+      return (
+        <Button asChild type="default">
+          <Link
+            href={`/project/${projectRef}/database/functions?schema=${metadata?.schema}&search=${metadata?.name}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            View functions
+          </Link>
+        </Button>
+      )
+    case 'rls_enabled_no_policy':
+      return (
+        <Button asChild type="default">
+          <Link
+            href={`/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            View policies
+          </Link>
+        </Button>
+      )
+    case 'policy_exists_rls_disabled':
+      return (
+        <Button asChild type="default">
+          <Link
+            href={`/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            View policies
+          </Link>
+        </Button>
+      )
+    case 'rls_disabled_in_public':
+      return (
+        <Button asChild type="default">
+          <Link
+            href={`/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            View policies
+          </Link>
+        </Button>
+      )
+    case 'security_definer_view':
+      // we don't have a good place to send the user to check out a view
+      return <></>
+
     default:
       assertUnreachable(title)
       return <></>

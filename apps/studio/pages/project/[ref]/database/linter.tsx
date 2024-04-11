@@ -1,25 +1,18 @@
-import { partition, sortBy } from 'lodash'
+import { sortBy } from 'lodash'
 import { Check, ExternalLink, Loader } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
-import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
+import { getHumanReadableTitle } from 'components/interfaces/Reports/ReportLints.utils'
 import ReportLintsTableRow from 'components/interfaces/Reports/ReportLintsTableRow'
 import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
-import { FormHeader } from 'components/ui/Forms'
-import { useProjectLintsQuery } from 'data/lint/lint-query'
-import { useLocalStorageQuery, useSelectedProject } from 'hooks'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import type { NextPageWithLayout } from 'types'
-import {
-  AccordionContent_Shadcn_,
-  AccordionItem_Shadcn_,
-  Accordion_Shadcn_,
-  Button,
-  LoadingLine,
-} from 'ui'
 import { FilterPopover } from 'components/ui/FilterPopover'
+import { FormHeader } from 'components/ui/Forms'
+import { LINT_TYPES, useProjectLintsQuery } from 'data/lint/lint-query'
+import { useSelectedProject } from 'hooks'
+import type { NextPageWithLayout } from 'types'
+import { Button, LoadingLine } from 'ui'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -27,10 +20,10 @@ const ProjectLints: NextPageWithLayout = () => {
     levels: [] as string[],
     types: [] as string[],
   })
-  const [lintIgnoreList] = useLocalStorageQuery<string[]>(
-    LOCAL_STORAGE_KEYS.PROJECT_LINT_IGNORE_LIST,
-    []
-  )
+  // const [lintIgnoreList] = useLocalStorageQuery<string[]>(
+  //   LOCAL_STORAGE_KEYS.PROJECT_LINT_IGNORE_LIST,
+  //   []
+  // )
 
   const { data, isLoading, isRefetching, refetch } = useProjectLintsQuery({
     projectRef: project?.ref,
@@ -45,9 +38,10 @@ const ProjectLints: NextPageWithLayout = () => {
     return 3
   })
 
-  const [ignoredLints, activeLints] = partition(lints, (lint) =>
-    lintIgnoreList.includes(lint.cache_key)
-  )
+  const activeLints = lints
+  // const [ignoredLints, activeLints] = partition(lints, (lint) =>
+  //   lintIgnoreList.includes(lint.cache_key)
+  // )
   const filteredLints = useMemo(() => {
     return activeLints
       .filter((x) => (filters.levels.length > 0 ? filters.levels.includes(x.level) : x))
@@ -56,6 +50,16 @@ const ProjectLints: NextPageWithLayout = () => {
 
   const warnLintsCount = activeLints.filter((x) => x.level === 'WARN').length
   const errorLintsCount = activeLints.filter((x) => x.level === 'ERROR').length
+
+  const filterOptions = useMemo(() => {
+    // only show filters for lint types which are present in the results and not ignored
+    return LINT_TYPES.filter((type) => activeLints.some((lint) => lint.name === type)).map(
+      (type) => ({
+        name: getHumanReadableTitle(type),
+        value: type,
+      })
+    )
+  }, [activeLints])
 
   return (
     <ScaffoldContainer>
@@ -86,14 +90,7 @@ const ProjectLints: NextPageWithLayout = () => {
               />
               <FilterPopover
                 name="Type"
-                options={[
-                  { name: 'Unindexed foreign keys', value: 'unindexed_foreign_keys' },
-                  { name: 'Auth users exposed', value: 'auth_users_exposed' },
-                  { name: 'No primary key', value: 'no_primary_key' },
-                  { name: 'Unused index', value: 'unused_index' },
-                  { name: 'Multiple permissive policies', value: 'multiple_permissive_policies' },
-                  { name: 'Auth RLS Initialization Plan', value: 'auth_rls_initplan' },
-                ]}
+                options={filterOptions}
                 labelKey="name"
                 valueKey="value"
                 activeOptions={filters.types}
@@ -179,7 +176,7 @@ const ProjectLints: NextPageWithLayout = () => {
           />
         </div>
 
-        {ignoredLints.length > 0 && (
+        {/* {ignoredLints.length > 0 && (
           <div className="col-span-12 flex flex-col text-sm max-w-none gap-8 py-4">
             <Accordion_Shadcn_ type="single" collapsible>
               <AccordionItem_Shadcn_ value="1" className="border-none">
@@ -219,7 +216,7 @@ const ProjectLints: NextPageWithLayout = () => {
               </AccordionItem_Shadcn_>
             </Accordion_Shadcn_>
           </div>
-        )}
+        )} */}
       </ScaffoldSection>
     </ScaffoldContainer>
   )
