@@ -9,6 +9,7 @@ import { PresetHookResult } from '../Reports/Reports.utils'
 import { QueryPerformanceFilterBar } from '../QueryPerformanceV2/QueryPerformanceFilterBar'
 import { ResetAnalysisNotice } from './ResetAnalysisNotice'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { QUERY_PERFORMANCE_REPORT_TYPES } from '../QueryPerformanceV2/QueryPerformance.constants'
 
 type QueryPerformancePreset = 'time' | 'frequent' | 'slowest'
 
@@ -77,7 +78,11 @@ export const QueryPerformance = ({
         })
       }}
     >
-      <Tabs.Panel key="time" id="time" label="Most time consuming">
+      <Tabs.Panel
+        key="time"
+        id={QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING}
+        label="Most time consuming"
+      >
         <div className={panelClassNames}>
           <Markdown
             content={TimeConsumingHelperText}
@@ -128,7 +133,11 @@ export const QueryPerformance = ({
           </div>
         </div>
       </Tabs.Panel>
-      <Tabs.Panel key="frequent" id="frequent" label="Most frequent">
+      <Tabs.Panel
+        key="frequent"
+        id={QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT}
+        label="Most frequent"
+      >
         <div className={panelClassNames}>
           <Markdown
             content={MostFrequentHelperText}
@@ -190,7 +199,11 @@ export const QueryPerformance = ({
           </div>
         </div>
       </Tabs.Panel>
-      <Tabs.Panel key="slowest" id="slowest" label="Slowest execution time">
+      <Tabs.Panel
+        key="slowest"
+        id={QUERY_PERFORMANCE_REPORT_TYPES.SLOWEST_EXECUTION}
+        label="Slowest execution time"
+      >
         <div className={panelClassNames}>
           <Markdown
             content={SlowestExecutionHelperText}
