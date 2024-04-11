@@ -13,6 +13,8 @@ import {
   useSetQuery,
 } from 'ui-patterns/CommandMenu'
 
+const API_KEYS_PAGE_NAME = 'api-keys'
+
 const useApiKeysCommands = () => {
   const setIsOpen = useSetCommandMenuOpen()
   const setPage = useSetPage()
@@ -55,7 +57,7 @@ const useApiKeysCommands = () => {
   )
 
   useRegisterPage(
-    'api-keys',
+    API_KEYS_PAGE_NAME,
     {
       type: PageType.Commands,
       commands: [
@@ -73,7 +75,7 @@ const useApiKeysCommands = () => {
       id: 'api-keys',
       name: 'Get API keys',
       action: () => {
-        setPage('api-keys')
+        setPage(API_KEYS_PAGE_NAME)
         setQuery('')
       },
     },
