@@ -429,7 +429,7 @@ const DocsSearchPage = () => {
                     openLink(page.type, formatPageUrl(page))
                   }}
                   forceMount={true}
-                  className={generateCommandClassNames(true)}
+                  className={cn(generateCommandClassNames(true), 'border border-overlay/90')}
                 >
                   <div className="grow flex gap-3 items-center">
                     <IconContainer>{getPageIcon(page)}</IconContainer>
@@ -449,7 +449,11 @@ const DocsSearchPage = () => {
                   <div className="border-l border-default ml-3 pt-3">
                     {page.sections.map((section, i) => (
                       <CommandItem_Shadcn_
-                        className={cn(generateCommandClassNames(true), 'ml-3 mb-3')}
+                        className={cn(
+                          generateCommandClassNames(true),
+                          'border border-overlay/90',
+                          'ml-3 mb-3'
+                        )}
                         onSelect={() => {
                           openLink(page.type, formatSectionUrl(page, section))
                         }}

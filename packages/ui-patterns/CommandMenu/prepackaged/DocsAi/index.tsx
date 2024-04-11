@@ -1,8 +1,9 @@
+import { AiIconAnimation } from 'ui'
+
 import { useRegisterCommands } from '../../api/hooks/commandsHooks'
 import { useRegisterPage, useSetPage } from '../../api/hooks/pagesHooks'
 import type { ICommand, UseCommandOptions } from '../../api/types'
-
-import { AiIconAnimation } from 'ui'
+import { PageType } from '../../api/utils'
 
 import { DocsAiPage } from './DocsAiPage'
 
@@ -19,7 +20,7 @@ const useDocsAiCommands = ({
 }: { modify?: (command: ICommand) => ICommand; options?: UseCommandOptions } = {}) => {
   const setCommandPage = useSetPage()
 
-  useRegisterPage(DOCS_AI_COMMANDS.PAGE_NAME, DocsAiPage)
+  useRegisterPage(DOCS_AI_COMMANDS.PAGE_NAME, { type: PageType.Component, component: DocsAiPage })
 
   useRegisterCommands(
     DOCS_AI_COMMANDS.SECTION_NAME,

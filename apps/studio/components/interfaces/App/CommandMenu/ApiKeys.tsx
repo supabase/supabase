@@ -3,10 +3,20 @@ import { useProjectApiQuery } from 'data/config/project-api-query'
 import { copyToClipboard } from 'lib/helpers'
 import { useMemo } from 'react'
 import { Badge } from 'ui'
-import { type ICommand, useSetCommandMenuOpen, useRegisterCommands } from 'ui-patterns/CommandMenu'
+import {
+  type ICommand,
+  useSetCommandMenuOpen,
+  useRegisterCommands,
+  useRegisterPage,
+  PageType,
+  useSetPage,
+  useSetQuery,
+} from 'ui-patterns/CommandMenu'
 
 const useApiKeysCommands = () => {
   const setIsOpen = useSetCommandMenuOpen()
+  const setPage = useSetPage()
+  const setQuery = useSetQuery()
 
   const { ref } = useParams()
   const { data: settings } = useProjectApiQuery({ projectRef: ref }, { enabled: !!ref })
@@ -25,7 +35,6 @@ const useApiKeysCommands = () => {
             setIsOpen(false)
           },
           badge: () => <Badge>Public</Badge>,
-          defaultHidden: true,
         },
         serviceKey && {
           id: 'service-key',
@@ -35,19 +44,40 @@ const useApiKeysCommands = () => {
             setIsOpen(false)
           },
           badge: () => <Badge variant="destructive">Secret</Badge>,
-          defaultHidden: true,
         },
         !(anonKey || serviceKey) && {
           id: 'api-keys-project-settings',
           name: 'See API keys in Project Settings',
-          route: `/dashboard/project/${ref ?? '_'}/settings/general`,
-          defaultHidden: true,
+          route: `/project/${ref ?? '_'}/settings/api`,
         },
       ].filter(Boolean) as ICommand[],
     [anonKey, serviceKey, ref, setIsOpen]
   )
 
-  useRegisterCommands('Project tools', commands, { deps: [anonKey, serviceKey, ref] })
+  useRegisterPage(
+    'api-keys',
+    {
+      type: PageType.Commands,
+      commands: [
+        {
+          id: 'api-keys',
+          name: 'API keys',
+          commands,
+        },
+      ],
+    },
+    [commands]
+  )
+  useRegisterCommands('Project tools', [
+    {
+      id: 'api-keys',
+      name: 'Get API keys',
+      action: () => {
+        setPage('api-keys')
+        setQuery('')
+      },
+    },
+  ])
 }
 
 export { useApiKeysCommands }

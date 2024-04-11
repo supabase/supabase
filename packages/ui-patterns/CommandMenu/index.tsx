@@ -9,6 +9,6 @@ export * from './api/hooks/pagesHooks'
 export * from './api/hooks/queryHooks'
 export { useHistoryKeys } from './api/hooks/useHistoryKeys'
 export * from './api/hooks/viewHooks'
-export { generateCommandClassNames, toSectionId } from './api/utils'
+export { PageType, generateCommandClassNames, toSectionId } from './api/utils'
 
 export * from './api/types'

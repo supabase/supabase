@@ -1,22 +1,30 @@
-import { type ComponentType, useEffect } from 'react'
+import { useEffect, useReducer, useRef } from 'react'
 import { useSnapshot } from 'valtio'
 
 import { useCommandContext } from '../../internal/Context'
-import { type ICommandPageName, type PageComponent } from '../../internal/state/pagesState'
+import {
+  type ICommandPageName,
+  type PageDefinition,
+  isComponentPage,
+} from '../../internal/state/pagesState'
+import { isEqual } from 'lodash'
 
 const useCurrentPage = () => {
   const { pagesState } = useCommandContext()
-  const { pageStack } = useSnapshot(pagesState)
+  const { commandPages, pageStack } = useSnapshot(pagesState)
 
-  return pageStack.at(-1)
+  const topOfStack = pageStack.at(-1)
+
+  return topOfStack ? commandPages[topOfStack] : undefined
 }
 
 const usePageComponent = () => {
-  const { pagesState } = useCommandContext()
-  const { commandPages } = useSnapshot(pagesState)
-  const currentPage = useCurrentPage()
+  const _currentPage = useCurrentPage()
 
-  return currentPage && commandPages[currentPage]
+  const currentPage = _currentPage as PageDefinition
+  if (!currentPage || !isComponentPage(currentPage)) return undefined
+
+  return currentPage.component
 }
 
 const useSetPage = () => {
@@ -31,11 +39,19 @@ const usePopPage = () => {
   return popPageStack
 }
 
-const useRegisterPage = (name: ICommandPageName, component: PageComponent) => {
+const useRegisterPage = (name: ICommandPageName, definition: PageDefinition, deps: any[] = []) => {
   const { pagesState } = useCommandContext()
   const { registerNewPage } = useSnapshot(pagesState)
 
-  useEffect(() => registerNewPage(name, component), [registerNewPage])
+  const [rerenderFlag, toggleRerenderFlag] = useReducer((flag) => (flag === 0 ? 1 : 0), 0)
+  const prevDeps = useRef(deps)
+
+  if (!isEqual(prevDeps.current, deps)) {
+    prevDeps.current = deps
+    toggleRerenderFlag()
+  }
+
+  useEffect(() => registerNewPage(name, definition), [registerNewPage, rerenderFlag])
 }
 
 export { useCurrentPage, useRegisterPage, useSetPage, usePopPage, usePageComponent }

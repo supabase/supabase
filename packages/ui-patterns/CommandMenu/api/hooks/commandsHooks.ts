@@ -1,12 +1,20 @@
+import { isEqual } from 'lodash'
 import { useEffect, useReducer, useRef } from 'react'
 import { useSnapshot } from 'valtio'
-import { useCommandContext } from '../../internal/Context'
+
 import type { ICommand, ICommandSectionName, UseCommandOptions } from '../types'
-import { isEqual } from 'lodash'
+import { useCommandContext } from '../../internal/Context'
+import { useCurrentPage } from './pagesHooks'
+import { PageDefinition, isCommandsPage } from '../../internal/state/pagesState'
 
 const useCommands = () => {
   const { commandsState } = useCommandContext()
   const { commandSections } = useSnapshot(commandsState)
+
+  const _currPage = useCurrentPage()
+  const currPage = _currPage as PageDefinition
+  if (currPage && isCommandsPage(currPage)) return currPage.commands
+
   return commandSections
 }
 

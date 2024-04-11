@@ -53,8 +53,6 @@ const generateCommandClassNames = (isLink: boolean) =>
     isLink
       ? `
 bg-transparent
-border
-border-overlay/90
 px-2
 transition-all
 outline-none
