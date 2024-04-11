@@ -77,7 +77,12 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
           ? `${Number(value.toFixed(2)).toLocaleString()}ms`
           : value.toLocaleString()
         return (
-          <div className="flex flex-col justify-center font-mono text-xs">
+          <div
+            className={cn(
+              'w-full flex flex-col justify-center font-mono text-xs',
+              typeof value === 'number' ? 'text-right' : ''
+            )}
+          >
             <p>{formattedValue}</p>
             {isTime && <p className="text-foreground-lighter">{(value / 1000).toFixed(2)}s</p>}
           </div>

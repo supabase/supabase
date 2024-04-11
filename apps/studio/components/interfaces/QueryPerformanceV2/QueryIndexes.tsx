@@ -1,4 +1,5 @@
 import { Check, Lightbulb, Table2 } from 'lucide-react'
+import { useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { AccordionTrigger } from '@ui/components/shadcn/ui/accordion'
@@ -26,7 +27,6 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { IndexAdvisorDisabledState } from './IndexAdvisorDisabledState'
 import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
-import { useState } from 'react'
 
 interface QueryIndexesProps {
   selectedRow: any
@@ -304,7 +304,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
       </QueryPanelSection>
 
       {isIndexAdvisorAvailable && hasIndexRecommendation && (
-        <div className="border-t py-3 flex items-center justify-between px-5">
+        <div className="bg-studio sticky bottom-0 border-t py-3 flex items-center justify-between px-5">
           <div className="flex flex-col gap-y-1 text-sm">
             <span>Apply index to database</span>
             <span className="text-xs text-foreground-light">
