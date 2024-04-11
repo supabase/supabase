@@ -165,11 +165,14 @@ const PostgrestConfig = () => {
                             <MultiSelectV2
                               options={schema}
                               disabled={!canUpdatePostgrestConfig}
-                              value={(values?.db_schema ?? '').replace(/ /g, '').split(',')}
-                              placeholder="No schema available to choose. New ones will appear here."
+                              value={
+                                values?.db_schema
+                                  ? values.db_schema.replace(/ /g, '').split(',')
+                                  : []
+                              }
+                              placeholder="Choose a schema to expose"
                               searchPlaceholder="Search for a schema"
                               onChange={(event) => {
-                                //debugger
                                 let updatedValues: any = values
                                 updatedValues.db_schema = event.join(', ')
                                 resetForm({ values: updatedValues, initialValues: updatedValues })
