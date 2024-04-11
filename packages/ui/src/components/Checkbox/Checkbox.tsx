@@ -74,6 +74,7 @@ function Group({
                 return (
                   <Checkbox
                     id={option.id}
+                    key={option.id}
                     value={option.value}
                     label={option.label}
                     beforeLabel={option.beforeLabel}
@@ -119,13 +120,13 @@ export function Checkbox({
         const markupId = id
           ? id
           : name
-          ? name
-          : label
-          ? label
-              .toLowerCase()
-              .replace(/^[^A-Z0-9]+/gi, '')
-              .replace(/ /g, '-')
-          : undefined
+            ? name
+            : label
+              ? label
+                  .toLowerCase()
+                  .replace(/^[^A-Z0-9]+/gi, '')
+                  .replace(/ /g, '-')
+              : undefined
 
         // @ts-ignore
         size = parentSize ? parentSize : size
