@@ -61,7 +61,7 @@ export const DayLink = ({ type, icon, text, href = '', className }: DayLink) => 
   const Trigger = ({ component: Comp, ...props }: any) => (
     <Comp
       className={cn(
-        'py-1 flex gap-2 items-center hover:text-foreground transition-colors text-sm',
+        'py-1 flex gap-2 items-center text-foreground-lighter hover:text-foreground transition-colors text-sm',
         className
       )}
       {...props}

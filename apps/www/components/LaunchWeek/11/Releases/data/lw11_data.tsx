@@ -10,6 +10,11 @@ export interface StepLink {
   href: string
 }
 
+export interface ThemeImage {
+  dark?: string
+  light?: string
+}
+
 export interface StepProps {
   title: string
   icon?: string
@@ -55,7 +60,7 @@ export interface WeekDayProps {
 
 export const endOfLWXHackathon = '2024-04-17T23:59:59.999-08:00'
 
-const days: WeekDayProps[] = [
+const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
   {
     id: 'day-1',
     d: 1,
@@ -64,10 +69,10 @@ const days: WeekDayProps[] = [
     shipped: true,
     isToday: false,
     blog: '#',
-    hasCountdown: true,
+    hasCountdown: false,
     date: '15 April',
     published_at: '2024-04-15T08:00:00.000-08:00',
-    videoThumbnail: '/images/launchweek/copple-placeholder.jpg',
+    videoThumbnail: '/images/launchweek/11/video-cover.jpg',
     links: [
       {
         type: 'blog',
@@ -93,96 +98,36 @@ const days: WeekDayProps[] = [
         title: 'Database',
         description: 'Fully portable Postgres Database',
         url: 'https://supabase.com/docs/guides/database/overview',
-        links: [
-          // {
-          //   type: 'podcast',
-          //   href: '#',
-          // },
-          // {
-          //   type: 'docs',
-          //   href: 'https://supabase.com/docs/guides/database/overview',
-          // },
-        ],
       },
       {
         icon: products.authentication.icon[16],
         title: 'Auth',
         description: 'User management out of the box',
         url: 'https://supabase.com/docs/guides/auth',
-        links: [
-          // {
-          //   type: 'podcast',
-          //   href: '#',
-          // },
-          // {
-          //   type: 'docs',
-          //   href: 'https://supabase.com/docs/guides/auth',
-          // },
-        ],
       },
       {
         icon: products.storage.icon[16],
         title: 'Storage',
         description: 'Serverless storage for any media',
         url: 'https://supabase.com/docs/guides/storage',
-        links: [
-          // {
-          //   type: 'podcast',
-          //   href: '#',
-          // },
-          // {
-          //   type: 'docs',
-          //   href: 'https://supabase.com/docs/guides/storage',
-          // },
-        ],
       },
       {
         icon: products.functions.icon[16],
         title: 'Edge Functions',
         description: 'Deploy code globally on the edge',
         url: 'https://supabase.com/docs/guides/functions',
-        links: [
-          // {
-          //   type: 'podcast',
-          //   href: '#',
-          // },
-          // {
-          //   type: 'docs',
-          //   href: 'https://supabase.com/docs/guides/functions',
-          // },
-        ],
       },
       {
         icon: products.realtime.icon[16],
         title: 'Realtime',
         description: 'Syncronize and broadcast events',
         url: 'https://supabase.com/docs/guides/realtime',
-        links: [
-          // {
-          //   type: 'podcast',
-          //   href: '#',
-          // },
-          // {
-          //   type: 'docs',
-          //   href: 'https://supabase.com/docs/guides/realtime',
-          // },
-        ],
       },
       {
         icon: products.vector.icon[16],
         title: 'Vector',
         description: 'AI toolkit to manage embeddings',
         url: 'https://supabase.com/docs/guides/ai',
-        links: [
-          // {
-          //   type: 'podcast',
-          //   href: '#',
-          // },
-          // {
-          //   type: 'docs',
-          //   href: 'https://supabase.com/docs/guides/ai',
-          // },
-        ],
       },
     ],
   },
@@ -192,11 +137,11 @@ const days: WeekDayProps[] = [
     dd: 'Tue',
     title: '',
     shipped: false,
-    hasCountdown: false,
+    hasCountdown: true,
     blog: '#',
     date: '16 April',
     published_at: '2024-04-16T08:00:00.000-08:00',
-    description: <>TBD</>,
+    description: <>Create vector embeddings with Edge Functions</>,
     links: [
       // {
       //   type: 'blog',
@@ -206,24 +151,12 @@ const days: WeekDayProps[] = [
       //   type: 'video',
       //   href: 'eCbiywoDORw',
       // },
-      // {
-      //   type: 'xSpace',
-      //   href: '#',
-      // },
-    ],
-    steps: [
       {
-        title: '',
-        blog: '#',
-        bg_layers: [
-          {
-            img: '/images/launchweek/lwx/day2/d2_edge.svg',
-            mobileImg: '/images/launchweek/lwx/day2/d2_edge_mobile.svg',
-          },
-        ],
-        steps: [],
+        type: 'xSpace',
+        href: '#',
       },
     ],
+    steps: [],
   },
   {
     id: 'day-3',
@@ -245,10 +178,10 @@ const days: WeekDayProps[] = [
       //   type: 'video',
       //   href: '',
       // },
-      // {
-      //   type: 'xSpace',
-      //   href: '#',
-      // },
+      {
+        type: 'xSpace',
+        href: '#',
+      },
     ],
     steps: [],
   },
@@ -272,10 +205,10 @@ const days: WeekDayProps[] = [
       //   type: 'video',
       //   href: '',
       // },
-      // {
-      //   type: 'xSpace',
-      //   href: '#',
-      // },
+      {
+        type: 'xSpace',
+        href: '#',
+      },
     ],
     steps: [],
   },
@@ -299,10 +232,10 @@ const days: WeekDayProps[] = [
       //   type: 'video',
       //   href: '',
       // },
-      // {
-      //   type: 'xSpace',
-      //   href: '#',
-      // },
+      {
+        type: 'xSpace',
+        href: '#',
+      },
     ],
     steps: [],
   },

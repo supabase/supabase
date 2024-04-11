@@ -1,6 +1,6 @@
 import React, { FC, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { WeekDayProps, mainDays as days } from './data'
+import { WeekDayProps, mainDays } from './data'
 import { cn } from 'ui'
 import { isBrowser } from 'common'
 
@@ -9,6 +9,7 @@ import useConfData from '../../hooks/use-conf-data'
 import Image from 'next/image'
 
 const LWXStickyNav: FC = () => {
+  const days = mainDays()
   const { ticketState, userData } = useConfData()
   const hasPlatinumTicket = userData.platinum
   const hasSecretTicket = userData.secret

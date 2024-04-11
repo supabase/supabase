@@ -1,7 +1,7 @@
 import { useBreakpoint } from 'common'
 import Image from 'next/image'
 import React, { ReactNode } from 'react'
-import { Modal } from 'ui'
+import { Modal, cn } from 'ui'
 import { Play } from 'lucide-react'
 
 interface ExpandableVideoProps {
@@ -49,9 +49,20 @@ export function ExpandableVideo({
   const CliccablePreview = () => (
     <div className="video-container overflow-hidden rounded hover:cursor-pointer">
       <div
-        className={`absolute inset-0 z-10 text-whiteA-1200 flex flex-col items-center justify-center gap-3 backdrop-blur-sm
-                before:content[''] before:-z-10 before:absolute before:inset-0 before:bg-black before:opacity-30 hover:before:opacity-50 before:transition-opacity
-              `}
+        className="
+          absolute inset-0 z-10
+          text-white
+          flex flex-col gap-3
+          items-center justify-center
+          before:content['']
+          before:absolute
+          before:inset-0
+          before:bg-black
+          before:opacity-30
+          before:-z-10
+          hover:before:opacity-50
+          before:transition-opacity
+        "
       >
         <Play strokeWidth={2} size="small" className="w-5 h-5" />
         <p className="text-sm">{imgOverlayText ?? 'Watch video guide'}</p>
@@ -60,7 +71,7 @@ export function ExpandableVideo({
         src={imgUrl ?? '/images/blur.png'}
         alt={imgAltText ?? 'Video guide preview'}
         fill
-        className="absolute inset-0 object-cover"
+        className="absolute inset-0 object-cover blur-sm scale-105"
       />
     </div>
   )
@@ -70,12 +81,12 @@ export function ExpandableVideo({
       <Modal
         visible={expandVideo}
         hideFooter
-        className={[
+        className={cn(
           '!bg-[#f8f9fa]/95 dark:!bg-[#1c1c1c]/80',
           '!border-[#e6e8eb]/90 dark:!border-[#282828]/90',
           'transition ease-out',
-          'mx-auto backdrop-blur-md w-[calc(100%-2rem)]',
-        ].join(' ')}
+          'mx-auto backdrop-blur-md w-[calc(100%-2rem)]'
+        )}
         onInteractOutside={(e) => {
           // Only hide menu when clicking outside, not focusing outside
           // Prevents Firefox dropdown issue that immediately closes menu after opening
