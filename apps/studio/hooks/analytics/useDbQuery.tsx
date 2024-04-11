@@ -10,6 +10,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 
 export interface DbQueryHook<T = any> {
   isLoading: boolean
+  isRefetching: boolean
   error: string
   data: T[]
   params: BaseReportParams
@@ -59,7 +60,8 @@ const useDbQuery = (
   return {
     error,
     data,
-    isLoading: isLoading || isRefetching,
+    isLoading,
+    isRefetching,
     params,
     runQuery: refetch,
     resolvedSql,
