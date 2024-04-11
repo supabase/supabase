@@ -42,7 +42,6 @@ select
         'Table \`%s.%s\` has a foreign key \`%s\` without a covering index. This can lead to suboptimal query performance.',
         fk.schema_,
         fk.table_,
-        fk.table_,
         fk.fkey_name
     ) as detail,
     'https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys' as remediation,
@@ -261,7 +260,7 @@ select
         pgc.relname
     ) as detail,
     'https://supabase.com/docs/guides/database/database-linter?lint=0004_no_primary_key' as remediation,
-     jsonb_build_object(
+      jsonb_build_object(
         'schema', pgns.nspname,
         'name', pgc.relname,
         'type', 'table'
@@ -506,8 +505,6 @@ from
     join pg_catalog.pg_class c
         on pi.tablename = c.relname
         and n.oid = c.relnamespace
-    left join pg_catalog.pg_policy p
-        on p.polrelid = c.oid
 where
     c.relkind in ('r', 'm') -- tables and materialized views
     and n.nspname not in (
@@ -601,7 +598,7 @@ select
     'EXTERNAL' as facing,
     'Detects cases where row level security (RLS) has not been enabled on a table in the \`public\` schema.' as description,
     format(
-        'Table \`%s.%s\` is in the \`public\` but RLS has not been enabled.',
+        'Table \`%s.%s\` is public, but RLS has not been enabled.',
         n.nspname,
         c.relname
     ) as detail,
