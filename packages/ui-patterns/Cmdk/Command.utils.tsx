@@ -6,7 +6,7 @@ import { cn } from 'ui/src/lib/utils'
 
 import { AlertTriangle } from 'lucide-react'
 import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
-import { DialogContent, Dialog } from 'ui'
+import { Dialog, DialogContent } from 'ui'
 import { Button } from 'ui/src/components/Button'
 import { LoadingLine } from 'ui/src/components/LoadingLine/LoadingLine'
 import { useCommandMenu } from './CommandMenuProvider'
@@ -23,8 +23,8 @@ export const copyToClipboard = (str: string, callback = () => {}) => {
   }
 }
 
-export function escapeDoubleQuotes(str: string) {
-  return str.replaceAll('"', '\\"')
+export function escapeDoubleQuotesAndNewLines(str: string) {
+  return str.replaceAll('"', '\\"').replaceAll('\n', '\\n')
 }
 
 export const Command = React.forwardRef<CommandPrimitiveElement, CommandPrimitiveProps>(
@@ -97,7 +97,10 @@ export const CommandDialog = ({
           animateBounce ? 'scale-[101.5%]' : 'scale-100'
         )}
       >
-        <ErrorBoundary FallbackComponent={CommandError}>
+        <ErrorBoundary
+          FallbackComponent={CommandError}
+          onError={(error, info) => console.log({ error, info })}
+        >
           <Command
             className={[
               '[&_[cmdk-group]]:px-2 [&_[cmdk-group]]:!bg-transparent [&_[cmdk-group-heading]]:!bg-transparent [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-border-stronger [&_[cmdk-input]]:h-12',
