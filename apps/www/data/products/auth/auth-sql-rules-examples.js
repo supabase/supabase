@@ -45,7 +45,7 @@ alter table profiles enable row level security;
 -- 3. Create Policy
 create policy "Users can update their own profiles." 
 on profiles for update 
-using ( auth.uid() = id );
+using ( (select auth.uid()) = id );
 `.trim(),
   },
   {
@@ -74,7 +74,7 @@ alter table teams enable row level security;
 create policy "Team members can update team details"
 on teams
 for update using (
-  auth.uid() in ( 
+  (select auth.uid()) in ( 
     select user_id from members 
     where team_id = id 
   )

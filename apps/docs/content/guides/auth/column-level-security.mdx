@@ -30,7 +30,7 @@ You can restrict updates to just the user who created it using [RLS](/docs/guide
 ```sql
 create a policy "Allow update for owners" on posts for
 update
-  using (auth.uid () = user_id);
+  using ((select auth.uid()) = user_id);
 ```
 
 However, this gives the post owner full access to update the row, including all of the columns.
@@ -129,7 +129,7 @@ supabase migration new create_posts_table
       -- Add row-level security
       create a policy "Allow update for owners" on posts for
       update
-      using (auth.uid () = user_id);
+      using ((select auth.uid()) = user_id);
 
       -- Add column-level security
       revoke
