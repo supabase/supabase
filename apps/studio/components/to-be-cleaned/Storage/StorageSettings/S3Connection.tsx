@@ -25,6 +25,8 @@ import {
 import Table from 'components/to-be-cleaned/Table'
 import Panel from 'components/ui/Panel'
 import { useStorageCredentialsDeleteMutation } from 'data/storage/storage-credentials-delete-mutation'
+import { GenericSkeletonLoader } from 'ui-patterns'
+import CopyButton from 'components/ui/CopyButton'
 
 type Props = {}
 
@@ -193,40 +195,47 @@ export const S3Connection = (props: Props) => {
         ])}
       >
         {storageCredsQuery.isLoading ? (
-          <div>Loading...</div>
+          <div className="p-4">
+            <GenericSkeletonLoader />
+          </div>
         ) : (
-          <Table
-            head={[
-              <Table.th key="secret-name">Description</Table.th>,
-              <Table.th key="secret-value">Created at</Table.th>,
-              <Table.th key="actions" />,
-            ]}
-            body={
-              hasStorageCreds ? (
-                storageCreds.data?.map((cred: any) => (
-                  <StorageCredItem
-                    key={cred.id}
-                    created_at={cred.created_at}
-                    description={cred.description}
-                    id={cred.id}
-                    onDeleteClick={() => {
-                      setDeleteCredId(cred.id)
-                      setOpenDeleteDialog(true)
-                    }}
-                  />
-                ))
-              ) : (
-                <Table.tr>
-                  <Table.td colSpan={3}>
-                    <p className="text-sm text-foreground">No credentials created</p>
-                    <p className="text-sm text-foreground-light">
-                      There are no credentials associated with your project yet
-                    </p>
-                  </Table.td>
-                </Table.tr>
-              )
-            }
-          />
+          <div className="overflow-x-auto">
+            <Table
+              className=""
+              head={[
+                <Table.th key="">Description</Table.th>,
+                <Table.th key="">Access key</Table.th>,
+                <Table.th key="">Created at</Table.th>,
+                <Table.th key="actions" />,
+              ]}
+              body={
+                hasStorageCreds ? (
+                  storageCreds.data?.map((cred: any) => (
+                    <StorageCredItem
+                      key={cred.id}
+                      created_at={cred.created_at}
+                      access_key={cred.access_key}
+                      description={cred.description}
+                      id={cred.id}
+                      onDeleteClick={() => {
+                        setDeleteCredId(cred.id)
+                        setOpenDeleteDialog(true)
+                      }}
+                    />
+                  ))
+                ) : (
+                  <Table.tr>
+                    <Table.td colSpan={3}>
+                      <p className="text-sm text-foreground">No credentials created</p>
+                      <p className="text-sm text-foreground-light">
+                        There are no credentials associated with your project yet
+                      </p>
+                    </Table.td>
+                  </Table.tr>
+                )
+              }
+            />
+          </div>
         )}
       </div>
       <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
@@ -269,11 +278,13 @@ function StorageCredItem({
   description,
   id,
   created_at,
+  access_key,
   onDeleteClick,
 }: {
   description: string
   id: string
   created_at: string
+  access_key: string
   onDeleteClick: (id: string) => void
 }) {
   function daysSince(date: string) {
@@ -291,8 +302,16 @@ function StorageCredItem({
   }
 
   return (
-    <tr className="h-8">
+    <tr className="h-8 text-ellipsis group">
       <td>{description}</td>
+      <td>
+        <div className="flex items-center justify-between">
+          <span className="text-ellipsis font-mono cursor-default">{access_key}</span>
+          <span className="w-24 text-right opacity-0 group-hover:opacity-100 transition-opacity">
+            <CopyButton text={access_key} type="outline" />
+          </span>
+        </div>
+      </td>
       <td>{daysSince(created_at)}</td>
       <td>
         <DropdownMenu>
