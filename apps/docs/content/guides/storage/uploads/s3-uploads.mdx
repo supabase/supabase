@@ -1,0 +1,71 @@
+---
+id: 's3-uploads'
+title: 'S3 Uploads'
+description: 'Learn how to upload files to Supabase Storage using S3.'
+subtitle: 'Learn how to upload files to Supabase Storage using S3.'
+sidebar_label: 'Uploads'
+---
+
+To get started with S3 please refer to the [S3 setup guide](/docs/guides/storage/s3/authentication).
+
+When using the S3 protocol you can upload files to Supabase Storage using the **PutObject** command or using **Multi Part Upload** method.
+
+In this guide we will explore both approaches and the differences between them.
+
+
+## PutObject
+
+The PutObject command works by uploading the file in a single request, the same as the [Standard Upload](/docs/guides/storage/uploads/standard-uploads) method.
+The maximum file size is 5GB for this type of upload.
+
+You will use the `PutObjectCommand` when you are uploading files that are relatively small in size and retrying the entire upload wont be an issue.
+
+Here is an example of how to upload a file using the PutObject command:
+
+```javascript
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3'
+
+const s3Client = new S3Client({...})
+
+const file = fs.createReadStream('path/to/file')
+
+const uploadCommand = new PutObjectCommand({
+  Bucket: 'bucket-name',
+  Key: 'path/to/file',
+  Body: file,
+  ContentType: 'image/jpeg',
+})
+
+await s3Client.send(uploadCommand)
+
+```
+
+## Multi Part Uploads
+
+The Multi Part Upload method works by splitting the file into smaller parts and uploading them in parallel, maximizing the upload speed on a fast network.
+
+The maximum file size is currently 50GB for this type of upload.
+
+This method is ideal for uploading large files, as it allows you to retry the upload of individual parts in case of network issues.
+You would prefer this method over [Resumable Upload](/docs/guides/storage/uploads/resumable-uploads) when you are uploading files server side and you want to maximize the upload speed at the cost of resumability.
+
+You can easily upload files using the Multi Part Upload method using the `Upload` class from the `@aws-sdk/lib-storage` package.
+
+```javascript
+import { S3Client } from '@aws-sdk/client-s3'
+import { Upload } from '@aws-sdk/lib-storage'
+
+const s3Client = new S3Client({...})
+
+const file = fs.createReadStream('path/to/very-large-file')
+
+const upload = new Upload(s3Client, {
+  Bucket: 'bucket-name',
+  Key: 'path/to/file',
+  ContentType: 'image/jpeg',
+  Body: file,
+})
+
+await uploader.done()
+```
+

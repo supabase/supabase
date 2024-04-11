@@ -1349,6 +1349,10 @@ export const storage: NavMenuConstant = {
           name: 'Resumable Uploads',
           url: '/guides/storage/uploads/resumable-uploads',
         },
+        {
+          name: 'S3 Uploads',
+          url: '/guides/storage/uploads/s3-uploads',
+        },
         { name: 'Limits', url: '/guides/storage/uploads/file-limits' },
       ],
     },
@@ -1361,6 +1365,14 @@ export const storage: NavMenuConstant = {
           name: 'Image Transformations',
           url: '/guides/storage/serving/image-transformations',
         },
+      ],
+    },
+    {
+      name: 'S3',
+      url: undefined,
+      items: [
+        { name: 'API Compatibility', url: '/guides/storage/s3/compatibility' },
+        { name: 'Authentication', url: '/guides/storage/s3/authentication' },
       ],
     },
     {
