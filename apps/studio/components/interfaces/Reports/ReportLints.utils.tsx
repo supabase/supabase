@@ -30,6 +30,8 @@ export function getHumanReadableTitle(title: LINT_TYPES) {
       return 'RLS Disabled in Public'
     case 'security_definer_view':
       return 'Security Definer View'
+    case 'duplicate_index':
+      return 'Duplicate Index'
     default:
       assertUnreachable(title)
       throw new Error('This case should never be reached')
@@ -84,6 +86,18 @@ export const LintCTA = ({
         </Button>
       )
     case 'unused_index':
+      return (
+        <Button asChild type="default">
+          <Link
+            href={`/project/${projectRef}/database/indexes?schema=${metadata?.schema}&table=${metadata?.name}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            View index
+          </Link>
+        </Button>
+      )
+    case 'duplicate_index':
       return (
         <Button asChild type="default">
           <Link

@@ -633,7 +633,7 @@ export const LINT_TYPES = [
   'multiple_permissive_policies',
   'policy_exists_rls_disabled',
   'rls_enabled_no_policy',
-  // 'duplicate_index', TODO: hidden because of a bug https://github.com/supabase/splinter/issues/20#issuecomment-2044661819
+  'duplicate_index',
   'security_definer_view',
   'function_search_path_mutable',
   'rls_disabled_in_public',
