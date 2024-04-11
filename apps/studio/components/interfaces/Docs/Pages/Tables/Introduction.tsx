@@ -4,10 +4,7 @@ import Link from 'next/link'
 import CodeSnippet from 'components/interfaces/Docs/CodeSnippet'
 import GeneratingTypes from 'components/interfaces/Docs/GeneratingTypes'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { Info } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
-import PublicSchemaNotEnabledAlert from '../../../Settings/API/PublicSchemaNotEnabledAlert'
+import PublicSchemaNotEnabledAlert from '../../PublicSchemaNotEnabledAlert'
 
 interface IntroductionProps {
   selectedLang: 'bash' | 'js'

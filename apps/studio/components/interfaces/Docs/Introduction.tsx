@@ -1,13 +1,10 @@
-import type { AutoApiService } from 'data/config/project-api-query'
-import Snippets from 'components/interfaces/Docs/Snippets'
-import CodeSnippet from './CodeSnippet'
-import Link from 'next/link'
-import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
-import { Info } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
 import { useParams } from 'common'
+import Snippets from 'components/interfaces/Docs/Snippets'
+import type { AutoApiService } from 'data/config/project-api-query'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import PublicSchemaNotEnabledAlert from '../Settings/API/PublicSchemaNotEnabledAlert'
+
+import CodeSnippet from './CodeSnippet'
+import PublicSchemaNotEnabledAlert from './PublicSchemaNotEnabledAlert'
 
 interface Props {
   autoApiService: AutoApiService
