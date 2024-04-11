@@ -1,10 +1,17 @@
 import { useProjectsQuery } from 'data/projects/projects-query'
 import { useMemo } from 'react'
-import { PageType, useRegisterCommands, useRegisterPage, useSetPage } from 'ui-patterns/CommandMenu'
+import {
+  PageType,
+  useRegisterCommands,
+  useRegisterPage,
+  useSetPage,
+  useSetQuery,
+} from 'ui-patterns/CommandMenu'
 
 const PROJECT_SWITCHER_PAGE_NAME = 'switch-project'
 
 const useProjectSwitchCommand = () => {
+  const setQuery = useSetQuery()
   const setPage = useSetPage()
 
   const { data: _projects } = useProjectsQuery()
@@ -36,7 +43,10 @@ const useProjectSwitchCommand = () => {
     {
       id: 'switch-project',
       name: 'Switch project',
-      action: () => setPage(PROJECT_SWITCHER_PAGE_NAME),
+      action: () => {
+        setPage(PROJECT_SWITCHER_PAGE_NAME)
+        setQuery('')
+      },
     },
   ])
 }

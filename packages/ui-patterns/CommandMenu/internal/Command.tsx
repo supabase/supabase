@@ -33,7 +33,7 @@ type IActionCommand = IBaseCommand & {
 }
 
 type IRouteCommand = IBaseCommand & {
-  route: `/${string}`
+  route: `/${string}` | `http${string}`
 }
 
 const isActionCommand = (command: ICommand): command is IActionCommand => 'action' in command
