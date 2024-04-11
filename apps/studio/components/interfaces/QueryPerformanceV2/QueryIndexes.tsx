@@ -18,11 +18,15 @@ import {
   Alert_Shadcn_,
   Button,
   CodeBlock,
+  CollapsibleContent_Shadcn_,
+  CollapsibleTrigger_Shadcn_,
+  Collapsible_Shadcn_,
   cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { IndexAdvisorDisabledState } from './IndexAdvisorDisabledState'
 import { QueryPanelContainer, QueryPanelScoreSection, QueryPanelSection } from './QueryPanel'
+import { useState } from 'react'
 
 interface QueryIndexesProps {
   selectedRow: any
@@ -35,6 +39,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
   // [Joshen] TODO implement this logic once the linter rules are in
   const isLinterWarning = false
   const { project } = useProjectContext()
+  const [showStartupCosts, setShowStartupCosts] = useState(false)
 
   const {
     data: usedIndexes,
@@ -159,7 +164,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
 
       <QueryPanelSection className="flex flex-col gap-y-6">
         <div className="flex flex-col gap-y-2">
-          <p className="text-sm">Index suggestion</p>
+          <p className="text-sm">New index recommendations</p>
           {isLoadingChecks ? (
             <GenericSkeletonLoader />
           ) : !isIndexAdvisorAvailable ? (
@@ -181,7 +186,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
                       <Check />
                       <AlertTitle_Shadcn_>This query is optimized</AlertTitle_Shadcn_>
                       <AlertDescription_Shadcn_>
-                        Suggestions for indexes to optimize queries will show here
+                        Recommendations for indexes will show here
                       </AlertDescription_Shadcn_>
                     </Alert_Shadcn_>
                   ) : (
@@ -222,7 +227,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
                         )}
                       />
                       <p className="text-sm text-foreground-light">
-                        This suggestion serves to prevent your queries from slowing down as your
+                        This recommendation serves to prevent your queries from slowing down as your
                         application grows, and hence the index may not be used immediately after
                         it's created. (e.g If your table is still small at this time)
                       </p>
@@ -234,27 +239,35 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
           )}
         </div>
         {isIndexAdvisorAvailable && hasIndexRecommendation && (
-          <div className="flex flex-col gap-y-2">
-            <p className="text-sm">Query costs</p>
-            <div className="pt-4 border rounded-md flex flex-col gap-y-3">
-              <div className="px-4 flex items-center justify-between">
+          <>
+            <div className="flex flex-col gap-y-2">
+              <p className="text-sm">Query costs</p>
+              <div className="pt-4 border rounded-md flex flex-col gap-y-3 bg-surface-100">
                 <QueryPanelScoreSection
-                  className="w-1/2"
-                  name="Total cost"
+                  name="Total cost of query"
                   description="An estimate of how long it will take to return all the rows (Includes start up cost)"
                   before={total_cost_before}
                   after={total_cost_after}
                 />
-                <QueryPanelScoreSection
-                  className="w-1/2"
-                  name="Start up cost"
-                  description="An estimate of how long it will take to fetch the first row"
-                  before={startup_cost_before}
-                  after={startup_cost_after}
-                />
+                <Collapsible_Shadcn_ open={showStartupCosts} onOpenChange={setShowStartupCosts}>
+                  <CollapsibleContent_Shadcn_ asChild className="pb-3">
+                    <QueryPanelScoreSection
+                      hideArrowMarkers
+                      name="Start up cost"
+                      description="An estimate of how long it will take to fetch the first row"
+                      before={startup_cost_before}
+                      after={startup_cost_after}
+                    />
+                  </CollapsibleContent_Shadcn_>
+                  <CollapsibleTrigger_Shadcn_ className="text-xs py-1.5 border-t text-foreground-light bg-studio w-full rounded-b-md">
+                    View {showStartupCosts ? 'less' : 'more'}
+                  </CollapsibleTrigger_Shadcn_>
+                </Collapsible_Shadcn_>
               </div>
-
-              <Accordion_Shadcn_ collapsible type="single" className="border-t">
+            </div>
+            <div className="flex flex-col gap-y-2">
+              <p className="text-sm">FAQ</p>
+              <Accordion_Shadcn_ collapsible type="single" className="border rounded-md">
                 <AccordionItem_Shadcn_ value="1">
                   <AccordionTrigger className="px-4 py-3 text-sm font-normal text-foreground-light hover:text-foreground transition [&[data-state=open]]:text-foreground">
                     What units are cost in?
@@ -285,7 +298,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
                 </AccordionItem_Shadcn_>
               </Accordion_Shadcn_>
             </div>
-          </div>
+          </>
         )}
       </QueryPanelSection>
 
