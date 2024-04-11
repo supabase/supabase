@@ -1,15 +1,12 @@
--- Insert your <PROJECT-REF> and <SUPABASE_ANON_KEY> below, then uncomment the trigger creation and run `supabase db push`
--- Alternatively, head to the Database Webhook settings https://supabase.com/dashboard/project/_/database/hooks
--- Select "Create a new Hook" > Table "public.embeddings" > check "INSERT" & "Update" > Supabase Edge Functions > Add auth header with service key 
+create function generate_embedding() returns trigger as $$
+begin
+    perform pg_notify('generate-embedding', to_json(NEW)::text);
+    return null;
+end;
+$$ language plpgsql;
 
--- CREATE TRIGGER "Generate embedding"
--- AFTER INSERT
--- OR
--- UPDATE ON public.embeddings FOR EACH ROW
--- EXECUTE FUNCTION supabase_functions.http_request (
---   'https://<PROJECT-REF>.supabase.co/functions/v1/generate-embedding',
---   'POST',
---   '{"Content-type":"application/json","Authorization":"Bearer <SUPABASE_ANON_KEY>"}',
---   '{}',
---   '1000'
--- );
+CREATE OR REPLACE TRIGGER "Generate embedding"
+AFTER INSERT
+OR
+UPDATE OF content ON public.embeddings FOR EACH ROW
+EXECUTE FUNCTION generate_embedding();

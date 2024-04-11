@@ -1,5 +1,6 @@
+import postgres from "https://deno.land/x/postgresjs@v3.4.4/mod.js";
 import { createClient } from "npm:@supabase/supabase-js@2.42.0";
-import { Database } from "../_shared/database.types.ts";
+import { Database, Tables } from "../_shared/database.types.ts";
 
 const supabase = createClient<Database>(
   Deno.env.get("SUPABASE_URL")!,
@@ -7,6 +8,39 @@ const supabase = createClient<Database>(
 );
 // @ts-ignore TODO: import Supabase AI types.
 const model = new Supabase.ai.Session("gte-small");
+
+const sql = postgres(Deno.env.get("SUPABASE_DB_URL") ?? "", {});
+await sql.listen(
+  "generate-embedding",
+  async (x) => await generateEmbedding(JSON.parse(x)),
+);
+
+// Backfill content without embedding
+const { data, error } = await supabase.from("embeddings").select().is(
+  "embedding",
+  null,
+);
+if (error) console.warn(error);
+for (const row of data ?? []) {
+  await generateEmbedding(row);
+}
+
+async function generateEmbedding({ content, id }: Tables<"embeddings">) {
+  console.log(`Generating embedding for id: ${id}`);
+
+  // Generate embedding
+  const embedding = await model.run(content, {
+    mean_pool: true,
+    normalize: true,
+  });
+
+  // Store in DB
+  const { error } = await supabase.from("embeddings").update({ embedding }).eq(
+    "id",
+    id,
+  );
+  if (error) console.warn(error);
+}
 
 Deno.serve(async (req) => {
   const { search } = await req.json();
