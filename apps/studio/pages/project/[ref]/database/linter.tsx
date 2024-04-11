@@ -130,7 +130,7 @@ const ProjectLints: NextPageWithLayout = () => {
               <Table.th key="header-type" className="py-2">
                 Problem
               </Table.th>,
-              // <Table.th key="header-expand" className="py-2 text-right"></Table.th>,
+              <Table.th key="header-expand" className="py-2 text-right"></Table.th>,
             ]}
             body={[
               <Table.tr key="loader">

@@ -5,7 +5,7 @@ import Table from 'components/to-be-cleaned/Table'
 import { LINT_TYPES, Lint } from 'data/lint/lint-query'
 import { Badge, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import { Markdown } from '../Markdown'
-import { getHumanReadableTitle } from './ReportLints.utils'
+import { LintCTA, getHumanReadableTitle } from './ReportLints.utils'
 
 type ReportLintsTableRowProps = {
   lint: Lint
@@ -114,10 +114,10 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
             )}
           </div>
         </Table.td>
-        {/* <Table.td>
+        <Table.td>
           <div className="flex items-center justify-end gap-x-2">
             <LintCTA title={lint.name} projectRef={ref!} metadata={lint.metadata} />
-            <Tooltip_Shadcn_>
+            {/* <Tooltip_Shadcn_>
               <TooltipTrigger_Shadcn_ asChild>
                 <Button
                   type="text"
@@ -133,9 +133,9 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
               <TooltipContent_Shadcn_ side="bottom">
                 {isIgnored ? 'Unignore problem' : 'Ignore problem'}
               </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+            </Tooltip_Shadcn_> */}
           </div>
-        </Table.td> */}
+        </Table.td>
       </Table.tr>
       {/* <Modal
         size="small"
