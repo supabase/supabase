@@ -102,6 +102,12 @@ Similar to the Read Replica API endpoints, only requests to the REST API are ava
 
 When a project no longer has any Read Replicas, the load balancer and its endpoint are brought down as well.
 
+<Admonition type="caution">
+
+If you use a [custom domains](/docs/guides/platform/custom-domains), requests will not be routed through the load balancer. You should use the dedicated endpoints provided in the dashboard.
+
+</Admonition>
+
 ### Centralized configuration management
 
 All settings made through the dashboard will be propagated across all databases of a project. This ensures that no Read Replica get out of sync with its Primary database or with other Read Replicas.
