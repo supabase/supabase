@@ -45,7 +45,11 @@ const usePopPage = () => {
   return popPageStack
 }
 
-const useRegisterPage = (name: ICommandPageName, definition: PageDefinition, deps: any[] = []) => {
+const useRegisterPage = (
+  name: ICommandPageName,
+  definition: PageDefinition,
+  { deps = [], enabled = true }: { deps?: any[]; enabled?: boolean } = {}
+) => {
   const { pagesState } = useCommandContext()
   const { registerNewPage } = useSnapshot(pagesState)
 
@@ -57,7 +61,10 @@ const useRegisterPage = (name: ICommandPageName, definition: PageDefinition, dep
     toggleRerenderFlag()
   }
 
-  useEffect(() => registerNewPage(name, definition), [registerNewPage, rerenderFlag])
+  useEffect(
+    () => (enabled ? registerNewPage(name, definition) : undefined),
+    [registerNewPage, enabled, rerenderFlag]
+  )
 }
 
 export { useCurrentPage, useRegisterPage, useSetPage, usePopPage, usePageComponent }

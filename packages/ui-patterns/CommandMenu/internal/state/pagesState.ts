@@ -14,7 +14,7 @@ enum PageType {
 
 interface CommandsPage {
   type: PageType.Commands
-  commands: ICommandSection[]
+  sections: ICommandSection[]
 }
 
 interface ComponentPage {

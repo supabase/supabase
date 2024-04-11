@@ -13,7 +13,7 @@ const useCommands = () => {
 
   const _currPage = useCurrentPage()
   const currPage = _currPage as PageDefinition
-  if (currPage && isCommandsPage(currPage)) return currPage.commands
+  if (currPage && isCommandsPage(currPage)) return currPage.sections
 
   return commandSections
 }

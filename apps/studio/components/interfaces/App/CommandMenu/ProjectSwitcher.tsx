@@ -24,7 +24,7 @@ const useProjectSwitchCommand = () => {
     PROJECT_SWITCHER_PAGE_NAME,
     {
       type: PageType.Commands,
-      commands: [
+      sections: [
         {
           id: 'switch-project',
           name: 'Switch project',
@@ -37,13 +37,14 @@ const useProjectSwitchCommand = () => {
         },
       ],
     },
-    [projects]
+    { deps: [projects] }
   )
 
   useRegisterCommands('Project tools', [
     {
       id: 'switch-project',
       name: 'Switch project',
+      value: 'Switch project, Change project, Select project',
       action: () => setPage(PROJECT_SWITCHER_PAGE_NAME),
       icon: () => <Wrench />,
     },

@@ -62,7 +62,7 @@ const useApiKeysCommands = () => {
     API_KEYS_PAGE_NAME,
     {
       type: PageType.Commands,
-      commands: [
+      sections: [
         {
           id: 'api-keys',
           name: 'API keys',
@@ -70,7 +70,7 @@ const useApiKeysCommands = () => {
         },
       ],
     },
-    [commands]
+    { deps: [commands] }
   )
   useRegisterCommands('Project tools', [
     {

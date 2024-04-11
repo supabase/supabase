@@ -17,7 +17,7 @@ const useThemeSwitcherCommands = ({ options }: { options?: UseCommandOptions } =
 
   useRegisterPage(THEME_SWITCHER_PAGE_NAME, {
     type: PageType.Commands,
-    commands: [
+    sections: [
       {
         id: 'switch-theme',
         name: 'Switch theme',
