@@ -74,10 +74,7 @@ const useApiKeysCommands = () => {
     {
       id: 'api-keys',
       name: 'Get API keys',
-      action: () => {
-        setPage(API_KEYS_PAGE_NAME)
-        setQuery('')
-      },
+      action: () => setPage(API_KEYS_PAGE_NAME),
     },
   ])
 }

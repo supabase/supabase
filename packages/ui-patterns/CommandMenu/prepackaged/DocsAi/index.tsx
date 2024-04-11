@@ -29,7 +29,7 @@ const useDocsAiCommands = ({
         id: 'ai-docs',
         name: 'Ask Supabase AI',
         action: () => {
-          setCommandPage(DOCS_AI_COMMANDS.PAGE_NAME)
+          setCommandPage(DOCS_AI_COMMANDS.PAGE_NAME, true)
         },
         icon: () => <AiIconAnimation />,
         className: 'text-brand',

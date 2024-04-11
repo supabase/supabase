@@ -8,6 +8,7 @@ import {
   isComponentPage,
 } from '../../internal/state/pagesState'
 import { isEqual } from 'lodash'
+import { useSetQuery } from './queryHooks'
 
 const useCurrentPage = () => {
   const { pagesState } = useCommandContext()
@@ -29,7 +30,12 @@ const usePageComponent = () => {
 
 const useSetPage = () => {
   const { pagesState } = useCommandContext()
-  return pagesState.appendPageStack
+  const setQuery = useSetQuery()
+
+  return (name: string, preserveQuery: boolean = false) => {
+    pagesState.appendPageStack(name)
+    if (!preserveQuery) setQuery('')
+  }
 }
 
 const usePopPage = () => {

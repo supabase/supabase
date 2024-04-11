@@ -42,10 +42,7 @@ const useThemeSwitcherCommands = ({ options }: { options?: UseCommandOptions } =
       {
         id: 'switch-theme',
         name: 'Switch theme',
-        action: () => {
-          setPage(THEME_SWITCHER_PAGE_NAME)
-          setQuery('')
-        },
+        action: () => setPage(THEME_SWITCHER_PAGE_NAME),
         defaultHidden: true,
       },
     ],

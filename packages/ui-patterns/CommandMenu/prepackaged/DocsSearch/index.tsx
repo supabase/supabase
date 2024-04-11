@@ -30,7 +30,7 @@ const useDocsSearchCommands = ({
         id: 'search-docs',
         name: 'Search the docs',
         action: () => {
-          setCommandPage(DOCS_SEARCH_COMMANDS.PAGE_NAME)
+          setCommandPage(DOCS_SEARCH_COMMANDS.PAGE_NAME, true)
         },
         icon: () => <Book />,
       },

@@ -43,10 +43,7 @@ const useProjectSwitchCommand = () => {
     {
       id: 'switch-project',
       name: 'Switch project',
-      action: () => {
-        setPage(PROJECT_SWITCHER_PAGE_NAME)
-        setQuery('')
-      },
+      action: () => setPage(PROJECT_SWITCHER_PAGE_NAME),
     },
   ])
 }
