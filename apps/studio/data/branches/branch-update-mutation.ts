@@ -10,9 +10,15 @@ export type BranchUpdateVariables = {
   projectRef: string
   branchName?: string
   gitBranch?: string
+  persistent?: boolean
 }
 
-export async function updateBranch({ id, branchName, gitBranch }: BranchUpdateVariables) {
+export async function updateBranch({
+  id,
+  branchName,
+  gitBranch,
+  persistent,
+}: BranchUpdateVariables) {
   const { data, error } = await patch('/v1/branches/{branch_id}', {
     params: {
       path: { branch_id: id },
@@ -20,6 +26,7 @@ export async function updateBranch({ id, branchName, gitBranch }: BranchUpdateVa
     body: {
       branch_name: branchName,
       git_branch: gitBranch,
+      persistent,
     },
   })
 
