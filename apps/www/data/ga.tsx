@@ -37,12 +37,12 @@ Many customers have been running production applications on Supabase for the pas
   highlightsSection: {
     highlights: [
       {
-        number: '1M+',
-        text: 'total databases launched',
+        number: '1M',
+        text: 'databases launched',
       },
       {
-        number: '100.000+',
-        text: 'active projects',
+        number: '100K',
+        text: 'weekly active projects',
       },
       {
         number: '1B',
@@ -50,10 +50,10 @@ Many customers have been running production applications on Supabase for the pas
       },
       {
         number: '10M',
-        text: 'edfe function requests per day',
+        text: 'edge function requests per day',
       },
       {
-        number: '+65K',
+        number: '65K',
         text: 'GitHub stars',
       },
     ],
