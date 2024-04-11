@@ -1,3 +1,4 @@
+import { ArrowRight } from 'lucide-react'
 import { useRegisterCommands } from 'ui-patterns/CommandMenu'
 
 interface Quickstart {
@@ -49,6 +50,7 @@ const useQuickstartCommands = () => {
       route: url,
       defaultHidden: true,
       value: `Quick starts: Get started with ${label}`,
+      icon: () => <ArrowRight />,
     }))
   )
 }

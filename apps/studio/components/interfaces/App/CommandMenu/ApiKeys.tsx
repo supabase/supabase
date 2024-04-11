@@ -1,6 +1,7 @@
 import { useParams } from 'common'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import { copyToClipboard } from 'lib/helpers'
+import { Key } from 'lucide-react'
 import { useMemo } from 'react'
 import { Badge } from 'ui'
 import {
@@ -10,7 +11,6 @@ import {
   useRegisterPage,
   PageType,
   useSetPage,
-  useSetQuery,
 } from 'ui-patterns/CommandMenu'
 
 const API_KEYS_PAGE_NAME = 'api-keys'
@@ -18,7 +18,6 @@ const API_KEYS_PAGE_NAME = 'api-keys'
 const useApiKeysCommands = () => {
   const setIsOpen = useSetCommandMenuOpen()
   const setPage = useSetPage()
-  const setQuery = useSetQuery()
 
   const { ref } = useParams()
   const { data: settings } = useProjectApiQuery({ projectRef: ref }, { enabled: !!ref })
@@ -37,6 +36,7 @@ const useApiKeysCommands = () => {
             setIsOpen(false)
           },
           badge: () => <Badge>Public</Badge>,
+          icon: () => <Key />,
         },
         serviceKey && {
           id: 'service-key',
@@ -46,11 +46,13 @@ const useApiKeysCommands = () => {
             setIsOpen(false)
           },
           badge: () => <Badge variant="destructive">Secret</Badge>,
+          icon: () => <Key />,
         },
         !(anonKey || serviceKey) && {
           id: 'api-keys-project-settings',
           name: 'See API keys in Project Settings',
           route: `/project/${ref ?? '_'}/settings/api`,
+          icon: () => <Key />,
         },
       ].filter(Boolean) as ICommand[],
     [anonKey, serviceKey, ref, setIsOpen]
@@ -75,6 +77,7 @@ const useApiKeysCommands = () => {
       id: 'api-keys',
       name: 'Get API keys',
       action: () => setPage(API_KEYS_PAGE_NAME),
+      icon: () => <Key />,
     },
   ])
 }

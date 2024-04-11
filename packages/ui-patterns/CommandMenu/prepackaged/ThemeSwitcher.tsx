@@ -6,12 +6,12 @@ import type { UseCommandOptions } from '../api/types'
 import { PageType } from '../api/utils'
 import { themes } from 'ui/src/components/ThemeProvider/themes'
 import { useSetQuery } from '../api/hooks/queryHooks'
+import { Monitor, MonitorDot, Moon, Sun } from 'lucide-react'
 
 const THEME_SWITCHER_PAGE_NAME = 'switch-theme'
 
 const useThemeSwitcherCommands = ({ options }: { options?: UseCommandOptions } = {}) => {
   const setIsOpen = useSetCommandMenuOpen()
-  const setQuery = useSetQuery()
   const setPage = useSetPage()
 
   const { setTheme } = useTheme()
@@ -31,6 +31,8 @@ const useThemeSwitcherCommands = ({ options }: { options?: UseCommandOptions } =
               setTheme(theme.value)
               setIsOpen(false)
             },
+            icon: () =>
+              theme.name === 'System' ? <Monitor /> : theme.name === 'Light' ? <Sun /> : <Moon />,
           })),
       },
     ],
@@ -44,6 +46,7 @@ const useThemeSwitcherCommands = ({ options }: { options?: UseCommandOptions } =
         name: 'Switch theme',
         action: () => setPage(THEME_SWITCHER_PAGE_NAME),
         defaultHidden: true,
+        icon: () => <MonitorDot />,
       },
     ],
     options

@@ -1,4 +1,5 @@
 import { useProjectsQuery } from 'data/projects/projects-query'
+import { Forward, Wrench } from 'lucide-react'
 import { useMemo } from 'react'
 import {
   PageType,
@@ -11,7 +12,6 @@ import {
 const PROJECT_SWITCHER_PAGE_NAME = 'switch-project'
 
 const useProjectSwitchCommand = () => {
-  const setQuery = useSetQuery()
   const setPage = useSetPage()
 
   const { data: _projects } = useProjectsQuery()
@@ -32,6 +32,7 @@ const useProjectSwitchCommand = () => {
             id: `project-${ref}`,
             name,
             route: `/project/${ref}`,
+            icon: () => <Forward />,
           })),
         },
       ],
@@ -44,6 +45,7 @@ const useProjectSwitchCommand = () => {
       id: 'switch-project',
       name: 'Switch project',
       action: () => setPage(PROJECT_SWITCHER_PAGE_NAME),
+      icon: () => <Wrench />,
     },
   ])
 }
