@@ -18,19 +18,17 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks'
 import { AlertCircle, Info } from 'lucide-react'
 import {
-  Form,
-  Input,
-  InputNumber,
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
+  Form,
+  Input,
+  InputNumber,
 } from 'ui'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
-import PublicSchemaNotEnabledAlert from './PublicSchemaNotEnabledAlert'
-import ReactMarkdown from 'react-markdown'
 import Link from 'next/link'
 
 const PostgrestConfig = () => {
@@ -172,14 +170,32 @@ const PostgrestConfig = () => {
                               <Alert_Shadcn_ variant="default">
                                 <Info className="h-4 w-4" />
                                 <AlertTitle_Shadcn_>
-                                  <ReactMarkdown>
-                                    The `public` schema for this project is not exposed
-                                  </ReactMarkdown>
+                                  The public schema for this project is not exposed
                                 </AlertTitle_Shadcn_>
                                 <AlertDescription_Shadcn_>
-                                  <ReactMarkdown>
-                                    {`You will not be able to query tables and views in the \`public\` schema via supabase-js or HTTP clients. ${isGraphqlPublicSchemaEnabled ? 'Tables in the `public` schema are still exposed over our GraphQL endpoints. Remove the `graphql_public` schema to block access from GraphQL endpoints.' : ''}`}
-                                  </ReactMarkdown>
+                                  <p>
+                                    You will not be able to query tables and views in the{' '}
+                                    <code>public</code> schema via supabase-js or HTTP clients.
+                                  </p>
+                                  {isGraphqlPublicSchemaEnabled && (
+                                    <div className="grid gap-3 mt-2">
+                                      <div>
+                                        Tables in the <code>public</code> schema are still exposed
+                                        over our GraphQL endpoints.
+                                      </div>
+                                      <p>
+                                        <Button asChild type="default">
+                                          <Link
+                                            target="_blank"
+                                            href={`/project/${projectRef}/database/extensions`}
+                                            className="!no-underline !hover:bg-surface-100 !text-foreground"
+                                          >
+                                            Disable the pg_graphql extension
+                                          </Link>
+                                        </Button>
+                                      </p>
+                                    </div>
+                                  )}
                                 </AlertDescription_Shadcn_>
                               </Alert_Shadcn_>
                             )}
