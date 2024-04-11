@@ -40,7 +40,7 @@ const QueryPerformanceLoadingRow = ({ colSpan }: { colSpan: number }) => {
       {Array(4)
         .fill('')
         .map((_, i) => (
-          <tr key={'loading-' + { i }}>
+          <tr key={'loading-' + i}>
             <td colSpan={colSpan}>
               <ShimmeringLoader />
             </td>
