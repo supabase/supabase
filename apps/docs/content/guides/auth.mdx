@@ -110,7 +110,7 @@ const { data, error } = await supabase
 // => { id: 'd0714948', name: 'Jane' }
 ```
 
-... you can simply define a rule on your database table, `auth.uid() = user_id`, and your request will return the rows which pass the rule, even when you remove the filter from your middleware:
+... you can simply define a rule on your database table, `(select auth.uid()) = user_id`, and your request will return the rows which pass the rule, even when you remove the filter from your middleware:
 
 ```js
 const { data, error } = await supabase.from('users').select('user_id, name')

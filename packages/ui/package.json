@@ -58,6 +58,7 @@
     "common-tags": "^1.8.2",
     "date-fns": "^2.30.0",
     "formik": "^2.2.9",
+    "input-otp": "^1.2.3",
     "lodash": "^4.17.21",
     "lucide-react": "^0.338.0",
     "next-themes": "^0.3.0",

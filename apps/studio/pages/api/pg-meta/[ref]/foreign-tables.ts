@@ -13,6 +13,7 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 
   switch (method) {
     case 'GET':
+      if (req.query.id) return handleGetOne(req, res)
       return handleGetAll(req, res)
     default:
       res.setHeader('Allow', ['GET'])
@@ -23,6 +24,17 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
   const headers = constructHeaders(req.headers)
   let response = await get(`${PG_META_URL}/foreign-tables`, {
+    headers,
+  })
+  if (response.error) {
+    return res.status(400).json({ error: response.error })
+  }
+  return res.status(200).json(response)
+}
+
+const handleGetOne = async (req: NextApiRequest, res: NextApiResponse) => {
+  const headers = constructHeaders(req.headers)
+  let response = await get(`${PG_META_URL}/foreign-tables/${req.query.id}`, {
     headers,
   })
   if (response.error) {

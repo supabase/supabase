@@ -237,6 +237,26 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("schema-db-changes")
+
+let changes = await myChannel.postgresChange(AnyAction.self, schema: "public")
+
+await myChannel.subscribe()
+
+for await change in changes {
+  switch change {
+  case .insert(let action): print(action)
+  case .update(let action): print(action)
+  case .delete(let action): print(action)
+  case .select(let action): print(action)
+  }
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -300,6 +320,23 @@ final changes = supabase
         schema: 'public',
         callback: (payload) => print(payload))
     .subscribe();
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Use `InsertAction.self` as type to listen only to database `INSERT`s:
+
+```swift
+let myChannel = await supabase.channel("schema-db-changes")
+
+let changes = await myChannel.postgresChange(InsertAction.self, schema: "public")
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
 ```
 
 </TabPanel>
@@ -367,6 +404,23 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Use `UpdateAction.self` as type to listen only to database `UPDATE`s:
+
+```swift
+let myChannel = await supabase.channel("schema-db-changes")
+
+let changes = await myChannel.postgresChange(UpdateAction.self, schema: "public")
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.oldRecord, change.record)
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 Use `PostgresAction.Update` as type to listen only to database `UPDATE`s:
@@ -428,6 +482,23 @@ supabase
         schema: 'public',
         callback: (payload) => print(payload))
     .subscribe();
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Use `DeleteAction.self` as type to listen only to database `DELETE`s:
+
+```swift
+let myChannel = await supabase.channel("schema-db-changes")
+
+let changes = await myChannel.postgresChange(DeleteAction.self, schema: "public")
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.oldRecord)
+}
 ```
 
 </TabPanel>
@@ -494,6 +565,26 @@ supabase
         table: 'todos',
         callback: (payload) => print(payload))
     .subscribe();
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(AnyAction.self, schema: "public", table: "todos")
+
+await myChannel.subscribe()
+
+for await change in changes {
+  switch change {
+  case .insert(let action): print(action)
+  case .update(let action): print(action)
+  case .delete(let action): print(action)
+  case .select(let action): print(action)
+  }
+}
 ```
 
 </TabPanel>
@@ -577,6 +668,18 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let messageChanges = await myChannel.postgresChange(AnyAction.self, schema: "public", table: "messages")
+let userChanges = await myChannel.postgresChange(InsertAction.self, schema: "public", table: "users")
+
+await myChannel.subscribe()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -639,6 +742,26 @@ const changes = client
           ),
           callback: (payload) => print(payload))
       .subscribe();
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  InsertAction.self,
+  schema: "public",
+  table: "todos",
+  filter: "id=eq.1"
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
 ```
 
 </TabPanel>
@@ -717,6 +840,26 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  UpdateAction.self,
+  schema: "public",
+  table: "messages",
+  filter: "body=eq.hey"
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -787,6 +930,26 @@ supabase
         ),
         callback: (payload) => print(payload))
     .subscribe();
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  UpdateAction.self,
+  schema: "public",
+  table: "messages",
+  filter: "body=neq.hey"
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
 ```
 
 </TabPanel>
@@ -864,6 +1027,26 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  InsertAction.self,
+  schema: "public",
+  table: "profiles",
+  filter: "age=lt.65"
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -934,6 +1117,26 @@ supabase
         ),
         callback: (payload) => print(payload))
     .subscribe();
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  InsertAction.self,
+  schema: "public",
+  table: "profiles",
+  filter: "age=lte.65"
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
 ```
 
 </TabPanel>
@@ -1010,6 +1213,26 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  InsertAction.self,
+  schema: "public",
+  table: "products",
+  filter: "quantity=gt.10"
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -1083,6 +1306,26 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  InsertAction.self,
+  schema: "public",
+  table: "products",
+  filter: "quantity=gte.10"
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -1153,6 +1396,26 @@ supabase
         ),
         callback: (payload) => print(payload))
     .subscribe();
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  InsertAction.self,
+  schema: "public",
+  table: "products",
+  filter: "name=in.(red, blue, yellow)"
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
 ```
 
 </TabPanel>
@@ -1278,6 +1541,28 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+await supabase.realtime.setAuth("your-custom-jwt")
+
+let myChannel = await supabase.channel("db-changes")
+
+let changes = await myChannel.postgresChange(
+  UpdateAction.self,
+  schema: "public",
+  table: "products",
+  filter: "name=in.(red, blue, yellow)"
+)
+
+await myChannel.subscribe()
+
+for await change in changes {
+  print(change.record)
+}
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -1331,6 +1616,13 @@ supabase.realtime.setAuth('fresh-token')
 
 ```dart
 supabase.realtime.setAuth('fresh-token');
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+await supabase.realtime.setAuth("fresh-token")
 ```
 
 </TabPanel>

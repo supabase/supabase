@@ -147,20 +147,18 @@ const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainActivate
         size="small"
         loading={isCheckingRecord || isActivating}
         visible={isActivateConfirmModalVisible}
-        header={
-          <div>
+        title={
+          <>
             Are you sure you want to activate the custom domain{' '}
             <code className="text-sm">{customDomain.hostname}</code> for the project?
-          </div>
+          </>
         }
-        buttonLabel="Activate"
-        buttonLoadingLabel="Activating"
-        onSelectCancel={() => setIsActivateConfirmModalVisible(false)}
-        onSelectConfirm={onActivateCustomDomain}
+        confirmLabel="Activate"
+        confirmLabelLoading="Activating"
+        onCancel={() => setIsActivateConfirmModalVisible(false)}
+        onConfirm={onActivateCustomDomain}
       >
-        <Modal.Content className="py-3">
-          <p className="text-sm">The existing Supabase subdomain will be deactivated.</p>
-        </Modal.Content>
+        <p className="text-sm">The existing Supabase subdomain will be deactivated.</p>
       </ConfirmationModal>
     </>
   )

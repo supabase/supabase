@@ -64,7 +64,7 @@ For example, the following policy would allow users to select their own rows in 
 ```sql hideCopy
 create policy todo_select_policy
     on todos for select
-    using ( auth.uid() = user_id );
+    using ( (select auth.uid()) = user_id );
 ```
 
 which is equivalent to adding

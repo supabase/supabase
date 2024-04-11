@@ -2903,6 +2903,37 @@ functions:
               password = "example-password"
           }
           ```
+  - id: sign-in-anonymously
+    title: 'signInAnonymously()'
+    notes: |
+      - Creates an anonymous user.
+      - The user can be retrieved by calling `supabase.auth.currentUserOrNull()`.
+      - It is recommended to set up captcha for anonymous sign-ins to prevent abuse. You can pass in the captcha token in the `options` param.
+    params:
+      - name: captchaToken
+        isOptional: true
+        type: String?
+        description: The captcha token when having captcha enabled.
+      - name: data
+        isOptional: true
+        type: JsonObject? or T
+        description: Extra user data to pass in.
+    examples:
+      - id: sign-in-anonymously
+        name: Create an anonymous user
+        isSpotlight: true
+        code: |
+          ```kotlin
+          supabase.auth.signInAnonymously(captchaToken = "token")
+          ```
+      - id: sign-in-anonymously-with-user-metadata
+        name: Create an anonymous user with custom user metadata
+        isSpotlight: false
+        code: |
+          ```kotlin
+          supabase.auth.signInAnonymously(data = customUserData)
+          ```
+
   - id: sign-in-with-password
     title: 'signInWith()'
     $ref: '@supabase/gotrue-js.GoTrueClient.signInWithPassword'

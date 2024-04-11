@@ -34,7 +34,7 @@ See the [Access control section](#access-control) for more details.
 
 <Admonition type="note" label="Self hosting and local development">
 
-For self-hosting, you can update your project configuration using the files and environment variables provided. See the [self-hosting docs](/docs/guides/self-hosting#configuration) for more details.
+For self-hosting, you can update your project configuration using the files and environment variables provided. See the [local development docs](/docs/guides/cli/config) for more details.
 
 </Admonition>
 
@@ -53,6 +53,33 @@ Call the [`signInAnonymously()`](/docs/reference/javascript/auth-signinanonymous
 
 ```js
 const { data, error } = await supabase.auth.signInAnonymously()
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Flutter">
+
+Call the [`signInAnonymously()`](/docs/reference/dart/auth-signinanonymously) method:
+
+```dart
+await supabase.auth.signInAnonymously();
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Call the [`signInAnonymously()`](/docs/reference/swift/auth-signinanonymously) method:
+
+```swift
+let session = try await supabase.auth.signInAnonymously()
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+Call the [`signInAnonymously()`](/docs/reference/kotlin/auth-signinanonymously) method:
+
+```kotlin
+supabase.auth.signInAnonymously()
 ```
 
 </TabPanel>
@@ -80,6 +107,37 @@ const { data, error } = await supabase.auth.updateUser({ email: 'example@email.c
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Flutter">
+
+You can use the [`updateUser()`](/docs/reference/dart/auth-updateuser) method to link an email or phone identity to the anonymous user.
+
+```dart
+await supabase.auth.updateUser(UserAttributes(email: 'example@email.com'));
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+You can use the [`updateUser()`](/docs/reference/swift/auth-updateuser) method to link an email or phone identity to the anonymous user.
+
+```swift
+try await supabase.auth.updateUser(
+  user: UserAttributes(email: "example@email.com")
+)
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+You can use the [`modifyUser()`](/docs/reference/kotlin/auth-updateuser) method to link an email or phone identity to the anonymous user.
+
+```kotlin
+supabase.auth.modifyUser {
+    email = "example@email.com"
+}
+```
+
+</TabPanel>
 </Tabs>
 
 ### Link an OAuth identity
@@ -100,6 +158,33 @@ const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Flutter">
+
+You can use the [`linkIdentity()`](/docs/reference/dart/auth-linkidentity) method to link an OAuth identity to the anonymous user.
+
+```dart
+await supabase.auth.linkIdentity(OAuthProvider.google);
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+You can use the [`linkIdentity()`](/docs/reference/swift/auth-linkidentity) method to link an OAuth identity to the anonymous user.
+
+```swift
+try await supabase.auth.linkIdentity(provider: .google)
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+You can use the [`linkIdentity()`](/docs/reference/kotlin/auth-linkidentity) method to link an oauth identity to the anonymous user.
+
+```kotlin
+supabase.auth.linkIdentity(Google)
+```
+
+</TabPanel>
 </Tabs>
 
 ## Access control
@@ -110,7 +195,7 @@ An anonymous user assumes the `authenticated` role just like a permanent user. Y
 create policy "Only permanent users can post to the news feed"
 on news_feed as restrictive for insert
 to authenticated
-with check ((auth.jwt()->>'is_anonymous')::boolean is false );
+with check ((select (auth.jwt()->>'is_anonymous')::boolean) is false );
 
 create policy "Anonymous and permanent users can view the news feed"
 on news_feed for select
