@@ -33,7 +33,6 @@ export function useStorageCredentialsDeleteMutation({
 
   return useMutation({
     mutationFn: ({ id }: { id: string }) => deleteStorageCredential({ projectRef, id }),
-    mutationKey: keys,
     onSettled: () => {
       queryClient.invalidateQueries(keys)
     },

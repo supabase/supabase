@@ -27,10 +27,10 @@ import Panel from 'components/ui/Panel'
 import { useStorageCredentialsDeleteMutation } from 'data/storage/storage-credentials-delete-mutation'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import CopyButton from 'components/ui/CopyButton'
+import { differenceInDays } from 'date-fns'
+import { useProjectApiQuery } from 'data/config/project-api-query'
 
-type Props = {}
-
-export const S3Connection = (props: Props) => {
+export const S3Connection = () => {
   const [openCreateCred, setOpenCreateCred] = React.useState(false)
   const [showSuccess, setShowSuccess] = React.useState(false)
   const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false)
@@ -53,13 +53,14 @@ export const S3Connection = (props: Props) => {
     projectRef,
   })
 
+  const { data: projectAPI } = useProjectApiQuery({ projectRef: projectRef })
+
   function getConnectionURL() {
-    const baseUrl = process.env.NEXT_PUBLIC_SITE_URL
-    if (!baseUrl) {
-      throw new Error('NEXT_PUBLIC_SITE_URL is required')
-    }
-    const url = new URL(baseUrl)
-    url.hostname = `${projectRef}.${url.hostname}`
+    const projUrl = projectAPI
+      ? `${projectAPI.autoApiService.protocol}://${projectAPI.autoApiService.endpoint}`
+      : `https://${projectRef}.supabase.co`
+
+    const url = new URL(projUrl)
     url.pathname = '/storage/v1/s3'
     return url.toString()
   }
@@ -95,8 +96,9 @@ export const S3Connection = (props: Props) => {
           )}
         </Panel>
       </section>
-      <section className="flex justify-between mt-8">
+      <div className="flex justify-between items-end mt-8">
         <FormHeader
+          className="!mb-0"
           title="S3 Credentials"
           description="Manage your S3 credentials for this project."
         />
@@ -186,12 +188,13 @@ export const S3Connection = (props: Props) => {
             )}
           </DialogContent>
         </Dialog>
-      </section>
+      </div>
+
       <div
         className={cn([
           'bg-surface-100',
           'overflow-hidden border-muted',
-          'rounded-md border shadow',
+          'rounded-md border shadow mt-6',
         ])}
       >
         {storageCredsQuery.isLoading ? (
@@ -225,7 +228,7 @@ export const S3Connection = (props: Props) => {
                   ))
                 ) : (
                   <Table.tr>
-                    <Table.td colSpan={3}>
+                    <Table.td colSpan={4}>
                       <p className="text-sm text-foreground">No credentials created</p>
                       <p className="text-sm text-foreground-light">
                         There are no credentials associated with your project yet
@@ -238,6 +241,7 @@ export const S3Connection = (props: Props) => {
           </div>
         )}
       </div>
+
       <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
         <DialogContent className="p-4">
           <DialogTitle>Revoke storage credentials</DialogTitle>
@@ -290,7 +294,7 @@ function StorageCredItem({
   function daysSince(date: string) {
     const now = new Date()
     const created = new Date(date)
-    const diffInDays = Math.floor((now.getTime() - created.getTime()) / (1000 * 60 * 60 * 24))
+    const diffInDays = differenceInDays(now, created)
 
     if (diffInDays === 0) {
       return 'Today'

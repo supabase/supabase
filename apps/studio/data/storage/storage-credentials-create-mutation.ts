@@ -39,7 +39,6 @@ export function useStorageCredentialsCreateMutation({
   return useMutation({
     mutationFn: ({ description }: { description: string }) =>
       createStorageCredential({ description, projectRef }),
-    mutationKey: keys,
     onSettled: () => {
       queryClient.invalidateQueries(keys)
     },
