@@ -84,6 +84,7 @@ export * from './src/components/shadcn/ui/toaster'
 export * from './src/components/shadcn/ui/separator'
 export * from './src/components/shadcn/ui/sheet'
 export * from './src/components/shadcn/ui/badge'
+export * from './src/components/shadcn/ui/input-otp'
 
 export {
   Command as Command_Shadcn_,
@@ -120,6 +121,7 @@ export {
   Popover as Popover_Shadcn_,
   PopoverTrigger as PopoverTrigger_Shadcn_,
   PopoverContent as PopoverContent_Shadcn_,
+  PopoverAnchor as PopoverAnchor_Shadcn_,
 } from './src/components/shadcn/ui/popover'
 
 export {
@@ -373,3 +375,6 @@ export * from './src/components/Icon/icons/IconZap'
 
 // Export hooks
 export * from './src/lib/Hooks'
+
+// Shared constants/utils
+export { TAB_CHANGE_EVENT_NAME } from './src/lib/events'

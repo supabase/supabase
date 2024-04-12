@@ -8,7 +8,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import APIDocsButton from 'components/ui/APIDocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useUsersQuery } from 'data/auth/users-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useCheckPermissions, useFlag, usePermissionsLoaded } from 'hooks'
 import { Button, IconRefreshCw, IconSearch, IconX, Input, Listbox } from 'ui'
 import AddUserDropdown from './AddUserDropdown'
 import UsersList from './UsersList'
@@ -19,11 +19,13 @@ const Users = () => {
   const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const showAnonUserFilter = useFlag('showAnonUserFilter')
 
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
   const [filterKeywords, setFilterKeywords] = useState('')
-  const [filterVerified, setFilterVerified] = useState<'verified' | 'unverified'>()
+  type Filter = 'verified' | 'unverified' | 'anonymous'
+  const [filter, setFilter] = useState<Filter>()
 
   const canReadUsers = useCheckPermissions(PermissionAction.TENANT_SQL_SELECT, 'auth.users')
   const isPermissionsLoaded = usePermissionsLoaded()
@@ -41,14 +43,15 @@ const Users = () => {
       projectRef,
       page,
       keywords: filterKeywords,
-      verified: filterVerified,
+      filter,
+      connectionString: project?.connectionString!,
     },
     {
       keepPreviousData: true,
       onSuccess(data) {
         if (data.users.length <= 0 && data.total > 0) {
           queryClient.removeQueries(
-            authKeys.users(projectRef, { page, keywords: filterKeywords, verified: filterVerified })
+            authKeys.users(projectRef, { page, keywords: filterKeywords, filter })
           )
 
           setPage((prev) => prev - 1)
@@ -57,14 +60,14 @@ const Users = () => {
     }
   )
 
-  function onVerifiedFilterChange(e: any) {
-    setFilterVerified(e)
+  function onVerifiedFilterChange(val: Filter) {
+    setFilter(val)
   }
 
   function clearSearch() {
     setSearch('')
     setFilterKeywords('')
-    setFilterVerified(undefined)
+    setFilter(undefined)
   }
 
   return (
@@ -96,7 +99,7 @@ const Users = () => {
           />
           <Listbox
             size="small"
-            value={filterVerified}
+            value={filter}
             onChange={onVerifiedFilterChange}
             name="verified"
             id="verified"
@@ -111,6 +114,11 @@ const Users = () => {
             <Listbox.Option label="Un-Verified Users" value="unverified">
               Un-Verified Users
             </Listbox.Option>
+            {showAnonUserFilter && (
+              <Listbox.Option label="Anonymous Users" value="anonymous">
+                Anonymous Users
+              </Listbox.Option>
+            )}
           </Listbox>
         </div>
         <div className="mt-4 flex items-center gap-2 md:mt-0">
@@ -139,7 +147,6 @@ const Users = () => {
                 page={page}
                 setPage={setPage}
                 keywords={filterKeywords}
-                verified={filterVerified}
                 total={data?.total ?? 0}
                 users={data?.users ?? []}
                 isLoading={isLoading}

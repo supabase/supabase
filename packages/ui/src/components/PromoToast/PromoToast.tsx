@@ -3,13 +3,19 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button, cn } from 'ui'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import PromoBg from './PromoBg'
+import CountdownComponent from '../../layout/banners/LW11CountdownBanner/Countdown'
+import announcement from '../../layout/banners/data/Announcement.json'
+import { useTheme } from 'next-themes'
 
-const LWXLogo =
-  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lwx/assets/lwx_logo.svg?t=2023-11-22T17%3A45%3A52.077Z'
+const LW11BGDark =
+  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw11/assets/backgrounds/regular/001.png'
+const LW11BGLight =
+  'https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/lw11/assets/backgrounds/platinum/001.png'
 
 const PromoToast = () => {
   const [visible, setVisible] = useState(false)
+  const { resolvedTheme } = useTheme()
+  const bgImage = resolvedTheme?.includes('dark') ? LW11BGDark : LW11BGLight
 
   useEffect(() => {
     const shouldHide =
@@ -26,36 +32,42 @@ const PromoToast = () => {
     localStorage?.setItem(LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST, 'true')
   }
 
-  if (!visible) {
-    return null
-  }
+  if (!visible) return null
 
   return (
     <div
       className={cn(
-        'opacity-0 translate-y-3 transition-all grid gap-4 fixed z-50 bottom-8 right-8 w-[80vw] sm:w-[350px] bg-alternative hover:bg-alternative border border-default rounded p-6 shadow-lg overflow-hidden',
+        'opacity-0 translate-y-3 transition-all grid gap-3 fixed z-50 bottom-4 right-4 sm:bottom-8 sm:right-8 w-[calc(100vw-2rem)] sm:w-[320px] bg-alternative hover:bg-alternative border border-default rounded p-6 shadow-lg overflow-hidden',
         visible && 'opacity-100 translate-y-0'
       )}
     >
-      <div className="relative z-10 text-foreground flex flex-col text-base w-1/2">
-        <div className="flex gap-1.5 items-center uppercase tracking-[0.5px]">
-          <p>Launch Week</p>
-          <Image src={LWXLogo} alt="Supabase Launch Week X Logo" width={14} height={14} />
-        </div>
-        <span className="text-sm leading-4 mt-2">11-15 Dec</span>
+      <p className="relative z-10 text-foreground flex flex-col text-2xl w-full leading-7">
+        <span className="text-foreground-lighter">Join us for a</span>
+        <span>Special Announcement</span>
+      </p>
+      <div className="relative z-10 text-foreground-lighter uppercase flex flex-col text-sm w-full font-mono mb-2">
+        <span>APRIL 15-19 / 7AM PT</span>
+        {/* <CountdownComponent date={new Date(announcement.launchDate)} showCard={false} /> */}
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
         <Button asChild type="secondary">
-          <Link target="_blank" rel="noreferrer" href="https://supabase.com/launch-week">
-            View announcements
+          <Link target="_blank" rel="noreferrer" href="https://supabase.com/special-announcement">
+            Claim your ticket
           </Link>
         </Button>
         <Button type="default" onClick={handleHide}>
           Dismiss
         </Button>
       </div>
-      <PromoBg className="absolute z-0 inset-0 w-full h-auto my-auto -right-5 left-auto" />
+      <Image
+        src={bgImage}
+        alt=""
+        fill
+        sizes="100%"
+        aria-hidden
+        className="absolute not-sr-only object-cover z-0 inset-0 w-full h-auto"
+      />
     </div>
   )
 }
