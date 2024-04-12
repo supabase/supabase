@@ -1,5 +1,5 @@
 import { isEqual } from 'lodash'
-import { useEffect, useLayoutEffect, useMemo, useReducer, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { useSnapshot } from 'valtio'
 
 import type { ICommand, ICommandSectionName, UseCommandOptions } from '../types'
