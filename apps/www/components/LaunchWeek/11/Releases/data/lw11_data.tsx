@@ -43,16 +43,16 @@ export interface StepProps {
 export interface WeekDayProps {
   id: string
   title: string
-  shipped: boolean
   date: string
-  published_at: string
-  isToday?: boolean
-  hasCountdown?: boolean
-  description: string | ReactNode
   d: number
   dd: string
-  links?: StepLink[]
-  videoId?: string
+  published_at: string
+  shipped: boolean // show card in layout
+  isToday?: boolean // current active day
+  hasCountdown?: boolean // use countdown only on "tomorrow"
+  description: string | ReactNode
+  links?: StepLink[] // types = 'productHunt' | 'video' | 'docs' | 'xSpace' | 'blog' | 'podcast'
+  videoId?: string // youtube id
   videoThumbnail?: string
   blog: string
   steps: StepProps[] | []

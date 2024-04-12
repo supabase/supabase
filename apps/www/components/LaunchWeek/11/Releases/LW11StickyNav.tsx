@@ -109,6 +109,7 @@ const LWXStickyNav: FC = () => {
                 height={24}
                 aria-hidden
                 className="w-auto h-4 shadow"
+                priority
               />
             </Link>
           </div>

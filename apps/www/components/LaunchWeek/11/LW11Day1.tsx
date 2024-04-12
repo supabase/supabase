@@ -40,6 +40,7 @@ const LW11Day1 = ({
           videoId=""
           imgUrl={day.videoThumbnail}
           imgOverlayText="Watch announcement"
+          priority
         />
         <p className="text-sm text-foreground">Supabase is ready for production use.</p>
       </div>

@@ -53,7 +53,7 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
               .from('lw11_meetups')
               .select('*')
               .neq('isPublished', false)
-            console.log('newMeets', newMeets)
+
             setMeets(
               newMeets?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1))!
             )

@@ -85,6 +85,7 @@ export default function Ticket() {
           onLoad={() => setImageHasLoaded(true)}
           loading="eager"
           fill
+          sizes="100%"
           className={cn(
             'absolute inset-0 object-cover object-right opacity-0 transition-opacity duration-1000',
             imageHasLoaded && 'opacity-100',

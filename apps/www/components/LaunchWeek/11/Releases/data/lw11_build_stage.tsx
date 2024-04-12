@@ -1,7 +1,9 @@
 // see apps/www/components/LaunchWeek/X/Releases/data/lwx_advent_days.tsx for reference
 
+import { ReactNode } from 'react'
+
 export interface AdventDay {
-  icon?: any
+  icon?: ReactNode // use svg jsx with 34x34px viewport
   className?: string
   id: string
   title: string
@@ -23,7 +25,7 @@ export const days: AdventDay[] = [
   {
     title: '',
     description: '',
-    icon: null, // Use square svg ~34x34px
+    icon: null,
     id: '',
     is_shipped: true,
     links: [

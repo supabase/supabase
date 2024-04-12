@@ -12,6 +12,7 @@ interface ExpandableVideoProps {
   imgAltText?: string
   trigger?: ReactNode
   onOpenCallback?: any
+  priority?: boolean
 }
 
 export function ExpandableVideo({
@@ -22,6 +23,7 @@ export function ExpandableVideo({
   imgAltText,
   trigger,
   onOpenCallback,
+  priority = false,
 }: ExpandableVideoProps) {
   const [expandVideo, setExpandVideo] = React.useState(false)
   const isMobile = useBreakpoint(768)
@@ -71,6 +73,8 @@ export function ExpandableVideo({
         src={imgUrl ?? '/images/blur.png'}
         alt={imgAltText ?? 'Video guide preview'}
         fill
+        sizes="100%"
+        priority={priority}
         className="absolute inset-0 object-cover blur-sm scale-105"
       />
     </div>

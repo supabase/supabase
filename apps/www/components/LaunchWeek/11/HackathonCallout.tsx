@@ -1,5 +1,7 @@
 import React from 'react'
 import { TextLink, cn } from 'ui'
+import CountdownComponent from './Countdown'
+import { LW11_LAUNCH_DATE_END } from '~/lib/constants'
 
 const HackathonCallout = ({ className }: { className?: string }) => {
   return (
@@ -10,12 +12,12 @@ const HackathonCallout = ({ className }: { className?: string }) => {
       )}
     >
       <div className="!text-foreground [&_*]:text-foreground text-sm flex flex-col sm:flex-row sm:items-center sm:gap-3">
-        Join the Hackathon
+        Hackathon ends in <CountdownComponent date={LW11_LAUNCH_DATE_END} showCard={false} />
       </div>
       <div className="!m-0 flex items-center">
         <TextLink
           label="Learn more"
-          url="/blog/supabase-hackathon-lw11"
+          url="/blog/supabase-oss-hackathon"
           target="_blank"
           hasChevron
           className="m-0"
