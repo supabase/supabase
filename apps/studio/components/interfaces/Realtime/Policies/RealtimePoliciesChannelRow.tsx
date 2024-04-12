@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  IconChevronDown,
   IconEdit,
   IconTrash,
 } from 'ui'
@@ -79,16 +80,31 @@ export const RealtimePoliciesChannelRow = ({
             <Antenna className="text-foreground-light w-4 h-4" />
             <h4 className="text-lg">{channel.name}</h4>
           </div>
-          <div className="flex space-x-1">
-            <Button type="outline" onClick={() => onSelectPolicyAdd('channels')}>
+          <div className="flex items-center">
+            <Button
+              type="default"
+              className="rounded-r-none"
+              onClick={() => onSelectPolicyAdd('channels')}
+            >
               New policy
             </Button>
-            <Button type="outline" onClick={() => onSelectPolicyAdd('broadcasts')}>
-              New broadcast policy
-            </Button>
-            <Button type="outline" onClick={() => onSelectPolicyAdd('presences')}>
-              New presence policy
-            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  type="default"
+                  className="rounded-l-none px-[4px] py-[5px]"
+                  icon={<IconChevronDown />}
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" side="bottom">
+                <DropdownMenuItem key="broadcast" onClick={() => onSelectPolicyAdd('broadcasts')}>
+                  New broadcast policy
+                </DropdownMenuItem>
+                <DropdownMenuItem key="presence" onClick={() => onSelectPolicyAdd('presences')}>
+                  New presence policy
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       }
