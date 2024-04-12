@@ -286,7 +286,7 @@ const ProjectLints: NextPageWithLayout = () => {
                   : null}
               </p> */}
         </div>
-        <div className="flex items-center gap-x-2">
+        {/* <div className="flex items-center gap-x-2">
           <Button asChild type="default" icon={<ExternalLink />}>
             <a href="https://supabase.github.io/splinter" target="_blank" rel="noreferrer">
               Documentation
@@ -300,7 +300,7 @@ const ProjectLints: NextPageWithLayout = () => {
           >
             Rerun linter
           </Button>
-        </div>
+        </div> */}
       </div>
 
       <ResizablePanelGroup
