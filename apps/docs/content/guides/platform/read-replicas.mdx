@@ -6,7 +6,7 @@ subtitle: 'Deploy additional read-only databases in multiple regions for your pr
 
 <Admonition type="note" label="Read Replicas are available to Pro, Team, and Enterprise organizations who have signed up for early access.">
 
-[Request early access](https://forms.supabase.com/read-replica) and you'll be notified once Read Replicas are available to your organization.
+We're in the process of opening up Read Replicas for all projects on the Teams and Enterprise plan that were created on or after 20th March, and progressively enabling it for additional groups afterwards. Please use the [early access form](https://forms.supabase.com/read-replica) if it's not enabled for you yet and you would like early access.
 
 </Admonition>
 
@@ -96,11 +96,17 @@ In the SQL editor, you can choose if you want to run the query on the Primary or
 
 When Read Replicas are deployed, an API load balancer becomes available for the project. An endpoint for it is provisioned and can be found [here](https://supabase.com/dashboard/project/_/settings/api).
 
-The load balancer uses a round-robin strategy to route `GET` requests to any of the API endpoints available, including that of the Primary database. Non-`GET` requests can also be sent through this endpoint. They are immediately redirected to the Primary database.
+The load balancer uses a round-robin strategy to route `GET` (i.e. read-only) requests to any of the API endpoints available, including that of the Primary database. Non-`GET` requests can also be sent through this endpoint, and will be routed to the Primary database. Read-only Postgres functions can be called using a [`GET` request](https://github.com/supabase/supabase-js/blob/v2.42.3/src/SupabaseClient.ts#L176-L177) as well.
 
-Similar to the Read Replica API endpoints, only requests to the REST API are available for now. Support for other Supabase products will become available once Read Replica support has been completed for them.
+Similar to the Read Replica API endpoints, only requests to the [REST API](https://supabase.com/docs/guides/api) are available for now. Support for other Supabase products will become available once Read Replica support has been completed for them.
 
-When a project no longer has any Read Replicas, the load balancer and its endpoint are brought down as well.
+When a project no longer has any Read Replicas, the load balancer and its endpoint are brought down as well, and will no longer service any requests.
+
+### Metrics
+
+Observability and metrics for Read Replicas are being worked on, and not currently available in the Supabase Dashboard.
+
+If you're ingesting your [project's metrics](https://supabase.com/docs/guides/platform/metrics#accessing-the-metrics-endpoint) into your own environment, you can update [your scraping setup](https://github.com/supabase/supabase-grafana?tab=readme-ov-file#read-replica-support) to additionally ingest metrics from your read replicas as well.
 
 ### Centralized configuration management
 
