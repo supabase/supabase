@@ -1,6 +1,15 @@
 import { sortBy } from 'lodash'
-import { Check, ExternalLink, Loader } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import {
+  Check,
+  ExternalLink,
+  Loader,
+  MessageSquareMore,
+  ArrowDown,
+  ArrowUp,
+  TextSearch,
+  X,
+} from 'lucide-react'
+import { useMemo, useState, useRef } from 'react'
 
 import { getHumanReadableTitle } from 'components/interfaces/Reports/ReportLints.utils'
 import ReportLintsTableRow from 'components/interfaces/Reports/ReportLintsTableRow'
@@ -12,14 +21,49 @@ import { FormHeader } from 'components/ui/Forms'
 import { LINT_TYPES, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks'
 import type { NextPageWithLayout } from 'types'
-import { Button, LoadingLine } from 'ui'
+import {
+  Button,
+  LoadingLine,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  cn,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+  TabsContent_Shadcn_,
+} from 'ui'
+import { InformationCircleIcon } from '@heroicons/react/16/solid'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import {
+  QUERY_PERFORMANCE_REPORT_TYPES,
+  QUERY_PERFORMANCE_REPORTS,
+} from '../../../../components/interfaces/QueryPerformanceV2/QueryPerformance.constants'
+import { useRouter } from 'next/router'
+import { useParams } from 'common'
+import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
+import { Column, Row, DataGridHandle } from 'react-data-grid'
+import DataGrid from 'react-data-grid'
+import { GenericSkeletonLoader } from 'ui-patterns'
+import { QueryDetail } from '../../../../components/interfaces/QueryPerformanceV2/QueryDetail'
+import { QueryIndexes } from '../../../../components/interfaces/QueryPerformanceV2/QueryIndexes'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
+  const router = useRouter()
+  const gridRef = useRef<DataGridHandle>(null)
+  const { preset } = useParams()
   const [filters, setFilters] = useState({
     levels: [] as string[],
     types: [] as string[],
   })
+
+  const [page, setPage] = useState<LINTER_LEVELS>((preset as LINTER_LEVELS) ?? LINTER_LEVELS.ERROR)
+  const [selectedRow, setSelectedRow] = useState<number>()
+  const [view, setView] = useState<'details' | 'suggestion'>('details')
   // const [lintIgnoreList] = useLocalStorageQuery<string[]>(
   //   LOCAL_STORAGE_KEYS.PROJECT_LINT_IGNORE_LIST,
   //   []
@@ -42,14 +86,17 @@ const ProjectLints: NextPageWithLayout = () => {
   // const [ignoredLints, activeLints] = partition(lints, (lint) =>
   //   lintIgnoreList.includes(lint.cache_key)
   // )
-  const filteredLints = useMemo(() => {
-    return activeLints
-      .filter((x) => (filters.levels.length > 0 ? filters.levels.includes(x.level) : x))
-      .filter((x) => (filters.types.length > 0 ? filters.types.includes(x.name) : x))
-  }, [activeLints, filters.levels, filters.types])
+  // const filteredLints = useMemo(() => {
+  //   return activeLints
+  //     .filter((x) => (filters.levels.length > 0 ? filters.levels.includes(x.level) : x))
+  //     .filter((x) => (filters.types.length > 0 ? filters.types.includes(x.name) : x))
+  // }, [activeLints, filters.levels, filters.types])
+
+  const filteredLints = activeLints.filter((x) => x.level === page)
 
   const warnLintsCount = activeLints.filter((x) => x.level === 'WARN').length
   const errorLintsCount = activeLints.filter((x) => x.level === 'ERROR').length
+  const infoLintsCount = activeLints.filter((x) => x.level === 'INFO').length
 
   const filterOptions = useMemo(() => {
     // only show filters for lint types which are present in the results and not ignored
@@ -61,122 +108,377 @@ const ProjectLints: NextPageWithLayout = () => {
     )
   }, [activeLints])
 
-  return (
-    <ScaffoldContainer>
-      <ScaffoldSection>
-        <div className="col-span-12">
-          <FormHeader
-            className="!mb-0"
-            title="Database Linter"
-            description="Identify common schema problems in your database."
-          />
-        </div>
+  const LINTER_TABS = [
+    {
+      id: LINTER_LEVELS.ERROR,
+      label: 'Errors',
+      description: 'Errors.....description',
+    },
+    {
+      id: LINTER_LEVELS.WARN,
+      label: 'Warnings ',
+      description: 'warning description',
+    },
+    {
+      id: LINTER_LEVELS.INFO,
+      label: 'Info ',
+      description: 'info description',
+    },
+  ]
 
-        <div className="col-span-12 flex items-center justify-between">
-          <div className="flex items-center gap-x-4">
+  const lintCols = [
+    { id: 'name', name: 'Issue type', description: undefined, minWidth: 200 },
+    { id: 'entity', name: 'Entity/item', description: undefined, minWidth: 200 },
+    { id: 'description', name: 'Description', description: undefined, minWidth: 400 },
+  ]
+  console.log(filteredLints)
+  const columns = lintCols.map((col) => {
+    const result: Column<any> = {
+      key: col.id,
+      name: col.name,
+      resizable: true,
+      minWidth: col.minWidth ?? 120,
+      headerCellClass: 'first:pl-6 cursor-pointer',
+      renderHeaderCell: () => {
+        return (
+          <div
+            className="flex items-center justify-between font-mono font-normal text-xs w-full"
+            //onClick={() => onSortChange(col.id)}
+          >
             <div className="flex items-center gap-x-2">
-              <p className="text-xs prose">Filter by</p>
-              <FilterPopover
-                name="Level"
-                options={[
-                  { name: 'Info', value: 'INFO' },
-                  { name: 'Warning', value: 'WARN' },
-                  { name: 'Error', value: 'ERROR' },
-                ]}
-                labelKey="name"
-                valueKey="value"
-                activeOptions={filters.levels}
-                onSaveFilters={(values) => setFilters({ ...filters, levels: values })}
-              />
-              <FilterPopover
-                name="Type"
-                options={filterOptions}
-                labelKey="name"
-                valueKey="value"
-                activeOptions={filters.types}
-                onSaveFilters={(values) => setFilters({ ...filters, types: values })}
-              />
+              <p className="!text-foreground">{col.name}</p>
+              {col.description && <p className="text-foreground-lighter">{col.description}</p>}
             </div>
-            <p className="text-foreground-light text-xs">
-              Identified {activeLints.length} problems{' '}
-              {warnLintsCount > 0 || errorLintsCount > 0
-                ? `(${errorLintsCount > 0 ? `${errorLintsCount} errors` : ''}${errorLintsCount > 0 && warnLintsCount > 0 ? ', ' : ''}${warnLintsCount > 0 ? `${warnLintsCount} warnings` : ''})`
-                : null}
-            </p>
           </div>
-          <div className="flex items-center gap-x-2">
-            <Button asChild type="default" icon={<ExternalLink />}>
-              <a href="https://supabase.github.io/splinter" target="_blank" rel="noreferrer">
-                Documentation
-              </a>
-            </Button>
-            <Button
-              type="primary"
-              disabled={isLoading || isRefetching}
-              loading={isLoading || isRefetching}
-              onClick={() => refetch()}
-            >
-              Rerun linter
-            </Button>
+        )
+      },
+      renderCell: (props) => {
+        const value = props.row?.[col.id]
+        //const isTime = col.name.includes('time')
+        // const formattedValue = isTime
+        //   ? `${Number(value.toFixed(2)).toLocaleString()}ms`
+        //   : value.toLocaleString()
+        return (
+          <div
+            className={cn(
+              'w-full flex flex-col justify-center font-mono text-xs',
+              typeof value === 'number' ? 'text-right' : ''
+            )}
+          >
+            {/* <p>{formattedValue}</p> */}
+            <span>{value}</span>
+            {/* {isTime && <p className="text-foreground-lighter">{(value / 1000).toFixed(2)}s</p>} */}
           </div>
-        </div>
+        )
+      },
+    }
+    return result
+  })
+  return (
+    <div>
+      <FormHeader
+        className="py-4 px-6 !mb-0"
+        title="Suggestions"
+        docsUrl="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
+      />
 
-        <div className="col-span-12">
-          <Table
-            head={[
-              <Table.th key="level" className="py-2">
-                Level
-              </Table.th>,
-              <Table.th key="header-type" className="py-2">
-                Problem
-              </Table.th>,
-              <Table.th key="header-expand" className="py-2 text-right"></Table.th>,
-            ]}
-            body={[
-              <Table.tr key="loader">
-                <Table.td colSpan={12} className="!p-0">
-                  <LoadingLine loading={isLoading || isRefetching} />
-                </Table.td>
-              </Table.tr>,
-              ...(activeLints.length === 0
+      <Tabs_Shadcn_
+        defaultValue={page}
+        onValueChange={(value) => {
+          setPage(value as LINTER_LEVELS)
+          const { sort, search, ...rest } = router.query
+          router.push({ ...router, query: { ...rest, preset: value } })
+        }}
+      >
+        <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10')}>
+          {LINTER_TABS.map((tab) => (
+            <TabsTrigger_Shadcn_
+              key={tab.id}
+              value={tab.id}
+              className={cn(
+                'group relative',
+                'px-6 py-3 border-b-0 flex flex-col items-start !shadow-none border-default border-t',
+                'even:border-x last:border-r even:!border-x-strong last:!border-r-strong',
+                tab.id === page ? '!bg-surface-200' : '!bg-surface-200/[33%]',
+                'hover:!bg-surface-100',
+                'data-[state=active]:!bg-surface-200',
+                'hover:text-foreground-light',
+                'transition'
+              )}
+            >
+              {tab.id === page && (
+                <div className="absolute top-0 left-0 w-full h-[1px] bg-foreground" />
+              )}
+
+              <div className="flex items-center gap-x-2">
+                <MessageSquareMore
+                  size={14}
+                  fill={
+                    tab.id === LINTER_LEVELS.ERROR
+                      ? 'red'
+                      : tab.id === LINTER_LEVELS.WARN
+                        ? 'orange'
+                        : 'green'
+                  }
+                  stroke="none"
+                />
+
+                <span className="">{tab.label}</span>
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
+                  </TooltipTrigger_Shadcn_>
+                  <TooltipContent_Shadcn_ side="top">{tab.description}</TooltipContent_Shadcn_>
+                </Tooltip_Shadcn_>
+              </div>
+
+              <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
+                {tab.id === LINTER_LEVELS.ERROR && `${errorLintsCount} errors`}
+                {tab.id === LINTER_LEVELS.WARN && `${warnLintsCount} suggestions`}
+                {tab.id === LINTER_LEVELS.INFO && `${infoLintsCount} suggestions`}
+              </span>
+
+              {tab.id === page && (
+                <div className="absolute bottom-0 left-0 w-full h-[1px] bg-surface-200"></div>
+              )}
+            </TabsTrigger_Shadcn_>
+          ))}
+        </TabsList_Shadcn_>
+      </Tabs_Shadcn_>
+
+      {/* <div className="col-span-12">
+            <FormHeader
+              className="!mb-0"
+              title="Database Linter"
+              description="Identify common schema problems in your database."
+            />
+          </div> */}
+
+      <div className="col-span-12 flex items-center justify-between">
+        <div className="flex items-center gap-x-4">
+          {/* <div className="flex items-center gap-x-2">
+                <p className="text-xs prose">Filter by</p>
+                <FilterPopover
+                  name="Level"
+                  options={[
+                    { name: 'Info', value: 'INFO' },
+                    { name: 'Warning', value: 'WARN' },
+                    { name: 'Error', value: 'ERROR' },
+                  ]}
+                  labelKey="name"
+                  valueKey="value"
+                  activeOptions={filters.levels}
+                  onSaveFilters={(values) => setFilters({ ...filters, levels: values })}
+                />
+                <FilterPopover
+                  name="Type"
+                  options={filterOptions}
+                  labelKey="name"
+                  valueKey="value"
+                  activeOptions={filters.types}
+                  onSaveFilters={(values) => setFilters({ ...filters, types: values })}
+                />
+              </div> */}
+          {/* <p className="text-foreground-light text-xs">
+                Identified {activeLints.length} problems{' '}
+                {warnLintsCount > 0 || errorLintsCount > 0
+                  ? `(${errorLintsCount > 0 ? `${errorLintsCount} errors` : ''}${errorLintsCount > 0 && warnLintsCount > 0 ? ', ' : ''}${warnLintsCount > 0 ? `${warnLintsCount} warnings` : ''})`
+                  : null}
+              </p> */}
+        </div>
+        <div className="flex items-center gap-x-2">
+          <Button asChild type="default" icon={<ExternalLink />}>
+            <a href="https://supabase.github.io/splinter" target="_blank" rel="noreferrer">
+              Documentation
+            </a>
+          </Button>
+          <Button
+            type="primary"
+            disabled={isLoading || isRefetching}
+            loading={isLoading || isRefetching}
+            onClick={() => refetch()}
+          >
+            Rerun linter
+          </Button>
+        </div>
+      </div>
+
+      <ResizablePanelGroup
+        direction="horizontal"
+        className="relative flex flex-grow bg-alternative min-h-0"
+        autoSaveId="query-performance-layout-v1"
+      >
+        <ResizablePanel defaultSize={1}>
+          <DataGrid
+            ref={gridRef}
+            style={{ height: '100%' }}
+            className={cn('flex-1 flex-grow h-full')}
+            rowHeight={44}
+            headerRowHeight={36}
+            columns={columns}
+            rows={filteredLints ?? []}
+            rowClass={(_, idx) => {
+              const isSelected = idx === selectedRow
+              return [
+                `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
+                `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
+                '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+                '[&>.rdg-cell:first-child>div]:ml-4',
+              ].join(' ')
+            }}
+            renderers={{
+              renderRow(idx, props) {
+                return (
+                  <Row
+                    {...props}
+                    // onClick={() => {
+                    //   if (typeof idx === 'number' && idx >= 0) {
+                    //     setSelectedRow(idx)
+                    //     gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+
+                    //     const selectedQuery = queryPerformanceQuery.data[idx]['query']
+                    //     if (!(selectedQuery ?? '').trim().toLowerCase().startsWith('select')) {
+                    //       setView('details')
+                    //     }
+                    //   }
+                    // }}
+                  />
+                )
+              },
+              noRowsFallback: isLoading ? (
+                <div className="absolute top-14 px-6 w-full">
+                  <GenericSkeletonLoader />
+                </div>
+              ) : (
+                <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
+                  <TextSearch className="text-foreground-muted" strokeWidth={1} />
+                  <div className="text-center">
+                    <p className="text-foreground">No queries detected</p>
+                    <p className="text-foreground-light">
+                      There are no actively running queries that match the criteria
+                    </p>
+                  </div>
+                </div>
+              ),
+            }}
+          />
+        </ResizablePanel>
+        {selectedRow !== undefined && (
+          <>
+            <ResizableHandle withHandle />
+            <ResizablePanel
+              defaultSize={30}
+              maxSize={45}
+              minSize={30}
+              className="bg-studio border-t"
+            >
+              <Button
+                type="text"
+                className="absolute top-3 right-3 px-1"
+                icon={<X size={14} />}
+                onClick={() => setSelectedRow(undefined)}
+              />
+              <Tabs_Shadcn_
+                value={view}
+                className="flex flex-col h-full"
+                onValueChange={(value: any) => setView(value)}
+              >
+                <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[46px]">
+                  <TabsTrigger_Shadcn_
+                    value="details"
+                    className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent !shadow-none"
+                  >
+                    Query details
+                  </TabsTrigger_Shadcn_>
+                  {/* {showIndexSuggestions && (
+                        <TabsTrigger_Shadcn_
+                          value="suggestion"
+                          className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent !shadow-none"
+                        >
+                          Indexes
+                        </TabsTrigger_Shadcn_>
+                      )} */}
+                </TabsList_Shadcn_>
+                <TabsContent_Shadcn_
+                  value="details"
+                  className="mt-0 flex-grow min-h-0 overflow-y-auto"
+                >
+                  hello again
+                  {/* <QueryDetail
+                        reportType={reportType}
+                        selectedRow={queryPerformanceQuery.data?.[selectedRow]}
+                        onClickViewSuggestion={() => setView('suggestion')}
+                      /> */}
+                </TabsContent_Shadcn_>
+                <TabsContent_Shadcn_
+                  value="suggestion"
+                  className="mt-0 flex-grow min-h-0 overflow-y-auto"
+                >
+                  hello
+                  {/* <QueryIndexes selectedRow={queryPerformanceQuery.data?.[selectedRow]} /> */}
+                </TabsContent_Shadcn_>
+              </Tabs_Shadcn_>
+            </ResizablePanel>
+          </>
+        )}
+      </ResizablePanelGroup>
+
+      <div className="col-span-12">
+        <Table
+          head={[
+            <Table.th key="level" className="py-2">
+              Level
+            </Table.th>,
+            <Table.th key="header-type" className="py-2">
+              Problem
+            </Table.th>,
+            <Table.th key="header-expand" className="py-2 text-right"></Table.th>,
+          ]}
+          body={[
+            <Table.tr key="loader">
+              <Table.td colSpan={12} className="!p-0">
+                <LoadingLine loading={isLoading || isRefetching} />
+              </Table.td>
+            </Table.tr>,
+            ...(activeLints.length === 0
+              ? [
+                  <Table.tr key="empty-state">
+                    <Table.td colSpan={6} className="p-3 py-12">
+                      {isLoading ? (
+                        <div className="flex items-center gap-x-2">
+                          <Loader className="animate-spin" size={12} />
+                          <p className="text-foreground-light">Checking database for issues...</p>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-x-2">
+                          <Check size={12} />
+                          <p className="text-foreground-light">
+                            No issues have been found for this database
+                          </p>
+                        </div>
+                      )}
+                    </Table.td>
+                  </Table.tr>,
+                ]
+              : (filters.levels.length > 0 || filters.types.length > 0) &&
+                  filteredLints.length === 0
                 ? [
                     <Table.tr key="empty-state">
                       <Table.td colSpan={6} className="p-3 py-12">
-                        {isLoading ? (
-                          <div className="flex items-center gap-x-2">
-                            <Loader className="animate-spin" size={12} />
-                            <p className="text-foreground-light">Checking database for issues...</p>
-                          </div>
-                        ) : (
-                          <div className="flex items-center gap-x-2">
-                            <Check size={12} />
-                            <p className="text-foreground-light">
-                              No issues have been found for this database
-                            </p>
-                          </div>
-                        )}
+                        <p className="text-foreground-light">
+                          No problems found based on the selected filters
+                        </p>
                       </Table.td>
                     </Table.tr>,
                   ]
-                : (filters.levels.length > 0 || filters.types.length > 0) &&
-                    filteredLints.length === 0
-                  ? [
-                      <Table.tr key="empty-state">
-                        <Table.td colSpan={6} className="p-3 py-12">
-                          <p className="text-foreground-light">
-                            No problems found based on the selected filters
-                          </p>
-                        </Table.td>
-                      </Table.tr>,
-                    ]
-                  : filteredLints.map((lint) => {
-                      return <ReportLintsTableRow key={lint.cache_key} lint={lint} />
-                    })),
-            ]}
-          />
-        </div>
+                : filteredLints.map((lint) => {
+                    return <ReportLintsTableRow key={lint.cache_key} lint={lint} />
+                  })),
+          ]}
+        />
+      </div>
 
-        {/* {ignoredLints.length > 0 && (
+      {/* {ignoredLints.length > 0 && (
           <div className="col-span-12 flex flex-col text-sm max-w-none gap-8 py-4">
             <Accordion_Shadcn_ type="single" collapsible>
               <AccordionItem_Shadcn_ value="1" className="border-none">
@@ -217,8 +519,7 @@ const ProjectLints: NextPageWithLayout = () => {
             </Accordion_Shadcn_>
           </div>
         )} */}
-      </ScaffoldSection>
-    </ScaffoldContainer>
+    </div>
   )
 }
 

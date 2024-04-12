@@ -61,7 +61,8 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
           <div>
             <div className="flex items-center gap-x-2">
               <span className="text-foreground flex items-center gap-2">
-                {getLintIcon(lint.name)}
+                {/* {getLintIcon(lint.name)} */}
+                -icon-
                 {getHumanReadableTitle(lint.name)}
               </span>
               <Tooltip_Shadcn_>
