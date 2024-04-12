@@ -8,6 +8,9 @@ import {
   ArrowUp,
   TextSearch,
   X,
+  IceCream,
+  Table2,
+  Eye,
 } from 'lucide-react'
 import { useMemo, useState, useRef } from 'react'
 
@@ -18,7 +21,7 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms'
-import { LINT_TYPES, useProjectLintsQuery } from 'data/lint/lint-query'
+import { LINT_TYPES, Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks'
 import type { NextPageWithLayout } from 'types'
 import {
@@ -50,6 +53,7 @@ import DataGrid from 'react-data-grid'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { QueryDetail } from '../../../../components/interfaces/QueryPerformanceV2/QueryDetail'
 import { QueryIndexes } from '../../../../components/interfaces/QueryPerformanceV2/QueryIndexes'
+import { getLintIcon } from '../../../../components/interfaces/Reports/ReportLints.utils'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -63,6 +67,7 @@ const ProjectLints: NextPageWithLayout = () => {
 
   const [page, setPage] = useState<LINTER_LEVELS>((preset as LINTER_LEVELS) ?? LINTER_LEVELS.ERROR)
   const [selectedRow, setSelectedRow] = useState<number>()
+  const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
   const [view, setView] = useState<'details' | 'suggestion'>('details')
   // const [lintIgnoreList] = useLocalStorageQuery<string[]>(
   //   LOCAL_STORAGE_KEYS.PROJECT_LINT_IGNORE_LIST,
@@ -91,7 +96,7 @@ const ProjectLints: NextPageWithLayout = () => {
   //     .filter((x) => (filters.levels.length > 0 ? filters.levels.includes(x.level) : x))
   //     .filter((x) => (filters.types.length > 0 ? filters.types.includes(x.name) : x))
   // }, [activeLints, filters.levels, filters.types])
-
+  console.log({ activeLints })
   const filteredLints = activeLints.filter((x) => x.level === page)
 
   const warnLintsCount = activeLints.filter((x) => x.level === 'WARN').length
@@ -127,9 +132,37 @@ const ProjectLints: NextPageWithLayout = () => {
   ]
 
   const lintCols = [
-    { id: 'name', name: 'Issue type', description: undefined, minWidth: 200 },
-    { id: 'entity', name: 'Entity/item', description: undefined, minWidth: 200 },
-    { id: 'description', name: 'Description', description: undefined, minWidth: 400 },
+    {
+      id: 'name',
+      name: 'Issue type',
+      description: undefined,
+      minWidth: 200,
+      value: (row: any) => (
+        <div className="flex items-center gap-1.5">
+          {getLintIcon(row.name)} {getHumanReadableTitle(row.name)}
+        </div>
+      ),
+    },
+    {
+      id: 'metadata.name',
+      name: 'Entity/item',
+      description: undefined,
+      minWidth: 200,
+      value: (row: any) => (
+        <div className="flex items-center gap-1">
+          {row.metadata?.type === 'table' && <Table2 size={15} strokeWidth={1} />}
+          {row.metadata?.type === 'view' && <Eye size={15} strokeWidth={1.5} />}{' '}
+          {`${row.metadata.schema}.${row.metadata.name}`}
+        </div>
+      ),
+    },
+    {
+      id: 'description',
+      name: 'Description',
+      description: undefined,
+      minWidth: 400,
+      value: (row: any) => row.description,
+    },
   ]
   console.log(filteredLints)
   const columns = lintCols.map((col) => {
@@ -141,10 +174,7 @@ const ProjectLints: NextPageWithLayout = () => {
       headerCellClass: 'first:pl-6 cursor-pointer',
       renderHeaderCell: () => {
         return (
-          <div
-            className="flex items-center justify-between font-mono font-normal text-xs w-full"
-            //onClick={() => onSortChange(col.id)}
-          >
+          <div className="flex items-center justify-between font-mono font-normal text-xs w-full">
             <div className="flex items-center gap-x-2">
               <p className="!text-foreground">{col.name}</p>
               {col.description && <p className="text-foreground-lighter">{col.description}</p>}
@@ -153,11 +183,8 @@ const ProjectLints: NextPageWithLayout = () => {
         )
       },
       renderCell: (props) => {
-        const value = props.row?.[col.id]
-        //const isTime = col.name.includes('time')
-        // const formattedValue = isTime
-        //   ? `${Number(value.toFixed(2)).toLocaleString()}ms`
-        //   : value.toLocaleString()
+        const value = col.value(props.row)
+
         return (
           <div
             className={cn(
@@ -165,9 +192,7 @@ const ProjectLints: NextPageWithLayout = () => {
               typeof value === 'number' ? 'text-right' : ''
             )}
           >
-            {/* <p>{formattedValue}</p> */}
             <span>{value}</span>
-            {/* {isTime && <p className="text-foreground-lighter">{(value / 1000).toFixed(2)}s</p>} */}
           </div>
         )
       },
@@ -186,6 +211,7 @@ const ProjectLints: NextPageWithLayout = () => {
         defaultValue={page}
         onValueChange={(value) => {
           setPage(value as LINTER_LEVELS)
+          setSelectedLint(null)
           const { sort, search, ...rest } = router.query
           router.push({ ...router, query: { ...rest, preset: value } })
         }}
@@ -234,7 +260,7 @@ const ProjectLints: NextPageWithLayout = () => {
 
               <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
                 {tab.id === LINTER_LEVELS.ERROR && `${errorLintsCount} errors`}
-                {tab.id === LINTER_LEVELS.WARN && `${warnLintsCount} suggestions`}
+                {tab.id === LINTER_LEVELS.WARN && `${warnLintsCount} warnings`}
                 {tab.id === LINTER_LEVELS.INFO && `${infoLintsCount} suggestions`}
               </span>
 
@@ -328,20 +354,22 @@ const ProjectLints: NextPageWithLayout = () => {
             }}
             renderers={{
               renderRow(idx, props) {
+                console.log({ props })
                 return (
                   <Row
                     {...props}
-                    // onClick={() => {
-                    //   if (typeof idx === 'number' && idx >= 0) {
-                    //     setSelectedRow(idx)
-                    //     gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
+                    onClick={() => {
+                      if (typeof idx === 'number' && idx >= 0) {
+                        setSelectedRow(idx)
+                        setSelectedLint(props.row)
+                        gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
 
-                    //     const selectedQuery = queryPerformanceQuery.data[idx]['query']
-                    //     if (!(selectedQuery ?? '').trim().toLowerCase().startsWith('select')) {
-                    //       setView('details')
-                    //     }
-                    //   }
-                    // }}
+                        // const selectedLint = activeLints[idx]['query']
+                        // if (!(selectedLint ?? '').trim().toLowerCase().startsWith('select')) {
+                        //   setView('details')
+                        // }
+                      }
+                    }}
                   />
                 )
               },
@@ -363,7 +391,7 @@ const ProjectLints: NextPageWithLayout = () => {
             }}
           />
         </ResizablePanel>
-        {selectedRow !== undefined && (
+        {selectedLint !== null && (
           <>
             <ResizableHandle withHandle />
             <ResizablePanel
@@ -376,26 +404,28 @@ const ProjectLints: NextPageWithLayout = () => {
                 type="text"
                 className="absolute top-3 right-3 px-1"
                 icon={<X size={14} />}
-                onClick={() => setSelectedRow(undefined)}
+                onClick={() => setSelectedLint(null)}
               />
               <Tabs_Shadcn_
                 value={view}
                 className="flex flex-col h-full"
-                onValueChange={(value: any) => setView(value)}
+                onValueChange={(value: any) => {
+                  setView(value)
+                }}
               >
                 <TabsList_Shadcn_ className="px-5 flex gap-x-4 min-h-[46px]">
                   <TabsTrigger_Shadcn_
                     value="details"
                     className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent !shadow-none"
                   >
-                    Query details
+                    Overview {selectedRow}
                   </TabsTrigger_Shadcn_>
                   {/* {showIndexSuggestions && (
                         <TabsTrigger_Shadcn_
                           value="suggestion"
                           className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent !shadow-none"
                         >
-                          Indexes
+                          Autofix
                         </TabsTrigger_Shadcn_>
                       )} */}
                 </TabsList_Shadcn_>
@@ -403,12 +433,18 @@ const ProjectLints: NextPageWithLayout = () => {
                   value="details"
                   className="mt-0 flex-grow min-h-0 overflow-y-auto"
                 >
-                  hello again
+                  {selectedLint && (
+                    <div className={cn('py-4 px-4 grid')}>
+                      <h3>{getHumanReadableTitle(selectedLint.name)}</h3>
+                      <p>{selectedLint.description}</p>
+                    </div>
+                  )}
+
                   {/* <QueryDetail
-                        reportType={reportType}
-                        selectedRow={queryPerformanceQuery.data?.[selectedRow]}
-                        onClickViewSuggestion={() => setView('suggestion')}
-                      /> */}
+                    reportType={QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT}
+                    selectedRow={activeLints[selectedRow]}
+                    onClickViewSuggestion={() => setView('suggestion')}
+                  /> */}
                 </TabsContent_Shadcn_>
                 <TabsContent_Shadcn_
                   value="suggestion"
@@ -423,7 +459,7 @@ const ProjectLints: NextPageWithLayout = () => {
         )}
       </ResizablePanelGroup>
 
-      <div className="col-span-12">
+      <div className="col-span-12 hidden">
         <Table
           head={[
             <Table.th key="level" className="py-2">

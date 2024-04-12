@@ -1,5 +1,5 @@
 import { LINT_TYPES, Lint } from 'data/lint/lint-query'
-import { Book, Key, LinkIcon, Lock, User } from 'lucide-react'
+import { AlertCircle, Book, Key, LinkIcon, Lock, User } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 
@@ -44,18 +44,29 @@ export function getLintIcon(title: LINT_TYPES) {
     case 'unindexed_foreign_keys':
       return <Key size={15} strokeWidth={1.5} />
     case 'auth_users_exposed':
-      return <User size={15} strokeWidth={1.5} />
-    case 'auth_rls_initplan':
       return <Lock size={15} strokeWidth={1.5} />
-    case 'no_primary_key':
-      return <Key size={15} strokeWidth={1.5} />
-    case 'unused_index':
-      return <LinkIcon size={15} strokeWidth={1.5} />
-    case 'multiple_permissive_policies':
-      return <LinkIcon size={15} strokeWidth={1.5} />
+    // case 'auth_rls_initplan':
+    //   return <LinkIcon size={15} strokeWidth={1.5} />
+    // case 'no_primary_key':
+    //   return <LinkIcon size={15} strokeWidth={1.5} />
+    // case 'unused_index':
+    //   return <LinkIcon size={15} strokeWidth={1.5} />
+    // case 'multiple_permissive_policies':
+    //   return <LinkIcon size={15} strokeWidth={1.5} />
+    // case 'function_search_path_mutable':
+    //   return <LinkIcon size={15} strokeWidth={1.5} />
+    // case 'rls_enabled_no_policy':
+    //   return <LinkIcon size={15} strokeWidth={1.5} />
+    // case 'policy_exists_rls_disabled':
+    //   return <LinkIcon size={15} strokeWidth={1.5} />
+    // case 'rls_disabled_in_public':
+    //   return <LinkIcon size={15} strokeWidth={1.5} />
+    // case 'security_definer_view':
+    //   return <LinkIcon size={15} strokeWidth={1.5} />
+    // case 'duplicate_index':
+    //   return <LinkIcon size={15} strokeWidth={1.5} />
     default:
-      assertUnreachable(title)
-      throw new Error('This case should never be reached')
+      return <AlertCircle size={15} strokeWidth={1.5} />
   }
 }
 
