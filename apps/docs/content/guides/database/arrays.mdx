@@ -73,6 +73,30 @@ const { data, error } = await supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Insert a record from the Swift client:
+
+```swift
+struct ArrayTest: Encodable {
+  let id: Int
+  let textarray: [String]
+}
+
+try await supabase
+  .from("arraytest")
+  .insert(
+    [
+      ArrayTest(
+        id: 2,
+        textarray: ["one", "two", "three", "four"]
+      )
+    ]
+  )
+  .execute()
+```
+
+</TabPanel>
 </Tabs>
 
 ## View the results
@@ -153,6 +177,30 @@ returns:
   {
     textarray: ['Harry', 'Larry', 'Moe'],
   },
+]
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+This returns the entire array field:
+
+```swift
+struct Response: Decodable {
+  let textarray: [String]
+}
+
+let response: [Response] = try await supabase.from("arraytest").select("textarray").execute().value
+dump(response)
+```
+
+returns:
+
+```
+[
+  Response(
+    textarray: ["Harry", "Larry", "Moe"],
+  )
 ]
 ```
 

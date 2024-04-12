@@ -8,8 +8,9 @@ const useRerenderOnEvt = (event: string, listeningElem?: Document | Window | HTM
   const [, rerender] = useReducer((state) => !state, true)
 
   useEffect(() => {
-    ;(listeningElem ?? window).addEventListener(event, rerender)
-    return () => (listeningElem ?? window).removeEventListener(event, rerender)
+    const elem = listeningElem ?? window
+    elem.addEventListener(event, rerender)
+    return () => elem.removeEventListener(event, rerender)
   }, [event, listeningElem, rerender])
 }
 

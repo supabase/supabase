@@ -55,19 +55,32 @@ const GuidesTableOfContents = ({
   useEffect(() => {
     if (overrideToc) return
 
-    const headings = Array.from(
-      document.querySelector('#sb-docs-guide-main-article')?.querySelectorAll('h2, h3') ?? []
-    )
-    const newHeadings = headings
-      .filter((heading) => heading.id)
-      .map((heading) => {
-        const text = heading.textContent.replace('#', '')
-        const link = heading.querySelector('a').getAttribute('href')
-        const level = heading.tagName === 'H2' ? 2 : 3
-        return { text, link, level }
-      })
-    setTocList(newHeadings)
-  }, [pathname]) // needed to recalculate the toc when path changes
+    /**
+     * Because we're directly querying the DOM, needs the setTimeout so the DOM
+     * update will happen first.
+     */
+    const timeoutHandle = setTimeout(() => {
+      const headings = Array.from(
+        document.querySelector('#sb-docs-guide-main-article')?.querySelectorAll('h2, h3') ?? []
+      )
+      const newHeadings = headings
+        .filter((heading) => heading.id)
+        .map((heading) => {
+          const text = heading.textContent.replace('#', '')
+          const link = heading.querySelector('a').getAttribute('href')
+          const level = heading.tagName === 'H2' ? 2 : 3
+          return { text, link, level }
+        })
+      setTocList(newHeadings)
+    })
+
+    return () => clearTimeout(timeoutHandle)
+    /**
+     * window.location.href needed to recalculate toc when page changes,
+     * useRerenderOnEvt below will guarantee rerender on change
+     */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [overrideToc, typeof window !== 'undefined' && window.location.href])
 
   useEffect(() => {
     if (hash && displayedList.length > 0) {

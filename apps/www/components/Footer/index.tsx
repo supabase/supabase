@@ -61,16 +61,20 @@ const Footer = (props: Props) => {
           <div className="space-y-8 xl:col-span-1">
             <Link href="#" as="/" className="w-40">
               <Image
-                src={
-                  forceDark
-                    ? supabaseLogoWordmarkDark
-                    : resolvedTheme?.includes('dark')
-                      ? supabaseLogoWordmarkDark
-                      : supabaseLogoWordmarkLight
-                }
+                src={supabaseLogoWordmarkLight}
                 width={160}
                 height={30}
-                alt="Supabase"
+                alt="Supabase Logo"
+                className="dark:hidden"
+                priority
+              />
+              <Image
+                src={supabaseLogoWordmarkDark}
+                width={160}
+                height={30}
+                alt="Supabase Logo"
+                className="hidden dark:block"
+                priority
               />
             </Link>
             <div className="flex space-x-5">

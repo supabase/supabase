@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Badge, Button, IconExternalLink, IconUsers, Input, Listbox } from 'ui'
+import { Badge, Button, IconExternalLink, IconUsers, Input, Listbox, Separator } from 'ui'
 
 import {
   FreeProjectLimitWarning,
@@ -300,11 +300,16 @@ const Wizard: NextPageWithLayout = () => {
 
   return (
     <Panel
-      hideHeaderStyling
       loading={!isOrganizationsSuccess || isLoadingFreeProjectLimitCheck}
       title={
         <div key="panel-title">
           <h3>Create a new project</h3>
+          <p className="text-sm text-foreground-lighter">
+            Your project will have its own dedicated instance and full postgres database.
+            <br />
+            An API will be set up so you can easily interact with your new database.
+            <br />
+          </p>
         </div>
       }
       footer={
@@ -334,26 +339,13 @@ const Wizard: NextPageWithLayout = () => {
       }
     >
       <>
-        <Panel.Content className="pt-0 pb-6">
-          <p className="text-sm text-foreground-lighter">
-            Your project will have its own dedicated instance and full postgres database.
-            <br />
-            An API will be set up so you can easily interact with your new database.
-            <br />
-          </p>
-        </Panel.Content>
         {projectCreationDisabled ? (
-          <Panel.Content className="pb-8 border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
+          <Panel.Content className="pb-8">
             <DisabledWarningDueToIncident title="Project creation is currently disabled" />
           </Panel.Content>
         ) : (
-          <>
-            <Panel.Content
-              className={[
-                'space-y-4 border-t border-b',
-                'border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark',
-              ].join(' ')}
-            >
+          <div className="divide-y divide-border-muted">
+            <Panel.Content className={['space-y-4'].join(' ')}>
               {(organizations?.length ?? 0) > 0 && (
                 <Listbox
                   label="Organization"
@@ -379,12 +371,7 @@ const Wizard: NextPageWithLayout = () => {
 
             {canCreateProject && (
               <>
-                <Panel.Content
-                  className={[
-                    'border-b',
-                    'border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark',
-                  ].join(' ')}
-                >
+                <Panel.Content>
                   <Input
                     id="project-name"
                     layout="horizontal"
@@ -398,12 +385,7 @@ const Wizard: NextPageWithLayout = () => {
                 </Panel.Content>
 
                 {showNonProdFields && (
-                  <Panel.Content
-                    className={[
-                      'border-b',
-                      'border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark',
-                    ].join(' ')}
-                  >
+                  <Panel.Content>
                     <Input
                       id="custom-postgres-version"
                       layout="horizontal"
@@ -425,12 +407,7 @@ const Wizard: NextPageWithLayout = () => {
                 )}
 
                 {cloudProviderEnabled && showNonProdFields && (
-                  <Panel.Content
-                    className={[
-                      'border-b',
-                      'border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark',
-                    ].join(' ')}
-                  >
+                  <Panel.Content>
                     <Listbox
                       layout="horizontal"
                       label="Cloud Provider"
@@ -453,12 +430,7 @@ const Wizard: NextPageWithLayout = () => {
                 )}
 
                 {orgSubscription?.plan.id !== 'free' && (
-                  <Panel.Content
-                    className={[
-                      'border-b',
-                      'border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark',
-                    ].join(' ')}
-                  >
+                  <Panel.Content>
                     <Listbox
                       layout="horizontal"
                       label={
@@ -537,7 +509,7 @@ const Wizard: NextPageWithLayout = () => {
                   </Panel.Content>
                 )}
 
-                <Panel.Content className="border-b border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
+                <Panel.Content>
                   <Input
                     id="password"
                     copy={dbPass.length > 0}
@@ -559,7 +531,7 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content className="border-b border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
+                <Panel.Content>
                   <RegionSelector
                     cloudProvider={cloudProvider}
                     selectedRegion={dbRegion}
@@ -569,19 +541,15 @@ const Wizard: NextPageWithLayout = () => {
               </>
             )}
 
-            {isAdmin && (
+            {isAdmin && freePlanWithExceedingLimits && slug && (
               <Panel.Content>
-                {freePlanWithExceedingLimits && slug && (
-                  <div className="mt-4">
-                    <FreeProjectLimitWarning
-                      membersExceededLimit={membersExceededLimit || []}
-                      orgSlug={slug}
-                    />
-                  </div>
-                )}
+                <FreeProjectLimitWarning
+                  membersExceededLimit={membersExceededLimit || []}
+                  orgSlug={slug}
+                />
               </Panel.Content>
             )}
-          </>
+          </div>
         )}
       </>
     </Panel>
