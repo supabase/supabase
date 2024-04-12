@@ -21,6 +21,11 @@ Deno.serve(async (req) => {
   const payload: WebhookPayload = await req.json();
   const { content, id } = payload.record;
 
+  // Check if content has changed.
+  if (content === payload?.old_record?.content) {
+    return new Response("ok - no change");
+  }
+
   // Generate embedding
   const embedding = await model.run(content, {
     mean_pool: true,
@@ -34,5 +39,5 @@ Deno.serve(async (req) => {
   );
   if (error) console.warn(error.message);
 
-  return new Response("ok");
+  return new Response("ok - updated");
 });
