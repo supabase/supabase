@@ -1,6 +1,5 @@
 import type { Route } from 'components/ui/ui.types'
 import type { Project } from 'data/projects/project-detail-query'
-import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import {
   Auth,
   Database,
@@ -11,8 +10,9 @@ import {
   Storage,
   TableEditor,
 } from 'icons'
+import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
+import { FileText, List, Settings } from 'lucide-react'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from './NavigationBar'
-import { Settings, FileText, List } from 'lucide-react'
 
 export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -91,7 +91,7 @@ export const generateProductRoutes = (
             key: 'realtime',
             label: 'Realtime',
             icon: <Realtime size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/realtime/inspector`),
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/realtime/policies`),
           },
         ]
       : []),

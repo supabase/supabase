@@ -1,4 +1,3 @@
-import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
 import { withAuth } from 'hooks'
@@ -10,8 +9,6 @@ export interface RealtimeLayoutProps {
 }
 
 const RealtimeLayout = ({ children }: PropsWithChildren<RealtimeLayoutProps>) => {
-  const router = useRouter()
-
   return (
     <ProjectLayout title="Realtime" product="Realtime" productMenu={<RealtimeMenu />}>
       {children}
