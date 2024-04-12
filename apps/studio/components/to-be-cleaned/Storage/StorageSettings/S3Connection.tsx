@@ -1,8 +1,8 @@
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FormHeader } from 'components/ui/Forms'
-import { useStorageCredentialsCreateMutation } from 'data/storage/storage-credentials-create-mutation'
-import { useStorageCredentialsQuery } from 'data/storage/storage-credentials-query'
+import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
+import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import React from 'react'
 import toast from 'react-hot-toast'
 import {
@@ -18,17 +18,18 @@ import {
   DropdownMenuTrigger,
   IconMoreVertical,
   IconTrash,
-  Input,
-  Label_Shadcn_,
   cn,
 } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+
 import Table from 'components/to-be-cleaned/Table'
 import Panel from 'components/ui/Panel'
-import { useStorageCredentialsDeleteMutation } from 'data/storage/storage-credentials-delete-mutation'
+import { useS3AccessKeyDeleteMutation } from 'data/storage/s3-access-key-delete-mutation'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import CopyButton from 'components/ui/CopyButton'
 import { differenceInDays } from 'date-fns'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export const S3Connection = () => {
   const [openCreateCred, setOpenCreateCred] = React.useState(false)
@@ -45,11 +46,11 @@ export const S3Connection = () => {
 
   const hasStorageCreds = storageCreds?.data && storageCreds.data.length > 0
 
-  const createStorageCreds = useStorageCredentialsCreateMutation({
+  const createS3AccessKey = useS3AccessKeyCreateMutation({
     projectRef,
   })
 
-  const deleteStorageCreds = useStorageCredentialsDeleteMutation({
+  const deleteS3AccessKey = useS3AccessKeyDeleteMutation({
     projectRef,
   })
 
@@ -68,34 +69,22 @@ export const S3Connection = () => {
   const s3connectionUrl = getConnectionURL()
 
   return (
-    <div>
-      <section>
+    <>
+      <div>
         <FormHeader title="S3 Connection" description="Connect directly to your bucket." />
         <Panel className="grid gap-4 p-4">
-          <Input
-            className="input-mono"
-            layout="horizontal"
-            readOnly
-            copy
-            disabled
-            value={s3connectionUrl}
-            label="Storage URL"
-          />
+          <FormItemLayout layout="horizontal" label="Storage URL" isReactForm={false}>
+            <Input readOnly copy disabled value={s3connectionUrl} />
+          </FormItemLayout>
           {projectIsLoading ? (
             <></>
           ) : (
-            <Input
-              className="input-mono"
-              layout="horizontal"
-              readOnly
-              copy
-              disabled
-              value={project?.region}
-              label="Region"
-            />
+            <FormItemLayout layout="horizontal" label="Region" isReactForm={false}>
+              <Input className="input-mono" copy disabled value={project?.region} />
+            </FormItemLayout>
           )}
         </Panel>
-      </section>
+      </div>
       <div className="flex justify-between items-end mt-8">
         <FormHeader
           className="!mb-0"
@@ -118,27 +107,30 @@ export const S3Connection = () => {
           >
             {showSuccess ? (
               <>
-                <DialogTitle>Save your new storage credential</DialogTitle>
+                <DialogTitle>Save your new S3 access keys</DialogTitle>
                 <DialogDescription>
-                  Please save your new storage credentials. You won't be able to see them again. If
-                  you lose these credentials, you'll need to create a new ones.
+                  You won't be able to see them again. If you lose these credentials, you'll need to
+                  create a new ones.
                 </DialogDescription>
-                <Input
-                  className="input-mono"
-                  readOnly
-                  copy
-                  disabled
-                  value={createStorageCreds.data?.data?.access_key}
-                  label="Access key"
-                />
-                <Input
-                  className="input-mono"
-                  readOnly
-                  copy
-                  disabled
-                  value={createStorageCreds.data?.data?.secret_key}
-                  label="Secret key"
-                />
+
+                <FormItemLayout label="Access key id" isReactForm={false}>
+                  <Input
+                    className="input-mono"
+                    readOnly
+                    copy
+                    disabled
+                    value={createS3AccessKey.data?.data?.access_key}
+                  />
+                </FormItemLayout>
+                <FormItemLayout label={'Secret access key'} isReactForm={false}>
+                  <Input
+                    className="input-mono"
+                    readOnly
+                    copy
+                    disabled
+                    value={createS3AccessKey.data?.data?.secret_key}
+                  />
+                </FormItemLayout>
                 <div className="flex justify-end">
                   <Button
                     className="mt-4"
@@ -153,7 +145,7 @@ export const S3Connection = () => {
               </>
             ) : (
               <>
-                <DialogTitle>Create new storage credential</DialogTitle>
+                <DialogTitle>Create new S3 access keys</DialogTitle>
                 <form
                   onSubmit={async (e) => {
                     e.preventDefault()
@@ -161,24 +153,25 @@ export const S3Connection = () => {
                     const formData = new FormData(e.target as HTMLFormElement)
                     const description = formData.get('description') as string
 
-                    await createStorageCreds.mutateAsync({ description })
-                    // toast.success('Storage credentials created')
+                    await createS3AccessKey.mutateAsync({ description })
                     setShowSuccess(true)
                   }}
                 >
-                  <Label_Shadcn_ htmlFor="description">Description</Label_Shadcn_>
-                  <Input
-                    autoComplete="off"
-                    placeholder="My test key"
-                    type="text"
-                    name="description"
-                    required
-                  />
+                  <FormItemLayout label="Description" isReactForm={false}>
+                    <Input
+                      autoComplete="off"
+                      placeholder="My test key"
+                      type="text"
+                      name="description"
+                      required
+                    />
+                  </FormItemLayout>
+
                   <div className="flex justify-end">
                     <Button
                       className="mt-4"
                       htmlType="submit"
-                      loading={createStorageCreds.isLoading}
+                      loading={createS3AccessKey.isLoading}
                     >
                       Create credential
                     </Button>
@@ -207,7 +200,7 @@ export const S3Connection = () => {
               className=""
               head={[
                 <Table.th key="">Description</Table.th>,
-                <Table.th key="">Access key</Table.th>,
+                <Table.th key="">Access key id</Table.th>,
                 <Table.th key="">Created at</Table.th>,
                 <Table.th key="actions" />,
               ]}
@@ -244,10 +237,9 @@ export const S3Connection = () => {
 
       <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
         <DialogContent className="p-4">
-          <DialogTitle>Revoke storage credentials</DialogTitle>
+          <DialogTitle>Revoke S3 access keys</DialogTitle>
           <DialogDescription>
-            This action will permanently revoke the credentials. Requests made with these
-            credentials will stop working. Are you sure you want to revoke these credentials?
+            This action is irreversible and requests made with these credentials will stop working.
           </DialogDescription>
           <div className="flex justify-end gap-2">
             <Button
@@ -261,12 +253,12 @@ export const S3Connection = () => {
             </Button>
             <Button
               type="danger"
-              loading={deleteStorageCreds.isLoading}
+              loading={deleteS3AccessKey.isLoading}
               onClick={async () => {
                 if (!deleteCredId) return
-                await deleteStorageCreds.mutateAsync({ id: deleteCredId })
+                await deleteS3AccessKey.mutateAsync({ id: deleteCredId })
                 setOpenDeleteDialog(false)
-                toast.success('Storage credentials revoked')
+                toast.success('S3 access keys revoked')
               }}
             >
               Yes, revoke credentials
@@ -274,7 +266,7 @@ export const S3Connection = () => {
           </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   )
 }
 

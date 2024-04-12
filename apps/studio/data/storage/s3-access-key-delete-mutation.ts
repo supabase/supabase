@@ -1,13 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { storageCredentialsKeys } from './storage-credentials-keys'
+import { storageCredentialsKeys } from './s3-access-key-keys'
 import { del } from 'data/fetchers'
 
-type StorageCredentialsDeleteMutation = {
+type S3AccessKeyDeleteMutation = {
   projectRef?: string
   id?: string
 }
 
-const deleteStorageCredential = async ({ projectRef, id }: StorageCredentialsDeleteMutation) => {
+const deleteS3AccessKeyCredential = async ({ projectRef, id }: S3AccessKeyDeleteMutation) => {
   if (!projectRef || !id) {
     throw new Error('projectRef and id are required')
   }
@@ -24,15 +24,13 @@ const deleteStorageCredential = async ({ projectRef, id }: StorageCredentialsDel
   return res
 }
 
-export function useStorageCredentialsDeleteMutation({
-  projectRef,
-}: StorageCredentialsDeleteMutation) {
+export function useS3AccessKeyDeleteMutation({ projectRef }: S3AccessKeyDeleteMutation) {
   const queryClient = useQueryClient()
 
   const keys = storageCredentialsKeys.credentials(projectRef)
 
   return useMutation({
-    mutationFn: ({ id }: { id: string }) => deleteStorageCredential({ projectRef, id }),
+    mutationFn: ({ id }: { id: string }) => deleteS3AccessKeyCredential({ projectRef, id }),
     onSettled: () => {
       queryClient.invalidateQueries(keys)
     },

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { storageCredentialsKeys } from './storage-credentials-keys'
+import { storageCredentialsKeys } from './s3-access-key-keys'
 import { get } from 'data/fetchers'
 
 type FetchStorageCredentials = {

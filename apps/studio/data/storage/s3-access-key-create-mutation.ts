@@ -1,12 +1,15 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { storageCredentialsKeys } from './storage-credentials-keys'
+import { storageCredentialsKeys } from './s3-access-key-keys'
 import { post } from 'data/fetchers'
 
-type CreateStorageCredential = {
+type CreateS3AccessKeyCredential = {
   description: string
   projectRef?: string
 }
-const createStorageCredential = async ({ description, projectRef }: CreateStorageCredential) => {
+const createS3AccessKeyCredential = async ({
+  description,
+  projectRef,
+}: CreateS3AccessKeyCredential) => {
   if (!projectRef) {
     throw new Error('projectRef is required')
   }
@@ -25,23 +28,20 @@ const createStorageCredential = async ({ description, projectRef }: CreateStorag
   return res
 }
 
-type StorageCredentialsCreateMutation = {
+type S3AccessKeyCreateMutation = {
   projectRef?: string
 }
 
-export function useStorageCredentialsCreateMutation({
-  projectRef,
-}: StorageCredentialsCreateMutation) {
+export function useS3AccessKeyCreateMutation({ projectRef }: S3AccessKeyCreateMutation) {
   const queryClient = useQueryClient()
 
   const keys = storageCredentialsKeys.credentials(projectRef)
 
   return useMutation({
     mutationFn: ({ description }: { description: string }) =>
-      createStorageCredential({ description, projectRef }),
+      createS3AccessKeyCredential({ description, projectRef }),
     onSettled: () => {
       queryClient.invalidateQueries(keys)
     },
-    // enabled: projectRef !== undefined,
   })
 }
