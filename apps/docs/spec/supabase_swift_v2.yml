@@ -2899,133 +2899,140 @@ functions:
         isSpotlight: true
         code: |
           ```swift
-          let channel = supabase
-            .realtime
-            .channel("room1")
+          let channel = await supabase.channel("room1")
 
-          channel
-            .on("broadcast", filter: ChannelFilter(event: "cursor-pos")) { message in 
-              print("Cursor position received!", message.payload)
+          let broadcastStream = await channel.broadcastStream(event: "cursor-pos")
+
+          await channel.subscribe()
+
+          Task {
+            for await message in broadcastMessage {
+              print("Cursor position received", message.payload)
             }
-            .subscribe { status, error in
-              if status == .subscribed {
-                Task {
-                  await channel.send(
-                    type: .broadcast,
-                    event: "cursor-pos",
-                    payload: ["x": Double.random(in: 0...1), "y": Double.random(in: 0...1)]
-                  )
-                }
-              }
-            }
+          }
+
+          Task {
+            await channel.broadcast(
+              event: "cursor-pos",
+              message: [
+                "x": .double(.random(in: 0...1)),
+                "y": .double(.random(in: 0...1))
+              ]
+            )
+          }
           ```
-      - id: listen-to-presence-sync
-        name: Listen to presence sync
-        isSpotlight: true
+
+      - id: listen-to-presence-updates
+        name: Listen to presence updates
         code: |
           ```swift
-          let channel = supabase.realtime.channel("room1")
-          channel
-            .on("presence", filter: ChannelFilter(event: "sync")) { _ in
-              print("Synced presence state: ", channel.presenceState())
+          struct PresenceState: Codable {
+            let username: String
+          }
+
+          let channel = await supabase.channel("channelId") 
+
+          let presenceChange = await channel.presenceChange()
+
+          await channel.subscribe()
+
+          Task {
+            for await presence in presenceChange {
+              let joins = try presence.decodeJoins(as: PresenceState.self)
+              let leaves = try presence.decodeLeaves(as: PresenceState.self)
             }
-            .subscribe { status, error in
-              if status == .subscribed {
-                Task {
-                  await channel.track(["online_at": Date().ISO8601Format()])
-                }
-              }
-            }
-          ```
-      - id: listen-to-presence-join
-        name: Listen to presence join
-        isSpotlight: true
-        code: |
-          ```swift
-          let channel = supabase.realtime.channel("room1")
-          channel
-            .on("presence", filter: ChannelFilter(event: "join")) { message in 
-              print("Newly joined presences: ", message.payload)
-            }
-            .subscribe { status, error in
-              if status == .subscribed {
-                Task {
-                  await channel.track(["online_at": Date().ISO8601Format()])
-                }
-              }
-            }
-          ```
-      - id: listen-to-presence-leave
-        name: Listen to presence leave
-        isSpotlight: true
-        code: |
-          ```swift
-          let channel = supabase.realtime.channel("room1")
-          channel
-            .on("presence", filter: ChannelFilter(event: "leave")) { message in 
-              print("Newly left presences: ", message.payload)
-            }
-            .subscribe { status, error in
-              if status == .subscribed {
-                Task {
-                  await channel.track(["online_at": Date().ISO8601Format()])
-                  await channel.untrack()
-                }
-              }
-            }
-          ```
+          }
+
+          // Send your own state
+          Task {
+            try await channel.track(PresenceState(username: "John"))
+          }
+
       - id: listen-to-all-database-changes
         name: Listen to all database changes
-        isSpotlight: true
         code: |
           ```swift
-          supabase.realtime
-            .channel("room1")
-            .on("postgres_changes", filter: ChannelFilter(event: "*", schema: "*")) { message in
-              print("Change received!", message.payload)
+          let channel = await supabase.channel("channelId") 
+
+          let changeStream = await channel.postgresChange(AnyAction.self, schema: "public")
+
+          await channel.subscribe()
+
+          for await change in changeStream {
+            switch change {
+              case .delete(let action): print("Deleted: \(action.oldRecord)")
+              case .insert(let action): print("Inserted: \(action.record)")
+              case .select(let action): print("Selected: \(action.record)")
+              case .update(let action): print("Updated": \(action.oldRecord) with \(action.record)")
             }
-            .subscribe()
+          }
           ```
       - id: listen-to-a-specific-table
         name: Listen to a specific table
         code: |
           ```swift
-          supabase.realtime
-            .channel("room1")
-            .on("postgres_changes", filter: ChannelFilter(event: "*", schema: "public", table: "countries")) { message in
-              print("Change received!", message.payload)
+          let channel = await supabase.channel("channelId") 
+
+          let changeStream = await channel.postgresChange(
+            AnyAction.self, 
+            schema: "public",
+            table: "users"
+          )
+
+          await channel.subscribe()
+
+          for await change in changeStream {
+            switch change {
+              case .delete(let action): print("Deleted: \(action.oldRecord)")
+              case .insert(let action): print("Inserted: \(action.record)")
+              case .select(let action): print("Selected: \(action.record)")
+              case .update(let action): print("Updated": \(action.oldRecord) with \(action.record)")
             }
-            .subscribe()
+          }
           ```
       - id: listen-to-inserts
         name: Listen to inserts
         code: |
           ```swift
-          supabase.realtime
-            .channel("room1")
-            .on("postgres_changes", filter: ChannelFilter(event: "INSERT", schema: "public", table: "countries")) { message in
-              print("Change received!", message.payload)
-            }
-            .subscribe()
+          let channel = await supabase.channel("channelId") 
+
+          let insertions = await channel.postgresChange(
+            InsertAction.self, 
+            schema: "public",
+            table: "users"
+          )
+
+          await channel.subscribe()
+
+          for await insert in insertions {
+            print("Inserted: \(insert.record)")
+          }
           ```
       - id: listen-to-updates
         name: Listen to updates
         description: |
           By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
-          enable full replication for the table you are listening to:
+          enable full replication for the table you are listening too:
 
           ```sql
           alter table "your_table" replica identity full;
           ```
         code: |
           ```swift
-          supabase.realtime
-            .channel("room1")
-            .on("postgres_changes", filter: ChannelFilter(event: "UPDATE", schema: "public", table: "countries")) { message in
-              print("Change received!", message.payload)
-            }
-            .subscribe()
-          ```
+           let channel = await supabase.channel("channelId") 
+           
+           let updates = await channel.postgresChange(
+             UpdateAction.self, 
+             schema: "public",
+             table: "users"
+           )
+
+           await channel.subscribe()
+           
+           for await update in updates {
+             print("Updated: \(update.oldRecord) with \(update.record)")
+           }
+           ```
       - id: listen-to-deletes
         name: Listen to deletes
         description: |
@@ -3037,131 +3044,96 @@ functions:
           ```
         code: |
           ```swift
-          supabase.realtime
-            .channel("room1")
-            .on("postgres_changes", filter: ChannelFilter(event: "DELETE", schema: "public", table: "countries")) { message in
-              print("Change received!", message.payload)
-            }
-            .subscribe()
-          ```
-      - id: listen-to-multiple-events
-        name: Listen to multiple events
-        description: You can chain listeners if you want to listen to multiple events for each table.
-        code: |
-          ```swift
-          supabase.realtime
-            .channel("room1")
-            .on("postgres_changes", filter: ChannelFilter(event: "INSERT", schema: "public", table: "countries"), handler: handleRecordInserted)
-            .on("postgres_changes", filter: ChannelFilter(event: "DELETE", schema: "public", table: "countries"), handler: handleRecordDeleted)
-            .subscribe()
+          let channel = await supabase.channel("channelId") 
 
-          func handleRecordInserted(_ message: Message) {
-            // handle message
-          }
+          let deletions = await channel.postgresChange(
+            DeleteAction.self, 
+            schema: "public",
+            table: "users"
+          )
 
-          func handleRecordDeleted(_ message: Message) {
-            // handle message
+          await channel.subscribe()
+
+          for await deletion in deletions {
+            print("Deleted: \(deletion.oldRecord)")
           }
           ```
       - id: listening-to-row-level-changes
         name: Listen to row level changes
-        description: You can listen to individual rows using the format `{table}:{col}=eq.{val}` - where `{col}` is the column name, and `{val}` is the value which you want to match.
-        notes: |
-          - ``eq`` filter works with all database types as under the hood, it's casting both the filter value and the database value to the correct type and then comparing them.
         code: |
           ```swift
-          supabase.realtime
-            .channel("room1")
-            .on(
-              "postgres_changes",
-              filter: ChannelFilter(
-                event: "INSERT",
-                schema: "public",
-                table: "countries",
-                filter: "id=eq.200"
-              ),
-              handler: handleRecordInserted
-            )
-            .subscribe()
+          let channel = await supabase.channel("channelId") 
 
-            func handleRecordInserted(_ message: Message) {
-              // handle message
-            }
-          ```
-  - id: broadcast-message
-    title: broadcastMessage()
-    description: |
-      Broadcast a message to all connected clients to a channel.
-    notes: |
-      - When using REST you don't need to subscribe to the channel
-    examples:
-      - id: send-a-message
-        name: Send a message via websocket
-        isSpotlight: true
-        code: |
-          ```swift
-          supabase.realtime
-            .channel("room1")
-            .subscribe { status, error in
-              if status == .subscribed {
-                Task {
-                  await channel.send(
-                    type: "broadcast",
-                    event: "cursor-pos",
-                    payload: ["x": Double.random(in: 0...1), "y": Double.random(in: 0...1)]
-                  )
-                }
-              }
-            }
-          ```
-      - id: send-a-message-via-rest
-        name: Send a message via REST
-        isSpotlight: true
-        code: |
-          ```swift
-          await supabase.realtime
-            .channel("room1")
-            .send(
-              type: "broadcast",
-              event: "cursor-pos",
-              payload: ["x": Double.random(in: 0...1), "y": Double.random(in: 0...1)]
-            )
-          ```
-  - id: get-channels
-    title: channels
-    examples:
-      - id: get-all-channels
-        name: Get all channels
-        isSpotlight: true
-        code: |
-          ```swift
-          let channels = supabase.realtime.channels
+          let deletions = await channel.postgresChange(
+            DeleteAction.self, 
+            schema: "public",
+            table: "users",
+            filter: "id=eq.1"
+          )
+
+          await channel.subscribe()
+
+          for await deletion in deletions {
+            print("Deleted: \(deletion.oldRecord)")
+          }
           ```
 
   - id: remove-channel
-    title: removeChannel()
+    description: |
+      Unsubscribes and removes Realtime channel from Realtime client.
+    title: "removeChannel()"
     notes: |
-      - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+      - Removing a channel is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes.
+      - Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+      - If you removed all channels, the client automatically disconnects from the Realtime websocket. This can be disabled in the Realtime config by setting `disconnectOnNoSubscriptions` to false.
     examples:
       - id: removes-a-channel
-        name: Removes a channel
+        name: Remove a channel
         isSpotlight: true
         code: |
           ```swift
-          supabase.realtime.remove(myChannel)
-          ```
+          let channel = await supabase.channel("channelId") 
 
+          //...
+          await supabase.removeChannel(channel)
+          ```
+      - id: unsubscribe-channel
+        name: Unsubscribe from a channel
+        isSpotlight: true
+        code: |
+          ```swift
+          let channel = await supabase.channel("channelId") 
+
+          //...
+          await channel.unsubscribe()
+          ```
   - id: remove-all-channels
     title: removeAllChannels()
+    $ref: "@supabase/supabase-js.index.SupabaseClient.removeAllChannels"
     notes: |
+      Unsubscribes and removes all Realtime channels from Realtime client.
       - Removing channels is a great way to maintain the performance of your project's Realtime service as well as your database if you're listening to Postgres changes. Supabase will automatically handle cleanup 30 seconds after a client is disconnected, but unused channels may cause degradation as more clients are simultaneously subscribed.
+      - If you removed all channels, the client automatically disconnects from the Realtime websocket. This can be disabled in the Realtime config by setting `disconnectOnNoSubscriptions` to false.
     examples:
       - id: remove-all-channels
         name: Remove all channels
         isSpotlight: true
         code: |
           ```swift
-          supabase.realtime.removeAllChannels()
+          await supabase.removeAllChannels()
+          ```
+  - id: get-channels
+    title: getChannels()
+    $ref: "@supabase/supabase-js.index.SupabaseClient.getChannels"
+    notes: |
+      Returns all Realtime channels.
+    examples:
+      - id: get-all-channels
+        name: Get all channels
+        isSpotlight: true
+        code: |
+          ```swift
+          let channels = await supabase.channels
           ```
 
   - id: list-buckets
