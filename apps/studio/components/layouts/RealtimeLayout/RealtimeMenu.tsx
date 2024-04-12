@@ -4,7 +4,7 @@ import { useState } from 'react'
 
 import { useParams } from 'common'
 import { useCheckPermissions } from 'hooks'
-import { Edit } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Menu } from 'ui'
 import { CreateChannelModal } from './CreateChannelModal'
@@ -27,7 +27,7 @@ export const RealtimeMenu = () => {
             <Button
               block
               type="default"
-              icon={<Edit className="text-foreground-lighter" />}
+              icon={<Plus strokeWidth={1} />}
               disabled={!canCreateChannels}
               style={{ justifyContent: 'start' }}
               onClick={() => setShowCreateChannelModal(true)}

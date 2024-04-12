@@ -2,7 +2,7 @@ import { PostgresPolicy } from '@supabase/postgres-meta'
 import Panel from 'components/ui/Panel'
 import { RealtimeChannel } from 'data/realtime/channels-query'
 import { isEmpty } from 'lodash'
-import { Antenna, MoreVertical } from 'lucide-react'
+import { Antenna, ChevronDown, MoreVertical } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -10,7 +10,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconChevronDown,
   IconEdit,
   IconTrash,
 } from 'ui'
@@ -93,7 +92,7 @@ export const RealtimePoliciesChannelRow = ({
                 <Button
                   type="default"
                   className="rounded-l-none px-[4px] py-[5px]"
-                  icon={<IconChevronDown />}
+                  icon={<ChevronDown strokeWidth={1} />}
                 />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" side="bottom">
