@@ -128,7 +128,7 @@ const GaPerformanceSection = ({
             <h2 className="text-2xl sm:text-3xl xl:text-4xl max-w-[280px] sm:max-w-xs xl:max-w-[360px] tracking-[-1px]">
               {title}
             </h2>
-            <p className="text-lighter mb-4">{paragraph}</p>
+            <p className="text-lighter mb-4 font-mono">{paragraph}</p>
             {cta && (
               <Button asChild type="default" size="small" icon={<IconArrowUpRight />}>
                 <Link href={cta.link}>{cta.label ?? 'Explore documentation'}</Link>
@@ -138,7 +138,9 @@ const GaPerformanceSection = ({
         </div>
         {content && (
           <div className="col-span-full lg:col-start-6 lg:col-span-7">
-            <ReactMarkdown className="prose text-foreground-light">{content}</ReactMarkdown>
+            <ReactMarkdown className="prose !max-w-none text-foreground-light">
+              {content}
+            </ReactMarkdown>
             <ComparisonChart className="mt-8 md:mt-16" />
           </div>
         )}
