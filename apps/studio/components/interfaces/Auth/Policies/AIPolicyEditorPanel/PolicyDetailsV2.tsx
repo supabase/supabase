@@ -1,17 +1,22 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
-import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandList_Shadcn_,
+  Command_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Input_Shadcn_,
+  PopoverContent_Shadcn_,
   RadioGroupLargeItem_Shadcn_,
   RadioGroup_Shadcn_,
   ScrollArea,
@@ -20,8 +25,13 @@ import {
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
   Select_Shadcn_,
+  Popover_Shadcn_,
+  Button,
+  PopoverTrigger_Shadcn_,
+  CommandItem_Shadcn_,
 } from 'ui'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
+import { ChevronsUpDown } from 'lucide-react'
 
 interface PolicyDetailsV2Props {
   searchString?: string
@@ -38,6 +48,7 @@ export const PolicyDetailsV2 = ({
 }: PolicyDetailsV2Props) => {
   const { project } = useProjectContext()
   const snap = useTableEditorStateSnapshot()
+  const [open, setOpen] = useState(false)
 
   const { data: tables, isSuccess: isSuccessTables } = useTablesQuery({
     projectRef: project?.ref,
@@ -111,36 +122,66 @@ export const PolicyDetailsV2 = ({
                   </p>
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
-                  <Select_Shadcn_
-                    disabled={isEditing}
-                    value={field.value}
-                    onValueChange={(value) => form.setValue('table', value)}
-                  >
-                    <SelectTrigger_Shadcn_ className="text-sm h-10">
-                      {snap.selectedSchemaName}.{field.value}
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
-                        <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>
-                          {(tables ?? []).map((table) => (
-                            <SelectItem_Shadcn_
-                              key={table.id}
-                              value={table.name}
-                              className="text-sm"
-                            >
-                              {table.name}
-                            </SelectItem_Shadcn_>
-                          ))}
-                        </ScrollArea>
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                  <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+                    <PopoverTrigger_Shadcn_ asChild>
+                      <Button
+                        type="default"
+                        className="w-full [&>span]:w-full h-[38px] text-sm"
+                        iconRight={
+                          <ChevronsUpDown
+                            className="text-foreground-muted"
+                            strokeWidth={2}
+                            size={14}
+                          />
+                        }
+                      >
+                        <div className="w-full flex gap-1">
+                          <span className="text-foreground">
+                            {snap.selectedSchemaName}.{field.value}
+                          </span>
+                        </div>
+                      </Button>
+                    </PopoverTrigger_Shadcn_>
+                    <PopoverContent_Shadcn_
+                      className="p-0"
+                      side="bottom"
+                      align="start"
+                      sameWidthAsTrigger
+                    >
+                      <Command_Shadcn_>
+                        <CommandInput_Shadcn_ placeholder="Find a table..." />
+                        <CommandList_Shadcn_>
+                          <CommandEmpty_Shadcn_>No tables found</CommandEmpty_Shadcn_>
+                          <CommandGroup_Shadcn_>
+                            <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>
+                              {(tables ?? []).map((table) => (
+                                <CommandItem_Shadcn_
+                                  key={table.id}
+                                  className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                                  onSelect={() => {
+                                    form.setValue('table', table.name)
+                                    setOpen(false)
+                                    console.log('field', field)
+                                  }}
+                                  onClick={() => {
+                                    form.setValue('table', table.name)
+                                    setOpen(false)
+                                  }}
+                                >
+                                  <span>{table.name}</span>
+                                </CommandItem_Shadcn_>
+                              ))}
+                            </ScrollArea>
+                          </CommandGroup_Shadcn_>
+                        </CommandList_Shadcn_>
+                      </Command_Shadcn_>
+                    </PopoverContent_Shadcn_>
+                  </Popover_Shadcn_>
                 </FormControl_Shadcn_>
                 <FormMessage_Shadcn_ />
               </FormItem_Shadcn_>
             )}
           />
-
           <FormField_Shadcn_
             control={form.control}
             name="behavior"
@@ -183,7 +224,6 @@ export const PolicyDetailsV2 = ({
               </FormItem_Shadcn_>
             )}
           />
-
           <FormField_Shadcn_
             control={form.control}
             name="command"
@@ -221,7 +261,6 @@ export const PolicyDetailsV2 = ({
               </FormItem_Shadcn_>
             )}
           />
-
           <FormField_Shadcn_
             control={form.control}
             name="roles"
