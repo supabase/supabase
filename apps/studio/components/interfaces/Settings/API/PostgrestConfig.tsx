@@ -94,11 +94,6 @@ const PostgrestConfig = () => {
     .map((name) => name.trim())
     .includes('public')
 
-  // const isGraphqlPublicSchemaEnabled = config?.db_schema
-  //   .split(',')
-  //   .map((name) => name.trim())
-  //   .includes('graphql_public')
-
   const isGraphqlExtensionEnabled =
     (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
 
@@ -106,7 +101,6 @@ const PostgrestConfig = () => {
     <Form id={formId} initialValues={initialValues} validate={() => {}} onSubmit={updateConfig}>
       {({ handleReset, resetForm, values, initialValues }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
-        console.log('schemas', config?.db_schema)
         // [Alaister] although this "technically" is breaking the rules of React hooks
         // it won't error because the hooks are always rendered in the same order
         // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -121,7 +115,6 @@ const PostgrestConfig = () => {
             resetForm({ values, initialValues: values })
           }
         }, [config])
-        //}, [config])
 
         return (
           <>
