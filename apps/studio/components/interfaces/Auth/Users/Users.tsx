@@ -8,7 +8,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import APIDocsButton from 'components/ui/APIDocsButton'
 import NoPermission from 'components/ui/NoPermission'
 import { useUsersQuery } from 'data/auth/users-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useCheckPermissions, useFlag, usePermissionsLoaded } from 'hooks'
 import { Button, IconRefreshCw, IconSearch, IconX, Input, Listbox } from 'ui'
 import AddUserDropdown from './AddUserDropdown'
 import UsersList from './UsersList'
@@ -19,6 +19,7 @@ const Users = () => {
   const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
   const isNewAPIDocsEnabled = useIsAPIDocsSidePanelEnabled()
+  const showAnonUserFilter = useFlag('showAnonUserFilter')
 
   const [page, setPage] = useState(1)
   const [search, setSearch] = useState('')
@@ -113,9 +114,11 @@ const Users = () => {
             <Listbox.Option label="Un-Verified Users" value="unverified">
               Un-Verified Users
             </Listbox.Option>
-            <Listbox.Option label="Anonymous Users" value="anonymous">
-              Anonymous Users
-            </Listbox.Option>
+            {showAnonUserFilter && (
+              <Listbox.Option label="Anonymous Users" value="anonymous">
+                Anonymous Users
+              </Listbox.Option>
+            )}
           </Listbox>
         </div>
         <div className="mt-4 flex items-center gap-2 md:mt-0">
