@@ -73,7 +73,7 @@ export const S3Connection = () => {
       <div>
         <FormHeader title="S3 Connection" description="Connect directly to your bucket." />
         <Panel className="grid gap-4 p-4">
-          <FormItemLayout layout="horizontal" label="Storage URL" isReactForm={false}>
+          <FormItemLayout layout="horizontal" label="Endpoint" isReactForm={false}>
             <Input readOnly copy disabled value={s3connectionUrl} />
           </FormItemLayout>
           {projectIsLoading ? (
