@@ -215,7 +215,7 @@ with check ( true );`.trim(),
       },
     ] as PolicyTemplate[]
 
-    if (templateData && templateData['channelId']) {
+    if (templateData && templateData['channelName']) {
       results.push(
         {
           id: 'policy-broadcast-3',
@@ -225,9 +225,9 @@ with check ( true );`.trim(),
           statement: `
     create policy "Enable listening to broadcasts from a specific channel"
     on realtime.broadcasts for select
-    using ( channel_id = ${templateData['channelId']} );`.trim(),
+    using ( realtime.channel_name() = '${templateData['channelName']}' );`.trim(),
           name: 'Enable listening to broadcasts from a specific channel',
-          definition: `channel_id = ${templateData['channelId']}`,
+          definition: `realtime.channel_name() = '${templateData['channelName']}'`,
           check: '',
           command: 'SELECT',
           roles: [],
@@ -240,11 +240,11 @@ with check ( true );`.trim(),
           statement: `
           create policy "Enable pushing broadcasts to specific channel"
   ON realtime.broadcasts for update
-  using ( channel_id = ${templateData['channelId']} )
-  with check ( channel_id = ${templateData['channelId']} );`.trim(),
+  using ( realtime.channel_name() = '${templateData['channelName']}' )
+  with check ( realtime.channel_name() = '${templateData['channelName']}' );`.trim(),
           name: 'Enable pushing broadcasts to specific channel',
-          definition: `channel_id = ${templateData['channelId']}`,
-          check: `channel_id = ${templateData['channelId']}`,
+          definition: `realtime.channel_name() = '${templateData['channelName']}'`,
+          check: `realtime.channel_name() = '${templateData['channelName']}'`,
           command: 'UPDATE',
           roles: [],
         }
@@ -294,7 +294,7 @@ with check ( true );
       },
     ] as PolicyTemplate[]
 
-    if (templateData && templateData['channelId']) {
+    if (templateData && templateData['channelName']) {
       results.push(
         {
           id: 'policy-presences-3',
@@ -304,9 +304,9 @@ with check ( true );
           statement: `
     create policy "Enable listening to presences from a specific channel"
     on realtime.presences for select
-    using ( channel_id = ${templateData['channelId']} );`.trim(),
+    using ( realtime.channel_name() = '${templateData['channelName']}' );`.trim(),
           name: 'Enable listening to presences from a specific channel',
-          definition: `channel_id = ${templateData['channelId']}`,
+          definition: `realtime.channel_name() = '${templateData['channelName']}'`,
           check: '',
           command: 'SELECT',
           roles: [],
@@ -319,12 +319,12 @@ with check ( true );
           statement: `
         create policy "Enable publishing presence to a specific channel"
 ON realtime.presences for update
-using ( channel_id = ${templateData['channelId']} )
-with check ( channel_id = ${templateData['channelId']} );
+using ( realtime.channel_name() = '${templateData['channelName']}' )
+with check ( realtime.channel_name() = '${templateData['channelName']}' );
   ;`.trim(),
           name: 'Enable publishing presence to a specific channel',
-          definition: `channel_id = ${templateData['channelId']}`,
-          check: `channel_id = ${templateData['channelId']}`,
+          definition: `realtime.channel_name() = '${templateData['channelName']}'`,
+          check: `realtime.channel_name() = '${templateData['channelName']}'`,
           command: 'UPDATE',
           roles: [],
         }
@@ -373,7 +373,7 @@ with check ( true );`.trim(),
       },
     ] as PolicyTemplate[]
 
-    if (templateData && templateData['channelId']) {
+    if (templateData && templateData['channelName']) {
       results.push(
         {
           id: 'policy-channels-3',
@@ -383,9 +383,9 @@ with check ( true );`.trim(),
           statement: `
   create policy "Enable read access to specific channel"
   on realtime.channels for select
-  using ( name = '${templateData['channelName']}' );`.trim(),
+  using ( realtime.channel_name() = '${templateData['channelName']}' );`.trim(),
           name: 'Enable read access to specific channel',
-          definition: `name = '${templateData['channelName']}'`,
+          definition: `realtime.channel_name() = '${templateData['channelName']}'`,
           check: '',
           command: 'SELECT',
           roles: [],
@@ -398,11 +398,11 @@ with check ( true );`.trim(),
           statement: `
         create policy "Enable update access to specific channel"
 ON realtime.channels for update
-using ( 'name = ${templateData['channelName']}' )
-with check ( 'name = ${templateData['channelName']}' );`.trim(),
+using ( 'realtime.channel_name() = ${templateData['channelName']}' )
+with check ( 'realtime.channel_name() = ${templateData['channelName']}' );`.trim(),
           name: 'Enable update access to specific channel',
-          definition: `name = '${templateData['channelName']}'`,
-          check: `name = '${templateData['channelName']}'`,
+          definition: `realtime.channel_name() = '${templateData['channelName']}'`,
+          check: `realtime.channel_name() = '${templateData['channelName']}'`,
           command: 'UPDATE',
           roles: [],
         }
