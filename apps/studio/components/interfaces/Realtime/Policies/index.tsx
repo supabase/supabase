@@ -132,8 +132,8 @@ export const RealtimePolicies = () => {
 
           <Separator />
           <p className="text-sm text-foreground-light">
-            You may also write policies for the tables under the storage schema directly for greater
-            control
+            You may also write general policies for the <code>channels</code> table under the
+            realtime schema directly for greater control
           </p>
           {ungroupedPolicies?.policies.map((policy) => {
             return (
