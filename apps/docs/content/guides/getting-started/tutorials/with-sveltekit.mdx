@@ -93,7 +93,7 @@ export const handle: Handle = async ({ event, resolve }) => {
     const {
       data: { user },
       error,
-    } = await supabase.auth.getUser()
+    } = await event.locals.supabase.auth.getUser()
     if (error) {
       return { session: null, user: null }
     }
