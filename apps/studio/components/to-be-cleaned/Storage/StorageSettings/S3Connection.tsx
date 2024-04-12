@@ -71,7 +71,10 @@ export const S3Connection = () => {
   return (
     <>
       <div>
-        <FormHeader title="S3 Connection" description="Connect to your bucket via the S3 protocol." />
+        <FormHeader
+          title="S3 Connection"
+          description="Connect to your bucket via the S3 protocol."
+        />
         <Panel className="grid gap-4 p-4">
           <FormItemLayout layout="horizontal" label="Endpoint" isReactForm={false}>
             <Input readOnly copy disabled value={s3connectionUrl} />
@@ -92,7 +95,13 @@ export const S3Connection = () => {
           description="Manage your S3 credentials for this project."
         />
 
-        <Dialog open={openCreateCred} onOpenChange={setOpenCreateCred}>
+        <Dialog
+          open={openCreateCred}
+          onOpenChange={(open) => {
+            setOpenCreateCred(open)
+            if (!open) setShowSuccess(false)
+          }}
+        >
           <DialogTrigger asChild>
             <Button type="outline">New credential</Button>
           </DialogTrigger>
