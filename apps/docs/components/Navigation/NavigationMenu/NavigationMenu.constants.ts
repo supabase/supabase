@@ -113,6 +113,12 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       level: 'reference_dart',
     },
     {
+      label: 'Swift',
+      icon: 'reference-swift',
+      href: '/reference/swift/introduction',
+      level: 'reference_swift',
+    },
+    {
       label: 'Python',
       icon: 'reference-python',
       href: '/reference/python/introduction',
@@ -124,13 +130,6 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       icon: 'reference-csharp',
       href: '/reference/csharp/introduction',
       level: 'reference_csharp',
-      community: true,
-    },
-    {
-      label: 'Swift',
-      icon: 'reference-swift',
-      href: '/reference/swift/introduction',
-      level: 'reference_swift',
       community: true,
     },
     {
