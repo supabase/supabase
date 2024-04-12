@@ -61,7 +61,7 @@ from
 where
     idx.index_ is null
     and fk.schema_::text not in (
-        'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgsodium', 'pgsodium_masks', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'storage', 'supabase_functions', 'supabase_migrations', 'vault'
+        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pg_catalog', 'pgbouncer', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault' 
     )
 order by
     fk.table_,
@@ -230,7 +230,7 @@ from
 where
     is_rls_active
     and schema_::text not in (
-        'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgsodium', 'pgsodium_masks', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'storage', 'supabase_functions', 'supabase_migrations', 'vault'
+        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pg_catalog', 'pgbouncer', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault' 
     )
     and (
         (
@@ -279,7 +279,7 @@ from
 where
     pgc.relkind = 'r' -- regular tables
     and pgns.nspname not in (
-        'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgsodium', 'pgsodium_masks', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'storage', 'supabase_functions', 'supabase_migrations', 'vault'
+        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pg_catalog', 'pgbouncer', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
 group by
     pgc.oid,
@@ -322,7 +322,7 @@ where
     and not pi.indisunique
     and not pi.indisprimary
     and psui.schemaname not in (
-        'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgsodium', 'pgsodium_masks', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'storage', 'supabase_functions', 'supabase_migrations', 'vault'
+        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pg_catalog', 'pgbouncer', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault' 
     ))
 union all
 (
@@ -376,7 +376,7 @@ from
 where
     c.relkind = 'r' -- regular tables
     and n.nspname not in (
-        'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgsodium', 'pgsodium_masks', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'storage', 'supabase_functions', 'supabase_migrations', 'vault'
+        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pg_catalog', 'pgbouncer', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault' 
     )
     and r.rolname not like 'pg_%'
     and r.rolname not like 'supabase%admin'
@@ -421,7 +421,7 @@ from
 where
     c.relkind = 'r' -- regular tables
     and n.nspname not in (
-        'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgsodium', 'pgsodium_masks', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'storage', 'supabase_functions', 'supabase_migrations', 'vault'
+        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pg_catalog', 'pgbouncer', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault' 
     )
     -- RLS is disabled
     and not c.relrowsecurity
@@ -460,7 +460,7 @@ from
 where
     c.relkind = 'r' -- regular tables
     and n.nspname not in (
-        'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgsodium', 'pgsodium_masks', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'storage', 'supabase_functions', 'supabase_migrations', 'vault'
+        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pg_catalog', 'pgbouncer', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault' 
     )
     -- RLS is enabled
     and c.relrowsecurity
@@ -508,7 +508,7 @@ from
 where
     c.relkind in ('r', 'm') -- tables and materialized views
     and n.nspname not in (
-        'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgsodium', 'pgsodium_masks', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'storage', 'supabase_functions', 'supabase_migrations', 'vault'
+        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pg_catalog', 'pgbouncer', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault' 
     )
 group by
     n.nspname,
@@ -586,7 +586,7 @@ from
         on p.pronamespace = n.oid
 where
     n.nspname not in (
-        'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgsodium', 'pgsodium_masks', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'storage', 'supabase_functions', 'supabase_migrations', 'vault'
+        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pg_catalog', 'pgbouncer', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault' 
     )
     -- Search path not set to ''
     and not coalesce(p.proconfig, '{}') && array['search_path=""'])
