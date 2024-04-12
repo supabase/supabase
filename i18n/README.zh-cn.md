@@ -10,9 +10,9 @@
 - [x] Postgres 数据库托管。[文档](https://supabase.com/docs/guides/database)
 - [x] 身份验证和授权。[文档](https://supabase.com/docs/guides/auth)
 - [x] 自动生成的 API。
-  - [x] REST。[文档](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL。[文档](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] 实时订阅。[文档](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST。[文档](https://supabase.com/docs/guides/api)
+  - [x] GraphQL。[文档](https://supabase.com/docs/guides/graphql)
+  - [x] 实时订阅。[文档](https://supabase.com/docs/guides/realtime)
 - [x] 函数。
   - [x] 数据库函数。[文档](https://supabase.com/docs/guides/database/functions)
   - [x] 边缘函数。[文档](https://supabase.com/docs/guides/functions)
@@ -53,7 +53,7 @@ Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注�
 - [PostgreSQL](https://www.postgresql.org/) 是一个对象关系型数据库系统，经过 30 多年的积极开发，它在可靠性、功能健壮性和性能方面赢得了很好的声誉。
 - [Realtime](https://github.com/supabase/realtime) 是一个 Elixir 服务器，允许你使用 WebSocket 监听 PostgreSQL 的插入、更新和删除。Supabase 监听 Postgres 的内置复制功能，将复制的字节流转换为 JSON，然后通过 WebSocket 广播 JSON。
 - [PostgREST](http://postgrest.org/) 是一个 Web 服务器，可以将你的 PostgreSQL 数据库直接生成 RESTful API
-- [GoTrue](https://github.com/netlify/gotrue) 是一个基于 SWT 的 API，用于管理用户和发布 SWT 令牌。
+- [GoTrue](https://github.com/supabase/gotrue) 是一个基于 SWT 的 API，用于管理用户和发布 SWT 令牌。
 - [Storage](https://github.com/supabase/storage-api) 提供了一个 RESTful 接口，用于管理存储在 S3 中的文件，使用 Postgres 来管理权限。
 - [pg_graphql](http://github.com/supabase/pg_graphql/) 公开GraphQL API的PostgreSQL扩展
 - [postgres-meta](https://github.com/supabase/postgres-meta) 是一个 RESTful API，用于管理你的 Postgres，允许你获取表、添加角色和运行查询等。
@@ -65,9 +65,9 @@ Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注�
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
-    <th>Language</th>
-    <th>Client</th>
-    <th colspan="5">Feature-Clients (bundled in Supabase client)</th>
+    <th>语言</th>
+    <th>客户端</th>
+    <th colspan="5">模块-客户端（已集成在 Supabase 客户端中）</th>
   </tr>
   <!-- notranslate -->
   <tr>
@@ -91,7 +91,7 @@ Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注�
   </tr>
   END ROW -->
   <!-- /notranslate -->
-  <th colspan="7">⚡️ Official ⚡️</th>
+  <th colspan="7">⚡️ 官方 ⚡️</th>
   <!-- notranslate -->
   <tr>
     <td>JavaScript (TypeScript)</td>
@@ -112,7 +112,7 @@ Supabase 是一个[托管平台](https://supabase.com/dashboard)。你可以注�
     <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
   </tr>
   <!-- /notranslate -->
-  <th colspan="7">💚 Community 💚</th>
+  <th colspan="7">💚 社区 💚</th>
   <!-- notranslate -->
   <tr>
     <td>C#</td>
