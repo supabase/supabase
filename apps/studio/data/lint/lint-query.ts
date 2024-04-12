@@ -597,7 +597,7 @@ select
     'function_search_path_mutable' as name,
     'WARN' as level,
     'EXTERNAL' as facing,
-    'Detects functions with a mutable search_path parameter which could fail to execute sucessfully for some roles.' as description,
+    'Detects functions with a mutable search_path parameter which could fail to execute successfully for some roles.' as description,
     format(
         'Function \`%s.%s\` has a role mutable search_path',
         n.nspname,
