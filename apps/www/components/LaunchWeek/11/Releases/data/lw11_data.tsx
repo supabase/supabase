@@ -77,11 +77,11 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     links: [
       {
         type: 'blog',
-        href: '#',
+        href: '/ga',
       },
       {
         type: 'xSpace',
-        href: '',
+        href: 'https://twitter.com/i/spaces/1MnGnMglMLjKO/peek',
       },
     ],
     description: (
@@ -152,10 +152,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       //   type: 'video',
       //   href: 'eCbiywoDORw',
       // },
-      {
-        type: 'xSpace',
-        href: '#',
-      },
+      // {
+      //   type: 'xSpace',
+      //   href: '#',
+      // },
     ],
     steps: [],
   },
@@ -179,10 +179,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       //   type: 'video',
       //   href: '',
       // },
-      {
-        type: 'xSpace',
-        href: '#',
-      },
+      // {
+      //   type: 'xSpace',
+      //   href: '#',
+      // },
     ],
     steps: [],
   },
@@ -206,10 +206,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       //   type: 'video',
       //   href: '',
       // },
-      {
-        type: 'xSpace',
-        href: '#',
-      },
+      // {
+      //   type: 'xSpace',
+      //   href: '#',
+      // },
     ],
     steps: [],
   },
@@ -233,10 +233,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       //   type: 'video',
       //   href: '',
       // },
-      {
-        type: 'xSpace',
-        href: '#',
-      },
+      // {
+      //   type: 'xSpace',
+      //   href: '#',
+      // },
     ],
     steps: [],
   },

@@ -44,14 +44,14 @@ export default function IndexPage() {
           <Image
             src="/images/ga/supabase-ga-visual.png"
             alt="GA logo"
-            className="w-auto h-52 -my-10"
+            className="w-auto h-40 md:h-52 -my-10"
             width={1200}
             height={1200}
             priority
             quality={100}
           />
           {data.hero.publishedAt && (
-            <p className="text-sm text-brand md:text-base">{data.hero.publishedAt}</p>
+            <span className="text-sm text-brand md:text-base">{data.hero.publishedAt}</span>
           )}
           <h1 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1.1px]">
             {data.hero.title}
@@ -60,8 +60,8 @@ export default function IndexPage() {
             {data.hero.paragraph}
           </p>
         </SectionContainer>
-        <SectionContainer>
-          <div className="flex flex-wrap md:flex-nowrap -mt-6 md:mt-0 w-fit md:w-full mx-auto md:flex md:items-start justify-around lg:w-full lg:max-w-5xl">
+        <SectionContainer className="!pt-0">
+          {/* <div className="flex flex-wrap md:flex-nowrap -mt-6 md:mt-0 w-fit md:w-full mx-auto md:flex md:items-start justify-around lg:w-full lg:max-w-5xl">
             {data.highlightsSection.highlights.map(
               (highlight: { number: string; text: string }, i: number) => {
                 return (
@@ -80,9 +80,9 @@ export default function IndexPage() {
                 )
               }
             )}
-          </div>
-          <div className="w-full max-w-2xl mx-auto mt-16 lg:mt-24">
-            <ol className="w-full md:pt-4 lg:pt-8 md:border-t gap-4 columns-2 lg:columns-3 text-foreground-light">
+          </div> */}
+          <div className="w-full border-t max-w-4xl mx-auto mt-10 lg:mt-16 flex justify-center">
+            <ol className="w-full max-w-2xl pt-8 gap-4 columns-2 lg:columns-3 text-foreground-light">
               {data.hero.sections.map((section, i) => (
                 <li key={section.title}>
                   <Link
