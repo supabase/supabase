@@ -113,6 +113,8 @@ export default function IndexPage() {
       <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.communitySection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
+      <ParagraphSection {...data.enterpriseSection} hasStickyTitle />
+      <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.integrationsSection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
       <FeaturesSection {...data.principlesSection} hasStickyTitle />
