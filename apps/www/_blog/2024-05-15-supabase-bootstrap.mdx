@@ -47,7 +47,7 @@ After selecting a starter, the Supabase CLI downloads all files from the templat
 
 <Admonition type="note" label="GitHub rate limits">
 
-You may run into GitHub rate limit when downloading too frequently from template repository. This can be avoided by setting `GITHUB_TOKEN` environment variable locally to your GitHub personal access token..
+You may run into GitHub rate limit when downloading too frequently from template repository. This can be avoided by setting `GITHUB_TOKEN` environment variable locally to your GitHub personal access token.
 
 </Admonition>
 
@@ -55,7 +55,7 @@ This model is very similar to the popular [shadcn](https://ui.shadcn.com/) workf
 
 ### Deploying to production
 
-During the `supabase bootstrap` process, a new project will be created on the Supabase platform, linked to your local environment. This command will run you through the account creation flow if you don't already have one.
+During the `supabase bootstrap` process, a new project will be created on the Supabase platform and linked to your local environment. This command will run you through the account creation flow if you don't already have one.
 
 ![Screenshot 2024-04-03 at 2.07.39 PM.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/aa0b055a-8ea5-4319-a4b2-a2899a943a07/Screenshot_2024-04-03_at_2.07.39_PM.png)
 
@@ -77,11 +77,6 @@ After pushing the migrations, your project credentials will be exported to a `.e
 - `SUPABASE_SERVICE_ROLE_KEY`
 
 Other custom variables from `.env.example` file defined by your chosen template will also be merged to your local `.env` file.
-
-<aside>
-💡 It is important to store these credentials securely as anyone can connect to your remote database using the `POSTGRES_URL`.
-
-</aside>
 
 <Admonition type="caution" label="Store credentials securely">
 
