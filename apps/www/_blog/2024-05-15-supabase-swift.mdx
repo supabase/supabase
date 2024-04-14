@@ -1,0 +1,35 @@
+---
+title: 'Supabase Swift'
+description: 'Supabase Swift is now officially support.'
+author: grdsdev
+image: launch-week-11/swift/og.png
+thumb: launch-week-11/swift/thumb.png
+categories:
+  - product
+tags:
+  - launch-week
+  - database
+date: '2024-04-15'
+toc_depth: 3
+launchweek: 11
+---
+
+We are excited to announce that Supabase Swift libraries are now officially supported by Supabase.
+
+This makes it simple to interact with Supabase from applications on Apple's platforms, including iOS, macOS, watchOS, tvOS, and visionOS:
+
+```swift
+let url = URL(string: "...")!
+let anonKey = "public-anon-key"
+let client = SupabaseClient(supabaseURL: url, supabaseKey: anonKey)
+
+struct Country: Decodable {
+  let id: Int
+  let name: String
+}
+
+let countries: [Country] = try await supabase.from("countries")
+  .select()
+  .execute()
+  .value
+```
