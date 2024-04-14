@@ -56,23 +56,15 @@ Today we’re confident in our ability to take any profile of customer and help 
     highlights: [
       {
         number: '1M',
-        text: 'databases launched',
+        text: 'databases managed',
       },
       {
-        number: '100K',
-        text: 'weekly active projects',
+        number: '2500',
+        text: 'databases launched daily',
       },
       {
-        number: '1B',
-        text: 'PostgREST requests per day',
-      },
-      {
-        number: '10M',
-        text: 'edge function requests per day',
-      },
-      {
-        number: '65K',
-        text: 'GitHub stars',
+        number: 'Top 125',
+        text: 'GitHub repo',
       },
     ],
   },

@@ -8,7 +8,7 @@ import { data } from '../data/ga'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '../components/Layouts/SectionContainer'
-// import ReactMarkdown from 'react-markdown'
+import ReactMarkdown from 'react-markdown'
 import Image from 'next/image'
 import GaPerformanceSection from '../components/GA/GaPerformanceSection'
 
@@ -61,26 +61,28 @@ export default function IndexPage() {
           </p>
         </SectionContainer>
         <SectionContainer className="!pt-0">
-          {/* <div className="flex flex-wrap md:flex-nowrap -mt-6 md:mt-0 w-fit md:w-full mx-auto md:flex md:items-start justify-around lg:w-full lg:max-w-5xl">
-            {data.highlightsSection.highlights.map(
-              (highlight: { number: string; text: string }, i: number) => {
-                return (
-                  <div
-                    key={i}
-                    className="border-t-[1px] mt-6 mx-2 md:mx-2 md:mt-0 md:border-0 border-brand w-[134px] md:max-w-none"
-                  >
-                    <div className="hidden md:block border-t-[1px] lg:border-t-2 border-brand w-[60px] lg:w-[100px]"></div>
-                    <h2 className="text-3xl lg:text-4xl pt-3 tracking-[-1.5px]">
-                      {highlight.number}
-                    </h2>
-                    <ReactMarkdown className="text-foreground-light text-sm lg:text-base">
-                      {highlight.text}
-                    </ReactMarkdown>
-                  </div>
-                )
-              }
-            )}
-          </div> */}
+          {data.highlightsSection.highlights && (
+            <div className="flex flex-wrap md:flex-nowrap mt-8 md:mt-16 w-fit md:w-full mx-auto md:flex md:items-start justify-around lg:w-full lg:max-w-xl">
+              {data.highlightsSection.highlights.map(
+                (highlight: { number: string; text: string }, i: number) => {
+                  return (
+                    <div
+                      key={i}
+                      className="border-t-[1px] mt-6 mx-2 md:mx-2 md:mt-0 md:border-0 border-brand w-[134px] md:max-w-none"
+                    >
+                      <div className="hidden md:block border-t-[1px] lg:border-t-2 border-brand w-[60px] lg:w-[100px]"></div>
+                      <h2 className="text-3xl lg:text-4xl pt-3 tracking-[-1.5px]">
+                        {highlight.number}
+                      </h2>
+                      <ReactMarkdown className="text-foreground-light text-sm lg:text-base">
+                        {highlight.text}
+                      </ReactMarkdown>
+                    </div>
+                  )
+                }
+              )}
+            </div>
+          )}
           <div className="w-full border-t max-w-4xl mx-auto mt-10 lg:mt-16 flex justify-center">
             <ol className="w-full max-w-2xl pt-8 gap-4 columns-2 lg:columns-3 text-foreground-light">
               {data.hero.sections.map((section, i) => (
