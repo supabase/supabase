@@ -72,6 +72,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     hasCountdown: false,
     date: '15 April',
     published_at: '2024-04-15T08:00:00.000-08:00',
+    videoId: 'Fy_lcHsXmFQ',
     videoThumbnail: '/images/launchweek/11/video-cover.jpg',
     links: [
       {
