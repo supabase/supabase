@@ -72,15 +72,16 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     hasCountdown: false,
     date: '15 April',
     published_at: '2024-04-15T08:00:00.000-08:00',
+    videoId: 'Fy_lcHsXmFQ',
     videoThumbnail: '/images/launchweek/11/video-cover.jpg',
     links: [
       {
         type: 'blog',
-        href: '#',
+        href: '/ga',
       },
       {
         type: 'xSpace',
-        href: '',
+        href: 'https://twitter.com/i/spaces/1MnGnMglMLjKO/peek',
       },
     ],
     description: (
@@ -151,10 +152,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       //   type: 'video',
       //   href: 'eCbiywoDORw',
       // },
-      {
-        type: 'xSpace',
-        href: '#',
-      },
+      // {
+      //   type: 'xSpace',
+      //   href: '#',
+      // },
     ],
     steps: [],
   },
@@ -178,10 +179,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       //   type: 'video',
       //   href: '',
       // },
-      {
-        type: 'xSpace',
-        href: '#',
-      },
+      // {
+      //   type: 'xSpace',
+      //   href: '#',
+      // },
     ],
     steps: [],
   },
@@ -205,10 +206,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       //   type: 'video',
       //   href: '',
       // },
-      {
-        type: 'xSpace',
-        href: '#',
-      },
+      // {
+      //   type: 'xSpace',
+      //   href: '#',
+      // },
     ],
     steps: [],
   },
@@ -232,10 +233,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       //   type: 'video',
       //   href: '',
       // },
-      {
-        type: 'xSpace',
-        href: '#',
-      },
+      // {
+      //   type: 'xSpace',
+      //   href: '#',
+      // },
     ],
     steps: [],
   },

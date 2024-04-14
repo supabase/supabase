@@ -37,12 +37,12 @@ const LW11Day1 = ({
         </div> */}
       <div className="md:max-w-xs flex flex-col gap-4">
         <ExpandableVideo
-          videoId=""
+          videoId={day.videoId ?? ''}
           imgUrl={day.videoThumbnail}
           imgOverlayText="Watch announcement"
           priority
         />
-        <p className="text-sm text-foreground">Supabase is ready for production use.</p>
+        {/* <p className="text-sm text-foreground">Supabase is ready for production use.</p> */}
       </div>
       {!!day.links && (
         <ul className="flex-1 h-full w-full justify-end xs:grid grid-cols-2 lg:grid-cols-3 flex flex-col gap-1">

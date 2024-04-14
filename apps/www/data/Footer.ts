@@ -96,7 +96,7 @@ const footerData = [
       },
       {
         text: 'Contributing',
-        url: '/docs/handbook/contributing',
+        url: 'https://github.com/supabase/supabase/blob/master/CONTRIBUTING.md',
       },
       {
         text: 'Open Source',
