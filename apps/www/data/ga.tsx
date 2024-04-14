@@ -12,6 +12,7 @@ export const data = {
       { title: 'Open Source', link: '#open-source' },
       { title: 'Community', link: '#community' },
       { title: 'Integrations', link: '#integrations' },
+      { title: 'Enterprise', link: '#enterprise' },
       { title: 'Core Principles', link: '#principles' },
       { title: 'Our mission', link: '#mission' },
     ],
@@ -29,6 +30,26 @@ We have <wow numbers> customers, projects, database created, etc. Just since the
 
 Many customers have been running production applications on Supabase for the past several years. Supabase may be new to General Availability but we are not new to running demanding production applications.
 
+## What does General Availability mean for Supabase?
+
+During the first year of Supabase we set ourselves a goal: build a managed service capable of running 1 million database, securely, and with minimal downtime. After a couple of years we were happy that we’d successfully built out infrastructure and a team capable of meeting that goal. 
+
+![Supabase customer auth user growth](/images/ga/supabase-customer-auth-user-growth.png)
+
+we slowly started to phase out the “beta” messaging and set ourselves a more ambitious goal. 
+
+Supabase is a tool that can be utilized by developers across an extremely broad spectrum, it doesn’t matter whether you’re a web developer, a mobile dev, a data scientist, or a video game studio, you can use Supabase to store your data and power your most critical applications. With this in mind we knew that we needed to expand our managed service to be capable of supporting ALL developers. That’s tens of millions of devs, running tens of millions of in-production services. You can take Supabase and self-host, we made this easier by providing tooling to deploy to any cloud or hosting provider. But Supabase of course, isn’t just a tool, it’s also a company stacked with security, stability, and database performance experts, and you need these experts to meet our ambitious goal of offering a database and API hosting service that scales to all businesses.
+
+We’ve been production-ready for years now. We kept the “beta” label because we wanted to make sure that our organization can support *all* types of customers, no matter their demands.
+
+Setting up an organization for 24/7 support is hard, especially when we need to simultaneously manage a burgeoning community of open source developers (sometimes more demanding than the paying customers). 
+
+Today we’re confident in our ability to take any profile of customer and help them become successful. We have a crew of amazing Postgres engineers and support staff who work tirelessly to educate customers with Postgres technicalities, improving our product simultaneously.
+
+- Maturity: Support / organizationally, technically
+- Enterprise readiness: stability, performance,
+- Security: HIPAA support, SOC2, Vanta stuff, time-tested/battle-tested, pen-tests, etc.
+- AWS marketplace
 `,
   },
   highlightsSection: {
@@ -108,11 +129,17 @@ Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deseru
     title: 'Community',
     paragraph: '06',
     content: `
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+## Community-driven growth. 
 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+When we [launched on Hacker News](https://news.ycombinator.com/item?id=23319901) in 2020 we recevied a lot of encouragement for our approach. Since then our strategy has been simple: [launch a feature](https://hn.algolia.com/?dateRange=all&page=0&prefix=true&query=supabase&sort=byPopularity&type=story), listen to the feedback, get back to work and do it again. 
 
-Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+All of our growth has been community-driven and word of mouth. 
+
+Supabase is a labor of love for our team. We don’t always get it right, but we always listen to the feedback and try to balance the (often conflicting) needs of a business and a community.
+
+We truly appreciate the feedback - no matter how raw. The fact that we have users that care enough to build a community around Supabase means the world to us. 
+
+- YC community stats: 30% of batch.
 `,
   },
   integrationsSection: {

@@ -8,7 +8,7 @@ import { data } from '../data/ga'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '../components/Layouts/SectionContainer'
-import ReactMarkdown from 'react-markdown'
+// import ReactMarkdown from 'react-markdown'
 import Image from 'next/image'
 import GaPerformanceSection from '../components/GA/GaPerformanceSection'
 
