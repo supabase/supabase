@@ -5,7 +5,7 @@ import { useRef, useState } from 'react'
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import { getHumanReadableTitle } from 'components/interfaces/Reports/ReportLints.utils'
+import { getHumanReadableTitle, lintInfoMap } from 'components/interfaces/Reports/ReportLints.utils'
 import ReportLintsTableRow from 'components/interfaces/Reports/ReportLintsTableRow'
 import { DatabaseLayout } from 'components/layouts'
 import Table from 'components/to-be-cleaned/Table'
@@ -35,6 +35,7 @@ import { GenericSkeletonLoader } from 'ui-patterns'
 import ReactMarkdown from 'react-markdown'
 import { Markdown } from '../../../../components/interfaces/Markdown'
 import { getLintIcon, LintCTA } from '../../../../components/interfaces/Reports/ReportLints.utils'
+import { FilterPopover } from 'components/ui/FilterPopover'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -43,7 +44,6 @@ const ProjectLints: NextPageWithLayout = () => {
   const gridRef = useRef<DataGridHandle>(null)
   const { preset } = useParams()
   const [filters, setFilters] = useState({
-    levels: [] as string[],
     types: [] as string[],
   })
 
@@ -73,21 +73,30 @@ const ProjectLints: NextPageWithLayout = () => {
   const errorLintsCount = activeLints.filter((x) => x.level === 'ERROR').length
   const infoLintsCount = activeLints.filter((x) => x.level === 'INFO').length
 
+  // console.log('keys', Object.keys(lintInfoMap))
+  // const filterOptions = Object.keys(lintInfoMap)
+  const filterOptions = lintInfoMap
+    // .filter((type) => activeLints.some((lint) => lint.name === type))
+    .map((type) => ({
+      name: type.title,
+      value: type.name,
+    }))
+
   const LINTER_TABS = [
     {
       id: LINTER_LEVELS.ERROR,
       label: 'Errors',
-      description: 'Errors.....description',
+      description: 'You should consider these issues urgent and and fix them as soon as you can.',
     },
     {
       id: LINTER_LEVELS.WARN,
       label: 'Warnings ',
-      description: 'warning description',
+      description: 'You should try and read through these issues and fix them if necessary.',
     },
     {
       id: LINTER_LEVELS.INFO,
       label: 'Info ',
-      description: 'info description',
+      description: 'You should read through these suggestions and consider implementing them.',
     },
   ]
 
@@ -99,7 +108,8 @@ const ProjectLints: NextPageWithLayout = () => {
       minWidth: 200,
       value: (row: any) => (
         <div className="flex items-center gap-1.5">
-          {getLintIcon(row.name)} {getHumanReadableTitle(row.name)}
+          {lintInfoMap.find((item) => row.name === item.name)?.icon}
+          {<h3 className="text-sm">{lintInfoMap.find((item) => row.name === item.name)?.title}</h3>}
         </div>
       ),
     },
@@ -107,7 +117,7 @@ const ProjectLints: NextPageWithLayout = () => {
       id: 'metadata.name',
       name: 'Entity/item',
       description: undefined,
-      minWidth: 200,
+      minWidth: 230,
       value: (row: any) => (
         <div className="flex items-center gap-1">
           {row.metadata?.type === 'table' && <Table2 size={15} strokeWidth={1} />}
@@ -231,6 +241,14 @@ const ProjectLints: NextPageWithLayout = () => {
         </TabsList_Shadcn_>
       </Tabs_Shadcn_>
 
+      <FilterPopover
+        name="Type"
+        options={filterOptions}
+        labelKey="name"
+        valueKey="value"
+        activeOptions={filters.types}
+        onSaveFilters={(values) => setFilters({ ...filters, types: values })}
+      />
       <div className="col-span-12 flex items-center justify-between">
         <div className="flex items-center gap-x-4"></div>
       </div>
@@ -341,7 +359,10 @@ const ProjectLints: NextPageWithLayout = () => {
                 >
                   {selectedLint && (
                     <div className={cn('py-4 px-4 grid gap-2')}>
-                      <h3 className="text-sm">{getHumanReadableTitle(selectedLint.name)}</h3>
+                      {/* <h3 className="text-sm">{getHumanReadableTitle(selectedLint.name)}</h3> */}
+                      <h3 className="text-sm">
+                        {lintInfoMap.find((item) => item.name === selectedLint.name)?.title}
+                      </h3>
                       <div className="flex items-center gap-2 text-sm">
                         <span>Entity</span>
                         <div className="flex items-center gap-1 px-2 py-0.5 bg-surface-200 border rounded-lg ">
@@ -412,7 +433,7 @@ const ProjectLints: NextPageWithLayout = () => {
         </div>
       </div>
       <div className="col-span-12 hidden remove-me-when-finished">
-        <Table
+        {/* <Table
           head={[
             <Table.th key="level" className="py-2">
               Level
@@ -448,22 +469,22 @@ const ProjectLints: NextPageWithLayout = () => {
                     </Table.td>
                   </Table.tr>,
                 ]
-              : (filters.levels.length > 0 || filters.types.length > 0) &&
-                  filteredLints.length === 0
-                ? [
-                    <Table.tr key="empty-state">
-                      <Table.td colSpan={6} className="p-3 py-12">
-                        <p className="text-foreground-light">
-                          No problems found based on the selected filters
-                        </p>
-                      </Table.td>
-                    </Table.tr>,
-                  ]
-                : filteredLints.map((lint) => {
-                    return <ReportLintsTableRow key={lint.cache_key} lint={lint} />
-                  })),
+              // : (filters.levels.length > 0 || filters.types.length > 0) &&
+              //     filteredLints.length === 0
+              //   ? [
+              //       <Table.tr key="empty-state">
+              //         <Table.td colSpan={6} className="p-3 py-12">
+              //           <p className="text-foreground-light">
+              //             No problems found based on the selected filters
+              //           </p>
+              //         </Table.td>
+              //       </Table.tr>,
+              //     ]
+              //   : filteredLints.map((lint) => {
+              //       return <ReportLintsTableRow key={lint.cache_key} lint={lint} />
+              //     })),
           ]}
-        />
+        /> */}
       </div>
     </div>
   )

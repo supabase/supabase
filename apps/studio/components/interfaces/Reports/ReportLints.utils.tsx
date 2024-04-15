@@ -1,5 +1,5 @@
 import { LINT_TYPES, Lint } from 'data/lint/lint-query'
-import { AlertCircle, Book, Key, LinkIcon, Lock, User } from 'lucide-react'
+import { AlertCircle, Book, Key, LinkIcon, Lock, Table2, User, Eye, Unlock } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 
@@ -12,17 +12,73 @@ interface LintInfo {
   icon: JSX.Element
 }
 
-const lintInfoMap: Record<LINT_TYPES, LintInfo> = {
-  unindexed_foreign_keys: {
+export const lintInfoMap = [
+  {
+    name: 'unindexed_foreign_keys',
     title: 'Unindexed foreign keys',
-    icon: <Key size={15} strokeWidth={1.5} />,
+    icon: <Table2 size={15} strokeWidth={1} />,
   },
-  auth_users_exposed: {
+  {
+    name: 'auth_users_exposed',
     title: 'Exposed Auth Users',
     icon: <Lock size={15} strokeWidth={1.5} />,
   },
-  // Add other lint types here
-}
+  {
+    name: 'auth_rls_initplan',
+    title: 'Auth RLS Initialization Plan',
+    icon: <Table2 size={15} strokeWidth={1} />,
+  },
+  {
+    name: 'no_primary_key',
+    title: 'No Primary Key',
+    icon: <Table2 size={15} strokeWidth={1} />,
+  },
+  {
+    name: 'unused_index',
+    title: 'Unused Index',
+    icon: <Table2 size={15} strokeWidth={1} />,
+  },
+  {
+    name: 'multiple_permissive_policies',
+    title: 'Multiple Permissive Policies',
+    icon: <Table2 size={15} strokeWidth={1} />,
+  },
+  {
+    name: 'function_search_path_mutable',
+    title: 'Function Search Path Mutable',
+    icon: <Table2 size={15} strokeWidth={1} />,
+  },
+  {
+    name: 'rls_enabled_no_policy',
+    title: 'RLS Enabled No Policy',
+    icon: <Table2 size={15} strokeWidth={1} />,
+  },
+  {
+    name: 'policy_exists_rls_disabled',
+    title: 'Policy Exists RLS Disabled',
+    icon: <Table2 size={15} strokeWidth={1} />,
+  },
+  {
+    name: 'rls_disabled_in_public',
+    title: 'RLS Disabled in Public',
+    icon: <Table2 size={15} strokeWidth={1} />,
+  },
+  {
+    name: 'security_definer_view',
+    title: 'Security Definer View',
+    icon: <Eye size={15} strokeWidth={1.5} />,
+  },
+  {
+    name: 'duplicate_index',
+    title: 'Duplicate Index',
+    icon: <Table2 size={15} strokeWidth={1} />,
+  },
+  {
+    name: 'extension_in_public',
+    title: 'Extension in Public',
+    icon: <Unlock size={15} strokeWidth={1} />,
+  },
+]
 
 export function getHumanReadableTitle(title: LINT_TYPES) {
   switch (title) {
