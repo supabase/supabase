@@ -1,5 +1,8 @@
-import { useState } from 'react'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
+import * as z from 'zod'
 
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import { useProfile } from 'lib/profile'
@@ -12,32 +15,34 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
-  Form,
-  Input,
+  FormControl_Shadcn_,
+  FormField_Shadcn_,
+  FormItem_Shadcn_,
+  FormLabel_Shadcn_,
+  Form_Shadcn_,
+  Input_Shadcn_,
 } from 'ui'
 
 export const DeleteAccountButton = () => {
   const { profile } = useProfile()
   const [isOpen, setIsOpen] = useState(false)
 
-  const account = profile?.primary_email
-
-  const onValidate = (values: any) => {
-    const errors: any = {}
-    if (!values.account) {
-      errors.account = 'Enter the account information.'
-    }
-    if (values.account !== account) {
-      errors.account = 'Value entered does not match the value above.'
-    }
-    return errors
-  }
+  const accountEmail = profile?.primary_email
+  const FormSchema = z.object({ account: z.string() })
+  const form = useForm<z.infer<typeof FormSchema>>({
+    mode: 'onBlur',
+    reValidateMode: 'onBlur',
+    resolver: zodResolver(FormSchema),
+    defaultValues: { account: '' },
+  })
+  const { account } = form.watch()
 
   const { mutate: submitSupportTicket, isLoading } = useSendSupportTicketMutation({
     onSuccess: () => {
       setIsOpen(false)
       toast.success(
-        'Successfully submitted account deletion request - we will reach out to you via email once the request is completed!'
+        'Successfully submitted account deletion request - we will reach out to you via email once the request is completed!',
+        { duration: 8000 }
       )
     },
     onError: (error) => {
@@ -46,7 +51,7 @@ export const DeleteAccountButton = () => {
   })
 
   const onConfirmDelete = async () => {
-    if (!account) return console.error('Account information is required')
+    if (!accountEmail) return console.error('Account information is required')
 
     const payload = {
       subject: 'Account Deletion Request',
@@ -59,10 +64,14 @@ export const DeleteAccountButton = () => {
     submitSupportTicket(payload)
   }
 
+  useEffect(() => {
+    if (isOpen && form !== undefined) form.reset({ account: '' })
+  }, [form, isOpen])
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button type="danger" loading={!account}>
+        <Button type="danger" loading={!accountEmail}>
           Request to delete account
         </Button>
       </DialogTrigger>
@@ -75,44 +84,48 @@ export const DeleteAccountButton = () => {
           </DialogDescription>
         </DialogHeader>
 
-        {/* [TODO] Use RHF, old Form component is deprecated */}
-        <Form
-          validateOnBlur
-          initialValues={{ account: '' }}
-          onSubmit={onConfirmDelete}
-          validate={onValidate}
-        >
-          {(props: any) => {
-            return (
-              <div className="space-y-4">
-                <Input
-                  id="account"
-                  label={
-                    <span>
-                      Please type <span className="font-bold">{profile?.primary_email ?? ''}</span>{' '}
-                      to confirm
-                    </span>
-                  }
-                  placeholder="Enter the account above"
-                  className="w-full px-7"
-                />
-                <DialogSectionSeparator />
-                <div className="px-7 pb-4">
-                  <Button
-                    block
-                    size="small"
-                    type="danger"
-                    htmlType="submit"
-                    loading={isLoading}
-                    disabled={props.values.account !== profile?.primary_email || isLoading}
-                  >
-                    I understand, delete this account
-                  </Button>
-                </div>
-              </div>
-            )
-          }}
-        </Form>
+        <Form_Shadcn_ {...form}>
+          <form
+            id="account-deletion-request"
+            className="flex flex-col gap-y-4"
+            onSubmit={form.handleSubmit(() => onConfirmDelete())}
+          >
+            <FormField_Shadcn_
+              name="account"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem_Shadcn_ className="px-7">
+                  <FormLabel_Shadcn_>
+                    Please type <span className="font-bold">{profile?.primary_email ?? ''}</span> to
+                    confirm
+                  </FormLabel_Shadcn_>
+                  <FormControl_Shadcn_>
+                    <Input_Shadcn_
+                      autoFocus
+                      {...field}
+                      autoComplete="off"
+                      disabled={isLoading}
+                      placeholder="Enter the account above"
+                    />
+                  </FormControl_Shadcn_>
+                </FormItem_Shadcn_>
+              )}
+            />
+            <DialogSectionSeparator />
+            <div className="px-7 pb-4">
+              <Button
+                block
+                size="small"
+                type="danger"
+                htmlType="submit"
+                loading={isLoading}
+                disabled={account !== accountEmail || isLoading}
+              >
+                I understand, delete this account
+              </Button>
+            </div>
+          </form>
+        </Form_Shadcn_>
       </DialogContent>
     </Dialog>
   )
