@@ -53,9 +53,10 @@ It implements MVCC, the feature that allows allows multiple connected users to s
 1. **Bloat Reduction**: Efficiently manages updates in-place with an undo log, which contributes to reducing database bloat — a common issue where the database size grows due to unused or obsolete data occupying space.
 1. **Index-organized tables:** Oriole stores table rows in the leafs of primary key index making primary key lookups very cheap. In many cases, this saves significant storage space.
 
-![Faster reads with Oriole](/images/blog/launch-week-11/oriole/read-only-results-amazon.png)
-
-<caption>Reads and writes are significantly faster with Oriole</caption>
+<figure>
+  ![Faster reads with Oriole](/images/blog/launch-week-11/oriole/read-only-results-amazon.png)
+  <figcaption>Reads and writes are significantly faster with Oriole</figcaption>
+</figure>
 
 ## Pluggable storage in Postgres
 
