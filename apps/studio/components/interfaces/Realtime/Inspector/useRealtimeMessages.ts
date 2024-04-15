@@ -178,7 +178,7 @@ export const useRealtimeMessages = (
         // console.log(`Realtime Channel status: ${status}`)
       } else if (status === 'CHANNEL_ERROR') {
         toast.error(
-          'Failed to connect to the channel. This may be due to restrictive RLS policies. Check your role and try again.'
+          'Failed to connect to the channel: This may be due to restrictive RLS policies. Check your role and try again.'
         )
 
         newChannel.unsubscribe()
