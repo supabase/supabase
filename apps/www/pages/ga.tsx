@@ -86,7 +86,7 @@ export default function IndexPage() {
             </div>
           </div>
         </SectionContainer>
-        <SectionContainer className="!pt-0">
+        <SectionContainer className="!pt-2 lg:!pt-8">
           {data.highlightsSection.highlights && (
             <div
               className="flex-wrap md:flex-nowrap w-fit md:w-full md:flex md:items-start grid lg:grid-cols-4 gap-4 md:gap-10 lg:gap-20
@@ -109,7 +109,7 @@ export default function IndexPage() {
               )}
             </div>
           )}
-          <div className="w-full border-t mt-12 lg:mt-32 flex justify-start">
+          <div className="w-full border-t mt-12 lg:mt-24 flex justify-start">
             <ol className="w-full max-w-4xl pt-8 gap-4 columns-2 lg:columns-3 text-foreground-light">
               {data.hero.sections.map((section, i) => (
                 <li key={section.title}>
