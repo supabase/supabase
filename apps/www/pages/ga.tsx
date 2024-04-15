@@ -174,9 +174,9 @@ export default function IndexPage() {
       <SectionContainer className="!pt-0 !grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 xl:gap-10">
         <div className="col-span-full lg:col-start-6 lg:col-span-7">
           <ImageGrid
-            smCols={3}
-            mdCols={3}
-            lgCols={3}
+            smCols={2}
+            mdCols={4}
+            lgCols={2}
             images={data.enterpriseSection.companies}
             removeFilter
             bg={false}

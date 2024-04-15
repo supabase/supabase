@@ -220,6 +220,12 @@ We'll continue to expand the Supabase Enterprise offering to include more deploy
           ? '/images/ga/enterprise/pwc--dark.svg'
           : '/images/ga/enterprise/pwc--light.svg',
       },
+      {
+        name: 'mozilla',
+        image: isDark
+          ? '/images/ga/enterprise/mozilla--dark.png'
+          : '/images/ga/enterprise/mozilla--light.png',
+      },
     ],
     highlights: [
       {

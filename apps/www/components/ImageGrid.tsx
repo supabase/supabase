@@ -10,7 +10,7 @@ interface iImages {
   link?: string
 }
 
-type colSizes = 8 | 6 | 5 | 4 | 3
+type colSizes = 8 | 6 | 5 | 4 | 3 | 2
 type paddingSizes = 6 | 8 | 12
 
 interface iImageGrid {
@@ -37,6 +37,7 @@ const ImageGrid = ({
   bg = true,
 }: iImageGrid) => {
   const smBreakpoint = {
+    2: 'grid-cols-2',
     3: 'grid-cols-3',
     4: 'grid-cols-4',
     5: 'grid-cols-5',
@@ -45,6 +46,7 @@ const ImageGrid = ({
   }
 
   const mdBreakpoint = {
+    2: 'md:grid-cols-2',
     3: 'md:grid-cols-3',
     4: 'md:grid-cols-4',
     5: 'md:grid-cols-5',
@@ -53,6 +55,7 @@ const ImageGrid = ({
   }
 
   const lgBreakpoint = {
+    2: 'lg:grid-cols-2',
     3: 'lg:grid-cols-3',
     4: 'lg:grid-cols-4',
     5: 'lg:grid-cols-5',
