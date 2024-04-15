@@ -4995,13 +4995,20 @@ functions:
         name: Invoking a Function in the UsEast1 region
         description: |
           Here are the available regions:
-          - `FunctionRegion.Any`, `FunctionRegion.ApNortheast1`,
-          - `FunctionRegion.ApNortheast2`, `FunctionRegion.ApSouth1`,
-          - `FunctionRegion.ApSoutheast1`, `FunctionRegion.ApSoutheast2`,
-          - `FunctionRegion.CaCentral1`, `FunctionRegion.EuCentral1`,
-          - `FunctionRegion.EuWest1`, `FunctionRegion.EuWest2`,
-          - `FunctionRegion.EuWest3`, `FunctionRegion.SaEast1`,
-          - `FunctionRegion.UsEast1`, `FunctionRegion.UsWest1`,
+          - `FunctionRegion.Any`
+          - `FunctionRegion.ApNortheast1`
+          - `FunctionRegion.ApNortheast2`
+          - `FunctionRegion.ApSouth1`
+          - `FunctionRegion.ApSoutheast1`
+          - `FunctionRegion.ApSoutheast2`
+          - `FunctionRegion.CaCentral1`
+          - `FunctionRegion.EuCentral1`
+          - `FunctionRegion.EuWest1`
+          - `FunctionRegion.EuWest2`
+          - `FunctionRegion.EuWest3`
+          - `FunctionRegion.SaEast1`
+          - `FunctionRegion.UsEast1`
+          - `FunctionRegion.UsWest1`
           - `FunctionRegion.UsWest2`
         isSpotlight: true
         code: |
