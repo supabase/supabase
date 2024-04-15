@@ -16,7 +16,7 @@ export const AccountDeletion = () => {
             <AlertTitle_Shadcn_>Request for account deletion</AlertTitle_Shadcn_>
             <AlertDescription_Shadcn_>
               Deleting your account is permanent and cannot be undone. Your data will be deleted
-              within 30 days, except we may retain a limited set of data for longer where required
+              within 30 days, except we may retain some metadata and logs for longer where required
               or permitted by law.
             </AlertDescription_Shadcn_>
             <AlertDescription_Shadcn_ className="mt-3">
