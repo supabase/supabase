@@ -83,26 +83,31 @@ We're committed to our free tier - we know the importance of this for testing ho
       {
         number: '65,000',
         text: 'GitHub stars',
-        icon: <IconGitHubSolid className="text-foreground-muted" />,
+        url: 'https://github.com/supabase',
+        icon: <IconGitHubSolid />,
       },
       {
         number: '106,000',
         text: 'Twitter followers',
-        icon: <IconTwitterX className="text-foreground-muted" />,
+        url: 'https://twitter.com/supabase',
+        icon: <IconTwitterX />,
       },
       {
         number: '25,000',
         text: 'Discord members',
-        icon: <IconDiscord className="text-foreground-muted" />,
+        url: 'https://discord.com/invite/R7bSpeBSJE',
+        icon: <IconDiscord />,
       },
       {
         number: '23,000',
         text: 'YouTube subscribers',
-        icon: <IconYoutubeSolid className="text-foreground-muted" />,
+        url: 'https://www.youtube.com/c/supabase',
+        icon: <IconYoutubeSolid />,
       },
       {
         number: '10,000',
         text: 'Reddit subs',
+        url: 'https://www.reddit.com/r/Supabase/',
         icon: (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -139,7 +144,7 @@ We're committed to our free tier - we know the importance of this for testing ho
                   strokeLinecap: 'butt',
                   strokeLinejoin: 'miter',
                   strokeMiterlimit: 10,
-                  fill: 'hsl(var(--foreground-muted) / 1)',
+                  fill: 'currentColor',
                   fillRule: 'nonzero',
                   opacity: 1,
                 }}

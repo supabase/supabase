@@ -128,10 +128,19 @@ export default function IndexPage() {
             "
           >
             {data.communityStats.highlights.map(
-              (highlight: { number: string; text: string; icon: React.ReactNode }, i: number) => {
+              (
+                highlight: { number: string; text: string; url: string; icon: React.ReactNode },
+                i: number
+              ) => {
                 return (
                   <div key={i} className="">
-                    {highlight.icon}
+                    <Link
+                      href={highlight.url}
+                      target="_blank"
+                      className="text-foreground-muted hover:text-foreground transition-colors"
+                    >
+                      {highlight.icon}
+                    </Link>
                     <div className="border-t-[1px] border-brand-500 w-[32px] mb-1 mt-4"></div>
                     <h2 className="text-xl md:text-2xl lg:text-4xl pt-1.5 lg:pt-3 tracking-[-1.5px] font-mono">
                       {highlight.number}
