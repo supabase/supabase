@@ -12,6 +12,7 @@ import ReactMarkdown from 'react-markdown'
 import Image from 'next/image'
 import ImageGrid from '../components/ImageGrid'
 import { useTheme } from 'next-themes'
+import { ExpandableVideo } from 'ui-patterns'
 
 const ParagraphSection = dynamic(() => import('~/components/Sections/ParagraphSection'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
@@ -43,37 +44,47 @@ export default function IndexPage() {
         }}
       />
       <div className="bg-alternative border-b border-muted">
-        <SectionContainer className="flex flex-col gap-6 lg:gap-12">
-          <Image
-            src="/images/launchweek/ga/ga-black.svg"
-            alt="GA logo"
-            className="dark:hidden w-12 md:w-16 aspect-[104/57] h-auto"
-            priority
-            quality={100}
-            width={300}
-            height={300}
-          />
-          <Image
-            src="/images/launchweek/ga/ga-white.svg"
-            alt="GA logo"
-            className="hidden dark:block w-12 md:w-16 aspect-[104/57] h-auto"
-            priority
-            quality={100}
-            width={300}
-            height={300}
-          />
-          <div>
-            <h1 className="text-3xl md:text-5xl xl:text-8xl lg:max-w-xl xl:max-w-7xl tracking-[-1.1px] text-foreground-light font-normal">
-              We are moving to
-              <br />
-              <span className="text-foreground">General Availability</span>
-            </h1>
+        <SectionContainer className="flex flex-col gap-4 lg:gap-8 py-8 md:py-12 lg:py-16">
+          <div className="w-full grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <div className="flex flex-col gap-4 lg:col-span-2">
+              <Image
+                src="/images/launchweek/ga/ga-black.svg"
+                alt="GA logo"
+                className="dark:hidden w-12 md:w-16 aspect-[104/57] h-auto"
+                priority
+                quality={100}
+                width={300}
+                height={300}
+              />
+              <Image
+                src="/images/launchweek/ga/ga-white.svg"
+                alt="GA logo"
+                className="hidden dark:block w-12 md:w-16 aspect-[104/57] h-auto"
+                priority
+                quality={100}
+                width={300}
+                height={300}
+              />
+              <h1 className="lg:pt-4 text-3xl md:text-5xl xl:text-7xl lg:max-w-xl xl:max-w-7xl tracking-[-1.1px] text-foreground-light font-normal">
+                We are moving to
+                <br />
+                <span className="text-foreground">General Availability</span>
+              </h1>
+              {data.hero?.publishedAt && (
+                <span className="text-sm text-foreground-lighter font-mono md:text-base">
+                  {data.hero.publishedAt}
+                </span>
+              )}
+            </div>
+            <div className="">
+              <ExpandableVideo
+                videoId="bRtdk8D4X8w"
+                imgUrl="/images/launchweek/11/video-cover.jpg"
+                imgOverlayText="Watch announcement"
+                priority
+              />
+            </div>
           </div>
-          {data.hero?.publishedAt && (
-            <span className="text-sm text-foreground-lighter font-mono md:text-base">
-              {data.hero.publishedAt}
-            </span>
-          )}
         </SectionContainer>
         <SectionContainer className="!pt-0">
           {data.highlightsSection.highlights && (
@@ -98,8 +109,8 @@ export default function IndexPage() {
               )}
             </div>
           )}
-          <div className="w-full border-t max-w-4xl mt-12 lg:mt-32 flex justify-center">
-            <ol className="w-full pt-8 gap-4 columns-2 lg:columns-3 text-foreground-light">
+          <div className="w-full border-t mt-12 lg:mt-32 flex justify-start">
+            <ol className="w-full max-w-4xl pt-8 gap-4 columns-2 lg:columns-3 text-foreground-light">
               {data.hero.sections.map((section, i) => (
                 <li key={section.title}>
                   <Link
