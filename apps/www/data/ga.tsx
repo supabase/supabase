@@ -1,5 +1,13 @@
+import {
+  ClipboardCheckIcon,
+  CreditCardIcon,
+  KeyIcon,
+  RewindIcon,
+  ShieldCheckIcon,
+  UserGroupIcon,
+} from '@heroicons/react/outline'
 import { Github } from 'lucide-react'
-import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
+import { IconActivity, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
 
 export const data = (isDark: boolean) => ({
   hero: {
@@ -157,10 +165,6 @@ We're committed to our free tier - we know the importance of this for testing ho
           </svg>
         ),
       },
-      // {
-      //   number: 'Top 5',
-      //   text: 'Product Hunt shout-outs',
-      // },
     ],
   },
   scaleSection: {
@@ -210,6 +214,40 @@ We'll continue to expand the Supabase Enterprise offering to include more deploy
         image: isDark
           ? '/images/ga/enterprise/pwc--dark.svg'
           : '/images/ga/enterprise/pwc--light.svg',
+      },
+    ],
+    highlights: [
+      {
+        text: 'SOC 2',
+        icon: <ShieldCheckIcon className="text-foreground-lighter w-6" strokeWidth={1} />,
+      },
+      {
+        text: 'HIPAA',
+        icon: <IconActivity strokeWidth={1} className="text-foreground-lighter w-6" />,
+      },
+      {
+        text: 'Data Encryption',
+        icon: <KeyIcon strokeWidth={1} className="text-foreground-lighter w-6" />,
+      },
+      {
+        text: 'Role-based access control',
+        icon: <UserGroupIcon strokeWidth={1} className="text-foreground-lighter w-6" />,
+      },
+      {
+        text: 'Backups',
+        icon: <RewindIcon strokeWidth={1} className="text-foreground-lighter w-6" />,
+      },
+      // {
+      //   text: 'Payment processing',
+      //   icon: <CreditCardIcon strokeWidth={1} className="text-foreground-lighter w-6" />,
+      // },
+      // {
+      //   text: 'Vulnerability Management',
+      //   icon: <ClipboardCheckIcon strokeWidth={1} className="text-foreground-lighter w-6" />,
+      // },
+      {
+        text: 'DDoS Protection',
+        icon: <ShieldCheckIcon strokeWidth={1} className="text-foreground-lighter w-6" />,
       },
     ],
   },

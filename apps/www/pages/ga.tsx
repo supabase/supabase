@@ -11,11 +11,9 @@ import SectionContainer from '../components/Layouts/SectionContainer'
 import ReactMarkdown from 'react-markdown'
 import Image from 'next/image'
 import ImageGrid from '../components/ImageGrid'
-import CompaniesData from 'data/Companies'
 import { useTheme } from 'next-themes'
 
 const ParagraphSection = dynamic(() => import('~/components/Sections/ParagraphSection'))
-const FeaturesSection = dynamic(() => import('~/components/Sections/FeaturesSection'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
 export default function IndexPage() {
@@ -66,7 +64,6 @@ export default function IndexPage() {
           />
           <div>
             <h1 className="text-3xl md:text-5xl xl:text-8xl lg:max-w-xl xl:max-w-7xl tracking-[-1.1px] text-foreground-light font-normal">
-              {/* {data.hero.title} */}
               We are moving to
               <br />
               <span className="text-foreground">General Availability</span>
@@ -164,6 +161,33 @@ export default function IndexPage() {
             bg={false}
           />
         </div>
+      </SectionContainer>
+      <SectionContainer className="!pt-0">
+        {data.enterpriseSection.highlights && (
+          <div
+            className="grid grid-cols-2 md:grid md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-8 md:gap-10 lg:gap-20
+            "
+          >
+            {data.enterpriseSection.highlights.map(
+              (highlight: { number?: string; text: string; icon: React.ReactNode }, i: number) => {
+                return (
+                  <div key={i} className="">
+                    {highlight.icon}
+                    <div className="border-t-[1px] border-brand-500 w-[32px] mb-1 mt-4"></div>
+                    {highlight.number && (
+                      <h2 className="text-xl md:text-2xl lg:text-4xl pt-1.5 lg:pt-3 tracking-[-1.5px] font-mono">
+                        {highlight.number}
+                      </h2>
+                    )}
+                    <ReactMarkdown className="text-foreground-light text-sm lg:text-base lg:mt-3">
+                      {highlight.text}
+                    </ReactMarkdown>
+                  </div>
+                )
+              }
+            )}
+          </div>
+        )}
       </SectionContainer>
       <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.integrationsSection} hasStickyTitle className="!pb-8 lg:!pb-16" />
