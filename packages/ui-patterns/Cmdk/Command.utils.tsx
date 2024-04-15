@@ -23,10 +23,6 @@ export const copyToClipboard = (str: string, callback = () => {}) => {
   }
 }
 
-export function escapeDoubleQuotesAndNewLines(str: string) {
-  return str.replaceAll('"', '\\"').replaceAll('\n', '\\n')
-}
-
 export const Command = React.forwardRef<CommandPrimitiveElement, CommandPrimitiveProps>(
   ({ className, ...props }, ref) => (
     <CommandPrimitive
