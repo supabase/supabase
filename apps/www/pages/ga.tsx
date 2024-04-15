@@ -119,6 +119,30 @@ export default function IndexPage() {
       <ParagraphSection {...data.companySection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.openSourceSection} hasStickyTitle />
+      <SectionContainer className="!pt-0">
+        {data.communityStats.highlights && (
+          <div
+            className="flex flex-wrap w-fit md:w-full md:flex md:items-start grid grid-cols-4 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-10 lg:gap-20
+            "
+          >
+            {data.communityStats.highlights.map(
+              (highlight: { number: string; text: string }, i: number) => {
+                return (
+                  <div key={i} className="">
+                    <div className="border-t-[1px] border-brand-500 w-[32px]"></div>
+                    <h2 className="text-xl md:text-2xl lg:text-4xl pt-1.5 lg:pt-3 tracking-[-1.5px] font-mono">
+                      {highlight.number}
+                    </h2>
+                    <ReactMarkdown className="text-foreground-light text-sm lg:text-base lg:mt-3">
+                      {highlight.text}
+                    </ReactMarkdown>
+                  </div>
+                )
+              }
+            )}
+          </div>
+        )}
+      </SectionContainer>
       <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.scaleSection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
