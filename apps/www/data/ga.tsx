@@ -148,7 +148,7 @@ Developers have different preferences on how to connect to their database, and S
 You can find the [full list of partners and integrations](https://supabase.com/partners/integrations) on our Partners page. If you're interested in partnering with Supabase head over to the [Partner Portal](https://supabase.com/partners).
 `,
   },
-  newSection: {
+  'whats-new': {
     id: 'whats-new',
     title: "What's new?",
     paragraph: '06',
@@ -167,7 +167,7 @@ The goal of Supabase is to become the default backend for all kinds of developer
 
 `,
   },
-  nextSection: {
+  'whats-next': {
     id: 'whats-next',
     title: "What's next?",
     paragraph: '07',

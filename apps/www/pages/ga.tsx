@@ -150,9 +150,9 @@ export default function IndexPage() {
       <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.integrationsSection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
-      <FeaturesSection {...data.newSection} hasStickyTitle />
+      <ParagraphSection {...data['whats-new']} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
-      <ParagraphSection {...data.nextSection} hasStickyTitle />
+      <ParagraphSection {...data['whats-next']} hasStickyTitle />
       <CTABanner />
     </DefaultLayout>
   )
