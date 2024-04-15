@@ -102,7 +102,7 @@ const CreateWrapper = () => {
             The wrapper type {type} requires a minimum extension version of{' '}
             {wrapperMeta.minimumExtensionVersion}. You have version{' '}
             {wrappersExtension?.installed_version} installed. Please{' '}
-            {databaseNeedsUpgrading && 'upgrade your database then'} reinstall the extension to
+            {databaseNeedsUpgrading && 'upgrade your database then '}reinstall the extension to
             create this wrapper.
           </p>
         </div>
