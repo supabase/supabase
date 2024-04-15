@@ -53,11 +53,14 @@ import DataGrid from 'react-data-grid'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { QueryDetail } from '../../../../components/interfaces/QueryPerformanceV2/QueryDetail'
 import { QueryIndexes } from '../../../../components/interfaces/QueryPerformanceV2/QueryIndexes'
-import { getLintIcon } from '../../../../components/interfaces/Reports/ReportLints.utils'
+import { getLintIcon, LintCTA } from '../../../../components/interfaces/Reports/ReportLints.utils'
+import { Markdown } from '../../../../components/interfaces/Markdown'
+import ReactMarkdown from 'react-markdown'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
   const router = useRouter()
+  const { ref } = useParams()
   const gridRef = useRef<DataGridHandle>(null)
   const { preset } = useParams()
   const [filters, setFilters] = useState({
@@ -200,13 +203,12 @@ const ProjectLints: NextPageWithLayout = () => {
     return result
   })
   return (
-    <div>
+    <div className="relative">
       <FormHeader
         className="py-4 px-6 !mb-0"
         title="Suggestions"
         docsUrl="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
       />
-
       <Tabs_Shadcn_
         defaultValue={page}
         onValueChange={(value) => {
@@ -271,7 +273,6 @@ const ProjectLints: NextPageWithLayout = () => {
           ))}
         </TabsList_Shadcn_>
       </Tabs_Shadcn_>
-
       {/* <div className="col-span-12">
             <FormHeader
               className="!mb-0"
@@ -279,7 +280,6 @@ const ProjectLints: NextPageWithLayout = () => {
               description="Identify common schema problems in your database."
             />
           </div> */}
-
       <div className="col-span-12 flex items-center justify-between">
         <div className="flex items-center gap-x-4">
           {/* <div className="flex items-center gap-x-2">
@@ -312,23 +312,8 @@ const ProjectLints: NextPageWithLayout = () => {
                   : null}
               </p> */}
         </div>
-        {/* <div className="flex items-center gap-x-2">
-          <Button asChild type="default" icon={<ExternalLink />}>
-            <a href="https://supabase.github.io/splinter" target="_blank" rel="noreferrer">
-              Documentation
-            </a>
-          </Button>
-          <Button
-            type="primary"
-            disabled={isLoading || isRefetching}
-            loading={isLoading || isRefetching}
-            onClick={() => refetch()}
-          >
-            Rerun linter
-          </Button>
-        </div> */}
       </div>
-
+      <LoadingLine loading={isLoading || isRefetching} />
       <ResizablePanelGroup
         direction="horizontal"
         className="relative flex flex-grow bg-alternative min-h-0"
@@ -418,7 +403,7 @@ const ProjectLints: NextPageWithLayout = () => {
                     value="details"
                     className="px-0 pb-0 h-full text-xs  data-[state=active]:bg-transparent !shadow-none"
                   >
-                    Overview {selectedRow}
+                    Overview
                   </TabsTrigger_Shadcn_>
                   {/* {showIndexSuggestions && (
                         <TabsTrigger_Shadcn_
@@ -434,9 +419,44 @@ const ProjectLints: NextPageWithLayout = () => {
                   className="mt-0 flex-grow min-h-0 overflow-y-auto"
                 >
                   {selectedLint && (
-                    <div className={cn('py-4 px-4 grid')}>
-                      <h3>{getHumanReadableTitle(selectedLint.name)}</h3>
-                      <p>{selectedLint.description}</p>
+                    <div className={cn('py-4 px-4 grid gap-2')}>
+                      <h3 className="text-sm">{getHumanReadableTitle(selectedLint.name)}</h3>
+                      <div className="flex items-center gap-2 text-sm">
+                        <span>Entity</span>
+                        <div className="flex items-center gap-1 px-2 py-0.5 bg-surface-200 border rounded-lg ">
+                          {selectedLint.metadata?.type === 'table' && (
+                            <Table2 size={15} strokeWidth={1} />
+                          )}
+                          {selectedLint.metadata?.type === 'view' && (
+                            <Eye size={15} strokeWidth={1.5} />
+                          )}{' '}
+                          {`${selectedLint.metadata?.schema}.${selectedLint.metadata?.name}`}
+                        </div>
+                      </div>
+
+                      <div className="grid gap-6 mt-6 text-sm">
+                        <div className="grid gap-2">
+                          <h3>Issue</h3>
+                          <ReactMarkdown className="">{selectedLint.detail}</ReactMarkdown>
+                        </div>
+                        <div className="grid gap-2">
+                          <h3>Description</h3>
+                          <ReactMarkdown className="text-sm">
+                            {selectedLint.description}
+                          </ReactMarkdown>
+                        </div>
+
+                        <div className="grid gap-2">
+                          <h3>Resolve</h3>
+                          <div>
+                            <LintCTA
+                              title={selectedLint.name}
+                              projectRef={ref!}
+                              metadata={selectedLint.metadata}
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   )}
 
@@ -458,7 +478,31 @@ const ProjectLints: NextPageWithLayout = () => {
           </>
         )}
       </ResizablePanelGroup>
+      <div className="px-6 py-6 flex gap-x-4 border-t">
+        <div className="w-[35%] flex flex-col gap-y-1 text-sm">
+          <p>Reset suggestions</p>
+          <p className="text-xs text-foreground-light">
+            Consider resetting the analysis making any changes
+          </p>
 
+          <Button
+            type="default"
+            className="!mt-3 w-min"
+            disabled={isLoading || isRefetching}
+            loading={isLoading || isRefetching}
+            onClick={() => refetch()}
+          >
+            Rerun linter
+          </Button>
+        </div>
+        <div className="w-[35%] flex flex-col gap-y-1 text-sm">
+          <p>How are these suggestions generated?</p>
+          <Markdown
+            className="text-xs"
+            content="These suggestions use [splinter (Supabase Postgres LINTER)](https://github.com/supabase/splinter)."
+          />
+        </div>
+      </div>
       <div className="col-span-12 hidden">
         <Table
           head={[
@@ -513,7 +557,6 @@ const ProjectLints: NextPageWithLayout = () => {
           ]}
         />
       </div>
-
       {/* {ignoredLints.length > 0 && (
           <div className="col-span-12 flex flex-col text-sm max-w-none gap-8 py-4">
             <Accordion_Shadcn_ type="single" collapsible>
