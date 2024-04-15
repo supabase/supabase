@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.151.1
+  version: 1.157.2
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -10,6 +10,8 @@ info:
   description: |
     Supabase CLI provides you with tools to develop your application locally, and deploy your application to the Supabase platform.
   tags:
+    - id: quick-start
+      title: Quick Start
     - id: local-dev
       title: Local Development
     - id: management-api
@@ -1349,19 +1351,21 @@ commands:
 
       If your local and remote migration history goes out of sync, you can repair the remote history by marking specific migrations as `--status applied` or `--status reverted`. Marking as `reverted` will delete an existing record from the migration history table while marking as `applied` will insert a new record.
 
-      For example, your migration history table may look like this after running `db pull` for the first time.
+      For example, your migration history may look like the table below, with missing entries in either local or remote.
 
       ```bash
       $ supabase migration list
               LOCAL      │     REMOTE     │     TIME (UTC)
         ─────────────────┼────────────────┼──────────────────────
-          20230103054303 │ 20230103054303 │ 2023-01-03 05:43:03
+                         │ 20230103054303 │ 2023-01-03 05:43:03
+         20230103054315  │                │ 2023-01-03 05:43:15
       ```
 
       To reset your migration history to a clean state, first delete your local migration file.
 
       ```bash
-      $ rm supabase/migrations/20230103054303_remote_commit.sql
+      $ rm supabase/migrations/20230103054315_remote_commit.sql
+
       $ supabase migration list
               LOCAL      │     REMOTE     │     TIME (UTC)
         ─────────────────┼────────────────┼──────────────────────
@@ -1372,13 +1376,30 @@ commands:
 
       ```bash
       $ supabase migration repair 20230103054303 --status reverted
-      Repaired migration history: 20230103054303 => reverted
+      Connecting to remote database...
+      Repaired migration history: [20220810154537] => reverted
+      Finished supabase migration repair.
+
       $ supabase migration list
               LOCAL      │     REMOTE     │     TIME (UTC)
         ─────────────────┼────────────────┼──────────────────────
       ```
 
       Now you can run `db pull` again to dump the remote schema as a local migration file.
+
+      ```bash
+      $ supabase db pull
+      Connecting to remote database...
+      Schema written to supabase/migrations/20240414044403_remote_schema.sql
+      Update remote migration history table? [Y/n]
+      Repaired migration history: [20240414044403] => applied
+      Finished supabase db pull.
+
+      $ supabase migration list
+              LOCAL      │     REMOTE     │     TIME (UTC)
+        ─────────────────┼────────────────┼──────────────────────
+          20240414044403 │ 20240414044403 │ 2024-04-14 04:44:03
+      ```
     examples:
       - id: basic-usage
         name: Mark a migration as reverted
@@ -1541,9 +1562,8 @@ commands:
     flags:
       - id: name
         name: --name <string>
-        description: |
-          Name that will be used to store token in your settings, defaults to built-in token name generator
-        default_value: ''
+        description: Name that will be used to store token in your settings
+        default_value: built-in token name generator
       - id: no-browser
         name: --no-browser
         description: Do not open browser automatically
@@ -2320,9 +2340,13 @@ commands:
     usage: supabase init [flags]
     subcommands: []
     flags:
+      - id: force
+        name: --force
+        description: Overwrite existing supabase/config.toml.
+        default_value: 'false'
       - id: use-orioledb
         name: --use-orioledb
-        description: Use OrioleDB storage engine for Postgres
+        description: Use OrioleDB storage engine for Postgres.
         default_value: 'false'
       - id: with-intellij-settings
         name: --with-intellij-settings
@@ -2828,6 +2852,39 @@ commands:
       Optionally, a new row can be inserted into the migration history table to reflect the current state of the remote database.
 
       If no entries exist in the migration history table, `pg_dump` will be used to capture all contents of the remote schemas you have created. Otherwise, this command will only diff schema changes against the remote database, similar to running `db diff --linked`.
+    examples:
+      - id: basic-usage
+        name: Basic usage
+        code: supabase db pull
+        response: |
+          Connecting to remote database...
+          Schema written to supabase/migrations/20240414044403_remote_schema.sql
+          Update remote migration history table? [Y/n]
+          Repaired migration history: [20240414044403] => applied
+          Finished supabase db pull.
+          The auth and storage schemas are excluded. Run supabase db pull --schema auth,storage again to diff them.
+      - id: local-studio
+        name: Local studio
+        code: supabase db pull --local
+        response: |
+          Connecting to local database...
+          Setting up initial schema....
+          Creating custom roles supabase/roles.sql...
+          Applying migration 20240414044403_remote_schema.sql...
+          No schema changes found
+          The auth and storage schemas are excluded. Run supabase db pull --schema auth,storage again to diff them.
+          exit status 1
+      - id: custom-schemas
+        name: Custom schemas
+        code: supabase db pull --schema auth,storage
+        response: |
+          Connecting to remote database...
+          Setting up initial schema....
+          Creating custom roles supabase/roles.sql...
+          Applying migration 20240414044403_remote_schema.sql...
+          No schema changes found
+          Try rerunning the command with --debug to troubleshoot the error.
+          exit status 1
     tags: []
     links: []
     usage: supabase db pull [migration name] [flags]
@@ -3437,3 +3494,16 @@ commands:
         description: enable experimental features
         required: true
         default_value: 'false'
+  - id: supabase-bootstrap
+    title: supabase bootstrap
+    summary: Bootstrap a Supabase project from a starter template
+    tags:
+      - quick-start
+    links: []
+    usage: supabase bootstrap [template] [flags]
+    subcommands: []
+    flags:
+      - id: password
+        name: -p, --password <string>
+        description: Password to your remote Postgres database.
+        default_value: ''

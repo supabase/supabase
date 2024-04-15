@@ -10,14 +10,17 @@ import { WeekDayProps } from '../data'
 import CountdownComponent from '../../Countdown'
 import { DayLink } from '.'
 
-const DaySection = ({ day }: { day: WeekDayProps }) => {
+const DaySection = ({ day, className }: { day: WeekDayProps; className?: string }) => {
   const isMobile = useBreakpoint(639)
   const cssGroup = 'group/d' + day.d
 
   return (
     <section
       id={day.id}
-      className="lwx-nav-anchor border-b py-8 first:border-t border-[#111718] text-[#575E61] scroll-mt-16 grid grid-cols-1 gap-4 md:grid-cols-3"
+      className={cn(
+        'lwx-nav-anchor border-b py-8 first:border-t dark:border-[#111718] text-foreground dark:text-[#575E61] scroll-mt-16 grid grid-cols-1 gap-4 md:grid-cols-3',
+        className
+      )}
     >
       {/* Day title and links */}
       <div
@@ -26,7 +29,7 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
       >
         <div
           className={cn(
-            'text-sm inline uppercase font-mono text-foreground-muted tracking-[0.1rem]',
+            'text-sm inline uppercase font-mono dark:text-foreground-muted tracking-[0.1rem]',
             day.shipped && 'text-foreground'
           )}
         >
@@ -57,7 +60,7 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
               cssGroup
             )}
           >
-            <div className="relative p-4 sm:p-6 md:p-8 z-20 flex-grow flex flex-col items-start justify-between gap-2 w-full lg:w-3/5 text-left">
+            <div className="relative text-foreground-light p-4 sm:p-6 md:p-8 z-20 flex-grow flex flex-col items-start justify-between gap-2 w-full lg:w-1/2 text-left">
               <div className="relative w-full flex items-center gap-2 text-sm translate-x-0 !ease-[.24,0,.22,.99] duration-200 group-hover:-translate-x-6 transition-transform">
                 <Edit className="w-4 min-w-4 group-hover:opacity-0 transition-opacity" />
                 <span>Blog post</span>
@@ -74,10 +77,10 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
                     !!layer.img && (
                       <div
                         key={`${day.title}-image-${i}`}
-                        className="absolute sm:opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100 shadow-[inset_0_-40px_40px_-40px_rgba(0,0,0,0.6)] sm:shadow-none"
+                        className="absolute sm:opacity-90 transition-opacity inset-0 w-full h-full -z-10 group-hover/d1:opacity-100"
                       >
                         <Image
-                          src={!!layer.mobileImg && isMobile ? (layer.mobileImg as any) : layer.img}
+                          src={!!layer.mobileImg && isMobile ? layer.mobileImg : layer.img}
                           className={`
                             absolute opacity-50 lg:opacity-100 object-cover
                             w-full h-full z-0 transition-all duration-300
@@ -96,8 +99,8 @@ const DaySection = ({ day }: { day: WeekDayProps }) => {
           <div
             className={cn(
               `min-h-[210px] group aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-end
-              bg-surface-100/10 border border-dashed border-[#14191B] text-[#8B9092]
-              rounded-xl p-4 sm:p-6 md:p-8 text-2xl bg-contain shadow-lg`,
+              bg-surface-100/10 border border-dashed border-strong dark:border-[#14191B] dark:text-[#8B9092]
+              rounded-xl p-4 sm:p-6 md:p-8 text-2xl bg-contain`,
               cssGroup
             )}
           >
