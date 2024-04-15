@@ -131,7 +131,7 @@ export default function IndexPage() {
             "
           >
             {data.communityStats.highlights.map(
-              (highlight: { number: string; text: string }, i: number) => {
+              (highlight: { number: string; text: string; icon: React.ReactNode }, i: number) => {
                 return (
                   <div key={i} className="">
                     {highlight.icon}
