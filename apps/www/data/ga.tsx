@@ -121,13 +121,13 @@ Postgres has been instrumental in our scalability and adoption. It's versatility
     title: 'Enterprise',
     paragraph: '04',
     content: `
-Supabase can now scale comfortably to any workload. Companies such as 1Password, PWC, & Johnson & Johnson are now running Supabase in production.
+Supabase can now scale comfortably to any workload. Companies such as 1Password, PWC, & Johnson & Johnson use Supabase to build Postgres-backed applications.
 
-We've spent the last few years working with these larger organizations on their requirements for running Supabase in production which include things like secure data systems and practices (SOC2 and HIPAA), round the clock support, and SLAs.
+We've spent years working with larger organizations to meet their requirements for running Supabase in production. This includes enhanced security tooling, industry best-practices (SOC2 and HIPAA), round the clock support, and SLAs.
 
-This week we're announcing that we've partnered with Amazon to offer Supabase through the AWS Marketplace, so customers can now purchase Supabase as part of their AWS committed spend.
+This week we've added support for Supabase in the AWS Marketplace. Enterprise customers can now purchase Supabase as part of their committed AWS spend. 
 
-We'll continue to expand the Supabase Enterprise offering to include more deployment options, if you're interested in using Supabase in production at your organization get in touch via the [Supabase for Enterprise form](https://forms.supabase.com/enterprise).
+We'll continue to expand the Supabase Enterprise offering to include more deployment options, including "Bring your own cloud". If you're interested in using Supabase in your organization, get in touch via the [Supabase for Enterprise form](https://forms.supabase.com/enterprise).
 `,
   },
   integrationsSection: {
