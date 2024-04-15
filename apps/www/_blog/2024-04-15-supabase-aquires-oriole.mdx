@@ -43,7 +43,7 @@ The `using` clause might look familiar if you have used other storage engines in
 
 The `orioledb` storage engine changes the representation of table data on disk. Its [architecture](https://github.com/orioledb/orioledb/blob/main/doc/arch.md) is designed to take advantage of modern hardware like SSDs and NVRAM.
 
-It implements MVCC, the feature that allows allows multiple connected users to see different versions of the data depending on when their transaction started, via an UNDO log rather than tuple versioning. Orioles architecture prevents bloat and provides several features and benefits:
+It implements MVCC, the feature that allows multiple connected users to see different versions of the data depending on when their transaction started, via an UNDO log rather than tuple versioning. Orioles architecture prevents bloat and provides several features and benefits:
 
 2. **Reduced IO**: It implements row-level WAL (Write-Ahead Log) and a non-persistent undo log. This significantly reduces IO operations for write transactions.
 1. **Scalability**: It implements lockless access for in-memory data. This helps to eliminate common bottlenecks found in traditional database engines.
