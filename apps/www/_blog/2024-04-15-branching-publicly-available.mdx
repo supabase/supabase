@@ -2,8 +2,8 @@
 title: 'Branching now Publicly Available'
 description: 'Supabase Branching is now available on Pro Plan and above.'
 author: alaister,qiao
-image: launch-week-11/branching/og.png
-thumb: launch-week-11/branching/thumb.png
+image: ga-week/branching-publicly-available/og.png
+thumb: ga-week/branching-publicly-available/thumb.png
 categories:
   - product
 tags:
@@ -18,7 +18,7 @@ tl;dr: Supabase Branching is now in open beta! You can enable it on any project 
 
 ## What is Branching?
 
-Branching is a seamless integration of Git with your development workflow, extending beyond your local environment to a remote database. Leveraging Git, particularly focusing on GitHub initially, each time a Pull Request is opened, a corresponding "Preview Environment" is spawned. 
+Branching is a seamless integration of Git with your development workflow, extending beyond your local environment to a remote database. Leveraging Git, particularly focusing on GitHub initially, each time a Pull Request is opened, a corresponding "Preview Environment" is spawned.
 
 <Img
   alt="Every Supabase Preview is a dedicated instance, with a full suite of Supabase services."
@@ -32,7 +32,7 @@ Branching is a seamless integration of Git with your development workflow, exten
 
 Preview Branches are essentially full Supabase instances. Every push triggers migrations from the `./supabase/migrations` folder, ensuring team synchronization and a shared source of truth. When you merge a Pull Request, your migrations are applied to the Production database.
 
-We [announced Branching](https://supabase.com/blog/supabase-branching) a few months ago in our previous Launch Week, with a deep dive on a few of the features like data seeding, integrations with Vercel, and seamless handling of environment variables.  Since launching Branching for early-access we've worked with early users of all sizes. Today we're making Branching available to everyone.
+We [announced Branching](https://supabase.com/blog/supabase-branching) a few months ago in our previous Launch Week, with a deep dive on a few of the features like data seeding, integrations with Vercel, and seamless handling of environment variables. Since launching Branching for early-access we've worked with early users of all sizes. Today we're making Branching available to everyone.
 
 ## New Features
 
@@ -47,6 +47,15 @@ Branching now deploys your Edge Functions along with your migrations. All Functi
 You can now set a custom Supabase directory path which allows for monorepo support. You can also choose to only spin up new branches when there are changes inside your Supabase directory. See all the configuration settings in your projects [here](https://supabase.com/dashboard/project/_/settings/integrations).
 
 ### Persistent branches
+
+<Img
+  alt="Every Supabase Preview is a dedicated instance, with a full suite of Supabase services."
+  src={{
+    light: '/images/blog/ga-week/branching-publicly-available/persistent-branches--light.jpg',
+    dark: '/images/blog/ga-week/branching-publicly-available/persistent-branches--dark.jpg',
+  }}
+  captionAlign="left"
+/>
 
 We had quite a few users of branching request for long-running branches so we added the concept of persistent branches. In persistent mode, a branch will remain active even after the underlying PR merges or closes.
 
