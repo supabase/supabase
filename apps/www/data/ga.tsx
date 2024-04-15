@@ -38,7 +38,7 @@ export const data = {
     content: `
 During the first year of Supabase we set ourselves a goal: build a managed service capable of running 1 million databases, securely, and with minimal downtime. Today we've proved that metric and we're announcing the General Availability of the platform that will service the next 99 million.
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/cbb8c268-5a73-4af9-962e-acffc66e21af/Untitled.png)
+![top user growth over time by days after launch](/images/ga/project-user-growth--dark.svg)
 
 > Supabase database growth since inception.
 
