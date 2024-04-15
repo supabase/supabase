@@ -111,7 +111,7 @@ const CreateWrapper = () => {
             href={
               databaseNeedsUpgrading
                 ? `/project/${ref}/settings/infrastructure`
-                : `/project/${ref}/database/extensions`
+                : `/project/${ref}/database/extensions?filter=wrappers`
             }
           >
             {databaseNeedsUpgrading ? 'Upgrade Database' : 'Reinstall Extension'}
