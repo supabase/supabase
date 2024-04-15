@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { NextSeo } from 'next-seo'
 import { GetStaticProps, GetStaticPaths } from 'next'
 import Link from 'next/link'
@@ -45,16 +45,6 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
   if (!ticketNumber) {
     return <Error statusCode={404} />
   }
-
-  useEffect(() => {
-    document.body.classList.add('bg-[#060809]')
-
-    return () => {
-      if (document.body.classList.contains('bg-[#060809]')) {
-        document.body.classList.remove('bg-[#060809]')
-      }
-    }
-  }, [])
 
   return (
     <>

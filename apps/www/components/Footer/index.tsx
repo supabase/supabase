@@ -20,7 +20,8 @@ const Footer = (props: Props) => {
   const { resolvedTheme } = useTheme()
   const { pathname } = useRouter()
 
-  const isLaunchWeek = pathname.includes('launch-week') || pathname.includes('special-announcement')
+  const isLaunchWeek = pathname.includes('/launch-week')
+  const isGAWeek = pathname.includes('/ga-week')
   const forceDark = isLaunchWeek || pathname === '/'
 
   if (props.hideFooter) {
@@ -29,7 +30,12 @@ const Footer = (props: Props) => {
 
   return (
     <footer
-      className={cn('bg-alternative', isLaunchWeek && 'bg-[#060809]', props.className)}
+      className={cn(
+        'bg-alternative',
+        isLaunchWeek && 'bg-[#060809]',
+        isGAWeek && 'dark:bg-[#060809]',
+        props.className
+      )}
       aria-labelledby="footerHeading"
     >
       <h2 id="footerHeading" className="sr-only">
