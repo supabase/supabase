@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
+import { GetServerSideProps } from 'next'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 import { Session } from '@supabase/supabase-js'
@@ -7,14 +9,29 @@ import supabase from '~/lib/supabaseMisc'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
-import TicketingFlow from '~/components/LaunchWeek/11/Ticket/TicketingFlow'
+import SectionContainer from '~/components/Layouts/SectionContainer'
+import { Meetup } from '~/components/LaunchWeek/11/LW11Meetups'
+import LW11StickyNav from '~/components/LaunchWeek/11/Releases/LW11StickyNav'
+import LW11Header from '~/components/LaunchWeek/11/Releases/LW11Header'
+import MainStage from '~/components/LaunchWeek/11/Releases/MainStage'
 
-export default function LaunchWeekIndex() {
+const BuildStage = dynamic(() => import('~/components/LaunchWeek/11/Releases/BuildStage'))
+const LW11Meetups = dynamic(() => import('~/components/LaunchWeek/11/LW11Meetups'))
+const TicketingFlow = dynamic(() => import('~/components/LaunchWeek/11/Ticket/TicketingFlow'))
+const LaunchWeekPrizeSection = dynamic(
+  () => import('~/components/LaunchWeek/11/LaunchWeekPrizeSection')
+)
+
+interface Props {
+  meetups?: Meetup[]
+}
+
+export default function GAWeekIndex({ meetups }: Props) {
   const { query } = useRouter()
 
-  const TITLE = 'Supabase Special Announcement | 15-19 April'
+  const TITLE = 'Supabase GA Week | 15-19 April 2024'
   const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
-  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/11/lw11-og.png`
+  const OG_IMAGE = `${SITE_ORIGIN}/images/launchweek/11/lw11-og-ga.png`
 
   const ticketNumber = query.ticketNumber?.toString()
   const bgImageId = query.bgImageId?.toString()
@@ -45,16 +62,6 @@ export default function LaunchWeekIndex() {
       return () => subscription.unsubscribe()
     }
   }, [supabase])
-
-  useEffect(() => {
-    document.body.classList.add('bg-[#060809]')
-
-    return () => {
-      if (document.body.classList.contains('bg-[#060809]')) {
-        document.body.classList.remove('bg-[#060809]')
-      }
-    }
-  }, [])
 
   useEffect(() => {
     if (session?.user) {
@@ -94,10 +101,35 @@ export default function LaunchWeekIndex() {
           setShowCustomizationForm,
         }}
       >
-        <DefaultLayout className="min-h-[92vh] h-full flex items-center">
-          <TicketingFlow />
+        <DefaultLayout className="bg-default dark:bg-[#060809]">
+          <LW11StickyNav />
+          <LW11Header className="pb-20 z-0" />
+          <MainStage className="relative -mt-20 z-10" />
+          <BuildStage />
+          <SectionContainer id="meetups" className="scroll-mt-[66px]">
+            <LW11Meetups meetups={meetups} />
+          </SectionContainer>
+          <SectionContainer className="!pb-8" id="ticket">
+            <TicketingFlow />
+          </SectionContainer>
+          <SectionContainer className="lg:pb-40" id="awards">
+            <LaunchWeekPrizeSection />
+          </SectionContainer>
         </DefaultLayout>
       </ConfDataContext.Provider>
     </>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const { data: meetups } = await supabase!
+    .from('lw11_meetups')
+    .select('*')
+    .neq('isPublished', false)
+
+  return {
+    props: {
+      meetups: meetups?.sort((a, b) => (new Date(a.start_at) > new Date(b.start_at) ? 1 : -1)),
+    },
+  }
 }
