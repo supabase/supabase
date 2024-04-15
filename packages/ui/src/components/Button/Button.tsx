@@ -231,6 +231,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         data-size={size}
         type={htmlType}
         {...props}
+        disabled={disabled}
         className={cn(buttonVariants({ type, size, disabled, block, rounded }), className)}
       >
         {asChild ? (
