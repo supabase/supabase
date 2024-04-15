@@ -7,6 +7,23 @@ const assertUnreachable = (n: never) => {
   console.error('Unhandled lint type', n)
 }
 
+interface LintInfo {
+  title: string
+  icon: JSX.Element
+}
+
+const lintInfoMap: Record<LINT_TYPES, LintInfo> = {
+  unindexed_foreign_keys: {
+    title: 'Unindexed foreign keys',
+    icon: <Key size={15} strokeWidth={1.5} />,
+  },
+  auth_users_exposed: {
+    title: 'Exposed Auth Users',
+    icon: <Lock size={15} strokeWidth={1.5} />,
+  },
+  // Add other lint types here
+}
+
 export function getHumanReadableTitle(title: LINT_TYPES) {
   switch (title) {
     case 'unindexed_foreign_keys':

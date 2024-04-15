@@ -358,7 +358,7 @@ const ProjectLints: NextPageWithLayout = () => {
                       <div className="grid gap-6 mt-6 text-sm">
                         <div className="grid gap-2">
                           <h3>Issue</h3>
-                          <ReactMarkdown className="">{selectedLint.detail}</ReactMarkdown>
+                          <ReactMarkdown className="leading-6">{selectedLint.detail}</ReactMarkdown>
                         </div>
                         <div className="grid gap-2">
                           <h3>Description</h3>
