@@ -1,13 +1,14 @@
 import React from 'react'
-import { cn } from 'ui'
+import { Button, cn } from 'ui'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import LW11Background from '../LW11Background'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const LW11Header = ({ className }: { className?: string }) => {
   return (
-    <div className={cn('relative w-full overflow-visible pt-4 lg:pt-8', className)}>
-      <SectionContainer className="h-full flex flex-col gap-4 !max-w-none lg:!container !pb-10">
+    <div className={cn('relative w-full overflow-visible pt-10 sm:pt-8', className)}>
+      <SectionContainer className="h-full flex flex-col items-start gap-4 !max-w-none lg:!container !pb-4 md:!pb-10">
         <Image
           src="/images/launchweek/ga/ga-black.svg"
           alt="GA logo"
@@ -34,6 +35,9 @@ const LW11Header = ({ className }: { className?: string }) => {
           . <br className="hidden sm:block" /> Join us in this major milestone and explore{' '}
           <br className="hidden sm:block" /> the exciting features that come with it.
         </p>
+        <Button asChild size="small" type="alternative">
+          <Link href="/ga">Learn more</Link>
+        </Button>
       </SectionContainer>
       <div className="absolute z-0 inset-0 w-full h-full overflow-hidden pointer-events-none">
         <div className="absolute z-0 inset-0 w-full aspect-video">

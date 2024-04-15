@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { cn } from 'ui'
 
 interface iImages {
   name: string
@@ -9,7 +10,7 @@ interface iImages {
   link?: string
 }
 
-type colSizes = 8 | 6 | 4 | 3
+type colSizes = 8 | 6 | 5 | 4 | 3
 type paddingSizes = 6 | 8 | 12
 
 interface iImageGrid {
@@ -20,6 +21,7 @@ interface iImageGrid {
   padding?: paddingSizes
   className?: string
   animated?: boolean
+  removeFilter?: boolean
 }
 
 const ImageGrid = ({
@@ -30,10 +32,12 @@ const ImageGrid = ({
   padding = 8,
   className,
   animated = false,
+  removeFilter = false,
 }: iImageGrid) => {
   const smBreakpoint = {
     3: 'grid-cols-3',
     4: 'grid-cols-4',
+    5: 'grid-cols-5',
     6: 'grid-cols-6',
     8: 'grid-cols-8',
   }
@@ -41,6 +45,7 @@ const ImageGrid = ({
   const mdBreakpoint = {
     3: 'md:grid-cols-3',
     4: 'md:grid-cols-4',
+    5: 'md:grid-cols-5',
     6: 'md:grid-cols-6',
     8: 'md:grid-cols-8',
   }
@@ -48,6 +53,7 @@ const ImageGrid = ({
   const lgBreakpoint = {
     3: 'lg:grid-cols-3',
     4: 'lg:grid-cols-4',
+    5: 'lg:grid-cols-5',
     6: 'lg:grid-cols-6',
     8: 'lg:grid-cols-8',
   }
@@ -61,7 +67,7 @@ const ImageGrid = ({
   return (
     <div
       className={`grid 
-      gap-0.5 
+      gap-0.5 rounded-lg overflow-hidden
     	${smBreakpoint[smCols]}
       ${mdBreakpoint[mdCols]}
       ${lgBreakpoint[lgCols]}
@@ -106,17 +112,14 @@ const ImageGrid = ({
             >
               <div className={`relative h-8 w-full overflow-auto ${imgPadding[padding]}`}>
                 <Image
-                  layout="fill"
-                  src={`${x.image}`}
+                  src={x.image}
                   alt={`${x.name} logo`}
-                  objectFit="scale-down"
-                  objectPosition="center"
-                  className="
-                      bg-no-repeat
-                    opacity-50 
-                    contrast-0
-                    filter
-                  "
+                  fill
+                  sizes="100%"
+                  className={cn(
+                    'object-scale-down object-center bg-no-repeat',
+                    !removeFilter && 'contrast-0 filter opacity-50'
+                  )}
                 />
               </div>
             </MaybeAnimatedDiv>
