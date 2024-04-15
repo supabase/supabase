@@ -102,8 +102,8 @@ const CreateWrapper = () => {
             The wrapper type {type} requires a minimum extension version of{' '}
             {wrapperMeta.minimumExtensionVersion}. You have version{' '}
             {wrappersExtension?.installed_version} installed. Please{' '}
-            {databaseNeedsUpgrading && 'upgrade your database then'} update the extension to create
-            this wrapper.
+            {databaseNeedsUpgrading && 'upgrade your database then'} reinstall the extension to
+            create this wrapper.
           </p>
         </div>
         <Button asChild type="default">
@@ -114,7 +114,7 @@ const CreateWrapper = () => {
                 : `/project/${ref}/database/extensions`
             }
           >
-            {databaseNeedsUpgrading ? 'Upgrade Database' : 'Update Extension'}
+            {databaseNeedsUpgrading ? 'Upgrade Database' : 'Reinstall Extension'}
           </Link>
         </Button>
       </div>
