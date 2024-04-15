@@ -8,13 +8,17 @@ import { AccountLayout } from './'
 import { ScaffoldContainer, ScaffoldDivider, ScaffoldHeader, ScaffoldTitle } from './Scaffold'
 import SettingsLayout from './SettingsLayout/SettingsLayout'
 import Link from 'next/link'
+import { useOrgSubscriptionQuery } from '../../data/subscriptions/org-subscription-query'
 
 const OrganizationLayout = ({ children }: PropsWithChildren<{}>) => {
   const selectedOrganization = useSelectedOrganization()
   const router = useRouter()
   const { slug } = useParams()
 
-  const invoicesEnabled = useIsFeatureEnabled('billing:invoices')
+  const invoicesEnabledOnProfileLevel = useIsFeatureEnabled('billing:invoices')
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+  const isNotOrgWithPartnerBilling = !subscription?.billing_via_partner ?? true
+  const invoicesEnabled = invoicesEnabledOnProfileLevel && isNotOrgWithPartnerBilling
 
   const navLayoutV2 = useFlag('navigationLayoutV2')
 
