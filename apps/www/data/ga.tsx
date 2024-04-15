@@ -39,6 +39,8 @@ export const data = {
     content: `
 During the first year of Supabase we set ourselves a goal: build a managed platform capable of securely running 1 million databases. Today we've proven that metric and we're announcing the General Availability of the platform that will service the next 99 million.
 
+![top user growth over time by days after launch](/images/ga/project-user-growth--dark.svg?v=2)
+
 > Supabase database growth since inception.
 
 We've been production-ready for years now. We kept the “beta” label because we wanted to make sure that our *organization* can support all types of customers, no matter their demands.
