@@ -259,6 +259,12 @@ You can find the [full list of partners and integrations](https://supabase.com/p
           ? '/images/ga/partners/twilio--dark.svg'
           : '/images/ga/partners/twilio--light.svg',
       },
+      {
+        name: 'vercel',
+        image: isDark
+          ? '/images/ga/partners/vercel--dark.svg'
+          : '/images/ga/partners/vercel--light.svg',
+      },
     ],
   },
   'whats-new': {
