@@ -122,12 +122,17 @@ You can find the full list of Supabase [partners and integrations here](https://
     title: "What's new?",
     paragraph: '10',
     content: `
-No Supabase announcement is complete without a round up of new features.
-- Index advisor
-- Branching
-- Oriole acquisition
-- Supabase Bootstrap
-- Supabase Swift official support
+In addition to General Availability, we also have several other major announcements to make today.
+
+THe Supabase Index advisor is now available inside Supabase Studio, the index advisor as it's name suggests will analyse your database and make recommendations on where you should add or remove table indexes. This is just the beginning of our plan to make automated data analysis tooling available to all developers.
+
+Supabase branches work like Git branches. They let you create and test changes like new configurations, database schemas, or features in a separate, temporary instance without affecting your production setup. Today Branching enters public beta. 
+
+Supabase has aquired Oriole. Oriole is a company founded by Postgres Hacker Alexander Korotkov to solve the hairy problems of Postrges. [Read the full announcement here]().
+
+We're constantly on the lookout for ways to remove the friction in getting started with your new projects. [Supabase Bootstrap]() is now the easiest way to get started with Supabase and your favourite development framework. 
+
+The goal of Supabase is to become the default backend for all kinds of developers. So far iOS and mobile developers have only enjoyed community support for Supabase mobile client libraries and SDKs. This is changing. Today Supabase Swift SDK will join supabase-js as an officially supported client library, and supabase-swift maintainer Guilherme Souza will join the Supabase team full time.
 
 `,
   },
@@ -136,13 +141,13 @@ No Supabase announcement is complete without a round up of new features.
     title: "What's next?",
     paragraph: '10',
     content: `
+One of our key metrics at Supabase is "Time to Value". How fast can a user go from idea to production? We'll never stop pushing on what's possible here.
 
-This is the first day of GA Week. Today's releases are just the start: we have 4 more days of exciting announcements to come.
+It is only day one of Supabase GA Week. Today's releases are just the start: we have 4 more days of exciting announcements to come. [Follow the new announcements here](https://supabase.com/ga-week).
 
-One of our key metrics at Supabase is "Time to Value". How fast can a user go from sign up, to making their first API request? How fast can they go from development to production? We’ll never stop pushing on what’s possible here. We're looking forward to the next 99 million dataabases.
+If you want to try Supabase today, we just started an asynchronous hackathon. It's a great way to try out all the new features. Go here to [read the rules and start hacking](https://supabase.com/blog/supabase-oss-hackathon).
 
-If you want to try Supabase today, we just started an asynchronous hackathon. It's a great way to try out all the new features.
-
+Together with the developer community we're looking forward to delpoying our next 100 million databases.
 `,
   },
 }
