@@ -30,7 +30,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                     draggable={false}
                     width={300}
                     height={300}
-                    className="hidden md:block absolute object-cover scale-50 lg:scale-100 lg:object-top w-[90%] h-full opacity-50 pointer-events-none"
+                    className="hidden md:block absolute object-cover scale-50 lg:scale-100 lg:object-top w-[90%] h-full opacity-90 dark:opacity-50 pointer-events-none"
                   />
                   <Image
                     src="/images/launchweek/11/airpods-max-alpha-crop.png"
@@ -38,13 +38,13 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                     draggable={false}
                     width={300}
                     height={300}
-                    className="md:hidden absolute mx-auto object-cover inset-x-0 lg:object-top w-auto h-full opacity-50 pointer-events-none"
+                    className="md:hidden absolute mx-auto object-cover inset-x-0 lg:object-top w-auto h-full opacity-90 dark:opacity-50 pointer-events-none"
                   />
                 </div>
                 <div className="flex flex-col lg:w-1/2 gap-1 p-4 md:p-8 lg:pl-0 lg:h-full">
                   <div className="flex flex-col gap-2 flex-grow">
                     <LabelBadge text="5 sets" />
-                    <p className="xl:mt-4">Win AirPods Max</p>
+                    <p className="xl:mt-4 text-foreground">Win AirPods Max</p>
                     <p className="text-foreground-lighter text-sm">
                       Secure your ticket to enter our random prize pool, and amplify your odds by
                       sharing. Or if you don't leave anything up for chance - join our Hackathon and

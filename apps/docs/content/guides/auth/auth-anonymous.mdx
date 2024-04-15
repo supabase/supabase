@@ -4,13 +4,7 @@ title: 'Anonymous Sign-Ins'
 subtitle: 'Create and use anonymous users to authenticate with Supabase'
 ---
 
-Enable Anonymous Sign-In to build apps which provide users an authenticated experience without requiring users to enter an email address, password, use an OAuth provider or provide any other PII (Personally Identifiable Information). Later, when ready, they can attach an authentication method to their account.
-
-It's most useful for:
-
-- E-commerce applications, such as shopping carts before check-out
-- Full-feature demos without collecting personal information
-- Temporary or throw-away accounts
+[Enable Anonymous Sign-Ins](/dashboard/project/_/settings/auth) to build apps which provide users an authenticated experience without requiring users to enter an email address, password, use an OAuth provider or provide any other PII (Personally Identifiable Information). Later, when ready, the user can link an authentication method to their account.
 
 <Admonition type="note" label="Anonymous user vs the anon key">
 
@@ -22,7 +16,11 @@ This is different from the `anon` API key which does not create a user and can b
 
 </Admonition>
 
-To get started, [enable anonymous sign-ins](/dashboard/project/_/settings/auth) for your Supabase Project.
+Anonymous sign-ins can be used to build:
+
+- E-commerce applications, such as shopping carts before check-out
+- Full-feature demos without collecting personal information
+- Temporary or throw-away accounts
 
 <Admonition type="caution">
 
@@ -87,7 +85,7 @@ supabase.auth.signInAnonymously()
 
 ## Convert an anonymous user to a permanent user
 
-Converting an anonymous user to a permanent user requires linking an identity to the user.
+Converting an anonymous user to a permanent user requires [linking an identity](/docs/guides/auth/auth-identity-linking#manual-linking-beta) to the user. This requires you to [enable manual linking](/dashboard/project/_/settings/auth) in your Supabase project.
 
 ### Link an Email / Phone identity
 
@@ -100,10 +98,16 @@ Converting an anonymous user to a permanent user requires linking an identity to
 >
 <TabPanel id="js" label="JavaScript">
 
-You can use the [`updateUser()`](/docs/reference/javascript/auth-updateuser) method to link an email or phone identity to the anonymous user.
+You can use the [`updateUser()`](/docs/reference/javascript/auth-updateuser) method to link an email or phone identity to the anonymous user. To add a password for the anonymous user, the user's email or phone number needs to be verified first.
 
 ```js
 const { data, error } = await supabase.auth.updateUser({ email: 'example@email.com' })
+
+// verify the user's email by clicking on the email change link
+// or entering the 6-digit OTP sent to the email address
+
+// once the user has been verified, update the password
+const { data, error } = await supabase.auth.updateUser({ password: 'password' })
 ```
 
 </TabPanel>
@@ -129,10 +133,10 @@ try await supabase.auth.updateUser(
 </TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
-You can use the [`modifyUser()`](/docs/reference/kotlin/auth-updateuser) method to link an email or phone identity to the anonymous user.
+You can use the [`updateUser()`](/docs/reference/kotlin/auth-updateuser) method to link an email or phone identity to the anonymous user.
 
 ```kotlin
-supabase.auth.modifyUser {
+supabase.auth.updateUser {
     email = "example@email.com"
 }
 ```
