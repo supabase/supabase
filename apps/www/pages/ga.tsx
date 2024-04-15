@@ -26,6 +26,7 @@ export default function IndexPage() {
   const meta_title = 'General Availability | Supabase'
   const meta_description =
     'Explore Supabase fees and pricing information. Find our competitive pricing plans, with no hidden pricing. We have a generous free plan for those getting started, and Pay As You Go for those scaling up.'
+  const meta_image = '/images/ga/ga-og.png'
 
   return (
     <DefaultLayout>
@@ -38,7 +39,7 @@ export default function IndexPage() {
           url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image-v2.jpg`,
+              url: meta_image,
             },
           ],
         }}
