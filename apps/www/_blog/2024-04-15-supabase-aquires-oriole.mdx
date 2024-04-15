@@ -1,0 +1,80 @@
+---
+title: 'Supabase acquires Oriole'
+description: 'The Oriole team are joining Supabase to build a faster storage engine for Postgres.'
+author: grdsdev
+image: launch-week-11/oriole/og.png
+thumb: launch-week-11/oriole/thumb.png
+categories:
+  - engineering
+tags:
+  - launch-week
+  - database
+date: '2024-04-15'
+toc_depth: 3
+launchweek: 11
+---
+
+[Oriole](https://github.com/orioledb/orioledb) is a **table storage extension for Postgres**. It is designed to be a drop-in replacement for Postgres' existing storage engine.
+
+The Oriole team are joining Supabase to:
+
+1. Build a faster storage engine for Postgres
+2. Help develop pluggable storage in Postgres
+3. Work on decoupled storage and compute in Postgres
+
+[oriole.mp4](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/7090ed2a-3866-4bc8-b88a-89e6e993315c/oriole.mp4)
+
+Let's explore all of these below:
+
+## Building a faster storage engine
+
+Oriole acts as a drop-in replacement for the default Postgres storage engine using the Table Access Method APIs:
+
+```sql
+create extension orioledb; -- enable the extension
+
+create table posts (
+  id int8 not null,
+  title text not null,
+  body text not null,
+  primary key (id)
+) using orioledb;    -- Specify the storage format
+```
+
+This might look familiar if you have seen other storage engines in Postgres like [Citus columnar](https://docs.citusdata.com/en/v11.1/admin_guide/table_management.html#columnar-storage), [Hydra](https://docs.hydra.so/concepts/using-hydra-columnar), [ParadeDB](https://docs.paradedb.com/search/quickstart), or [zheap](https://github.com/cybertec-postgresql/zheap). These all use Postgres' [Table Access Method](https://www.postgresql.org/docs/current/tableam.html) API - a set of APIs that provide pluggable storage.
+
+The `orioledb` storage engine changes the representation of table data on disk. Its [architecture](https://github.com/orioledb/orioledb/blob/main/doc/arch.md) is designed to take advantage of modern hardware like SSDs and NVRAM.
+
+It implements MVCC, the feature that allows allows multiple connected users to see different versions of the data depending on when their transaction started, via an UNDO log rather than tuple versioning, which is prone to bloat. This architectur provides several benefits:
+
+1. **Scalability**: OrioleDB's design implements innovative concepts like lockless access for in-memory data. This helps to eliminate common bottlenecks found in traditional database engines.
+2. **IO-Reduction**: It significantly reduces IO operations for write transactions by utilizing a row-level WAL (Write-Ahead Log) and a non-persistent undo log, leading to more efficient data modification handling.
+3. **Data Compression**: Implements page-level data compression, which can reduce the overall size of a typical database by approximately 4 to 5 times, saving storage space.
+4. **Bloat Reduction**: Efficiently manages updates in-place with an undo log, which contributes to reducing database bloat—a common issue where the database size grows due to unused or obsolete data occupying space.
+5. **Index-organized tables:** OrioleDB stores table rows in the leafs of primary key index making primary key lookups very cheap. Also, in many cases, this saves significant storage space.
+
+## Pluggable storage in Postgres
+
+We've [written previously](https://supabase.com/blog/postgres-pluggable-strorage) about Pluggable Storage: it gives developers the ability to use different storage engines for different tables _within the same database_. This system is [available in MySQL](https://en.wikipedia.org/wiki/Comparison_of_MySQL_database_engines), which uses the [InnoDB](https://en.wikipedia.org/wiki/InnoDB) as the default storage engine since MySQL 5.5 (replacing [MyISAM](https://en.wikipedia.org/wiki/MyISAM)).
+
+Oriole aims to be a drop-in replacement for Postgres' default storage engine and supports similar use-cases with improved performance. Other storage engines, to name a few possibilities, could implement columnar storage for OLAP workloads, highly compressed timeseries storage for event data, or compressed storage for minimizing disk usage.
+
+In version 12, PostgreSQL introduced support for pluggable storage with the goal of [adding ZHeap](https://anarazel.de/talks/2019-05-30-pgcon-pluggable-table-storage/pluggable.pdf) - a previous effort to solve some shortcomings of Postgres' default storage format. We hope to contribute towards these efforts.
+
+OrioleDB currently requires a [set of patches to Postgres](https://github.com/orioledb/postgres/commits/patches16/) to expand on the type of features external storage engines extensions can implement. We remain committed to open source we'll work with the Oriole team and Postgres community with the goal of upstreaming patches so that Oriole can be used with any Postgres installation. We have no timeline for this, but it's safe to expect that it could be a few major Postgres versions away.
+
+## Decoupled Storage and Compute
+
+The Oriole storage engine's reduction in disk IO is significant enough that it unlocks performant databases backed by S3 compatible blob storage.
+
+We've been working with the Oriole team for a few months to develop [experimental support decoupled storage and compute](https://github.com/orioledb/orioledb/blob/main/doc/usage.md#s3-database-storage-experimental):
+
+[Screen recording (1).mov](<https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/1c13cf9b-73d1-4e58-beb7-04af0cf6f7b1/Screen_recording_(1).mov>)
+
+Local storage implements caching of the data most often accessed, ensuring good performance, and then synced with S3 asynchronously.
+
+You can connect an empty Postgres instance to an s3 bucket (using an [S3 loader utility](https://github.com/orioledb/orioledb/blob/main/doc/usage.md#s3-loader-utility)). The Oriole roadmap includes the ability to connect multiple read-replicas to the same S3 bucket as leader.
+
+## Oriole + Supabase
+
+[Portability](https://supabase.com/docs/guides/getting-started/architecture#everything-is-portable) is a core principle at Supabase. Because Oriole requires a few minimal patch sets on top of Postgres, we will roll it out as an _option_ for developers in the future. Over time we hope that it can become available for any Postgres installation and we will continue to work with Oriole and the Postgres community to make this happen.
