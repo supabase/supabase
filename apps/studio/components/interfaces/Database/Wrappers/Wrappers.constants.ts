@@ -843,6 +843,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'Auth0Fdw',
     label: 'Auth0',
     docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/auth0',
+    minimumExtensionVersion: '0.3.0',
     server: {
       options: [
         {
@@ -972,6 +973,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'CognitoFdw',
     label: 'Cognito',
     docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/cognito',
+    minimumExtensionVersion: '0.3.0',
     server: {
       options: [
         {
@@ -1054,6 +1056,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'mssqlFdw',
     label: 'Microsoft SQL Server',
     docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/mssql',
+    minimumExtensionVersion: '0.3.0',
     server: {
       options: [
         {
@@ -1089,6 +1092,7 @@ export const WRAPPERS: WrapperMeta[] = [
     extensionName: 'redisFdw',
     label: 'Redis',
     docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/redis',
+    minimumExtensionVersion: '0.3.0',
     server: {
       options: [
         {
