@@ -122,12 +122,17 @@ You can find the full list of Supabase [partners and integrations here](https://
     title: "What's new?",
     paragraph: '10',
     content: `
-No Supabase announcement is complete without a round up of new features.
-- Index advisor
-- Branching
-- Oriole acquisition
-- Supabase Bootstrap
-- Supabase Swift official support
+In addition to General Availability, we also have several other major announcements to make today.
+
+THe Supabase Index advisor is now available inside Supabase Studio, the index advisor as it's name suggests will analyse your database and make recommendations on where you should add or remove table indexes. This is just the beginning of our plan to make automated data analysis tooling available to all developers.
+
+Supabase branches work like Git branches. They let you create and test changes like new configurations, database schemas, or features in a separate, temporary instance without affecting your production setup. Today Branching enters public beta. 
+
+Supabase has aquired Oriole. Oriole is a company founded by Postgres Hacker Alexander Korotkov to solve the hairy problems of Postrges. [Read the full announcement here]().
+
+We're constantly on the lookout for ways to remove the friction in getting started with your new projects. [Supabase Bootstrap]() is now the easiest way to get started with Supabase and your favourite development framework. 
+
+The goal of Supabase is to become the default backend for all kinds of developers. So far iOS and mobile developers have only enjoyed community support for Supabase mobile client libraries and SDKs. This is changing. Today Supabase Swift SDK will join supabase-js as an officially supported client library, and supabase-swift maintainer Guilherme Souza will join the Supabase team full time.
 
 `,
   },
