@@ -32,6 +32,8 @@ export function getHumanReadableTitle(title: LINT_TYPES) {
       return 'Security Definer View'
     case 'duplicate_index':
       return 'Duplicate Index'
+    case 'extension_in_public':
+      return 'Extension in Public'
     default:
       assertUnreachable(title)
       throw new Error('This case should never be reached')
@@ -172,7 +174,18 @@ export const LintCTA = ({
     case 'security_definer_view':
       // we don't have a good place to send the user to check out a view
       return <></>
-
+    case 'extension_in_public':
+      return (
+        <Button asChild type="default">
+          <Link
+            href={`/project/${projectRef}/database/extensions?filter=${metadata?.name}`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            View extension
+          </Link>
+        </Button>
+      )
     default:
       assertUnreachable(title)
       return <></>

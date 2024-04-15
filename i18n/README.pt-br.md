@@ -19,9 +19,14 @@
   - [x] Funções de banco de dados. [Docs](https://supabase.com/docs/guides/database/functions)
   - [x] Funções de borda [Docs](https://supabase.com/docs/guides/functions)
 - [x] Armazenamento de arquivos. [Docs](https://supabase.com/docs/guides/storage)
+- [x] AI + Vector/Toolkit de incorporações. [Docs](https://supabase.com/docs/guides/ai)
 - [x] Dashboard
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+
+Clique em Watch e selecione "releases" deste repositório para ser notificado sobre atualizações importantes.
+
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ## Documentação
 
@@ -35,19 +40,6 @@ Para ver como contribuir, visite [Getting Started](../DEVELOPERS.md)
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Melhor para: bugs e erros que você encontra usando o Supabase.
 - [Suporte por e-mail](https://supabase.com/docs/support#business-support). Ideal para: problemas com seu banco de dados ou infraestrutura.
 - [Discord](https://discord.supabase.com). Ideal para: compartilhar seus aplicativos e interagir com a comunidade.
-
-## Status
-
-- [x] Alfa: Estamos testando o Supabase com um conjunto fechado de clientes
-- [x] Alfa público: Qualquer pessoa pode se registrar em [supabase.com/dashboard](https://supabase.com/dashboard). Mas vá com calma, pois há alguns problemas
-- [x] Beta público: Estável o suficiente para a maioria dos casos de uso não corporativos
-- [ ] Público: Disponibilidade geral [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
-
-No momento, estamos em Beta Pública. Acompanhe os "lançamentos" deste repositório para ser notificado sobre as principais atualizações.
-
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
-
----
 
 ## Como funciona
 
@@ -63,10 +55,10 @@ Você também pode [auto-hospedar](https://supabase.com/docs/guides/hosting/over
 - o [PostgreSQL](https://www.postgresql.org/) é um sistema de banco de dados objeto-relacional com mais de 30 anos de desenvolvimento ativo que lhe rendeu uma forte reputação de confiabilidade, robustez de recursos e desempenho.
 - [Realtime](https://github.com/supabase/realtime) é um servidor Elixir que permite que você ouça inserções, atualizações e exclusões do PostgreSQL usando websockets. O Realtime pesquisa a funcionalidade de replicação integrada do PostgreSQL em busca de alterações no banco de dados, converte as alterações em JSON e, em seguida, transmite o JSON por meio de websockets para clientes autorizados.
 - [PostgREST](http://postgrest.org/) é um servidor da Web que transforma seu banco de dados PostgreSQL diretamente em uma API RESTful
+- [GoTrue](https://github.com/netlify/gotrue) é uma API baseada em SWT para gerenciar usuários e emitir tokens SWT.
 - [pg_graphql](http://github.com/supabase/pg_graphql/) é uma extensão do PostgreSQL que expõe uma API GraphQL
 - [Storage](https://github.com/supabase/storage-api) fornece uma interface RESTful para gerenciar arquivos armazenados no S3, usando o Postgres para gerenciar permissões.
 - [postgres-meta](https://github.com/supabase/postgres-meta) é uma API RESTful para gerenciar seu Postgres, permitindo que você busque tabelas, adicione funções e execute consultas, etc.
-- [GoTrue](https://github.com/netlify/gotrue) é uma API baseada em SWT para gerenciar usuários e emitir tokens SWT.
 - [Kong](https://github.com/Kong/kong) é um gateway de API nativo da nuvem.
 
 #### Bibliotecas de clientes
@@ -211,6 +203,42 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
 <!--- Remove this list if you're translating to another language, it's hard to keep updated across multiple files-->
 <!--- Keep only the link to the list of translation files-->
 
+## Badges
+
+![Made with Supabase](../apps/www/public/badge-made-with-supabase.svg)
+
+```md
+[![Made with Supabase](https://supabase.com/badge-made-with-supabase.svg)](https://supabase.com)
+```
+
+```html
+<a href="https://supabase.com">
+  <img
+    width="168"
+    height="30"
+    src="https://supabase.com/badge-made-with-supabase.svg"
+    alt="Made with Supabase"
+  />
+</a>
+```
+
+![Made with Supabase (dark)](../apps/www/public/badge-made-with-supabase-dark.svg)
+
+```md
+[![Made with Supabase](https://supabase.com/badge-made-with-supabase-dark.svg)](https://supabase.com)
+```
+
+```html
+<a href="https://supabase.com">
+  <img
+    width="168"
+    height="30"
+    src="https://supabase.com/badge-made-with-supabase-dark.svg"
+    alt="Made with Supabase"
+  />
+</a>
+```
+
 ## Traduções
 
 - [Árabe | العربية](/i18n/README.ar.md)
@@ -252,9 +280,3 @@ Nossa abordagem para bibliotecas de clientes é modular. Cada sub-biblioteca é 
 - [Ucraniano / Українська](/i18n/README.uk.md)
 - [Vietnamita / Tiếng Việt](/i18n/README.vi-vn.md)
 - [Lista de traduções](/i18n/languages.md) <!--- Keep only this -->
-
----
-
-## Patrocinadores
-
-[![Novo patrocinador](https://user-images.githubusercontent.com/10214025/90518111-e74bbb00-e198-11ea-8f88-c9e3c1aa4b5b.png)](https://github.com/sponsors/supabase)
