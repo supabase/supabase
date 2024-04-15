@@ -76,10 +76,6 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     videoThumbnail: '/images/launchweek/11/video-cover.jpg',
     links: [
       {
-        type: 'blog',
-        href: '/ga',
-      },
-      {
         type: 'xSpace',
         href: 'https://twitter.com/i/spaces/1MnGnMglMLjKO/peek',
       },
