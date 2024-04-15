@@ -161,6 +161,7 @@ export default function IndexPage() {
             lgCols={3}
             images={data.enterpriseSection.companies}
             removeFilter
+            bg={false}
           />
         </div>
       </SectionContainer>
@@ -174,6 +175,7 @@ export default function IndexPage() {
             lgCols={3}
             images={data.integrationsSection.partners}
             removeFilter
+            bg={false}
           />
         </div>
       </SectionContainer>

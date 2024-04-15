@@ -22,6 +22,7 @@ interface iImageGrid {
   className?: string
   animated?: boolean
   removeFilter?: boolean
+  bg?: boolean
 }
 
 const ImageGrid = ({
@@ -33,6 +34,7 @@ const ImageGrid = ({
   className,
   animated = false,
   removeFilter = false,
+  bg = true,
 }: iImageGrid) => {
   const smBreakpoint = {
     3: 'grid-cols-3',
@@ -68,6 +70,7 @@ const ImageGrid = ({
     <div
       className={`grid 
       gap-0.5 rounded-lg overflow-hidden
+      items-center
     	${smBreakpoint[smCols]}
       ${mdBreakpoint[mdCols]}
       ${lgBreakpoint[lgCols]}
@@ -105,10 +108,13 @@ const ImageGrid = ({
           <Container link={x.link} key={i}>
             <MaybeAnimatedDiv
               key={`${x.name}-${i}`}
-              className={`
-                  bg-surface-200 col-span-1 flex items-center justify-center 
+              className={cn(
+                bg && 'bg-surface-200',
+                'w-full',
+                `col-span-1 flex items-center justify-center 
                   ${x.link && 'hover:bg-overlay-hover'}
-                  p-8 ${className}`}
+                  p-8 ${className}`
+              )}
             >
               <div className={`relative h-8 w-full overflow-auto ${imgPadding[padding]}`}>
                 <Image
