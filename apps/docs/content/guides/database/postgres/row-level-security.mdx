@@ -362,7 +362,7 @@ Always use the Role of inside your policies, specified by the `TO` operator. For
 
 ```sql
 create policy "rls_test_select" on rls_test
-using ( (select auth.uid()) = user_id );
+using ( auth.uid() = user_id );
 ```
 
 Use:
