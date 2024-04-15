@@ -83,7 +83,7 @@ export const days: AdventDay[] = [
     ],
   },
   {
-    title: 'Supabase acquires Oriole',
+    title: 'Oriole joins Supabase',
     description:
       'The Oriole team are joining Supabase to build a faster storage engine for Postgres.',
     id: 'oriole',
