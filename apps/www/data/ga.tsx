@@ -60,7 +60,7 @@ Whether you're an indie hacker or a Fortune 500 company, Supabase can now scale 
     content: `
 Our community is the driving force behind the development and adoption of Supabase. 
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/f9587845-c797-4ec5-835d-4b2d2ec396bc/Untitled.png)
+![top user growth over time by days after launch](/images/ga/github-start-growth--dark.svg?v=1)
 
 The GitHub community is the foundation of our company: submitting feature requests, discovering bugs, creating PRs, and pushing our team to develop a useful product. 
 
