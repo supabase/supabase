@@ -9,13 +9,7 @@ export const AccountDeletion = () => {
 
   return (
     <>
-      <Panel
-        title={
-          <p key="panel-title" className="uppercase">
-            Danger Zone
-          </p>
-        }
-      >
+      <Panel className="[&>div:first-child]:uppercase" title="Danger Zone">
         <Panel.Content>
           <Alert_Shadcn_ variant="destructive">
             <CriticalIcon />
