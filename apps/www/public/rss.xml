@@ -11,12 +11,12 @@
   <guid>https://supabase.com/blog/supabase-swift</guid>
   <title>Supabase Swift</title>
   <link>https://supabase.com/blog/supabase-swift</link>
-  <description>Supabase Swift is now officially support.</description>
+  <description>Supabase Swift is now officially supported.</description>
   <pubDate>Sun, 14 Apr 2024 22:00:00 GMT</pubDate>
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-bootstrap</guid>
-  <title>Supabase Bootstrap: the fastest way to launch a Supabase project</title>
+  <title>Supabase Bootstrap: the fastest way to launch a new project</title>
   <link>https://supabase.com/blog/supabase-bootstrap</link>
   <description>Launch a new hosted Supabase project directly from the CLI using pre-built applications.</description>
   <pubDate>Sun, 14 Apr 2024 22:00:00 GMT</pubDate>
@@ -30,7 +30,7 @@
 </item>
 <item>
   <guid>https://supabase.com/blog/supabase-aquires-oriole</guid>
-  <title>Supabase acquires Oriole</title>
+  <title>Oriole joins Supabase</title>
   <link>https://supabase.com/blog/supabase-aquires-oriole</link>
   <description>The Oriole team are joining Supabase to build a faster storage engine for Postgres.</description>
   <pubDate>Sun, 14 Apr 2024 22:00:00 GMT</pubDate>
