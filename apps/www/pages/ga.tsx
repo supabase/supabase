@@ -122,14 +122,15 @@ export default function IndexPage() {
       <SectionContainer className="!pt-0">
         {data.communityStats.highlights && (
           <div
-            className="grid grid-cols-2 md:grid md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-6 gap-5 md:gap-10 lg:gap-20
+            className="grid grid-cols-2 md:grid md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-8 md:gap-10 lg:gap-20
             "
           >
             {data.communityStats.highlights.map(
               (highlight: { number: string; text: string }, i: number) => {
                 return (
                   <div key={i} className="">
-                    <div className="border-t-[1px] border-brand-500 w-[32px]"></div>
+                    {highlight.icon}
+                    <div className="border-t-[1px] border-brand-500 w-[32px] mb-1 mt-4"></div>
                     <h2 className="text-xl md:text-2xl lg:text-4xl pt-1.5 lg:pt-3 tracking-[-1.5px] font-mono">
                       {highlight.number}
                     </h2>

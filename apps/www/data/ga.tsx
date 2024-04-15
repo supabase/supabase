@@ -1,3 +1,6 @@
+import { Github } from 'lucide-react'
+import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
+
 export const data = {
   hero: {
     title: <>We are moving to General Availability</>,
@@ -75,27 +78,92 @@ We're committed to our free tier - we know the importance of this for testing ho
       {
         number: '65,000',
         text: 'GitHub stars',
+        icon: <IconGitHubSolid className="text-foreground-muted" />,
       },
       {
         number: '106,000',
         text: 'Twitter followers',
+        icon: <IconTwitterX className="text-foreground-muted" />,
       },
       {
         number: '25,000',
         text: 'Discord members',
+        icon: <IconDiscord className="text-foreground-muted" />,
       },
       {
         number: '23,000',
         text: 'YouTube subscribers',
+        icon: <IconYoutubeSolid className="text-foreground-muted" />,
       },
       {
         number: '10,000',
         text: 'Reddit subs',
+        icon: (
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            xmlnsXlink="http://www.w3.org/1999/xlink"
+            version="1.1"
+            width={18}
+            height={18}
+            viewBox="0 0 256 256"
+            xmlSpace="preserve"
+          >
+            <defs />
+            <g
+              style={{
+                stroke: 'none',
+                strokeWidth: 0,
+                strokeDasharray: 'none',
+                strokeLinecap: 'butt',
+                strokeLinejoin: 'miter',
+                strokeMiterlimit: 10,
+                fill: 'none',
+                fillRule: 'nonzero',
+                opacity: 1,
+              }}
+              transform="translate(1.4065934065934016 1.4065934065934016) scale(2.81 2.81)"
+            >
+              <circle
+                cx={45}
+                cy={45}
+                r={45}
+                style={{
+                  stroke: 'none',
+                  strokeWidth: 1,
+                  strokeDasharray: 'none',
+                  strokeLinecap: 'butt',
+                  strokeLinejoin: 'miter',
+                  strokeMiterlimit: 10,
+                  fill: 'hsl(var(--foreground-muted) / 1)',
+                  fillRule: 'nonzero',
+                  opacity: 1,
+                }}
+                transform="  matrix(1 0 0 1 0 0) "
+              />
+              <path
+                d="M 75.011 45 c -0.134 -3.624 -3.177 -6.454 -6.812 -6.331 c -1.611 0.056 -3.143 0.716 -4.306 1.823 c -5.123 -3.49 -11.141 -5.403 -17.327 -5.537 l 2.919 -14.038 l 9.631 2.025 c 0.268 2.472 2.483 4.262 4.955 3.993 c 2.472 -0.268 4.262 -2.483 3.993 -4.955 s -2.483 -4.262 -4.955 -3.993 c -1.421 0.145 -2.696 0.973 -3.4 2.204 L 48.68 17.987 c -0.749 -0.168 -1.499 0.302 -1.667 1.063 c 0 0.011 0 0.011 0 0.022 l -3.322 15.615 c -6.264 0.101 -12.36 2.025 -17.55 5.537 c -2.64 -2.483 -6.801 -2.36 -9.284 0.291 c -2.483 2.64 -2.36 6.801 0.291 9.284 c 0.515 0.481 1.107 0.895 1.767 1.186 c -0.045 0.66 -0.045 1.32 0 1.98 c 0 10.078 11.745 18.277 26.23 18.277 c 14.485 0 26.23 -8.188 26.23 -18.277 c 0.045 -0.66 0.045 -1.32 0 -1.98 C 73.635 49.855 75.056 47.528 75.011 45 z M 30.011 49.508 c 0 -2.483 2.025 -4.508 4.508 -4.508 c 2.483 0 4.508 2.025 4.508 4.508 s -2.025 4.508 -4.508 4.508 C 32.025 53.993 30.011 51.991 30.011 49.508 z M 56.152 62.058 v -0.179 c -3.199 2.405 -7.114 3.635 -11.119 3.468 c -4.005 0.168 -7.919 -1.063 -11.119 -3.468 c -0.425 -0.515 -0.347 -1.286 0.168 -1.711 c 0.447 -0.369 1.085 -0.369 1.544 0 c 2.707 1.98 6.007 2.987 9.362 2.83 c 3.356 0.179 6.667 -0.783 9.407 -2.74 c 0.492 -0.481 1.297 -0.47 1.779 0.022 C 56.655 60.772 56.644 61.577 56.152 62.058 z M 55.537 54.34 c -0.078 0 -0.145 0 -0.224 0 l 0.034 -0.168 c -2.483 0 -4.508 -2.025 -4.508 -4.508 s 2.025 -4.508 4.508 -4.508 s 4.508 2.025 4.508 4.508 C 59.955 52.148 58.02 54.239 55.537 54.34 z"
+                style={{
+                  stroke: 'none',
+                  strokeWidth: 1,
+                  strokeDasharray: 'none',
+                  strokeLinecap: 'butt',
+                  strokeLinejoin: 'miter',
+                  strokeMiterlimit: 10,
+                  fill: 'hsl(var(--background-default) / 1)',
+                  fillRule: 'nonzero',
+                  opacity: 1,
+                }}
+                transform=" matrix(1 0 0 1 0 0) "
+                strokeLinecap="round"
+              />
+            </g>
+          </svg>
+        ),
       },
-      {
-        number: 'Top 5',
-        text: 'Product Hunt shout-outs',
-      },
+      // {
+      //   number: 'Top 5',
+      //   text: 'Product Hunt shout-outs',
+      // },
     ],
   },
   scaleSection: {
@@ -153,15 +221,15 @@ You can find the [full list of partners and integrations](https://supabase.com/p
     content: `
 In addition to General Availability, we also have several other major announcements to make today.
 
-The Supabase [Index Advisor](https://github.com/supabase/index_advisor) is now available inside Supabase Studio. As its name suggests, this will analyze your database and make recommendations to add or remove table indexes. This is just the beginning of our plan to make automated data analysis tooling available to all developers.
+- The Supabase [Index Advisor](https://github.com/supabase/index_advisor) is now available inside Supabase Studio. As its name suggests, this will analyze your database and make recommendations to add or remove table indexes. This is just the beginning of our plan to make automated data analysis tooling available to all developers.
 
-[Supabase Branching](https://supabase.com/blog/branching-publicly-available) works like Git branches. You can create and test database changes or try out features in a separate, temporary instance without affecting your production setup. Today Branching enters public availability. 
+- [Supabase Branching](https://supabase.com/blog/branching-publicly-available) works like Git branches. You can create and test database changes or try out features in a separate, temporary instance without affecting your production setup. Today Branching enters public availability. 
 
-Supabase has [acquired Oriole](https://supabase.com/blog/supabase-aquires-oriole). Oriole is a company founded by Postgres Hacker Alexander Korotkov to solve the hairy problems of Postgres.
+- Supabase has [acquired Oriole](https://supabase.com/blog/supabase-aquires-oriole). Oriole is a company founded by Postgres Hacker Alexander Korotkov to solve the hairy problems of Postgres.
 
-We're constantly on the lookout for ways to remove the friction in getting started with your new projects. [Supabase Bootstrap](https://supabase.com/blog/supabase-bootstrap) is now the easiest way to get started with Supabase and your favorite development framework. 
+- We're constantly on the lookout for ways to remove the friction in getting started with your new projects. [Supabase Bootstrap](https://supabase.com/blog/supabase-bootstrap) is now the easiest way to get started with Supabase and your favorite development framework. 
 
-The goal of Supabase is to become the default backend for all kinds of developers. So far iOS and mobile developers have only enjoyed community support for Supabase mobile client libraries and SDKs. This is changing. Today Supabase Swift SDK will join supabase-js as an [officially supported client library](https://supabase.com/blog/supabase-swift), and supabase-swift maintainer Guilherme Souza will join the Supabase team full time.
+- Today Supabase Swift SDK will join supabase-js as an [officially supported client library](https://supabase.com/blog/supabase-swift), and supabase-swift maintainer Guilherme Souza will join the Supabase team full time. The goal of Supabase is to become the default backend for all kinds of developers.
 
 `,
   },
