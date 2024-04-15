@@ -39,11 +39,17 @@ Whether you’re an indie hacker or a Fortune 500 company, Supabase can now scal
     title: 'Open Source & Community',
     paragraph: '05',
     content: `
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+Our community is the driving force behind the development and adoption of Supabase. 
 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/f9587845-c797-4ec5-835d-4b2d2ec396bc/Untitled.png)
 
-Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+The GitHub community is the foundation of our company: submitting feature requests, discovering bugs, creating PRs, and pushing our team to develop a useful product. 
+
+We’re committed to our licenses - all of our public repos have OSI-compliant licenses. We have no plans to change this.
+
+Self-hosting is easier than ever. You can get started in [less than 5 minutes](https://www.youtube.com/watch?v=FqiQKRKsfZE) on a hosted VPS.
+
+We’re committed to our free tier - we know the importance of this for testing hobby projects and prototyping. Almost all of the largest databases on Supabase today started on the free tier, a clear indication that our free tier is important for building an enduring platform.
 `,
   },
   integrationsSection: {
