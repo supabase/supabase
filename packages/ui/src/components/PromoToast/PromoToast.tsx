@@ -40,11 +40,11 @@ const PromoToast = () => {
         visible && 'opacity-100 translate-y-0'
       )}
     >
-      <p className="relative z-10 text-foreground flex flex-col text-lg w-full leading-7">
-        {announcement.text}
-      </p>
-      <div className="relative z-10 text-foreground-lighter uppercase flex flex-col text-sm w-full font-mono mb-2">
-        <span>Day 1</span>
+      <div className="relative z-10 text-foreground-lighter flex flex-col text-sm w-full mb-2">
+        <p className="relative z-10 text-foreground flex flex-col text-lg w-full leading-6 mb-1">
+          General Availability Week
+        </p>
+        <span className="uppercase font-mono">Day 1</span>
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
