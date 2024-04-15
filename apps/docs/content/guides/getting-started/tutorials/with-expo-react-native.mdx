@@ -452,13 +452,15 @@ photos and videos.
 You will need an image picker that works on the environment you will build the project for, we will use `expo-image-picker` in this example.
 
 ```bash
-expo install expo-image-picker
+npx expo install expo-image-picker
 ```
 
 ### Create an upload widget
 
 Let's create an avatar for the user so that they can upload a profile photo.
 We can start by creating a new component:
+
+{/* <!-- vale off --> */}
 
 ```tsx components/Avatar.tsx
 import { useState, useEffect } from 'react'
@@ -593,6 +595,8 @@ const styles = StyleSheet.create({
 })
 ```
 
+{/* <!-- vale on --> */}
+
 ### Add the new widget
 
 And then we can add the widget to the Account page:
@@ -624,11 +628,7 @@ return (
 Now you will need to run the prebuild command to get the application working on your chosen platform.
 
 ```bash
-expo prebuild
+npx expo prebuild
 ```
-
-### Storage management
-
-<StorageManagement />
 
 At this stage you have a fully functional application!

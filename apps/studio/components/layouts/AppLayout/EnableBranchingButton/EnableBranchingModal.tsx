@@ -4,6 +4,7 @@ import { last } from 'lodash'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 import {
   Button,
   Form_Shadcn_,
@@ -25,7 +26,7 @@ import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-
 import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useSelectedOrganization, useStore } from 'hooks'
+import { useSelectedOrganization } from 'hooks'
 import { useAppStateSnapshot } from 'state/app-state'
 import BranchingPITRNotice from './BranchingPITRNotice'
 import BranchingPlanNotice from './BranchingPlanNotice'
@@ -33,7 +34,6 @@ import BranchingPostgresVersionNotice from './BranchingPostgresVersionNotice'
 import GithubRepositorySelection from './GithubRepositorySelection'
 
 const EnableBranchingModal = () => {
-  const { ui } = useStore()
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
   const selectedOrg = useSelectedOrganization()
@@ -86,7 +86,7 @@ const EnableBranchingModal = () => {
 
   const { mutate: createBranch, isLoading: isCreating } = useBranchCreateMutation({
     onSuccess: () => {
-      ui.setNotification({ category: 'success', message: `Successfully created new branch` })
+      toast.success(`Successfully created new branch`)
       snap.setShowEnableBranchingModal(false)
     },
   })

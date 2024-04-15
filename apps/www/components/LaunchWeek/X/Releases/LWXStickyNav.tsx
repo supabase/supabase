@@ -56,13 +56,17 @@ const LWXStickyNav: FC = () => {
         <SectionContainer className="!max-w-none !py-0 lg:!container flex items-center justify-between font-mono gap-4 md:gap-8 text-sm">
           <div className="flex items-center gap-4 md:gap-8">
             <div className="flex items-center gap-3 leading-none uppercase">
-              <span className="text-foreground tracking-[1px]">Launch Week</span>{' '}
-              <Image
-                src="/images/launchweek/lwx/logos/lwx_logo.svg"
-                alt="Supabase Launch Week X icon"
-                width={16}
-                height={16}
-              />
+              <Link href="/launch-week" className="text-foreground tracking-[1px]">
+                Launch Week
+              </Link>{' '}
+              <Link href="/launch-week/x">
+                <Image
+                  src="/images/launchweek/lwx/logos/lwx_logo.svg"
+                  alt="Supabase Launch Week X icon"
+                  width={16}
+                  height={16}
+                />
+              </Link>
             </div>
 
             {/* Nav items */}

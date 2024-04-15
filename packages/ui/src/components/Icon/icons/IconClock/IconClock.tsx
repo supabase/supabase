@@ -9,5 +9,12 @@
     return <IconBase icon={Clock} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { clock } from 'lucide-react'
+  */
   export default IconClock
   

@@ -1,6 +1,7 @@
 import { useParams } from 'common'
 import { useState } from 'react'
-import { Button, IconCode, Popover } from 'ui'
+import { Button, Popover, cn } from 'ui'
+import { CodeIcon } from 'lucide-react'
 
 import { LogTemplate, TEMPLATES } from 'components/interfaces/Settings/Logs'
 import LogsLayout from 'components/layouts/LogsLayout/LogsLayout'
@@ -14,7 +15,7 @@ export const LogsTemplatesPage: NextPageWithLayout = () => {
   return (
     <div className="mx-auto h-full w-full px-5 py-6">
       <LogsExplorerHeader subtitle="Templates" />
-      <div className="grid grid-cols-3 gap-6 mt-4">
+      <div className="grid lg:grid-cols-3 gap-6 mt-4 pb-24">
         {TEMPLATES.sort((a, b) => a.label!.localeCompare(b.label!))
           .filter((template) => template.mode === 'custom')
           .map((template, i) => {
@@ -37,20 +38,20 @@ const Template = ({ projectRef, template }: { projectRef?: string; template: Log
       title={template.label}
       icon={
         <div
-          className="duration-400 flex h-6 w-6 items-center justify-center rounded
-          bg-foreground
-          text-background
-          transition-colors
-          group-hover:bg-brand
-          group-hover:text-brand-600
-        "
+          className={cn(
+            'duration-400 flex h-6 w-6 items-center justify-center rounded transition-colors',
+            'border bg-background-200',
+            'group-hover:bg-brand-300 group-hover:text-brand-600 group-hover:border-brand-500',
+            'dark:border-background-selection dark:bg-background-200 dark:text-foreground',
+            'dark:group-hover:border-brand-600 dark:group-hover:bg-brand-300 dark:group-hover:text-brand-600'
+          )}
         >
           <div className="scale-100 group-hover:scale-110">
-            <IconCode size={12} strokeWidth={2} />
+            <CodeIcon size={12} strokeWidth={2} />
           </div>
         </div>
       }
-      className="h-40"
+      className="h-44"
       linkHref={`/project/${projectRef}/logs/explorer?q=${encodeURI(template.searchString)}`}
       description={template.description}
       footer={

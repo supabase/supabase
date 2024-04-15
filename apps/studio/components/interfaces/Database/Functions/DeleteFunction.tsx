@@ -35,6 +35,7 @@ const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
   return (
     <>
       <TextConfirmModal
+        variant={'warning'}
         visible={visible}
         onCancel={() => setVisible(!visible)}
         onConfirm={handleDelete}
@@ -43,8 +44,14 @@ const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
         confirmLabel={`Delete function ${name}`}
         confirmPlaceholder="Type in name of function"
         confirmString={name}
-        text={`This will delete your function called ${name} of schema ${schema}.`}
-        alert="You cannot recover this function once it is deleted!"
+        text={
+          <>
+            This will delete the function
+            <span className="text-bold text-foreground">{name}</span> from the schema
+            <span className="text-bold text-foreground">{schema}</span>
+          </>
+        }
+        alert={{ title: 'You cannot recover this function once deleted.' }}
       />
     </>
   )

@@ -5,7 +5,7 @@ import { useRouter } from 'next/router'
 import { useTheme } from 'next-themes'
 import { useWindowSize } from 'react-use'
 
-import { Button, cn } from 'ui'
+import { Announcement, Button, cn, LW11CountdownBanner } from 'ui'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -38,8 +38,10 @@ const Nav = (props: Props) => {
   const isUserLoading = useIsUserLoading()
 
   const isHomePage = router.pathname === '/'
-  const isLaunchWeekPage = router.pathname.includes('launch-week')
-  const isLaunchWeekXPage = router.pathname === '/launch-week'
+  const isSpecialAnnouncementPage = router.pathname.includes('special-announcement')
+  const isLaunchWeekPage = router.pathname.includes('launch-week') || isSpecialAnnouncementPage
+  const isLaunchWeekXPage = router.pathname === '/launch-week/x'
+  const isLaunchWeek11Page = router.pathname === '/special-announcement'
   const showLaunchWeekNavMode = isLaunchWeekPage && !open
 
   React.useEffect(() => {
@@ -64,6 +66,9 @@ const Nav = (props: Props) => {
 
   return (
     <>
+      <Announcement>
+        <LW11CountdownBanner />
+      </Announcement>
       <div
         className={cn('sticky top-0 z-40 transform', isLaunchWeekXPage && 'relative')}
         style={{ transform: 'translate3d(0,0,999px)' }}
@@ -108,15 +113,18 @@ const Nav = (props: Props) => {
                     />
                   </Link>
 
-                  {isLaunchWeekPage && !isLaunchWeekXPage && (
-                    <Link
-                      href="/launch-week"
-                      as="/launch-week"
-                      className="hidden ml-2 xl:block font-mono text-sm uppercase leading-4 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
-                    >
-                      Launch Week
-                    </Link>
-                  )}
+                  {!isSpecialAnnouncementPage &&
+                    !isLaunchWeek11Page &&
+                    isLaunchWeekPage &&
+                    !isLaunchWeekXPage && (
+                      <Link
+                        href="/launch-week"
+                        as="/launch-week"
+                        className="hidden ml-2 xl:block font-mono text-sm uppercase leading-4 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-foreground-lighter focus-visible:ring-offset-4 focus-visible:ring-offset-background-alternative focus-visible:rounded-sm"
+                      >
+                        Launch Week
+                      </Link>
+                    )}
                 </div>
                 <NavigationMenu
                   delayDuration={0}

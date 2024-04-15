@@ -49,13 +49,17 @@ const InstanceConfigurationUI = () => {
   const [selectedReplicaToDrop, setSelectedReplicaToDrop] = useState<Database>()
   const [selectedReplicaToRestart, setSelectedReplicaToRestart] = useState<Database>()
 
-  const { data: loadBalancers, isSuccess: isSuccessLoadBalancers } = useLoadBalancersQuery({
+  const {
+    data: loadBalancers,
+    refetch: refetchLoadBalancers,
+    isSuccess: isSuccessLoadBalancers,
+  } = useLoadBalancersQuery({
     projectRef,
   })
   const {
     data,
     error,
-    refetch,
+    refetch: refetchReplicas,
     isLoading,
     isError,
     isSuccess: isSuccessReplicas,
@@ -79,7 +83,8 @@ const InstanceConfigurationUI = () => {
         // If any replica's status has changed, refetch databases
         if (numComingUp.current !== comingUpReplicas.length) {
           numComingUp.current = comingUpReplicas.length
-          await refetch()
+          await refetchReplicas()
+          setTimeout(() => refetchLoadBalancers(), 2000)
         }
 
         // If all replicas are active healthy, stop fetching statuses
@@ -280,24 +285,22 @@ const InstanceConfigurationUI = () => {
       {/* <ConfirmationModal
         size="medium"
         visible={selectedReplicaToRestart !== undefined}
-        header="Confirm to restart selected replica?"
-        buttonLabel="Restart replica"
-        buttonLoadingLabel="Restarting replica"
-        onSelectCancel={() => setSelectedReplicaToRestart(undefined)}
-        onSelectConfirm={() => onConfirmRestartReplica()}
+        title="Confirm to restart selected replica?"
+        confirmLabel="Restart replica"
+        confirmLabelLoading="Restarting replica"
+        onCancel={() => setSelectedReplicaToRestart(undefined)}
+        onConfirm={() => onConfirmRestartReplica()}
       >
-        <Modal.Content className="py-3">
-          <p className="text-sm">Before restarting the replica, consider:</p>
-          <ul className="text-sm text-foreground-light py-1 list-disc mx-4 space-y-1">
-            <li>
-              Network traffic from this region may slow down while the replica is restarting,
-              especially if you have no other replicas in this region
-            </li>
-          </ul>
-          <p className="text-sm mt-2">
-            Are you sure you want to restart this replica (ID: {selectedReplicaToRestart?.id}) now?{' '}
-          </p>
-        </Modal.Content>
+        <p className="text-sm">Before restarting the replica, consider:</p>
+        <ul className="text-sm text-foreground-light py-1 list-disc mx-4 space-y-1">
+          <li>
+            Network traffic from this region may slow down while the replica is restarting,
+            especially if you have no other replicas in this region
+          </li>
+        </ul>
+        <p className="text-sm mt-2">
+          Are you sure you want to restart this replica (ID: {selectedReplicaToRestart?.id}) now?{' '}
+        </p>
       </ConfirmationModal> */}
     </>
   )

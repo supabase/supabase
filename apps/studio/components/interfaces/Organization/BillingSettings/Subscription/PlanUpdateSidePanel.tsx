@@ -1,10 +1,10 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import clsx from 'clsx'
+import { isArray } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import { plans as subscriptionsPlans } from 'shared-data/plans'
+import { useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
 
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
@@ -12,13 +12,16 @@ import InformationBox from 'components/ui/InformationBox'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationBillingSubscriptionPreview } from 'data/organizations/organization-billing-subscription-preview'
+import { useProjectsQuery } from 'data/projects/projects-query'
 import { useOrgPlansQuery } from 'data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useOrgSubscriptionUpdateMutation } from 'data/subscriptions/org-subscription-update-mutation'
 import type { OrgPlan, SubscriptionTier } from 'data/subscriptions/types'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
+import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
+import { formatCurrency } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
+import { plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import {
   Button,
@@ -28,23 +31,24 @@ import {
   IconInfo,
   Modal,
   SidePanel,
+  cn,
 } from 'ui'
 import DowngradeModal from './DowngradeModal'
 import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
+import UpgradeSurveyModal from './UpgradeModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
-import { formatCurrency } from 'lib/helpers'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { isArray } from 'lodash'
 
 const PlanUpdateSidePanel = () => {
-  const { ui } = useStore()
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
 
+  const originalPlanRef = useRef<string>()
+
   const [showExitSurvey, setShowExitSurvey] = useState(false)
+  const [showUpgradeSurvey, setShowUpgradeSurvey] = useState(false)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [showDowngradeError, setShowDowngradeError] = useState(false)
   const [selectedTier, setSelectedTier] = useState<'tier_free' | 'tier_pro' | 'tier_team'>()
@@ -69,26 +73,22 @@ const PlanUpdateSidePanel = () => {
     snap.setPanelKey(undefined)
   }
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
+    orgSlug: slug,
+  })
   const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
   const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
     {
       onSuccess: () => {
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully updated subscription to ${subscriptionPlanMeta?.name}!`,
-        })
+        toast.success(`Successfully updated subscription to ${subscriptionPlanMeta?.name}!`)
         setSelectedTier(undefined)
         onClose()
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+        setShowUpgradeSurvey(true)
       },
       onError: (error) => {
-        ui.setNotification({
-          error,
-          category: 'error',
-          message: `Unable to update subscription: ${error.message}`,
-        })
+        toast.error(`Unable to update subscription: ${error.message}`)
       },
     }
   )
@@ -134,6 +134,12 @@ const PlanUpdateSidePanel = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
 
+  useEffect(() => {
+    if (visible && isSuccessSubscription) {
+      originalPlanRef.current = subscription.plan.id
+    }
+  }, [visible, isSuccessSubscription])
+
   const onConfirmDowngrade = () => {
     setSelectedTier(undefined)
     if (hasMembersExceedingFreeTierLimit) {
@@ -147,7 +153,7 @@ const PlanUpdateSidePanel = () => {
     if (!slug) return console.error('org slug is required')
     if (!selectedTier) return console.error('Selected plan is required')
     if (!selectedPaymentMethod && !paymentViaInvoice) {
-      return ui.setNotification({ category: 'error', message: 'Please select a payment method' })
+      return toast.error('Please select a payment method')
     }
 
     // If the user is downgrading from team, should have spend cap disabled by default
@@ -210,7 +216,7 @@ const PlanUpdateSidePanel = () => {
                 >
                   <div className="w-full">
                     <div className="flex items-center space-x-2">
-                      <p className={clsx('text-brand text-sm uppercase')}>{plan.name}</p>
+                      <p className={cn('text-brand text-sm uppercase')}>{plan.name}</p>
                       {isCurrentPlan ? (
                         <div className="text-xs bg-surface-300 text-foreground-light rounded px-2 py-0.5">
                           Current plan
@@ -394,7 +400,7 @@ const PlanUpdateSidePanel = () => {
                                 className="!pl-0 !pr-1"
                                 icon={
                                   <IconChevronRight
-                                    className={clsx(
+                                    className={cn(
                                       'transition',
                                       usageFeesExpanded.includes(item.description) && 'rotate-90'
                                     )}
@@ -563,6 +569,16 @@ const PlanUpdateSidePanel = () => {
         subscription={subscription}
         onClose={(success?: boolean) => {
           setShowExitSurvey(false)
+          if (success) onClose()
+        }}
+      />
+
+      <UpgradeSurveyModal
+        visible={showUpgradeSurvey}
+        originalPlan={originalPlanRef.current}
+        subscription={subscription}
+        onClose={(success?: boolean) => {
+          setShowUpgradeSurvey(false)
           if (success) onClose()
         }}
       />

@@ -71,7 +71,7 @@ const Message = memo(function Message({
         {createdAt && (
           <span className="text-xs text-foreground-muted">{dayjs(createdAt).fromNow()}</span>
         )}
-        {isDebug && <Badge color="amber">Debug request</Badge>}
+        {isDebug && <Badge variant="warning">Debug request</Badge>}
       </div>
       <ReactMarkdown
         className="gap-2.5 flex flex-col"
@@ -82,9 +82,10 @@ const Message = memo(function Message({
             return (
               <AIPolicyPre
                 onDiff={onDiff}
-                className={
+                className={cn(
+                  'transition',
                   isSelected ? '[&>div>pre]:!border-stronger [&>div>pre]:!bg-surface-200' : ''
-                }
+                )}
               >
                 {props.children[0].props.children}
               </AIPolicyPre>

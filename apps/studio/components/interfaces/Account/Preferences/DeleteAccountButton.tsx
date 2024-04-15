@@ -1,13 +1,11 @@
 import { useState } from 'react'
 import { Button, Form, Input, Modal } from 'ui'
 
-import { useStore } from 'hooks'
 import { useSendSupportTicketMutation } from 'data/feedback/support-ticket-send'
 import type { Profile } from 'data/profile/types'
+import toast from 'react-hot-toast'
 
 const DeleteAccountButton = ({ profile }: { profile?: Profile }) => {
-  const { ui } = useStore()
-
   const [isOpen, setIsOpen] = useState(false)
   const [value, setValue] = useState('')
   const [supportTicketSubmissionStatus, setSupportTicketSubmissionStatus] = useState<
@@ -51,15 +49,11 @@ const DeleteAccountButton = ({ profile }: { profile?: Profile }) => {
       await submitSupportTicket(payload)
       setIsOpen(false)
     } catch (error) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to submit support ticket: ${error}`,
-      })
+      toast.error(`Failed to submit account deletion request: ${error}`)
     } finally {
-      ui.setNotification({
-        category: 'success',
-        message: `Support request sent. Thank you!`,
-      })
+      toast.success(
+        'Successfully submitted account deletion request - we will reach out to you via email once the request is completed!'
+      )
     }
   }
 

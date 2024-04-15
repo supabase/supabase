@@ -95,6 +95,12 @@ export const sqlEditorState = proxy({
 
     sqlEditorState.needsSaving.delete(id)
   },
+  updateSnippet: (id: string, snippet: SqlSnippet) => {
+    if (sqlEditorState.snippets[id]) {
+      sqlEditorState.snippets[id].snippet = snippet
+      sqlEditorState.needsSaving.add(id)
+    }
+  },
   setSplitSizes: (id: string, splitSizes: number[]) => {
     if (sqlEditorState.snippets[id]) {
       sqlEditorState.snippets[id].splitSizes = splitSizes
@@ -139,6 +145,11 @@ export const sqlEditorState = proxy({
   },
   addNeedsSaving: (id: string) => {
     sqlEditorState.needsSaving.add(id)
+  },
+  resetResult: (id: string) => {
+    if (sqlEditorState.results[id]) {
+      sqlEditorState.results[id] = []
+    }
   },
   addResult: (id: string, results: any[]) => {
     if (sqlEditorState.results[id]) {

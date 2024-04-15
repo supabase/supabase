@@ -30,6 +30,8 @@ For this guide we'll use the following example data:
 >
 <TabPanel id="data" label="Data">
 
+{/* <!-- vale off --> */}
+
 | id  | title                               | author                 | description                                                        |
 | --- | ----------------------------------- | ---------------------- | ------------------------------------------------------------------ |
 | 1   | The Poky Little Puppy               | Janette Sebring Lowrey | Puppy is slower than other, bigger animals.                        |
@@ -37,6 +39,8 @@ For this guide we'll use the following example data:
 | 3   | Tootle                              | Gertrude Crampton      | Little toy train has big dreams.                                   |
 | 4   | Green Eggs and Ham                  | Dr. Seuss              | Sam has changing food preferences and eats unusually colored food. |
 | 5   | Harry Potter and the Goblet of Fire | J.K. Rowling           | Fourth year of school starts, big drama ensues.                    |
+
+{/* <!-- vale on --> */}
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
@@ -80,7 +84,7 @@ The functions we'll cover in this guide are:
 
 ### `to_tsvector()` [#to-tsvector]
 
-Converts your data into searchable "tokens". `to_tsvector()` stands for "to text search vector". For example:
+Converts your data into searchable tokens. `to_tsvector()` stands for "to text search vector." For example:
 
 ```sql
 select to_tsvector('green eggs and ham');
@@ -91,10 +95,10 @@ Collectively these tokens are called a "document" which Postgres can use for com
 
 ### `to_tsquery()` [#to-tsquery]
 
-Converts a query string into "tokens" to match. `to_tsquery()` stands for "to text search query".
+Converts a query string into tokens to match. `to_tsquery()` stands for "to text search query."
 
 This conversion step is important because we will want to "fuzzy match" on keywords.
-For example if a user searches for "eggs", and a column has the value "egg", we probably still want to return a match.
+For example if a user searches for `eggs`, and a column has the value `egg`, we probably still want to return a match.
 
 ### Match: `@@` [#match]
 
@@ -132,6 +136,16 @@ final result = await client
   .from('books')
   .select()
   .eq('title', 'Harry');
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await supabase.from("books")
+  .select()
+  .eq("title", value: "Harry")
+  .execute()
 ```
 
 </TabPanel>
@@ -181,6 +195,15 @@ final result = await client
   .from('books')
   .select()
   .textSearch('title', "'Harry'");
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await supabase.from("books")
+  .select()
+  .textSearch("title", value: "'Harry'")
 ```
 
 </TabPanel>
@@ -240,6 +263,16 @@ final result = await client
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = await client.from("books")
+  .select()
+  .textSearch("description", value: "'big'")
+  .execute()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -253,10 +286,14 @@ val data = supabase.from("books").select {
 </TabPanel>
 <TabPanel id="data" label="Data">
 
+{/* <!-- vale off --> */}
+
 | id  | title                               | author            | description                                     |
 | --- | ----------------------------------- | ----------------- | ----------------------------------------------- |
 | 3   | Tootle                              | Gertrude Crampton | Little toy train has big dreams.                |
 | 5   | Harry Potter and the Goblet of Fire | J.K. Rowling      | Fourth year of school starts, big drama ensues. |
+
+{/* <!-- vale on --> */}
 
 </TabPanel>
 </Tabs>
@@ -319,6 +356,23 @@ final result = await client
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```sql
+create function title_description(books) returns text as $$
+  select $1.title || ' ' || $1.description;
+$$ language sql immutable;
+```
+
+```swift
+let response = try await client
+  .from("books")
+  .select()
+  .textSearch("title_description", value: "little")
+  .execute()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```sql
@@ -338,10 +392,14 @@ val data = supabase.from("books").select {
 </TabPanel>
 <TabPanel id="data" label="Data">
 
+{/* <!-- vale off --> */}
+
 | id  | title                 | author                 | description                                 |
 | --- | --------------------- | ---------------------- | ------------------------------------------- |
 | 1   | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals. |
 | 3   | Tootle                | Gertrude Crampton      | Little toy train has big dreams.            |
+
+{/* <!-- vale on --> */}
 
 </TabPanel>
 </Tabs>
@@ -390,6 +448,17 @@ final result = await client
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await client
+  .from("books")
+  .select()
+  .textSearch("description", value: "'little' & 'big'");
+  .execute()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -403,9 +472,13 @@ val data = supabase.from("books").select {
 </TabPanel>
 <TabPanel id="data" label="Data">
 
+{/* <!-- vale off --> */}
+
 | id  | title  | author            | description                      |
 | --- | ------ | ----------------- | -------------------------------- |
 | 3   | Tootle | Gertrude Crampton | Little toy train has big dreams. |
+
+{/* <!-- vale on --> */}
 
 </TabPanel>
 </Tabs>
@@ -454,6 +527,17 @@ final result = await client
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await client
+  .from("books")
+  .select()
+  .textSearch("description", value: "'little' | 'big'")
+  .execute()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -467,15 +551,102 @@ val data = supabase.from("books").select {
 </TabPanel>
 <TabPanel id="data" label="Data">
 
+{/* <!-- vale off --> */}
+
 | id  | title                 | author                 | description                                 |
 | --- | --------------------- | ---------------------- | ------------------------------------------- |
 | 1   | The Poky Little Puppy | Janette Sebring Lowrey | Puppy is slower than other, bigger animals. |
 | 3   | Tootle                | Gertrude Crampton      | Little toy train has big dreams.            |
 
+{/* <!-- vale on --> */}
+
 </TabPanel>
 </Tabs>
 
 Notice how searching for `big` includes results with the word `bigger` (or `biggest`, etc).
+
+## Partial search
+
+Partial search is particularly useful when you want to find matches on substrings within your data.
+
+### Implementing partial search
+
+You can use the `:*` syntax with `to_tsquery()`. Here's an example that searches for any book titles beginning with "Lit":
+
+```sql
+select title from books where to_tsvector(title) @@ to_tsquery('Lit:*');
+```
+
+### Extending functionality with RPC
+
+To make the partial search functionality accessible through the API, you can wrap the search logic in a stored procedure.
+
+After creating this function, you can invoke it from your application using the SDK for your platform. Here's an example:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="language"
+>
+<TabPanel id="sql" label="SQL">
+
+```sql
+create or replace function search_books_by_title_prefix(prefix text)
+return setof books AS $$
+begin
+  return query
+  select * from books where to_tsvector('english', title) @@ to_tsquery(prefix || ':*');
+end;
+$$ language plpgsql;
+```
+
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.rpc('search_books_by_title_prefix', { prefix: 'Lit' })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Dart">
+
+```dart
+final data = await supabase.rpc('search_books_by_title_prefix', params: { 'prefix': 'Lit' });
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await supabase.rpc(
+  "search_books_by_title_prefix",
+  params: ["prefix": "Lit"]
+)
+.execute()
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val rpcParams = mapOf("prefix" to "Lit")
+val result = supabase.postgrest.rpc("search_books_by_title_prefix", rpcParams)
+```
+
+</TabPanel>
+</Tabs>
+
+This function takes a prefix parameter and returns all books where the title contains a word starting with that prefix. The `:*` operator is used to denote a prefix match in the `to_tsquery()` function.
+
+## Handling spaces in queries
+
+When you want the search term to include a phrase or multiple words, you can concatenate words using a `+` as a placeholder for space:
+
+```sql
+select * from search_books_by_title_prefix('Little+Puppy');
+```
 
 ## Creating indexes
 
@@ -514,6 +685,8 @@ from books;
 </TabPanel>
 <TabPanel id="data" label="Data">
 
+{/* <!-- vale off --> */}
+
 | id  | fts                                                                                                             |
 | --- | --------------------------------------------------------------------------------------------------------------- |
 | 1   | 'anim':7 'bigger':6 'littl':10 'poki':9 'puppi':1,11 'slower':3                                                 |
@@ -521,6 +694,8 @@ from books;
 | 3   | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3                                                         |
 | 4   | 'chang':3 'color':9 'eat':7 'egg':12 'food':4,10 'green':11 'ham':14 'prefer':5 'sam':1 'unus':8                |
 | 5   | 'big':6 'drama':7 'ensu':8 'fire':15 'fourth':1 'goblet':13 'harri':9 'potter':10 'school':4 'start':5 'year':2 |
+
+{/* <!-- vale on --> */}
 
 </TabPanel>
 </Tabs>
@@ -565,6 +740,17 @@ final result = await client
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await client
+  .from("books")
+  .select()
+  .textSearch("fts", value: "'little' & 'big'")
+  .execute()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -578,9 +764,13 @@ val data = supabase.from("books").select {
 </TabPanel>
 <TabPanel id="data" label="Data">
 
+{/* <!-- vale off --> */}
+
 | id  | title  | author            | description                      | fts                                                     |
 | --- | ------ | ----------------- | -------------------------------- | ------------------------------------------------------- |
 | 3   | Tootle | Gertrude Crampton | Little toy train has big dreams. | 'big':5 'dream':6 'littl':1 'tootl':7 'toy':2 'train':3 |
+
+{/* <!-- vale on --> */}
 
 </TabPanel>
 </Tabs>
@@ -631,6 +821,17 @@ final result = await client
   .from('books')
   .select()
   .textSearch('description', "'big' <-> 'dreams'");
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await client
+  .from("books")
+  .select()
+  .textSearch("description", value: "'big' <-> 'dreams'")
+  .execute()
 ```
 
 </TabPanel>
@@ -688,6 +889,17 @@ final result = await client
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await supabase
+  .from("books")
+  .select()
+  .textSearch("description", value: "'year' <2> 'school'")
+  .execute()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -742,6 +954,17 @@ final result = await client
   .from('books')
   .select()
   .textSearch('description', "'big' & !'little'");
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await client
+  .from("books")
+  .select()
+  .textSearch("description", value: "'big' & !'little'")
+  .execute()
 ```
 
 </TabPanel>

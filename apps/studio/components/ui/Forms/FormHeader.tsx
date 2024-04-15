@@ -1,6 +1,9 @@
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
-import { Button, IconExternalLink } from 'ui'
+
+import { Markdown } from 'components/interfaces/Markdown'
+import { Button } from 'ui'
 
 const FormHeader = ({
   title,
@@ -21,14 +24,10 @@ const FormHeader = ({
             {title}
           </ReactMarkdown>
         </h3>
-        {description && (
-          <div className="text-foreground-lighter text-sm">
-            <ReactMarkdown>{description}</ReactMarkdown>
-          </div>
-        )}
+        {description && <Markdown content={description} className="max-w-full" />}
       </div>
       {docsUrl !== undefined && (
-        <Button asChild type="default" icon={<IconExternalLink />}>
+        <Button asChild type="default" icon={<ExternalLink size={14} />}>
           <Link href={docsUrl} target="_blank" rel="noreferrer">
             Documentation
           </Link>

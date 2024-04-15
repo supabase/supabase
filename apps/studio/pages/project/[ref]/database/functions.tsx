@@ -1,3 +1,4 @@
+import { PostgresFunction } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
 
@@ -5,14 +6,15 @@ import { CreateFunction, DeleteFunction } from 'components/interfaces/Database'
 import FunctionsList from 'components/interfaces/Database/Functions/FunctionsList/FunctionsList'
 import { DatabaseLayout } from 'components/layouts'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { FormHeader } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import type { NextPageWithLayout } from 'types'
 
 const FunctionsPage: NextPageWithLayout = () => {
-  const [selectedFunction, setSelectedFunction] = useState<any>()
-  const [showCreateFunctionForm, setShowCreateFunctionForm] = useState<boolean>(false)
-  const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState<boolean>(false)
+  const [selectedFunction, setSelectedFunction] = useState<PostgresFunction | undefined>()
+  const [showCreateFunctionForm, setShowCreateFunctionForm] = useState(false)
+  const [showDeleteFunctionForm, setShowDeleteFunctionForm] = useState(false)
 
   const canReadFunctions = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'functions')
   const isPermissionsLoaded = usePermissionsLoaded()
@@ -41,7 +43,7 @@ const FunctionsPage: NextPageWithLayout = () => {
       <ScaffoldContainer>
         <ScaffoldSection>
           <div className="col-span-12">
-            <h3 className=" mb-4 text-xl text-foreground">Database Functions</h3>
+            <FormHeader title="Database Functions" />
             <FunctionsList
               createFunction={createFunction}
               editFunction={editFunction}

@@ -220,7 +220,7 @@ const App = () => (
 )
 ```
 
-If you created your own theme, you may not need to override any of the them.
+If you created your own theme, you may not need to override any of them.
 
 ### Create your own theme [#create-theme]
 
@@ -470,3 +470,14 @@ Setting `showLinks` to `false` will hide the following links:
 - Already have an account? Sign in
 - Send a magic link email
 - Forgot your password?
+
+### Sign in and Sign up views
+
+Add `sign_in` or `sign_up` views with the `view` prop:
+
+```
+<Auth
+  supabaseClient={supabase}
+  view="sign_up"
+/>
+```

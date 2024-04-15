@@ -41,6 +41,10 @@ export interface paths {
     /** Send exit survey to HubSpot */
     post: operations['SendExitSurveyController_sendExitSurvey']
   }
+  '/platform/feedback/upgrade': {
+    /** Send upgrade survey to survey_responses table */
+    post: operations['SendUpgradeSurveyController_sendUpgradeSurvey']
+  }
   '/platform/signup': {
     /** Sign up with email and password */
     post: operations['SignUpController_signUp']
@@ -99,6 +103,10 @@ export interface paths {
   '/platform/database/{ref}/backups': {
     /** Gets project backups */
     get: operations['BackupsController_getBackups']
+  }
+  '/platform/database/{ref}/backups/enable-physical-backups': {
+    /** Enable usage of physical backups */
+    post: operations['BackupsController_enablePhysicalBackup']
   }
   '/platform/database/{ref}/backups/download': {
     /** Download project backup */
@@ -822,14 +830,6 @@ export interface paths {
     /** Get GitHub connection branch */
     get: operations['GitHubBranchesController_getConnectionBranch']
   }
-  '/platform/integrations/github/pull-requests/{connectionId}': {
-    /** List GitHub connection pull requests */
-    get: operations['GitHubPullRequestsController_getConnectionPullRequests']
-  }
-  '/platform/integrations/github/pull-requests/{connectionId}/{branchName}': {
-    /** List GitHub pull requests for a specific branch */
-    get: operations['GitHubPullRequestsController_validateConnectionBranch']
-  }
   '/platform/integrations/github/repositories': {
     /** Gets GitHub repositories for user */
     get: operations['GitHubRepositoriesController_listRepositories']
@@ -855,6 +855,10 @@ export interface paths {
     delete: operations['DatabaseOwnerController_rollbackOwnerReassign']
     /** Reassigns object owner from temp to postgres */
     patch: operations['DatabaseOwnerController_finaliseOwnerReassign']
+  }
+  '/system/database/{ref}/password': {
+    /** Updates the database password */
+    patch: operations['DatabasePasswordController_updatePassword']
   }
   '/system/github-secret-alert': {
     /** Reset JWT if leaked keys found by GitHub secret scanning */
@@ -890,6 +894,10 @@ export interface paths {
     /** Refreshes secrets */
     post: operations['SecretsRefreshController_refreshSecrets']
   }
+  '/system/health': {
+    /** Get API health status */
+    get: operations['HealthController_getStatus']
+  }
   '/system/projects/{ref}/health-reporting': {
     /** Updates a project's health status. */
     put: operations['HealthReportingController_updateStatus']
@@ -922,11 +930,19 @@ export interface paths {
     /** Gets usage stats */
     get: operations['OrgUsageSystemController_getOrgUsage']
   }
+  '/system/organizations/{slug}/billing/partner/usage-and-costs': {
+    /** Gets the partner usage and costs */
+    get: operations['PartnerBillingSystemController_getPartnerUsageAndCosts']
+  }
   '/system/organizations/{slug}/billing/subscription': {
     /** Gets the current subscription */
     get: operations['OrgSubscriptionSystemController_getSubscription']
     /** Updates subscription */
     put: operations['OrgSubscriptionSystemController_updateSubscription']
+  }
+  '/system/organizations/{slug}/restrictions': {
+    /** Updates restriction status of an org */
+    put: operations['OrgRestrictionsSystemController_updateRestriction']
   }
   '/system/integrations/vercel/webhooks': {
     /** Processes Vercel event */
@@ -1003,6 +1019,10 @@ export interface paths {
   '/v0/database/{ref}/backups': {
     /** Gets project backups */
     get: operations['BackupsController_getBackups']
+  }
+  '/v0/database/{ref}/backups/enable-physical-backups': {
+    /** Enable usage of physical backups */
+    post: operations['BackupsController_enablePhysicalBackup']
   }
   '/v0/database/{ref}/backups/download': {
     /** Download project backup */
@@ -1452,6 +1472,13 @@ export interface paths {
      */
     patch: operations['BranchController_updateBranch']
   }
+  '/v1/branches/{branch_id}/reset': {
+    /**
+     * Resets a database branch
+     * @description Resets the specified database branch
+     */
+    post: operations['BranchController_resetBranch']
+  }
   '/v1/projects': {
     /**
      * List all projects
@@ -1844,6 +1871,13 @@ export interface components {
       additionalFeedback?: string
       exitAction?: string
     }
+    SendUpgradeSurveyBody: {
+      orgSlug?: string
+      prevPlan?: string
+      currentPlan?: string
+      reasons: string[]
+      additionalFeedback?: string
+    }
     SignUpBody: {
       email: string
       password: string
@@ -1890,6 +1924,7 @@ export interface components {
       MAILER_TEMPLATES_MAGIC_LINK_CONTENT: string
       MFA_MAX_ENROLLED_FACTORS: number
       URI_ALLOW_LIST: string
+      EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean
       EXTERNAL_EMAIL_ENABLED: boolean
       EXTERNAL_PHONE_ENABLED: boolean
       SAML_ENABLED: boolean
@@ -1900,6 +1935,7 @@ export interface components {
       SESSIONS_INACTIVITY_TIMEOUT: number
       SESSIONS_SINGLE_PER_USER: boolean
       SESSIONS_TAGS: string
+      RATE_LIMIT_ANONYMOUS_USERS: number
       RATE_LIMIT_EMAIL_SENT: number
       RATE_LIMIT_SMS_SENT: number
       RATE_LIMIT_VERIFY: number
@@ -2031,6 +2067,7 @@ export interface components {
       MAILER_TEMPLATES_MAGIC_LINK_CONTENT?: string
       MFA_MAX_ENROLLED_FACTORS?: number
       URI_ALLOW_LIST?: string
+      EXTERNAL_ANONYMOUS_USERS_ENABLED?: boolean
       EXTERNAL_EMAIL_ENABLED?: boolean
       EXTERNAL_PHONE_ENABLED?: boolean
       SAML_ENABLED?: boolean
@@ -2041,6 +2078,7 @@ export interface components {
       SESSIONS_INACTIVITY_TIMEOUT?: number
       SESSIONS_SINGLE_PER_USER?: boolean
       SESSIONS_TAGS?: string
+      RATE_LIMIT_ANONYMOUS_USERS?: number
       RATE_LIMIT_EMAIL_SENT?: number
       RATE_LIMIT_SMS_SENT?: number
       RATE_LIMIT_VERIFY?: number
@@ -2187,6 +2225,7 @@ export interface components {
       updated_at?: string
       is_sso_user?: boolean
       deleted_at?: string
+      is_anonymous?: boolean
     }
     UsersResponse: {
       total: number
@@ -2243,14 +2282,17 @@ export interface components {
       migrated_at: string | null
     }
     OrganizationResponse: {
+      /** @enum {string|null} */
+      restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
       id: number
       slug: string
       name: string
-      billing_email: string
+      billing_email: string | null
       is_owner: boolean
-      stripe_customer_id: string
-      subscription_id?: string
+      stripe_customer_id: string | null
+      subscription_id: string | null
       opt_in_tags: string[]
+      restriction_data: Record<string, never>
     }
     GetOrganizationByFlyOrganizationIdResponse: {
       slug: string
@@ -3548,6 +3590,8 @@ export interface components {
         | 'RESTORING'
         | 'UNKNOWN'
         | 'UPGRADING'
+        | 'INIT_READ_REPLICA'
+        | 'INIT_READ_REPLICA_FAILED'
       /** @enum {string} */
       cloud_provider: 'AWS' | 'FLY'
       db_port: number
@@ -3573,6 +3617,8 @@ export interface components {
         | 'RESTORING'
         | 'UNKNOWN'
         | 'UPGRADING'
+        | 'INIT_READ_REPLICA'
+        | 'INIT_READ_REPLICA_FAILED'
       identifier: string
     }
     UpdatePasswordBody: {
@@ -3631,6 +3677,10 @@ export interface components {
       is_branch_enabled: boolean
       parent_project_ref?: string
       is_read_replicas_enabled: boolean
+      v2MaintenanceWindow: {
+        start?: string
+        end?: string
+      }
     }
     ProjectRefResponse: {
       id: number
@@ -4278,6 +4328,11 @@ export interface components {
     DeleteVercelConnectionResponse: {
       id: string
     }
+    GitHubAuthorization: {
+      id: number
+      user_id: number
+      sender_id: number
+    }
     CreateGitHubAuthorizationBody: {
       code: string
     }
@@ -4304,7 +4359,6 @@ export interface components {
       repository: components['schemas']['ListGitHubConnectionsRepository']
       user: components['schemas']['ListGitHubConnectionsUser'] | null
       workdir: string
-      supabase_changes_only: boolean
     }
     ListGitHubConnectionsResponse: {
       connections: components['schemas']['ListGitHubConnectionsConnection'][]
@@ -4349,6 +4403,9 @@ export interface components {
       name: string
       value: string
     }
+    HealthResponse: {
+      healthy: boolean
+    }
     ReportStatusBody: {
       /** @enum {string} */
       status:
@@ -4361,6 +4418,8 @@ export interface components {
         | 'RESTORING'
         | 'UNKNOWN'
         | 'UPGRADING'
+        | 'INIT_READ_REPLICA'
+        | 'INIT_READ_REPLICA_FAILED'
       reportingToken: string
       databaseIdentifier: string
     }
@@ -4382,6 +4441,8 @@ export interface components {
     UpdateAddonAdminBody: {
       addon_variant: components['schemas']['AddonVariantId']
       addon_type: components['schemas']['ProjectAddonType']
+      /** @enum {string} */
+      proration_behaviour?: 'prorate_and_invoice_end_of_cycle' | 'prorate_and_invoice_now'
       price_id?: string
     }
     SystemCreateProjectBody: {
@@ -4455,6 +4516,35 @@ export interface components {
       tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
       price_id?: string
     }
+    RestrictionData: {
+      grace_period_end?: string
+      /** @enum {string} */
+      restrictions?: 'drop_requests_402'
+      violations?: (
+        | 'exceed_db_size_quota'
+        | 'exceed_egress_quota'
+        | 'exceed_edge_functions_count_quota'
+        | 'exceed_edge_functions_invocations_quota'
+        | 'exceed_monthly_active_users_quota'
+        | 'exceed_realtime_connection_count_quota'
+        | 'exceed_realtime_message_count_quota'
+        | 'exceed_storage_size_quota'
+        | 'overdue_payment'
+      )[]
+    }
+    UpdateRestrictionsBody: {
+      /** @enum {string} */
+      restriction_status: 'grace_period' | 'grace_period_over' | 'null' | 'restricted'
+      restriction_data?: components['schemas']['RestrictionData']
+      no_notification?: boolean
+    }
+    UpdateRestrictionsResponse: {
+      slug: string
+      /** @enum {string} */
+      restriction_status?: 'grace_period' | 'grace_period_over' | 'null' | 'restricted'
+      restriction_data?: components['schemas']['RestrictionData']
+      message?: string
+    }
     GetMetricsBody: {
       /** @enum {string} */
       metric: 'user_queries'
@@ -4497,6 +4587,7 @@ export interface components {
       branch_name?: string
       git_branch?: string
       reset_on_push?: boolean
+      persistent?: boolean
     }
     BranchResponse: {
       id: string
@@ -4507,10 +4598,17 @@ export interface components {
       git_branch?: string
       pr_number?: number
       reset_on_push: boolean
+      persistent: boolean
       /** @enum {string} */
       status: 'CREATING_PROJECT' | 'RUNNING_MIGRATIONS' | 'MIGRATIONS_PASSED' | 'MIGRATIONS_FAILED'
       created_at: string
       updated_at: string
+    }
+    BranchDeleteResponse: {
+      message: string
+    }
+    BranchResetResponse: {
+      message: string
     }
     V1DatabaseResponse: {
       /** @description Database host */
@@ -4774,6 +4872,7 @@ export interface components {
     }
     AuthConfigResponse: {
       disable_signup: boolean | null
+      external_anonymous_users_enabled: boolean | null
       external_apple_additional_client_ids: string | null
       external_apple_client_id: string | null
       external_apple_enabled: boolean | null
@@ -4865,6 +4964,7 @@ export interface components {
       password_hibp_enabled: boolean | null
       password_min_length: number | null
       password_required_characters: string | null
+      rate_limit_anonymous_users: number | null
       rate_limit_email_sent: number | null
       rate_limit_sms_sent: number | null
       rate_limit_token_refresh: number | null
@@ -4938,6 +5038,7 @@ export interface components {
       mailer_templates_magic_link_content?: string
       mfa_max_enrolled_factors?: number
       uri_allow_list?: string
+      external_anonymous_users_enabled?: boolean
       external_email_enabled?: boolean
       external_phone_enabled?: boolean
       saml_enabled?: boolean
@@ -4948,6 +5049,7 @@ export interface components {
       sessions_inactivity_timeout?: number
       sessions_single_per_user?: boolean
       sessions_tags?: string
+      rate_limit_anonymous_users?: number
       rate_limit_email_sent?: number
       rate_limit_sms_sent?: number
       rate_limit_verify?: number
@@ -5209,7 +5311,7 @@ export interface components {
     }
     V1OrganizationSlugResponse: {
       plan?: components['schemas']['BillingPlanId']
-      opt_in_tags: ('AI_SQL_GENERATOR_OPT_IN' | 'PREVIEW_BRANCHES_OPT_IN')[]
+      opt_in_tags: 'AI_SQL_GENERATOR_OPT_IN'[]
       id: string
       name: string
     }
@@ -5401,7 +5503,7 @@ export interface components {
        */
       itemName: string
       /** @enum {string} */
-      type: 'usage' | 'plan' | 'addon' | 'proration'
+      type: 'usage' | 'plan' | 'addon' | 'proration' | 'compute_credits'
       /**
        * @description In case of a usage item, the free usage included in the customers plan
        * @example 100
@@ -5573,6 +5675,25 @@ export interface operations {
         }
       }
       /** @description Failed to send exit survey */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Send upgrade survey to survey_responses table */
+  SendUpgradeSurveyController_sendUpgradeSurvey: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SendUpgradeSurveyBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['SendFeedbackResponse']
+        }
+      }
+      /** @description Failed to send upgrade survey */
       500: {
         content: never
       }
@@ -5909,6 +6030,24 @@ export interface operations {
         }
       }
       /** @description Failed to get project backups */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Enable usage of physical backups */
+  BackupsController_enablePhysicalBackup: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      201: {
+        content: never
+      }
+      /** @description Failed to enable usage of physical backups */
       500: {
         content: never
       }
@@ -10587,6 +10726,10 @@ export interface operations {
   /** Gets the Vercel project with the given ID */
   VercelProjectsController_getVercelProject: {
     parameters: {
+      query: {
+        id: string
+        teamId: string
+      }
       header: {
         vercel_authorization: string
       }
@@ -10857,6 +11000,11 @@ export interface operations {
   /** Get GitHub authorization */
   GitHubAuthorizationsController_getGitHubAuthorization: {
     responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GitHubAuthorization']
+        }
+      }
       /** @description Failed to get GitHub authorization */
       500: {
         content: never
@@ -10872,9 +11020,7 @@ export interface operations {
     }
     responses: {
       201: {
-        content: {
-          'application/json': Record<string, never>
-        }
+        content: never
       }
       /** @description Failed to create GitHub authorization */
       500: {
@@ -10995,52 +11141,6 @@ export interface operations {
         }
       }
       /** @description Failed to get GitHub connection branch */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** List GitHub connection pull requests */
-  GitHubPullRequestsController_getConnectionPullRequests: {
-    parameters: {
-      query: {
-        pr_number: number[]
-      }
-      path: {
-        connectionId: number
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>[]
-        }
-      }
-      /** @description Failed to list GitHub connection pull requests */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** List GitHub pull requests for a specific branch */
-  GitHubPullRequestsController_validateConnectionBranch: {
-    parameters: {
-      query?: {
-        per_page?: number
-        page?: number
-      }
-      path: {
-        connectionId: number
-        branchName: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>[]
-        }
-      }
-      /** @description Failed to validate GitHub connection branch */
       500: {
         content: never
       }
@@ -11205,6 +11305,32 @@ export interface operations {
         content: never
       }
       /** @description Failed to reassign owner on the project */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates the database password */
+  DatabasePasswordController_updatePassword: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdatePasswordBody']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update database password */
       500: {
         content: never
       }
@@ -11377,6 +11503,20 @@ export interface operations {
       }
     }
   }
+  /** Get API health status */
+  HealthController_getStatus: {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['HealthResponse']
+        }
+      }
+      /** @description Failed to retrieve API health status */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Updates a project's health status. */
   HealthReportingController_updateStatus: {
     parameters: {
@@ -11529,6 +11669,24 @@ export interface operations {
       }
     }
   }
+  /** Gets the partner usage and costs */
+  PartnerBillingSystemController_getPartnerUsageAndCosts: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to retrieve subscription */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets the current subscription */
   OrgSubscriptionSystemController_getSubscription: {
     parameters: {
@@ -11565,6 +11723,31 @@ export interface operations {
         content: never
       }
       /** @description Failed to update subscription */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates restriction status of an org */
+  OrgRestrictionsSystemController_updateRestriction: {
+    parameters: {
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateRestrictionsBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['UpdateRestrictionsResponse']
+        }
+      }
+      /** @description Failed to update restriction status */
       500: {
         content: never
       }
@@ -11683,7 +11866,9 @@ export interface operations {
     }
     responses: {
       200: {
-        content: never
+        content: {
+          'application/json': components['schemas']['BranchDeleteResponse']
+        }
       }
       /** @description Failed to delete database branch */
       500: {
@@ -11714,6 +11899,29 @@ export interface operations {
         }
       }
       /** @description Failed to update database branch */
+      500: {
+        content: never
+      }
+    }
+  }
+  /**
+   * Resets a database branch
+   * @description Resets the specified database branch
+   */
+  BranchController_resetBranch: {
+    parameters: {
+      path: {
+        /** @description Branch ID */
+        branch_id: string
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['BranchResetResponse']
+        }
+      }
+      /** @description Failed to reset database branch */
       500: {
         content: never
       }

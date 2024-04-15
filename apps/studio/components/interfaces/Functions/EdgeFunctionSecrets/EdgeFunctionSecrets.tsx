@@ -1,20 +1,19 @@
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
 import { Button, IconExternalLink, IconSearch, Input, Modal } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useSecretsDeleteMutation } from 'data/secrets/secrets-delete-mutation'
 import { ProjectSecret, useSecretsQuery } from 'data/secrets/secrets-query'
-import { useStore } from 'hooks'
 import AddNewSecretModal from './AddNewSecretModal'
 import EdgeFunctionSecret from './EdgeFunctionSecret'
 
 const EdgeFunctionSecrets = () => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const [searchString, setSearchString] = useState('')
   const [showCreateSecret, setShowCreateSecret] = useState(false)
@@ -26,10 +25,7 @@ const EdgeFunctionSecrets = () => {
 
   const { mutate: deleteSecret, isLoading: isDeleting } = useSecretsDeleteMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully deleted ${selectedSecret?.name}`,
-      })
+      toast.success(`Successfully deleted ${selectedSecret?.name}`)
       setSelectedSecret(undefined)
     },
   })
@@ -125,22 +121,20 @@ const EdgeFunctionSecrets = () => {
       <ConfirmationModal
         loading={isDeleting}
         visible={selectedSecret !== undefined}
-        buttonLabel="Delete secret"
-        buttonLoadingLabel="Deleting secret"
-        header={`Confirm to delete secret "${selectedSecret?.name}"`}
-        onSelectCancel={() => setSelectedSecret(undefined)}
-        onSelectConfirm={() => {
+        confirmLabel="Delete secret"
+        confirmLabelLoading="Deleting secret"
+        title={`Confirm to delete secret "${selectedSecret?.name}"`}
+        onCancel={() => setSelectedSecret(undefined)}
+        onConfirm={() => {
           if (selectedSecret !== undefined) {
             deleteSecret({ projectRef, secrets: [selectedSecret.name] })
           }
         }}
       >
-        <Modal.Content className="py-4">
-          <p className="text-sm">
-            Before removing this secret, do ensure that none of your edge functions are currently
-            actively using this secret. This action cannot be undone.
-          </p>
-        </Modal.Content>
+        <p className="text-sm">
+          Before removing this secret, do ensure that none of your edge functions are currently
+          actively using this secret. This action cannot be undone.
+        </p>
       </ConfirmationModal>
     </>
   )

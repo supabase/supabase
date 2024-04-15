@@ -5,15 +5,19 @@ import { debounce } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useRef, useState } from 'react'
+import toast from 'react-hot-toast'
+import { Badge, Button, IconExternalLink, IconUsers, Input, Listbox, Separator } from 'ui'
 
 import {
   FreeProjectLimitWarning,
   NotOrganizationOwnerWarning,
 } from 'components/interfaces/Organization/NewProject'
 import { RegionSelector } from 'components/interfaces/ProjectCreation/RegionSelector'
+import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 import DisabledWarningDueToIncident from 'components/ui/DisabledWarningDueToIncident'
 import Panel from 'components/ui/Panel'
 import PasswordStrengthBar from 'components/ui/PasswordStrengthBar'
+import type { components } from 'data/api'
 import { useFreeProjectLimitCheckQuery } from 'data/organizations/free-project-limit-check-query'
 import { useOrganizationsQuery } from 'data/organizations/organizations-query'
 import {
@@ -22,7 +26,7 @@ import {
   useProjectCreateMutation,
 } from 'data/projects/project-create-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useFlag, useStore, withAuth } from 'hooks'
+import { useCheckPermissions, useFlag, withAuth } from 'hooks'
 import {
   AWS_REGIONS,
   CloudProvider,
@@ -34,16 +38,12 @@ import {
 } from 'lib/constants'
 import { passwordStrength, pluckObjectFields } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
-import { Badge, Button, IconExternalLink, IconUsers, Input, Listbox } from 'ui'
-import type { components } from 'data/api'
-import { WizardLayoutWithoutAuth } from 'components/layouts/WizardLayout'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
 const Wizard: NextPageWithLayout = () => {
   const router = useRouter()
   const { slug } = useParams()
-  const { ui } = useStore()
 
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
   const cloudProviderEnabled = useFlag('enableFlyCloudProvider')
@@ -128,9 +128,9 @@ const Wizard: NextPageWithLayout = () => {
   useEffect(() => {
     // User added a new payment method
     if (router.query.setup_intent && router.query.redirect_status) {
-      ui.setNotification({ category: 'success', message: 'Successfully added new payment method' })
+      toast.success('Successfully added new payment method')
     }
-  }, [router.query.redirect_status, router.query.setup_intent, ui])
+  }, [router.query.redirect_status, router.query.setup_intent])
 
   function onProjectNameChange(e: any) {
     e.target.value = e.target.value.replace(/\./g, '')
@@ -179,10 +179,9 @@ const Wizard: NextPageWithLayout = () => {
     }
     if (postgresVersion) {
       if (!postgresVersion.match(/1[2-9]\..*/)) {
-        return ui.setNotification({
-          category: 'error',
-          message: `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`,
-        })
+        toast.error(
+          `Invalid Postgres version, should start with a number between 12-19, a dot and additional characters, i.e. 15.2 or 15.2.0-3`
+        )
       }
 
       data['customSupabaseRequest'] = {
@@ -301,11 +300,16 @@ const Wizard: NextPageWithLayout = () => {
 
   return (
     <Panel
-      hideHeaderStyling
       loading={!isOrganizationsSuccess || isLoadingFreeProjectLimitCheck}
       title={
         <div key="panel-title">
           <h3>Create a new project</h3>
+          <p className="text-sm text-foreground-lighter">
+            Your project will have its own dedicated instance and full postgres database.
+            <br />
+            An API will be set up so you can easily interact with your new database.
+            <br />
+          </p>
         </div>
       }
       footer={
@@ -335,26 +339,13 @@ const Wizard: NextPageWithLayout = () => {
       }
     >
       <>
-        <Panel.Content className="pt-0 pb-6">
-          <p className="text-sm text-foreground-lighter">
-            Your project will have its own dedicated instance and full postgres database.
-            <br />
-            An API will be set up so you can easily interact with your new database.
-            <br />
-          </p>
-        </Panel.Content>
         {projectCreationDisabled ? (
-          <Panel.Content className="pb-8 border-t border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
+          <Panel.Content className="pb-8">
             <DisabledWarningDueToIncident title="Project creation is currently disabled" />
           </Panel.Content>
         ) : (
-          <>
-            <Panel.Content
-              className={[
-                'space-y-4 border-t border-b',
-                'border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark',
-              ].join(' ')}
-            >
+          <div className="divide-y divide-border-muted">
+            <Panel.Content className={['space-y-4'].join(' ')}>
               {(organizations?.length ?? 0) > 0 && (
                 <Listbox
                   label="Organization"
@@ -380,12 +371,7 @@ const Wizard: NextPageWithLayout = () => {
 
             {canCreateProject && (
               <>
-                <Panel.Content
-                  className={[
-                    'border-b',
-                    'border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark',
-                  ].join(' ')}
-                >
+                <Panel.Content>
                   <Input
                     id="project-name"
                     layout="horizontal"
@@ -399,12 +385,7 @@ const Wizard: NextPageWithLayout = () => {
                 </Panel.Content>
 
                 {showNonProdFields && (
-                  <Panel.Content
-                    className={[
-                      'border-b',
-                      'border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark',
-                    ].join(' ')}
-                  >
+                  <Panel.Content>
                     <Input
                       id="custom-postgres-version"
                       layout="horizontal"
@@ -426,12 +407,7 @@ const Wizard: NextPageWithLayout = () => {
                 )}
 
                 {cloudProviderEnabled && showNonProdFields && (
-                  <Panel.Content
-                    className={[
-                      'border-b',
-                      'border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark',
-                    ].join(' ')}
-                  >
+                  <Panel.Content>
                     <Listbox
                       layout="horizontal"
                       label="Cloud Provider"
@@ -454,12 +430,7 @@ const Wizard: NextPageWithLayout = () => {
                 )}
 
                 {orgSubscription?.plan.id !== 'free' && (
-                  <Panel.Content
-                    className={[
-                      'border-b',
-                      'border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark',
-                    ].join(' ')}
-                  >
+                  <Panel.Content>
                     <Listbox
                       layout="horizontal"
                       label={
@@ -515,7 +486,7 @@ const Wizard: NextPageWithLayout = () => {
                             <div className="flex space-x-2">
                               <div className="text-center w-[80px]">
                                 <Badge
-                                  color={option === 'micro' ? 'gray' : 'brand'}
+                                  variant={option === 'micro' ? 'default' : 'brand'}
                                   className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
                                 >
                                   {instanceSizeSpecs[option].label}
@@ -538,7 +509,7 @@ const Wizard: NextPageWithLayout = () => {
                   </Panel.Content>
                 )}
 
-                <Panel.Content className="border-b border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
+                <Panel.Content>
                   <Input
                     id="password"
                     copy={dbPass.length > 0}
@@ -560,7 +531,7 @@ const Wizard: NextPageWithLayout = () => {
                   />
                 </Panel.Content>
 
-                <Panel.Content className="border-b border-panel-border-interior-light [[data-theme*=dark]_&]:border-panel-border-interior-dark">
+                <Panel.Content>
                   <RegionSelector
                     cloudProvider={cloudProvider}
                     selectedRegion={dbRegion}
@@ -570,19 +541,15 @@ const Wizard: NextPageWithLayout = () => {
               </>
             )}
 
-            {isAdmin && (
+            {isAdmin && freePlanWithExceedingLimits && slug && (
               <Panel.Content>
-                {freePlanWithExceedingLimits && slug && (
-                  <div className="mt-4">
-                    <FreeProjectLimitWarning
-                      membersExceededLimit={membersExceededLimit || []}
-                      orgSlug={slug}
-                    />
-                  </div>
-                )}
+                <FreeProjectLimitWarning
+                  membersExceededLimit={membersExceededLimit || []}
+                  orgSlug={slug}
+                />
               </Panel.Content>
             )}
-          </>
+          </div>
         )}
       </>
     </Panel>

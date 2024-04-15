@@ -2,10 +2,11 @@ import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Alert, Badge, Button, Checkbox, IconBookOpen, Input, Modal, SidePanel } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import {
   CONSTRAINT_TYPE,
@@ -17,7 +18,7 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { useIsFeatureEnabled, useStore } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SpreadsheetImport } from '../'
@@ -75,7 +76,6 @@ const TableEditor = ({
   updateEditorDirty = noop,
 }: TableEditorProps) => {
   const snap = useTableEditorStateSnapshot()
-  const { ui } = useStore()
   const { project } = useProjectContext()
   const isNewRecord = isUndefined(table)
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
@@ -171,15 +171,15 @@ const TableEditor = ({
     if (tableFields) {
       const errors: any = validateFields(tableFields)
       if (errors.columns) {
-        ui.setNotification({ category: 'error', message: errors.columns, duration: 4000 })
+        toast.error(errors.columns)
       }
       setErrors(errors)
 
       if (isEmpty(errors)) {
         const payload = {
-          name: tableFields.name,
+          name: tableFields.name.trim(),
           schema: snap.selectedSchemaName,
-          comment: tableFields.comment,
+          comment: tableFields.comment?.trim(),
           ...(!isNewRecord && { rls_enabled: tableFields.isRLSEnabled }),
         }
         const configuration = {
@@ -191,8 +191,11 @@ const TableEditor = ({
           existingForeignKeyRelations: foreignKeys,
           primaryKey,
         }
+        const columns = tableFields.columns.map((column) => {
+          return { ...column, name: column.name.trim() }
+        })
 
-        saveChanges(payload, tableFields.columns, fkRelations, isNewRecord, configuration, resolve)
+        saveChanges(payload, columns, fkRelations, isNewRecord, configuration, resolve)
       } else {
         resolve()
       }
@@ -276,7 +279,7 @@ const TableEditor = ({
           label={
             <div className="flex items-center space-x-2">
               <span>Enable Row Level Security (RLS)</span>
-              <Badge color="gray">Recommended</Badge>
+              <Badge>Recommended</Badge>
             </div>
           }
           // @ts-ignore
@@ -399,18 +402,16 @@ const TableEditor = ({
 
         <ConfirmationModal
           visible={rlsConfirmVisible}
-          header="Turn off Row Level Security"
-          buttonLabel="Confirm"
+          title="Turn off Row Level Security"
+          confirmLabel="Confirm"
           size="medium"
-          onSelectCancel={() => setRlsConfirmVisible(false)}
-          onSelectConfirm={() => {
+          onCancel={() => setRlsConfirmVisible(false)}
+          onConfirm={() => {
             onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
             setRlsConfirmVisible(false)
           }}
         >
-          <Modal.Content>
-            <RLSDisableModalContent />
-          </Modal.Content>
+          <RLSDisableModalContent />
         </ConfirmationModal>
       </SidePanel.Content>
 

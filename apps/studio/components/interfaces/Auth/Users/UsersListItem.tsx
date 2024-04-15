@@ -40,14 +40,16 @@ const UserListItem = ({
         <span className="text-foreground">{!user.phone ? '-' : user.phone}</span>
       </Table.td>
       <Table.td className="table-cell">
-        <span className="capitalize text-foreground">{user?.raw_app_meta_data?.provider}</span>
+        <span className="capitalize text-foreground">
+          {user.is_anonymous ? 'Anonymous' : user?.raw_app_meta_data?.provider}
+        </span>
       </Table.td>
       <Table.td className="table-cell">
         <span className="text-foreground">{createdAt?.format('DD MMM, YYYY HH:mm')}</span>
       </Table.td>
       <Table.td className="table-cell">
         {!isUserConfirmed ? (
-          <Badge color="yellow">Waiting for verification..</Badge>
+          <Badge variant="warning">Waiting for verification..</Badge>
         ) : user.last_sign_in_at ? (
           lastSignedIn?.format('DD MMM, YYYY HH:mm')
         ) : (
@@ -56,9 +58,7 @@ const UserListItem = ({
       </Table.td>
       <Table.td className="table-cell">
         <div className="flex max-w-[72px] items-baseline">
-          <SimpleCodeBlock metastring="" className="font-xs bash">
-            {user.id}
-          </SimpleCodeBlock>
+          <SimpleCodeBlock className="font-xs bash">{user.id}</SimpleCodeBlock>
           <div>...</div>
         </div>
       </Table.td>

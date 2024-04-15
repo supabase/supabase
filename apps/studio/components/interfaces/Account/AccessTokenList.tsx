@@ -77,20 +77,18 @@ const AccessTokenList = () => {
       </div>
       <ConfirmationModal
         visible={isOpen}
-        danger={true}
-        header="Confirm to delete"
-        buttonLabel="Delete"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={() => setIsOpen(false)}
-        onSelectConfirm={() => {
+        variant={'destructive'}
+        title="Confirm to delete"
+        confirmLabel="Delete"
+        confirmLabelLoading="Deleting"
+        onCancel={() => setIsOpen(false)}
+        onConfirm={() => {
           if (token) onDeleteToken(token.id)
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            {`This action cannot be undone. Are you sure you want to delete "${token?.name}" token?`}
-          </p>
-        </Modal.Content>
+        <p className="py-4 text-sm text-foreground-light">
+          {`This action cannot be undone. Are you sure you want to delete "${token?.name}" token?`}
+        </p>
       </ConfirmationModal>
     </>
   )

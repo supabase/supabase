@@ -1,6 +1,5 @@
 import { useParams } from 'common'
 import { find } from 'lodash'
-import { observer } from 'mobx-react-lite'
 
 import { StorageLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -40,4 +39,4 @@ const PageLayout: NextPageWithLayout = () => {
 
 PageLayout.getLayout = (page) => <StorageLayout title="Buckets">{page}</StorageLayout>
 
-export default observer(PageLayout)
+export default PageLayout
