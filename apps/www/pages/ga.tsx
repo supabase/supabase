@@ -12,6 +12,7 @@ import ReactMarkdown from 'react-markdown'
 import Image from 'next/image'
 import ImageGrid from '../components/ImageGrid'
 import { useTheme } from 'next-themes'
+import { ExpandableVideo } from 'ui-patterns'
 
 const ParagraphSection = dynamic(() => import('~/components/Sections/ParagraphSection'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
@@ -23,8 +24,8 @@ export default function IndexPage() {
   const data = pageData(isDark!)
 
   const meta_title = 'General Availability | Supabase'
-  const meta_description =
-    'Explore Supabase fees and pricing information. Find our competitive pricing plans, with no hidden pricing. We have a generous free plan for those getting started, and Pay As You Go for those scaling up.'
+  const meta_description = 'Supabase is officially launching into General Availability.'
+  const meta_image = '/images/ga/ga-og.png'
 
   return (
     <DefaultLayout>
@@ -37,45 +38,55 @@ export default function IndexPage() {
           url: `https://supabase.com/${router.pathname}`,
           images: [
             {
-              url: `https://supabase.com/images/og/og-image-v2.jpg`,
+              url: meta_image,
             },
           ],
         }}
       />
       <div className="bg-alternative border-b border-muted">
-        <SectionContainer className="flex flex-col gap-6 lg:gap-12">
-          <Image
-            src="/images/launchweek/ga/ga-black.svg"
-            alt="GA logo"
-            className="dark:hidden w-12 md:w-16 aspect-[104/57] h-auto"
-            priority
-            quality={100}
-            width={300}
-            height={300}
-          />
-          <Image
-            src="/images/launchweek/ga/ga-white.svg"
-            alt="GA logo"
-            className="hidden dark:block w-12 md:w-16 aspect-[104/57] h-auto"
-            priority
-            quality={100}
-            width={300}
-            height={300}
-          />
-          <div>
-            <h1 className="text-3xl md:text-5xl xl:text-8xl lg:max-w-xl xl:max-w-7xl tracking-[-1.1px] text-foreground-light font-normal">
-              We are moving to
-              <br />
-              <span className="text-foreground">General Availability</span>
-            </h1>
+        <SectionContainer className="flex flex-col gap-4 lg:gap-8 py-8 md:py-12 lg:py-16">
+          <div className="w-full grid grid-cols-1 gap-4 lg:grid-cols-3">
+            <div className="flex flex-col gap-4 lg:col-span-2">
+              <Image
+                src="/images/launchweek/ga/ga-black.svg"
+                alt="GA logo"
+                className="dark:hidden w-12 md:w-16 aspect-[104/57] h-auto"
+                priority
+                quality={100}
+                width={300}
+                height={300}
+              />
+              <Image
+                src="/images/launchweek/ga/ga-white.svg"
+                alt="GA logo"
+                className="hidden dark:block w-12 md:w-16 aspect-[104/57] h-auto"
+                priority
+                quality={100}
+                width={300}
+                height={300}
+              />
+              <h1 className="lg:pt-4 text-3xl md:text-5xl xl:text-7xl lg:max-w-xl xl:max-w-7xl tracking-[-1.1px] text-foreground-light font-normal">
+                We are moving to
+                <br />
+                <span className="text-foreground">General Availability</span>
+              </h1>
+              {data.hero?.publishedAt && (
+                <span className="text-sm text-foreground-lighter font-mono md:text-base">
+                  {data.hero.publishedAt}
+                </span>
+              )}
+            </div>
+            <div className="">
+              <ExpandableVideo
+                videoId="bRtdk8D4X8w"
+                imgUrl="/images/launchweek/11/video-cover.jpg"
+                imgOverlayText="Watch announcement"
+                priority
+              />
+            </div>
           </div>
-          {data.hero?.publishedAt && (
-            <span className="text-sm text-foreground-lighter font-mono md:text-base">
-              {data.hero.publishedAt}
-            </span>
-          )}
         </SectionContainer>
-        <SectionContainer className="!pt-0">
+        <SectionContainer className="!pt-2 lg:!pt-8">
           {data.highlightsSection.highlights && (
             <div
               className="flex-wrap md:flex-nowrap w-fit md:w-full md:flex md:items-start grid lg:grid-cols-4 gap-4 md:gap-10 lg:gap-20
@@ -98,8 +109,8 @@ export default function IndexPage() {
               )}
             </div>
           )}
-          <div className="w-full border-t max-w-4xl mt-12 lg:mt-32 flex justify-center">
-            <ol className="w-full pt-8 gap-4 columns-2 lg:columns-3 text-foreground-light">
+          <div className="w-full border-t mt-12 lg:mt-24 flex justify-start">
+            <ol className="w-full max-w-4xl pt-8 gap-4 columns-2 lg:columns-3 text-foreground-light">
               {data.hero.sections.map((section, i) => (
                 <li key={section.title}>
                   <Link
@@ -128,10 +139,19 @@ export default function IndexPage() {
             "
           >
             {data.communityStats.highlights.map(
-              (highlight: { number: string; text: string; icon: React.ReactNode }, i: number) => {
+              (
+                highlight: { number: string; text: string; url: string; icon: React.ReactNode },
+                i: number
+              ) => {
                 return (
                   <div key={i} className="">
-                    {highlight.icon}
+                    <Link
+                      href={highlight.url}
+                      target="_blank"
+                      className="text-foreground-muted hover:text-foreground transition-colors"
+                    >
+                      {highlight.icon}
+                    </Link>
                     <div className="border-t-[1px] border-brand-500 w-[32px] mb-1 mt-4"></div>
                     <h2 className="text-xl md:text-2xl lg:text-4xl pt-1.5 lg:pt-3 tracking-[-1.5px] font-mono">
                       {highlight.number}
@@ -153,9 +173,9 @@ export default function IndexPage() {
       <SectionContainer className="!pt-0 !grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 xl:gap-10">
         <div className="col-span-full lg:col-start-6 lg:col-span-7">
           <ImageGrid
-            smCols={3}
-            mdCols={3}
-            lgCols={3}
+            smCols={2}
+            mdCols={4}
+            lgCols={2}
             images={data.enterpriseSection.companies}
             removeFilter
             bg={false}
