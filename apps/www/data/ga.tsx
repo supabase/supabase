@@ -39,7 +39,7 @@ export const data = {
     content: `
 During the first year of Supabase we set ourselves a goal: build a managed platform capable of securely running 1 million databases. Today we've proven that metric and we're announcing the General Availability of the platform that will service the next 99 million.
 
-![top user growth over time by days after launch](/images/ga/project-user-growth--dark.svg?v=2)
+![top user growth over time by days after launch](/images/ga/database-growth--dark.svg?v=2)
 
 > Supabase database growth since inception.
 
@@ -109,7 +109,7 @@ Our tagline is “Build in a weekend, scale to millions”. This isn't hyperbole
 
 In the past year, we've had 11 companies build with Supabase and grow from zero to over 1 million users. 
 
-![top user growth over time by days after launch](/images/ga/project-user-growth--dark.svg)
+![top user growth over time by days after launch](/images/ga/project-user-growth--dark.svg?v=3)
 
 Most of these were AI companies, like Udio, Krea, Humata, Chatbase, Pika, Quivr, Mendable, Markprompt and [MDN search](https://developer.mozilla.org/en-US/blog/introducing-ai-help/) by Mozilla.
 
