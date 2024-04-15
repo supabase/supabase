@@ -22,7 +22,7 @@ You can just think of them as adding a `WHERE` clause to every query. For exampl
 ```sql
 create policy "Individuals can view their own todos."
 on todos for select
-using ( auth.uid() = user_id );
+using ( (select auth.uid()) = user_id );
 ```
 
 .. would translate to this whenever a user tries to select from the todos table:
@@ -79,7 +79,7 @@ Alternatively, if you only wanted users to be able to see their own profiles:
 ```sql
 create policy "User can see their own profile only."
 on profiles
-for select using ( auth.uid() = user_id );
+for select using ( (select auth.uid()) = user_id );
 ```
 
 ### INSERT policies
@@ -103,7 +103,7 @@ alter table profiles enable row level security;
 create policy "Users can create a profile."
 on profiles for insert
 to authenticated                          -- the Postgres Role (recommended)
-with check ( auth.uid() = user_id );      -- the actual Policy
+with check ( (select auth.uid()) = user_id );      -- the actual Policy
 ```
 
 ### UPDATE policies
@@ -131,8 +131,8 @@ alter table profiles enable row level security;
 create policy "Users can update their own profile."
 on profiles for update
 to authenticated                    -- the Postgres Role (recommended)
-using ( auth.uid() = user_id )       -- checks if the existing row complies with the policy expression
-with check ( auth.uid() = user_id ); -- checks if the new row complies with the policy expression
+using ( (select auth.uid()) = user_id )       -- checks if the existing row complies with the policy expression
+with check ( (select auth.uid()) = user_id ); -- checks if the new row complies with the policy expression
 ```
 
 If no `with check` expression is defined, then the `using` expression will be used both to determine which rows are visible (normal USING case) and which new rows will be allowed to be added (WITH CHECK case).
@@ -158,7 +158,7 @@ alter table profiles enable row level security;
 create policy "Users can delete a profile."
 on profiles for delete
 to authenticated                     -- the Postgres Role (recommended)
-using ( auth.uid() = user_id );      -- the actual Policy
+using ( (select auth.uid()) = user_id );      -- the actual Policy
 ```
 
 ## Bypassing Row Level Security
@@ -184,7 +184,7 @@ Make sure you've added [indexes](/docs/guides/database/postgres/indexes) on any 
 ```sql
 create policy "rls_test_select" on test_table
 to authenticated
-using ( auth.uid() = user_id );
+using ( (select auth.uid()) = user_id );
 ```
 
 You can add an index like:
@@ -208,7 +208,7 @@ You can use `select` statement to improve policies that use functions. For examp
 ```sql
 create policy "rls_test_select" on test_table
 to authenticated
-using ( auth.uid() = user_id );
+using ( (select auth.uid()) = user_id );
 ```
 
 You can do:
@@ -276,7 +276,7 @@ to authenticated
 using (
   exists (
     select 1 from roles_table
-    where auth.uid() = user_id and role = 'good_role'
+    where (select auth.uid()) = user_id and role = 'good_role'
   )
 );
 ```
@@ -292,7 +292,7 @@ as $$
 begin
   return exists (
     select 1 from roles_table
-    where auth.uid() = user_id and role = 'good_role'
+    where (select auth.uid()) = user_id and role = 'good_role'
   );
 end;
 $$;
@@ -320,7 +320,7 @@ For example, this is an example of a slow policy which joins the source `test_ta
 create policy "rls_test_select" on test_table
 to authenticated
 using (
-  auth.uid() in (
+  (select auth.uid()) in (
     select user_id
     from team_user
     where team_user.team_id = team_id -- joins to the source "test_table.team_id"
@@ -337,7 +337,7 @@ using (
   team_id in (
     select team_id
     from team_user
-    where user_id = auth.uid() -- no join
+    where user_id = (select auth.uid()) -- no join
   )
 );
 ```
@@ -362,7 +362,7 @@ Always use the Role of inside your policies, specified by the `TO` operator. For
 
 ```sql
 create policy "rls_test_select" on rls_test
-using ( auth.uid() = user_id );
+using ( (select auth.uid()) = user_id );
 ```
 
 Use:
@@ -370,10 +370,10 @@ Use:
 ```sql
 create policy "rls_test_select" on rls_test
 to authenticated
-using ( auth.uid() = user_id );
+using ( (select auth.uid()) = user_id );
 ```
 
-This prevents the policy `( auth.uid() = user_id )` from running for any `anon` users, since the execution stops at the `to authenticated` step.
+This prevents the policy `( (select auth.uid()) = user_id )` from running for any `anon` users, since the execution stops at the `to authenticated` step.
 
 #### Benchmarks
 

@@ -528,6 +528,7 @@ export const auth = {
       name: 'Authentication',
       url: undefined,
       items: [
+        { name: 'Anonymous Sign-Ins', url: '/guides/auth/auth-anonymous' },
         { name: 'Email Login', url: '/guides/auth/auth-email' },
         {
           name: 'Passwordless Login',
@@ -793,7 +794,14 @@ export const database: NavMenuConstant = {
           name: 'Query optimization',
           url: '/guides/database/query-optimization',
         },
-        { name: 'Debugging and monitoring', url: '/guides/database/inspect' },
+        {
+          name: 'Database linter',
+          url: '/guides/database/database-linter',
+        },
+        {
+          name: 'Debugging and monitoring',
+          url: '/guides/database/inspect',
+        },
         {
           name: 'Debugging performance issues',
           url: '/guides/database/debugging-performance',
@@ -917,8 +925,16 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/wrappers/overview',
         },
         {
+          name: 'Connecting to Auth0',
+          url: '/guides/database/extensions/wrappers/auth0',
+        },
+        {
           name: 'Connecting to Airtable',
           url: '/guides/database/extensions/wrappers/airtable',
+        },
+        {
+          name: 'Connecting to AWS Cognito',
+          url: '/guides/database/extensions/wrappers/cognito',
         },
         {
           name: 'Connecting to AWS S3',
@@ -939,6 +955,14 @@ export const database: NavMenuConstant = {
         {
           name: 'Connecting to Logflare',
           url: '/guides/database/extensions/wrappers/logflare',
+        },
+        {
+          name: 'Connecting to MSSQL',
+          url: '/guides/database/extensions/wrappers/mssql',
+        },
+        {
+          name: 'Connecting to Redis',
+          url: '/guides/database/extensions/wrappers/redis',
         },
         {
           name: 'Connecting to Stripe',

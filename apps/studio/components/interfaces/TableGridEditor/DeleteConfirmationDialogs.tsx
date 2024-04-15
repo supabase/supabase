@@ -1,6 +1,15 @@
 import Link from 'next/link'
 import toast from 'react-hot-toast'
-import { Alert, Button, Checkbox, IconExternalLink, Modal } from 'ui'
+import {
+  Alert,
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Checkbox,
+  IconExternalLink,
+  Modal,
+} from 'ui'
 
 import type { SupaRow } from 'components/grid'
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
@@ -220,40 +229,39 @@ const DeleteConfirmationDialogs = ({
   return (
     <>
       <ConfirmationModal
-        danger
+        variant="destructive"
         size="small"
         visible={snap.confirmationDialog?.type === 'column'}
-        header={`Confirm deletion of column "${
+        title={`Confirm deletion of column "${
           snap.confirmationDialog?.type === 'column' && snap.confirmationDialog.column.name
         }"`}
-        buttonLabel="Delete"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={() => {
+        confirmLabel="Delete"
+        confirmLabelLoading="Deleting"
+        onCancel={() => {
           snap.closeConfirmationDialog()
         }}
-        onSelectConfirm={onConfirmDeleteColumn}
+        onConfirm={onConfirmDeleteColumn}
       >
-        <Modal.Content>
-          <div className="py-4 space-y-4">
-            <p className="text-sm text-foreground-light">
-              Are you sure you want to delete the selected column? This action cannot be undone.
-            </p>
-            <Checkbox
-              label="Drop column with cascade?"
-              description="Deletes the column and its dependent objects"
-              checked={isDeleteWithCascade}
-              onChange={() => snap.toggleConfirmationIsWithCascade()}
-            />
-            {isDeleteWithCascade && (
-              <Alert
-                withIcon
-                variant="warning"
-                title="Warning: Dropping with cascade may result in unintended consequences"
-              >
-                <p className="mb-4">
-                  All dependent objects will be removed, as will any objects that depend on them,
-                  recursively.
-                </p>
+        <div className="space-y-4">
+          <p className="text-sm text-foreground-light">
+            Are you sure you want to delete the selected column? This action cannot be undone.
+          </p>
+          <Checkbox
+            label="Drop column with cascade?"
+            description="Deletes the column and its dependent objects"
+            checked={isDeleteWithCascade}
+            onChange={() => snap.toggleConfirmationIsWithCascade()}
+          />
+          {isDeleteWithCascade && (
+            <Alert_Shadcn_
+              variant="warning"
+              title="Warning: Dropping with cascade may result in unintended consequences"
+            >
+              <AlertTitle_Shadcn_>
+                All dependent objects will be removed, as will any objects that depend on them,
+                recursively.
+              </AlertTitle_Shadcn_>
+              <AlertDescription_Shadcn_>
                 <Button asChild size="tiny" type="default" icon={<IconExternalLink />}>
                   <Link
                     href="https://www.postgresql.org/docs/current/ddl-depend.html"
@@ -263,85 +271,81 @@ const DeleteConfirmationDialogs = ({
                     About dependency tracking
                   </Link>
                 </Button>
-              </Alert>
-            )}
-          </div>
-        </Modal.Content>
+              </AlertDescription_Shadcn_>
+            </Alert_Shadcn_>
+          )}
+        </div>
       </ConfirmationModal>
 
       <ConfirmationModal
-        danger
+        variant={'destructive'}
         size="small"
         visible={snap.confirmationDialog?.type === 'table'}
-        header={
+        title={
           <span className="break-words">{`Confirm deletion of table "${selectedTable?.name}"`}</span>
         }
-        buttonLabel="Delete"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={() => {
+        confirmLabel="Delete"
+        confirmLabelLoading="Deleting"
+        onCancel={() => {
           snap.closeConfirmationDialog()
         }}
-        onSelectConfirm={onConfirmDeleteTable}
+        onConfirm={onConfirmDeleteTable}
       >
-        <Modal.Content>
-          <div className="py-4 space-y-4">
-            <p className="text-sm text-foreground-light">
-              Are you sure you want to delete the selected table? This action cannot be undone.
-            </p>
-            <Checkbox
-              label="Drop table with cascade?"
-              description="Deletes the table and its dependent objects"
-              checked={isDeleteWithCascade}
-              onChange={() => snap.toggleConfirmationIsWithCascade(!isDeleteWithCascade)}
-            />
-            {isDeleteWithCascade && (
-              <Alert
-                withIcon
-                variant="warning"
-                title="Warning: Dropping with cascade may result in unintended consequences"
-              >
-                <p className="mb-4">
-                  All dependent objects will be removed, as will any objects that depend on them,
-                  recursively.
-                </p>
-                <Button asChild size="tiny" type="default" icon={<IconExternalLink />}>
-                  <Link
-                    href="https://www.postgresql.org/docs/current/ddl-depend.html"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    About dependency tracking
-                  </Link>
-                </Button>
-              </Alert>
-            )}
-          </div>
-        </Modal.Content>
+        <div className="space-y-4">
+          <p className="text-sm text-foreground-light">
+            Are you sure you want to delete the selected table? This action cannot be undone.
+          </p>
+          <Checkbox
+            label="Drop table with cascade?"
+            description="Deletes the table and its dependent objects"
+            checked={isDeleteWithCascade}
+            onChange={() => snap.toggleConfirmationIsWithCascade(!isDeleteWithCascade)}
+          />
+          {isDeleteWithCascade && (
+            <Alert
+              withIcon
+              variant="warning"
+              title="Warning: Dropping with cascade may result in unintended consequences"
+            >
+              <p className="mb-4">
+                All dependent objects will be removed, as will any objects that depend on them,
+                recursively.
+              </p>
+              <Button asChild size="tiny" type="default" icon={<IconExternalLink />}>
+                <Link
+                  href="https://www.postgresql.org/docs/current/ddl-depend.html"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  About dependency tracking
+                </Link>
+              </Button>
+            </Alert>
+          )}
+        </div>
       </ConfirmationModal>
 
       <ConfirmationModal
-        danger
+        variant={'destructive'}
         size="small"
         visible={snap.confirmationDialog?.type === 'row'}
-        header={
+        title={
           <span className="break-words">
             Confirm to delete the selected row{numRows > 1 && 's'}
           </span>
         }
-        buttonLabel="Delete"
-        buttonLoadingLabel="Deleting"
-        onSelectCancel={() => snap.closeConfirmationDialog()}
-        onSelectConfirm={() => onConfirmDeleteRow()}
+        confirmLabel="Delete"
+        confirmLabelLoading="Deleting"
+        onCancel={() => snap.closeConfirmationDialog()}
+        onConfirm={() => onConfirmDeleteRow()}
       >
-        <Modal.Content>
-          <div className="py-4 space-y-4">
-            <p className="text-sm text-foreground-light">
-              Are you sure you want to delete {isAllRowsSelected ? 'all' : 'the selected'}{' '}
-              {numRows > 1 && `${numRows} `}row
-              {numRows > 1 && 's'}? This action cannot be undone.
-            </p>
-          </div>
-        </Modal.Content>
+        <div className="space-y-4">
+          <p className="text-sm text-foreground-light">
+            Are you sure you want to delete {isAllRowsSelected ? 'all' : 'the selected'}{' '}
+            {numRows > 1 && `${numRows} `}row
+            {numRows > 1 && 's'}? This action cannot be undone.
+          </p>
+        </div>
       </ConfirmationModal>
     </>
   )

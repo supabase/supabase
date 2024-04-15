@@ -1,9 +1,11 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
+import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 import { PITRNotice, PITRSelection } from 'components/interfaces/Database/Backups/PITR'
 import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
+import { FormHeader } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import UpgradeToPro from 'components/ui/UpgradeToPro'
@@ -11,7 +13,6 @@ import { useBackupsQuery } from 'data/database/backups-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useCheckPermissions, usePermissionsLoaded, useSelectedOrganization } from 'hooks'
 import type { NextPageWithLayout } from 'types'
-import DatabaseBackupsNav from 'components/interfaces/Database/Backups/DatabaseBackupsNav'
 
 const DatabasePhysicalBackups: NextPageWithLayout = () => {
   const { project } = useProjectContext()
@@ -22,7 +23,7 @@ const DatabasePhysicalBackups: NextPageWithLayout = () => {
       <ScaffoldSection>
         <div className="col-span-12">
           <div className="space-y-6">
-            <h3 className="text-xl text-foreground">Database Backups</h3>
+            <FormHeader className="!mb-0" title="Database Backups" />
             <DatabaseBackupsNav active="pitr" projRef={ref} />
             <div className="space-y-8">
               <PITR />

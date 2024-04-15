@@ -62,11 +62,13 @@ The schedule uses the standard cron syntax, in which \* means "run every time pe
  * * * * *
 ```
 
-You can use [crontab.guru](https://crontab.guru/) to help validate your cron schedules.
+You can use `[1-59] seconds` as the cron syntax to schedule sub-minute jobs. This is available on `pg_cron` v1.5.0+; upgrade your existing Supabase project to use this syntax.
+
+Head over to [crontab.guru](https://crontab.guru/) to validate your cron schedules.
 
 ### Scheduling system maintenance
 
-Be extremely careful when setting up pg_cron jobs for system maintenance tasks as they can have unintended consequences. For instance, scheduling a command to terminate idle connections with `pg_terminate_backend(pid)` can disrupt critical background processes like nightly backups. Often, there is an existing Postgres setting e.g. `idle_session_timeout` that can perform these common maintenance tasks without the risk.
+Be extremely careful when setting up `pg_cron` jobs for system maintenance tasks as they can have unintended consequences. For instance, scheduling a command to terminate idle connections with `pg_terminate_backend(pid)` can disrupt critical background processes like nightly backups. Often, there is an existing Postgres setting e.g. `idle_session_timeout` that can perform these common maintenance tasks without the risk.
 
 Reach out to [Supabase Support](https://supabase.com/support) if you're unsure if that applies to your use case.
 
@@ -74,7 +76,7 @@ Reach out to [Supabase Support](https://supabase.com/support) if you're unsure i
 
 ### Delete data every week
 
-Delete old data on Saturday at 3:30am (GMT):
+Delete old data every Saturday at 3:30am (GMT):
 
 ```sql
 select cron.schedule (
@@ -86,21 +88,35 @@ select cron.schedule (
 
 ### Run a vacuum every day
 
-Vacuum every day at 3:00am (GMT)
+Vacuum every day at 3:00am (GMT):
 
 ```sql
 select cron.schedule('nightly-vacuum', '0 3 * * *', 'VACUUM');
 ```
 
-### Invoke Supabase Edge Function every minute
+### Call a database function every 5 minutes
 
-Make a POST request to a Supabase Edge Function every minute. Note: this requires the [`pg_net` extension](/docs/guides/database/extensions/pgnet) to be enabled.
+Create a [`hello_world()`](https://supabase.com/docs/guides/database/functions?language=sql#simple-functions) database function and then call it every 5 minutes:
+
+```sql
+select cron.schedule('call-db-function', '*/5 * * * *', 'CALL hello_world()');
+```
+
+### Invoke Supabase Edge Function every 30 seconds
+
+<Admonition type="note">
+
+This requires `pg_cron` v1.5.0+ and the [`pg_net` extension](/docs/guides/database/extensions/pgnet) to be enabled.
+
+</Admonition>
+
+Make a POST request to a Supabase Edge Function every 30 seconds:
 
 ```sql
 select
   cron.schedule(
-    'invoke-function-every-minute',
-    '* * * * *', -- every minute
+    'invoke-function-every-half-minute',
+    '30 seconds',
     $$
     select
       net.http_post(
@@ -164,4 +180,4 @@ The records in cron.job_run_details are not cleaned automatically which will tak
 
 ## Resources
 
-- [pg_cron GitHub Repository](https://github.com/citusdata/pg_cron)
+- [`pg_cron` GitHub Repository](https://github.com/citusdata/pg_cron)

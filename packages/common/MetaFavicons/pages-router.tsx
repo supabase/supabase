@@ -31,29 +31,34 @@ const MetaFaviconsPagesRouter = ({
       {/* prettier-ignore */}
       <link rel="apple-touch-icon-precomposed" sizes="57x57" href={`${basePath}${route}/apple-icon-57x57.png`}/>
       {/* prettier-ignore */}
-      <link rel="apple-touch-icon-precomposed" sizes="114x114" href={`${basePath}${route}/apple-icon-114x114.png`}/>
+      <link rel="apple-touch-icon-precomposed" sizes="60x60" href={`${basePath}${route}/apple-icon-60x60.png`}/>
       {/* prettier-ignore */}
       <link rel="apple-touch-icon-precomposed" sizes="72x72" href={`${basePath}${route}/apple-icon-72x72.png`}/>
       {/* prettier-ignore */}
-      <link rel="apple-touch-icon-precomposed" sizes="144x144" href={`${basePath}${route}/apple-icon-144x144.png`}/>
+      <link rel="apple-touch-icon-precomposed" sizes="76x76" href={`${basePath}${route}/apple-icon-76x76.png`}/>
       {/* prettier-ignore */}
-      <link rel="apple-touch-icon-precomposed" sizes="60x60" href={`${basePath}${route}/apple-icon-60x60.png`}/>
+      <link rel="apple-touch-icon-precomposed" sizes="114x114" href={`${basePath}${route}/apple-icon-114x114.png`}/>
       {/* prettier-ignore */}
       <link rel="apple-touch-icon-precomposed" sizes="120x120" href={`${basePath}${route}/apple-icon-120x120.png`}/>
       {/* prettier-ignore */}
-      <link rel="apple-touch-icon-precomposed" sizes="76x76" href={`${basePath}${route}/apple-icon-76x76.png`}/>
+      <link rel="apple-touch-icon-precomposed" sizes="144x144" href={`${basePath}${route}/apple-icon-144x144.png`}/>
       {/* prettier-ignore */}
       <link rel="apple-touch-icon-precomposed" sizes="152x152" href={`${basePath}${route}/apple-icon-152x152.png`}/>
       {/* prettier-ignore */}
-      <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-128.png`} sizes="128x128"/>
-      {/* prettier-ignore */}
-      <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-196x196.png`} sizes="196x196"/>
-      {/* prettier-ignore */}
-      <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-96x96.png`} sizes="96x96"/>
+      <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-16x16.png`} sizes="16x16"/>
       {/* prettier-ignore */}
       <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-32x32.png`} sizes="32x32"/>
       {/* prettier-ignore */}
-      <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-16x16.png`} sizes="16x16"/>
+      <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-48x48.png`} sizes="48x48"/>
+      {/* prettier-ignore */}
+      <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-96x96.png`} sizes="96x96"/>
+      {/* prettier-ignore */}
+      <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-128.png`} sizes="128x128"/>
+      {/* prettier-ignore */}
+      <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-180x180.png`} sizes="180x180"/>
+      {/* prettier-ignore */}
+      <link rel="icon" type="image/png" href={`${basePath}${route}/favicon-196x196.png`} sizes="196x196"/>
+      {/* prettier-ignore */}
       <meta name="application-name" content={applicationName ?? '&nbsp;'} />
       {/* prettier-ignore */}
       <meta name="msapplication-TileColor" content={`#${themeColor}`} />
@@ -69,7 +74,7 @@ const MetaFaviconsPagesRouter = ({
       <meta name="msapplication-square310x310logo" content={`${basePath}${route}/mstile-310x310.png`} />
       <meta name="theme-color" content={`#${themeColor}`} />
       <link rel="shortcut icon" href={`${basePath}${route}/favicon.ico`} />
-      <link rel="icon" type="image/png" href={`${basePath}${route}/favicon.ico`} />
+      <link rel="icon" type="image/x-icon" href={`${basePath}${route}/favicon.ico`} />
       <link rel="apple-touch-icon" href={`${basePath}${route}/favicon.ico`} />
       {includeRssXmlFeed && (
         <link rel="alternate" type="application/rss+xml" href={`${basePath}/feed.xml`} />

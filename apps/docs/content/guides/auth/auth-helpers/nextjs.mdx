@@ -11,6 +11,20 @@ The `auth-helpers` package has been replaced with the `@supabase/ssr` package. W
 
 </Admonition>
 
+<Accordion
+  type="default"
+  openBehaviour="multiple"
+  chevronAlign="right"
+  justified
+  size="medium"
+  className="text-foreground-light border-b mt-8 pb-2"
+  >
+  
+  <Accordion.Item
+        header="See legacy docs"
+        id="legacy-docs"
+      >
+
 The [Next.js Auth Helpers package](https://github.com/supabase/auth-helpers) configures Supabase Auth to store the user's `session` in a `cookie`, rather than `localStorage`. This makes it available across the client and server of the App Router - [Client Components](/docs/guides/auth/auth-helpers/nextjs#client-components), [Server Components](/docs/guides/auth/auth-helpers/nextjs#server-components), [Server Actions](/docs/guides/auth/auth-helpers/nextjs#server-actions), [Route Handlers](/docs/guides/auth/auth-helpers/nextjs#route-handlers) and [Middleware](/docs/guides/auth/auth-helpers/nextjs#middleware). The `session` is automatically sent along with any requests to Supabase.
 
 <div className="video-container">
@@ -1312,3 +1326,7 @@ export default function() {
 ```
 
 For an example of creating multiple Supabase clients, check [Singleton section](/docs/guides/auth/auth-helpers/nextjs#singleton) above.
+
+</Accordion.Item>
+
+</Accordion>
