@@ -1,10 +1,10 @@
-import React from 'react'
 import Panel from 'components/ui/Panel'
-import { Alert } from 'ui'
-import DeleteAccountButton from './DeleteAccountButton'
 import { useProfile } from 'lib/profile'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_ } from 'ui'
+import { CriticalIcon } from 'ui-patterns/Icons/StatusIcons'
+import { DeleteAccountButton } from './DeleteAccountButton'
 
-const AccountDeletion = () => {
+export const AccountDeletion = () => {
   const { profile } = useProfile()
 
   return (
@@ -17,26 +17,20 @@ const AccountDeletion = () => {
         }
       >
         <Panel.Content>
-          <Alert
-            withIcon
-            variant="danger"
-            // @ts-ignore
-            title={
-              <span className="text-red-900">
-                Deleting your account is permanent and cannot be undone.
-              </span>
-            }
-          >
-            <p className="text-red-900">
-              Your data will be deleted within 30 days, except we may retain a limited set of data
-              for longer where required or permitted by law.
-            </p>
-            <DeleteAccountButton profile={profile} />
-          </Alert>
+          <Alert_Shadcn_ variant="destructive">
+            <CriticalIcon />
+            <AlertTitle_Shadcn_>Request for account deletion</AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              Deleting your account is permanent and cannot be undone. Your data will be deleted
+              within 30 days, except we may retain a limited set of data for longer where required
+              or permitted by law.
+            </AlertDescription_Shadcn_>
+            <AlertDescription_Shadcn_ className="mt-3">
+              <DeleteAccountButton />
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
         </Panel.Content>
       </Panel>
     </>
   )
 }
-
-export default AccountDeletion

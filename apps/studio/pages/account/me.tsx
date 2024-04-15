@@ -2,9 +2,9 @@ import {
   AccountInformation,
   AnalyticsSettings,
   ThemeSettings,
-  AccountDeletion,
   ThemeSettingsOld,
 } from 'components/interfaces/Account/Preferences'
+import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { AccountLayout } from 'components/layouts'
 import AlertError from 'components/ui/AlertError'
