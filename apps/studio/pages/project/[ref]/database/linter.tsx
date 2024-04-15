@@ -1,61 +1,40 @@
 import { sortBy } from 'lodash'
-import {
-  Check,
-  ExternalLink,
-  Loader,
-  MessageSquareMore,
-  ArrowDown,
-  ArrowUp,
-  TextSearch,
-  X,
-  IceCream,
-  Table2,
-  Eye,
-} from 'lucide-react'
-import { useMemo, useState, useRef } from 'react'
+import { Check, Eye, Loader, MessageSquareMore, Table2, TextSearch, X } from 'lucide-react'
+import { useRef, useState } from 'react'
 
+import { InformationCircleIcon } from '@heroicons/react/16/solid'
+import { useParams } from 'common'
+import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { getHumanReadableTitle } from 'components/interfaces/Reports/ReportLints.utils'
 import ReportLintsTableRow from 'components/interfaces/Reports/ReportLintsTableRow'
 import { DatabaseLayout } from 'components/layouts'
-import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
-import { FilterPopover } from 'components/ui/FilterPopover'
 import { FormHeader } from 'components/ui/Forms'
-import { LINT_TYPES, Lint, useProjectLintsQuery } from 'data/lint/lint-query'
+import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks'
+import { useRouter } from 'next/router'
+import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import type { NextPageWithLayout } from 'types'
 import {
   Button,
-  LoadingLine,
-  TabsList_Shadcn_,
-  TabsTrigger_Shadcn_,
-  Tabs_Shadcn_,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
   cn,
+  LoadingLine,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
+  Tabs_Shadcn_,
   TabsContent_Shadcn_,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
 } from 'ui'
-import { InformationCircleIcon } from '@heroicons/react/16/solid'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import {
-  QUERY_PERFORMANCE_REPORT_TYPES,
-  QUERY_PERFORMANCE_REPORTS,
-} from '../../../../components/interfaces/QueryPerformanceV2/QueryPerformance.constants'
-import { useRouter } from 'next/router'
-import { useParams } from 'common'
-import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import { Column, Row, DataGridHandle } from 'react-data-grid'
-import DataGrid from 'react-data-grid'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import { QueryDetail } from '../../../../components/interfaces/QueryPerformanceV2/QueryDetail'
-import { QueryIndexes } from '../../../../components/interfaces/QueryPerformanceV2/QueryIndexes'
-import { getLintIcon, LintCTA } from '../../../../components/interfaces/Reports/ReportLints.utils'
-import { Markdown } from '../../../../components/interfaces/Markdown'
+
 import ReactMarkdown from 'react-markdown'
+import { Markdown } from '../../../../components/interfaces/Markdown'
+import { getLintIcon, LintCTA } from '../../../../components/interfaces/Reports/ReportLints.utils'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -72,10 +51,6 @@ const ProjectLints: NextPageWithLayout = () => {
   const [selectedRow, setSelectedRow] = useState<number>()
   const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
   const [view, setView] = useState<'details' | 'suggestion'>('details')
-  // const [lintIgnoreList] = useLocalStorageQuery<string[]>(
-  //   LOCAL_STORAGE_KEYS.PROJECT_LINT_IGNORE_LIST,
-  //   []
-  // )
 
   const { data, isLoading, isRefetching, refetch } = useProjectLintsQuery({
     projectRef: project?.ref,
@@ -91,30 +66,12 @@ const ProjectLints: NextPageWithLayout = () => {
   })
 
   const activeLints = lints
-  // const [ignoredLints, activeLints] = partition(lints, (lint) =>
-  //   lintIgnoreList.includes(lint.cache_key)
-  // )
-  // const filteredLints = useMemo(() => {
-  //   return activeLints
-  //     .filter((x) => (filters.levels.length > 0 ? filters.levels.includes(x.level) : x))
-  //     .filter((x) => (filters.types.length > 0 ? filters.types.includes(x.name) : x))
-  // }, [activeLints, filters.levels, filters.types])
-  console.log({ activeLints })
+
   const filteredLints = activeLints.filter((x) => x.level === page)
 
   const warnLintsCount = activeLints.filter((x) => x.level === 'WARN').length
   const errorLintsCount = activeLints.filter((x) => x.level === 'ERROR').length
   const infoLintsCount = activeLints.filter((x) => x.level === 'INFO').length
-
-  const filterOptions = useMemo(() => {
-    // only show filters for lint types which are present in the results and not ignored
-    return LINT_TYPES.filter((type) => activeLints.some((lint) => lint.name === type)).map(
-      (type) => ({
-        name: getHumanReadableTitle(type),
-        value: type,
-      })
-    )
-  }, [activeLints])
 
   const LINTER_TABS = [
     {
@@ -273,45 +230,9 @@ const ProjectLints: NextPageWithLayout = () => {
           ))}
         </TabsList_Shadcn_>
       </Tabs_Shadcn_>
-      {/* <div className="col-span-12">
-            <FormHeader
-              className="!mb-0"
-              title="Database Linter"
-              description="Identify common schema problems in your database."
-            />
-          </div> */}
+
       <div className="col-span-12 flex items-center justify-between">
-        <div className="flex items-center gap-x-4">
-          {/* <div className="flex items-center gap-x-2">
-                <p className="text-xs prose">Filter by</p>
-                <FilterPopover
-                  name="Level"
-                  options={[
-                    { name: 'Info', value: 'INFO' },
-                    { name: 'Warning', value: 'WARN' },
-                    { name: 'Error', value: 'ERROR' },
-                  ]}
-                  labelKey="name"
-                  valueKey="value"
-                  activeOptions={filters.levels}
-                  onSaveFilters={(values) => setFilters({ ...filters, levels: values })}
-                />
-                <FilterPopover
-                  name="Type"
-                  options={filterOptions}
-                  labelKey="name"
-                  valueKey="value"
-                  activeOptions={filters.types}
-                  onSaveFilters={(values) => setFilters({ ...filters, types: values })}
-                />
-              </div> */}
-          {/* <p className="text-foreground-light text-xs">
-                Identified {activeLints.length} problems{' '}
-                {warnLintsCount > 0 || errorLintsCount > 0
-                  ? `(${errorLintsCount > 0 ? `${errorLintsCount} errors` : ''}${errorLintsCount > 0 && warnLintsCount > 0 ? ', ' : ''}${warnLintsCount > 0 ? `${warnLintsCount} warnings` : ''})`
-                  : null}
-              </p> */}
-        </div>
+        <div className="flex items-center gap-x-4"></div>
       </div>
       <LoadingLine loading={isLoading || isRefetching} />
       <ResizablePanelGroup
@@ -459,19 +380,6 @@ const ProjectLints: NextPageWithLayout = () => {
                       </div>
                     </div>
                   )}
-
-                  {/* <QueryDetail
-                    reportType={QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT}
-                    selectedRow={activeLints[selectedRow]}
-                    onClickViewSuggestion={() => setView('suggestion')}
-                  /> */}
-                </TabsContent_Shadcn_>
-                <TabsContent_Shadcn_
-                  value="suggestion"
-                  className="mt-0 flex-grow min-h-0 overflow-y-auto"
-                >
-                  hello
-                  {/* <QueryIndexes selectedRow={queryPerformanceQuery.data?.[selectedRow]} /> */}
                 </TabsContent_Shadcn_>
               </Tabs_Shadcn_>
             </ResizablePanel>
@@ -503,7 +411,7 @@ const ProjectLints: NextPageWithLayout = () => {
           />
         </div>
       </div>
-      <div className="col-span-12 hidden">
+      <div className="col-span-12 hidden remove-me-when-finished">
         <Table
           head={[
             <Table.th key="level" className="py-2">
@@ -557,47 +465,6 @@ const ProjectLints: NextPageWithLayout = () => {
           ]}
         />
       </div>
-      {/* {ignoredLints.length > 0 && (
-          <div className="col-span-12 flex flex-col text-sm max-w-none gap-8 py-4">
-            <Accordion_Shadcn_ type="single" collapsible>
-              <AccordionItem_Shadcn_ value="1" className="border-none">
-                <AccordionTrigger className="px-4 bg-surface-100 rounded border [&[data-state=open]]:rounded-b-none hover:no-underline">
-                  <div className="text-sm text-foreground-light font-normal">
-                    Ignored problems ({ignoredLints.length})
-                  </div>
-                </AccordionTrigger>
-                <AccordionContent_Shadcn_>
-                  <Table
-                    body={
-                      (lints ?? []).length === 0 ? (
-                        <Table.tr>
-                          <Table.td colSpan={6} className="p-3 py-12 text-center">
-                            <p className="text-foreground-light">
-                              {isLoading ? (
-                                <>
-                                  <Loader className="animate-spin" size={12} />
-                                  Checking for database issues
-                                </>
-                              ) : (
-                                'No issues have been found for this database'
-                              )}
-                            </p>
-                          </Table.td>
-                        </Table.tr>
-                      ) : (
-                        <>
-                          {ignoredLints.map((lint) => {
-                            return <ReportLintsTableRow key={lint.cache_key} lint={lint} />
-                          })}
-                        </>
-                      )
-                    }
-                  />
-                </AccordionContent_Shadcn_>
-              </AccordionItem_Shadcn_>
-            </Accordion_Shadcn_>
-          </div>
-        )} */}
     </div>
   )
 }
