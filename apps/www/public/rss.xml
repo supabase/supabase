@@ -5,9 +5,23 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 28 Feb 2024 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Sun, 31 Mar 2024 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/pg-paper-dump</guid>
+  <title>Announcing Data Preservation Service</title>
+  <link>https://supabase.com/blog/pg-paper-dump</link>
+  <description>Secure, reliable and timeless backups</description>
+  <pubDate>Sun, 31 Mar 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/semantic-image-search-amazon-bedrock</guid>
+  <title>Implementing semantic image search with Amazon Titan and Supabase Vector</title>
+  <link>https://supabase.com/blog/semantic-image-search-amazon-bedrock</link>
+  <description>Implementing semantic image search with Amazon Titan and Supabase Vector in Python.</description>
+  <pubDate>Mon, 25 Mar 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/postgrest-aggregate-functions</guid>
   <title>PostgREST Aggregate Functions</title>
   <link>https://supabase.com/blog/postgrest-aggregate-functions</link>
