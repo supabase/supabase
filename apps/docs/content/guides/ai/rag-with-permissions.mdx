@@ -45,7 +45,7 @@ on document_sections for select to authenticated using (
   document_id in (
     select id
     from documents
-    where owner_id = auth.uid()
+    where (owner_id = (select auth.uid()))
   )
 );
 ```
@@ -100,7 +100,7 @@ on document_sections for select to authenticated using (
   document_id in (
     select document_id
     from document_owners
-    where owner_id = auth.uid()
+    where (owner_id = (select auth.uid()))
   )
 );
 ```
@@ -248,7 +248,7 @@ on document_sections for select to authenticated using (
   document_id in (
     select id
     from documents
-    where owner_id = auth.uid()
+    where (owner_id = (select auth.uid()))
   )
 );
 ```

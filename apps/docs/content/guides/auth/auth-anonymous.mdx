@@ -56,6 +56,24 @@ const { data, error } = await supabase.auth.signInAnonymously()
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Flutter">
+
+Call the [`signInAnonymously()`](/docs/reference/dart/auth-signinanonymously) method:
+
+```dart
+await supabase.auth.signInAnonymously();
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Call the [`signInAnonymously()`](/docs/reference/swift/auth-signinanonymously) method:
+
+```swift
+let session = try await supabase.auth.signInAnonymously()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 Call the [`signInAnonymously()`](/docs/reference/kotlin/auth-signinanonymously) method:
@@ -86,6 +104,26 @@ You can use the [`updateUser()`](/docs/reference/javascript/auth-updateuser) met
 
 ```js
 const { data, error } = await supabase.auth.updateUser({ email: 'example@email.com' })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Flutter">
+
+You can use the [`updateUser()`](/docs/reference/dart/auth-updateuser) method to link an email or phone identity to the anonymous user.
+
+```dart
+await supabase.auth.updateUser(UserAttributes(email: 'example@email.com'));
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+You can use the [`updateUser()`](/docs/reference/swift/auth-updateuser) method to link an email or phone identity to the anonymous user.
+
+```swift
+try await supabase.auth.updateUser(
+  user: UserAttributes(email: "example@email.com")
+)
 ```
 
 </TabPanel>
@@ -120,6 +158,24 @@ const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
 ```
 
 </TabPanel>
+<TabPanel id="dart" label="Flutter">
+
+You can use the [`linkIdentity()`](/docs/reference/dart/auth-linkidentity) method to link an OAuth identity to the anonymous user.
+
+```dart
+await supabase.auth.linkIdentity(OAuthProvider.google);
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+You can use the [`linkIdentity()`](/docs/reference/swift/auth-linkidentity) method to link an OAuth identity to the anonymous user.
+
+```swift
+try await supabase.auth.linkIdentity(provider: .google)
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 You can use the [`linkIdentity()`](/docs/reference/kotlin/auth-linkidentity) method to link an oauth identity to the anonymous user.
@@ -139,7 +195,7 @@ An anonymous user assumes the `authenticated` role just like a permanent user. Y
 create policy "Only permanent users can post to the news feed"
 on news_feed as restrictive for insert
 to authenticated
-with check ((auth.jwt()->>'is_anonymous')::boolean is false );
+with check ((select (auth.jwt()->>'is_anonymous')::boolean) is false );
 
 create policy "Anonymous and permanent users can view the news feed"
 on news_feed for select

@@ -2,9 +2,10 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresFunction } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop, partition } from 'lodash'
-import { useState } from 'react'
+import { useRouter } from 'next/router'
 import { Button, IconSearch, Input } from 'ui'
 
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import Table from 'components/to-be-cleaned/Table'
@@ -15,6 +16,7 @@ import { useDatabaseFunctionsQuery } from 'data/database-functions/database-func
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import { useEffect } from 'react'
 import ProtectedSchemaWarning from '../../ProtectedSchemaWarning'
 import FunctionList from './FunctionList'
 
@@ -30,8 +32,33 @@ const FunctionsList = ({
   deleteFunction = noop,
 }: FunctionsListProps) => {
   const { project } = useProjectContext()
-  const [selectedSchema, setSelectedSchema] = useState<string>('public')
-  const [filterString, setFilterString] = useState<string>('')
+  const router = useRouter()
+  const { schema, search } = useParams()
+  const selectedSchema = schema ?? 'public'
+  const filterString = search ?? ''
+
+  const setSelectedSchema = (s: string) => {
+    const url = new URL(document.URL)
+    url.searchParams.delete('search')
+    url.searchParams.set('schema', s)
+    router.push(url)
+  }
+  const setFilterString = (str: string) => {
+    const url = new URL(document.URL)
+    if (str === '') {
+      url.searchParams.delete('search')
+    } else {
+      url.searchParams.set('search', str)
+    }
+    router.push(url)
+  }
+
+  // update the url to point to public schema
+  useEffect(() => {
+    if (schema !== selectedSchema) {
+      setSelectedSchema(selectedSchema)
+    }
+  }, [])
 
   const canCreateFunctions = useCheckPermissions(
     PermissionAction.TENANT_SQL_ADMIN_WRITE,
@@ -45,8 +72,8 @@ const FunctionsList = ({
   const [protectedSchemas] = partition(schemas ?? [], (schema) =>
     EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
-  const schema = schemas?.find((schema) => schema.name === selectedSchema)
-  const isLocked = protectedSchemas.some((s) => s.id === schema?.id)
+  const foundSchema = schemas?.find((schema) => schema.name === selectedSchema)
+  const isLocked = protectedSchemas.some((s) => s.id === foundSchema?.id)
 
   const {
     data: functions,

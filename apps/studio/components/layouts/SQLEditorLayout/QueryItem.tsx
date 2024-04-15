@@ -205,7 +205,7 @@ const QueryItem = ({
                 description:
                   'Deleting this query will remove it for all members of the project team.',
               }
-            : {}
+            : undefined
         }
       >
         <p className="text-sm">Are you sure you want to delete '{name}'?</p>

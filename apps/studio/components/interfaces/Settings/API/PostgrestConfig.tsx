@@ -16,28 +16,49 @@ import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-co
 import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useCheckPermissions } from 'hooks'
-import { Form, IconAlertCircle, Input, InputNumber } from 'ui'
-import MultiSelect from 'ui-patterns/MultiSelect'
+import { AlertCircle, Info } from 'lucide-react'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Form,
+  Input,
+  InputNumber,
+} from 'ui'
+import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+
+import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
+import Link from 'next/link'
 
 const PostgrestConfig = () => {
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
-  const { data: schemas } = useSchemasQuery({
+
+  const { data: schemas, isLoading: isLoadingSchemas } = useSchemasQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
   const { data: config, isError } = useProjectPostgrestConfigQuery({ projectRef })
+
   const { mutate: updatePostgrestConfig, isLoading: isUpdating } =
     useProjectPostgrestConfigUpdateMutation({
       onSuccess: () => {
         toast.success('Successfully saved settings')
       },
     })
+
   const canUpdatePostgrestConfig = useCheckPermissions(
     PermissionAction.UPDATE,
     'custom_config_postgrest'
   )
+
+  const { data: extensions } = useDatabaseExtensionsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const formId = 'project-postgres-config'
   const initialValues = { db_schema: '', max_rows: '', db_extra_search_path: '' }
@@ -52,7 +73,6 @@ const PostgrestConfig = () => {
     })
   }
 
-  const permanentSchema = ['public', 'storage']
   const hiddenSchema = ['auth', 'pgbouncer', 'hooks', 'extensions']
   const schema =
     schemas
@@ -65,15 +85,22 @@ const PostgrestConfig = () => {
           id: x.id,
           value: x.name,
           name: x.name,
-          disabled: indexOf(permanentSchema, x.name) >= 0 ? true : false,
+          disabled: false,
         }
       }) ?? []
+
+  const isPublicSchemaEnabled = config?.db_schema
+    .split(',')
+    .map((name) => name.trim())
+    .includes('public')
+
+  const isGraphqlExtensionEnabled =
+    (extensions ?? []).find((ext) => ext.name === 'pg_graphql')?.installed_version !== null
 
   return (
     <Form id={formId} initialValues={initialValues} validate={() => {}} onSubmit={updateConfig}>
       {({ handleReset, resetForm, values, initialValues }: any) => {
         const hasChanges = JSON.stringify(values) !== JSON.stringify(initialValues)
-
         // [Alaister] although this "technically" is breaking the rules of React hooks
         // it won't error because the hooks are always rendered in the same order
         // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -84,6 +111,7 @@ const PostgrestConfig = () => {
               max_rows: config.max_rows,
               db_extra_search_path: config.db_extra_search_path ?? '',
             }
+
             resetForm({ values, initialValues: values })
           }
         }, [config])
@@ -112,51 +140,81 @@ const PostgrestConfig = () => {
             >
               {isError ? (
                 <div className="flex items-center justify-center py-8 space-x-2">
-                  <IconAlertCircle size={16} strokeWidth={1.5} />
+                  <AlertCircle size={16} strokeWidth={1.5} />
                   <p className="text-sm text-foreground-light">Failed to retrieve API settings</p>
                 </div>
               ) : (
                 <>
                   <FormSection header={<FormSectionLabel>Exposed schemas</FormSectionLabel>}>
-                    <FormSectionContent loading={false}>
-                      {schema.length >= 1 && (
-                        <MultiSelect
-                          disabled={!canUpdatePostgrestConfig}
-                          options={schema}
-                          descriptionText={
-                            <>
+                    {isLoadingSchemas ? (
+                      <div className="col-span-12 flex flex-col gap-2 lg:col-span-7">
+                        <ShimmeringLoader />
+                        <ShimmeringLoader className="w-3/4" />
+                      </div>
+                    ) : (
+                      <FormSectionContent loading={false}>
+                        {schema.length >= 1 && (
+                          <div className="grid gap-2">
+                            <MultiSelectV2
+                              options={schema}
+                              disabled={!canUpdatePostgrestConfig}
+                              value={
+                                values?.db_schema
+                                  ? values.db_schema.replace(/ /g, '').split(',')
+                                  : []
+                              }
+                              placeholder="Choose a schema to expose"
+                              searchPlaceholder="Search for a schema"
+                              onChange={(event) => {
+                                let updatedValues: any = values
+                                updatedValues.db_schema = event.join(', ')
+                                resetForm({ values: updatedValues, initialValues: updatedValues })
+                                updateConfig({ ...updatedValues })
+                              }}
+                            />
+                            <p className="text-foreground-lighter text-sm">
                               The schemas to expose in your API. Tables, views and stored procedures
                               in these schemas will get API endpoints.
-                              <code className="text-xs">public</code> and{' '}
-                              <code className="text-xs">storage</code> are protected by default.
-                            </>
-                          }
-                          emptyMessage={
-                            <>
-                              <IconAlertCircle strokeWidth={2} />
-                              <div className="flex flex-col mt-2 text-center">
-                                <p className="text-sm align-center">
-                                  No schema available to choose
-                                </p>
-                                <p className="text-xs opacity-50">
-                                  New schemas you create will appear here
-                                </p>
-                              </div>
-                            </>
-                          }
-                          // value must be passed as array of strings
-                          value={(values?.db_schema ?? '').replace(/ /g, '').split(',')}
-                          // onChange returns array of strings
-                          onChange={(event) => {
-                            let updatedValues: any = values
-                            updatedValues.db_schema = event.join(', ')
-                            resetForm({ values: updatedValues, initialValues: updatedValues })
-                            updateConfig({ ...updatedValues })
-                          }}
-                        />
-                      )}
-                    </FormSectionContent>
+                            </p>
+
+                            {!isPublicSchemaEnabled && (
+                              <Alert_Shadcn_ variant="default">
+                                <Info className="h-4 w-4" />
+                                <AlertTitle_Shadcn_>
+                                  The public schema for this project is not exposed
+                                </AlertTitle_Shadcn_>
+                                <AlertDescription_Shadcn_>
+                                  <p>
+                                    You will not be able to query tables and views in the{' '}
+                                    <code>public</code> schema via supabase-js or HTTP clients.
+                                  </p>
+                                  {isGraphqlExtensionEnabled && (
+                                    <div className="grid gap-3 mt-2">
+                                      <div>
+                                        Tables in the <code>public</code> schema are still exposed
+                                        over our GraphQL endpoints.
+                                      </div>
+                                      <p>
+                                        <Button asChild type="default">
+                                          <Link
+                                            href={`/project/${projectRef}/database/extensions`}
+                                            className="!no-underline !hover:bg-surface-100 !text-foreground"
+                                          >
+                                            Disable the pg_graphql extension
+                                          </Link>
+                                        </Button>
+                                      </p>
+                                    </div>
+                                  )}
+                                </AlertDescription_Shadcn_>
+                              </Alert_Shadcn_>
+                            )}
+                          </div>
+                        )}
+                      </FormSectionContent>
+                    )}
                   </FormSection>
+
                   <FormSection header={<FormSectionLabel>Extra search path</FormSectionLabel>}>
                     <FormSectionContent loading={false}>
                       <Input
