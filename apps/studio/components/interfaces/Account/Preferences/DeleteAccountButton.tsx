@@ -121,7 +121,7 @@ export const DeleteAccountButton = () => {
                 loading={isLoading}
                 disabled={account !== accountEmail || isLoading}
               >
-                I understand, delete this account
+                Submit request for account deletion
               </Button>
             </div>
           </form>
