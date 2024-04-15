@@ -1,14 +1,11 @@
-import { sortBy } from 'lodash'
-import { Check, Eye, Loader, MessageSquareMore, Table2, TextSearch, X } from 'lucide-react'
+import { Eye, MessageSquareMore, Table2, TextSearch, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import { getHumanReadableTitle, lintInfoMap } from 'components/interfaces/Reports/ReportLints.utils'
-import ReportLintsTableRow from 'components/interfaces/Reports/ReportLintsTableRow'
+import { lintInfoMap } from 'components/interfaces/Reports/ReportLints.utils'
 import { DatabaseLayout } from 'components/layouts'
-import Table from 'components/to-be-cleaned/Table'
 import { FormHeader } from 'components/ui/Forms'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks'
@@ -32,10 +29,10 @@ import {
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 
+import { FilterPopover } from 'components/ui/FilterPopover'
 import ReactMarkdown from 'react-markdown'
 import { Markdown } from '../../../../components/interfaces/Markdown'
-import { getLintIcon, LintCTA } from '../../../../components/interfaces/Reports/ReportLints.utils'
-import { FilterPopover } from 'components/ui/FilterPopover'
+import { LintCTA } from '../../../../components/interfaces/Reports/ReportLints.utils'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -43,11 +40,17 @@ const ProjectLints: NextPageWithLayout = () => {
   const { ref } = useParams()
   const gridRef = useRef<DataGridHandle>(null)
   const { preset } = useParams()
-  const [filters, setFilters] = useState({
-    types: [] as string[],
-  })
 
-  const [page, setPage] = useState<LINTER_LEVELS>((preset as LINTER_LEVELS) ?? LINTER_LEVELS.ERROR)
+  // need to maintain a list of filters for each tab
+  const [filters, setFilters] = useState([
+    { level: LINTER_LEVELS.ERROR, filters: [] },
+    { level: LINTER_LEVELS.WARN, filters: [] },
+    { level: LINTER_LEVELS.INFO, filters: [] },
+  ])
+
+  const [currentTab, setCurrentTab] = useState<LINTER_LEVELS>(
+    (preset as LINTER_LEVELS) ?? LINTER_LEVELS.ERROR
+  )
   const [selectedRow, setSelectedRow] = useState<number>()
   const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
   const [view, setView] = useState<'details' | 'suggestion'>('details')
@@ -57,30 +60,43 @@ const ProjectLints: NextPageWithLayout = () => {
     connectionString: project?.connectionString,
   })
 
-  // sort the lints by level, ERROR should be at the top.
-  const lints = sortBy(data || [], (lint) => {
-    if (lint.level === 'ERROR') return 0
-    if (lint.level === 'WARN') return 1
-    if (lint.level === 'INFO') return 2
-    return 3
-  })
+  const activeLints = data || []
+  const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
+    []) as string[]
 
-  const activeLints = lints
-
-  const filteredLints = activeLints.filter((x) => x.level === page)
+  const filteredLints = activeLints
+    .filter((x) => x.level === currentTab)
+    .filter((x) => (currentTabFilters.length > 0 ? currentTabFilters.includes(x.name) : x))
 
   const warnLintsCount = activeLints.filter((x) => x.level === 'WARN').length
   const errorLintsCount = activeLints.filter((x) => x.level === 'ERROR').length
   const infoLintsCount = activeLints.filter((x) => x.level === 'INFO').length
 
-  // console.log('keys', Object.keys(lintInfoMap))
-  // const filterOptions = Object.keys(lintInfoMap)
   const filterOptions = lintInfoMap
-    // .filter((type) => activeLints.some((lint) => lint.name === type))
+    // only show filters for lint types which are present in the results and not ignored
+    .filter((item) =>
+      activeLints.some((lint) => lint.name === item.name && lint.level === currentTab)
+    )
     .map((type) => ({
       name: type.title,
       value: type.name,
     }))
+
+  const updateFilters = (level: any, newFilters: any) => {
+    console.log('zans', 'newFilters', newFilters, 'filters', filters)
+    setFilters((prevFilters) => {
+      // Map over the previous filters array
+      return prevFilters.map((filter) => {
+        // If the filter level matches the desired level, update its filters
+        if (filter.level === level) {
+          return { ...filter, filters: newFilters }
+        } else {
+          // Otherwise, return the filter unchanged
+          return filter
+        }
+      })
+    })
+  }
 
   const LINTER_TABS = [
     {
@@ -177,9 +193,9 @@ const ProjectLints: NextPageWithLayout = () => {
         docsUrl="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
       />
       <Tabs_Shadcn_
-        defaultValue={page}
+        defaultValue={currentTab}
         onValueChange={(value) => {
-          setPage(value as LINTER_LEVELS)
+          setCurrentTab(value as LINTER_LEVELS)
           setSelectedLint(null)
           const { sort, search, ...rest } = router.query
           router.push({ ...router, query: { ...rest, preset: value } })
@@ -194,14 +210,14 @@ const ProjectLints: NextPageWithLayout = () => {
                 'group relative',
                 'px-6 py-3 border-b-0 flex flex-col items-start !shadow-none border-default border-t',
                 'even:border-x last:border-r even:!border-x-strong last:!border-r-strong',
-                tab.id === page ? '!bg-surface-200' : '!bg-surface-200/[33%]',
+                tab.id === currentTab ? '!bg-surface-200' : '!bg-surface-200/[33%]',
                 'hover:!bg-surface-100',
                 'data-[state=active]:!bg-surface-200',
                 'hover:text-foreground-light',
                 'transition'
               )}
             >
-              {tab.id === page && (
+              {tab.id === currentTab && (
                 <div className="absolute top-0 left-0 w-full h-[1px] bg-foreground" />
               )}
 
@@ -233,7 +249,7 @@ const ProjectLints: NextPageWithLayout = () => {
                 {tab.id === LINTER_LEVELS.INFO && `${infoLintsCount} suggestions`}
               </span>
 
-              {tab.id === page && (
+              {tab.id === currentTab && (
                 <div className="absolute bottom-0 left-0 w-full h-[1px] bg-surface-200"></div>
               )}
             </TabsTrigger_Shadcn_>
@@ -241,14 +257,19 @@ const ProjectLints: NextPageWithLayout = () => {
         </TabsList_Shadcn_>
       </Tabs_Shadcn_>
 
-      <FilterPopover
-        name="Type"
-        options={filterOptions}
-        labelKey="name"
-        valueKey="value"
-        activeOptions={filters.types}
-        onSaveFilters={(values) => setFilters({ ...filters, types: values })}
-      />
+      <div className="bg-surface-200 p-2">
+        <FilterPopover
+          name="Filter"
+          options={filterOptions}
+          labelKey="name"
+          valueKey="value"
+          activeOptions={filters.find((filter) => filter.level === currentTab)?.filters || []}
+          onSaveFilters={(values) => {
+            console.log('some values', values)
+            updateFilters(currentTab, values)
+          }}
+        />
+      </div>
       <div className="col-span-12 flex items-center justify-between">
         <div className="flex items-center gap-x-4"></div>
       </div>
