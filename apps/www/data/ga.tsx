@@ -47,9 +47,9 @@ Today we're confident in our ability to take any profile of customer and help th
 
 Whether you're an indie hacker or a Fortune 500, Supabase can scale comfortably for your production workload. Rocket ships like [Udio](https://www.udio.com/), [Krea](https://www.krea.ai), [Humata](https://www.humata.ai/), and [Pika](https://pika.art) use Supabase to build fast and scale faster. Enterprise customers such as Mozilla, PWC, Johnson & Johnson, and 1Password use Supabase to manage their applications securely. 30% of the last Y Combinator batch used Supabase to launch their start ups.
 
-> *"Supabase has been great to develop applications. As a firm focused on security, we've been happy to work with Row Level Security Policies to secure database operations."*
-> 
-> Matthieu, Tech Lead. PWC France
+> *Supabase has been great to develop applications. As a firm focused on security, we've been happy to work with Row Level Security Policies to secure database operations.*
+
+*Matthieu, Tech Lead. PWC France*
 `,
   },
   openSourceSection: {
