@@ -261,6 +261,40 @@ We'll continue to expand the Supabase Enterprise offering to include more deploy
         icon: <ShieldCheckIcon strokeWidth={1} className="text-foreground-lighter w-6" />,
       },
     ],
+    highlights: [
+      {
+        text: 'SOC 2',
+        icon: <ShieldCheckIcon className="text-foreground-lighter w-6" strokeWidth={1} />,
+      },
+      {
+        text: 'HIPAA',
+        icon: <IconActivity strokeWidth={1} className="text-foreground-lighter w-6" />,
+      },
+      {
+        text: 'Data Encryption',
+        icon: <KeyIcon strokeWidth={1} className="text-foreground-lighter w-6" />,
+      },
+      {
+        text: 'Role-based access control',
+        icon: <UserGroupIcon strokeWidth={1} className="text-foreground-lighter w-6" />,
+      },
+      {
+        text: 'Backups',
+        icon: <RewindIcon strokeWidth={1} className="text-foreground-lighter w-6" />,
+      },
+      // {
+      //   text: 'Payment processing',
+      //   icon: <CreditCardIcon strokeWidth={1} className="text-foreground-lighter w-6" />,
+      // },
+      // {
+      //   text: 'Vulnerability Management',
+      //   icon: <ClipboardCheckIcon strokeWidth={1} className="text-foreground-lighter w-6" />,
+      // },
+      {
+        text: 'DDoS Protection',
+        icon: <ShieldCheckIcon strokeWidth={1} className="text-foreground-lighter w-6" />,
+      },
+    ],
   },
   integrationsSection: {
     id: 'partners',
