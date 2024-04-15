@@ -163,7 +163,7 @@ Supabase has [acquired Oriole](/blog/supabase-aquires-oriole). Oriole is a compa
 
 We're constantly on the lookout for ways to remove the friction in getting started with your new projects. [Supabase Bootstrap](/blog/supabase-bootstrap) is now the easiest way to get started with Supabase and your favorite development framework. 
 
-The goal of Supabase is to become the default backend for all kinds of developers. So far iOS and mobile developers have only enjoyed community support for Supabase mobile client libraries and SDKs. This is changing. Today Supabase Swift SDK will join supabase-js as an [officially supported client library](/blog/supabase-swift), and\`supabase-swift\` maintainer Guilherme Souza will join the Supabase team full time.
+The goal of Supabase is to become the default backend for all kinds of developers. So far iOS and mobile developers have only enjoyed community support for Supabase mobile client libraries and SDKs. This is changing. Today Supabase Swift SDK will join supabase-js as an [officially supported client library](/blog/supabase-swift), and supabase-swift maintainer Guilherme Souza will join the Supabase team full time.
 
 `,
   },
