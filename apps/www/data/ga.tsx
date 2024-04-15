@@ -39,7 +39,7 @@ export const data = {
     content: `
 During the first year of Supabase we set ourselves a goal: build a managed platform capable of securely running 1 million databases. Today we've proven that metric and we're announcing the General Availability of the platform that will service the next 99 million.
 
-![top user growth over time by days after launch](/images/ga/project-user-growth--dark.svg?v=2)
+![top user growth over time by days after launch](/images/ga/database-growth--dark.svg?v=2)
 
 We've been production-ready for years now. We kept the “beta” label because we wanted to make sure that our *organization* can support all types of customers, no matter their demands.
 
@@ -107,7 +107,7 @@ Our tagline is “Build in a weekend, scale to millions”. This isn't hyperbole
 
 In the past year, we've had 11 companies build with Supabase and grow from zero to over 1 million users. 
 
-![top user growth over time by days after launch](/images/ga/project-user-growth--dark.svg)
+![top user growth over time by days after launch](/images/ga/project-user-growth--dark.svg?v=3)
 
 Most of these were AI companies, like Udio, Krea, Humata, Chatbase, Pika, Quivr, Mendable, Markprompt and [MDN search](https://developer.mozilla.org/en-US/blog/introducing-ai-help/) by Mozilla.
 
@@ -146,7 +146,7 @@ Developers have different preferences on how to connect to their database, and S
 You can find the [full list of partners and integrations](https://supabase.com/partners/integrations) on our Partners page. If you're interested in partnering with Supabase head over to the [Partner Portal](https://supabase.com/partners).
 `,
   },
-  newSection: {
+  'whats-new': {
     id: 'whats-new',
     title: "What's new?",
     paragraph: '06',
@@ -165,7 +165,7 @@ The goal of Supabase is to become the default backend for all kinds of developer
 
 `,
   },
-  nextSection: {
+  'whats-next': {
     id: 'whats-next',
     title: "What's next?",
     paragraph: '07',
