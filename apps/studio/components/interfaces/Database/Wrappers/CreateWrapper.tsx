@@ -91,6 +91,9 @@ const CreateWrapper = () => {
   }
 
   if (!hasRequiredVersion) {
+    const databaseNeedsUpgrading =
+      wrappersExtension?.installed_version !== wrappersExtension?.default_version
+
     return (
       <div className="flex flex-col items-center justify-center w-full h-full space-y-4">
         <div className="space-y-2 flex flex-col items-center w-[400px]">
@@ -98,12 +101,21 @@ const CreateWrapper = () => {
           <p className="text-sm text-center text-foreground-light">
             The wrapper type {type} requires a minimum extension version of{' '}
             {wrapperMeta.minimumExtensionVersion}. You have version{' '}
-            {wrappersExtension?.installed_version} installed. Please update the extension to create
+            {wrappersExtension?.installed_version} installed. Please{' '}
+            {databaseNeedsUpgrading && 'upgrade your database then'} update the extension to create
             this wrapper.
           </p>
         </div>
         <Button asChild type="default">
-          <Link href={`/project/${ref}/settings/infrastructure`}>Upgrade Database</Link>
+          <Link
+            href={
+              databaseNeedsUpgrading
+                ? `/project/${ref}/settings/infrastructure`
+                : `/project/${ref}/database/extensions`
+            }
+          >
+            {databaseNeedsUpgrading ? 'Upgrade Database' : 'Update Extension'}
+          </Link>
         </Button>
       </div>
     )
