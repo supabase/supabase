@@ -141,13 +141,13 @@ The goal of Supabase is to become the default backend for all kinds of developer
     title: "What's next?",
     paragraph: '10',
     content: `
+One of our key metrics at Supabase is "Time to Value". How fast can a user go from idea to production? We'll never stop pushing on what's possible here.
 
-This is the first day of GA Week. Today's releases are just the start: we have 4 more days of exciting announcements to come.
+It is only day one of Supabase GA Week. Today's releases are just the start: we have 4 more days of exciting announcements to come. [Follow the new announcements here](https://supabase.com/ga-week).
 
-One of our key metrics at Supabase is "Time to Value". How fast can a user go from sign up, to making their first API request? How fast can they go from development to production? We’ll never stop pushing on what’s possible here. We're looking forward to the next 99 million dataabases.
+If you want to try Supabase today, we just started an asynchronous hackathon. It's a great way to try out all the new features. Go here to [read the rules and start hacking](https://supabase.com/blog/supabase-oss-hackathon).
 
-If you want to try Supabase today, we just started an asynchronous hackathon. It's a great way to try out all the new features.
-
+Together with the developer community we're looking forward to delpoying our next 100 million databases.
 `,
   },
 }
