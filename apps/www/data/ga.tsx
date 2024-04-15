@@ -137,13 +137,15 @@ We'll continue to expand the Supabase Enterprise offering to include more deploy
     content: `
 The Supabase community doesn't exist in isolation. It’s part of a group of developer focused companies and communities who are constantly pushing the boundaries of developer experience and developer productivity.
 
+We've [teamed up with Fly](/blog/postgres-on-fly-by-supabase) to bring Postgres to developers across the world. (More on this later this week).
+
 Cloudflare recently announced the Supabase integration for [Workers](https://developers.cloudflare.com/workers/databases/native-integrations/supabase/) and [Hyperdrive](https://developers.cloudflare.com/hyperdrive/examples/supabase/). 
 
-Vercel users can use the [Supabase integration](https://vercel.com/integrations/supabase) to connect Supabase to their Next.js projects, and we have deep integrations with [Fly.io](https://fly.io/docs/reference/supabase/), [Flutterflow](https://docs.flutterflow.io/data-and-backend/supabase), [Resend](https://resend.com/blog/how-to-configure-supabase-to-send-emails-from-your-domain), and [Twilio](https://www.twilio.com/en-us/blog/send-sms-notifications-supabase-users-node-js-twilio-messaging).
+Vercel users can use the [Supabase integration](https://vercel.com/integrations/supabase) to connect Supabase to their Next.js projects, and we have deep integrations with [Flutterflow](https://docs.flutterflow.io/data-and-backend/supabase), [Resend](https://resend.com/blog/how-to-configure-supabase-to-send-emails-from-your-domain), and [Twilio](https://www.twilio.com/en-us/blog/send-sms-notifications-supabase-users-node-js-twilio-messaging).
 
 Developers have different preferences on how to connect to their database, and Supabase is ["just Postgres"](https://itsjustpostgres.com/) you can connect natively with [Prisma](https://www.prisma.io/docs/orm/overview/databases/supabase), [Drizzle](https://orm.drizzle.team/docs/get-started-postgresql#supabase), or [Kysely](https://github.com/kysely-org/kysely-supabase).
 
-You can find the full list of Supabase [partners and integrations here](https://supabase.com/partners/integrations), and if you're interested in partnering with Supabase head over to the [Partner Portal](https://supabase.com/partners).
+You can find the [full list of partners and integrations](https://supabase.com/partners/integrations) on our Partners page. If you're interested in partnering with Supabase head over to the [Partner Portal](https://supabase.com/partners).
 `,
   },
   newSection: {
@@ -153,15 +155,15 @@ You can find the full list of Supabase [partners and integrations here](https://
     content: `
 In addition to General Availability, we also have several other major announcements to make today.
 
-THe Supabase Index advisor is now available inside Supabase Studio, the index advisor as it's name suggests will analyse your database and make recommendations on where you should add or remove table indexes. This is just the beginning of our plan to make automated data analysis tooling available to all developers.
+THe Supabase [Index Advisor](https://github.com/supabase/index_advisor) is now available inside Supabase Studio. As its name suggests, this will analyze your database and make recommendations to add or remove table indexes. This is just the beginning of our plan to make automated data analysis tooling available to all developers.
 
-Supabase branches work like Git branches. They let you create and test changes like new configurations, database schemas, or features in a separate, temporary instance without affecting your production setup. Today Branching enters public beta. 
+[Supabase Branching](/blog/branching-publicly-available) works like Git branches. You can create and test database changes or try out features in a separate, temporary instance without affecting your production setup. Today Branching enters public availability. 
 
-Supabase has aquired Oriole. Oriole is a company founded by Postgres Hacker Alexander Korotkov to solve the hairy problems of Postrges. [Read the full announcement here]().
+Supabase has [acquired Oriole](/blog/supabase-aquires-oriole). Oriole is a company founded by Postgres Hacker Alexander Korotkov to solve the hairy problems of Postrges.
 
-We're constantly on the lookout for ways to remove the friction in getting started with your new projects. [Supabase Bootstrap]() is now the easiest way to get started with Supabase and your favourite development framework. 
+We're constantly on the lookout for ways to remove the friction in getting started with your new projects. [Supabase Bootstrap](/blog/supabase-bootstrap) is now the easiest way to get started with Supabase and your favorite development framework. 
 
-The goal of Supabase is to become the default backend for all kinds of developers. So far iOS and mobile developers have only enjoyed community support for Supabase mobile client libraries and SDKs. This is changing. Today Supabase Swift SDK will join supabase-js as an officially supported client library, and supabase-swift maintainer Guilherme Souza will join the Supabase team full time.
+The goal of Supabase is to become the default backend for all kinds of developers. So far iOS and mobile developers have only enjoyed community support for Supabase mobile client libraries and SDKs. This is changing. Today Supabase Swift SDK will join supabase-js as an [officially supported client library](/blog/supabase-swift), and\`supabase-swift\` maintainer Guilherme Souza will join the Supabase team full time.
 
 `,
   },
@@ -172,11 +174,11 @@ The goal of Supabase is to become the default backend for all kinds of developer
     content: `
 One of our key metrics at Supabase is "Time to Value". How fast can a user go from idea to production? We'll never stop pushing on what's possible here.
 
-It is only day one of Supabase GA Week. Today's releases are just the start: we have 4 more days of exciting announcements to come. [Follow the new announcements here](https://supabase.com/ga-week).
+It is only the first day of Supabase GA Week. Today's releases are just the start: we have 4 more days of exciting announcements to come. [Follow the new announcements here](https://supabase.com/ga-week).
 
 If you want to try Supabase today, we just started an asynchronous hackathon. It's a great way to try out all the new features. Go here to [read the rules and start hacking](https://supabase.com/blog/supabase-oss-hackathon).
 
-Together with the developer community we're looking forward to delpoying our next 100 million databases.
+Together with the developer community we're looking forward to deploying our next 100 million databases.
 `,
   },
 }
