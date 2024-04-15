@@ -120,7 +120,7 @@ To use the Dashboard Index Advisor:
 
 ### Understanding Index Advisor results
 
-The Indexes tab shows the existing indexes used in the selected query. Note that an existing index might not be used if the Postgres planner decides that the query will be faster without the index. For example, on a small table, a sequential scan might be faster, but the planner will switch to using the index as the table size grows.
+The Indexes tab shows the existing indexes used in the selected query. Note that indexes suggested in the "New Index Recommendations" section may not be used when you create them. Postgres' query planner may intentionally ignore an available index if it determines that the query will be faster without. For example, on a small table, a sequential scan might be faster than an index scan. In that case, the planner will switch to using the index as the table size grows, helping to future proof the query.
 
 If additional indexes might improve your query, the Index Advisor shows the suggested indexes with the estimated improvement in startup and total costs:
 
