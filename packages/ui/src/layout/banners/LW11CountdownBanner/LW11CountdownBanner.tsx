@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
-import Countdown from './Countdown'
 import announcement from '../data/Announcement.json'
 import Link from 'next/link'
 import { isBrowser } from 'common'
@@ -8,9 +7,9 @@ import { isBrowser } from 'common'
 export function LW11CountdownBanner() {
   const router = useRouter()
   const isHomePage = router.pathname === '/'
-  const isLaunchWeekPage = router.pathname === '/special-announcement'
+  const isLaunchWeekPage = router.pathname === '/ga-week'
   const isLaunchWeekSection =
-    router.pathname.includes('launch-week') || router.pathname.includes('special-announcement')
+    router.pathname.includes('/launch-week') || router.pathname.includes('/ga-week')
   const siteUrl = isBrowser && window.location.origin
 
   if (isLaunchWeekPage || isHomePage) return null
@@ -25,11 +24,8 @@ export function LW11CountdownBanner() {
           )}
         >
           <p className="flex gap-1.5 items-center">{announcement.text}</p>
-          <div className="hidden sm:block">
-            <Countdown date={new Date(announcement.launchDate)} showCard={false} />
-          </div>
           <Button size="tiny" type="default" className="px-2 !leading-none text-xs" asChild>
-            <Link href={`${siteUrl}/special-announcement`}>Claim your ticket</Link>
+            <Link href="https://supabase.com/ga-week">Learn more</Link>
           </Button>
         </div>
       </div>
