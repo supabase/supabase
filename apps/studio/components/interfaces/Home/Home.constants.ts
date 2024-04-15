@@ -30,10 +30,10 @@ export const CLIENT_LIBRARIES = [
   },
   {
     language: 'Swift',
-    officialSupport: false,
+    officialSupport: true,
     releaseState: undefined,
     docsUrl: 'https://supabase.com/docs/reference/swift/initializing',
-    gitUrl: 'https://github.com/supabase-community/supabase-swift',
+    gitUrl: 'https://github.com/supabase/supabase-swift',
   },
   {
     language: 'Kotlin',
