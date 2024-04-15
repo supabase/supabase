@@ -157,13 +157,13 @@ In addition to General Availability, we also have several other major announceme
 
 THe Supabase [Index Advisor](https://github.com/supabase/index_advisor) is now available inside Supabase Studio. As its name suggests, this will analyze your database and make recommendations to add or remove table indexes. This is just the beginning of our plan to make automated data analysis tooling available to all developers.
 
-[Supabase Branching](/blog/branching-publicly-available) works like Git branches. You can create and test database changes or try out features in a separate, temporary instance without affecting your production setup. Today Branching enters public availability. 
+[Supabase Branching](https://supabase.com/blog/branching-publicly-available) works like Git branches. You can create and test database changes or try out features in a separate, temporary instance without affecting your production setup. Today Branching enters public availability. 
 
-Supabase has [acquired Oriole](/blog/supabase-aquires-oriole). Oriole is a company founded by Postgres Hacker Alexander Korotkov to solve the hairy problems of Postrges.
+Supabase has [acquired Oriole](https://supabase.com/blog/supabase-aquires-oriole). Oriole is a company founded by Postgres Hacker Alexander Korotkov to solve the hairy problems of Postgres.
 
-We're constantly on the lookout for ways to remove the friction in getting started with your new projects. [Supabase Bootstrap](/blog/supabase-bootstrap) is now the easiest way to get started with Supabase and your favorite development framework. 
+We're constantly on the lookout for ways to remove the friction in getting started with your new projects. [Supabase Bootstrap](https://supabase.com/blog/supabase-bootstrap) is now the easiest way to get started with Supabase and your favorite development framework. 
 
-The goal of Supabase is to become the default backend for all kinds of developers. So far iOS and mobile developers have only enjoyed community support for Supabase mobile client libraries and SDKs. This is changing. Today Supabase Swift SDK will join supabase-js as an [officially supported client library](/blog/supabase-swift), and supabase-swift maintainer Guilherme Souza will join the Supabase team full time.
+The goal of Supabase is to become the default backend for all kinds of developers. So far iOS and mobile developers have only enjoyed community support for Supabase mobile client libraries and SDKs. This is changing. Today Supabase Swift SDK will join supabase-js as an [officially supported client library](https://supabase.com/blog/supabase-swift), and supabase-swift maintainer Guilherme Souza will join the Supabase team full time.
 
 `,
   },
