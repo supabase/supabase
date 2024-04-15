@@ -171,7 +171,7 @@ We're committed to our free tier - we know the importance of this for testing ho
     content: `
 Our tagline is “Build in a weekend, scale to millions”. This isn't hyperbole. In the past, reaching 1 million users was an incredible challenge. It took Instagram 2.5 months, Facebook 10 months, and Twitter 24 months.
 
-In the past year, we've had 11 companies start on Supabase and grow from zero to over 1 million users. 
+In the past year, we've had 12 companies start on Supabase and grow from zero to over 1 million users. 
 
 ![top user growth over time by days after launch](/images/ga/project-user-growth--dark.svg?v=3)
 
