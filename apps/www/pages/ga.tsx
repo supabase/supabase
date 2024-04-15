@@ -4,13 +4,15 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { NextSeo } from 'next-seo'
 
-import { data } from '../data/ga'
+import { data as pageData } from '../data/ga'
 
 import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '../components/Layouts/SectionContainer'
 import ReactMarkdown from 'react-markdown'
 import Image from 'next/image'
-import GaPerformanceSection from '../components/GA/GaPerformanceSection'
+import ImageGrid from '../components/ImageGrid'
+import CompaniesData from 'data/Companies'
+import { useTheme } from 'next-themes'
 
 const ParagraphSection = dynamic(() => import('~/components/Sections/ParagraphSection'))
 const FeaturesSection = dynamic(() => import('~/components/Sections/FeaturesSection'))
@@ -18,6 +20,9 @@ const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
 export default function IndexPage() {
   const router = useRouter()
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme?.includes('dark')
+  const data = pageData(isDark!)
 
   const meta_title = 'General Availability | Supabase'
   const meta_description =
@@ -67,7 +72,7 @@ export default function IndexPage() {
               <span className="text-foreground">General Availability</span>
             </h1>
           </div>
-          {data.hero.publishedAt && (
+          {data.hero?.publishedAt && (
             <span className="text-sm text-foreground-lighter font-mono md:text-base">
               {data.hero.publishedAt}
             </span>
@@ -76,7 +81,7 @@ export default function IndexPage() {
         <SectionContainer className="!pt-0">
           {data.highlightsSection.highlights && (
             <div
-              className="flex flex-wrap md:flex-nowrap w-fit md:w-full md:flex md:items-start grid lg:grid-cols-4 gap-4 md:gap-10 lg:gap-20
+              className="flex-wrap md:flex-nowrap w-fit md:w-full md:flex md:items-start grid lg:grid-cols-4 gap-4 md:gap-10 lg:gap-20
             "
             >
               {data.highlightsSection.highlights.map(
@@ -147,9 +152,31 @@ export default function IndexPage() {
       <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.scaleSection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
-      <ParagraphSection {...data.enterpriseSection} hasStickyTitle />
+      <ParagraphSection {...data.enterpriseSection} hasStickyTitle className="!pb-8 lg:!pb-16" />
+      <SectionContainer className="!pt-0 !grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 xl:gap-10">
+        <div className="col-span-full lg:col-start-6 lg:col-span-7">
+          <ImageGrid
+            smCols={3}
+            mdCols={3}
+            lgCols={3}
+            images={data.enterpriseSection.companies}
+            removeFilter
+          />
+        </div>
+      </SectionContainer>
       <SectionContainer className="!py-0 border-b" children={null} />
-      <ParagraphSection {...data.integrationsSection} hasStickyTitle />
+      <ParagraphSection {...data.integrationsSection} hasStickyTitle className="!pb-8 lg:!pb-16" />
+      <SectionContainer className="!pt-0 !grid grid-cols-1 lg:grid-cols-12 gap-4 md:gap-8 xl:gap-10">
+        <div className="col-span-full lg:col-start-6 lg:col-span-7">
+          <ImageGrid
+            smCols={3}
+            mdCols={3}
+            lgCols={3}
+            images={data.integrationsSection.partners}
+            removeFilter
+          />
+        </div>
+      </SectionContainer>
       <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data['whats-new']} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />

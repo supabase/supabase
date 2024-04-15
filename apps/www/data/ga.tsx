@@ -1,10 +1,9 @@
 import { Github } from 'lucide-react'
 import { IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
 
-export const data = {
+export const data = (isDark: boolean) => ({
   hero: {
     title: <>We are moving to General Availability</>,
-    // paragraph: 'Published 15 April 2024',
     publishedAt: '15 April 2024',
     // publishedAt: null,
     sections: [
@@ -17,7 +16,6 @@ export const data = {
       { title: "What's next", link: '#whats-next' },
     ],
   },
-
   highlightsSection: {
     highlights: [
       {
@@ -34,7 +32,6 @@ export const data = {
       },
     ],
   },
-
   companySection: {
     id: 'ga',
     title: 'General Availability',
@@ -195,13 +192,33 @@ This week we've added support for Supabase in the AWS Marketplace. Enterprise cu
 
 We'll continue to expand the Supabase Enterprise offering to include more deployment options, including "Bring your own cloud". If you're interested in using Supabase in your organization, get in touch via the [Supabase for Enterprise form](https://forms.supabase.com/enterprise).
 `,
+    companies: [
+      {
+        name: '1Password',
+        image: isDark
+          ? '/images/ga/enterprise/1-password--dark.svg'
+          : '/images/ga/enterprise/1-password--light.svg',
+      },
+      {
+        name: 'johnson-and-johnson',
+        image: isDark
+          ? '/images/ga/enterprise/johnson-and-johnson--dark.svg'
+          : '/images/ga/enterprise/johnson-and-johnson--light.svg',
+      },
+      {
+        name: 'pwc',
+        image: isDark
+          ? '/images/ga/enterprise/pwc--dark.svg'
+          : '/images/ga/enterprise/pwc--light.svg',
+      },
+    ],
   },
   integrationsSection: {
     id: 'partners',
     title: 'Our partners',
     paragraph: '05',
     content: `
-The Supabase community doesn't exist in isolation. It’s part of a group of developer focused companies and communities who are constantly pushing the boundaries of developer experience and developer productivity.
+The Supabase community doesn't exist in isolation. It's part of a group of developer focused companies and communities who are constantly pushing the boundaries of developer experience and developer productivity.
 
 We've [teamed up with Fly](/blog/postgres-on-fly-by-supabase) to bring Postgres to developers across the world. (More on this later this week).
 
@@ -213,6 +230,36 @@ Developers have different preferences on how to connect to their database, and S
 
 You can find the [full list of partners and integrations](https://supabase.com/partners/integrations) on our Partners page. If you're interested in partnering with Supabase head over to the [Partner Portal](https://supabase.com/partners).
 `,
+    partners: [
+      {
+        name: 'fly',
+        image: isDark ? '/images/ga/partners/fly--dark.svg' : '/images/ga/partners/fly--light.svg',
+      },
+      {
+        name: 'cloudflare',
+        image: isDark
+          ? '/images/ga/partners/cloudflare--dark.svg'
+          : '/images/ga/partners/cloudflare--light.svg',
+      },
+      {
+        name: 'flutterflow',
+        image: isDark
+          ? '/images/ga/partners/flutterflow--dark.svg'
+          : '/images/ga/partners/flutterflow--light.svg',
+      },
+      {
+        name: 'resend',
+        image: isDark
+          ? '/images/ga/partners/resend--dark.svg'
+          : '/images/ga/partners/resend--light.svg',
+      },
+      {
+        name: 'twilio',
+        image: isDark
+          ? '/images/ga/partners/twilio--dark.svg'
+          : '/images/ga/partners/twilio--light.svg',
+      },
+    ],
   },
   'whats-new': {
     id: 'whats-new',
@@ -247,4 +294,4 @@ If you want to try Supabase today, we just started an asynchronous hackathon. It
 Together with the developer community we're looking forward to deploying our next 100 million databases.
 `,
   },
-}
+})
