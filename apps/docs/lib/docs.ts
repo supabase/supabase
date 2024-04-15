@@ -19,11 +19,26 @@ type GuideFrontmatter = {
   title: string
   description?: string
   hideToc?: boolean
+  tocVideo?: string
 }
 
+/**
+ * Validate the frontmatter for guide MDX files.
+ *
+ * @throws Throws if frontmatter is invalid.
+ */
 export function isValidGuideFrontmatter(obj: object): obj is GuideFrontmatter {
-  if (!('title' in obj) || typeof obj.title !== 'string') return false
-  if ('description' in obj && typeof obj.description !== 'string') return false
+  if (!('title' in obj) || typeof obj.title !== 'string') {
+    throw Error(
+      // @ts-expect-error - Getting undefined for unknown property is desired here.
+      `Invalid guide frontmatter: Title must exist and be a string. Received: ${obj.title}`
+    )
+  }
+  if ('description' in obj && typeof obj.description !== 'string') {
+    throw Error(
+      `Invalid guide frontmatter: Description must be a string. Received: ${obj.description}`
+    )
+  }
   return true
 }
 
@@ -81,7 +96,8 @@ export async function getGuidesStaticProps(
 
   const { data: frontmatter, content } = matter(mdx)
   if (!isValidGuideFrontmatter(frontmatter)) {
-    throw Error('Type of frontmatter is not valid')
+    // Will have thrown
+    return
   }
 
   const codeHikeOptions: CodeHikeConfig = {

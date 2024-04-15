@@ -508,8 +508,8 @@ export const auth = {
       url: '/guides/auth',
     },
     {
-      name: 'Redirect URLs',
-      url: '/guides/auth/concepts/redirect-urls',
+      name: 'Architecture',
+      url: '/guides/auth/architecture',
     },
     {
       name: 'Quickstarts',
@@ -524,10 +524,19 @@ export const auth = {
       ],
     },
     {
-      name: 'Authentication',
-      url: undefined,
+      name: 'Concepts',
+      items: [
+        { name: 'User', url: '/guides/auth/concepts/user ' },
+        { name: 'Identity', url: '/guides/auth/concepts/identity' },
+        { name: 'Session', url: '/guides/auth/concepts/session' },
+        { name: 'Factor', url: '/guides/auth/concepts/factor' },
+      ],
+    },
+    {
+      name: 'Flows',
       items: [
         { name: 'Anonymous Sign-Ins', url: '/guides/auth/auth-anonymous' },
+        { name: 'Passwords', url: '/guides/auth/passwords' },
         { name: 'Email Login', url: '/guides/auth/auth-email' },
         {
           name: 'Passwordless Login',
@@ -571,21 +580,7 @@ export const auth = {
             },
           ],
         },
-        {
-          name: 'User Sessions',
-          url: '/guides/auth/sessions',
-        },
-        { name: 'Passwords', url: '/guides/auth/passwords' },
-        {
-          name: 'User Management',
-          url: '/guides/auth/auth-user-management',
-          items: [
-            {
-              name: 'Identity Linking',
-              url: '/guides/auth/auth-identity-linking',
-            },
-          ],
-        },
+        { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
         {
           name: 'Enterprise SSO',
           url: '/guides/auth/enterprise-sso',
@@ -596,18 +591,37 @@ export const auth = {
             },
           ],
         },
-        { name: 'Email Templates', url: '/guides/auth/auth-email-templates' },
-        { name: 'Auth Hooks', url: '/guides/auth/auth-hooks' },
       ],
     },
     {
-      name: 'Authorization',
-      url: undefined,
+      name: 'Configuration',
       items: [
-        { name: 'Enable Captcha Protection', url: '/guides/auth/auth-captcha' },
+        { name: 'Email Templates', url: '/guides/auth/auth-email-templates' },
+        {
+          name: 'Redirect URLs',
+          url: '/guides/auth/concepts/redirect-urls',
+        },
+        { name: 'Auth Hooks', url: '/guides/auth/auth-hooks' },
         { name: 'Configuring Custom SMTP', url: '/guides/auth/auth-smtp' },
         { name: 'Managing User Data', url: '/guides/auth/managing-user-data' },
-        { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
+        {
+          name: 'User Management',
+          url: '/guides/auth/auth-user-management',
+          items: [
+            {
+              name: 'Identity Linking',
+              url: '/guides/auth/auth-identity-linking',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'Security',
+      items: [
+        { name: 'Rate Limits', url: '/' }, // TODO
+        { name: 'Enable Captcha Protection', url: '/guides/auth/auth-captcha' },
+        { name: 'JWTs', url: '/guides/auth/jwt' },
         { name: 'Row Level Security', url: '/guides/auth/row-level-security' },
         {
           name: 'Column Level Security',
@@ -619,7 +633,7 @@ export const auth = {
         },
       ],
     },
-    {
+    /*     {
       name: 'Server-side Auth',
       url: undefined,
       items: [
@@ -649,7 +663,7 @@ export const auth = {
           url: '/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
         },
       ],
-    },
+    }, */
     {
       name: 'Auth UI',
       url: undefined,
@@ -658,29 +672,6 @@ export const auth = {
         {
           name: 'Flutter Auth UI',
           url: '/guides/auth/auth-helpers/flutter-auth-ui',
-        },
-      ],
-    },
-    {
-      name: 'Deep Dive',
-      url: undefined,
-      items: [
-        {
-          name: 'Part One: JWTs',
-          url: '/guides/auth/auth-deep-dive/auth-deep-dive-jwts',
-        },
-        {
-          name: 'Part Two: Row Level Security',
-          url: '/guides/auth/auth-deep-dive/auth-row-level-security',
-        },
-        {
-          name: 'Part Three: Policies',
-          url: '/guides/auth/auth-deep-dive/auth-policies',
-        },
-        { name: 'Part Four: GoTrue', url: '/guides/auth/auth-deep-dive/auth-gotrue' },
-        {
-          name: 'Part Five: Google OAuth',
-          url: '/guides/auth/auth-deep-dive/auth-google-oauth',
         },
       ],
     },
