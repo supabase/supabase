@@ -24,8 +24,7 @@ export default function IndexPage() {
   const data = pageData(isDark!)
 
   const meta_title = 'General Availability | Supabase'
-  const meta_description =
-    'Explore Supabase fees and pricing information. Find our competitive pricing plans, with no hidden pricing. We have a generous free plan for those getting started, and Pay As You Go for those scaling up.'
+  const meta_description = 'Supabase is officially launching into General Availability.'
   const meta_image = '/images/ga/ga-og.png'
 
   return (
