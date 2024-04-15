@@ -82,7 +82,7 @@ export const CodeBlock = ({
   const showLineNumbers = !hideLineNumbers
 
   return (
-    <div>
+    <>
       {title && (
         <div className="text-sm rounded-t-md bg-surface-100 py-2 px-4 border border-b-0 border-default font-sans">
           {title}
@@ -158,6 +158,6 @@ export const CodeBlock = ({
       ) : (
         <code className={shortCodeBlockClasses}>{value || children}</code>
       )}
-    </div>
+    </>
   )
 }
