@@ -122,19 +122,13 @@ export default function IndexPage() {
       <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.scaleSection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
-      <ParagraphSection {...data.securitySection} hasStickyTitle />
-      <SectionContainer className="!py-0 border-b" children={null} />
-      <GaPerformanceSection {...data.performanceSection} hasStickyTitle />
-      <SectionContainer className="!py-0 border-b" children={null} />
-      <ParagraphSection {...data.reliabilitySection} hasStickyTitle />
-      <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.enterpriseSection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
       <ParagraphSection {...data.integrationsSection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
-      <FeaturesSection {...data.principlesSection} hasStickyTitle />
+      <FeaturesSection {...data.newSection} hasStickyTitle />
       <SectionContainer className="!py-0 border-b" children={null} />
-      <ParagraphSection {...data.missionSection} hasStickyTitle />
+      <ParagraphSection {...data.nextSection} hasStickyTitle />
       <CTABanner />
     </DefaultLayout>
   )
