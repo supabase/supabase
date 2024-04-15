@@ -434,8 +434,16 @@
     "author_id": "grdsdev",
     "author": "Guilherme Souza",
     "username": "grdsdev",
-    "position": "Guest Author",
+    "position": "Engineering",
     "author_url": "https://github.com/grdsdev",
     "author_image_url": "https://github.com/grdsdev.png"
+  },
+  {
+    "author_id": "chris_chandler",
+    "author": "Chris Chandler",
+    "username": "chrischandler",
+    "position": "Partnerships",
+    "author_url": "https://github.com/chrischandler",
+    "author_image_url": "https://github.com/chrischandler.png"
   }
 ]
