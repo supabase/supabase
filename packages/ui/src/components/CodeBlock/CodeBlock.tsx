@@ -1,24 +1,23 @@
-import { Children } from 'react'
+import { Check, Copy } from 'lucide-react'
+import { useTheme } from 'next-themes'
+import { Children, ReactNode, useState } from 'react'
 import * as CopyToClipboard from 'react-copy-to-clipboard'
 import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { Button, cn } from 'ui'
 import { monokaiCustomTheme } from './CodeBlock.utils'
-import { Button, IconCheck, IconCopy, cn } from 'ui'
 
-import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
-import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
-import csharp from 'react-syntax-highlighter/dist/cjs/languages/hljs/csharp'
-import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
-import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
+import csharp from 'react-syntax-highlighter/dist/cjs/languages/hljs/csharp'
 import dart from 'react-syntax-highlighter/dist/cjs/languages/hljs/dart'
+import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
-
-import { useState } from 'react'
-import { useTheme } from 'next-themes'
+import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
+import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
+import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
 
 export interface CodeBlockProps {
-  title?: string
+  title?: ReactNode
   language?: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json' | 'csharp' | 'kotlin'
   linesToHighlight?: number[]
   hideCopy?: boolean
@@ -85,12 +84,12 @@ export const CodeBlock = ({
   return (
     <>
       {title && (
-        <div className="rounded-t-md bg-surface-100 py-2 px-4 border-b border-default text-blue-1100 font-sans">
-          {title.replace(/%20/g, ' ')}
+        <div className="text-sm rounded-t-md bg-surface-100 py-2 px-4 border border-b-0 border-default font-sans">
+          {title}
         </div>
       )}
       {className ? (
-        <div className="relative max-w-[90vw] md:max-w-none overflow-auto">
+        <div className="group relative max-w-[90vw] md:max-w-none overflow-auto">
           {/* @ts-ignore */}
           <SyntaxHighlighter
             language={lang}
@@ -136,9 +135,9 @@ export const CodeBlock = ({
           {!hideCopy && (value || children) && className ? (
             <div
               className={[
-                'absolute right-2',
+                'absolute right-2 top-2',
+                'opacity-0 group-hover:opacity-100 transition',
                 `${isDarkTheme ? 'dark' : ''}`,
-                `${!title ? 'top-2' : 'top-[3.25rem]'}`,
               ].join(' ')}
             >
               {/* //
@@ -146,7 +145,8 @@ export const CodeBlock = ({
               <CopyToClipboard text={value || children}>
                 <Button
                   type="default"
-                  icon={copied ? <IconCheck /> : <IconCopy />}
+                  className="px-1.5"
+                  icon={copied ? <Check /> : <Copy />}
                   onClick={() => handleCopy()}
                 >
                   {copied ? 'Copied' : ''}

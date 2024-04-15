@@ -457,7 +457,7 @@ create policy "Policy name."
   on table_name
   as restrictive
   to authenticated
-  using (auth.jwt()->>'aal' = 'aal2');
+  using ((select auth.jwt()->>'aal') = 'aal2');
 ```
 
 - Here the policy will not accept any JWTs with an `aal` claim other than
@@ -475,14 +475,14 @@ create policy "Policy name."
   as restrictive -- very important!
   to authenticated
   using
-    (array[auth.jwt()->>'aal'] <@ (
+    (array[(select auth.jwt()->>'aal')] <@ (
        select
          case
            when created_at >= '2022-12-12T00:00:00Z' then array['aal2']
            else array['aal1', 'aal2']
          end as aal
        from auth.users
-       where auth.uid() = id));
+       where (select auth.uid()) = id));
 ```
 
 - The policy will accept both `aal1` and `aal2` for users with a `created_at`
@@ -504,14 +504,14 @@ create policy "Policy name."
   as restrictive -- very important!
   to authenticated
   using (
-    array[auth.jwt()->>'aal'] <@ (
+    array[(select auth.jwt()->>'aal')] <@ (
       select
           case
             when count(id) > 0 then array['aal2']
             else array['aal1', 'aal2']
           end as aal
         from auth.mfa_factors
-        where auth.uid() = user_id and status = 'verified'
+        where ((select auth.uid()) = user_id) and status = 'verified'
     ));
 ```
 
@@ -600,7 +600,7 @@ Use the `supabase.auth.getAuthenticatorAssuranceLevel()` method to get easy acce
 You can use this PostgreSQL snippet in RLS policies, too:
 
 ```sql
-jsonb_path_query(auth.jwt(), '$.amr[0]')
+jsonb_path_query((select auth.jwt()), '$.amr[0]')
 ```
 
 - [`jsonb_path_query(json, path)`](https://www.postgresql.org/docs/current/functions-json.html#FUNCTIONS-JSON-PROCESSING-TABLE)
