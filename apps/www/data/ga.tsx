@@ -1,12 +1,4 @@
-import {
-  ClipboardCheckIcon,
-  CreditCardIcon,
-  KeyIcon,
-  RewindIcon,
-  ShieldCheckIcon,
-  UserGroupIcon,
-} from '@heroicons/react/outline'
-import { Github } from 'lucide-react'
+import { KeyIcon, RewindIcon, ShieldCheckIcon, UserGroupIcon } from '@heroicons/react/outline'
 import { IconActivity, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid } from 'ui'
 
 export const data = (isDark: boolean) => ({
@@ -83,26 +75,31 @@ We're committed to our free tier - we know the importance of this for testing ho
       {
         number: '65,000',
         text: 'GitHub stars',
-        icon: <IconGitHubSolid className="text-foreground-muted" />,
+        url: 'https://github.com/supabase',
+        icon: <IconGitHubSolid />,
       },
       {
         number: '106,000',
         text: 'Twitter followers',
-        icon: <IconTwitterX className="text-foreground-muted" />,
+        url: 'https://twitter.com/supabase',
+        icon: <IconTwitterX />,
       },
       {
         number: '25,000',
         text: 'Discord members',
-        icon: <IconDiscord className="text-foreground-muted" />,
+        url: 'https://discord.com/invite/R7bSpeBSJE',
+        icon: <IconDiscord />,
       },
       {
         number: '23,000',
         text: 'YouTube subscribers',
-        icon: <IconYoutubeSolid className="text-foreground-muted" />,
+        url: 'https://www.youtube.com/c/supabase',
+        icon: <IconYoutubeSolid />,
       },
       {
         number: '10,000',
         text: 'Reddit subs',
+        url: 'https://www.reddit.com/r/Supabase/',
         icon: (
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -139,7 +136,7 @@ We're committed to our free tier - we know the importance of this for testing ho
                   strokeLinecap: 'butt',
                   strokeLinejoin: 'miter',
                   strokeMiterlimit: 10,
-                  fill: 'hsl(var(--foreground-muted) / 1)',
+                  fill: 'currentColor',
                   fillRule: 'nonzero',
                   opacity: 1,
                 }}
@@ -174,7 +171,7 @@ We're committed to our free tier - we know the importance of this for testing ho
     content: `
 Our tagline is “Build in a weekend, scale to millions”. This isn't hyperbole. In the past, reaching 1 million users was an incredible challenge. It took Instagram 2.5 months, Facebook 10 months, and Twitter 24 months.
 
-In the past year, we've had 11 companies start on Supabase and grow from zero to over 1 million users. 
+In the past year, we've had 12 companies start on Supabase and grow from zero to over 1 million users. 
 
 ![top user growth over time by days after launch](/images/ga/project-user-growth--dark.svg?v=3)
 
@@ -215,6 +212,12 @@ We'll continue to expand the Supabase Enterprise offering to include more deploy
           ? '/images/ga/enterprise/pwc--dark.svg'
           : '/images/ga/enterprise/pwc--light.svg',
       },
+      {
+        name: 'mozilla',
+        image: isDark
+          ? '/images/ga/enterprise/mozilla--dark.png'
+          : '/images/ga/enterprise/mozilla--light.png',
+      },
     ],
     highlights: [
       {
@@ -237,14 +240,6 @@ We'll continue to expand the Supabase Enterprise offering to include more deploy
         text: 'Backups',
         icon: <RewindIcon strokeWidth={1} className="text-foreground-lighter w-6" />,
       },
-      // {
-      //   text: 'Payment processing',
-      //   icon: <CreditCardIcon strokeWidth={1} className="text-foreground-lighter w-6" />,
-      // },
-      // {
-      //   text: 'Vulnerability Management',
-      //   icon: <ClipboardCheckIcon strokeWidth={1} className="text-foreground-lighter w-6" />,
-      // },
       {
         text: 'DDoS Protection',
         icon: <ShieldCheckIcon strokeWidth={1} className="text-foreground-lighter w-6" />,
