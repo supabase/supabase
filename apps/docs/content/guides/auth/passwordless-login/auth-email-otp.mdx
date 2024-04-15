@@ -55,6 +55,18 @@ Future<void> signInWithEmailOtp() async {
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+When your user signs in, call [signInWithOTP()](/docs/reference/swift/auth-signinwithotp) with their email address:
+
+```swift
+try await supabase.auth.signInWithOTP(
+  email: "example@email.com",
+  // set this to false if you do not want the user to be automatically signed up
+  shouldCreateUser: false
+)
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs in, call [signInWith(OTP)](/docs/reference/kotlin/auth-signinwithotp) with their email address:
@@ -104,6 +116,19 @@ const {
   token: '123456',
   type: 'email',
 })
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Provide an input field for the user to key in the one-time code. To verify the code and complete the user's sign in, call [verifyOTP()](/docs/reference/swift/auth-verifyotp) with their email address, the code, and `type: .email`:
+
+```swift
+try await supabase.auth.verifyOTP(
+  email: email,
+  token: "123456",
+  type: .email
+)
 ```
 
 </TabPanel>

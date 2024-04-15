@@ -6,9 +6,10 @@ import { Tabs } from 'ui'
 import { Markdown } from '../Markdown'
 import ReportQueryPerformanceTableRow from '../Reports/ReportQueryPerformanceTableRow'
 import { PresetHookResult } from '../Reports/Reports.utils'
-import { QueryPerformanceFilterBar } from './QueryPerformanceFilterBar'
-import { QueryPerformanceLoadingRow } from './QueryPerformanceLoadingRow'
+import { QueryPerformanceFilterBar } from '../QueryPerformanceV2/QueryPerformanceFilterBar'
 import { ResetAnalysisNotice } from './ResetAnalysisNotice'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { QUERY_PERFORMANCE_REPORT_TYPES } from '../QueryPerformanceV2/QueryPerformance.constants'
 
 type QueryPerformancePreset = 'time' | 'frequent' | 'slowest'
 
@@ -34,14 +35,27 @@ interface QueryPerformanceProps {
   queryPerformanceQuery: DbQueryHook<any>
 }
 
+const QueryPerformanceLoadingRow = ({ colSpan }: { colSpan: number }) => {
+  return (
+    <>
+      {Array(4)
+        .fill('')
+        .map((_, i) => (
+          <tr key={'loading-' + i}>
+            <td colSpan={colSpan}>
+              <ShimmeringLoader />
+            </td>
+          </tr>
+        ))}
+    </>
+  )
+}
+
 export const QueryPerformance = ({
   queryHitRate,
   queryPerformanceQuery,
 }: QueryPerformanceProps) => {
   const router = useRouter()
-  const isLoading = [queryPerformanceQuery.isLoading, queryHitRate.isLoading].every(
-    (value) => value
-  )
 
   const handleRefresh = async () => {
     queryPerformanceQuery.runQuery()
@@ -64,15 +78,19 @@ export const QueryPerformance = ({
         })
       }}
     >
-      <Tabs.Panel key="time" id="time" label="Most time consuming">
+      <Tabs.Panel
+        key="time"
+        id={QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING}
+        label="Most time consuming"
+      >
         <div className={panelClassNames}>
           <Markdown
             content={TimeConsumingHelperText}
             className="max-w-full [&>p]:mt-0 [&>p]:m-0 space-y-2"
           />
           <ResetAnalysisNotice handleRefresh={handleRefresh} />
-          <div className="thin-scrollbars max-w-full overflow-auto">
-            <QueryPerformanceFilterBar onRefreshClick={handleRefresh} isLoading={isLoading} />
+          <div className="thin-scrollbars max-w-full overflow-auto space-y-3">
+            <QueryPerformanceFilterBar queryPerformanceQuery={queryPerformanceQuery} />
             <Table
               className="table-fixed"
               head={
@@ -115,15 +133,19 @@ export const QueryPerformance = ({
           </div>
         </div>
       </Tabs.Panel>
-      <Tabs.Panel key="frequent" id="frequent" label="Most frequent">
+      <Tabs.Panel
+        key="frequent"
+        id={QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT}
+        label="Most frequent"
+      >
         <div className={panelClassNames}>
           <Markdown
             content={MostFrequentHelperText}
             className="max-w-full [&>p]:mt-0 [&>p]:m-0 space-y-2"
           />
           <ResetAnalysisNotice handleRefresh={handleRefresh} />
-          <div className="thin-scrollbars max-w-full overflow-auto">
-            <QueryPerformanceFilterBar onRefreshClick={handleRefresh} isLoading={isLoading} />
+          <div className="thin-scrollbars max-w-full overflow-auto space-y-3">
+            <QueryPerformanceFilterBar queryPerformanceQuery={queryPerformanceQuery} />
             <Table
               head={
                 <>
@@ -177,15 +199,19 @@ export const QueryPerformance = ({
           </div>
         </div>
       </Tabs.Panel>
-      <Tabs.Panel key="slowest" id="slowest" label="Slowest execution time">
+      <Tabs.Panel
+        key="slowest"
+        id={QUERY_PERFORMANCE_REPORT_TYPES.SLOWEST_EXECUTION}
+        label="Slowest execution time"
+      >
         <div className={panelClassNames}>
           <Markdown
             content={SlowestExecutionHelperText}
             className="max-w-full [&>p]:mt-0 [&>p]:m-0 space-y-2"
           />
           <ResetAnalysisNotice handleRefresh={handleRefresh} />
-          <div className="thin-scrollbars max-w-full overflow-auto">
-            <QueryPerformanceFilterBar onRefreshClick={handleRefresh} isLoading={isLoading} />
+          <div className="thin-scrollbars max-w-full overflow-auto space-y-3">
+            <QueryPerformanceFilterBar queryPerformanceQuery={queryPerformanceQuery} />
             <Table
               head={
                 <>

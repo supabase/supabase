@@ -38,11 +38,11 @@ const Nav = (props: Props) => {
   const isUserLoading = useIsUserLoading()
 
   const isHomePage = router.pathname === '/'
-  const isSpecialAnnouncementPage = router.pathname.includes('special-announcement')
-  const isLaunchWeekPage = router.pathname.includes('launch-week') || isSpecialAnnouncementPage
+  const isGAWeekSection = router.pathname.includes('/ga-week')
+  const isLaunchWeekPage = router.pathname.includes('launch-week') || isGAWeekSection
   const isLaunchWeekXPage = router.pathname === '/launch-week/x'
-  const isLaunchWeek11Page = router.pathname === '/special-announcement'
-  const showLaunchWeekNavMode = isLaunchWeekPage && !open
+  const isLaunchWeek11Page = router.pathname === '/ga-week'
+  const showLaunchWeekNavMode = (isLaunchWeekPage || isLaunchWeek11Page) && !open
 
   React.useEffect(() => {
     if (open) {
@@ -70,14 +70,18 @@ const Nav = (props: Props) => {
         <LW11CountdownBanner />
       </Announcement>
       <div
-        className={cn('sticky top-0 z-40 transform', isLaunchWeekXPage && 'relative')}
+        className={cn(
+          'sticky top-0 z-40 transform',
+          (isLaunchWeekXPage || isLaunchWeek11Page) && 'relative'
+        )}
         style={{ transform: 'translate3d(0,0,999px)' }}
       >
         <div
           className={cn(
             'absolute inset-0 h-full w-full opacity-80 bg-background',
             !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
-            showLaunchWeekNavMode && '!bg-transparent transition-all'
+            showLaunchWeekNavMode && '!bg-transparent transition-all',
+            isGAWeekSection && 'dark:!bg-[#060809]'
           )}
         />
         <nav
@@ -113,7 +117,7 @@ const Nav = (props: Props) => {
                     />
                   </Link>
 
-                  {!isSpecialAnnouncementPage &&
+                  {!isGAWeekSection &&
                     !isLaunchWeek11Page &&
                     isLaunchWeekPage &&
                     !isLaunchWeekXPage && (

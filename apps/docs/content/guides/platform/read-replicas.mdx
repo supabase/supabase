@@ -1,16 +1,17 @@
 ---
 title: 'Read Replicas'
-description: 'Deploy additional read-only databases in multiple regions for your project.'
-subtitle: 'Deploy additional read-only databases in multiple regions for your project'
+description: 'Deploy read-only databases across multiple regions, for lower latency.'
+subtitle: 'Deploy read-only databases across multiple regions, for lower latency and better resource management.'
 ---
 
-<Admonition type="note" label="Read Replicas are available to Pro, Team, and Enterprise organizations who have signed up for early access.">
+Read Replicas are additional databases that are kept in sync with your Primary database. You can read your data from a Read Replica, which helps with:
 
-[Request early access](https://forms.supabase.com/read-replica) and you'll be notified once Read Replicas are available to your organization.
-
-</Admonition>
+- **Load balancing:** Read Replicas reduce load on the Primary database. For example, you can use a Read Replica for complex analytical queries and reserve the Primary for user-facing create, update, and delete operations.
+- **Improved latency:** For projects with a global user base, additional databases can be deployed closer to users to reduce latency.
+- **Redundancy:** Read Replicas provide data redundancy.
 
 <figure className="max-w-[700px] mx-auto">
+
     <Image
         className="hidden dark:block"
         alt="Map view of all project databases"
@@ -25,57 +26,74 @@ subtitle: 'Deploy additional read-only databases in multiple regions for your pr
 
 </figure>
 
-Read Replicas are Postgres databases that are continuously synced to a Supabase project's Primary database. You can both read from and write to a Primary database, but you can _only_ read from a Read Replica, such as using `select` statements.
+## About Read Replicas
+
+The database you start with when launching a Supabase project is your Primary database. Read Replicas are kept in sync with the Primary through a process called "replication." Replication is asynchronous to ensure that transactions on the Primary aren't blocked. There is a delay between an update on the Primary and the time that a Read Replica receives the change. This delay is called "replication lag."
+
+You can only read data from a Read Replica. This is in contrast to a Primary database, where you can both read and write:
 
 |              | select | insert | update | delete |
 | ------------ | ------ | ------ | ------ | ------ |
 | Primary      | ✅     | ✅     | ✅     | ✅     |
 | Read Replica | ✅     | -      | -      | -      |
 
-A database is spun up automatically with every Supabase project. This database is the Primary database. You can choose to add Read Replicas to your project and those Replicas will receive and synchronize data from the Primary database.
-
-Replication is asynchronous and happens in the background so transactions on the Primary aren't blocked. The time delay between writing data to the Primary and the Read Replica receiving the change is replication lag.
-
-Read Replicas have many applications:
-
-- They reduce read load on the Primary database.
-  - For example, you can use a Read Replica for complex analytical queries and reserve the Primary for user-facing create, update, and delete operations.
-- For projects that need to cover a global audience, additional databases can be deployed closer to users in any of our twelve supported regions to reduce latency.
-- Read Replicas provide data redundancy.
-
 ## Prerequisites
 
-A project needs to satisfy these requirements to deploy a Read Replica:
+<Admonition type="note" label="Read Replicas are available on the Team and Enterprise plans">
+
+Read replicas are available to projects created on the Teams and Enterprise plans after 2024 March 20. They will be progressively rolled out to older projects, and eventually available on the Pro plan.
+
+If your project doesn't meet these criteria, you can join the [early access queue](https://forms.supabase.com/read-replica).
+
+</Admonition>
+
+Projects must meet these requirements to use Read Replicas:
 
 1. Running on AWS.
    - Support for projects on Fly.io is coming.
 1. Running on at least a [Small compute add-on](/docs/guides/platform/compute-add-ons).
-   - Read Replicas are currently placed on the same compute instance as the database to make sure they can keep up with the Primary's activities.
-1. Running on Postgres 15.
-   - For projects running on older versions of PostgreSQL, you will need to [upgrade to the latest platform version](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade).
+   - Read Replicas are started on the same compute instance as the Primary to keep up with changes.
+1. Running on Postgres 15+.
+   - For projects running on older versions of Postgres, you will need to [upgrade to the latest platform version](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade).
 1. Using [physical backups](/docs/guides/platform/backups#point-in-time-recovery)
    - Physical backups are automatically enabled if using [PITR](/docs/guides/platform/backups#point-in-time-recovery)
    - If you're not using PITR, you'll be able to switch to physical backups as part of the Read Replica setup process. Note that physical backups can't be downloaded from the dashboard in the way logical backups can.
 
 ## Getting started
 
-Read Replicas can be managed from the [infrastructure settings page](https://supabase.com/dashboard/project/_/settings/infrastructure). For now, each project can only deploy up to two Read Replicas and all Read Replicas inherit the compute size of their Primary database.
+To add a Read Replica, go to the [Infrastructure Settings page](/dashboard/project/_/settings/infrastructure) in your dashboard. Each project can deploy up to two Read Replicas and all Read Replicas inherit the compute size of their Primary database.
+
+## Features
 
 Read Replicas offer the following features:
 
 ### Dedicated endpoints
 
-Each Read Replica has its own dedicated database and API endpoints. The database endpoint can be found in your [dashboard database settings](https://supabase.com/dashboard/project/_/settings/database) under **Connection info**. The API endpoint can be found in [dashboard API settings](https://supabase.com/dashboard/project/_/settings/api) under **Project URL**.
+Each Read Replica has its own dedicated database and API endpoints.
 
-A Read Replica's API endpoint only supports `GET` requests to the [REST API](https://supabase.com/docs/guides/api). Requests towards other Supabase products, such as Auth, Storage, and Realtime, are not able to utilize a Read Replica nor its API endpoint for now. We are working on adding Read Replica support for them.
+- Find the database endpoint on the [Database Settings page](/dashboard/project/_/settings/database) under **Connection Info**
+- Find the API endpoint on the [API Settings page](/dashboard/project/_/settings/api) under **Project URL**
 
-### Dedicated connection pool
+Read Replicas only support `GET` requests and the [REST API](/docs/guides/api). Requests to other Supabase products, such as Auth, Storage, and Realtime, aren't able to use a Read Replica or its API endpoint. Support for more products will be added in the future.
 
-A connection pool through Supavisor is also available for each Read Replica. Its unique connection string can be found in your [dashboard database settings](https://supabase.com/dashboard/project/_/settings/database) under **Connection string**.
+## Dedicated connection pool
+
+A connection pool through Supavisor is also available for each Read Replica. Find the connection string on the [Database Settings page](/dashboard/project/_/settings/database) under **Connection String**.
+
+## API load balancer
+
+A load balancer is deployed to balance requests between your Primary database and Read Replicas. Find its endpoint on the [API Settings page](/dashboard/project/_/settings/api).
+
+The load balancer uses a round-robin strategy to route `GET` requests to all available API endpoints, including the Primary database. Non-`GET` requests can also be sent through this endpoint, and will be routed to the Primary database. Read-only Postgres functions can be called using a [`GET` request](https://github.com/supabase/supabase-js/blob/v2.42.3/src/SupabaseClient.ts#L176-L177) as well.
+
+If you remove all Read Replicas from your project, the load balancer and its endpoint are removed as well. Make sure to redirect requests back to your Primary database before removal.
 
 ### Querying through the SQL editor
 
+In the SQL editor, you can choose if you want to run the query on a particular Read Replica.
+
 <figure className="max-w-[700px] mx-auto">
+
     <Image
         className="hidden dark:block"
         alt="SQL editor view."
@@ -90,23 +108,28 @@ A connection pool through Supavisor is also available for each Read Replica. Its
 
 </figure>
 
-In the SQL editor, you can choose if you want to run the query on the Primary or one of the Replicas.
+### Metrics
 
-### API load balancer
+Observability and metrics for Read Replicas are not currently available in the Supabase Dashboard.
 
-When Read Replicas are deployed, an API load balancer becomes available for the project. An endpoint for it is provisioned and can be found [here](https://supabase.com/dashboard/project/_/settings/api).
-
-The load balancer uses a round-robin strategy to route `GET` requests to any of the API endpoints available, including that of the Primary database. Non-`GET` requests can also be sent through this endpoint. They are immediately redirected to the Primary database.
-
-Similar to the Read Replica API endpoints, only requests to the REST API are available for now. Support for other Supabase products will become available once Read Replica support has been completed for them.
-
-When a project no longer has any Read Replicas, the load balancer and its endpoint are brought down as well.
+If you're ingesting your [project's metrics](/docs/guides/platform/metrics#accessing-the-metrics-endpoint) into your own environment, you can update [your scraping setup](https://github.com/supabase/supabase-grafana?tab=readme-ov-file#read-replica-support) to additionally ingest metrics from your Read Replicas.
 
 ### Centralized configuration management
 
-All settings made through the dashboard will be propagated across all databases of a project. This ensures that no Read Replica get out of sync with its Primary database or with other Read Replicas.
+All settings configured through the dashboard will be propagated across all databases of a project. This ensures that no Read Replica get out of sync with the Primary database or with other Read Replicas.
 
-## How are Read Replicas made?
+## Operations blocked by Read Replicas
+
+### Project upgrades and data restorations
+
+The following procedures require all Read Replicas for a project to be brought down before they can be performed:
+
+1. [Project upgrades](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade)
+1. [Data restorations](/docs/guides/platform/backups#pitr-restoration-process)
+
+These operations need to be completed before Read Replicas can be re-deployed.
+
+## About replication
 
 We use a hybrid approach to replicate data from a Primary to its Read Replicas, combining the native methods of streaming replication and file-based log shipping.
 
@@ -135,14 +158,3 @@ In this replication method, the Primary continuously buffers WAL changes to a lo
 We bring these two methods together to achieve quick, stable, and reliable replication. Each method addresses the limitations of the other. Streaming replication minimizes replication lag, while file-based log shipping provides a fallback. For file-based log shipping, we use our existing Point In Time Recovery (PITR) infrastructure. We regularly archive files from the Primary using [WAL-G](https://github.com/wal-g/wal-g), an open source archival and restoration tool, and ship the WAL files to S3.
 
 We combine it with streaming replication to reduce replication lag. Once WAL-G files have been synced from S3, Read Replicas connect to the Primary and stream the WAL directly.
-
-## Operations blocked by Read Replicas
-
-### Project upgrades and data restorations
-
-The following procedures require all Read Replicas for a project to be brought down before they can be performed:
-
-1. [Project upgrades](/docs/guides/platform/migrating-and-upgrading-projects#pgupgrade)
-1. [Data restorations](/docs/guides/platform/backups#pitr-restoration-process)
-
-These operations need to be completed before Read Replicas can be re-deployed.
