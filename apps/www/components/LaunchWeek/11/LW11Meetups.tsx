@@ -87,7 +87,7 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
           Join our live community-driven meetups to celebrate GA Week with the community, listen to
           tech talks and grab some swag.
         </p>
-        <TextLink label="Read more about meetups" hasChevron url="/blog/community-meetups-lw11" />
+        {/* <TextLink label="Read more about meetups" hasChevron url="" /> */}
       </div>
       <div className="col-span-1 xl:col-span-7 xl:col-start-6 w-full max-w-4xl flex flex-wrap gap-x-3 gap-y-1">
         {meets &&
