@@ -17,8 +17,8 @@ export const CreateChannelModal = ({ visible, onClose }: CreateChannelModalProps
   const [name, setName] = useState('')
   const { endpoint, accessToken, isReady } = useProjectConnectionData(ref!)
   const { mutate: createChannel, isLoading: isCreating } = useChannelCreateMutation({
-    onSuccess: (name) => {
-      toast.success(`Successfully created channel ${name}`)
+    onSuccess: (channel) => {
+      toast.success(`Successfully created channel ${channel.name}`)
       onClose()
     },
   })
