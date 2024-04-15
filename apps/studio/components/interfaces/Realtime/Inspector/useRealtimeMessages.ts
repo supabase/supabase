@@ -1,6 +1,6 @@
 import { RealtimeChannel, SupabaseClient } from '@supabase/supabase-js'
 import { sortBy, take } from 'lodash'
-import { useCallback, useEffect, useReducer, useState } from 'react'
+import { Dispatch, SetStateAction, useCallback, useEffect, useReducer, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useProjectApiQuery } from 'data/config/project-api-query'
@@ -50,20 +50,25 @@ export interface RealtimeConfig {
   enableDbChanges: boolean
 }
 
-export const useRealtimeMessages = ({
-  enabled,
-  channelName,
-  projectRef,
-  logLevel,
-  token,
-  schema,
-  table,
-  filter,
-  bearer,
-  enablePresence,
-  enableDbChanges,
-  enableBroadcast,
-}: RealtimeConfig) => {
+export const useRealtimeMessages = (
+  config: RealtimeConfig,
+  setRealtimeConfig: Dispatch<SetStateAction<RealtimeConfig>>
+) => {
+  const {
+    enabled,
+    channelName,
+    projectRef,
+    logLevel,
+    token,
+    schema,
+    table,
+    filter,
+    bearer,
+    enablePresence,
+    enableDbChanges,
+    enableBroadcast,
+  } = config
+
   const { data } = useProjectApiQuery({ projectRef: projectRef })
 
   // the default host is prod until the correct one comes through an API call.
@@ -97,7 +102,8 @@ export const useRealtimeMessages = ({
       },
     }
     const newClient = new SupabaseClient(host, token, opts)
-    if (bearer != '') {
+
+    if (bearer) {
       newClient.realtime.setAuth(bearer)
     }
 
@@ -170,6 +176,14 @@ export const useRealtimeMessages = ({
         }
       } else if (status === 'CLOSED') {
         // console.log(`Realtime Channel status: ${status}`)
+      } else if (status === 'CHANNEL_ERROR') {
+        toast.error(
+          'Failed to connect to the channel: This may be due to restrictive RLS policies. Check your role and try again.'
+        )
+
+        newChannel.unsubscribe()
+        setChannel(undefined)
+        setRealtimeConfig({ ...config, enabled: false })
       } else {
         // console.error(`Realtime Channel error status: ${status}`)
         // console.error(`Realtime Channel error: ${error}`)
