@@ -1,7 +1,7 @@
 ---
 title: 'Supabase acquires Oriole'
 description: 'The Oriole team are joining Supabase to build a faster storage engine for Postgres.'
-author: grdsdev
+author: paul_copplestone
 image: launch-week-11/oriole/og.png
 thumb: launch-week-11/oriole/thumb.png
 categories:
@@ -18,9 +18,9 @@ launchweek: 11
 
 The Oriole team are joining Supabase to:
 
-1. Build a faster storage engine for Postgres
-2. Help develop pluggable storage in Postgres
-3. Work on decoupled storage and compute in Postgres
+1. Build a faster storage engine for Postgres.
+2. Help develop pluggable storage in Postgres.
+3. Work on decoupled storage and compute in Postgres.
 
 [oriole.mp4](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/7090ed2a-3866-4bc8-b88a-89e6e993315c/oriole.mp4)
 
@@ -41,23 +41,29 @@ create table posts (
 ) using orioledb;    -- Specify the storage format
 ```
 
-This might look familiar if you have seen other storage engines in Postgres like [Citus columnar](https://docs.citusdata.com/en/v11.1/admin_guide/table_management.html#columnar-storage), [Hydra](https://docs.hydra.so/concepts/using-hydra-columnar), [ParadeDB](https://docs.paradedb.com/search/quickstart), or [zheap](https://github.com/cybertec-postgresql/zheap). These all use Postgres' [Table Access Method](https://www.postgresql.org/docs/current/tableam.html) API - a set of APIs that provide pluggable storage.
+The `using` clause might look familiar if you have used other storage engines in Postgres like [Citus columnar](https://docs.citusdata.com/en/v11.1/admin_guide/table_management.html#columnar-storage), [Hydra](https://docs.hydra.so/concepts/using-hydra-columnar), [ParadeDB](https://docs.paradedb.com/search/quickstart), or [zheap](https://github.com/cybertec-postgresql/zheap). These all use the [Table Access Method API](https://www.postgresql.org/docs/current/tableam.html) - a set of methods that provide pluggable storage.
 
 The `orioledb` storage engine changes the representation of table data on disk. Its [architecture](https://github.com/orioledb/orioledb/blob/main/doc/arch.md) is designed to take advantage of modern hardware like SSDs and NVRAM.
 
-It implements MVCC, the feature that allows allows multiple connected users to see different versions of the data depending on when their transaction started, via an UNDO log rather than tuple versioning, which is prone to bloat. This architectur provides several benefits:
+It implements MVCC, the feature that allows allows multiple connected users to see different versions of the data depending on when their transaction started, via an UNDO log rather than tuple versioning. Orioles architecture prevents bloat and provides several features and benefits:
 
-1. **Scalability**: OrioleDB's design implements innovative concepts like lockless access for in-memory data. This helps to eliminate common bottlenecks found in traditional database engines.
-2. **IO-Reduction**: It significantly reduces IO operations for write transactions by utilizing a row-level WAL (Write-Ahead Log) and a non-persistent undo log, leading to more efficient data modification handling.
-3. **Data Compression**: Implements page-level data compression, which can reduce the overall size of a typical database by approximately 4 to 5 times, saving storage space.
-4. **Bloat Reduction**: Efficiently manages updates in-place with an undo log, which contributes to reducing database bloat—a common issue where the database size grows due to unused or obsolete data occupying space.
-5. **Index-organized tables:** OrioleDB stores table rows in the leafs of primary key index making primary key lookups very cheap. Also, in many cases, this saves significant storage space.
+2. **Reduced IO**: It implements row-level WAL (Write-Ahead Log) and a non-persistent undo log. This significantly reduces IO operations for write transactions.
+1. **Scalability**: It implements lockless access for in-memory data. This helps to eliminate common bottlenecks found in traditional database engines.
+1. **Data Compression**: It implements page-level data compression, which can reduce the overall size of a typical database by approximately 4 to 5 times, saving storage space.
+1. **Bloat Reduction**: Efficiently manages updates in-place with an undo log, which contributes to reducing database bloat — a common issue where the database size grows due to unused or obsolete data occupying space.
+1. **Index-organized tables:** Oriole stores table rows in the leafs of primary key index making primary key lookups very cheap. In many cases, this saves significant storage space.
+
+![Faster reads with Oriole](/images/blog/launch-week-11/oriole/read-only-results-amazon.png)
+
+<caption>Reads and writes are significantly faster with Oriole</caption>
 
 ## Pluggable storage in Postgres
 
 We've [written previously](https://supabase.com/blog/postgres-pluggable-strorage) about Pluggable Storage: it gives developers the ability to use different storage engines for different tables _within the same database_. This system is [available in MySQL](https://en.wikipedia.org/wiki/Comparison_of_MySQL_database_engines), which uses the [InnoDB](https://en.wikipedia.org/wiki/InnoDB) as the default storage engine since MySQL 5.5 (replacing [MyISAM](https://en.wikipedia.org/wiki/MyISAM)).
 
 Oriole aims to be a drop-in replacement for Postgres' default storage engine and supports similar use-cases with improved performance. Other storage engines, to name a few possibilities, could implement columnar storage for OLAP workloads, highly compressed timeseries storage for event data, or compressed storage for minimizing disk usage.
+
+![Pluggable storage](/images/blog/launch-week-11/oriole/table-storage.png)
 
 In version 12, PostgreSQL introduced support for pluggable storage with the goal of [adding ZHeap](https://anarazel.de/talks/2019-05-30-pgcon-pluggable-table-storage/pluggable.pdf) - a previous effort to solve some shortcomings of Postgres' default storage format. We hope to contribute towards these efforts.
 
