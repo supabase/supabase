@@ -46,7 +46,7 @@ We've been production-ready for years now. We kept the “beta” label because 
 
 Today we're confident in our ability to take any profile of customer and help them become successful. We have a crew of amazing Postgres engineers and support staff who work tirelessly to educate customers with Postgres technicalities, improving our product simultaneously.
 
-Whether you're an indie hacker or a Fortune 500 company, Supabase can now scale comfortably to your production workload. Rocket ships like Udio, Krea, Chatbase, and Pika use Supabase to build fast and scale faster. Enterprise customers such as Mozilla, PWC, Johnson & Johnson, and 1Password use Supabase to manage their applications securely. 30% of the last Y Combinator batch use Supabase to launch their start ups.
+Whether you're an indie hacker or a Fortune 500 company, Supabase can now scale comfortably to your production workload. Rocket ships like Udio, Krea, Chatbase, Humata, and Pika use Supabase to build fast and scale to millions of end users. Enterprise customers such as Mozilla, PWC, Johnson & Johnson, and 1Password use Supabase to manage their applications securely. 30% of the last Y Combinator batch use Supabase to launch their start ups.
 
 > “Supabase has been great to develop applications. As a firm focused on security, we've been happy to work with Row Level Security Policies to secure database operations.”
 
