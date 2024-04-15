@@ -40,41 +40,54 @@ export default function IndexPage() {
         }}
       />
       <div className="bg-alternative border-b border-muted">
-        <SectionContainer className="text-center flex flex-col items-center space-y-4 !pb-0">
+        <SectionContainer className="flex flex-col gap-6 lg:gap-12">
           <Image
-            src="/images/ga/supabase-ga-visual.png"
+            src="/images/launchweek/ga/ga-black.svg"
             alt="GA logo"
-            className="w-auto h-40 md:h-52 -my-10"
-            width={1200}
-            height={1200}
+            className="dark:hidden w-12 md:w-16 aspect-[104/57] h-auto"
             priority
             quality={100}
+            width={300}
+            height={300}
           />
+          <Image
+            src="/images/launchweek/ga/ga-white.svg"
+            alt="GA logo"
+            className="hidden dark:block w-12 md:w-16 aspect-[104/57] h-auto"
+            priority
+            quality={100}
+            width={300}
+            height={300}
+          />
+          <div>
+            <h1 className="text-3xl md:text-5xl xl:text-8xl lg:max-w-xl xl:max-w-7xl tracking-[-1.1px] text-foreground-light font-normal">
+              {/* {data.hero.title} */}
+              We are moving to
+              <br />
+              <span className="text-foreground">General Availability</span>
+            </h1>
+          </div>
           {data.hero.publishedAt && (
-            <span className="text-sm text-brand md:text-base">{data.hero.publishedAt}</span>
+            <span className="text-sm text-foreground-lighter font-mono md:text-base">
+              {data.hero.publishedAt}
+            </span>
           )}
-          <h1 className="text-3xl md:text-4xl xl:text-5xl lg:max-w-2xl xl:max-w-3xl lg:mx-auto tracking-[-1.1px]">
-            {data.hero.title}
-          </h1>
-          <p className="text-sm md:text-base text-foreground-lighter max-w-sm sm:max-w-md md:max-w-lg mx-auto">
-            {data.hero.paragraph}
-          </p>
         </SectionContainer>
         <SectionContainer className="!pt-0">
           {data.highlightsSection.highlights && (
-            <div className="flex flex-wrap md:flex-nowrap mt-8 md:mt-16 w-fit md:w-full mx-auto md:flex md:items-start justify-around lg:w-full lg:max-w-xl">
+            <div
+              className="flex flex-wrap md:flex-nowrap w-fit md:w-full md:flex md:items-start grid lg:grid-cols-4 gap-4 md:gap-10 lg:gap-20
+            "
+            >
               {data.highlightsSection.highlights.map(
                 (highlight: { number: string; text: string }, i: number) => {
                   return (
-                    <div
-                      key={i}
-                      className="border-t-[1px] mt-6 mx-2 md:mx-2 md:mt-0 md:border-0 border-brand w-[134px] md:max-w-none"
-                    >
-                      <div className="hidden md:block border-t-[1px] lg:border-t-2 border-brand w-[60px] lg:w-[100px]"></div>
-                      <h2 className="text-3xl lg:text-4xl pt-3 tracking-[-1.5px]">
+                    <div key={i} className="">
+                      <div className="border-t-[1px] border-brand-500 w-[32px]"></div>
+                      <h2 className="text-xl md:text-2xl lg:text-4xl pt-1.5 lg:pt-3 tracking-[-1.5px] font-mono">
                         {highlight.number}
                       </h2>
-                      <ReactMarkdown className="text-foreground-light text-sm lg:text-base">
+                      <ReactMarkdown className="text-foreground-light text-sm lg:text-base lg:mt-3">
                         {highlight.text}
                       </ReactMarkdown>
                     </div>
@@ -83,8 +96,8 @@ export default function IndexPage() {
               )}
             </div>
           )}
-          <div className="w-full border-t max-w-4xl mx-auto mt-10 lg:mt-16 flex justify-center">
-            <ol className="w-full max-w-2xl pt-8 gap-4 columns-2 lg:columns-3 text-foreground-light">
+          <div className="w-full border-t max-w-4xl mt-12 lg:mt-32 flex justify-center">
+            <ol className="w-full pt-8 gap-4 columns-2 lg:columns-3 text-foreground-light">
               {data.hero.sections.map((section, i) => (
                 <li key={section.title}>
                   <Link

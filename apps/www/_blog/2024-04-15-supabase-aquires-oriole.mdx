@@ -76,7 +76,15 @@ The Oriole storage engine's reduction in disk IO is significant enough that it u
 
 We've been working with the Oriole team for a few months to develop [experimental support decoupled storage and compute](https://github.com/orioledb/orioledb/blob/main/doc/usage.md#s3-database-storage-experimental):
 
-[Screen recording (1).mov](<https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/1c13cf9b-73d1-4e58-beb7-04af0cf6f7b1/Screen_recording_(1).mov>)
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/NO6xd1n9OKw"
+    title="Decoupled storage and compute in Postgres"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  />
+</div>
 
 Local storage implements caching of the data most often accessed, ensuring good performance, and then synced with S3 asynchronously.
 

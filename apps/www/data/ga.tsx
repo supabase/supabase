@@ -1,9 +1,9 @@
 export const data = {
   hero: {
-    title: <>General Availability</>,
-    paragraph: 'Published 15 April 2024',
-    // publishedAt: '15 April 2024',
-    publishedAt: null,
+    title: <>We are moving to General Availability</>,
+    // paragraph: 'Published 15 April 2024',
+    publishedAt: '15 April 2024',
+    // publishedAt: null,
     sections: [
       { title: 'Company', link: '#company' },
       { title: 'Security', link: '#security' },
@@ -55,16 +55,16 @@ Today we’re confident in our ability to take any profile of customer and help 
   highlightsSection: {
     highlights: [
       {
-        number: '1M',
+        number: '1,000,000+',
         text: 'databases managed',
       },
       {
-        number: '2500',
+        number: '2,500+',
         text: 'databases launched daily',
       },
       {
-        number: 'Top 125',
-        text: 'GitHub repo',
+        number: 'Top 125 GitHub Ranking',
+        text: 'GitHub repo star rating',
       },
     ],
   },
