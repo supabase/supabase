@@ -59,7 +59,7 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
         variants={variants}
       >
         <div className="relative w-full h-full flex flex-col flex-1">
-          <div className="flex-1 opacity-30 group-hover:opacity-100 transition-opacity">
+          <div className="flex-1 opacity-30 group-hover:opacity-100 transition-opacity text-foreground-light">
             {day.icon}
           </div>
           <div
