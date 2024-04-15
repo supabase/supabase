@@ -41,17 +41,15 @@ During the first year of Supabase we set ourselves a goal: build a managed platf
 
 ![top user growth over time by days after launch](/images/ga/database-growth--dark.svg?v=2)
 
-> Supabase database growth since inception.
-
 We've been production-ready for years now. We kept the “beta” label because we wanted to make sure that our *organization* can support all types of customers, no matter their demands.
 
 Today we're confident in our ability to take any profile of customer and help them become successful. We have a crew of amazing Postgres engineers and support staff who work tirelessly to educate customers with Postgres technicalities, improving our product simultaneously.
 
 Whether you're an indie hacker or a Fortune 500, Supabase can scale comfortably for your production workload. Rocket ships like Udio, Krea, Humata, and Pika use Supabase to build fast and scale faster. Enterprise customers such as Mozilla, PWC, Johnson & Johnson, and 1Password use Supabase to manage their applications securely. 30% of the last Y Combinator batch use Supabase to launch their start ups.
 
-<Quote img="pwc.png" caption="Matthieu, Tech Lead. PWC France">
-  “Supabase has been great to develop applications. As a firm focused on security, we've been happy to work with Row Level Security Policies to secure database operations
-</Quote>
+> *“Supabase has been great to develop applications. As a firm focused on security, we've been happy to work with Row Level Security Policies to secure database operations."*
+> 
+> Matthieu, Tech Lead. PWC France
 `,
   },
   openSourceSection: {
@@ -107,13 +105,13 @@ We're committed to our free tier - we know the importance of this for testing ho
     content: `
 Our tagline is “Build in a weekend, scale to millions”. This isn't hyperbole. In the past, reaching 1 million users was an incredible challenge. It took Instagram 2.5 months, Facebook 10 months, and Twitter 24 months.
 
-In the past year, we've had 11 companies build with Supabase and grow from zero to over 1 million users. 
+In the past year, we've had 11 companies start on Supabase and grow from zero to over 1 million users. 
 
 ![top user growth over time by days after launch](/images/ga/project-user-growth--dark.svg?v=3)
 
 Most of these were AI companies, like Udio, Krea, Humata, Chatbase, Pika, Quivr, Mendable, Markprompt and [MDN search](https://developer.mozilla.org/en-US/blog/introducing-ai-help/) by Mozilla.
 
-Postgres has been instrumental in our scalability and adoption. It's versatility is best demonstrated by pgvector. We were the fist cloud provider to offer it, and today 15% of all new Supabase projects use pgvector for AI and ML workloads. 
+Postgres has been instrumental in our scalability and adoption. It's versatility is best demonstrated by pgvector: we were the fist cloud provider to offer it, and today 15% of all new Supabase projects use pgvector for AI and ML workloads. Look out for a few related announcements this week.
 `,
   },
   enterpriseSection: {
@@ -139,9 +137,9 @@ The Supabase community doesn't exist in isolation. It’s part of a group of dev
 
 We've [teamed up with Fly](/blog/postgres-on-fly-by-supabase) to bring Postgres to developers across the world. (More on this later this week).
 
-Cloudflare recently announced the Supabase integration for [Workers](https://developers.cloudflare.com/workers/databases/native-integrations/supabase/) and [Hyperdrive](https://developers.cloudflare.com/hyperdrive/examples/supabase/). 
-
 Vercel users can use the [Supabase integration](https://vercel.com/integrations/supabase) to connect Supabase to their Next.js projects, and we have deep integrations with [Flutterflow](https://docs.flutterflow.io/data-and-backend/supabase), [Resend](https://resend.com/blog/how-to-configure-supabase-to-send-emails-from-your-domain), and [Twilio](https://www.twilio.com/en-us/blog/send-sms-notifications-supabase-users-node-js-twilio-messaging).
+
+Cloudflare recently announced the Supabase integration for [Workers](https://developers.cloudflare.com/workers/databases/native-integrations/supabase/) and [Hyperdrive](https://developers.cloudflare.com/hyperdrive/examples/supabase/). 
 
 Developers have different preferences on how to connect to their database, and Supabase is ["just Postgres"](https://itsjustpostgres.com/) you can connect natively with [Prisma](https://www.prisma.io/docs/orm/overview/databases/supabase), [Drizzle](https://orm.drizzle.team/docs/get-started-postgresql#supabase), or [Kysely](https://github.com/kysely-org/kysely-supabase).
 
@@ -155,7 +153,7 @@ You can find the [full list of partners and integrations](https://supabase.com/p
     content: `
 In addition to General Availability, we also have several other major announcements to make today.
 
-THe Supabase [Index Advisor](https://github.com/supabase/index_advisor) is now available inside Supabase Studio. As its name suggests, this will analyze your database and make recommendations to add or remove table indexes. This is just the beginning of our plan to make automated data analysis tooling available to all developers.
+The Supabase [Index Advisor](https://github.com/supabase/index_advisor) is now available inside Supabase Studio. As its name suggests, this will analyze your database and make recommendations to add or remove table indexes. This is just the beginning of our plan to make automated data analysis tooling available to all developers.
 
 [Supabase Branching](https://supabase.com/blog/branching-publicly-available) works like Git branches. You can create and test database changes or try out features in a separate, temporary instance without affecting your production setup. Today Branching enters public availability. 
 
