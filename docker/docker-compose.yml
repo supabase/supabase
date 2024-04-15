@@ -10,7 +10,7 @@ version: "3.8"
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20240326-5e5586d
+    image: supabase/studio:20240408-6bf3b81
     restart: unless-stopped
     healthcheck:
       test:
@@ -76,7 +76,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.143.0
+    image: supabase/gotrue:v2.145.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -274,7 +274,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.41.2
+    image: supabase/edge-runtime:v1.41.3
     restart: unless-stopped
     depends_on:
       analytics:

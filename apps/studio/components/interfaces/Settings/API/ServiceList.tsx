@@ -169,7 +169,7 @@ const ServiceList = () => {
             <JWTSettings />
           </section>
 
-          <section id="postgrest-config">
+          <section>
             <PostgrestConfig />
           </section>
         </>
