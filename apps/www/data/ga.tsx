@@ -56,7 +56,7 @@ Whether you're an indie hacker or a Fortune 500 company, Supabase can now scale 
   openSourceSection: {
     id: 'open-source',
     title: 'Open Source & Community',
-    paragraph: '05',
+    paragraph: '02',
     content: `
 Our community is the driving force behind the development and adoption of Supabase. 
 
@@ -74,7 +74,7 @@ We're committed to our free tier - we know the importance of this for testing ho
   scaleSection: {
     id: 'scale',
     title: 'Build in a weekend, scale to millions',
-    paragraph: '05',
+    paragraph: '03',
     content: `
 Our tagline is “Build in a weekend, scale to millions”. This isn't hyperbole. In the past, reaching 1 million users was an incredible challenge. It took Instagram 2.5 months, Facebook 10 months, and Twitter 24 months.
 
@@ -90,7 +90,7 @@ Postgres has been instrumental in our scalability and adoption. It's versatility
   enterpriseSection: {
     id: 'enterprise',
     title: 'Enterprise',
-    paragraph: '08',
+    paragraph: '04',
     content: `
 Supabase can now scale comfortably to any workload. Companies such as 1Password, PWC, & Johnson & Johnson are now running Supabase in production.
 
@@ -104,7 +104,7 @@ We'll continue to expand the Supabase Enterprise offering to include more deploy
   integrationsSection: {
     id: 'partners',
     title: 'Our partners',
-    paragraph: '07',
+    paragraph: '05',
     content: `
 The Supabase community could not exist in isolation, it’s part of a group of developer focussed companies and communities who are constantly pushing the boundaries of developer experience and developer productivity.
 
@@ -120,7 +120,7 @@ You can find the full list of Supabase [partners and integrations here](https://
   newSection: {
     id: 'whats-new',
     title: "What's new?",
-    paragraph: '10',
+    paragraph: '06',
     content: `
 In addition to General Availability, we also have several other major announcements to make today.
 
@@ -139,7 +139,7 @@ The goal of Supabase is to become the default backend for all kinds of developer
   nextSection: {
     id: 'whats-next',
     title: "What's next?",
-    paragraph: '10',
+    paragraph: '07',
     content: `
 One of our key metrics at Supabase is "Time to Value". How fast can a user go from idea to production? We'll never stop pushing on what's possible here.
 
