@@ -27,14 +27,6 @@ const LW11Day1 = ({
       id={day.isToday ? 'today' : undefined}
       className="flex h-full scroll-mt-10 flex-col gap-4 items-between"
     >
-      {/* <div
-          className={cn(
-            'text-sm inline uppercase font-mono text-foreground-muted tracking-[0.1rem]',
-            day.shipped && 'text-foreground'
-          )}
-        >
-          {day.dd}, {day.date}
-        </div> */}
       <div className="md:max-w-xs flex flex-col gap-4">
         <ExpandableVideo
           videoId={day.videoId ?? ''}
@@ -42,7 +34,6 @@ const LW11Day1 = ({
           imgOverlayText="Watch announcement"
           priority
         />
-        {/* <p className="text-sm text-foreground">Supabase is ready for production use.</p> */}
       </div>
       {!!day.links && (
         <ul className="flex-1 h-full w-full justify-end xs:grid grid-cols-2 lg:grid-cols-3 flex flex-col gap-1">
