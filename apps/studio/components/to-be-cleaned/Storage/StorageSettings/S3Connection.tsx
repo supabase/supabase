@@ -1,10 +1,17 @@
-import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { FormHeader } from 'components/ui/Forms'
-import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
-import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
+import { differenceInDays } from 'date-fns'
 import React from 'react'
 import toast from 'react-hot-toast'
+
+import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import Table from 'components/to-be-cleaned/Table'
+import CopyButton from 'components/ui/CopyButton'
+import { FormHeader } from 'components/ui/Forms'
+import Panel from 'components/ui/Panel'
+import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
+import { useS3AccessKeyDeleteMutation } from 'data/storage/s3-access-key-delete-mutation'
+import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import {
   Button,
   Dialog,
@@ -20,15 +27,8 @@ import {
   IconTrash,
   cn,
 } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
-
-import Table from 'components/to-be-cleaned/Table'
-import Panel from 'components/ui/Panel'
-import { useS3AccessKeyDeleteMutation } from 'data/storage/s3-access-key-delete-mutation'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import CopyButton from 'components/ui/CopyButton'
-import { differenceInDays } from 'date-fns'
-import { useProjectApiQuery } from 'data/config/project-api-query'
+import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export const S3Connection = () => {
@@ -76,7 +76,7 @@ export const S3Connection = () => {
           description="Connect to your bucket via the S3 protocol."
           docsUrl="https://supabase.com/docs/guides/storage/s3/authentication"
         />
-        <Panel className="grid gap-4 p-4">
+        <Panel className="grid gap-4 p-4 !mb-0">
           <FormItemLayout layout="horizontal" label="Endpoint" isReactForm={false}>
             <Input readOnly copy disabled value={s3connectionUrl} />
           </FormItemLayout>
@@ -89,160 +89,160 @@ export const S3Connection = () => {
           )}
         </Panel>
       </div>
-      <div className="flex justify-between items-end mt-8">
+
+      <div>
         <FormHeader
-          className="!mb-0"
           title="S3 Credentials"
           description="Manage your S3 credentials for this project."
+          actions={
+            <Dialog
+              open={openCreateCred}
+              onOpenChange={(open) => {
+                setOpenCreateCred(open)
+                if (!open) setShowSuccess(false)
+              }}
+            >
+              <DialogTrigger asChild>
+                <Button type="outline">New credential</Button>
+              </DialogTrigger>
+
+              <DialogContent
+                className="p-4"
+                onInteractOutside={(e) => {
+                  if (showSuccess) {
+                    e.preventDefault()
+                  }
+                }}
+              >
+                {showSuccess ? (
+                  <>
+                    <DialogTitle>Save your new S3 access keys</DialogTitle>
+                    <DialogDescription>
+                      You won't be able to see them again. If you lose these credentials, you'll
+                      need to create a new ones.
+                    </DialogDescription>
+
+                    <FormItemLayout label="Access key id" isReactForm={false}>
+                      <Input
+                        className="input-mono"
+                        readOnly
+                        copy
+                        disabled
+                        value={createS3AccessKey.data?.data?.access_key}
+                      />
+                    </FormItemLayout>
+                    <FormItemLayout label={'Secret access key'} isReactForm={false}>
+                      <Input
+                        className="input-mono"
+                        readOnly
+                        copy
+                        disabled
+                        value={createS3AccessKey.data?.data?.secret_key}
+                      />
+                    </FormItemLayout>
+                    <div className="flex justify-end">
+                      <Button
+                        className="mt-4"
+                        onClick={() => {
+                          setOpenCreateCred(false)
+                          setShowSuccess(false)
+                        }}
+                      >
+                        Done
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <DialogTitle>Create new S3 access keys</DialogTitle>
+                    <form
+                      onSubmit={async (e) => {
+                        e.preventDefault()
+
+                        const formData = new FormData(e.target as HTMLFormElement)
+                        const description = formData.get('description') as string
+
+                        await createS3AccessKey.mutateAsync({ description })
+                        setShowSuccess(true)
+                      }}
+                    >
+                      <FormItemLayout label="Description" isReactForm={false}>
+                        <Input
+                          autoComplete="off"
+                          placeholder="My test key"
+                          type="text"
+                          name="description"
+                          required
+                        />
+                      </FormItemLayout>
+
+                      <div className="flex justify-end">
+                        <Button
+                          className="mt-4"
+                          htmlType="submit"
+                          loading={createS3AccessKey.isLoading}
+                        >
+                          Create credential
+                        </Button>
+                      </div>
+                    </form>
+                  </>
+                )}
+              </DialogContent>
+            </Dialog>
+          }
         />
 
-        <Dialog
-          open={openCreateCred}
-          onOpenChange={(open) => {
-            setOpenCreateCred(open)
-            if (!open) setShowSuccess(false)
-          }}
+        <div
+          className={cn([
+            'bg-surface-100',
+            'overflow-hidden border-muted',
+            'rounded-md border shadow',
+          ])}
         >
-          <DialogTrigger asChild>
-            <Button type="outline">New credential</Button>
-          </DialogTrigger>
-
-          <DialogContent
-            className="p-4"
-            onInteractOutside={(e) => {
-              if (showSuccess) {
-                e.preventDefault()
-              }
-            }}
-          >
-            {showSuccess ? (
-              <>
-                <DialogTitle>Save your new S3 access keys</DialogTitle>
-                <DialogDescription>
-                  You won't be able to see them again. If you lose these credentials, you'll need to
-                  create a new ones.
-                </DialogDescription>
-
-                <FormItemLayout label="Access key id" isReactForm={false}>
-                  <Input
-                    className="input-mono"
-                    readOnly
-                    copy
-                    disabled
-                    value={createS3AccessKey.data?.data?.access_key}
-                  />
-                </FormItemLayout>
-                <FormItemLayout label={'Secret access key'} isReactForm={false}>
-                  <Input
-                    className="input-mono"
-                    readOnly
-                    copy
-                    disabled
-                    value={createS3AccessKey.data?.data?.secret_key}
-                  />
-                </FormItemLayout>
-                <div className="flex justify-end">
-                  <Button
-                    className="mt-4"
-                    onClick={() => {
-                      setOpenCreateCred(false)
-                      setShowSuccess(false)
-                    }}
-                  >
-                    Done
-                  </Button>
-                </div>
-              </>
-            ) : (
-              <>
-                <DialogTitle>Create new S3 access keys</DialogTitle>
-                <form
-                  onSubmit={async (e) => {
-                    e.preventDefault()
-
-                    const formData = new FormData(e.target as HTMLFormElement)
-                    const description = formData.get('description') as string
-
-                    await createS3AccessKey.mutateAsync({ description })
-                    setShowSuccess(true)
-                  }}
-                >
-                  <FormItemLayout label="Description" isReactForm={false}>
-                    <Input
-                      autoComplete="off"
-                      placeholder="My test key"
-                      type="text"
-                      name="description"
-                      required
-                    />
-                  </FormItemLayout>
-
-                  <div className="flex justify-end">
-                    <Button
-                      className="mt-4"
-                      htmlType="submit"
-                      loading={createS3AccessKey.isLoading}
-                    >
-                      Create credential
-                    </Button>
-                  </div>
-                </form>
-              </>
-            )}
-          </DialogContent>
-        </Dialog>
-      </div>
-
-      <div
-        className={cn([
-          'bg-surface-100',
-          'overflow-hidden border-muted',
-          'rounded-md border shadow mt-6',
-        ])}
-      >
-        {storageCredsQuery.isLoading ? (
-          <div className="p-4">
-            <GenericSkeletonLoader />
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <Table
-              className=""
-              head={[
-                <Table.th key="">Description</Table.th>,
-                <Table.th key="">Access key id</Table.th>,
-                <Table.th key="">Created at</Table.th>,
-                <Table.th key="actions" />,
-              ]}
-              body={
-                hasStorageCreds ? (
-                  storageCreds.data?.map((cred: any) => (
-                    <StorageCredItem
-                      key={cred.id}
-                      created_at={cred.created_at}
-                      access_key={cred.access_key}
-                      description={cred.description}
-                      id={cred.id}
-                      onDeleteClick={() => {
-                        setDeleteCredId(cred.id)
-                        setOpenDeleteDialog(true)
-                      }}
-                    />
-                  ))
-                ) : (
-                  <Table.tr>
-                    <Table.td colSpan={4}>
-                      <p className="text-sm text-foreground">No credentials created</p>
-                      <p className="text-sm text-foreground-light">
-                        There are no credentials associated with your project yet
-                      </p>
-                    </Table.td>
-                  </Table.tr>
-                )
-              }
-            />
-          </div>
-        )}
+          {storageCredsQuery.isLoading ? (
+            <div className="p-4">
+              <GenericSkeletonLoader />
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <Table
+                head={[
+                  <Table.th key="">Description</Table.th>,
+                  <Table.th key="">Access key id</Table.th>,
+                  <Table.th key="">Created at</Table.th>,
+                  <Table.th key="actions" />,
+                ]}
+                body={
+                  hasStorageCreds ? (
+                    storageCreds.data?.map((cred: any) => (
+                      <StorageCredItem
+                        key={cred.id}
+                        created_at={cred.created_at}
+                        access_key={cred.access_key}
+                        description={cred.description}
+                        id={cred.id}
+                        onDeleteClick={() => {
+                          setDeleteCredId(cred.id)
+                          setOpenDeleteDialog(true)
+                        }}
+                      />
+                    ))
+                  ) : (
+                    <Table.tr>
+                      <Table.td colSpan={4}>
+                        <p className="text-sm text-foreground">No credentials created</p>
+                        <p className="text-sm text-foreground-light">
+                          There are no credentials associated with your project yet
+                        </p>
+                      </Table.td>
+                    </Table.tr>
+                  )
+                }
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
