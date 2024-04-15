@@ -2,8 +2,8 @@
 title: 'Supabase Bootstrap: the fastest way to launch a Supabase project'
 description: 'Launch a new hosted Supabase project directly from the CLI using pre-built applications.'
 author: qiao,thor_schaeff
-image: launch-week-11/bootstrap/og.png
-thumb: launch-week-11/bootstrap/thumb.png
+image: ga-week/bootstrap/og.png
+thumb: ga-week/bootstrap/thumb.png
 categories:
   - product
 tags:
@@ -30,7 +30,7 @@ From any local directory, run `supabase bootstrap` and you will be prompted to c
 - NPM: `npx supabase@latest bootstrap`
 - Bun: `bunx` `supabase@latest bootstrap`
 
-![Screenshot 2024-04-03 at 2.07.21 PM.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/2fa83736-9668-42e6-b082-3321f99c2834/Screenshot_2024-04-03_at_2.07.21_PM.png)
+![Bootstrap getting started](/images/blog/ga-week/bootstrap/getting-started.jpg)
 
 ## How templates work
 
@@ -57,7 +57,7 @@ This model is very similar to the popular [shadcn](https://ui.shadcn.com/) workf
 
 During the `supabase bootstrap` process, a new project will be created on the Supabase platform and linked to your local environment. This command will run you through the account creation flow if you don't already have one.
 
-![Screenshot 2024-04-03 at 2.07.39 PM.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/aa0b055a-8ea5-4319-a4b2-a2899a943a07/Screenshot_2024-04-03_at_2.07.39_PM.png)
+![Bootstrap getting started](/images/blog/ga-week/bootstrap/deploying-to-production.jpg)
 
 <Admonition type="note" label="Some patience required">
 
@@ -67,7 +67,7 @@ Linking to your new hosted project may take a short while as it needs to spin up
 
 Once the linking is completed, you will be prompted to push any template migration files to your new hosted project. These migration files will setup your remote database with the necessary schemas to support the starter application.
 
-![Screenshot 2024-04-03 at 2.12.17 PM.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/ee0c34ef-f7d2-411c-9245-9afa116706df/Screenshot_2024-04-03_at_2.12.17_PM.png)
+![Bootstrap getting started](/images/blog/ga-week/bootstrap/deploying-to-production-2.jpg)
 
 After pushing the migrations, your project credentials will be exported to a `.env` file for you to connect from any frontend or backend code. The default environment variables include:
 
@@ -88,7 +88,7 @@ It is important to store these credentials securely as anyone can connect to you
 
 Finally, the CLI will suggest a `start` command to launch your application locally. Starting the local app will use credentials defined in `.env` file to connect to your new hosted project.
 
-![Screenshot 2024-04-03 at 2.16.30 PM.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/2aeb3a5d-8a3d-4aa5-8fe1-28e7eff54796/Screenshot_2024-04-03_at_2.16.30_PM.png)
+![Bootstrap getting started](/images/blog/ga-week/bootstrap/start-developing.jpg)
 
 ## Template library
 
