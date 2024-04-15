@@ -74,6 +74,7 @@ export const S3Connection = () => {
         <FormHeader
           title="S3 Connection"
           description="Connect to your bucket via the S3 protocol."
+          docsUrl="https://supabase.com/docs/guides/storage/s3/authentication"
         />
         <Panel className="grid gap-4 p-4">
           <FormItemLayout layout="horizontal" label="Endpoint" isReactForm={false}>
