@@ -17,3 +17,16 @@ export const subscriptionHasHipaaAddon = (subscription?: OrgSubscription): boole
     (addon) => addon.supabase_prod_id === 'addon_security_hipaa'
   )
 }
+
+export const billingPartnerLabel = (billingPartner?: string) => {
+  if (!billingPartner) return billingPartner
+
+  switch (billingPartner) {
+    case 'fly':
+      return 'Fly.io'
+    case 'aws':
+      return 'AWS'
+    default:
+      return billingPartner
+  }
+}
