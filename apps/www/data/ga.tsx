@@ -135,7 +135,7 @@ We'll continue to expand the Supabase Enterprise offering to include more deploy
     title: 'Our partners',
     paragraph: '05',
     content: `
-The Supabase community could not exist in isolation, it’s part of a group of developer focussed companies and communities who are constantly pushing the boundaries of developer experience and developer productivity.
+The Supabase community doesn't exist in isolation. It’s part of a group of developer focused companies and communities who are constantly pushing the boundaries of developer experience and developer productivity.
 
 Cloudflare recently announced the Supabase integration for [Workers](https://developers.cloudflare.com/workers/databases/native-integrations/supabase/) and [Hyperdrive](https://developers.cloudflare.com/hyperdrive/examples/supabase/). 
 
