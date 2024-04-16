@@ -3,7 +3,6 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button, cn } from 'ui'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import announcement from '../../layout/banners/data/Announcement.json'
 import { useTheme } from 'next-themes'
 
 const LW11BGDark =
@@ -41,15 +40,15 @@ const PromoToast = () => {
       )}
     >
       <div className="relative z-10 text-foreground-lighter flex flex-col text-sm w-full mb-2">
-        <p className="relative z-10 text-foreground flex flex-col text-lg w-full leading-6 mb-1">
+        <p className="text-foreground flex flex-col text-lg w-full leading-6 mb-1">
           General Availability Week
         </p>
-        <span className="uppercase font-mono">Day 1</span>
+        <span className="uppercase font-mono">Day 2</span>
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
         <Button asChild type="secondary">
-          <Link target="_blank" rel="noreferrer" href="https://supabase.com/ga-week">
+          <Link target="_blank" rel="noreferrer" href="https://supabase.com/ga-week#day-2">
             Learn more
           </Link>
         </Button>
