@@ -1188,6 +1188,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/examples/og-image',
         },
         {
+          name: 'Building a Smenatic Search Engine',
+          url: '/guides/functions/examples/semantic-search',
+        },
+        {
           name: 'CAPTCHA support with Cloudflare Turnstile',
           url: '/guides/functions/examples/cloudflare-turnstile',
         },
