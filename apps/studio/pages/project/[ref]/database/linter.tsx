@@ -299,7 +299,6 @@ const ProjectLints: NextPageWithLayout = () => {
             }}
             renderers={{
               renderRow(idx, props) {
-                console.log({ props })
                 return (
                   <Row
                     {...props}
@@ -308,11 +307,6 @@ const ProjectLints: NextPageWithLayout = () => {
                         setSelectedRow(idx)
                         setSelectedLint(props.row)
                         gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
-
-                        // const selectedLint = activeLints[idx]['query']
-                        // if (!(selectedLint ?? '').trim().toLowerCase().startsWith('select')) {
-                        //   setView('details')
-                        // }
                       }
                     }}
                   />
@@ -326,9 +320,9 @@ const ProjectLints: NextPageWithLayout = () => {
                 <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
                   <TextSearch className="text-foreground-muted" strokeWidth={1} />
                   <div className="text-center">
-                    <p className="text-foreground">No queries detected</p>
+                    <p className="text-foreground">No issues detected</p>
                     <p className="text-foreground-light">
-                      There are no actively running queries that match the criteria
+                      There are suggestions available for this database
                     </p>
                   </div>
                 </div>
@@ -453,60 +447,7 @@ const ProjectLints: NextPageWithLayout = () => {
           />
         </div>
       </div>
-      <div className="col-span-12 hidden remove-me-when-finished">
-        {/* <Table
-          head={[
-            <Table.th key="level" className="py-2">
-              Level
-            </Table.th>,
-            <Table.th key="header-type" className="py-2">
-              Problem
-            </Table.th>,
-            <Table.th key="header-expand" className="py-2 text-right"></Table.th>,
-          ]}
-          body={[
-            <Table.tr key="loader">
-              <Table.td colSpan={12} className="!p-0">
-                <LoadingLine loading={isLoading || isRefetching} />
-              </Table.td>
-            </Table.tr>,
-            ...(activeLints.length === 0
-              ? [
-                  <Table.tr key="empty-state">
-                    <Table.td colSpan={6} className="p-3 py-12">
-                      {isLoading ? (
-                        <div className="flex items-center gap-x-2">
-                          <Loader className="animate-spin" size={12} />
-                          <p className="text-foreground-light">Checking database for issues...</p>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-x-2">
-                          <Check size={12} />
-                          <p className="text-foreground-light">
-                            No issues have been found for this database
-                          </p>
-                        </div>
-                      )}
-                    </Table.td>
-                  </Table.tr>,
-                ]
-              // : (filters.levels.length > 0 || filters.types.length > 0) &&
-              //     filteredLints.length === 0
-              //   ? [
-              //       <Table.tr key="empty-state">
-              //         <Table.td colSpan={6} className="p-3 py-12">
-              //           <p className="text-foreground-light">
-              //             No problems found based on the selected filters
-              //           </p>
-              //         </Table.td>
-              //       </Table.tr>,
-              //     ]
-              //   : filteredLints.map((lint) => {
-              //       return <ReportLintsTableRow key={lint.cache_key} lint={lint} />
-              //     })),
-          ]}
-        /> */}
-      </div>
+      <div className="col-span-12 hidden remove-me-when-finished"></div>
     </div>
   )
 }
