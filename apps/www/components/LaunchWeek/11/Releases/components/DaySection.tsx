@@ -30,7 +30,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
         <div
           className={cn(
             'text-sm inline uppercase font-mono dark:text-foreground-muted tracking-[0.1rem]',
-            day.shipped && 'text-foreground'
+            day.shipped && '!text-foreground'
           )}
         >
           {day.dd}, {day.date}

@@ -126,6 +126,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Tue',
     title: '',
     shipped: true,
+    isToday: true,
     hasCountdown: false,
     blog: '/blog/ai-inference-now-available-in-supabase-edge-functions',
     date: '16 April',
