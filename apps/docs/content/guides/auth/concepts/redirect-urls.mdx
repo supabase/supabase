@@ -76,6 +76,22 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 })
 ```
 
+## Email templates when using `redirectTo`
+
+When using a `redirectTo` option, you may need to replace the `{{ .SiteURL }}` with `{{ .RedirectTo }}` in your email templates. See the [Email Templates guide](/docs/guides/auth/auth-email-templates) for more information.
+
+For example, change the following:
+
+```html
+<!-- Old -->
+<a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup">Confirm your mail</a>
+
+<!-- New -->
+<a href="{{ .RedirectTo }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup"
+  >Confirm your mail</a
+>
+```
+
 ## Mobile deep linking URIs
 
 For mobile applications you can use deep linking URIs. For example, for your `SITE_URL` you can specify something like `com.supabase://login-callback/` and for additional redirect URLs something like `com.supabase.staging://login-callback/` if needed.
