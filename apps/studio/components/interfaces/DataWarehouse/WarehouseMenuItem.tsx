@@ -76,7 +76,13 @@ export const WarehouseMenuItem = ({ item }: Props) => {
               icon={<IconChevronDown size="tiny" strokeWidth={2} />}
             />
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-52 *:space-x-2">
+          <DropdownMenuContent
+            onClick={(e) => {
+              e.stopPropagation()
+            }}
+            align="start"
+            className="w-52 *:space-x-2"
+          >
             <DropdownMenuItem
               onClick={() => {
                 setShowUpdateDialog(true)
