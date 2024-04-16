@@ -154,6 +154,8 @@ Deno.serve(async (req: Request) => {
 })
 ```
 
+Check out the full guide [here](https://supabase.com/docs/guides/functions/ai-models#using-large-language-models).
+
 ### Technical architecture
 
 LLM models are challenging to run directly via ONNX runtime on CPU. For these, we are using a GPU-accelerated [Ollama](https://ollama.com/) server under the hood:
