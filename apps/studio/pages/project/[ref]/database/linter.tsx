@@ -1,4 +1,4 @@
-import { Eye, MessageSquareMore, Table2, TextSearch, X } from 'lucide-react'
+import { Box, Eye, MessageSquareMore, RefreshCcw, Table2, TextSearch, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
@@ -32,7 +32,11 @@ import { GenericSkeletonLoader } from 'ui-patterns'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import ReactMarkdown from 'react-markdown'
 import { Markdown } from '../../../../components/interfaces/Markdown'
-import { LintCTA } from '../../../../components/interfaces/Reports/ReportLints.utils'
+import {
+  LintCTA,
+  entityTypeIcon,
+} from '../../../../components/interfaces/Reports/ReportLints.utils'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -61,9 +65,10 @@ const ProjectLints: NextPageWithLayout = () => {
   })
 
   const activeLints = data || []
+
   const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
     []) as string[]
-
+  console.log({ activeLints })
   const filteredLints = activeLints
     .filter((x) => x.level === currentTab)
     .filter((x) => (currentTabFilters.length > 0 ? currentTabFilters.includes(x.name) : x))
@@ -83,20 +88,30 @@ const ProjectLints: NextPageWithLayout = () => {
     }))
 
   const updateFilters = (level: any, newFilters: any) => {
-    console.log('zans', 'newFilters', newFilters, 'filters', filters)
-    setFilters((prevFilters) => {
-      // Map over the previous filters array
-      return prevFilters.map((filter) => {
-        // If the filter level matches the desired level, update its filters
-        if (filter.level === level) {
-          return { ...filter, filters: newFilters }
-        } else {
-          // Otherwise, return the filter unchanged
-          return filter
-        }
-      })
-    })
+    console.log('newFilters', newFilters, 'filters', filters)
+    // setFilters((prevFilters) => {
+    //   return prevFilters.map((filter) => {
+    //     // If the filter level matches the desired level, update its filters
+    //     if (filter.level === level) {
+    //       return { ...filter, filters: newFilters }
+    //     } else {
+    //       return filter
+    //     }
+    //   })
+    // })
   }
+
+  const lintCountLabel = (count: number, label: string) => (
+    <>
+      {isLoading ? (
+        <ShimmeringLoader className="w-32 pt-1" />
+      ) : (
+        <>
+          {count} {label}
+        </>
+      )}
+    </>
+  )
 
   const LINTER_TABS = [
     {
@@ -121,11 +136,11 @@ const ProjectLints: NextPageWithLayout = () => {
       id: 'name',
       name: 'Issue type',
       description: undefined,
-      minWidth: 200,
+      minWidth: 240,
       value: (row: any) => (
         <div className="flex items-center gap-1.5">
           {lintInfoMap.find((item) => row.name === item.name)?.icon}
-          {<h3 className="text-sm">{lintInfoMap.find((item) => row.name === item.name)?.title}</h3>}
+          {<h3 className="text-xs">{lintInfoMap.find((item) => row.name === item.name)?.title}</h3>}
         </div>
       ),
     },
@@ -135,9 +150,8 @@ const ProjectLints: NextPageWithLayout = () => {
       description: undefined,
       minWidth: 230,
       value: (row: any) => (
-        <div className="flex items-center gap-1">
-          {row.metadata?.type === 'table' && <Table2 size={15} strokeWidth={1} />}
-          {row.metadata?.type === 'view' && <Eye size={15} strokeWidth={1.5} />}{' '}
+        <div className="flex items-center gap-1 text-xs">
+          <span className="shrink-0">{entityTypeIcon(row.metadata?.type)}</span>
           {`${row.metadata.schema}.${row.metadata.name}`}
         </div>
       ),
@@ -147,7 +161,7 @@ const ProjectLints: NextPageWithLayout = () => {
       name: 'Description',
       description: undefined,
       minWidth: 400,
-      value: (row: any) => row.description,
+      value: (row: any) => <ReactMarkdown className="text-xs">{row.description}</ReactMarkdown>,
     },
   ]
   console.log(filteredLints)
@@ -186,17 +200,18 @@ const ProjectLints: NextPageWithLayout = () => {
     return result
   })
   return (
-    <div className="relative">
+    <div className="h-full flex flex-col">
       <FormHeader
         className="py-4 px-6 !mb-0"
         title="Suggestions"
-        docsUrl="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
+        docsUrl="https://supabase.github.io/splinter/"
       />
       <Tabs_Shadcn_
         defaultValue={currentTab}
         onValueChange={(value) => {
           setCurrentTab(value as LINTER_LEVELS)
           setSelectedLint(null)
+          setSelectedRow(undefined)
           const { sort, search, ...rest } = router.query
           router.push({ ...router, query: { ...rest, preset: value } })
         }}
@@ -244,9 +259,9 @@ const ProjectLints: NextPageWithLayout = () => {
               </div>
 
               <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
-                {tab.id === LINTER_LEVELS.ERROR && `${errorLintsCount} errors`}
-                {tab.id === LINTER_LEVELS.WARN && `${warnLintsCount} warnings`}
-                {tab.id === LINTER_LEVELS.INFO && `${infoLintsCount} suggestions`}
+                {tab.id === LINTER_LEVELS.ERROR && lintCountLabel(errorLintsCount, 'errors')}
+                {tab.id === LINTER_LEVELS.WARN && lintCountLabel(warnLintsCount, 'warnings')}
+                {tab.id === LINTER_LEVELS.INFO && lintCountLabel(infoLintsCount, 'suggestions')}
               </span>
 
               {tab.id === currentTab && (
@@ -273,11 +288,11 @@ const ProjectLints: NextPageWithLayout = () => {
       <div className="col-span-12 flex items-center justify-between">
         <div className="flex items-center gap-x-4"></div>
       </div>
-      <LoadingLine loading={isLoading || isRefetching} />
+      <LoadingLine loading={isRefetching} />
       <ResizablePanelGroup
         direction="horizontal"
         className="relative flex flex-grow bg-alternative min-h-0"
-        autoSaveId="query-performance-layout-v1"
+        autoSaveId="linter-layout-v1"
       >
         <ResizablePanel defaultSize={1}>
           <DataGrid
@@ -322,7 +337,7 @@ const ProjectLints: NextPageWithLayout = () => {
                   <div className="text-center">
                     <p className="text-foreground">No issues detected</p>
                     <p className="text-foreground-light">
-                      There are suggestions available for this database
+                      Congrats! There are no suggestions available for this database
                     </p>
                   </div>
                 </div>
@@ -343,7 +358,10 @@ const ProjectLints: NextPageWithLayout = () => {
                 type="text"
                 className="absolute top-3 right-3 px-1"
                 icon={<X size={14} />}
-                onClick={() => setSelectedLint(null)}
+                onClick={() => {
+                  setSelectedLint(null)
+                  setSelectedRow(undefined)
+                }}
               />
               <Tabs_Shadcn_
                 value={view}
@@ -359,14 +377,6 @@ const ProjectLints: NextPageWithLayout = () => {
                   >
                     Overview
                   </TabsTrigger_Shadcn_>
-                  {/* {showIndexSuggestions && (
-                        <TabsTrigger_Shadcn_
-                          value="suggestion"
-                          className="px-0 pb-0 h-full text-xs data-[state=active]:bg-transparent !shadow-none"
-                        >
-                          Autofix
-                        </TabsTrigger_Shadcn_>
-                      )} */}
                 </TabsList_Shadcn_>
                 <TabsContent_Shadcn_
                   value="details"
@@ -422,7 +432,7 @@ const ProjectLints: NextPageWithLayout = () => {
           </>
         )}
       </ResizablePanelGroup>
-      <div className="px-6 py-6 flex gap-x-4 border-t">
+      <div className="px-6 py-6 flex gap-x-4 border-t ">
         <div className="w-[35%] flex flex-col gap-y-1 text-sm">
           <p>Reset suggestions</p>
           <p className="text-xs text-foreground-light">

@@ -1,5 +1,5 @@
 import { LINT_TYPES, Lint } from 'data/lint/lint-query'
-import { AlertCircle, Book, Key, LinkIcon, Lock, Table2, User, Eye, Unlock } from 'lucide-react'
+import { AlertCircle, Box, Eye, Key, Lock, Table2, Unlock } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 
@@ -294,5 +294,16 @@ export const LintCTA = ({
     default:
       assertUnreachable(title)
       return <></>
+  }
+}
+
+export const entityTypeIcon = (type: string) => {
+  switch (type) {
+    case 'table':
+      return <Table2 size={15} strokeWidth={1} />
+    case 'view':
+      return <Eye size={15} strokeWidth={1.5} />
+    default:
+      return <Box size={15} strokeWidth={1.5} />
   }
 }
