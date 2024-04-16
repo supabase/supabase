@@ -18,7 +18,7 @@ const LW11Day1 = ({
   <section
     id={day.id}
     className={cn(
-      'lwx-nav-anchor border-b py-8 first:border-t dark:border-[#111718] dark:text-[#575E61] scroll-mt-16 grid grid-cols-1 gap-4 md:grid-cols-3',
+      'lwx-nav-anchor border-b py-8 first:border-t dark:border-[#111718] scroll-mt-16 grid grid-cols-1 gap-4 md:grid-cols-3',
       className
     )}
   >
@@ -49,7 +49,7 @@ const LW11Day1 = ({
     <div
       className={cn(
         `group relative overflow-hidden flex-1 flex col-span-2 
-          md:px-4 text-[#8B9092] text-2xl`,
+          md:px-4 text-2xl`,
         cardClassName
       )}
     >
@@ -82,13 +82,6 @@ const LW11Day1 = ({
               <ArrowRight className="w-4 ml-2 -mt-px opacity-0 -rotate-45 translate-y-1 -translate-x-1 text-foreground-light transition-all will-change-transform group-hover/step:opacity-100 group-hover/step:translate-y-0 group-hover/step:translate-x-0" />
             </div>
             <p className="text-foreground">{step.description}</p>
-            {/* <ul>
-                {step.links?.map((link) => (
-                  <li key={`${step.title}-${link.href}`}>
-                    <DayLink {...link} />
-                  </li>
-                ))}
-              </ul> */}
           </Link>
         ))}
       </div>

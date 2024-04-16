@@ -61,8 +61,10 @@ export const DeleteAccountButton = () => {
       subject: 'Account Deletion Request',
       message: 'I want to delete my account.',
       category: SupportCategories.PROBLEM,
-      severity: 'Medium',
+      severity: 'Low',
       allowSupportAccess: false,
+      verified: true,
+      projectRef: 'no-project',
     }
 
     submitSupportTicket(payload)
