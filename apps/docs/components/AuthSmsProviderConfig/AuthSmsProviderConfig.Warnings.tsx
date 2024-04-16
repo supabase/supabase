@@ -6,8 +6,8 @@ const CostWarning = () => (
     <p>
       SMS providers charge to send SMS messages. To keep costs under control, make sure you adjust
       your project&apos;s rate limits and{' '}
-      <Link href="/docs/guides/auth/auth-captcha">configure CAPTCHA</Link>. See the{' '}
-      <Link href="/docs/guides/platform/going-into-prod">Production Checklist</Link> to learn more.
+      <Link href="/guides/auth/auth-captcha">configure CAPTCHA</Link>. See the{' '}
+      <Link href="/guides/platform/going-into-prod">Production Checklist</Link> to learn more.
     </p>
     <p>
       Some countries have special regulations for services that send SMS messages to users, for
