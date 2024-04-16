@@ -3,15 +3,6 @@
  * Do not make direct changes to the file.
  */
 
-/** OneOf type helpers */
-type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never }
-type XOR<T, U> = T | U extends object ? (Without<T, U> & U) | (Without<U, T> & T) : T | U
-type OneOf<T extends any[]> = T extends [infer Only]
-  ? Only
-  : T extends [infer A, infer B, ...infer Rest]
-    ? OneOf<[XOR<A, B>, ...Rest]>
-    : never
-
 export interface paths {
   '/platform/notifications': {
     /** Get notifications */
@@ -44,6 +35,10 @@ export interface paths {
   '/platform/feedback/upgrade': {
     /** Send upgrade survey to survey_responses table */
     post: operations['SendUpgradeSurveyController_sendUpgradeSurvey']
+  }
+  '/platform/feedback/docs': {
+    /** Send feedback on docs */
+    post: operations['SendDocsFeedbackController_sendDocsFeedback']
   }
   '/platform/signup': {
     /** Sign up with email and password */
@@ -591,6 +586,50 @@ export interface paths {
     /** Gets project's usage api requests count */
     get: operations['UsageApiController_getApiRequestsCount']
   }
+  '/platform/projects/{ref}/analytics/warehouse/tenant': {
+    /** Gets project's warehouse tenant from logflare */
+    get: operations['TenantController_getTenant']
+  }
+  '/platform/projects/{ref}/analytics/warehouse/collections': {
+    /** Lists project's warehouse collections from logflare */
+    get: operations['CollectionController_listCollections']
+    /** Create a warehouse collection */
+    post: operations['CollectionController_createCollection']
+  }
+  '/platform/projects/{ref}/analytics/warehouse/collections/{token}': {
+    /** Get a warehouse collection */
+    get: operations['CollectionController_getCollection']
+    /** Delete a warehouse collection */
+    delete: operations['CollectionController_deleteCollection']
+    /** Update a warehouse collection */
+    patch: operations['CollectionController_updateCollection']
+  }
+  '/platform/projects/{ref}/analytics/warehouse/access-tokens': {
+    /** Lists project's warehouse access tokens from logflare */
+    get: operations['AccessTokenController_listAccessTokens']
+    /** Create a warehouse access token */
+    post: operations['AccessTokenController_createAccessToken']
+  }
+  '/platform/projects/{ref}/analytics/warehouse/access-tokens/{token}': {
+    /** Delete a warehouse access token */
+    delete: operations['AccessTokenController_deleteAccessToken']
+  }
+  '/platform/projects/{ref}/analytics/warehouse/endpoints': {
+    /** Lists project's warehouse endpoints from logflare */
+    get: operations['EndpointController_listEndpoints']
+    /** Create a warehouse endpoint */
+    post: operations['EndpointController_createEndpoint']
+  }
+  '/platform/projects/{ref}/analytics/warehouse/endpoints/{token}': {
+    /** Update a warehouse endpoint */
+    put: operations['EndpointController_updateEndpoint']
+    /** Delete a warehouse endpoint */
+    delete: operations['EndpointController_deleteEndpoint']
+  }
+  '/platform/projects/{ref}/analytics/warehouse/query': {
+    /** Lists project's warehouse queries from logflare */
+    get: operations['WarehouseQueryController_runQuery']
+  }
   '/platform/projects/{ref}/config/pgbouncer': {
     /** Gets project's pgbouncer config */
     get: operations['PgbouncerConfigController_getPgbouncerConfig']
@@ -706,6 +745,16 @@ export interface paths {
   '/platform/storage/{ref}/buckets/{id}/objects': {
     /** Deletes objects */
     delete: operations['StorageObjectsController_deleteObjects']
+  }
+  '/platform/storage/{ref}/credentials': {
+    /** Gets project storage credentials */
+    get: operations['StorageS3CredentialsController_getAllCredentials']
+    /** Creates project storage credential */
+    post: operations['StorageS3CredentialsController_createCredential']
+  }
+  '/platform/storage/{ref}/credentials/{id}': {
+    /** Deletes project storage credential */
+    delete: operations['StorageS3CredentialsController_deleteCredential']
   }
   '/platform/stripe/invoices': {
     /** Gets invoices for the given customer */
@@ -864,12 +913,24 @@ export interface paths {
     /** Reset JWT if leaked keys found by GitHub secret scanning */
     post: operations['GithubSecretAlertController_resetJwt']
   }
+  '/system/projects/{ref}/functions/{function_slug}': {
+    /**
+     * Update a function
+     * @description Updates a function with the specified slug and project.
+     */
+    patch: operations['SystemFunctionSlugController_updateFunction']
+  }
   '/system/projects/{ref}/functions': {
     /**
      * List all functions
      * @description Returns all functions you've previously added to the specified project.
      */
     get: operations['SystemFunctionsController_getFunctions']
+    /**
+     * Create a function
+     * @description Creates a function and adds it to the specified project.
+     */
+    post: operations['SystemFunctionsController_createFunction']
     /** Deletes all Edge Functions from a project */
     delete: operations['SystemFunctionsController_systemDeleteAllFunctions']
   }
@@ -943,6 +1004,10 @@ export interface paths {
   '/system/organizations/{slug}/restrictions': {
     /** Updates restriction status of an org */
     put: operations['OrgRestrictionsSystemController_updateRestriction']
+  }
+  '/system/partner-organizations': {
+    /** Creates a partner organization */
+    post: operations['AwsPartnerOrganizationsSystemController_createPartnerOrganization']
   }
   '/system/integrations/vercel/webhooks': {
     /** Processes Vercel event */
@@ -1357,6 +1422,50 @@ export interface paths {
     /** Gets project's usage api requests count */
     get: operations['UsageApiController_getApiRequestsCount']
   }
+  '/v0/projects/{ref}/analytics/warehouse/tenant': {
+    /** Gets project's warehouse tenant from logflare */
+    get: operations['TenantController_getTenant']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/collections': {
+    /** Lists project's warehouse collections from logflare */
+    get: operations['CollectionController_listCollections']
+    /** Create a warehouse collection */
+    post: operations['CollectionController_createCollection']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/collections/{token}': {
+    /** Get a warehouse collection */
+    get: operations['CollectionController_getCollection']
+    /** Delete a warehouse collection */
+    delete: operations['CollectionController_deleteCollection']
+    /** Update a warehouse collection */
+    patch: operations['CollectionController_updateCollection']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/access-tokens': {
+    /** Lists project's warehouse access tokens from logflare */
+    get: operations['AccessTokenController_listAccessTokens']
+    /** Create a warehouse access token */
+    post: operations['AccessTokenController_createAccessToken']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/access-tokens/{token}': {
+    /** Delete a warehouse access token */
+    delete: operations['AccessTokenController_deleteAccessToken']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/endpoints': {
+    /** Lists project's warehouse endpoints from logflare */
+    get: operations['EndpointController_listEndpoints']
+    /** Create a warehouse endpoint */
+    post: operations['EndpointController_createEndpoint']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/endpoints/{token}': {
+    /** Update a warehouse endpoint */
+    put: operations['EndpointController_updateEndpoint']
+    /** Delete a warehouse endpoint */
+    delete: operations['EndpointController_deleteEndpoint']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/query': {
+    /** Lists project's warehouse queries from logflare */
+    get: operations['WarehouseQueryController_runQuery']
+  }
   '/v0/projects/{ref}/config/pgbouncer': {
     /** Gets project's pgbouncer config */
     get: operations['PgbouncerConfigController_getPgbouncerConfig']
@@ -1454,6 +1563,16 @@ export interface paths {
   '/v0/storage/{ref}/buckets/{id}/objects': {
     /** Deletes objects */
     delete: operations['StorageObjectsController_deleteObjects']
+  }
+  '/v0/storage/{ref}/credentials': {
+    /** Gets project storage credentials */
+    get: operations['StorageS3CredentialsController_getAllCredentials']
+    /** Creates project storage credential */
+    post: operations['StorageS3CredentialsController_createCredential']
+  }
+  '/v0/storage/{ref}/credentials/{id}': {
+    /** Deletes project storage credential */
+    delete: operations['StorageS3CredentialsController_deleteCredential']
   }
   '/v1/branches/{branch_id}': {
     /**
@@ -1651,6 +1770,18 @@ export interface paths {
     /** Updates a project's auth config */
     patch: operations['V1AuthConfigController_updateV1AuthConfig']
   }
+  '/v1/projects/{ref}/config/auth/third-party-auth': {
+    /** Lists all third-party auth integrations */
+    get: operations['ThirdPartyAuthController_listTPAForProject']
+    /** Creates a new third-party auth integration */
+    post: operations['ThirdPartyAuthController_createTPAForProject']
+  }
+  '/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}': {
+    /** Get a third-party integration */
+    get: operations['ThirdPartyAuthController_getTPAForProject']
+    /** Removes a third-party auth integration */
+    delete: operations['ThirdPartyAuthController_deleteTPAForProject']
+  }
   '/v1/projects/{ref}/config/auth/sso/providers': {
     /** Lists all SSO providers */
     get: operations['ProvidersController_listAllProviders']
@@ -1794,911 +1925,116 @@ export type webhooks = Record<string, never>
 
 export interface components {
   schemas: {
-    NotificationResponseV1: {
-      id: string
-      inserted_at: string
-      project_id: number
-      notification_name: string
-      notification_status: string
-      data: Record<string, never>
-      meta: Record<string, never>
-    }
-    UpdateNotificationsBodyV1: {
-      ids: string[]
-    }
-    NotificationAction: {
-      label: string
-      url?: string
-      action_type?: string
-    }
-    NotificationData: {
-      org_slug?: string
-      project_ref?: string
-      title: string
-      message?: string
-      actions?: components['schemas']['NotificationAction'][]
-    }
-    NotificationResponseV2: {
-      /** @enum {string} */
-      status: 'new' | 'seen' | 'archived'
-      /** @enum {string} */
-      priority: 'Critical' | 'Warning' | 'Info'
-      data: components['schemas']['NotificationData']
-      id: string
-      inserted_at: string
-      name: string
-      meta: Record<string, never>
-    }
-    NotificationsSummary: {
-      unread_count: number
-      has_warning: boolean
-      has_critical: boolean
-    }
-    UpdateNotificationBodyV2: {
-      id: string
-      /** @enum {string} */
-      status: 'new' | 'seen' | 'archived'
-    }
-    ResetPasswordBody: {
-      email: string
-      redirectTo?: string
-    }
-    SendFeedbackBody: {
-      message: string
-      affectedServices?: string
-      library?: string
-      category: string
-      subject?: string
-      tags: string[]
-      additionalRedirectUrls?: string
-      pathname?: string
-      projectRef?: string
-      organizationSlug?: string
-      severity?: string
-      siteUrl?: string
-      urlToAirTable?: string
-      allowSupportAccess?: boolean
-      verified?: boolean
-      browserInformation?: string
-    }
-    SendFeedbackResponse: {
-      result: string
-    }
-    SendExitSurveyBody: {
-      projectRef?: string
-      orgSlug?: string
-      reasons: string
-      additionalFeedback?: string
-      exitAction?: string
-    }
-    SendUpgradeSurveyBody: {
-      orgSlug?: string
-      prevPlan?: string
-      currentPlan?: string
-      reasons: string[]
-      additionalFeedback?: string
-    }
-    SignUpBody: {
-      email: string
-      password: string
-      redirectTo?: string
-    }
-    ProjectResourceWarningsResponse: {
-      /** @enum {string|null} */
-      need_pitr: 'critical' | 'warning' | null
-      /** @enum {string|null} */
-      disk_io_exhaustion: 'critical' | 'warning' | null
-      /** @enum {string|null} */
-      disk_space_exhaustion: 'critical' | 'warning' | null
-      /** @enum {string|null} */
-      cpu_exhaustion: 'critical' | 'warning' | null
-      /** @enum {string|null} */
-      memory_and_swap_exhaustion: 'critical' | 'warning' | null
-      /** @enum {string|null} */
-      auth_rate_limit_exhaustion: 'critical' | 'warning' | null
-      project: string
-      is_readonly_mode_enabled: boolean
-    }
-    GoTrueConfigResponse: {
-      SITE_URL: string
-      DISABLE_SIGNUP: boolean
-      JWT_EXP: number
-      SMTP_ADMIN_EMAIL: string
-      SMTP_HOST: string
-      SMTP_PORT: string
-      SMTP_USER: string
-      SMTP_PASS: string
-      SMTP_MAX_FREQUENCY: number
-      SMTP_SENDER_NAME: string
-      MAILER_AUTOCONFIRM: boolean
-      MAILER_ALLOW_UNVERIFIED_EMAIL_SIGN_INS: boolean
-      MAILER_SUBJECTS_INVITE: string
-      MAILER_SUBJECTS_CONFIRMATION: string
-      MAILER_SUBJECTS_RECOVERY: string
-      MAILER_SUBJECTS_EMAIL_CHANGE: string
-      MAILER_SUBJECTS_MAGIC_LINK: string
-      MAILER_TEMPLATES_INVITE_CONTENT: string
-      MAILER_TEMPLATES_CONFIRMATION_CONTENT: string
-      MAILER_TEMPLATES_RECOVERY_CONTENT: string
-      MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT: string
-      MAILER_TEMPLATES_MAGIC_LINK_CONTENT: string
-      MFA_MAX_ENROLLED_FACTORS: number
-      URI_ALLOW_LIST: string
-      EXTERNAL_ANONYMOUS_USERS_ENABLED: boolean
-      EXTERNAL_EMAIL_ENABLED: boolean
-      EXTERNAL_PHONE_ENABLED: boolean
-      SAML_ENABLED: boolean
-      SECURITY_CAPTCHA_ENABLED: boolean
-      SECURITY_CAPTCHA_PROVIDER: string
-      SECURITY_CAPTCHA_SECRET: string
-      SESSIONS_TIMEBOX: number
-      SESSIONS_INACTIVITY_TIMEOUT: number
-      SESSIONS_SINGLE_PER_USER: boolean
-      SESSIONS_TAGS: string
-      RATE_LIMIT_ANONYMOUS_USERS: number
-      RATE_LIMIT_EMAIL_SENT: number
-      RATE_LIMIT_SMS_SENT: number
-      RATE_LIMIT_VERIFY: number
-      RATE_LIMIT_TOKEN_REFRESH: number
-      MAILER_SECURE_EMAIL_CHANGE_ENABLED: boolean
-      REFRESH_TOKEN_ROTATION_ENABLED: boolean
-      PASSWORD_HIBP_ENABLED: boolean
-      PASSWORD_MIN_LENGTH: number
-      PASSWORD_REQUIRED_CHARACTERS: string
-      SECURITY_MANUAL_LINKING_ENABLED: boolean
-      SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean
-      SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number
-      MAILER_OTP_EXP: number
-      SMS_AUTOCONFIRM: boolean
-      SMS_MAX_FREQUENCY: number
-      SMS_OTP_EXP: number
-      SMS_OTP_LENGTH: number
-      SMS_PROVIDER: string
-      SMS_MESSAGEBIRD_ACCESS_KEY: string
-      SMS_MESSAGEBIRD_ORIGINATOR: string
-      SMS_TEXTLOCAL_API_KEY: string
-      SMS_TEXTLOCAL_SENDER: string
-      SMS_TWILIO_ACCOUNT_SID: string
-      SMS_TWILIO_AUTH_TOKEN: string
-      SMS_TWILIO_CONTENT_SID: string
-      SMS_TWILIO_MESSAGE_SERVICE_SID: string
-      SMS_TWILIO_VERIFY_ACCOUNT_SID: string
-      SMS_TWILIO_VERIFY_AUTH_TOKEN: string
-      SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID: string
-      SMS_VONAGE_API_KEY: string
-      SMS_VONAGE_API_SECRET: string
-      SMS_VONAGE_FROM: string
-      SMS_TEMPLATE: string
-      SMS_TEST_OTP: string
-      SMS_TEST_OTP_VALID_UNTIL: string
-      HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED: boolean
-      HOOK_MFA_VERIFICATION_ATTEMPT_URI: string
-      HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED: boolean
-      HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI: string
-      HOOK_CUSTOM_ACCESS_TOKEN_ENABLED: boolean
-      HOOK_CUSTOM_ACCESS_TOKEN_URI: string
-      EXTERNAL_APPLE_ENABLED: boolean
-      EXTERNAL_APPLE_CLIENT_ID: string
-      EXTERNAL_APPLE_SECRET: string
-      EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS: string
-      EXTERNAL_AZURE_ENABLED: boolean
-      EXTERNAL_AZURE_CLIENT_ID: string
-      EXTERNAL_AZURE_SECRET: string
-      EXTERNAL_AZURE_URL: string
-      EXTERNAL_BITBUCKET_ENABLED: boolean
-      EXTERNAL_BITBUCKET_CLIENT_ID: string
-      EXTERNAL_BITBUCKET_SECRET: string
-      EXTERNAL_DISCORD_ENABLED: boolean
-      EXTERNAL_DISCORD_CLIENT_ID: string
-      EXTERNAL_DISCORD_SECRET: string
-      EXTERNAL_FACEBOOK_ENABLED: boolean
-      EXTERNAL_FACEBOOK_CLIENT_ID: string
-      EXTERNAL_FACEBOOK_SECRET: string
-      EXTERNAL_FIGMA_ENABLED: boolean
-      EXTERNAL_FIGMA_CLIENT_ID: string
-      EXTERNAL_FIGMA_SECRET: string
-      EXTERNAL_GITHUB_ENABLED: boolean
-      EXTERNAL_GITHUB_CLIENT_ID: string
-      EXTERNAL_GITHUB_SECRET: string
-      EXTERNAL_GITLAB_ENABLED: boolean
-      EXTERNAL_GITLAB_CLIENT_ID: string
-      EXTERNAL_GITLAB_SECRET: string
-      EXTERNAL_GITLAB_URL: string
-      EXTERNAL_GOOGLE_ENABLED: boolean
-      EXTERNAL_GOOGLE_CLIENT_ID: string
-      EXTERNAL_GOOGLE_SECRET: string
-      EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS: string
-      EXTERNAL_GOOGLE_SKIP_NONCE_CHECK: boolean
-      EXTERNAL_KAKAO_ENABLED: boolean
-      EXTERNAL_KAKAO_CLIENT_ID: string
-      EXTERNAL_KAKAO_SECRET: string
-      EXTERNAL_KEYCLOAK_ENABLED: boolean
-      EXTERNAL_KEYCLOAK_CLIENT_ID: string
-      EXTERNAL_KEYCLOAK_SECRET: string
-      EXTERNAL_KEYCLOAK_URL: string
-      EXTERNAL_LINKEDIN_OIDC_ENABLED: boolean
-      EXTERNAL_LINKEDIN_OIDC_CLIENT_ID: string
-      EXTERNAL_LINKEDIN_OIDC_SECRET: string
-      EXTERNAL_NOTION_ENABLED: boolean
-      EXTERNAL_NOTION_CLIENT_ID: string
-      EXTERNAL_NOTION_SECRET: string
-      EXTERNAL_SLACK_ENABLED: boolean
-      EXTERNAL_SLACK_CLIENT_ID: string
-      EXTERNAL_SLACK_SECRET: string
-      EXTERNAL_SPOTIFY_ENABLED: boolean
-      EXTERNAL_SPOTIFY_CLIENT_ID: string
-      EXTERNAL_SPOTIFY_SECRET: string
-      EXTERNAL_TWITCH_ENABLED: boolean
-      EXTERNAL_TWITCH_CLIENT_ID: string
-      EXTERNAL_TWITCH_SECRET: string
-      EXTERNAL_TWITTER_ENABLED: boolean
-      EXTERNAL_TWITTER_CLIENT_ID: string
-      EXTERNAL_TWITTER_SECRET: string
-      EXTERNAL_WORKOS_ENABLED: boolean
-      EXTERNAL_WORKOS_CLIENT_ID: string
-      EXTERNAL_WORKOS_SECRET: string
-      EXTERNAL_WORKOS_URL: string
-      EXTERNAL_ZOOM_ENABLED: boolean
-      EXTERNAL_ZOOM_CLIENT_ID: string
-      EXTERNAL_ZOOM_SECRET: string
-    }
-    UpdateGoTrueConfigBody: {
-      SITE_URL?: string
-      DISABLE_SIGNUP?: boolean
-      JWT_EXP?: number
-      SMTP_ADMIN_EMAIL?: string
-      SMTP_HOST?: string
-      SMTP_PORT?: string
-      SMTP_USER?: string
-      SMTP_PASS?: string
-      SMTP_MAX_FREQUENCY?: number
-      SMTP_SENDER_NAME?: string
-      MAILER_ALLOW_UNVERIFIED_EMAIL_SIGN_INS?: boolean
-      MAILER_AUTOCONFIRM?: boolean
-      MAILER_SUBJECTS_INVITE?: string
-      MAILER_SUBJECTS_CONFIRMATION?: string
-      MAILER_SUBJECTS_RECOVERY?: string
-      MAILER_SUBJECTS_EMAIL_CHANGE?: string
-      MAILER_SUBJECTS_MAGIC_LINK?: string
-      MAILER_TEMPLATES_INVITE_CONTENT?: string
-      MAILER_TEMPLATES_CONFIRMATION_CONTENT?: string
-      MAILER_TEMPLATES_RECOVERY_CONTENT?: string
-      MAILER_TEMPLATES_EMAIL_CHANGE_CONTENT?: string
-      MAILER_TEMPLATES_MAGIC_LINK_CONTENT?: string
-      MFA_MAX_ENROLLED_FACTORS?: number
-      URI_ALLOW_LIST?: string
-      EXTERNAL_ANONYMOUS_USERS_ENABLED?: boolean
-      EXTERNAL_EMAIL_ENABLED?: boolean
-      EXTERNAL_PHONE_ENABLED?: boolean
-      SAML_ENABLED?: boolean
-      SECURITY_CAPTCHA_ENABLED?: boolean
-      SECURITY_CAPTCHA_PROVIDER?: string
-      SECURITY_CAPTCHA_SECRET?: string
-      SESSIONS_TIMEBOX?: number
-      SESSIONS_INACTIVITY_TIMEOUT?: number
-      SESSIONS_SINGLE_PER_USER?: boolean
-      SESSIONS_TAGS?: string
-      RATE_LIMIT_ANONYMOUS_USERS?: number
-      RATE_LIMIT_EMAIL_SENT?: number
-      RATE_LIMIT_SMS_SENT?: number
-      RATE_LIMIT_VERIFY?: number
-      RATE_LIMIT_TOKEN_REFRESH?: number
-      MAILER_SECURE_EMAIL_CHANGE_ENABLED?: boolean
-      REFRESH_TOKEN_ROTATION_ENABLED?: boolean
-      PASSWORD_HIBP_ENABLED?: boolean
-      PASSWORD_MIN_LENGTH?: number
-      /** @enum {string} */
-      PASSWORD_REQUIRED_CHARACTERS?:
-        | 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
-        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
-        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:!@#$%^&*()_+-=[]{};\'\\:"|<>?,./`~'
-        | ''
-      SECURITY_MANUAL_LINKING_ENABLED?: boolean
-      SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION?: boolean
-      SECURITY_REFRESH_TOKEN_REUSE_INTERVAL?: number
-      MAILER_OTP_EXP?: number
-      SMS_AUTOCONFIRM?: boolean
-      SMS_MAX_FREQUENCY?: number
-      SMS_OTP_EXP?: number
-      SMS_OTP_LENGTH?: number
-      SMS_PROVIDER?: string
-      SMS_MESSAGEBIRD_ACCESS_KEY?: string
-      SMS_MESSAGEBIRD_ORIGINATOR?: string
-      SMS_TEST_OTP?: string
-      SMS_TEST_OTP_VALID_UNTIL?: string
-      SMS_TEXTLOCAL_API_KEY?: string
-      SMS_TEXTLOCAL_SENDER?: string
-      SMS_TWILIO_ACCOUNT_SID?: string
-      SMS_TWILIO_AUTH_TOKEN?: string
-      SMS_TWILIO_CONTENT_SID?: string
-      SMS_TWILIO_MESSAGE_SERVICE_SID?: string
-      SMS_TWILIO_VERIFY_ACCOUNT_SID?: string
-      SMS_TWILIO_VERIFY_AUTH_TOKEN?: string
-      SMS_TWILIO_VERIFY_MESSAGE_SERVICE_SID?: string
-      SMS_VONAGE_API_KEY?: string
-      SMS_VONAGE_API_SECRET?: string
-      SMS_VONAGE_FROM?: string
-      SMS_TEMPLATE?: string
-      HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
-      HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
-      HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED?: boolean
-      HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI?: string
-      HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean
-      HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
-      EXTERNAL_APPLE_ENABLED?: boolean
-      EXTERNAL_APPLE_CLIENT_ID?: string
-      EXTERNAL_APPLE_SECRET?: string
-      EXTERNAL_APPLE_ADDITIONAL_CLIENT_IDS?: string
-      EXTERNAL_AZURE_ENABLED?: boolean
-      EXTERNAL_AZURE_CLIENT_ID?: string
-      EXTERNAL_AZURE_SECRET?: string
-      EXTERNAL_AZURE_URL?: string
-      EXTERNAL_BITBUCKET_ENABLED?: boolean
-      EXTERNAL_BITBUCKET_CLIENT_ID?: string
-      EXTERNAL_BITBUCKET_SECRET?: string
-      EXTERNAL_DISCORD_ENABLED?: boolean
-      EXTERNAL_DISCORD_CLIENT_ID?: string
-      EXTERNAL_DISCORD_SECRET?: string
-      EXTERNAL_FACEBOOK_ENABLED?: boolean
-      EXTERNAL_FACEBOOK_CLIENT_ID?: string
-      EXTERNAL_FACEBOOK_SECRET?: string
-      EXTERNAL_FIGMA_ENABLED?: boolean
-      EXTERNAL_FIGMA_CLIENT_ID?: string
-      EXTERNAL_FIGMA_SECRET?: string
-      EXTERNAL_GITHUB_ENABLED?: boolean
-      EXTERNAL_GITHUB_CLIENT_ID?: string
-      EXTERNAL_GITHUB_SECRET?: string
-      EXTERNAL_GITLAB_ENABLED?: boolean
-      EXTERNAL_GITLAB_CLIENT_ID?: string
-      EXTERNAL_GITLAB_SECRET?: string
-      EXTERNAL_GITLAB_URL?: string
-      EXTERNAL_GOOGLE_ENABLED?: boolean
-      EXTERNAL_GOOGLE_CLIENT_ID?: string
-      EXTERNAL_GOOGLE_SECRET?: string
-      EXTERNAL_GOOGLE_ADDITIONAL_CLIENT_IDS?: string
-      EXTERNAL_GOOGLE_SKIP_NONCE_CHECK?: boolean
-      EXTERNAL_KAKAO_ENABLED?: boolean
-      EXTERNAL_KAKAO_CLIENT_ID?: string
-      EXTERNAL_KAKAO_SECRET?: string
-      EXTERNAL_KEYCLOAK_ENABLED?: boolean
-      EXTERNAL_KEYCLOAK_CLIENT_ID?: string
-      EXTERNAL_KEYCLOAK_SECRET?: string
-      EXTERNAL_KEYCLOAK_URL?: string
-      EXTERNAL_LINKEDIN_OIDC_ENABLED?: boolean
-      EXTERNAL_LINKEDIN_OIDC_CLIENT_ID?: string
-      EXTERNAL_LINKEDIN_OIDC_SECRET?: string
-      EXTERNAL_NOTION_ENABLED?: boolean
-      EXTERNAL_NOTION_CLIENT_ID?: string
-      EXTERNAL_NOTION_SECRET?: string
-      EXTERNAL_SLACK_ENABLED?: boolean
-      EXTERNAL_SLACK_CLIENT_ID?: string
-      EXTERNAL_SLACK_SECRET?: string
-      EXTERNAL_SPOTIFY_ENABLED?: boolean
-      EXTERNAL_SPOTIFY_CLIENT_ID?: string
-      EXTERNAL_SPOTIFY_SECRET?: string
-      EXTERNAL_TWITCH_ENABLED?: boolean
-      EXTERNAL_TWITCH_CLIENT_ID?: string
-      EXTERNAL_TWITCH_SECRET?: string
-      EXTERNAL_TWITTER_ENABLED?: boolean
-      EXTERNAL_TWITTER_CLIENT_ID?: string
-      EXTERNAL_TWITTER_SECRET?: string
-      EXTERNAL_WORKOS_ENABLED?: boolean
-      EXTERNAL_WORKOS_CLIENT_ID?: string
-      EXTERNAL_WORKOS_SECRET?: string
-      EXTERNAL_WORKOS_URL?: string
-      EXTERNAL_ZOOM_ENABLED?: boolean
-      EXTERNAL_ZOOM_CLIENT_ID?: string
-      EXTERNAL_ZOOM_SECRET?: string
-    }
-    UserBody: {
-      id?: string
-      aud?: string
-      banned_until?: string
-      confirmation_sent_at?: string
-      confirmation_token?: string
-      confirmed_at?: string
-      created_at?: string
-      email?: string
-      email_change?: string
-      email_change_confirm_status?: number
-      email_change_sent_at?: string
-      email_change_token_current?: string
-      email_change_token_new?: string
-      email_confirmed_at?: string
-      encrypted_password?: string
-      instance_id?: string
-      invited_at?: string
-      is_super_admin?: boolean
-      last_sign_in_at?: string
-      phone?: string
-      phone_change?: string
-      phone_change_sent_at?: string
-      phone_change_token?: string
-      phone_confirmed_at?: string
-      raw_app_meta_data?: Record<string, never>
-      raw_user_meta_data?: Record<string, never>
-      reauthentication_sent_at?: string
-      reauthentication_token?: string
-      recovery_sent_at?: string
-      recovery_token?: string
-      role?: string
-      updated_at?: string
-      is_sso_user?: boolean
-      deleted_at?: string
-      is_anonymous?: boolean
-    }
-    UsersResponse: {
-      total: number
-      users: components['schemas']['UserBody'][]
-    }
-    Backup: {
-      id: number
-      isPhysicalBackup: boolean
-      project_id: number
-      status: Record<string, never>
-      inserted_at: string
-    }
-    BackupsResponse: {
-      tierKey: string
-      region: string
-      walg_enabled: boolean
-      pitr_enabled: boolean
-      backups: components['schemas']['Backup'][]
-      physicalBackupData: {
-        earliestPhysicalBackupDateUnix?: number
-        latestPhysicalBackupDateUnix?: number
-      }
-    }
-    DownloadBackupBody: {
-      id: number
-      data: Record<string, never>
-      inserted_at: string
-      project_id: number
-      s3_bucket: string
-      s3_path: string
-      status: string
-    }
-    DownloadBackupResponse: {
-      fileUrl: string
-    }
-    RestoreLogicalBackupBody: {
-      id: number
-    }
-    RestorePhysicalBackupBody: {
-      id: number
-      recovery_time_target: string
-    }
-    PointInTimeRestoreBody: {
-      recovery_time_target_unix: number
-    }
-    OwnerResponse: {
-      project_ref: string
-      /** @enum {string} */
-      current: 'unmigrated' | 'temp_role' | 'migrated'
-      /** @enum {string} */
-      desired: 'unmigrated' | 'temp_role' | 'migrated'
-      created_at: string
-      modified_at: string
-      migrated_at: string | null
-    }
-    OrganizationResponse: {
-      /** @enum {string|null} */
-      restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
-      id: number
-      slug: string
-      name: string
-      billing_email: string | null
-      is_owner: boolean
-      stripe_customer_id: string | null
-      subscription_id: string | null
-      opt_in_tags: string[]
-      restriction_data: Record<string, never>
-    }
-    GetOrganizationByFlyOrganizationIdResponse: {
-      slug: string
-    }
-    CreateOrganizationBody: {
-      name: string
-      kind?: string
-      size?: string
-      /** @enum {string} */
-      tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
-      payment_method?: string
-    }
-    UpdateOrganizationBody: {
-      name: string
-      billing_email: string
-      opt_in_tags: string[]
-    }
-    OrganizationSlugResponse: {
-      id: number
-      slug: string
-      name: string
-      billing_email?: string
-      stripe_customer_id?: string
-      opt_in_tags: string[]
-    }
-    CustomerResponse: {
-      id: string
-      email: string
-      address: string
-      balance: number
-      invoice_settings: Record<string, never>
-      billing_via_partner: boolean
-    }
-    CustomerUpdateResponse: {
-      id: string
-      object: string
-      address: Record<string, never>
-      balance: number
-      cash_balance?: Record<string, never>
-      created: number
-      currency: string
-      default_currency?: string
-      default_source: string
-      delinquent: boolean
-      description: string
-      discount: Record<string, never>
-      email: string
-      invoice_credit_balance?: Record<string, never>
-      invoice_prefix: string
-      invoice_settings: Record<string, never>
-      livemode: boolean
-      metadata: Record<string, never>
-      name: string
-      next_invoice_sequence?: number
-      phone: string
-      preferred_locales: string[]
-      shipping: Record<string, never>
-      sources?: Record<string, never>
-      subscriptions?: Record<string, never>
-      tax?: Record<string, never>
-      tax_exempt?: string
-      tax_ids?: Record<string, never>
-      test_clock?: Record<string, never>
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
-    }
-    Role: {
-      id: number
-      name: string
-    }
-    TaxId: {
-      id: string
-      object: string
-      country: string
-      created: number
-      customer: Record<string, never>
-      deleted?: Record<string, never>
-      livemode: boolean
-      type: string
-      value: string
-      verification: Record<string, never>
-    }
-    TaxIdResponse: {
-      object: string
-      data: components['schemas']['TaxId'][]
-      has_more: boolean
-      url: string
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
-    }
-    CreateTaxIdBody: {
-      type: Record<string, never>
-      value: string
-    }
-    CreateTaxIdResponse: {
-      id: string
-      object: string
-      country: string
-      created: number
-      customer: Record<string, never>
-      livemode: boolean
-      type: string
-      value: string
-      verification: Record<string, never>
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
-    }
-    DeleteTaxIdBody: {
-      id: string
-    }
-    DeleteTaxIdResponse: {
-      id: string
-      object: string
-      deleted: boolean
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
-    }
-    TransferOrganizationBody: {
-      member_gotrue_id: string
-      member_id: number
-      org_id: number
-    }
-    ProjectAllocation: {
-      ref: string
-      usage: number
-      name: string
-    }
-    OrgMetricUsage: {
-      usage: number
-      usage_original: number
-      cost: number
-      unit_price_desc: string
-      available_in_plan: boolean
-      unlimited: boolean
-      capped: boolean
-      /** @enum {string} */
-      metric:
-        | 'EGRESS'
-        | 'DATABASE_SIZE'
-        | 'STORAGE_SIZE'
-        | 'MONTHLY_ACTIVE_USERS'
-        | 'MONTHLY_ACTIVE_SSO_USERS'
-        | 'FUNCTION_INVOCATIONS'
-        | 'FUNCTION_COUNT'
-        | 'STORAGE_IMAGES_TRANSFORMED'
-        | 'REALTIME_MESSAGE_COUNT'
-        | 'REALTIME_PEAK_CONNECTIONS'
-        | 'COMPUTE_HOURS_BRANCH'
-        | 'COMPUTE_HOURS_XS'
-        | 'COMPUTE_HOURS_SM'
-        | 'COMPUTE_HOURS_MD'
-        | 'COMPUTE_HOURS_L'
-        | 'COMPUTE_HOURS_XL'
-        | 'COMPUTE_HOURS_2XL'
-        | 'COMPUTE_HOURS_4XL'
-        | 'COMPUTE_HOURS_8XL'
-        | 'COMPUTE_HOURS_12XL'
-        | 'COMPUTE_HOURS_16XL'
-      /** @enum {string} */
-      pricing_strategy: 'UNIT' | 'PACKAGE' | 'NONE'
-      pricing_free_units?: number
-      pricing_package_price?: number
-      pricing_package_size?: number
-      pricing_per_unit_price?: number
-      project_allocations: components['schemas']['ProjectAllocation'][]
-    }
-    OrgUsageResponse: {
-      usage_billing_enabled: boolean
-      slugs: string[]
-      usages: components['schemas']['OrgMetricUsage'][]
-    }
-    OrgDocumentUrlResponse: {
-      fileUrl: string
-    }
-    AuditLogsResponse: {
-      result: Record<string, never>[]
-      retention_period: number
-    }
-    Invite: {
-      invited_id: number
-      invited_at: string
-      invited_email: string
-      role_id: number
-    }
-    InviteUserBody: {
-      invited_email: string
-      owner_id: number
-      role_id: number
-    }
-    SendInviteResponse: {
-      invited_at: string
-      invited_email: string
-      role_id: number
-    }
-    InviteResponse: {
-      organization_name: string
-      invite_id: string
-      token_does_not_exist: boolean
-      email_match: boolean
-      authorized_user: boolean
-      expired_token: boolean
-    }
-    JoinResponse: {
-      billing_email: string
-      id: number
-      name: string
-      slug: string
-      stripe_customer_id: string
-    }
-    RemoveMemberBody: {
-      member_id: number
-    }
-    Member: {
-      gotrue_id: string
-      primary_email: string | null
-      role_ids: number[]
-      username: string
-      mfa_enabled: boolean
-    }
-    UpdateMemberBody: {
-      role_id: number
-    }
-    MemberWithFreeProjectLimit: {
-      free_project_limit: number
-      primary_email: string
-      username: string
-    }
-    Payment: {
-      id: string
-      object: string
-      acss_debit?: Record<string, never>
-      affirm?: Record<string, never>
-      afterpay_clearpay?: Record<string, never>
-      alipay?: Record<string, never>
-      au_becs_debit?: Record<string, never>
-      bacs_debit?: Record<string, never>
-      bancontact?: Record<string, never>
-      billing_details: Record<string, never>
-      blik?: Record<string, never>
-      boleto?: Record<string, never>
-      card?: Record<string, never>
-      card_present?: Record<string, never>
-      created: number
-      customer: Record<string, never>
-      customer_balance?: Record<string, never>
-      eps?: Record<string, never>
-      fpx?: Record<string, never>
-      giropay?: Record<string, never>
-      grabpay?: Record<string, never>
-      ideal?: Record<string, never>
-      interac_present?: Record<string, never>
-      klarna?: Record<string, never>
-      konbini?: Record<string, never>
-      link?: Record<string, never>
-      livemode: boolean
-      metadata: Record<string, never>
-      oxxo?: Record<string, never>
-      p24?: Record<string, never>
-      paynow?: Record<string, never>
-      promptpay?: Record<string, never>
-      radar_options?: Record<string, never>
-      sepa_debit?: Record<string, never>
-      sofort?: Record<string, never>
-      type: string
-      us_bank_account?: Record<string, never>
-      wechat_pay?: Record<string, never>
-    }
-    PaymentsResponse: {
-      object: string
-      data: components['schemas']['Payment'][]
-      has_more: boolean
-      url: string
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
-    }
-    DetachPaymentMethodBody: {
-      card_id: string
-    }
-    DetachPaymentResponse: {
-      id: string
-      object: string
-      acss_debit?: Record<string, never>
-      affirm?: Record<string, never>
-      afterpay_clearpay?: Record<string, never>
-      alipay?: Record<string, never>
-      au_becs_debit?: Record<string, never>
-      bacs_debit?: Record<string, never>
-      bancontact?: Record<string, never>
-      billing_details: Record<string, never>
-      blik?: Record<string, never>
-      boleto?: Record<string, never>
-      card?: Record<string, never>
-      card_present?: Record<string, never>
-      created: number
-      customer: Record<string, never>
-      customer_balance?: Record<string, never>
-      eps?: Record<string, never>
-      fpx?: Record<string, never>
-      giropay?: Record<string, never>
-      grabpay?: Record<string, never>
-      ideal?: Record<string, never>
-      interac_present?: Record<string, never>
-      klarna?: Record<string, never>
-      konbini?: Record<string, never>
-      link?: Record<string, never>
-      livemode: boolean
-      metadata: Record<string, never>
-      oxxo?: Record<string, never>
-      p24?: Record<string, never>
-      paynow?: Record<string, never>
-      promptpay?: Record<string, never>
-      radar_options?: Record<string, never>
-      sepa_debit?: Record<string, never>
-      sofort?: Record<string, never>
-      type: string
-      us_bank_account?: Record<string, never>
-      wechat_pay?: Record<string, never>
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
-    }
+    UpdateNotificationsBodyV1: Record<string, never>
+    UpdateNotificationBodyV2: Record<string, never>
+    ResetPasswordBody: Record<string, never>
+    SendFeedbackBody: Record<string, never>
+    SendExitSurveyBody: Record<string, never>
+    SendUpgradeSurveyBody: Record<string, never>
+    SendDocsFeedbackBody: Record<string, never>
+    SignUpBody: Record<string, never>
+    UpdateGoTrueConfigBody: Record<string, never>
+    UserBody: Record<string, never>
+    DownloadBackupBody: Record<string, never>
+    RestoreLogicalBackupBody: Record<string, never>
+    RestorePhysicalBackupBody: Record<string, never>
+    PointInTimeRestoreBody: Record<string, never>
+    CreateOrganizationBody: Record<string, never>
+    UpdateOrganizationBody: Record<string, never>
+    CreateTaxIdBody: Record<string, never>
+    DeleteTaxIdBody: Record<string, never>
+    TransferOrganizationBody: Record<string, never>
+    InviteUserBody: Record<string, never>
+    RemoveMemberBody: Record<string, never>
+    UpdateMemberBody: Record<string, never>
+    DetachPaymentMethodBody: Record<string, never>
     HCaptchaBody: {
       hcaptchaToken: string
     }
-    SetupIntentResponse: {
-      id: string
-      object: string
-      application: Record<string, never>
-      attach_to_self?: boolean
-      cancellation_reason: string
-      client_secret: string
-      created: number
-      customer: Record<string, never>
-      description: string
-      flow_directions: Record<string, never>
-      last_setup_error: Record<string, never>
-      latest_attempt: Record<string, never>
-      livemode: boolean
-      mandate: Record<string, never>
-      metadata: Record<string, never>
-      next_action: Record<string, never>
-      on_behalf_of: Record<string, never>
-      payment_method: Record<string, never>
-      payment_method_options: Record<string, never>
-      payment_method_types: string[]
-      single_use_mandate: Record<string, never>
-      status: string
-      usage: string
-      lastResponse: {
-        headers?: Record<string, never>
-        requestId?: string
-        statusCode?: number
-        apiVersion?: string
-        idempotencyKey?: string
-        stripeAccount?: string
-      }
-    }
+    UpdateSubscriptionBody: Record<string, never>
+    GrantColumnPrivilegesBody: Record<string, never>
+    RevokeColumnPrivilegesBody: Record<string, never>
+    CreateColumnBody: Record<string, never>
+    UpdateColumnBody: Record<string, never>
+    CreateExtensionBody: Record<string, never>
+    CreateFunctionBody: Record<string, never>
+    UpdateFunctionBody: Record<string, never>
+    CreatePolicyBody: Record<string, never>
+    UpdatePolicyBody: Record<string, never>
+    CreatePublicationBody: Record<string, never>
+    UpdatePublicationBody: Record<string, never>
+    RunQueryBody: Record<string, never>
+    FormatQueryBody: Record<string, never>
+    ValidateQueryBody: Record<string, never>
+    CreateRoleBody: Record<string, never>
+    UpdateRoleBody: Record<string, never>
+    CreateSchemaBody: Record<string, never>
+    UpdateSchemaBody: Record<string, never>
+    SearchTableBody: Record<string, never>
+    SearchColumnBody: Record<string, never>
+    GrantTablePrivilegesBody: Record<string, never>
+    RevokeTablePrivilegesBody: Record<string, never>
+    CreateTableBody: Record<string, never>
+    UpdateTableBody: Record<string, never>
+    CreateTriggerBody: Record<string, never>
+    UpdateTriggerBody: Record<string, never>
+    CreateAccessTokenBody: Record<string, never>
+    SearchProfileBody: Record<string, never>
+    PasswordCheckBody: Record<string, never>
+    UpdateProfileBody: Record<string, never>
     /** @enum {string} */
-    BillingPlanId: 'free' | 'pro' | 'team' | 'enterprise'
-    BillingSubscriptionPlan: {
-      id: components['schemas']['BillingPlanId']
-      name: string
-      price: number
+    DesiredInstanceSize:
+      | 'micro'
+      | 'small'
+      | 'medium'
+      | 'large'
+      | 'xlarge'
+      | '2xlarge'
+      | '4xlarge'
+      | '8xlarge'
+      | '12xlarge'
+      | '16xlarge'
+    CreateProjectBody: {
+      /** @deprecated */
+      kps_enabled: boolean
+      desired_instance_size: components['schemas']['DesiredInstanceSize']
     }
-    BillingSubscriptionAddon: {
-      name: string
-      supabase_prod_id: string
-      price: number
+    CreateContentParams: Record<string, never>
+    UpsertContentParams: Record<string, never>
+    UpdateContentParams: Record<string, never>
+    UpdatePasswordBody: Record<string, never>
+    Buffer: Record<string, never>
+    ResizeBody: Record<string, never>
+    UpdateProjectBody: Record<string, never>
+    RestartServicesBody: Record<string, never>
+    ProjectSettingsResponse: Record<string, never>
+    TransferProjectBody: Record<string, never>
+    UpdatePgbouncerConfigBody: {
+      default_pool_size: number
+      max_client_conn: number
     }
-    /** @enum {string} */
-    ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr' | 'ipv4'
+    UpdatePostgrestConfigBody: {
+      max_rows: number
+      db_pool: number
+    }
+    UpdatePostgresConfigBody: {
+      statement_timeout: string
+      effective_cache_size: string
+      maintenance_work_mem: string
+      max_connections: number
+      max_locks_per_transaction: number
+      max_parallel_maintenance_workers: number
+      max_parallel_workers: number
+      max_parallel_workers_per_gather: number
+      max_worker_processes: number
+      shared_buffers: string
+      work_mem: string
+    }
+    UpdateSecretsConfigBody: Record<string, never>
+    UpdateStorageConfigBody: Record<string, never>
+    UpdateSupavisorConfigBody: {
+      default_pool_size: number
+    }
     /** @enum {string} */
     AddonVariantId:
       | 'ci_micro'
@@ -2717,1683 +2053,47 @@ export interface components {
       | 'pitr_28'
       | 'ipv4_default'
     /** @enum {string} */
-    ProjectAddonVariantPricingType: 'fixed' | 'usage'
-    /** @enum {string} */
-    ProjectAddonPricingInterval: 'monthly' | 'hourly'
-    ProjectAddonVariantResponse: {
-      identifier: components['schemas']['AddonVariantId']
-      price_type: components['schemas']['ProjectAddonVariantPricingType']
-      price_interval: components['schemas']['ProjectAddonPricingInterval']
-      name: string
-      price_description: string
-      price: number
-      meta?: Record<string, never>
-    }
-    SelectedAddonResponse: {
-      type: components['schemas']['ProjectAddonType']
-      variant: components['schemas']['ProjectAddonVariantResponse']
-    }
-    BillingProjectAddonResponse: {
-      addons: components['schemas']['SelectedAddonResponse'][]
-      name: string
-      ref: string
-    }
-    BillingPricingOptionsUnit: {
-      perUnitPrice: number
-      freeUnits?: number
-    }
-    BillingPricingOptionsPackage: {
-      packageSize: number
-      packagePrice: number
-      freeUnits?: number
-    }
-    BillingPricingOptionsNone: {
-      freeUnits?: number
-    }
-    BillingUsageBasedPrice: {
-      /** @enum {string} */
-      metric:
-        | 'EGRESS'
-        | 'DATABASE_SIZE'
-        | 'STORAGE_SIZE'
-        | 'MONTHLY_ACTIVE_USERS'
-        | 'MONTHLY_ACTIVE_SSO_USERS'
-        | 'FUNCTION_INVOCATIONS'
-        | 'FUNCTION_COUNT'
-        | 'STORAGE_IMAGES_TRANSFORMED'
-        | 'REALTIME_MESSAGE_COUNT'
-        | 'REALTIME_PEAK_CONNECTIONS'
-        | 'COMPUTE_HOURS_BRANCH'
-        | 'COMPUTE_HOURS_XS'
-        | 'COMPUTE_HOURS_SM'
-        | 'COMPUTE_HOURS_MD'
-        | 'COMPUTE_HOURS_L'
-        | 'COMPUTE_HOURS_XL'
-        | 'COMPUTE_HOURS_2XL'
-        | 'COMPUTE_HOURS_4XL'
-        | 'COMPUTE_HOURS_8XL'
-        | 'COMPUTE_HOURS_12XL'
-        | 'COMPUTE_HOURS_16XL'
-      /** @enum {string} */
-      pricingStrategy: 'UNIT' | 'PACKAGE' | 'NONE'
-      pricingOptions:
-        | components['schemas']['BillingPricingOptionsUnit']
-        | components['schemas']['BillingPricingOptionsPackage']
-        | components['schemas']['BillingPricingOptionsNone']
-      name: string
-      unit: string
-    }
-    PaymentMethodCardDetails: {
-      last_4_digits: string
-      brand: string
-      expiry_month: number
-      expiry_year: number
-    }
-    ScheduledPlanChange: {
-      target_plan: components['schemas']['BillingPlanId']
-      /** Format: date-time */
-      at: string
-      usage_billing_enabled: boolean
-    }
-    GetSubscriptionResponse: {
-      billing_cycle_anchor: number
-      current_period_end: number
-      current_period_start: number
-      next_invoice_at: number
-      usage_billing_enabled: boolean
-      plan: components['schemas']['BillingSubscriptionPlan']
-      addons: components['schemas']['BillingSubscriptionAddon'][]
-      project_addons: components['schemas']['BillingProjectAddonResponse'][]
-      usage_fees: components['schemas']['BillingUsageBasedPrice'][]
-      payment_method_type: string
-      payment_method_id?: string
-      payment_method_card_details?: components['schemas']['PaymentMethodCardDetails']
-      billing_via_partner: boolean
-      /** @enum {string} */
-      billing_partner: 'fly'
-      scheduled_plan_change: components['schemas']['ScheduledPlanChange'] | null
-      customer_balance: number
-      nano_enabled: boolean
-    }
-    UpdateSubscriptionBody: {
-      payment_method?: string
-      /** @enum {string} */
-      tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
-    }
-    /** @enum {string} */
-    BillingPlanChangeType: 'upgrade' | 'downgrade' | 'none'
-    /** @enum {string} */
-    BillingPlanEffectiveAt: 'now' | 'end_of_billing_period' | 'none'
-    PlanResponse: {
-      id: components['schemas']['BillingPlanId']
-      change_type: components['schemas']['BillingPlanChangeType']
-      effective_at: components['schemas']['BillingPlanEffectiveAt']
-      name: string
-      price: number
-      is_current: boolean
-    }
-    PlansResponse: {
-      plans: components['schemas']['PlanResponse'][]
-    }
-    UpcomingInvoice: Record<string, never>
-    ColumnPrivilege: {
-      grantor: string
-      grantee: string
-      /** @enum {string} */
-      privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
-      is_grantable: boolean
-    }
-    PostgresColumnPrivileges: {
-      column_id: string
-      relation_schema: string
-      relation_name: string
-      column_name: string
-      privileges: components['schemas']['ColumnPrivilege'][]
-    }
-    GrantColumnPrivilegesBody: {
-      is_grantable?: boolean
-      column_id: string
-      grantee: string
-      /** @enum {string} */
-      privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
-    }
-    RevokeColumnPrivilegesBody: {
-      column_id: string
-      grantee: string
-      /** @enum {string} */
-      privilege_type: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'REFERENCES'
-    }
-    PostgresColumn: {
-      table_id: number
-      schema: string
-      table: string
-      id: string
-      ordinal_position: number
-      name: string
-      default_value: Record<string, never>
-      data_type: string
-      format: string
-      is_identity: boolean
-      identity_generation: Record<string, never>
-      is_generated: boolean
-      is_nullable: boolean
-      is_updatable: boolean
-      is_unique: boolean
-      enums: string[]
-      check: string | null
-      comment: string | null
-    }
-    CreateColumnBody: {
-      tableId: number
-      name: string
-      type: string
-      check?: string
-      comment?: string
-      defaultValue?: Record<string, never>
-      /** @enum {string} */
-      defaultValueFormat?: 'expression' | 'literal'
-      /** @enum {string} */
-      identityGeneration?: 'BY DEFAULT' | 'ALWAYS'
-      isIdentity?: boolean
-      isNullable?: boolean
-      isPrimaryKey?: boolean
-      isUnique?: boolean
-    }
-    UpdateColumnBody: {
-      dropDefault?: boolean
-      name?: string
-      type?: string
-      id?: number
-      check?: string
-      comment?: string
-      defaultValue?: Record<string, never>
-      /** @enum {string} */
-      defaultValueFormat?: 'expression' | 'literal'
-      /** @enum {string} */
-      identityGeneration?: 'BY DEFAULT' | 'ALWAYS'
-      isIdentity?: boolean
-      isNullable?: boolean
-      isUnique?: boolean
-    }
-    PostgresExtension: {
-      name: string
-      schema: string | null
-      default_version: string
-      installed_version: string | null
-      comment: string | null
-    }
-    CreateExtensionBody: {
-      cascade: boolean
-      name: string
-      schema: string
-      version: string
-    }
-    PostgresForeignTable: {
-      id: number
-      schema: string
-      name: string
-      comment: string | null
-      columns?: components['schemas']['PostgresColumn'][]
-    }
-    PostgresFunction: {
-      id: number
-      schema: string
-      name: string
-      language: string
-      definition: string
-      complete_statement: string
-      argument_types: string
-      identity_argument_types: string
-      return_type: string
-      /** @enum {string} */
-      behavior: 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
-      security_definer: boolean
-      config_params: unknown
-    }
-    CreateFunctionBody: {
-      args: string[]
-      /** @enum {string} */
-      behavior: 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
-      config_params?: Record<string, never>
-      definition: string
-      language: string
-      name: string
-      return_type: string
-      schema: string
-      security_definer: boolean
-    }
-    UpdateFunctionBody: {
-      id?: number
-      args?: string[]
-      /** @enum {string} */
-      behavior?: 'VOLATILE' | 'STABLE' | 'IMMUTABLE'
-      config_params?: Record<string, never>
-      definition?: string
-      language?: string
-      name?: string
-      return_type?: string
-      schema?: string
-      security_definer?: boolean
-    }
-    PostgresMaterializedView: {
-      id: number
-      schema: string
-      name: string
-      is_populated: boolean
-      comment: string | null
-      columns?: components['schemas']['PostgresColumn'][]
-    }
-    PostgresPolicy: {
-      id: number
-      schema: string
-      table: string
-      table_id: number
-      name: string
-      /** @enum {string} */
-      action: 'PERMISSIVE' | 'RESTRICTIVE'
-      roles: string[]
-      /** @enum {string} */
-      command: 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'ALL'
-      definition: string | null
-      check: string | null
-    }
-    CreatePolicyBody: {
-      name: string
-      table: string
-      schema?: string
-      definition?: string
-      check?: string
-      /** @enum {string} */
-      action?: 'PERMISSIVE' | 'RESTRICTIVE'
-      /** @enum {string} */
-      command?: 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE' | 'ALL'
-      roles?: string[]
-    }
-    UpdatePolicyBody: {
-      id?: number
-      name?: string
-      definition?: string
-      check?: string
-      roles?: string[]
-    }
-    Table: {
-      id: number
-      name: string
-      schema: string
-    }
-    PostgresPublication: {
-      id: number
-      name: string
-      owner: string
-      publish_insert: boolean
-      publish_update: boolean
-      publish_delete: boolean
-      publish_truncate: boolean
-      tables: components['schemas']['Table'][] | null
-    }
-    CreatePublicationBody: {
-      name: string
-      owner?: string
-      tables?: string[] | null
-      publish_insert?: boolean
-      publish_update?: boolean
-      publish_delete?: boolean
-      publish_truncate?: boolean
-    }
-    UpdatePublicationBody: {
-      id?: number
-      name?: string
-      owner?: string
-      tables?: string[] | null
-      publish_insert?: boolean
-      publish_update?: boolean
-      publish_delete?: boolean
-      publish_truncate?: boolean
-    }
-    RunQueryBody: {
-      query: string
-    }
-    FormatQueryBody: {
-      query: string
-    }
-    ValidateQueryBody: {
-      query: string
-    }
-    ValidateQueryResponse: {
-      valid: boolean
-    }
-    PostgresRole: {
-      id: number
-      name: string
-      is_superuser: boolean
-      can_create_db: boolean
-      can_create_role: boolean
-      inherit_role: boolean
-      can_login: boolean
-      is_replication_role: boolean
-      can_bypass_rls: boolean
-      active_connections: number
-      connection_limit: number
-      password: string
-      valid_until: string | null
-      config: string[] | null
-    }
-    CreateRoleBody: {
-      name: string
-      password?: string
-      inherit_role?: boolean
-      can_login?: boolean
-      is_superuser?: boolean
-      can_create_db?: boolean
-      can_create_role?: boolean
-      is_replication_role?: boolean
-      can_bypass_rls?: boolean
-      connection_limit?: number
-      member_of?: string[]
-      members?: string[]
-      admins?: string[]
-      valid_until?: string
-      config?: Record<string, never>
-    }
-    UpdateRoleBody: {
-      name?: string
-      password?: string
-      inherit_role?: boolean
-      can_login?: boolean
-      is_superuser?: boolean
-      can_create_db?: boolean
-      can_create_role?: boolean
-      is_replication_role?: boolean
-      can_bypass_rls?: boolean
-      connection_limit?: number
-      valid_until?: string
-      config?: Record<string, never>
-    }
-    PostgresSchema: {
-      id: number
-      name: string
-      owner: string
-    }
-    CreateSchemaBody: {
-      name: string
-      owner: string
-    }
-    UpdateSchemaBody: {
-      name?: string
-      owner?: string
-    }
-    SearchTableBody: {
-      name: string
-      schema: string
-    }
-    SearchColumnBody: {
-      name: string
-      schema: string
-    }
-    Column: {
-      id: number
-      name: string
-      schema: string
-      table_id: number
-      table: string
-    }
-    TablePrivilege: {
-      grantor: string
-      grantee: string
-      /** @enum {string} */
-      privilege_type:
-        | 'ALL'
-        | 'SELECT'
-        | 'INSERT'
-        | 'UPDATE'
-        | 'DELETE'
-        | 'TRUNCATE'
-        | 'REFERENCES'
-        | 'TRIGGER'
-      is_grantable: boolean
-    }
-    PostgresTablePrivileges: {
-      schema: string
-      name: string
-      kind: string
-      privileges: components['schemas']['TablePrivilege'][]
-    }
-    GrantTablePrivilegesBody: {
-      is_grantable?: boolean
-      relation_id: number
-      grantee: string
-      /** @enum {string} */
-      privilege_type:
-        | 'ALL'
-        | 'SELECT'
-        | 'INSERT'
-        | 'UPDATE'
-        | 'DELETE'
-        | 'TRUNCATE'
-        | 'REFERENCES'
-        | 'TRIGGER'
-    }
-    RevokeTablePrivilegesBody: {
-      relation_id: number
-      grantee: string
-      /** @enum {string} */
-      privilege_type:
-        | 'ALL'
-        | 'SELECT'
-        | 'INSERT'
-        | 'UPDATE'
-        | 'DELETE'
-        | 'TRUNCATE'
-        | 'REFERENCES'
-        | 'TRIGGER'
-    }
-    PrimaryKey: {
-      schema: string
-      table_name: string
-      name: string
-      table_id: number
-    }
-    Relationship: {
-      id: number
-      constraint_name: string
-      source_schema: string
-      source_table_name: string
-      source_column_name: string
-      target_table_schema: string
-      target_table_name: string
-      target_column_name: string
-    }
-    PostgresTable: {
-      id: number
-      schema: string
-      name: string
-      rls_enabled: boolean
-      rls_forced: boolean
-      /** @enum {string} */
-      replica_identity: 'DEFAULT' | 'INDEX' | 'FULL' | 'NOTHING'
-      bytes: number
-      size: string
-      live_rows_estimate: number
-      dead_rows_estimate: number
-      comment: string | null
-      columns?: components['schemas']['PostgresColumn'][]
-      primary_keys: components['schemas']['PrimaryKey'][]
-      relationships: components['schemas']['Relationship'][]
-    }
-    CreateTableBody: {
-      name: string
-      schema?: string
-      comment?: string
-    }
-    UpdateTableBody: {
-      id?: number
-      rls_enabled?: boolean
-      rls_forced?: boolean
-      /** @enum {string} */
-      replica_identity?: 'DEFAULT' | 'INDEX' | 'FULL' | 'NOTHING'
-      replica_identity_index?: string
-      name?: string
-      schema?: string
-      comment?: string
-    }
-    PostgresTrigger: {
-      id: number
-      table_id: number
-      /** @enum {string} */
-      enabled_mode: 'ORIGIN' | 'REPLICA' | 'ALWAYS' | 'DISABLED'
-      name: string
-      table: string
-      schema: string
-      condition: string | null
-      /** @enum {string} */
-      orientation: 'ROW' | 'STATEMENT'
-      /** @enum {string} */
-      activation: 'AFTER' | 'BEFORE'
-      events: string[]
-      function_schema: string
-      function_name: string
-      function_args: string[]
-    }
-    CreateTriggerBody: {
-      /** @enum {string} */
-      activation: 'AFTER' | 'BEFORE'
-      /** @enum {string} */
-      enabled_mode: 'ORIGIN' | 'REPLICA' | 'ALWAYS' | 'DISABLED'
-      events: ('INSERT' | 'UPDATE' | 'DELETE')[]
-      function_args: string[]
-      function_name: string
-      function_schema: string
-      name: string
-      /** @enum {string} */
-      orientation: 'ROW' | 'STATEMENT'
-      schema: string
-      table: string
-      table_id?: number
-    }
-    UpdateTriggerBody: {
-      id?: number
-      /** @enum {string} */
-      activation?: 'AFTER' | 'BEFORE'
-      /** @enum {string} */
-      enabled_mode?: 'ORIGIN' | 'REPLICA' | 'ALWAYS' | 'DISABLED'
-      events?: ('INSERT' | 'UPDATE' | 'DELETE')[]
-      function_args?: string[]
-      function_name?: string
-      function_schema?: string
-      name?: string
-      /** @enum {string} */
-      orientation?: 'ROW' | 'STATEMENT'
-      schema?: string
-      table?: string
-      table_id?: number
-    }
-    PostgresType: {
-      id: number
-      name: string
-      schema: string
-      format: string
-      enums: string[]
-      comment: string | null
-    }
-    PostgresView: {
-      id: number
-      schema: string
-      name: string
-      is_updatable: boolean
-      comment: string | null
-      columns?: components['schemas']['PostgresColumn'][]
-    }
-    AccessToken: {
-      created_at: string
-      id: number
-      token_alias: string
-      name: string
-      /** @enum {string} */
-      scope?: 'V0'
-    }
-    CreateAccessTokenBody: {
-      name: string
-      /** @enum {string} */
-      scope?: 'V0'
-    }
-    CreateAccessTokenResponse: {
-      created_at: string
-      id: number
-      token_alias: string
-      name: string
-      /** @enum {string} */
-      scope?: 'V0'
-      token: string
-    }
-    SearchProfileBody: {
-      keywords: string
-    }
-    Profile: {
-      first_name: string
-      gotrue_id: string
-      id: number
-      last_name: string
-      username: string
-    }
-    SubscriptionStatisticsResponse: {
-      total_paid_projects: number
-      total_free_projects: number
-      total_active_free_projects: number
-      total_paused_free_projects: number
-      total_pro_projects: number
-      total_payg_projects: number
-      total_team_projects: number
-      total_enterprise_projects: number
-    }
-    PasswordCheckBody: {
-      password: string
-    }
-    PasswordCheckResponse: {
-      result: {
-        feedback?: {
-          warning?: string
-          suggestions?: string[]
-        }
-        score?: number
-      }
-    }
-    Permission: {
-      actions: (
-        | 'analytics:Read'
-        | 'auth:Execute'
-        | 'billing:Read'
-        | 'billing:Write'
-        | 'write:Create'
-        | 'write:Delete'
-        | 'functions:Read'
-        | 'functions:Write'
-        | 'infra:Execute'
-        | 'read:Read'
-        | 'sql:Read:Select'
-        | 'sql:Write:Delete'
-        | 'sql:Write:Insert'
-        | 'sql:Write:Update'
-        | 'storage:Admin:Read'
-        | 'storage:Admin:Write'
-        | 'tenant:Sql:Admin:Read'
-        | 'tenant:Sql:Admin:Write'
-        | 'tenant:Sql:CreateTable'
-        | 'tenant:Sql:Write:Delete'
-        | 'tenant:Sql:Write:Insert'
-        | 'tenant:Sql:Query'
-        | 'tenant:Sql:Read:Select'
-        | 'tenant:Sql:Write:Update'
-        | 'write:Update'
-      )[]
-      condition: unknown
-      organization_id: number
-      resources: string[]
-    }
-    ProfileResponse: {
-      id: number
-      auth0_id: string
-      primary_email: string
-      username: string
-      first_name: string
-      last_name: string
-      mobile: string
-      is_alpha_user: boolean
-      gotrue_id: string
-      free_project_limit: number
-      disabled_features: (
-        | 'organizations:create'
-        | 'organizations:delete'
-        | 'organization_members:create'
-        | 'organization_members:delete'
-        | 'projects:create'
-        | 'projects:transfer'
-        | 'project_auth:all'
-        | 'project_storage:all'
-        | 'project_edge_function:all'
-        | 'profile:update'
-        | 'billing:account_data'
-        | 'billing:credits'
-        | 'billing:invoices'
-        | 'billing:payment_methods'
-        | 'realtime:all'
-      )[]
-    }
-    UpdateProfileBody: {
-      first_name: string
-      last_name: string
-    }
-    /** @enum {string} */
-    DbInstanceSize:
-      | 'nano'
-      | 'micro'
-      | 'small'
-      | 'medium'
-      | 'large'
-      | 'xlarge'
-      | '2xlarge'
-      | '4xlarge'
-      | '8xlarge'
-      | '12xlarge'
-      | '16xlarge'
-    ProjectInfo: {
-      infra_compute_size?: components['schemas']['DbInstanceSize']
-      cloud_provider: string
-      id: number
-      inserted_at: string
-      name: string
-      organization_id: number
-      ref: string
-      region: string
-      status: string
-      subscription_id: string
-      is_branch_enabled: boolean
-      is_read_replicas_enabled: boolean
-      preview_branch_refs: string[]
-      disk_volume_size_gb?: number
-    }
-    GetProjectByFlyExtensionIdResponse: {
-      ref: string
-    }
-    /** @enum {string} */
-    DesiredInstanceSize:
-      | 'micro'
-      | 'small'
-      | 'medium'
-      | 'large'
-      | 'xlarge'
-      | '2xlarge'
-      | '4xlarge'
-      | '8xlarge'
-      | '12xlarge'
-      | '16xlarge'
-    AmiSearchOptions: {
-      search_tags?: Record<string, never>
-    }
-    CustomSupabaseInternalRequests: {
-      ami: components['schemas']['AmiSearchOptions']
-    }
-    CreateProjectBody: {
-      /** @deprecated */
-      kps_enabled?: boolean
-      desired_instance_size?: components['schemas']['DesiredInstanceSize']
-      cloud_provider: string
-      org_id: number
-      name: string
-      db_pass: string
-      db_region: string
-      db_pricing_tier_id?: string
-      db_sql?: string
-      auth_site_url?: string
-      vercel_configuration_id?: string
-      custom_supabase_internal_requests?: components['schemas']['CustomSupabaseInternalRequests']
-    }
-    CreateProjectResponse: {
-      infra_compute_size?: components['schemas']['DbInstanceSize']
-      cloud_provider: string
-      id: number
-      inserted_at: string
-      name: string
-      organization_id: number
-      ref: string
-      region: string
-      status: string
-      subscription_id: string
-      is_branch_enabled: boolean
-      is_read_replicas_enabled: boolean
-      preview_branch_refs: string[]
-      disk_volume_size_gb?: number
-      endpoint: string
-      anon_key: string
-      service_key: string
-    }
-    GetUserContentObject: {
-      owner: {
-        id?: number
-        username?: string
-      }
-      updated_by: {
-        id?: number
-        username?: string
-      }
-      id: string
-      inserted_at: string
-      updated_at: string
-      type: Record<string, never>
-      visibility: Record<string, never>
-      name: string
-      description?: string
-      project_id: number
-      owner_id: number
-      last_updated_by: number
-    }
-    GetUserContentResponse: {
-      data: components['schemas']['GetUserContentObject'][]
-    }
-    CreateContentParams: {
-      id: string
-      name: string
-      description: string
-      /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
-      /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
-      content?: Record<string, never>
-      owner_id?: number
-    }
-    UserContentObject: {
-      id: string
-      inserted_at: string
-      updated_at: string
-      type: Record<string, never>
-      visibility: Record<string, never>
-      name: string
-      description?: string
-      project_id: number
-      owner_id: number
-      last_updated_by: number
-    }
-    UpsertContentParams: {
-      id: string
-      name: string
-      description: string
-      /** @enum {string} */
-      type: 'sql' | 'report' | 'log_sql'
-      /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
-      content?: Record<string, never>
-      owner_id?: number
-      project_id: number
-    }
-    UpdateContentParams: {
-      id?: string
-      name?: string
-      description?: string
-      /** @enum {string} */
-      type?: 'sql' | 'report' | 'log_sql'
-      /** @enum {string} */
-      visibility?: 'user' | 'project' | 'org' | 'public'
-      content?: Record<string, never>
-      owner_id?: number
-    }
-    BulkDeleteUserContentResponse: {
-      id: string
-    }
-    DatabaseDetailResponse: {
-      /** @enum {string} */
-      status:
-        | 'ACTIVE_HEALTHY'
-        | 'ACTIVE_UNHEALTHY'
-        | 'COMING_UP'
-        | 'GOING_DOWN'
-        | 'INIT_FAILED'
-        | 'REMOVED'
-        | 'RESTORING'
-        | 'UNKNOWN'
-        | 'UPGRADING'
-        | 'INIT_READ_REPLICA'
-        | 'INIT_READ_REPLICA_FAILED'
-      /** @enum {string} */
-      cloud_provider: 'AWS' | 'FLY'
-      db_port: number
-      db_name: string
-      db_user: string
-      restUrl: string
-      db_host: string
-      connectionString: string
-      identifier: string
-      inserted_at: string
-      size: string
-      region: string
-    }
-    DatabaseStatusResponse: {
-      /** @enum {string} */
-      status:
-        | 'ACTIVE_HEALTHY'
-        | 'ACTIVE_UNHEALTHY'
-        | 'COMING_UP'
-        | 'GOING_DOWN'
-        | 'INIT_FAILED'
-        | 'REMOVED'
-        | 'RESTORING'
-        | 'UNKNOWN'
-        | 'UPGRADING'
-        | 'INIT_READ_REPLICA'
-        | 'INIT_READ_REPLICA_FAILED'
-      identifier: string
-    }
-    UpdatePasswordBody: {
-      password: string
-    }
-    LoadBalancerDatabase: {
-      identifier: string
-      /** @enum {string} */
-      type: 'PRIMARY' | 'READ_REPLICA'
-      status: string
-    }
-    LoadBalancerDetailResponse: {
-      endpoint: string
-      databases: components['schemas']['LoadBalancerDatabase'][]
-    }
-    Buffer: Record<string, never>
-    ResizeBody: {
-      volume_size_gb: number
-    }
-    ServiceVersions: {
-      gotrue: string
-      postgrest: string
-      'supabase-postgres': string
-    }
-    ProjectDetailResponse: {
-      infra_compute_size?: components['schemas']['DbInstanceSize']
-      cloud_provider: string
-      db_host: string
-      id: number
-      inserted_at: string
-      name: string
-      organization_id: number
-      ref: string
-      region: string
-      /** @enum {string} */
-      status:
-        | 'INACTIVE'
-        | 'ACTIVE_HEALTHY'
-        | 'ACTIVE_UNHEALTHY'
-        | 'COMING_UP'
-        | 'UNKNOWN'
-        | 'GOING_DOWN'
-        | 'INIT_FAILED'
-        | 'REMOVED'
-        | 'RESTORING'
-        | 'UPGRADING'
-      subscription_id: string
-      connectionString: string
-      kpsVersion?: string
-      dbVersion?: string
-      restUrl: string
-      serviceVersions?: components['schemas']['ServiceVersions']
-      volumeSizeGb?: number
-      maxDatabasePreprovisionGb?: number
-      lastDatabaseResizeAt?: string
-      is_branch_enabled: boolean
-      parent_project_ref?: string
-      is_read_replicas_enabled: boolean
-      v2MaintenanceWindow: {
-        start?: string
-        end?: string
-      }
-    }
-    ProjectRefResponse: {
-      id: number
-      ref: string
-      name: string
-    }
-    UpdateProjectBody: {
-      name: string
-    }
-    BackupId: {
-      id: number
-    }
-    RestoreProjectInfo: {
-      id: number
-      status: string
-      organization_id: number
-      subscription_id: string
-      region: string
-      cloud_provider: string
-      back_ups: components['schemas']['BackupId'][]
-    }
-    RestartServiceRequest: {
-      services: (
-        | 'adminapi'
-        | 'api-gateway'
-        | 'envoy'
-        | 'functions'
-        | 'gotrue'
-        | 'kong'
-        | 'pgbouncer'
-        | 'pgsodium'
-        | 'postgresql'
-        | 'postgrest'
-        | 'realtime'
-        | 'storage'
-        | 'walg'
-        | 'autoshutdown'
-      )[]
-      source_notification_id?: string
-      region: string
-    }
-    RestartServicesBody: {
-      restartRequest: components['schemas']['RestartServiceRequest']
-    }
-    ProjectAppConfigResponse: {
-      db_schema: string
-      endpoint: string
-    }
-    ProjectServiceApiKeyResponse: {
-      api_key: string
-      name: string
-      tags: string
-    }
-    ProjectSettingsResponse: {
-      name: string
-      ref: string
-      status: string
-      inserted_at: string
-      db_dns_name: string
-      db_host: string
-      db_name: string
-      db_user: string
-      db_port: string
-      ssl_enforced: boolean
-      cloud_provider: string
-      region: string
-      app_config?: components['schemas']['ProjectAppConfigResponse']
-      jwt_secret?: string
-      service_api_keys?: components['schemas']['ProjectServiceApiKeyResponse'][]
-      /** @enum {string|null} */
-      db_ip_addr_config: 'legacy' | 'static-ipv4' | 'concurrent-ipv6' | 'ipv6' | null
-    }
-    TransferProjectBody: {
-      target_organization_slug: string
-    }
-    PreviewTransferInfo: {
-      key: string
-      message: string
-    }
-    MemberExceedingFreeProjectLimit: {
-      name: string
-      limit: number
-    }
-    PreviewTransferInvoiceItem: {
-      description: string
-      quantity: number
-      amount: number
-    }
-    PreviewProjectTransferResponse: {
-      source_subscription_plan: components['schemas']['BillingPlanId']
-      target_subscription_plan: components['schemas']['BillingPlanId']
-      valid: boolean
-      warnings: components['schemas']['PreviewTransferInfo'][]
-      errors: components['schemas']['PreviewTransferInfo'][]
-      members_exceeding_free_project_limit: components['schemas']['MemberExceedingFreeProjectLimit'][]
-      has_permissions_on_source_organization: boolean
-      has_access_to_target_organization: boolean
-      source_project_eligible: boolean
-      target_organization_eligible: boolean | null
-      target_organization_has_free_project_slots: boolean | null
-      credits_on_source_organization: number
-      costs_on_target_organization: number
-      charge_on_target_organization: number
-      source_invoice_items: components['schemas']['PreviewTransferInvoiceItem'][]
-      target_invoice_items: components['schemas']['PreviewTransferInvoiceItem'][]
-    }
-    AnalyticsResponse: {
-      error?: OneOf<
-        [
-          {
-            code?: number
-            errors?: {
-              domain?: string
-              location?: string
-              locationType?: string
-              message?: string
-              reason?: string
-            }[]
-            message?: string
-            status?: string
-          },
-          string,
-        ]
-      >
-      result?: Record<string, never>[]
-    }
-    PgbouncerConfigResponse: {
-      default_pool_size?: number
-      ignore_startup_parameters?: string
-      max_client_conn?: number
-      /** @enum {string} */
-      pool_mode?: 'transaction' | 'session' | 'statement'
-      inserted_at: string
-      db_dns_name: string
-      db_user: string
-      db_host: string
-      db_port: number
-      db_name: string
-      ssl_enforced: boolean
-      pgbouncer_enabled: boolean
-      supavisor_enabled: boolean
-      /** @enum {string} */
-      pgbouncer_status: 'COMING_DOWN' | 'COMING_UP' | 'DISABLED' | 'ENABLED' | 'RELOADING'
-      connectionString: string
-    }
-    PgbouncerStatusResponse: {
-      active: boolean
-    }
-    UpdatePgbouncerConfigBody: {
-      default_pool_size?: number
-      max_client_conn?: number | null
-      ignore_startup_parameters: string
-      pgbouncer_enabled: boolean
-      /** @enum {string} */
-      pool_mode: 'transaction' | 'session' | 'statement'
-    }
-    UpdatePoolingConfigResponse: {
-      default_pool_size?: number
-      max_client_conn?: number | null
-      ignore_startup_parameters: string
-      pgbouncer_enabled: boolean
-      /** @enum {string} */
-      pool_mode: 'transaction' | 'session' | 'statement'
-      /** @enum {string} */
-      pgbouncer_status: 'COMING_DOWN' | 'COMING_UP' | 'DISABLED' | 'ENABLED' | 'RELOADING'
-    }
-    PostgrestConfigResponse: {
-      db_schema: string
-      db_anon_role: string
-      role_claim_key: string
-      jwt_secret: string
-      max_rows: number
-      db_extra_search_path: string
-    }
-    UpdatePostgrestConfigBody: {
-      max_rows?: number
-      db_extra_search_path?: string
-      db_schema?: string
-    }
-    V1PostgrestConfigResponse: {
-      max_rows: number
-      db_schema: string
-      db_extra_search_path: string
-    }
-    PostgresConfigResponse: {
-      statement_timeout?: string
-      effective_cache_size?: string
-      maintenance_work_mem?: string
-      max_connections?: number
-      max_locks_per_transaction?: number
-      max_parallel_maintenance_workers?: number
-      max_parallel_workers?: number
-      max_parallel_workers_per_gather?: number
-      max_worker_processes?: number
-      shared_buffers?: string
-      work_mem?: string
-      /** @enum {string} */
-      session_replication_role?: 'origin' | 'replica' | 'local'
-    }
-    UpdatePostgresConfigBody: {
-      statement_timeout?: string
-      effective_cache_size?: string
-      maintenance_work_mem?: string
-      max_connections?: number
-      max_locks_per_transaction?: number
-      max_parallel_maintenance_workers?: number
-      max_parallel_workers?: number
-      max_parallel_workers_per_gather?: number
-      max_worker_processes?: number
-      shared_buffers?: string
-      work_mem?: string
-      /** @enum {string} */
-      session_replication_role?: 'origin' | 'replica' | 'local'
-    }
-    UpdateSecretsConfigBody: {
-      jwt_secret: string
-      change_tracking_id: string
-    }
-    UpdateSecretsResponse: {
-      message: string
-    }
-    StorageConfigResponse: {
-      isFreeTier: boolean
-      fileSizeLimit: number
-    }
-    UpdateStorageConfigBody: {
-      fileSizeLimit: number
-    }
-    UpdateStorageConfigResponse: {
-      fileSizeLimit: number
-    }
-    SupavisorConfigResponse: {
-      identifier: string
-      /** @enum {string} */
-      database_type: 'PRIMARY' | 'READ_REPLICA'
-      is_using_scram_auth: boolean
-      db_user: string
-      db_host: string
-      db_port: number
-      db_name: string
-      connectionString: string
-      default_pool_size: number | null
-      max_client_conn: number | null
-      /** @enum {string|null} */
-      pool_mode: 'transaction' | 'session' | 'statement' | null
-    }
-    UpdateSupavisorConfigBody: {
-      default_pool_size?: number
-      /** @enum {string} */
-      pool_mode: 'transaction' | 'session' | 'statement'
-    }
-    UpdateSupavisorConfigResponse: {
-      default_pool_size?: number
-      /** @enum {string} */
-      pool_mode: 'transaction' | 'session' | 'statement'
-    }
-    AvailableAddonResponse: {
-      type: components['schemas']['ProjectAddonType']
-      name: string
-      variants: components['schemas']['ProjectAddonVariantResponse'][]
-    }
-    ProjectAddonsResponse: {
-      ref: string
-      selected_addons: components['schemas']['SelectedAddonResponse'][]
-      available_addons: components['schemas']['AvailableAddonResponse'][]
-    }
+    ProjectAddonType: 'custom_domain' | 'compute_instance' | 'pitr' | 'ipv4'
     UpdateAddonBody: {
       addon_variant: components['schemas']['AddonVariantId']
       addon_type: components['schemas']['ProjectAddonType']
     }
-    ServiceApiKey: {
-      api_key_encrypted?: string
-      tags: string
-      name: string
-    }
-    AutoApiService: {
-      protocol: string
-      endpoint: string
-      restUrl: string
-      project: {
-        ref?: string
-      }
-      defaultApiKey: string
-      serviceApiKey: string
-      id: number
-      name: string
-      app_config: Record<string, never>
-      app: {
-        id?: number
-        name?: string
-      }
-      service_api_keys: components['schemas']['ServiceApiKey'][]
-    }
-    ApiResponse: {
-      autoApiService: components['schemas']['AutoApiService']
-    }
-    JwtSecretUpdateStatus: {
-      jwtSecretUpdateStatus: {
-        change_tracking_id?: string
-        /** @enum {number} */
-        error?: 0 | 1 | 2 | 3 | 4 | 5
-        /** @enum {number} */
-        progress?: 0 | 1 | 2 | 3 | 4 | 5
-        /** @enum {number} */
-        status?: 0 | 1 | 2
-      }
-    }
-    ServiceApiKeyResponse: {
-      api_key_encrypted?: string
-      tags: string
-      name: string
-      api_key?: string
-    }
-    ServiceResponse: {
-      service_api_keys: components['schemas']['ServiceApiKeyResponse'][]
-      id: number
-      name: string
-      app_config: Record<string, never>
-      app: {
-        id?: number
-        name?: string
-      }
-    }
-    ProjectResponse: {
-      jwt_secret: string
-      services?: components['schemas']['ServiceResponse'][]
-      id: number
-      name: string
-      ref: string
-      status: string
-      inserted_at: string
-      db_dns_name: string
-      db_host: string
-      db_name: string
-      db_user: string
-      db_port: string
-      ssl_enforced: boolean
-      cloud_provider: string
-      region: string
-    }
-    SettingsResponse: {
-      project: components['schemas']['ProjectResponse']
-      services: components['schemas']['ServiceResponse'][]
-    }
-    StorageBucket: {
-      id: string
-      name: string
-      owner: string
-      created_at: string
-      updated_at: string
-      public: boolean
-    }
-    UpdateStorageBucketBody: {
-      public: boolean
-      file_size_limit: number
-      allowed_mime_types: string[]
-    }
-    CreateStorageBucketBody: {
-      id: string
-      public: boolean
-      file_size_limit: number
-      allowed_mime_types: string[]
-    }
-    StorageObjectSortBy: {
-      column?: string
-      order?: string
-    }
-    StorageObjectSearchOptions: {
-      limit?: number
-      offset?: number
-      sortBy?: components['schemas']['StorageObjectSortBy']
-      search?: string
-    }
-    GetObjectsBody: {
-      path: string
-      options: components['schemas']['StorageObjectSearchOptions']
-    }
-    StorageObject: {
-      name: string
-      bucket_id: string
-      owner: string
-      id: string
-      updated_at: string
-      created_at: string
-      last_accessed_at: string
-      metadata: Record<string, never>
-      buckets: components['schemas']['StorageBucket']
-    }
-    StorageObjectTransformOptions: {
-      width?: number
-      height?: number
-      /** @enum {string} */
-      resize?: 'cover' | 'contain' | 'fill'
-      quality?: number
-      /** @enum {string} */
-      format?: 'origin'
-    }
-    PublicUrlOptions: {
-      transform?: components['schemas']['StorageObjectTransformOptions']
-      download?: boolean
-      downloadName?: string
-    }
-    GetPublicUrlBody: {
-      path: string
-      options?: components['schemas']['PublicUrlOptions']
-    }
-    PublicUrlResponse: {
-      publicUrl: string
-    }
-    DownloadObjectOptions: {
-      transform?: components['schemas']['StorageObjectTransformOptions']
-      download?: boolean
-      downloadName?: string
-    }
-    DownloadObjectBody: {
-      path: string
-      options?: components['schemas']['DownloadObjectOptions']
-    }
-    SignedUrlOptions: {
-      transform?: components['schemas']['StorageObjectTransformOptions']
-      download?: boolean
-      downloadName?: string
-    }
-    GetSignedUrlBody: {
-      path: string
-      expiresIn: number
-      options?: components['schemas']['SignedUrlOptions']
-    }
-    SignedUrlResponse: {
-      signedUrl: string
-    }
-    SignedUrlsOptions: {
-      download?: boolean
-      downloadName?: string
-    }
-    GetSignedUrlsBody: {
-      path: string[]
-      expiresIn: number
-      options?: components['schemas']['SignedUrlsOptions']
-    }
-    SignedUrlsResponse: {
-      signedUrl: string
-      error: string | null
-      path: string | null
-    }
-    CopyObjectBody: {
-      from: string
-      to: string
-    }
-    CopyObjectResponse: {
-      path: string
-    }
-    MoveObjectBody: {
-      from: string
-      to: string
-    }
-    DeleteObjectsBody: {
-      paths: string[]
-    }
-    Invoice: {
-      id: string
-      invoice_pdf: string
-      subscription: string
-      subtotal: number
-      number: string
-      period_end: number
-      status: string
-    }
-    OverdueInvoiceCount: {
-      organization_id: number
-      overdue_invoice_count: number
-    }
-    GoogleAnalyticBody: {
-      language?: string
-      screen_resolution?: string
-      session_id: string
-    }
-    TelemetryEventBody: {
-      category: string
-      action: string
-      label?: Record<string, never>
-      value?: string
-      page_referrer?: string
-      page_title?: string
-      page_location?: string
-      ga?: components['schemas']['GoogleAnalyticBody']
-    }
-    IdentifyUserBody: {
-      id: number
-      gotrue_id: string
-      mobile?: string
-      primary_email: string
-      username?: string
-      first_name?: string
-      last_name?: string
-      is_alpha_user?: boolean
-      free_project_limit?: number
-      auth0_id?: string
-    }
-    TelemetryIdentifyBody: {
-      user: components['schemas']['IdentifyUserBody']
-      ga?: components['schemas']['GoogleAnalyticBody']
-    }
-    TelemetryPageBody: {
-      referrer: string
-      title: string
-      route?: string
-      ga?: components['schemas']['GoogleAnalyticBody']
-    }
-    PageBody: {
-      path: string
-      location: string
-      referrer?: string
-      title?: string
-    }
-    TelemetryActivityBody: {
-      activity: string
-      source: string
-      projectRef?: string
-      orgSlug?: string
-      data?: Record<string, never>
-      page: components['schemas']['PageBody']
-    }
-    TelemetryPageviewBody: {
-      projectRef?: string
-      orgSlug?: string
-      referrer: string
-      title: string
-      path: string
-      location: string
-    }
-    CreateVercelEnvironmentVariableBody: {
-      key: string
-      target: string[]
-      type: string
-      value: string
-    }
-    GetUserOrganizationIntegrationResponse: {
-      id: string
-      inserted_at: string
-      updated_at: string
-      metadata: Record<string, never>
-      integration: {
-        name?: string
-      }
-      added_by: {
-        username?: string
-        primary_email?: string
-      }
-      organization: {
-        slug?: string
-      }
-    }
-    ProjectIntegrationConnection: {
-      id: string
-      inserted_at: string
-      updated_at: string
-      organization_integration_id: string
-      supabase_project_ref: string
-      added_by: {
-        username?: string
-        primary_email?: string
-      }
-    }
-    GetOrganizationIntegrationResponse: {
-      id: string
-      inserted_at: string
-      updated_at: string
-      metadata: Record<string, never>
-      integration: {
-        name?: string
-      }
-      added_by: {
-        username?: string
-        primary_email?: string
-      }
-      organization: {
-        slug?: string
-      }
-      connections: components['schemas']['ProjectIntegrationConnection'][]
-    }
-    CreateVercelIntegrationBody: {
-      code: string
-      configuration_id: string
-      organization_slug: string
-      metadata: Record<string, never>
-      source: string
-      teamId?: string
-    }
-    VercelProjectDeployHooks: {
-      createdAt?: number
-      id: string
-      name: string
-      ref: string
-      url: string
-    }
-    VercelProjectLink: {
-      type?: string
-      deployHooks: components['schemas']['VercelProjectDeployHooks'][]
-      gitCredentialId?: string
-      productionBranch?: string
-    }
-    IntegrationVercelProject: {
-      id: string
-      name: string
-      framework?: string | null
-      link?: components['schemas']['VercelProjectLink']
-    }
-    GetVercelProjectsResponse: {
-      projects: components['schemas']['IntegrationVercelProject'][]
-      pagination: {
-        count?: number
-        next?: number | null
-        prev?: number | null
-      }
-    }
-    GetVercelConnections: {
-      id: string
-      inserted_at: string
-      updated_at: string
-      organization_integration_id: string
-      supabase_project_ref: string
-      foreign_project_id: string
-      metadata: Record<string, never>
-    }
-    IntegrationConnectionVercel: {
-      foreign_project_id: string
-      supabase_project_ref: string
-      metadata: Record<string, never>
-    }
-    CreateVercelConnectionsBody: {
-      organization_integration_id: string
-      connection: components['schemas']['IntegrationConnectionVercel']
-    }
-    SyncVercelEnvError: {
-      message: string
-    }
-    CreateVercelConnectionResponse: {
-      id: string
-      env_sync_error?: components['schemas']['SyncVercelEnvError']
-    }
-    UpdateVercelConnectionsBody: {
-      metadata: Record<string, never>
-    }
-    DeleteVercelConnectionResponse: {
-      id: string
-    }
-    GitHubAuthorization: {
-      id: number
-      user_id: number
-      sender_id: number
-    }
-    CreateGitHubAuthorizationBody: {
-      code: string
-    }
-    ListGitHubConnectionsProject: {
-      id: number
-      ref: string
-      name: string
-    }
-    ListGitHubConnectionsRepository: {
-      id: number
-      name: string
-    }
-    ListGitHubConnectionsUser: {
-      id: number
-      username: string
-      primary_email: string | null
-    }
-    ListGitHubConnectionsConnection: {
-      id: number
-      inserted_at: string
-      updated_at: string
-      installation_id: number
-      project: components['schemas']['ListGitHubConnectionsProject']
-      repository: components['schemas']['ListGitHubConnectionsRepository']
-      user: components['schemas']['ListGitHubConnectionsUser'] | null
-      workdir: string
-    }
-    ListGitHubConnectionsResponse: {
-      connections: components['schemas']['ListGitHubConnectionsConnection'][]
-    }
-    CreateGitHubConnectionsBody: {
-      project_ref: string
-      installation_id: number
-      repository_id: number
-    }
-    UpdateGitHubConnectionsBody: {
-      workdir?: string
-      supabase_changes_only?: boolean
-    }
-    CreateCliLoginSessionBody: {
-      session_id: string
-      public_key: string
-      token_name?: string
-    }
-    FunctionResponse: {
-      id: string
+    ApiResponse: Record<string, never>
+    SettingsResponse: Record<string, never>
+    UpdateStorageBucketBody: Record<string, never>
+    CreateStorageBucketBody: Record<string, never>
+    GetObjectsBody: Record<string, never>
+    GetPublicUrlBody: Record<string, never>
+    DownloadObjectBody: Record<string, never>
+    GetSignedUrlBody: Record<string, never>
+    GetSignedUrlsBody: Record<string, never>
+    CopyObjectBody: Record<string, never>
+    MoveObjectBody: Record<string, never>
+    DeleteObjectsBody: Record<string, never>
+    CreateStorageCredentialBody: Record<string, never>
+    TelemetryEventBody: Record<string, never>
+    TelemetryIdentifyBody: Record<string, never>
+    TelemetryPageBody: Record<string, never>
+    TelemetryActivityBody: Record<string, never>
+    TelemetryPageviewBody: Record<string, never>
+    CreateVercelEnvironmentVariableBody: Record<string, never>
+    CreateVercelIntegrationBody: Record<string, never>
+    CreateVercelConnectionsBody: Record<string, never>
+    UpdateVercelConnectionsBody: Record<string, never>
+    CreateGitHubAuthorizationBody: Record<string, never>
+    CreateGitHubConnectionsBody: Record<string, never>
+    UpdateGitHubConnectionsBody: Record<string, never>
+    CreateCliLoginSessionBody: Record<string, never>
+    V1UpdateFunctionBody: {
+      name?: string
+      body?: string
+      verify_jwt?: boolean
+    }
+    V1CreateFunctionBody: {
       slug: string
       name: string
-      /** @enum {string} */
-      status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
-      version: number
-      created_at: number
-      updated_at: number
+      body: string
       verify_jwt?: boolean
-      import_map?: boolean
-      entrypoint_path?: string
-      import_map_path?: string
-    }
-    SecretResponse: {
-      name: string
-      value: string
     }
     CreateSecretBody: {
       /**
@@ -4401,49 +2101,15 @@ export interface components {
        * @example string
        */
       name: string
-      value: string
     }
-    HealthResponse: {
-      healthy: boolean
-    }
-    ReportStatusBody: {
-      /** @enum {string} */
-      status:
-        | 'ACTIVE_HEALTHY'
-        | 'ACTIVE_UNHEALTHY'
-        | 'COMING_UP'
-        | 'GOING_DOWN'
-        | 'INIT_FAILED'
-        | 'REMOVED'
-        | 'RESTORING'
-        | 'UNKNOWN'
-        | 'UPGRADING'
-        | 'INIT_READ_REPLICA'
-        | 'INIT_READ_REPLICA_FAILED'
-      reportingToken: string
-      databaseIdentifier: string
-    }
-    EventBody: {
-      reportingToken: string
-      eventType: string
-      message: string
-    }
-    CredentialsRequestBody: {
-      projectToken: string
-    }
-    CredentialsResponseBody: {
-      access_key_id: string
-      secret_access_key: string
-      session_token: string
-      /** Format: date-time */
-      expiry_time: string
-    }
+    ReportStatusBody: Record<string, never>
+    EventBody: Record<string, never>
+    CredentialsRequestBody: Record<string, never>
     UpdateAddonAdminBody: {
       addon_variant: components['schemas']['AddonVariantId']
       addon_type: components['schemas']['ProjectAddonType']
       /** @enum {string} */
-      proration_behaviour?: 'prorate_and_invoice_end_of_cycle' | 'prorate_and_invoice_now'
-      price_id?: string
+      proration_behaviour: 'prorate_and_invoice_end_of_cycle' | 'prorate_and_invoice_now'
     }
     SystemCreateProjectBody: {
       /** @description Database password */
@@ -4479,11 +2145,6 @@ export interface components {
         | 'ca-central-1'
         | 'ap-south-1'
         | 'sa-east-1'
-      jwt_secret: string
-      anon_key: string
-      service_key: string
-      api_key_supabase: string
-      db_pass_supabase: string
     }
     SystemDatabaseResponse: {
       /** @description Database host */
@@ -4510,105 +2171,54 @@ export interface components {
       created_at: string
       database?: components['schemas']['SystemDatabaseResponse']
     }
-    UpdateSubscriptionV2AdminBody: {
-      payment_method?: string
-      /** @enum {string} */
-      tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
-      price_id?: string
-    }
-    RestrictionData: {
-      grace_period_end?: string
-      /** @enum {string} */
-      restrictions?: 'drop_requests_402'
-      violations?: (
-        | 'exceed_db_size_quota'
-        | 'exceed_egress_quota'
-        | 'exceed_edge_functions_count_quota'
-        | 'exceed_edge_functions_invocations_quota'
-        | 'exceed_monthly_active_users_quota'
-        | 'exceed_realtime_connection_count_quota'
-        | 'exceed_realtime_message_count_quota'
-        | 'exceed_storage_size_quota'
-        | 'overdue_payment'
-      )[]
-    }
-    UpdateRestrictionsBody: {
-      /** @enum {string} */
-      restriction_status: 'grace_period' | 'grace_period_over' | 'null' | 'restricted'
-      restriction_data?: components['schemas']['RestrictionData']
-      no_notification?: boolean
-    }
-    UpdateRestrictionsResponse: {
-      slug: string
-      /** @enum {string} */
-      restriction_status?: 'grace_period' | 'grace_period_over' | 'null' | 'restricted'
-      restriction_data?: components['schemas']['RestrictionData']
-      message?: string
-    }
-    GetMetricsBody: {
-      /** @enum {string} */
-      metric: 'user_queries'
-      /** @enum {string} */
-      interval: '1d' | '3d' | '7d'
-      project_refs: string[]
-      region: string
-    }
-    ProjectMetric: {
-      project_ref: string
-      metric: string
-      value: number
-    }
-    GetMetricsResponse: {
-      metrics: components['schemas']['ProjectMetric'][]
-    }
-    BranchDetailResponse: {
-      db_port: number
-      ref: string
-      postgres_version: string
-      /** @enum {string} */
-      status:
-        | 'ACTIVE_HEALTHY'
-        | 'ACTIVE_UNHEALTHY'
-        | 'COMING_UP'
-        | 'GOING_DOWN'
-        | 'INACTIVE'
-        | 'INIT_FAILED'
-        | 'REMOVED'
-        | 'RESTORING'
-        | 'UNKNOWN'
-        | 'UPGRADING'
-        | 'PAUSING'
-      db_host: string
-      db_user?: string
-      db_pass?: string
-      jwt_secret?: string
-    }
-    UpdateBranchBody: {
-      branch_name?: string
-      git_branch?: string
-      reset_on_push?: boolean
-      persistent?: boolean
-    }
-    BranchResponse: {
-      id: string
+    UpdateSubscriptionV2AdminBody: Record<string, never>
+    UpdateRestrictionsBody: Record<string, never>
+    CreateAwsPartnerOrganizationBody: Record<string, never>
+    GetMetricsBody: Record<string, never>
+    UpdateBranchBody: Record<string, never>
+    V1CreateProjectBody: {
+      /** @description Database password */
+      db_pass: string
+      /** @description Name of your project, should not contain dots */
       name: string
-      project_ref: string
-      parent_project_ref: string
-      is_default: boolean
-      git_branch?: string
-      pr_number?: number
-      reset_on_push: boolean
-      persistent: boolean
-      /** @enum {string} */
-      status: 'CREATING_PROJECT' | 'RUNNING_MIGRATIONS' | 'MIGRATIONS_PASSED' | 'MIGRATIONS_FAILED'
-      created_at: string
-      updated_at: string
-    }
-    BranchDeleteResponse: {
-      message: string
-    }
-    BranchResetResponse: {
-      message: string
+      /** @description Slug of your organization */
+      organization_id: string
+      /**
+       * @deprecated
+       * @description Subscription plan is now set on organization level and is ignored in this request
+       * @example free
+       * @enum {string}
+       */
+      plan: 'free' | 'pro'
+      /**
+       * @description Region you want your server to reside in
+       * @example us-east-1
+       * @enum {string}
+       */
+      region:
+        | 'us-east-1'
+        | 'us-west-1'
+        | 'us-west-2'
+        | 'ap-east-1'
+        | 'ap-southeast-1'
+        | 'ap-northeast-1'
+        | 'ap-northeast-2'
+        | 'ap-southeast-2'
+        | 'eu-west-1'
+        | 'eu-west-2'
+        | 'eu-west-3'
+        | 'eu-central-1'
+        | 'ca-central-1'
+        | 'ap-south-1'
+        | 'sa-east-1'
+      /** @deprecated */
+      kps_enabled: boolean
+      desired_instance_size: components['schemas']['DesiredInstanceSize']
+      /**
+       * @description Template URL used to create the project from the CLI.
+       * @example https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone
+       */
+      template_url: string
     }
     V1DatabaseResponse: {
       /** @description Database host */
@@ -4635,186 +2245,14 @@ export interface components {
       created_at: string
       database?: components['schemas']['V1DatabaseResponse']
     }
-    V1CreateProjectBody: {
-      /** @description Database password */
-      db_pass: string
-      /** @description Name of your project, should not contain dots */
-      name: string
-      /** @description Slug of your organization */
-      organization_id: string
-      /**
-       * @deprecated
-       * @description Subscription plan is now set on organization level and is ignored in this request
-       * @example free
-       * @enum {string}
-       */
-      plan?: 'free' | 'pro'
-      /**
-       * @description Region you want your server to reside in
-       * @example us-east-1
-       * @enum {string}
-       */
-      region:
-        | 'us-east-1'
-        | 'us-west-1'
-        | 'us-west-2'
-        | 'ap-east-1'
-        | 'ap-southeast-1'
-        | 'ap-northeast-1'
-        | 'ap-northeast-2'
-        | 'ap-southeast-2'
-        | 'eu-west-1'
-        | 'eu-west-2'
-        | 'eu-west-3'
-        | 'eu-central-1'
-        | 'ca-central-1'
-        | 'ap-south-1'
-        | 'sa-east-1'
-      /** @deprecated */
-      kps_enabled?: boolean
-      desired_instance_size?: components['schemas']['DesiredInstanceSize']
-    }
-    ApiKeyResponse: {
-      name: string
-      api_key: string
-    }
-    CreateBranchBody: {
-      branch_name: string
-      git_branch?: string
-      region?: string
-    }
-    UpdateCustomHostnameResponse: {
-      /** @enum {string} */
-      status:
-        | '1_not_started'
-        | '2_initiated'
-        | '3_challenge_verified'
-        | '4_origin_setup_completed'
-        | '5_services_reconfigured'
-      custom_hostname: string
-      data: Record<string, never>
-    }
-    UpdateCustomHostnameBody: {
-      custom_hostname: string
-    }
-    NetworkBanResponse: {
-      banned_ipv4_addresses: string[]
-    }
-    RemoveNetworkBanRequest: {
-      ipv4_addresses: string[]
-    }
-    NetworkRestrictionsRequest: {
-      dbAllowedCidrs?: string[]
-      dbAllowedCidrsV6?: string[]
-    }
-    NetworkRestrictionsResponse: {
-      /** @enum {string} */
-      entitlement: 'disallowed' | 'allowed'
-      config: components['schemas']['NetworkRestrictionsRequest']
-      old_config?: components['schemas']['NetworkRestrictionsRequest']
-      /** @enum {string} */
-      status: 'stored' | 'applied'
-    }
-    PgsodiumConfigResponse: {
-      root_key: string
-    }
-    UpdatePgsodiumConfigBody: {
-      root_key: string
-    }
-    PostgrestConfigWithJWTSecretResponse: {
-      max_rows: number
-      db_schema: string
-      db_extra_search_path: string
-      jwt_secret?: string
-    }
-    V1ProjectRefResponse: {
-      id: number
-      ref: string
-      name: string
-    }
-    SslEnforcements: {
-      database: boolean
-    }
-    SslEnforcementResponse: {
-      currentConfig: components['schemas']['SslEnforcements']
-      appliedSuccessfully: boolean
-    }
-    SslEnforcementRequest: {
-      requestedConfig: components['schemas']['SslEnforcements']
-    }
-    TypescriptResponse: {
-      types: string
-    }
-    VanitySubdomainConfigResponse: {
-      /** @enum {string} */
-      status: 'not-used' | 'custom-domain-used' | 'active'
-      custom_domain?: string
-    }
-    VanitySubdomainBody: {
-      vanity_subdomain: string
-    }
-    SubdomainAvailabilityResponse: {
-      available: boolean
-    }
-    ActivateVanitySubdomainResponse: {
-      custom_domain: string
-    }
-    UpgradeDatabaseBody: {
-      target_version: number
-    }
-    ProjectUpgradeInitiateResponse: {
-      tracking_id: string
-    }
-    ProjectVersion: {
-      postgres_version: number
-      app_version: string
-    }
-    ProjectUpgradeEligibilityResponse: {
-      eligible: boolean
-      current_app_version: string
-      latest_app_version: string
-      target_upgrade_versions: components['schemas']['ProjectVersion'][]
-      potential_breaking_changes: string[]
-      duration_estimate_hours: number
-      legacy_auth_custom_roles: string[]
-      extension_dependent_objects: string[]
-    }
-    DatabaseUpgradeStatus: {
-      initiated_at: string
-      target_version: number
-      /** @enum {string} */
-      error?:
-        | '1_upgraded_instance_launch_failed'
-        | '2_volume_detachchment_from_upgraded_instance_failed'
-        | '3_volume_attachment_to_original_instance_failed'
-        | '4_data_upgrade_initiation_failed'
-        | '5_data_upgrade_completion_failed'
-        | '6_volume_detachchment_from_original_instance_failed'
-        | '7_volume_attachment_to_upgraded_instance_failed'
-        | '8_upgrade_completion_failed'
-      /** @enum {string} */
-      progress?:
-        | '0_requested'
-        | '1_started'
-        | '2_launched_upgraded_instance'
-        | '3_detached_volume_from_upgraded_instance'
-        | '4_attached_volume_to_original_instance'
-        | '5_initiated_data_upgrade'
-        | '6_completed_data_upgrade'
-        | '7_detached_volume_from_original_instance'
-        | '8_attached_volume_to_upgraded_instance'
-        | '9_completed_upgrade'
-      /** @enum {number} */
-      status: 0 | 1 | 2
-    }
-    DatabaseUpgradeStatusResponse: {
-      databaseUpgradeStatus: components['schemas']['DatabaseUpgradeStatus'] | null
-    }
-    ReadOnlyStatusResponse: {
-      enabled: boolean
-      override_enabled: boolean
-      override_active_until: string
-    }
+    CreateBranchBody: Record<string, never>
+    UpdateCustomHostnameBody: Record<string, never>
+    RemoveNetworkBanRequest: Record<string, never>
+    NetworkRestrictionsRequest: Record<string, never>
+    UpdatePgsodiumConfigBody: Record<string, never>
+    SslEnforcementRequest: Record<string, never>
+    VanitySubdomainBody: Record<string, never>
+    UpgradeDatabaseBody: Record<string, never>
     SetUpReadReplicaBody: {
       /**
        * @description Region you want your read replica to reside in
@@ -4838,9 +2276,7 @@ export interface components {
         | 'ap-south-1'
         | 'sa-east-1'
     }
-    RemoveReadReplicaBody: {
-      database_identifier: string
-    }
+    RemoveReadReplicaBody: Record<string, never>
     AuthHealthResponse: {
       name: string
       version: string
@@ -4852,686 +2288,24 @@ export interface components {
       connected_cluster: number
     }
     V1ServiceHealthResponse: {
-      info?:
+      info:
         | components['schemas']['AuthHealthResponse']
         | components['schemas']['RealtimeHealthResponse']
-      /** @enum {string} */
-      name: 'auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage'
-      healthy: boolean
-      /** @enum {string} */
-      status: 'COMING_UP' | 'ACTIVE_HEALTHY' | 'UNHEALTHY'
-      error?: string
     }
-    V1PgbouncerConfigResponse: {
-      /** @enum {string} */
-      pool_mode?: 'transaction' | 'session' | 'statement'
-      default_pool_size?: number
-      ignore_startup_parameters?: string
-      max_client_conn?: number
-      connection_string?: string
-    }
-    AuthConfigResponse: {
-      disable_signup: boolean | null
-      external_anonymous_users_enabled: boolean | null
-      external_apple_additional_client_ids: string | null
-      external_apple_client_id: string | null
-      external_apple_enabled: boolean | null
-      external_apple_secret: string | null
-      external_azure_client_id: string | null
-      external_azure_enabled: boolean | null
-      external_azure_secret: string | null
-      external_azure_url: string | null
-      external_bitbucket_client_id: string | null
-      external_bitbucket_enabled: boolean | null
-      external_bitbucket_secret: string | null
-      external_discord_client_id: string | null
-      external_discord_enabled: boolean | null
-      external_discord_secret: string | null
-      external_email_enabled: boolean | null
-      external_facebook_client_id: string | null
-      external_facebook_enabled: boolean | null
-      external_facebook_secret: string | null
-      external_figma_client_id: string | null
-      external_figma_enabled: boolean | null
-      external_figma_secret: string | null
-      external_github_client_id: string | null
-      external_github_enabled: boolean | null
-      external_github_secret: string | null
-      external_gitlab_client_id: string | null
-      external_gitlab_enabled: boolean | null
-      external_gitlab_secret: string | null
-      external_gitlab_url: string | null
-      external_google_additional_client_ids: string | null
-      external_google_client_id: string | null
-      external_google_enabled: boolean | null
-      external_google_secret: string | null
-      external_google_skip_nonce_check: boolean | null
-      external_kakao_client_id: string | null
-      external_kakao_enabled: boolean | null
-      external_kakao_secret: string | null
-      external_keycloak_client_id: string | null
-      external_keycloak_enabled: boolean | null
-      external_keycloak_secret: string | null
-      external_keycloak_url: string | null
-      external_linkedin_oidc_client_id: string | null
-      external_linkedin_oidc_enabled: boolean | null
-      external_linkedin_oidc_secret: string | null
-      external_notion_client_id: string | null
-      external_notion_enabled: boolean | null
-      external_notion_secret: string | null
-      external_phone_enabled: boolean | null
-      external_slack_client_id: string | null
-      external_slack_enabled: boolean | null
-      external_slack_secret: string | null
-      external_spotify_client_id: string | null
-      external_spotify_enabled: boolean | null
-      external_spotify_secret: string | null
-      external_twitch_client_id: string | null
-      external_twitch_enabled: boolean | null
-      external_twitch_secret: string | null
-      external_twitter_client_id: string | null
-      external_twitter_enabled: boolean | null
-      external_twitter_secret: string | null
-      external_workos_client_id: string | null
-      external_workos_enabled: boolean | null
-      external_workos_secret: string | null
-      external_workos_url: string | null
-      external_zoom_client_id: string | null
-      external_zoom_enabled: boolean | null
-      external_zoom_secret: string | null
-      hook_custom_access_token_enabled: boolean | null
-      hook_custom_access_token_uri: string | null
-      hook_mfa_verification_attempt_enabled: boolean | null
-      hook_mfa_verification_attempt_uri: string | null
-      hook_password_verification_attempt_enabled: boolean | null
-      hook_password_verification_attempt_uri: string | null
-      jwt_exp: number | null
-      mailer_allow_unverified_email_sign_ins: boolean | null
-      mailer_autoconfirm: boolean | null
-      mailer_otp_exp: number | null
-      mailer_secure_email_change_enabled: boolean | null
-      mailer_subjects_confirmation: string | null
-      mailer_subjects_email_change: string | null
-      mailer_subjects_invite: string | null
-      mailer_subjects_magic_link: string | null
-      mailer_subjects_recovery: string | null
-      mailer_templates_confirmation_content: string | null
-      mailer_templates_email_change_content: string | null
-      mailer_templates_invite_content: string | null
-      mailer_templates_magic_link_content: string | null
-      mailer_templates_recovery_content: string | null
-      mfa_max_enrolled_factors: number | null
-      password_hibp_enabled: boolean | null
-      password_min_length: number | null
-      password_required_characters: string | null
-      rate_limit_anonymous_users: number | null
-      rate_limit_email_sent: number | null
-      rate_limit_sms_sent: number | null
-      rate_limit_token_refresh: number | null
-      rate_limit_verify: number | null
-      refresh_token_rotation_enabled: boolean | null
-      saml_enabled: boolean | null
-      security_captcha_enabled: boolean | null
-      security_captcha_provider: string | null
-      security_captcha_secret: string | null
-      security_manual_linking_enabled: boolean | null
-      security_refresh_token_reuse_interval: number | null
-      security_update_password_require_reauthentication: boolean | null
-      sessions_inactivity_timeout: number | null
-      sessions_single_per_user: boolean | null
-      sessions_tags: string | null
-      sessions_timebox: number | null
-      site_url: string | null
-      sms_autoconfirm: boolean | null
-      sms_max_frequency: number | null
-      sms_messagebird_access_key: string | null
-      sms_messagebird_originator: string | null
-      sms_otp_exp: number | null
-      sms_otp_length: number | null
-      sms_provider: string | null
-      sms_template: string | null
-      sms_test_otp: string | null
-      sms_test_otp_valid_until: string | null
-      sms_textlocal_api_key: string | null
-      sms_textlocal_sender: string | null
-      sms_twilio_account_sid: string | null
-      sms_twilio_auth_token: string | null
-      sms_twilio_content_sid: string | null
-      sms_twilio_message_service_sid: string | null
-      sms_twilio_verify_account_sid: string | null
-      sms_twilio_verify_auth_token: string | null
-      sms_twilio_verify_message_service_sid: string | null
-      sms_vonage_api_key: string | null
-      sms_vonage_api_secret: string | null
-      sms_vonage_from: string | null
-      smtp_admin_email: string | null
-      smtp_host: string | null
-      smtp_max_frequency: number | null
-      smtp_pass: string | null
-      smtp_port: string | null
-      smtp_sender_name: string | null
-      smtp_user: string | null
-      uri_allow_list: string | null
-    }
-    UpdateAuthConfigBody: {
-      site_url?: string
-      disable_signup?: boolean
-      jwt_exp?: number
-      smtp_admin_email?: string
-      smtp_host?: string
-      smtp_port?: string
-      smtp_user?: string
-      smtp_pass?: string
-      smtp_max_frequency?: number
-      smtp_sender_name?: string
-      mailer_allow_unverified_email_sign_ins?: boolean
-      mailer_autoconfirm?: boolean
-      mailer_subjects_invite?: string
-      mailer_subjects_confirmation?: string
-      mailer_subjects_recovery?: string
-      mailer_subjects_email_change?: string
-      mailer_subjects_magic_link?: string
-      mailer_templates_invite_content?: string
-      mailer_templates_confirmation_content?: string
-      mailer_templates_recovery_content?: string
-      mailer_templates_email_change_content?: string
-      mailer_templates_magic_link_content?: string
-      mfa_max_enrolled_factors?: number
-      uri_allow_list?: string
-      external_anonymous_users_enabled?: boolean
-      external_email_enabled?: boolean
-      external_phone_enabled?: boolean
-      saml_enabled?: boolean
-      security_captcha_enabled?: boolean
-      security_captcha_provider?: string
-      security_captcha_secret?: string
-      sessions_timebox?: number
-      sessions_inactivity_timeout?: number
-      sessions_single_per_user?: boolean
-      sessions_tags?: string
-      rate_limit_anonymous_users?: number
-      rate_limit_email_sent?: number
-      rate_limit_sms_sent?: number
-      rate_limit_verify?: number
-      rate_limit_token_refresh?: number
-      mailer_secure_email_change_enabled?: boolean
-      refresh_token_rotation_enabled?: boolean
-      password_hibp_enabled?: boolean
-      password_min_length?: number
-      /** @enum {string} */
-      password_required_characters?:
-        | 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
-        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789'
-        | 'abcdefghijklmnopqrstuvwxyz:ABCDEFGHIJKLMNOPQRSTUVWXYZ:0123456789:!@#$%^&*()_+-=[]{};\'\\:"|<>?,./`~'
-        | ''
-      security_manual_linking_enabled?: boolean
-      security_update_password_require_reauthentication?: boolean
-      security_refresh_token_reuse_interval?: number
-      mailer_otp_exp?: number
-      sms_autoconfirm?: boolean
-      sms_max_frequency?: number
-      sms_otp_exp?: number
-      sms_otp_length?: number
-      sms_provider?: string
-      sms_messagebird_access_key?: string
-      sms_messagebird_originator?: string
-      sms_test_otp?: string
-      sms_test_otp_valid_until?: string
-      sms_textlocal_api_key?: string
-      sms_textlocal_sender?: string
-      sms_twilio_account_sid?: string
-      sms_twilio_auth_token?: string
-      sms_twilio_content_sid?: string
-      sms_twilio_message_service_sid?: string
-      sms_twilio_verify_account_sid?: string
-      sms_twilio_verify_auth_token?: string
-      sms_twilio_verify_message_service_sid?: string
-      sms_vonage_api_key?: string
-      sms_vonage_api_secret?: string
-      sms_vonage_from?: string
-      sms_template?: string
-      hook_mfa_verification_attempt_enabled?: boolean
-      hook_mfa_verification_attempt_uri?: string
-      hook_password_verification_attempt_enabled?: boolean
-      hook_password_verification_attempt_uri?: string
-      hook_custom_access_token_enabled?: boolean
-      hook_custom_access_token_uri?: string
-      external_apple_enabled?: boolean
-      external_apple_client_id?: string
-      external_apple_secret?: string
-      external_apple_additional_client_ids?: string
-      external_azure_enabled?: boolean
-      external_azure_client_id?: string
-      external_azure_secret?: string
-      external_azure_url?: string
-      external_bitbucket_enabled?: boolean
-      external_bitbucket_client_id?: string
-      external_bitbucket_secret?: string
-      external_discord_enabled?: boolean
-      external_discord_client_id?: string
-      external_discord_secret?: string
-      external_facebook_enabled?: boolean
-      external_facebook_client_id?: string
-      external_facebook_secret?: string
-      external_figma_enabled?: boolean
-      external_figma_client_id?: string
-      external_figma_secret?: string
-      external_github_enabled?: boolean
-      external_github_client_id?: string
-      external_github_secret?: string
-      external_gitlab_enabled?: boolean
-      external_gitlab_client_id?: string
-      external_gitlab_secret?: string
-      external_gitlab_url?: string
-      external_google_enabled?: boolean
-      external_google_client_id?: string
-      external_google_secret?: string
-      external_google_additional_client_ids?: string
-      external_google_skip_nonce_check?: boolean
-      external_kakao_enabled?: boolean
-      external_kakao_client_id?: string
-      external_kakao_secret?: string
-      external_keycloak_enabled?: boolean
-      external_keycloak_client_id?: string
-      external_keycloak_secret?: string
-      external_keycloak_url?: string
-      external_linkedin_oidc_enabled?: boolean
-      external_linkedin_oidc_client_id?: string
-      external_linkedin_oidc_secret?: string
-      external_notion_enabled?: boolean
-      external_notion_client_id?: string
-      external_notion_secret?: string
-      external_slack_enabled?: boolean
-      external_slack_client_id?: string
-      external_slack_secret?: string
-      external_spotify_enabled?: boolean
-      external_spotify_client_id?: string
-      external_spotify_secret?: string
-      external_twitch_enabled?: boolean
-      external_twitch_client_id?: string
-      external_twitch_secret?: string
-      external_twitter_enabled?: boolean
-      external_twitter_client_id?: string
-      external_twitter_secret?: string
-      external_workos_enabled?: boolean
-      external_workos_client_id?: string
-      external_workos_secret?: string
-      external_workos_url?: string
-      external_zoom_enabled?: boolean
-      external_zoom_client_id?: string
-      external_zoom_secret?: string
-    }
-    AttributeValue: {
-      default?: Record<string, never> | number | string | boolean
-      name?: string
-      names?: string[]
-    }
-    AttributeMapping: {
-      keys: {
-        [key: string]: components['schemas']['AttributeValue']
-      }
-    }
+    UpdateAuthConfigBody: Record<string, never>
+    CreateThirdPartyAuthBody: Record<string, never>
     CreateProviderBody: {
       /**
        * @description What type of provider will be created
        * @enum {string}
        */
       type: 'saml'
-      metadata_xml?: string
-      metadata_url?: string
-      domains?: string[]
-      attribute_mapping?: components['schemas']['AttributeMapping']
     }
-    SamlDescriptor: {
-      id: string
-      entity_id: string
-      metadata_url?: string
-      metadata_xml?: string
-      attribute_mapping?: components['schemas']['AttributeMapping']
-    }
-    Domain: {
-      id: string
-      domain?: string
-      created_at?: string
-      updated_at?: string
-    }
-    CreateProviderResponse: {
-      id: string
-      saml?: components['schemas']['SamlDescriptor']
-      domains?: components['schemas']['Domain'][]
-      created_at?: string
-      updated_at?: string
-    }
-    Provider: {
-      id: string
-      saml?: components['schemas']['SamlDescriptor']
-      domains?: components['schemas']['Domain'][]
-      created_at?: string
-      updated_at?: string
-    }
-    ListProvidersResponse: {
-      items: components['schemas']['Provider'][]
-    }
-    GetProviderResponse: {
-      id: string
-      saml?: components['schemas']['SamlDescriptor']
-      domains?: components['schemas']['Domain'][]
-      created_at?: string
-      updated_at?: string
-    }
-    UpdateProviderBody: {
-      metadata_xml?: string
-      metadata_url?: string
-      domains?: string[]
-      attribute_mapping?: components['schemas']['AttributeMapping']
-    }
-    UpdateProviderResponse: {
-      id: string
-      saml?: components['schemas']['SamlDescriptor']
-      domains?: components['schemas']['Domain'][]
-      created_at?: string
-      updated_at?: string
-    }
-    DeleteProviderResponse: {
-      id: string
-      saml?: components['schemas']['SamlDescriptor']
-      domains?: components['schemas']['Domain'][]
-      created_at?: string
-      updated_at?: string
-    }
-    V1RunQueryBody: {
-      query: string
-    }
-    V1Backup: {
-      /** @enum {string} */
-      status: 'COMPLETED' | 'FAILED' | 'PENDING' | 'REMOVED' | 'ARCHIVED'
-      is_physical_backup: boolean
-      inserted_at: string
-    }
-    V1PhysicalBackup: {
-      earliest_physical_backup_date_unix?: number
-      latest_physical_backup_date_unix?: number
-    }
-    V1BackupsResponse: {
-      region: string
-      walg_enabled: boolean
-      pitr_enabled: boolean
-      backups: components['schemas']['V1Backup'][]
-      physical_backup_data: components['schemas']['V1PhysicalBackup']
-    }
-    V1RestorePitrBody: {
-      recovery_time_target_unix: number
-    }
-    V1CreateFunctionBody: {
-      slug: string
-      name: string
-      body: string
-      verify_jwt?: boolean
-    }
-    FunctionSlugResponse: {
-      id: string
-      slug: string
-      name: string
-      /** @enum {string} */
-      status: 'ACTIVE' | 'REMOVED' | 'THROTTLED'
-      version: number
-      created_at: number
-      updated_at: number
-      verify_jwt?: boolean
-      import_map?: boolean
-      entrypoint_path?: string
-      import_map_path?: string
-    }
-    V1UpdateFunctionBody: {
-      name?: string
-      body?: string
-      verify_jwt?: boolean
-    }
-    V1StorageBucketResponse: {
-      id: string
-      name: string
-      owner: string
-      created_at: string
-      updated_at: string
-      public: boolean
-    }
-    OrganizationResponseV1: {
-      id: string
-      name: string
-    }
-    CreateOrganizationBodyV1: {
-      name: string
-    }
-    V1OrganizationMemberResponse: {
-      user_id: string
-      user_name: string
-      email?: string
-      role_name: string
-      mfa_enabled: boolean
-    }
-    V1OrganizationSlugResponse: {
-      plan?: components['schemas']['BillingPlanId']
-      opt_in_tags: 'AI_SQL_GENERATOR_OPT_IN'[]
-      id: string
-      name: string
-    }
-    OAuthTokenBody: {
-      /** @enum {string} */
-      grant_type: 'authorization_code' | 'refresh_token'
-      client_id: string
-      client_secret: string
-      code?: string
-      code_verifier?: string
-      redirect_uri?: string
-      refresh_token?: string
-    }
-    OAuthTokenResponse: {
-      /** @enum {string} */
-      token_type: 'Bearer'
-      access_token: string
-      refresh_token: string
-      expires_in: number
-    }
-    SnippetProject: {
-      id: number
-      name: string
-    }
-    SnippetUser: {
-      id: number
-      username: string
-    }
-    SnippetMeta: {
-      id: string
-      inserted_at: string
-      updated_at: string
-      /** @enum {string} */
-      type: 'sql'
-      /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
-      name: string
-      description: string | null
-      project: components['schemas']['SnippetProject']
-      owner: components['schemas']['SnippetUser']
-      updated_by: components['schemas']['SnippetUser']
-    }
-    SnippetList: {
-      data: components['schemas']['SnippetMeta'][]
-    }
-    SnippetContent: {
-      favorite: boolean
-      schema_version: string
-      sql: string
-    }
-    SnippetResponse: {
-      id: string
-      inserted_at: string
-      updated_at: string
-      /** @enum {string} */
-      type: 'sql'
-      /** @enum {string} */
-      visibility: 'user' | 'project' | 'org' | 'public'
-      name: string
-      description: string | null
-      project: components['schemas']['SnippetProject']
-      owner: components['schemas']['SnippetUser']
-      updated_by: components['schemas']['SnippetUser']
-      content: components['schemas']['SnippetContent']
-    }
-    ServiceHealthResponse: {
-      /**
-       * @description Service name
-       * @enum {string}
-       */
-      name: 'auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage'
-      /** @description Whether the service is healthy */
-      healthy: boolean
-      /**
-       * @description Service health status
-       * @example COMING_UP
-       * @enum {string}
-       */
-      status: 'COMING_UP' | 'ACTIVE_HEALTHY' | 'UNHEALTHY'
-      /** @description Service health check error */
-      error?: string
-    }
-    ResourceWithServicesStatusResponse: {
-      /** @description Supabase project instance compute size */
-      compute: string
-      /** @description Unique ID representing the fly extension */
-      id: string
-      /**
-       * @description Supabase project status
-       * @example ACTIVE_HEALTHY
-       * @enum {string}
-       */
-      status:
-        | 'REMOVED'
-        | 'COMING_UP'
-        | 'INACTIVE'
-        | 'ACTIVE_HEALTHY'
-        | 'ACTIVE_UNHEALTHY'
-        | 'UNKNOWN'
-        | 'GOING_DOWN'
-        | 'INIT_FAILED'
-        | 'RESTORING'
-        | 'UPGRADING'
-        | 'PAUSING'
-      /**
-       * @description Supabase organization id
-       * @example fly_123456789
-       */
-      supabase_org_id: string
-      /** @description Supabase project services health status */
-      services: components['schemas']['ServiceHealthResponse'][]
-    }
-    ResourceProvisioningConfigResponse: {
-      /**
-       * @description PSQL connection string
-       * @example postgresql://postgres:dbpass@db.abcdefghijklmnop.supabase.co:5432/postgres
-       */
-      DATABASE_URL: string
-      /**
-       * @description Pooler connection string
-       * @example postgres://postgres.abcdefghijklmnop:dbpass@aws-0-us-east-1.pooler.supabase.com:6543/postgres
-       */
-      DATABASE_POOLER_URL: string
-    }
-    ResourceProvisioningResponse: {
-      /** @description Supabase envs config */
-      config: components['schemas']['ResourceProvisioningConfigResponse']
-      /**
-       * @description The target Fly application for internal traffic
-       * @example ext-db-pgshhamktpsgnptvcadw
-       */
-      fly_app_name: string
-      /**
-       * @description Supabase project id
-       * @example pgshhamktpsgnptvcadw
-       */
-      id: string
-      /** @description Welcome message */
-      message: string
-      /**
-       * @description Supabase organization id
-       * @example fly_123456789
-       */
-      supabase_org_id: string
-    }
-    FlyOrganization: {
-      plan: components['schemas']['BillingPlanId']
-      id: string
-      supabase_org_id: string
-      name: string
-    }
-    OrganizationExtensionStatus: {
-      /** @description Supabase project instance compute size */
-      compute: string
-      /** @description Unique ID representing the fly extension */
-      id: string
-      /**
-       * @description Supabase project status
-       * @example ACTIVE_HEALTHY
-       * @enum {string}
-       */
-      status:
-        | 'REMOVED'
-        | 'COMING_UP'
-        | 'INACTIVE'
-        | 'ACTIVE_HEALTHY'
-        | 'ACTIVE_UNHEALTHY'
-        | 'UNKNOWN'
-        | 'GOING_DOWN'
-        | 'INIT_FAILED'
-        | 'RESTORING'
-        | 'UPGRADING'
-        | 'PAUSING'
-      /**
-       * @description Supabase organization id
-       * @example fly_123456789
-       */
-      supabase_org_id: string
-    }
-    ResourceBillingItem: {
-      /**
-       * @description Non-Unique identifier of the item
-       * @example usage_egress
-       */
-      itemIdentifier: string
-      /**
-       * @description Descriptive name of the billing item
-       * @example Pro Plan
-       */
-      itemName: string
-      /** @enum {string} */
-      type: 'usage' | 'plan' | 'addon' | 'proration' | 'compute_credits'
-      /**
-       * @description In case of a usage item, the free usage included in the customers plan
-       * @example 100
-       */
-      freeUnitsInPlan?: number
-      /**
-       * @description In case of a usage item, the total usage
-       * @example 100
-       */
-      usageTotal?: number
-      /**
-       * @description In case of a usage item, the billable usage amount, free usage has been deducted
-       * @example 100
-       */
-      usageBillable?: number
-      /**
-       * @description Costs of the item in cents
-       * @example 100
-       */
-      costs: number
-    }
-    ResourceBillingResponse: {
-      /** @description Whether the user is exceeding the included quotas in the plan - only relevant for users on usage-capped plans. */
-      exceedsPlanLimits: boolean
-      /** @description Whether the user is can have over-usage, which will be billed - this will be false on usage-capped plans. */
-      overusageAllowed: boolean
-      items: components['schemas']['ResourceBillingItem'][]
-    }
+    UpdateProviderBody: Record<string, never>
+    V1RunQueryBody: Record<string, never>
+    V1RestorePitrBody: Record<string, never>
+    CreateOrganizationBodyV1: Record<string, never>
+    OAuthTokenBody: Record<string, never>
   }
   responses: never
   parameters: never
@@ -5547,22 +2321,7 @@ export type external = Record<string, never>
 export interface operations {
   /** Get notifications */
   NotificationsController_getNotificationsV2: {
-    parameters: {
-      query: {
-        status: 'new' | 'seen' | 'archived'
-        priority: 'Critical' | 'Warning' | 'Info'
-        org_slug?: string[]
-        project_ref?: string[]
-        offset: number
-        limit: number
-      }
-    }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['NotificationResponseV2'][]
-        }
-      }
       /** @description Failed to retrieve notifications */
       500: {
         content: never
@@ -5577,11 +2336,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['NotificationResponseV1'][]
-        }
-      }
       /** @description Failed to delete notifications */
       500: {
         content: never
@@ -5596,11 +2350,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['NotificationResponseV2'][]
-        }
-      }
       /** @description Failed to update notifications */
       500: {
         content: never
@@ -5611,18 +2360,13 @@ export interface operations {
   NotificationsController_getNotificationsSummary: {
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['NotificationsSummary']
-        }
+        content: never
       }
     }
   }
   /** Archives all notifications */
   NotificationsController_archiveAllNotifications: {
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to archive all notifications */
       500: {
         content: never
@@ -5650,11 +2394,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['SendFeedbackResponse']
-        }
-      }
       /** @description Failed to send feedback */
       500: {
         content: never
@@ -5669,11 +2408,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['SendFeedbackResponse']
-        }
-      }
       /** @description Failed to send exit survey */
       500: {
         content: never
@@ -5688,12 +2422,21 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['SendFeedbackResponse']
-        }
-      }
       /** @description Failed to send upgrade survey */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Send feedback on docs */
+  SendDocsFeedbackController_sendDocsFeedback: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SendDocsFeedbackBody']
+      }
+    }
+    responses: {
+      /** @description Failed to send feedback for docs */
       500: {
         content: never
       }
@@ -5721,9 +2464,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to get project's status */
       500: {
         content: never
@@ -5737,9 +2477,7 @@ export interface operations {
   ProjectsResourceWarningsController_getProjectsResourceWarnings: {
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['ProjectResourceWarningsResponse'][]
-        }
+        content: never
       }
     }
   }
@@ -5766,11 +2504,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['GoTrueConfigResponse']
-        }
-      }
       /** @description Failed to retrieve GoTrue config */
       500: {
         content: never
@@ -5791,11 +2524,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['GoTrueConfigResponse']
-        }
-      }
       /** @description Failed to update GoTrue config */
       500: {
         content: never
@@ -5816,11 +2544,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       403: {
         content: never
       }
@@ -5844,11 +2567,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       403: {
         content: never
       }
@@ -5872,11 +2590,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       403: {
         content: never
       }
@@ -5900,11 +2613,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       403: {
         content: never
       }
@@ -5916,18 +2624,7 @@ export interface operations {
   }
   /** Gets GoTrue template */
   TemplateController_getTemplate: {
-    parameters: {
-      path: {
-        ref: string
-        template: 'confirmation' | 'email-change' | 'invite' | 'magic-link' | 'recovery'
-      }
-    }
     responses: {
-      200: {
-        content: {
-          'application/json': string
-        }
-      }
       /** @description Failed to retrieve GoTrue template */
       500: {
         content: never
@@ -5937,23 +2634,12 @@ export interface operations {
   /** Gets users */
   UsersController_getUsers: {
     parameters: {
-      query: {
-        keywords: string
-        limit: string
-        offset: string
-        verified: string
-      }
       path: {
         /** @description Project ref */
         ref: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['UsersResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -5977,11 +2663,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       403: {
         content: never
       }
@@ -5997,15 +2678,9 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
-        id: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       403: {
         content: never
       }
@@ -6024,11 +2699,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['BackupsResponse']
-        }
-      }
       /** @description Failed to get project backups */
       500: {
         content: never
@@ -6044,9 +2714,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to enable usage of physical backups */
       500: {
         content: never
@@ -6067,11 +2734,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['DownloadBackupResponse']
-        }
-      }
       /** @description Failed to download project backup */
       500: {
         content: never
@@ -6092,9 +2754,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to restore project backup */
       500: {
         content: never
@@ -6115,9 +2774,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to restore project with physical backup */
       500: {
         content: never
@@ -6138,9 +2794,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to restore project to a previous point in time */
       500: {
         content: never
@@ -6150,11 +2803,6 @@ export interface operations {
   /** Gets hook logs with the given ID */
   HooksController_getHookLogs: {
     parameters: {
-      query: {
-        id: number
-        limit?: string
-        offset?: string
-      }
       header: {
         'x-connection-encrypted': string
       }
@@ -6164,11 +2812,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       403: {
         content: never
       }
@@ -6187,9 +2830,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -6208,11 +2848,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
       /** @description Failed to get status of owner reassignment */
       500: {
         content: never
@@ -6231,11 +2866,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -6257,11 +2887,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -6283,11 +2908,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -6303,11 +2923,6 @@ export interface operations {
    */
   OrganizationsController_getOrganizations: {
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OrganizationResponseV1'][]
-        }
-      }
       /** @description Unexpected error listing organizations */
       500: {
         content: never
@@ -6322,11 +2937,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['OrganizationResponse']
-        }
-      }
       /** @description Unexpected error creating an organization */
       500: {
         content: never
@@ -6342,9 +2952,7 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['GetOrganizationByFlyOrganizationIdResponse']
-        }
+        content: never
       }
     }
   }
@@ -6357,9 +2965,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -6383,11 +2988,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OrganizationSlugResponse']
-        }
-      }
       /** @description Failed to update organization */
       500: {
         content: never
@@ -6403,11 +3003,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['CustomerResponse']
-        }
-      }
       /** @description Failed to retrieve the Stripe customer */
       500: {
         content: never
@@ -6423,11 +3018,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['CustomerUpdateResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -6446,11 +3036,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['Role'][]
-        }
-      }
       /** @description Failed to retrieve the organization's roles */
       500: {
         content: never
@@ -6466,11 +3051,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['TaxIdResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -6494,11 +3074,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['CreateTaxIdResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -6522,11 +3097,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['DeleteTaxIdResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -6544,9 +3114,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to update owner */
       500: {
         content: never
@@ -6556,45 +3123,12 @@ export interface operations {
   /** Gets daily organization stats */
   OrgDailyStatsController_getDailyStats: {
     parameters: {
-      query: {
-        metric:
-          | 'EGRESS'
-          | 'DATABASE_SIZE'
-          | 'STORAGE_SIZE'
-          | 'MONTHLY_ACTIVE_USERS'
-          | 'MONTHLY_ACTIVE_SSO_USERS'
-          | 'FUNCTION_INVOCATIONS'
-          | 'FUNCTION_COUNT'
-          | 'STORAGE_IMAGES_TRANSFORMED'
-          | 'REALTIME_MESSAGE_COUNT'
-          | 'REALTIME_PEAK_CONNECTIONS'
-          | 'COMPUTE_HOURS_BRANCH'
-          | 'COMPUTE_HOURS_XS'
-          | 'COMPUTE_HOURS_SM'
-          | 'COMPUTE_HOURS_MD'
-          | 'COMPUTE_HOURS_L'
-          | 'COMPUTE_HOURS_XL'
-          | 'COMPUTE_HOURS_2XL'
-          | 'COMPUTE_HOURS_4XL'
-          | 'COMPUTE_HOURS_8XL'
-          | 'COMPUTE_HOURS_12XL'
-          | 'COMPUTE_HOURS_16XL'
-        interval: string
-        endDate: string
-        startDate: string
-        projectRef?: string
-      }
       path: {
         /** @description Organization slug */
         slug: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       /** @description Failed to get daily organization stats */
       500: {
         content: never
@@ -6604,20 +3138,12 @@ export interface operations {
   /** Gets daily organization stats for compute */
   OrgDailyStatsController_getDailyStatsCompute: {
     parameters: {
-      query: {
-        endDate: string
-        startDate: string
-        projectRef?: string
-      }
       path: {
         /** @description Organization slug */
         slug: string
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to get daily organization stats for compute */
       500: {
         content: never
@@ -6627,22 +3153,12 @@ export interface operations {
   /** Gets usage stats */
   OrgUsageController_getOrgUsage: {
     parameters: {
-      query?: {
-        project_ref?: string
-        start?: string
-        end?: string
-      }
       path: {
         /** @description Organization slug */
         slug: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OrgUsageResponse']
-        }
-      }
       /** @description Failed to get usage stats */
       500: {
         content: never
@@ -6659,9 +3175,7 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['OrgDocumentUrlResponse']
-        }
+        content: never
       }
     }
   }
@@ -6675,9 +3189,7 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['OrgDocumentUrlResponse']
-        }
+        content: never
       }
     }
   }
@@ -6696,11 +3208,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['AuditLogsResponse']
-        }
-      }
       /** @description Failed to get an organization's audit logs */
       500: {
         content: never
@@ -6716,11 +3223,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['Invite'][]
-        }
-      }
       /** @description Failed to get invited users */
       500: {
         content: never
@@ -6741,11 +3243,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['SendInviteResponse']
-        }
-      }
       /** @description Failed to invite user */
       500: {
         content: never
@@ -6764,9 +3261,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to delete invited user */
       500: {
         content: never
@@ -6785,11 +3279,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['InviteResponse']
-        }
-      }
       /** @description Failed to get invite */
       500: {
         content: never
@@ -6808,11 +3297,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['JoinResponse']
-        }
-      }
       /** @description Failed to join organization */
       500: {
         content: never
@@ -6828,11 +3312,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       /** @description Failed to leave organization */
       500: {
         content: never
@@ -6853,11 +3332,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       /** @description Failed to leave organization */
       500: {
         content: never
@@ -6873,11 +3347,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['Member'][]
-        }
-      }
       /** @description Failed to retrieve organization's members */
       500: {
         content: never
@@ -6890,13 +3359,9 @@ export interface operations {
       path: {
         /** @description Organization slug */
         slug: string
-        gotrue_id: string
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to remove organization member */
       500: {
         content: never
@@ -6909,7 +3374,6 @@ export interface operations {
       path: {
         /** @description Organization slug */
         slug: string
-        gotrue_id: string
       }
     }
     requestBody: {
@@ -6918,9 +3382,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to update organization member */
       500: {
         content: never
@@ -6936,11 +3397,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['MemberWithFreeProjectLimit'][]
-        }
-      }
       /** @description Failed to retrieve organization members who have reached their free project limit */
       500: {
         content: never
@@ -6956,11 +3412,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PaymentsResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -6978,11 +3429,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['DetachPaymentResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -7006,11 +3452,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['SetupIntentResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -7029,11 +3470,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['GetSubscriptionResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -7057,9 +3493,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -7083,9 +3516,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -7104,9 +3534,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -7125,11 +3552,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PlansResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -7148,11 +3570,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['UpcomingInvoice']
-        }
-      }
       403: {
         content: never
       }
@@ -7174,11 +3591,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresColumnPrivileges'][]
-        }
-      }
       403: {
         content: never
       }
@@ -7205,11 +3617,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['PostgresColumnPrivileges'][]
-        }
-      }
       403: {
         content: never
       }
@@ -7236,11 +3643,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresColumnPrivileges'][]
-        }
-      }
       403: {
         content: never
       }
@@ -7266,11 +3668,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresColumn'][]
-        }
-      }
       403: {
         content: never
       }
@@ -7297,11 +3694,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['PostgresColumn']
-        }
-      }
       403: {
         content: never
       }
@@ -7316,8 +3708,7 @@ export interface operations {
     parameters: {
       query: {
         /** @description Column ID */
-        id: string
-        cascade?: string
+        id: unknown
       }
       header: {
         'x-connection-encrypted': string
@@ -7328,11 +3719,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresColumn']
-        }
-      }
       403: {
         content: never
       }
@@ -7347,7 +3733,7 @@ export interface operations {
     parameters: {
       query: {
         /** @description Column ID */
-        id: string
+        id: unknown
       }
       header: {
         'x-connection-encrypted': string
@@ -7363,11 +3749,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresColumn']
-        }
-      }
       403: {
         content: never
       }
@@ -7389,11 +3770,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresExtension'][]
-        }
-      }
       403: {
         content: never
       }
@@ -7420,11 +3796,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['PostgresExtension']
-        }
-      }
       403: {
         content: never
       }
@@ -7450,11 +3821,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresExtension']
-        }
-      }
       403: {
         content: never
       }
@@ -7482,11 +3848,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresForeignTable'][]
-        }
-      }
       403: {
         content: never
       }
@@ -7508,11 +3869,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['FunctionResponse'][]
-        }
-      }
       403: {
         content: never
       }
@@ -7529,12 +3885,12 @@ export interface operations {
   FunctionsController_createFunction: {
     parameters: {
       query?: {
-        slug?: string
-        name?: string
-        verify_jwt?: boolean
-        import_map?: boolean
-        entrypoint_path?: string
         import_map_path?: string
+        entrypoint_path?: string
+        import_map?: boolean
+        verify_jwt?: boolean
+        name?: string
+        slug?: string
       }
       path: {
         /** @description Project ref */
@@ -7548,11 +3904,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['FunctionResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -7578,11 +3929,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresFunction']
-        }
-      }
       403: {
         content: never
       }
@@ -7613,11 +3959,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresFunction']
-        }
-      }
       403: {
         content: never
       }
@@ -7647,11 +3988,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresMaterializedView'][]
-        }
-      }
       403: {
         content: never
       }
@@ -7677,11 +4013,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresPolicy'][]
-        }
-      }
       403: {
         content: never
       }
@@ -7708,11 +4039,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['PostgresPolicy']
-        }
-      }
       403: {
         content: never
       }
@@ -7738,11 +4064,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresPolicy']
-        }
-      }
       403: {
         content: never
       }
@@ -7773,11 +4094,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresPolicy']
-        }
-      }
       403: {
         content: never
       }
@@ -7799,11 +4115,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresPublication'][]
-        }
-      }
       403: {
         content: never
       }
@@ -7830,11 +4141,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['PostgresPublication']
-        }
-      }
       403: {
         content: never
       }
@@ -7860,11 +4166,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresPublication']
-        }
-      }
       403: {
         content: never
       }
@@ -7895,11 +4196,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresPublication']
-        }
-      }
       403: {
         content: never
       }
@@ -7926,11 +4222,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       403: {
         content: never
       }
@@ -7954,11 +4245,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': string
-        }
-      }
       /** @description Failed to format sql query */
       500: {
         content: never
@@ -7979,11 +4265,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['ValidateQueryResponse']
-        }
-      }
       /** @description Failed to validate sql query */
       500: {
         content: never
@@ -8002,11 +4283,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresRole'][]
-        }
-      }
       403: {
         content: never
       }
@@ -8033,11 +4309,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['PostgresRole']
-        }
-      }
       403: {
         content: never
       }
@@ -8063,11 +4334,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresRole']
-        }
-      }
       403: {
         content: never
       }
@@ -8098,11 +4364,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresRole']
-        }
-      }
       403: {
         content: never
       }
@@ -8124,11 +4385,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresSchema'][]
-        }
-      }
       403: {
         content: never
       }
@@ -8155,11 +4411,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['PostgresSchema']
-        }
-      }
       403: {
         content: never
       }
@@ -8185,11 +4436,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresSchema']
-        }
-      }
       403: {
         content: never
       }
@@ -8220,11 +4466,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresSchema']
-        }
-      }
       403: {
         content: never
       }
@@ -8251,11 +4492,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['Table'][]
-        }
-      }
       403: {
         content: never
       }
@@ -8282,11 +4518,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['Column'][]
-        }
-      }
       403: {
         content: never
       }
@@ -8308,11 +4539,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresTablePrivileges'][]
-        }
-      }
       403: {
         content: never
       }
@@ -8339,11 +4565,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['PostgresTablePrivileges'][]
-        }
-      }
       403: {
         content: never
       }
@@ -8370,11 +4591,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresTablePrivileges'][]
-        }
-      }
       403: {
         content: never
       }
@@ -8406,11 +4622,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresTable'][]
-        }
-      }
       403: {
         content: never
       }
@@ -8437,11 +4648,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['PostgresTable']
-        }
-      }
       403: {
         content: never
       }
@@ -8468,11 +4674,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresTable']
-        }
-      }
       403: {
         content: never
       }
@@ -8503,11 +4704,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresTable']
-        }
-      }
       403: {
         content: never
       }
@@ -8533,11 +4729,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresTrigger'][]
-        }
-      }
       403: {
         content: never
       }
@@ -8564,11 +4755,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['PostgresTrigger']
-        }
-      }
       403: {
         content: never
       }
@@ -8594,11 +4780,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresTrigger']
-        }
-      }
       403: {
         content: never
       }
@@ -8629,11 +4810,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresTrigger']
-        }
-      }
       403: {
         content: never
       }
@@ -8659,11 +4835,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresType'][]
-        }
-      }
       403: {
         content: never
       }
@@ -8694,11 +4865,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresView'][]
-        }
-      }
       403: {
         content: never
       }
@@ -8711,11 +4877,6 @@ export interface operations {
   /** Gets the user's access tokens */
   AccessTokensController_getAccessTokens: {
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['AccessToken'][]
-        }
-      }
       /** @description Failed to get user's access tokens */
       500: {
         content: never
@@ -8730,11 +4891,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['CreateAccessTokenResponse']
-        }
-      }
       /** @description Failed to create access token */
       500: {
         content: never
@@ -8750,11 +4906,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['AccessToken']
-        }
-      }
       /** @description Failed to get access token */
       500: {
         content: never
@@ -8770,11 +4921,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['AccessToken']
-        }
-      }
       /** @description Failed to delete access token */
       500: {
         content: never
@@ -8792,11 +4938,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['AuditLogsResponse']
-        }
-      }
       /** @description Failed to get a user's audit logs */
       500: {
         content: never
@@ -8811,11 +4952,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['Profile'][]
-        }
-      }
       /** @description Failed to search profiles with the given keywords */
       500: {
         content: never
@@ -8825,11 +4961,6 @@ export interface operations {
   /** Gets the user's subscription statistics */
   SubscriptionsController_getSubscriptionsStatistics: {
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['SubscriptionStatisticsResponse']
-        }
-      }
       /** @description Failed to retrieve user's subscription statistics */
       500: {
         content: never
@@ -8844,11 +4975,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['PasswordCheckResponse']
-        }
-      }
       /** @description Failed to check password strength */
       500: {
         content: never
@@ -8858,11 +4984,6 @@ export interface operations {
   /** Gets all the user's permissions */
   PermissionsController_getPermissions: {
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['Permission'][]
-        }
-      }
       /** @description Failed to retrieve permissions */
       500: {
         content: never
@@ -8872,11 +4993,6 @@ export interface operations {
   /** Gets the user's profile */
   ProfileController_getProfile: {
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ProfileResponse']
-        }
-      }
       /** @description Failed to retrieve user's profile */
       500: {
         content: never
@@ -8886,11 +5002,6 @@ export interface operations {
   /** Creates user's profile */
   ProfileController_createProfile: {
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['ProfileResponse']
-        }
-      }
       /** @description Failed to create user's profile */
       500: {
         content: never
@@ -8900,9 +5011,6 @@ export interface operations {
   /** Deletes user's profile */
   ProfileController_deleteProfile: {
     responses: {
-      200: {
-        content: never
-      }
       /** @description Forbidden action */
       403: {
         content: never
@@ -8921,11 +5029,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ProfileResponse']
-        }
-      }
       /** @description Failed to update user's profile */
       500: {
         content: never
@@ -8939,9 +5042,7 @@ export interface operations {
   ProjectsController_getProjects: {
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['ProjectInfo'][]
-        }
+        content: never
       }
     }
   }
@@ -8954,9 +5055,7 @@ export interface operations {
     }
     responses: {
       201: {
-        content: {
-          'application/json': components['schemas']['CreateProjectResponse']
-        }
+        content: never
       }
     }
   }
@@ -8969,9 +5068,7 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['GetProjectByFlyExtensionIdResponse']
-        }
+        content: never
       }
     }
   }
@@ -8984,11 +5081,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['GetUserContentResponse']
-        }
-      }
       /** @description Failed to retrieve project's content */
       500: {
         content: never
@@ -9003,11 +5095,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['UserContentObject']
-        }
-      }
       /** @description Failed to update project's content */
       500: {
         content: never
@@ -9028,11 +5115,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['UserContentObject'][]
-        }
-      }
       /** @description Failed to create project's content */
       500: {
         content: never
@@ -9042,20 +5124,12 @@ export interface operations {
   /** Deletes project's contents */
   ContentController_deleteContents: {
     parameters: {
-      query: {
-        ids: string[]
-      }
       path: {
         /** @description Project ref */
         ref: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['BulkDeleteUserContentResponse'][]
-        }
-      }
       /** @description Failed to delete project's contents */
       500: {
         content: never
@@ -9064,22 +5138,12 @@ export interface operations {
   }
   /** Updates project's content */
   ContentController_updateContent: {
-    parameters: {
-      query: {
-        id: string
-      }
-    }
     requestBody: {
       content: {
         'application/json': components['schemas']['UpdateContentParams']
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['UserContentObject'][]
-        }
-      }
       /** @description Failed to update project's content */
       500: {
         content: never
@@ -9089,23 +5153,12 @@ export interface operations {
   /** Gets daily project stats */
   DailyStatsController_getDailyStats: {
     parameters: {
-      query: {
-        attribute: string
-        interval: string
-        endDate: string
-        startDate: string
-      }
       path: {
         /** @description Project ref */
         ref: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       /** @description Failed to get daily project stats */
       500: {
         content: never
@@ -9122,9 +5175,7 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['DatabaseDetailResponse'][]
-        }
+        content: never
       }
     }
   }
@@ -9137,11 +5188,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['DatabaseStatusResponse'][]
-        }
-      }
       /** @description Failed to get statuses of databases of a project */
       500: {
         content: never
@@ -9162,9 +5208,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -9183,9 +5226,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -9205,9 +5245,7 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['LoadBalancerDetailResponse'][]
-        }
+        content: never
       }
     }
   }
@@ -9220,11 +5258,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       403: {
         content: never
       }
@@ -9251,11 +5284,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       403: {
         content: never
       }
@@ -9268,30 +5296,12 @@ export interface operations {
   /** Gets project's usage metrics */
   InfraMonitoringController_getUsageMetrics: {
     parameters: {
-      query: {
-        attribute:
-          | 'cpu_usage'
-          | 'max_cpu_usage'
-          | 'avg_cpu_usage'
-          | 'disk_io_budget'
-          | 'disk_io_consumption'
-          | 'ram_usage'
-          | 'swap_usage'
-        startDate: string
-        endDate: string
-        interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
-      }
       path: {
         /** @description Project ref */
         ref: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       /** @description Failed to get project's usage metrics */
       500: {
         content: never
@@ -9307,9 +5317,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to pause the project */
       500: {
         content: never
@@ -9330,9 +5337,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to resize database disk */
       500: {
         content: never
@@ -9348,9 +5352,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -9370,9 +5371,7 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['ProjectDetailResponse']
-        }
+        content: never
       }
     }
   }
@@ -9385,11 +5384,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['V1ProjectRefResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -9409,11 +5403,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ProjectRefResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -9432,11 +5421,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['RestoreProjectInfo']
-        }
-      }
       /** @description Failed to restore project */
       500: {
         content: never
@@ -9457,9 +5441,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to restart given services */
       500: {
         content: never
@@ -9504,9 +5485,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -9530,11 +5508,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['PreviewProjectTransferResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -9554,9 +5527,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -9565,21 +5535,12 @@ export interface operations {
   /** Gets a project's function invocation statistics */
   FunctionInvocationLogsController_getStatus: {
     parameters: {
-      query: {
-        interval: '5min' | '15min' | '1hr' | '1day' | '7day'
-        function_id: string
-      }
       path: {
         /** @description Project ref */
         ref: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['AnalyticsResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -9592,21 +5553,12 @@ export interface operations {
   /** Gets a project's function request statistics */
   FunctionRequestLogsController_getStatus: {
     parameters: {
-      query: {
-        interval: '5min' | '15min' | '1hr' | '1day' | '7day'
-        function_id: string
-      }
       path: {
         /** @description Project ref */
         ref: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['AnalyticsResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -9619,21 +5571,12 @@ export interface operations {
   /** Gets a project's function resource usage */
   FunctionResourceLogsController_getStatus: {
     parameters: {
-      query: {
-        interval: '5min' | '15min' | '1hr' | '1day' | '7day'
-        function_id: string
-      }
       path: {
         /** @description Project ref */
         ref: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['AnalyticsResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -9646,25 +5589,12 @@ export interface operations {
   /** Gets project's logs */
   LogsController_getApiPaths: {
     parameters: {
-      query: {
-        sql: string
-        project: string
-        iso_timestamp_start: string
-        iso_timestamp_end: string
-        timestamp_start: string
-        timestamp_end: string
-      }
       path: {
         /** @description Project ref */
         ref: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['AnalyticsResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -9677,20 +5607,12 @@ export interface operations {
   /** Gets project's usage api counts */
   UsageApiController_getApiCounts: {
     parameters: {
-      query: {
-        interval: 'minutely' | 'hourly' | 'daily'
-      }
       path: {
         /** @description Project ref */
         ref: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['AnalyticsResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -9709,12 +5631,205 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['AnalyticsResponse']
-        }
-      }
       /** @description Failed to get project's usage api requests count */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets project's warehouse tenant from logflare */
+  TenantController_getTenant: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch or provision warehouse tenant */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Lists project's warehouse collections from logflare */
+  CollectionController_listCollections: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse collections */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Create a warehouse collection */
+  CollectionController_createCollection: {
+    responses: {
+      403: {
+        content: never
+      }
+      /** @description Failed to create warehouse collection */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get a warehouse collection */
+  CollectionController_getCollection: {
+    responses: {
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse collection */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Delete a warehouse collection */
+  CollectionController_deleteCollection: {
+    responses: {
+      403: {
+        content: never
+      }
+      /** @description Failed to delete warehouse collection */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Update a warehouse collection */
+  CollectionController_updateCollection: {
+    responses: {
+      403: {
+        content: never
+      }
+      /** @description Failed to update warehouse collection */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Lists project's warehouse access tokens from logflare */
+  AccessTokenController_listAccessTokens: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse access tokens */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Create a warehouse access token */
+  AccessTokenController_createAccessToken: {
+    responses: {
+      403: {
+        content: never
+      }
+      /** @description Failed to create warehouse access token */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Delete a warehouse access token */
+  AccessTokenController_deleteAccessToken: {
+    responses: {
+      403: {
+        content: never
+      }
+      /** @description Failed to delete warehouse access token */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Lists project's warehouse endpoints from logflare */
+  EndpointController_listEndpoints: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse endpoints */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Create a warehouse endpoint */
+  EndpointController_createEndpoint: {
+    responses: {
+      403: {
+        content: never
+      }
+      /** @description Failed to create warehouse endpoint */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Update a warehouse endpoint */
+  EndpointController_updateEndpoint: {
+    responses: {
+      403: {
+        content: never
+      }
+      /** @description Failed to update warehouse endpoint */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Delete a warehouse endpoint */
+  EndpointController_deleteEndpoint: {
+    responses: {
+      403: {
+        content: never
+      }
+      /** @description Failed to delete warehouse endpoint */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Lists project's warehouse queries from logflare */
+  WarehouseQueryController_runQuery: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse endpoints */
       500: {
         content: never
       }
@@ -9729,11 +5844,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PgbouncerConfigResponse']
-        }
-      }
       /** @description Failed to retrieve project's pgbouncer config */
       500: {
         content: never
@@ -9754,11 +5864,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['UpdatePoolingConfigResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -9777,11 +5882,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PgbouncerStatusResponse']
-        }
-      }
       /** @description Failed to retrieve project's pgbouncer status */
       500: {
         content: never
@@ -9797,11 +5897,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgrestConfigWithJWTSecretResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -9825,11 +5920,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['V1PostgrestConfigResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -9848,11 +5938,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresConfigResponse']
-        }
-      }
       /** @description Failed to retrieve project's Postgres config */
       500: {
         content: never
@@ -9873,11 +5958,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresConfigResponse']
-        }
-      }
       /** @description Failed to update project's Postgres config */
       500: {
         content: never
@@ -9898,11 +5978,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['UpdateSecretsResponse']
-        }
-      }
       /** @description Failed to update project's secrets config */
       500: {
         content: never
@@ -9918,11 +5993,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['StorageConfigResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -9946,11 +6016,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['UpdateStorageConfigResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -9969,11 +6034,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['SupavisorConfigResponse'][]
-        }
-      }
       /** @description Failed to retrieve project's supavisor config */
       500: {
         content: never
@@ -9994,11 +6054,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['UpdateSupavisorConfigResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -10017,11 +6072,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ProjectAddonsResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -10045,9 +6095,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -10067,9 +6114,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -10111,11 +6155,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['JwtSecretUpdateStatus']
-        }
-      }
       /** @description Failed to retrieve JWT secret update status */
       500: {
         content: never
@@ -10133,11 +6172,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['StorageBucket']
-        }
-      }
       403: {
         content: never
       }
@@ -10158,9 +6192,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -10186,9 +6217,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -10209,9 +6237,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -10230,11 +6255,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['StorageBucket'][]
-        }
-      }
       403: {
         content: never
       }
@@ -10258,11 +6278,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': string
-        }
-      }
       403: {
         content: never
       }
@@ -10288,11 +6303,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['StorageObject'][]
-        }
-      }
       403: {
         content: never
       }
@@ -10318,11 +6328,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['PublicUrlResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -10348,9 +6353,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -10376,11 +6378,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['SignedUrlResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -10406,11 +6403,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['SignedUrlsResponse'][]
-        }
-      }
       403: {
         content: never
       }
@@ -10436,11 +6428,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['CopyObjectResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -10466,9 +6453,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -10494,9 +6478,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -10506,22 +6487,70 @@ export interface operations {
       }
     }
   }
-  /** Gets invoices for the given customer */
-  InvoicesController_getInvoices: {
+  /** Gets project storage credentials */
+  StorageS3CredentialsController_getAllCredentials: {
     parameters: {
-      query: {
-        customer: string
-        slug?: string
-        limit: string
-        offset: string
+      path: {
+        /** @description Project ref */
+        ref: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['Invoice'][]
-        }
+      403: {
+        content: never
       }
+      /** @description Failed to get project storage credentials */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates project storage credential */
+  StorageS3CredentialsController_createCredential: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateStorageCredentialBody']
+      }
+    }
+    responses: {
+      403: {
+        content: never
+      }
+      /** @description Failed to create project storage credential */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Deletes project storage credential */
+  StorageS3CredentialsController_deleteCredential: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Storage credential id */
+        id: string
+      }
+    }
+    responses: {
+      403: {
+        content: never
+      }
+      /** @description Failed to delete project storage credential */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets invoices for the given customer */
+  InvoicesController_getInvoices: {
+    responses: {
       /** @description Failed to retrieve invoices */
       500: {
         content: never
@@ -10530,12 +6559,6 @@ export interface operations {
   }
   /** Gets the total count of invoices for the given customer */
   InvoicesController_countInvoices: {
-    parameters: {
-      query: {
-        customer: string
-        slug?: string
-      }
-    }
     responses: {
       200: {
         headers: {
@@ -10554,9 +6577,7 @@ export interface operations {
   InvoicesController_getOverdueInvoices: {
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['OverdueInvoiceCount'][]
-        }
+        content: never
       }
     }
   }
@@ -10568,11 +6589,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['Invoice']
-        }
-      }
       /** @description Failed to retrieve invoice */
       500: {
         content: never
@@ -10587,11 +6603,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['SetupIntentResponse']
-        }
-      }
       /** @description Failed to set up a payment method */
       500: {
         content: never
@@ -10606,9 +6617,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to send analytics server event */
       500: {
         content: never
@@ -10623,9 +6631,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to send analytics identify event */
       500: {
         content: never
@@ -10640,9 +6645,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to send server page event */
       500: {
         content: never
@@ -10657,9 +6659,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to send mixpanel server activity */
       500: {
         content: never
@@ -10674,9 +6673,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to send mixpanel page event */
       500: {
         content: never
@@ -10685,15 +6681,7 @@ export interface operations {
   }
   /** Gets the Vercel access token for the given code */
   VercelAccessTokenController_getAccessToken: {
-    parameters: {
-      query: {
-        code: string
-      }
-    }
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to get Vercel access token */
       500: {
         content: never
@@ -10703,20 +6691,11 @@ export interface operations {
   /** Gets the list of Vercel projects */
   VercelProjectsController_getVercelProjects: {
     parameters: {
-      query: {
-        id: string
-        teamId: string
-      }
       header: {
         vercel_authorization: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>[]
-        }
-      }
       /** @description Failed to get projects */
       500: {
         content: never
@@ -10726,24 +6705,11 @@ export interface operations {
   /** Gets the Vercel project with the given ID */
   VercelProjectsController_getVercelProject: {
     parameters: {
-      query: {
-        id: string
-        teamId: string
-      }
       header: {
         vercel_authorization: string
       }
-      path: {
-        id: string
-        teamId: string
-      }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       /** @description Failed to get project */
       500: {
         content: never
@@ -10753,20 +6719,11 @@ export interface operations {
   /** Gets the environment variables for the given project ID on behalf of the given team ID */
   VercelEnvironmentVariablesController_getEnvironmentVariables: {
     parameters: {
-      query: {
-        projectId: string
-        teamId?: string
-      }
       header: {
         vercel_authorization: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>[]
-        }
-      }
       /** @description Failed to get Vercel environment variables */
       500: {
         content: never
@@ -10776,10 +6733,6 @@ export interface operations {
   /** Creates the environment variable for the given project ID on behalf of the given team ID */
   VercelEnvironmentVariablesController_createEnvironmentVariable: {
     parameters: {
-      query: {
-        projectId: string
-        teamId?: string
-      }
       header: {
         vercel_authorization: string
       }
@@ -10790,11 +6743,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       /** @description Failed to get the environment variables */
       500: {
         content: never
@@ -10810,11 +6758,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['GetUserOrganizationIntegrationResponse'][]
-        }
-      }
       /** @description Failed to get user's integrations */
       500: {
         content: never
@@ -10829,11 +6772,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['GetOrganizationIntegrationResponse'][]
-        }
-      }
       /** @description Failed to get integration with the given organization slug */
       500: {
         content: never
@@ -10851,9 +6789,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to create vercel integration */
       500: {
         content: never
@@ -10868,9 +6803,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to remove Vercel organization integration with the given id */
       500: {
         content: never
@@ -10880,21 +6812,11 @@ export interface operations {
   /** Gets vercel projects with the given organization integration id */
   VercelProjectController_getVercelProjects: {
     parameters: {
-      query: {
-        search?: string
-        from?: string
-        limit: string
-      }
       path: {
         organization_integration_id: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['GetVercelProjectsResponse']
-        }
-      }
       /** @description Failed to get vercel projects with the given organization integration id */
       500: {
         content: never
@@ -10909,11 +6831,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['GetVercelConnections'][]
-        }
-      }
       /** @description Failed to get installed vercel connections for the given organization integration */
       500: {
         content: never
@@ -10928,11 +6845,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['CreateVercelConnectionResponse']
-        }
-      }
       /** @description Failed to create project connection */
       500: {
         content: never
@@ -10947,9 +6859,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to sync supabase project envs with given connection id */
       500: {
         content: never
@@ -10964,11 +6873,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['DeleteVercelConnectionResponse']
-        }
-      }
       /** @description Failed to delete vercel integration project connection */
       500: {
         content: never
@@ -10988,9 +6892,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to update Vercel connection */
       500: {
         content: never
@@ -11000,11 +6901,6 @@ export interface operations {
   /** Get GitHub authorization */
   GitHubAuthorizationsController_getGitHubAuthorization: {
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['GitHubAuthorization']
-        }
-      }
       /** @description Failed to get GitHub authorization */
       500: {
         content: never
@@ -11019,9 +6915,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to create GitHub authorization */
       500: {
         content: never
@@ -11030,17 +6923,7 @@ export interface operations {
   }
   /** List organization GitHub connections */
   GitHubConnectionsController_listOrganizationGitHubConnections: {
-    parameters: {
-      query: {
-        organization_id: number
-      }
-    }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ListGitHubConnectionsResponse']
-        }
-      }
       /** @description Failed to list organization GitHub connections */
       500: {
         content: never
@@ -11055,9 +6938,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to create project connections */
       500: {
         content: never
@@ -11072,9 +6952,6 @@ export interface operations {
       }
     }
     responses: {
-      204: {
-        content: never
-      }
       /** @description Failed to delete github integration project connection */
       500: {
         content: never
@@ -11094,9 +6971,6 @@ export interface operations {
       }
     }
     responses: {
-      204: {
-        content: never
-      }
       /** @description Failed to update GitHub connection */
       500: {
         content: never
@@ -11105,21 +6979,7 @@ export interface operations {
   }
   /** List GitHub connection branches */
   GitHubBranchesController_listConnectionBranches: {
-    parameters: {
-      query?: {
-        per_page?: number
-        page?: number
-      }
-      path: {
-        connectionId: number
-      }
-    }
     responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>[]
-        }
-      }
       /** @description Failed to list GitHub connection branches */
       500: {
         content: never
@@ -11128,18 +6988,7 @@ export interface operations {
   }
   /** Get GitHub connection branch */
   GitHubBranchesController_getConnectionBranch: {
-    parameters: {
-      path: {
-        connectionId: number
-        branchName: string
-      }
-    }
     responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       /** @description Failed to get GitHub connection branch */
       500: {
         content: never
@@ -11149,9 +6998,6 @@ export interface operations {
   /** Gets GitHub repositories for user */
   GitHubRepositoriesController_listRepositories: {
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to get GitHub repositories for user */
       500: {
         content: never
@@ -11166,9 +7012,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to create CLI login session */
       500: {
         content: never
@@ -11177,15 +7020,7 @@ export interface operations {
   }
   /** Retrieve CLI login session */
   CliLoginController_getCliLoginSession: {
-    parameters: {
-      path: {
-        session_id: string
-      }
-    }
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to retrieve CLI login session */
       500: {
         content: never
@@ -11194,18 +7029,7 @@ export interface operations {
   }
   /** Gets GoTrue template */
   AuthTemplateController_getTemplate: {
-    parameters: {
-      path: {
-        ref: string
-        template: 'confirmation' | 'email-change' | 'invite' | 'magic-link' | 'recovery'
-      }
-    }
     responses: {
-      200: {
-        content: {
-          'application/json': string
-        }
-      }
       /** @description Failed to retrieve GoTrue template */
       500: {
         content: never
@@ -11221,11 +7045,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
       /** @description Failed to get status of owner reassignment */
       500: {
         content: never
@@ -11244,11 +7063,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -11270,11 +7084,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -11296,11 +7105,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -11324,9 +7128,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -11350,10 +7151,43 @@ export interface operations {
       }
     }
     responses: {
-      200: {
+      /** @description Failed to reset JWT */
+      500: {
         content: never
       }
-      /** @description Failed to reset JWT */
+    }
+  }
+  /**
+   * Update a function
+   * @description Updates a function with the specified slug and project.
+   */
+  SystemFunctionSlugController_updateFunction: {
+    parameters: {
+      query?: {
+        import_map_path?: string
+        entrypoint_path?: string
+        import_map?: boolean
+        verify_jwt?: boolean
+        name?: string
+      }
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Function slug */
+        function_slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1UpdateFunctionBody']
+        'application/vnd.denoland.eszip': components['schemas']['V1UpdateFunctionBody']
+      }
+    }
+    responses: {
+      403: {
+        content: never
+      }
+      /** @description Failed to update function with given slug */
       500: {
         content: never
       }
@@ -11371,15 +7205,45 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['FunctionResponse'][]
-        }
-      }
       403: {
         content: never
       }
       /** @description Failed to retrieve project's functions */
+      500: {
+        content: never
+      }
+    }
+  }
+  /**
+   * Create a function
+   * @description Creates a function and adds it to the specified project.
+   */
+  SystemFunctionsController_createFunction: {
+    parameters: {
+      query?: {
+        import_map_path?: string
+        entrypoint_path?: string
+        import_map?: boolean
+        verify_jwt?: boolean
+        name?: string
+        slug?: string
+      }
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1CreateFunctionBody']
+        'application/vnd.denoland.eszip': components['schemas']['V1CreateFunctionBody']
+      }
+    }
+    responses: {
+      403: {
+        content: never
+      }
+      /** @description Failed to create project's function */
       500: {
         content: never
       }
@@ -11411,11 +7275,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['SecretResponse'][]
-        }
-      }
       403: {
         content: never
       }
@@ -11442,9 +7301,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -11471,11 +7327,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       403: {
         content: never
       }
@@ -11494,9 +7345,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to refresh secrets */
       500: {
         content: never
@@ -11506,11 +7354,6 @@ export interface operations {
   /** Get API health status */
   HealthController_getStatus: {
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['HealthResponse']
-        }
-      }
       /** @description Failed to retrieve API health status */
       500: {
         content: never
@@ -11531,9 +7374,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to update health status. */
       500: {
         content: never
@@ -11554,9 +7394,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to record HA event. */
       500: {
         content: never
@@ -11577,11 +7414,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['CredentialsResponseBody']
-        }
-      }
       /** @description Failed to obtain temporary credentials. */
       500: {
         content: never
@@ -11602,9 +7434,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to update project addon */
       500: {
         content: never
@@ -11621,9 +7450,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to remove project addon */
       500: {
         content: never
@@ -11647,22 +7473,12 @@ export interface operations {
   /** Gets usage stats */
   OrgUsageSystemController_getOrgUsage: {
     parameters: {
-      query?: {
-        project_ref?: string
-        start?: string
-        end?: string
-      }
       path: {
         /** @description Organization slug */
         slug: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OrgUsageResponse']
-        }
-      }
       /** @description Failed to get usage stats */
       500: {
         content: never
@@ -11678,9 +7494,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to retrieve subscription */
       500: {
         content: never
@@ -11696,9 +7509,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to retrieve subscription */
       500: {
         content: never
@@ -11719,9 +7529,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to update subscription */
       500: {
         content: never
@@ -11742,12 +7549,21 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['UpdateRestrictionsResponse']
-        }
-      }
       /** @description Failed to update restriction status */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates a partner organization */
+  AwsPartnerOrganizationsSystemController_createPartnerOrganization: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateAwsPartnerOrganizationBody']
+      }
+    }
+    responses: {
+      /** @description Unexpected error creating a partner organization */
       500: {
         content: never
       }
@@ -11761,9 +7577,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to process Vercel event */
       500: {
         content: never
@@ -11775,14 +7588,10 @@ export interface operations {
     parameters: {
       header: {
         'x-github-delivery': string
-        'x-github-event': string
         'x-hub-signature-256': string
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to process GitHub event */
       500: {
         content: never
@@ -11802,9 +7611,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to process Stripe event */
       500: {
         content: never
@@ -11824,9 +7630,7 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['GetMetricsResponse']
-        }
+        content: never
       }
     }
   }
@@ -11842,11 +7646,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['BranchDetailResponse']
-        }
-      }
       /** @description Failed to retrieve database branch */
       500: {
         content: never
@@ -11865,11 +7664,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['BranchDeleteResponse']
-        }
-      }
       /** @description Failed to delete database branch */
       500: {
         content: never
@@ -11893,11 +7687,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['BranchResponse']
-        }
-      }
       /** @description Failed to update database branch */
       500: {
         content: never
@@ -11916,11 +7705,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['BranchResetResponse']
-        }
-      }
       /** @description Failed to reset database branch */
       500: {
         content: never
@@ -11934,9 +7718,7 @@ export interface operations {
   V1ProjectsController_getProjects: {
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['V1ProjectResponse'][]
-        }
+        content: never
       }
     }
   }
@@ -11964,11 +7746,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ApiKeyResponse'][]
-        }
-      }
       403: {
         content: never
       }
@@ -11986,11 +7763,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['BranchResponse'][]
-        }
-      }
       /** @description Failed to retrieve database branches */
       500: {
         content: never
@@ -12014,11 +7786,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['BranchResponse']
-        }
-      }
       /** @description Failed to create database branch */
       500: {
         content: never
@@ -12037,9 +7804,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       /** @description Failed to disable preview branching */
       500: {
         content: never
@@ -12055,11 +7819,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['UpdateCustomHostnameResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12078,9 +7837,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -12104,11 +7860,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['UpdateCustomHostnameResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12127,11 +7878,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['UpdateCustomHostnameResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12150,11 +7896,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['UpdateCustomHostnameResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12173,11 +7914,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['NetworkBanResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12201,9 +7937,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -12222,11 +7955,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['NetworkRestrictionsResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12250,11 +7978,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['NetworkRestrictionsResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12273,11 +7996,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PgsodiumConfigResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12301,11 +8019,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PgsodiumConfigResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12327,11 +8040,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['SecretResponse'][]
-        }
-      }
       403: {
         content: never
       }
@@ -12358,9 +8066,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -12387,11 +8092,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       403: {
         content: never
       }
@@ -12410,11 +8110,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['SslEnforcementResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12438,11 +8133,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['SslEnforcementResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12467,11 +8157,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['TypescriptResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12490,11 +8175,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['VanitySubdomainConfigResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12513,9 +8193,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -12539,11 +8216,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['SubdomainAvailabilityResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12567,11 +8239,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['ActivateVanitySubdomainResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12595,11 +8262,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['ProjectUpgradeInitiateResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12618,11 +8280,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ProjectUpgradeEligibilityResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12641,11 +8298,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['DatabaseUpgradeStatusResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12664,11 +8316,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ReadOnlyStatusResponse']
-        }
-      }
       /** @description Failed to get project readonly mode status */
       500: {
         content: never
@@ -12684,9 +8331,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to disable project's readonly mode */
       500: {
         content: never
@@ -12707,9 +8351,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to set up read replica */
       500: {
         content: never
@@ -12730,9 +8371,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       /** @description Failed to remove read replica */
       500: {
         content: never
@@ -12743,8 +8381,7 @@ export interface operations {
   ServiceHealthController_checkServiceHealth: {
     parameters: {
       query: {
-        timeout_ms?: number
-        services: ('auth' | 'db' | 'pooler' | 'realtime' | 'rest' | 'storage')[]
+        timeout_ms: number
       }
       path: {
         /** @description Project ref */
@@ -12772,11 +8409,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresConfigResponse']
-        }
-      }
       /** @description Failed to retrieve project's Postgres config */
       500: {
         content: never
@@ -12797,11 +8429,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['PostgresConfigResponse']
-        }
-      }
       /** @description Failed to update project's Postgres config */
       500: {
         content: never
@@ -12817,11 +8444,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['V1PgbouncerConfigResponse']
-        }
-      }
       /** @description Failed to retrieve project's pgbouncer config */
       500: {
         content: never
@@ -12837,11 +8459,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['AuthConfigResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12865,16 +8482,72 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['AuthConfigResponse']
-        }
-      }
       403: {
         content: never
       }
       /** @description Failed to update project's auth config */
       500: {
+        content: never
+      }
+    }
+  }
+  /** Lists all third-party auth integrations */
+  ThirdPartyAuthController_listTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Creates a new third-party auth integration */
+  ThirdPartyAuthController_createTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateThirdPartyAuthBody']
+      }
+    }
+    responses: {
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Get a third-party integration */
+  ThirdPartyAuthController_getTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      403: {
+        content: never
+      }
+    }
+  }
+  /** Removes a third-party auth integration */
+  ThirdPartyAuthController_deleteTPAForProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      403: {
         content: never
       }
     }
@@ -12888,11 +8561,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['ListProvidersResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12916,11 +8584,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['CreateProviderResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12936,15 +8599,9 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
-        provider_id: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['GetProviderResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12960,7 +8617,6 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
-        provider_id: string
       }
     }
     requestBody: {
@@ -12969,11 +8625,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['UpdateProviderResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -12989,15 +8640,9 @@ export interface operations {
       path: {
         /** @description Project ref */
         ref: string
-        provider_id: string
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['DeleteProviderResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -13021,11 +8666,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': Record<string, never>
-        }
-      }
       403: {
         content: never
       }
@@ -13044,9 +8684,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -13065,11 +8702,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['V1BackupsResponse']
-        }
-      }
       /** @description Failed to get backups */
       500: {
         content: never
@@ -13109,11 +8741,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['FunctionSlugResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -13137,9 +8764,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -13156,12 +8780,11 @@ export interface operations {
   FunctionSlugController_updateFunction: {
     parameters: {
       query?: {
-        slug?: string
-        name?: string
-        verify_jwt?: boolean
-        import_map?: boolean
-        entrypoint_path?: string
         import_map_path?: string
+        entrypoint_path?: string
+        import_map?: boolean
+        verify_jwt?: boolean
+        name?: string
       }
       path: {
         /** @description Project ref */
@@ -13177,11 +8800,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['FunctionResponse']
-        }
-      }
       403: {
         content: never
       }
@@ -13205,9 +8823,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: never
-      }
       403: {
         content: never
       }
@@ -13226,11 +8841,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['V1StorageBucketResponse'][]
-        }
-      }
       403: {
         content: never
       }
@@ -13248,11 +8858,6 @@ export interface operations {
       }
     }
     responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['OrganizationResponseV1']
-        }
-      }
       /** @description Unexpected error creating an organization */
       500: {
         content: never
@@ -13261,48 +8866,22 @@ export interface operations {
   }
   /** List members of an organization */
   V1OrganizationMembersController_v1ListOrganizationMembers: {
-    parameters: {
-      path: {
-        slug: string
-      }
-    }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['V1OrganizationMemberResponse'][]
-        }
+        content: never
       }
     }
   }
   /** Gets information about the organization */
   V1OrganizationSlugController_getOrganization: {
-    parameters: {
-      path: {
-        slug: string
-      }
-    }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['V1OrganizationSlugResponse']
-        }
+        content: never
       }
     }
   }
   /** Authorize user through oauth */
   OAuthController_authorize: {
-    parameters: {
-      query: {
-        client_id: string
-        response_type: 'code' | 'token' | 'id_token token'
-        redirect_uri: string
-        scope?: string
-        state?: string
-        response_mode?: string
-        code_challenge?: string
-        code_challenge_method?: 'plain' | 'sha256' | 'S256'
-      }
-    }
     responses: {
       303: {
         content: never
@@ -13318,25 +8897,13 @@ export interface operations {
     }
     responses: {
       201: {
-        content: {
-          'application/json': components['schemas']['OAuthTokenResponse']
-        }
+        content: never
       }
     }
   }
   /** Lists SQL snippets for the logged in user */
   SnippetsController_listSnippets: {
-    parameters: {
-      query?: {
-        project_ref?: string
-      }
-    }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['SnippetList']
-        }
-      }
       /** @description Failed to list user's SQL snippets */
       500: {
         content: never
@@ -13351,11 +8918,6 @@ export interface operations {
       }
     }
     responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['SnippetResponse']
-        }
-      }
       /** @description Failed to retrieve SQL snippet */
       500: {
         content: never
@@ -13379,9 +8941,7 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['ResourceWithServicesStatusResponse']
-        }
+        content: never
       }
     }
   }
@@ -13415,9 +8975,7 @@ export interface operations {
   ExtensionsController_provisionResource: {
     responses: {
       201: {
-        content: {
-          'application/json': components['schemas']['ResourceProvisioningResponse']
-        }
+        content: never
       }
     }
   }
@@ -13430,9 +8988,7 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['FlyOrganization']
-        }
+        content: never
       }
     }
   }
@@ -13445,9 +9001,7 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['OrganizationExtensionStatus'][]
-        }
+        content: never
       }
     }
   }
@@ -13473,9 +9027,7 @@ export interface operations {
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['ResourceBillingResponse']
-        }
+        content: never
       }
     }
   }

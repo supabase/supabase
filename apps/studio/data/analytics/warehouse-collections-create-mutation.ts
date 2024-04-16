@@ -7,19 +7,30 @@ type CreateCollectionArgs = {
 }
 type CreateCollectionPayload = {
   name: string
-  description?: string
+  id: string
+  token: string
 }
 export function useCreateCollection({ projectRef }: CreateCollectionArgs) {
   const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: async (payload: CreateCollectionPayload) => {
-      console.log('payload', payload)
-      const resp = await post(`/platform/projects/${projectRef}/analytics/warehouse/collections`, {body: payload})
-      console.log({resp})
+      const tenantRes = await post(`/platform/projects/{ref}/analytics/warehouse/tenant`, {
+        params: {
+          path: { ref: projectRef },
+        },
+      })
+      console.log('DEBUG TENANT', tenantRes.data)
+
+      const res = await post(`/platform/projects/{ref}/analytics/warehouse/collections`, {
+        params: {
+          path: { ref: projectRef },
+        },
+        body: payload as any,
+      })
 
       const keysToInvalidate = analyticsKeys.warehouseCollections(projectRef)
       queryClient.invalidateQueries(keysToInvalidate)
-      return resp
+      return res
     },
     mutationKey: analyticsKeys.warehouseCollections(projectRef),
   })

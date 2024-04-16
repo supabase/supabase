@@ -27,6 +27,7 @@ export async function getWarehouseQuery(
       signal,
     }
   )
+
   if (response.error) {
     throw response.error
   }

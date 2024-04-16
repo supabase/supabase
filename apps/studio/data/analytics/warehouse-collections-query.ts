@@ -11,20 +11,16 @@ export async function getWarehouseCollections(
   { projectRef }: WarehouseCollectionsVariables,
   signal?: AbortSignal
 ) {
-  if (!projectRef || projectRef === "undefined") {
+  if (!projectRef || projectRef === 'undefined') {
     throw new Error('projectRef is required')
   }
 
-  // TODO: Uncomment this code and remove the mock once the endpoint is implemented
   const response = await get(`/platform/projects/{ref}/analytics/warehouse/collections`, {
     params: { path: { ref: projectRef } },
     signal,
   })
-  if (response.error) {
-    throw response.error
-  }
 
-  return response.data;
+  return response.data
 }
 
 export const useWarehouseCollectionsQuery = (

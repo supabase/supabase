@@ -186,7 +186,6 @@ const LogTable = ({
     maxHeight || (!queryType ? 'calc(100vh - 42px - 10rem)' : 'calc(100vh - 42px - 3rem)')
 
   const logDataRows = useMemo(() => {
-    console.log('DEBUG: ', hasId, hasTimestamp, logMap, dedupedData)
     if (hasId && hasTimestamp) {
       return Object.values(logMap).sort((a, b) => b.timestamp - a.timestamp)
     } else {

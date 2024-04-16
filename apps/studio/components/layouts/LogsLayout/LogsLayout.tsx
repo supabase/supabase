@@ -13,7 +13,6 @@ import {
 } from 'hooks'
 import { ProjectLayout } from '../'
 import { generateLogsMenu } from './LogsMenu.utils'
-import { useCollectionsQuery } from 'data/collections/collections-query'
 import { Menu } from 'ui'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { CreateWarehouseCollectionModal } from 'components/interfaces/DataWarehouse/CreateWarehouseCollection'
@@ -38,10 +37,6 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
   const showWarehouse = useFlag('warehouse')
   const project = useSelectedProject()
   const projectRef = project?.ref || 'default'
-
-  // const { data: _collections, isLoading: _collectionsLoading } = useCollectionsQuery({
-  //   projectRef,
-  // })
 
   const { data: tenant } = useWarehouseTenantQuery({ projectRef })
   const { data: collections, isLoading: collectionsLoading } = useWarehouseCollectionsQuery(
