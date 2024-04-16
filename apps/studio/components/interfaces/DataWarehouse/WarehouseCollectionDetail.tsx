@@ -1,7 +1,5 @@
-import LogsPreviewer from 'components/interfaces/Settings/Logs/LogsPreviewer'
 import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
-import { useCollectionQuery } from 'data/collections/collections-query'
 import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
 import { Button, IconRefreshCcw, IconRewind } from 'ui'
@@ -24,7 +22,7 @@ export const WarehouseCollectionDetail = () => {
       setParams({
         ...params,
         sql: `
-        select id, timestamp, event_message, metadata as testing from \`${collection.name}\` 
+        select id, timestamp, event_message from \`${collection.name}\` 
         where timestamp > '2024-01-01' 
         order by timestamp desc limit 100
         `,
@@ -44,7 +42,6 @@ export const WarehouseCollectionDetail = () => {
 
   return (
     <>
-      {/* <pre>{JSON.stringify(collection, null, 2)}</pre> */}
       <div className="relative flex flex-col flex-grow h-full">
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
@@ -70,7 +67,7 @@ export const WarehouseCollectionDetail = () => {
               Load older
             </Button>
             <Button
-              onClick={()=> refetch()}
+              onClick={() => refetch()}
               icon={<IconRefreshCcw />}
               type="default"
               loading={isLoading}
