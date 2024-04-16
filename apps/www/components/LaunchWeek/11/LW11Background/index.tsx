@@ -155,16 +155,6 @@ const LW11Background = ({ className }: { className?: string }) => {
 
   !hasInitialized && init()
 
-  // useEffect(() => {
-  //   document.body.classList.add('bg-[#060809]')
-
-  //   return () => {
-  //     if (document.body.classList.contains('bg-[#060809]')) {
-  //       document.body.classList.remove('bg-[#060809]')
-  //     }
-  //   }
-  // }, [])
-
   return (
     <canvas
       ref={canvasRef}
