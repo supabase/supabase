@@ -1,0 +1,65 @@
+---
+id: 'function-ai-models'
+title: 'Running AI Models'
+description: 'How to run AI models in Edge Functions.'
+subtitle: 'How to run AI models in Edge Functions.'
+---
+
+[Supabase Edge Runtime](https://github.com/supabase/edge-runtime) has a built-in API for running AI models. You can use this API to generate embeddings, build conversational workflows, and do other AI/ML related tasks in your Edge Functions.
+
+## Setup
+
+There are no external dependencies or packages to install to enable the API.
+
+You can simply create a new inference session by doing:
+
+```ts
+
+const session = new Supabase.ai.Session('model-name');
+```
+
+<Admonition type="tip">
+
+To get type hints and checks for the API we recommend adding this triple-slash directive to the start of the Edge Function code: `/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />`
+
+</Admonition>
+
+## Running a model inference
+
+Once the session is instantiated, you can call it with inputs to perform inferences. Depending on the model you run, you may need to provide different options (we'll discuss them below).
+
+```ts
+  const output = await model.run(input, options);
+```
+
+## How to generate text embeddings
+
+Now let's see how to write an Edge Function using the `Supabase.ai` API to generate text embeddings. Currently, `Supabase.ai` API only supports the (gte-small)[https://huggingface.co/Supabase/gte-small] model.
+
+
+<Admonition type="tip">
+
+`gte-small` model exclusively caters to English texts, and any lengthy texts will be truncated to a maximum of 512 tokens. While you can provide inputs longer than 512 tokens, truncation may affect the accuracy.
+
+</Admonition>
+
+```ts
+const session = new Supabase.ai.Session('gte-small');
+
+Deno.serve(async (req: Request) => {
+	const params = new URL(req.url).searchParams;
+	const input = params.get('input');
+	const output = await model.run(input, { mean_pool: true, normalize: true });
+	return new Response(
+		JSON.stringify(
+			output,
+		),
+		{
+			headers: {
+				'Content-Type': 'application/json',
+				'Connection': 'keep-alive',
+			},
+		},
+	);
+});
+```
