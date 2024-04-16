@@ -49,7 +49,7 @@ export const IndexAdvisorDisabledState = () => {
         <Markdown
           className="text-foreground"
           content={
-            indexAdvisorExtension === null
+            indexAdvisorExtension === undefined
               ? 'Newer version of Postgres required'
               : 'Postgres extensions `index_advisor` and `hypopg` required'
           }
@@ -58,7 +58,7 @@ export const IndexAdvisorDisabledState = () => {
       <AlertDescription_Shadcn_>
         <Markdown
           content={
-            indexAdvisorExtension === null
+            indexAdvisorExtension === undefined
               ? 'Upgrade to the latest version of Postgres to get recommendations on indexes for your queries'
               : 'These extensions can help in recommending database indexes to reduce the costs of your query.'
           }
@@ -67,7 +67,7 @@ export const IndexAdvisorDisabledState = () => {
 
       <AlertDescription_Shadcn_ className="mt-3">
         <div className="flex items-center gap-x-2">
-          {indexAdvisorExtension === null ? (
+          {indexAdvisorExtension === undefined ? (
             <Button asChild type="default">
               <Link href={`/project/${ref}/settings/infrastructure`}>Upgrade Postgres version</Link>
             </Button>
