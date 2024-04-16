@@ -1,4 +1,4 @@
-/// <reference types="https://esm.sh/v135/@supabase/functions-js@2.3.0/src/edge-runtime.d.ts" />
+/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
 
 import { createClient } from "npm:@supabase/supabase-js@2.42.0";
 import { Database, Tables } from "../_shared/database.types.ts";
