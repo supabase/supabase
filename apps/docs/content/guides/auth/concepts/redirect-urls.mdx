@@ -76,17 +76,17 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 })
 ```
 
-## Email templates when using redirectTo
-When using a redirectTo option, you may need to replace the ```{{ .SiteURL }}``` with ```{{ .RedirectTo }}``` as document in https://supabase.com/docs/guides/auth/auth-email-templates  
+## Email templates when using `redirectTo`
 
-Example:
-```
+When using a `redirectTo` option, you may need to replace the `{{ .SiteURL }}` with `{{ .RedirectTo }}` in your email templates. See the [Email Templates guide](/docs/guides/auth/auth-email-templates) for more information.
+
+For example, change the following:
+
+```html
+<!-- Old -->
 <a href="{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup">Confirm your mail</a>
-```
 
-to
-
-```
+<!-- New -->
 <a href="{{ .RedirectTo }}/auth/confirm?token_hash={{ .TokenHash }}&type=signup">Confirm your mail</a>
 ```
 
