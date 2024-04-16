@@ -7,16 +7,12 @@ import {
   PropsWithChildren,
   useEffect,
   useState,
-  useRef,
-  useCallback,
-  useMemo,
 } from 'react'
-import { useInView } from 'react-intersection-observer'
 
 import { TAB_CHANGE_EVENT_NAME } from '../../lib/events'
 import styleHandler from '../../lib/theme/styleHandler'
 import { useTabGroup } from './TabsProvider'
-import { throttle } from 'lodash'
+import { useSticky } from './Tabs.utils'
 
 interface TabsProps {
   type?: 'pills' | 'underlined' | 'cards' | 'rounded-pills'
@@ -77,53 +73,10 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
       children?.[0]?.props?.id
   )
 
-  const [inView, setInView] = useState(false)
-  const stickyRef = useRef<HTMLDivElement>(null)
-  const { ref: intersectionRef } = useInView({
-    threshold: 0.1,
-    onChange: (inView) => (inView ? setInView(true) : setInView(false)),
-    skip: !stickyTabList,
+  const { inView, observedRef, stickyRef } = useSticky({
+    enabled: !!stickyTabList,
+    ...stickyTabList,
   })
-
-  const scrollHandler = useCallback(() => {
-    if (!stickyRef.current) return
-
-    const top = stickyRef.current.getBoundingClientRect().top
-    if (top > 0) return
-
-    const { style = {} } = stickyTabList ?? {}
-    if (inView) {
-      stickyRef.current.style.position = 'sticky'
-      stickyRef.current.style.top = '100px'
-      stickyRef.current.style.zIndex = '5'
-
-      for (const property in style) {
-        // @ts-ignore
-        stickyRef.current.style[property] = style[property]
-      }
-    } else {
-      stickyRef.current.style.position = ''
-      stickyRef.current.style.top = ''
-      stickyRef.current.style.zIndex = ''
-      for (const property in style) {
-        // @ts-ignore
-        stickyRef.current.style[property] = ''
-      }
-    }
-  }, [inView])
-
-  const throttledScrollHandler = useMemo(() => throttle(scrollHandler, 300), [scrollHandler])
-
-  useEffect(() => {
-    const { scrollContainer } = stickyTabList ?? {}
-    const elem =
-      scrollContainer instanceof HTMLElement
-        ? scrollContainer
-        : (scrollContainer && document.getElementById(scrollContainer)) || document
-
-    elem.addEventListener('scroll', throttledScrollHandler)
-    return () => elem.removeEventListener('scroll', throttledScrollHandler)
-  }, [throttledScrollHandler, stickyTabList?.scrollContainer])
 
   useEffect(() => {
     /**
@@ -212,7 +165,7 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
     <TabsPrimitive.Root
       value={active}
       className={[__styles.base, baseClassNames].join(' ')}
-      ref={intersectionRef}
+      ref={observedRef}
     >
       <TabsPrimitive.List className={listClasses.join(' ')} ref={stickyRef}>
         {addOnBefore}
