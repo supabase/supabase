@@ -86,7 +86,6 @@ class _HomePageState extends State<HomePage> {
 `}
         </SimpleCodeBlock>
       </ConnectTabContent>
-
     </ConnectTabs>
   )
 }
