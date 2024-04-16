@@ -50,7 +50,7 @@ export const IndexAdvisorDisabledState = () => {
           className="text-foreground"
           content={
             indexAdvisorExtension === null
-              ? 'Newer version of Postgres required to run index recommendations'
+              ? 'Newer version of Postgres required'
               : 'Postgres extensions `index_advisor` and `hypopg` required'
           }
         />
