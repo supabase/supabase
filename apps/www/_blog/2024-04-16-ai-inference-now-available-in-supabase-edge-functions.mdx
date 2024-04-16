@@ -68,13 +68,15 @@ Edge Functions are tightly integrated with the rest of the [Supabase Stack](http
 
 You can now utilize [database webhooks](https://supabase.com/docs/guides/database/webhooks) to automatically generate embeddings whenever a new row is inserted into a database table.
 
-![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/8b9f49e5-e12a-4c31-a008-9a3c512ee78c/Untitled.png)
+{/* ![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/8b9f49e5-e12a-4c31-a008-9a3c512ee78c/Untitled.png) */}
+
+![Bootstrap getting started](/images/blog/ga-week/ai-inference-now-available-in-supabase-edge-functions/text-insert-example.svg)
 
 Because embedding creation is a compute-intensive task, it makes sense to offload the work from your database. Edge Functions are the perfect “background worker”.
 
 ### Technical architecture
 
-![Screenshot 2024-04-16 at 7.01.44 PM.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/fe1f2676-b065-4db3-a436-c4d52809d17d/Screenshot_2024-04-16_at_7.01.44_PM.png)
+{/* ![Screenshot 2024-04-16 at 7.01.44 PM.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/fe1f2676-b065-4db3-a436-c4d52809d17d/Screenshot_2024-04-16_at_7.01.44_PM.png) */}
 
 Embedding generation uses the [ONNX runtime](https://onnxruntime.ai/) under the hood. This is a cross-platform inferencing library that supports multiple execution providers from CPU to specialized GPUs.
 
@@ -82,7 +84,9 @@ Libraries like `transformers.js` also use ONNX runtime which, in the context of 
 
 To solve this, we built a native extension in Edge Runtime that enables using ONNX runtime via the Rust interface. This was made possible thanks to an excellent Rust wrapper called [Ort](https://github.com/pykeio/ort):
 
-![Screenshot 2024-04-16 at 6.57.03 PM.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/9015b93b-cb03-44e8-874c-7cb2356a47c0/Screenshot_2024-04-16_at_6.57.03_PM.png)
+![Bootstrap getting started](/images/blog/ga-week/ai-inference-now-available-in-supabase-edge-functions/infra-01.svg)
+
+{/* ![Screenshot 2024-04-16 at 6.57.03 PM.png](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/9015b93b-cb03-44e8-874c-7cb2356a47c0/Screenshot_2024-04-16_at_6.57.03_PM.png) */}
 
 Embedding generation is fairly lightweight compared to LLM workloads, so it can run on a CPU without hardware acceleration.
 
@@ -152,7 +156,9 @@ Deno.serve(async (req: Request) => {
 
 LLM models are challenging to run directly via ONNX runtime on CPU. For these, we are using a GPU-accelerated [Ollama](https://ollama.com/) server under the hood:
 
-![rough rough](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/a9ee7f17-3a99-49e1-9331-b101442ceeac/Screenshot_2024-04-16_at_7.04.30_PM.png)
+![Bootstrap getting started](/images/blog/ga-week/ai-inference-now-available-in-supabase-edge-functions/infra-02.svg)
+
+{/* ![rough rough](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/a9ee7f17-3a99-49e1-9331-b101442ceeac/Screenshot_2024-04-16_at_7.04.30_PM.png) */}
 
 We think this is a great match: the Ollama team have worked hard to ensure that the local development experience is great, and we love development environments that can be run without internet access (for those who enjoy programming on planes).
 
