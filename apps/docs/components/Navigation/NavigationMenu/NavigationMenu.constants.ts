@@ -1140,6 +1140,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/routing',
         },
         {
+          name: 'Running AI Models',
+          url: '/guides/functions/ai-models',
+        },
+        {
           name: 'Regional invocations',
           url: '/guides/functions/regional-invocation',
         },
@@ -1186,6 +1190,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Generating OG images ',
           url: '/guides/functions/examples/og-image',
+        },
+        {
+          name: 'Semantic AI Search',
+          url: '/guides/functions/examples/semantic-search',
         },
         {
           name: 'CAPTCHA support with Cloudflare Turnstile',

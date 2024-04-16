@@ -68,7 +68,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     title: 'Lorem ipsum',
     shipped: true,
     isToday: false,
-    blog: '#',
+    blog: '/ga',
     hasCountdown: false,
     date: '15 April',
     published_at: '2024-04-15T08:00:00.000-08:00',
@@ -80,15 +80,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         href: 'https://supabase.link/twitter-space-ga',
       },
     ],
-    description: (
-      <>
-        <p className="text-foreground">Our products are now ready for production use.</p>{' '}
-        <p className="text-foreground-lighter">
-          Confidently leverage the full power of Supabase to build scalable, high-performance
-          applications with ease.
-        </p>
-      </>
-    ),
+    description: 'Supabase is officially launching into General Availability',
     steps: [
       {
         icon: products.database.icon[16],
@@ -135,19 +127,23 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     title: '',
     shipped: true,
     hasCountdown: false,
-    blog: '#',
+    blog: '/blog/ai-inference-now-available-in-supabase-edge-functions',
     date: '16 April',
     published_at: '2024-04-16T08:00:00.000-08:00',
-    description: <>Create vector embeddings with Edge Functions</>,
+    description: (
+      <>
+        Supabase Functions now supports <strong>AI models</strong>
+      </>
+    ),
     links: [
       {
         type: 'blog',
-        href: '#',
+        href: '/blog/ai-inference-now-available-in-supabase-edge-functions',
       },
-      {
-        type: 'video',
-        href: '',
-      },
+      // {
+      //   type: 'video',
+      //   href: '',
+      // },
       {
         type: 'xSpace',
         href: 'https://supabase.link/twitter-space-ga-week-2',

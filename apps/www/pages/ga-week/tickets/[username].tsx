@@ -43,13 +43,18 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
   const [ticketState, setTicketState] = useState<TicketState>('ticket')
   const { resolvedTheme, setTheme } = useTheme()
 
+  const isDark = resolvedTheme?.includes('dark')
   const isDarkTheme = resolvedTheme === 'dark'
 
   useEffect(() => {
-    if (isDarkTheme) {
-      setTheme('deep-dark')
-    }
+    isDarkTheme && setTheme('deep-dark')
   }, [isDarkTheme])
+
+  useEffect(() => {
+    return () => {
+      isDark && setTheme('dark')
+    }
+  }, [])
 
   if (!ticketNumber) {
     return <Error statusCode={404} />

@@ -30,10 +30,14 @@ export default function IndexPage() {
   const isDarkTheme = resolvedTheme === 'dark'
 
   useEffect(() => {
-    if (isDarkTheme) {
-      setTheme('deep-dark')
-    }
+    isDarkTheme && setTheme('deep-dark')
   }, [isDarkTheme])
+
+  useEffect(() => {
+    return () => {
+      isDark && setTheme('dark')
+    }
+  }, [])
 
   return (
     <DefaultLayout>
