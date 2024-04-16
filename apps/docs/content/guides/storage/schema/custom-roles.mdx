@@ -43,27 +43,26 @@ To impersonate the `manager` role, you will need a valid JWT token with the `man
 You can quickly create one using the `jsonwebtoken` library in Node.js.
 
 ```js
-const jwt = require('jsonwebtoken');
+const jwt = require('jsonwebtoken')
 
-const JWT_SECRET = 'your-jwt-secret'; // You can find this in your Supabase project settings under API
-const USER_ID = ''; // the user id that we want to give the manager role
+const JWT_SECRET = 'your-jwt-secret' // You can find this in your Supabase project settings under API
+const USER_ID = '' // the user id that we want to give the manager role
 
 const token = jwt.sign({ role: 'manager', sub: USER_ID }, JWT_SECRET, {
-    expiresIn: '1h'
-});
+  expiresIn: '1h',
+})
 ```
 
 Now you can use this token to access the Storage API.
 
 ```js
+const { StorageClient } = require('@supabase/storage-js')
 
-const { StorageClient } = require('@supabase/storage-js');
-
-const PROJECT_URL = 'https://your-project-id.supabase.co/storage/v1';
+const PROJECT_URL = 'https://your-project-id.supabase.co/storage/v1'
 
 const storage = new StorageClient(PROJECT_URL, {
-    authorization: `Bearer ${token}`
-});
+  authorization: `Bearer ${token}`,
+})
 
-await storage.from('teams').list();
+await storage.from('teams').list()
 ```

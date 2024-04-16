@@ -16,10 +16,7 @@ When making a copy of an object the owner of the new object will be the user who
 To copy an object within the same bucket, you can use the `copy` method.
 
 ```javascript
-await supabase
-  .storage
-  .from('avatars')
-  .copy('public/avatar1.png', 'private/avatar2.png')
+await supabase.storage.from('avatars').copy('public/avatar1.png', 'private/avatar2.png')
 ```
 
 ##### Copying objects across buckets
@@ -27,12 +24,9 @@ await supabase
 To copy an object across buckets, you can use the `copy` method specifying the destination bucket.
 
 ```javascript
-await supabase
-  .storage
-  .from('avatars')
-  .copy('public/avatar1.png', 'private/avatar2.png', {
-    destinationBucket: 'avatars2'
-  })
+await supabase.storage.from('avatars').copy('public/avatar1.png', 'private/avatar2.png', {
+  destinationBucket: 'avatars2',
+})
 ```
 
 ## Move Objects
@@ -46,9 +40,7 @@ Once the object is moved the original object will no longer exists.
 To move an object within the same bucket, you can use the `move` method.
 
 ```javascript
-
-const { data, error } = await supabase
-  .storage
+const { data, error } = await supabase.storage
   .from('avatars')
   .move('public/avatar1.png', 'private/avatar2.png')
 ```
@@ -58,12 +50,9 @@ const { data, error } = await supabase
 To move an object across buckets, you can use the `move` method specifying the destination bucket.
 
 ```javascript
-await supabase
-  .storage
-  .from('avatars')
-  .move('public/avatar1.png', 'private/avatar2.png', {
-    destinationBucket: 'avatars2'
-  })
+await supabase.storage.from('avatars').move('public/avatar1.png', 'private/avatar2.png', {
+  destinationBucket: 'avatars2',
+})
 ```
 
 ## Permissions

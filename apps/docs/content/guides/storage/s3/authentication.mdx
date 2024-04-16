@@ -62,6 +62,7 @@ You can use these credentials to authenticate with Supabase Storage S3 using any
         region = project_region
         ```
     </TabPanel>
+
 </Tabs>
 
 ## Session Token
@@ -80,9 +81,11 @@ To authenticate with S3 using a Session Token, use the following credentials:
 For example, using the `aws-sdk` library:
 
 ```javascript
-import { S3Client } from '@aws-sdk/client-s3';
+import { S3Client } from '@aws-sdk/client-s3'
 
-const { data: { session } } = await supabase.auth.getSession()
+const {
+  data: { session },
+} = await supabase.auth.getSession()
 
 const client = new S3Client({
   forcePathStyle: true,
@@ -92,6 +95,6 @@ const client = new S3Client({
     accessKeyId: 'project_ref',
     accessSecretKey: 'anonKey',
     sessionToken: session.access_token,
-  }
+  },
 })
 ```
