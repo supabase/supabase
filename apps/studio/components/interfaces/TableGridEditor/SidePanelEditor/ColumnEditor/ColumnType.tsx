@@ -15,14 +15,14 @@ import {
   Listbox,
 } from 'ui'
 
+import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
+import { ListPlus } from 'lucide-react'
 import {
   POSTGRES_DATA_TYPES,
   POSTGRES_DATA_TYPE_OPTIONS,
   RECOMMENDED_ALTERNATIVE_DATA_TYPE,
 } from '../SidePanelEditor.constants'
 import type { PostgresDataTypeOption } from '../SidePanelEditor.types'
-import { ListPlus } from 'lucide-react'
-import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 
 interface ColumnTypeProps {
   value: string
@@ -51,9 +51,23 @@ const ColumnType = ({
   showRecommendation = false,
   onOptionSelect = noop,
 }: ColumnTypeProps) => {
-  // @ts-ignore
-  const availableTypes = POSTGRES_DATA_TYPES.concat(enumTypes.map((type) => type.name))
-  const isAvailableType = value ? availableTypes.includes(value) : true
+  const availableTypes = POSTGRES_DATA_TYPES
+  const isAvailableInPgTypes = value ? availableTypes.includes(value) : true
+
+  let isAvailableInEnums = false
+  if (!isAvailableInPgTypes) {
+    const foundByName = enumTypes.find((type) => type.name === value)
+    if (foundByName && foundByName.schema !== 'public') {
+      onOptionSelect(foundByName.format)
+    }
+    const foundByFormat = enumTypes.find((type) => type.format === value)
+    if (foundByFormat) {
+      isAvailableInEnums = true
+    }
+  }
+
+  const isAvailableType = isAvailableInPgTypes || isAvailableInEnums
+
   const recommendation = RECOMMENDED_ALTERNATIVE_DATA_TYPE[value]
 
   const inferIcon = (type: string) => {
@@ -188,10 +202,10 @@ const ColumnType = ({
 
         {enumTypes.length > 0 ? (
           // @ts-ignore
-          enumTypes.map((enumType: PostgresType) => (
+          enumTypes.map((enumType) => (
             <Listbox.Option
-              key={enumType.name}
-              value={enumType.name}
+              key={enumType.format}
+              value={enumType.format}
               label={enumType.name}
               addOnBefore={() => {
                 return <ListPlus size={16} className="text-foreground" strokeWidth={1.5} />
