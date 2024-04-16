@@ -471,19 +471,19 @@ export const SocialLoginItems = [
 
 export const PhoneLoginsItems = [
   {
-    name: 'MessageBird SMS Login',
+    name: 'MessageBird',
     icon: '/docs/img/icons/messagebird-icon',
     linkDescription: 'Communication between businesses and their customers — across any channel.',
     url: '/guides/auth/phone-login/messagebird',
   },
   {
-    name: 'Twilio SMS Login',
+    name: 'Twilio',
     icon: '/docs/img/icons/twilio-icon',
     url: '/guides/auth/phone-login/twilio',
     linkDescription: 'Customer engagement platform used by hundreds of thousands of businesses.',
   },
   {
-    name: 'Vonage SMS Login',
+    name: 'Vonage',
     icon: '/docs/img/icons/vonage-icon',
     url: '/guides/auth/phone-login/vonage',
     linkDescription:
@@ -492,7 +492,7 @@ export const PhoneLoginsItems = [
     hasLightIcon: true,
   },
   {
-    name: 'Textlocal SMS Login (Community Supported)',
+    name: 'Textlocal (Community Supported)',
     icon: '/docs/img/icons/textlocal-icon',
     url: '/guides/auth/phone-login/textlocal',
     linkDescription: 'Textlocal is a cloud-based SMS platform offering bulk messaging services.',
@@ -526,35 +526,19 @@ export const auth = {
     {
       name: 'Concepts',
       items: [
-        { name: 'User', url: '/guides/auth/concepts/user ' },
-        { name: 'Identity', url: '/guides/auth/concepts/identity' },
-        { name: 'Session', url: '/guides/auth/concepts/session' },
-        { name: 'Factor', url: '/guides/auth/concepts/factor' },
+        { name: 'Users', url: '/guides/auth/concepts/users' },
+        { name: 'Identities', url: '/guides/auth/concepts/identities' },
+        { name: 'Sessions', url: '/guides/auth/concepts/sessions' },
+        { name: 'Factors', url: '/guides/auth/concepts/factors' },
       ],
     },
     {
-      name: 'Flows',
+      name: 'Flows (How-tos)',
       items: [
-        { name: 'Anonymous Sign-Ins', url: '/guides/auth/auth-anonymous' },
-        { name: 'Passwords', url: '/guides/auth/passwords' },
-        { name: 'Email Login', url: '/guides/auth/auth-email' },
+        { name: 'Password-based', url: '/guides/auth/passwords' },
+        { name: 'Email (Magic Link or OTP)', url: '/guides/auth/auth-email' },
         {
-          name: 'Passwordless Login',
-          url: '/guides/auth/passwordless-login',
-          items: [
-            {
-              name: 'Email Magic Link',
-              url: '/guides/auth/passwordless-login/auth-magic-link',
-            },
-            {
-              name: 'Email OTP',
-              url: '/guides/auth/passwordless-login/auth-email-otp',
-            },
-            { name: 'Phone OTP', url: '/guides/auth/phone-login' },
-          ],
-        },
-        {
-          name: 'Phone Login',
+          name: 'Phone Login (OTP)',
           url: '/guides/auth/phone-login',
           items: [...PhoneLoginsItems],
         },
@@ -580,6 +564,7 @@ export const auth = {
             },
           ],
         },
+        { name: 'Anonymous signins', url: '/guides/auth/auth-anonymous' },
         { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
         {
           name: 'Enterprise SSO',
@@ -589,6 +574,22 @@ export const auth = {
               name: 'SAML 2.0',
               url: '/guides/auth/enterprise-sso/auth-sso-saml',
             },
+          ],
+        },
+        /* TO BE DEPRECATED BELOW */
+        {
+          name: 'Passwordless Login',
+          url: '/guides/auth/passwordless-login',
+          items: [
+            {
+              name: 'Email Magic Link',
+              url: '/guides/auth/passwordless-login/auth-magic-link',
+            },
+            {
+              name: 'Email OTP',
+              url: '/guides/auth/passwordless-login/auth-email-otp',
+            },
+            { name: 'Phone OTP', url: '/guides/auth/phone-login' },
           ],
         },
       ],
@@ -619,6 +620,7 @@ export const auth = {
     {
       name: 'Security',
       items: [
+        { name: 'Password Security', url: '/password-security' },
         { name: 'Rate Limits', url: '/' }, // TODO
         { name: 'Enable Captcha Protection', url: '/guides/auth/auth-captcha' },
         { name: 'JWTs', url: '/guides/auth/jwt' },

@@ -4,7 +4,7 @@ import { serialize } from 'next-mdx-remote/serialize'
 import type { SerializeOptions } from 'next-mdx-remote/dist/types'
 import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
-import { dirname, join, extname, sep } from 'node:path'
+import { dirname, join, extname, sep, basename } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import remarkGfm from 'remark-gfm'
 import rehypeKatex from 'rehype-katex'
@@ -46,7 +46,7 @@ export async function getGuidesStaticPaths(section: string) {
   const directory = join(GUIDES_DIRECTORY, section)
 
   const files = (await readdir(directory, { recursive: true }))
-    .filter((file) => extname(file) === '.mdx')
+    .filter((file) => extname(file) === '.mdx' && !basename(file).startsWith('_'))
     .map((file) => ({
       params: {
         slug: file.replace(/\.mdx$/, '').split(sep),

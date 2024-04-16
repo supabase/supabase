@@ -2431,6 +2431,6 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/sessions',
-    destination: '/docs/guides/auth/concepts/session',
+    destination: '/docs/guides/auth/concepts/sessions',
   },
 ]
