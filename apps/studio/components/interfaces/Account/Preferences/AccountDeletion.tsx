@@ -1,12 +1,9 @@
 import Panel from 'components/ui/Panel'
-import { useProfile } from 'lib/profile'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_ } from 'ui'
 import { CriticalIcon } from 'ui-patterns/Icons/StatusIcons'
 import { DeleteAccountButton } from './DeleteAccountButton'
 
 export const AccountDeletion = () => {
-  const { profile } = useProfile()
-
   return (
     <>
       <Panel className="[&>div:first-child]:uppercase" title="Danger Zone">
