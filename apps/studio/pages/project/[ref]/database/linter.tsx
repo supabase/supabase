@@ -127,7 +127,7 @@ const ProjectLints: NextPageWithLayout = () => {
   const lintCountLabel = (count: number, label: string) => (
     <>
       {isLoading ? (
-        <ShimmeringLoader className="w-18 pt-1" />
+        <ShimmeringLoader className="w-20 pt-1" />
       ) : (
         <>
           {count} {label}
