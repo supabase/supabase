@@ -80,15 +80,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         href: 'https://supabase.link/twitter-space-ga',
       },
     ],
-    description: (
-      <>
-        <p className="text-foreground">Our products are now ready for production use.</p>{' '}
-        <p className="text-foreground-lighter">
-          Confidently leverage the full power of Supabase to build scalable, high-performance
-          applications with ease.
-        </p>
-      </>
-    ),
+    description: 'Supabase is officially launching into General Availability',
     steps: [
       {
         icon: products.database.icon[16],
