@@ -14,7 +14,7 @@ toc_depth: 3
 launchweek: 11
 ---
 
-We are making it super easy to run AI models within Supabase Edge Functions. A new built-in API is now available within Edge Runtime, so you can do model inferences in just 2 lines:
+We're making it super easy to run AI models within Supabase Edge Functions. A new built-in API is available within the Edge Runtime to run inference workloads in just a few lines of code:
 
 ```jsx
 // Instantiate a new inference session
@@ -30,11 +30,11 @@ console.log(output)
 With this new API you can:
 
 - Generate embeddings using models like `gte-small` to store and retrieve with pgvector. This is available today.
-- Inference, using models like `llama2` and `mistral` for GenAI workloads. This will be progressively rolled out as we get our hands on more GPUs.
+- Use Large Language Models like `llama2` and `mistral` for GenAI workloads. This will be progressively rolled out as we get our hands on more GPUs.
 
-In our previous Launch Week we announced support for AI inference [via Transformers.js](https://supabase.com/blog/hugging-face-supabase#hugging-face-with-edge-functions). This was a good start but had some shortcoming: it takes time to “boot” the Edge Function because it needs to instantiate a WASM runtime and build the inference pipeline. We increased CPU limits to mitigate these drawbacks, but we knew we wanted a better Developer Experience.
+In our previous Launch Week we [announced](/blog/hugging-face-supabase) support for AI inference via Transformers.js. This was a good start but had some shortcomings: it takes time to “boot” because it needs to instantiate a WASM runtime and build the inference pipeline. We increased CPU limits to mitigate this, but we knew we wanted a better Developer Experience.
 
-In this post we'll cover some of the improvements to remove cold starts using [Ort](https://github.com/pykeio/ort) and how we're adding inference support using [Ollama](https://ollama.com/).
+In this post we'll cover some of the improvements to remove cold starts using [Ort](https://github.com/pykeio/ort) and how we're adding LLM support using [Ollama](https://ollama.com/).
 
 <div className="video-container">
   <iframe
@@ -48,29 +48,17 @@ In this post we'll cover some of the improvements to remove cold starts using [O
 
 ## Generating Text Embeddings in Edge Functions
 
-Embeddings capture the "relatedness" of text, images, video, or other types of information [[read more](https://www.notion.so/Introducing-AI-inference-in-Edge-Functions-3bd7b1a34422404893b88644b1c89951?pvs=21)]. Embeddings are stored in the database as an array of floating point numbers, known as vectors. Since we [released pgvector](https://supabase.com/blog/openai-embeddings-postgres-vector) on the platform, Postgres has become a popular vector database. You can use pgvector to [store and query embeddings in Postgres](https://supabase.com/docs/guides/ai/vector-columns#querying-a-vector--embedding) and use them for Retrieval Augmented Generation (RAG) and Semantic Search. This release solves a few technical challenges for developers who want to use pgvector.
+Embeddings capture the "relatedness" of text, images, video, or other types of information. Embeddings are stored in the database as an array of floating point numbers, known as vectors. Since we [released](/openai-embeddings-postgres-vector) pgvector on the platform, Postgres has become a popular vector database.
 
-We've added a new built-in API to Edge Runtime, `Supabase.ai`. This is similar to other runtime APIs like `Deno.serve` or `Deno.env` except only available within Supabase's Edge Runtime:
-
-```jsx
-// Instantiate a new inference session
-// This can be done once in function
-const session = new Supabase.ai.Session('gte-small')
-
-// then use the session to run inference on a prompt
-const prompt = 'The sky is blue'
-const output = await session.run(prompt, { mean_pool: true, normalize: true })
-```
+Today's release solves a few technical challenges for developers who want to generate embeddings from the content in their database, giving them the ability to offload this compute-intensive task to background workers.
 
 ### Integrated pgvector experience
 
-Edge Functions are tightly integrated with the rest of the [Supabase Stack](https://supabase.com/docs/guides/getting-started/architecture), making it a breeze to work with [pgvector](https://supabase.com/docs/guides/database/extensions/pgvector) for storing and querying embeddings. You can see this in action in our [semantic search demo on GitHub](https://github.com/supabase/supabase/tree/master/examples/ai/edge-functions).
-
-You can now utilize [database webhooks](https://supabase.com/docs/guides/database/webhooks) to automatically generate embeddings whenever a new row is inserted into a database table.
+You can now utilize [database webhooks](/docs/guides/database/webhooks) to automatically generate embeddings whenever a new row is inserted into a database table.
 
 ![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/8b9f49e5-e12a-4c31-a008-9a3c512ee78c/Untitled.png)
 
-Because embedding creation is a compute-intensive task, it makes sense to offload the work from your database. Edge Functions are the perfect “background worker”.
+Because embedding creation is a compute-intensive task, it makes sense to offload the work from your database. Edge Functions are the perfect “background worker”. We've created a simple example to show how you can generate embeddings in Edge Functions: [link to docs]().
 
 ### Technical architecture
 
@@ -171,4 +159,6 @@ We plan to extend support for more models. [Let us know](https://forms.supabase.
 Check out the Supabase docs today to get started with the AI models:
 
 - Edge Functions: [supabase.com/docs/guides/functions](https://supabase.com/docs/guides/functions)
-- Vectors: https://supabase.com/docs/guides/ai
+- Vectors: [https://supabase.com/docs/guides/ai](supabase.com/docs/guides/ai)
+- Semantic search demo: [GitHub](https://github.com/supabase/supabase/tree/master/examples/ai/edge-functions).
+- [Store and query embeddings](/docs/guides/ai/vector-columns#querying-a-vector--embedding) in Postgres and use them for Retrieval Augmented Generation (RAG) and Semantic Search.
