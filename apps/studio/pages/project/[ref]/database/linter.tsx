@@ -112,16 +112,16 @@ const ProjectLints: NextPageWithLayout = () => {
     }))
 
   const updateFilters = (level: any, newFilters: any) => {
-    setFilters((prevFilters) => {
-      return prevFilters.map((filter) => {
-        // If the filter level matches the desired level, update its filters
-        if (filter.level === level) {
-          return { ...filter, filters: newFilters }
-        } else {
-          return filter
-        }
-      })
-    })
+    // Create a copy of the current filters state
+    const updatedFilters = [...filters]
+    // Find the index of the filter object corresponding to the provided level
+    const index = updatedFilters.findIndex((filter) => filter.level === level)
+    if (index !== -1) {
+      // Update the filters array at the found index with the new filters
+      updatedFilters[index] = { ...updatedFilters[index], filters: newFilters }
+      // Update the filters state with the updated array
+      setFilters(updatedFilters)
+    }
   }
 
   const lintCountLabel = (count: number, label: string) => (
@@ -224,7 +224,7 @@ const ProjectLints: NextPageWithLayout = () => {
           router.push({ ...router, query: { ...rest, preset: value } })
         }}
       >
-        <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10')}>
+        <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10 relative')}>
           {LINT_TABS.map((tab) => (
             <TabsTrigger_Shadcn_
               key={tab.id}
@@ -243,7 +243,6 @@ const ProjectLints: NextPageWithLayout = () => {
               {tab.id === currentTab && (
                 <div className="absolute top-0 left-0 w-full h-[1px] bg-foreground" />
               )}
-
               <div className="flex items-center gap-x-2">
                 <span
                   className={
@@ -265,32 +264,29 @@ const ProjectLints: NextPageWithLayout = () => {
                   <TooltipContent_Shadcn_ side="top">{tab.description}</TooltipContent_Shadcn_>
                 </Tooltip_Shadcn_>
               </div>
-
               <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
                 {tab.id === LINTER_LEVELS.ERROR && lintCountLabel(errorLintsCount, 'errors')}
                 {tab.id === LINTER_LEVELS.WARN && lintCountLabel(warnLintsCount, 'warnings')}
                 {tab.id === LINTER_LEVELS.INFO && lintCountLabel(infoLintsCount, 'suggestions')}
               </span>
-
-              {tab.id === currentTab && (
-                <div className="absolute bottom-0 left-0 w-full h-[1px] bg-surface-200"></div>
-              )}
             </TabsTrigger_Shadcn_>
           ))}
         </TabsList_Shadcn_>
       </Tabs_Shadcn_>
 
-      <div className="bg-surface-200 p-2">
-        <FilterPopover
-          name="Filter"
-          options={filterOptions}
-          labelKey="name"
-          valueKey="value"
-          activeOptions={filters.find((filter) => filter.level === currentTab)?.filters || []}
-          onSaveFilters={(values) => {
-            updateFilters(currentTab, values)
-          }}
-        />
+      <div className="bg-surface-200 p-2 px-6 py-2 border-t -mt-px">
+        {LINT_TABS.map((tab) => (
+          <div key={tab.id} className={tab.id === currentTab ? '' : 'hidden'}>
+            <FilterPopover
+              name="Filter"
+              options={filterOptions}
+              labelKey="name"
+              valueKey="value"
+              activeOptions={filters.find((filter) => filter.level === currentTab)?.filters || []}
+              onSaveFilters={(values) => updateFilters(currentTab, values)}
+            />
+          </div>
+        ))}
       </div>
       <div className="col-span-12 flex items-center justify-between">
         <div className="flex items-center gap-x-4"></div>
