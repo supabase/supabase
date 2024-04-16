@@ -49,9 +49,9 @@ export const ROLE_PERMISSIONS = {
     grant_by_dashboard: true,
   },
   can_bypass_rls: {
-    disabled: true,
+    disabled: false,
     description: 'User bypasses every row level security policy',
-    grant_by_dashboard: false,
+    grant_by_dashboard: true,
   },
   is_superuser: {
     disabled: true,
@@ -59,9 +59,9 @@ export const ROLE_PERMISSIONS = {
     grant_by_dashboard: false,
   },
   is_replication_role: {
-    disabled: true,
+    disabled: false,
     description:
       'User can initiate streaming replication and put the system in and out of backup mode',
-    grant_by_dashboard: false,
+    grant_by_dashboard: true,
   },
 } as const
