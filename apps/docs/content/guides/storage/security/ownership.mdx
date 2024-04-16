@@ -1,0 +1,43 @@
+---
+id: 'storage-access-control'
+title: 'Ownership'
+description: 'Learn how ownership works in Supabase Storage and how to control access'
+sidebar_label: 'Security'
+---
+
+When creating new buckets or objects in Supabase Storage, an owner is automatically assigned to the bucket or object.
+The owner is the user who created the resource and the value is derived from `sub` claim in the JWT token.
+
+<Admonition type="note">
+    When using the `service_key` to create a bucket or object, the owner will not bet set and the bucket or object will be owned by anyone. This is especially true when you are creating Storage resources via the Supabase Studio.
+</Admonition>
+
+We store the `owner` in the `owner_id` column. This column is used to determine the owner of the bucket or object.
+<Admonition type="note">
+    Currently the Storage schema has 2 fields to represent ownership, **owner** and **owner_id**.
+    The `owner` field is **Deprecated** and will be removed in the future, please use `owner_id` instead.
+</Admonition>
+
+## Access Control
+
+By itself the ownership of a resource does not provide any access control.
+However, you can enforce the ownership by implementing access control against storage resources scoped to their owner.
+
+For example, you can implement a policy where only the owner of an object can delete it.
+To do this, you can check the `owner_id` field of the object and compare it with the `sub` claim of the JWT token.
+
+For example we can write the following RLS policy:
+
+```sql
+CREATE POLICY "User can delete their own objects"
+ON storage.objects
+FOR DELETE
+TO authenticated
+USING (
+    owner_id = auth.uid()
+);
+```
+
+The use of RLS policies is just one way to enforce access control, you can also implement access control in your server code by following the same pattern.
+
+In the next section [Access Control](/docs/guides/storage/security/access-control) you'll learn about using RLS policies.

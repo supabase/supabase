@@ -1332,6 +1332,10 @@ export const storage: NavMenuConstant = {
       url: undefined,
       items: [
         {
+          name: 'Ownership',
+          url: '/guides/storage/security/ownership',
+        },
+        {
           name: 'Access Control',
           url: '/guides/storage/security/access-control',
         },
@@ -1368,6 +1372,14 @@ export const storage: NavMenuConstant = {
       ],
     },
     {
+      name: 'Management',
+      url: undefined,
+      items: [
+        { name: 'Copy / Move Objects', url: '/guides/storage/management/copy-move-objects' },
+        { name: 'Delete Objects', url: '/guides/storage/management/delete-objects' },
+      ]
+    },
+    {
       name: 'S3',
       url: undefined,
       items: [
@@ -1401,6 +1413,7 @@ export const storage: NavMenuConstant = {
           name: 'Helper Functions',
           url: '/guides/storage/schema/helper-functions',
         },
+        { name: 'Custom Roles', url: '/guides/storage/schema/custom-roles' },
       ],
     },
     {

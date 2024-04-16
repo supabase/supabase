@@ -1,0 +1,91 @@
+---
+id: 'storage-management'
+title: 'Copy Objects'
+description: 'Learn how to copy and move objects'
+subtitle: 'Learn how to copy and move objects'
+sidebar_label: 'Copy / Move Objects'
+---
+
+## Copy Objects
+
+You can copy objects between buckets or within the same bucket. Currently only objects up to 5GB can be copied using the API.
+When making a copy of an object the owner of the new object will be the user who initiated the copy operation.
+
+##### Copying objects within the same bucket
+
+To copy an object within the same bucket, you can use the `copy` method.
+
+```javascript
+await supabase
+  .storage
+  .from('avatars')
+  .copy('public/avatar1.png', 'private/avatar2.png')
+```
+
+##### Copying objects across buckets
+
+To copy an object across buckets, you can use the `copy` method specifying the destination bucket.
+
+```javascript
+await supabase
+  .storage
+  .from('avatars')
+  .copy('public/avatar1.png', 'private/avatar2.png', {
+    destinationBucket: 'avatars2'
+  })
+```
+
+## Move Objects
+
+You can move objects between buckets or within the same bucket. Currently only objects up to 5GB can be moved using the API.
+When moving object the owner of the new object will be the user who initiated the move operation.
+Once the object is moved the original object will no longer exists.
+
+##### Moving objects within the same bucket
+
+To move an object within the same bucket, you can use the `move` method.
+
+```javascript
+
+const { data, error } = await supabase
+  .storage
+  .from('avatars')
+  .move('public/avatar1.png', 'private/avatar2.png')
+```
+
+##### Moving objects across buckets
+
+To move an object across buckets, you can use the `move` method specifying the destination bucket.
+
+```javascript
+await supabase
+  .storage
+  .from('avatars')
+  .move('public/avatar1.png', 'private/avatar2.png', {
+    destinationBucket: 'avatars2'
+  })
+```
+
+## Permissions
+
+You will need to grant the `SELECT` permission on the source object and the `INSERT` permission on the destination object.
+
+Example RLS:
+
+```sql
+CREATE POLICY "User can select their own objects (in any buckets)"
+ON storage.objects
+FOR SELECT
+TO authenticated
+USING (
+    owner_id = auth.uid()
+);
+
+CREATE POLICY "User can upload in their own folders (in any buckets)"
+ON storage.objects
+FOR INSERT
+TO authenticated
+WITH CHECK (
+    storage.folder(name)[1] = auth.uid()
+);
+```

@@ -8,7 +8,7 @@ sidebar_label: 'S3'
 
 You have two options to authenticate with Supabase Storage S3:
 
-- Using the generated S3 credentials from your project settings (Intended exclusively for server-side use)
+- Using the generated S3 credentials from your [project settings](https://supabase.com/dashboard/project/_/settings/storage) (Intended exclusively for server-side use)
 - Using a Session Token, which will allow you to authenticate with a user JWT token and provide limited access via RLS
 
 ## S3 credentials
@@ -28,31 +28,52 @@ You can use these credentials to authenticate with Supabase Storage S3 using any
 **Region**: The region is the same as the region you selected during project creation.
 **Endpoint**: `https://<PROJECT_REF>.supabase.co/storage/v1/s3`
 
-For example, using the `aws-sdk` library:
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+    <TabPanel id="javascript" label="aws-sdk-js">
+        ```js
+        import { S3Client } from '@aws-sdk/client-s3';
 
-```javascript
-import { S3Client } from '@aws-sdk/client-s3';
+        const client = new S3Client({
+          forcePathStyle: true,
+          region: 'project_region',
+          endpoint: 'https://project_ref.supabase.co/storage/v1/s3',
+          credentials: {
+            accessKeyId: 'your_access_key_id',
+            accessSecretKey: 'your_secret_access_key',
+          }
+        })
+        ```
+    </TabPanel>
 
-const client = new S3Client({
-  forcePathStyle: true,
-  region: 'project-region',
-  endpoint: 'https://project_ref.supabase.co/storage/v1/s3',
-  credentials: {
-    accessKeyId: 'your-access-key-id',
-    accessSecretKey: 'your-secret-access-key',
-  }
-})
-```
+    <TabPanel id="credentials" label="Aws Credentials">
+        ```bash
+        # ~/.aws/credentials
+
+        [supabase]
+        aws_access_key_id = your_access_key_id
+        aws_secret_access_key = your_secret_access_key
+        endpoint_url = https://project_ref.supabase.co/storage/v1/s3
+        region = project_region
+        ```
+    </TabPanel>
+</Tabs>
 
 ## Session Token
 
-When using the Session Token mechanism, you can to authenticate with a user JWT token and provide limited access via RLS. You can initialize the S3 client on the server scoped to a specific user, or use the S3 client directly from the client side.
+You can authenticate to Supabase S3 with a user JWT token to provide limited access via RLS to all S3 operations.
+This is useful when you want initialize the S3 client on the server scoped to a specific user, or use the S3 client directly from the client side.
 
-All S3 operations performed with the Session Token are scoped to the token user. RLS policies on the Storage Schema are respected.
+All S3 operations performed with the Session Token are scoped to the authenticated user. RLS policies on the Storage Schema are respected.
 
 To authenticate with S3 using a Session Token, use the following credentials:
 
-- access_key_id: `project-ref`
+- access_key_id: `project_ref`
 - access_secret_key: `anonKey`
 - session_token: `valid jwt token`
 
@@ -61,14 +82,16 @@ For example, using the `aws-sdk` library:
 ```javascript
 import { S3Client } from '@aws-sdk/client-s3';
 
+const { data: { session } } = await supabase.auth.getSession()
+
 const client = new S3Client({
   forcePathStyle: true,
-  region: 'project-region',
+  region: 'project_region',
   endpoint: 'https://project_ref.supabase.co/storage/v1/s3',
   credentials: {
-    accessKeyId: 'project-ref',
+    accessKeyId: 'project_ref',
     accessSecretKey: 'anonKey',
-    sessionToken: 'user-jwt-token',
+    sessionToken: session.access_token,
   }
 })
 ```

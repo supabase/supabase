@@ -19,8 +19,6 @@ The PutObject command uploads the file in a single request. This matches the beh
 
 Use `PutObject` to upload smaller files, where retrying the entire upload won't be an issue. The maximum file size is 5GB.
 
-### Upload a file
-
 For example, using JavaScript and the `aws-sdk` client:
 
 ```javascript
@@ -70,3 +68,7 @@ const upload = new Upload(s3Client, {
 await uploader.done()
 ```
 
+### Aborting Multi Part Uploads
+
+Currently all multi-part uploads are automatically aborted after 24h.
+If you want to abort a multi-part upload before that, you can use the `AbortMultipartUpload` command.
