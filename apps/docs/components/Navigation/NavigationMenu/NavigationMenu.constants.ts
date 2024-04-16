@@ -1188,7 +1188,7 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/examples/og-image',
         },
         {
-          name: 'Building a Smenatic Search Engine',
+          name: 'Semantic AI Search',
           url: '/guides/functions/examples/semantic-search',
         },
         {
