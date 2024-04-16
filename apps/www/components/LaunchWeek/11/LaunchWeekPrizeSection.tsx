@@ -10,14 +10,14 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
     <div
       id="prizes"
       className={cn(
-        'relative text-left flex flex-col max-w-7xl mx-auto gap-2 scroll-mt-[66px] text-[#575E61]',
+        'relative text-left flex flex-col max-w-7xl mx-auto gap-2 scroll-mt-[66px] text-foreground-lighter',
         className
       )}
     >
       <h2 className="w-full text-sm font-mono uppercase tracking-[1px]">Awards</h2>
       <p className="text-2xl text-foreground-lighter">Generate your ticket for a chance to win.</p>
       <div className="w-full pt-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mx-auto h-auto text-[#EDEDED]">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mx-auto h-auto text-foreground">
           <LaunchWeekPrizeCard
             className="col-span-full md:col-span-2"
             contentClassName="flex flex-col justify-between"
