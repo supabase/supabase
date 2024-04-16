@@ -1,4 +1,4 @@
-import { Box, Eye, MessageSquareMore, RefreshCcw, Table2, TextSearch, X } from 'lucide-react'
+import { Eye, MessageSquareMore, Table2, TextSearch, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
@@ -14,29 +14,29 @@ import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
 import type { NextPageWithLayout } from 'types'
 import {
   Button,
-  cn,
   LoadingLine,
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-  Tabs_Shadcn_,
   TabsContent_Shadcn_,
   TabsList_Shadcn_,
   TabsTrigger_Shadcn_,
-  Tooltip_Shadcn_,
+  Tabs_Shadcn_,
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 
 import { FilterPopover } from 'components/ui/FilterPopover'
 import ReactMarkdown from 'react-markdown'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 import { Markdown } from '../../../../components/interfaces/Markdown'
 import {
   LintCTA,
   entityTypeIcon,
 } from '../../../../components/interfaces/Reports/ReportLints.utils'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -89,16 +89,16 @@ const ProjectLints: NextPageWithLayout = () => {
 
   const updateFilters = (level: any, newFilters: any) => {
     console.log('newFilters', newFilters, 'filters', filters)
-    // setFilters((prevFilters) => {
-    //   return prevFilters.map((filter) => {
-    //     // If the filter level matches the desired level, update its filters
-    //     if (filter.level === level) {
-    //       return { ...filter, filters: newFilters }
-    //     } else {
-    //       return filter
-    //     }
-    //   })
-    // })
+    setFilters((prevFilters) => {
+      return prevFilters.map((filter) => {
+        // If the filter level matches the desired level, update its filters
+        if (filter.level === level) {
+          return { ...filter, filters: newFilters }
+        } else {
+          return filter
+        }
+      })
+    })
   }
 
   const lintCountLabel = (count: number, label: string) => (
@@ -241,7 +241,7 @@ const ProjectLints: NextPageWithLayout = () => {
                   size={14}
                   fill={
                     tab.id === LINTER_LEVELS.ERROR
-                      ? 'red'
+                      ? 'red' // get proper colours
                       : tab.id === LINTER_LEVELS.WARN
                         ? 'orange'
                         : 'green'
