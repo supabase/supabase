@@ -1,6 +1,5 @@
 import { useEffect } from 'react'
 
-import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useTablesQuery } from 'data/tables/tables-query'
@@ -24,6 +23,7 @@ import {
 import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
 
 interface PolicyDetailsV2Props {
+  schema: string
   searchString?: string
   isEditing: boolean
   form: any
@@ -31,6 +31,7 @@ interface PolicyDetailsV2Props {
 }
 
 export const PolicyDetailsV2 = ({
+  schema,
   searchString,
   isEditing,
   form,
@@ -42,7 +43,7 @@ export const PolicyDetailsV2 = ({
   const { data: tables, isSuccess: isSuccessTables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: snap.selectedSchemaName,
+    schema: schema,
     sortByProperty: 'name',
     includeColumns: true,
   })
@@ -66,7 +67,7 @@ export const PolicyDetailsV2 = ({
     if (!isEditing) {
       const table = tables?.find(
         (table) =>
-          table.schema === snap.selectedSchemaName &&
+          table.schema === schema &&
           (table.id.toString() === searchString || table.name === searchString)
       )
       if (table) {
@@ -117,7 +118,7 @@ export const PolicyDetailsV2 = ({
                     onValueChange={(value) => form.setValue('table', value)}
                   >
                     <SelectTrigger_Shadcn_ className="text-sm h-10">
-                      {snap.selectedSchemaName}.{field.value}
+                      {schema}.{field.value}
                     </SelectTrigger_Shadcn_>
                     <SelectContent_Shadcn_>
                       <SelectGroup_Shadcn_>

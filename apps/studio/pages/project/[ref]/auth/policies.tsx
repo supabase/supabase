@@ -196,6 +196,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
       <AIPolicyEditorPanel
         visible={showPolicyAiEditor}
+        schema={schema}
         searchString={searchString}
         selectedPolicy={selectedPolicyToEdit}
         onSelectCancel={() => {
