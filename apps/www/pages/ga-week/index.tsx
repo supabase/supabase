@@ -65,13 +65,18 @@ export default function GAWeekIndex({ meetups }: Props) {
     }
   }, [supabase])
 
+  const isDark = resolvedTheme?.includes('dark')
   const isDarkTheme = resolvedTheme === 'dark'
 
   useEffect(() => {
-    if (isDarkTheme) {
-      setTheme('deep-dark')
-    }
+    isDarkTheme && setTheme('deep-dark')
   }, [isDarkTheme])
+
+  useEffect(() => {
+    return () => {
+      isDark && setTheme('dark')
+    }
+  }, [])
 
   useEffect(() => {
     if (session?.user) {
