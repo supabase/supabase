@@ -59,7 +59,7 @@ Deno.serve(async (req: Request) => {
 
 ## Using larger models
 
-Inference via larger models is supported via [Ollama](https://ollama.com/). In the first iteration, the `llama2` and `mistral` models are supported.
+Inference via larger models is supported via [Ollama](https://ollama.com/). In the first iteration, the `llama2` and `mistral` models are supported and you would need to manage the Ollama server yourself.
 
 <video width="99%" muted playsInline controls={true}>
   <source
@@ -101,6 +101,8 @@ const session = new Supabase.ai.Session('mistral')
 Deno.serve(async (req: Request) => {
   const params = new URL(req.url).searchParams
   const prompt = params.get('prompt') ?? ''
+
+  // Get the output as a stream
   const output = await session.run(prompt, { stream: true })
 
   const headers = new Headers({
@@ -108,32 +110,24 @@ Deno.serve(async (req: Request) => {
     Connection: 'keep-alive',
   })
 
+  // Create a stream
   const stream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder()
-      // Retry every 10 seconds if connection closes
-      controller.enqueue(encoder.encode('retry: 10000\n\n'))
 
       try {
         for await (const chunk of output) {
-          if (chunk.response) {
-            controller.enqueue(encoder.encode(chunk.response))
-          } else {
-            console.error('Chunk without response:', chunk)
-          }
+          controller.enqueue(encoder.encode(chunk.response ?? ''))
         }
       } catch (err) {
         console.error('Stream error:', err)
-        // Send an error event
-        controller.enqueue(
-          encoder.encode('event: error\ndata: ' + JSON.stringify(err.message) + '\n\n')
-        )
       } finally {
         controller.close()
       }
     },
   })
 
+  // Return the stream to the user
   return new Response(stream, {
     headers,
   })
@@ -143,7 +137,7 @@ Deno.serve(async (req: Request) => {
 5. Execute the function
 
 ```
- curl http://localhost:54321/functions/v1/ollama-test?prompt="write a short rap song about Supabase, the Postgres Developer platform, as sung by Nicki Minaj" -H "Authorization: $ANON_KEY"
+  curl --get "http://localhost:54321/functions/v1/ollama-test" --data-urlencode "prompt=write a short rap song about Supabase, the Postgres Developer platform, as sung by Nicki Minaj" -H "Authorization: $ANON_KEY"
 ```
 
 ### Deploying to production
@@ -160,4 +154,6 @@ supabase secrets set AI_INFERENCE_API_HOST=https://path-to-your-ollama-server/
 supabase functions deploy ollama-test
 ```
 
-In the future, a Ollama server powered by GPUs will be provided out of the box, so you won't have to manage this. To sign up for early access, fill up [this form](https://forms.supabase.com/supabase.ai-llm-early-access).
+As demonstrated in the video above, running Ollama locally is typically slower than running it in on a server with dedicated GPUs. We are collaborating with the Ollama team to improve local performance.
+
+In the future, a hosted Ollama API, will be provided as part of the Supabase platform. Supabase will scale and manage the API and GPU for you. To sign up for early access, fill up [this form](https://forms.supabase.com/supabase.ai-llm-early-access).
