@@ -58,7 +58,7 @@ You can now utilize [database webhooks](/docs/guides/database/webhooks) to autom
 
 ![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/8b9f49e5-e12a-4c31-a008-9a3c512ee78c/Untitled.png)
 
-Because embedding creation is a compute-intensive task, it makes sense to offload the work from your database. Edge Functions are the perfect “background worker”. We've created a simple example to show how you can generate embeddings in Edge Functions: [link to docs]().
+Because embedding creation is a compute-intensive task, it makes sense to offload the work from your database. Edge Functions are the perfect “background worker”. We've created a simple example to show how you can generate embeddings in Edge Functions: [Semantic Search with pgvector and Supabase Edge Functions](/docs/guides/functions/examples/semantic-search).
 
 ### Technical architecture
 
@@ -89,8 +89,6 @@ Proprietary LLMs like OpenAI and Claude provide [APIs](https://platform.openai.c
 Open source text embedding models provide similar performance to OpenAI's paid models. For example, the `gte-small` model, which operates on 384 dimensions, has an average of 61.36 compared to OpenAI's `text-embedding-3-small`, which is at 62.26 on the [MTEB leaderboard](https://huggingface.co/spaces/mteb/leaderboard), and they perform search faster with [fewer dimensions](https://supabase.com/blog/fewer-dimensions-are-better-pgvector).
 
 With Supabase Edge Functions, you can generate text embeddings 10x cheaper than OpenAI embeddings APIs.
-
-(Math)
 
 ## Large Language Models in Supabase Edge Functions
 
