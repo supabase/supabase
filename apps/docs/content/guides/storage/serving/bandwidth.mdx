@@ -1,15 +1,14 @@
 ---
-id: 'storage-bandwith'
-title: 'Bandwith & Storage Egress'
-description: 'How to calculate the bandwith and storage egress'
-subtitle: 'Bandwith & Storage Egress'
-sidebar_label: 'Bandwith & Storage Egress'
+id: 'storage-bandwidth'
+title: 'bandwidth & Storage Egress'
+description: 'How to calculate the bandwidth and storage egress'
+subtitle: 'bandwidth & Storage Egress'
+sidebar_label: 'bandwidth & Storage Egress'
 ---
 
-## Bandwith & Storage Egress
+## bandwidth & Storage Egress
 
-Free plan Organizations in Supabase have a limit of 5GB of bandwith. This limit is calculated by the sum of all the data transferred from the Supabase servers to the client. This includes all the data transferred from the database, storage, and functions.
-
+Free plan Organizations in Supabase have a limit of 5GB of bandwidth. This limit is calculated by the sum of all the data transferred from the Supabase servers to the client. This includes all the data transferred from the database, storage, and functions.
 
 ### Checking Storage Egress Requests in Log Explorer:
 
@@ -17,23 +16,20 @@ We have a template query that you can use to get the number of requests for each
 
 ```sql
 select
-    r.method as http_verb,
-    r.path as filepath,
-    count(*) as num_requests,
-  from edge_logs
-    cross join unnest(metadata) as m
-    cross join unnest(m.request) AS r
-    cross join unnest(r.headers) AS h
-  where
-    (path like '%storage/v1/object/%' or path like '%storage/v1/render/%')
-    and r.method = 'GET'
-  group by
-    r.path, r.method
-  order by
-    num_requests desc
-  limit 100
-
+  r.method as http_verb,
+  r.path as filepath,
+  count(*) as num_requests
+from
+  edge_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.request) as r
+  cross join unnest(r.headers) as h
+where (path like '%storage/v1/object/%' or path like '%storage/v1/render/%') and r.method = 'GET'
+group by r.path, r.method
+order by num_requests desc
+limit 100;
 ```
+
 Example of the output:
 
 ```
@@ -75,5 +71,4 @@ You can see that these values can get quite large, so it's important to keep tra
 
 If you are on the pro plan, you can use the [Supabase Image Transformations](/docs/guides/storage/image-transformations) to optimize the images and reduce the egress.
 
-import { template } from "lodash"
-
+import { template } from 'lodash'
