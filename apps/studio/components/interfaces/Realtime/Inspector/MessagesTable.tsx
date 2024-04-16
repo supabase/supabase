@@ -2,7 +2,7 @@ import { useParams, useTelemetryProps } from 'common'
 import { isEqual } from 'lodash'
 import { Loader2, MegaphoneIcon } from 'lucide-react'
 import Link from 'next/link'
-import { Key, useEffect, useState } from 'react'
+import { Key, useEffect, useMemo, useState } from 'react'
 import DataGrid, { RenderRowProps, Row } from 'react-data-grid'
 import { Button, IconBroadcast, IconDatabaseChanges, IconExternalLink, IconPresence, cn } from 'ui'
 
@@ -45,7 +45,7 @@ const NoResultAlert = ({
                 <p className="text-foreground">Create a Broadcast message</p>
                 <p className="text-foreground-lighter text-xs">Send a message in the channel</p>
               </div>
-              <Button type="default" onClick={showSendMessage}>
+              <Button type="default" onClick={showSendMessage} disabled={!enabled}>
                 Broadcast a message
               </Button>
             </div>
