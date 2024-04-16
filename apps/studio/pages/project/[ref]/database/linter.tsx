@@ -3,7 +3,7 @@ import { useRef, useState } from 'react'
 
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import { useParams } from 'common'
-import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
+
 import { lintInfoMap } from 'components/interfaces/Reports/ReportLints.utils'
 import { DatabaseLayout } from 'components/layouts'
 import { FormHeader } from 'components/ui/Forms'
@@ -38,6 +38,30 @@ import {
   entityTypeIcon,
 } from '../../../../components/interfaces/Reports/ReportLints.utils'
 
+enum LINTER_LEVELS {
+  ERROR = 'ERROR',
+  WARN = 'WARN',
+  INFO = 'INFO',
+}
+
+const LINT_TABS = [
+  {
+    id: LINTER_LEVELS.ERROR,
+    label: 'Errors',
+    description: 'You should consider these issues urgent and and fix them as soon as you can.',
+  },
+  {
+    id: LINTER_LEVELS.WARN,
+    label: 'Warnings ',
+    description: 'You should try and read through these issues and fix them if necessary.',
+  },
+  {
+    id: LINTER_LEVELS.INFO,
+    label: 'Info ',
+    description: 'You should read through these suggestions and consider implementing them.',
+  },
+]
+
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
   const router = useRouter()
@@ -68,7 +92,7 @@ const ProjectLints: NextPageWithLayout = () => {
 
   const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
     []) as string[]
-  console.log({ activeLints })
+
   const filteredLints = activeLints
     .filter((x) => x.level === currentTab)
     .filter((x) => (currentTabFilters.length > 0 ? currentTabFilters.includes(x.name) : x))
@@ -88,7 +112,6 @@ const ProjectLints: NextPageWithLayout = () => {
     }))
 
   const updateFilters = (level: any, newFilters: any) => {
-    console.log('newFilters', newFilters, 'filters', filters)
     setFilters((prevFilters) => {
       return prevFilters.map((filter) => {
         // If the filter level matches the desired level, update its filters
@@ -112,24 +135,6 @@ const ProjectLints: NextPageWithLayout = () => {
       )}
     </>
   )
-
-  const LINTER_TABS = [
-    {
-      id: LINTER_LEVELS.ERROR,
-      label: 'Errors',
-      description: 'You should consider these issues urgent and and fix them as soon as you can.',
-    },
-    {
-      id: LINTER_LEVELS.WARN,
-      label: 'Warnings ',
-      description: 'You should try and read through these issues and fix them if necessary.',
-    },
-    {
-      id: LINTER_LEVELS.INFO,
-      label: 'Info ',
-      description: 'You should read through these suggestions and consider implementing them.',
-    },
-  ]
 
   const lintCols = [
     {
@@ -164,7 +169,7 @@ const ProjectLints: NextPageWithLayout = () => {
       value: (row: any) => <ReactMarkdown className="text-xs">{row.description}</ReactMarkdown>,
     },
   ]
-  console.log(filteredLints)
+
   const columns = lintCols.map((col) => {
     const result: Column<any> = {
       key: col.id,
@@ -199,6 +204,7 @@ const ProjectLints: NextPageWithLayout = () => {
     }
     return result
   })
+
   return (
     <div className="h-full flex flex-col">
       <FormHeader
@@ -217,7 +223,7 @@ const ProjectLints: NextPageWithLayout = () => {
         }}
       >
         <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10')}>
-          {LINTER_TABS.map((tab) => (
+          {LINT_TABS.map((tab) => (
             <TabsTrigger_Shadcn_
               key={tab.id}
               value={tab.id}
@@ -237,17 +243,17 @@ const ProjectLints: NextPageWithLayout = () => {
               )}
 
               <div className="flex items-center gap-x-2">
-                <MessageSquareMore
-                  size={14}
-                  fill={
+                <span
+                  className={
                     tab.id === LINTER_LEVELS.ERROR
-                      ? 'red' // get proper colours
+                      ? 'text-destructive-600'
                       : tab.id === LINTER_LEVELS.WARN
-                        ? 'orange'
-                        : 'green'
+                        ? 'text-warning-600'
+                        : 'text-brand-500'
                   }
-                  stroke="none"
-                />
+                >
+                  <MessageSquareMore size={14} fill="currentColor" strokeWidth={0} />
+                </span>
 
                 <span className="">{tab.label}</span>
                 <Tooltip_Shadcn_>
@@ -280,7 +286,6 @@ const ProjectLints: NextPageWithLayout = () => {
           valueKey="value"
           activeOptions={filters.find((filter) => filter.level === currentTab)?.filters || []}
           onSaveFilters={(values) => {
-            console.log('some values', values)
             updateFilters(currentTab, values)
           }}
         />
@@ -384,7 +389,6 @@ const ProjectLints: NextPageWithLayout = () => {
                 >
                   {selectedLint && (
                     <div className={cn('py-4 px-4 grid gap-2')}>
-                      {/* <h3 className="text-sm">{getHumanReadableTitle(selectedLint.name)}</h3> */}
                       <h3 className="text-sm">
                         {lintInfoMap.find((item) => item.name === selectedLint.name)?.title}
                       </h3>
