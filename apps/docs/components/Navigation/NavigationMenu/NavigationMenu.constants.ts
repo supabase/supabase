@@ -1131,6 +1131,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/routing',
         },
         {
+          name: 'Running AI Models',
+          url: '/guides/functions/ai-models',
+        },
+        {
           name: 'Regional invocations',
           url: '/guides/functions/regional-invocation',
         },
