@@ -140,10 +140,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         type: 'blog',
         href: '/blog/ai-inference-now-available-in-supabase-edge-functions',
       },
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'video',
+        href: 'w4Rr_1whU-U',
+      },
       {
         type: 'xSpace',
         href: 'https://supabase.link/twitter-space-ga-week-2',
