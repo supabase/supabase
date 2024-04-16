@@ -1,5 +1,5 @@
+import { useParams } from 'common'
 import { useCreateCollection } from 'data/analytics/warehouse-collections-create-mutation'
-import { useSelectedProject } from 'hooks'
 import { useRouter } from 'next/router'
 import React from 'react'
 import toast from 'react-hot-toast'
@@ -9,9 +9,18 @@ type Props = {}
 
 export const CreateWarehouseCollectionModal = (props: Props) => {
   const [isOpen, setIsOpen] = React.useState(false)
-  const project = useSelectedProject()
-  const { mutateAsync: createCollection, isLoading } = useCreateCollection({
-    projectRef: project?.ref!,
+  const router = useRouter()
+  const { ref } = useParams()
+
+  const {
+    mutateAsync: createCollection,
+    isLoading,
+    data: newCollection,
+  } = useCreateCollection({
+    projectRef: ref || 'default',
+    onSuccess: (data) => {
+      router.push(`/project/${ref}/logs/collections/${data.data?.token}`)
+    },
   })
 
   return (
@@ -38,7 +47,6 @@ export const CreateWarehouseCollectionModal = (props: Props) => {
             e.preventDefault()
             try {
               const formData = new FormData(e.target as HTMLFormElement)
-              console.log(formData)
               const values = {
                 name: formData.get('name') as string,
               }

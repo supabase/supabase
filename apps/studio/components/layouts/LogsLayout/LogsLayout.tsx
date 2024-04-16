@@ -19,6 +19,7 @@ import { CreateWarehouseCollectionModal } from 'components/interfaces/DataWareho
 import { WarehouseMenuItem } from 'components/interfaces/DataWarehouse/WarehouseMenuItem'
 import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
 import { useWarehouseTenantQuery } from 'data/analytics/warehouse-tenant-query'
+import { useParams } from 'common'
 interface LogsLayoutProps {
   title?: string
 }
@@ -36,7 +37,8 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
 
   const showWarehouse = useFlag('warehouse')
   const project = useSelectedProject()
-  const projectRef = project?.ref || 'default'
+  const { ref } = useParams()
+  const projectRef = ref || 'default'
 
   const { data: tenant } = useWarehouseTenantQuery({ projectRef })
   const { data: collections, isLoading: collectionsLoading } = useWarehouseCollectionsQuery(

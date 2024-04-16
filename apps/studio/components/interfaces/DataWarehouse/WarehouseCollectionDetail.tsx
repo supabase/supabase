@@ -45,15 +45,19 @@ export const WarehouseCollectionDetail = () => {
       <div className="relative flex flex-col flex-grow h-full">
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
-          <LogTable
-            projectRef={projectRef}
-            isLoading={isLoading}
-            hideHeader={true}
-            data={results}
-            params={params}
-            error={isError ? 'Error loading data' : undefined}
-            maxHeight="calc(100vh - 3rem - 44px)"
-          />
+          <div>
+            <h2 className="p-3">{collection?.name}</h2>
+            <pre className="overflow-auto max-h-[300px]">{JSON.stringify(collection, null, 2)}</pre>
+            <LogTable
+              projectRef={projectRef}
+              isLoading={isLoading}
+              hideHeader={true}
+              data={results}
+              params={params}
+              error={isError ? 'Error loading data' : undefined}
+              maxHeight="calc(100vh - 3rem - 44px)"
+            />
+          </div>
         </LoadingOpacity>
         {!isError && (
           <div className="border-t flex flex-row justify-between p-2">
