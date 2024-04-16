@@ -3,7 +3,6 @@ import { ExternalLink } from 'lucide-react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useIndexAdvisorEnableMutation } from 'data/database/index-advisor-enable-mutation'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { Markdown } from '../Markdown'
 
@@ -14,12 +13,10 @@ export const IndexAdvisorDisabledState = () => {
     connectionString: project?.connectionString,
   })
   const hypopgExtension = (extensions ?? []).find((ext) => ext.name === 'hypopg')
+  const indexAdvisorExtension = (extensions ?? []).find((ext) => ext.name === 'index_advisor')
 
   const { mutateAsync: enableExtension, isLoading: isEnablingExtension } =
     useDatabaseExtensionEnableMutation()
-  const { mutateAsync: enableIndexAdvisor, isLoading: isEnablingIndexAdvisor } =
-    useIndexAdvisorEnableMutation()
-  const isEnabling = isEnablingExtension || isEnablingIndexAdvisor
 
   const onEnableIndexAdvisor = async () => {
     if (project === undefined) return console.error('Project is required')
@@ -32,12 +29,15 @@ export const IndexAdvisorDisabledState = () => {
         version: hypopgExtension.default_version,
       })
     }
-
-    // [Joshen] Once index_advisor ext is ready, it'll just be enabling an extension
-    await enableIndexAdvisor({
-      projectRef: project.ref,
-      connectionString: project.connectionString,
-    })
+    if (indexAdvisorExtension?.installed_version === null) {
+      await enableExtension({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        name: indexAdvisorExtension.name,
+        schema: indexAdvisorExtension?.schema ?? 'extensions',
+        version: indexAdvisorExtension.default_version,
+      })
+    }
   }
 
   return (
@@ -52,8 +52,8 @@ export const IndexAdvisorDisabledState = () => {
         <div className="flex items-center gap-x-2">
           <Button
             type="default"
-            disabled={isEnabling}
-            loading={isEnabling}
+            disabled={isEnablingExtension}
+            loading={isEnablingExtension}
             onClick={() => onEnableIndexAdvisor()}
           >
             Enable index advisor
