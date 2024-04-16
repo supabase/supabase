@@ -16,134 +16,69 @@ export const lintInfoMap = [
   {
     name: 'unindexed_foreign_keys',
     title: 'Unindexed foreign keys',
-    icon: <Table2 size={15} strokeWidth={1} />,
+    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
   },
   {
     name: 'auth_users_exposed',
     title: 'Exposed Auth Users',
-    icon: <Lock size={15} strokeWidth={1.5} />,
+    icon: <Lock className="text-foreground-muted" size={15} strokeWidth={1.5} />,
   },
   {
     name: 'auth_rls_initplan',
     title: 'Auth RLS Initialization Plan',
-    icon: <Table2 size={15} strokeWidth={1} />,
+    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
   },
   {
     name: 'no_primary_key',
     title: 'No Primary Key',
-    icon: <Table2 size={15} strokeWidth={1} />,
+    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
   },
   {
     name: 'unused_index',
     title: 'Unused Index',
-    icon: <Table2 size={15} strokeWidth={1} />,
+    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
   },
   {
     name: 'multiple_permissive_policies',
     title: 'Multiple Permissive Policies',
-    icon: <Table2 size={15} strokeWidth={1} />,
+    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
   },
   {
     name: 'function_search_path_mutable',
     title: 'Function Search Path Mutable',
-    icon: <Table2 size={15} strokeWidth={1} />,
+    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
   },
   {
     name: 'rls_enabled_no_policy',
     title: 'RLS Enabled No Policy',
-    icon: <Table2 size={15} strokeWidth={1} />,
+    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
   },
   {
     name: 'policy_exists_rls_disabled',
     title: 'Policy Exists RLS Disabled',
-    icon: <Table2 size={15} strokeWidth={1} />,
+    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
   },
   {
     name: 'rls_disabled_in_public',
     title: 'RLS Disabled in Public',
-    icon: <Table2 size={15} strokeWidth={1} />,
+    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
   },
   {
     name: 'security_definer_view',
     title: 'Security Definer View',
-    icon: <Eye size={15} strokeWidth={1.5} />,
+    icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
   },
   {
     name: 'duplicate_index',
     title: 'Duplicate Index',
-    icon: <Table2 size={15} strokeWidth={1} />,
+    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
   },
   {
     name: 'extension_in_public',
     title: 'Extension in Public',
-    icon: <Unlock size={15} strokeWidth={1} />,
+    icon: <Unlock className="text-foreground-muted" size={15} strokeWidth={1} />,
   },
 ]
-
-export function getHumanReadableTitle(title: LINT_TYPES) {
-  switch (title) {
-    case 'unindexed_foreign_keys':
-      return 'Unindexed foreign keys'
-    case 'auth_users_exposed':
-      return 'Exposed Auth Users'
-    case 'auth_rls_initplan':
-      return 'Auth RLS Initialization Plan'
-    case 'no_primary_key':
-      return 'No Primary Key'
-    case 'unused_index':
-      return 'Unused Index'
-    case 'multiple_permissive_policies':
-      return 'Multiple Permissive Policies'
-    case 'function_search_path_mutable':
-      return 'Function Search Path Mutable'
-    case 'rls_enabled_no_policy':
-      return 'RLS Enabled No Policy'
-    case 'policy_exists_rls_disabled':
-      return 'Policy Exists RLS Disabled'
-    case 'rls_disabled_in_public':
-      return 'RLS Disabled in Public'
-    case 'security_definer_view':
-      return 'Security Definer View'
-    case 'duplicate_index':
-      return 'Duplicate Index'
-    case 'extension_in_public':
-      return 'Extension in Public'
-    default:
-      assertUnreachable(title)
-      throw new Error('This case should never be reached')
-  }
-}
-
-export function getLintIcon(title: LINT_TYPES) {
-  switch (title) {
-    case 'unindexed_foreign_keys':
-      return <Key size={15} strokeWidth={1.5} />
-    case 'auth_users_exposed':
-      return <Lock size={15} strokeWidth={1.5} />
-    // case 'auth_rls_initplan':
-    //   return <LinkIcon size={15} strokeWidth={1.5} />
-    // case 'no_primary_key':
-    //   return <LinkIcon size={15} strokeWidth={1.5} />
-    // case 'unused_index':
-    //   return <LinkIcon size={15} strokeWidth={1.5} />
-    // case 'multiple_permissive_policies':
-    //   return <LinkIcon size={15} strokeWidth={1.5} />
-    // case 'function_search_path_mutable':
-    //   return <LinkIcon size={15} strokeWidth={1.5} />
-    // case 'rls_enabled_no_policy':
-    //   return <LinkIcon size={15} strokeWidth={1.5} />
-    // case 'policy_exists_rls_disabled':
-    //   return <LinkIcon size={15} strokeWidth={1.5} />
-    // case 'rls_disabled_in_public':
-    //   return <LinkIcon size={15} strokeWidth={1.5} />
-    // case 'security_definer_view':
-    //   return <LinkIcon size={15} strokeWidth={1.5} />
-    // case 'duplicate_index':
-    //   return <LinkIcon size={15} strokeWidth={1.5} />
-    default:
-      return <AlertCircle size={15} strokeWidth={1.5} />
-  }
-}
 
 export const LintCTA = ({
   title,
@@ -162,6 +97,7 @@ export const LintCTA = ({
             href={`/project/${projectRef}/database/indexes?schema=${metadata?.schema}`}
             target="_blank"
             rel="noreferrer"
+            className="no-underline"
           >
             Create an index
           </Link>
@@ -171,7 +107,12 @@ export const LintCTA = ({
     case 'auth_users_exposed':
       return (
         <Button asChild type="default">
-          <Link href={`/project/${projectRef}/editor`} target="_blank" rel="noreferrer">
+          <Link
+            href={`/project/${projectRef}/editor`}
+            target="_blank"
+            rel="noreferrer"
+            className="no-underline"
+          >
             View table
           </Link>
         </Button>
@@ -179,7 +120,12 @@ export const LintCTA = ({
     case 'auth_rls_initplan':
       return (
         <Button asChild type="default">
-          <Link href={`/project/${projectRef}/auth/policies`} target="_blank" rel="noreferrer">
+          <Link
+            href={`/project/${projectRef}/auth/policies`}
+            target="_blank"
+            rel="noreferrer"
+            className="no-underline"
+          >
             View policies
           </Link>
         </Button>
@@ -187,7 +133,12 @@ export const LintCTA = ({
     case 'no_primary_key':
       return (
         <Button asChild type="default">
-          <Link href={`/project/${projectRef}/editor`} target="_blank" rel="noreferrer">
+          <Link
+            href={`/project/${projectRef}/editor`}
+            target="_blank"
+            rel="noreferrer"
+            className="no-underline"
+          >
             View table
           </Link>
         </Button>
@@ -199,6 +150,7 @@ export const LintCTA = ({
             href={`/project/${projectRef}/database/indexes?schema=${metadata?.schema}&table=${metadata?.name}`}
             target="_blank"
             rel="noreferrer"
+            className="no-underline"
           >
             View index
           </Link>
@@ -211,6 +163,7 @@ export const LintCTA = ({
             href={`/project/${projectRef}/database/indexes?schema=${metadata?.schema}&table=${metadata?.name}`}
             target="_blank"
             rel="noreferrer"
+            className="no-underline"
           >
             View index
           </Link>
@@ -223,6 +176,7 @@ export const LintCTA = ({
             href={`/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`}
             target="_blank"
             rel="noreferrer"
+            className="no-underline"
           >
             View policies
           </Link>
@@ -235,6 +189,7 @@ export const LintCTA = ({
             href={`/project/${projectRef}/database/functions?schema=${metadata?.schema}&search=${metadata?.name}`}
             target="_blank"
             rel="noreferrer"
+            className="no-underline"
           >
             View functions
           </Link>
@@ -247,6 +202,7 @@ export const LintCTA = ({
             href={`/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`}
             target="_blank"
             rel="noreferrer"
+            className="no-underline"
           >
             View policies
           </Link>
@@ -259,6 +215,7 @@ export const LintCTA = ({
             href={`/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`}
             target="_blank"
             rel="noreferrer"
+            className="no-underline"
           >
             View policies
           </Link>
@@ -271,6 +228,7 @@ export const LintCTA = ({
             href={`/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`}
             target="_blank"
             rel="noreferrer"
+            className="no-underline"
           >
             View policies
           </Link>
@@ -286,6 +244,7 @@ export const LintCTA = ({
             href={`/project/${projectRef}/database/extensions?filter=${metadata?.name}`}
             target="_blank"
             rel="noreferrer"
+            className="no-underline"
           >
             View extension
           </Link>
@@ -300,10 +259,10 @@ export const LintCTA = ({
 export const entityTypeIcon = (type: string) => {
   switch (type) {
     case 'table':
-      return <Table2 size={15} strokeWidth={1} />
+      return <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />
     case 'view':
-      return <Eye size={15} strokeWidth={1.5} />
+      return <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />
     default:
-      return <Box size={15} strokeWidth={1.5} />
+      return <Box className="text-foreground-muted" size={15} strokeWidth={1.5} />
   }
 }

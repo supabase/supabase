@@ -387,10 +387,10 @@ const ProjectLints: NextPageWithLayout = () => {
                 </TabsList_Shadcn_>
                 <TabsContent_Shadcn_
                   value="details"
-                  className="mt-0 flex-grow min-h-0 overflow-y-auto"
+                  className="mt-0 flex-grow min-h-0 overflow-y-auto prose"
                 >
                   {selectedLint && (
-                    <div className={cn('py-4 px-4 grid gap-2')}>
+                    <div className={cn('py-4 px-5')}>
                       <h3 className="text-sm">
                         {lintInfoMap.find((item) => item.name === selectedLint.name)?.title}
                       </h3>
@@ -398,23 +398,23 @@ const ProjectLints: NextPageWithLayout = () => {
                         <span>Entity</span>
                         <div className="flex items-center gap-1 px-2 py-0.5 bg-surface-200 border rounded-lg ">
                           {selectedLint.metadata?.type === 'table' && (
-                            <Table2 size={15} strokeWidth={1} />
+                            <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />
                           )}
                           {selectedLint.metadata?.type === 'view' && (
-                            <Eye size={15} strokeWidth={1.5} />
+                            <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />
                           )}{' '}
                           {`${selectedLint.metadata?.schema}.${selectedLint.metadata?.name}`}
                         </div>
                       </div>
 
-                      <div className="grid gap-6 mt-6">
-                        <div className="grid gap-2">
+                      <div className="grid">
+                        <div>
                           <h3 className="text-sm">Issue</h3>
                           <ReactMarkdown className="leading-6 text-sm">
                             {selectedLint.detail}
                           </ReactMarkdown>
                         </div>
-                        <div className="grid gap-2">
+                        <div>
                           <h3 className="text-sm">Description</h3>
                           <ReactMarkdown className="text-sm">
                             {selectedLint.description}
