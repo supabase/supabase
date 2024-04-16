@@ -186,6 +186,7 @@ functions:
           - You keep the `expo-secure-storage`, `aes-js` and `react-native-get-random-values` libraries up-to-date.
           - Choose the correct [`SecureStoreOptions`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestoreoptions) for your app's needs. E.g. [`SecureStore.WHEN_UNLOCKED`](https://docs.expo.dev/versions/latest/sdk/securestore/#securestorewhen_unlocked) regulates when the data can be accessed.
           - Carefully consider optimizations or other modifications to the above example, as those can lead to introducing subtle security vulnerabilities.
+
   - id: auth-api
     title: 'Overview'
     notes: |
