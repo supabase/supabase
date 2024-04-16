@@ -9,7 +9,6 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useGetIndexAdvisorResult } from 'data/database/retrieve-index-advisor-result-query'
 import { useGetIndexesFromSelectQuery } from 'data/database/retrieve-index-from-select-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useExecuteSqlQuery } from 'data/sql/execute-sql-query'
 import {
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
@@ -51,21 +50,16 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
     query: selectedRow?.['query'],
   })
 
-  const { data: indexAdvisorExt, isLoading: isLoadingIndexAdvisorExt } = useExecuteSqlQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-    sql: `select * from pg_proc where proname = 'index_advisor';`,
-    queryKey: ['index-advisor-function-check'],
-  })
   const { data: extensions, isLoading: isLoadingExtensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  const isLoadingChecks = isLoadingIndexAdvisorExt || isLoadingExtensions
   const hypopgExtension = (extensions ?? []).find((ext) => ext.name === 'hypopg')
+  const indexAdvisorExtension = (extensions ?? []).find((ext) => ext.name === 'index_advisor')
   const isIndexAdvisorAvailable =
-    (indexAdvisorExt?.result ?? []).length > 0 &&
+    indexAdvisorExtension !== undefined &&
+    indexAdvisorExtension.installed_version !== null &&
     hypopgExtension !== undefined &&
     hypopgExtension.installed_version !== null
 
@@ -165,7 +159,7 @@ export const QueryIndexes = ({ selectedRow }: QueryIndexesProps) => {
       <QueryPanelSection className="flex flex-col gap-y-6">
         <div className="flex flex-col gap-y-2">
           <p className="text-sm">New index recommendations</p>
-          {isLoadingChecks ? (
+          {isLoadingExtensions ? (
             <GenericSkeletonLoader />
           ) : !isIndexAdvisorAvailable ? (
             <IndexAdvisorDisabledState />
