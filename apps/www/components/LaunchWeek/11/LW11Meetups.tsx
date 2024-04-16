@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
-import { TextLink, cn } from 'ui'
+import { cn } from 'ui'
 import useConfData from '../hooks/use-conf-data'
 import { SupabaseClient } from '@supabase/supabase-js'
 
@@ -110,9 +110,9 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
                   title={liveNow ? 'Live now' : undefined}
                   className={cn(
                     'h-10 group inline-flex items-center flex-wrap text-4xl',
-                    'text-foreground-muted dark:text-foreground-muted/50 hover:!text-foreground !leading-none transition-colors',
+                    'text-foreground-muted hover:!text-foreground !leading-none transition-colors',
                     meetup.id === activeMeetup.id && '!text-foreground',
-                    liveNow && 'text-[#B0B0B0]'
+                    liveNow && 'text-foreground-light'
                   )}
                 >
                   {liveNow && (

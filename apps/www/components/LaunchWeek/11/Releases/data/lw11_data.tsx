@@ -133,27 +133,43 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 2,
     dd: 'Tue',
     title: '',
-    shipped: false,
-    hasCountdown: true,
+    shipped: true,
+    hasCountdown: false,
     blog: '#',
     date: '16 April',
     published_at: '2024-04-16T08:00:00.000-08:00',
     description: <>Create vector embeddings with Edge Functions</>,
     links: [
-      // {
-      //   type: 'blog',
-      //   href: '#',
-      // },
-      // {
-      //   type: 'video',
-      //   href: 'eCbiywoDORw',
-      // },
-      // {
-      //   type: 'xSpace',
-      //   href: '#',
-      // },
+      {
+        type: 'blog',
+        href: '#',
+      },
+      {
+        type: 'video',
+        href: 'eCbiywoDORw',
+      },
+      {
+        type: 'xSpace',
+        href: '#',
+      },
     ],
-    steps: [],
+    steps: [
+      {
+        title: 'Create vector embeddings with Edge Functions',
+        blog: '#',
+        bg_layers: [
+          {
+            img: isDark
+              ? '/images/launchweek/11/days/d2-dark.svg'
+              : '/images/launchweek/11/days/d2-light.svg',
+            mobileImg: isDark
+              ? '/images/launchweek/11/days/d2-dark-mobile.svg'
+              : '/images/launchweek/11/days/d2-light-mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
   {
     id: 'day-3',
@@ -161,11 +177,11 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Wed',
     title: '',
     shipped: false,
-    hasCountdown: false,
+    hasCountdown: true,
     blog: '#',
     date: '17 April',
     published_at: '2024-04-17T08:00:00.000-08:00',
-    description: <>TBD</>,
+    description: <></>,
     links: [
       // {
       //   type: 'blog',
@@ -192,7 +208,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     blog: '#',
     date: '18 April',
     published_at: '2024-04-18T08:00:00.000-08:00',
-    description: <>TBD</>,
+    description: <></>,
     links: [
       // {
       //   type: 'blog',
@@ -219,7 +235,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     blog: '#',
     date: '19 April',
     published_at: '2024-04-19T08:00:00.000-08:00',
-    description: <>TBD</>,
+    description: <></>,
     links: [
       // {
       //   type: 'blog',

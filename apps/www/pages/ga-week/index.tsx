@@ -14,6 +14,7 @@ import { Meetup } from '~/components/LaunchWeek/11/LW11Meetups'
 import LW11StickyNav from '~/components/LaunchWeek/11/Releases/LW11StickyNav'
 import LW11Header from '~/components/LaunchWeek/11/Releases/LW11Header'
 import MainStage from '~/components/LaunchWeek/11/Releases/MainStage'
+import { useTheme } from 'next-themes'
 
 const BuildStage = dynamic(() => import('~/components/LaunchWeek/11/Releases/BuildStage'))
 const LW11Meetups = dynamic(() => import('~/components/LaunchWeek/11/LW11Meetups'))
@@ -28,6 +29,7 @@ interface Props {
 
 export default function GAWeekIndex({ meetups }: Props) {
   const { query } = useRouter()
+  const { resolvedTheme, setTheme } = useTheme()
 
   const TITLE = 'Supabase GA Week | 15-19 April 2024'
   const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
@@ -62,6 +64,14 @@ export default function GAWeekIndex({ meetups }: Props) {
       return () => subscription.unsubscribe()
     }
   }, [supabase])
+
+  const isDarkTheme = resolvedTheme === 'dark'
+
+  useEffect(() => {
+    if (isDarkTheme) {
+      setTheme('deep-dark')
+    }
+  }, [isDarkTheme])
 
   useEffect(() => {
     if (session?.user) {

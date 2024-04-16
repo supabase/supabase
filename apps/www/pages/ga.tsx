@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -19,13 +19,21 @@ const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
 export default function IndexPage() {
   const router = useRouter()
-  const { resolvedTheme } = useTheme()
+  const { resolvedTheme, setTheme } = useTheme()
   const isDark = resolvedTheme?.includes('dark')
   const data = pageData(isDark!)
 
   const meta_title = 'General Availability | Supabase'
   const meta_description = 'Supabase is officially launching into General Availability.'
-  const meta_image = '/images/ga/ga-og.png'
+  const meta_image = '/images/ga/ga-og.png?v=2'
+
+  const isDarkTheme = resolvedTheme === 'dark'
+
+  useEffect(() => {
+    if (isDarkTheme) {
+      setTheme('deep-dark')
+    }
+  }, [isDarkTheme])
 
   return (
     <DefaultLayout>
