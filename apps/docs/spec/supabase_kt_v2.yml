@@ -57,7 +57,7 @@ functions:
              scheme = "deeplink scheme"
 
              // On Android only, you can set OAuth and SSO logins to open in a custom tab, rather than an external browser:
-             defaultExternalAuthAction = ExternalAuthAction.CUSTOM_TABS //defaults to EXTERNAL_BROWSER
+             defaultExternalAuthAction = ExternalAuthAction.CustomTabs() //defaults to ExternalAuthAction.ExternalBrowser
           }
           ```
       4. **Call platform specific function on startup** \
@@ -684,10 +684,10 @@ functions:
         isOptional: true # Not directly `optional`, as there are two overloads one with and one without `parameters`.
         type: T
         description: Parameters to pass to the function. T can be any serializable type.
-      - name: head
+      - name: method
         isOptional: true
-        type: Boolean
-        description: If true, delete will delete the selected data.
+        type: RpcMethod
+        description: The HTTP method to use. Defaults  to `RpcMethod.POST`
       - name: request
         isOptional: true
         type: PostgrestRequestBuilder.() -> Unit
@@ -3317,7 +3317,7 @@ functions:
     title: 'reauthenticate()'
     $ref: '@supabase/gotrue-js.GoTrueClient.reauthenticate'
     notes: |
-      - This method is used together with `modifyUser()` when a user's password needs to be updated.
+      - This method is used together with `updateUser()` when a user's password needs to be updated.
       - This method will send a nonce to the user's email. If the user doesn't have a confirmed email address, the method will send the nonce to the user's confirmed phone number instead.
     examples:
       - id: send-reauthentication-nonce
@@ -3422,11 +3422,11 @@ functions:
           val user = supabase.auth.retrieveUser("JWT")
           ```
   - id: update-user
-    title: 'modifyUser()'
+    title: 'updateUser()'
     $ref: '@supabase/gotrue-js.GoTrueClient.updateUser'
     notes: |
       Modifies the user data.
-      - In order to use the `modifyUser()` method, the user needs to be signed in first.
+      - In order to use the `updateUser()` method, the user needs to be signed in first.
       - By default, email updates sends a confirmation link to both the user's current and new email.
       To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
     params:
@@ -3469,7 +3469,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val user = supabase.auth.modifyUser {
+          val user = supabase.auth.updateUser {
              email = "newEmail@email.com"
           }
           ```
@@ -3478,7 +3478,7 @@ functions:
         isSpotlight: false
         code: |
           ```kotlin
-          val user = supabase.auth.modifyUser {
+          val user = supabase.auth.updateUser {
              password = "secretPassword"
           }
           ```
@@ -3487,7 +3487,7 @@ functions:
         isSpotlight: true
         code: |
           ```kotlin
-          val user = supabase.auth.modifyUser {
+          val user = supabase.auth.updateUser {
              data {
                 put("name", "John")
              }
@@ -3681,11 +3681,11 @@ functions:
       Sends a password reset request to the given email address.
       - The password reset flow consist of 2 broad steps: (i) Allow the user to login via the password reset link; (ii) Update the user's password.
       - The `resetPasswordForEmail()` only sends a password reset link to the user's email.
-      To update the user's password, see [`modifyUser()`](/docs/reference/kotlin/auth-updateuser).
+      To update the user's password, see [`updateUser()`](/docs/reference/kotlin/auth-updateuser).
       - The user gets redirected back to your app, assuming you setup [OTP handling](/docs/reference/kotlin/initializing)
-      - After the user has been redirected successfully, prompt them for a new password and call `modifyUser()`:
+      - After the user has been redirected successfully, prompt them for a new password and call `updateUser()`:
         ```kotlin
-        supabase.auth.modifyUser {
+        supabase.auth.updateUser {
             password = "1234567"
         }
         ```
