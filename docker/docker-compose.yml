@@ -156,7 +156,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.27.5
+    image: supabase/realtime:v2.28.23
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -197,7 +197,7 @@ services:
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v0.46.4
+    image: supabase/storage-api:v1.0.6
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -274,7 +274,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.41.3
+    image: supabase/edge-runtime:v1.43.2
     restart: unless-stopped
     depends_on:
       analytics:
