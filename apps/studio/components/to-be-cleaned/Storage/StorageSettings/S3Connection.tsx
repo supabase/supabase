@@ -92,7 +92,7 @@ export const S3Connection = () => {
 
       <div>
         <FormHeader
-          title="Access Keys"
+          title="S3 Access Keys"
           description="Manage your access keys for this project."
           actions={
             <Dialog
