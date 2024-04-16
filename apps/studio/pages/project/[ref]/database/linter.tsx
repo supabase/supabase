@@ -127,7 +127,7 @@ const ProjectLints: NextPageWithLayout = () => {
   const lintCountLabel = (count: number, label: string) => (
     <>
       {isLoading ? (
-        <ShimmeringLoader className="w-32 pt-1" />
+        <ShimmeringLoader className="w-18 pt-1" />
       ) : (
         <>
           {count} {label}
@@ -144,7 +144,9 @@ const ProjectLints: NextPageWithLayout = () => {
       minWidth: 240,
       value: (row: any) => (
         <div className="flex items-center gap-1.5">
-          {lintInfoMap.find((item) => row.name === item.name)?.icon}
+          <span className="shrink-0">
+            {lintInfoMap.find((item) => row.name === item.name)?.icon}
+          </span>
           {<h3 className="text-xs">{lintInfoMap.find((item) => row.name === item.name)?.title}</h3>}
         </div>
       ),
@@ -405,20 +407,22 @@ const ProjectLints: NextPageWithLayout = () => {
                         </div>
                       </div>
 
-                      <div className="grid gap-6 mt-6 text-sm">
+                      <div className="grid gap-6 mt-6">
                         <div className="grid gap-2">
-                          <h3>Issue</h3>
-                          <ReactMarkdown className="leading-6">{selectedLint.detail}</ReactMarkdown>
+                          <h3 className="text-sm">Issue</h3>
+                          <ReactMarkdown className="leading-6 text-sm">
+                            {selectedLint.detail}
+                          </ReactMarkdown>
                         </div>
                         <div className="grid gap-2">
-                          <h3>Description</h3>
+                          <h3 className="text-sm">Description</h3>
                           <ReactMarkdown className="text-sm">
                             {selectedLint.description}
                           </ReactMarkdown>
                         </div>
 
                         <div className="grid gap-2">
-                          <h3>Resolve</h3>
+                          <h3 className="text-sm">Resolve</h3>
                           <div>
                             <LintCTA
                               title={selectedLint.name}
