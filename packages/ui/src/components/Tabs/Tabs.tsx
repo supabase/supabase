@@ -16,7 +16,7 @@ import { useInView } from 'react-intersection-observer'
 import { TAB_CHANGE_EVENT_NAME } from '../../lib/events'
 import styleHandler from '../../lib/theme/styleHandler'
 import { useTabGroup } from './TabsProvider'
-import { debounce } from 'lodash'
+import { throttle } from 'lodash'
 
 interface TabsProps {
   type?: 'pills' | 'underlined' | 'cards' | 'rounded-pills'
@@ -77,29 +77,27 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
       children?.[0]?.props?.id
   )
 
-  const [stuck, setStuck] = useState(false)
+  const [inView, setInView] = useState(false)
   const stickyRef = useRef<HTMLDivElement>(null)
   const { ref: intersectionRef } = useInView({
     threshold: 0.1,
-    onChange: (inView) => (inView ? setStuck(true) : setStuck(false)),
+    onChange: (inView) => (inView ? setInView(true) : setInView(false)),
     skip: !stickyTabList,
   })
 
   const scrollHandler = useCallback(() => {
-    console.log('SCROLLING')
     if (!stickyRef.current) return
 
     const top = stickyRef.current.getBoundingClientRect().top
     if (top > 0) return
 
     const { style = {} } = stickyTabList ?? {}
-    if (stuck) {
+    if (inView) {
       stickyRef.current.style.position = 'sticky'
       stickyRef.current.style.top = '100px'
       stickyRef.current.style.zIndex = '5'
 
       for (const property in style) {
-        console.log(property)
         // @ts-ignore
         stickyRef.current.style[property] = style[property]
       }
@@ -112,9 +110,9 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
         stickyRef.current.style[property] = ''
       }
     }
-  }, [stuck])
+  }, [inView])
 
-  const debouncedScrollHandler = useMemo(() => debounce(scrollHandler, 100), [scrollHandler])
+  const throttledScrollHandler = useMemo(() => throttle(scrollHandler, 300), [scrollHandler])
 
   useEffect(() => {
     const { scrollContainer } = stickyTabList ?? {}
@@ -123,9 +121,9 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
         ? scrollContainer
         : (scrollContainer && document.getElementById(scrollContainer)) || document
 
-    elem.addEventListener('scroll', debouncedScrollHandler)
-    return () => elem.removeEventListener('scroll', debouncedScrollHandler)
-  }, [debouncedScrollHandler, stickyTabList?.scrollContainer])
+    elem.addEventListener('scroll', throttledScrollHandler)
+    return () => elem.removeEventListener('scroll', throttledScrollHandler)
+  }, [throttledScrollHandler, stickyTabList?.scrollContainer])
 
   useEffect(() => {
     /**
@@ -181,6 +179,23 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
     currentTarget.dispatchEvent(
       new CustomEvent(TAB_CHANGE_EVENT_NAME, { bubbles: true, detail: { queryGroup, id } })
     )
+
+    if (stickyTabList && inView && stickyRef.current) {
+      let elem = stickyRef.current as Element | null
+      while (elem && !elem.matches('[role="tabpanel"][data-state="active"]')) {
+        elem = elem.nextElementSibling
+      }
+      if (!elem) return
+
+      const top = elem.getBoundingClientRect().top
+      ;(elem as HTMLElement).style.scrollMarginTop = 'calc(var(--header-height)*3)'
+      if (top < 0)
+        elem.scrollIntoView({
+          behavior: window.matchMedia('(prefers-reduced-motion: no-preference)').matches
+            ? 'smooth'
+            : 'instant',
+        })
+    }
 
     onClick?.(id)
     if (id !== active) {
