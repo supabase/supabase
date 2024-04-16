@@ -177,7 +177,7 @@ create policy "Users can update their boards" on boards for
     );
 
 create policy "Users can delete their created boards" on boards for
-    delete using (auth.uid() = creator);
+    delete using ((select auth.uid()) = creator);
 
 -- user_boards row level security
 alter table user_boards enable row level security;
@@ -186,10 +186,10 @@ create policy "Users can add their boards" on user_boards for
     insert to authenticated with check (true);
 
 create policy "Users can view boards" on user_boards for
-    select using (auth.uid() = user_id);
+    select using ((select auth.uid()) = user_id);
 
 create policy "Users can delete their boards" on user_boards for
-    delete using (auth.uid() = user_id);
+    delete using ((select auth.uid()) = user_id);
 
 -- lists row level security
 alter table lists enable row level security;

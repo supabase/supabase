@@ -39,6 +39,7 @@ import ExitSurveyModal from './ExitSurveyModal'
 import UpgradeSurveyModal from './UpgradeModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
+import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
@@ -545,8 +546,9 @@ const PlanUpdateSidePanel = () => {
           ) : (
             <div className="py-4 space-y-2">
               <p className="text-sm">
-                This organization is billed through our partner Fly.io and you will be charged by
-                them directly.
+                This organization is billed through our partner{' '}
+                {billingPartnerLabel(subscription?.billing_partner)} and you will be charged by them
+                directly.
               </p>
               {subscriptionPreview?.billed_via_partner &&
                 subscriptionPreview?.plan_change_type === 'downgrade' && (

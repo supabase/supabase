@@ -21,10 +21,7 @@ export async function formatQuery(
     { query: sql },
     { headers: Object.fromEntries(headers), signal }
   )
-  if (response.error) {
-    throw response.error
-  }
-
+  if (response.error) throw response.error
   return { result: response }
 }
 

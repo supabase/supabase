@@ -111,6 +111,33 @@ supabase
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+// Initialize the Swift client
+import Supabase
+
+let supabase = SupabaseClient(supabaseURL: SUPABASE_URL, supabaseKey: SUPABASE_ANON_KEY)
+
+// Create channel
+let channel = await supabase.realtime.channel("todos")
+
+// Create the observations before subscribing
+let insertions = await channel.postgresChanges(
+  InsertAction.self,
+  schema: "public",
+  table: "todos"
+)
+
+await channel.subscribe()
+
+for await insertion in insertions {
+  let todo = try insertion.decoded(as: Todo.self)
+  print("Todo inserted", todo)
+}
+```
+
+</TabPanel>
 </Tabs>
 
 Use [subscribe()](/docs/reference/javascript/subscribe) to listen to database changes.

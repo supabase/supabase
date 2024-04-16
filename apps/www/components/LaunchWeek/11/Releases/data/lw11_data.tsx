@@ -10,6 +10,11 @@ export interface StepLink {
   href: string
 }
 
+export interface ThemeImage {
+  dark?: string
+  light?: string
+}
+
 export interface StepProps {
   title: string
   icon?: string
@@ -38,16 +43,16 @@ export interface StepProps {
 export interface WeekDayProps {
   id: string
   title: string
-  shipped: boolean
   date: string
-  published_at: string
-  isToday?: boolean
-  hasCountdown?: boolean
-  description: string | ReactNode
   d: number
   dd: string
-  links?: StepLink[]
-  videoId?: string
+  published_at: string
+  shipped: boolean // show card in layout
+  isToday?: boolean // current active day
+  hasCountdown?: boolean // use countdown only on "tomorrow"
+  description: string | ReactNode
+  links?: StepLink[] // types = 'productHunt' | 'video' | 'docs' | 'xSpace' | 'blog' | 'podcast'
+  videoId?: string // youtube id
   videoThumbnail?: string
   blog: string
   steps: StepProps[] | []
@@ -55,7 +60,7 @@ export interface WeekDayProps {
 
 export const endOfLWXHackathon = '2024-04-17T23:59:59.999-08:00'
 
-const days: WeekDayProps[] = [
+const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
   {
     id: 'day-1',
     d: 1,
@@ -64,18 +69,15 @@ const days: WeekDayProps[] = [
     shipped: true,
     isToday: false,
     blog: '#',
-    hasCountdown: true,
+    hasCountdown: false,
     date: '15 April',
     published_at: '2024-04-15T08:00:00.000-08:00',
-    videoThumbnail: '/images/launchweek/copple-placeholder.jpg',
+    videoId: 'bRtdk8D4X8w',
+    videoThumbnail: '/images/launchweek/11/video-cover.jpg',
     links: [
       {
-        type: 'blog',
-        href: '#',
-      },
-      {
         type: 'xSpace',
-        href: '',
+        href: 'https://twitter.com/i/spaces/1MnGnMglMLjKO/peek',
       },
     ],
     description: (
@@ -92,91 +94,37 @@ const days: WeekDayProps[] = [
         icon: products.database.icon[16],
         title: 'Database',
         description: 'Fully portable Postgres Database',
-        links: [
-          // {
-          //   type: 'podcast',
-          //   href: '#',
-          // },
-          {
-            type: 'docs',
-            href: 'https://supabase.com/docs/guides/database/overview',
-          },
-        ],
+        url: 'https://supabase.com/docs/guides/database/overview',
       },
       {
         icon: products.authentication.icon[16],
         title: 'Auth',
         description: 'User management out of the box',
-        links: [
-          // {
-          //   type: 'podcast',
-          //   href: '#',
-          // },
-          {
-            type: 'docs',
-            href: 'https://supabase.com/docs/guides/auth',
-          },
-        ],
+        url: 'https://supabase.com/docs/guides/auth',
       },
       {
         icon: products.storage.icon[16],
         title: 'Storage',
         description: 'Serverless storage for any media',
-        links: [
-          // {
-          //   type: 'podcast',
-          //   href: '#',
-          // },
-          {
-            type: 'docs',
-            href: 'https://supabase.com/docs/guides/storage',
-          },
-        ],
+        url: 'https://supabase.com/docs/guides/storage',
       },
       {
         icon: products.functions.icon[16],
         title: 'Edge Functions',
         description: 'Deploy code globally on the edge',
-        links: [
-          // {
-          //   type: 'podcast',
-          //   href: '#',
-          // },
-          {
-            type: 'docs',
-            href: 'https://supabase.com/docs/guides/functions',
-          },
-        ],
+        url: 'https://supabase.com/docs/guides/functions',
       },
       {
         icon: products.realtime.icon[16],
         title: 'Realtime',
         description: 'Syncronize and broadcast events',
-        links: [
-          // {
-          //   type: 'podcast',
-          //   href: '#',
-          // },
-          {
-            type: 'docs',
-            href: 'https://supabase.com/docs/guides/realtime',
-          },
-        ],
+        url: 'https://supabase.com/docs/guides/realtime',
       },
       {
         icon: products.vector.icon[16],
         title: 'Vector',
         description: 'AI toolkit to manage embeddings',
-        links: [
-          // {
-          //   type: 'podcast',
-          //   href: '#',
-          // },
-          {
-            type: 'docs',
-            href: 'https://supabase.com/docs/guides/ai',
-          },
-        ],
+        url: 'https://supabase.com/docs/guides/ai',
       },
     ],
   },
@@ -186,11 +134,11 @@ const days: WeekDayProps[] = [
     dd: 'Tue',
     title: '',
     shipped: false,
-    hasCountdown: false,
+    hasCountdown: true,
     blog: '#',
     date: '16 April',
     published_at: '2024-04-16T08:00:00.000-08:00',
-    description: <>TBD</>,
+    description: <>Create vector embeddings with Edge Functions</>,
     links: [
       // {
       //   type: 'blog',
@@ -205,19 +153,7 @@ const days: WeekDayProps[] = [
       //   href: '#',
       // },
     ],
-    steps: [
-      {
-        title: '',
-        blog: '#',
-        bg_layers: [
-          {
-            img: '/images/launchweek/lwx/day2/d2_edge.svg',
-            mobileImg: '/images/launchweek/lwx/day2/d2_edge_mobile.svg',
-          },
-        ],
-        steps: [],
-      },
-    ],
+    steps: [],
   },
   {
     id: 'day-3',

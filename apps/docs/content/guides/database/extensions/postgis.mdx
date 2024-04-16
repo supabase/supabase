@@ -140,6 +140,26 @@ await supabase.from('restaurants').insert([
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+struct Restaurant: Codable {
+    let name: String
+    let location: String // You could also use a custom type with a custom `Encodable` conformance for convenience.
+}
+
+try await supabase.from("restaurants")
+  .insert(
+    [
+      Restaurant(name: "Supa Burger", location: "POINT(-73.946823 40.807416)"),
+      Restaurant(name: "Supa Pizza", location: "POINT(-73.94581 40.807475)"),
+      Restaurant(name: "Supa Taco", location: "POINT(-73.945826 40.80629)"),
+    ]
+  )
+  .execute()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -213,6 +233,34 @@ final data = await supabase.rpc('nearby_restaurants',params: {
   'lat': 40.807313,
   'long': -73.946713,
 });
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+struct Response: Codable {
+  let id: Int
+  let name: String
+  let lat: Double
+  let long: Double
+  let distance: Double
+
+  enum CodingKeys: String, CodingKey {
+    case id, name, lat, long
+    case distance = "dist_meters"
+  }
+}
+
+let response: Response = try await supabase.rpc(
+  "nearby_restaurants",
+  params: [
+    "lat": 40.807313,
+    "long": -73.946713
+  ]
+)
+.execute()
+.value
 ```
 
 </TabPanel>
@@ -312,6 +360,30 @@ final data = await supabase.rpc('restaurants_in_view', params: {
   'max_lat': 40.808,
   'max_long': -73.945,
 });
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+struct Response: Codable {
+  let id: Int
+  let name: String
+  let lat: Double
+  let long: Double
+}
+
+let response: Response = try await supabase.rpc(
+  "restaurants_in_view",
+  params: [
+    "min_lat": 40.807,
+    "min_long": -73.946,
+    "max_long": -73.945,
+    "max_lat": 40.808,
+  ]
+)
+.execute()
+.value
 ```
 
 </TabPanel>

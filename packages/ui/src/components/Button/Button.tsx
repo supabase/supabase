@@ -218,12 +218,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const Comp = asChild ? Slot : 'button'
-    const { className, disabled } = props
+    const { className } = props
     const showIcon = loading || icon
     // decrecating 'showIcon' for rightIcon
     const _iconLeft: React.ReactNode = icon ?? iconLeft
     // if loading, button is disabled
-    props.disabled = loading ? true : props.disabled
+    const disabled = loading === true || props.disabled
 
     return (
       <Comp
@@ -231,6 +231,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         data-size={size}
         type={htmlType}
         {...props}
+        disabled={disabled}
         className={cn(buttonVariants({ type, size, disabled, block, rounded }), className)}
       >
         {asChild ? (

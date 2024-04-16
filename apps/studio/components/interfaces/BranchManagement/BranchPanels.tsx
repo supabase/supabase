@@ -1,6 +1,7 @@
+import * as Tooltip from '@radix-ui/react-tooltip'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { GitPullRequest, RefreshCw, Trash2 } from 'lucide-react'
+import { Clock, GitPullRequest, Infinity, RefreshCw, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren, ReactNode, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -9,6 +10,7 @@ import { useInView } from 'react-intersection-observer'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBranchQuery } from 'data/branches/branch-query'
 import { useBranchResetMutation } from 'data/branches/branch-reset-mutation'
+import { useBranchUpdateMutation } from 'data/branches/branch-update-mutation'
 import type { Branch } from 'data/branches/branches-query'
 import {
   Badge,
@@ -21,7 +23,6 @@ import {
   IconExternalLink,
   IconMoreVertical,
   IconShield,
-  Modal,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BranchStatusBadge from './BranchStatusBadge'
@@ -114,6 +115,20 @@ export const BranchRow = ({
     }
   )
 
+  const [showBranchModeSwitch, setShowBranchModeSwitch] = useState(false)
+
+  const { mutate: updateBranch, isLoading: isUpdating } = useBranchUpdateMutation({
+    onSuccess() {
+      toast.success('Successfully updated branch')
+      setShowBranchModeSwitch(false)
+    },
+  })
+
+  const onUpdateBranchPersistentMode = () => {
+    if (projectRef == undefined) return console.error('Project ref is required')
+    updateBranch({ id: branch.id, projectRef, persistent: !branch.persistent })
+  }
+
   const [showConfirmResetModal, setShowConfirmResetModal] = useState(false)
 
   const { mutate, isLoading: isResetting } = useBranchResetMutation({
@@ -134,16 +149,45 @@ export const BranchRow = ({
   return (
     <div className="w-full flex items-center justify-between px-6 py-2.5" ref={ref}>
       <div className="flex items-center gap-x-4">
-        <Button
-          asChild
-          type="default"
-          className="max-w-[300px]"
-          icon={isMain && <IconShield strokeWidth={2} className="text-amber-900" />}
-        >
-          <Link href={`/project/${branch.project_ref}/branches`} title={branch.name}>
-            {branch.name}
-          </Link>
-        </Button>
+        <Tooltip.Root delayDuration={0}>
+          <Tooltip.Trigger asChild>
+            <Button
+              asChild
+              type="default"
+              className="max-w-[300px]"
+              icon={
+                isMain ? (
+                  <IconShield strokeWidth={2} className="text-amber-900" />
+                ) : branch.persistent ? (
+                  <Infinity size={16} />
+                ) : null
+              }
+            >
+              <Link href={`/project/${branch.project_ref}/branches`} title={branch.name}>
+                {branch.name}
+              </Link>
+            </Button>
+          </Tooltip.Trigger>
+          {branch.persistent && (
+            <Tooltip.Portal>
+              <Tooltip.Content side="top">
+                <Tooltip.Arrow className="radix-tooltip-arrow" />
+                <div
+                  className={[
+                    'rounded bg-alternative py-1 px-2 leading-none shadow',
+                    'border border-background',
+                  ].join(' ')}
+                >
+                  <span className="text-xs text-foreground">
+                    {branch.name} is a persistent branch and will remain active even after the
+                    underlying PR is closed
+                  </span>
+                </div>
+              </Tooltip.Content>
+            </Tooltip.Portal>
+          )}
+        </Tooltip.Root>
+
         {isActive && <Badge>Current</Badge>}
         <BranchStatusBadge
           status={
@@ -155,34 +199,6 @@ export const BranchRow = ({
         </p>
       </div>
       <div className="flex items-center gap-x-8">
-        {branch.pr_number !== undefined && (
-          <div className="flex items-center">
-            <Link
-              href={`https://github.com/${repo}/pull/${branch.pr_number}`}
-              target="_blank"
-              rel="noreferrer"
-              className="text-xs transition text-foreground-lighter mr-4 hover:text-foreground"
-            >
-              #{branch.pr_number}
-            </Link>
-            <div className="flex items-center gap-x-2 bg-brand-500 px-3 py-1 rounded-full">
-              <GitPullRequest size={14} />
-              <p className="text-xs">Open</p>
-            </div>
-            <IconArrowRight className="mx-1 text-foreground-light" strokeWidth={1.5} size={16} />
-            <Button asChild type="default">
-              <Link
-                passHref
-                target="_blank"
-                rel="noreferer"
-                href={`http://github.com/${repo}/tree/${branch.git_branch}`}
-              >
-                {branch.git_branch}
-              </Link>
-            </Button>
-          </div>
-        )}
-
         {isMain ? (
           <div className="flex items-center gap-x-2">
             <Button asChild type="default" iconRight={<IconExternalLink />}>
@@ -205,20 +221,39 @@ export const BranchRow = ({
           </div>
         ) : (
           <div className="flex items-center gap-x-2">
-            <Button asChild type="default" iconRight={<IconExternalLink />}>
-              <Link
-                passHref
-                target="_blank"
-                rel="noreferrer"
-                href={
-                  branch.pr_number !== undefined
-                    ? `https://github.com/${repo}/pull/${branch.pr_number}`
-                    : createPullRequestURL
-                }
-              >
-                {branch.pr_number !== undefined ? 'View Pull Request' : 'Create Pull Request'}
-              </Link>
-            </Button>
+            {branch.pr_number === undefined ? (
+              <Button asChild type="default" iconRight={<IconExternalLink />}>
+                <Link passHref target="_blank" rel="noreferrer" href={createPullRequestURL}>
+                  Create Pull Request
+                </Link>
+              </Button>
+            ) : (
+              <div className="flex items-center">
+                <Link
+                  href={`https://github.com/${repo}/pull/${branch.pr_number}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-x-2 transition px-3 py-1 rounded-full bg-background-surface-400 hover:text-foreground"
+                >
+                  <GitPullRequest size={14} />#{branch.pr_number}
+                </Link>
+                <IconArrowRight
+                  className="mx-1 text-foreground-light"
+                  strokeWidth={1.5}
+                  size={16}
+                />
+                <Button asChild type="default">
+                  <Link
+                    passHref
+                    target="_blank"
+                    rel="noreferer"
+                    href={`http://github.com/${repo}/tree/${branch.git_branch}`}
+                  >
+                    {branch.git_branch}
+                  </Link>
+                </Button>
+              </div>
+            )}
             <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button type="text" icon={<IconMoreVertical />} className="px-1" />
@@ -231,6 +266,21 @@ export const BranchRow = ({
                 >
                   <RefreshCw size={14} />
                   Reset Branch
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="gap-x-2"
+                  onSelect={() => setShowBranchModeSwitch(true)}
+                  onClick={() => setShowBranchModeSwitch(true)}
+                >
+                  {branch.persistent ? (
+                    <>
+                      <Clock size={14} /> Switch to ephemeral
+                    </>
+                  ) : (
+                    <>
+                      <Infinity size={14} className="scale-110" /> Switch to persistent
+                    </>
+                  )}
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   className="gap-x-2"
@@ -256,6 +306,27 @@ export const BranchRow = ({
             >
               <p className="text-sm text-foreground-light">
                 Are you sure you want to reset the "{branch.name}" branch? All data will be deleted.
+              </p>
+            </ConfirmationModal>
+            <ConfirmationModal
+              variant={'default'}
+              visible={showBranchModeSwitch}
+              confirmLabel={branch.persistent ? 'Switch to ephemeral' : 'Switch to persistent'}
+              title={`Confirm branch mode switch`}
+              loading={isUpdating}
+              onCancel={() => {
+                setShowBranchModeSwitch(false)
+              }}
+              onConfirm={onUpdateBranchPersistentMode}
+            >
+              <p className="text-sm text-foreground-light">
+                Are you sure you want to switch the branch "{branch.name}" to{' '}
+                {branch.persistent ? 'ephemeral' : 'persistent'} mode?
+                <br />
+                <br />
+                {branch.persistent
+                  ? 'Ephemeral branches will be deleted once the underlying PR closes.'
+                  : 'Persistent branches will remain active even after the underlying PR is closed.'}
               </p>
             </ConfirmationModal>
           </div>
