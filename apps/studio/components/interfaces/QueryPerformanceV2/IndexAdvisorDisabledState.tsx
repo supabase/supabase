@@ -46,52 +46,52 @@ export const IndexAdvisorDisabledState = () => {
   return (
     <Alert_Shadcn_ className="mb-6">
       <AlertTitle_Shadcn_>
-        Get index suggestions to improve your query performance
+        <Markdown
+          className="text-foreground"
+          content={
+            indexAdvisorExtension === null
+              ? 'Newer version of Postgres required to run index recommendations'
+              : 'Postgres extensions `index_advisor` and `hypopg` required'
+          }
+        />
       </AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_>
-        <Markdown content="The `index_advisor` extension can help in recommending database indexes to reduce the costs of your query." />
+        <Markdown
+          content={
+            indexAdvisorExtension === null
+              ? 'Upgrade to the latest version of Postgres to get recommendations on indexes for your queries'
+              : 'These extensions can help in recommending database indexes to reduce the costs of your query.'
+          }
+        />
       </AlertDescription_Shadcn_>
-      {indexAdvisorExtension === null ? (
-        <AlertDescription_Shadcn_ className="mt-3">
-          <Markdown content="This extension is only available in the latest version of Postgres. Upgrade to the latest version of Postgres to leverage on the `index_advisor` extension." />
-          <div className="flex items-center gap-x-2 mt-3">
+
+      <AlertDescription_Shadcn_ className="mt-3">
+        <div className="flex items-center gap-x-2">
+          {indexAdvisorExtension === null ? (
             <Button asChild type="default">
               <Link href={`/project/${ref}/settings/infrastructure`}>Upgrade Postgres version</Link>
             </Button>
-            <Button asChild type="default" icon={<ExternalLink />}>
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href="https://supabase.com/docs/guides/database/extensions/index_advisor"
-              >
-                Documentation
-              </a>
-            </Button>
-          </div>
-        </AlertDescription_Shadcn_>
-      ) : (
-        <AlertDescription_Shadcn_ className="mt-3">
-          <div className="flex items-center gap-x-2">
+          ) : (
             <Button
               type="default"
               disabled={isEnablingExtension}
               loading={isEnablingExtension}
               onClick={() => onEnableIndexAdvisor()}
             >
-              Enable index advisor
+              Enable extensions
             </Button>
-            <Button asChild type="default" icon={<ExternalLink />}>
-              <a
-                target="_blank"
-                rel="noreferrer"
-                href="https://supabase.com/docs/guides/database/extensions/index_advisor"
-              >
-                Documentation
-              </a>
-            </Button>
-          </div>
-        </AlertDescription_Shadcn_>
-      )}
+          )}
+          <Button asChild type="outline" icon={<ExternalLink />}>
+            <a
+              target="_blank"
+              rel="noreferrer"
+              href="https://supabase.com/docs/guides/database/extensions/index_advisor"
+            >
+              Documentation
+            </a>
+          </Button>
+        </div>
+      </AlertDescription_Shadcn_>
     </Alert_Shadcn_>
   )
 }
