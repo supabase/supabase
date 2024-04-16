@@ -1,3 +1,5 @@
+import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
 import { useDeleteCollection } from 'data/analytics/warehouse-collections-delete-mutation'
 import { useUpdateCollection } from 'data/analytics/warehouse-collections-update-mutation'
 import { useSelectedProject } from 'hooks'
@@ -32,15 +34,21 @@ type Props = {
 
 export const WarehouseMenuItem = ({ item }: Props) => {
   const router = useRouter()
-  const project = useSelectedProject()
-  const projectRef = project?.ref || 'default'
+  const { ref } = useParams()
+  const projectRef = ref || 'default'
 
   const [showUpdateDialog, setShowUpdateDialog] = React.useState(false)
   const [showDeleteDialog, setDeleteDialog] = React.useState(false)
   const [confirmDelete, setConfirmDelete] = React.useState(false)
 
   const updateCollection = useUpdateCollection({ projectRef, collectionToken: item.token })
-  const deleteCollection = useDeleteCollection({ projectRef, collectionToken: item.token })
+  const deleteCollection = useDeleteCollection({
+    projectRef,
+    collectionToken: item.token,
+    onSuccess: () => {
+      router.push(`/project/${projectRef}/logs/explorer`)
+    },
+  })
 
   const isLoading = updateCollection.isLoading || deleteCollection.isLoading
 
@@ -175,15 +183,12 @@ export const WarehouseMenuItem = ({ item }: Props) => {
             <div className="flex items-center my-2">
               <Checkbox_Shadcn_
                 required
+                onCheckedChange={(checked) => setConfirmDelete(!!checked)}
                 checked={confirmDelete}
-                onCheckedChange={() => setConfirmDelete(!confirmDelete)}
                 id="confirm"
+                name="confirm"
               />
-              <Label_Shadcn_
-                onClick={() => setConfirmDelete(!confirmDelete)}
-                className="p-2"
-                htmlFor="confirm"
-              >
+              <Label_Shadcn_ className="p-2" htmlFor="confirm">
                 Yes, I want to delete <span className="font-medium">{item.name}</span>.
               </Label_Shadcn_>
             </div>

@@ -5,17 +5,26 @@ import { del } from 'data/fetchers'
 type DeleteCollectionArgs = {
   projectRef: string
   collectionToken: string
+  onSuccess: () => void
 }
-export function useDeleteCollection({ projectRef, collectionToken }: DeleteCollectionArgs) {
+export function useDeleteCollection({
+  projectRef,
+  collectionToken,
+  onSuccess,
+}: DeleteCollectionArgs) {
   const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: async () => {
-      const resp = await del(`/platform/projects/${projectRef}/analytics/warehouse/collections/${collectionToken}`, {})
+      await del(
+        `/platform/projects/${projectRef}/analytics/warehouse/collections/${collectionToken}`,
+        {}
+      )
 
       const keysToInvalidate = analyticsKeys.warehouseCollections(projectRef)
       queryClient.invalidateQueries(keysToInvalidate)
     },
     mutationKey: analyticsKeys.warehouseCollections(projectRef),
+    onSuccess,
   })
 
   return mutation
