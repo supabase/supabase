@@ -76,7 +76,7 @@ Embedding generation is fairly lightweight compared to LLM workloads, so it can 
 
 ### Availability: open source embeddings
 
-Embeddings models are available on Edge Functions today. We currently support `[gte-small](https://huggingface.co/Supabase/gte-small)` and we'll add more embeddings models based on user feedback.
+Embeddings models are available on Edge Functions today. We currently support [`gte-small`](https://huggingface.co/Supabase/gte-small) and we'll add more embeddings models based on user feedback.
 
 Embedding generation via `Supabase.ai` API is available today for all Edge Functions users in both local, hosted, and self-hosted platforms.
 
@@ -110,14 +110,17 @@ We are excited to announce experimental support for Llama & Mistral with `Supaba
 The API is simple to use, with support for streaming responses:
 
 ```jsx
-// Mistral with streaming
 const session = new Supabase.ai.Session('mistral')
 
 Deno.serve(async (req: Request) => {
+  // Get the prompt from the query string
   const params = new URL(req.url).searchParams
   const prompt = params.get('prompt') ?? ''
+
+  // Get the output as a stream
   const output = await session.run(prompt, { stream: true })
 
+  // Create a stream
   const stream = new ReadableStream({
     async start(controller) {
       const encoder = new TextEncoder()
@@ -127,6 +130,7 @@ Deno.serve(async (req: Request) => {
     },
   })
 
+  // Return the stream to the user
   return new Response(stream, {
     headers: new Headers({
       'Content-Type': 'text/event-stream',
