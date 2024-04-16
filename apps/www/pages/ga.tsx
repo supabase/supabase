@@ -25,7 +25,7 @@ export default function IndexPage() {
 
   const meta_title = 'General Availability | Supabase'
   const meta_description = 'Supabase is officially launching into General Availability.'
-  const meta_image = '/images/ga/ga-og.png?v=2'
+  const meta_image = '/images/ga/ga-og-alt.png'
 
   const isDarkTheme = resolvedTheme === 'dark'
 

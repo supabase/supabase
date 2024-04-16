@@ -77,7 +77,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     links: [
       {
         type: 'xSpace',
-        href: 'https://twitter.com/i/spaces/1MnGnMglMLjKO/peek',
+        href: 'https://supabase.link/twitter-space-ga',
       },
     ],
     description: (
@@ -146,11 +146,11 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       },
       {
         type: 'video',
-        href: 'eCbiywoDORw',
+        href: '',
       },
       {
         type: 'xSpace',
-        href: '#',
+        href: 'https://supabase.link/twitter-space-ga-week-2',
       },
     ],
     steps: [
@@ -191,10 +191,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       //   type: 'video',
       //   href: '',
       // },
-      // {
-      //   type: 'xSpace',
-      //   href: '#',
-      // },
+      {
+        type: 'xSpace',
+        href: 'https://supabase.link/twitter-space-ga-week-3',
+      },
     ],
     steps: [],
   },
@@ -218,10 +218,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       //   type: 'video',
       //   href: '',
       // },
-      // {
-      //   type: 'xSpace',
-      //   href: '#',
-      // },
+      {
+        type: 'xSpace',
+        href: 'https://supabase.link/twitter-space-ga-week-4',
+      },
     ],
     steps: [],
   },
@@ -245,10 +245,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       //   type: 'video',
       //   href: '',
       // },
-      // {
-      //   type: 'xSpace',
-      //   href: '#',
-      // },
+      {
+        type: 'xSpace',
+        href: 'https://supabase.link/twitter-space-ga-week-5',
+      },
     ],
     steps: [],
   },
