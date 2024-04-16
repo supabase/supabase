@@ -60,7 +60,7 @@ export const DeleteAccountButton = () => {
     const payload = {
       subject: 'Account Deletion Request',
       message: 'I want to delete my account.',
-      category: 'Account deletion',
+      category: 'Account Deletion',
       severity: 'Medium',
       allowSupportAccess: false,
     }
