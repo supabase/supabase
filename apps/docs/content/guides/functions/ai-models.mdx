@@ -5,7 +5,7 @@ description: 'How to run AI models in Edge Functions.'
 subtitle: 'How to run AI models in Edge Functions.'
 ---
 
-[Supabase Edge Runtime](https://github.com/supabase/edge-runtime) has a built-in API for running AI models. You can use this API to generate embeddings, build conversational workflows, and do other AI/ML related tasks in your Edge Functions.
+[Supabase Edge Runtime](https://github.com/supabase/edge-runtime) has a built-in API for running AI models. You can use this API to generate embeddings, build conversational workflows, and do other AI related tasks in your Edge Functions.
 
 ## Setup
 
@@ -14,7 +14,7 @@ There are no external dependencies or packages to install to enable the API.
 You can create a new inference session by doing:
 
 ```ts
-const session = new Supabase.ai.Session('model-name')
+const model = new Supabase.ai.Session('model-name')
 ```
 
 <Admonition type="tip">
@@ -25,7 +25,7 @@ To get type hints and checks for the API we recommend adding this triple-slash d
 
 ## Running a model inference
 
-Once the session is instantiated, you can call it with inputs to perform inferences. Depending on the model you run, you may need to provide different options (we'll discuss them below).
+Once the session is instantiated, you can call it with inputs to perform inferences. Depending on the model you run, you may need to provide different options (discussed below).
 
 ```ts
 const output = await model.run(input, options)
@@ -42,7 +42,7 @@ Now let's see how to write an Edge Function using the `Supabase.ai` API to gener
 </Admonition>
 
 ```ts
-const session = new Supabase.ai.Session('gte-small')
+const model = new Supabase.ai.Session('gte-small')
 
 Deno.serve(async (req: Request) => {
   const params = new URL(req.url).searchParams
@@ -57,74 +57,9 @@ Deno.serve(async (req: Request) => {
 })
 ```
 
-## Running inference with Mistral
+## Using larger models
 
-Inference is supported via [Ollama](https://ollama.com/)
-
-1. Run the Ollama server locally
-   `ollama serve`
-
-2. Set a function secret called AI_INFERENCE_API_HOST to point to the Ollama server
-   `echo "AI_INFERENCE_API_HOST=http://host.docker.internal:11434/api/generate" >> supabase/functions/.env`
-
-3. Create a new function with the following code
-
-   `supabase functions new ollama-test`
-
-   ```ts
-   /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
-   const session = new Supabase.ai.Session('mistral')
-
-   Deno.serve(async (req: Request) => {
-     const params = new URL(req.url).searchParams
-     const prompt = params.get('prompt') ?? ''
-     const output = await session.run(prompt, { stream: true })
-
-     const headers = new Headers({
-       'Content-Type': 'text/event-stream',
-       'Cache-Control': 'no-cache',
-       Connection: 'keep-alive',
-     })
-
-     const stream = new ReadableStream({
-       async start(controller) {
-         const encoder = new TextEncoder()
-         controller.enqueue(encoder.encode('retry: 10000\n\n')) // Retry every 10 seconds if connection closes
-
-         try {
-           for await (const chunk of output) {
-             if (chunk.response) {
-               controller.enqueue(encoder.encode(chunk.response))
-             } else {
-               console.error('Chunk without response:', chunk)
-             }
-           }
-         } catch (err) {
-           console.error('Stream error:', err)
-           // Send an error event
-           controller.enqueue(
-             encoder.encode('event: error\ndata: ' + JSON.stringify(err.message) + '\n\n')
-           )
-         } finally {
-           controller.close()
-         }
-       },
-     })
-
-     return new Response(stream, {
-       headers,
-     })
-   })
-   ```
-
-4. Execute the function
-
-```
- curl http://localhost:54321/functions/v1/ollama-test?prompt="write a short rap song about Supabase, the Postgres Developer platform, as sung by Nicki Minaj" -H "Authorization: $ANON_KEY"
-```
-
-5. Deploy a Ollama server and set the function secret to point to the deployed Ollama server
-6. Deploy the Supabase function and invoke it.
+Inference via larger models is supported via [Ollama](https://ollama.com/). In the first iteration, the `llama2` and `mistral` models are supported.
 
 <video width="99%" muted playsInline controls={true}>
   <source
@@ -132,5 +67,97 @@ Inference is supported via [Ollama](https://ollama.com/)
     type="video/mp4"
   />
 </video>
+
+### Running locally
+
+1. Install Ollama and pull the Mistral model
+
+```
+ollama pull mistral
+```
+
+1. Run the Ollama server locally
+
+```
+ollama serve
+```
+
+3. Set a function secret called AI_INFERENCE_API_HOST to point to the Ollama server
+
+```
+echo "AI_INFERENCE_API_HOST=http://host.docker.internal:11434/api/generate" >> supabase/functions/.env
+```
+
+4. Create a new function with the following code
+
+```
+supabase functions new ollama-test
+```
+
+```ts
+/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
+const session = new Supabase.ai.Session('mistral')
+
+Deno.serve(async (req: Request) => {
+  const params = new URL(req.url).searchParams
+  const prompt = params.get('prompt') ?? ''
+  const output = await session.run(prompt, { stream: true })
+
+  const headers = new Headers({
+    'Content-Type': 'text/event-stream',
+    Connection: 'keep-alive',
+  })
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      const encoder = new TextEncoder()
+      // Retry every 10 seconds if connection closes
+      controller.enqueue(encoder.encode('retry: 10000\n\n'))
+
+      try {
+        for await (const chunk of output) {
+          if (chunk.response) {
+            controller.enqueue(encoder.encode(chunk.response))
+          } else {
+            console.error('Chunk without response:', chunk)
+          }
+        }
+      } catch (err) {
+        console.error('Stream error:', err)
+        // Send an error event
+        controller.enqueue(
+          encoder.encode('event: error\ndata: ' + JSON.stringify(err.message) + '\n\n')
+        )
+      } finally {
+        controller.close()
+      }
+    },
+  })
+
+  return new Response(stream, {
+    headers,
+  })
+})
+```
+
+5. Execute the function
+
+```
+ curl http://localhost:54321/functions/v1/ollama-test?prompt="write a short rap song about Supabase, the Postgres Developer platform, as sung by Nicki Minaj" -H "Authorization: $ANON_KEY"
+```
+
+### Deploying to production
+
+1. Deploy a Ollama server and set the function secret to point to the deployed Ollama server
+
+```
+supabase secrets set AI_INFERENCE_API_HOST=https://path-to-your-ollama-server/
+```
+
+2. Deploy the Supabase function and invoke it.
+
+```
+supabase functions deploy ollama-test
+```
 
 In the future, a Ollama server powered by GPUs will be provided out of the box, so you won't have to manage this. To sign up for early access, fill up [this form](https://forms.supabase.com/supabase.ai-llm-early-access).
