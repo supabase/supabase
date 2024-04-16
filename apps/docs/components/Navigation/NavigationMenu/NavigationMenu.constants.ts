@@ -1286,6 +1286,13 @@ export const realtime: NavMenuConstant = {
       ],
     },
     {
+      name: 'Security',
+      url: undefined,
+      items: [
+        { name: 'Authorization', url: '/guides/realtime/authorization' },
+      ],
+    },
+    {
       name: 'Guides',
       url: undefined,
       items: [
