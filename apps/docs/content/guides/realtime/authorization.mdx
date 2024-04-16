@@ -7,7 +7,7 @@ sidebar_label: 'Authorization'
 
 <Admonition type="note">
 
-The [Typescript client library](https://www.npmjs.com/package/@supabase/realtime-js/v/2.10.0-next.6) is still under heavy development and as such is under the `next` version to ensure we're able to improve the developer experience.
+The [Typescript client library](https://www.npmjs.com/package/@supabase/realtime-js/v/2.10.0-next.6) is still under heavy development and as such is under the `next` version to ensure a better developer experience.
 
 </Admonition>
 
@@ -45,7 +45,7 @@ USING (
 
 <Admonition type="note">
 
-If you do not create a channel, we will have the assumption that you do not want RLS checks on the channel.
+If you don't create a channel, we will have the assumption that you don't want RLS checks on the channel.
 
 </Admonition>
 
@@ -288,7 +288,7 @@ USING (
 
 Now that you'll need to create Channels you will also need to manage them and handle deleting them accordingly as that will impact your performance.
 
-If you use your service_role token you'll be able to perform all of the operations as it bypasses RLS but you can also setup RLS rules to allow other users to perform them.
+If you use your `service_role` token you'll be able to perform all of the operations as it bypasses RLS but you can also setup RLS rules to allow other users to perform them.
 
 ### List Channels
 
@@ -414,7 +414,7 @@ USING ( true )
 
 ## Avoid usage with Postgres Changes
 
-The rules you set for realtime.channels will impact your Postgres Changes channels. At the moment we do not advice to use this as a feature as this was built with the intent to be used in Broadcast and Presence features.
+The rules you set for realtime.channels will impact your Postgres Changes channels. At the moment we don't advice to use this as a feature as this was built with the intent to be used in Broadcast and Presence features.
 
 As such we advice you to use a separate channel (a non persistent one) to use for Postgres Changes.
 
