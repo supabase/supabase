@@ -584,6 +584,35 @@ functions:
     notes: |
       - The `verifyOtp` method takes in different verification types. If a phone number is used, the type can either be `sms` or `phone_change`. If an email address is used, the type can be one of the following: `signup`, `magiclink`, `recovery`, `invite` or `email_change`.
       - The verification type used should be determined based on the corresponding auth method called before `verifyOtp` to sign up or sign in a user.
+    params:
+      - name: token
+        isOptional: false
+        type: String
+        description: The token that user was sent to their email or mobile phone
+      - name: type
+        isOptional: false
+        type: OtpType
+        description: Type of the OTP to verify
+      - name: email
+        isOptional: true
+        type: String
+        description: Email address that the OTP was sent to
+      - name: phone
+        isOptional: true
+        type: String
+        description: Phone number that the OTP was sent to
+      - name: redirectTo
+        isOptional: true
+        type: String
+        description: URI to redirect the user to after the OTP is verified
+      - name: captchaToken
+        isOptional: true
+        type: String
+        description: The captcha token to be used for captcha verification
+      - name: tokenHash
+        isOptional: true
+        type: String
+        description: Token used in an email link
     examples:
       - id: verify-sms-one-time-password(otp)
         name: Verify SMS One-Time Password (OTP)
@@ -642,6 +671,36 @@ functions:
       - In order to use the `updateUser()` method, the user needs to be signed in first.
       - By default, email updates sends a confirmation link to both the user's current and new email.
       To only send a confirmation link to the user's new email, disable **Secure email change** in your project's [email auth provider settings](https://supabase.com/dashboard/project/_/auth/providers).
+    params:
+      - name: attributes
+        isOptional: false
+        type: UserAttributes
+        description: Attributes to update for the user.
+        subContent:
+          - name: email
+            isOptional: true
+            type: String
+            description: The new email address for the user.
+          - name: phone
+            isOptional: true
+            type: String
+            description: The new phone number for the user.
+          - name: password
+            isOptional: true
+            type: String
+            description: The new password for the user.
+          - name: data
+            isOptional: true
+            type: Map<String, dynamic>
+            description: The user's metadata to be stored in the user's object.
+          - name: nonce
+            isOptional: true
+            type: String
+            description: The nonce sent for reauthentication if the user's password is to be updated.
+      - name: emailRedirectTo
+        isOptional: true
+        type: String
+        description: The URI to redirect the user to after the email is updated.
     examples:
       - id: update-the-email-for-an-authenticated-user
         name: Update the email for an authenticated user
@@ -874,6 +933,11 @@ functions:
       - The refresh token can only be used once to obtain a new session.
       - [Refresh token rotation](/docs/guides/cli/config#auth.enable_refresh_token_rotation) is enabled by default on all projects to guard against replay attacks.
       - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](/docs/guides/cli/config#auth.refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
+    params:
+      - name: refreshToken
+        isOptional: false
+        type: String
+        description: Refresh token to use to get a new session.
     examples:
       - id: refresh-the-session
         name: Refresh the session
@@ -919,6 +983,19 @@ functions:
       - To create a challenge, see [`mfa.challenge()`](/docs/reference/dart/auth-mfa-challenge).
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify).
       - To create and verify a challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/dart/auth-mfa-challengeandverify).
+    params:
+      - name: factorType
+        isOptional: true
+        type: String
+        description: Type of factor being enrolled.
+      - name: issuer
+        isOptional: true
+        type: String
+        description: Domain which the user is enrolled with.
+      - name: friendlyName
+        isOptional: true
+        type: String
+        description: Human readable name assigned to the factor.
     examples:
       - id: enroll-totp-factor
         name: Enroll a time-based, one-time password (TOTP) factor
@@ -935,6 +1012,11 @@ functions:
       Prepares a challenge used to verify that a user has access to a MFA factor.
       - An [enrolled factor](/docs/reference/dart/auth-mfa-enroll) is required before creating a challenge.
       - To verify a challenge, see [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify).
+    params:
+      - name: factorId
+        isOptional: false
+        type: String
+        description: System assigned identifier for authenticator device as returned by enroll
     examples:
       - id: create-mfa-challenge
         name: Create a challenge for a factor
@@ -950,6 +1032,19 @@ functions:
     notes: |
       Verifies a code against a challenge. The verification code is provided by the user by entering a code seen in their authenticator app.
       - To verify a challenge, please [create a challenge](/docs/reference/dart/auth-mfa-challenge) first.
+    params:
+      - name: factorId
+        isOptional: false
+        type: String
+        description: System assigned identifier for authenticator device as returned by enroll
+      - name: challengeId
+        isOptional: false
+        type: String
+        description: The ID of the challenge to verify
+      - name: code
+        isOptional: false
+        type: String
+        description: The verification code on the user's authenticator app
     examples:
       - id: verify-challenge
         name: Verify a challenge for a factor
@@ -968,6 +1063,15 @@ functions:
       Helper method which creates a challenge and immediately uses the given code to verify against it thereafter. The verification code is provided by the user by entering a code seen in their authenticator app.
       - An [enrolled factor](/docs/reference/dart/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
       - Executes [`mfa.challenge()`](/docs/reference/dart/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify) in a single step.
+    params:
+      - name: factorId
+        isOptional: false
+        type: String
+        description: System assigned identifier for authenticator device as returned by enroll
+      - name: code
+        isOptional: false
+        type: String
+        description: The verification code on the user's authenticator app
     examples:
       - id: challenge-and-verify
         name: Create and verify a challenge for a factor
@@ -984,7 +1088,11 @@ functions:
     notes: |
       Unenroll removes a MFA factor.
       A user has to have an `aal2` authenticator level in order to unenroll a `verified` factor.
-
+    params:
+      - name: factorId
+        isOptional: false
+        type: String
+        description: System assigned identifier for authenticator device as returned by enroll
     examples:
       - id: unenroll-a-factor
         name: Unenroll a factor
@@ -1032,6 +1140,11 @@ functions:
       Get user by id.
       - Fetches the user object from the database based on the user's id.
       - The `getUserById()` method requires the user's id which maps to the `auth.users.id` column.
+    params:
+      - name: uid
+        isOptional: false
+        type: String
+        description: User ID of the user to fetch.
     examples:
       - id: fetch-the-user-object-using-the-access-token-jwt
         name: Fetch the user object using the access_token jwt
@@ -1046,6 +1159,15 @@ functions:
     notes: |
       Get a list of users.
       - Defaults to return 50 users per page.
+    params:
+      - name: page
+        isOptional: true
+        type: int
+        description: What page of users to return.
+      - name: page
+        isOptional: true
+        type: int
+        description: How many users to be returned per page. Defaults to 50.
     examples:
       - id: get-a-full-list-of-users
         name: Get a page of users
@@ -1073,6 +1195,44 @@ functions:
       - To confirm the user's email address or phone number, set `email_confirm` or `phone_confirm` to true. Both arguments default to false.
       - `createUser()` will not send a confirmation email to the user. You can use [`inviteUserByEmail()`](/docs/reference/dart/auth-admin-inviteuserbyemail) if you want to send them an email invite instead.
       - If you are sure that the created user's email or phone number is legitimate and verified, you can set the `email_confirm` or `phone_confirm` param to `true`.
+    params:
+      - name: attributes
+        isOptional: false
+        type: AdminUserAttributes
+        description: Attributes to create the user with.
+        subContent:
+          - name: email
+            isOptional: false
+            type: String
+            description: The email address of the user.
+          - name: password
+            isOptional: false
+            type: String
+            description: The password of the user.
+          - name: phone
+            isOptional: true
+            type: String
+            description: The phone number of the user.
+          - name: userMetadata
+            isOptional: true
+            type: Map<String, dynamic>
+            description: A custom data object to store the user's metadata. This maps to the `auth.users.user_metadata` column.
+          - name: appMetadata
+            isOptional: true
+            type: Map<String, dynamic>
+            description: A custom data object to store the user's application specific metadata. This maps to the `auth.users.app_metadata` column.
+          - name: emailConfirm
+            isOptional: true
+            type: bool
+            description: Whether to confirm the user's email address.
+          - name: phoneConfirm
+            isOptional: true
+            type: bool
+            description: Whether to confirm the user's phone number.
+          - name: banDuration
+            isOptional: true
+            type: String
+            description: Determines how long a user is banned for. Some possible durations include '300ms', '2h45m'.
     examples:
       - id: create-a-new-user-with-custom-user-metadata
         name: With custom user metadata
@@ -1108,6 +1268,11 @@ functions:
     notes: |
       Delete a user.
       - The `deleteUser()` method requires the user's ID, which maps to the `auth.users.id` column.
+    params:
+      - name: id
+        isOptional: false
+        type: String
+        description: ID of the user to be deleted.
     examples:
       - id: removes-a-user
         name: Removes a user
@@ -1121,6 +1286,19 @@ functions:
     title: 'inviteUserByEmail()'
     notes: |
       Sends an invite link to the user's email address.
+    params:
+      - name: email
+        isOptional: false
+        type: String
+        description: Email address of the user to invite.
+      - name: redirectTo
+        isOptional: true
+        type: String
+        description: URI to redirect the user to after they open the invite link.
+      - name: data
+        isOptional: true
+        type: Map<String, dynamic>
+        description: A custom data object to store the user's metadata. This maps to the `auth.users.user_metadata` column.
     examples:
       - id: invite-a-user
         name: Invite a user
@@ -1138,6 +1316,27 @@ functions:
       - The following types can be passed into `generateLink()`: `signup`, `magiclink`, `invite`, `recovery`, `emailChangeCurrent`, `emailChangeNew`, `phoneChange`.
       - `generateLink()` only generates the email link for `email_change_email` if the "Secure email change" setting is enabled under the "Email" provider in your Supabase project.
       - `generateLink()` handles the creation of the user for `signup`, `invite` and `magiclink`.
+    params:
+      - name: type
+        isOptional: false
+        type: GenerateLinkType
+        description: The type of invite link to generate.
+      - name: email
+        isOptional: false
+        type: String
+        description: Email address of the user to invite.
+      - name: password
+        isOptional: true
+        type: String
+        description: Password for the user. Required for `signup` type.
+      - name: redirectTo
+        isOptional: true
+        type: String
+        description: URI to redirect the user to after they open the invite link.
+      - name: data
+        isOptional: true
+        type: Map<String, dynamic>
+        description: A custom data object to store the user's metadata. This maps to the `auth.users.user_metadata` column.
     examples:
       - id: generate-a-signup-link
         name: Generate a signup link
@@ -1153,6 +1352,48 @@ functions:
           ```
   - id: update-user-by-id
     title: 'updateUserById()'
+    params:
+      - name: uid
+        isOptional: false
+        type: GenerateLinkType
+        description: User ID of the user to update.
+      - name: attributes
+        isOptional: false
+        type: AdminUserAttributes
+        description: Attributes to update for the user.
+        subContent:
+          - name: email
+            isOptional: false
+            type: String
+            description: The email address of the user.
+          - name: password
+            isOptional: false
+            type: String
+            description: The password of the user.
+          - name: phone
+            isOptional: true
+            type: String
+            description: The phone number of the user.
+          - name: userMetadata
+            isOptional: true
+            type: Map<String, dynamic>
+            description: A custom data object to store the user's metadata. This maps to the `auth.users.user_metadata` column.
+          - name: appMetadata
+            isOptional: true
+            type: Map<String, dynamic>
+            description: A custom data object to store the user's application specific metadata. This maps to the `auth.users.app_metadata` column.
+          - name: emailConfirm
+            isOptional: true
+            type: bool
+            description: Whether to confirm the user's email address.
+          - name: phoneConfirm
+            isOptional: true
+            type: bool
+            description: Whether to confirm the user's phone number.
+          - name: banDuration
+            isOptional: true
+            type: String
+            description: Determines how long a user is banned for. Some possible durations include '300ms', '2h45m'.
     examples:
       - id: updates-a-users-email
         name: Updates a user's email
@@ -1173,6 +1414,23 @@ functions:
     notes: |
       - Requires an Authorization header.
       - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
+    params:
+      - name: functionName
+        isOptional: false
+        type: String
+        description: The name of the function to invoke.
+      - name: headers
+        isOptional: true
+        type: Map<String, String>
+        description: Custom headers to send with the request.
+      - name: body
+        isOptional: true
+        type: Map<String, String>
+        description: The body of the request.
+      - name: method
+        isOptional: true
+        type: HttpMethod
+        description: HTTP method of the request. Defaults to POST.
     examples:
       - id: basic-invocation
         name: Basic invocation.

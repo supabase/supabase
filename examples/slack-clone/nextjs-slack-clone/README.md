@@ -10,7 +10,6 @@ This is a full-stack Slack clone example using:
 
 ## Demo
 
-- Live demo: http://supabase-slack-clone-supabase.vercel.app/
 - CodeSandbox: https://codesandbox.io/s/github/supabase/supabase/tree/master/examples/nextjs-slack-clone
 
 ![Demo animation gif](./public/slack-clone-demo.gif)

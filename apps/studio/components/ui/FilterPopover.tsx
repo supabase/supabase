@@ -7,6 +7,7 @@ interface FilterPopoverProps {
   valueKey: string
   labelKey: string
   name: string
+  variant?: 'rectangular' | 'rounded'
   onSaveFilters: (options: string[]) => void
 }
 
@@ -19,6 +20,7 @@ export const FilterPopover = ({
   valueKey,
   labelKey,
   name,
+  variant = 'rectangular',
   onSaveFilters,
 }: FilterPopoverProps) => {
   const [open, setOpen] = useState(false)
@@ -38,9 +40,10 @@ export const FilterPopover = ({
       header={<div className="prose text-xs">Select {name.toLowerCase()}</div>}
       overlay={
         <>
-          <div className="space-y-4 px-3 py-3 min-w-[170px]">
+          <div className="space-y-4 min-w-[170px]">
             <ScrollArea className={options.length > 7 ? 'h-[205px]' : ''}>
               <Checkbox.Group
+                className="px-3 py-3"
                 id="projects"
                 onChange={(event) => {
                   const value = event.target.value
@@ -88,6 +91,7 @@ export const FilterPopover = ({
         asChild
         type={activeOptions.length > 0 ? 'default' : 'dashed'}
         onClick={() => setOpen(false)}
+        className={variant === 'rounded' ? 'rounded-full' : ''}
       >
         <div>
           <span>{name}</span>

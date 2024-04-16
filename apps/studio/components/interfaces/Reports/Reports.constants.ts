@@ -297,7 +297,7 @@ select
     inner join pg_authid as auth on statements.userid = auth.oid
   ${where || ''}
   ${orderBy || 'order by statements.calls desc'}
-  limit 10;`,
+  limit 20;`,
       },
       mostTimeConsuming: {
         queryType: 'db',
@@ -313,7 +313,7 @@ select
     inner join pg_authid as auth on statements.userid = auth.oid
   ${where || ''}
   ${orderBy || 'order by total_time desc'}
-  limit 10;`,
+  limit 20;`,
       },
       slowestExecutionTime: {
         queryType: 'db',
@@ -338,7 +338,7 @@ select
     inner join pg_authid as auth on statements.userid = auth.oid
   ${where || ''}
   ${orderBy || 'order by max_time desc'}
-  limit 10`,
+  limit 20`,
       },
       queryHitRate: {
         queryType: 'db',

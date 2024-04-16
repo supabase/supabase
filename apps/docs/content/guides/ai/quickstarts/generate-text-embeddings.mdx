@@ -1,15 +1,11 @@
 ---
 id: 'ai-generating-embeddings'
 title: 'Generate Embeddings'
-subtitle: 'Generate text embeddings using Edge Functions + Transformer.js.'
+subtitle: 'Generate text embeddings using Edge Functions.'
 breadcrumb: 'AI Quickstarts'
 ---
 
-This guide will walk you through how to generate high quality text embeddings in [Edge Functions](/docs/guides/functions) using Transformers.js. Inference is performed directly in Edge Functions using open source Hugging Face models, so no external API is required.
-
-## What is Transformers.js?
-
-[Transformers.js](https://huggingface.co/docs/transformers.js/index) is a library that allows you to perform inference using the JavaScript runtime. You can run Hugging Face embedding models through Transformers.js directly in Supabase [Edge Functions](/docs/guides/functions).
+This guide will walk you through how to generate high quality text embeddings in [Edge Functions](/docs/guides/functions) using its built-in AI inference API, so no external API is required.
 
 ## Build the Edge Function
 
@@ -60,88 +56,44 @@ Let's build an Edge Function that will accept an input string and generate an em
 
   <StepHikeCompact.Step step={3}>
 
-    <StepHikeCompact.Details title="Import & configure Transformer.js" fullWidth>
+    <StepHikeCompact.Details title="Setup Inference Session" fullWidth>
 
-      Let's modify the Edge Function to import the Transformers.js client and configure it for the Deno runtime.
+      Let's create a new inference session to be used in the lifetime of this function. Multiple requests can use the same inference session.
 
-      ```ts ./supabase/functions/embed/index.ts
-      import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-      import { env, pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.5.0'
-
-      // Configuration for Deno runtime
-      env.useBrowserCache = false;
-      env.allowLocalModels = false;
-      ```
+      Currently, only the `gte-small` (https://huggingface.co/Supabase/gte-small) text embedding model is supported in Supabase's Edge Runtime.
 
     </StepHikeCompact.Details>
+
+    <StepHikeCompact.Code>
+      ```ts ./supabase/functions/embed/index.ts
+      const session = new Supabase.ai.Session('gte-small');
+      ```
+    </StepHikeCompact.Code>
 
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={4}>
 
-    <StepHikeCompact.Details title="Construct embedding pipeline">
-
-      Next let's construct the `pipe()` function we'll use to generate the embeddings. We use the Transformer.js `pipeline()` function to create this.
-
-    </StepHikeCompact.Details>
-
-    <StepHikeCompact.Code>
-
-      ```ts ./supabase/functions/embed/index.ts
-      const pipe = await pipeline(
-        'feature-extraction',
-        'Supabase/gte-small',
-      );
-      ```
-
-    </StepHikeCompact.Code>
-
-    <StepHikeCompact.Details fullWidth>
-
-     Note the two arguments we pass to `pipeline()`:
-
-      1. The first argument specifies the type of [inference task](https://huggingface.co/docs/transformers.js/index#tasks) to perform. `feature-extraction` is used for embedding generation.
-      2. The second argument specifies which Hugging Face model to use for the embedding generation. Supabase officially supports models available on the [Supabase org](https://huggingface.co/Supabase).
-
-      <Admonition>
-
-      We intentially construct the pipeline before the `serve()` function. This allows us to reuse the pre-loaded model in future warm-start requests, significantly speeding up future queries. Note that you'll only notice this speedup after deploying your function to Supabase - requests in local development will always be a cold-start.
-
-      </Admonition>
-
-    </StepHikeCompact.Details>
-
-  </StepHikeCompact.Step>
-
-  <StepHikeCompact.Step step={5}>
-
     <StepHikeCompact.Details title="Implement request handler">
 
-      Modify our `serve()` request handler to accept an `input` string from the POST request JSON body.
+      Modify our request handler to accept an `input` string from the POST request JSON body.
 
-      Finally let's generate the embedding by:
-
-        1. Calling `pipe()` to perform the embedding generation
-        2. Extracting the embedding from the output as a number array
-        3. Returning it as a JSON response
+      Then generate the embedding by calling `session.run(input)`.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
 
       ```ts ./supabase/functions/embed/index.ts
-      serve(async (req) => {
+      Deno.serve(async (req) => {
         // Extract input string from JSON body
         const { input } = await req.json();
 
         // Generate the embedding from the user input
-        const output = await pipe(input, {
-          pooling: 'mean',
+        const embedding = await session.run(input, {
+          mean_pool: true,
           normalize: true,
         });
-
-        // Extract the embedding output
-        const embedding = Array.from(output.data);
 
         // Return the embedding
         return new Response(
@@ -155,16 +107,16 @@ Let's build an Edge Function that will accept an input string and generate an em
 
     <StepHikeCompact.Details fullWidth>
 
-      Note the two options we pass to `pipe()`:
+      Note the two options we pass to `session.run()`:
 
-      - `pooling`: The first option sets `pooling` to `mean`. Pooling referes to how token-level embedding representations are compressed into a single sentence embedding that reflects the meaning of the entire sentence. Average pooling is the most common type of pooling for sentence embeddings and is the method supported by Transformers.js.
-      - `normalize`: The second option tells Transformers.js to normalize the embedding vector so that it can be used with distance measures like dot product. A normalized vector means its length (magnitude) is 1 - also referred to as a unit vector. A vector is normalized by dividing each element by the vector's length (magnitude), which maintains its direction but changes its length to 1.
+      - `mean_pool`: The first option sets `pooling` to `mean`. Pooling referes to how token-level embedding representations are compressed into a single sentence embedding that reflects the meaning of the entire sentence. Average pooling is the most common type of pooling for sentence embeddings.
+      - `normalize`: The second option tells to normalize the embedding vector so that it can be used with distance measures like dot product. A normalized vector means its length (magnitude) is 1 - also referred to as a unit vector. A vector is normalized by dividing each element by the vector's length (magnitude), which maintains its direction but changes its length to 1.
 
     </StepHikeCompact.Details>
 
   </StepHikeCompact.Step>
 
-  <StepHikeCompact.Step step={6}>
+  <StepHikeCompact.Step step={5}>
 
     <StepHikeCompact.Details title="Test it!">
 
