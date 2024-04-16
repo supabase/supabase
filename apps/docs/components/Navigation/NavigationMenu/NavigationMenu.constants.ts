@@ -1360,6 +1360,10 @@ export const storage: NavMenuConstant = {
           name: 'Image Transformations',
           url: '/guides/storage/serving/image-transformations',
         },
+        {
+          name: 'Bandwith & Storage Egress',
+          url: '/guides/storage/serving/bandwidth',
+        },
       ],
     },
     {
