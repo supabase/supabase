@@ -4,7 +4,20 @@ title: 'index_advisor: query optimization'
 description: 'Automatically optimize SQL queries'
 ---
 
-[Index advisor](https://database.dev/olirice/index_advisor) is a Postgres extension for recommending indexes to improve query performance.
+[Index advisor](https://github.com/supabase/index_advisor) is a Postgres extension for recommending indexes to improve query performance.
+
+Features:
+
+- Supports generic parameters e.g. `$1`, `$2`
+- Supports materialized views
+- Identifies tables/columns obfuscated by views
+- Skips duplicate indexes
+
+index_advisor is accessible directly through Supabase Studio by navigating to the [Query Performance Report](/dashboard/project/*/database/query-performance) and selecting a query and then the "indexes" tab.
+
+![Supabase Studio index_advisor integration.](/docs/img/index_advisor_studio.png)
+
+Alternatively, you can use index_advisor directly via SQL.
 
 For example:
 
@@ -20,25 +33,12 @@ from
 (1 row)
 ```
 
-Features:
-
-- Supports generic parameters e.g. `$1`, `$2`
-- Supports materialized views
-- Identifies tables/columns obfuscated by views
-- Skips duplicate indexes
-
 ## Installation
 
-index_advisor is a trusted language extension, which means it is directly installable by users from the [database.dev](https://database.dev/) SQL package repository.
-
-To get started, enable the dbdev client by executing the [setup SQL script](https://database.dev/installer).
-
-Then, install index_advisor by running
+To get started, enable index_advisor by running
 
 ```sql
-select dbdev.install('olirice-index_advisor');
-create extension if not exists hypopg;
-create extension "olirice-index_advisor";
+create extension index_advisor;
 ```
 
 ## API
@@ -152,5 +152,4 @@ from
 
 ## Resources
 
-- dbdev [`index_advisor`](https://database.dev/olirice/index_advisor) docs
-- dbdev [Github Repository](https://github.com/supabase/dbdev)
+- [`index_advisor`](https://github.com/supabase/index_advisor) repo
