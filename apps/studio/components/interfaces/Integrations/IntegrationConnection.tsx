@@ -151,7 +151,7 @@ const IntegrationConnectionItem = forwardRef<HTMLLIElement, IntegrationConnectio
                   description: ` Deleting this GitHub connection will remove all preview branches on this project,
                 and also disable branching for ${project.name}`,
                 }
-              : {}
+              : undefined
           }
         >
           <p className="text-sm text-foreground-light">

@@ -1,0 +1,171 @@
+---
+id: 'function-ai-models'
+title: 'Running AI Models'
+description: 'How to run AI models in Edge Functions.'
+subtitle: 'How to run AI models in Edge Functions.'
+---
+
+[Supabase Edge Runtime](https://github.com/supabase/edge-runtime) has a built-in API for running AI models. You can use this API to generate embeddings, build conversational workflows, and do other AI related tasks in your Edge Functions.
+
+## Setup
+
+There are no external dependencies or packages to install to enable the API.
+
+You can create a new inference session by doing:
+
+```ts
+const model = new Supabase.ai.Session('model-name')
+```
+
+<Admonition type="tip">
+
+To get type hints and checks for the API we recommend adding this triple-slash directive to the start of the Edge Function code: `/// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />`
+
+</Admonition>
+
+## Running a model inference
+
+Once the session is instantiated, you can call it with inputs to perform inferences. Depending on the model you run, you may need to provide different options (discussed below).
+
+```ts
+const output = await model.run(input, options)
+```
+
+## How to generate text embeddings
+
+Now let's see how to write an Edge Function using the `Supabase.ai` API to generate text embeddings. Currently, `Supabase.ai` API only supports the [gte-small](https://huggingface.co/Supabase/gte-small) model.
+
+<Admonition type="tip">
+
+`gte-small` model exclusively caters to English texts, and any lengthy texts will be truncated to a maximum of 512 tokens. While you can provide inputs longer than 512 tokens, truncation may affect the accuracy.
+
+</Admonition>
+
+```ts
+const model = new Supabase.ai.Session('gte-small')
+
+Deno.serve(async (req: Request) => {
+  const params = new URL(req.url).searchParams
+  const input = params.get('input')
+  const output = await model.run(input, { mean_pool: true, normalize: true })
+  return new Response(JSON.stringify(output), {
+    headers: {
+      'Content-Type': 'application/json',
+      Connection: 'keep-alive',
+    },
+  })
+})
+```
+
+## Using Large Language Models
+
+Inference via larger models is supported via [Ollama](https://ollama.com/). In the first iteration, the `llama2` and `mistral` models are supported and you would need to manage the Ollama server yourself.
+
+<video width="99%" muted playsInline controls={true}>
+  <source
+    src="https://xguihxuzqibwxjnimxev.supabase.co/storage/v1/object/public/videos/docs/guides/edge-functions-inference-2.mp4"
+    type="video/mp4"
+  />
+</video>
+
+### Running locally
+
+1. Install Ollama and pull the Mistral model
+
+   ```
+   ollama pull mistral
+   ```
+
+1. Run the Ollama server locally
+
+   ```
+   ollama serve
+   ```
+
+1. Set a function secret called AI_INFERENCE_API_HOST to point to the Ollama server
+
+   ```
+   echo "AI_INFERENCE_API_HOST=http://host.docker.internal:11434/api/generate" >> supabase/functions/.env
+   ```
+
+1. Create a new function with the following code
+
+   ```
+   supabase functions new ollama-test
+   ```
+
+   ```ts
+   /// <reference types="https://esm.sh/@supabase/functions-js/src/edge-runtime.d.ts" />
+   const session = new Supabase.ai.Session('mistral')
+
+   Deno.serve(async (req: Request) => {
+     const params = new URL(req.url).searchParams
+     const prompt = params.get('prompt') ?? ''
+
+     // Get the output as a stream
+     const output = await session.run(prompt, { stream: true })
+
+     const headers = new Headers({
+       'Content-Type': 'text/event-stream',
+       Connection: 'keep-alive',
+     })
+
+     // Create a stream
+     const stream = new ReadableStream({
+       async start(controller) {
+         const encoder = new TextEncoder()
+
+         try {
+           for await (const chunk of output) {
+             controller.enqueue(encoder.encode(chunk.response ?? ''))
+           }
+         } catch (err) {
+           console.error('Stream error:', err)
+         } finally {
+           controller.close()
+         }
+       },
+     })
+
+     // Return the stream to the user
+     return new Response(stream, {
+       headers,
+     })
+   })
+   ```
+
+1. Execute the function
+
+   ```
+   curl --get "http://localhost:54321/functions/v1/ollama-test" \
+   --data-urlencode "prompt=write a short rap song about Supabase, the Postgres Developer platform, as sung by Nicki Minaj" \
+   -H "Authorization: $ANON_KEY"
+   ```
+
+### Deploying to production
+
+Once the function is working locally, it's time to deploy to production.
+
+1. Deploy a Ollama server and set a function secret called `AI_INFERENCE_API_HOST` to point to the deployed Ollama server
+
+   ```
+   supabase secrets set AI_INFERENCE_API_HOST=https://path-to-your-ollama-server/
+   ```
+
+2. Deploy the Supabase function
+
+   ```
+   supabase functions deploy ollama-test
+   ```
+
+3. Execute the function
+
+   ```
+   curl --get "https://project-ref.supabase.co/functions/v1/ollama-test" \
+   --data-urlencode "prompt=write a short rap song about Supabase, the Postgres Developer platform, as sung by Nicki Minaj" \
+   -H "Authorization: $ANON_KEY"
+   ```
+
+As demonstrated in the video above, running Ollama locally is typically slower than running it in on a server with dedicated GPUs. We are collaborating with the Ollama team to improve local performance.
+
+In the future, a hosted Ollama API, will be provided as part of the Supabase platform. Supabase will scale and manage the API and GPUs for you. To sign up for early access, fill up [this form](https://forms.supabase.com/supabase.ai-llm-early-access).

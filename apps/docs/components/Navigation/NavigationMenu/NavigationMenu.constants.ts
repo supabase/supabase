@@ -113,6 +113,12 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       level: 'reference_dart',
     },
     {
+      label: 'Swift',
+      icon: 'reference-swift',
+      href: '/reference/swift/introduction',
+      level: 'reference_swift',
+    },
+    {
       label: 'Python',
       icon: 'reference-python',
       href: '/reference/python/introduction',
@@ -124,13 +130,6 @@ export const HOMEPAGE_MENU_ITEMS: HomepageMenuItems = [
       icon: 'reference-csharp',
       href: '/reference/csharp/introduction',
       level: 'reference_csharp',
-      community: true,
-    },
-    {
-      label: 'Swift',
-      icon: 'reference-swift',
-      href: '/reference/swift/introduction',
-      level: 'reference_swift',
       community: true,
     },
     {
@@ -1141,6 +1140,10 @@ export const functions: NavMenuConstant = {
           url: '/guides/functions/routing',
         },
         {
+          name: 'Running AI Models',
+          url: '/guides/functions/ai-models',
+        },
+        {
           name: 'Regional invocations',
           url: '/guides/functions/regional-invocation',
         },
@@ -1187,6 +1190,10 @@ export const functions: NavMenuConstant = {
         {
           name: 'Generating OG images ',
           url: '/guides/functions/examples/og-image',
+        },
+        {
+          name: 'Semantic AI Search',
+          url: '/guides/functions/examples/semantic-search',
         },
         {
           name: 'CAPTCHA support with Cloudflare Turnstile',
