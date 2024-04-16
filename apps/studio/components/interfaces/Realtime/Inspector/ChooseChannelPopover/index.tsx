@@ -123,6 +123,16 @@ export const ChooseChannelPopover = ({ config, onChangeConfig }: ChooseChannelPo
                 >
                   our docs
                 </Link>
+                . If you want the channel to be authorized, you need to use{' '}
+                <Link
+                  href="https://supabase.com/docs/guides/realtime/concepts#channels"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline hover:text-foreground transition"
+                >
+                  RLS policies
+                </Link>
+                .
               </p>
             </>
           ) : (
