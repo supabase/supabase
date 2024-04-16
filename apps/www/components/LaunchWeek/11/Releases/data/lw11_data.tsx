@@ -127,14 +127,18 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     title: '',
     shipped: true,
     hasCountdown: false,
-    blog: '#',
+    blog: '/blog/ai-inference-now-available-in-supabase-edge-functions',
     date: '16 April',
     published_at: '2024-04-16T08:00:00.000-08:00',
-    description: <>Create vector embeddings with Edge Functions</>,
+    description: (
+      <>
+        Supabase Functions now supports <strong>AI models</strong>
+      </>
+    ),
     links: [
       {
         type: 'blog',
-        href: '#',
+        href: '/blog/ai-inference-now-available-in-supabase-edge-functions',
       },
       {
         type: 'video',
