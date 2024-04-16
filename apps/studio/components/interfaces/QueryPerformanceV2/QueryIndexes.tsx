@@ -9,7 +9,6 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useGetIndexAdvisorResult } from 'data/database/retrieve-index-advisor-result-query'
 import { useGetIndexesFromSelectQuery } from 'data/database/retrieve-index-from-select-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
-import { useExecuteSqlQuery } from 'data/sql/execute-sql-query'
 import {
   AccordionContent_Shadcn_,
   AccordionItem_Shadcn_,
