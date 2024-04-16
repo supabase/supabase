@@ -26,9 +26,7 @@ await supabase.storage.from('bucket').remove(['object-key-1', 'object-key-2'])
 
 ## RLS
 
-In order to delete an object, the user must have the `delete` permission on the object.
-
-Example policy:
+In order to delete an object, the user must have the `delete` permission on the object. For example:
 
 ```sql
 CREATE POLICY "User can delete their own objects"

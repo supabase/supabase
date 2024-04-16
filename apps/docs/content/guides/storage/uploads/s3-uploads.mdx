@@ -17,7 +17,7 @@ The S3 protocol supports file upload using:
 
 The PutObject command uploads the file in a single request. This matches the behavior of the Supabase SDK [Standard Upload](/docs/guides/storage/uploads/standard-uploads).
 
-Use `PutObject` to upload smaller files, where retrying the entire upload won't be an issue. The maximum file size is 5GB.
+Use `PutObject` to upload smaller files, where retrying the entire upload won't be an issue. The maximum file size is 5 GB.
 
 For example, using JavaScript and the `aws-sdk` client:
 
@@ -38,17 +38,15 @@ const uploadCommand = new PutObjectCommand({
 await s3Client.send(uploadCommand)
 ```
 
-## Multi Part Uploads
+## Multi part uploads
 
-Multi Part Uploads split the file into smaller parts and upload them in parallel, maximizing the upload speed on a fast network.
+Multi Part Uploads split the file into smaller parts and upload them in parallel, maximizing the upload speed on a fast network. When uploading large files, this allows you to retry the upload of individual parts in case of network issues.
 
-Use this method to upload large files, as it allows you to retry the upload of individual parts in case of network issues. You would prefer this method over [Resumable Upload](/docs/guides/storage/uploads/resumable-uploads) during server-side uploads, when you want to maximize upload speed at the cost of resumability. The maximum file size is 50GB.
+This method is preferable over [Resumable Upload](/docs/guides/storage/uploads/resumable-uploads) for server-side uploads, when you want to maximize upload speed at the cost of resumability. The maximum file size is 50 GB.
 
 ### Upload a file in parts
 
-Use the `Upload` class from an S3 client to upload a file in parts.
-
-For example, using JavaScript:
+Use the `Upload` class from an S3 client to upload a file in parts. For example, using JavaScript:
 
 ```javascript
 import { S3Client } from '@aws-sdk/client-s3'
@@ -68,7 +66,6 @@ const upload = new Upload(s3Client, {
 await uploader.done()
 ```
 
-### Aborting Multi Part Uploads
+### Aborting multi part uploads
 
-Currently all multi-part uploads are automatically aborted after 24h.
-If you want to abort a multi-part upload before that, you can use the `AbortMultipartUpload` command.
+Currently all multi-part uploads are automatically aborted after 24 hrs. If you want to abort a multi-part upload before that, you can use the [`AbortMultipartUpload`](https://docs.aws.amazon.com/AmazonS3/latest/API/API_AbortMultipartUpload.html) command.

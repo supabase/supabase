@@ -57,9 +57,7 @@ await supabase.storage.from('avatars').move('public/avatar1.png', 'private/avata
 
 ## Permissions
 
-You will need to grant the `SELECT` permission on the source object and the `INSERT` permission on the destination object.
-
-Example RLS:
+You will need to grant the `SELECT` permission on the source object and the `INSERT` permission on the destination object. For example:
 
 ```sql
 CREATE POLICY "User can select their own objects (in any buckets)"

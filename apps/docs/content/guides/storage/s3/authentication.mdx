@@ -13,9 +13,9 @@ You have two options to authenticate with Supabase Storage S3:
 
 ## S3 credentials
 
-<Admonition type="danger">
+<Admonition type="danger" label="Keep these credentials secure">
 
-Keep these credentials secure. They provide full access to all S3 operations across all buckets, bypassing RLS policies.
+They provide full access to all S3 operations across all buckets, bypassing RLS policies.
 
 </Admonition>
 
@@ -24,9 +24,6 @@ To authenticate with S3 on the server, you need to generate a pair of credential
 You can use these credentials to authenticate with Supabase Storage S3 using any S3-compatible service.
 
 <img alt="Storage S3 Credentials" src="/docs/img/storage/s3-credentials.png" width="100%" />
-
-**Region**: The region is the same as the region you selected during project creation.
-**Endpoint**: `https://<PROJECT_REF>.supabase.co/storage/v1/s3`
 
 <Tabs
   scrollable
@@ -41,7 +38,7 @@ You can use these credentials to authenticate with Supabase Storage S3 using any
 
         const client = new S3Client({
           forcePathStyle: true,
-          region: 'project_region',
+          region: 'project_region', // the region selected during project creation
           endpoint: 'https://project_ref.supabase.co/storage/v1/s3',
           credentials: {
             accessKeyId: 'your_access_key_id',
@@ -51,7 +48,7 @@ You can use these credentials to authenticate with Supabase Storage S3 using any
         ```
     </TabPanel>
 
-    <TabPanel id="credentials" label="Aws Credentials">
+    <TabPanel id="credentials" label="AWS Credentials">
         ```bash
         # ~/.aws/credentials
 
@@ -67,8 +64,7 @@ You can use these credentials to authenticate with Supabase Storage S3 using any
 
 ## Session Token
 
-You can authenticate to Supabase S3 with a user JWT token to provide limited access via RLS to all S3 operations.
-This is useful when you want initialize the S3 client on the server scoped to a specific user, or use the S3 client directly from the client side.
+You can authenticate to Supabase S3 with a user JWT token to provide limited access via RLS to all S3 operations. This is useful when you want initialize the S3 client on the server scoped to a specific user, or use the S3 client directly from the client side.
 
 All S3 operations performed with the Session Token are scoped to the authenticated user. RLS policies on the Storage Schema are respected.
 
