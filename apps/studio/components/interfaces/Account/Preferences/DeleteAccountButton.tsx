@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -29,7 +30,6 @@ export const DeleteAccountButton = () => {
   const { profile } = useProfile()
   const [isOpen, setIsOpen] = useState(false)
   const { data: organizations, isSuccess } = useOrganizationsQuery()
-  const numberOfOwnership = (organizations ?? []).filter((org) => org.is_owner).length
 
   const accountEmail = profile?.primary_email
   const FormSchema = z.object({ account: z.string() })
@@ -60,7 +60,7 @@ export const DeleteAccountButton = () => {
     const payload = {
       subject: 'Account Deletion Request',
       message: 'I want to delete my account.',
-      category: 'Account Deletion',
+      category: SupportCategories.ACCOUNT_DELETION,
       severity: 'Medium',
       allowSupportAccess: false,
     }
