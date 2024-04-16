@@ -1,10 +1,9 @@
 import React, { useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
-import Image from 'next/image'
 import { AnimatePresence, m, LazyMotion, domAnimation, useInView } from 'framer-motion'
 import { Badge, cn } from 'ui'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
-import { LW11_DATE, LW11_LAUNCH_DATE, LW11_LAUNCH_DATE_END } from '~/lib/constants'
+import { LW11_DATE, LW11_LAUNCH_DATE_END } from '~/lib/constants'
 import useWinningChances from '../../hooks/useWinningChances'
 import useLwGame from '../../hooks/useLwGame'
 
@@ -130,7 +129,7 @@ const TicketingFlow = () => {
                           ) : (
                             <p className="text-2xl mb-1">Thanks for sharing!</p>
                           )}
-                          <p className="text-[#8B9092]">
+                          <p className="text-foreground-lighter">
                             Stay tuned after GA Week to find out if you're a lucky winner.
                           </p>
                         </div>
@@ -139,7 +138,7 @@ const TicketingFlow = () => {
                           {!hasSecretTicket && (
                             <p className="text-2xl mb-1">@{userData.username}, you're in!</p>
                           )}
-                          <p className="text-[#8B9092]">
+                          <p className="text-foreground-lighter">
                             Now share your ticket to have a chance of winning AirPods Max and other
                             limited swag.
                           </p>
@@ -147,7 +146,7 @@ const TicketingFlow = () => {
                       ) : (
                         <div>
                           <p className="text-2xl mb-1">@{userData.username}, almost there!</p>
-                          <p className="text-[#8B9092]">
+                          <p className="text-foreground-lighter">
                             Keep sharing to max out your chances of winning AirPods Max and other
                             limited swag.
                           </p>

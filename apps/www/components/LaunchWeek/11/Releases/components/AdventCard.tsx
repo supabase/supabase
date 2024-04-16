@@ -53,7 +53,7 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
     <div id={day.id} ref={tiltRef} className="absolute -inset-px group will-change">
       <motion.div
         className={cn(
-          'opacity-0 flex flex-col justify-between w-full h-full p-6 rounded-xl bg-surface-75 dark:bg-[#121516] transition-colors dark:text-[#575E61] border border-strong dark:border-default hover:border-stronger hover:dark:border-strong  overflow-hidden',
+          'opacity-0 flex flex-col justify-between w-full h-full p-6 rounded-xl bg-surface-75 transition-colors border border-strong hover:border-stronger overflow-hidden',
           isClientLibsCard && 'xl:flex-row'
         )}
         variants={variants}
@@ -80,14 +80,14 @@ const AdventCard = ({ day, index }: { day: AdventDay; index: number }) => {
                 WebkitFontSmoothing: 'subpixel-antialiased',
               }}
             >
-              <p className="text-[#575E61] text-sm">{day.description}</p>
+              <p className="text-foreground-lighter text-sm">{day.description}</p>
               <div className="flex gap-1 mt-3 flex-wrap">
                 {day.links?.map((link: AdventLink) => (
                   <Link
                     key={link.url}
                     href={link.url}
                     target={link.target ?? '_self'}
-                    className="px-2 py-1 pointer-events-auto border transition-colors text-foreground-light dark:bg-[#191D1E] hover:dark:bg-[#22272A] rounded text-xs"
+                    className="px-2 py-1 pointer-events-auto border transition-colors text-foreground-light bg-surface-100 hover:bg-surface-200 rounded text-xs"
                   >
                     {link.label}
                   </Link>

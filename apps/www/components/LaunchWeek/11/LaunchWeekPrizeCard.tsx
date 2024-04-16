@@ -17,9 +17,9 @@ export default function LaunchWeekPrizeCard({
   return (
     <Panel
       hasShimmer
-      outerClassName={cn('relative rounded-lg overflow-hidden dark:shadow-lg', className)}
+      outerClassName={cn('relative rounded-lg overflow-hidden', className)}
       innerClassName={cn(
-        'relative h-full flex flex-col dark:bg-[#121516] rounded-lg overflow-hidden dark:text-[#EDEDED]',
+        'relative h-full flex flex-col rounded-lg overflow-hidden',
         contentClassName
       )}
       shimmerToColor={
