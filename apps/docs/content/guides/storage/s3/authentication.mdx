@@ -8,7 +8,7 @@ sidebar_label: 'S3'
 
 You have two options to authenticate with Supabase Storage S3:
 
-- Using the generated S3 credentials from your [project settings](https://supabase.com/dashboard/project/_/settings/storage) (Intended exclusively for server-side use)
+- Using the generated S3 credentials from your [project settings](/dashboard/project/_/settings/storage) (Intended exclusively for server-side use)
 - Using a Session Token, which will allow you to authenticate with a user JWT token and provide limited access via RLS
 
 ## S3 credentials
@@ -19,7 +19,7 @@ They provide full access to all S3 operations across all buckets, bypassing RLS 
 
 </Admonition>
 
-To authenticate with S3 on the server, you need to generate a pair of credentials (Access Key ID and Secret Access Key) from your [project settings](https://supabase.com/dashboard/project/_/settings/storage).
+To authenticate with S3 on the server, you need to generate a pair of credentials (Access Key ID and Secret Access Key) from your [project settings](/dashboard/project/_/settings/storage).
 
 You can use these credentials to authenticate with Supabase Storage S3 using any S3-compatible service.
 
@@ -62,7 +62,7 @@ You can use these credentials to authenticate with Supabase Storage S3 using any
 
 </Tabs>
 
-## Session Token
+## Session token
 
 You can authenticate to Supabase S3 with a user JWT token to provide limited access via RLS to all S3 operations. This is useful when you want initialize the S3 client on the server scoped to a specific user, or use the S3 client directly from the client side.
 
