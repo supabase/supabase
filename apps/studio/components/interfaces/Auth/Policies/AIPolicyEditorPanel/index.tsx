@@ -544,6 +544,7 @@ export const AIPolicyEditorPanel = memo(function ({
                       />
                       <div className="h-full">
                         <LockedCreateQuerySection
+                          schema={schema}
                           selectedPolicy={selectedPolicy}
                           editorOneRef={editorOneRef}
                           editorTwoRef={editorTwoRef}
@@ -670,6 +671,7 @@ export const AIPolicyEditorPanel = memo(function ({
                           <LockedRenameQuerySection
                             oldName={selectedPolicy.name}
                             newName={name}
+                            schema={schema}
                             table={table}
                             lineNumber={
                               8 + expOneLineCount + (showCheckBlock ? expTwoLineCount : 0)
@@ -789,6 +791,7 @@ export const AIPolicyEditorPanel = memo(function ({
                     >
                       <ScrollArea className="h-full w-full">
                         <PolicyTemplates
+                          schema={schema}
                           table={table}
                           selectedPolicy={selectedPolicy}
                           selectedTemplate={selectedDiff}

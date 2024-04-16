@@ -3,7 +3,6 @@ import { useEffect } from 'react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -38,7 +37,6 @@ export const PolicyDetailsV2 = ({
   onUpdateCommand,
 }: PolicyDetailsV2Props) => {
   const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
 
   const { data: tables, isSuccess: isSuccessTables } = useTablesQuery({
     projectRef: project?.ref,
