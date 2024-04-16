@@ -3,31 +3,40 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { buildDays, mainDays } from './Releases/data'
 
-const LWXSummary = () => {
+const LW11Summary = () => {
   const days = mainDays()
 
   return (
     <div className="w-full border bg-alternative-200 flex flex-col rounded-lg text-foreground-lighter mt-12">
       <div className="w-full p-4 flex justify-between items-center">
         <Link
-          href="/launch-week"
-          className="flex items-center gap-1.5 leading-none uppercase text-xs"
+          href="/ga-week"
+          className="flex items-center gap-1.5 leading-none uppercase text-xs opacity-80 transition-opacity hover:opacity-100"
         >
-          <span className="text-foreground tracking-[1px]">Launch Week</span>{' '}
           <Image
-            src="/images/launchweek/lwx/logos/lwx_logo.svg"
-            alt="Supabase Launch Week X icon"
-            width={16}
-            height={16}
-            className="w-3 h-3"
+            src="/images/launchweek/ga/ga-black.svg"
+            alt="GA logo"
+            className="dark:hidden w-5 aspect-[104/57] h-auto"
+            priority
+            width={30}
+            height={30}
           />
+          <Image
+            src="/images/launchweek/ga/ga-white.svg"
+            alt="GA logo"
+            className="hidden dark:block w-5 aspect-[104/57] h-auto"
+            priority
+            width={30}
+            height={30}
+          />
+          <span className="text-foreground tracking-[1px] font-mono">Week</span>
         </Link>
-        <div className="font-mono uppercase tracking-wide text-xs">11-15 Dec</div>
+        <div className="font-mono uppercase tracking-wide text-xs">15-19 April</div>
       </div>
       <div className="pb-4 border-t p-4">
-        <div className="font-mono uppercase text-xs text-foreground tracking-wide mb-3">
+        {/* <div className="font-mono uppercase text-xs text-foreground tracking-wide mb-3">
           Main Stage
-        </div>
+        </div> */}
         <ul className="flex flex-col gap-2">
           {days.map(
             (day, i: number) =>
@@ -71,18 +80,18 @@ const LWXSummary = () => {
             )}
             <ol className="border-t pt-4 mt-2">
               <Link
-                href="/blog/supabase-hackathon-lwx"
+                href="/blog/supabase-oss-hackathon"
                 className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"
               >
-                Supabase Launch Week X Hackathon
+                Open Source Hackathon 2024
               </Link>
             </ol>
             <ol>
               <Link
-                href="/blog/community-meetups-lwx"
+                href="/ga-week#meetups"
                 className="relative flex items-center justify-between group w-full py-1 hover:text-foreground"
               >
-                Supabase Launch Week X Community Meetups
+                Community Meetups
               </Link>
             </ol>
           </ul>
@@ -92,4 +101,4 @@ const LWXSummary = () => {
   )
 }
 
-export default LWXSummary
+export default LW11Summary
