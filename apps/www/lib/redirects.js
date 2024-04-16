@@ -2443,4 +2443,9 @@ module.exports = [
     source: '/docs/guides/database/database-linter',
     destination: '/docs/guides/database/database-advisors',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/sessions',
+    destination: '/docs/guides/auth/concepts/sessions',
+  },
 ]

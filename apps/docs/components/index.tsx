@@ -69,6 +69,7 @@ import { IconArrowDown, IconCheck } from 'ui'
 
 // Heavy/rare (lazy-loaded)
 import { AppleSecretGenerator } from './AppleSecretGenerator'
+import { AuthSmsProviderConfig } from './AuthSmsProviderConfig'
 import { Extensions } from './Extensions'
 import { JwtGenerator } from './JwtGenerator'
 import { Mermaid } from './Mermaid'
@@ -85,6 +86,7 @@ const components = {
   ),
   AppleSecretGenerator,
   AuthProviders,
+  AuthSmsProviderConfig,
   Button,
   ButtonCard,
   CH,

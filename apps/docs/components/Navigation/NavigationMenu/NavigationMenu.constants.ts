@@ -471,19 +471,19 @@ export const SocialLoginItems = [
 
 export const PhoneLoginsItems = [
   {
-    name: 'MessageBird SMS Login',
+    name: 'MessageBird',
     icon: '/docs/img/icons/messagebird-icon',
     linkDescription: 'Communication between businesses and their customers — across any channel.',
     url: '/guides/auth/phone-login/messagebird',
   },
   {
-    name: 'Twilio SMS Login',
+    name: 'Twilio',
     icon: '/docs/img/icons/twilio-icon',
     url: '/guides/auth/phone-login/twilio',
     linkDescription: 'Customer engagement platform used by hundreds of thousands of businesses.',
   },
   {
-    name: 'Vonage SMS Login',
+    name: 'Vonage',
     icon: '/docs/img/icons/vonage-icon',
     url: '/guides/auth/phone-login/vonage',
     linkDescription:
@@ -492,7 +492,7 @@ export const PhoneLoginsItems = [
     hasLightIcon: true,
   },
   {
-    name: 'Textlocal SMS Login (Community Supported)',
+    name: 'Textlocal (Community Supported)',
     icon: '/docs/img/icons/textlocal-icon',
     url: '/guides/auth/phone-login/textlocal',
     linkDescription: 'Textlocal is a cloud-based SMS platform offering bulk messaging services.',
@@ -508,8 +508,8 @@ export const auth = {
       url: '/guides/auth',
     },
     {
-      name: 'Redirect URLs',
-      url: '/guides/auth/concepts/redirect-urls',
+      name: 'Architecture',
+      url: '/guides/auth/architecture',
     },
     {
       name: 'Quickstarts',
@@ -524,28 +524,21 @@ export const auth = {
       ],
     },
     {
-      name: 'Authentication',
-      url: undefined,
+      name: 'Concepts',
       items: [
-        { name: 'Anonymous Sign-Ins', url: '/guides/auth/auth-anonymous' },
-        { name: 'Email Login', url: '/guides/auth/auth-email' },
+        { name: 'Users', url: '/guides/auth/concepts/users' },
+        { name: 'Identities', url: '/guides/auth/concepts/identities' },
+        { name: 'Sessions', url: '/guides/auth/concepts/sessions' },
+        { name: 'Factors', url: '/guides/auth/concepts/factors' },
+      ],
+    },
+    {
+      name: 'Flows (How-tos)',
+      items: [
+        { name: 'Password-based', url: '/guides/auth/passwords' },
+        { name: 'Email (Magic Link or OTP)', url: '/guides/auth/auth-email' },
         {
-          name: 'Passwordless Login',
-          url: '/guides/auth/passwordless-login',
-          items: [
-            {
-              name: 'Email Magic Link',
-              url: '/guides/auth/passwordless-login/auth-magic-link',
-            },
-            {
-              name: 'Email OTP',
-              url: '/guides/auth/passwordless-login/auth-email-otp',
-            },
-            { name: 'Phone OTP', url: '/guides/auth/phone-login' },
-          ],
-        },
-        {
-          name: 'Phone Login',
+          name: 'Phone Login (OTP)',
           url: '/guides/auth/phone-login',
           items: [...PhoneLoginsItems],
         },
@@ -571,21 +564,8 @@ export const auth = {
             },
           ],
         },
-        {
-          name: 'User Sessions',
-          url: '/guides/auth/sessions',
-        },
-        { name: 'Passwords', url: '/guides/auth/passwords' },
-        {
-          name: 'User Management',
-          url: '/guides/auth/auth-user-management',
-          items: [
-            {
-              name: 'Identity Linking',
-              url: '/guides/auth/auth-identity-linking',
-            },
-          ],
-        },
+        { name: 'Anonymous signins', url: '/guides/auth/auth-anonymous' },
+        { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
         {
           name: 'Enterprise SSO',
           url: '/guides/auth/enterprise-sso',
@@ -596,18 +576,54 @@ export const auth = {
             },
           ],
         },
-        { name: 'Email Templates', url: '/guides/auth/auth-email-templates' },
-        { name: 'Auth Hooks', url: '/guides/auth/auth-hooks' },
+        /* TO BE DEPRECATED BELOW */
+        {
+          name: 'Passwordless Login',
+          url: '/guides/auth/passwordless-login',
+          items: [
+            {
+              name: 'Email Magic Link',
+              url: '/guides/auth/passwordless-login/auth-magic-link',
+            },
+            {
+              name: 'Email OTP',
+              url: '/guides/auth/passwordless-login/auth-email-otp',
+            },
+            { name: 'Phone OTP', url: '/guides/auth/phone-login' },
+          ],
+        },
       ],
     },
     {
-      name: 'Authorization',
-      url: undefined,
+      name: 'Configuration',
       items: [
-        { name: 'Enable Captcha Protection', url: '/guides/auth/auth-captcha' },
+        { name: 'Email Templates', url: '/guides/auth/auth-email-templates' },
+        {
+          name: 'Redirect URLs',
+          url: '/guides/auth/concepts/redirect-urls',
+        },
+        { name: 'Auth Hooks', url: '/guides/auth/auth-hooks' },
         { name: 'Configuring Custom SMTP', url: '/guides/auth/auth-smtp' },
         { name: 'Managing User Data', url: '/guides/auth/managing-user-data' },
-        { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
+        {
+          name: 'User Management',
+          url: '/guides/auth/auth-user-management',
+          items: [
+            {
+              name: 'Identity Linking',
+              url: '/guides/auth/auth-identity-linking',
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'Security',
+      items: [
+        { name: 'Password Security', url: '/password-security' },
+        { name: 'Rate Limits', url: '/' }, // TODO
+        { name: 'Enable Captcha Protection', url: '/guides/auth/auth-captcha' },
+        { name: 'JWTs', url: '/guides/auth/jwt' },
         { name: 'Row Level Security', url: '/guides/auth/row-level-security' },
         {
           name: 'Custom Claims & RBAC',
@@ -615,7 +631,7 @@ export const auth = {
         },
       ],
     },
-    {
+    /*     {
       name: 'Server-side Auth',
       url: undefined,
       items: [
@@ -649,7 +665,7 @@ export const auth = {
           url: '/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
         },
       ],
-    },
+    }, */
     {
       name: 'Auth UI',
       url: undefined,
@@ -658,29 +674,6 @@ export const auth = {
         {
           name: 'Flutter Auth UI',
           url: '/guides/auth/auth-helpers/flutter-auth-ui',
-        },
-      ],
-    },
-    {
-      name: 'Deep Dive',
-      url: undefined,
-      items: [
-        {
-          name: 'Part One: JWTs',
-          url: '/guides/auth/auth-deep-dive/auth-deep-dive-jwts',
-        },
-        {
-          name: 'Part Two: Row Level Security',
-          url: '/guides/auth/auth-deep-dive/auth-row-level-security',
-        },
-        {
-          name: 'Part Three: Policies',
-          url: '/guides/auth/auth-deep-dive/auth-policies',
-        },
-        { name: 'Part Four: GoTrue', url: '/guides/auth/auth-deep-dive/auth-gotrue' },
-        {
-          name: 'Part Five: Google OAuth',
-          url: '/guides/auth/auth-deep-dive/auth-google-oauth',
         },
       ],
     },

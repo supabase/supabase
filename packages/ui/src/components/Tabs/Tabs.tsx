@@ -7,11 +7,16 @@ import {
   PropsWithChildren,
   useEffect,
   useState,
+  useRef,
+  useCallback,
+  useMemo,
 } from 'react'
+import { useInView } from 'react-intersection-observer'
 
 import { TAB_CHANGE_EVENT_NAME } from '../../lib/events'
 import styleHandler from '../../lib/theme/styleHandler'
 import { useTabGroup } from './TabsProvider'
+import { debounce } from 'lodash'
 
 interface TabsProps {
   type?: 'pills' | 'underlined' | 'cards' | 'rounded-pills'
@@ -28,6 +33,7 @@ interface TabsProps {
   wrappable?: boolean
   addOnBefore?: React.ReactNode
   addOnAfter?: React.ReactNode
+  stickyTabList?: { scrollContainer?: string | HTMLElement; style?: CSSStyleDeclaration }
   listClassNames?: string
   baseClassNames?: string
 }
@@ -49,6 +55,7 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   wrappable,
   addOnBefore,
   addOnAfter,
+  stickyTabList,
   listClassNames,
   baseClassNames,
   children: _children,
@@ -69,6 +76,56 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
       // if no defaultActiveId is set use the first panel
       children?.[0]?.props?.id
   )
+
+  const [stuck, setStuck] = useState(false)
+  const stickyRef = useRef<HTMLDivElement>(null)
+  const { ref: intersectionRef } = useInView({
+    threshold: 0.1,
+    onChange: (inView) => (inView ? setStuck(true) : setStuck(false)),
+    skip: !stickyTabList,
+  })
+
+  const scrollHandler = useCallback(() => {
+    console.log('SCROLLING')
+    if (!stickyRef.current) return
+
+    const top = stickyRef.current.getBoundingClientRect().top
+    if (top > 0) return
+
+    const { style = {} } = stickyTabList ?? {}
+    if (stuck) {
+      stickyRef.current.style.position = 'sticky'
+      stickyRef.current.style.top = '100px'
+      stickyRef.current.style.zIndex = '5'
+
+      for (const property in style) {
+        console.log(property)
+        // @ts-ignore
+        stickyRef.current.style[property] = style[property]
+      }
+    } else {
+      stickyRef.current.style.position = ''
+      stickyRef.current.style.top = ''
+      stickyRef.current.style.zIndex = ''
+      for (const property in style) {
+        // @ts-ignore
+        stickyRef.current.style[property] = ''
+      }
+    }
+  }, [stuck])
+
+  const debouncedScrollHandler = useMemo(() => debounce(scrollHandler, 100), [scrollHandler])
+
+  useEffect(() => {
+    const { scrollContainer } = stickyTabList ?? {}
+    const elem =
+      scrollContainer instanceof HTMLElement
+        ? scrollContainer
+        : (scrollContainer && document.getElementById(scrollContainer)) || document
+
+    elem.addEventListener('scroll', debouncedScrollHandler)
+    return () => elem.removeEventListener('scroll', debouncedScrollHandler)
+  }, [debouncedScrollHandler, stickyTabList?.scrollContainer])
 
   useEffect(() => {
     /**
@@ -137,8 +194,12 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   if (listClassNames) listClasses.push(listClassNames)
 
   return (
-    <TabsPrimitive.Root value={active} className={[__styles.base, baseClassNames].join(' ')}>
-      <TabsPrimitive.List className={listClasses.join(' ')}>
+    <TabsPrimitive.Root
+      value={active}
+      className={[__styles.base, baseClassNames].join(' ')}
+      ref={intersectionRef}
+    >
+      <TabsPrimitive.List className={listClasses.join(' ')} ref={stickyRef}>
         {addOnBefore}
         {children.map((tab) => {
           const isActive = active === tab.props.id
