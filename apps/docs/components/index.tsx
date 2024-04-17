@@ -39,6 +39,7 @@ import GetSessionWarning from './MDX/get_session_warning.mdx'
 import HuggingFaceDeployment from './MDX/ai/quickstart_hf_deployment.mdx'
 import KotlinProjectSetup from './MDX/kotlin_project_setup.mdx'
 import MigrationWarnings from './MDX/migration_warnings.mdx'
+import OAuthPkceFlow from './MDX/oauth_pkce_flow.mdx'
 import ProjectSetup from './MDX/project_setup.mdx'
 import QuickstartIntro from './MDX/quickstart_intro.mdx'
 import SocialProviderSettingsSupabase from './MDX/social_provider_settings_supabase.mdx'
@@ -146,6 +147,7 @@ const components = {
   Mermaid,
   MigrationWarnings,
   NavData,
+  OAuthPkceFlow,
   Options,
   Param,
   ProjectConfigVariables,

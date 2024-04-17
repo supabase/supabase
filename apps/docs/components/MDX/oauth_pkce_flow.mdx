@@ -1,16 +1,49 @@
----
-title: 'OAuth with PKCE flow for SSR'
-description: 'Learn how to configure OAuth authentication in your server-side rendering (SSR) application to work with the PKCE flow.'
-subtitle: 'Learn how to configure OAuth authentication in your server-side rendering (SSR) application to work with the PKCE flow.'
----
+For a PKCE flow, for example in Server-Side Auth, you need an extra step to handle the code exchange. When calling `signInWithOAuth`, provide a `redirectTo` URL which points to a callback route. This redirect URL should be added to your [redirect allow list](/docs/guides/auth/redirect-urls).
 
-### Setting up SSR client
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="client"
+  queryGroup="environment"
+>
+<TabPanel id="client" label="Client">
 
-Check out our [guide for creating a client](/docs/guides/auth/server-side/creating-a-client) to learn how to install the necessary packages, declare environment variables, and create a Supabase client configured for SSR in your framework.
+In the browser, `signInWithOAuth` automatically redirects to the SSO provider's authentication endpoint, which then redirects to your endpoint.
 
-### Create API endpoint for handling the `code` exchange
+```js
+await supabase.auth.signInWithOAuth({
+  provider,
+  options: {
+    redirectTo: `http://example.com/auth/callback`,
+  },
+})
+```
 
-In order to use OAuth we will need to setup a endpoint for the `code` exchange, to exchange an auth `code` for the user's `session`, which is set as a cookie for future requests made to Supabase.
+</TabPanel>
+
+<TabPanel id="server" label="Server">
+
+In the server, you need to handle the redirect to the OAuth provider's authentication endpoint. The `signInWithOAuth` method returns the endpoint URL, which you can redirect to.
+
+```js
+const { data, error } = await supabase.auth.signInWithOAuth({
+  provider,
+  options: {
+    redirectTo: 'http://example.com/auth/callback',
+  },
+})
+
+if (data.url) {
+  redirect(data.url) // use the redirect API for your server framework
+}
+```
+
+</TabPanel>
+
+</Tabs>
+
+At the callback endpoint, handle the code exchange to save the user session.
 
 <Tabs
   scrollable
@@ -203,49 +236,4 @@ app.get("/auth/callback", async function (req, res) {
 ```
 
 </TabPanel>
-</Tabs>
-
-Let's point our `.signInWithOAuth` method's redirect to the callback route we create above:
-
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="client"
-  queryGroup="environment"
->
-<TabPanel id="client" label="Client">
-
-In the browser, `signInWithOAuth` automatically redirects to the SSO provider's authentication endpoint, which then redirects to your endpoint.
-
-```js
-await supabase.auth.signInWithOAuth({
-  provider,
-  options: {
-    redirectTo: `http://example.com/auth/callback`,
-  },
-})
-```
-
-</TabPanel>
-
-<TabPanel id="server" label="Server">
-
-In the server, you need to handle the redirect to the OAuth provider's authentication endpoint. The `signInWithOAuth` method returns the endpoint URL, which you can redirect to.
-
-```js
-const { data, error } = await supabase.auth.signInWithOAuth({
-  provider,
-  options: {
-    redirectTo: 'http://example.com/auth/callback',
-  },
-})
-
-if (data.url) {
-  redirect(data.url) // use the redirect API for your server framework
-}
-```
-
-</TabPanel>
-
 </Tabs>
