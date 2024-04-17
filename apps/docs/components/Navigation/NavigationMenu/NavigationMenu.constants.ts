@@ -513,12 +513,15 @@ export const auth = {
     },
     {
       name: 'SSR',
-      url: '/guides/auth/ssr',
+      url: '/guides/auth/server-side',
     },
     {
-      name: 'Quickstarts',
+      name: 'Getting Started',
       items: [
-        { name: 'Next.js', url: '/guides/auth/quickstarts/nextjs', items: [] },
+        {
+          name: 'Next.js',
+          url: '/guides/auth/quickstarts/nextjs',
+        },
         { name: 'React', url: '/guides/auth/quickstarts/react', items: [] },
         {
           name: 'React Native',
@@ -560,8 +563,12 @@ export const auth = {
             },
           ],
         },
-        { name: 'Anonymous signins', url: '/guides/auth/auth-anonymous' },
+        { name: 'Anonymous Signins', url: '/guides/auth/auth-anonymous' },
         { name: 'Mobile Deep Linking', url: '/guides/auth/native-mobile-deep-linking' },
+        {
+          name: 'Identity Linking',
+          url: '/guides/auth/auth-identity-linking',
+        },
         { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
         {
           name: 'Signout',
@@ -572,24 +579,18 @@ export const auth = {
     {
       name: 'Configuration',
       items: [
+        {
+          name: 'General Configuration',
+          url: '/guides/auth/general-configuration',
+        },
         { name: 'Email Templates', url: '/guides/auth/auth-email-templates' },
         {
           name: 'Redirect URLs',
-          url: '/guides/auth/concepts/redirect-urls',
+          url: '/guides/auth/redirect-urls',
         },
         { name: 'Auth Hooks', url: '/guides/auth/auth-hooks' },
-        { name: 'Configuring Custom SMTP', url: '/guides/auth/auth-smtp' },
-        { name: 'Managing User Data', url: '/guides/auth/managing-user-data' },
-        {
-          name: 'User Management',
-          url: '/guides/auth/auth-user-management',
-          items: [
-            {
-              name: 'Identity Linking',
-              url: '/guides/auth/auth-identity-linking',
-            },
-          ],
-        },
+        { name: 'Custom SMTP', url: '/guides/auth/auth-smtp' },
+        { name: 'User Management', url: '/guides/auth/managing-user-data' },
       ],
     },
     {

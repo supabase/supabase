@@ -57,14 +57,7 @@ The Auth service is responsible for:
 
 ## Postgres
 
-{/* TODO: Double-check with Auth team. This warning probably needs to be softened: Which operations are safe to perform directly? */}
-Supabase Auth uses the `auth` schema in your Postgres database to store user tables and other information. You should not directly edit this schema or objects within it. Doing so might break guarantees relied upon by the Auth service. Instead, make changes via the SDKs and API.
-
-<Admonition type="warning">
-
-Do not directly edit objects in the Auth schema.
-
-</Admonition>
+Supabase Auth uses the `auth` schema in your Postgres database to store user tables and other information. For security, this schema is not exposed on the auto-generated API.
 
 You can connect Auth information to your own objects using [database triggers](/docs/guides/database/postgres/triggers) and [foreign keys](https://www.postgresql.org/docs/current/tutorial-fk.html). Make sure that any views you create for Auth data are adequately protected by [enabling RLS](/docs/guides/database/rls) or [revoking grants](https://www.postgresql.org/docs/current/sql-revoke.html).
 

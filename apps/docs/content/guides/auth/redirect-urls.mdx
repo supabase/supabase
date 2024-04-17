@@ -7,7 +7,9 @@ subtitle: 'Set up redirect urls with Supabase Auth.'
 
 ## Overview
 
-When using [passwordless sign-ins](/docs/reference/javascript/auth-signinwithotp) or [third-party providers](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect), the Supabase client library methods provide a `redirectTo` parameter to specify where to redirect the user to after authentication. By default, the user will be redirected to the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls) but you can modify the `SITE_URL` or add additional redirect URLs to the [allow list](https://supabase.com/dashboard/project/_/auth/url-configuration). Once you've added necessary URLs to the allow list, you can specify the URL you want the user to be redirected to in the `redirectTo` parameter.
+When using [passwordless sign-ins](/docs/reference/javascript/auth-signinwithotp) or [third-party providers](/docs/reference/javascript/auth-signinwithoauth#sign-in-using-a-third-party-provider-with-redirect), the Supabase client library methods provide a `redirectTo` parameter to specify where to redirect the user to after authentication. By default, the user will be redirected to the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls) but you can modify the `SITE_URL` or add additional redirect URLs to the allow list. Once you've added necessary URLs to the allow list, you can specify the URL you want the user to be redirected to in the `redirectTo` parameter.
+
+To edit the allow list, go to the [URL Configuration](/dashboard/project/_/auth/url-configuration) page. In local development or self-hosted projects, use the [configuration file](/docs/guides/cli/config#auth.additional_redirect_urls).
 
 ## Use wildcards in redirect URLs
 
