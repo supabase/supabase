@@ -1,82 +1,145 @@
 import { LINT_TYPES, Lint } from 'data/lint/lint-query'
-import { AlertCircle, Box, Eye, Key, Lock, Table2, Unlock } from 'lucide-react'
+import { Box, Eye, Lock, Table2, Unlock } from 'lucide-react'
 import Link from 'next/link'
-import { Button } from 'ui'
-
-const assertUnreachable = (n: never) => {
-  console.error('Unhandled lint type', n)
-}
+import { Button, Badge } from 'ui'
 
 interface LintInfo {
+  name: string
   title: string
   icon: JSX.Element
+  link: (args: { projectRef: string; metadata: Lint['metadata'] }) => string
+  linkText: string
+  docsLink: string
 }
 
-export const lintInfoMap = [
+export const lintInfoMap: LintInfo[] = [
   {
     name: 'unindexed_foreign_keys',
     title: 'Unindexed foreign keys',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/database/indexes?schema=${metadata?.schema}`,
+    linkText: 'Create an index',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0001_unindexed_foreign_keys',
   },
   {
     name: 'auth_users_exposed',
     title: 'Exposed Auth Users',
     icon: <Lock className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef }) => `/project/${projectRef}/editor`,
+    linkText: 'View table',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0002_auth_users_exposed',
   },
   {
     name: 'auth_rls_initplan',
     title: 'Auth RLS Initialization Plan',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/auth/policies`,
+    linkText: 'View policies',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0003_auth_rls_initplan',
   },
   {
     name: 'no_primary_key',
     title: 'No Primary Key',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/editor`,
+    linkText: 'View table',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0004_no_primary_key',
   },
   {
     name: 'unused_index',
     title: 'Unused Index',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/database/indexes?schema=${metadata?.schema}&table=${metadata?.name}`,
+    linkText: 'View index',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0005_unused_index',
   },
   {
     name: 'multiple_permissive_policies',
     title: 'Multiple Permissive Policies',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
-  },
-  {
-    name: 'function_search_path_mutable',
-    title: 'Function Search Path Mutable',
-    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
-  },
-  {
-    name: 'rls_enabled_no_policy',
-    title: 'RLS Enabled No Policy',
-    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`,
+    linkText: 'View policies',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0006_multiple_permissive_policies',
   },
   {
     name: 'policy_exists_rls_disabled',
     title: 'Policy Exists RLS Disabled',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`,
+    linkText: 'View policies',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0007_policy_exists_rls_disabled',
   },
   {
-    name: 'rls_disabled_in_public',
-    title: 'RLS Disabled in Public',
+    name: 'rls_enabled_no_policy',
+    title: 'RLS Enabled No Policy',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
-  },
-  {
-    name: 'security_definer_view',
-    title: 'Security Definer View',
-    icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`,
+    linkText: 'View table',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0008_rls_enabled_no_policy',
   },
   {
     name: 'duplicate_index',
     title: 'Duplicate Index',
     icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/database/indexes?schema=${metadata?.schema}&table=${metadata?.name}`,
+    linkText: 'View index',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0009_duplicate_index',
   },
+  {
+    name: 'security_definer_view',
+    title: 'Security Definer View',
+    icon: <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />,
+    link: () =>
+      'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0010_security_definer_view',
+    linkText: 'View docs',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0010_security_definer_view',
+  },
+  {
+    name: 'function_search_path_mutable',
+    title: 'Function Search Path Mutable',
+    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/database/functions?schema=${metadata?.schema}&search=${metadata?.name}`,
+    linkText: 'View functions',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0011_function_search_path_mutable',
+  },
+  {
+    name: 'rls_disabled_in_public',
+    title: 'RLS Disabled in Public',
+    icon: <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`,
+    linkText: 'View policies',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0013_rls_disabled_in_public',
+  },
+
   {
     name: 'extension_in_public',
     title: 'Extension in Public',
     icon: <Unlock className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/database/extensions?filter=${metadata?.name}`,
+    linkText: 'View extension',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0014_extension_in_public',
   },
 ]
 
@@ -89,171 +152,22 @@ export const LintCTA = ({
   projectRef: string
   metadata: Lint['metadata']
 }) => {
-  switch (title) {
-    case 'unindexed_foreign_keys':
-      return (
-        <Button asChild type="default">
-          <Link
-            href={`/project/${projectRef}/database/indexes?schema=${metadata?.schema}`}
-            target="_blank"
-            rel="noreferrer"
-            className="no-underline"
-          >
-            Create an index
-          </Link>
-        </Button>
-      )
+  const lintInfo = lintInfoMap.find((item) => item.name === title)
 
-    case 'auth_users_exposed':
-      return (
-        <Button asChild type="default">
-          <Link
-            href={`/project/${projectRef}/editor`}
-            target="_blank"
-            rel="noreferrer"
-            className="no-underline"
-          >
-            View table
-          </Link>
-        </Button>
-      )
-    case 'auth_rls_initplan':
-      return (
-        <Button asChild type="default">
-          <Link
-            href={`/project/${projectRef}/auth/policies`}
-            target="_blank"
-            rel="noreferrer"
-            className="no-underline"
-          >
-            View policies
-          </Link>
-        </Button>
-      )
-    case 'no_primary_key':
-      return (
-        <Button asChild type="default">
-          <Link
-            href={`/project/${projectRef}/editor`}
-            target="_blank"
-            rel="noreferrer"
-            className="no-underline"
-          >
-            View table
-          </Link>
-        </Button>
-      )
-    case 'unused_index':
-      return (
-        <Button asChild type="default">
-          <Link
-            href={`/project/${projectRef}/database/indexes?schema=${metadata?.schema}&table=${metadata?.name}`}
-            target="_blank"
-            rel="noreferrer"
-            className="no-underline"
-          >
-            View index
-          </Link>
-        </Button>
-      )
-    case 'duplicate_index':
-      return (
-        <Button asChild type="default">
-          <Link
-            href={`/project/${projectRef}/database/indexes?schema=${metadata?.schema}&table=${metadata?.name}`}
-            target="_blank"
-            rel="noreferrer"
-            className="no-underline"
-          >
-            View index
-          </Link>
-        </Button>
-      )
-    case 'multiple_permissive_policies':
-      return (
-        <Button asChild type="default">
-          <Link
-            href={`/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`}
-            target="_blank"
-            rel="noreferrer"
-            className="no-underline"
-          >
-            View policies
-          </Link>
-        </Button>
-      )
-    case 'function_search_path_mutable':
-      return (
-        <Button asChild type="default">
-          <Link
-            href={`/project/${projectRef}/database/functions?schema=${metadata?.schema}&search=${metadata?.name}`}
-            target="_blank"
-            rel="noreferrer"
-            className="no-underline"
-          >
-            View functions
-          </Link>
-        </Button>
-      )
-    case 'rls_enabled_no_policy':
-      return (
-        <Button asChild type="default">
-          <Link
-            href={`/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`}
-            target="_blank"
-            rel="noreferrer"
-            className="no-underline"
-          >
-            View policies
-          </Link>
-        </Button>
-      )
-    case 'policy_exists_rls_disabled':
-      return (
-        <Button asChild type="default">
-          <Link
-            href={`/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`}
-            target="_blank"
-            rel="noreferrer"
-            className="no-underline"
-          >
-            View policies
-          </Link>
-        </Button>
-      )
-    case 'rls_disabled_in_public':
-      return (
-        <Button asChild type="default">
-          <Link
-            href={`/project/${projectRef}/auth/policies?schema=${metadata?.schema}&search=${metadata?.name}`}
-            target="_blank"
-            rel="noreferrer"
-            className="no-underline"
-          >
-            View policies
-          </Link>
-        </Button>
-      )
-    case 'security_definer_view':
-      // we don't have a good place to send the user to check out a view
-      return <></>
-    case 'extension_in_public':
-      return (
-        <Button asChild type="default">
-          <Link
-            href={`/project/${projectRef}/database/extensions?filter=${metadata?.name}`}
-            target="_blank"
-            rel="noreferrer"
-            className="no-underline"
-          >
-            View extension
-          </Link>
-        </Button>
-      )
-    default:
-      assertUnreachable(title)
-      return <></>
+  if (!lintInfo) {
+    return null
   }
+
+  const link = lintInfo.link({ projectRef, metadata })
+  const linkText = lintInfo.linkText
+
+  return (
+    <Button asChild type="default">
+      <Link href={link} target="_blank" rel="noreferrer" className="no-underline">
+        {linkText}
+      </Link>
+    </Button>
+  )
 }
 
 export const entityTypeIcon = (type: string) => {
@@ -265,4 +179,12 @@ export const entityTypeIcon = (type: string) => {
     default:
       return <Box className="text-foreground-muted" size={15} strokeWidth={1.5} />
   }
+}
+
+export const LintCategoryBadge = ({ category }: { category: string }) => {
+  return (
+    <Badge variant={category === 'SECURITY' ? 'destructive' : 'warning'} className="capitalize">
+      {category.toLowerCase()}
+    </Badge>
+  )
 }

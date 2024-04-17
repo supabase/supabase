@@ -1,4 +1,4 @@
-import { Eye, MessageSquareMore, Table2, TextSearch, X } from 'lucide-react'
+import { ExternalLink, Eye, MessageSquareMore, Table2, TextSearch, X } from 'lucide-react'
 import { useRef, useState } from 'react'
 
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
@@ -26,6 +26,7 @@ import {
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
   cn,
+  Badge,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 
@@ -36,7 +37,9 @@ import { Markdown } from '../../../../components/interfaces/Markdown'
 import {
   LintCTA,
   entityTypeIcon,
+  LintCategoryBadge,
 } from '../../../../components/interfaces/Reports/ReportLints.utils'
+import Link from 'next/link'
 
 enum LINTER_LEVELS {
   ERROR = 'ERROR',
@@ -89,7 +92,6 @@ const ProjectLints: NextPageWithLayout = () => {
   })
 
   const activeLints = data || []
-
   const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
     []) as string[]
 
@@ -212,7 +214,7 @@ const ProjectLints: NextPageWithLayout = () => {
       <FormHeader
         className="py-4 px-6 !mb-0"
         title="Suggestions"
-        docsUrl="https://supabase.github.io/splinter/"
+        docsUrl="https://supabase.com/docs/guides/database/database-linter"
       />
       <Tabs_Shadcn_
         defaultValue={currentTab}
@@ -366,6 +368,7 @@ const ProjectLints: NextPageWithLayout = () => {
                   setSelectedRow(undefined)
                 }}
               />
+
               <Tabs_Shadcn_
                 value={view}
                 className="flex flex-col h-full"
@@ -386,11 +389,14 @@ const ProjectLints: NextPageWithLayout = () => {
                   className="mt-0 flex-grow min-h-0 overflow-y-auto prose"
                 >
                   {selectedLint && (
-                    <div className={cn('py-4 px-5')}>
-                      <h3 className="text-sm">
-                        {lintInfoMap.find((item) => item.name === selectedLint.name)?.title}
-                      </h3>
-                      <div className="flex items-center gap-2 text-sm">
+                    <div className="py-4 px-5">
+                      <div className="flex items-center gap-2 py-2">
+                        <h3 className="text-sm m-0">
+                          {lintInfoMap.find((item) => item.name === selectedLint.name)?.title}
+                        </h3>
+                        <LintCategoryBadge category={selectedLint.categories[0]} />
+                      </div>
+                      <div className="flex items-center gap-2 text-sm mt-4">
                         <span>Entity</span>
                         <div className="flex items-center gap-1 px-2 py-0.5 bg-surface-200 border rounded-lg ">
                           {selectedLint.metadata?.type === 'table' && (
@@ -419,12 +425,28 @@ const ProjectLints: NextPageWithLayout = () => {
 
                         <div className="grid gap-2">
                           <h3 className="text-sm">Resolve</h3>
-                          <div>
+                          <div className="flex items-center gap-2">
                             <LintCTA
                               title={selectedLint.name}
                               projectRef={ref!}
                               metadata={selectedLint.metadata}
                             />
+                            <Button asChild type="text">
+                              <Link
+                                href={
+                                  lintInfoMap.find((item) => item.name === selectedLint.name)
+                                    ?.docsLink ||
+                                  'https://supabase.com/docs/guides/database/database-linter'
+                                }
+                                target="_blank"
+                                rel="noreferrer"
+                                className="no-underline"
+                              >
+                                <span className="flex items-center gap-2">
+                                  Learn more <ExternalLink size={14} />
+                                </span>
+                              </Link>
+                            </Button>
                           </div>
                         </div>
                       </div>
