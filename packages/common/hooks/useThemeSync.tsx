@@ -10,7 +10,7 @@ const useThemeSync = (app: App) => {
   useEffect(() => {
     const handleSetLocalStorage = (e: any) => {
       const theme = e.target?.localStorage?.theme
-      const wwwTheme = e.target?.localStorage['www-theme']
+      const wwwTheme = e.target?.localStorage?.wwwTheme
 
       if (theme && isWww) {
         setTheme(theme === 'dark' && wwwTheme === 'deep-dark' ? 'deep-dark' : theme)
