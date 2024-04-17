@@ -115,6 +115,8 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
 
     if (queryGroup) {
       const url = new URL(document.location.href)
+      if (!url.searchParams.getAll('queryGroups')?.includes(queryGroup))
+        url.searchParams.append('queryGroups', queryGroup)
       url.searchParams.set(queryGroup, id)
       window.history.replaceState(undefined, '', url)
     }

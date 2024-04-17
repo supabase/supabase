@@ -3,23 +3,23 @@ import { ExternalLink } from 'lucide-react'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-extensions-query'
-import { useIndexAdvisorEnableMutation } from 'data/database/index-advisor-enable-mutation'
 import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button } from 'ui'
 import { Markdown } from '../Markdown'
+import Link from 'next/link'
+import { useParams } from 'common'
 
 export const IndexAdvisorDisabledState = () => {
+  const { ref } = useParams()
   const { project } = useProjectContext()
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   const hypopgExtension = (extensions ?? []).find((ext) => ext.name === 'hypopg')
+  const indexAdvisorExtension = (extensions ?? []).find((ext) => ext.name === 'index_advisor')
 
   const { mutateAsync: enableExtension, isLoading: isEnablingExtension } =
     useDatabaseExtensionEnableMutation()
-  const { mutateAsync: enableIndexAdvisor, isLoading: isEnablingIndexAdvisor } =
-    useIndexAdvisorEnableMutation()
-  const isEnabling = isEnablingExtension || isEnablingIndexAdvisor
 
   const onEnableIndexAdvisor = async () => {
     if (project === undefined) return console.error('Project is required')
@@ -32,33 +32,56 @@ export const IndexAdvisorDisabledState = () => {
         version: hypopgExtension.default_version,
       })
     }
-
-    // [Joshen] Once index_advisor ext is ready, it'll just be enabling an extension
-    await enableIndexAdvisor({
-      projectRef: project.ref,
-      connectionString: project.connectionString,
-    })
+    if (indexAdvisorExtension?.installed_version === null) {
+      await enableExtension({
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        name: indexAdvisorExtension.name,
+        schema: indexAdvisorExtension?.schema ?? 'extensions',
+        version: indexAdvisorExtension.default_version,
+      })
+    }
   }
 
   return (
-    <Alert_Shadcn_>
+    <Alert_Shadcn_ className="mb-6">
       <AlertTitle_Shadcn_>
-        Get index suggestions to improve your query performance
+        <Markdown
+          className="text-foreground"
+          content={
+            indexAdvisorExtension === undefined
+              ? 'Newer version of Postgres required'
+              : 'Postgres extensions `index_advisor` and `hypopg` required'
+          }
+        />
       </AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_>
-        <Markdown content="The `index_advisor` extension can help in recommending database indexes to reduce the costs of your query." />
+        <Markdown
+          content={
+            indexAdvisorExtension === undefined
+              ? 'Upgrade to the latest version of Postgres to get recommendations on indexes for your queries'
+              : 'These extensions can help in recommending database indexes to reduce the costs of your query.'
+          }
+        />
       </AlertDescription_Shadcn_>
+
       <AlertDescription_Shadcn_ className="mt-3">
         <div className="flex items-center gap-x-2">
-          <Button
-            type="default"
-            disabled={isEnabling}
-            loading={isEnabling}
-            onClick={() => onEnableIndexAdvisor()}
-          >
-            Enable index advisor
-          </Button>
-          <Button asChild type="default" icon={<ExternalLink />}>
+          {indexAdvisorExtension === undefined ? (
+            <Button asChild type="default">
+              <Link href={`/project/${ref}/settings/infrastructure`}>Upgrade Postgres version</Link>
+            </Button>
+          ) : (
+            <Button
+              type="default"
+              disabled={isEnablingExtension}
+              loading={isEnablingExtension}
+              onClick={() => onEnableIndexAdvisor()}
+            >
+              Enable extensions
+            </Button>
+          )}
+          <Button asChild type="outline" icon={<ExternalLink />}>
             <a
               target="_blank"
               rel="noreferrer"

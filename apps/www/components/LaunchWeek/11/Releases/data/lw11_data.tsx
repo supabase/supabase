@@ -68,7 +68,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     title: 'Lorem ipsum',
     shipped: true,
     isToday: false,
-    blog: '#',
+    blog: '/ga',
     hasCountdown: false,
     date: '15 April',
     published_at: '2024-04-15T08:00:00.000-08:00',
@@ -77,18 +77,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     links: [
       {
         type: 'xSpace',
-        href: 'https://twitter.com/i/spaces/1MnGnMglMLjKO/peek',
+        href: 'https://supabase.link/twitter-space-ga',
       },
     ],
-    description: (
-      <>
-        <p className="text-foreground">Our products are now ready for production use.</p>{' '}
-        <p className="text-foreground-lighter">
-          Confidently leverage the full power of Supabase to build scalable, high-performance
-          applications with ease.
-        </p>
-      </>
-    ),
+    description: 'Supabase is officially launching into General Availability',
     steps: [
       {
         icon: products.database.icon[16],
@@ -133,27 +125,48 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 2,
     dd: 'Tue',
     title: '',
-    shipped: false,
-    hasCountdown: true,
-    blog: '#',
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
+    blog: '/blog/ai-inference-now-available-in-supabase-edge-functions',
     date: '16 April',
     published_at: '2024-04-16T08:00:00.000-08:00',
-    description: <>Create vector embeddings with Edge Functions</>,
+    description: (
+      <>
+        Supabase Functions now supports <strong>AI models</strong>
+      </>
+    ),
     links: [
-      // {
-      //   type: 'blog',
-      //   href: '#',
-      // },
-      // {
-      //   type: 'video',
-      //   href: 'eCbiywoDORw',
-      // },
-      // {
-      //   type: 'xSpace',
-      //   href: '#',
-      // },
+      {
+        type: 'blog',
+        href: '/blog/ai-inference-now-available-in-supabase-edge-functions',
+      },
+      {
+        type: 'video',
+        href: 'w4Rr_1whU-U',
+      },
+      {
+        type: 'xSpace',
+        href: 'https://supabase.link/twitter-space-ga-week-2',
+      },
     ],
-    steps: [],
+    steps: [
+      {
+        title: 'Create vector embeddings with Edge Functions',
+        blog: '#',
+        bg_layers: [
+          {
+            img: isDark
+              ? '/images/launchweek/11/days/d2-dark.svg'
+              : '/images/launchweek/11/days/d2-light.svg',
+            mobileImg: isDark
+              ? '/images/launchweek/11/days/d2-dark-mobile.svg'
+              : '/images/launchweek/11/days/d2-light-mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
   {
     id: 'day-3',
@@ -161,11 +174,11 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Wed',
     title: '',
     shipped: false,
-    hasCountdown: false,
+    hasCountdown: true,
     blog: '#',
     date: '17 April',
     published_at: '2024-04-17T08:00:00.000-08:00',
-    description: <>TBD</>,
+    description: <></>,
     links: [
       // {
       //   type: 'blog',
@@ -175,10 +188,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       //   type: 'video',
       //   href: '',
       // },
-      // {
-      //   type: 'xSpace',
-      //   href: '#',
-      // },
+      {
+        type: 'xSpace',
+        href: 'https://supabase.link/twitter-space-ga-week-3',
+      },
     ],
     steps: [],
   },
@@ -192,7 +205,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     blog: '#',
     date: '18 April',
     published_at: '2024-04-18T08:00:00.000-08:00',
-    description: <>TBD</>,
+    description: <></>,
     links: [
       // {
       //   type: 'blog',
@@ -202,10 +215,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       //   type: 'video',
       //   href: '',
       // },
-      // {
-      //   type: 'xSpace',
-      //   href: '#',
-      // },
+      {
+        type: 'xSpace',
+        href: 'https://supabase.link/twitter-space-ga-week-4',
+      },
     ],
     steps: [],
   },
@@ -219,7 +232,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     blog: '#',
     date: '19 April',
     published_at: '2024-04-19T08:00:00.000-08:00',
-    description: <>TBD</>,
+    description: <></>,
     links: [
       // {
       //   type: 'blog',
@@ -229,10 +242,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       //   type: 'video',
       //   href: '',
       // },
-      // {
-      //   type: 'xSpace',
-      //   href: '#',
-      // },
+      {
+        type: 'xSpace',
+        href: 'https://supabase.link/twitter-space-ga-week-5',
+      },
     ],
     steps: [],
   },
