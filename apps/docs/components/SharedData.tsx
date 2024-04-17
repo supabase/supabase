@@ -11,9 +11,12 @@ const sharedData = {
  * A wrapper component to access data from the `shared-data` package within MDX
  * files.
  *
- * @param children - Can be a string, which represents the path to a data item,
- *                   or a function, which takes the data object as an argument,
- *                   and returns a ReactNode.
+ * @param children - How to access the shared data. If it is a render function,
+ *                   it takes the data object as a param. If it is a string, it
+ *                   takes a path through the data object, formatted like
+ *                   `a[0].b.c`. This path should lead to either a renderable
+ *                   type or a nested object. If it leads to an object, the
+ *                   return value is `${object.value} ${object.unit}`.
  */
 function SharedData({
   data,
@@ -22,9 +25,11 @@ function SharedData({
   data: keyof typeof sharedData
   children: ((selectedData: (typeof sharedData)[keyof typeof sharedData]) => ReactNode) | string
 }) {
-  const selectedData = sharedData[data]
+  let selectedData = sharedData[data] as any
   return typeof children === 'string'
-    ? (at(selectedData, [children])[0] as unknown as ReactNode)
+    ? ((typeof (selectedData = at(selectedData, [children])[0]) === 'object'
+        ? `${selectedData.value ?? ''} ${selectedData.unit ?? ''}`.trim()
+        : selectedData) as unknown as ReactNode)
     : children(selectedData)
 }
 
