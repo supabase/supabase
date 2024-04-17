@@ -46,13 +46,13 @@ import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/Featur
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
+import DefaultLayout from 'layouts/Default'
 import { AuthProvider } from 'lib/auth'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { ProfileProvider } from 'lib/profile'
 import { useAppStateSnapshot } from 'state/app-state'
 import HCaptchaLoadedStore from 'stores/hcaptcha-loaded-store'
 import { AppPropsWithLayout } from 'types'
-import DefaultLayout from '../layouts/Default'
 
 dayjs.extend(customParseFormat)
 dayjs.extend(utc)
