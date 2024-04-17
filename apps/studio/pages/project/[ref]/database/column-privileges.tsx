@@ -23,7 +23,7 @@ import {
 import PrivilegesHead from 'components/interfaces/Database/Privileges/PrivilegesHead'
 import PrivilegesTable from 'components/interfaces/Database/Privileges/PrivilegesTable'
 import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
-import { AuthLayout } from 'components/layouts'
+import { AuthLayout, DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
@@ -376,6 +376,8 @@ const PrivilegesPage: NextPageWithLayout = () => {
   )
 }
 
-PrivilegesPage.getLayout = (page) => <AuthLayout title="Column Privileges">{page}</AuthLayout>
+PrivilegesPage.getLayout = (page) => (
+  <DatabaseLayout title="Column Privileges">{page}</DatabaseLayout>
+)
 
 export default PrivilegesPage

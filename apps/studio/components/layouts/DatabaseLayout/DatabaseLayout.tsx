@@ -7,6 +7,7 @@ import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedProject, withAuth } from 'hooks'
 import { ProjectLayout } from '../'
 import { generateDatabaseMenu } from './DatabaseMenu.utils'
+import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 export interface DatabaseLayoutProps {
   title?: string
@@ -26,6 +27,7 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
 
   const pgNetExtensionExists = (data ?? []).find((ext) => ext.name === 'pg_net') !== undefined
   const pitrEnabled = addons?.selected_addons.find((addon) => addon.type === 'pitr') !== undefined
+  const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
 
   return (
     <ProjectLayout
@@ -33,7 +35,11 @@ const DatabaseLayout = ({ children }: PropsWithChildren<DatabaseLayoutProps>) =>
       productMenu={
         <ProductMenu
           page={page}
-          menu={generateDatabaseMenu(project, { pgNetExtensionExists, pitrEnabled })}
+          menu={generateDatabaseMenu(project, {
+            pgNetExtensionExists,
+            pitrEnabled,
+            columnLevelPrivileges,
+          })}
         />
       }
       isBlocking={false}

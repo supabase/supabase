@@ -2,7 +2,6 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren } from 'react'
 
-import { useIsColumnLevelPrivilegesEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ProductMenu } from 'components/ui/ProductMenu'
 import { useAuthConfigPrefetch } from 'data/auth/auth-config-query'
 import { withAuth } from 'hooks'
@@ -15,7 +14,6 @@ export interface AuthLayoutProps {
 
 const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => {
   const { ref: projectRef = 'default' } = useParams()
-  const columnLevelPrivileges = useIsColumnLevelPrivilegesEnabled()
 
   useAuthConfigPrefetch({ projectRef })
 
@@ -26,12 +24,7 @@ const AuthLayout = ({ title, children }: PropsWithChildren<AuthLayoutProps>) => 
     <ProjectLayout
       title={title || 'Authentication'}
       product="Authentication"
-      productMenu={
-        <ProductMenu
-          page={page}
-          menu={generateAuthMenu(projectRef ?? 'default', { columnLevelPrivileges })}
-        />
-      }
+      productMenu={<ProductMenu page={page} menu={generateAuthMenu(projectRef ?? 'default')} />}
       isBlocking={false}
     >
       <main style={{ maxHeight: '100vh' }} className="flex-1 overflow-y-auto">

@@ -354,6 +354,11 @@ const nextConfig = {
         source: '/project/:ref/reports/query-performance',
         destination: '/project/:ref/database/query-performance',
       },
+      {
+        permanent: true,
+        source: '/project/:ref/auth/column-privileges',
+        destination: '/project/:ref/database/column-privileges',
+      },
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
             {

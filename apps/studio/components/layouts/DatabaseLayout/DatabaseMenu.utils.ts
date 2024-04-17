@@ -4,10 +4,10 @@ import { IS_PLATFORM } from 'lib/constants'
 
 export const generateDatabaseMenu = (
   project?: Project,
-  flags?: { pgNetExtensionExists: boolean; pitrEnabled: boolean }
+  flags?: { pgNetExtensionExists: boolean; pitrEnabled: boolean; columnLevelPrivileges?: boolean }
 ): ProductMenuGroup[] => {
   const ref = project?.ref ?? 'default'
-  const { pgNetExtensionExists, pitrEnabled } = flags || {}
+  const { pgNetExtensionExists, pitrEnabled, columnLevelPrivileges } = flags || {}
 
   return [
     {
@@ -103,6 +103,17 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/linter`,
           items: [],
         },
+        ...(columnLevelPrivileges
+          ? [
+              {
+                name: 'Column Privileges',
+                key: 'column-privileges',
+                url: `/project/${ref}/database/column-privileges`,
+                items: [],
+                label: 'ALPHA',
+              },
+            ]
+          : []),
       ],
     },
   ]
