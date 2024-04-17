@@ -46,7 +46,7 @@ const LW11Summary = () => {
                     <span className="shrink-0 text-sm font-mono uppercase leading-6">
                       Day {i + 1} -
                     </span>
-                    <span className="leading-6">{day.description}</span>
+                    <span className="leading-6">{day.title}</span>
                   </Link>
                 </ol>
               )
