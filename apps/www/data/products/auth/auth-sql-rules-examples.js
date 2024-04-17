@@ -65,7 +65,7 @@ create table teams (
 
 create table members (
   team_id references team.id,
-  user_id referenced auth.users.id
+  user_id references auth.users.id
 );
 
 alter table teams enable row level security;
