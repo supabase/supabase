@@ -512,6 +512,10 @@ export const auth = {
       url: '/guides/auth/architecture',
     },
     {
+      name: 'SSR',
+      url: '/guides/auth/ssr',
+    },
+    {
       name: 'Quickstarts',
       items: [
         { name: 'Next.js', url: '/guides/auth/quickstarts/nextjs', items: [] },
@@ -538,9 +542,8 @@ export const auth = {
         { name: 'Password-based', url: '/guides/auth/passwords' },
         { name: 'Email (Magic Link or OTP)', url: '/guides/auth/auth-email-passwordless' },
         {
-          name: 'Phone Login (OTP)',
+          name: 'Phone Login',
           url: '/guides/auth/phone-login',
-          items: [...PhoneLoginsItems],
         },
         {
           name: 'Social Login (OAuth)',

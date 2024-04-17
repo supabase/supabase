@@ -2,11 +2,10 @@ import Link from 'next/link'
 import { Admonition } from 'ui'
 
 const CostWarning = () => (
-  <Admonition type="warning" title="Follow regulations and keep costs under control">
+  <Admonition type="warning">
     <p>
-      SMS providers charge to send SMS messages. To keep costs under control, make sure you adjust
-      your project&apos;s rate limits and{' '}
-      <Link href="/guides/auth/auth-captcha">configure CAPTCHA</Link>. See the{' '}
+      To keep SMS sending costs under control, make sure you adjust your project&apos;s rate limits
+      and <Link href="/guides/auth/auth-captcha">configure CAPTCHA</Link>. See the{' '}
       <Link href="/guides/platform/going-into-prod">Production Checklist</Link> to learn more.
     </p>
     <p>

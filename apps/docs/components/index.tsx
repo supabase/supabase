@@ -23,9 +23,10 @@ import RefHeaderSection from './reference/RefHeaderSection'
 
 // Other components
 import AuthProviders from '~/components/AuthProviders'
+import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderConfig.Warnings'
 import Options from '~/components/Options'
 import Param from '~/components/Params'
-import { ProjectConfigVariables } from './ProjectConfigVariables'
+import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
 
 // Data wrappers
 import { NavData } from './NavData'
@@ -92,6 +93,7 @@ const components = {
   CH,
   CliGlobalFlagsHandler: () => <CliGlobalFlagsHandler />,
   CodeBlock,
+  CostWarning,
   DatabaseSetup,
   Extensions,
   GetSessionWarning,
