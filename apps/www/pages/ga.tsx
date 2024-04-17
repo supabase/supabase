@@ -20,7 +20,7 @@ const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
 export default function IndexPage() {
   const router = useRouter()
-  const { resolvedTheme } = useTheme()
+  const { resolvedTheme, theme } = useTheme()
   const isDark = resolvedTheme?.includes('dark')
   const data = pageData(isDark!)
 
