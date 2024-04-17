@@ -41,7 +41,7 @@ export default function GAWeekIndex({ meetups }: Props) {
   const [session, setSession] = useState<Session | null>(null)
   const [showCustomizationForm, setShowCustomizationForm] = useState<boolean>(false)
 
-  const isDarkTheme = resolvedTheme === 'dark'
+  const isDarkTheme = resolvedTheme === 'dark' || resolvedTheme === 'deep-dark'
 
   const defaultUserData = {
     id: query.id?.toString(),
@@ -80,10 +80,6 @@ export default function GAWeekIndex({ meetups }: Props) {
 
   useEffect(() => {
     handleForceDeepDark(isDarkTheme)
-  }, [])
-
-  useEffect(() => {
-    handleForceDeepDarkOnChange(isDarkTheme)
   }, [resolvedTheme, theme, isDarkTheme])
 
   return (

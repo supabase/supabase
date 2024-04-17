@@ -30,12 +30,3 @@ export function handleForceDeepDark(isDarkTheme: boolean) {
     window.removeEventListener('load', handleDocumentLoad)
   }
 }
-
-export function handleForceDeepDarkOnChange(isDarkTheme: boolean) {
-  const theme = isDarkTheme ? 'deep-dark' : 'light'
-
-  if (document) {
-    document.documentElement.setAttribute('data-theme', theme)
-    document.documentElement.style.colorScheme = theme
-  }
-}
