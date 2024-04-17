@@ -162,7 +162,7 @@ const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeade
                     >
                       <Link
                         passHref
-                        href={`/project/${projectRef}/auth/policies?search=${table.id}`}
+                        href={`/project/${projectRef}/auth/policies?search=${table.id}&schema=${table.schema}`}
                       >
                         Add RLS policy
                       </Link>
@@ -202,7 +202,10 @@ const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeade
                     )
                   }
                 >
-                  <Link passHref href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
+                  <Link
+                    passHref
+                    href={`/project/${projectRef}/auth/policies?search=${table.id}&schema=${table.schema}`}
+                  >
                     Auth {policies.length > 1 ? 'policies' : 'policy'}
                   </Link>
                 </Button>
