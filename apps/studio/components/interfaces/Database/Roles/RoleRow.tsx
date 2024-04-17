@@ -33,19 +33,15 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
 
   const { mutate: updateDatabaseRole, isLoading: isUpdating } = useDatabaseRoleUpdateMutation()
 
-  const {
-    isSuperuser,
-    canLogin,
-    canCreateRole,
-    canCreateDb,
-    isReplicationRole,
-    canBypassRls,
-  } = role
+  const { isSuperuser, canLogin, canCreateRole, canCreateDb, isReplicationRole, canBypassRls } =
+    role
 
   const onSaveChanges = async (values: Partial<PgRole>, { resetForm }: any) => {
     if (!project) return console.error('Project is required')
 
-    const changed = Object.fromEntries(Object.entries(values).filter(([k, v]) => v !== (role as any)[k]))
+    const changed = Object.fromEntries(
+      Object.entries(values).filter(([k, v]) => v !== (role as any)[k])
+    )
 
     updateDatabaseRole(
       {

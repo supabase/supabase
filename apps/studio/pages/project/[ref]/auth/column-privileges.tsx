@@ -133,8 +133,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
     [allColumnPrivileges, selectedRole, selectedSchema, selectedTable]
   )
 
-  const rolesList =
-    allRoles?.filter((role: PgRole) => EDITABLE_ROLES.includes(role.name)) ?? []
+  const rolesList = allRoles?.filter((role: PgRole) => EDITABLE_ROLES.includes(role.name)) ?? []
   const roles = rolesList.map((role: PgRole) => role.name)
 
   const table = tableList?.find(
