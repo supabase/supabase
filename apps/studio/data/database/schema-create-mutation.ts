@@ -3,7 +3,6 @@ import pgMeta from '@supabase/pg-meta'
 import { toast } from 'react-hot-toast'
 
 import type { ResponseError } from 'types'
-import { databaseKeys } from './keys'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { invalidateSchemasQuery } from './schemas-query'
 
