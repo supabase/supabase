@@ -278,7 +278,8 @@ const RateLimits = () => {
                   <FormSectionLabel
                     description={
                       <p className="text-foreground-light text-sm">
-                        Number of sessions that can be refreshed in a 5 minute interval
+                        Number of sessions that can be refreshed in a 5 minute interval per IP
+                        address.
                       </p>
                     }
                   >
@@ -315,7 +316,7 @@ const RateLimits = () => {
                     description={
                       <p className="text-foreground-light text-sm">
                         Number of OTP/Magic link verifications that can be made in a 5 minute
-                        interval
+                        interval per IP address.
                       </p>
                     }
                   >
@@ -349,7 +350,7 @@ const RateLimits = () => {
                   <FormSectionLabel
                     description={
                       <p className="text-foreground-light text-sm">
-                        Number of anonymous sign-ins that can be made per hour
+                        Number of anonymous sign-ins that can be made per hour per IP address.
                       </p>
                     }
                   >

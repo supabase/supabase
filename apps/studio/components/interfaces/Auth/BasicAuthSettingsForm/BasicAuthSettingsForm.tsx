@@ -34,6 +34,7 @@ import { IS_PLATFORM } from 'lib/constants'
 import Link from 'next/link'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import FormField from '../AuthProvidersForm/FormField'
+import { ExternalLink } from 'lucide-react'
 
 // Use a const string to represent no chars option. Represented as empty string on the backend side.
 const NO_REQUIRED_CHARACTERS = 'NO_REQUIRED_CHARS'
@@ -233,17 +234,30 @@ const BasicAuthSettingsForm = () => {
                             Anonymous users will use the{' '}
                             <code className="text-xs">authenticated</code> role when signing in
                           </AlertTitle_Shadcn_>
-                          <AlertDescription_Shadcn_>
-                            As a result, anonymous users will be subjected to RLS policies that
-                            apply to the <code className="text-xs">public</code> and{' '}
-                            <code className="text-xs">authenticated</code> roles. We strongly advise{' '}
-                            <Link
-                              href={`/project/${projectRef}/auth/policies`}
-                              className="text-foreground underline"
+                          <AlertDescription_Shadcn_ className="flex flex-col gap-y-3">
+                            <p>
+                              As a result, anonymous users will be subjected to RLS policies that
+                              apply to the <code className="text-xs">public</code> and{' '}
+                              <code className="text-xs">authenticated</code> roles. We strongly
+                              advise{' '}
+                              <Link
+                                href={`/project/${projectRef}/auth/policies`}
+                                className="text-foreground underline"
+                              >
+                                reviewing your RLS policies
+                              </Link>{' '}
+                              to ensure that access to your data is restricted where required.
+                            </p>
+                            <Button
+                              asChild
+                              type="default"
+                              className="w-min"
+                              icon={<ExternalLink size={14} />}
                             >
-                              reviewing your RLS policies
-                            </Link>{' '}
-                            to ensure that access to your data is restricted where required.
+                              <Link href="/docs/guides/auth/auth-anonymous#access-control">
+                                View access control docs
+                              </Link>
+                            </Button>
                           </AlertDescription_Shadcn_>
                         </div>
                       </Alert_Shadcn_>
