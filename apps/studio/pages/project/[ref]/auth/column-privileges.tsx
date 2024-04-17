@@ -28,7 +28,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
+import { PgRole, useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-query'
 import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
 import { useTablesQuery } from 'data/tables/tables-query'
@@ -133,9 +133,8 @@ const PrivilegesPage: NextPageWithLayout = () => {
     [allColumnPrivileges, selectedRole, selectedSchema, selectedTable]
   )
 
-  const rolesList =
-    allRoles?.filter((role: PostgresRole) => EDITABLE_ROLES.includes(role.name)) ?? []
-  const roles = rolesList.map((role: PostgresRole) => role.name)
+  const rolesList = allRoles?.filter((role: PgRole) => EDITABLE_ROLES.includes(role.name)) ?? []
+  const roles = rolesList.map((role: PgRole) => role.name)
 
   const table = tableList?.find(
     (table) => table.schema === selectedSchema && table.name === selectedTable
