@@ -10,15 +10,16 @@ export const useThemeSync = (app: App) => {
   useEffect(() => {
     const handleSetLocalStorage = (e: any) => {
       const theme = e.target?.localStorage?.theme
-      const wwwTheme = e.target?.localStorage?.wwwTheme
+      const wwwTheme = e.target?.localStorage?.wwwTheme?.replace('deep-', '')
+
+      if (theme === wwwTheme) return
 
       if (theme && isWww) {
         setTheme(theme === 'dark' && wwwTheme === 'deep-dark' ? 'deep-dark' : theme)
       }
 
       if (wwwTheme && !isWww) {
-        console.log('www theme change', wwwTheme)
-        setTheme(wwwTheme.replace('deep-', ''))
+        setTheme(wwwTheme)
       }
     }
 
