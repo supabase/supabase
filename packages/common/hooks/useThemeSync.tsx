@@ -17,7 +17,8 @@ export const useThemeSync = (app: App) => {
       }
 
       if (wwwTheme && !isWww) {
-        setTheme(wwwTheme.includes('dark') ? 'dark' : wwwTheme)
+        console.log('www theme change', wwwTheme)
+        setTheme(wwwTheme.replace('deep-', ''))
       }
     }
 
