@@ -34,9 +34,6 @@ const LW11Summary = () => {
         <div className="font-mono uppercase tracking-wide text-xs">15-19 April</div>
       </div>
       <div className="pb-4 border-t p-4">
-        {/* <div className="font-mono uppercase text-xs text-foreground tracking-wide mb-3">
-          Main Stage
-        </div> */}
         <ul className="flex flex-col gap-2">
           {days.map(
             (day, i: number) =>
