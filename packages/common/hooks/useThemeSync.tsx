@@ -9,12 +9,12 @@ export const useThemeSync = (app: App) => {
 
   useEffect(() => {
     const handleSetLocalStorage = (e: any) => {
-      const theme = e.target?.localStorage?.theme
+      // const theme = e.target?.localStorage?.theme
       const wwwTheme = e.target?.localStorage?.wwwTheme
 
-      if (theme && isWww) {
-        setTheme(theme === 'dark' && wwwTheme === 'deep-dark' ? 'deep-dark' : theme)
-      }
+      // if (theme && isWww) {
+      //   setTheme(theme === 'dark' && wwwTheme === 'deep-dark' ? 'deep-dark' : theme)
+      // }
 
       if (wwwTheme && !isWww) {
         setTheme(wwwTheme?.replace('deep-', ''))
