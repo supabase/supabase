@@ -191,7 +191,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       },
       {
         type: 'video',
-        href: '',
+        href: 'WNN7Pp5Ftk4',
       },
       {
         type: 'xSpace',
@@ -201,7 +201,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     steps: [
       {
         title: 'Supabase Auth now supports Anonymous sign-ins',
-        blog: '#',
+        blog: '/blog/anonymous-sign-ins',
         bg_layers: [
           {
             img: isDark
