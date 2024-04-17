@@ -20,8 +20,7 @@ import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
-  //const enableQueryPerformanceV2 = useFlag('queryPerformanceV2')
-  const enableQueryPerformanceV2 = true
+  const enableQueryPerformanceV2 = useFlag('queryPerformanceV2')
 
   // [Joshen] Has been false on configcat for a long time
   const tableIndexEfficiencyEnabled = useFlag('tableIndexEfficiency')

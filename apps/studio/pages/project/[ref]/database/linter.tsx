@@ -461,7 +461,6 @@ const ProjectLints: NextPageWithLayout = () => {
           />
         </div>
       </div>
-      <div className="col-span-12 hidden remove-me-when-finished"></div>
     </div>
   )
 }
