@@ -38,7 +38,7 @@ const BuildStage: FC = () => {
             <li
               key={`${day.id}-${i}`}
               className={cn(
-                'relative flex flex-col w-full aspect-square rounded-xl border border-dashed border-muted dark:border-muted/50 bg-surface-100/10 col-span-1',
+                'relative flex flex-col w-full aspect-square rounded-xl border border-dashed border-muted bg-surface-100/10 col-span-1',
                 day.className
               )}
               data-delay={i}
@@ -58,7 +58,7 @@ const BuildStage: FC = () => {
                         fillRule="evenodd"
                         clipRule="evenodd"
                         d="M3.9999 7.55557V5.95557C3.9999 3.74643 5.79076 1.95557 7.9999 1.95557C10.209 1.95557 11.9999 3.74643 11.9999 5.95557V7.55557C12.8836 7.55557 13.5999 8.27191 13.5999 9.15557V13.1556C13.5999 14.0392 12.8836 14.7556 11.9999 14.7556H3.9999C3.11625 14.7556 2.3999 14.0392 2.3999 13.1556V9.15557C2.3999 8.27191 3.11625 7.55557 3.9999 7.55557ZM10.3999 5.95557V7.55557H5.5999V5.95557C5.5999 4.63008 6.67442 3.55557 7.9999 3.55557C9.32539 3.55557 10.3999 4.63008 10.3999 5.95557Z"
-                        fill="#8B9092"
+                        fill="hsl(var(--foreground-lighter))"
                       />
                     </g>
                   </svg>
