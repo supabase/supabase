@@ -548,27 +548,8 @@ export const auth = {
         {
           name: 'Social Login (OAuth)',
           url: '/guides/auth/social-login',
-          items: [
-            {
-              name: 'Native Mobile OAuth',
-              url: '/guides/auth/native-mobile-deep-linking',
-            },
-            ...SocialLoginItems,
-          ],
+          items: [...SocialLoginItems],
         },
-        {
-          name: 'Native Mobile Login',
-          url: '/guides/auth/native-mobile-login',
-          items: [
-            ...NativeMobileLoginItems,
-            {
-              name: 'OAuth Deep Linking',
-              url: '/guides/auth/native-mobile-deep-linking',
-            },
-          ],
-        },
-        { name: 'Anonymous signins', url: '/guides/auth/auth-anonymous' },
-        { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
         {
           name: 'Enterprise SSO',
           url: '/guides/auth/enterprise-sso',
@@ -579,15 +560,12 @@ export const auth = {
             },
           ],
         },
+        { name: 'Anonymous signins', url: '/guides/auth/auth-anonymous' },
+        { name: 'Mobile Deep Linking', url: '/guides/auth/native-mobile-deep-linking' },
+        { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
         {
           name: 'Signout',
           url: '/guides/auth/signout',
-        },
-        /* TO BE DEPRECATED BELOW */
-        {
-          name: 'Passwordless Login',
-          url: '/guides/auth/passwordless-login',
-          items: [{ name: 'Phone OTP', url: '/guides/auth/phone-login' }],
         },
       ],
     },
