@@ -15,7 +15,6 @@ import LW11StickyNav from '~/components/LaunchWeek/11/Releases/LW11StickyNav'
 import LW11Header from '~/components/LaunchWeek/11/Releases/LW11Header'
 import MainStage from '~/components/LaunchWeek/11/Releases/MainStage'
 import { useTheme } from 'next-themes'
-import Head from 'next/head'
 import { handleForceDeepDark, handleForceDeepDarkOnChange } from '~/lib/theme.utils'
 
 const BuildStage = dynamic(() => import('~/components/LaunchWeek/11/Releases/BuildStage'))
@@ -89,10 +88,6 @@ export default function GAWeekIndex({ meetups }: Props) {
 
   return (
     <>
-      <Head>
-        {/* Update the attributes */}
-        <html lang="en" data-theme="deep-dark" style={{ colorScheme: 'deep-dark' }} />
-      </Head>
       <NextSeo
         title={TITLE}
         description={DESCRIPTION}
