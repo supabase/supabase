@@ -65,7 +65,6 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-1',
     d: 1,
     dd: 'Mon',
-    title: 'Lorem ipsum',
     shipped: true,
     isToday: false,
     blog: '/ga',
@@ -74,13 +73,14 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     published_at: '2024-04-15T08:00:00.000-08:00',
     videoId: 'bRtdk8D4X8w',
     videoThumbnail: '/images/launchweek/11/video-cover.jpg',
+    title: 'Supabase is officially launching into General Availability',
+    description: 'Supabase is officially launching into General Availability',
     links: [
       {
         type: 'xSpace',
         href: 'https://supabase.link/twitter-space-ga',
       },
     ],
-    description: 'Supabase is officially launching into General Availability',
     steps: [
       {
         icon: products.database.icon[16],
@@ -124,13 +124,13 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-2',
     d: 2,
     dd: 'Tue',
-    title: '',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/ai-inference-now-available-in-supabase-edge-functions',
     date: '16 April',
     published_at: '2024-04-16T08:00:00.000-08:00',
+    title: 'Supabase Functions now supports AI models',
     description: (
       <>
         Supabase Functions now supports <strong>AI models</strong>
@@ -152,7 +152,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     ],
     steps: [
       {
-        title: 'Create vector embeddings with Edge Functions',
+        title: 'Supabase Functions now supports AI models',
         blog: '#',
         bg_layers: [
           {
@@ -172,39 +172,61 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-3',
     d: 3,
     dd: 'Wed',
-    title: '',
-    shipped: false,
-    hasCountdown: true,
-    blog: '#',
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
+    blog: '/blog/anonymous-sign-ins',
     date: '17 April',
     published_at: '2024-04-17T08:00:00.000-08:00',
-    description: <></>,
+    title: 'Supabase Auth now supports Anonymous sign-ins',
+    description: (
+      <>
+        Supabase Auth now supports <strong>Anonymous sign-ins</strong>
+      </>
+    ),
     links: [
-      // {
-      //   type: 'blog',
-      //   href: '#',
-      // },
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'blog',
+        href: '/blog/anonymous-sign-ins',
+      },
+      {
+        type: 'video',
+        href: 'WNN7Pp5Ftk4',
+      },
       {
         type: 'xSpace',
         href: 'https://supabase.link/twitter-space-ga-week-3',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: 'Supabase Auth now supports Anonymous sign-ins',
+        blog: '/blog/anonymous-sign-ins',
+        bg_layers: [
+          {
+            img: isDark
+              ? '/images/launchweek/11/days/d3-dark.svg'
+              : '/images/launchweek/11/days/d3-light.svg',
+            mobileImg: isDark
+              ? '/images/launchweek/11/days/d3-dark-mobile.svg'
+              : '/images/launchweek/11/days/d3-light-mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
   {
     id: 'day-4',
     d: 4,
     dd: 'Thu',
-    title: '',
     shipped: false,
-    hasCountdown: false,
+    isToday: false,
+    hasCountdown: true,
     blog: '#',
     date: '18 April',
     published_at: '2024-04-18T08:00:00.000-08:00',
+    title: '',
     description: <></>,
     links: [
       // {
@@ -226,12 +248,13 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-5',
     d: 5,
     dd: 'Fri',
-    title: '',
     shipped: false,
+    isToday: false,
     hasCountdown: false,
     blog: '#',
     date: '19 April',
     published_at: '2024-04-19T08:00:00.000-08:00',
+    title: '',
     description: <></>,
     links: [
       // {
