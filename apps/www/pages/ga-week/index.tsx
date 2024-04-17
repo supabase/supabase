@@ -15,7 +15,7 @@ import LW11StickyNav from '~/components/LaunchWeek/11/Releases/LW11StickyNav'
 import LW11Header from '~/components/LaunchWeek/11/Releases/LW11Header'
 import MainStage from '~/components/LaunchWeek/11/Releases/MainStage'
 import { useTheme } from 'next-themes'
-import { handleForceDeepDark, handleForceDeepDarkOnChange } from '~/lib/theme.utils'
+import { handleForceDeepDark } from '~/lib/theme.utils'
 
 const BuildStage = dynamic(() => import('~/components/LaunchWeek/11/Releases/BuildStage'))
 const LW11Meetups = dynamic(() => import('~/components/LaunchWeek/11/LW11Meetups'))
