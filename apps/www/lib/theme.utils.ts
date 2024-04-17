@@ -1,32 +1,43 @@
-export function handleForceDeepDark(isDarkTheme: boolean) {
-  const handleDocumentLoad = () => {
-    // Update the HTML element attributes
+import { useEffect } from 'react'
+import { useTheme } from 'next-themes'
+import { useRouter } from 'next/router'
 
-    const theme = isDarkTheme ? 'deep-dark' : 'light'
+export function useForceDeepDark() {
+  const router = useRouter()
+  const { resolvedTheme, theme } = useTheme()
 
-    document.documentElement.setAttribute('data-theme', theme)
-    document.documentElement.style.colorScheme = theme
+  const isDarkTheme = resolvedTheme?.includes('dark')
+  const isGaSection = router.pathname.includes('/ga-week') || router.pathname === '/ga'
 
-    // wait 1 second before setting the theme
-    setTimeout(() => {
+  useEffect(() => {
+    const handleDocumentLoad = () => {
+      // Update the HTML element attributes
+      const theme = isDarkTheme ? (isGaSection ? 'deep-dark' : 'dark') : 'light'
+
       document.documentElement.setAttribute('data-theme', theme)
       document.documentElement.style.colorScheme = theme
-    }, 200)
 
-    // Clean up the event listener
-    window.removeEventListener('load', handleDocumentLoad)
-  }
+      // wait before setting the theme
+      setTimeout(() => {
+        document.documentElement.setAttribute('data-theme', theme)
+        document.documentElement.style.colorScheme = theme
+      }, 200)
 
-  // Check if document is already loaded
-  if (document.readyState === 'complete') {
-    handleDocumentLoad()
-  } else {
-    // Add a global load event listener
-    window.addEventListener('load', handleDocumentLoad)
-  }
+      // Clean up the event listener
+      window.removeEventListener('load', handleDocumentLoad)
+    }
 
-  // Clean up the event listener on component unmount
-  return () => {
-    window.removeEventListener('load', handleDocumentLoad)
-  }
+    // Check if document is already loaded
+    if (document.readyState === 'complete') {
+      handleDocumentLoad()
+    } else {
+      // Add a global load event listener
+      window.addEventListener('load', handleDocumentLoad)
+    }
+
+    // Clean up the event listener on component unmount
+    return () => {
+      window.removeEventListener('load', handleDocumentLoad)
+    }
+  }, [resolvedTheme, theme, isDarkTheme, router])
 }

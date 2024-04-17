@@ -14,8 +14,6 @@ import { Meetup } from '~/components/LaunchWeek/11/LW11Meetups'
 import LW11StickyNav from '~/components/LaunchWeek/11/Releases/LW11StickyNav'
 import LW11Header from '~/components/LaunchWeek/11/Releases/LW11Header'
 import MainStage from '~/components/LaunchWeek/11/Releases/MainStage'
-import { useTheme } from 'next-themes'
-import { handleForceDeepDark } from '~/lib/theme.utils'
 
 const BuildStage = dynamic(() => import('~/components/LaunchWeek/11/Releases/BuildStage'))
 const LW11Meetups = dynamic(() => import('~/components/LaunchWeek/11/LW11Meetups'))
@@ -30,7 +28,6 @@ interface Props {
 
 export default function GAWeekIndex({ meetups }: Props) {
   const { query } = useRouter()
-  const { resolvedTheme, theme } = useTheme()
 
   const TITLE = 'Supabase GA Week | 15-19 April 2024'
   const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
@@ -40,8 +37,6 @@ export default function GAWeekIndex({ meetups }: Props) {
   const bgImageId = query.bgImageId?.toString()
   const [session, setSession] = useState<Session | null>(null)
   const [showCustomizationForm, setShowCustomizationForm] = useState<boolean>(false)
-
-  const isDarkTheme = resolvedTheme === 'dark' || resolvedTheme === 'deep-dark'
 
   const defaultUserData = {
     id: query.id?.toString(),
@@ -77,10 +72,6 @@ export default function GAWeekIndex({ meetups }: Props) {
     }
     if (!session) return setTicketState('registration')
   }, [session, userData])
-
-  useEffect(() => {
-    handleForceDeepDark(isDarkTheme)
-  }, [resolvedTheme, theme, isDarkTheme])
 
   return (
     <>
