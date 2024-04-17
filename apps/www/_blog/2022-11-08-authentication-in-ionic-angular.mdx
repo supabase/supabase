@@ -115,7 +115,7 @@ create policy "Authenticated users can create groups." on groups for
   insert to authenticated with check (true);
 
 create policy "The owner can delete a group." on groups for
-    delete using (auth.uid() = creator);
+    delete using ((select auth.uid()) = creator);
 
 -- Message Policies
 create policy "Authenticated users can read messages." on messages

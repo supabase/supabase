@@ -568,7 +568,7 @@ functions:
     notes: |
       - Requires either an email or phone number.
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
-      - If the user doesn't exist, `signInWithOtp()` will signup the user instead. To restrict this behaviour, you can set `shouldCreateUser` in `SignInWithPasswordlessCredentials.options` to `false`.
+      - If the user doesn't exist, `signInWithOtp()` will signup the user instead. To restrict this behavior, you can set `shouldCreateUser` in `SignInWithPasswordlessCredentials.options` to `false`.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](/docs/guides/auth/concepts/redirect-urls).
@@ -4925,7 +4925,7 @@ functions:
     notes: |
       - Requires an Authorization header.
       - Invoke params generally match the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) spec.
-      - When you pass in a body to your function, we automatically attach the Content-Type header for `Blob`, `ArrayBuffer`, `File`, `FormData` and `String`. If it doesn't match any of these types we assume the payload is `json`, serialise it and attach the `Content-Type` header as `application/json`. You can override this behaviour by passing in a `Content-Type` header of your own.
+      - When you pass in a body to your function, we automatically attach the Content-Type header for `Blob`, `ArrayBuffer`, `File`, `FormData` and `String`. If it doesn't match any of these types we assume the payload is `json`, serialize it and attach the `Content-Type` header as `application/json`. You can override this behavior by passing in a `Content-Type` header of your own.
       - Responses are automatically parsed as `json`, `blob` and `form-data` depending on the `Content-Type` header sent by your function. Responses are parsed as `text` by default.
     examples:
       - id: basic-invocation
@@ -4991,6 +4991,36 @@ functions:
             method: 'DELETE'
           })
           ```
+      - id: regional-invocation
+        name: Invoking a Function in the UsEast1 region
+        description: |
+          Here are the available regions:
+          - `FunctionRegion.Any`
+          - `FunctionRegion.ApNortheast1`
+          - `FunctionRegion.ApNortheast2`
+          - `FunctionRegion.ApSouth1`
+          - `FunctionRegion.ApSoutheast1`
+          - `FunctionRegion.ApSoutheast2`
+          - `FunctionRegion.CaCentral1`
+          - `FunctionRegion.EuCentral1`
+          - `FunctionRegion.EuWest1`
+          - `FunctionRegion.EuWest2`
+          - `FunctionRegion.EuWest3`
+          - `FunctionRegion.SaEast1`
+          - `FunctionRegion.UsEast1`
+          - `FunctionRegion.UsWest1`
+          - `FunctionRegion.UsWest2`
+        isSpotlight: true
+        code: |
+          ```js
+          import { createClient, FunctionRegion } from '@supabase/supabase-js'
+
+          const { data, error } = await supabase.functions.invoke('hello', {
+            body: { foo: 'bar' },
+            region: FunctionRegion.UsEast1
+          })
+          ```
+
       - id: calling-with-get-verb
         name: Calling with GET HTTP verb
         description: |

@@ -4,6 +4,8 @@ import Link from 'next/link'
 import { buildDays, mainDays } from './Releases/data'
 
 const LWXSummary = () => {
+  const days = mainDays()
+
   return (
     <div className="w-full border bg-alternative-200 flex flex-col rounded-lg text-foreground-lighter mt-12">
       <div className="w-full p-4 flex justify-between items-center">
@@ -27,7 +29,7 @@ const LWXSummary = () => {
           Main Stage
         </div>
         <ul className="flex flex-col gap-2">
-          {mainDays.map(
+          {days.map(
             (day, i: number) =>
               day.shipped && (
                 <ol key={day.id}>

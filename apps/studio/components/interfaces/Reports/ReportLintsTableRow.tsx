@@ -1,19 +1,9 @@
-import { Eye, EyeIcon, EyeOff, HelpCircle, Table2 } from 'lucide-react'
-import { useState } from 'react'
+import { Eye, HelpCircle, Table2 } from 'lucide-react'
 
 import { useParams } from 'common'
 import Table from 'components/to-be-cleaned/Table'
 import { LINT_TYPES, Lint } from 'data/lint/lint-query'
-import { useLocalStorageQuery } from 'hooks'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
-import {
-  Badge,
-  Button,
-  Modal,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Badge, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import { Markdown } from '../Markdown'
 import { LintCTA, getHumanReadableTitle } from './ReportLints.utils'
 
@@ -23,33 +13,35 @@ type ReportLintsTableRowProps = {
 
 const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
   const { ref } = useParams()
-  const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
+  // TODO: Comment out functionality for ignoring lints because it relied on local storage. Will revisit later.
+  // const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
 
-  const [lintIgnoreList, setLintIgnoreList] = useLocalStorageQuery<string[]>(
-    LOCAL_STORAGE_KEYS.PROJECT_LINT_IGNORE_LIST,
-    []
-  )
-  const isIgnored = lintIgnoreList.includes(lint.cache_key)
+  // const [lintIgnoreList, setLintIgnoreList] = useLocalStorageQuery<string[]>(
+  //   LOCAL_STORAGE_KEYS.PROJECT_LINT_IGNORE_LIST,
+  //   []
+  // )
+  // const isIgnored = lintIgnoreList.includes(lint.cache_key)
 
   // if the lint type can't be handled (there's no CTA text defined), don't render it
   if (!LINT_TYPES.includes(lint.name)) {
+    console.log('Unhandled lint type:', lint.name)
     return null
   }
 
-  const toggleLintIgnore = () => {
-    let currentIgnoreList = []
-    const cacheKey = lint.cache_key
+  // const toggleLintIgnore = () => {
+  //   let currentIgnoreList = []
+  //   const cacheKey = lint.cache_key
 
-    // Check if the cacheKey exists in the array and ignore or unignore it
-    const index = lintIgnoreList.indexOf(cacheKey)
-    if (index !== -1) {
-      currentIgnoreList = lintIgnoreList.filter((l) => l !== cacheKey)
-    } else {
-      currentIgnoreList = lintIgnoreList.concat(cacheKey)
-    }
-    setLintIgnoreList(currentIgnoreList)
-    setSelectedLint(null)
-  }
+  //   // Check if the cacheKey exists in the array and ignore or unignore it
+  //   const index = lintIgnoreList.indexOf(cacheKey)
+  //   if (index !== -1) {
+  //     currentIgnoreList = lintIgnoreList.filter((l) => l !== cacheKey)
+  //   } else {
+  //     currentIgnoreList = lintIgnoreList.concat(cacheKey)
+  //   }
+  //   setLintIgnoreList(currentIgnoreList)
+  //   setSelectedLint(null)
+  // }
 
   return (
     <>
@@ -109,7 +101,7 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
             )}
             {lint.remediation && (
               <p className="text-foreground-light max-w-full leading-relaxed">
-                You can read more about this lint rule and the best ways to remedy it{' '}
+                You can read more about this lint rule and ways to remedy it{' '}
                 <a
                   className="underline text-foreground-light transition-all hover:text-foreground hover:decoration-brand"
                   href={lint.remediation}
@@ -125,7 +117,7 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
         <Table.td>
           <div className="flex items-center justify-end gap-x-2">
             <LintCTA title={lint.name} projectRef={ref!} metadata={lint.metadata} />
-            <Tooltip_Shadcn_>
+            {/* <Tooltip_Shadcn_>
               <TooltipTrigger_Shadcn_ asChild>
                 <Button
                   type="text"
@@ -141,11 +133,11 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
               <TooltipContent_Shadcn_ side="bottom">
                 {isIgnored ? 'Unignore problem' : 'Ignore problem'}
               </TooltipContent_Shadcn_>
-            </Tooltip_Shadcn_>
+            </Tooltip_Shadcn_> */}
           </div>
         </Table.td>
       </Table.tr>
-      <Modal
+      {/* <Modal
         size="small"
         alignFooter="right"
         visible={selectedLint !== null}
@@ -162,7 +154,7 @@ const ReportLintsTableRow = ({ lint }: ReportLintsTableRowProps) => {
             </p>
           </Modal.Content>
         </div>
-      </Modal>
+      </Modal> */}
     </>
   )
 }

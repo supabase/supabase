@@ -139,6 +139,16 @@ final result = await client
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await supabase.from("books")
+  .select()
+  .eq("title", value: "Harry")
+  .execute()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -185,6 +195,15 @@ final result = await client
   .from('books')
   .select()
   .textSearch('title', "'Harry'");
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await supabase.from("books")
+  .select()
+  .textSearch("title", value: "'Harry'")
 ```
 
 </TabPanel>
@@ -241,6 +260,16 @@ final result = await client
   .from('books')
   .select()
   .textSearch('description', "'big'");
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = await client.from("books")
+  .select()
+  .textSearch("description", value: "'big'")
+  .execute()
 ```
 
 </TabPanel>
@@ -327,6 +356,23 @@ final result = await client
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```sql
+create function title_description(books) returns text as $$
+  select $1.title || ' ' || $1.description;
+$$ language sql immutable;
+```
+
+```swift
+let response = try await client
+  .from("books")
+  .select()
+  .textSearch("title_description", value: "little")
+  .execute()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```sql
@@ -402,6 +448,17 @@ final result = await client
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await client
+  .from("books")
+  .select()
+  .textSearch("description", value: "'little' & 'big'");
+  .execute()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -467,6 +524,17 @@ final result = await client
   .from('books')
   .select()
   .textSearch('description', "'little' | 'big'");
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await client
+  .from("books")
+  .select()
+  .textSearch("description", value: "'little' | 'big'")
+  .execute()
 ```
 
 </TabPanel>
@@ -546,6 +614,17 @@ const { data, error } = await supabase.rpc('search_books_by_title_prefix', { pre
 
 ```dart
 final data = await supabase.rpc('search_books_by_title_prefix', params: { 'prefix': 'Lit' });
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await supabase.rpc(
+  "search_books_by_title_prefix",
+  params: ["prefix": "Lit"]
+)
+.execute()
 ```
 
 </TabPanel>
@@ -661,6 +740,17 @@ final result = await client
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await client
+  .from("books")
+  .select()
+  .textSearch("fts", value: "'little' & 'big'")
+  .execute()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -734,6 +824,17 @@ final result = await client
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await client
+  .from("books")
+  .select()
+  .textSearch("description", value: "'big' <-> 'dreams'")
+  .execute()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -785,6 +886,17 @@ final result = await client
   .from('books')
   .select()
   .textSearch('description', "'year' <2> 'school'");
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await supabase
+  .from("books")
+  .select()
+  .textSearch("description", value: "'year' <2> 'school'")
+  .execute()
 ```
 
 </TabPanel>
@@ -842,6 +954,17 @@ final result = await client
   .from('books')
   .select()
   .textSearch('description', "'big' & !'little'");
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+let response = try await client
+  .from("books")
+  .select()
+  .textSearch("description", value: "'big' & !'little'")
+  .execute()
 ```
 
 </TabPanel>
