@@ -51,8 +51,11 @@ enable_anonymous_sign_ins = true
 
 You can create an anonymous user through the [Javascript](/docs/reference/javascript/auth-signinanonymously), [Flutter](/docs/reference/dart/auth-signinanonymously) or [Swift](/docs/reference/swift/auth-signinanonymously) SDKs today. Here’s how you can create an anonymous user using `supabase-js` .
 
+{/* prettier-ignore */}
 ```jsx
-const { data, error } = await supabase.auth.signInAnonymously()
+const { data, error } = await supabase
+  .auth
+  .signInAnonymously()
 ```
 
 ## Terminology
@@ -117,12 +120,12 @@ on public.posts
 for select
 to authenticated -- Note: user is still authenticated
 using (
-	case
-		when (select (auth.jwt() ->> 'is_anonymous'))::boolean is true
-		then (created_at >= current_date)
+  case
+    when (select (auth.jwt() ->> 'is_anonymous'))::boolean is true
+    then (created_at >= current_date)
   else
-	  true
-	end
+    true
+  end
 );
 ```
 
@@ -145,8 +148,11 @@ Supabase Auth provides 2 ways to achieve this:
 
 To link an email or phone identity:
 
+{/* prettier-ignore */}
 ```jsx
-const { data, error } = await supabase.auth.updateUser({ email })
+const { data, error } = await supabase
+  .auth
+  .updateUser({ email })
 ```
 
 ### Link an OAuth identity
@@ -165,8 +171,11 @@ To link an OAuth identity to an anonymous user, you need to [enable manual linki
 
 Once enabled, you can call the `linkIdentity()` method:
 
+{/* prettier-ignore */}
 ```jsx
-const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
+const { data, error } = await supabase
+  .auth
+  .linkIdentity({ provider: 'google' })
 ```
 
 ## Impersonating an anonymous user
