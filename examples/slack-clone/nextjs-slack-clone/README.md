@@ -115,7 +115,7 @@ When a user logs in, they are issued a JWT with the role `authenticated` and the
 We can use these details to provide fine-grained control over what each user can and cannot do.
 
 - For the full schema refer to [full-schema.sql](./full-schema.sql).
-- For documentation on Role-based Access Control, refer to the [docs](https://supabase.com/docs/guides/auth/custom-claims-and-role-based-access-control-rbac).
+- For documentation on Role-based Access Control, refer to the [docs](https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac).
 
 ## Authors
 

@@ -20,7 +20,7 @@ Custom Claims are special attributes attached to a user that you can use to cont
 
 To implement Role-Based Access Control (RBAC) with `custom claims`, use a [Custom Access Token Auth Hook](/docs/guides/auth/auth-hooks#hook-custom-access-token). This hook runs before a token is issued. You can use it to add additional claims to the user's JWT.
 
-This guide uses the [Slack Clone example](https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone) to demonstrate how to add a `user_role` claim and use it in your [Row Level Security (RLS) policies](/docs/guides/auth/row-level-security).
+This guide uses the [Slack Clone example](https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone) to demonstrate how to add a `user_role` claim and use it in your [Row Level Security (RLS) policies](/docs/guides/database/postgres/row-level-security).
 
 ## Create a table to track user roles and permissions
 
@@ -235,7 +235,7 @@ $$ language plpgsql security definer set search_path = public;
 
 <Admonition type="note">
 
-You can read more about using functions in RLS policies in the [RLS guide](/docs/guides/auth/row-level-security#using-functions).
+You can read more about using functions in RLS policies in the [RLS guide](/docs/guides/database/postgres/row-level-security#using-functions).
 
 </Admonition>
 
@@ -272,6 +272,6 @@ You now have a robust system in place to manage user roles and permissions withi
 ## More resources
 
 - [Auth Hooks](/docs/guides/auth/auth-hooks)
-- [Row Level Security](/docs/guides/auth/row-level-security)
-- [RLS Functions](/docs/guides/auth/row-level-security#using-functions)
+- [Row Level Security](/docs/guides/database/postgres/row-level-security)
+- [RLS Functions](/docs/guides/database/postgres/row-level-security#using-functions)
 - [Next.js Slack Clone Example](https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone)

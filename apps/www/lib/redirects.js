@@ -2478,4 +2478,24 @@ module.exports = [
     source: '/docs/guides/auth/auth-user-management',
     destination: '/docs/guides/auth/general-configuration',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-deep-dive/auth-deep-dive-jwts',
+    destination: '/docs/guides/auth/jwts',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/row-level-security',
+    destination: '/docs/guides/database/postgres/row-level-security',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/column-level-security',
+    destination: '/docs/guides/database/postgres/column-level-security',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/custom-claims-and-role-based-access-control-rbac',
+    destination: '/docs/guides/database/postgres/column-level-security',
+  },
 ]

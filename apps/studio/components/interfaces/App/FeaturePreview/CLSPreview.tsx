@@ -12,11 +12,11 @@ const CLSPreview = () => {
       <div className="mb-4 flex flex-col gap-y-2">
         <Markdown
           className="text-foreground-light max-w-full"
-          content={`[Postgres Column-Level Privileges](https://supabase.com/docs/guides/auth/column-level-security) is a feature of Postgres that allows you to grant or revoke privileges on tables and columns based on user roles.`}
+          content={`[Postgres Column-Level Privileges](https://supabase.com/docs/guides/database/postgres/column-level-security) is a feature of Postgres that allows you to grant or revoke privileges on tables and columns based on user roles.`}
         />
         <Markdown
           className="text-foreground-light max-w-full"
-          content={`This is an advanced feature and should be used with caution. Unless you have a very specific use case, we recommend just using [Row-Level Security](https://supabase.com/docs/guides/auth/row-level-security).`}
+          content={`This is an advanced feature and should be used with caution. Unless you have a very specific use case, we recommend just using [Row-Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security).`}
         />
         <Alert_Shadcn_ variant="warning" className="mt-2">
           <IconAlertCircle strokeWidth={2} />

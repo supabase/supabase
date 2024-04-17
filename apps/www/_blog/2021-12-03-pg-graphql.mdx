@@ -64,7 +64,7 @@ By our most conservative estimate, that reduces the platform's memory requiremen
 
 As a native PostgreSQL extension, `pg_graphl` is written in a combination of C and SQL. Each GraphQL query is parsed, validated, and transpiled to SQL, all within the database.
 
-Each GraphQL request is resolved by a single SQL statement. That SQL statement aggregates requested data as a JSON document to return to the caller. This approach results in blazing fast response times, avoids the [N+1 query problem](https://medium.com/the-marcy-lab-school/what-is-the-n-1-problem-in-graphql-dd4921cb3c1a), and hits the theoretical minimum achievable network IO overhead of any GraphQL to SQL resolver. No special permissions are required for the PostgreSQL role executing queries, so `pg_graphql` is fully compatible with your existing [row level security policies](/docs/guides/auth/row-level-security).
+Each GraphQL request is resolved by a single SQL statement. That SQL statement aggregates requested data as a JSON document to return to the caller. This approach results in blazing fast response times, avoids the [N+1 query problem](https://medium.com/the-marcy-lab-school/what-is-the-n-1-problem-in-graphql-dd4921cb3c1a), and hits the theoretical minimum achievable network IO overhead of any GraphQL to SQL resolver. No special permissions are required for the PostgreSQL role executing queries, so `pg_graphql` is fully compatible with your existing [row level security policies](/docs/guides/database/postgres/row-level-security).
 
 Embedding the GraphQL server directly in the database allows us to leverage PostgreSQL's built-in solutions for common challenges:
 

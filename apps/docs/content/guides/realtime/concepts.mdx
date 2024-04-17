@@ -67,7 +67,7 @@ Channels provide a generic networking solution. Supabase Realtime is designed to
 
 ### Postgres changes
 
-The Postgres Changes extension listens for database changes and sends them to clients. Clients are required to subscribe with a JWT dictating which changes they are allowed to receive based on the database's [Row Level Security](/docs/guides/auth/row-level-security).
+The Postgres Changes extension listens for database changes and sends them to clients. Clients are required to subscribe with a JWT dictating which changes they are allowed to receive based on the database's [Row Level Security](/docs/guides/database/postgres/row-level-security).
 
 ```js
 const allChanges = client
@@ -83,6 +83,6 @@ const allChanges = client
   .subscribe()
 ```
 
-Anyone with access to a valid JWT signed with the project's JWT secret is able to listen to your database's changes, unless tables have [Row Level Security](/docs/guides/auth/row-level-security) enabled and policies in place.
+Anyone with access to a valid JWT signed with the project's JWT secret is able to listen to your database's changes, unless tables have [Row Level Security](/docs/guides/database/postgres/row-level-security) enabled and policies in place.
 
 Clients can choose to receive `INSERT`, `UPDATE`, `DELETE`, or `*` (all) changes for all changes in a schema, a table in a schema, or a column's value in a table. Your clients should only listen to tables in the `public` schema and you must first enable the tables you want your clients to listen to.

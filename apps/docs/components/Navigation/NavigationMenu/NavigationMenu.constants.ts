@@ -596,14 +596,18 @@ export const auth = {
     {
       name: 'Security',
       items: [
-        { name: 'Password Security', url: '/password-security' },
-        { name: 'Rate Limits', url: '/' }, // TODO
-        { name: 'Enable Captcha Protection', url: '/guides/auth/auth-captcha' },
-        { name: 'JWTs', url: '/guides/auth/jwt' },
-        { name: 'Row Level Security', url: '/guides/auth/row-level-security' },
+        { name: 'Password Security', url: '/guides/auth/password-security' },
+        { name: 'Rate Limits', url: '/guides/auth/rate-limits' },
+        { name: 'Captcha', url: '/guides/auth/auth-captcha' },
+        { name: 'JWTs', url: '/guides/auth/jwts' },
+        { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
+        {
+          name: 'Column Level Security',
+          url: '/guides/database/postgres/column-level-security',
+        },
         {
           name: 'Custom Claims & RBAC',
-          url: '/guides/auth/custom-claims-and-role-based-access-control-rbac',
+          url: '/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
         },
       ],
     },
@@ -738,6 +742,14 @@ export const database: NavMenuConstant = {
         {
           name: 'Row Level Security',
           url: '/guides/database/postgres/row-level-security',
+        },
+        {
+          name: 'Column Level Security',
+          url: '/guides/database/postgres/column-level-security',
+        },
+        {
+          name: 'Custom Claims & RBAC',
+          url: '/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
         },
         {
           name: 'Managing Postgres Roles',

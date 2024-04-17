@@ -46,7 +46,7 @@ export default function RLSDisableModalContent() {
           <p className="mt-2">
             <Button asChild type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
               <Link
-                href="https://supabase.com/docs/guides/auth/row-level-security"
+                href="https://supabase.com/docs/guides/database/postgres/row-level-security"
                 target="_blank"
                 rel="noreferrer"
               >

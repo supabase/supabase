@@ -108,7 +108,7 @@ If we can’t find the image in storage, then we kick off the ticket generation 
 
 Each image includes the user’s GitHub details. We use [`supabase-js`](https://supabase.com/docs/reference/javascript/installing) for authentication: users log in with their GitHub account and we store their username in a table in Postgres.
 
-Since this table includes email addresses, we secure it using [RLS](https://supabase.com/docs/guides/auth/row-level-security) to ensure each user can only view their own data. At the same time, we want these tickets to be publicly shareable, and that’s where [Postgres Views](https://supabase.com/blog/postgresql-views) come in handy.
+Since this table includes email addresses, we secure it using [RLS](https://supabase.com/docs/guides/database/postgres/row-level-security) to ensure each user can only view their own data. At the same time, we want these tickets to be publicly shareable, and that’s where [Postgres Views](https://supabase.com/blog/postgresql-views) come in handy.
 
 By creating a view, we can selectively publicize parts of our table and also compute some additional values on the fly:
 

@@ -11,7 +11,7 @@ const config = {
       },
       magic_link: {
         /**
-         * Inverse of the frequency at which a Magic Link can be requested.
+         * Wait time between requests.
          */
         period: {
           value: 60,
@@ -27,7 +27,7 @@ const config = {
       },
       otp: {
         /**
-         * Inverse of the frequency at which an OTP can be requested.
+         * Wait time between requests.
          */
         period: {
           value: 60,
@@ -39,6 +39,62 @@ const config = {
         validity: {
           value: 1,
           unit: 'hour1',
+        },
+        /**
+         * How many OTPs can be requested per hour.
+         */
+        requests_per_hour: {
+          value: 30,
+        },
+      },
+      signup_confirmation: {
+        /**
+         * Wait time between requests.
+         */
+        period: {
+          value: 60,
+          unit: 'seconds',
+        },
+      },
+      password_reset: {
+        /**
+         * Wait time between requests.
+         */
+        period: {
+          value: 60,
+          unit: 'seconds',
+        },
+      },
+      verification: {
+        requests_per_hour: {
+          value: 360,
+        },
+        requests_burst: {
+          value: 30,
+        },
+      },
+      token_refresh: {
+        requests_per_hour: {
+          value: 1800,
+        },
+        requests_burst: {
+          value: 30,
+        },
+      },
+      mfa: {
+        requests_per_hour: {
+          value: 15,
+        },
+        requests_burst: {
+          value: 30,
+        },
+      },
+      anonymous_signin: {
+        requests_per_hour: {
+          value: 30,
+        },
+        requests_burst: {
+          value: 30,
         },
       },
     },

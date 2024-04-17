@@ -236,7 +236,7 @@ const PrivilegesPage: NextPageWithLayout = () => {
             <div className="flex items-center space-x-2">
               <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
                 <a
-                  href="https://supabase.com/docs/guides/auth/column-level-security"
+                  href="https://supabase.com/docs/guides/database/postgres/column-level-security"
                   target="_blank"
                   rel="noreferrer"
                 >

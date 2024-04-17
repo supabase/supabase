@@ -315,7 +315,7 @@ const TableEditor = ({
               <a
                 target="_blank"
                 rel="noreferrer"
-                href="https://supabase.com/docs/guides/auth/row-level-security"
+                href="https://supabase.com/docs/guides/database/postgres/row-level-security"
               >
                 RLS Documentation
               </a>
@@ -336,7 +336,7 @@ const TableEditor = ({
               <a
                 target="_blank"
                 rel="noreferrer"
-                href="https://supabase.com/docs/guides/auth/row-level-security"
+                href="https://supabase.com/docs/guides/database/postgres/row-level-security"
               >
                 RLS Documentation
               </a>

@@ -33,6 +33,7 @@ import { NavData } from './NavData'
 import { SharedData } from './SharedData'
 
 // Partials
+import AuthRateLimits from './MDX/auth_rate_limits.mdx'
 import DatabaseSetup from './MDX/database_setup.mdx'
 import GetSessionWarning from './MDX/get_session_warning.mdx'
 import HuggingFaceDeployment from './MDX/ai/quickstart_hf_deployment.mdx'
@@ -87,6 +88,7 @@ const components = {
   ),
   AppleSecretGenerator,
   AuthProviders,
+  AuthRateLimits,
   AuthSmsProviderConfig,
   Button,
   ButtonCard,

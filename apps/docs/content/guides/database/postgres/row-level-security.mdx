@@ -9,9 +9,15 @@ When you need granular authorization rules, nothing beats Postgres's [Row Level 
 
 ## Row Level Security in Supabase
 
-RLS is incredibly powerful and flexible, allowing you to write complex SQL rules that fit your unique business needs. RLS can be [combined with Supabase Auth](/docs/guides/auth/row-level-security) for end-to-end user security from the browser to the database.
+RLS is incredibly powerful and flexible, allowing you to write complex SQL rules that fit your unique business needs. RLS can be [combined with Supabase Auth](/docs/guides/database/postgres/row-level-security) for end-to-end user security from the browser to the database.
 
 RLS is a Postgres primitive and can provide "[defense in depth](<https://en.wikipedia.org/wiki/Defense_in_depth_(computing)>)" to protect your data from malicious actors even when accessed through third-party tooling.
+
+<Admonition type="info">
+
+You should _always_ enable RLS on tables created in a public schema. This is done for you when you create a table with the Table Editor. If you create one in raw SQL or with the SQL Editor, remember to enable RLS yourself.
+
+</Admonition>
 
 ## Policies
 
@@ -44,11 +50,40 @@ alter table "table_name" enable row level security;
 
 Once you have enabled RLS, no data will be accessible via the [API](/docs/guides/api) when using the public `anon` key, until you create policies.
 
+## Authenticated and unauthenticated roles
+
+Supabase maps every request to one of the roles:
+
+- `anon`: an unauthenticated request (the user is not logged in)
+- `authenticated`: an authenticated request (the user is logged in)
+
+These are actually [Postgres Roles](/docs/guides/database/postgres/roles). You can use these roles within your Policies using the `TO` clause:
+
+```sql
+create policy "Profiles are viewable by everyone"
+on profiles for select
+to authenticated, anon
+using ( true );
+
+-- OR
+
+create policy "Public profiles are viewable only by authenticated users"
+on profiles for select
+to authenticated
+using ( true );
+```
+
+<Admonition type="note" label="Anonymous user vs the anon key">
+
+Using the `anon` Postgres role is different from an [anonymous user](/docs/guides/auth/auth-anonymous) in Supabase Auth. An anonymous user assumes the `authenticated` role to access the database and can be differentiated from a permanent user by checking the `is_anonymous` claim in the JWT.
+
+</Admonition>
+
 ## Creating policies
 
 Policies are simply SQL logic that you attach to a Postgres table. You can attach as many policies as you want to each table.
 
-Supabase provides some [helpers](/docs/guides/auth/row-level-security#helper-functions) that simplify RLS if you're using Supabase Auth. We'll use these helpers to illustrate some basic policies:
+Supabase provides some [helpers](#helper-functions) that simplify RLS if you're using Supabase Auth. We'll use these helpers to illustrate some basic policies:
 
 ### SELECT policies
 
@@ -161,9 +196,77 @@ to authenticated                     -- the Postgres Role (recommended)
 using ( (select auth.uid()) = user_id );      -- the actual Policy
 ```
 
+### Views
+
+Views bypass RLS by default because they are usually created with the `postgres` user. This is a feature of Postgres, which automatically creates views with `security definer`.
+
+In Postgres 15 and above, you can make a view obey the RLS policies of the underlying tables when invoked by `anon` and `authenticated` roles by setting `security_invoker = true`.
+
+```sql
+create view <VIEW_NAME>
+with(security_invoker = true)
+as select <QUERY>
+```
+
+In older versions of Postgres, protect your views by revoking access from the `anon` and `authenticated` roles, or by putting them in an unexposed schema.
+
+## Helper functions
+
+Supabase provides some helper functions that make it easier to write Policies.
+
+### `auth.uid()`
+
+Returns the ID of the user making the request.
+
+### `auth.jwt()`
+
+Returns the JWT of the user making the request. Anything that you store in the user's `app_metadata` column or the `user_metadata` column will be accessible using this function. It's important to know the distinction between these two:
+
+- `user_metadata` - can be updated by the authenticated user using the `supabase.auth.update()` function. It is not a good place to store authorization data.
+- `app_metadata` - cannot be updated by the user, so it's a good place to store authorization data.
+
+The `auth.jwt()` function is extremely versatile. For example, if you store some team data inside `app_metadata`, you can use it to determine whether a particular user belongs to a team. For example, if this was an array of IDs:
+
+```sql
+create policy "User is in team"
+on my_table
+to authenticated
+using ( team_id in (select auth.jwt() -> 'app_metadata' -> 'teams'));
+```
+
+<Admonition type="caution">
+
+Keep in mind that a JWT is not always "fresh". In the example above, even if you remove a user from a team and update the `app_metadata` field, that will not be reflected using `auth.jwt()` until the user's JWT is refreshed.
+
+Also, if you are using Cookies for Auth, then you must be mindful of the JWT size. Some browsers are limited to 4096 bytes for each cookie, and so the total size of your JWT should be small enough to fit inside this limitation.
+
+</Admonition>
+
+### MFA
+
+The `auth.jwt()` function can be used to check for [Multi-Factor Authentication](/docs/guides/auth/auth-mfa#enforce-rules-for-mfa-logins). For example, you could restrict a user from updating their profile unless they have at least 2 levels of authentication (Assurance Level 2):
+
+```sql
+create policy "Restrict updates."
+on profiles
+as restrictive
+for update
+to authenticated using (
+  (select auth.jwt()->>'aal') = 'aal2'
+);
+```
+
 ## Bypassing Row Level Security
 
-You can create [Postgres Roles](/docs/guides/database/postgres/roles) which can bypass Row Level Security using the "bypass RLS" privilege:
+Supabase provides special "Service" keys, which can be used to bypass RLS. These should never be used in the browser or exposed to customers, but they are useful for administrative tasks.
+
+<Admonition type="note">
+
+Supabase will adhere to the RLS policy of the signed-in user, even if the client library is initialized with a Service Key.
+
+</Admonition>
+
+You can also create new [Postgres Roles](/docs/guides/database/postgres/roles) which can bypass Row Level Security using the "bypass RLS" privilege:
 
 ```sql
 grant bypassrls on "table_name" to "role_name";
@@ -380,3 +483,8 @@ This prevents the policy `( (select auth.uid()) = user_id )` from running for an
 | Test                                                                                          | Before (ms) | After (ms) | % Improvement | Change                                                                                                                           |
 | --------------------------------------------------------------------------------------------- | ----------- | ---------- | ------------- | -------------------------------------------------------------------------------------------------------------------------------- |
 | [test6-To-role](https://github.com/GaryAustin1/RLS-Performance/tree/main/tests/test6-To-role) | 170         | < 0.1      | 99.78%        | <details className="cursor-pointer">Before:<br/>No `TO` policy<br/><br/>After:<br/>`TO authenticated` (anon accessing)</details> |
+
+## Resources
+
+- [Testing your database](/docs/guides/database/testing)
+- Community repo on testing RLS using [pgTAP and dbdev](https://github.com/usebasejump/supabase-test-helpers/tree/main)

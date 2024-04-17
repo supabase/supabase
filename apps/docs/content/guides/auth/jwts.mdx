@@ -1,32 +1,19 @@
 ---
-id: 'auth-deep-dive-jwts'
-title: 'Part One: JWTs'
-description: 'Supabase Auth Deep Dive Part 1 - JWTs'
-video: 'https://www.youtube.com/v/v3Exg5YpJvE'
+id: 'auth-jwts'
+title: 'JWTs'
+subtitle: 'JSON Web Tokens'
+tocVideo: 'v3Exg5YpJvE'
 ---
 
-### About
+A [JSON Web Token](https://jwt.io/introduction) is a type of data structure, represented as a string, that usually contains identity and authorization information about a user. It encodes information about its lifetime and is signed with a cryptographic key to make it tamper-resistant.
 
-An introduction to JWTs and how they are used in Supabase Auth.
+Supabase Access Tokens are JWTs. The JWT is sent along with every request to Supabase services. By verifying the token and inspecting the included claims, you can allow or deny access to resources. [Row Level Security](/docs/guides/database/postgres/row-level-security) policies are based on the information present in JWTs.
 
-### Watch
+## Encoding and signing JWTs
 
-<div className="video-container">
-  <iframe
-    src="https://www.youtube-nocookie.com/embed/v3Exg5YpJvE"
-    frameBorder="1"
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-    allowFullScreen
-  ></iframe>
-</div>
+JWTs are encoded and signed as follows.
 
-### What are JSON Web Tokens (JWTs)?
-
-JWTs are JSON objects that are encoded and signed and sent around as a string. They are distributed to users of a service or website, who can later show the JWT to the website or service as proof that they have the right to access certain content.
-
-What exactly do we mean when we say "encoded" and "signed"?
-
-Well, the JSON object starts out looking something like this:
+The JSON object starts out looking something like this:
 
 ```js
 {
@@ -54,7 +41,7 @@ Well, the JSON object starts out looking something like this:
 
 Just note that the more data you store in your token, the longer the encoded string will be.
 
-When we want to send the JWT to the user, we first encode the data using an algorithm such as `HS256`. There are many libraries (and several different algorithms) that can be used to do this encoding/decoding, such as [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken). I made a repl [here](https://replit.com/@awalias/jsonwebtokens#index.js) so you can try it for yourself. The signing is as simple as:
+When we want to send the JWT to the user, we first encode the data using an algorithm such as `HS256`. There are many libraries (and several different algorithms) that can be used to do this encoding/decoding, such as [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken). The signing is as simple as:
 
 ```js
 // from https://replit.com/@awalias/jsonwebtokens#index.js
@@ -69,7 +56,7 @@ eyJhbGciOiJIUzI1NiJ9
   .zMcHjKlkGhuVsiPIkyAkB2rjXzyzJsMMgpvEGvGtjvA
 ```
 
-You will notice that the string is actually made up of three components, which we'll address one by one:
+You will notice that the string is actually made up of three components:
 
 The first segment `eyJhbGciOiJIUzI1NiJ9` is known as the "header", and when decoded just tells us which algorithm was used to do the encoding:
 
@@ -108,7 +95,7 @@ You might wonder why JWTs are so popular all of a sudden. The answer is that wit
 
 Note: One downside of JWTs is that they are not easily voidable, like session tokens. If a JWT is leaked to a malicious actor, they will be able to redeem it anywhere until the expiry date is reached – unless of course the system owner updates the `jwt_secret` (which will of course invalidate _everyone's_ existing tokens).
 
-### JWTs in Supabase
+## JWTs in Supabase
 
 In Supabase we issue JWTs for three different purposes:
 
@@ -138,7 +125,7 @@ If we put this token into https://jwt.io, we see it decodes to:
 
 This JWT is signed by a `jwt_secret` specific to the developer's Supabase token (you can find this secret alongside this encoded "anon key" on your Dashboard under Settings > API page) and is required to get past the Supabase API gateway and access the developer's project.
 
-The idea with this particular key is that it's safe to put into your client, meaning it's okay if your end users see this key – but _only_ if you first enable Row Level Security, which is the topic of [Part Two](./auth-row-level-security) in this series.
+The idea with this particular key is that it's safe to put into your client, meaning it's okay if your end users see this key – but _only_ if you first enable Row Level Security.
 
 The second key, `service role key`, should only ever be used on one of your own servers or environments, and should never be shared with end users. You might use this token to do things like make batch inserts of data.
 
@@ -175,18 +162,8 @@ You'll notice that this token is quite a bit longer, since it contains informati
 }
 ```
 
-Now that you understand what JWTs are and where they're used in Supabase, you can explore how to use them in combination with Row Level Security to start restricting access to certain tables, rows, and columns in your Postgres database: [Part Two: Row Level Security](./auth-row-level-security)
+Now that you understand what JWTs are and where they're used in Supabase, you can explore how to use them in combination with Row Level Security to start restricting access to certain tables, rows, and columns in your Postgres database.
 
-### Resources
+## Resources
 
 - JWT debugger: https://jwt.io/
-
-### Next steps
-
-{/* <!-- - Watch [Part One: JWTs](./auth-deep-dive-jwts) --> */}
-
-- [Part Two: Row Level Security](./auth-row-level-security)
-- [Part Three: Policies](./auth-policies)
-- [Part Four: GoTrue](./auth-gotrue)
-- [Part Five: Google Oauth](./auth-google-oauth)
-- Sign up for Supabase: [supabase.com/dashboard](https://supabase.com/dashboard)

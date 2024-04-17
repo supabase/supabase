@@ -40,7 +40,7 @@ You can choose your preferred vector database provider from a list of [supported
 We've implemented two vector provider options: one for Postgres and one for Supabase. The main differences are:
 
 - The Postgres version uses the `psycopg2` python library to directly connect to the database.
-- The Supabase version interacts with the database via PostgREST. This is helpful if you want to use [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security) or if you are planning to use the data in the Retrieval store beyond ChatGPT.
+- The Supabase version interacts with the database via PostgREST. This is helpful if you want to use [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) or if you are planning to use the data in the Retrieval store beyond ChatGPT.
 
 The Postgres implementation is great to start with because there are now a [large number of providers](https://github.com/pgvector/pgvector/issues/54) supporting pgvector.
 
