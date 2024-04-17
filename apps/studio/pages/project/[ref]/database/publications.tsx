@@ -41,7 +41,7 @@ const DatabasePublications: NextPageWithLayout = () => {
     <ScaffoldContainer>
       <ScaffoldSection>
         <div className="col-span-12">
-          <FormHeader title="Database Replications" />
+          <FormHeader title="Database Publications" />
           {selectedPublication === undefined ? (
             <PublicationsList onSelectPublication={setSelectedPublicationId} />
           ) : (
