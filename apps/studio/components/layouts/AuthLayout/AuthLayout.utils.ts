@@ -16,7 +16,6 @@ export const generateAuthMenu = (ref: string): ProductMenuGroup[] => {
           url: `/project/${ref}/auth/policies`,
           items: [],
         },
-
         ...(IS_PLATFORM
           ? [
               {
