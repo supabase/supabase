@@ -2448,4 +2448,19 @@ module.exports = [
     source: '/docs/guides/auth/sessions',
     destination: '/docs/guides/auth/concepts/sessions',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-email',
+    destination: '/docs/guides/auth/passwords',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/passwordless-login/auth-magic-link',
+    destination: '/docs/guides/auth/auth-email-passwordless',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/passwordless-login/auth-email-otp',
+    destination: '/docs/guides/auth/auth-email-passwordless',
+  },
 ]

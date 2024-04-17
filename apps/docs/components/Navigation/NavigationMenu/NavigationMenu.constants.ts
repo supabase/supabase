@@ -536,7 +536,7 @@ export const auth = {
       name: 'Flows (How-tos)',
       items: [
         { name: 'Password-based', url: '/guides/auth/passwords' },
-        { name: 'Email (Magic Link or OTP)', url: '/guides/auth/auth-email' },
+        { name: 'Email (Magic Link or OTP)', url: '/guides/auth/auth-email-passwordless' },
         {
           name: 'Phone Login (OTP)',
           url: '/guides/auth/phone-login',
@@ -576,21 +576,15 @@ export const auth = {
             },
           ],
         },
+        {
+          name: 'Signout',
+          url: '/guides/auth/signout',
+        },
         /* TO BE DEPRECATED BELOW */
         {
           name: 'Passwordless Login',
           url: '/guides/auth/passwordless-login',
-          items: [
-            {
-              name: 'Email Magic Link',
-              url: '/guides/auth/passwordless-login/auth-magic-link',
-            },
-            {
-              name: 'Email OTP',
-              url: '/guides/auth/passwordless-login/auth-email-otp',
-            },
-            { name: 'Phone OTP', url: '/guides/auth/phone-login' },
-          ],
+          items: [{ name: 'Phone OTP', url: '/guides/auth/phone-login' }],
         },
       ],
     },
