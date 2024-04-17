@@ -13,13 +13,14 @@ import Image from 'next/image'
 import ImageGrid from '../components/ImageGrid'
 import { useTheme } from 'next-themes'
 import { ExpandableVideo } from 'ui-patterns'
+import { handleForceDeepDark, handleForceDeepDarkOnChange } from '~/lib/theme.utils'
 
 const ParagraphSection = dynamic(() => import('~/components/Sections/ParagraphSection'))
 const CTABanner = dynamic(() => import('~/components/CTABanner'))
 
 export default function IndexPage() {
   const router = useRouter()
-  const { resolvedTheme, setTheme } = useTheme()
+  const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme?.includes('dark')
   const data = pageData(isDark!)
 
@@ -30,14 +31,12 @@ export default function IndexPage() {
   const isDarkTheme = resolvedTheme === 'dark'
 
   useEffect(() => {
-    isDarkTheme && setTheme('deep-dark')
-  }, [isDarkTheme])
+    handleForceDeepDark(isDarkTheme)
+  }, [])
 
   useEffect(() => {
-    return () => {
-      isDark && setTheme('dark')
-    }
-  }, [])
+    handleForceDeepDarkOnChange(isDarkTheme)
+  }, [resolvedTheme])
 
   return (
     <DefaultLayout>

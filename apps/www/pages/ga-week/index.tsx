@@ -15,6 +15,8 @@ import LW11StickyNav from '~/components/LaunchWeek/11/Releases/LW11StickyNav'
 import LW11Header from '~/components/LaunchWeek/11/Releases/LW11Header'
 import MainStage from '~/components/LaunchWeek/11/Releases/MainStage'
 import { useTheme } from 'next-themes'
+import Head from 'next/head'
+import { handleForceDeepDark, handleForceDeepDarkOnChange } from '~/lib/theme.utils'
 
 const BuildStage = dynamic(() => import('~/components/LaunchWeek/11/Releases/BuildStage'))
 const LW11Meetups = dynamic(() => import('~/components/LaunchWeek/11/LW11Meetups'))
@@ -29,7 +31,7 @@ interface Props {
 
 export default function GAWeekIndex({ meetups }: Props) {
   const { query } = useRouter()
-  const { resolvedTheme, setTheme } = useTheme()
+  const { resolvedTheme } = useTheme()
 
   const TITLE = 'Supabase GA Week | 15-19 April 2024'
   const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
@@ -39,6 +41,8 @@ export default function GAWeekIndex({ meetups }: Props) {
   const bgImageId = query.bgImageId?.toString()
   const [session, setSession] = useState<Session | null>(null)
   const [showCustomizationForm, setShowCustomizationForm] = useState<boolean>(false)
+
+  const isDarkTheme = resolvedTheme === 'dark'
 
   const defaultUserData = {
     id: query.id?.toString(),
@@ -65,19 +69,6 @@ export default function GAWeekIndex({ meetups }: Props) {
     }
   }, [supabase])
 
-  const isDark = resolvedTheme?.includes('dark')
-  const isDarkTheme = resolvedTheme === 'dark'
-
-  useEffect(() => {
-    isDarkTheme && setTheme('deep-dark')
-  }, [isDarkTheme])
-
-  useEffect(() => {
-    return () => {
-      isDark && setTheme('dark')
-    }
-  }, [])
-
   useEffect(() => {
     if (session?.user) {
       if (userData?.id) {
@@ -88,8 +79,20 @@ export default function GAWeekIndex({ meetups }: Props) {
     if (!session) return setTicketState('registration')
   }, [session, userData])
 
+  useEffect(() => {
+    handleForceDeepDark(isDarkTheme)
+  }, [])
+
+  useEffect(() => {
+    handleForceDeepDarkOnChange(isDarkTheme)
+  }, [resolvedTheme])
+
   return (
     <>
+      <Head>
+        {/* Update the attributes */}
+        <html lang="en" data-theme="deep-dark" style={{ colorScheme: 'deep-dark' }} />
+      </Head>
       <NextSeo
         title={TITLE}
         description={DESCRIPTION}
