@@ -3,7 +3,7 @@ import { QueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { ExecuteSqlData, useExecuteSqlQuery } from 'data/sql/execute-sql-query'
-import { databaseKeys } from './keys'
+import { sqlKeys } from 'data/sql/keys'
 
 export type SchemasVariables = {
   projectRef?: string
@@ -37,5 +37,5 @@ export const useSchemasQuery = <TData = SchemasData>(
   )
 
 export function invalidateSchemasQuery(client: QueryClient, projectRef: string | undefined) {
-  return client.invalidateQueries(databaseKeys.schemaList(projectRef))
+  return client.invalidateQueries(sqlKeys.query(projectRef, ['schemas', 'list']))
 }
