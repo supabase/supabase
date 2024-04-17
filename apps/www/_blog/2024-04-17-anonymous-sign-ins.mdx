@@ -2,8 +2,8 @@
 title: 'Supabase Auth supports Anonymous Sign-ins'
 description: 'Sign in as an anonymous user to authenticate with Supabase'
 author: kangmingtay
-# image: ga-week/ai-inference-now-available-in-supabase-edge-functions/og.jpg
-# thumb: ga-week/ai-inference-now-available-in-supabase-edge-functions/thumb.jpg
+image: ga-week/anonymous-sign-ins/og.png
+thumb: ga-week/anonymous-sign-ins/thumb.png
 categories:
   - product
 tags:
@@ -24,7 +24,15 @@ Anonymous sign-ins can be used to create **temporary users** that haven’t sign
 
 You can [enable anonymous sign-ins](/dashboard/project/_/settings/auth) for your project today from the dashboard:
 
-{/* Add image to button toggle here */}
+<Img
+  alt="Allow anonymous sign ins"
+  src={{
+    light: '/images/blog/ga-week/anonymous-sign-ins/allow-anon-sign-ins--light.png',
+    dark: '/images/blog/ga-week/anonymous-sign-ins/allow-anon-sign-ins.png',
+  }}
+  captionAlign="left"
+  zoomable={false}
+/>
 
 For local development, upgrade your Supabase CLI and add the config to the `config.toml` file:
 
@@ -45,13 +53,14 @@ Profiles created with anonymous sign-ins are also `authenticated` !
 
 Once you call `.signInAnonymously()` you have moved the user into an authentication flow, and we treat them like a signed in user:
 
-| Status                | Type            | Postgres role | is_anonymous |
-| --------------------- | --------------- | ------------- | ------------ |
-| No profile            | Unauthenticated | anon          |              |
-| Anonymous / temporary | Authenticated   | authenticated | true         |
-| Permanent / signed in | Authenticated   | authenticated | false        |
-
-{/* Replace table above with nice flow chart */}
+<Img
+  alt="Integrated pgvector experience"
+  src={{
+    light: '/images/blog/ga-week/anonymous-sign-ins/anonymous-user-lifecycle--light.svg',
+    dark: '/images/blog/ga-week/anonymous-sign-ins/anonymous-user-lifecycle.svg',
+  }}
+  captionAlign="left"
+/>
 
 ## Restricting access for anonymous users
 
@@ -113,9 +122,9 @@ using (
 
 At some point, an anonymous user may decide they want to create a post. This is where we prompt them to sign up for an account which converts them to a permanent user.
 
-<Admonition type='note'>
+<Admonition type='note' title="An anonymous user is considered a permanent user when they have an identity associated to them.">
 
-An anonymous user is considered a permanent user when they have an identity associated to them. After they have been converted, the user id remains the same, which means that any data associated with the user’s id would be carried over.
+After they have been converted, the user id remains the same, which means that any data associated with the user’s id would be carried over.
 
 </Admonition>
 
@@ -136,7 +145,15 @@ const { data, error } = await supabase.auth.updateUser({ email })
 
 To link an OAuth identity to an anonymous user, you need to [enable manual linking](/dashboard/project/_/settings/auth) for your project. Learn about about how [identity linking](/docs/guides/auth/auth-identity-linking) works with Supabase Auth.
 
-{/* show enable manual linking button image */}
+<Img
+  alt="Allow anonymous sign ins"
+  src={{
+    light: '/images/blog/ga-week/anonymous-sign-ins/allow-manual-linking--light.png',
+    dark: '/images/blog/ga-week/anonymous-sign-ins/allow-manual-linking.png',
+  }}
+  captionAlign="left"
+  zoomable={false}
+/>
 
 Once enabled, you can call the `linkIdentity()` method:
 
@@ -148,11 +165,29 @@ const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
 
 When creating RLS policies to differentiate access for an anonymous user, you can leverage the [user impersonation feature](/blog/studio-introducing-assistant) in the SQL editor to test out your policies:
 
-{/* user impersonation images go here */}
+<Img
+  alt="Allow anonymous sign ins"
+  src={{
+    light: '/images/blog/ga-week/anonymous-sign-ins/impersonation-role-settings--light.png',
+    dark: '/images/blog/ga-week/anonymous-sign-ins/impersonation-role-settings.png',
+  }}
+  captionAlign="left"
+  caption="Database role settings in the SQL editor. You can impersonate an anonymous user by selecting the user from the dropdown."
+  zoomable={false}
+/>
 
 The [user management screen](/dashboard/project/_/auth/users) provides an option to filter by anonymous users, which can be helpful to know how many anonymous users have been created.
 
-{/* user management screen goes here */}
+<Img
+  alt="Allow anonymous sign ins"
+  src={{
+    light: '/images/blog/ga-week/anonymous-sign-ins/anon-user-filtering--light.png',
+    dark: '/images/blog/ga-week/anonymous-sign-ins/anon-user-filtering.png',
+  }}
+  captionAlign="left"
+  caption="Filtering by anonymous users on the Users page."
+  zoomable={false}
+/>
 
 ## What’s next
 
