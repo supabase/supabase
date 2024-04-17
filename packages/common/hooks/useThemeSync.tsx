@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 
 type App = 'docs' | 'studio' | 'www'
 
-const useThemeSync = (app: App) => {
+export const useThemeSync = (app: App) => {
   const { setTheme } = useTheme()
   const isWww = app === 'www'
 
@@ -25,5 +25,3 @@ const useThemeSync = (app: App) => {
     return window.removeEventListener('storage', () => null)
   }, [])
 }
-
-export default useThemeSync

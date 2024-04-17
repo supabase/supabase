@@ -1,9 +1,7 @@
-import { useEffect } from 'react'
-import { useTheme } from 'next-themes'
 import Nav from 'components/Nav/index'
 import Footer from 'components/Footer/index'
 import { cn } from 'ui'
-import useThemeSync from 'common/hooks/useThemeSync'
+import { useThemeSync } from 'common'
 
 type Props = {
   hideHeader?: boolean

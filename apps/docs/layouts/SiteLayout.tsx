@@ -1,6 +1,6 @@
-import useThemeSync from 'common/hooks/useThemeSync'
-import Head from 'next/head'
 import { PropsWithChildren } from 'react'
+import Head from 'next/head'
+import { useThemeSync } from 'common'
 
 const SiteLayout = ({ children }: PropsWithChildren<{}>) => {
   useThemeSync('docs')
