@@ -121,6 +121,7 @@ export default function App({ Component, pageProps }: AppProps) {
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
+            storageKey="www-theme"
             forcedTheme={forceDarkMode ? 'dark' : undefined}
           >
             <CommandMenuProvider site="website">
