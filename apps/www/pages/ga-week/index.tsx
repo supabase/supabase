@@ -30,7 +30,7 @@ interface Props {
 
 export default function GAWeekIndex({ meetups }: Props) {
   const { query } = useRouter()
-  const { resolvedTheme } = useTheme()
+  const { resolvedTheme, theme } = useTheme()
 
   const TITLE = 'Supabase GA Week | 15-19 April 2024'
   const DESCRIPTION = 'Join us for a week of announcing new features, every day at 7 AM PT.'
