@@ -71,17 +71,6 @@ export default function App({ Component, pageProps }: AppProps) {
 
   const forceDarkMode = pathname === '/' || router.pathname.startsWith('/launch-week')
 
-  useEffect(() => {
-    const handleSetLocalStorage = () => {
-      if (localStorage?.getItem('theme')) {
-        setTheme(localStorage?.getItem('theme')!)
-      }
-    }
-
-    window.addEventListener('storage', handleSetLocalStorage)
-    return window.removeEventListener('storage', () => null)
-  }, [])
-
   let applicationName = 'Supabase'
   let faviconRoute = DEFAULT_FAVICON_ROUTE
   let themeColor = DEFAULT_FAVICON_THEME_COLOR
