@@ -34,6 +34,7 @@ const ProductMenu = ({ page, menu }: ProductMenuProps) => {
                       url={item.url}
                       name={item.name}
                       icon={item.icon}
+                      rightIcon={item.rightIcon}
                       isActive={page === item.key}
                       isExternal={item.isExternal}
                       target={item.isExternal ? '_blank' : '_self'}
