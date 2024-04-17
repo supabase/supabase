@@ -84,7 +84,7 @@ export default function GAWeekIndex({ meetups }: Props) {
 
   useEffect(() => {
     handleForceDeepDarkOnChange(isDarkTheme)
-  }, [resolvedTheme, theme, isDarkMode])
+  }, [resolvedTheme, theme, isDarkTheme])
 
   return (
     <>
