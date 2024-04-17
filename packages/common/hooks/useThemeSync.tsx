@@ -1,20 +1,23 @@
 import { useTheme } from 'next-themes'
 import { useEffect } from 'react'
 
-const useThemeSync = () => {
+type App = 'docs' | 'studio' | 'www'
+
+const useThemeSync = (app: App) => {
   const { setTheme } = useTheme()
+  const isWww = app === 'www'
 
   useEffect(() => {
     const handleSetLocalStorage = (e: any) => {
       const detectedTheme = e.target?.localStorage?.theme
-      const wwwTheme = e.target.localStorage['www-theme']
+      const wwwTheme = e.target?.localStorage['www-theme']
 
-      if (detectedTheme) {
-        setTheme(
-          detectedTheme === 'dark' && wwwTheme === 'deep-dark'
-            ? 'deep-dark'
-            : localStorage?.getItem('theme')!
-        )
+      if (detectedTheme && isWww) {
+        setTheme(detectedTheme === 'dark' && wwwTheme === 'deep-dark' ? 'deep-dark' : detectedTheme)
+      }
+
+      if (wwwTheme && !isWww) {
+        setTheme(wwwTheme.includes('dark') ? 'dark' : wwwTheme)
       }
     }
 

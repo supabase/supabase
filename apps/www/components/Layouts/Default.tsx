@@ -3,7 +3,7 @@ import { useTheme } from 'next-themes'
 import Nav from 'components/Nav/index'
 import Footer from 'components/Footer/index'
 import { cn } from 'ui'
-import useThemeSync from '../../hooks/useThemeSync'
+import useThemeSync from 'common/hooks/useThemeSync'
 
 type Props = {
   hideHeader?: boolean
@@ -22,7 +22,7 @@ const DefaultLayout = (props: Props) => {
     children,
   } = props
 
-  useThemeSync()
+  useThemeSync('www')
 
   return (
     <>
