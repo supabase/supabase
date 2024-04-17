@@ -36,7 +36,7 @@ export default function IndexPage() {
 
   useEffect(() => {
     handleForceDeepDarkOnChange(isDarkTheme)
-  }, [resolvedTheme, theme, isDarkMode])
+  }, [resolvedTheme, theme, isDarkTheme])
 
   return (
     <DefaultLayout>
