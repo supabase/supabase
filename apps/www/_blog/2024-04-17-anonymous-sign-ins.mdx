@@ -1,5 +1,5 @@
 ---
-title: 'Supabase Auth now supports Anonymous Sign-Ins'
+title: 'Supabase Auth supports Anonymous Sign-ins'
 description: 'Sign in as an anonymous user to authenticate with Supabase'
 author: kangmingtay
 # image: ga-week/ai-inference-now-available-in-supabase-edge-functions/og.jpg
@@ -113,10 +113,11 @@ using (
 
 At some point, an anonymous user may decide they want to create a post. This is where we prompt them to sign up for an account which converts them to a permanent user.
 
-<aside>
-💡 An anonymous user is considered a permanent user when they have an identity associated to them. After they have been converted, the user id remains the same, which means that any data associated with the user’s id would be carried over.
+<Admonition type='note'>
 
-</aside>
+An anonymous user is considered a permanent user when they have an identity associated to them. After they have been converted, the user id remains the same, which means that any data associated with the user’s id would be carried over.
+
+</Admonition>
 
 Supabase Auth provides 2 ways to achieve this:
 
