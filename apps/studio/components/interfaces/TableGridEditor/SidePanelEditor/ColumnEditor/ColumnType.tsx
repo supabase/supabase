@@ -56,11 +56,15 @@ const ColumnType = ({
 
   let isAvailableInEnums = false
   if (!isAvailableInPgTypes) {
+    // this logic is to map the enums. The API for table columns sends only the enums name, without the schema. Since the
+    // create/update API call for tables expect the enums to be sent with their schemas prefixed. We also want to show
+    // the prefixed enums in the dropdown so we're changing the value of dropdowns from "enumName" to "schema.enumName"
+    // on first render
     const foundByName = enumTypes.find((type) => type.name === value)
-    if (foundByName && foundByName.schema !== 'public') {
-      onOptionSelect(foundByName.format)
+    if (foundByName) {
+      onOptionSelect(`${foundByName.schema}.${foundByName.name}`)
     }
-    const foundByFormat = enumTypes.find((type) => type.format === value)
+    const foundByFormat = enumTypes.find((type) => `${type.schema}.${type.name}` === value)
     if (foundByFormat) {
       isAvailableInEnums = true
     }
@@ -204,15 +208,15 @@ const ColumnType = ({
           // @ts-ignore
           enumTypes.map((enumType) => (
             <Listbox.Option
-              key={enumType.format}
-              value={enumType.format}
-              label={enumType.name}
+              key={`${enumType.schema}.${enumType.name}`}
+              value={`${enumType.schema}.${enumType.name}`}
+              label={`${enumType.schema}.${enumType.name}`}
               addOnBefore={() => {
                 return <ListPlus size={16} className="text-foreground" strokeWidth={1.5} />
               }}
             >
               <div className="flex items-center space-x-4">
-                <p className="text-foreground">{enumType.name}</p>
+                <p className="text-foreground">{`${enumType.schema}.${enumType.name}`}</p>
                 {enumType.comment !== undefined && (
                   <p className="text-foreground-lighter">{enumType.comment}</p>
                 )}
