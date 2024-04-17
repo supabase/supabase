@@ -2446,7 +2446,7 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/sessions',
-    destination: '/docs/guides/auth/concepts/sessions',
+    destination: '/docs/guides/auth/sessions',
   },
   {
     permanent: true,
@@ -2496,6 +2496,46 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/custom-claims-and-role-based-access-control-rbac',
-    destination: '/docs/guides/database/postgres/column-level-security',
+    destination: '/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-deep-dive/auth-google-oauth',
+    destination: '/docs/guides/auth/social-login/auth-google',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-deep-dive/auth-gotrue',
+    destination: '/docs/guides/auth/architecture',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-deep-dive/auth-policies',
+    destination: '/docs/guides/database/postgres/row-level-security',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/auth-deep-dive/auth-row-level-security',
+    destination: '/docs/guides/database/postgres/row-level-security',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/server-side-rendering',
+    destination: '/docs/guides/auth/server-side',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/server-side/overview',
+    destination: '/docs/guides/auth/server-side',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr',
+    destination: '/docs/guides/auth/server-side',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr',
+    destination: '/docs/guides/auth/oauth-with-pkce-flow-for-ssr',
   },
 ]

@@ -60,7 +60,7 @@ functions:
       - **Confirm email** determines if users need to confirm their email address after signing up.
         - If **Confirm email** is enabled, a `user` is returned but `session` is null.
         - If **Confirm email** is disabled, both a `user` and a `session` are returned.
-      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/guides/auth/concepts/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+      - When the user confirms their email address, they are redirected to the [`SITE_URL`](https://supabase.com/docs/guides/auth/redirect-urls) by default. You can modify your `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
       - If signUp() is called for an existing confirmed user:
           - If **Confirm email** is enabled in [your project](https://supabase.com/dashboard/project/_/auth/providers), an obfuscated/fake user object is returned.
           - If **Confirm email** is disabled, the error message, `User already registered` is returned.
@@ -141,7 +141,7 @@ functions:
       - This method is used for passwordless sign-ins where a OTP is sent to the user's email or phone number.
       - If you're using an email, you can configure whether you want the user to receive a magiclink or a OTP.
       - If you're using phone, you can configure whether you want the user to receive a OTP.
-      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/guides/auth/concepts/redirect-urls). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
+      - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/guides/auth/redirect-urls). You can modify the `SITE_URL` or add additional redirect urls in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
     examples:
       - id: sign-in-with-email
         name: Sign in with email.

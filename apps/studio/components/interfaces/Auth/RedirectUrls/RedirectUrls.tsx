@@ -111,7 +111,7 @@ const RedirectUrls = () => {
         <div className="flex items-center gap-2 mb-6 ml-12">
           <Button asChild type="default" icon={<IconExternalLink />}>
             <Link
-              href="https://supabase.com/docs/guides/auth/concepts/redirect-urls"
+              href="https://supabase.com/docs/guides/auth/redirect-urls"
               target="_blank"
               rel="noreferrer"
             >

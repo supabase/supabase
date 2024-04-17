@@ -49,3 +49,29 @@ suspend fun logout() {
 
 </TabPanel>
 </Tabs>
+
+## Sign out and scopes
+
+Supabase Auth allows you to specify three different scopes for when a user invokes the [sign out API](/docs/reference/javascript/auth-signout) in your application:
+
+- `global` (default) when all sessions active for the user are terminated.
+- `local` which only terminates the current session for the user but keep sessions on other devices or browsers active.
+- `others` to terminate all but the current session for the user.
+
+You can invoke these by providing the `scope` option:
+
+```typescript
+// defaults to the global scope
+await supabase.auth.signOut()
+
+// sign out from the current session only
+await supabase.auth.signOut({ scope: 'local' })
+```
+
+Upon sign out, all refresh tokens and potentially other database objects related to the affected sessions are destroyed and the client library removes the session stored in the local storage medium.
+
+<Admonition type="caution">
+
+Access Tokens of revoked sessions remain valid until their expiry time, encoded in the `exp` claim. The user won't be immediately logged out and will only be logged out when the Access Token expires.
+
+</Admonition>

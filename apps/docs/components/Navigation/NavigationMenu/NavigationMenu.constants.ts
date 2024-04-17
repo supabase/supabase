@@ -512,10 +512,6 @@ export const auth = {
       url: '/guides/auth/architecture',
     },
     {
-      name: 'SSR',
-      url: '/guides/auth/server-side',
-    },
-    {
       name: 'Getting Started',
       items: [
         {
@@ -526,22 +522,47 @@ export const auth = {
         {
           name: 'React Native',
           url: '/guides/auth/quickstarts/react-native',
-          items: [],
         },
       ],
     },
     {
       name: 'Concepts',
       items: [
-        { name: 'Users', url: '/guides/auth/concepts/users' },
-        { name: 'Identities', url: '/guides/auth/concepts/identities' },
-        { name: 'Sessions', url: '/guides/auth/concepts/sessions' },
-        { name: 'Factors', url: '/guides/auth/concepts/factors' },
+        { name: 'Users', url: '/guides/auth/users' },
+        { name: 'Identities', url: '/guides/auth/identities' },
+        {
+          name: 'Sessions',
+          url: '/guides/auth/sessions',
+          items: [
+            { name: 'Implicit flow', url: '/guides/auth/sessions/implicit-flow' },
+            { name: 'PKCE flow', url: '/guides/auth/sessions/pkce-flow' },
+          ],
+        },
       ],
     },
     {
       name: 'Flows (How-tos)',
       items: [
+        {
+          name: 'Server-Side Rendering',
+          url: '/guides/auth/server-side',
+          items: [
+            { name: 'Next.js guide', url: '/guides/auth/server-side/nextjs' },
+            {
+              name: 'SvelteKit guide',
+              url: '/guides/auth/server-side/sveltekit',
+            },
+            { name: 'Creating a client', url: '/guides/auth/server-side/creating-a-client' },
+            {
+              name: 'Migrating from Auth Helpers',
+              url: '/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
+            },
+            {
+              name: 'Advanced guide',
+              url: '/guides/auth/server-side/advanced-guide',
+            },
+          ],
+        },
         { name: 'Password-based', url: '/guides/auth/passwords' },
         { name: 'Email (Magic Link or OTP)', url: '/guides/auth/auth-email-passwordless' },
         {
@@ -611,41 +632,6 @@ export const auth = {
         },
       ],
     },
-    /*     {
-      name: 'Server-side Auth',
-      url: undefined,
-      items: [
-        { name: 'Overview', url: '/guides/auth/server-side/overview' },
-        {
-          name: 'Next.js guide',
-          url: '/guides/auth/server-side/nextjs',
-        },
-        {
-          name: 'SvelteKit guide',
-          url: '/guides/auth/server-side/sveltekit',
-        },
-        {
-          name: 'Creating a client',
-          url: '/guides/auth/server-side/creating-a-client',
-        },
-        {
-          name: 'Email Auth with PKCE flow',
-          url: '/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr',
-        },
-        {
-          name: 'OAuth with PKCE flow',
-          url: '/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
-        },
-        {
-          name: 'Server-side Rendering',
-          url: '/guides/auth/server-side-rendering',
-        },
-        {
-          name: 'Migrating from Auth Helpers',
-          url: '/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
-        },
-      ],
-    }, */
     {
       name: 'Auth UI',
       url: undefined,
