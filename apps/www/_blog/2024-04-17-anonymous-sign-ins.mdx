@@ -95,7 +95,7 @@ create table public.posts (
 
 If we only want to allow permanent users to create posts, we can check if the user is anonymous by inspecting the JWT `select auth.jwt() ->> 'is_anonymous'`.
 
-Using this function in in an RLS policy:
+Using this function in an RLS policy:
 
 ```sql
 create policy "Only permanent users can create posts"
