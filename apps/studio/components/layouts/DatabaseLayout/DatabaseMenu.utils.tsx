@@ -69,6 +69,7 @@ export const generateDatabaseMenu = (
                 key: 'column-privileges',
                 url: `/project/${ref}/database/column-privileges`,
                 items: [],
+                label: 'ALPHA',
               },
             ]
           : []),
@@ -141,17 +142,6 @@ export const generateDatabaseMenu = (
           url: `/project/${ref}/database/linter`,
           items: [],
         },
-        ...(columnLevelPrivileges
-          ? [
-              {
-                name: 'Column Privileges',
-                key: 'column-privileges',
-                url: `/project/${ref}/database/column-privileges`,
-                items: [],
-                label: 'ALPHA',
-              },
-            ]
-          : []),
       ],
     },
   ]
