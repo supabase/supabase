@@ -18,7 +18,15 @@ Supabase Auth now supports [anonymous sign-ins](/docs/guides/auth/auth-anonymous
 
 Anonymous sign-ins can be used to create **temporary users** that haven’t signed up for your application yet. This lowers the friction for new users to try out your product since they don’t have to provide any signup credentials.
 
-[](https://www.youtube.com/watch?v=VNQd2oDAM9g)
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/WNN7Pp5Ftk4"
+    title="Anonymous sign-ins with Supabase Auth"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  />
+</div>
 
 ## Enabling Anonymous sign-ins
 
@@ -138,9 +146,7 @@ Supabase Auth provides 2 ways to achieve this:
 To link an email or phone identity:
 
 ```jsx
-const { data, error } = await supabase
-  .auth
-  .updateUser({ email })
+const { data, error } = await supabase.auth.updateUser({ email })
 ```
 
 ### Link an OAuth identity
@@ -160,9 +166,7 @@ To link an OAuth identity to an anonymous user, you need to [enable manual linki
 Once enabled, you can call the `linkIdentity()` method:
 
 ```jsx
-const { data, error } = await supabase
-  .auth
-  .linkIdentity({ provider: 'google' })
+const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
 ```
 
 ## Impersonating an anonymous user
