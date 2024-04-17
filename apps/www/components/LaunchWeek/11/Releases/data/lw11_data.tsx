@@ -126,7 +126,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Tue',
     title: '',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/ai-inference-now-available-in-supabase-edge-functions',
     date: '16 April',
@@ -173,27 +173,48 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 3,
     dd: 'Wed',
     title: '',
-    shipped: false,
-    hasCountdown: true,
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
     blog: '#',
     date: '17 April',
     published_at: '2024-04-17T08:00:00.000-08:00',
-    description: <></>,
+    description: (
+      <>
+        Supabase Auth now supports <strong>Anonymous sign-ins</strong>
+      </>
+    ),
     links: [
-      // {
-      //   type: 'blog',
-      //   href: '#',
-      // },
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'blog',
+        href: '#',
+      },
+      {
+        type: 'video',
+        href: '',
+      },
       {
         type: 'xSpace',
         href: 'https://supabase.link/twitter-space-ga-week-3',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: 'Supabase Auth now supports Anonymous sign-ins',
+        blog: '#',
+        bg_layers: [
+          {
+            img: isDark
+              ? '/images/launchweek/11/days/d3-dark.svg'
+              : '/images/launchweek/11/days/d3-light.svg',
+            mobileImg: isDark
+              ? '/images/launchweek/11/days/d3-dark-mobile.svg'
+              : '/images/launchweek/11/days/d3-light-mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
   {
     id: 'day-4',
@@ -201,7 +222,8 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Thu',
     title: '',
     shipped: false,
-    hasCountdown: false,
+    isToday: false,
+    hasCountdown: true,
     blog: '#',
     date: '18 April',
     published_at: '2024-04-18T08:00:00.000-08:00',
@@ -228,6 +250,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Fri',
     title: '',
     shipped: false,
+    isToday: false,
     hasCountdown: false,
     blog: '#',
     date: '19 April',
