@@ -20,11 +20,13 @@ import MetaFaviconsPagesRouter, {
 import { API_URL, APP_NAME, DEFAULT_META_DESCRIPTION } from '~/lib/constants'
 import { post } from '~/lib/fetchWrapper'
 import supabase from '~/lib/supabase'
+import { useTheme } from 'next-themes'
 
 export default function App({ Component, pageProps }: AppProps) {
   const router = useRouter()
   const telemetryProps = useTelemetryProps()
   const { consentValue, hasAcceptedConsent } = useConsent()
+  const { setTheme } = useTheme()
 
   useThemeSandbox()
 
@@ -68,6 +70,17 @@ export default function App({ Component, pageProps }: AppProps) {
   const { basePath, pathname } = useRouter()
 
   const forceDarkMode = pathname === '/' || router.pathname.startsWith('/launch-week')
+
+  useEffect(() => {
+    const handleSetLocalStorage = () => {
+      if (localStorage?.getItem('theme')) {
+        setTheme(localStorage?.getItem('theme')!)
+      }
+    }
+
+    window.addEventListener('storage', handleSetLocalStorage)
+    return window.removeEventListener('storage', () => null)
+  }, [])
 
   let applicationName = 'Supabase'
   let faviconRoute = DEFAULT_FAVICON_ROUTE
