@@ -192,7 +192,7 @@ begin
     ${inheritRole === undefined ? '' : inheritRole ? 'inherit' : 'noinherit'}
     ${canLogin === undefined ? '' : canLogin ? 'login' : 'nologin'}
     ${isReplicationRole === undefined ? '' : isReplicationRole ? 'replication' : 'noreplication'}
-    ${canBypassRls === undefined ? '' : canBypassRls ? 'bypassrls' : 'bypassrls'}
+    ${canBypassRls === undefined ? '' : canBypassRls ? 'bypassrls' : 'nobypassrls'}
     ${connectionLimit === undefined ? '' : `connection limit ${literal(connectionLimit)}`}
     ${password === undefined ? '' : `password ${literal(password)}`}
     ${validUntil === undefined ? '' : `valid until ${literal(validUntil)}`}
