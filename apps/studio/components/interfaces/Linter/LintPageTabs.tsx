@@ -39,6 +39,27 @@ const LintPageTabs = ({
   const errorLintsCount = activeLints.filter((x) => x.level === 'ERROR').length
   const infoLintsCount = activeLints.filter((x) => x.level === 'INFO').length
 
+  const LintCountLabel = ({ tab }: { tab: (typeof LINT_TABS)[number] }) => {
+    const getCountLabel = () => {
+      switch (tab.id) {
+        case LINTER_LEVELS.ERROR:
+          return lintCountLabel(isLoading, errorLintsCount, 'errors')
+        case LINTER_LEVELS.WARN:
+          return lintCountLabel(isLoading, warnLintsCount, 'warnings')
+        case LINTER_LEVELS.INFO:
+          return lintCountLabel(isLoading, infoLintsCount, 'suggestions')
+        default:
+          return null
+      }
+    }
+
+    return (
+      <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
+        {getCountLabel()}
+      </span>
+    )
+  }
+
   return (
     <Tabs_Shadcn_
       defaultValue={currentTab}
@@ -90,14 +111,7 @@ const LintPageTabs = ({
                 <TooltipContent_Shadcn_ side="top">{tab.description}</TooltipContent_Shadcn_>
               </Tooltip_Shadcn_>
             </div>
-            <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
-              {tab.id === LINTER_LEVELS.ERROR &&
-                lintCountLabel(isLoading, errorLintsCount, 'errors')}
-              {tab.id === LINTER_LEVELS.WARN &&
-                lintCountLabel(isLoading, warnLintsCount, 'warnings')}
-              {tab.id === LINTER_LEVELS.INFO &&
-                lintCountLabel(isLoading, infoLintsCount, 'suggestions')}
-            </span>
+            <LintCountLabel tab={tab} />
           </TabsTrigger_Shadcn_>
         ))}
       </TabsList_Shadcn_>
