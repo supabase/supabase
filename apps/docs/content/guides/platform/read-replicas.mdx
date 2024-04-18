@@ -76,7 +76,9 @@ Each Read Replica has its own dedicated database and API endpoints.
 
 Read Replicas only support `GET` requests and the [REST API](/docs/guides/api). Requests to other Supabase products, such as Auth, Storage, and Realtime, aren't able to use a Read Replica or its API endpoint. Support for more products will be added in the future.
 
-## Dedicated connection pool
+If you're using an [IPv4 add-on](/docs/guides/platform/ipv4-address#read-replicas), the database endpoints for your Read Replicas will also use an IPv4 add-on.
+
+### Dedicated connection pool
 
 A connection pool through Supavisor is also available for each Read Replica. Find the connection string on the [Database Settings page](/dashboard/project/_/settings/database) under **Connection String**.
 
