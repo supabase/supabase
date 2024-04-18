@@ -2,8 +2,8 @@
 title: 'Supabase Storage: now supports the S3 protocol'
 description: 'Supabase Storage is now officially an S3-Compatible Storage Provider.'
 author: fabrizio
-image: ga-week/s3-compatible-storage/og.png
-thumb: ga-week/s3-compatible-storage/thumb.png
+image: ga-week/s3-compatible-storage/og.png?v=2
+thumb: ga-week/s3-compatible-storage/thumb.png?v=2
 categories:
   - product
 tags:
@@ -34,7 +34,7 @@ The [Supabase Storage Engine](https://github.com/supabase/storage) is fully open
 
 ## S3 compatibility
 
-We always strive to adopt industry standards at Supabase. The S3 API is undoubtedly a storage standard, and we're making it accessible to developers of various experience-levels.
+We always strive to adopt industry standards at Supabase. Supporting standards [makes workloads portable](https://supabase.com/docs/guides/getting-started/architecture#everything-is-portable), a key product principle. The S3 API is undoubtedly a storage standard, and we're making it accessible to developers of various experience-levels.
 
 The S3 protocol is backwards compatible with our other APIs. If you are already using Storage via our REST or TUS APIs, today you can use any S3 client to interact with your buckets and files: upload with TUS, serve them with REST, and manage them with the S3 protocol.
 
@@ -56,7 +56,7 @@ With the support of the S3 protocol, you can now connect Supabase Storage to man
 
 You can use popular tools for backups and migrations, such as:
 
-- AWS s3 CLI: [docs.aws.amazon.com/cli/latest/reference/s3](https://docs.aws.amazon.com/cli/latest/reference/s3/)
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/reference/s3/): The official AWS CLI
 - [rclone](https://rclone.org/): a command-line program to manage files on cloud storage.
 - [Cyberduck](https://cyberduck.io/): a cloud storage browser for Mac and Windows.
 - and any other s3-compatible tool ...
@@ -85,9 +85,10 @@ In this example our incredible data analyst, Tyler, demonstrates how to store Pa
   />
 </div>
 
-### Multi-Part Uploads in S3
+### Multipart Uploads in S3
 
-We are working on multipart uploads via the S3 protocol. This will maximise the upload throughput by uploading chunks in parallel, which are concatenated once all the chunks are uploaded. This work is already in progress and will be available soon.
+In addition to the standard uploads and resumable uploads, we now support multipart uploads via the S3 protocol.
+This allows you to maximize upload throughput by uploading chunks in parallel, which are then concatenated at the end.
 
 # Resumable uploads is Generally Available
 
@@ -99,7 +100,7 @@ Supabase contributed [some advanced features](https://github.com/tus/tus-node-se
 
 ![Supabase contributions](/images/blog/ga-week/s3-compatible-storage/supabase-contributions.png)
 
-These features were essential for Supabase, and since [`tus-node-server`](https://github.com/tus/tus-node-server) is open source, they are also available for you to use. This remains one of our core principles: wherever possible, we [use and support existing tools](https://supabase.com/docs/guides/getting-started/architecture#support-existing-tools) rather than developing from scratch.
+These features were essential for Supabase, and since [`tus-node-server`](https://github.com/tus/tus-node-server) is open source, they are also available for you to use. This is another core principle: wherever possible, we [use and support existing tools](/docs/guides/getting-started/architecture#support-existing-tools) rather than developing from scratch.
 
 ## Quality of Life additions
 
@@ -110,4 +111,7 @@ These features were essential for Supabase, and since [`tus-node-server`](https:
 
 ## Getting started
 
-- Links
+- Check out the S3 API compatibility [in our docs](/docs/guides/storage/s3/compatibility)
+- Learn about [S3 Authentication](docs/guides/storage/s3/authentication)
+- Try S3 with Cyberduck: follow our [integration guide](/partners/integrations/cyberduck)
+- Try S3 with DuckDB: follow the guide [on YouTube](https://www.youtube.com/watch?v=oIgVY8L7qLQ)
