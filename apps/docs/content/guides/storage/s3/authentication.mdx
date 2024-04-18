@@ -8,10 +8,10 @@ sidebar_label: 'S3'
 
 You have two options to authenticate with Supabase Storage S3:
 
-- Using the generated S3 credentials from your [project settings](/dashboard/project/_/settings/storage) (Intended exclusively for server-side use)
-- Using a Session Token, which will allow you to authenticate with a user JWT token and provide limited access via RLS
+- Using the generated S3 access keys from your [project settings](/dashboard/project/_/settings/storage) (Intended exclusively for server-side use)
+- Using a Session Token, which will allow you to authenticate with a user JWT token and provide limited access via Row Level Security
 
-## S3 credentials
+## S3 access keys
 
 <Admonition type="danger" label="Keep these credentials secure">
 
@@ -23,7 +23,7 @@ To authenticate with S3 on the server, you need to generate a pair of credential
 
 You can use these credentials to authenticate with Supabase Storage S3 using any S3-compatible service.
 
-<img alt="Storage S3 Credentials" src="/docs/img/storage/s3-credentials.png" width="100%" />
+<img alt="Storage S3 Access keys" src="/docs/img/storage/s3-credentials.png" width="100%" />
 
 <Tabs
   scrollable
