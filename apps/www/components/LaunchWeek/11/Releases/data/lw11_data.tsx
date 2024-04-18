@@ -70,7 +70,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     blog: '/ga',
     hasCountdown: false,
     date: '15 April',
-    published_at: '2024-04-15T08:00:00.000-08:00',
+    published_at: '2024-04-15T08:00:00.000-07:00',
     videoId: 'bRtdk8D4X8w',
     videoThumbnail: '/images/launchweek/11/video-cover.jpg',
     title: 'Supabase is officially launching into General Availability',
@@ -129,7 +129,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     hasCountdown: false,
     blog: '/blog/ai-inference-now-available-in-supabase-edge-functions',
     date: '16 April',
-    published_at: '2024-04-16T08:00:00.000-08:00',
+    published_at: '2024-04-16T08:00:00.000-07:00',
     title: 'Supabase Functions now supports AI models',
     description: (
       <>
@@ -173,11 +173,11 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 3,
     dd: 'Wed',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/anonymous-sign-ins',
     date: '17 April',
-    published_at: '2024-04-17T08:00:00.000-08:00',
+    published_at: '2024-04-17T08:00:00.000-07:00',
     title: 'Supabase Auth now supports Anonymous sign-ins',
     description: (
       <>
@@ -220,29 +220,49 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-4',
     d: 4,
     dd: 'Thu',
-    shipped: false,
-    isToday: false,
-    hasCountdown: true,
-    blog: '#',
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
+    blog: '/blog/s3-compatible-storage',
     date: '18 April',
-    published_at: '2024-04-18T08:00:00.000-08:00',
-    title: '',
-    description: <></>,
+    published_at: '2024-04-18T08:00:00.000-07:00',
+    title: 'Supabase Storage: now supports the S3 protocol',
+    description: (
+      <>
+        Supabase Storage: now supports the <strong>S3 protocol</strong>
+      </>
+    ),
     links: [
-      // {
-      //   type: 'blog',
-      //   href: '#',
-      // },
-      // {
-      //   type: 'video',
-      //   href: '',
-      // },
+      {
+        type: 'blog',
+        href: '/blog/s3-compatible-storage',
+      },
+      {
+        type: 'video',
+        href: 'WvvGhcNeSPk',
+      },
       {
         type: 'xSpace',
         href: 'https://supabase.link/twitter-space-ga-week-4',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: 'Supabase Storage: now supports the S3 protocol',
+        blog: '/blog/s3-compatible-storage',
+        bg_layers: [
+          {
+            img: isDark
+              ? '/images/launchweek/11/days/d4-dark.svg'
+              : '/images/launchweek/11/days/d4-light.svg',
+            mobileImg: isDark
+              ? '/images/launchweek/11/days/d4-dark-mobile.svg'
+              : '/images/launchweek/11/days/d4-light-mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
   {
     id: 'day-5',
@@ -250,10 +270,10 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     dd: 'Fri',
     shipped: false,
     isToday: false,
-    hasCountdown: false,
+    hasCountdown: true,
     blog: '#',
     date: '19 April',
-    published_at: '2024-04-19T08:00:00.000-08:00',
+    published_at: '2024-04-19T08:00:00.000-07:00',
     title: '',
     description: <></>,
     links: [
