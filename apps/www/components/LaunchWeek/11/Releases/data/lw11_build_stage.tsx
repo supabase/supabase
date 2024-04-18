@@ -259,7 +259,7 @@ export const days: AdventDay[] = [
     description: '',
     icon: null,
     id: '',
-    is_shipped: false,
+    is_shipped: true,
     links: [
       {
         url: '',
