@@ -28,7 +28,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconAlertCircle,
   IconMoreVertical,
   IconTrash,
   cn,
@@ -38,6 +37,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { AlertTitle } from '@ui/components/shadcn/ui/alert'
 import Link from 'next/link'
+import { AlertCircle } from 'lucide-react'
 
 export const S3Connection = () => {
   const [openCreateCred, setOpenCreateCred] = React.useState(false)
@@ -101,7 +101,7 @@ export const S3Connection = () => {
           ) : (
             <>
               <Alert_Shadcn_ variant="warning">
-                <IconAlertCircle />
+                <AlertCircle />
                 <AlertTitle>Project is paused</AlertTitle>
                 <AlertDescription_Shadcn_>
                   To connect to your S3 bucket, you need to restore your project.
