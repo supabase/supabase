@@ -137,9 +137,15 @@ export const generateDatabaseMenu = (
           items: [],
         },
         {
-          name: 'Database Linter',
-          key: 'linter',
-          url: `/project/${ref}/database/linter`,
+          name: 'Security Advisor',
+          key: 'security-advisor',
+          url: `/project/${ref}/database/security-advisor`,
+          items: [],
+        },
+        {
+          name: 'Performance Advisor',
+          key: 'performance-advisor',
+          url: `/project/${ref}/database/performance-advisor`,
           items: [],
         },
       ],

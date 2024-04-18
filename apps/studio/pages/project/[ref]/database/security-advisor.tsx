@@ -91,11 +91,12 @@ const ProjectLints: NextPageWithLayout = () => {
     connectionString: project?.connectionString,
   })
 
-  const activeLints = data || []
+  const activeLints = data?.filter((x) => x.categories.includes('SECURITY')) || []
   const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
     []) as string[]
 
   const filteredLints = activeLints
+    .filter((x) => x.categories.includes('SECURITY'))
     .filter((x) => x.level === currentTab)
     .filter((x) => (currentTabFilters.length > 0 ? currentTabFilters.includes(x.name) : x))
 
@@ -213,7 +214,7 @@ const ProjectLints: NextPageWithLayout = () => {
     <div className="h-full flex flex-col">
       <FormHeader
         className="py-4 px-6 !mb-0"
-        title="Suggestions"
+        title="Security Advisor"
         docsUrl="https://supabase.com/docs/guides/database/database-linter"
       />
       <Tabs_Shadcn_
@@ -340,7 +341,9 @@ const ProjectLints: NextPageWithLayout = () => {
                 <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
                   <TextSearch className="text-foreground-muted" strokeWidth={1} />
                   <div className="text-center">
-                    <p className="text-foreground">No issues detected</p>
+                    <p className="text-foreground">
+                      No {currentTab === LINTER_LEVELS.ERROR ? 'errors' : 'issues'} detected
+                    </p>
                     <p className="text-foreground-light">
                       Congrats! There are no suggestions available for this database
                     </p>
