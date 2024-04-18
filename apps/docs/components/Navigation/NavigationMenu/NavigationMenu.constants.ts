@@ -610,10 +610,6 @@ export const auth = {
         { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
         { name: 'Row Level Security', url: '/guides/auth/row-level-security' },
         {
-          name: 'Column Level Security',
-          url: '/guides/auth/column-level-security',
-        },
-        {
           name: 'Custom Claims & RBAC',
           url: '/guides/auth/custom-claims-and-role-based-access-control-rbac',
         },
@@ -774,6 +770,10 @@ export const database: NavMenuConstant = {
         {
           name: 'Superuser Access and Unsupported Operations',
           url: '/guides/database/postgres/roles-superuser',
+        },
+        {
+          name: 'Column level privileges',
+          url: '/guides/database/postgres/column-level-privileges',
         },
       ],
     },
