@@ -74,7 +74,7 @@ As we are transitioning to a new error code system, you might still see the foll
 
 Here's a list of the most common error codes and their potential resolutions:
 
-## 404 not_found
+### 404 not_found
 
 Indicates that the resource is not found or you don't have the correct permission to access it
 **Resolution:**
@@ -83,14 +83,14 @@ Indicates that the resource is not found or you don't have the correct permissio
 - Ensure you include the user `Authorization` header
 - Verify the object exists
 
-## 409 already_exists
+### 409 already_exists
 
 Indicates that the resource already exists.
 **Resolution:**
 
 - Use the `upsert` functionality in order to overwrite the file. Find out more [here](/docs/guides/storage/uploads/standard-uploads#overwriting-files).
 
-## 403 unauthorized
+### 403 unauthorized
 
 You don't have permission to action this request
 **Resolution:**
@@ -98,7 +98,7 @@ You don't have permission to action this request
 - Add RLS policy to grant permission. See our [Access Control docs](/docs/guides/storage/uploads/access-control) for more information.
 - Ensure you include the user `Authorization` header
 
-## 429 too many requests
+### 429 too many requests
 
 This problem typically arises when a large number of clients are concurrently interacting with the Storage service, and the pooler has reached its `max_clients` limit.
 
@@ -107,7 +107,7 @@ This problem typically arises when a large number of clients are concurrently in
 - Increase the max_clients limits of the pooler.
 - Upgrade to a bigger project compute instance [here](https://supabase.com/dashboard/project/_/settings/addons).
 
-## 544 database_timeout
+### 544 database_timeout
 
 This problem arises when a high number of clients are concurrently using the Storage service, and Postgres doesn't have enough available connections to efficiently handle requests to Storage.
 
@@ -116,7 +116,7 @@ This problem arises when a high number of clients are concurrently using the Sto
 - Increase the pool_size limits of the pooler.
 - Upgrade to a bigger project compute instance [here](https://supabase.com/dashboard/project/_/settings/addons).
 
-## 500 internal_server_error
+### 500 internal_server_error
 
 This issue occurs where there is a unhandled error.
 **Resolution:**
