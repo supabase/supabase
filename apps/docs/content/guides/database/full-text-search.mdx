@@ -594,7 +594,7 @@ After creating this function, you can invoke it from your application using the 
 
 ```sql
 create or replace function search_books_by_title_prefix(prefix text)
-return setof books AS $$
+returns setof books AS $$
 begin
   return query
   select * from books where to_tsvector('english', title) @@ to_tsquery(prefix || ':*');
