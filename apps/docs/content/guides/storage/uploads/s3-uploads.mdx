@@ -10,14 +10,14 @@ You can use the S3 protocol to upload files to Supabase Storage. To get started 
 
 The S3 protocol supports file upload using:
 
-- The `PutObject` command
-- Multi-Part Upload
+- A single request
+- Multiple requests via Multipart Upload
 
-## `PutObject`
+## Single request uploads
 
-The PutObject command uploads the file in a single request. This matches the behavior of the Supabase SDK [Standard Upload](/docs/guides/storage/uploads/standard-uploads).
+The `PutObject` action uploads the file in a single request. This matches the behavior of the Supabase SDK [Standard Upload](/docs/guides/storage/uploads/standard-uploads).
 
-Use `PutObject` to upload smaller files, where retrying the entire upload won't be an issue. The maximum file size is 5 GB.
+Use `PutObject` to upload smaller files, where retrying the entire upload won't be an issue. The maximum file size on paid plans is 5 GB.
 
 For example, using JavaScript and the `aws-sdk` client:
 
@@ -38,11 +38,11 @@ const uploadCommand = new PutObjectCommand({
 await s3Client.send(uploadCommand)
 ```
 
-## Multi part uploads
+## Multipart uploads
 
-Multi Part Uploads split the file into smaller parts and upload them in parallel, maximizing the upload speed on a fast network. When uploading large files, this allows you to retry the upload of individual parts in case of network issues.
+Multipart Uploads split the file into smaller parts and upload them in parallel, maximizing the upload speed on a fast network. When uploading large files, this allows you to retry the upload of individual parts in case of network issues.
 
-This method is preferable over [Resumable Upload](/docs/guides/storage/uploads/resumable-uploads) for server-side uploads, when you want to maximize upload speed at the cost of resumability. The maximum file size is 50 GB.
+This method is preferable over [Resumable Upload](/docs/guides/storage/uploads/resumable-uploads) for server-side uploads, when you want to maximize upload speed at the cost of resumability. The maximum file size on paid plans is 50 GB.
 
 ### Upload a file in parts
 
@@ -66,6 +66,6 @@ const upload = new Upload(s3Client, {
 await uploader.done()
 ```
 
-### Aborting multi part uploads
+### Aborting multipart uploads
 
-All multi-part uploads are automatically aborted after 24 hrs. If you want to abort a multi-part upload before that, you can use the [`AbortMultipartUpload`](https://docs.aws.amazon.com/AmazonS3/latest/API/API_AbortMultipartUpload.html) command.
+All multipart uploads are automatically aborted after 24 hrs. To abort a multipart upload before that, you can use the [`AbortMultipartUpload`](https://docs.aws.amazon.com/AmazonS3/latest/API/API_AbortMultipartUpload.html) action.
