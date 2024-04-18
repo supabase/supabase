@@ -29,7 +29,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   IconMoreVertical,
-  IconTrash,
   cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
@@ -37,7 +36,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { AlertTitle } from '@ui/components/shadcn/ui/alert'
 import Link from 'next/link'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, TrashIcon } from 'lucide-react'
 import {
   Tooltip,
   TooltipContent,
@@ -92,35 +91,31 @@ export const S3Connection = () => {
           description="Connect to your bucket via the S3 protocol."
           docsUrl="https://supabase.com/docs/guides/storage/s3/authentication"
         />
-        <Panel className="grid gap-4 p-4 !mb-0">
-          {isProjectActive ? (
-            <>
-              <FormItemLayout layout="horizontal" label="Endpoint" isReactForm={false}>
-                <Input readOnly copy disabled value={s3connectionUrl} />
+        {isProjectActive ? (
+          <Panel className="grid gap-4 p-4 !mb-0">
+            <FormItemLayout layout="horizontal" label="Endpoint" isReactForm={false}>
+              <Input readOnly copy disabled value={s3connectionUrl} />
+            </FormItemLayout>
+            {!projectIsLoading && (
+              <FormItemLayout layout="horizontal" label="Region" isReactForm={false}>
+                <Input className="input-mono" copy disabled value={project?.region} />
               </FormItemLayout>
-              {!projectIsLoading && (
-                <FormItemLayout layout="horizontal" label="Region" isReactForm={false}>
-                  <Input className="input-mono" copy disabled value={project?.region} />
-                </FormItemLayout>
-              )}
-            </>
-          ) : (
-            <>
-              <Alert_Shadcn_ variant="warning">
-                <AlertCircle />
-                <AlertTitle>Project is paused</AlertTitle>
-                <AlertDescription_Shadcn_>
-                  To connect to your S3 bucket, you need to restore your project.
-                </AlertDescription_Shadcn_>
-                <div className="mt-3 flex items-center space-x-2">
-                  <Button asChild type="default">
-                    <Link href={`/project/${projectRef}`}>Restore project</Link>
-                  </Button>
-                </div>
-              </Alert_Shadcn_>
-            </>
-          )}
-        </Panel>
+            )}
+          </Panel>
+        ) : (
+          <Alert_Shadcn_ variant="warning">
+            <AlertCircle />
+            <AlertTitle>Project is paused</AlertTitle>
+            <AlertDescription_Shadcn_>
+              To connect to your S3 bucket, you need to restore your project.
+            </AlertDescription_Shadcn_>
+            <div className="mt-3 flex items-center space-x-2">
+              <Button asChild type="default">
+                <Link href={`/project/${projectRef}`}>Restore project</Link>
+              </Button>
+            </div>
+          </Alert_Shadcn_>
+        )}
       </div>
 
       <div>
@@ -136,20 +131,18 @@ export const S3Connection = () => {
               }}
             >
               <DialogTrigger asChild>
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button disabled={!isProjectActive} type="outline">
-                        New access key
-                      </Button>
-                    </TooltipTrigger>
-                    {!isProjectActive && (
-                      <TooltipContent>
-                        Restore your project to create new access keys
-                      </TooltipContent>
-                    )}
-                  </Tooltip>
-                </TooltipProvider>
+                <Button disabled={!isProjectActive} type="outline">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>New access key</TooltipTrigger>
+                      {!isProjectActive && (
+                        <TooltipContent>
+                          Restore your project to create new access keys
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
+                </Button>
               </DialogTrigger>
 
               <DialogContent
@@ -165,7 +158,7 @@ export const S3Connection = () => {
                     <div className="flex flex-col gap-y-2">
                       <DialogTitle>Save your new S3 access keys</DialogTitle>
                       <DialogDescription>
-                        You won't be able to see them again. If you lose these credentials, you'll
+                        You won't be able to see them again. If you lose these access keys, you'll
                         need to create a new ones.
                       </DialogDescription>
                     </div>
@@ -284,9 +277,9 @@ export const S3Connection = () => {
                   ) : (
                     <Table.tr>
                       <Table.td colSpan={4}>
-                        <p className="text-sm text-foreground">No credentials created</p>
+                        <p className="text-sm text-foreground">No access keys created</p>
                         <p className="text-sm text-foreground-light">
-                          There are no credentials associated with your project yet
+                          There are no access keys associated with your project yet
                         </p>
                       </Table.td>
                     </Table.tr>
@@ -302,7 +295,7 @@ export const S3Connection = () => {
         <DialogContent className="p-4">
           <DialogTitle>Revoke S3 access keys</DialogTitle>
           <DialogDescription>
-            This action is irreversible and requests made with these credentials will stop working.
+            This action is irreversible and requests made with these access keys will stop working.
           </DialogDescription>
           <div className="flex justify-end gap-2">
             <Button
@@ -324,7 +317,7 @@ export const S3Connection = () => {
                 toast.success('S3 access keys revoked')
               }}
             >
-              Yes, revoke credentials
+              Yes, revoke access keys
             </Button>
           </div>
         </DialogContent>
@@ -385,8 +378,8 @@ function StorageCredItem({
                 onDeleteClick(id)
               }}
             >
-              <IconTrash />
-              Revoke credentials
+              <TrashIcon size="14" />
+              Revoke keys
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
