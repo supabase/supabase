@@ -7,7 +7,7 @@ const HackathonCallout = ({ className }: { className?: string }) => {
   return (
     <div
       className={cn(
-        'font-mono uppercase tracking-[1px] py-8 text-[#575E61] scroll-mt-16 flex flex-col md:flex-row justify-between gap-2',
+        'font-mono uppercase tracking-[1px] py-8 scroll-mt-16 flex flex-col md:flex-row justify-between gap-2',
         className
       )}
     >

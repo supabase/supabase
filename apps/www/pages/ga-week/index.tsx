@@ -101,7 +101,7 @@ export default function GAWeekIndex({ meetups }: Props) {
           setShowCustomizationForm,
         }}
       >
-        <DefaultLayout className="bg-default dark:bg-[#060809]">
+        <DefaultLayout className="bg-alternative">
           <LW11StickyNav />
           <LW11Header className="pb-20 z-0" />
           <MainStage className="relative -mt-20 z-10" />

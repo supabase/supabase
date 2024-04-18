@@ -126,7 +126,7 @@ where
         -- Standard View, accessible to anon or authenticated that is security_definer
         (
             c.relkind = 'v' -- v for view
-            -- Exclude security invoker views 
+            -- Exclude security invoker views
             and not (
                 lower(coalesce(c.reloptions::text,'{}'))::text[]
                 && array[
@@ -141,7 +141,7 @@ where
         -- Standard View, security invoker, but no RLS enabled on auth.users
         (
             c.relkind in ('v') -- v for view
-            -- is security invoker 
+            -- is security invoker
             and (
                 lower(coalesce(c.reloptions::text,'{}'))::text[]
                 && array[
@@ -151,7 +151,7 @@ where
                     'security_invoker=on'
                 ]
             )
-            and not pg_class_auth_users.relrowsecurity 
+            and not pg_class_auth_users.relrowsecurity
         )
     )
 group by
@@ -240,16 +240,16 @@ where
     and (
         (
             -- Example: auth.uid()
-            qual  ~ '(auth)\.(uid|jwt|role|email)\(\)'
+            qual  ~ '(auth)\\.(uid|jwt|role|email)\\(\\)'
             -- Example: select auth.uid()
-            and lower(qual) !~ 'select\s+(auth)\.(uid|jwt|role|email)\(\)'
+            and lower(qual) !~ 'select\\s+(auth)\\.(uid|jwt|role|email)\\(\\)'
         )
         or
         (
             -- Example: auth.uid()
-            with_check  ~ '(auth)\.(uid|jwt|role|email)\(\)'
+            with_check  ~ '(auth)\\.(uid|jwt|role|email)\\(\\)'
             -- Example: select auth.uid()
-            and lower(with_check) !~ 'select\s+(auth)\.(uid|jwt|role|email)\(\)'
+            and lower(with_check) !~ 'select\\s+(auth)\\.(uid|jwt|role|email)\\(\\)'
         )
     ))
 union all
@@ -663,7 +663,7 @@ where
     and not c.relrowsecurity)
 union all
 (
-select 
+select
     'extension_in_public' as name,
     'WARN' as level,
     'EXTERNAL' as facing,
@@ -706,6 +706,7 @@ export const LINT_TYPES = [
   'rls_disabled_in_public',
   'extension_in_public',
 ] as const
+
 export type LINT_TYPES = (typeof LINT_TYPES)[number]
 
 export type Lint = {

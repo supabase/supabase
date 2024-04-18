@@ -16,6 +16,7 @@ import { Button, cn } from 'ui'
 import { useSendFeedbackMutation } from '~/lib/fetch/feedback'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { FeedbackModal, type FeedbackFields } from './FeedbackModal'
+import { getSanitizedTabParams } from './Feedback.utils'
 
 const FeedbackButton = forwardRef<
   HTMLButtonElement,
@@ -89,7 +90,7 @@ function Feedback() {
       vote: response,
       page: pathname,
       metadata: {
-        query: Object.fromEntries(new URLSearchParams(window.location.search).entries()),
+        query: getSanitizedTabParams(),
       },
     })
     if (error) console.error(error)

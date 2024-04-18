@@ -1,49 +1,41 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
-import type { PostgresRole } from '@supabase/postgres-meta'
+import pgMeta from '@supabase/pg-meta'
+import { QueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { z } from 'zod'
 
-import { get } from 'data/fetchers'
-import type { ResponseError } from 'types'
-import { databaseRolesKeys } from './keys'
+import { ExecuteSqlData, useExecuteSqlQuery } from 'data/sql/execute-sql-query'
+import { sqlKeys } from 'data/sql/keys'
 
 export type DatabaseRolesVariables = {
   projectRef?: string
   connectionString?: string
 }
 
-export async function getDatabaseRoles(
-  { projectRef, connectionString }: DatabaseRolesVariables,
-  signal?: AbortSignal
-) {
-  if (!projectRef) throw new Error('projectRef is required')
+export type PgRole = z.infer<typeof pgMeta.roles.zod>
 
-  let headers = new Headers()
-  if (connectionString) headers.set('x-connection-encrypted', connectionString)
+const pgMetaRolesList = pgMeta.roles.list()
 
-  const { data, error } = await get('/platform/pg-meta/{ref}/roles', {
-    params: {
-      header: { 'x-connection-encrypted': connectionString! },
-      path: { ref: projectRef },
-    },
-    headers,
-    signal,
-  })
-
-  if (error) throw error
-  return data as PostgresRole[]
-}
-
-export type DatabaseRolesData = Awaited<ReturnType<typeof getDatabaseRoles>>
-export type DatabaseRolesError = ResponseError
+export type DatabaseRolesData = z.infer<typeof pgMetaRolesList.zod>
+export type DatabaseRolesError = unknown
 
 export const useDatabaseRolesQuery = <TData = DatabaseRolesData>(
   { projectRef, connectionString }: DatabaseRolesVariables,
-  { enabled = true, ...options }: UseQueryOptions<DatabaseRolesData, DatabaseRolesError, TData> = {}
+  options: UseQueryOptions<ExecuteSqlData, DatabaseRolesError, TData> = {}
 ) =>
-  useQuery<DatabaseRolesData, DatabaseRolesError, TData>(
-    databaseRolesKeys.list(projectRef),
-    ({ signal }) => getDatabaseRoles({ projectRef, connectionString }, signal),
+  useExecuteSqlQuery(
     {
-      enabled: enabled && typeof projectRef !== 'undefined',
+      projectRef,
+      connectionString,
+      sql: pgMetaRolesList.sql,
+      queryKey: ['roles', 'list'],
+    },
+    {
+      select(data) {
+        return data.result
+      },
       ...options,
     }
   )
+
+export function invalidateRolesQuery(client: QueryClient, projectRef: string | undefined) {
+  return client.invalidateQueries(sqlKeys.query(projectRef, ['roles', 'list']))
+}
