@@ -34,7 +34,7 @@ The [Supabase Storage Engine](https://github.com/supabase/storage) is fully open
 
 ## S3 compatibility
 
-We always strive to adopt industry standards at Supabase. Supporting standards [makes workloads portable](https://supabase.com/docs/guides/getting-started/architecture#everything-is-portable), a key product principle. The S3 API is undoubtedly a storage standard, and we're making it accessible to developers of various experience-levels.
+We always strive to adopt industry standards at Supabase. Supporting standards makes workloads portable, [a key product principle](https://supabase.com/docs/guides/getting-started/architecture#everything-is-portable). The S3 API is undoubtedly a storage standard, and we're making it accessible to developers of various experience-levels.
 
 The S3 protocol is backwards compatible with our other APIs. If you are already using Storage via our REST or TUS APIs, today you can use any S3 client to interact with your buckets and files: upload with TUS, serve them with REST, and manage them with the S3 protocol.
 
@@ -96,11 +96,11 @@ Along with the [platform GA announcement](https://supabase.com/ga), we are also 
 
 Resumable uploads are powered by the [TUS protocol](https://tus.io/). The journey to get here was immensely rewarding, working closely with the TUS team. A big shoutout to the maintainers of the TUS protocol, [@murderlon](https://github.com/Murderlon) and [@acconut](https://github.com/Acconut), for their collaborative approach to open source.
 
-Supabase contributed [some advanced features](https://github.com/tus/tus-node-server/pulls?q=is%3Apr+sort%3Aupdated-desc+author%3Afenos) from the Node implementation of TUS Spec including distributed locks, max file size, expiration extension and bug fixes:
+Supabase contributed [some advanced features](https://github.com/tus/tus-node-server/pulls?q=is%3Apr+sort%3Aupdated-desc+author%3Afenos) from the Node implementation of TUS Spec including [distributed locks](https://github.com/tus/tus-node-server/pull/514), [max file size](https://github.com/tus/tus-node-server/pull/517), [expiration extension](https://github.com/tus/tus-node-server/pull/513) and numerous bug fixes:
 
 ![Supabase contributions](/images/blog/ga-week/s3-compatible-storage/supabase-contributions.png)
 
-These features were essential for Supabase, and since https://github.com/tus/tus-node-server is open source, they are also available for you to use. This is another core principle: wherever possible, we [use and support existing tools](https://supabase.com/docs/guides/getting-started/architecture#support-existing-tools) rather than developing from scratch.
+These features were essential for Supabase, and since the [TUS node server](https://github.com/tus/tus-node-server) is open source, they are also available for you to use. This is another core principle: wherever possible, we [use and support existing tools](https://supabase.com/docs/guides/getting-started/architecture#support-existing-tools) rather than developing from scratch.
 
 ## Quality of Life additions
 
