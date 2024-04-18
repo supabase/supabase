@@ -91,13 +91,13 @@ We are working on multipart uploads via the S3 protocol. This will maximise the 
 
 Along with the [platform GA announcement](https://supabase.com/ga), we are also thrilled to announce that resumable uploads are also generally available.
 
-The journey to get here was immensely rewarding, working closely with the team behind the TUS protocol. A big shoutout to [@murderlon](https://github.com/Murderlon) and [@acconut](https://github.com/Acconut), maintainers of the TUS protocol, for their collaborative approach to open source.
+Resumable uploads are powered by the [TUS protocol](https://tus.io/). The journey to get here was immensely rewarding, working closely with the TUS team. A big shoutout to the maintainers of the TUS protocol, [@murderlon](https://github.com/Murderlon) and [@acconut](https://github.com/Acconut), for their collaborative approach to open source.
 
-Supabase contributed some advanced features from the TUS Spec that were not available in the Node implementation, including distributed locks, max file size, expiration extension and bug fixes:
+Supabase contributed [some advanced features](https://github.com/tus/tus-node-server/pulls?q=is%3Apr+sort%3Aupdated-desc+author%3Afenos) from the Node implementation of TUS Spec including distributed locks, max file size, expiration extension and bug fixes:
 
 ![Supabase contributions](/images/blog/ga-week/s3-compatible-storage/supabase-contributions.png)
 
-These features were essential for Supabase, but since https://github.com/tus/tus-node-server is open source, they are also available for you to use. This remains one of our core principles: wherever possible, we [use and support existing tools](https://supabase.com/docs/guides/getting-started/architecture) rather than developing from scratch.
+These features were essential for Supabase, and since https://github.com/tus/tus-node-server is open source, they are also available for you to use. This remains one of our core principles: wherever possible, we [use and support existing tools](https://supabase.com/docs/guides/getting-started/architecture#support-existing-tools) rather than developing from scratch.
 
 ## Quality of Life additions
 
