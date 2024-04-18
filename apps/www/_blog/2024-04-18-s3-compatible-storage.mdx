@@ -85,7 +85,8 @@ In this example our incredible data analyst, Tyler, demonstrates how to store Pa
 
 ### Multi-Part Uploads in S3
 
-We are working on multipart uploads via the S3 protocol. This will maximise the upload throughput by uploading chunks in parallel, which are concatenated once all the chunks are uploaded. This work is already in progress and will be available soon.
+In addition to the Standard Upload and TUS resumable upload, we are now supporting Multi-Part uploads via the S3 protocol.
+This allows you to maximize upload throughput by uploading chunks in parallel, which are then concatenated at the end.
 
 # Resumable uploads is Generally Available
 
