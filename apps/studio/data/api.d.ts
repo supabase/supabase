@@ -2022,7 +2022,8 @@ export interface components {
       page: string
       isHelpful: boolean
       title: string
-      feedback: string
+      feedback?: string
+      team?: string
     }
     SignUpBody: {
       email: string
@@ -4044,10 +4045,11 @@ export interface components {
       db_schema?: string
     }
     V1PostgrestConfigResponse: {
-      max_rows: number | null
+      max_rows: number
+      /** @description If `null`, the value is automatically configured based on compute size. */
       db_pool: number | null
-      db_schema: string | null
-      db_extra_search_path: string | null
+      db_schema: string
+      db_extra_search_path: string
     }
     PostgresConfigResponse: {
       statement_timeout?: string
@@ -4961,10 +4963,11 @@ export interface components {
       root_key: string
     }
     PostgrestConfigWithJWTSecretResponse: {
-      max_rows: number | null
+      max_rows: number
+      /** @description If `null`, the value is automatically configured based on compute size. */
       db_pool: number | null
-      db_schema: string | null
-      db_extra_search_path: string | null
+      db_schema: string
+      db_extra_search_path: string
       jwt_secret?: string
     }
     V1ProjectRefResponse: {
