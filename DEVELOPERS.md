@@ -37,7 +37,7 @@ You will need to install and configure the following dependencies on your machin
 
 - [Git](http://git-scm.com/)
 - [Node.js v20.x (LTS)](http://nodejs.org)
-- [npm](https://www.npmjs.com/) version 18.x.x
+- [npm](https://www.npmjs.com/) version 10.x.x
 - [Docker](https://docs.docker.com/get-docker/) (to run studio locally)
 
 ## Local development
