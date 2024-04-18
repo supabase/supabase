@@ -187,6 +187,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/project/:ref/database/replication',
+        destination: '/project/:ref/database/publications',
+        permanent: true,
+      },
+      {
         source: '/project/:ref/database/graphiql',
         destination: '/project/:ref/api/graphiql',
         permanent: true,
@@ -353,6 +358,11 @@ const nextConfig = {
         permanent: true,
         source: '/project/:ref/reports/query-performance',
         destination: '/project/:ref/database/query-performance',
+      },
+      {
+        permanent: true,
+        source: '/project/:ref/auth/column-privileges',
+        destination: '/project/:ref/database/column-privileges',
       },
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [

@@ -6,19 +6,19 @@ import { Lock, MousePointer2, PlusCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, Modal, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
+import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
-import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 
 export interface GridHeaderActionsProps {
   table: PostgresTable
@@ -284,8 +284,8 @@ const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeade
           {!isRealtimeEnabled && (
             <p className="text-sm">
               You may also select which events to broadcast to subscribers on the{' '}
-              <Link href={`/project/${ref}/database/replication`} className="text-brand">
-                database replication
+              <Link href={`/project/${ref}/database/publications`} className="text-brand">
+                database publications
               </Link>{' '}
               settings.
             </p>
