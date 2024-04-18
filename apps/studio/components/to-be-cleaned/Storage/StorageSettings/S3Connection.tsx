@@ -246,47 +246,64 @@ export const S3Connection = () => {
             'rounded-md border shadow',
           ])}
         >
-          {storageCredsQuery.isLoading ? (
-            <div className="p-4">
-              <GenericSkeletonLoader />
-            </div>
+          {!isProjectActive ? (
+            <Alert_Shadcn_ variant="warning">
+              <AlertCircle />
+              <AlertTitle>Can't fetch S3 access keys</AlertTitle>
+              <AlertDescription_Shadcn_>
+                To fetch your S3 access keys, you need to restore your project.
+              </AlertDescription_Shadcn_>
+              <div className="mt-3 flex items-center space-x-2">
+                <Button asChild type="default">
+                  <Link href={`/project/${projectRef}`}>Restore project</Link>
+                </Button>
+              </div>
+            </Alert_Shadcn_>
           ) : (
-            <div className="overflow-x-auto">
-              <Table
-                head={[
-                  <Table.th key="">Description</Table.th>,
-                  <Table.th key="">Access key ID</Table.th>,
-                  <Table.th key="">Created at</Table.th>,
-                  <Table.th key="actions" />,
-                ]}
-                body={
-                  hasStorageCreds ? (
-                    storageCreds.data?.map((cred: any) => (
-                      <StorageCredItem
-                        key={cred.id}
-                        created_at={cred.created_at}
-                        access_key={cred.access_key}
-                        description={cred.description}
-                        id={cred.id}
-                        onDeleteClick={() => {
-                          setDeleteCredId(cred.id)
-                          setOpenDeleteDialog(true)
-                        }}
-                      />
-                    ))
-                  ) : (
-                    <Table.tr>
-                      <Table.td colSpan={4}>
-                        <p className="text-sm text-foreground">No access keys created</p>
-                        <p className="text-sm text-foreground-light">
-                          There are no access keys associated with your project yet
-                        </p>
-                      </Table.td>
-                    </Table.tr>
-                  )
-                }
-              />
-            </div>
+            <>
+              {storageCredsQuery.isLoading ? (
+                <div className="p-4">
+                  <GenericSkeletonLoader />
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table
+                    head={[
+                      <Table.th key="">Description</Table.th>,
+                      <Table.th key="">Access key ID</Table.th>,
+                      <Table.th key="">Created at</Table.th>,
+                      <Table.th key="actions" />,
+                    ]}
+                    body={
+                      hasStorageCreds ? (
+                        storageCreds.data?.map((cred) => (
+                          <StorageCredItem
+                            key={cred.id}
+                            created_at={cred.created_at}
+                            access_key={cred.access_key}
+                            description={cred.description}
+                            id={cred.id}
+                            onDeleteClick={() => {
+                              setDeleteCredId(cred.id)
+                              setOpenDeleteDialog(true)
+                            }}
+                          />
+                        ))
+                      ) : (
+                        <Table.tr>
+                          <Table.td colSpan={4}>
+                            <p className="text-sm text-foreground">No access keys created</p>
+                            <p className="text-sm text-foreground-light">
+                              There are no access keys associated with your project yet
+                            </p>
+                          </Table.td>
+                        </Table.tr>
+                      )
+                    }
+                  />
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
