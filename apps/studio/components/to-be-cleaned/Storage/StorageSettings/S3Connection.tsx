@@ -92,8 +92,8 @@ export const S3Connection = () => {
 
       <div>
         <FormHeader
-          title="S3 Credentials"
-          description="Manage your S3 credentials for this project."
+          title="S3 Access Keys"
+          description="Manage your access keys for this project."
           actions={
             <Dialog
               open={openCreateCred}
@@ -103,7 +103,7 @@ export const S3Connection = () => {
               }}
             >
               <DialogTrigger asChild>
-                <Button type="outline">New credential</Button>
+                <Button type="outline">New access key</Button>
               </DialogTrigger>
 
               <DialogContent
@@ -116,13 +116,15 @@ export const S3Connection = () => {
               >
                 {showSuccess ? (
                   <>
-                    <DialogTitle>Save your new S3 access keys</DialogTitle>
-                    <DialogDescription>
-                      You won't be able to see them again. If you lose these credentials, you'll
-                      need to create a new ones.
-                    </DialogDescription>
+                    <div className="flex flex-col gap-y-2">
+                      <DialogTitle>Save your new S3 access keys</DialogTitle>
+                      <DialogDescription>
+                        You won't be able to see them again. If you lose these credentials, you'll
+                        need to create a new ones.
+                      </DialogDescription>
+                    </div>
 
-                    <FormItemLayout label="Access key id" isReactForm={false}>
+                    <FormItemLayout label="Access key ID" isReactForm={false}>
                       <Input
                         className="input-mono"
                         readOnly
@@ -142,7 +144,6 @@ export const S3Connection = () => {
                     </FormItemLayout>
                     <div className="flex justify-end">
                       <Button
-                        className="mt-4"
                         onClick={() => {
                           setOpenCreateCred(false)
                           setShowSuccess(false)
@@ -154,7 +155,13 @@ export const S3Connection = () => {
                   </>
                 ) : (
                   <>
-                    <DialogTitle>Create new S3 access keys</DialogTitle>
+                    <div className="flex flex-col gap-y-2">
+                      <DialogTitle>Create new S3 access keys</DialogTitle>
+                      <DialogDescription>
+                        S3 access keys provide full access to all S3 operations across all buckets
+                        and bypass any existing RLS policies.
+                      </DialogDescription>
+                    </div>
                     <form
                       onSubmit={async (e) => {
                         e.preventDefault()
@@ -182,7 +189,7 @@ export const S3Connection = () => {
                           htmlType="submit"
                           loading={createS3AccessKey.isLoading}
                         >
-                          Create credential
+                          Create access key
                         </Button>
                       </div>
                     </form>
@@ -209,7 +216,7 @@ export const S3Connection = () => {
               <Table
                 head={[
                   <Table.th key="">Description</Table.th>,
-                  <Table.th key="">Access key id</Table.th>,
+                  <Table.th key="">Access key ID</Table.th>,
                   <Table.th key="">Created at</Table.th>,
                   <Table.th key="actions" />,
                 ]}
