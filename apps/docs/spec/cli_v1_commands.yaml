@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.161.0
+  version: 1.162.4
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
