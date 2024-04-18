@@ -78,7 +78,7 @@ In this example our incredible data analyst, Tyler, demonstrates how to store Pa
 <div className="video-container">
   <iframe
     className="w-full"
-    src="https://www.youtube-nocookie.com/embed/oIgVY8L7qLQ "
+    src="https://www.youtube-nocookie.com/embed/diL00ZZ-q50"
     title="store Parquet files in Supabase Storage and query them directly using DuckDB"
     allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
     allowfullscreen
@@ -102,8 +102,6 @@ Supabase contributed [some advanced features](https://github.com/tus/tus-node-se
 
 These features were essential for Supabase, and since the [TUS node server](https://github.com/tus/tus-node-server) is open source, they are also available for you to use. This is another core principle: wherever possible, we [use and support existing tools](https://supabase.com/docs/guides/getting-started/architecture#support-existing-tools) rather than developing from scratch.
 
-## Quality of Life updates
-
 - **Cross-bucket transfers:** We have added the availability to copy and move objects across buckets, where previously you could do these operations only within the same Supabase bucket.
 - **Standardized error codes:** Error codes have now been standardized across the Storage server and now will be much easier to branch logic on specific errors. You can find the list of error codes [here](https://supabase.com/docs/guides/storage/debugging/error-codes).
 - **Multi-tenant migrations:** We made significant improvements to the running migrations across all our tenants. This has reduced migration errors across the fleet and enables us to run long running migrations in an asynchronous manner. Stay tuned for a separate blog post with more details.
@@ -112,6 +110,6 @@ These features were essential for Supabase, and since the [TUS node server](http
 # Getting started
 
 - Check out the S3 API compatibility [in our docs](/docs/guides/storage/s3/compatibility)
-- Learn about [S3 Authentication](docs/guides/storage/s3/authentication)
+- Learn about [S3 Authentication](/docs/guides/storage/s3/authentication)
 - Try S3 with Cyberduck: follow our [integration guide](/partners/integrations/cyberduck)
 - Try S3 with DuckDB: follow the guide [on YouTube](https://www.youtube.com/watch?v=diL00ZZ-q50)
