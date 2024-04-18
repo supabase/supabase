@@ -1,5 +1,4 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import type { PostgresRole } from '@supabase/postgres-meta'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import {
@@ -18,13 +17,14 @@ import {
 } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { PgRole } from 'data/database-roles/database-roles-query'
 import { useDatabaseRoleUpdateMutation } from 'data/database-roles/database-role-update-mutation'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 
 interface RoleRowProps {
-  role: PostgresRole
+  role: PgRole
   disabled?: boolean
-  onSelectDelete: (role: PostgresRole) => void
+  onSelectDelete: (role: PgRole) => void
 }
 
 const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
@@ -33,25 +33,22 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
 
   const { mutate: updateDatabaseRole, isLoading: isUpdating } = useDatabaseRoleUpdateMutation()
 
-  const {
-    is_superuser,
-    can_login,
-    can_create_role,
-    can_create_db,
-    is_replication_role,
-    can_bypass_rls,
-  } = role
+  const { isSuperuser, canLogin, canCreateRole, canCreateDb, isReplicationRole, canBypassRls } =
+    role
 
-  const onSaveChanges = async (values: any, { resetForm }: any) => {
+  const onSaveChanges = async (values: Partial<PgRole>, { resetForm }: any) => {
     if (!project) return console.error('Project is required')
 
-    const { is_superuser, is_replication_role, ...payload } = values
+    const changed = Object.fromEntries(
+      Object.entries(values).filter(([k, v]) => v !== (role as any)[k])
+    )
+
     updateDatabaseRole(
       {
         projectRef: project.ref,
         connectionString: project.connectionString,
         id: role.id,
-        payload,
+        payload: changed,
       },
       {
         onSuccess: () => {
@@ -66,12 +63,12 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
     <Form
       name="role-update-form"
       initialValues={{
-        is_superuser,
-        can_login,
-        can_create_role,
-        can_create_db,
-        is_replication_role,
-        can_bypass_rls,
+        isSuperuser,
+        canLogin,
+        canCreateRole,
+        canCreateDb,
+        isReplicationRole,
+        canBypassRls,
       }}
       onSubmit={onSaveChanges}
       className={[
@@ -118,7 +115,7 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                   </div>
                 </div>
                 <div className="flex items-center space-x-4">
-                  {role.active_connections > 0 && (
+                  {role.activeConnections > 0 && (
                     <div className="relative h-2 w-2">
                       <span className="flex h-2 w-2">
                         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand opacity-75"></span>
@@ -129,10 +126,10 @@ const RoleRow = ({ role, disabled = false, onSelectDelete }: RoleRowProps) => {
                   <p
                     id="collapsible-trigger"
                     className={`text-sm ${
-                      role.active_connections > 0 ? 'text-foreground' : 'text-foreground-light'
+                      role.activeConnections > 0 ? 'text-foreground' : 'text-foreground-light'
                     }`}
                   >
-                    {role.active_connections} connections
+                    {role.activeConnections} connections
                   </p>
                   {!disabled && (
                     <DropdownMenu>
