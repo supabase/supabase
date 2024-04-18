@@ -1,0 +1,93 @@
+---
+title: 'Supabase Storage: now supports the S3 protocol'
+description: 'Supabase Storage is now officially an S3-Compatible Storage Provider.'
+author: fabrizio
+image: launch-week-11/swift/og.png
+thumb: launch-week-11/swift/thumb.png
+categories:
+  - product
+tags:
+  - launch-week
+  - storage
+date: '2024-04-18'
+toc_depth: 3
+launchweek: 11
+---
+
+Supabase Storage is now officially an S3-Compatible Storage Provider. This is one of the most-requested features and is available today in open beta. Resumable Uploads are also transitioning from Beta to Stable.
+
+The [Supabase Storage Engine](https://github.com/supabase/storage) is fully open source and is one of the few storage solutions that offer 3 interoperable protocols to manage your files:
+
+- [REST API](/docs/reference/self-hosting-storage/introduction): simple to get started
+- [TUS Protocol](https://tus.io/): for resumable uploads with large uploads
+- [S3 Protocol](/docs/guides/storage/s3/compatibility): for compatibility across the plethora of tools
+
+## S3 compatibility
+
+We always strive to adopt industry standards at Supabase. The S3 API is undoubtedly a storage standard, and we're making it accessible to developers of experience-levels.
+
+The S3 protocol is backwards compatible with our other APIs. If you are already using Storage via our REST or TUS APIs, today you can use any S3 client to interact with your buckets and files: upload with TUS, serve them with REST, and manage them with the S3 protocol.
+
+The protocol works on the cloud, local development, and self-hosting.
+
+### Authenticating to Supabase S3
+
+To authenticate with Supabase S3 you have 2 options:
+
+1. **The standard `access_key` and `secret_key` credentials.** You can generate these from the [storage settings page](/dashboard/project/_/settings/storage). This authentication method is widely compatible with tools supporting the S3 protocol. It is also meant to be used _exclusively serverside_ since it provides full access to your Storage resources.
+
+   We will add scoped access key credentials in the near future which can have access to specific buckets.
+
+2. **User-scoped credentials with RLS.** This takes advantage of a well-adopted concept across all Supabase services, [Row Level Security](/docs/guides/auth/auth-deep-dive/auth-row-level-security). It allows you to interact with the S3 protocol by scoping storage operations to a particular authenticated user or role, respecting your existing RLS policies. This method is made possible by using the Session token header which the S3 protocol supports. You can find more information on how to use the Session token mechanism in the [doc](/docs/guides/storage/s3/authentication#session-token).
+
+### S3-compatible Integrations
+
+With the support of the S3 protocol, you can now connect Supabase Storage to many 3rd-party tools and services by providing a pair of credentials which can be revoked at any time.
+
+You can use popular tools for backups and migrations, such as:
+
+- AWS s3 CLI: [docs.aws.amazon.com/cli/latest/reference/s3](https://docs.aws.amazon.com/cli/latest/reference/s3/)
+- [rclone](https://rclone.org/): a command-line program to manage files on cloud storage.
+- [Cyberduck](https://cyberduck.io/): a cloud storage browser for Mac and Windows
+- and many more…
+
+- [ ] TODO: add image of Cyberduck connected to memes bucket
+
+### S3 for Data Engineers
+
+S3 compatibility provides a nice primitive for Data Engineers. You can use it with many popular tools:
+
+- Data Warehouses like ClickHouse
+- Query engines like DuckDB, Spark, Trino, & Snowflake External Table
+- Data Loaders like Fivetran & Airbyte
+
+In this example our incredible data analyst, Tyler, demonstrates how to store Parquet files in Supabase Storage and query them directly using DuckDB:
+
+Check out his video: [LINK]
+
+### Multi-Part Uploads in S3
+
+We are working on multipart uploads via the S3 protocol. This will maximise the upload throughput by uploading chunks in parallel, which are concatenated once all the chunks are uploaded. This work is already in progress and will be available soon.
+
+# TUS reaches Stable release
+
+With the GA announcement, we are also thrilled to announce that TUS resumable uploads have reached a stable release.
+
+The journey to get here was immensely rewarding, working closely with the team behind the TUS protocol. A big shoutout to [@murderlon](https://github.com/Murderlon) and [@acconut](https://github.com/Acconut), maintainers of the TUS protocol, for their collaborative approach to open source.
+
+Supabase contributed some advanced features from the TUS Spec that were not available in the Node implementation, including distributed locks, max file size, expiration extension and bug fixes:
+
+![Untitled](https://prod-files-secure.s3.us-west-2.amazonaws.com/165a3c21-8e38-4d4b-831a-f9bb88a3262b/673fd00c-b168-4122-94dd-9c74d79f38e5/Untitled.png)
+
+These features were essential for Supabase, but since https://github.com/tus/tus-node-server is open source, they are also available for you to use. This remains one of our core principles: wherever possible, we [use and support existing tools](https://supabase.com/docs/guides/getting-started/architecture) rather than developing from scratch.
+
+## Quality of Life additions
+
+- **Cross-bucket transfers:** We have added the availability to copy and move objects across buckets, where previously you could do these operations only within the same Supabase bucket.
+- **Standardized error codes:** error codes have now been standardized across the Storage server and now will be much easier to branch logic on specific errors
+- **Multi-tenant migrations:** Rewrote the SQL migration strategy to handle multi-tenancy more efficiently (a very nice blog post on this is in the making)
+- **Decoupled dependencies:** we fully decoupled the Storage service from other Supabase-specific components, which means you can run Storage as a standalone service, you can see how easy it is from this [docker-compose file](https://github.com/supabase/storage/blob/master/docker-compose.yml).
+
+## Getting started
+
+- Links
