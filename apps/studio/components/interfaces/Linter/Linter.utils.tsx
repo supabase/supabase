@@ -2,16 +2,8 @@ import { LINT_TYPES, Lint } from 'data/lint/lint-query'
 import { Box, Eye, Lock, Table2, Unlock, TextSearch } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Badge } from 'ui'
-import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-
-interface LintInfo {
-  name: string
-  title: string
-  icon: JSX.Element
-  link: (args: { projectRef: string; metadata: Lint['metadata'] }) => string
-  linkText: string
-  docsLink: string
-}
+import { LINTER_LEVELS, LintInfo } from 'components/interfaces/Linter/Linter.constants'
+import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 export const lintInfoMap: LintInfo[] = [
   {
@@ -204,3 +196,15 @@ export const NoIssuesFound = ({ level }: { level: string }) => {
     </div>
   )
 }
+
+export const lintCountLabel = (isLoading: boolean, count: number, label: string) => (
+  <>
+    {isLoading ? (
+      <ShimmeringLoader className="w-20 pt-1" />
+    ) : (
+      <>
+        {count} {label}
+      </>
+    )}
+  </>
+)
