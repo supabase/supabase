@@ -38,6 +38,12 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { AlertTitle } from '@ui/components/shadcn/ui/alert'
 import Link from 'next/link'
 import { AlertCircle } from 'lucide-react'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@ui/components/shadcn/ui/tooltip'
 
 export const S3Connection = () => {
   const [openCreateCred, setOpenCreateCred] = React.useState(false)
@@ -130,7 +136,20 @@ export const S3Connection = () => {
               }}
             >
               <DialogTrigger asChild>
-                <Button type="outline">New access key</Button>
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button disabled={!isProjectActive} type="outline">
+                        New access key
+                      </Button>
+                    </TooltipTrigger>
+                    {!isProjectActive && (
+                      <TooltipContent>
+                        Restore your project to create new access keys
+                      </TooltipContent>
+                    )}
+                  </Tooltip>
+                </TooltipProvider>
               </DialogTrigger>
 
               <DialogContent
