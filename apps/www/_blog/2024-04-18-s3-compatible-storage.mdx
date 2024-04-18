@@ -14,13 +14,13 @@ toc_depth: 3
 launchweek: 11
 ---
 
-Supabase Storage is now officially an S3-Compatible Storage Provider. This is one of the most-requested features and is available today in open beta. Resumable Uploads are also transitioning from Beta to Stable.
+Supabase Storage is now officially an S3-Compatible Storage Provider. This is one of the most-requested features and is available today in public alpha. Resumable Uploads are also transitioning from Beta to Generally Available.
 
 The [Supabase Storage Engine](https://github.com/supabase/storage) is fully open source and is one of the few storage solutions that offer 3 interoperable protocols to manage your files:
 
-- [REST API](/docs/reference/self-hosting-storage/introduction): simple to get started
-- [TUS Protocol](https://tus.io/): for resumable uploads with large uploads
-- [S3 Protocol](/docs/guides/storage/s3/compatibility): for compatibility across the plethora of tools
+- [Standard uploads](/docs/guides/storage/uploads/standard-uploads): simple to get started
+- [Resumable uploads](/docs/guides/storage/uploads/resumable-uploads): for resumable uploads with large uploads
+- [S3 uploads](/docs/guides/storage/s3/compatibility): for compatibility across a plethora of tools
 
 <div className="video-container">
   <iframe
@@ -34,13 +34,13 @@ The [Supabase Storage Engine](https://github.com/supabase/storage) is fully open
 
 ## S3 compatibility
 
-We always strive to adopt industry standards at Supabase. The S3 API is undoubtedly a storage standard, and we're making it accessible to developers of experience-levels.
+We always strive to adopt industry standards at Supabase. The S3 API is undoubtedly a storage standard, and we're making it accessible to developers of various experience-levels.
 
 The S3 protocol is backwards compatible with our other APIs. If you are already using Storage via our REST or TUS APIs, today you can use any S3 client to interact with your buckets and files: upload with TUS, serve them with REST, and manage them with the S3 protocol.
 
 The protocol works on the cloud, local development, and self-hosting. Check out the API compatibility [in our docs](/docs/guides/storage/s3/compatibility)
 
-### Authenticating to Supabase S3
+### Authenticating with Supabase S3
 
 To authenticate with Supabase S3 you have 2 options:
 
@@ -87,9 +87,9 @@ In this example our incredible data analyst, Tyler, demonstrates how to store Pa
 
 We are working on multipart uploads via the S3 protocol. This will maximise the upload throughput by uploading chunks in parallel, which are concatenated once all the chunks are uploaded. This work is already in progress and will be available soon.
 
-# TUS reaches Stable release
+# Resumable uploads is Generally Available
 
-With the GA announcement, we are also thrilled to announce that TUS resumable uploads have reached a stable release.
+Along with the [platform GA announcement](https://supabase.com/ga), we are also thrilled to announce that resumable uploads are also generally available.
 
 The journey to get here was immensely rewarding, working closely with the team behind the TUS protocol. A big shoutout to [@murderlon](https://github.com/Murderlon) and [@acconut](https://github.com/Acconut), maintainers of the TUS protocol, for their collaborative approach to open source.
 
