@@ -2545,6 +2545,8 @@ functions:
         select 'Hello world';
       $$ language sql;
       ```
+
+      To call Postgres functions on [Read Replicas](/docs/guides/platform/read-replicas), use the `get: true` option.
     $ref: '@supabase/postgrest-js.PostgrestClient.rpc'
     examples:
       - id: call-a-postgres-function-without-arguments
@@ -2658,6 +2660,28 @@ functions:
           ```
         description: |
           Postgres functions that return tables can also be combined with [Filters](/docs/reference/javascript/using-filters) and [Modifiers](/docs/reference/javascript/using-modifiers).
+        hideCodeBlock: true
+      - id: call-a-read-only-postgres-function
+        name: Call a read-only Postgres function
+        code: |
+          ```ts
+          const { data, error } = await supabase.rpc('hello_world', { get: true })
+          ```
+        data:
+          sql: |
+            ```sql
+            create function hello_world() returns text as $$
+              select 'Hello world';
+            $$ language sql;
+            ```
+        response: |
+          ```json
+          {
+            "data": "Hello world",
+            "status": 200,
+            "statusText": "OK"
+          }
+          ```
         hideCodeBlock: true
 
   - id: using-filters
