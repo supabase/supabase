@@ -760,7 +760,7 @@ const getProjectLints = async (
     },
     signal
   )
-  console.log('resulty', result)
+
   return result
 }
 

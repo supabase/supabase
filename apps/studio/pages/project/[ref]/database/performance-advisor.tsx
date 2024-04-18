@@ -4,7 +4,7 @@ import { useRef, useState } from 'react'
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import { useParams } from 'common'
 
-import { lintInfoMap } from 'components/interfaces/Reports/ReportLints.utils'
+import { NoIssuesFound, lintInfoMap } from 'components/interfaces/Reports/ReportLints.utils'
 import { DatabaseLayout } from 'components/layouts'
 import { FormHeader } from 'components/ui/Forms'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
@@ -40,12 +40,7 @@ import {
   LintCategoryBadge,
 } from '../../../../components/interfaces/Reports/ReportLints.utils'
 import Link from 'next/link'
-
-enum LINTER_LEVELS {
-  ERROR = 'ERROR',
-  WARN = 'WARN',
-  INFO = 'INFO',
-}
+import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 
 const LINT_TABS = [
   {
@@ -338,15 +333,7 @@ const ProjectLints: NextPageWithLayout = () => {
                   <GenericSkeletonLoader />
                 </div>
               ) : (
-                <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-                  <TextSearch className="text-foreground-muted" strokeWidth={1} />
-                  <div className="text-center">
-                    <p className="text-foreground">No issues detected</p>
-                    <p className="text-foreground-light">
-                      Congrats! There are no suggestions available for this database
-                    </p>
-                  </div>
-                </div>
+                <NoIssuesFound level={currentTab} />
               ),
             }}
           />

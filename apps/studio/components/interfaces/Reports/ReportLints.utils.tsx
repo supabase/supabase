@@ -1,7 +1,8 @@
 import { LINT_TYPES, Lint } from 'data/lint/lint-query'
-import { Box, Eye, Lock, Table2, Unlock } from 'lucide-react'
+import { Box, Eye, Lock, Table2, Unlock, TextSearch } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Badge } from 'ui'
+import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 
 interface LintInfo {
   name: string
@@ -186,5 +187,20 @@ export const LintCategoryBadge = ({ category }: { category: string }) => {
     <Badge variant={category === 'SECURITY' ? 'destructive' : 'warning'} className="capitalize">
       {category.toLowerCase()}
     </Badge>
+  )
+}
+
+export const NoIssuesFound = ({ level }: { level: string }) => {
+  const noun = level === LINTER_LEVELS.ERROR ? 'errors' : 'warnings'
+  return (
+    <div className="absolute top-28 px-6 flex flex-col items-center justify-center w-full gap-y-2">
+      <TextSearch className="text-foreground-muted" strokeWidth={1} />
+      <div className="text-center">
+        <p className="text-foreground">No {noun} detected</p>
+        <p className="text-foreground-light">
+          Congrats! There are no {noun} detected for this database
+        </p>
+      </div>
+    </div>
   )
 }
