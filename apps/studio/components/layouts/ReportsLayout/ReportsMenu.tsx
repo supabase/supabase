@@ -8,7 +8,6 @@ import { CreateReportModal } from 'components/interfaces/Reports/Reports.CreateR
 import { UpdateCustomReportModal } from 'components/interfaces/Reports/Reports.UpdateModal'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { useContentInsertMutation } from 'data/content/content-insert-mutation'
 import { Content, useContentQuery } from 'data/content/content-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { useIsFeatureEnabled, useSelectedProject } from 'hooks'
@@ -129,7 +128,9 @@ const ReportsMenu = () => {
 
           {reportMenuItems.length > 0 ? (
             <div>
-              <Menu.Group title={'Your custom reports'} />
+              <Menu.Group
+                title={<span className="uppercase font-mono">Your custom reports</span>}
+              />
               {reportMenuItems.map((item, idx) => (
                 <Link
                   className={cn(
@@ -183,7 +184,7 @@ const ReportsMenu = () => {
             <div key={item.key + '-menu-group'}>
               {item.items ? (
                 <>
-                  <Menu.Group title={item.title} />
+                  <Menu.Group title={<span className="uppercase font-mono">{item.title}</span>} />
                   <div key={item.key} className="flex flex-col">
                     {item.items.map((subItem) => (
                       <li

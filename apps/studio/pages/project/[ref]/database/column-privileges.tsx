@@ -1,4 +1,3 @@
-import type { PostgresRole } from '@supabase/postgres-meta'
 import { useParams } from 'common'
 import { XIcon } from 'lucide-react'
 import Link from 'next/link'
@@ -23,7 +22,7 @@ import {
 import PrivilegesHead from 'components/interfaces/Database/Privileges/PrivilegesHead'
 import PrivilegesTable from 'components/interfaces/Database/Privileges/PrivilegesTable'
 import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
-import { AuthLayout } from 'components/layouts'
+import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
@@ -35,8 +34,8 @@ import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import type { NextPageWithLayout } from 'types'
 import { useAppStateSnapshot } from 'state/app-state'
+import type { NextPageWithLayout } from 'types'
 
 const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
 
@@ -376,6 +375,8 @@ const PrivilegesPage: NextPageWithLayout = () => {
   )
 }
 
-PrivilegesPage.getLayout = (page) => <AuthLayout title="Column Privileges">{page}</AuthLayout>
+PrivilegesPage.getLayout = (page) => (
+  <DatabaseLayout title="Column Privileges">{page}</DatabaseLayout>
+)
 
 export default PrivilegesPage
