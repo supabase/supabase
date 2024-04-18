@@ -65,7 +65,7 @@ export default function Ticket() {
       <Panel
         hasShimmer
         outerClassName="flex relative flex-col w-[360px] h-auto max-h-[680px] rounded-3xl !shadow-xl !p-0"
-        innerClassName="flex relative flex-col justify-between w-full transition-colors aspect-[396/613] rounded-xl bg-[#020405] text-left text-sm group/ticket"
+        innerClassName="flex relative flex-col justify-between w-full transition-colors aspect-[396/613] rounded-xl dark:bg-[#020405] text-left text-sm group/ticket"
         shimmerFromColor="hsl(var(--border-strong))"
         shimmerToColor="hsl(var(--background-default))"
         style={{ transform: 'translateZ(-10px)' }}
@@ -85,6 +85,7 @@ export default function Ticket() {
           onLoad={() => setImageHasLoaded(true)}
           loading="eager"
           fill
+          sizes="100%"
           className={cn(
             'absolute inset-0 object-cover object-right opacity-0 transition-opacity duration-1000',
             imageHasLoaded && 'opacity-100',
@@ -100,13 +101,13 @@ export default function Ticket() {
               className="absolute z-40 inset-0 w-full h-full outline-none"
               onClick={handleCustomizeTicket}
             />
-            <div className="flex md:translate-y-3 opacity-100 md:opacity-0 group-hover/ticket:opacity-100 group-hover/ticket:md:translate-y-0 transition-all absolute z-30 right-4 top-4 md:inset-0 m-auto w-10 h-10 rounded-full items-center justify-center bg-[#020405] border shadow-lg text-foreground">
+            <div className="flex md:translate-y-3 opacity-100 md:opacity-0 group-hover/ticket:opacity-100 group-hover/ticket:md:translate-y-0 transition-all absolute z-30 right-4 top-4 md:inset-0 m-auto w-10 h-10 rounded-full items-center justify-center bg-surface-100 dark:bg-[#020405] border shadow-lg text-foreground">
               {!showCustomizationForm ? <Pencil className="w-4" /> : <X className="w-4" />}
             </div>
           </>
         )}
       </Panel>
-      <div className="absolute top-0 left-auto right-auto mx-auto w-[20%] aspect-square -translate-y-[65%] bg-[#060809] z-40 rounded-b-[100px]" />
+      <div className="absolute top-0 left-auto right-auto mx-auto w-[20%] aspect-square -translate-y-[65%] dark:bg-[#060809] z-40 rounded-b-[100px]" />
       {!sharePage && (
         <TicketCustomizationForm className="absolute inset-0 top-auto z-40 order-last md:order-first" />
       )}

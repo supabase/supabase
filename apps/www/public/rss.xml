@@ -5,9 +5,72 @@
       <link>https://supabase.com</link>
       <description>Latest news from Supabase</description>
       <language>en</language>
-      <lastBuildDate>Wed, 28 Feb 2024 23:00:00 GMT</lastBuildDate>
+      <lastBuildDate>Sun, 14 Apr 2024 22:00:00 GMT</lastBuildDate>
       <atom:link href="https://supabase.com/rss.xml" rel="self" type="application/rss+xml"/>
       <item>
+  <guid>https://supabase.com/blog/supabase-swift</guid>
+  <title>Supabase Swift</title>
+  <link>https://supabase.com/blog/supabase-swift</link>
+  <description>Supabase Swift is now officially supported.</description>
+  <pubDate>Sun, 14 Apr 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-bootstrap</guid>
+  <title>Supabase Bootstrap: the fastest way to launch a new project</title>
+  <link>https://supabase.com/blog/supabase-bootstrap</link>
+  <description>Launch a new hosted Supabase project directly from the CLI using pre-built applications.</description>
+  <pubDate>Sun, 14 Apr 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-aws-marketplace</guid>
+  <title>Supabase on the AWS Marketplace</title>
+  <link>https://supabase.com/blog/supabase-aws-marketplace</link>
+  <description>Supabase is now available on the AWS Marketplace, Simplifying Procurement for Enterprise Customers.</description>
+  <pubDate>Sun, 14 Apr 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-aquires-oriole</guid>
+  <title>Oriole joins Supabase</title>
+  <link>https://supabase.com/blog/supabase-aquires-oriole</link>
+  <description>The Oriole team are joining Supabase to build a faster storage engine for Postgres.</description>
+  <pubDate>Sun, 14 Apr 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/branching-publicly-available</guid>
+  <title>Branching now Publicly Available</title>
+  <link>https://supabase.com/blog/branching-publicly-available</link>
+  <description>Supabase Branching is now available on Pro Plan and above.</description>
+  <pubDate>Sun, 14 Apr 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/supabase-oss-hackathon</guid>
+  <title>Supabase Open Source Hackathon 2024</title>
+  <link>https://supabase.com/blog/supabase-oss-hackathon</link>
+  <description>Build an Open Source Project over 10 days. 5 prize categories.</description>
+  <pubDate>Thu, 11 Apr 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/postgres-roles-and-privileges</guid>
+  <title>Postgres Roles and Privileges</title>
+  <link>https://supabase.com/blog/postgres-roles-and-privileges</link>
+  <description>A guide to Postgres roles and privileges</description>
+  <pubDate>Wed, 10 Apr 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/pg-paper-dump</guid>
+  <title>Announcing Data Preservation Service</title>
+  <link>https://supabase.com/blog/pg-paper-dump</link>
+  <description>Secure, reliable and timeless backups</description>
+  <pubDate>Sun, 31 Mar 2024 22:00:00 GMT</pubDate>
+</item>
+<item>
+  <guid>https://supabase.com/blog/semantic-image-search-amazon-bedrock</guid>
+  <title>Implementing semantic image search with Amazon Titan and Supabase Vector</title>
+  <link>https://supabase.com/blog/semantic-image-search-amazon-bedrock</link>
+  <description>Implementing semantic image search with Amazon Titan and Supabase Vector in Python.</description>
+  <pubDate>Mon, 25 Mar 2024 23:00:00 GMT</pubDate>
+</item>
+<item>
   <guid>https://supabase.com/blog/postgrest-aggregate-functions</guid>
   <title>PostgREST Aggregate Functions</title>
   <link>https://supabase.com/blog/postgrest-aggregate-functions</link>

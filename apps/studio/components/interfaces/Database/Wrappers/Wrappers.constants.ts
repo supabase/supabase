@@ -9,6 +9,10 @@ export const WRAPPER_HANDLERS = {
   BIG_QUERY: 'big_query_fdw_handler',
   AIRTABLE: 'airtable_fdw_handler',
   LOGFLARE: 'logflare_fdw_handler',
+  AUTH0: 'auth0_fdw_handler',
+  COGNITO: 'cognito_fdw_handler',
+  MSSQL: 'mssql_fdw_handler',
+  REDIS: 'redis_fdw_handler',
 }
 
 export const WRAPPERS: WrapperMeta[] = [
@@ -825,6 +829,337 @@ export const WRAPPERS: WrapperMeta[] = [
             label: 'Endpoint',
             editable: true,
             required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'auth0_wrapper',
+    handlerName: WRAPPER_HANDLERS.AUTH0,
+    validatorName: 'auth0_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/auth0-icon.svg`,
+    extensionName: 'Auth0Fdw',
+    label: 'Auth0',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/auth0',
+    minimumExtensionVersion: '0.3.0',
+    server: {
+      options: [
+        {
+          name: 'api_key_id',
+          label: 'Auth0 API key or PAT',
+          required: true,
+          encrypted: true,
+          hidden: true,
+        },
+        {
+          name: 'url',
+          label: 'Auth0 API URL',
+          defaultValue: 'https://dev-<tenant-id>.us.auth0.com/api/v2/users',
+          required: false,
+          encrypted: false,
+          hidden: false,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Users',
+        description: 'Auth0 Users',
+        availableColumns: [
+          {
+            name: 'user_id',
+            type: 'text',
+          },
+          {
+            name: 'email',
+            type: 'text',
+          },
+          {
+            name: 'email_verified',
+            type: 'boolean',
+          },
+          {
+            name: 'username',
+            type: 'text',
+          },
+          {
+            name: 'phone_number',
+            type: 'text',
+          },
+          {
+            name: 'phone_verified',
+            type: 'boolean',
+          },
+          {
+            name: 'created_at',
+            type: 'jsonb',
+          },
+          {
+            name: 'updated_at',
+            type: 'jsonb',
+          },
+          {
+            name: 'identities',
+            type: 'jsonb',
+          },
+          {
+            name: 'app_metadata',
+            type: 'jsonb',
+          },
+          {
+            name: 'user_metadata',
+            type: 'jsonb',
+          },
+          {
+            name: 'picture',
+            type: 'text',
+          },
+          {
+            name: 'name',
+            type: 'text',
+          },
+          {
+            name: 'nickname',
+            type: 'text',
+          },
+          {
+            name: 'multifactor',
+            type: 'jsonb',
+          },
+          {
+            name: 'last_ip',
+            type: 'text',
+          },
+          {
+            name: 'last_login',
+            type: 'jsonb',
+          },
+          {
+            name: 'logins_count',
+            type: 'integer',
+          },
+          {
+            name: 'blocked',
+            type: 'boolean',
+          },
+          {
+            name: 'given_name',
+            type: 'text',
+          },
+          {
+            name: 'family_name',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'users',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'cognito_wrapper',
+    handlerName: WRAPPER_HANDLERS.COGNITO,
+    validatorName: 'cognito_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/cognito-icon.svg`,
+    extensionName: 'CognitoFdw',
+    label: 'Cognito',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/cognito',
+    minimumExtensionVersion: '0.3.0',
+    server: {
+      options: [
+        {
+          name: 'aws_access_key_id',
+          label: 'AWS Access Key ID',
+          required: true,
+          encrypted: false,
+          hidden: false,
+        },
+        {
+          name: 'api_key_id',
+          label: 'AWS Secret Key',
+          required: true,
+          encrypted: true,
+          hidden: true,
+        },
+        {
+          name: 'region',
+          label: 'Region',
+          required: true,
+          encrypted: false,
+          hidden: false,
+        },
+        {
+          name: 'user_pool_id',
+          label: 'User Pool ID',
+          required: true,
+          encrypted: false,
+          hidden: false,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Users',
+        description: 'Cognito Users',
+        availableColumns: [
+          {
+            name: 'email',
+            type: 'text',
+          },
+          {
+            name: 'created_at',
+            type: 'text',
+          },
+          {
+            name: 'email_verified',
+            type: 'boolean',
+          },
+          {
+            name: 'identities',
+            type: 'jsonb',
+          },
+          {
+            name: 'username',
+            type: 'text',
+          },
+          {
+            name: 'status',
+            type: 'text',
+          },
+        ],
+        options: [
+          {
+            name: 'object',
+            defaultValue: 'users',
+            editable: false,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'mssql_wrapper',
+    handlerName: WRAPPER_HANDLERS.MSSQL,
+    validatorName: 'mssql_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/mssql-icon.svg`,
+    extensionName: 'mssqlFdw',
+    label: 'Microsoft SQL Server',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/mssql',
+    minimumExtensionVersion: '0.3.0',
+    server: {
+      options: [
+        {
+          name: 'conn_string_id',
+          label: 'Connection String',
+          required: true,
+          encrypted: true,
+          hidden: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Microsoft SQL Server Table',
+        description: 'Map to an Microsoft SQL Server Table',
+        options: [
+          {
+            name: 'table',
+            label: 'MSSQL Table',
+            editable: true,
+            required: true,
+            type: 'text',
+          },
+        ],
+      },
+    ],
+  },
+  {
+    name: 'redis_wrapper',
+    handlerName: WRAPPER_HANDLERS.REDIS,
+    validatorName: 'redis_fdw_validator',
+    icon: `${BASE_PATH}/img/icons/redis-icon.svg`,
+    extensionName: 'redisFdw',
+    label: 'Redis',
+    docsUrl: 'https://supabase.com/docs/guides/database/extensions/wrappers/redis',
+    minimumExtensionVersion: '0.3.0',
+    server: {
+      options: [
+        {
+          name: 'conn_url_id',
+          label: 'Connection URL',
+          required: true,
+          encrypted: true,
+          hidden: true,
+        },
+      ],
+    },
+    tables: [
+      {
+        label: 'Redis Table',
+        description: 'Map to an Redis Table',
+        options: [
+          {
+            name: 'src_type',
+            label: 'Source Type',
+            editable: true,
+            required: true,
+            type: 'select',
+            defaultValue: 'list',
+            options: [
+              {
+                label: 'list',
+                value: 'list',
+              },
+              {
+                label: 'set',
+                value: 'set',
+              },
+              {
+                label: 'hash',
+                value: 'hash',
+              },
+              {
+                label: 'zset',
+                value: 'zset',
+              },
+              {
+                label: 'stream',
+                value: 'stream',
+              },
+              {
+                label: 'multi_list',
+                value: 'multi_list',
+              },
+              {
+                label: 'multi_set',
+                value: 'multi_set',
+              },
+              {
+                label: 'multi_hash',
+                value: 'multi_hash',
+              },
+              {
+                label: 'multi_zset',
+                value: 'multi_zset',
+              },
+            ],
+          },
+          {
+            name: 'src_key',
+            label: 'Source Key',
+            editable: true,
+            required: false,
             type: 'text',
           },
         ],
