@@ -88,7 +88,7 @@ const StorageMenu = () => {
         </div>
         <div className="space-y-6">
           <div>
-            <Menu.Group title="All buckets" />
+            <Menu.Group title={<span className="uppercase font-mono">All buckets</span>} />
 
             {isLoading && (
               <div className="space-y-2 mx-2">
@@ -146,7 +146,7 @@ const StorageMenu = () => {
           </div>
           <div className="h-px w-full bg-border"></div>
           <div>
-            <Menu.Group title="Configuration" />
+            <Menu.Group title={<span className="uppercase font-mono">Configuration</span>} />
             <Link href={`/project/${ref}/storage/policies`} legacyBehavior>
               <Menu.Item rounded active={page === 'policies'}>
                 <p className="truncate">Policies</p>

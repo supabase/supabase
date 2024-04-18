@@ -17,10 +17,9 @@ const ProductMenu = ({ page, menu }: ProductMenuProps) => {
             <div className="my-6 space-y-8">
               <div className="mx-3">
                 <Menu.Group
-                  //@ts-ignore
                   title={
                     group.title ? (
-                      <div className="flex flex-col space-y-2">
+                      <div className="flex flex-col space-y-2 uppercase font-mono">
                         <span>{group.title}</span>
                         {group.isPreview && <Badge variant="warning">Not production ready</Badge>}
                       </div>
