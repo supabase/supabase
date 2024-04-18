@@ -1392,7 +1392,6 @@ export const storage: NavMenuConstant = {
       items: [
         { name: 'API Compatibility', url: '/guides/storage/s3/compatibility' },
         { name: 'Authentication', url: '/guides/storage/s3/authentication' },
-        { name: 'Cyberduck', url: '/guides/storage/s3/cyberduck' },
       ],
     },
     {
