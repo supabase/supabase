@@ -637,7 +637,7 @@ export interface paths {
   }
   '/platform/projects/{ref}/analytics/warehouse/query': {
     /** Lists project's warehouse queries from logflare */
-    get: operations['QueryController_runQuery']
+    get: operations['WarehouseQueryController_runQuery']
   }
   '/platform/projects/{ref}/config/pgbouncer': {
     /** Gets project's pgbouncer config */
@@ -1473,7 +1473,7 @@ export interface paths {
   }
   '/v0/projects/{ref}/analytics/warehouse/query': {
     /** Lists project's warehouse queries from logflare */
-    get: operations['QueryController_runQuery']
+    get: operations['WarehouseQueryController_runQuery']
   }
   '/v0/projects/{ref}/config/pgbouncer': {
     /** Gets project's pgbouncer config */
@@ -4039,13 +4039,15 @@ export interface components {
     }
     UpdatePostgrestConfigBody: {
       max_rows?: number
+      db_pool?: number
       db_extra_search_path?: string
       db_schema?: string
     }
     V1PostgrestConfigResponse: {
-      max_rows: number
-      db_schema: string
-      db_extra_search_path: string
+      max_rows: number | null
+      db_pool: number | null
+      db_schema: string | null
+      db_extra_search_path: string | null
     }
     PostgresConfigResponse: {
       statement_timeout?: string
@@ -4959,9 +4961,10 @@ export interface components {
       root_key: string
     }
     PostgrestConfigWithJWTSecretResponse: {
-      max_rows: number
-      db_schema: string
-      db_extra_search_path: string
+      max_rows: number | null
+      db_pool: number | null
+      db_schema: string | null
+      db_extra_search_path: string | null
       jwt_secret?: string
     }
     V1ProjectRefResponse: {
@@ -8184,22 +8187,32 @@ export interface operations {
       }
     }
   }
-  /** Lists project's warehouse queries from logflare */
+  /** Run sql query */
   QueryController_runQuery: {
     parameters: {
+      header: {
+        'x-connection-encrypted': string
+      }
       path: {
         /** @description Project ref */
         ref: string
       }
     }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RunQueryBody']
+      }
+    }
     responses: {
-      200: {
-        content: never
+      201: {
+        content: {
+          'application/json': Record<string, never>
+        }
       }
       403: {
         content: never
       }
-      /** @description Failed to fetch warehouse endpoints */
+      /** @description Failed to run sql query */
       500: {
         content: never
       }
@@ -10223,6 +10236,27 @@ export interface operations {
         content: never
       }
       /** @description Failed to delete warehouse endpoint */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Lists project's warehouse queries from logflare */
+  WarehouseQueryController_runQuery: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse endpoints */
       500: {
         content: never
       }
