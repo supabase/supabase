@@ -17,21 +17,25 @@ The [Typescript client library](https://www.npmjs.com/package/@supabase/realtime
 
 </Admonition>
 
-Realtime provides a system to set Authorization not only per Channel but also per feature (Broadcast and Presence).
+Realtime provides a system to set authorization per Channel and per Channel feature (Broadcast and Presence).
 
-In this section we will detail how to set it up using RLS policies with small examples.
+In this section we detail how to set up Channel authorization using RLS policies.
 
 ## How it works
 
-We're using auxiliary tables in the `realtime` schema to allow you to write RLS policies that will determine the access your users will have to your channel and features within a channel.
+We use tables in the `realtime` schema to allow you to write RLS policies that will determine the access your users have to your Channel and features within a Channel.
 
-The validation itself is done one connect per each user, meaning that for each websocket connection we'll calculate the policies of your user based on the RLS policies you provided with their connection context which will include JWT token, Headers set on connect and the channel the user is trying to connect against.
+The validation itself is done on connect per each user, meaning that for each WebSocket connection we generate the policy of your user based on:
 
-You can make the policies as complex as you want but be aware that they will impact your database performance and time to connect of your users so they will increase latency and reduce the rate of users joins per second.
+- the RLS policies you provided with their connection context which will include JWT
+- Headers set on connect and
+- the Channel the user is trying to connect against
+
+Increased RLS complexity can impact database performance and user connection time, leading to higher connection latency and decreased user join rates.
 
 ## Helper functions
 
-To allow easier access to the context of the user connection, we've added a helper function to help you build policies.
+We've included a helper function to facilitate building policies, making it easier to access user connection context.
 
 ### realtime.channel_name
 
@@ -51,23 +55,25 @@ USING (
 
 <Admonition type="note">
 
-If you don't create a channel, we will have the assumption that you don't want RLS checks on the channel.
+If you don't create a channel, we assume you don't want RLS enabled on it.
 
 </Admonition>
 
-As mentioned in the section above, we now have tables in the `realtime` schema to represent your Channels. This are not created automatically on connect, you will need to do this action yourself.
+As previously stated, tables in the Realtime schema now represent your Channels.
 
-As soon as you create a channel they will be checked with RLS policies.
+These are not automatically created upon connection; you must perform this action yourself.
+
+Once a Channel is created, it will be subject to RLS policy checks.
 
 <Admonition type="note">
 
-Whenever you use this feature we advice you to setup your RLS policies first otherwise you won't be able to test your code properly
+Whenever you use this feature we advice you to setup your RLS policies first otherwise you won't be able to test your code properly.
 
 </Admonition>
 
-### Creating Channels as an admin
+### Admin created Channels
 
-Using your `service_role` token you can call either our endpoint or use the client lib to generate a channel.
+Using your `service_role` token you can call either our REST endpoint or use a client library to create a Channel.
 
 <Tabs
   scrollable
@@ -96,9 +102,13 @@ Using your `service_role` token you can call either our endpoint or use the clie
   </TabPanel>
 </Tabs>
 
-### Letting users create Channels
+### User created Channels
 
-You can also allow users to create Channels by creating an RLS rule against `realtime.channels` for INSERTs and then using your `anon_token` and setting the `authorization` header with the bearer token users will be checked if they can create and channel and if allowed the channel will be created.
+Users can create Channels by creating an RLS policy for `INSERT` on the `realtime.channels` table.
+
+Utilize your `anon_token` and set the `Authorization` header with the bearer token to verify if a user can create a Channel.
+
+If permitted, the Channel will be created.
 
 ```sql
 CREATE POLICY "authenticated can create channel"
@@ -136,7 +146,11 @@ WITH CHECK (TRUE);
   </TabPanel>
 </Tabs>
 
-## Example schema
+## Authorizing Channels
+
+Channels serve as our WebSocket representation, and here, we restrict joining capabilities by preventing WebSocket connections and terminating such connections.
+
+### Example schema
 
 Using the following schema for our examples below.
 
@@ -166,15 +180,11 @@ EXECUTE FUNCTION insert_user ();
 GRANT EXECUTE ON FUNCTION insert_user () TO supabase_auth_admin;
 ```
 
-## Authorizing Channels
+### Allow Channel join
 
-Channels are our representation of websockets and this is where we limit the capabilities for people to join your channel by not allowing the websocket to connect and killing said connection.
+To allow access we'll write an RLS policy for `SELECT` and determine which users are able to connect.
 
-### Allow access
-
-To allow access we'll write an RLS policies for SELECT and determine which users are able to connect.
-
-You can write down the following rule to allow only users that are present in the relationship table public.rooms_users to access the channel
+You can implement the following policy to grant access to the Channel exclusively to users listed in the relationship table `public.rooms_users`.
 
 ```sql
 CREATE POLICY "authenticated users can view all profiles"
@@ -194,13 +204,13 @@ EXISTS (
 );
 ```
 
-## Authorize Broadcast Receive and Send
+## Authorize Broadcast read and write
 
-Broadcast is represented by a new table called ‘broadcasts’ under the ‘realtime’ schema that will be associated with a channel via id and which will be automatically created for you.
+Broadcast is represented by a new table called `broadcasts` under the `realtime` schema that will be associated with a Channel via id and which will be automatically created for you.
 
-### Allow Receive Messages
+### Allow Broadcast read
 
-To give permissions to your users to receive messages you'll need to set a rule on SELECT in realtime.broadcasts.
+To grant users permission to read Broadcast messages on a Channel, you must create a policy for `SELECT` operations on `realtime.broadcasts`.
 
 ```sql
 CREATE POLICY "authenticated user can receive in room"
@@ -220,9 +230,9 @@ USING (
 );
 ```
 
-### Allow Send Message
+### Allow Broadcast write
 
-Similarly to allow sending messages you'll need to set a rule for UPDATE in realtime.broadcasts
+Similarly to allow sending Broadcast messages you'll need to set a policy for `UPDATE` in `realtime.broadcasts`.
 
 ```sql
 CREATE POLICY "authenticated user can broadcast in room"
@@ -242,13 +252,13 @@ USING (
 );
 ```
 
-## Authorize Presence Listening and Registering
+## Authorize Presence read and write
 
-In the same way that you set Broadcast, you can do the same for Presence where you can determine if users are able to listen for user changes or if they register their presence.
+Similar to setting up a Broadcast, you can establish the same for Presence. This allows you to specify whether users can read Presence changes or write Presece updates.
 
-### Allow Listen
+### Allow Presence read
 
-Again, here we use a rule for SELECT for realtime.presences
+Again, here we use a policy for `SELECT` for `realtime.presences`.
 
 ```sql
 CREATE POLICY "authenticated user can listen to changes in room"
@@ -268,9 +278,9 @@ USING (
 );
 ```
 
-### Allow track presence
+### Allow Presence write
 
-And for tracking we need to set a re for UPDATE on realtime.presences.
+To update the Presence status for a user we need to create a policy for `UPDATE` on `realtime.presences`.
 
 ```sql
 CREATE POLICY "authenticated user can register presence in room"
@@ -292,19 +302,17 @@ USING (
 
 ## Managing Channels
 
-Now that you'll need to create Channels you will also need to manage them and handle deleting them accordingly as that will impact your performance.
+Now that you can create Channels, you can also manage them.
 
-If you use your `service_role` token you'll be able to perform all of the operations as it bypasses RLS but you can also setup RLS policies to allow other users to perform them.
+Utilizing your `service_role` token enables you to perform all operations, bypassing RLS.
+
+Alternatively, you can create RLS policies to authorize your users to manage only certain Channels.
 
 ### List Channels
 
-<Admonition type="note">
+List Channels a user has access to.
 
-The policies on SELECT set for realtime.channels will intersect with this functionality.
-
-</Admonition>
-
-Users are able to list the channels they have access to and it uses the SELECT rule set in realtime.channels.
+Results are filtered with the `SELECT` policy on the `realtime.channels` tables.
 
 ```sql
 -- Authenticated user would access and be able to list all channels
@@ -343,7 +351,7 @@ USING ( true )
 
 ### Delete Channel
 
-They can also delete channels based on the DELETE rule set on realtime.channels.
+Users can also delete Channels based on the `DELETE` policy on the `realtime.channels` table.
 
 ```sql
 -- Authenticated user can delete all channels
@@ -379,9 +387,9 @@ USING ( true );
   </TabPanel>
 </Tabs>
 
-## Update Name
+### Update Channel
 
-Finally you can update channel names. Do not forget channel names are unique so users will receive unique index errors.
+Users can update Channel names. Channel names are unique so users will receive unique index errors if a Channel already exists.
 
 ```sql
 -- authenticated users can update channel name
@@ -420,10 +428,24 @@ USING ( true )
 
 ## Avoid usage with Postgres Changes
 
-The policies you set for realtime.channels will impact your Postgres Changes channels. At the moment we don't advice to use this as a feature as this was built with the intent to be used in Broadcast and Presence features.
+If the Channel is created the policies on `realtime.channels` will influence the Channels you use to receive updates for Postgres Changes.
 
-As such we advice you to use a separate channel (a non persistent one) to use for Postgres Changes.
+We recommend not creating a Channel before subscribing when useing Postgres Changes.
 
-## Change RLS policies
+In this way, Realtime Channl authorization is backwards compatible with your production application.
 
-Since we're checking during your users connect, as soon as they are connected we don't check them again. As such we highly advice you to set low JWT expiration times as that will force the user to reconnect and check their RLS policies for changes.
+## Changing RLS policies
+
+When you change an RLS policy these changes are picked up when a user connects to a Channel.
+
+When a user connects, Realtime queries your database and generates a representation of the permissions for a user for a Channel.
+
+Permissions are cached for the duration of the connection so we don't have to query your database for each Channel message.
+
+RLS policies are re-checked when access tokens are updated on the Channel. Our client libraries default to updating the access token every 30 seconds.
+
+If a user Channel permissions have been updated these changes will be picked up when the access token is sent over the Channel from the client.
+
+If a new access token is never received on the Channel users will be disconnected when the JWT expires.
+
+Make sure to expire your JWTs frequently.
