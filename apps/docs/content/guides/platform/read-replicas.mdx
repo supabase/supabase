@@ -69,6 +69,16 @@ Read Replicas offer the following features:
 
 ### Dedicated endpoints
 
+<Admonition type="note" label="Known bug in Postgrest schema reloading">
+
+There is currently a known bug that results in the [Postgrest schema cache](https://postgrest.org/en/v12/references/schema_cache.html) on Read Replicas not being reloaded correctly on DDL changes.
+
+A stale schema cache can result in Postgrest on Read Replicas not knowing about newly created functions, tables, changes to their structure, etc. As a short-term workaround, you can [save any trivial configuration change](https://supabase.com/dashboard/project/_/settings/api) to your Postgrest configuration (e.g. changing the Max Rows by 1), which will result in the service being restarted with a fresh schema cache.
+
+We expect to have this issue fixed in the coming weeks.
+
+</Admonition>
+
 Each Read Replica has its own dedicated database and API endpoints.
 
 - Find the database endpoint on the [Database Settings page](/dashboard/project/_/settings/database) under **Connection Info**
