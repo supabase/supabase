@@ -1390,8 +1390,8 @@ export const storage: NavMenuConstant = {
       name: 'S3',
       url: undefined,
       items: [
-        { name: 'API Compatibility', url: '/guides/storage/s3/compatibility' },
         { name: 'Authentication', url: '/guides/storage/s3/authentication' },
+        { name: 'API Compatibility', url: '/guides/storage/s3/compatibility' },
       ],
     },
     {
