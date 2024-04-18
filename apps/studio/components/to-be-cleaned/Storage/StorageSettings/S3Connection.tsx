@@ -3,7 +3,10 @@ import React from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  useIsProjectActive,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import CopyButton from 'components/ui/CopyButton'
 import { FormHeader } from 'components/ui/Forms'
@@ -13,6 +16,8 @@ import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-
 import { useS3AccessKeyDeleteMutation } from 'data/storage/s3-access-key-delete-mutation'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import {
+  AlertDescription_Shadcn_,
+  Alert_Shadcn_,
   Button,
   Dialog,
   DialogContent,
@@ -23,6 +28,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  IconAlertCircle,
   IconMoreVertical,
   IconTrash,
   cn,
@@ -30,6 +36,8 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { AlertTitle } from '@ui/components/shadcn/ui/alert'
+import Link from 'next/link'
 
 export const S3Connection = () => {
   const [openCreateCred, setOpenCreateCred] = React.useState(false)
@@ -39,6 +47,8 @@ export const S3Connection = () => {
 
   const { ref: projectRef } = useParams()
   const { project, isLoading: projectIsLoading } = useProjectContext()
+
+  const isProjectActive = useIsProjectActive()
 
   const { data: storageCreds, ...storageCredsQuery } = useStorageCredentialsQuery({
     projectRef,
@@ -77,15 +87,32 @@ export const S3Connection = () => {
           docsUrl="https://supabase.com/docs/guides/storage/s3/authentication"
         />
         <Panel className="grid gap-4 p-4 !mb-0">
-          <FormItemLayout layout="horizontal" label="Endpoint" isReactForm={false}>
-            <Input readOnly copy disabled value={s3connectionUrl} />
-          </FormItemLayout>
-          {projectIsLoading ? (
-            <></>
+          {isProjectActive ? (
+            <>
+              <FormItemLayout layout="horizontal" label="Endpoint" isReactForm={false}>
+                <Input readOnly copy disabled value={s3connectionUrl} />
+              </FormItemLayout>
+              {!projectIsLoading && (
+                <FormItemLayout layout="horizontal" label="Region" isReactForm={false}>
+                  <Input className="input-mono" copy disabled value={project?.region} />
+                </FormItemLayout>
+              )}
+            </>
           ) : (
-            <FormItemLayout layout="horizontal" label="Region" isReactForm={false}>
-              <Input className="input-mono" copy disabled value={project?.region} />
-            </FormItemLayout>
+            <>
+              <Alert_Shadcn_ variant="warning">
+                <IconAlertCircle />
+                <AlertTitle>Project is paused</AlertTitle>
+                <AlertDescription_Shadcn_>
+                  To connect to your S3 bucket, you need to restore your project.
+                </AlertDescription_Shadcn_>
+                <div className="mt-3 flex items-center space-x-2">
+                  <Button asChild type="default">
+                    <Link href={`/project/${projectRef}`}>Restore project</Link>
+                  </Button>
+                </div>
+              </Alert_Shadcn_>
+            </>
           )}
         </Panel>
       </div>
