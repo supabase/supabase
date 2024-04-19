@@ -35,6 +35,7 @@ const BlogGridItem = ({ post }: Props) => {
             <Image
               fill
               sizes="100%"
+              quality={100}
               src={
                 !post.thumb
                   ? `/images/blog/blog-placeholder.png`
