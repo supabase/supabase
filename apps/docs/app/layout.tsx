@@ -4,10 +4,10 @@ import '../styles/main.scss'
 import '../styles/new-docs.scss'
 import '../styles/prism-okaidia.scss'
 
-import { type Metadata } from 'next'
-
 import { ThemeProvider } from 'common'
+import { type Metadata } from 'next'
 import { PortalToast, TabsProvider } from 'ui'
+import { CommandMenuProvider } from 'ui-patterns/Cmdk'
 
 import { AuthContainer, SignOutHandler } from '~/features/auth/auth.client'
 import { QueryClientProvider } from '~/features/data/queryClient.client'
@@ -19,7 +19,6 @@ import { favicons } from '~/features/ui/favicons/faviconData'
 import { ThemeSandbox } from '~/features/ui/theme/theme.client'
 import { ScrollRestoration } from '~/features/ui/utils/scroll.client'
 import SiteLayout from '~/layouts/SiteLayout'
-import { CommandMenuProvider } from 'ui-patterns/Cmdk'
 
 const metadata: Metadata = {
   title: 'Supabase Docs',

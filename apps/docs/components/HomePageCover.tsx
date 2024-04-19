@@ -1,3 +1,5 @@
+'use client'
+
 import Link from 'next/link'
 import { IconBackground, IconPlay } from 'ui'
 import { useBreakpoint } from 'common'

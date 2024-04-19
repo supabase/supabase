@@ -1,3 +1,5 @@
+'use client'
+
 import * as Accordion from '@radix-ui/react-accordion'
 import { useRouter } from 'next/router'
 

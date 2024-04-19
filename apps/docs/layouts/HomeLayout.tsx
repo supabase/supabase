@@ -1,9 +1,5 @@
-'use client'
-
-import { MDXProvider } from '@mdx-js/react'
 import { type PropsWithChildren } from 'react'
 
-import components from '~/components'
 import HomePageCover from '~/components/HomePageCover'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import { LayoutMainContent } from './DefaultLayout'
@@ -16,9 +12,7 @@ const HomeLayout = ({ children }: PropsWithChildren) => {
         <HomePageCover title="Supabase Documentation" />
         <LayoutMainContent>
           <div className={['relative transition-all ease-out', 'duration-150 '].join(' ')}>
-            <div className="prose max-w-none">
-              <MDXProvider components={components}>{children}</MDXProvider>
-            </div>
+            <div className="prose max-w-none">{children}</div>
           </div>
         </LayoutMainContent>
       </article>

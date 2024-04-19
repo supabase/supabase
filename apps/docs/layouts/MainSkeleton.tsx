@@ -1,3 +1,5 @@
+'use client'
+
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
