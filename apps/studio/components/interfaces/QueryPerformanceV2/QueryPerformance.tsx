@@ -25,6 +25,9 @@ import { PresetHookResult } from '../Reports/Reports.utils'
 import { QUERY_PERFORMANCE_REPORT_TYPES } from './QueryPerformance.constants'
 import { QueryPerformanceFilterBar } from './QueryPerformanceFilterBar'
 import { QueryPerformanceGrid } from './QueryPerformanceGrid'
+import { useLocalStorageQuery } from 'hooks'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { X } from 'lucide-react'
 
 interface QueryPerformanceProps {
   queryHitRate: PresetHookResult
@@ -42,6 +45,11 @@ export const QueryPerformance = ({
     (preset as QUERY_PERFORMANCE_REPORT_TYPES) ?? QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING
   )
   const [showResetgPgStatStatements, setShowResetgPgStatStatements] = useState(false)
+
+  const [showBottomSection, setShowBottomSection] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.QUERY_PERF_SHOW_BOTTOM_SECTION,
+    true
+  )
 
   const handleRefresh = () => {
     queryPerformanceQuery.runQuery()
@@ -161,12 +169,31 @@ export const QueryPerformance = ({
       </Tabs_Shadcn_>
 
       <div className="px-6 py-3 bg-surface-200 border-t -mt-px">
-        <QueryPerformanceFilterBar queryPerformanceQuery={queryPerformanceQuery} />
+        <QueryPerformanceFilterBar
+          queryPerformanceQuery={queryPerformanceQuery}
+          onResetReportClick={() => {
+            setShowResetgPgStatStatements(true)
+          }}
+        />
       </div>
 
       <QueryPerformanceGrid queryPerformanceQuery={queryPerformanceQuery} />
 
-      <div className="px-6 py-6 flex gap-x-4 border-t">
+      <div
+        className={cn('px-6 py-6 flex gap-x-4 border-t relative', {
+          hidden: showBottomSection === false,
+        })}
+      >
+        <Button
+          className="absolute top-1.5 right-3 px-1.5"
+          type="text"
+          size="tiny"
+          onClick={() => {
+            setShowBottomSection(false)
+          }}
+        >
+          <X size="14" />
+        </Button>
         <div className="w-[35%] flex flex-col gap-y-1 text-sm">
           <p>Reset report</p>
           <p className="text-xs text-foreground-light">
