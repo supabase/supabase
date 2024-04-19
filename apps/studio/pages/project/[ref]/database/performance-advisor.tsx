@@ -1,18 +1,18 @@
-import { useState } from 'react'
 import { useParams } from 'common'
 import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import { DatabaseLayout } from 'components/layouts'
 import { FormHeader } from 'components/ui/Forms'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks'
+import { useState } from 'react'
 import type { NextPageWithLayout } from 'types'
 import { LoadingLine } from 'ui'
 
 import LintPageTabs from 'components/interfaces/Linter/LintPageTabs'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import LinterDataGrid from 'components/interfaces/Linter/LinterDataGrid'
-import LinterPageFooter from 'components/interfaces/Linter/LinterPageFooter'
 import LinterFilters from 'components/interfaces/Linter/LinterFilters'
+import LinterPageFooter from 'components/interfaces/Linter/LinterPageFooter'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -28,7 +28,6 @@ const ProjectLints: NextPageWithLayout = () => {
   const [currentTab, setCurrentTab] = useState<LINTER_LEVELS>(
     (preset as LINTER_LEVELS) ?? LINTER_LEVELS.ERROR
   )
-  const [selectedRow, setSelectedRow] = useState<number>()
   const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
 
   const { data, isLoading, isRefetching, refetch } = useProjectLintsQuery({
@@ -68,7 +67,6 @@ const ProjectLints: NextPageWithLayout = () => {
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
         setSelectedLint={setSelectedLint}
-        setSelectedRow={setSelectedRow}
       />
       <LinterFilters
         filterOptions={filterOptions}
@@ -81,8 +79,6 @@ const ProjectLints: NextPageWithLayout = () => {
       <LinterDataGrid
         filteredLints={filteredLints}
         currentTab={currentTab}
-        selectedRow={selectedRow}
-        setSelectedRow={setSelectedRow}
         selectedLint={selectedLint}
         setSelectedLint={setSelectedLint}
         isLoading={isLoading}

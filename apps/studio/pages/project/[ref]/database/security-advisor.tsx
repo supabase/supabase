@@ -29,12 +29,11 @@ const ProjectLints: NextPageWithLayout = () => {
   const [currentTab, setCurrentTab] = useState<LINTER_LEVELS>(
     (preset as LINTER_LEVELS) ?? LINTER_LEVELS.ERROR
   )
-  const [selectedRow, setSelectedRow] = useState<number>()
   const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
 
   const {
     data,
-    isLoading,
+    isLoading: areLintsLoading,
     isRefetching,
     refetch: refetchLintsQuery,
   } = useProjectLintsQuery({
@@ -42,9 +41,15 @@ const ProjectLints: NextPageWithLayout = () => {
     connectionString: project?.connectionString,
   })
 
-  const { data: authConfig, refetch: refetchAuthConfigQuery } = useAuthConfigQuery({
+  const {
+    data: authConfig,
+    isLoading: isAuthConfigLoading,
+    refetch: refetchAuthConfigQuery,
+  } = useAuthConfigQuery({
     projectRef: project?.ref,
   })
+
+  const isLoading = areLintsLoading || isAuthConfigLoading
 
   const refetch = () => {
     refetchLintsQuery()
@@ -125,7 +130,6 @@ const ProjectLints: NextPageWithLayout = () => {
         currentTab={currentTab}
         setCurrentTab={setCurrentTab}
         setSelectedLint={setSelectedLint}
-        setSelectedRow={setSelectedRow}
       />
       <LinterFilters
         filterOptions={filterOptions}
@@ -138,8 +142,6 @@ const ProjectLints: NextPageWithLayout = () => {
       <LinterDataGrid
         filteredLints={filteredLints}
         currentTab={currentTab}
-        selectedRow={selectedRow}
-        setSelectedRow={setSelectedRow}
         selectedLint={selectedLint}
         setSelectedLint={setSelectedLint}
         isLoading={isLoading}
