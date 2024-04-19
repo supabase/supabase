@@ -135,16 +135,6 @@ export const lintInfoMap: LintInfo[] = [
       'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0014_extension_in_public',
   },
   {
-    name: 'extension_in_public',
-    title: 'Extension in Public',
-    icon: <Unlock className="text-foreground-muted" size={15} strokeWidth={1} />,
-    link: ({ projectRef, metadata }) =>
-      `/project/${projectRef}/database/extensions?filter=${metadata?.name}`,
-    linkText: 'View extension',
-    docsLink:
-      'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0014_extension_in_public',
-  },
-  {
     name: 'auth_otp_long_expiry',
     title: 'Auth OTP Long Expiry',
     icon: <Clock className="text-foreground-muted" size={15} strokeWidth={1} />,
