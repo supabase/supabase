@@ -136,6 +136,10 @@ const footerData = [
         url: '/company',
       },
       {
+        text: 'General Availability',
+        url: '/ga',
+      },
+      {
         text: 'Terms of Service',
         url: '/terms',
       },
