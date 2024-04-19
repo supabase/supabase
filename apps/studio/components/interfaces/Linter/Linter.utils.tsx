@@ -1,10 +1,9 @@
-import { Box, Clock, Eye, Lock, Ruler, Table2, TextSearch, Unlock } from 'lucide-react'
+import { Box, Clock, Eye, Lock, Ruler, Table2, TextSearch, Unlock, User } from 'lucide-react'
 import Link from 'next/link'
 
 import { LINTER_LEVELS, LintInfo } from 'components/interfaces/Linter/Linter.constants'
 import { LINT_TYPES, Lint } from 'data/lint/lint-query'
 import { Badge, Button } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 export const lintInfoMap: LintInfo[] = [
   {
@@ -150,6 +149,15 @@ export const lintInfoMap: LintInfo[] = [
     linkText: 'View settings',
     docsLink: 'https://supabase.com/docs/guides/platform/going-into-prod#security',
   },
+  {
+    name: 'rls_references_user_metadata',
+    title: 'RLS references user metadata',
+    icon: <User className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/auth/policies`,
+    linkText: 'View policies',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0015_rls_references_user_metadata',
+  },
 ]
 
 export const LintCTA = ({
@@ -179,7 +187,7 @@ export const LintCTA = ({
   )
 }
 
-export const entityTypeIcon = (type: string) => {
+export const EntityTypeIcon = ({ type }: { type: string | undefined }) => {
   switch (type) {
     case 'table':
       return <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />
@@ -192,7 +200,7 @@ export const entityTypeIcon = (type: string) => {
   }
 }
 
-export const lintEntity = (metadata: Lint['metadata']) => {
+export const LintEntity = ({ metadata }: { metadata: Lint['metadata'] }) => {
   return (
     (metadata &&
       (metadata.entity ||
@@ -223,15 +231,3 @@ export const NoIssuesFound = ({ level }: { level: string }) => {
     </div>
   )
 }
-
-export const lintCountLabel = (isLoading: boolean, count: number, label: string) => (
-  <>
-    {isLoading ? (
-      <ShimmeringLoader className="w-20 pt-1" />
-    ) : (
-      <>
-        {count} {label}
-      </>
-    )}
-  </>
-)

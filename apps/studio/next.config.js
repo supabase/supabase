@@ -364,6 +364,11 @@ const nextConfig = {
         source: '/project/:ref/auth/column-privileges',
         destination: '/project/:ref/database/column-privileges',
       },
+      {
+        permanent: true,
+        source: '/project/:ref/database/linter',
+        destination: '/project/:ref/database/security-advisor',
+      },
       ...(process.env.NEXT_PUBLIC_BASE_PATH?.length
         ? [
             {
