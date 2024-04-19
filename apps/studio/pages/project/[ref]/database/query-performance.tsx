@@ -1,8 +1,8 @@
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { QueryPerformance } from 'components/interfaces/QueryPerformanceV2/QueryPerformance'
-import { QUERY_PERFORMANCE_REPORT_TYPES } from 'components/interfaces/QueryPerformanceV2/QueryPerformance.constants'
+import { QueryPerformance } from 'components/interfaces/QueryPerformance/QueryPerformance'
+import { QUERY_PERFORMANCE_REPORT_TYPES } from 'components/interfaces/QueryPerformance/QueryPerformance.constants'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import {
   QueryPerformanceSort,
