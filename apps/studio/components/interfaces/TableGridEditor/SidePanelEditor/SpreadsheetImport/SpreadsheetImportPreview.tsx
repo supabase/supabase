@@ -63,8 +63,8 @@ const SpreadsheetImportPreview = ({
           <div className="py-1 flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <p className="text-sm">Preview data to be imported</p>
-              {!isCompatible && <Badge color="red">Data incompatible</Badge>}
-              {errors.length > 0 && <Badge color="yellow">{errors.length} issues found</Badge>}
+              {!isCompatible && <Badge variant="destructive">Data incompatible</Badge>}
+              {errors.length > 0 && <Badge variant="warning">{errors.length} issues found</Badge>}
             </div>
             <Button
               type="text"

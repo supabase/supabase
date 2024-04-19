@@ -169,6 +169,20 @@ export const FRAMEWORKS: ConnectionType[] = [
       },
     ],
   },
+  {
+    key: 'flutter',
+    label: 'Flutter',
+    icon: 'flutter',
+    guideLink: 'https://supabase.com/docs/guides/getting-started/tutorials/with-flutter',
+    children: [
+      {
+        key: 'supabaseflutter',
+        label: 'supabase-flutter',
+        children: [],
+        icon: 'supabase',
+      },
+    ],
+  },
 ]
 
 export const ORMS: ConnectionType[] = [

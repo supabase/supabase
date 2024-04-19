@@ -66,6 +66,20 @@ These are the currently supported region values you can provide for `x-region` h
 - `us-west-1`
 - `us-west-2`
 
+## Using the client library
+
+You can also specify the region when invoking a Function using the Supabase client library:
+
+```js
+const { createClient, FunctionRegion } = require('@supabase/supabase-js')
+const { data: ret, error } = await supabase.functions.invoke('my-function-name', {
+  headers: { 'Content-Type': 'application/json' },
+  method: 'GET',
+  body: {},
+  region: FunctionRegion.UsEast1,
+})
+```
+
 ## Handling regional outages
 
 If you explicitly specify the region via `x-region` header, requests **will NOT** be automatically re-routed to another region and you should consider temporarily changing regions during the outage.

@@ -429,12 +429,6 @@ export default function Index () {
 
 Creating a Supabase client with the `ssr` package automatically configures it to use Cookies. This means your user's session is available throughout the entire SvelteKit stack - page, layout, server, hooks.
 
-<Admonition type="danger">
-
-Beware when accessing the session object on the server, because it is not revalidated on every request from the client. That means the sender can tamper with unencoded data in the session object. If you need to verify the integrity of user data for server logic, call `auth.getUser` instead, which will query the Supabase Auth server for trusted user data.
-
-</Admonition>
-
 <Tabs
   scrollable
   size="small"
@@ -475,15 +469,23 @@ export const handle: Handle = async ({ event, resolve }) => {
   })
 
   /**
-   * a little helper that is written for convenience so that instead
-   * of calling `const { data: { session } } = await supabase.auth.getSession()`
-   * you just call this `await getSession()`
+   * Unlike `supabase.auth.getSession`, which is unsafe on the server because it
+   * doesn't validate the JWT, this function validates the JWT by first calling
+   * `getUser` and aborts early if the JWT signature is invalid.
    */
-  event.locals.getSession = async () => {
+  event.locals.safeGetSession = async () => {
+    const {
+      data: { user },
+      error,
+    } = await event.locals.supabase.auth.getUser()
+    if (error) {
+      return { session: null, user: null }
+    }
+
     const {
       data: { session },
     } = await event.locals.supabase.auth.getSession()
-    return session
+    return { session, user }
   }
 
   return resolve(event, {
@@ -528,6 +530,11 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
     },
   })
 
+  /**
+   * It's fine to use `getSession` here, because on the client, `getSession` is
+   * safe, and on the server, it reads `session` from the `LayoutData`, which
+   * safely checked the session using `safeGetSession`.
+   */
   const {
     data: { session },
   } = await supabase.auth.getSession()
@@ -543,9 +550,12 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 ```ts +layout.server.ts
 import type { LayoutServerLoad } from './$types'
 
-export const load: LayoutServerLoad = async ({ locals: { getSession } }) => {
+export const load: LayoutServerLoad = async ({ locals: { safeGetSession } }) => {
+  const { session, user } = await safeGetSession()
+
   return {
-    session: await getSession(),
+    session,
+    user,
   }
 }
 ```

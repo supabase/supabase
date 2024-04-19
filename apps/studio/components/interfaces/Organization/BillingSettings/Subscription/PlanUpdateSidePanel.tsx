@@ -3,7 +3,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { isArray } from 'lodash'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import Table from 'components/to-be-cleaned/Table'
@@ -21,7 +21,7 @@ import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { plans as subscriptionsPlans } from 'shared-data/plans'
+import { pickFeatures, pickFooter, plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import {
   Button,
@@ -36,15 +36,20 @@ import {
 import DowngradeModal from './DowngradeModal'
 import EnterpriseCard from './EnterpriseCard'
 import ExitSurveyModal from './ExitSurveyModal'
+import UpgradeSurveyModal from './UpgradeModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
+import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
   const selectedOrganization = useSelectedOrganization()
   const slug = selectedOrganization?.slug
 
+  const originalPlanRef = useRef<string>()
+
   const [showExitSurvey, setShowExitSurvey] = useState(false)
+  const [showUpgradeSurvey, setShowUpgradeSurvey] = useState(false)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>()
   const [showDowngradeError, setShowDowngradeError] = useState(false)
   const [selectedTier, setSelectedTier] = useState<'tier_free' | 'tier_pro' | 'tier_team'>()
@@ -69,7 +74,9 @@ const PlanUpdateSidePanel = () => {
     snap.setPanelKey(undefined)
   }
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+  const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
+    orgSlug: slug,
+  })
   const { data: plans, isLoading: isLoadingPlans } = useOrgPlansQuery({ orgSlug: slug })
   const { data: membersExceededLimit } = useFreeProjectLimitCheckQuery({ slug })
   const { mutate: updateOrgSubscription, isLoading: isUpdating } = useOrgSubscriptionUpdateMutation(
@@ -79,6 +86,7 @@ const PlanUpdateSidePanel = () => {
         setSelectedTier(undefined)
         onClose()
         window.scrollTo({ top: 0, left: 0, behavior: 'smooth' })
+        setShowUpgradeSurvey(true)
       },
       onError: (error) => {
         toast.error(`Unable to update subscription: ${error.message}`)
@@ -87,6 +95,7 @@ const PlanUpdateSidePanel = () => {
   )
 
   const billingViaPartner = subscription?.billing_via_partner === true
+  const billingPartner = subscription?.billing_partner
   const paymentViaInvoice = subscription?.payment_method_type === 'invoice'
 
   const {
@@ -126,6 +135,12 @@ const PlanUpdateSidePanel = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [visible])
+
+  useEffect(() => {
+    if (visible && isSuccessSubscription) {
+      originalPlanRef.current = subscription.plan.id
+    }
+  }, [visible, isSuccessSubscription])
 
   const onConfirmDowngrade = () => {
     setSelectedTier(undefined)
@@ -181,7 +196,8 @@ const PlanUpdateSidePanel = () => {
               const price = planMeta?.price ?? 0
               const isDowngradeOption = planMeta?.change_type === 'downgrade'
               const isCurrentPlan = planMeta?.id === subscription?.plan?.id
-              const features = billingViaPartner ? plan.featuresPartner : plan.features
+              const features = pickFeatures(plan, billingPartner)
+              const footer = pickFooter(plan, billingPartner)
 
               if (plan.id === 'tier_enterprise') {
                 return (
@@ -189,7 +205,7 @@ const PlanUpdateSidePanel = () => {
                     key={plan.id}
                     plan={plan}
                     isCurrentPlan={isCurrentPlan}
-                    billingViaPartner={billingViaPartner}
+                    billingPartner={billingPartner}
                   />
                 )
               }
@@ -312,11 +328,9 @@ const PlanUpdateSidePanel = () => {
                     </ul>
                   </div>
 
-                  {(plan.footer || (billingViaPartner && plan.footerPartner)) && (
+                  {footer && (
                     <div className="border-t pt-4 mt-4">
-                      <p className="text-foreground-light text-xs">
-                        {billingViaPartner ? plan.footerPartner || plan.footer : plan.footer}
-                      </p>
+                      <p className="text-foreground-light text-xs">{footer}</p>
                     </div>
                   )}
                 </div>
@@ -532,8 +546,9 @@ const PlanUpdateSidePanel = () => {
           ) : (
             <div className="py-4 space-y-2">
               <p className="text-sm">
-                This organization is billed through our partner Fly.io and you will be charged by
-                them directly.
+                This organization is billed through our partner{' '}
+                {billingPartnerLabel(subscription?.billing_partner)} and you will be charged by them
+                directly.
               </p>
               {subscriptionPreview?.billed_via_partner &&
                 subscriptionPreview?.plan_change_type === 'downgrade' && (
@@ -556,6 +571,16 @@ const PlanUpdateSidePanel = () => {
         subscription={subscription}
         onClose={(success?: boolean) => {
           setShowExitSurvey(false)
+          if (success) onClose()
+        }}
+      />
+
+      <UpgradeSurveyModal
+        visible={showUpgradeSurvey}
+        originalPlan={originalPlanRef.current}
+        subscription={subscription}
+        onClose={(success?: boolean) => {
+          setShowUpgradeSurvey(false)
           if (success) onClose()
         }}
       />

@@ -75,7 +75,7 @@ For example, you can use Row Level Security (RLS) to build multi-tenant applicat
 
 ```sql
 create policy "Only allow read-write access to tenants" on tablename as restrictive to authenticated using (
-  tenant_id = (auth.jwt () -> 'app_metadata' ->> 'provider')
+  tenant_id = (select auth.jwt() -> 'app_metadata' ->> 'provider')
 );
 ```
 

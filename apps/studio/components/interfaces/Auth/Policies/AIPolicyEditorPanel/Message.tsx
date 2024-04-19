@@ -71,7 +71,7 @@ const Message = memo(function Message({
         {createdAt && (
           <span className="text-xs text-foreground-muted">{dayjs(createdAt).fromNow()}</span>
         )}
-        {isDebug && <Badge color="amber">Debug request</Badge>}
+        {isDebug && <Badge variant="warning">Debug request</Badge>}
       </div>
       <ReactMarkdown
         className="gap-2.5 flex flex-col"

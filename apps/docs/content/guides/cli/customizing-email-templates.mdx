@@ -132,4 +132,10 @@ The value will be one of: `magiclink`, `recovery`, `invite`, `signup` or `email_
 
 ## Deploying email templates
 
-These settings are only for local development. To update your hosted project, please copy the templates into the [Email Templates](/dashboard/project/_/auth/templates) section of the Dashboard.
+These settings are for local development. To apply the changes locally, stop and restart the Supabase containers:
+
+```sh
+supabase stop && supabase start
+```
+
+For hosted projects managed by Supabase, copy the templates into the [Email Templates](/dashboard/project/_/auth/templates) section of the Dashboard.
