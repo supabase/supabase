@@ -322,7 +322,7 @@ Create your first page. This example page calls Supabase from the server to get 
 
 This is an example of a public page that uses publicly readable data.
 
-To populate your database, run the [countries quickstart](/dashboard/project/_/sql/3ab7f123-675a-4342-a5d3-d342ed115a4b) from your dashboard.
+To populate your database, run the [countries quickstart](/dashboard/project/_/sql/quickstarts) from your dashboard.
 
 </StepHikeCompact.Details>
 
@@ -489,12 +489,12 @@ export const GET: RequestHandler = async ({ url, locals: { supabase } }) => {
     const { error } = await supabase.auth.verifyOtp({ type, token_hash })
     if (!error) {
       redirectTo.searchParams.delete('next')
-      return redirect(307, redirectTo)
+      return redirect(303, redirectTo)
     }
   }
 
   redirectTo.pathname = '/auth/error'
-  return redirect(307, redirectTo)
+  return redirect(303, redirectTo)
 }
 ```
 
