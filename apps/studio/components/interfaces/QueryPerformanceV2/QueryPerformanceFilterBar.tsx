@@ -24,7 +24,7 @@ export const QueryPerformanceFilterBar = ({
   onResetReportClick,
 }: {
   queryPerformanceQuery: DbQueryHook<any>
-  onResetReportClick: () => void
+  onResetReportClick?: () => void
 }) => {
   const router = useRouter()
   const { project } = useProjectContext()
@@ -136,7 +136,7 @@ export const QueryPerformanceFilterBar = ({
       </div>
 
       <div className="flex gap-2 items-center">
-        {!showBottomSection && (
+        {!showBottomSection && onResetReportClick && (
           <Button
             onClick={() => {
               onResetReportClick()
