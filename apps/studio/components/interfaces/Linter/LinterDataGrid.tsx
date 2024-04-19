@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown'
 
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import { NoIssuesFound, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
+import { NoIssuesFound, lintEntity, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import { Lint } from 'data/lint/lint-query'
 import {
   Button,
@@ -69,11 +69,7 @@ const LinterDataGrid = ({
       value: (row: any) => (
         <div className="flex items-center gap-1 text-xs">
           <span className="shrink-0">{entityTypeIcon(row.metadata?.type)}</span>
-          {row.metadata &&
-            (row.metadata.entity ||
-              (row.metadata.schema &&
-                row.metadata.name &&
-                `${row.metadata.schema}.${row.metadata.name}`))}
+          {lintEntity(row.metadata)}
         </div>
       ),
     },
@@ -220,11 +216,7 @@ const LinterDataGrid = ({
                         {selectedLint.metadata?.type === 'view' && (
                           <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />
                         )}{' '}
-                        {selectedLint.metadata &&
-                          (selectedLint.metadata.entity ||
-                            (selectedLint.metadata.schema &&
-                              selectedLint.metadata.name &&
-                              `${selectedLint.metadata.schema}.${selectedLint.metadata.name}`))}
+                        {lintEntity(selectedLint.metadata)}
                       </div>
                     </div>
 

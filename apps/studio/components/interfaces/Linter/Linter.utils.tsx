@@ -184,6 +184,15 @@ export const entityTypeIcon = (type: string) => {
   }
 }
 
+export const lintEntity = (metadata: Lint['metadata']) => {
+  return (
+    (metadata &&
+      (metadata.entity ||
+        (metadata.schema && metadata.name && `${metadata.schema}.${metadata.name}`))) ??
+    undefined
+  )
+}
+
 export const LintCategoryBadge = ({ category }: { category: string }) => {
   return (
     <Badge variant={category === 'SECURITY' ? 'destructive' : 'warning'} className="capitalize">
