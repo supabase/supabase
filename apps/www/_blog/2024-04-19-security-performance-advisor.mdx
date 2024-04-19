@@ -51,12 +51,6 @@ As with all of our tooling, it's designed to both help and to teach. The suggest
 
 ## Performance Advisor
 
-While database tuning is a speciality on its own, many projects have simple optimizations to improve performance. We're releasing a new Performance Advisor in Supabase Studio to surface the low-hanging fruit.
-
-The Performance Advisor checks for misconfigurations, like tables with unindexed foreign key columns, inefficient RLS policies, or columns with duplicate indexes. As a project grows, issues like this can sneak in and slow your projects down (and fill up your disks).
-
-If you're looking for ways to speed up your database, this is the place to start.
-
 <Img
   alt="security-peformance-advisor"
   src={{
@@ -78,6 +72,12 @@ If you're looking for ways to speed up your database, this is the place to start
   captionAlign="left"
   zoomable={false}
 />
+
+While database tuning is a speciality on its own, many projects have simple optimizations to improve performance. We're releasing a new Performance Advisor in Supabase Studio to surface the low-hanging fruit.
+
+The Performance Advisor checks for misconfigurations, like tables with unindexed foreign key columns, inefficient RLS policies, or columns with duplicate indexes. As a project grows, issues like this can sneak in and slow your projects down (and fill up your disks).
+
+If you're looking for ways to speed up your database, this is the place to start.
 
 Speaking of performance, we have another treat for you. Last week, we announced [PostgreSQL index advisor](https://news.ycombinator.com/item?id=40028111) on Hacker News. This is a Postgres extension that can determine if a given query should have an index. It's already proving useful:
 
