@@ -1,11 +1,11 @@
-import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react'
+import { ArrowDown, ArrowUp, Info, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import { useFlag } from 'hooks'
+import { useFlag, useLocalStorageQuery } from 'hooks'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import {
   Button,
@@ -17,15 +17,22 @@ import {
 } from 'ui'
 import { TextSearchPopover } from './TextSearchPopover'
 import { QueryPerformanceSort } from '../Reports/Reports.queries'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export const QueryPerformanceFilterBar = ({
   queryPerformanceQuery,
+  onResetReportClick,
 }: {
   queryPerformanceQuery: DbQueryHook<any>
+  onResetReportClick?: () => void
 }) => {
   const router = useRouter()
   const { project } = useProjectContext()
   const enableQueryPerformanceV2 = useFlag('queryPerformanceV2')
+  const [showBottomSection, setShowBottomSection] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.QUERY_PERF_SHOW_BOTTOM_SECTION,
+    true
+  )
   const defaultSearchQueryValue = router.query.search ? String(router.query.search) : ''
   const defaultFilterRoles = router.query.roles ? (router.query.roles as string[]) : []
   const defaultSortByValue = router.query.sort
@@ -128,20 +135,32 @@ export const QueryPerformanceFilterBar = ({
         </div>
       </div>
 
-      <Button
-        type="default"
-        size="tiny"
-        onClick={() => queryPerformanceQuery.runQuery()}
-        disabled={isLoading || isRefetching}
-        icon={
-          <RefreshCw
-            size={12}
-            className={`text-foreground-light ${isLoading || isRefetching ? 'animate-spin' : ''}`}
-          />
-        }
-      >
-        Refresh
-      </Button>
+      <div className="flex gap-2 items-center">
+        {!showBottomSection && onResetReportClick && (
+          <Button
+            onClick={() => {
+              onResetReportClick()
+            }}
+            type="default"
+          >
+            Reset report
+          </Button>
+        )}
+        <Button
+          type="default"
+          size="tiny"
+          onClick={() => queryPerformanceQuery.runQuery()}
+          disabled={isLoading || isRefetching}
+          icon={
+            <RefreshCw
+              size={12}
+              className={`text-foreground-light ${isLoading || isRefetching ? 'animate-spin' : ''}`}
+            />
+          }
+        >
+          Refresh
+        </Button>
+      </div>
     </div>
   )
 }

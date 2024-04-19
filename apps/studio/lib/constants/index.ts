@@ -50,6 +50,8 @@ export const LOCAL_STORAGE_KEYS = {
   PGBOUNCER_DEPRECATION_WARNING: 'pgbouncer-deprecation-warning-dismissed',
 
   PROJECT_LINT_IGNORE_LIST: 'supabase-project-lint-ignore-list',
+
+  QUERY_PERF_SHOW_BOTTOM_SECTION: 'supabase-query-perf-show-bottom-section',
 }
 
 export const OPT_IN_TAGS = {
