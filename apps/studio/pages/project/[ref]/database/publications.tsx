@@ -5,17 +5,17 @@ import { PublicationsList, PublicationsTables } from 'components/interfaces/Data
 import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
+import { FormHeader } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import type { NextPageWithLayout } from 'types'
-import { FormHeader } from 'components/ui/Forms'
 
 // [Joshen] Technically, best that we have these as separate URLs
 // makes it easier to manage state, but foresee that this page might
 // be consolidated somewhere else eventually for better UX
 
-const DatabaseReplication: NextPageWithLayout = () => {
+const DatabasePublications: NextPageWithLayout = () => {
   const { project } = useProjectContext()
 
   const { data } = useDatabasePublicationsQuery({
@@ -41,7 +41,7 @@ const DatabaseReplication: NextPageWithLayout = () => {
     <ScaffoldContainer>
       <ScaffoldSection>
         <div className="col-span-12">
-          <FormHeader title="Database Replications" />
+          <FormHeader title="Database Publications" />
           {selectedPublication === undefined ? (
             <PublicationsList onSelectPublication={setSelectedPublicationId} />
           ) : (
@@ -56,6 +56,6 @@ const DatabaseReplication: NextPageWithLayout = () => {
   )
 }
 
-DatabaseReplication.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
+DatabasePublications.getLayout = (page) => <DatabaseLayout title="Database">{page}</DatabaseLayout>
 
-export default DatabaseReplication
+export default DatabasePublications
