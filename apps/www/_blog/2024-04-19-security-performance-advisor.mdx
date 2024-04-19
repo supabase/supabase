@@ -19,7 +19,7 @@ We're dropping some handy tools in Supabase Studio this week to help with securi
 2. **Performance Advisor**: for suggesting database optimizations
 3. **Index Advisor**: for suggesting indexes on slow-running queries
 
-We [announced reaching General Availability](/ga) this week, reaching a point where we feel confident our organization can support all types of customers and help them become successful, regardless of their demands. It's a big milestone after four years of building.
+We [announced entering General Availability](/ga) this week, reaching a point where we feel confident our organization can support all types of customers and help them become successful, regardless of their demands. It's a big milestone after four years of building.
 
 As we've grown up as a company, so too have our customers. Many of you have been with us since the start and have seen your projects grow from 0 to literally millions of users, scaling from the free plan up to the largest size servers we offer. .
 
@@ -29,7 +29,7 @@ Along with this growth, we've learned many lessons about the types of issues dev
 
 As we've helped hundreds of thousands of customers through issues like these, a trend emerged: developers want their problems resolved quickly, but they also want to know what happened and why. This is the typical profile of a Supabase developer — thoughtful, curious, and hungry to learn more about the inner workings of Postgres.
 
-This week, we're adding features into Supabase Studio to address common issues as you scale up. These are powered by tools that we have open sourced this week: [index_advisor](https://github.com/supabase/index_advisor) and [splinter](https://github.com/supabase/splinter) (“**S**upabase **P**ostgres **LINTER**).
+This week, we're adding features into Supabase Studio to address common issues as you scale up. These are powered by tools that we have open sourced this week: [index_advisor](https://github.com/supabase/index_advisor) and [splinter](https://github.com/supabase/splinter) (“**S**upabase **P**ostgres **linter**).
 
 ## Security Advisor
 
@@ -47,19 +47,15 @@ This week we're releasing Security Advisor in Supabase Studio. This is a new int
 
 The Security Advisor is helpful in pointing out security issues that you might have forgotten or not yet be aware: some lints are general purpose for Postgres projects, while others are specific to Supabase.
 
-As with all of our tooling, it's designed to both help and to teach. The suggestions are well-documented with a rationale, descriptions, examples and remediation steps. Did you know, for example, that views don't respect RLS policies unless you've set `security_invoker=on`? Now you do! Let's see how that looks in `{Linter}`
-
-[security invoker example screenshot + description]
+As with all of our tooling, it's designed to both help and to teach. The suggestions are well-documented with a rationale, descriptions, examples and remediation steps. Did you know, for example, that views don't respect RLS policies unless you've set `security_invoker=on`? Now you do!
 
 ## Performance Advisor
 
-While database tuning is a speciality on its own, many projects have simple optimizations to improive performance. We're releasing a new Performance Advisor in Supabase Studio to surface the low-hanging fruit.
+While database tuning is a speciality on its own, many projects have simple optimizations to improve performance. We're releasing a new Performance Advisor in Supabase Studio to surface the low-hanging fruit.
 
-The Performance Advisor checks for misconfigurations, like tables with unindexed foreign key columns, inefficient RLS Policies, or columns with duplicate indexes. As a project grows, issues like this can sneak in and slow your projects down (and fill up your disks).
+The Performance Advisor checks for misconfigurations, like tables with unindexed foreign key columns, inefficient RLS policies, or columns with duplicate indexes. As a project grows, issues like this can sneak in and slow your projects down (and fill up your disks).
 
 If you're looking for ways to speed up your database, this is the place to start.
-
-[performance advisor screenshot]
 
 <Img
   alt="security-peformance-advisor"
@@ -72,8 +68,6 @@ If you're looking for ways to speed up your database, this is the place to start
 />
 
 ## Bonus: Index Advisor
-
-[screenshot]
 
 <Img
   alt="security-peformance-advisor"
@@ -102,7 +96,7 @@ The Supabase [Index Advisor](https://github.com/supabase/index_advisor) is now a
   sequentially.
 </details>
 
-This is just the beginning of our plan to make automated data analysis tooling available to all developers. Even if you're experienced with databases, this will be a huge help with the optimization work you'd already planned to do. If you're new to databases, the Index Advisor will help you level-up, surfacing issues and showing you how to fix them.
+This is just the beginning of our plan to make automated data analysis tooling available to all developers. Even if you're experienced with databases, this will be a huge help with the optimization work you have already planned to do. If you're new to databases, the Index Advisor will help you level-up, surfacing issues and showing you how to fix them.
 
 Let's have a look at some queries:
 
