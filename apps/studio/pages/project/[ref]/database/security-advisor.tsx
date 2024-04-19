@@ -33,7 +33,7 @@ const ProjectLints: NextPageWithLayout = () => {
 
   const {
     data,
-    isLoading,
+    isLoading: areLintsLoading,
     isRefetching,
     refetch: refetchLintsQuery,
   } = useProjectLintsQuery({
@@ -41,9 +41,15 @@ const ProjectLints: NextPageWithLayout = () => {
     connectionString: project?.connectionString,
   })
 
-  const { data: authConfig, refetch: refetchAuthConfigQuery } = useAuthConfigQuery({
+  const {
+    data: authConfig,
+    isLoading: isAuthConfigLoading,
+    refetch: refetchAuthConfigQuery,
+  } = useAuthConfigQuery({
     projectRef: project?.ref,
   })
+
+  const isLoading = areLintsLoading || isAuthConfigLoading
 
   const refetch = () => {
     refetchLintsQuery()
