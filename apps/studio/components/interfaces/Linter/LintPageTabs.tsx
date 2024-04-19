@@ -13,9 +13,9 @@ import {
 } from 'ui'
 
 import { LINTER_LEVELS, LINT_TABS } from 'components/interfaces/Linter/Linter.constants'
+import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { Lint } from 'data/lint/lint-query'
 import { useRouter } from 'next/router'
-import { lintCountLabel } from './Linter.utils'
 
 interface LintPageTabsProps {
   currentTab: string
@@ -38,22 +38,32 @@ const LintPageTabs = ({
   const infoLintsCount = activeLints.filter((x) => x.level === 'INFO').length
 
   const LintCountLabel = ({ tab }: { tab: (typeof LINT_TABS)[number] }) => {
-    const getCountLabel = () => {
-      switch (tab.id) {
-        case LINTER_LEVELS.ERROR:
-          return lintCountLabel(isLoading, errorLintsCount, 'errors')
-        case LINTER_LEVELS.WARN:
-          return lintCountLabel(isLoading, warnLintsCount, 'warnings')
-        case LINTER_LEVELS.INFO:
-          return lintCountLabel(isLoading, infoLintsCount, 'suggestions')
-        default:
-          return null
-      }
+    let count = 0
+    let label = ''
+    if (tab.id === LINTER_LEVELS.ERROR) {
+      count = errorLintsCount
+      label = 'errors'
+    }
+
+    if (tab.id === LINTER_LEVELS.WARN) {
+      count = warnLintsCount
+      label = 'warnings'
+    }
+
+    if (tab.id === LINTER_LEVELS.INFO) {
+      count = infoLintsCount
+      label = 'suggestions'
     }
 
     return (
       <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
-        {getCountLabel()}
+        {isLoading ? (
+          <ShimmeringLoader className="w-20 pt-1" />
+        ) : (
+          <>
+            {count} {label}
+          </>
+        )}
       </span>
     )
   }

@@ -4,7 +4,6 @@ import Link from 'next/link'
 import { LINTER_LEVELS, LintInfo } from 'components/interfaces/Linter/Linter.constants'
 import { LINT_TYPES, Lint } from 'data/lint/lint-query'
 import { Badge, Button } from 'ui'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 export const lintInfoMap: LintInfo[] = [
   {
@@ -232,15 +231,3 @@ export const NoIssuesFound = ({ level }: { level: string }) => {
     </div>
   )
 }
-
-export const lintCountLabel = (isLoading: boolean, count: number, label: string) => (
-  <>
-    {isLoading ? (
-      <ShimmeringLoader className="w-20 pt-1" />
-    ) : (
-      <>
-        {count} {label}
-      </>
-    )}
-  </>
-)
