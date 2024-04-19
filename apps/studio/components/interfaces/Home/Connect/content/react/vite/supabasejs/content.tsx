@@ -20,8 +20,8 @@ const ContentFile = ({ projectKeys }: ContentFileProps) => {
       <ConnectTabContent value=".env">
         <SimpleCodeBlock className="bash" parentClassName="min-h-72">
           {`
-VITE_APP_URL=${projectKeys.apiUrl ?? 'your-project-url'}
-VITE_APP_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
+VITE_SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
+VITE_SUPABASE_ANON_KEY=${projectKeys.anonKey ?? 'your-anon-key'}
         `}
         </SimpleCodeBlock>
       </ConnectTabContent>
