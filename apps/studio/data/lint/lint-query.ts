@@ -1,8 +1,9 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+
 import { executeSql } from '../sql/execute-sql-query'
 import { lintKeys } from './keys'
 
-export const LINT_SQL = `set local search_path = '';
+export const LINT_SQL = /* SQL */ `set local search_path = '';
 
 (
 with foreign_keys as (
@@ -720,6 +721,7 @@ export const LINT_TYPES = [
   'function_search_path_mutable',
   'rls_disabled_in_public',
   'extension_in_public',
+  'auth_otp_long_expiry',
 ] as const
 
 export type LINT_TYPES = (typeof LINT_TYPES)[number]
@@ -735,7 +737,8 @@ export type Lint = {
   metadata: {
     schema?: string
     name?: string
-    type?: 'table' | 'view'
+    entity?: string
+    type?: 'table' | 'view' | 'auth'
     fkey_name?: string
     fkey_columns?: number[]
   } | null

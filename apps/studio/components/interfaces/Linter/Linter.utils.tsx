@@ -1,8 +1,9 @@
-import { LINT_TYPES, Lint } from 'data/lint/lint-query'
-import { Box, Eye, Lock, Table2, Unlock, TextSearch } from 'lucide-react'
+import { Box, Clock, Eye, Lock, Table2, TextSearch, Unlock } from 'lucide-react'
 import Link from 'next/link'
-import { Button, Badge } from 'ui'
+
 import { LINTER_LEVELS, LintInfo } from 'components/interfaces/Linter/Linter.constants'
+import { LINT_TYPES, Lint } from 'data/lint/lint-query'
+import { Badge, Button } from 'ui'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
 
 export const lintInfoMap: LintInfo[] = [
@@ -123,7 +124,6 @@ export const lintInfoMap: LintInfo[] = [
     docsLink:
       'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0013_rls_disabled_in_public',
   },
-
   {
     name: 'extension_in_public',
     title: 'Extension in Public',
@@ -133,6 +133,24 @@ export const lintInfoMap: LintInfo[] = [
     linkText: 'View extension',
     docsLink:
       'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0014_extension_in_public',
+  },
+  {
+    name: 'extension_in_public',
+    title: 'Extension in Public',
+    icon: <Unlock className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef, metadata }) =>
+      `/project/${projectRef}/database/extensions?filter=${metadata?.name}`,
+    linkText: 'View extension',
+    docsLink:
+      'https://supabase.com/docs/guides/database/database-linter?queryGroups=lint&lint=0014_extension_in_public',
+  },
+  {
+    name: 'auth_otp_long_expiry',
+    title: 'Auth OTP Long Expiry',
+    icon: <Clock className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/auth/providers`,
+    linkText: 'View settings',
+    docsLink: 'https://supabase.com/docs/guides/platform/going-into-prod#security',
   },
 ]
 
@@ -169,6 +187,8 @@ export const entityTypeIcon = (type: string) => {
       return <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />
     case 'view':
       return <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />
+    case 'auth':
+      return <Lock className="text-foreground-muted" size={15} strokeWidth={1.5} />
     default:
       return <Box className="text-foreground-muted" size={15} strokeWidth={1.5} />
   }

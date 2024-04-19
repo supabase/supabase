@@ -1,18 +1,19 @@
 import { useState } from 'react'
+
 import { useParams } from 'common'
+import LintPageTabs from 'components/interfaces/Linter/LintPageTabs'
+import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
 import { lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
+import LinterDataGrid from 'components/interfaces/Linter/LinterDataGrid'
+import LinterFilters from 'components/interfaces/Linter/LinterFilters'
+import LinterPageFooter from 'components/interfaces/Linter/LinterPageFooter'
 import { DatabaseLayout } from 'components/layouts'
 import { FormHeader } from 'components/ui/Forms'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks'
 import type { NextPageWithLayout } from 'types'
 import { LoadingLine } from 'ui'
-
-import LintPageTabs from 'components/interfaces/Linter/LintPageTabs'
-import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import LinterDataGrid from 'components/interfaces/Linter/LinterDataGrid'
-import LinterPageFooter from 'components/interfaces/Linter/LinterPageFooter'
-import LinterFilters from 'components/interfaces/Linter/LinterFilters'
 
 const ProjectLints: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -36,7 +37,32 @@ const ProjectLints: NextPageWithLayout = () => {
     connectionString: project?.connectionString,
   })
 
-  const activeLints = data?.filter((x) => x.categories.includes('SECURITY')) || []
+  const { data: authConfig } = useAuthConfigQuery({ projectRef: project?.ref })
+
+  let clientLints: Lint[] = []
+
+  // [Alaister]: checking this client side for speed, but should be moved into the query if possible
+  if (authConfig?.EXTERNAL_EMAIL_ENABLED && authConfig.MAILER_OTP_EXP > 3600) {
+    clientLints.push({
+      name: 'auth_otp_long_expiry',
+      level: 'WARN',
+      facing: 'EXTERNAL',
+      categories: ['SECURITY'],
+      description: 'OTP expiry exceeds recommended threshold',
+      detail:
+        'We have detected that you have enabled the email provider with the OTP expiry set to more than an hour. It is recommended to set this value to less than an hour.',
+      cache_key: 'auth_otp_long_expiry',
+      remediation: 'https://supabase.com/docs/guides/platform/going-into-prod#security',
+      metadata: {
+        type: 'auth',
+        entity: 'Auth',
+      },
+    })
+  }
+
+  const activeLints = [...(data ?? []), ...clientLints]?.filter((x) =>
+    x.categories.includes('SECURITY')
+  )
 
   const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
     []) as string[]
