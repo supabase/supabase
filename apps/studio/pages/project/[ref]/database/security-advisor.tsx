@@ -32,12 +32,24 @@ const ProjectLints: NextPageWithLayout = () => {
   const [selectedRow, setSelectedRow] = useState<number>()
   const [selectedLint, setSelectedLint] = useState<Lint | null>(null)
 
-  const { data, isLoading, isRefetching, refetch } = useProjectLintsQuery({
+  const {
+    data,
+    isLoading,
+    isRefetching,
+    refetch: refetchLintsQuery,
+  } = useProjectLintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  const { data: authConfig } = useAuthConfigQuery({ projectRef: project?.ref })
+  const { data: authConfig, refetch: refetchAuthConfigQuery } = useAuthConfigQuery({
+    projectRef: project?.ref,
+  })
+
+  const refetch = () => {
+    refetchLintsQuery()
+    refetchAuthConfigQuery()
+  }
 
   let clientLints: Lint[] = []
 
