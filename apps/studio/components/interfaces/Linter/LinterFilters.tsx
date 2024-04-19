@@ -37,11 +37,11 @@ const LinterFilters = ({
           <FilterPopover
             name="Filter"
             options={filterOptions}
-            disabled={activeLints.filter((x) => x.level === currentTab).length === 0}
+            disabled={activeLints.filter((x) => x.level === tab.id).length === 0}
             labelKey="name"
             valueKey="value"
-            activeOptions={filters.find((filter) => filter.level === currentTab)?.filters || []}
-            onSaveFilters={(values) => updateFilters(currentTab, values)}
+            activeOptions={filters.find((filter) => filter.level === tab.id)?.filters || []}
+            onSaveFilters={(values) => updateFilters(tab.id, values)}
           />
         </div>
       ))}
