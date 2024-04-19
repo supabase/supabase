@@ -62,7 +62,7 @@ const ProjectLints: NextPageWithLayout = () => {
       categories: ['SECURITY'],
       description: 'OTP expiry exceeds recommended threshold',
       detail:
-        'We have detected that you have enabled the email provider with the OTP expiry set to more than an hour. It is recommended to set this value to less than an hour.',
+        'We have detected that you have enabled the email provider with the OTP expiry set to more than an hour. It is recommended to set this value to less than an hour to prevent brute force attacks.',
       cache_key: 'auth_otp_long_expiry',
       remediation: 'https://supabase.com/docs/guides/platform/going-into-prod#security',
       metadata: {
