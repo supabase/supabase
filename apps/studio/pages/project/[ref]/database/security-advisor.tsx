@@ -54,22 +54,41 @@ const ProjectLints: NextPageWithLayout = () => {
   let clientLints: Lint[] = []
 
   // [Alaister]: checking this client side for speed, but should be moved into the query if possible
-  if (authConfig?.EXTERNAL_EMAIL_ENABLED && authConfig.MAILER_OTP_EXP > 3600) {
-    clientLints.push({
-      name: 'auth_otp_long_expiry',
-      level: 'WARN',
-      facing: 'EXTERNAL',
-      categories: ['SECURITY'],
-      description: 'OTP expiry exceeds recommended threshold',
-      detail:
-        'We have detected that you have enabled the email provider with the OTP expiry set to more than an hour. It is recommended to set this value to less than an hour to prevent brute force attacks.',
-      cache_key: 'auth_otp_long_expiry',
-      remediation: 'https://supabase.com/docs/guides/platform/going-into-prod#security',
-      metadata: {
-        type: 'auth',
-        entity: 'Auth',
-      },
-    })
+  if (authConfig?.EXTERNAL_EMAIL_ENABLED) {
+    if (authConfig.MAILER_OTP_EXP > 3600) {
+      clientLints.push({
+        name: 'auth_otp_long_expiry',
+        level: 'WARN',
+        facing: 'EXTERNAL',
+        categories: ['SECURITY'],
+        description: 'OTP expiry exceeds recommended threshold',
+        detail:
+          'We have detected that you have enabled the email provider with the OTP expiry set to more than an hour. It is recommended to set this value to less than an hour.',
+        cache_key: 'auth_otp_long_expiry',
+        remediation: 'https://supabase.com/docs/guides/platform/going-into-prod#security',
+        metadata: {
+          type: 'auth',
+          entity: 'Auth',
+        },
+      })
+    }
+
+    if (authConfig.SMS_OTP_LENGTH <= 6) {
+      clientLints.push({
+        name: 'auth_otp_short_length',
+        level: 'WARN',
+        facing: 'EXTERNAL',
+        categories: ['SECURITY'],
+        description: 'OTP length is less than recommended threshold',
+        detail: 'We have detected that you have set the OTP length to less than 6 characters',
+        cache_key: 'auth_otp_short_length',
+        remediation: 'https://supabase.com/docs/guides/platform/going-into-prod#security',
+        metadata: {
+          type: 'auth',
+          entity: 'Auth',
+        },
+      })
+    }
   }
 
   const activeLints = [...(data ?? []), ...clientLints]?.filter((x) =>

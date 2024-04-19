@@ -1,4 +1,4 @@
-import { Box, Clock, Eye, Lock, Table2, TextSearch, Unlock } from 'lucide-react'
+import { Box, Clock, Eye, Lock, Ruler, Table2, TextSearch, Unlock } from 'lucide-react'
 import Link from 'next/link'
 
 import { LINTER_LEVELS, LintInfo } from 'components/interfaces/Linter/Linter.constants'
@@ -138,6 +138,14 @@ export const lintInfoMap: LintInfo[] = [
     name: 'auth_otp_long_expiry',
     title: 'Auth OTP Long Expiry',
     icon: <Clock className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/auth/providers`,
+    linkText: 'View settings',
+    docsLink: 'https://supabase.com/docs/guides/platform/going-into-prod#security',
+  },
+  {
+    name: 'auth_otp_short_length',
+    title: 'Auth OTP Short Length',
+    icon: <Ruler className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/auth/providers`,
     linkText: 'View settings',
     docsLink: 'https://supabase.com/docs/guides/platform/going-into-prod#security',

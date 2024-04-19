@@ -722,6 +722,7 @@ export const LINT_TYPES = [
   'rls_disabled_in_public',
   'extension_in_public',
   'auth_otp_long_expiry',
+  'auth_otp_short_length',
 ] as const
 
 export type LINT_TYPES = (typeof LINT_TYPES)[number]
