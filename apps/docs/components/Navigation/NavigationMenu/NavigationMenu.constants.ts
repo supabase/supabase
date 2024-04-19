@@ -773,7 +773,7 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'Column level privileges',
-          url: '/guides/database/postgres/column-level-privileges',
+          url: '/guides/database/postgres/column-level-security',
         },
       ],
     },
