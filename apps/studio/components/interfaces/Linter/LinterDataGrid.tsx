@@ -1,4 +1,4 @@
-import { ExternalLink, Eye, Table2, X } from 'lucide-react'
+import { ExternalLink, X } from 'lucide-react'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
@@ -6,7 +6,7 @@ import ReactMarkdown from 'react-markdown'
 
 import { useParams } from 'common'
 import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import { NoIssuesFound, lintEntity, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
+import { LintEntity, NoIssuesFound, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
 import { Lint } from 'data/lint/lint-query'
 import {
   Button,
@@ -20,7 +20,7 @@ import {
   cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import { LintCTA, LintCategoryBadge, entityTypeIcon } from './Linter.utils'
+import { EntityTypeIcon, LintCTA, LintCategoryBadge } from './Linter.utils'
 
 interface LinterDataGridProps {
   isLoading: boolean
@@ -64,8 +64,10 @@ const LinterDataGrid = ({
       minWidth: 230,
       value: (row: any) => (
         <div className="flex items-center gap-1 text-xs">
-          <span className="shrink-0">{entityTypeIcon(row.metadata?.type)}</span>
-          {lintEntity(row.metadata)}
+          <span className="shrink-0">
+            <EntityTypeIcon type={row.metadata?.type} />
+          </span>
+          <LintEntity metadata={row.metadata} />
         </div>
       ),
     },
@@ -204,13 +206,8 @@ const LinterDataGrid = ({
                     <div className="flex items-center gap-2 text-sm mt-4">
                       <span>Entity</span>
                       <div className="flex items-center gap-1 px-2 py-0.5 bg-surface-200 border rounded-lg ">
-                        {selectedLint.metadata?.type === 'table' && (
-                          <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />
-                        )}
-                        {selectedLint.metadata?.type === 'view' && (
-                          <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />
-                        )}{' '}
-                        {lintEntity(selectedLint.metadata)}
+                        <EntityTypeIcon type={selectedLint.metadata?.type} />
+                        <LintEntity metadata={selectedLint.metadata} />
                       </div>
                     </div>
 

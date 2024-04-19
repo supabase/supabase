@@ -187,7 +187,7 @@ export const LintCTA = ({
   )
 }
 
-export const entityTypeIcon = (type: string) => {
+export const EntityTypeIcon = ({ type }: { type: string | undefined }) => {
   switch (type) {
     case 'table':
       return <Table2 className="text-foreground-muted" size={15} strokeWidth={1} />
@@ -200,7 +200,7 @@ export const entityTypeIcon = (type: string) => {
   }
 }
 
-export const lintEntity = (metadata: Lint['metadata']) => {
+export const LintEntity = ({ metadata }: { metadata: Lint['metadata'] }) => {
   return (
     (metadata &&
       (metadata.entity ||
