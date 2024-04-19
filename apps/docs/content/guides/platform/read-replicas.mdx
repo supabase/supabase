@@ -76,7 +76,9 @@ Each Read Replica has its own dedicated database and API endpoints.
 
 Read Replicas only support `GET` requests and the [REST API](/docs/guides/api). Requests to other Supabase products, such as Auth, Storage, and Realtime, aren't able to use a Read Replica or its API endpoint. Support for more products will be added in the future.
 
-## Dedicated connection pool
+If you're using an [IPv4 add-on](/docs/guides/platform/ipv4-address#read-replicas), the database endpoints for your Read Replicas will also use an IPv4 add-on.
+
+### Dedicated connection pool
 
 A connection pool through Supavisor is also available for each Read Replica. Find the connection string on the [Database Settings page](/dashboard/project/_/settings/database) under **Connection String**.
 
@@ -84,7 +86,9 @@ A connection pool through Supavisor is also available for each Read Replica. Fin
 
 A load balancer is deployed to balance requests between your Primary database and Read Replicas. Find its endpoint on the [API Settings page](/dashboard/project/_/settings/api).
 
-The load balancer uses a round-robin strategy to route `GET` requests to all available API endpoints, including the Primary database. Non-`GET` requests can also be sent through this endpoint, and will be routed to the Primary database. Read-only Postgres functions can be called using a [`GET` request](https://github.com/supabase/supabase-js/blob/v2.42.3/src/SupabaseClient.ts#L176-L177) as well.
+The load balancer uses a round-robin strategy to route `GET` requests to all available API endpoints, including the Primary database. Non-`GET` requests can also be sent through this endpoint, and will be routed to the Primary database.
+
+To call a read-only Postgres function on Read Replicas, use the `get: true` [option](/docs/reference/javascript/rpc?queryGroups=example&example=call-a-read-only-postgres-function).
 
 If you remove all Read Replicas from your project, the load balancer and its endpoint are removed as well. Make sure to redirect requests back to your Primary database before removal.
 

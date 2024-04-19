@@ -208,7 +208,7 @@ You can use `select` statement to improve policies that use functions. For examp
 ```sql
 create policy "rls_test_select" on test_table
 to authenticated
-using ( (select auth.uid()) = user_id );
+using ( auth.uid() = user_id );
 ```
 
 You can do:
