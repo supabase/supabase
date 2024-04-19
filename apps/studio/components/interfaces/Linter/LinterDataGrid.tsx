@@ -1,7 +1,13 @@
 import { ExternalLink, Eye, Table2, X } from 'lucide-react'
-import { NoIssuesFound, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
-import DataGrid from 'react-data-grid'
-import { Row, DataGridHandle, Column } from 'react-data-grid'
+import Link from 'next/link'
+import { useRef, useState } from 'react'
+import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
+import ReactMarkdown from 'react-markdown'
+
+import { useParams } from 'common'
+import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
+import { NoIssuesFound, lintEntity, lintInfoMap } from 'components/interfaces/Linter/Linter.utils'
+import { Lint } from 'data/lint/lint-query'
 import {
   Button,
   ResizableHandle,
@@ -14,13 +20,7 @@ import {
   cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
-import ReactMarkdown from 'react-markdown'
 import { LintCTA, LintCategoryBadge, entityTypeIcon } from './Linter.utils'
-import Link from 'next/link'
-import { useRef, useState } from 'react'
-import { Lint } from 'data/lint/lint-query'
-import { LINTER_LEVELS } from 'components/interfaces/Linter/Linter.constants'
-import { useParams } from 'common'
 
 interface LinterDataGridProps {
   isLoading: boolean
@@ -69,7 +69,7 @@ const LinterDataGrid = ({
       value: (row: any) => (
         <div className="flex items-center gap-1 text-xs">
           <span className="shrink-0">{entityTypeIcon(row.metadata?.type)}</span>
-          {`${row.metadata.schema}.${row.metadata.name}`}
+          {lintEntity(row.metadata)}
         </div>
       ),
     },
@@ -216,7 +216,7 @@ const LinterDataGrid = ({
                         {selectedLint.metadata?.type === 'view' && (
                           <Eye className="text-foreground-muted" size={15} strokeWidth={1.5} />
                         )}{' '}
-                        {`${selectedLint.metadata?.schema}.${selectedLint.metadata?.name}`}
+                        {lintEntity(selectedLint.metadata)}
                       </div>
                     </div>
 
