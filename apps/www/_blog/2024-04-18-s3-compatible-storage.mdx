@@ -1,0 +1,115 @@
+---
+title: 'Supabase Storage: now supports the S3 protocol'
+description: 'Supabase Storage is now officially an S3-Compatible Storage Provider.'
+author: fabrizio
+image: ga-week/s3-compatible-storage/og.png?v=2
+thumb: ga-week/s3-compatible-storage/thumb.png?v=2
+categories:
+  - product
+tags:
+  - launch-week
+  - storage
+date: '2024-04-18'
+toc_depth: 3
+launchweek: 11
+---
+
+Supabase Storage is now officially an S3-Compatible Storage Provider. This is one of the most-requested features and is available today in public alpha. Resumable Uploads are also transitioning from Beta to Generally Available.
+
+The [Supabase Storage Engine](https://github.com/supabase/storage) is fully open source and is one of the few storage solutions that offer 3 interoperable protocols to manage your files:
+
+- [Standard uploads](/docs/guides/storage/uploads/standard-uploads): simple to get started
+- [Resumable uploads](/docs/guides/storage/uploads/resumable-uploads): for resumable uploads with large uploads
+- [S3 uploads](/docs/guides/storage/s3/compatibility): for compatibility across a plethora of tools
+
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/WvvGhcNeSPk"
+    title="Supabase Storage is now compatible with AWS S3"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  />
+</div>
+
+## S3 compatibility
+
+We always strive to adopt industry standards at Supabase. Supporting standards makes workloads portable, [a key product principle](https://supabase.com/docs/guides/getting-started/architecture#everything-is-portable). The S3 API is undoubtedly a storage standard, and we're making it accessible to developers of various experience-levels.
+
+The S3 protocol is backwards compatible with our other APIs. If you are already using Storage via our REST or TUS APIs, today you can use any S3 client to interact with your buckets and files: upload with TUS, serve them with REST, and manage them with the S3 protocol.
+
+The protocol works on the cloud, local development, and self-hosting. Check out the API compatibility [in our docs](/docs/guides/storage/s3/compatibility)
+
+### Authenticating with Supabase S3
+
+To authenticate with Supabase S3 you have 2 options:
+
+1. **The standard `access_key` and `secret_key` credentials.** You can generate these from the [storage settings page](/dashboard/project/_/settings/storage). This authentication method is widely compatible with tools supporting the S3 protocol. It is also meant to be used _exclusively serverside_ since it provides full access to your Storage resources.
+
+   We will add scoped access key credentials in the near future which can have access to specific buckets.
+
+2. **User-scoped credentials with RLS.** This takes advantage of a well-adopted concept across all Supabase services, [Row Level Security](/docs/guides/auth/auth-deep-dive/auth-row-level-security). It allows you to interact with the S3 protocol by scoping storage operations to a particular authenticated user or role, respecting your existing RLS policies. This method is made possible by using the Session token header which the S3 protocol supports. You can find more information on how to use the Session token mechanism in the [doc](/docs/guides/storage/s3/authentication#session-token).
+
+### S3-compatible Integrations
+
+With the support of the S3 protocol, you can now connect Supabase Storage to many 3rd-party tools and services by providing a pair of credentials which can be revoked at any time.
+
+You can use popular tools for backups and migrations, such as:
+
+- [AWS CLI](https://docs.aws.amazon.com/cli/latest/reference/s3/): The official AWS CLI
+- [rclone](https://rclone.org/): a command-line program to manage files on cloud storage.
+- [Cyberduck](https://cyberduck.io/): a cloud storage browser for Mac and Windows.
+- and any other s3-compatible tool ...
+
+![Supabase Cyberduck](https://obuldanrptloktxcffvn.supabase.co/storage/v1/object/public/images/integrations/cyberduck/cyberduck-files.png?t=2024-04-18T08%3A39%3A48.575Z)
+
+Check out our Cyberduck guide [here](/partners/integrations/cyberduck).
+
+### S3 for Data Engineers
+
+S3 compatibility provides a nice primitive for Data Engineers. You can use it with many popular tools:
+
+- Data Warehouses like ClickHouse
+- Query engines like DuckDB, Spark, Trino, & Snowflake External Table
+- Data Loaders like Fivetran & Airbyte
+
+In this example our incredible data analyst, Tyler, demonstrates how to store Parquet files in Supabase Storage and query them directly using DuckDB:
+
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/diL00ZZ-q50"
+    title="store Parquet files in Supabase Storage and query them directly using DuckDB"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  />
+</div>
+
+### Multipart Uploads in S3
+
+In addition to the standard uploads and resumable uploads, we now support multipart uploads via the S3 protocol.
+This allows you to maximize upload throughput by uploading chunks in parallel, which are then concatenated at the end.
+
+# Resumable uploads is Generally Available
+
+Along with the [platform GA announcement](https://supabase.com/ga), we are also thrilled to announce that resumable uploads are also generally available.
+
+Resumable uploads are powered by the [TUS protocol](https://tus.io/). The journey to get here was immensely rewarding, working closely with the TUS team. A big shoutout to the maintainers of the TUS protocol, [@murderlon](https://github.com/Murderlon) and [@acconut](https://github.com/Acconut), for their collaborative approach to open source.
+
+Supabase contributed [some advanced features](https://github.com/tus/tus-node-server/pulls?q=is%3Apr+sort%3Aupdated-desc+author%3Afenos) from the Node implementation of TUS Spec including [distributed locks](https://github.com/tus/tus-node-server/pull/514), [max file size](https://github.com/tus/tus-node-server/pull/517), [expiration extension](https://github.com/tus/tus-node-server/pull/513) and numerous bug fixes:
+
+![Supabase contributions](/images/blog/ga-week/s3-compatible-storage/supabase-contributions.png)
+
+These features were essential for Supabase, and since the [TUS node server](https://github.com/tus/tus-node-server) is open source, they are also available for you to use. This is another core principle: wherever possible, we [use and support existing tools](https://supabase.com/docs/guides/getting-started/architecture#support-existing-tools) rather than developing from scratch.
+
+- **Cross-bucket transfers:** We have added the availability to copy and move objects across buckets, where previously you could do these operations only within the same Supabase bucket.
+- **Standardized error codes:** Error codes have now been standardized across the Storage server and now will be much easier to branch logic on specific errors. You can find the list of error codes [here](https://supabase.com/docs/guides/storage/debugging/error-codes).
+- **Multi-tenant migrations:** We made significant improvements to the running migrations across all our tenants. This has reduced migration errors across the fleet and enables us to run long running migrations in an asynchronous manner. Stay tuned for a separate blog post with more details.
+- **Decoupled dependencies:** Storage is fully decoupled from other Supabase products, which means you can run Storage as a standalone service. Get started with this [docker-compose file](https://github.com/supabase/storage/blob/master/docker-compose.yml).
+
+# Getting started
+
+- Check out the S3 API compatibility [in our docs](/docs/guides/storage/s3/compatibility)
+- Learn about [S3 Authentication](/docs/guides/storage/s3/authentication)
+- Try S3 with Cyberduck: follow our [integration guide](/partners/integrations/cyberduck)
+- Try S3 with DuckDB: follow the guide [on YouTube](https://www.youtube.com/watch?v=diL00ZZ-q50)

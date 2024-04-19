@@ -1,8 +1,9 @@
+import { compact, debounce, uniqBy } from 'lodash'
 import * as React from 'react'
 import { useCallback, useEffect, useMemo, useReducer, useRef } from 'react'
-import { compact, debounce, uniqBy } from 'lodash'
 
 import { useSupabaseClient } from '@supabase/auth-helpers-react'
+import { useRouter } from 'next/router'
 import {
   Button,
   IconAlertTriangle,
@@ -13,14 +14,7 @@ import {
   IconMessageSquare,
   IconSearch,
 } from 'ui'
-import {
-  CommandGroup,
-  CommandItem,
-  CommandLabel,
-  TextHighlighter,
-  escapeDoubleQuotes,
-} from './Command.utils'
-import { useRouter } from 'next/router'
+import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'
 import { useCommandMenu } from './CommandMenuProvider'
 
 const NUMBER_SOURCES = 2
@@ -416,12 +410,12 @@ const DocsSearch = () => {
             <CommandGroup
               heading=""
               key={`${page.path}-group`}
-              value={`${escapeDoubleQuotes(page.title)}-group-index-${i}`}
+              value={`${encodeURIComponent(page.title)}-group-index-${i}`}
               forceMount={true}
             >
               <CommandItem
                 key={`${page.path}-item`}
-                value={`${escapeDoubleQuotes(page.title)}-item-index-${i}`}
+                value={`${encodeURIComponent(page.title)}-item-index-${i}`}
                 type="block-link"
                 onSelect={() => {
                   openLink(page.type, formatPageUrl(page))
@@ -456,9 +450,9 @@ const DocsSearch = () => {
                         openLink(page.type, formatSectionUrl(page, section))
                       }}
                       key={`${page.path}__${section.heading}-item`}
-                      value={`${escapeDoubleQuotes(
+                      value={`${encodeURIComponent(
                         page.title
-                      )}__${escapeDoubleQuotes(section.heading)}-item-index-${i}`}
+                      )}__${encodeURIComponent(section.heading)}-item-index-${i}`}
                       forceMount={true}
                       type="block-link"
                     >

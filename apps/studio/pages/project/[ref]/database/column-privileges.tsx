@@ -1,4 +1,3 @@
-import type { PostgresRole } from '@supabase/postgres-meta'
 import { useParams } from 'common'
 import { XIcon } from 'lucide-react'
 import Link from 'next/link'
@@ -23,20 +22,20 @@ import {
 import PrivilegesHead from 'components/interfaces/Database/Privileges/PrivilegesHead'
 import PrivilegesTable from 'components/interfaces/Database/Privileges/PrivilegesTable'
 import ProtectedSchemaWarning from 'components/interfaces/Database/ProtectedSchemaWarning'
-import { AuthLayout } from 'components/layouts'
+import { DatabaseLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { ScaffoldContainer, ScaffoldSection } from 'components/layouts/Scaffold'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
-import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
+import { PgRole, useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useColumnPrivilegesQuery } from 'data/privileges/column-privileges-query'
 import { useTablePrivilegesQuery } from 'data/privileges/table-privileges-query'
 import { useTablesQuery } from 'data/tables/tables-query'
 import { useLocalStorage } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import type { NextPageWithLayout } from 'types'
 import { useAppStateSnapshot } from 'state/app-state'
+import type { NextPageWithLayout } from 'types'
 
 const EDITABLE_ROLES = ['authenticated', 'anon', 'service_role']
 
@@ -133,9 +132,8 @@ const PrivilegesPage: NextPageWithLayout = () => {
     [allColumnPrivileges, selectedRole, selectedSchema, selectedTable]
   )
 
-  const rolesList =
-    allRoles?.filter((role: PostgresRole) => EDITABLE_ROLES.includes(role.name)) ?? []
-  const roles = rolesList.map((role: PostgresRole) => role.name)
+  const rolesList = allRoles?.filter((role: PgRole) => EDITABLE_ROLES.includes(role.name)) ?? []
+  const roles = rolesList.map((role: PgRole) => role.name)
 
   const table = tableList?.find(
     (table) => table.schema === selectedSchema && table.name === selectedTable
@@ -377,6 +375,8 @@ const PrivilegesPage: NextPageWithLayout = () => {
   )
 }
 
-PrivilegesPage.getLayout = (page) => <AuthLayout title="Column Privileges">{page}</AuthLayout>
+PrivilegesPage.getLayout = (page) => (
+  <DatabaseLayout title="Column Privileges">{page}</DatabaseLayout>
+)
 
 export default PrivilegesPage

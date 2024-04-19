@@ -153,6 +153,19 @@ export const pricing: Pricing = {
         usage_based: true,
       },
       {
+        title: 'Anonymous Sign-ins',
+        tooltips: {
+          main: 'Anonymous user requests count towards MAU, just like a permanent user.',
+        },
+        plans: {
+          free: true,
+          pro: true,
+          team: true,
+          enterprise: true,
+        },
+        usage_based: false,
+      },
+      {
         title: 'Social OAuth providers',
         plans: {
           free: true,

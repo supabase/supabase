@@ -87,6 +87,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
                             object-center sm:object-right
                           `}
                           fill
+                          sizes="100%"
                           quality={100}
                           alt={day.title}
                         />

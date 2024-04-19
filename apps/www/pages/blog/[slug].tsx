@@ -323,6 +323,7 @@ function BlogPostPage(props: InferGetStaticPropsType<typeof getStaticProps>) {
                               src={'/images/blog/' + props.blog.thumb}
                               alt={props.blog.title}
                               fill
+                              quality={100}
                               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                               className="object-cover m-0"
                             />
