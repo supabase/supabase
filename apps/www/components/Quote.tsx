@@ -21,7 +21,7 @@ export default function Quote(props: Props) {
             <Avatar caption={caption} img={img} />
           </div>
         )}
-        <div className="absolute rounded-full w-1 h-full inset-0 right-auto bg-brand" />
+        <div className="absolute rounded-full w-px h-full inset-0 right-auto bg-border" />
       </div>
     </figure>
   )

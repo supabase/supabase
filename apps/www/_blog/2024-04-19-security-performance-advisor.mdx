@@ -1,9 +1,9 @@
 ---
 title: 'Supabase Security Advisor & Performance Advisor'
-description: 'We're making it easier to build a secure and high-performing application.'
+description: "We're making it easier to build a secure and high-performing application."
 author: saltcod,oli_rice
-image: ga-week/s3-compatible-storage/og.png?v=2
-thumb: ga-week/s3-compatible-storage/thumb.png?v=2
+image: ga-week/security-peformance-advisor/og.png?v=2
+thumb: ga-week/security-peformance-advisor/thumb.png?v=2
 categories:
   - product
 tags:
@@ -33,13 +33,21 @@ This week, we're adding features into Supabase Studio to address common issues a
 
 ## Security Advisor
 
-[security advisor screenshot]
+<Img
+  alt="security-peformance-advisor"
+  src={{
+    light: '/images/blog/ga-week/security-peformance-advisor/security-advisor--light.png',
+    dark: '/images/blog/ga-week/security-peformance-advisor/security-advisor.png',
+  }}
+  captionAlign="left"
+  zoomable={false}
+/>
 
 This week we're releasing Security Advisor in Supabase Studio. This is a new interface for exploring security issues with your database because, well, sometimes even Postgres veterans get it wrong. The Security Advisor runs a set queries on your database to identify configuration issues.
 
 The Security Advisor is helpful in pointing out security issues that you might have forgotten or not yet be aware: some lints are general purpose for Postgres projects, while others are specific to Supabase.
 
-As with all of our tooling, it's designed to both help and to teach. The suggestions are well-documented with a rationale, descriptions, examples and remediation steps. Did you know, for example, that views don't respect RLS policies unless you've set `security_invoker=on`? Now you do! Let's see how that looks in {Linter}
+As with all of our tooling, it's designed to both help and to teach. The suggestions are well-documented with a rationale, descriptions, examples and remediation steps. Did you know, for example, that views don't respect RLS policies unless you've set `security_invoker=on`? Now you do! Let's see how that looks in `{Linter}`
 
 [security invoker example screenshot + description]
 
@@ -53,9 +61,29 @@ If you're looking for ways to speed up your database, this is the place to start
 
 [performance advisor screenshot]
 
+<Img
+  alt="security-peformance-advisor"
+  src={{
+    light: '/images/blog/ga-week/security-peformance-advisor/performance-advisor--light.png',
+    dark: '/images/blog/ga-week/security-peformance-advisor/performance-advisor.png',
+  }}
+  captionAlign="left"
+  zoomable={false}
+/>
+
 ## Bonus: Index Advisor
 
 [screenshot]
+
+<Img
+  alt="security-peformance-advisor"
+  src={{
+    light: '/images/blog/ga-week/security-peformance-advisor/index-advisor--light.png',
+    dark: '/images/blog/ga-week/security-peformance-advisor/index-advisor.png',
+  }}
+  captionAlign="left"
+  zoomable={false}
+/>
 
 Speaking of performance, we have another treat for you. Last week, we announced [PostgreSQL index advisor](https://news.ycombinator.com/item?id=40028111) on Hacker News. This is a Postgres extension that can determine if a given query should have an index. It's already proving useful:
 
@@ -78,9 +106,27 @@ This is just the beginning of our plan to make automated data analysis tooling a
 
 Let's have a look at some queries:
 
-[doesn't need an index]
+<Img
+  alt="security-peformance-advisor"
+  src={{
+    light: '/images/blog/ga-week/security-peformance-advisor/no-index--light.png',
+    dark: '/images/blog/ga-week/security-peformance-advisor/no-index.png',
+  }}
+  captionAlign="left"
+  zoomable={false}
+  caption="This query doesn't need an index"
+/>
 
-[needs an index]
+<Img
+  alt="security-peformance-advisor"
+  src={{
+    light: '/images/blog/ga-week/security-peformance-advisor/needs-index--light.png',
+    dark: '/images/blog/ga-week/security-peformance-advisor/needs-index.png',
+  }}
+  captionAlign="left"
+  zoomable={false}
+  caption="This query would benefit from an index"
+/>
 
 ## What's next
 
