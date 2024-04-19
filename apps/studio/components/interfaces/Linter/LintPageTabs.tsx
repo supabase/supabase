@@ -21,7 +21,6 @@ interface LintPageTabsProps {
   currentTab: string
   setCurrentTab: (value: LINTER_LEVELS) => void
   setSelectedLint: (value: Lint | null) => void
-  setSelectedRow: (value: number | undefined) => void
   isLoading: boolean
   activeLints: Lint[]
 }
@@ -29,7 +28,6 @@ const LintPageTabs = ({
   currentTab,
   setCurrentTab,
   setSelectedLint,
-  setSelectedRow,
   isLoading,
   activeLints,
 }: LintPageTabsProps) => {
@@ -66,7 +64,6 @@ const LintPageTabs = ({
       onValueChange={(value) => {
         setCurrentTab(value as LINTER_LEVELS)
         setSelectedLint(null)
-        setSelectedRow(undefined)
         const { sort, search, ...rest } = router.query
         router.push({ ...router, query: { ...rest, preset: value } })
       }}

@@ -25,8 +25,6 @@ import { LintCTA, LintCategoryBadge, entityTypeIcon } from './Linter.utils'
 interface LinterDataGridProps {
   isLoading: boolean
   filteredLints: Lint[]
-  selectedRow: number | undefined
-  setSelectedRow: (value: number | undefined) => void
   selectedLint: Lint | null
   setSelectedLint: (value: Lint | null) => void
   currentTab: LINTER_LEVELS
@@ -35,8 +33,6 @@ interface LinterDataGridProps {
 const LinterDataGrid = ({
   isLoading,
   filteredLints,
-  selectedRow,
-  setSelectedRow,
   selectedLint,
   setSelectedLint,
   currentTab,
@@ -132,8 +128,8 @@ const LinterDataGrid = ({
           headerRowHeight={36}
           columns={columns}
           rows={filteredLints ?? []}
-          rowClass={(_, idx) => {
-            const isSelected = idx === selectedRow
+          rowClass={(lint) => {
+            const isSelected = lint.cache_key === selectedLint?.cache_key
             return [
               `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : 'bg-200'} cursor-pointer`,
               `${isSelected ? '[&>div:first-child]:border-l-4 border-l-secondary [&>div]:border-l-foreground' : ''}`,
@@ -148,7 +144,6 @@ const LinterDataGrid = ({
                   {...props}
                   onClick={() => {
                     if (typeof idx === 'number' && idx >= 0) {
-                      setSelectedRow(idx)
                       setSelectedLint(props.row)
                       gridRef.current?.scrollToCell({ idx: 0, rowIdx: idx })
                     }
@@ -176,7 +171,6 @@ const LinterDataGrid = ({
               icon={<X size={14} />}
               onClick={() => {
                 setSelectedLint(null)
-                setSelectedRow(undefined)
               }}
             />
 
