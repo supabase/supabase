@@ -221,7 +221,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     d: 4,
     dd: 'Thu',
     shipped: true,
-    isToday: true,
+    isToday: false,
     hasCountdown: false,
     blog: '/blog/s3-compatible-storage',
     date: '18 April',
@@ -268,19 +268,23 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
     id: 'day-5',
     d: 5,
     dd: 'Fri',
-    shipped: false,
-    isToday: false,
-    hasCountdown: true,
-    blog: '#',
+    shipped: true,
+    isToday: true,
+    hasCountdown: false,
+    blog: '/blog/security-performance-advisor',
     date: '19 April',
     published_at: '2024-04-19T08:00:00.000-07:00',
-    title: '',
-    description: <></>,
+    title: 'Supabase Security Advisor & Performance Advisor',
+    description: (
+      <>
+        Supabase <strong>Security Advisor</strong> & <strong>Performance Advisor</strong>
+      </>
+    ),
     links: [
-      // {
-      //   type: 'blog',
-      //   href: '#',
-      // },
+      {
+        type: 'blog',
+        href: '/blog/security-performance-advisor',
+      },
       // {
       //   type: 'video',
       //   href: '',
@@ -290,7 +294,23 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
         href: 'https://supabase.link/twitter-space-ga-week-5',
       },
     ],
-    steps: [],
+    steps: [
+      {
+        title: 'Supabase Storage: now supports the S3 protocol',
+        blog: '/blog/s3-compatible-storage',
+        bg_layers: [
+          {
+            img: isDark
+              ? '/images/launchweek/11/days/d5-dark.svg'
+              : '/images/launchweek/11/days/d5-light.svg',
+            mobileImg: isDark
+              ? '/images/launchweek/11/days/d5-dark-mobile.svg'
+              : '/images/launchweek/11/days/d5-light-mobile.svg',
+          },
+        ],
+        steps: [],
+      },
+    ],
   },
 ]
 

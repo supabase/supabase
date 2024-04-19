@@ -2,7 +2,6 @@ import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
 import announcement from '../data/Announcement.json'
 import Link from 'next/link'
-import { isBrowser } from 'common'
 
 export function LW11CountdownBanner() {
   const router = useRouter()
@@ -10,7 +9,6 @@ export function LW11CountdownBanner() {
   const isLaunchWeekPage = router.pathname === '/ga-week'
   const isLaunchWeekSection =
     router.pathname.includes('/launch-week') || router.pathname.includes('/ga-week')
-  const siteUrl = isBrowser && window.location.origin
 
   if (isLaunchWeekPage || isHomePage) return null
 
@@ -25,7 +23,7 @@ export function LW11CountdownBanner() {
         >
           <p className="flex gap-1.5 items-center">{announcement.text}</p>
           <Button size="tiny" type="default" className="px-2 !leading-none text-xs" asChild>
-            <Link href="https://supabase.com/ga-week#day-4">Learn more</Link>
+            <Link href="https://supabase.com/ga-week#day-5">Learn more</Link>
           </Button>
         </div>
       </div>
