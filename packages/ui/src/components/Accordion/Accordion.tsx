@@ -1,3 +1,5 @@
+'use client'
+
 import * as RadixAccordion from '@radix-ui/react-accordion'
 import React, { createContext, useContext, useState } from 'react'
 

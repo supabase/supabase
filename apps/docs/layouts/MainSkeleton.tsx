@@ -269,10 +269,7 @@ const HeaderLogo = memo(function HeaderLogo() {
   )
 })
 
-const Container = memo(function Container({
-  children,
-  style,
-}: PropsWithChildren<{ style?: CSSProperties }>) {
+const Container = memo(function Container({ children }: PropsWithChildren) {
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (
@@ -285,11 +282,11 @@ const Container = memo(function Container({
         // 'absolute lg:relative',
         mobileMenuOpen ? 'ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden' : 'overflow-auto',
         // desktop override any margin styles
-        'lg:ml-0'
+        'lg:ml-0',
+        '[--header-height:40px] lg:[--header-height:60px]'
       )}
-      style={style}
     >
-      <div className="flex flex-col relative">{children}</div>
+      <div className="h-full overflow-auto">{children}</div>
     </div>
   )
 })
@@ -364,15 +361,8 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
   return (
     <div className="flex flex-row h-full">
       <NavContainer menuId={menuId} />
-      <Container
-        style={
-          {
-            '--desktop-header-height': '60px',
-            '--mobile-header-height': '40px',
-          } as CSSProperties
-        }
-      >
-        <div className={['lg:sticky top-0 z-10 overflow-hidden'].join(' ')}>
+      <Container>
+        <div className="lg:sticky top-0 z-10">
           <TopNavBar />
         </div>
         <div
@@ -386,10 +376,8 @@ function MainSkeleton({ children, menuId }: PropsWithChildren<{ menuId: MenuId }
             <MobileHeader menuId={menuId} />
           </div>
         </div>
-        <div className="grow">
-          {children}
-          <Footer />
-        </div>
+        {children}
+        <Footer />
         <MobileMenuBackdrop />
       </Container>
     </div>

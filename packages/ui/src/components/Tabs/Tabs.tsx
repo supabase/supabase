@@ -1,5 +1,5 @@
 import * as TabsPrimitive from '@radix-ui/react-tabs'
-import { useRouter } from 'next/router'
+import { useSearchParams } from 'next/navigation'
 import {
   Children,
   type KeyboardEvent,
@@ -58,8 +58,8 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   const children = Children.toArray(_children) as PanelPropsProps[]
   const tabIds = children.map((tab) => tab.props.id)
 
-  const router = useRouter()
-  const queryTabs = queryGroup ? router.query[queryGroup] : undefined
+  const searchParams = useSearchParams()
+  const queryTabs = queryGroup && searchParams?.get(queryGroup)
   const [queryTabRaw] = Array.isArray(queryTabs) ? queryTabs : [queryTabs]
   const queryTab = queryTabRaw && tabIds.includes(queryTabRaw) ? queryTabRaw : undefined
 

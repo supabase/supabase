@@ -1,3 +1,5 @@
+'use client'
+
 import { Suspense, lazy } from 'react'
 
 const MermaidHeavy = lazy(() => import('./Mermaid'))

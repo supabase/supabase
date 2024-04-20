@@ -1,3 +1,5 @@
+'use client'
+
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
@@ -50,7 +52,7 @@ const GuidesTableOfContents = ({
   video,
 }: {
   className?: string
-  overrideToc?: Array<{ text: string; link: string; level: number }>
+  overrideToc?: Array<TOCHeader>
   video?: string
 }) => {
   const [tocList, setTocList] = useState<TOCHeader[]>([])

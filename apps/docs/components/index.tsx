@@ -1,3 +1,5 @@
+'use client'
+
 /**
  * This entire file could do with a cleanup and better code-splitting, but one thing at a time.
  */

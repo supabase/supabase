@@ -17,13 +17,22 @@ export const GUIDES_DIRECTORY = join(DOCS_DIRECTORY, 'content/guides')
 
 type GuideFrontmatter = {
   title: string
+  subtitle?: string
   description?: string
   hideToc?: boolean
+  // @deprecated
+  hide_table_of_contents?: boolean
+  tocVideo?: string
 }
 
 export function isValidGuideFrontmatter(obj: object): obj is GuideFrontmatter {
   if (!('title' in obj) || typeof obj.title !== 'string') return false
   if ('description' in obj && typeof obj.description !== 'string') return false
+  if ('subtitle' in obj && typeof obj.subtitle !== 'string') return false
+  if ('hideToc' in obj && typeof obj.hideToc !== 'boolean') return false
+  if ('hide_table_of_contents' in obj && typeof obj.hide_table_of_contents !== 'boolean')
+    return false
+  if ('tocVideo' in obj && typeof obj.tocVideo !== 'string') return false
   return true
 }
 

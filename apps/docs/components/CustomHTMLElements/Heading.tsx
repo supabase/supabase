@@ -1,3 +1,5 @@
+'use client'
+
 import {
   getAnchor,
   removeAnchor,
@@ -5,13 +7,6 @@ import {
   unHighlightSelectedTocItems,
 } from './CustomHTMLElements.utils'
 import { useInView } from 'react-intersection-observer'
-
-/**
- * [Joshen] The trick with rootMargin
- * We are shrinking the top of the root element by 20 percent, which is currently our entire page,
- * and the bottom by 35 percent. Therefore, when a header is at the top 20 percent and bottom 35 percent
- * of our page, it will not be counted as visible.
- */
 
 interface Props {
   tag?: string
@@ -35,6 +30,12 @@ const Heading: React.FC<React.PropsWithChildren<Props>> = ({ tag, customAnchor, 
 
   const { ref } = useInView({
     threshold: 1,
+    /**
+     * [Joshen] The trick with rootMargin
+     * We are shrinking the top of the root element by 20 percent, which is currently our entire page,
+     * and the bottom by 35 percent. Therefore, when a header is at the top 20 percent and bottom 35 percent
+     * of our page, it will not be counted as visible.
+     */
     rootMargin: '-20% 0% -35% 0px',
     onChange: (inView, entry) => {
       if (window.scrollY === 0) unHighlightSelectedTocItems()

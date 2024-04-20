@@ -1,6 +1,5 @@
-//import { Step } from 'next-seo/lib/types'
 import { FC, PropsWithChildren } from 'react'
-import { cn } from 'ui'
+import { cn } from 'ui/server'
 
 interface IStep {
   title: string
