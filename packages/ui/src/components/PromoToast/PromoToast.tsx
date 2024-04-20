@@ -43,12 +43,11 @@ const PromoToast = () => {
         <p className="text-foreground flex flex-col text-lg w-full leading-6 mb-1">
           General Availability Week
         </p>
-        <span className="uppercase font-mono">Day 5</span>
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
         <Button asChild type="secondary">
-          <Link target="_blank" rel="noreferrer" href="https://supabase.com/ga-week#day-5">
+          <Link target="_blank" rel="noreferrer" href="https://supabase.com/ga-week">
             Learn more
           </Link>
         </Button>
