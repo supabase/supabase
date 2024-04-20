@@ -7,6 +7,7 @@ import { readFile } from 'node:fs/promises'
 import { join, sep } from 'node:path'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
+import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import remarkMath from 'remark-math'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
@@ -26,14 +27,24 @@ import { NavData } from '~/components/NavData'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
 import StepHikeCompact from '~/components/StepHikeCompact'
 import { Accordion, AccordionItem } from '~/features/ui/Accordion'
-import { CH, CHCode } from '~/features/ui/CodeHike'
+import * as CH from '~/features/ui/CodeHike'
 import { Tabs, TabPanel } from '~/features/ui/Tabs'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter } from '~/lib/docs'
+
+import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
+
+const codeHikeOptions: CodeHikeConfig = {
+    theme: codeHikeTheme,
+    lineNumbers: true,
+    showCopyButton: true,
+    skipLanguages: [],
+    autoImport: false,
+  }
 
 const mdxOptions: SerializeOptions = {
   mdxOptions: {
     useDynamicImport: true,
-    remarkPlugins: [[remarkMath, { singleDollarTextMath: false }], remarkGfm],
+    remarkPlugins: [[remarkMath, { singleDollarTextMath: false }], remarkGfm, [remarkCodeHike, codeHikeOptions]],
     rehypePlugins: [rehypeKatex as any],
   },
 }
@@ -73,7 +84,6 @@ const components = {
   AppleSecretGenerator,
   AuthProviders,
   CH,
-  CHCode,
   GetSessionWarning,
   GlassPanel,
   IconPanel,
@@ -150,7 +160,7 @@ const AuthGuide = async ({ params }: { params: { slug?: string[] } }) => {
           className={cn(
             'col-span-3 self-start',
             'hidden md:block md:col-span-3',
-            'sticky top-0',
+            'sticky top-[calc(var(--header-height)+2rem)]',
             'max-h-[calc(100vh-60px-5rem)]'
           )}
         />
