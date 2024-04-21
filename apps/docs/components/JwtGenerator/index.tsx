@@ -1,3 +1,5 @@
+'use client'
+
 import { lazy, Suspense } from 'react'
 
 const Generator = lazy(() => import('./JwtGenerator'))
