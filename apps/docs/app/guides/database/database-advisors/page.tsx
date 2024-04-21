@@ -1,29 +1,21 @@
-import { CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import { Octokit } from '@octokit/core'
 import { capitalize } from 'lodash'
-import { GetStaticProps, InferGetStaticPropsType } from 'next'
-import { MDXRemote } from 'next-mdx-remote'
-import { serialize } from 'next-mdx-remote/serialize'
-import remarkGfm from 'remark-gfm'
+import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import rehypeSlug from 'rehype-slug'
-
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
-import { Tabs } from 'ui'
-
-import components from '~/components'
+import { GuideTemplate } from '~/app/GuideTemplate'
 import { Heading } from '~/components/CustomHTMLElements'
-import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
-import Layout from '~/layouts/DefaultGuideLayout'
+import { MDXRemoteGuides } from '~/features/docs/guides/GuidesMdx'
+import { Tabs, TabPanel } from '~/features/ui/Tabs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
 import remarkPyMdownTabs from '~/lib/mdx/plugins/remarkTabs'
 
 // We fetch these docs at build time from an external repo
-export const org = 'supabase'
-export const repo = 'splinter'
-export const branch = 'main'
-export const docsDir = 'docs'
+const org = 'supabase'
+const repo = 'splinter'
+const branch = 'main'
+const docsDir = 'docs'
 
 const meta = {
   title: 'Performance and Security Advisors',
@@ -42,28 +34,34 @@ In the dashboard, navigate to [Security Advisor](https://supabase.com/dashboard/
 
 const getBasename = (path: string) => path.split('/').at(-1)!.replace(/\.md$/, '')
 
-export default function DatabaseAdvisorDocs({
-  intro,
-  lints,
-}: InferGetStaticPropsType<typeof getStaticProps>) {
+const DatabaseAdvisorDocs = async () => {
+  const { lints, lintsList } = await getLints()
+
+  const options = {
+    mdxOptions: {
+      remarkPlugins: [remarkMkDocsAdmonition, remarkPyMdownTabs, [removeTitle, meta.title]],
+      rehypePlugins: [[linkTransform, urlTransform(lintsList)], rehypeSlug],
+    },
+  } as SerializeOptions
+
   return (
-    <Layout menuId={MenuId.Database} meta={meta} editLink={editLink}>
-      <MDXRemote {...intro} components={components} />
+    <GuideTemplate pathname="database-linter" editLink={editLink}>
+      <MDXRemoteGuides source={markdownIntro} />
       <Heading tag="h2">Available checks</Heading>
       <Tabs listClassNames="flex flex-wrap gap-2 [&>button]:!m-0" queryGroup="lint">
         {lints.map((lint) => (
-          <Tabs.Panel
+          <TabPanel
             key={lint.path}
             id={lint.path}
             label={capitalize(getBasename(lint.path).replace(/_/g, ' '))}
           >
             <section id={getBasename(lint.path)}>
-              <MDXRemote {...lint.content} components={components} />
+              <MDXRemoteGuides source={lint.content} options={options} />
             </section>
-          </Tabs.Panel>
+          </TabPanel>
         ))}
       </Tabs>
-    </Layout>
+    </GuideTemplate>
   )
 }
 
@@ -101,41 +99,10 @@ const urlTransform: (lints: Array<{ path: string }>) => UrlTransformFunction = (
   }
 }
 
-const transformMarkdown = async (
-  rawContent: string,
-  { replacementLinks = [] }: { replacementLinks?: Array<{ path: string }> } = {}
-) => {
-  const codeHikeOptions: CodeHikeConfig = {
-    theme: codeHikeTheme,
-    lineNumbers: true,
-    showCopyButton: true,
-    skipLanguages: [],
-    autoImport: false,
-  }
-
-  const content = await serialize(rawContent, {
-    scope: {
-      chCodeConfig: codeHikeOptions,
-    },
-    mdxOptions: {
-      remarkPlugins: [
-        remarkGfm,
-        remarkMkDocsAdmonition,
-        remarkPyMdownTabs,
-        [removeTitle, meta.title],
-        [remarkCodeHike, codeHikeOptions],
-      ],
-      rehypePlugins: [[linkTransform, urlTransform(replacementLinks)], rehypeSlug],
-    },
-  })
-
-  return content
-}
-
 /**
- * Fetch markdown from external repo and transform links
+ * Fetch lint remediation Markdown from external repo
  */
-export const getStaticProps = (async () => {
+const getLints = async () => {
   const octokit = new Octokit()
 
   const response = await octokit.request('GET /repos/{owner}/{repo}/contents/{path}', {
@@ -158,33 +125,28 @@ export const getStaticProps = (async () => {
     )
   }
 
-  const [intro, ...lints] = await Promise.all([
-    await transformMarkdown(markdownIntro),
-    ...response.data
-      .filter(({ path }) => /docs\/\d+.+\.md$/.test(path))
-      .map(async ({ path }, _, data) => {
-        const fileResponse = await fetch(
-          `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${path}`
-        )
+  const lintsList = response.data.filter(({ path }) => /docs\/\d+.+\.md$/.test(path))
 
-        if (fileResponse.status >= 400) {
-          throw Error(`Could not get contents of file ${org}/${repo}/${path}`)
-        }
+  const lints = await Promise.all(
+    lintsList.map(async ({ path }) => {
+      const fileResponse = await fetch(
+        `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${path}`
+      )
 
-        const rawContent = await fileResponse.text()
-        const content = await transformMarkdown(rawContent, { replacementLinks: data })
+      if (fileResponse.status >= 400) {
+        throw Error(`Could not get contents of file ${org}/${repo}/${path}`)
+      }
 
-        return {
-          path: getBasename(path),
-          content,
-        }
-      }),
-  ])
+      const content = await fileResponse.text()
 
-  return {
-    props: {
-      intro,
-      lints,
-    },
-  }
-}) satisfies GetStaticProps
+      return {
+        path: getBasename(path),
+        content,
+      }
+    })
+  )
+
+  return { lints, lintsList }
+}
+
+export default DatabaseAdvisorDocs

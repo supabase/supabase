@@ -1,0 +1,11 @@
+import { GuideTemplate } from '~/app/GuideTemplate'
+
+import { getGuidesMarkdown } from '~/features/docs/guides/GuidesMdx'
+
+const DatabaseGuide = async ({ params }: { params: { slug?: string[] } }) => {
+  const { frontmatter, ...data } = await getGuidesMarkdown('database', params)
+
+  return <GuideTemplate meta={frontmatter} {...data} />
+}
+
+export default DatabaseGuide
