@@ -2,7 +2,6 @@
 
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
-
 import { DOCS_CONTENT_CONTAINER_ID } from './uiConstants'
 
 const useScrollTopOnPageChange = () => {
@@ -12,6 +11,7 @@ const useScrollTopOnPageChange = () => {
     if (document && pathname) {
       // Don't scroll on reference pages
       if (pathname.includes('reference/')) return
+      console.log('一二三')
 
       const container = document.getElementById(DOCS_CONTENT_CONTAINER_ID)
       if (container) container.scrollTop = 0

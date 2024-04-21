@@ -274,19 +274,21 @@ const Container = memo(function Container({ children }: PropsWithChildren) {
 
   return (
     <div
-      // #docs-content-container is used by layout to scroll to top
       id="docs-content-container"
       className={cn(
-        // 'overflow-x-auto',
+        /**
+         * This controls scroll restoration on page navigation, so the overflow
+         * must be on the element with id #docs-content-container
+         */
+        'overflow-auto',
         'w-full transition-all ease-out',
-        // 'absolute lg:relative',
         mobileMenuOpen ? 'ml-[75%] sm:ml-[50%] md:ml-[33%] overflow-hidden' : 'overflow-auto',
         // desktop override any margin styles
         'lg:ml-0',
         '[--header-height:40px] lg:[--header-height:60px]'
       )}
     >
-      <div className="h-full overflow-auto">{children}</div>
+      {children}
     </div>
   )
 })
