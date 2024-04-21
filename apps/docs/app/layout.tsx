@@ -12,7 +12,7 @@ import { CommandMenuProvider } from 'ui-patterns/Cmdk'
 import { AuthContainer, SignOutHandler } from '~/features/auth/auth.client'
 import { QueryClientProvider } from '~/features/data/queryClient.client'
 import { RefDocHistoryHandler } from '~/features/docs/reference/navigation.client'
-import { alternates, metadata as generalMetadata } from '~/features/robots/metadata'
+import { alternates, metadata as generalMetadata, viewport } from '~/features/robots/metadata'
 import { ShortcutPreviewBuild } from '~/features/staging/staging.client'
 import { PageTelemetry } from '~/features/telemetry/telemetry.client'
 import { favicons } from '~/features/ui/favicons/faviconData'
@@ -64,5 +64,5 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
   )
 }
 
-export { metadata }
+export { metadata, viewport }
 export default RootLayout

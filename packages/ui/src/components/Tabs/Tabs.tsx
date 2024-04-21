@@ -2,13 +2,14 @@ import * as TabsPrimitive from '@radix-ui/react-tabs'
 import { useSearchParams } from 'next/navigation'
 import {
   Children,
+  PropsWithChildren,
+  Suspense,
+  type ComponentProps,
   type KeyboardEvent,
   type MouseEvent,
-  PropsWithChildren,
   useEffect,
   useState,
 } from 'react'
-
 import { TAB_CHANGE_EVENT_NAME } from '../../lib/events'
 import styleHandler from '../../lib/theme/styleHandler'
 import { useTabGroup } from './TabsProvider'
@@ -32,11 +33,7 @@ interface TabsProps {
   baseClassNames?: string
 }
 
-interface TabsSubComponents {
-  Panel: React.FC<PropsWithChildren<PanelProps>>
-}
-
-const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
+const TabsInternal: React.FC<PropsWithChildren<TabsProps>> = ({
   defaultActiveId,
   activeId,
   type = 'pills',
@@ -179,6 +176,12 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
     </TabsPrimitive.Root>
   )
 }
+
+const Tabs = (props: ComponentProps<typeof TabsInternal>) => (
+  <Suspense>
+    <TabsInternal {...props} />
+  </Suspense>
+)
 
 // bit of a hack because we map over the JSX in the parent component
 interface PanelPropsProps {

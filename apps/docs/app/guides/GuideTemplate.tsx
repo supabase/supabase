@@ -3,6 +3,7 @@ import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { type PropsWithChildren } from 'react'
 import { cn } from 'ui/server'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
+import { MDXProviderGuides } from '~/features/docs/guides/GuidesMdx.client'
 import { MDXRemoteGuides } from '~/features/docs/guides/GuidesMdx'
 import { type GuideFrontmatter } from '~/lib/docs'
 
@@ -37,7 +38,9 @@ const GuideTemplate = ({
         <h1 className="mb-0">{meta?.title || 'Supabase Docs'}</h1>
         {meta?.subtitle && <h2 className="mt-3 text-xl text-foreground-light">{meta.subtitle}</h2>}
         <div className="w-full border-b my-8"></div>
-        {content && <MDXRemoteGuides source={content} options={mdxOptions} />}
+        <MDXProviderGuides>
+          {content && <MDXRemoteGuides source={content} options={mdxOptions} />}
+        </MDXProviderGuides>
         {children}
         <div className="mt-16 not-prose">
           <div>

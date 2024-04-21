@@ -4,8 +4,9 @@ import { readFile } from 'node:fs/promises'
 import { join, relative, sep } from 'node:path'
 import rehypeSlug from 'rehype-slug'
 import emoji from 'remark-emoji'
-import { GuideTemplate } from '~/app/GuideTemplate'
-import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
+import { GuideTemplate } from '~/app/guides/GuideTemplate'
+import { genGuidesStaticParams } from '~/features/docs/guides/GuidesMdx'
+import { GUIDES_DIRECTORY, isValidGuideFrontmatter, } from '~/lib/docs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
@@ -102,12 +103,19 @@ const pageMap = [
 const WrappersDocs = async ({ params }: { params: { slug?: string[] } }) => {
   const { isExternal, meta, ...data } = await getContent(params)
 
-  const options = isExternal ? {
-  mdxOptions: {
-    remarkPlugins: [remarkMkDocsAdmonition, emoji, remarkPyMdownTabs, [removeTitle, meta.title]],
-    rehypePlugins: [[linkTransform, urlTransform], rehypeSlug],
-	}
-  } as SerializeOptions : undefined
+  const options = isExternal
+    ? ({
+        mdxOptions: {
+          remarkPlugins: [
+            remarkMkDocsAdmonition,
+            emoji,
+            remarkPyMdownTabs,
+            [removeTitle, meta.title],
+          ],
+          rehypePlugins: [[linkTransform, urlTransform], rehypeSlug],
+        },
+      } as SerializeOptions)
+    : undefined
 
   return <GuideTemplate pathname="" meta={meta} mdxOptions={options} {...data} />
 }
@@ -120,13 +128,13 @@ const getContent = async (params: { slug?: string[] }) => {
     ({ slug }) => params && slug && params.slug && slug === params.slug.at(0)
   )
 
-	let isExternal: boolean
+  let isExternal: boolean
   let meta: any
   let content: string
   let editLink: string | undefined
 
   if (!federatedPage) {
-  isExternal = false
+    isExternal = false
     const rawContent = await readFile(
       join(
         GUIDES_DIRECTORY,
@@ -142,7 +150,7 @@ const getContent = async (params: { slug?: string[] }) => {
       throw Error(`Expected valid frontmatter, got ${JSON.stringify(meta, null, 2)}`)
     }
   } else {
-  isExternal = true
+    isExternal = true
     let remoteFile: string
     ;({ remoteFile, meta } = federatedPage)
     const repoPath = `${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
@@ -152,7 +160,7 @@ const getContent = async (params: { slug?: string[] }) => {
   }
 
   return {
-  isExternal,
+    isExternal,
     editLink,
     meta,
     content,
@@ -191,10 +199,10 @@ const urlTransform: UrlTransformFunction = (url) => {
   }
 }
 
-const generateStaticParams = () => {
-  const mdxPaths = []
+const generateStaticParams = async () => {
+  const mdxPaths = await genGuidesStaticParams('database/extensions/wrappers')()
   const federatedPaths = pageMap.map(({ slug }) => ({
-    slug: [slug]
+    slug: [slug],
   }))
 
   return [...mdxPaths, ...federatedPaths]

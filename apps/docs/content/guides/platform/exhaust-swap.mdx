@@ -1,11 +1,8 @@
-import Layout from '~/layouts/DefaultGuideLayout'
-
-export const meta = {
-  id: 'exhaust-swap',
-  title: 'High swap usage',
-  description:
-    'Learn what high Swap usage could mean for your Supabase instance and what could have caused it.',
-}
+---
+id: 'exhaust-swap'
+title: 'High swap usage'
+description: 'Learn what high Swap usage could mean for your Supabase instance and what could have caused it.'
+---
 
 Learn what high Swap usage means, what can cause it, and how to solve it.
 
@@ -65,7 +62,3 @@ If you find that your RAM and Swap usage are high, you have three options:
 1. **Optimize performance:** Get more out of your instance's resources by optimizing your usage. See the [performance tuning guide](https://supabase.com/docs/guides/platform/performance#examining-query-performance) and our [production readiness guide](https://supabase.com/docs/guides/platform/going-into-prod#performance).
 2. **Upgrade your compute:** You can get a Compute Add-on for your project. Navigate to [the **Addons** section in project settings](https://supabase.com/dashboard/project/_/settings/addons?panel=computeInstance) to see your upgrade options.
 3. **Read Replicas:** You can spread the load on your Supabase project by creating a Read Replica. See [the read replicas guide](https://supabase.com/docs/guides/platform/read-replicas) for more information.
-
-export const Page = ({ children }) => <Layout meta={meta} children={children} />
-
-export default Page

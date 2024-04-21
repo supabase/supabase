@@ -2,37 +2,16 @@ import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 import matter from 'gray-matter'
 import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { MDXRemote } from 'next-mdx-remote/rsc'
-import Link from 'next/link'
-import { readFile } from 'node:fs/promises'
-import { join, sep } from 'node:path'
+import { existsSync } from 'node:fs'
+import { readFile, readdir } from 'node:fs/promises'
+import { extname, join, sep } from 'node:path'
 import { type ComponentProps } from 'react'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
 import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import remarkMath from 'remark-math'
-import { GlassPanel } from 'ui-patterns/GlassPanel'
-import { IconPanel } from 'ui-patterns/IconPanel'
-import { ThemeImage } from 'ui-patterns/ThemeImage'
-import { Button } from 'ui/client'
-import { Admonition } from 'ui/server'
-import { AppleSecretGenerator } from '~/components/AppleSecretGenerator'
-import AuthProviders from '~/components/AuthProviders'
-import { Heading } from '~/components/CustomHTMLElements'
-import {
-  GetSessionWarning,
-  SocialProviderSettingsSupabase,
-  SocialProviderSetup,
-} from '~/components/MDX/partials'
-import { Mermaid } from '~/components/Mermaid'
-import { NavData } from '~/components/NavData'
-import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
-import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
-import StepHikeCompact from '~/components/StepHikeCompact'
-import { Accordion, AccordionItem } from '~/features/ui/Accordion'
-import * as CH from '~/features/ui/CodeHike'
-import { Tabs, TabPanel } from '~/features/ui/Tabs'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter } from '~/lib/docs'
-import { Extensions } from '~/components/Extensions'
+import { components } from './GuidesMdx.shared'
 
 const getGuidesMarkdown = async (section: string, params: { slug?: string[] }) => {
   const relPath = (section + '/' + (params?.slug?.join(sep) ?? '')).replace(/\/$/, '')
@@ -62,44 +41,22 @@ const getGuidesMarkdown = async (section: string, params: { slug?: string[] }) =
   }
 }
 
-const components = {
-  Accordion,
-  AccordionItem,
-  Admonition,
-  AppleSecretGenerator,
-  AuthProviders,
-  Button,
-  CH,
-  Extensions,
-  GetSessionWarning,
-  GlassPanel,
-  IconPanel,
-  Image: (props: any) => <ThemeImage fill className="object-contain" {...props} />,
-  Link,
-  Mermaid,
-  NavData,
-  ProjectConfigVariables,
-  RealtimeLimitsEstimator,
-  SocialProviderSettingsSupabase,
-  SocialProviderSetup,
-  StepHikeCompact,
-  Tabs,
-  TabPanel,
-  h2: (props: any) => (
-    <Heading tag="h2" {...props}>
-      {props.children}
-    </Heading>
-  ),
-  h3: (props: any) => (
-    <Heading tag="h3" {...props}>
-      {props.children}
-    </Heading>
-  ),
-  h4: (props: any) => (
-    <Heading tag="h4" {...props}>
-      {props.children}
-    </Heading>
-  ),
+const genGuidesStaticParams = (section: string) => async () => {
+  const directory = join(GUIDES_DIRECTORY, section)
+
+  const files = (await readdir(directory, { recursive: true }))
+    .filter((file) => extname(file) === '.mdx')
+    .map((file) => ({
+      slug: file.replace(/\.mdx$/, '').split(sep),
+    }))
+
+  // Index page isn't included in the directory
+  const indexFile = join(GUIDES_DIRECTORY, `${section}.mdx`)
+  if (existsSync(indexFile)) {
+    files.push({ slug: [] })
+  }
+
+  return files
 }
 
 const codeHikeOptions: CodeHikeConfig = {
@@ -147,4 +104,4 @@ const MDXRemoteGuides = ({ options = {}, ...props }: ComponentProps<typeof MDXRe
   return <MDXRemote components={components} options={finalOptions} {...props} />
 }
 
-export { MDXRemoteGuides, getGuidesMarkdown }
+export { MDXRemoteGuides, getGuidesMarkdown, genGuidesStaticParams }

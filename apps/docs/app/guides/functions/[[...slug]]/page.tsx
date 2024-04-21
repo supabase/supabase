@@ -1,6 +1,6 @@
-import { GuideTemplate } from '~/app/GuideTemplate'
+import { GuideTemplate } from '~/app/guides/GuideTemplate'
 
-import { getGuidesMarkdown } from '~/features/docs/guides/GuidesMdx'
+import { genGuidesStaticParams, getGuidesMarkdown } from '~/features/docs/guides/GuidesMdx'
 
 const FunctionsGuide = async ({ params }: { params: { slug?: string[] } }) => {
   const { frontmatter, ...data } = await getGuidesMarkdown('functions', params)
@@ -8,4 +8,7 @@ const FunctionsGuide = async ({ params }: { params: { slug?: string[] } }) => {
   return <GuideTemplate meta={frontmatter} {...data} />
 }
 
+const generateStaticParams = genGuidesStaticParams('functions')
+
 export default FunctionsGuide
+export { generateStaticParams }
