@@ -134,6 +134,20 @@ services:
       GOTRUE_EXTERNAL_PHONE_ENABLED: ${ENABLE_PHONE_SIGNUP}
       GOTRUE_SMS_AUTOCONFIRM: ${ENABLE_PHONE_AUTOCONFIRM}
 
+      # Uncomment to enable custom access token hook. You'll need to create a public.custom_access_token_hook function and grant necessary permissions.
+      # See: https://supabase.com/docs/guides/auth/auth-hooks#hook-custom-access-token for details
+      # GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_ENABLED="true"
+      # GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_URI="pg-functions://postgres/public/custom_access_token_hook"
+      
+      # GOTRUE_HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED="true"
+      # GOTRUE_HOOK_MFA_VERIFICATION_ATTEMPT_URI="pg-functions://postgres/public/mfa_verification_attempt"
+
+      # GOTRUE_HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED="true"
+      # GOTRUE_HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI="pg-functions://postgres/public/password_verification_attempt"
+
+
+
+
   rest:
     container_name: supabase-rest
     image: postgrest/postgrest:v12.0.1
