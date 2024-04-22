@@ -625,6 +625,10 @@ export const auth = {
           url: '/guides/auth/server-side/nextjs',
         },
         {
+          name: 'SvelteKit guide',
+          url: '/guides/auth/server-side/sveltekit',
+        },
+        {
           name: 'Creating a client',
           url: '/guides/auth/server-side/creating-a-client',
         },
