@@ -160,34 +160,34 @@ const FunctionsList = ({
           </div>
 
           {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="functions" />}
-
-          <Table
-            className="table-fixed"
-            head={
-              <>
-                <Table.th key="name">Name</Table.th>
-                <Table.th key="arguments" className="hidden md:table-cell">
-                  Arguments
-                </Table.th>
-                <Table.th key="return_type" className="hidden lg:table-cell">
-                  Return type
-                </Table.th>
-                <Table.th key="security" className="hidden lg:table-cell w-[100px]">
-                  Security
-                </Table.th>
-                <Table.th key="buttons" className="w-1/6"></Table.th>
-              </>
-            }
-            body={
-              <FunctionList
-                schema={selectedSchema}
-                filterString={filterString}
-                isLocked={isLocked}
-                editFunction={editFunction}
-                deleteFunction={deleteFunction}
-              />
-            }
-          />
+          <div className="overflow-x-auto rounded">
+            <Table
+              head={
+                <>
+                  <Table.th key="name">Name</Table.th>
+                  <Table.th key="arguments" className="table-cell">
+                    Arguments
+                  </Table.th>
+                  <Table.th key="return_type" className="table-cell">
+                    Return type
+                  </Table.th>
+                  <Table.th key="security" className="table-cell w-[100px]">
+                    Security
+                  </Table.th>
+                  <Table.th key="buttons" className="w-1/6"></Table.th>
+                </>
+              }
+              body={
+                <FunctionList
+                  schema={selectedSchema}
+                  filterString={filterString}
+                  isLocked={isLocked}
+                  editFunction={editFunction}
+                  deleteFunction={deleteFunction}
+                />
+              }
+            />
+          </div>
         </div>
       )}
     </>
