@@ -134,7 +134,7 @@ const getContent = async ({ slug }: { slug?: string[] }) => {
   return {
     meta,
     content,
-	editLink
+    editLink,
   }
 }
 

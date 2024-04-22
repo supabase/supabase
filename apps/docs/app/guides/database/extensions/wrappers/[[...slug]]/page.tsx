@@ -135,7 +135,7 @@ const getContent = async (params: { slug?: string[] }) => {
 
   if (!federatedPage) {
     isExternal = false
-	editLink = `supabase/supabase/apps/docs/content/guides/database/extensions/wrappers/${params?.slug?.join(sep) || 'index'}.mdx`
+    editLink = `supabase/supabase/apps/docs/content/guides/database/extensions/wrappers/${params?.slug?.join(sep) || 'index'}.mdx`
     const rawContent = await readFile(
       join(
         GUIDES_DIRECTORY,
