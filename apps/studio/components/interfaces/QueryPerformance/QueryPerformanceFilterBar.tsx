@@ -1,12 +1,13 @@
-import { ArrowDown, ArrowUp, Info, RefreshCw } from 'lucide-react'
+import { ArrowDown, ArrowUp, RefreshCw } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { FilterPopover } from 'components/ui/FilterPopover'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
-import { useFlag, useLocalStorageQuery } from 'hooks'
+import { useLocalStorageQuery } from 'hooks'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import {
   Button,
   DropdownMenu,
@@ -15,9 +16,8 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { TextSearchPopover } from './TextSearchPopover'
 import { QueryPerformanceSort } from '../Reports/Reports.queries'
-import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { TextSearchPopover } from './TextSearchPopover'
 
 export const QueryPerformanceFilterBar = ({
   queryPerformanceQuery,
@@ -28,7 +28,6 @@ export const QueryPerformanceFilterBar = ({
 }) => {
   const router = useRouter()
   const { project } = useProjectContext()
-  const enableQueryPerformanceV2 = useFlag('queryPerformanceV2')
   const [showBottomSection, setShowBottomSection] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.QUERY_PERF_SHOW_BOTTOM_SECTION,
     true
@@ -101,37 +100,27 @@ export const QueryPerformanceFilterBar = ({
           />
           <TextSearchPopover name="Query" value={searchInputVal} onSaveText={onSearchQueryChange} />
 
-          {!enableQueryPerformanceV2 && (
-            <>
-              <div className="border-r border-strong h-6" />
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button icon={sortByValue?.order === 'desc' ? <ArrowDown /> : <ArrowUp />}>
-                    {getSortButtonLabel()}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-56">
-                  <DropdownMenuRadioGroup
-                    value={sortByValue?.order}
-                    onValueChange={(value: any) => onSortChange(value)}
-                  >
-                    <DropdownMenuRadioItem
-                      value="desc"
-                      defaultChecked={sortByValue?.order === 'desc'}
-                    >
-                      Sort by latency - high to low
-                    </DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem
-                      value="asc"
-                      defaultChecked={sortByValue?.order === 'asc'}
-                    >
-                      Sort by latency - low to high
-                    </DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </>
-          )}
+          <div className="border-r border-strong h-6" />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button icon={sortByValue?.order === 'desc' ? <ArrowDown /> : <ArrowUp />}>
+                {getSortButtonLabel()}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56">
+              <DropdownMenuRadioGroup
+                value={sortByValue?.order}
+                onValueChange={(value: any) => onSortChange(value)}
+              >
+                <DropdownMenuRadioItem value="desc" defaultChecked={sortByValue?.order === 'desc'}>
+                  Sort by latency - high to low
+                </DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="asc" defaultChecked={sortByValue?.order === 'asc'}>
+                  Sort by latency - low to high
+                </DropdownMenuRadioItem>
+              </DropdownMenuRadioGroup>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </div>
 

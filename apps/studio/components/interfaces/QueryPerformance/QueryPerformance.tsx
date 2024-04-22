@@ -1,54 +1,37 @@
+import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import { useRouter } from 'next/router'
+import { useMemo, useState } from 'react'
+import toast from 'react-hot-toast'
 
-import Table from 'components/to-be-cleaned/Table'
+import { useParams } from 'common'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { executeSql } from 'data/sql/execute-sql-query'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
-import { Tabs } from 'ui'
-import { Markdown } from '../Markdown'
-import ReportQueryPerformanceTableRow from '../Reports/ReportQueryPerformanceTableRow'
-import { PresetHookResult } from '../Reports/Reports.utils'
-import { QueryPerformanceFilterBar } from '../QueryPerformanceV2/QueryPerformanceFilterBar'
-import { ResetAnalysisNotice } from './ResetAnalysisNotice'
+import {
+  Button,
+  TabsList_Shadcn_,
+  TabsTrigger_Shadcn_,
+  Tabs_Shadcn_,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+  cn,
+} from 'ui'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
-import { QUERY_PERFORMANCE_REPORT_TYPES } from '../QueryPerformanceV2/QueryPerformance.constants'
-
-type QueryPerformancePreset = 'time' | 'frequent' | 'slowest'
-
-const panelClassNames = 'text-sm max-w-none flex flex-col gap-4'
-
-const TimeConsumingHelperText = `This table lists queries ordered by their cumulative total execution time.
-
-It displays the total time a query has spent running and the proportion of total execution time the query has consumed.
-`
-
-const MostFrequentHelperText = `This table lists queries in order of their execution count, providing insights into the most frequently executed queries.
-
-Pay attention to queries with high max_time or mean_time values that are called frequently, as they may benefit from optimization.
-`
-
-const SlowestExecutionHelperText = `This table lists queries ordered by their maximum execution time. It shows outliers with high execution times.
-
-Look for queries with high or mean execution times as these are often good candidates for optimization.
-`
+import { Markdown } from '../Markdown'
+import { useQueryPerformanceQuery } from '../Reports/Reports.queries'
+import { PresetHookResult } from '../Reports/Reports.utils'
+import { QUERY_PERFORMANCE_REPORT_TYPES } from './QueryPerformance.constants'
+import { QueryPerformanceFilterBar } from './QueryPerformanceFilterBar'
+import { QueryPerformanceGrid } from './QueryPerformanceGrid'
+import { useLocalStorageQuery } from 'hooks'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { X } from 'lucide-react'
 
 interface QueryPerformanceProps {
   queryHitRate: PresetHookResult
   queryPerformanceQuery: DbQueryHook<any>
-}
-
-const QueryPerformanceLoadingRow = ({ colSpan }: { colSpan: number }) => {
-  return (
-    <>
-      {Array(4)
-        .fill('')
-        .map((_, i) => (
-          <tr key={'loading-' + i}>
-            <td colSpan={colSpan}>
-              <ShimmeringLoader />
-            </td>
-          </tr>
-        ))}
-    </>
-  )
 }
 
 export const QueryPerformance = ({
@@ -56,207 +39,207 @@ export const QueryPerformance = ({
   queryPerformanceQuery,
 }: QueryPerformanceProps) => {
   const router = useRouter()
+  const { preset } = useParams()
+  const { project } = useProjectContext()
+  const [page, setPage] = useState<QUERY_PERFORMANCE_REPORT_TYPES>(
+    (preset as QUERY_PERFORMANCE_REPORT_TYPES) ?? QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING
+  )
+  const [showResetgPgStatStatements, setShowResetgPgStatStatements] = useState(false)
 
-  const handleRefresh = async () => {
+  const [showBottomSection, setShowBottomSection] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.QUERY_PERF_SHOW_BOTTOM_SECTION,
+    true
+  )
+
+  const handleRefresh = () => {
     queryPerformanceQuery.runQuery()
     queryHitRate.runQuery()
   }
 
+  const { data: mostTimeConsumingQueries, isLoading: isLoadingMTC } = useQueryPerformanceQuery({
+    preset: 'mostTimeConsuming',
+  })
+  const { data: mostFrequentlyInvoked, isLoading: isLoadingMFI } = useQueryPerformanceQuery({
+    preset: 'mostFrequentlyInvoked',
+  })
+  const { data: slowestExecutionTime, isLoading: isLoadingMMF } = useQueryPerformanceQuery({
+    preset: 'slowestExecutionTime',
+  })
+
+  const QUERY_PERFORMANCE_TABS = useMemo(() => {
+    return [
+      {
+        id: QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING,
+        label: 'Most time consuming',
+        description: 'Lists queries ordered by their cumulative total execution time.',
+        isLoading: isLoadingMTC,
+        max:
+          (mostTimeConsumingQueries ?? []).length > 0
+            ? Math.max(...(mostTimeConsumingQueries ?? []).map((x: any) => x.total_time)).toFixed(2)
+            : undefined,
+      },
+      {
+        id: QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT,
+        label: 'Most frequent',
+        description: 'Lists queries in order of their execution count',
+        isLoading: isLoadingMFI,
+        max:
+          (mostFrequentlyInvoked ?? []).length > 0
+            ? Math.max(...(mostFrequentlyInvoked ?? []).map((x: any) => x.calls)).toFixed(2)
+            : undefined,
+      },
+      {
+        id: QUERY_PERFORMANCE_REPORT_TYPES.SLOWEST_EXECUTION,
+        label: 'Slowest execution',
+        description: 'Lists queries ordered by their maximum execution time',
+        isLoading: isLoadingMMF,
+        max:
+          (slowestExecutionTime ?? []).length > 0
+            ? Math.max(...(slowestExecutionTime ?? []).map((x: any) => x.max_time)).toFixed(2)
+            : undefined,
+      },
+    ]
+  }, [
+    isLoadingMFI,
+    isLoadingMMF,
+    isLoadingMTC,
+    mostFrequentlyInvoked,
+    mostTimeConsumingQueries,
+    slowestExecutionTime,
+  ])
+
   return (
-    <Tabs
-      type="underlined"
-      size="medium"
-      onChange={(e: string) => {
-        // To reset the search and sort query params when switching tabs
-        const { sort, search, ...rest } = router.query
-        router.push({
-          ...router,
-          query: {
-            ...rest,
-            preset: e,
-          },
-        })
-      }}
-    >
-      <Tabs.Panel
-        key="time"
-        id={QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING}
-        label="Most time consuming"
+    <>
+      <Tabs_Shadcn_
+        defaultValue={page}
+        onValueChange={(value) => {
+          setPage(value as QUERY_PERFORMANCE_REPORT_TYPES)
+          const { sort, search, ...rest } = router.query
+          router.push({ ...router, query: { ...rest, preset: value } })
+        }}
       >
-        <div className={panelClassNames}>
-          <Markdown
-            content={TimeConsumingHelperText}
-            className="max-w-full [&>p]:mt-0 [&>p]:m-0 space-y-2"
-          />
-          <ResetAnalysisNotice handleRefresh={handleRefresh} />
-          <div className="thin-scrollbars max-w-full overflow-auto space-y-3">
-            <QueryPerformanceFilterBar queryPerformanceQuery={queryPerformanceQuery} />
-            <Table
-              className="table-fixed"
-              head={
-                <>
-                  <Table.th className="text-ellipsis overflow-hidden">Role</Table.th>
-                  <Table.th className="w-[300px]">Query</Table.th>
-                  <Table.th className="text-right">Calls</Table.th>
-                  <Table.th className="text-right">Time Consumed</Table.th>
-                  <Table.th className="text-right">Total Latency</Table.th>
-                </>
-              }
-              body={
-                !queryPerformanceQuery.isLoading ? (
-                  queryPerformanceQuery?.data?.map((item, i) => {
-                    return (
-                      <ReportQueryPerformanceTableRow
-                        key={i + '-mosttimeconsumed'}
-                        sql={item.query}
-                        colSpan={5}
-                      >
-                        <Table.td className="truncate" title={item.rolname}>
-                          {item.rolname}
-                        </Table.td>
-                        <Table.td className="max-w-xs">
-                          <p className="font-mono line-clamp-2 text-xs">{item.query}</p>
-                        </Table.td>
-                        <Table.td className="truncate text-right">{item.calls}</Table.td>
-                        <Table.td className="truncate text-right">{item.prop_total_time}</Table.td>
-                        <Table.td className="truncate text-right">
-                          {item.total_time.toFixed(2)}ms
-                        </Table.td>
-                      </ReportQueryPerformanceTableRow>
-                    )
-                  })
-                ) : (
-                  <QueryPerformanceLoadingRow colSpan={5} />
-                )
-              }
-            />
-          </div>
-        </div>
-      </Tabs.Panel>
-      <Tabs.Panel
-        key="frequent"
-        id={QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT}
-        label="Most frequent"
+        <TabsList_Shadcn_ className={cn('flex gap-0 border-0 items-end z-10')}>
+          {QUERY_PERFORMANCE_TABS.map((tab) => (
+            <TabsTrigger_Shadcn_
+              key={tab.id}
+              value={tab.id}
+              className={cn(
+                'group relative',
+                'px-6 py-3 border-b-0 flex flex-col items-start !shadow-none border-default border-t',
+                'even:border-x last:border-r even:!border-x-strong last:!border-r-strong',
+                tab.id === page ? '!bg-surface-200' : '!bg-surface-200/[33%]',
+                'hover:!bg-surface-100',
+                'data-[state=active]:!bg-surface-200',
+                'hover:text-foreground-light',
+                'transition'
+              )}
+            >
+              {tab.id === page && (
+                <div className="absolute top-0 left-0 w-full h-[1px] bg-foreground" />
+              )}
+
+              <div className="flex items-center gap-x-2">
+                <span className="">{tab.label}</span>
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <InformationCircleIcon className="transition text-foreground-muted w-3 h-3 data-[state=delayed-open]:text-foreground-light" />
+                  </TooltipTrigger_Shadcn_>
+                  <TooltipContent_Shadcn_ side="top">{tab.description}</TooltipContent_Shadcn_>
+                </Tooltip_Shadcn_>
+              </div>
+              {tab.isLoading ? (
+                <ShimmeringLoader className="w-32 pt-1" />
+              ) : tab.max === undefined ? (
+                <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
+                  No data yet
+                </span>
+              ) : (
+                <span className="text-xs text-foreground-muted group-hover:text-foreground-lighter group-data-[state=active]:text-foreground-lighter transition">
+                  {Number(tab.max).toLocaleString()}
+                  {tab.id !== QUERY_PERFORMANCE_REPORT_TYPES.MOST_FREQUENT ? 'ms' : ' calls'}
+                </span>
+              )}
+
+              {tab.id === page && (
+                <div className="absolute bottom-0 left-0 w-full h-[1px] bg-surface-200"></div>
+              )}
+            </TabsTrigger_Shadcn_>
+          ))}
+        </TabsList_Shadcn_>
+      </Tabs_Shadcn_>
+
+      <div className="px-6 py-3 bg-surface-200 border-t -mt-px">
+        <QueryPerformanceFilterBar
+          queryPerformanceQuery={queryPerformanceQuery}
+          onResetReportClick={() => {
+            setShowResetgPgStatStatements(true)
+          }}
+        />
+      </div>
+
+      <QueryPerformanceGrid queryPerformanceQuery={queryPerformanceQuery} />
+
+      <div
+        className={cn('px-6 py-6 flex gap-x-4 border-t relative', {
+          hidden: showBottomSection === false,
+        })}
       >
-        <div className={panelClassNames}>
-          <Markdown
-            content={MostFrequentHelperText}
-            className="max-w-full [&>p]:mt-0 [&>p]:m-0 space-y-2"
-          />
-          <ResetAnalysisNotice handleRefresh={handleRefresh} />
-          <div className="thin-scrollbars max-w-full overflow-auto space-y-3">
-            <QueryPerformanceFilterBar queryPerformanceQuery={queryPerformanceQuery} />
-            <Table
-              head={
-                <>
-                  <Table.th className="">Role</Table.th>
-                  <Table.th className="w-[300px]">Query</Table.th>
-                  <Table.th className="text-right">Avg. Roles</Table.th>
-                  <Table.th className="text-right">Calls</Table.th>
-                  <Table.th className="text-right">Max Time</Table.th>
-                  <Table.th className="text-right">Mean Time</Table.th>
-                  <Table.th className="text-right">Min Time</Table.th>
-                  <Table.th className="text-right">Total Latency</Table.th>
-                </>
-              }
-              body={
-                queryPerformanceQuery.isLoading ? (
-                  <QueryPerformanceLoadingRow colSpan={8} />
-                ) : (
-                  queryPerformanceQuery.data?.map((item, i) => {
-                    return (
-                      <ReportQueryPerformanceTableRow
-                        key={i + '-mostfreq'}
-                        sql={item.query}
-                        colSpan={8}
-                      >
-                        <Table.td className="truncate" title={item.rolname}>
-                          {item.rolname}
-                        </Table.td>
-                        <Table.td className="min-w-xs">
-                          <p className="text-xs font-mono line-clamp-2">{item.query}</p>
-                        </Table.td>
-                        <Table.td className="truncate text-right">{item.avg_rows}</Table.td>
-                        <Table.td className="truncate text-right">{item.calls}</Table.td>
-                        <Table.td className="truncate text-right">
-                          {item.max_time?.toFixed(2)}ms
-                        </Table.td>
-                        <Table.td className="text-right truncate">
-                          {item.mean_time?.toFixed(2)}ms
-                        </Table.td>
-                        <Table.td className="text-right truncate">
-                          {item.min_time?.toFixed(2)}ms
-                        </Table.td>
-                        <Table.td className="text-right truncate">
-                          {item.total_time?.toFixed(2)}ms
-                        </Table.td>
-                      </ReportQueryPerformanceTableRow>
-                    )
-                  })
-                )
-              }
-            />
-          </div>
+        <Button
+          className="absolute top-1.5 right-3 px-1.5"
+          type="text"
+          size="tiny"
+          onClick={() => {
+            setShowBottomSection(false)
+          }}
+        >
+          <X size="14" />
+        </Button>
+        <div className="w-[35%] flex flex-col gap-y-1 text-sm">
+          <p>Reset report</p>
+          <p className="text-xs text-foreground-light">
+            Consider resetting the analysis after optimizing any queries
+          </p>
+          <Button
+            type="default"
+            className="!mt-3 w-min"
+            onClick={() => setShowResetgPgStatStatements(true)}
+          >
+            Reset report
+          </Button>
         </div>
-      </Tabs.Panel>
-      <Tabs.Panel
-        key="slowest"
-        id={QUERY_PERFORMANCE_REPORT_TYPES.SLOWEST_EXECUTION}
-        label="Slowest execution time"
-      >
-        <div className={panelClassNames}>
+        <div className="w-[35%] flex flex-col gap-y-1 text-sm">
+          <p>How is this report generated?</p>
           <Markdown
-            content={SlowestExecutionHelperText}
-            className="max-w-full [&>p]:mt-0 [&>p]:m-0 space-y-2"
+            className="text-xs"
+            content="This report uses the pg_stat_statements table, and pg_stat_statements extension. [Learn more here](https://supabase.com/docs/guides/platform/performance#examining-query-performance)."
           />
-          <ResetAnalysisNotice handleRefresh={handleRefresh} />
-          <div className="thin-scrollbars max-w-full overflow-auto space-y-3">
-            <QueryPerformanceFilterBar queryPerformanceQuery={queryPerformanceQuery} />
-            <Table
-              head={
-                <>
-                  <Table.th className="table-cell">Role</Table.th>
-                  <Table.th className="table-cell">Query</Table.th>
-                  <Table.th className="table-cell">Avg Rows</Table.th>
-                  <Table.th className="table-cell">Calls</Table.th>
-                  <Table.th className="table-cell">Max Time</Table.th>
-                  <Table.th className="table-cell">Mean Time</Table.th>
-                  <Table.th className="table-cell">Min Time</Table.th>
-                  <Table.th className="table-cell">Total Latency</Table.th>
-                </>
-              }
-              body={
-                queryPerformanceQuery.isLoading ? (
-                  <QueryPerformanceLoadingRow colSpan={8} />
-                ) : (
-                  queryPerformanceQuery.data?.map((item, i) => {
-                    return (
-                      <ReportQueryPerformanceTableRow
-                        key={i + '-slowestexec'}
-                        sql={item.query}
-                        colSpan={8}
-                      >
-                        <Table.td className="truncate" title={item.rolname}>
-                          {item.rolname}
-                        </Table.td>
-                        <Table.td className="max-w-xs">
-                          <p className="font-mono line-clamp-2 text-xs">{item.query}</p>
-                        </Table.td>
-                        <Table.td className="truncate">{item.avg_rows}</Table.td>
-                        <Table.td className="truncate">{item.calls}</Table.td>
-                        <Table.td className="truncate">{item.max_time?.toFixed(2)}ms</Table.td>
-                        <Table.td className="truncate">{item.mean_time?.toFixed(2)}ms</Table.td>
-                        <Table.td className="truncate">{item.min_time?.toFixed(2)}ms</Table.td>
-                        <Table.td className="truncate">{item.total_time?.toFixed(2)}ms</Table.td>
-                      </ReportQueryPerformanceTableRow>
-                    )
-                  })
-                )
-              }
-            />
-          </div>
         </div>
-      </Tabs.Panel>
-    </Tabs>
+      </div>
+
+      <ConfirmModal
+        danger
+        visible={showResetgPgStatStatements}
+        title="Reset query performance analysis"
+        description={
+          'This will reset the `extensions.pg_stat_statements` table that is used to calculate query performance. This data will repopulate immediately after.'
+        }
+        buttonLabel="Clear table"
+        buttonLoadingLabel="Deleting"
+        onSelectCancel={() => setShowResetgPgStatStatements(false)}
+        onSelectConfirm={async () => {
+          try {
+            await executeSql({
+              projectRef: project?.ref,
+              connectionString: project?.connectionString,
+              sql: `SELECT pg_stat_statements_reset();`,
+            })
+            handleRefresh()
+            setShowResetgPgStatStatements(false)
+          } catch (error: any) {
+            toast.error(`Failed to reset analysis: ${error.message}`)
+          }
+        }}
+      />
+    </>
   )
 }
