@@ -125,6 +125,20 @@ on my_table for select
 using ( true );
 ```
 
+### Protect views using `security_invoker`
+
+Views bypass RLS by default because they are usually created with the `postgres` user. This is a feature of Postgres, which automatically creates views with `security definer`.
+
+In Postgres 15 and above, you can make a view obey the RLS policies of the underlying tables when invoked by `anon` and `authenticated` roles by setting `security_invoker = true`.
+
+```sql
+create view <VIEW_NAME>
+with(security_invoker = true)
+as select <QUERY>
+```
+
+In older versions of Postgres, protect your views by revoking access from the `anon` and `authenticated` roles, or by putting them in an unexposed schema.
+
 ### Using external authorization systems
 
 If you want to use another authorization method for your applications that's also fine. Supabase is "just Postgres", so if your application works with Postgres, then it also works with Supabase. If you take this path, don't put your tables in the `public` schema - instead create a new schema for your tables and functions:
