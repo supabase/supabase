@@ -418,7 +418,6 @@ export const AIPolicyEditorPanel = memo(function ({
           setShowCheckBlock(true)
         }
       } else if (selectedTable !== undefined) {
-        console.log('st table', { selectedTable })
         form.reset({ ...defaultValues, table: selectedTable })
       }
     }
