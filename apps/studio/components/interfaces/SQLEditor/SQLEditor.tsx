@@ -3,10 +3,11 @@ import { useChat } from 'ai/react'
 import { motion } from 'framer-motion'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams, useTelemetryProps } from 'common'
+import { useSqlDebugMutation } from 'data/ai/sql-debug-mutation'
 import { useSqlTitleGenerateMutation } from 'data/ai/sql-title-mutation'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
 import { useEntityDefinitionsQuery } from 'data/database/entity-definitions-query'
@@ -14,12 +15,14 @@ import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
 import { useFormatQueryMutation } from 'data/sql/format-sql-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
+import { isError } from 'data/utils/error-check'
 import { useLocalStorageQuery, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { BASE_PATH, IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import Telemetry from 'lib/telemetry'
+import { format } from 'sql-formatter'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
@@ -43,7 +46,6 @@ import {
   DiffType,
   IStandaloneCodeEditor,
   IStandaloneDiffEditor,
-  SQLEditorContextValues,
 } from './SQLEditor.types'
 import {
   checkDestructiveQuery,
@@ -60,18 +62,6 @@ const DiffEditor = dynamic(
   () => import('@monaco-editor/react').then(({ DiffEditor }) => DiffEditor),
   { ssr: false }
 )
-
-const SQLEditorContext = createContext<SQLEditorContextValues | undefined>(undefined)
-
-export function useSqlEditor() {
-  const values = useContext(SQLEditorContext)
-
-  if (!values) {
-    throw new Error('No SQL editor context. Are you using useSqlEditor() outside of SQLEditor?')
-  }
-
-  return values
-}
 
 const SQLEditor = () => {
   const { ref, id: urlId } = useParams()
@@ -93,8 +83,8 @@ const SQLEditor = () => {
 
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
+  const { mutateAsync: debugSql, isLoading: isDebugSqlLoading } = useSqlDebugMutation()
 
-  const [aiInput, setAiInput] = useState('')
   const [selectedMessage, setSelectedMessage] = useState<string>()
   const [debugSolution, setDebugSolution] = useState<string>()
   const [sourceSqlDiff, setSourceSqlDiff] = useState<ContentDiff>()
@@ -396,6 +386,42 @@ const SQLEditor = () => {
     [setAiQueryCount]
   )
 
+  const onDebug = useCallback(async () => {
+    try {
+      const snippet = snap.snippets[id]
+      const result = snap.results[id]?.[0]
+
+      const { solution, sql } = await debugSql({
+        sql: snippet.snippet.content.sql.replace(sqlAiDisclaimerComment, '').trim(),
+        errorMessage: result.error.message,
+        entityDefinitions,
+      })
+
+      const formattedSql =
+        sqlAiDisclaimerComment +
+        '\n\n' +
+        format(sql, {
+          language: 'postgresql',
+          keywordCase: 'lower',
+        })
+      setDebugSolution(solution)
+      setSourceSqlDiff({
+        original: snippet.snippet.content.sql,
+        modified: formattedSql,
+      })
+      setSelectedDiffType(DiffType.Modification)
+    } catch (error: unknown) {
+      // [Joshen] There's a tendency for the SQL debug to chuck a lengthy error message
+      // that's not relevant for the user - so we prettify it here by avoiding to return the
+      // entire error body from the assistant
+      if (isError(error)) {
+        toast.error(
+          `Sorry, the assistant failed to debug your query! Please try again with a different one.`
+        )
+      }
+    }
+  }, [debugSql, entityDefinitions, id, snap.results, snap.snippets])
+
   const acceptAiHandler = useCallback(async () => {
     try {
       setIsAcceptDiffLoading(true)
@@ -444,7 +470,6 @@ const SQLEditor = () => {
         router
       )
 
-      setAiInput('')
       setSelectedMessage(undefined)
       setSelectedDiffType(DiffType.Modification)
       setDebugSolution(undefined)
@@ -567,17 +592,7 @@ const SQLEditor = () => {
   }, [selectedDiffType, sourceSqlDiff])
 
   return (
-    <SQLEditorContext.Provider
-      value={{
-        aiInput,
-        setAiInput,
-        sqlDiff: sourceSqlDiff,
-        setSqlDiff: setSourceSqlDiff,
-        debugSolution,
-        setDebugSolution,
-        setSelectedDiffType,
-      }}
-    >
+    <>
       <ConfirmModal
         visible={isConfirmModalOpen}
         title="Destructive operation"
@@ -715,9 +730,11 @@ const SQLEditor = () => {
                 id={id}
                 isExecuting={isExecuting}
                 isDisabled={isDiffOpen}
+                isDebugging={isDebugSqlLoading}
                 hasSelection={hasSelection}
                 prettifyQuery={prettifyQuery}
                 executeQuery={executeQuery}
+                onDebug={onDebug}
               />
             )}
           </ResizablePanel>
@@ -739,7 +756,7 @@ const SQLEditor = () => {
           />
         )}
       </div>
-    </SQLEditorContext.Provider>
+    </>
   )
 }
 

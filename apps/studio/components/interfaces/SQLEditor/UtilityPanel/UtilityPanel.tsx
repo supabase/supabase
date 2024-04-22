@@ -15,10 +15,12 @@ import UtilityTabResults from './UtilityTabResults'
 export type UtilityPanelProps = {
   id: string
   isExecuting?: boolean
+  isDebugging?: boolean
   isDisabled?: boolean
   hasSelection: boolean
   prettifyQuery: () => void
   executeQuery: () => void
+  onDebug: () => void
 }
 
 const DEFAULT_CHART_CONFIG = {
@@ -31,10 +33,12 @@ const DEFAULT_CHART_CONFIG = {
 const UtilityPanel = ({
   id,
   isExecuting,
+  isDebugging,
   isDisabled,
   hasSelection,
   prettifyQuery,
   executeQuery,
+  onDebug,
 }: UtilityPanelProps) => {
   const snap = useSqlEditorStateSnapshot()
   const { ref } = useParams()
@@ -137,7 +141,13 @@ const UtilityPanel = ({
         </div>
       </TabsList_Shadcn_>
       <TabsContent_Shadcn_ className="mt-0 h-full" value="results">
-        <UtilityTabResults id={id} isExecuting={isExecuting} />
+        <UtilityTabResults
+          id={id}
+          isExecuting={isExecuting}
+          isDisabled={isDisabled}
+          onDebug={onDebug}
+          isDebugging={isDebugging}
+        />
       </TabsContent_Shadcn_>
       <TabsContent_Shadcn_ className="mt-0 h-full" value="chart">
         <ChartConfig results={result} config={chartConfig} onConfigChange={onConfigChange} />
