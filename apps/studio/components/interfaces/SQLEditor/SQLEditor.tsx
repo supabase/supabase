@@ -369,36 +369,32 @@ const SQLEditor = () => {
     [profile?.id, project?.id, ref, router, snap]
   )
 
-  const updateEditorWithCheckForDiff = ({
-    id,
-    diffType,
-    sql,
-  }: {
-    id: string
-    diffType: DiffType
-    sql: string
-  }) => {
-    const editorModel = editorRef.current?.getModel()
-    if (!editorModel) return
+  const updateEditorWithCheckForDiff = useCallback(
+    ({ id, diffType, sql }: { id: string; diffType: DiffType; sql: string }) => {
+      const editorModel = editorRef.current?.getModel()
+      if (!editorModel) return
 
-    setAiQueryCount((count) => count + 1)
+      setAiQueryCount((count) => count + 1)
 
-    const existingValue = editorRef.current?.getValue() ?? ''
-    if (existingValue.length === 0) {
-      editorRef.current?.executeEdits('apply-ai-message', [
-        {
-          text: `${sqlAiDisclaimerComment}\n\n${sql}`,
-          range: editorModel.getFullModelRange(),
-        },
-      ])
-    } else {
-      setSelectedMessage(id)
-      const currentSql = editorRef.current?.getValue()
-      const diff = { original: currentSql || '', modified: sql }
-      setSourceSqlDiff(diff)
-      setSelectedDiffType(diffType)
-    }
-  }
+      const existingValue = editorRef.current?.getValue() ?? ''
+      if (existingValue.length === 0) {
+        // if the editor is empty, just copy over the code
+        editorRef.current?.executeEdits('apply-ai-message', [
+          {
+            text: `${sqlAiDisclaimerComment}\n\n${sql}`,
+            range: editorModel.getFullModelRange(),
+          },
+        ])
+      } else {
+        setSelectedMessage(id)
+        const currentSql = editorRef.current?.getValue()
+        const diff = { original: currentSql || '', modified: sql }
+        setSourceSqlDiff(diff)
+        setSelectedDiffType(diffType)
+      }
+    },
+    [setAiQueryCount]
+  )
 
   const acceptAiHandler = useCallback(async () => {
     try {
