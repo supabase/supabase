@@ -60,7 +60,7 @@ const FormSchema = z.object({
   schema: z.string().trim().min(1),
   args: z.array(z.object({ name: z.string().trim().min(1), type: z.string().trim() })),
   behavior: z.enum(['IMMUTABLE', 'STABLE', 'VOLATILE']),
-  definition: z.string().trim(),
+  definition: z.string().trim().min(1),
   language: z.string().trim(),
   return_type: z.string().trim(),
   security_definer: z.boolean(),
@@ -255,7 +255,9 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                           Definition
                         </FormLabel_Shadcn_>
                         <FormDescription_Shadcn_ className="text-sm text-foreground-light">
-                          <p>The language below should be written in `plpgsql`.</p>
+                          <p>
+                            The language below should be written in <code>plpgsql</code>.
+                          </p>
                           {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
                         </FormDescription_Shadcn_>
                       </div>
@@ -272,7 +274,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                         />
                       </div>
 
-                      <FormMessage_Shadcn_ />
+                      <FormMessage_Shadcn_ className="px-content" />
                     </FormItem_Shadcn_>
                   )}
                 />
