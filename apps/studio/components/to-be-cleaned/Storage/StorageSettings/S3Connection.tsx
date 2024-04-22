@@ -3,7 +3,10 @@ import React from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import {
+  useIsProjectActive,
+  useProjectContext,
+} from 'components/layouts/ProjectLayout/ProjectContext'
 import Table from 'components/to-be-cleaned/Table'
 import CopyButton from 'components/ui/CopyButton'
 import { FormHeader } from 'components/ui/Forms'
@@ -13,6 +16,8 @@ import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-
 import { useS3AccessKeyDeleteMutation } from 'data/storage/s3-access-key-delete-mutation'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
 import {
+  AlertDescription_Shadcn_,
+  Alert_Shadcn_,
   Button,
   Dialog,
   DialogContent,
@@ -24,12 +29,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   IconMoreVertical,
-  IconTrash,
   cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { AlertTitle } from '@ui/components/shadcn/ui/alert'
+import Link from 'next/link'
+import { AlertCircle, TrashIcon } from 'lucide-react'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@ui/components/shadcn/ui/tooltip'
 
 export const S3Connection = () => {
   const [openCreateCred, setOpenCreateCred] = React.useState(false)
@@ -39,6 +52,8 @@ export const S3Connection = () => {
 
   const { ref: projectRef } = useParams()
   const { project, isLoading: projectIsLoading } = useProjectContext()
+
+  const isProjectActive = useIsProjectActive()
 
   const { data: storageCreds, ...storageCredsQuery } = useStorageCredentialsQuery({
     projectRef,
@@ -76,18 +91,31 @@ export const S3Connection = () => {
           description="Connect to your bucket via the S3 protocol."
           docsUrl="https://supabase.com/docs/guides/storage/s3/authentication"
         />
-        <Panel className="grid gap-4 p-4 !mb-0">
-          <FormItemLayout layout="horizontal" label="Endpoint" isReactForm={false}>
-            <Input readOnly copy disabled value={s3connectionUrl} />
-          </FormItemLayout>
-          {projectIsLoading ? (
-            <></>
-          ) : (
-            <FormItemLayout layout="horizontal" label="Region" isReactForm={false}>
-              <Input className="input-mono" copy disabled value={project?.region} />
+        {isProjectActive ? (
+          <Panel className="grid gap-4 p-4 !mb-0">
+            <FormItemLayout layout="horizontal" label="Endpoint" isReactForm={false}>
+              <Input readOnly copy disabled value={s3connectionUrl} />
             </FormItemLayout>
-          )}
-        </Panel>
+            {!projectIsLoading && (
+              <FormItemLayout layout="horizontal" label="Region" isReactForm={false}>
+                <Input className="input-mono" copy disabled value={project?.region} />
+              </FormItemLayout>
+            )}
+          </Panel>
+        ) : (
+          <Alert_Shadcn_ variant="warning">
+            <AlertCircle />
+            <AlertTitle>Project is paused</AlertTitle>
+            <AlertDescription_Shadcn_>
+              To connect to your S3 bucket, you need to restore your project.
+            </AlertDescription_Shadcn_>
+            <div className="mt-3 flex items-center space-x-2">
+              <Button asChild type="default">
+                <Link href={`/project/${projectRef}`}>Restore project</Link>
+              </Button>
+            </div>
+          </Alert_Shadcn_>
+        )}
       </div>
 
       <div>
@@ -103,7 +131,18 @@ export const S3Connection = () => {
               }}
             >
               <DialogTrigger asChild>
-                <Button type="outline">New access key</Button>
+                <Button disabled={!isProjectActive} type="outline">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger>New access key</TooltipTrigger>
+                      {!isProjectActive && (
+                        <TooltipContent>
+                          Restore your project to create new access keys
+                        </TooltipContent>
+                      )}
+                    </Tooltip>
+                  </TooltipProvider>
+                </Button>
               </DialogTrigger>
 
               <DialogContent
@@ -119,7 +158,7 @@ export const S3Connection = () => {
                     <div className="flex flex-col gap-y-2">
                       <DialogTitle>Save your new S3 access keys</DialogTitle>
                       <DialogDescription>
-                        You won't be able to see them again. If you lose these credentials, you'll
+                        You won't be able to see them again. If you lose these access keys, you'll
                         need to create a new ones.
                       </DialogDescription>
                     </div>
@@ -207,47 +246,64 @@ export const S3Connection = () => {
             'rounded-md border shadow',
           ])}
         >
-          {storageCredsQuery.isLoading ? (
-            <div className="p-4">
-              <GenericSkeletonLoader />
-            </div>
+          {!isProjectActive ? (
+            <Alert_Shadcn_ variant="warning">
+              <AlertCircle />
+              <AlertTitle>Can't fetch S3 access keys</AlertTitle>
+              <AlertDescription_Shadcn_>
+                To fetch your S3 access keys, you need to restore your project.
+              </AlertDescription_Shadcn_>
+              <div className="mt-3 flex items-center space-x-2">
+                <Button asChild type="default">
+                  <Link href={`/project/${projectRef}`}>Restore project</Link>
+                </Button>
+              </div>
+            </Alert_Shadcn_>
           ) : (
-            <div className="overflow-x-auto">
-              <Table
-                head={[
-                  <Table.th key="">Description</Table.th>,
-                  <Table.th key="">Access key ID</Table.th>,
-                  <Table.th key="">Created at</Table.th>,
-                  <Table.th key="actions" />,
-                ]}
-                body={
-                  hasStorageCreds ? (
-                    storageCreds.data?.map((cred: any) => (
-                      <StorageCredItem
-                        key={cred.id}
-                        created_at={cred.created_at}
-                        access_key={cred.access_key}
-                        description={cred.description}
-                        id={cred.id}
-                        onDeleteClick={() => {
-                          setDeleteCredId(cred.id)
-                          setOpenDeleteDialog(true)
-                        }}
-                      />
-                    ))
-                  ) : (
-                    <Table.tr>
-                      <Table.td colSpan={4}>
-                        <p className="text-sm text-foreground">No credentials created</p>
-                        <p className="text-sm text-foreground-light">
-                          There are no credentials associated with your project yet
-                        </p>
-                      </Table.td>
-                    </Table.tr>
-                  )
-                }
-              />
-            </div>
+            <>
+              {storageCredsQuery.isLoading ? (
+                <div className="p-4">
+                  <GenericSkeletonLoader />
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <Table
+                    head={[
+                      <Table.th key="">Description</Table.th>,
+                      <Table.th key="">Access key ID</Table.th>,
+                      <Table.th key="">Created at</Table.th>,
+                      <Table.th key="actions" />,
+                    ]}
+                    body={
+                      hasStorageCreds ? (
+                        storageCreds.data?.map((cred) => (
+                          <StorageCredItem
+                            key={cred.id}
+                            created_at={cred.created_at}
+                            access_key={cred.access_key}
+                            description={cred.description}
+                            id={cred.id}
+                            onDeleteClick={() => {
+                              setDeleteCredId(cred.id)
+                              setOpenDeleteDialog(true)
+                            }}
+                          />
+                        ))
+                      ) : (
+                        <Table.tr>
+                          <Table.td colSpan={4}>
+                            <p className="text-sm text-foreground">No access keys created</p>
+                            <p className="text-sm text-foreground-light">
+                              There are no access keys associated with your project yet
+                            </p>
+                          </Table.td>
+                        </Table.tr>
+                      )
+                    }
+                  />
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
@@ -256,7 +312,7 @@ export const S3Connection = () => {
         <DialogContent className="p-4">
           <DialogTitle>Revoke S3 access keys</DialogTitle>
           <DialogDescription>
-            This action is irreversible and requests made with these credentials will stop working.
+            This action is irreversible and requests made with these access keys will stop working.
           </DialogDescription>
           <div className="flex justify-end gap-2">
             <Button
@@ -278,7 +334,7 @@ export const S3Connection = () => {
                 toast.success('S3 access keys revoked')
               }}
             >
-              Yes, revoke credentials
+              Yes, revoke access keys
             </Button>
           </div>
         </DialogContent>
@@ -339,8 +395,8 @@ function StorageCredItem({
                 onDeleteClick(id)
               }}
             >
-              <IconTrash />
-              Revoke credentials
+              <TrashIcon size="14" />
+              Revoke keys
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

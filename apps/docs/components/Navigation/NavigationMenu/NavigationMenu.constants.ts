@@ -773,7 +773,7 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'Column level privileges',
-          url: '/guides/database/postgres/column-level-privileges',
+          url: '/guides/database/postgres/column-level-security',
         },
       ],
     },
@@ -1375,6 +1375,10 @@ export const storage: NavMenuConstant = {
         {
           name: 'Image Transformations',
           url: '/guides/storage/serving/image-transformations',
+        },
+        {
+          name: 'Bandwidth & Storage Egress',
+          url: '/guides/storage/serving/bandwidth',
         },
       ],
     },
