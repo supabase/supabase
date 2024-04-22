@@ -174,7 +174,8 @@ export function processMdxForSearch(_content: string, options?: { yaml?: boolean
     const [firstNode] = tree.children
     const content = toMarkdown(tree)
 
-    const rawHeading: string | undefined = firstNode.type === 'heading' ? toString(firstNode) : undefined
+    const rawHeading: string | undefined =
+      firstNode.type === 'heading' ? toString(firstNode) : undefined
 
     if (!rawHeading) {
       return { content }

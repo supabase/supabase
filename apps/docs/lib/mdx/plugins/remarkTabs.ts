@@ -130,7 +130,11 @@ function extractLinkedSiblings(parent: Parent, node: Node, index: number, indent
 
   do {
     nextSibling = parent.children[++i]
-  } while (column && nextSibling?.position && nextSibling.position.start.column === column + indentAmount)
+  } while (
+    column &&
+    nextSibling?.position &&
+    nextSibling.position.start.column === column + indentAmount
+  )
 
   return parent.children.splice(index + 1, i - index - 1)
 }

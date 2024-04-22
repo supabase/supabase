@@ -162,9 +162,9 @@ export class OpenApiReferenceSource extends ReferenceSource<enrichedOperation> {
 
   extractIndexedContent(): string {
     const { summary, description, operation, tags } = this.specSection
-    return `${this.meta.title}\n\n${summary}\n\n${description}\n\n${operation}\n\n${(tags ?? []).join(
-      ', '
-    )}`
+    return `${this.meta.title}\n\n${summary}\n\n${description}\n\n${operation}\n\n${(
+      tags ?? []
+    ).join(', ')}`
   }
 }
 

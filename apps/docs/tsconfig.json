@@ -4,19 +4,11 @@
     "noImplicitAny": false,
     "baseUrl": ".",
     "paths": {
-      "~/*": [
-        "./*"
-      ],
-      "@ui/*": [
-        "./../../packages/ui/src/*"
-      ] // handle ui package paths
+      "~/*": ["./*"],
+      "@ui/*": ["./../../packages/ui/src/*"] // handle ui package paths
     },
     "target": "ES2021",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": false,
@@ -43,7 +35,5 @@
     "jest.config.mjs",
     ".next/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }
