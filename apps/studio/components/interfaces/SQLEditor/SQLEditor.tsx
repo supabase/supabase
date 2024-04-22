@@ -741,7 +741,6 @@ const SQLEditor = () => {
               })
             }
             onDiff={updateEditorWithCheckForDiff}
-            onChange={() => {}}
             onClose={() => setIsAiOpen(false)}
           />
         )}

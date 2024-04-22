@@ -35,7 +35,6 @@ interface AiAssistantPanelProps {
   onSubmit: (s: string) => void
   onDiff: ({ id, diffType, sql }: { id: string; diffType: DiffType; sql: string }) => void
   onClose: () => void
-  onChange: (value: boolean) => void
 }
 
 export const AiAssistantPanel = ({
@@ -45,7 +44,6 @@ export const AiAssistantPanel = ({
   onSubmit,
   onDiff,
   onClose,
-  onChange,
 }: AiAssistantPanelProps) => {
   const router = useRouter()
   const { profile } = useProfile()
@@ -67,7 +65,6 @@ export const AiAssistantPanel = ({
     resolver: zodResolver(FormSchema),
     defaultValues: { chat: '' },
   })
-  const formChatValue = form.getValues().chat
   const pendingReply = loading && last(messages)?.role === 'user'
 
   // try to scroll on each rerender to the bottom
@@ -85,10 +82,6 @@ export const AiAssistantPanel = ({
       form.setFocus('chat')
     }
   }, [loading])
-
-  useEffect(() => {
-    onChange(formChatValue.length === 0)
-  }, [formChatValue])
 
   return (
     <div className="flex flex-col h-full min-w-[400px] w-[400px] border-l border-control">
@@ -145,18 +138,6 @@ export const AiAssistantPanel = ({
         {pendingReply && <Message key="thinking" role="assistant" content="Thinking..." />}
 
         <div ref={bottomRef} className="h-1" />
-        {/* <div className="grid grid-cols-12 gap-2 p-2">
-          {ASSISTANT_TEMPLATES.map((template) => (
-            <CardButton
-              hideChevron
-              key={template.name}
-              title={template.name}
-              description={template.description}
-              className="!p-3 col-span-12 h-auto [&>div>div]:!mt-0 [&>div>h5]:text-sm"
-              onClick={() => onSubmit(template.prompt)}
-            />
-          ))}
-        </div> */}
       </div>
 
       <Form_Shadcn_ {...form}>
