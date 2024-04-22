@@ -159,20 +159,20 @@ const TableList = ({
       {isError && <AlertError error={error} subject="Failed to retrieve tables" />}
 
       {isSuccess && (
-        <div className="my-4 w-full">
+        <div className="my-4 w-full overflow-x-auto rounded">
           <Table
             head={[
               <Table.th key="name">Name</Table.th>,
-              <Table.th key="description" className="hidden lg:table-cell">
+              <Table.th key="description" className="table-cell">
                 Description
               </Table.th>,
-              <Table.th key="rows" className="hidden text-right xl:table-cell">
+              <Table.th key="rows" className="text-right table-cell">
                 Rows (Estimated)
               </Table.th>,
-              <Table.th key="size" className="hidden text-right xl:table-cell">
+              <Table.th key="size" className="text-right table-cell">
                 Size (Estimated)
               </Table.th>,
-              <Table.th key="realtime" className="hidden xl:table-cell text-center">
+              <Table.th key="realtime" className="table-cell text-center">
                 Realtime Enabled
               </Table.th>,
               <Table.th key="buttons"></Table.th>,
@@ -230,20 +230,20 @@ const TableList = ({
                           <p>{x.name}</p>
                         )}
                       </Table.td>
-                      <Table.td className="hidden max-w-sm truncate lg:table-cell break-all whitespace-normal">
+                      <Table.td className="max-w-sm truncate table-cell break-all whitespace-normal">
                         {x.comment !== null ? (
                           <p title={x.comment}>{x.comment}</p>
                         ) : (
                           <p className="text-border-stronger">No description</p>
                         )}
                       </Table.td>
-                      <Table.td className="hidden text-right xl:table-cell">
+                      <Table.td className="text-right table-cell">
                         {(x.live_rows_estimate ?? x.live_row_count).toLocaleString()}
                       </Table.td>
-                      <Table.td className="hidden text-right xl:table-cell">
+                      <Table.td className="text-right table-cell">
                         <code className="text-xs">{x.size}</code>
                       </Table.td>
-                      <Table.td className="hidden xl:table-cell text-center">
+                      <Table.td className="table-cell text-center">
                         {(realtimePublication?.tables ?? []).find(
                           (table: any) => table.id === x.id
                         ) ? (
