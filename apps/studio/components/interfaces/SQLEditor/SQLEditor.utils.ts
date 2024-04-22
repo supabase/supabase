@@ -1,11 +1,11 @@
+import { removeCommentsFromSql } from 'lib/helpers'
+import type { SqlSnippets, UserContent } from 'types'
 import {
   NEW_SQL_SNIPPET_SKELETON,
   destructiveSqlRegex,
   sqlAiDisclaimerComment,
 } from './SQLEditor.constants'
-import type { SqlSnippets, UserContent } from 'types'
 import { ContentDiff, DiffType } from './SQLEditor.types'
-import { removeCommentsFromSql } from 'lib/helpers'
 
 export const createSqlSnippetSkeleton = ({
   id,
@@ -80,9 +80,11 @@ ${isNpx ? 'npx ' : ''}supabase snippets download ${id} > \\
 `
 
 export const compareAsModification = (sqlDiff: ContentDiff) => {
+  const formattedModified = sqlDiff.modified.replace(sqlAiDisclaimerComment, '').trim()
+
   return {
     original: sqlDiff.original,
-    modified: `${sqlAiDisclaimerComment}\n\n${sqlDiff.modified}`,
+    modified: `${sqlAiDisclaimerComment}\n\n${formattedModified}`,
   }
 }
 
