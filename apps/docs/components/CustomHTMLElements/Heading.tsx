@@ -1,5 +1,6 @@
 'use client'
 
+import { type HTMLAttributes } from 'react'
 import {
   getAnchor,
   removeAnchor,
@@ -8,7 +9,7 @@ import {
 } from './CustomHTMLElements.utils'
 import { useInView } from 'react-intersection-observer'
 
-interface Props {
+interface Props extends HTMLAttributes<HTMLHeadingElement> {
   tag?: string
   parseAnchors?: boolean
   customAnchor?: string
@@ -23,7 +24,12 @@ interface Props {
  * need to parse the <a> and generate anchors. Custom anchors are used in tsx files.
  * (see: /pages/guides/cli/config.tsx)
  */
-const Heading: React.FC<React.PropsWithChildren<Props>> = ({ tag, customAnchor, children }) => {
+const Heading: React.FC<React.PropsWithChildren<Props>> = ({
+  tag,
+  customAnchor,
+  children,
+  ...attributes
+}) => {
   const HeadingTag = `${tag}` as any
   const anchor = customAnchor ? customAnchor : getAnchor(children)
   const link = `#${anchor}`
@@ -44,7 +50,7 @@ const Heading: React.FC<React.PropsWithChildren<Props>> = ({ tag, customAnchor, 
   })
 
   return (
-    <HeadingTag id={anchor} ref={ref} className="group scroll-mt-24">
+    <HeadingTag id={anchor} ref={ref} className="group scroll-mt-24" {...attributes}>
       {removeAnchor(children)}
       {anchor && (
         <a
