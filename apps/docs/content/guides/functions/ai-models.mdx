@@ -59,7 +59,7 @@ Deno.serve(async (req: Request) => {
 
 ## Using Large Language Models
 
-Inference via larger models is supported via [Ollama](https://ollama.com/). In the first iteration, the `llama2` and `mistral` models are supported and you would need to manage the Ollama server yourself.
+Inference via larger models is supported via [Ollama](https://ollama.com/). In the first iteration, you can use it with a self-managed Ollama server. We are progressively rolling out support for the hosted solution. To sign up for early access, fill up [this form](https://forms.supabase.com/supabase.ai-llm-early-access).
 
 <video width="99%" muted playsInline controls={true}>
   <source
@@ -133,6 +133,12 @@ Inference via larger models is supported via [Ollama](https://ollama.com/). In t
      })
    })
    ```
+
+1. Serve the function
+
+```
+supabase functions serve --env-file supabase/functions/.env
+```
 
 1. Execute the function
 
