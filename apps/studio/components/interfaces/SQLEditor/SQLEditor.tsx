@@ -108,10 +108,10 @@ const SQLEditor = () => {
   const selectedProject = useSelectedProject()
   const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
   const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
+  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
+
   const [isAcceptDiffLoading, setIsAcceptDiffLoading] = useState(false)
   const [, setAiQueryCount] = useLocalStorageQuery('supabase_sql-editor-ai-query-count', 0)
-
-  const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
 
   const [selectedDiffType, setSelectedDiffType] = useState<DiffType | undefined>(undefined)
   const [isFirstRender, setIsFirstRender] = useState(true)
@@ -145,11 +145,14 @@ const SQLEditor = () => {
   const monacoRef = useRef<Monaco | null>(null)
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
 
+  // Use chat id because useChat doesn't have a reset function to clear all messages
+  const [chatId, setChatId] = useState(uuidv4())
   const {
     messages: chatMessages,
     append,
     isLoading: isLoadingChat,
   } = useChat({
+    id: chatId,
     api: `${BASE_PATH}/api/ai/sql/generate-v2`,
     body: {
       existingSql: editorRef.current?.getValue(),
@@ -751,6 +754,7 @@ const SQLEditor = () => {
                 createdAt: new Date(),
               })
             }
+            onClearHistory={() => setChatId(uuidv4())}
             onDiff={updateEditorWithCheckForDiff}
             onClose={() => setIsAiOpen(false)}
           />

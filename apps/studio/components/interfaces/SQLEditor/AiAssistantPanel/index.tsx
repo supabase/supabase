@@ -33,6 +33,7 @@ interface AiAssistantPanelProps {
   selectedMessage?: string
   loading: boolean
   onSubmit: (s: string) => void
+  onClearHistory: () => void
   onDiff: ({ id, diffType, sql }: { id: string; diffType: DiffType; sql: string }) => void
   onClose: () => void
 }
@@ -43,6 +44,7 @@ export const AiAssistantPanel = ({
   loading,
   onSubmit,
   onDiff,
+  onClearHistory,
   onClose,
 }: AiAssistantPanelProps) => {
   const router = useRouter()
@@ -105,21 +107,26 @@ export const AiAssistantPanel = ({
             </Button>
           }
         >
-          <Button
-            type="default"
-            className="w-min"
-            icon={
-              <div
-                className={cn(
-                  'w-2 h-2 rounded-full',
-                  includeSchemaMetadata ? 'bg-brand' : 'border border-stronger'
-                )}
-              />
-            }
-            onClick={() => snap.setShowAiSettingsModal(true)}
-          >
-            {includeSchemaMetadata ? 'Include' : 'Exclude'} database metadata in queries
-          </Button>
+          <div className="flex flex-row justify-between">
+            <Button
+              type="default"
+              className="w-min"
+              icon={
+                <div
+                  className={cn(
+                    'w-2 h-2 rounded-full',
+                    includeSchemaMetadata ? 'bg-brand' : 'border border-stronger'
+                  )}
+                />
+              }
+              onClick={() => snap.setShowAiSettingsModal(true)}
+            >
+              {includeSchemaMetadata ? 'Include' : 'Exclude'} database metadata in queries
+            </Button>
+            <Button type="warning" onClick={() => onClearHistory()}>
+              Clear history
+            </Button>
+          </div>
         </Message>
 
         {messages.map((m) => (
