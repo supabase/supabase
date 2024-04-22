@@ -158,7 +158,11 @@ export const load = (async ({ locals: { safeGetSession } }) => {
 }) satisfies LayoutServerLoad
 ```
 
-> Start your dev server (`npm run dev`) in order to generate the `./$types` files we are referencing in our project.
+<Admonition type="tip">
+
+Start your dev server (`npm run dev`) in order to generate the `./$types` files we are referencing in our project.
+
+</Admonition>
 
 Create a new `src/routes/+layout.ts` file to handle the session and the supabase object on the client-side.
 
