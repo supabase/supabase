@@ -135,22 +135,21 @@ const TriggersList = ({
           {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
 
           <Table
-            className="table-fixed"
             head={
               <>
                 <Table.th key="name" className="space-x-4">
                   Name
                 </Table.th>
-                <Table.th key="table" className="hidden lg:table-cell">
+                <Table.th key="table" className="table-cell">
                   Table
                 </Table.th>
-                <Table.th key="function" className="hidden xl:table-cell">
+                <Table.th key="function" className="table-cell">
                   Function
                 </Table.th>
-                <Table.th key="events" className="hidden xl:table-cell">
+                <Table.th key="events" className="table-cell">
                   Events
                 </Table.th>
-                <Table.th key="enabled" className="hidden w-20 xl:table-cell">
+                <Table.th key="enabled" className="w-20 table-cell">
                   Enabled
                 </Table.th>
                 <Table.th key="buttons" className="w-1/12"></Table.th>
