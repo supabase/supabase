@@ -27,7 +27,6 @@
   "devDependencies": {
     "@babel/core": "^7.12.9",
     "@types/react": "^18.0.17",
-    "@types/react-native": "^0.69.5",
     "@types/react-native-elements": "^0.18.0",
     "prettier": "^2.7.1",
     "typescript": "^4.7.4"
