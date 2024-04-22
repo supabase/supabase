@@ -604,40 +604,38 @@ const SQLEditor = () => {
           direction="vertical"
           autoSaveId={LOCAL_STORAGE_KEYS.SQL_EDITOR_SPLIT_SIZE}
         >
-          {isAiOpen && !hasHipaaAddon && (
+          {(isAiOpen || isDiffOpen) && !hasHipaaAddon && (
             <AISchemaSuggestionPopover
               onClickSettings={() => {
                 appSnap.setShowAiSettingsModal(true)
               }}
             >
-              <>
-                {isDiffOpen ? (
-                  <motion.div
-                    key="ask-ai-input-container"
-                    layoutId="ask-ai-input-container"
-                    variants={{ visible: { borderRadius: 0, x: 0 }, hidden: { x: 100 } }}
-                    initial={isFirstRender ? 'visible' : 'hidden'}
-                    animate="visible"
-                    className={cn(
-                      'flex flex-row items-center gap-3 justify-end px-2 py-2 w-full z-10',
-                      'bg-brand-200 border-b border-brand-400  !shadow-none'
-                    )}
-                  >
-                    {debugSolution && (
-                      <div className="h-full w-full flex flex-row items-center overflow-y-hidden text-sm text-brand-600">
-                        {debugSolution}
-                      </div>
-                    )}
-                    <DiffActionBar
-                      loading={isAcceptDiffLoading}
-                      selectedDiffType={selectedDiffType || DiffType.Modification}
-                      onChangeDiffType={(diffType) => setSelectedDiffType(diffType)}
-                      onAccept={acceptAiHandler}
-                      onCancel={discardAiHandler}
-                    />
-                  </motion.div>
-                ) : null}
-              </>
+              {isDiffOpen ? (
+                <motion.div
+                  key="ask-ai-input-container"
+                  layoutId="ask-ai-input-container"
+                  variants={{ visible: { borderRadius: 0, x: 0 }, hidden: { x: 100 } }}
+                  initial={isFirstRender ? 'visible' : 'hidden'}
+                  animate="visible"
+                  className={cn(
+                    'flex flex-row items-center gap-3 justify-end px-2 py-2 w-full z-10',
+                    'bg-brand-200 border-b border-brand-400  !shadow-none'
+                  )}
+                >
+                  {debugSolution && (
+                    <div className="h-full w-full flex flex-row items-center overflow-y-hidden text-sm text-brand-600">
+                      {debugSolution}
+                    </div>
+                  )}
+                  <DiffActionBar
+                    loading={isAcceptDiffLoading}
+                    selectedDiffType={selectedDiffType || DiffType.Modification}
+                    onChangeDiffType={(diffType) => setSelectedDiffType(diffType)}
+                    onAccept={acceptAiHandler}
+                    onCancel={discardAiHandler}
+                  />
+                </motion.div>
+              ) : null}
             </AISchemaSuggestionPopover>
           )}
           <ResizablePanel collapsible collapsedSize={10} minSize={20}>
