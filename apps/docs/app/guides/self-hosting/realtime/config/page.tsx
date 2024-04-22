@@ -15,7 +15,6 @@ const RealtimeConfigPage = async () => {
 
   return (
     <GuideTemplate
-      pathname="self-hosting/realtime/config"
       meta={meta}
       editLink="/supabase/supabase/blob/master/apps/docs/pages/guides/self-hosting/realtime/config.tsx"
     >

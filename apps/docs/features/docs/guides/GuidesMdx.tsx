@@ -13,14 +13,33 @@ import remarkMath from 'remark-math'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter } from '~/lib/docs'
 import { components } from './GuidesMdx.shared'
 
-const getGuidesMarkdown = async (section: string, params: { slug?: string[] }) => {
-  const relPath = (section + '/' + (params?.slug?.join(sep) ?? '')).replace(/\/$/, '')
+const PUBLISHED_SECTIONS = [
+  'ai',
+  'api',
+  'auth',
+  'cli',
+  'database',
+  'functions',
+  'getting-started',
+  // 'graphql', -- technically published, but completely federated
+  'platform',
+  'realtime',
+  'resources',
+  'self-hosting',
+  'storage',
+] as const
+
+const getGuidesMarkdown = async ({ slug }: { slug: string[] }) => {
+  const relPath = slug.join(sep).replace(/\/$/, '')
   const fullPath = join(GUIDES_DIRECTORY, relPath + '.mdx')
   /**
    * SAFETY CHECK:
-   * Prevent accessing anything outside of GUIDES_DIRECTORY
+   * Prevent accessing anything outside of published sections and GUIDES_DIRECTORY
    */
-  if (!fullPath.startsWith(GUIDES_DIRECTORY)) {
+  if (
+    !fullPath.startsWith(GUIDES_DIRECTORY) ||
+    !PUBLISHED_SECTIONS.some((section) => relPath.startsWith(section))
+  ) {
     throw Error('Accessing forbidden route. Content must be within the GUIDES_DIRECTORY.')
   }
 
@@ -28,35 +47,38 @@ const getGuidesMarkdown = async (section: string, params: { slug?: string[] }) =
 
   const editLink = `supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
 
-  const { data: frontmatter, content } = matter(mdx)
-  if (!isValidGuideFrontmatter(frontmatter)) {
+  const { data: meta, content } = matter(mdx)
+  if (!isValidGuideFrontmatter(meta)) {
     throw Error('Type of frontmatter is not valid')
   }
 
   return {
-    pathname: relPath,
-    frontmatter,
+    meta,
     content,
     editLink,
   }
 }
 
-const genGuidesStaticParams = (section: string) => async () => {
-  const directory = join(GUIDES_DIRECTORY, section)
+const genGuidesStaticParams = (directory?: string) => async () => {
+  const promises = directory
+    ? (await readdir(join(GUIDES_DIRECTORY, directory), { recursive: true }))
+        .filter((file) => extname(file) === '.mdx')
+        .map((file) => ({ slug: file.replace(/\.mdx$/, '').split(sep) }))
+    : PUBLISHED_SECTIONS.map(async (section) =>
+        (await readdir(join(GUIDES_DIRECTORY, section), { recursive: true }))
+          .filter((file) => extname(file) === '.mdx')
+          .map((file) => ({
+            slug: [section, ...file.replace(/\.mdx$/, '').split(sep)],
+          }))
+          .concat(existsSync(join(GUIDES_DIRECTORY, `${section}.mdx`)) ? [{ slug: [section] }] : [])
+      )
 
-  const files = (await readdir(directory, { recursive: true }))
-    .filter((file) => extname(file) === '.mdx')
-    .map((file) => ({
-      slug: file.replace(/\.mdx$/, '').split(sep),
-    }))
-
-  // Index page isn't included in the directory
-  const indexFile = join(GUIDES_DIRECTORY, `${section}.mdx`)
-  if (existsSync(indexFile)) {
-    files.push({ slug: [] })
-  }
-
-  return files
+  /**
+   * Flattening earlier will not work because there is nothing to flatten
+   * until the promises resolve.
+   */
+  const result = (await Promise.all(promises)).flat()
+  return result
 }
 
 const codeHikeOptions: CodeHikeConfig = {

@@ -347,8 +347,10 @@ function DataSources({ schema }: { schema: any }) {
 const TerraformReferencePage = async () => {
   const { schema } = await getSchema()
 
+  const editLink = 'supabase/terraform-provider-supabase'
+
   return (
-    <GuideTemplate pathname="terraform/reference" meta={meta}>
+    <GuideTemplate meta={meta} editLink={editLink}>
       The Terraform Provider provices access to{' '}
       <Link
         href="https://developer.hashicorp.com/terraform/language/resources"
@@ -386,10 +388,6 @@ const TerraformReferencePage = async () => {
 const getSchema = async () => {
   let response = await fetch(
     `https://raw.githubusercontent.com/${terraformDocsOrg}/${terraformDocsRepo}/${terraformDocsBranch}/${terraformDocsDocsDir}/schema.json`
-  )
-  console.log(
-    '一二三',
-    `https://raw.githubusercontent.com/${terraformDocsOrg}/${terraformDocsBranch}/${terraformDocsRepo}/${terraformDocsDocsDir}/schema.json`
   )
   if (!response.ok) throw Error('Failed to fetch Terraform JSON schema from GitHub')
 

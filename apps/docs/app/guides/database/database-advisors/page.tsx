@@ -22,7 +22,7 @@ const meta = {
   subtitle: 'Check your database for performance and security issues',
 }
 
-const editLink = 'https://github.com/supabase/splinter/tree/main/docs'
+const editLink = 'supabase/splinter/tree/main/docs'
 
 const markdownIntro = `
 You can use the Database Performance and Security Advisors to check your database for issues such as missing indexes and improperly set-up RLS policies.
@@ -45,7 +45,7 @@ const DatabaseAdvisorDocs = async () => {
   } as SerializeOptions
 
   return (
-    <GuideTemplate pathname="database-linter" editLink={editLink}>
+    <GuideTemplate editLink={editLink}>
       <MDXRemoteGuides source={markdownIntro} />
       <Heading tag="h2">Available checks</Heading>
       <Tabs listClassNames="flex flex-wrap gap-2 [&>button]:!m-0" queryGroup="lint">

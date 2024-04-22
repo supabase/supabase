@@ -7,9 +7,8 @@ import { useEffect } from 'react'
 import { Button, cn } from 'ui'
 import { useCommandMenu } from 'ui-patterns/Cmdk'
 import ButtonCard from '~/components/ButtonCard'
-import { Heading } from '~/components/CustomHTMLElements'
 
-const GuideErrorTemplate = () => {
+const GuideErrorPage = () => {
   const pathname = usePathname() ?? ''
   const { setIsOpen: setCommandMenuOpen } = useCommandMenu()
   const { searchState, handleDocsSearch } = useDocsSearch()
@@ -77,4 +76,4 @@ const GuideErrorTemplate = () => {
   )
 }
 
-export { GuideErrorTemplate }
+export default GuideErrorPage

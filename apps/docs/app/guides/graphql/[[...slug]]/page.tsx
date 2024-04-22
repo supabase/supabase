@@ -123,6 +123,8 @@ const getContent = async ({ slug }: { slug?: string[] }) => {
 
   const { remoteFile, meta } = page
 
+  const editLink = `${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`
+
   const response = await fetch(
     `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
   )
@@ -130,9 +132,9 @@ const getContent = async ({ slug }: { slug?: string[] }) => {
   const content = await response.text()
 
   return {
-    pathname: slug?.at(0) ?? '',
     meta,
     content,
+	editLink
   }
 }
 

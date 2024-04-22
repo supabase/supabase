@@ -15,7 +15,6 @@ const AuthConfigPage = async () => {
 
   return (
     <GuideTemplate
-      pathname="self-hosting/auth/config"
       meta={meta}
       editLink="/supabase/supabase/blob/master/apps/docs/pages/guides/self-hosting/auth/config.tsx"
     >

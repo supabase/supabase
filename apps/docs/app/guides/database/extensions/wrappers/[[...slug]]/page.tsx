@@ -117,7 +117,7 @@ const WrappersDocs = async ({ params }: { params: { slug?: string[] } }) => {
       } as SerializeOptions)
     : undefined
 
-  return <GuideTemplate pathname="" meta={meta} mdxOptions={options} {...data} />
+  return <GuideTemplate meta={meta} mdxOptions={options} {...data} />
 }
 
 /**
@@ -131,10 +131,11 @@ const getContent = async (params: { slug?: string[] }) => {
   let isExternal: boolean
   let meta: any
   let content: string
-  let editLink: string | undefined
+  let editLink: string
 
   if (!federatedPage) {
     isExternal = false
+	editLink = `supabase/supabase/apps/docs/content/guides/database/extensions/wrappers/${params?.slug?.join(sep) || 'index'}.mdx`
     const rawContent = await readFile(
       join(
         GUIDES_DIRECTORY,

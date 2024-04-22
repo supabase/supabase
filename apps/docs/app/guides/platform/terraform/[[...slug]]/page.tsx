@@ -100,6 +100,8 @@ const getContent = async ({ slug }: { slug?: string[] }) => {
 
   const { meta, remoteFile, useRoot } = page
 
+  const editLink = `${terraformDocsOrg}/${terraformDocsRepo}/blob/${terraformDocsBranch}/${useRoot ? '' : `${terraformDocsDocsDir}/`}${remoteFile}`
+
   let response = await fetch(
     `https://raw.githubusercontent.com/${terraformDocsOrg}/${terraformDocsRepo}/${terraformDocsBranch}/${useRoot ? '' : `${terraformDocsDocsDir}/`}${remoteFile}`
   )
@@ -115,9 +117,9 @@ const getContent = async ({ slug }: { slug?: string[] }) => {
   }
 
   return {
-    pathname: requestedSlug ?? '',
     meta,
     content,
+	editLink
   }
 }
 

@@ -15,7 +15,6 @@ const AnalyticsConfigPage = async () => {
 
   return (
     <GuideTemplate
-      pathname="self-hosting/analytics/config"
       meta={meta}
       editLink="/supabase/supabase/blob/master/apps/docs/pages/guides/self-hosting/analytics/config.tsx"
     >

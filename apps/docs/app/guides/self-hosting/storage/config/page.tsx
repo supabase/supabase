@@ -15,7 +15,6 @@ const StorageConfigPage = async () => {
 
   return (
     <GuideTemplate
-      pathname="self-hosting/storage/config"
       meta={meta}
       editLink="/supabase/supabase/blob/master/apps/docs/pages/guides/self-hosting/storage/config.tsx"
     >

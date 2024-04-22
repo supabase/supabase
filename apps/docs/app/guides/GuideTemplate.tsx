@@ -1,26 +1,27 @@
 import { ExternalLink } from 'lucide-react'
 import { type SerializeOptions } from 'next-mdx-remote/dist/types'
-import { type PropsWithChildren } from 'react'
+import { type ReactNode } from 'react'
 import { cn } from 'ui/server'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import { MDXProviderGuides } from '~/features/docs/guides/GuidesMdx.client'
 import { MDXRemoteGuides } from '~/features/docs/guides/GuidesMdx'
 import { type GuideFrontmatter } from '~/lib/docs'
 
-const GuideTemplate = ({
-  pathname,
-  meta,
-  content,
-  children,
-  editLink,
-  mdxOptions,
-}: PropsWithChildren<{
-  pathname: string
+interface BaseGuideTemplateProps {
   meta?: GuideFrontmatter
   content?: string
-  editLink?: string
+  children?: ReactNode
+  editLink: string
   mdxOptions?: SerializeOptions
-}>) => (
+}
+
+type WithRequired<T, K extends keyof T> = T & { [P in K]-?: T[P] }
+
+type GuideTemplateProps =
+  | WithRequired<BaseGuideTemplateProps, 'children'>
+  | WithRequired<BaseGuideTemplateProps, 'content'>
+
+const GuideTemplate = ({ meta, content, children, editLink, mdxOptions }: GuideTemplateProps) => (
   <div className={'grid grid-cols-12 relative gap-4'}>
     <div
       className={cn(
@@ -45,11 +46,7 @@ const GuideTemplate = ({
         <div className="mt-16 not-prose">
           <div>
             <a
-              href={`https://github.com/${
-                editLink ||
-                `supabase/supabase/edit/master/apps/docs/content/guides/auth${pathname}.mdx`
-              }
-                    `}
+              href={editLink.startsWith('http') ? editLink : `https://github.com/${editLink}`}
               className="text-sm transition flex items-center gap-1 text-scale-1000 hover:text-scale-1200 w-fit"
             >
               Edit this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />

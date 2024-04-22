@@ -32,9 +32,11 @@ const Config = () => {
     title: 'CLI configuration',
   }
 
+  const editLink = 'supabase/supabase/blob/master/apps/docs/spec/cli_v1_config.yaml'
+
   return (
     <>
-      <GuideTemplate pathname="config" meta={meta}>
+      <GuideTemplate meta={meta} editLink={editLink}>
         <ReactMarkdown>{specFile.info.description}</ReactMarkdown>
         <div>{content}</div>
       </GuideTemplate>
