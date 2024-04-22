@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRightIcon } from '@heroicons/react/outline'
@@ -13,6 +13,14 @@ import { DayLink } from '.'
 const DaySection = ({ day, className }: { day: WeekDayProps; className?: string }) => {
   const isMobile = useBreakpoint(639)
   const cssGroup = 'group/d' + day.d
+
+  const [isMounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!isMounted) return null
 
   return (
     <section
@@ -87,6 +95,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
                             object-center sm:object-right
                           `}
                           fill
+                          sizes="100%"
                           quality={100}
                           alt={day.title}
                         />

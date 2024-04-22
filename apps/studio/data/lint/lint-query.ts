@@ -1,14 +1,18 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+
 import { executeSql } from '../sql/execute-sql-query'
 import { lintKeys } from './keys'
 
-export const LINT_SQL = `(
+export const LINT_SQL = /* SQL */ `set local search_path = '';
+
+(
 with foreign_keys as (
     select
-        cl.relnamespace::regnamespace as schema_,
-        cl.oid::regclass as table_,
+        cl.relnamespace::regnamespace::text as schema_name,
+        cl.relname as table_name,
+        cl.oid as table_oid,
         ct.conname as fkey_name,
-        ct.conkey col_attnums
+        ct.conkey as col_attnums
     from
         pg_catalog.pg_constraint ct
         join pg_catalog.pg_class cl -- fkey owning table
@@ -25,12 +29,11 @@ with foreign_keys as (
 ),
 index_ as (
     select
-        indrelid::regclass as table_,
-        indrelid as table_oid,
+        pi.indrelid as table_oid,
         indexrelid::regclass as index_,
         string_to_array(indkey::text, ' ')::smallint[] as col_attnums
     from
-        pg_catalog.pg_index
+        pg_catalog.pg_index pi
     where
         indisvalid
 )
@@ -38,38 +41,40 @@ select
     'unindexed_foreign_keys' as name,
     'INFO' as level,
     'EXTERNAL' as facing,
+    array['PERFORMANCE'] as categories,
     'Identifies foreign key constraints without a covering index, which can impact database performance.' as description,
     format(
         'Table \`%s.%s\` has a foreign key \`%s\` without a covering index. This can lead to suboptimal query performance.',
-        fk.schema_,
-        fk.table_,
+        fk.schema_name,
+        fk.table_name,
         fk.fkey_name
     ) as detail,
     'https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys' as remediation,
     jsonb_build_object(
-        'schema', fk.schema_,
-        'name', fk.table_,
+        'schema', fk.schema_name,
+        'name', fk.table_name,
         'type', 'table',
         'fkey_name', fk.fkey_name,
         'fkey_columns', fk.col_attnums
     ) as metadata,
-    format('unindexed_foreign_keys_%s_%s_%s', fk.schema_, fk.table_, fk.fkey_name) as cache_key
+    format('unindexed_foreign_keys_%s_%s_%s', fk.schema_name, fk.table_name, fk.fkey_name) as cache_key
 from
     foreign_keys fk
     left join index_ idx
-        on fk.table_ = idx.table_
+        on fk.table_oid = idx.table_oid
         and fk.col_attnums = idx.col_attnums
     left join pg_catalog.pg_depend dep
         on idx.table_oid = dep.objid
         and dep.deptype = 'e'
 where
     idx.index_ is null
-    and fk.schema_::text not in (
+    and fk.schema_name not in (
         '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and dep.objid is null -- exclude tables owned by extensions
 order by
-    fk.table_,
+    fk.schema_name,
+    fk.table_name,
     fk.fkey_name)
 union all
 (
@@ -77,6 +82,7 @@ select
     'auth_users_exposed' as name,
     'WARN' as level,
     'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
     'Detects if auth.users is exposed to anon or authenticated roles via a view or materialized view in the public schema, potentially compromising user data security.' as description,
     format(
         'View/Materialized View "%s" in the public schema may expose \`auth.users\` data to anon or authenticated roles.',
@@ -92,14 +98,14 @@ select
     format('auth_users_exposed_%s_%s', 'public', c.relname) as cache_key
 from
     -- Identify the oid for auth.users
-  pg_catalog.pg_class auth_users_pg_class
+	pg_catalog.pg_class auth_users_pg_class
     join pg_catalog.pg_namespace auth_users_pg_namespace
-    on auth_users_pg_class.relnamespace = auth_users_pg_namespace.oid
-    and auth_users_pg_class.relname = 'users'
-    and auth_users_pg_namespace.nspname = 'auth'
-  -- Depends on auth.users
+		on auth_users_pg_class.relnamespace = auth_users_pg_namespace.oid
+		and auth_users_pg_class.relname = 'users'
+		and auth_users_pg_namespace.nspname = 'auth'
+	-- Depends on auth.users
     join pg_catalog.pg_depend d
-      on d.refobjid = auth_users_pg_class.oid
+    	on d.refobjid = auth_users_pg_class.oid
     join pg_catalog.pg_rewrite r
         on r.oid = d.objid
     join pg_catalog.pg_class c
@@ -157,39 +163,12 @@ where
 group by
     c.relname, c.oid)
 union all
-(/*
-Usage of auth.uid(), auth.role() ... are common in RLS policies.
-
-A naive policy like
-
-    create policy "rls_test_select" on test_table
-    to authenticated
-    using ( auth.uid() = user_id )
-
-will re-evaluate the auth.uid() function for every row. That can result in 100s of times slower performance
-https://supabase.com/docs/guides/database/postgres/row-level-security#call-functions-with-select
-
-To resolve that issue, the function calls can be wrapped like "(select auth.uid())" which causes the value to
-be executed exactly 1 time per query
-
-For example:
-
-    create policy "rls_test_select" on test_table
-    to authenticated
-    using ( (select auth.uid()) = user_id )
-
-NOTE:
-    This lint requires search_path = '' or 'auth' not in search_path
-    because qual and with_check are dependent on search_path to determine if function calls include the "auth" schema
-*/
-
-
-
+(
 with policies as (
     select
-        nsp.nspname as schema_,
-        polrelid::regclass table_,
-        pc.relrowsecurity is_rls_active,
+        nsp.nspname as schema_name,
+        pb.tablename as table_name,
+        pc.relrowsecurity as is_rls_active,
         polname as policy_name,
         polpermissive as is_permissive, -- if not, then restrictive
         (select array_agg(r::regrole) from unnest(polroles) as x(r)) as roles,
@@ -217,24 +196,26 @@ select
     'auth_rls_initplan' as name,
     'WARN' as level,
     'EXTERNAL' as facing,
+    array['PERFORMANCE'] as categories,
     'Detects if calls to \`auth.<function>()\` in RLS policies are being unnecessarily re-evaluated for each row' as description,
     format(
-        'Table \`%s\` has a row level security policy \`%s\` that re-evaluates an auth.<function>() for each row. This produces suboptimal query performance at scale. Resolve the issue by replacing \`auth.<function>()\` with \`(select auth.<function>())\`. See https://supabase.com/docs/guides/database/postgres/row-level-security#call-functions-with-select for more.',
-        table_,
+        'Table \`%s.%s\` has a row level security policy \`%s\` that re-evaluates an auth.<function>() for each row. This produces suboptimal query performance at scale. Resolve the issue by replacing \`auth.<function>()\` with \`(select auth.<function>())\`. See [docs](https://supabase.com/docs/guides/database/postgres/row-level-security#call-functions-with-select) for more info.',
+        schema_name,
+        table_name,
         policy_name
     ) as detail,
     'https://supabase.com/docs/guides/database/database-linter?lint=0003_auth_rls_initplan' as remediation,
     jsonb_build_object(
-        'schema', schema_,
-        'name', table_,
+        'schema', schema_name,
+        'name', table_name,
         'type', 'table'
     ) as metadata,
-    format('auth_rls_init_plan_%s_%s_%s', schema_, table_, policy_name) as cache_key
+    format('auth_rls_init_plan_%s_%s_%s', schema_name, table_name, policy_name) as cache_key
 from
     policies
 where
     is_rls_active
-    and schema_::text not in (
+    and schema_name not in (
         '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and (
@@ -258,6 +239,7 @@ select
     'no_primary_key' as name,
     'INFO' as level,
     'EXTERNAL' as facing,
+    array['PERFORMANCE'] as categories,
     'Detects if a table does not have a primary key. Tables without a primary key can be inefficient to interact with at scale.' as description,
     format(
         'Table \`%s.%s\` does not have a primary key',
@@ -265,7 +247,7 @@ select
         pgc.relname
     ) as detail,
     'https://supabase.com/docs/guides/database/database-linter?lint=0004_no_primary_key' as remediation,
-      jsonb_build_object(
+     jsonb_build_object(
         'schema', pgns.nspname,
         'name', pgc.relname,
         'type', 'table'
@@ -302,6 +284,7 @@ select
     'unused_index' as name,
     'INFO' as level,
     'EXTERNAL' as facing,
+    array['PERFORMANCE'] as categories,
     'Detects if an index has never been used and may be a candidate for removal.' as description,
     format(
         'Index \`%s\` on table \`%s.%s\` has not been used',
@@ -343,6 +326,7 @@ select
     'multiple_permissive_policies' as name,
     'WARN' as level,
     'EXTERNAL' as facing,
+    array['PERFORMANCE'] as categories,
     'Detects if multiple permissive row level security policies are present on a table for the same \`role\` and \`action\` (e.g. insert). Multiple permissive policies are suboptimal for performance as each policy must be executed for every relevant query.' as description,
     format(
         'Table \`%s.%s\` has multiple permissive policies for role \`%s\` for action \`%s\`. Policies include \`%s\`',
@@ -413,6 +397,7 @@ select
     'policy_exists_rls_disabled' as name,
     'INFO' as level,
     'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
     'Detects cases where row level security (RLS) policies have been created, but RLS has not been enabled for the underlying table.' as description,
     format(
         'Table \`%s.%s\` has RLS policies but RLS is not enabled on the table. Policies include %s.',
@@ -457,6 +442,7 @@ select
     'rls_enabled_no_policy' as name,
     'INFO' as level,
     'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
     'Detects cases where row level security (RLS) has been enabled on a table but no RLS policies have been created.' as description,
     format(
         'Table \`%s.%s\` has RLS enabled, but no policies exist',
@@ -501,6 +487,7 @@ select
     'duplicate_index' as name,
     'WARN' as level,
     'EXTERNAL' as facing,
+    array['PERFORMANCE'] as categories,
     'Detects cases where two ore more identical indexes exist.' as description,
     format(
         'Table \`%s.%s\` has identical indexes %s. Drop all except one of them',
@@ -554,6 +541,7 @@ select
     'security_definer_view' as name,
     'WARN' as level,
     'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
     'Detects views that are SECURITY DEFINER meaning that they ignore row level security (RLS) policies.' as description,
     format(
         'View \`%s.%s\` is SECURITY DEFINER',
@@ -582,21 +570,22 @@ where
     c.relkind = 'v'
     and n.nspname = 'public'
     and dep.objid is null -- exclude views owned by extensions
-  and not (
-    lower(coalesce(c.reloptions::text,'{}'))::text[]
-    && array[
-      'security_invoker=1',
-      'security_invoker=true',
-      'security_invoker=yes',
-      'security_invoker=on'
-    ]
-  ))
+	and not (
+		lower(coalesce(c.reloptions::text,'{}'))::text[]
+		&& array[
+			'security_invoker=1',
+			'security_invoker=true',
+			'security_invoker=yes',
+			'security_invoker=on'
+		]
+	))
 union all
 (
 select
     'function_search_path_mutable' as name,
     'WARN' as level,
     'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
     'Detects functions with a mutable search_path parameter which could fail to execute successfully for some roles.' as description,
     format(
         'Function \`%s.%s\` has a role mutable search_path',
@@ -635,6 +624,7 @@ select
     'rls_disabled_in_public' as name,
     'ERROR' as level,
     'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
     'Detects cases where row level security (RLS) has not been enabled on a table in the \`public\` schema.' as description,
     format(
         'Table \`%s.%s\` is public, but RLS has not been enabled.',
@@ -667,6 +657,7 @@ select
     'extension_in_public' as name,
     'WARN' as level,
     'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
     'Detects extensions installed in the \`public\` schema.' as description,
     format(
         'Extension \`%s\` is installed in the public schema. Move it to another schema.',
@@ -688,7 +679,61 @@ where
     -- plpgsql is installed by default in public and outside user control
     -- confirmed safe
     pe.extname not in ('plpgsql')
-    and pe.extnamespace::regnamespace::text = 'public')`.trim()
+    and pe.extnamespace::regnamespace::text = 'public')
+union all
+(
+with policies as (
+    select
+        nsp.nspname as schema_name,
+        pb.tablename as table_name,
+        polname as policy_name,
+        qual,
+        with_check
+    from
+        pg_catalog.pg_policy pa
+        join pg_catalog.pg_class pc
+            on pa.polrelid = pc.oid
+        join pg_catalog.pg_namespace nsp
+            on pc.relnamespace = nsp.oid
+        join pg_catalog.pg_policies pb
+            on pc.relname = pb.tablename
+            and nsp.nspname = pb.schemaname
+            and pa.polname = pb.policyname
+)
+select
+    'rls_references_user_metadata' as name,
+    'ERROR' as level,
+    'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
+    'Detects when Supabase Auth user_metadata is referenced insecurely in a row level security (RLS) policy.' as description,
+    format(
+        'Table \`%s.%s\` has a row level security policy \`%s\` that references Supabase Auth \`user_metadata\`. \`user_metadata\` is editable by end users and should never be used in a security context.',
+        schema_name,
+        table_name,
+        policy_name
+    ) as detail,
+    'https://supabase.com/docs/guides/database/database-linter?lint=0015_rls_references_user_metadata' as remediation,
+    jsonb_build_object(
+        'schema', schema_name,
+        'name', table_name,
+        'type', 'table'
+    ) as metadata,
+    format('rls_references_user_metadata_%s_%s_%s', schema_name, table_name, policy_name) as cache_key
+from
+    policies
+where
+    schema_name not in (
+        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+    )
+    and (
+            -- Example: auth.jwt() -> 'user_metadata'
+			-- False positives are possible, but it isn't practical to string match
+			-- If false positive rate is too high, this expression can iterate
+            qual like '%auth.jwt()%user_metadata%'
+			or qual like '%current_setting(%request.jwt.claims%)%user_metadata%'
+			or with_check like '%auth.jwt()%user_metadata%'
+			or with_check like '%current_setting(%request.jwt.claims%)%user_metadata%'
+    ))`.trim()
 
 // Array of all lint rules we handle right now.
 export const LINT_TYPES = [
@@ -705,20 +750,26 @@ export const LINT_TYPES = [
   'function_search_path_mutable',
   'rls_disabled_in_public',
   'extension_in_public',
+  'auth_otp_long_expiry',
+  'auth_otp_short_length',
+  'rls_references_user_metadata',
 ] as const
+
 export type LINT_TYPES = (typeof LINT_TYPES)[number]
 
 export type Lint = {
   name: LINT_TYPES
   level: 'ERROR' | 'WARN' | 'INFO'
   facing: string
+  categories: ['PERFORMANCE' | 'SECURITY']
   description: string
   detail: string
   remediation: any
   metadata: {
     schema?: string
     name?: string
-    type?: 'table' | 'view'
+    entity?: string
+    type?: 'table' | 'view' | 'auth' | 'function' | 'extension'
     fkey_name?: string
     fkey_columns?: number[]
   } | null
@@ -743,6 +794,7 @@ const getProjectLints = async (
     },
     signal
   )
+
   return result
 }
 

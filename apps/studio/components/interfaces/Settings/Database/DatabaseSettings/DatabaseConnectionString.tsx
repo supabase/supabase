@@ -198,7 +198,10 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
               >
                 {readReplicasEnabled && <DatabaseSelector />}
                 <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
-                  <a href="https://supabase.com/docs/guides/database/connecting-to-postgres">
+                  <a
+                    target="_blank"
+                    href="https://supabase.com/docs/guides/database/connecting-to-postgres"
+                  >
                     Documentation
                   </a>
                 </Button>
