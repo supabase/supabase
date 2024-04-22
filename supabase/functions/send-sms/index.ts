@@ -12,6 +12,8 @@ const accountSid: string | undefined = Deno.env.get("TWILIO_ACCOUNT_SID");
 const authToken: string | undefined = Deno.env.get("TWILIO_AUTH_TOKEN");
 const fromNumber: string = Deno.env.get("TWILIO_PHONE_NUMBER")
 const toNumber: string = Deno.env.get("TWILIO_TO_NUMBER")
+const APP_HASH = Deno.env.get("APP_HASH")
+
 
 
 const sendTextMessage = async (
@@ -60,7 +62,7 @@ Deno.serve(async (req) => {
   const wh = new Webhook(base64_secret);
   try {
     const { user_id, phone, otp } = wh.verify(payload, headers);
-    const messageBody = `Your OTP is: ${otp}`;
+    const messageBody = `Your OTP is: ${otp} <#> Your code: ${APP_HASH}`;
     const response = await sendTextMessage(
       messageBody,
       accountSid,
