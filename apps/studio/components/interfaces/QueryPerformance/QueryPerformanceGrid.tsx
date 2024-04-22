@@ -24,7 +24,6 @@ import {
   QUERY_PERFORMANCE_REPORTS,
   QUERY_PERFORMANCE_REPORT_TYPES,
 } from './QueryPerformance.constants'
-import { useFlag } from 'hooks'
 
 interface QueryPerformanceGridProps {
   queryPerformanceQuery: DbQueryHook<any>
@@ -33,7 +32,6 @@ interface QueryPerformanceGridProps {
 export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformanceGridProps) => {
   const router = useRouter()
   const gridRef = useRef<DataGridHandle>(null)
-  const showIndexAdvisor = useFlag('indexAdvisor')
   const { preset, sort: urlSort, order, roles, search } = useParams()
   const { isLoading } = queryPerformanceQuery
 
@@ -94,8 +92,7 @@ export const QueryPerformanceGrid = ({ queryPerformanceQuery }: QueryPerformance
 
   const selectedQuery =
     selectedRow !== undefined ? queryPerformanceQuery.data?.[selectedRow]['query'] : undefined
-  const showIndexSuggestions =
-    showIndexAdvisor && (selectedQuery ?? '').trim().toLowerCase().startsWith('select')
+  const showIndexSuggestions = (selectedQuery ?? '').trim().toLowerCase().startsWith('select')
 
   const onSortChange = (column: string) => {
     let updatedSort = undefined
