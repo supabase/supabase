@@ -133,38 +133,39 @@ const TriggersList = ({
           </div>
 
           {isLocked && <ProtectedSchemaWarning schema={selectedSchema} entity="triggers" />}
-
-          <Table
-            head={
-              <>
-                <Table.th key="name" className="space-x-4">
-                  Name
-                </Table.th>
-                <Table.th key="table" className="table-cell">
-                  Table
-                </Table.th>
-                <Table.th key="function" className="table-cell">
-                  Function
-                </Table.th>
-                <Table.th key="events" className="table-cell">
-                  Events
-                </Table.th>
-                <Table.th key="enabled" className="w-20 table-cell">
-                  Enabled
-                </Table.th>
-                <Table.th key="buttons" className="w-1/12"></Table.th>
-              </>
-            }
-            body={
-              <TriggerList
-                schema={selectedSchema}
-                filterString={filterString}
-                isLocked={isLocked}
-                editTrigger={editTrigger}
-                deleteTrigger={deleteTrigger}
-              />
-            }
-          />
+          <div className="overflow-x-auto rounded">
+            <Table
+              head={
+                <>
+                  <Table.th key="name" className="space-x-4">
+                    Name
+                  </Table.th>
+                  <Table.th key="table" className="table-cell">
+                    Table
+                  </Table.th>
+                  <Table.th key="function" className="table-cell">
+                    Function
+                  </Table.th>
+                  <Table.th key="events" className="table-cell">
+                    Events
+                  </Table.th>
+                  <Table.th key="enabled" className="w-20 table-cell">
+                    Enabled
+                  </Table.th>
+                  <Table.th key="buttons" className="w-1/12"></Table.th>
+                </>
+              }
+              body={
+                <TriggerList
+                  schema={selectedSchema}
+                  filterString={filterString}
+                  isLocked={isLocked}
+                  editTrigger={editTrigger}
+                  deleteTrigger={deleteTrigger}
+                />
+              }
+            />
+          </div>
         </div>
       )}
     </>
