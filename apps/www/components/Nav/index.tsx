@@ -81,7 +81,7 @@ const Nav = (props: Props) => {
             'absolute inset-0 h-full w-full opacity-80 bg-background',
             !showLaunchWeekNavMode && '!opacity-100 transition-opacity',
             showLaunchWeekNavMode && '!bg-transparent transition-all',
-            isGAWeekSection && 'dark:!bg-[#060809]'
+            isGAWeekSection && 'dark:!bg-alternative'
           )}
         />
         <nav

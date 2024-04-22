@@ -23,7 +23,7 @@ type QueryPerformanceQueryOpts = {
 
 export const useQueryPerformanceQuery = ({
   preset,
-  orderBy = { column: 'total_time', order: 'desc' },
+  orderBy,
   searchQuery = '',
   roles,
 }: QueryPerformanceQueryOpts) => {
@@ -39,7 +39,7 @@ export const useQueryPerformanceQuery = ({
     .filter((x) => x.length > 0)
     .join(' OR ')
 
-  const orderBySql = `ORDER BY ${orderBy.column} ${orderBy.order}`
+  const orderBySql = orderBy && `ORDER BY ${orderBy.column} ${orderBy.order}`
   const sql = baseSQL.sql([], whereSql.length > 0 ? `WHERE ${whereSql}` : undefined, orderBySql)
   return useDbQuery(sql, undefined, whereSql, orderBySql)
 }

@@ -12,6 +12,7 @@ interface RootProps {
   children?: React.ReactNode
   className?: string
   defaultOpen?: boolean
+  disabled?: boolean
   modal?: boolean
   onOpenChange?: RadixPopoverTypes.PopoverProps['onOpenChange']
   open?: boolean
@@ -42,6 +43,7 @@ function Popover({
   header,
   footer,
   size = 'content',
+  disabled,
 }: RootProps) {
   const __styles = styleHandler('popover')
 
@@ -59,6 +61,7 @@ function Popover({
     >
       <RadixPopover.Trigger
         // className={DropdownStyles['sbui-popover__trigger']}
+        disabled={disabled}
         className={__styles.trigger}
         aria-label={ariaLabel}
       >
