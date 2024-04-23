@@ -1,6 +1,10 @@
 import { redirect } from 'next/navigation'
 import { sep } from 'node:path'
-import { genGuidesStaticParams, getGuidesMarkdown } from '~/features/docs/guides/GuidesMdx'
+import {
+  genGuideMeta,
+  genGuidesStaticParams,
+  getGuidesMarkdown,
+} from '~/features/docs/guides/GuidesMdx'
 import { GuideTemplate } from '../GuideTemplate'
 
 const GuidePage = async ({ params }: { params: { slug: string[] } }) => {
@@ -26,6 +30,7 @@ const GuidePage = async ({ params }: { params: { slug: string[] } }) => {
 }
 
 const generateStaticParams = genGuidesStaticParams()
+const generateMetadata = genGuideMeta(getGuidesMarkdown)
 
 export default GuidePage
-export { generateStaticParams }
+export { generateStaticParams, generateMetadata }

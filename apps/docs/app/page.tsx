@@ -1,11 +1,23 @@
-import { type Metadata } from 'next'
+import { type Metadata, type ResolvingMetadata } from 'next'
 import Link from 'next/link'
 import { IconBackground, TextLink } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
-
 import HomeMenuIconPicker from '~/components/Navigation/NavigationMenu/HomeMenuIconPicker'
 import HomeLayout from '~/layouts/HomeLayout'
+import { BASE_PATH } from '~/lib/constants'
+
+const generateMetadata = async (_, parent: ResolvingMetadata): Promise<Metadata> => {
+  const parentAlternates = (await parent).alternates
+
+  return {
+    // @ts-ignore
+    alternates: {
+      ...parentAlternates,
+      canonical: `${BASE_PATH}`,
+    },
+  }
+}
 
 const products = [
   {
@@ -188,15 +200,6 @@ const additionalResources = [
   },
 ]
 
-const metadata: Metadata = {
-  openGraph: {
-    images: 'https://supabase.com/docs/img/supabase-og-image.png',
-  },
-  twitter: {
-    images: 'https://supabase.com/docs/img/supabase-og-image.png',
-  },
-}
-
 const HomePage = () => (
   <HomeLayout>
     <div className="flex flex-col">
@@ -366,5 +369,5 @@ const HomePage = () => (
   </HomeLayout>
 )
 
-export { metadata }
 export default HomePage
+export { generateMetadata }

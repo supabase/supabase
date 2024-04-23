@@ -10,19 +10,24 @@ import {
   Popover_Shadcn_,
 } from 'ui'
 import { GuideTemplate } from '~/app/guides/GuideTemplate'
-import { type GuideFrontmatter } from '~/lib/docs'
+import { genGuideMeta } from '~/features/docs/guides/GuidesMdx'
+import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import {
   terraformDocsBranch,
   terraformDocsDocsDir,
   terraformDocsOrg,
   terraformDocsRepo,
 } from '../terraformConstants'
-import { TabPanel, Tabs } from '~/features/ui/Tabs'
 
 const meta = {
   title: 'Terraform Provider reference',
   subtitle: 'Resources and data sources available through the Terraform Provider',
-} as GuideFrontmatter
+}
+
+const generateMetadata = genGuideMeta(() => ({
+  pathname: '/guides/platform/terraform/reference',
+  meta,
+}))
 
 function ProviderSettings({ schema }: { schema: any }) {
   const attributes = schema.block.attributes
@@ -399,3 +404,4 @@ const getSchema = async () => {
 }
 
 export default TerraformReferencePage
+export { generateMetadata }

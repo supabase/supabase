@@ -1,13 +1,17 @@
 import { GuideTemplate } from '~/app/guides/GuideTemplate'
 import Param from '~/components/Params'
-import { MDXRemoteGuides } from '~/features/docs/guides/GuidesMdx'
-import { type GuideFrontmatter } from '~/lib/docs'
+import { MDXRemoteGuides, genGuideMeta } from '~/features/docs/guides/GuidesMdx'
 import { getRealtimeConfigV0 } from '~/lib/mdx/getConfig'
 
 const meta = {
   title: 'Realtime Self-hosting Config',
   description: 'How to configure and deploy Supabase Realtime.',
-} as GuideFrontmatter
+}
+
+const generateMetadata = genGuideMeta(() => ({
+  pathname: '/guides/self-hosting/realtime/config',
+  meta,
+}))
 
 const RealtimeConfigPage = async () => {
   const spec = getRealtimeConfigV0()
@@ -54,3 +58,4 @@ const RealtimeConfigPage = async () => {
 }
 
 export default RealtimeConfigPage
+export { generateMetadata }

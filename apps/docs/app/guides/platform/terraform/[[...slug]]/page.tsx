@@ -13,6 +13,7 @@ import {
   terraformDocsOrg,
   terraformDocsRepo,
 } from '../terraformConstants'
+import { genGuideMeta } from '~/features/docs/guides/GuidesMdx'
 
 // Each external docs page is mapped to a local page
 const pageMap = [
@@ -117,6 +118,7 @@ const getContent = async ({ slug }: { slug?: string[] }) => {
   }
 
   return {
+    pathname: `/guides/platform/terraform${slug?.length ? `/${slug.join('/')}` : ''}`,
     meta,
     content,
     editLink,
@@ -124,6 +126,7 @@ const getContent = async ({ slug }: { slug?: string[] }) => {
 }
 
 const generateStaticParams = async () => pageMap.map(({ slug }) => ({ slug: slug ? [slug] : [] }))
+const generateMetadata = genGuideMeta(getContent)
 
 export default TerraformDocs
-export { generateStaticParams }
+export { generateStaticParams, generateMetadata }

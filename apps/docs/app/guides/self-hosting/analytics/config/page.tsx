@@ -1,13 +1,17 @@
 import { GuideTemplate } from '~/app/guides/GuideTemplate'
 import Param from '~/components/Params'
-import { MDXRemoteGuides } from '~/features/docs/guides/GuidesMdx'
-import { type GuideFrontmatter } from '~/lib/docs'
+import { MDXRemoteGuides, genGuideMeta } from '~/features/docs/guides/GuidesMdx'
 import { getAnalyticsConfigV0 } from '~/lib/mdx/getConfig'
 
 const meta = {
   title: 'Analytics Self-hosting Config',
   description: 'How to configure and deploy Supabase Analytics.',
-} as GuideFrontmatter
+}
+
+const generateMetadata = genGuideMeta(() => ({
+  pathname: '/guides/self-hosting/analytics/config',
+  meta,
+}))
 
 const AnalyticsConfigPage = async () => {
   const spec = getAnalyticsConfigV0()
@@ -54,3 +58,4 @@ const AnalyticsConfigPage = async () => {
 }
 
 export default AnalyticsConfigPage
+export { generateMetadata }

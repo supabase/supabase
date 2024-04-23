@@ -1,4 +1,3 @@
-import { type Metadata } from 'next'
 import ReactMarkdown from 'react-markdown'
 import { CodeBlock, cn } from 'ui'
 import { Heading } from '~/components/CustomHTMLElements'
@@ -6,10 +5,16 @@ import { type TOCHeader } from '~/components/GuidesTableOfContents'
 import { Parameter } from '~/lib/refGenerator/refTypes'
 import specFile from '~/spec/cli_v1_config.yaml' assert { type: 'yml' }
 import { GuideTemplate } from '../../GuideTemplate'
+import { genGuideMeta } from '~/features/docs/guides/GuidesMdx'
 
-const metadata: Metadata = {
+const meta = {
   title: 'Supabase CLI config',
 }
+
+const generateMetadata = genGuideMeta(() => ({
+  pathname: '/guides/cli/config',
+  meta,
+}))
 
 const tocList: TOCHeader[] = []
 const content = specFile.info.tags.map((tag, id) => {
@@ -104,4 +109,4 @@ function Info({ parameter }: { parameter: Parameter }) {
 }
 
 export default Config
-export { metadata }
+export { generateMetadata }

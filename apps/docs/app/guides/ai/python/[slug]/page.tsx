@@ -2,6 +2,7 @@ import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { relative } from 'path'
 import rehypeSlug from 'rehype-slug'
 import { GuideTemplate } from '~/app/guides/GuideTemplate'
+import { genGuideMeta } from '~/features/docs/guides/GuidesMdx'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
@@ -79,6 +80,7 @@ const getContent = async ({ slug }: { slug: string }) => {
   const content = await response.text()
 
   return {
+    pathname: `/guides/ai/python/${slug}`,
     meta,
     content,
     editLink,
@@ -119,6 +121,7 @@ const urlTransform: UrlTransformFunction = (url) => {
 }
 
 const generateStaticParams = () => pageMap.map(({ slug }) => ({ slug }))
+const generateMetadata = genGuideMeta(getContent)
 
 export default PythonClientDocs
-export { generateStaticParams }
+export { generateStaticParams, generateMetadata }

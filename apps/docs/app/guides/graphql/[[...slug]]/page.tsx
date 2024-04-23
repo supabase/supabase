@@ -2,6 +2,7 @@ import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { isAbsolute, relative } from 'path'
 import rehypeSlug from 'rehype-slug'
 import { GuideTemplate } from '~/app/guides/GuideTemplate'
+import { genGuideMeta } from '~/features/docs/guides/GuidesMdx'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
@@ -132,6 +133,7 @@ const getContent = async ({ slug }: { slug?: string[] }) => {
   const content = await response.text()
 
   return {
+    pathname: `/guides/graphql${slug?.length ? `/${slug.join('/')}` : ''}`,
     meta,
     content,
     editLink,
@@ -178,6 +180,7 @@ const urlTransform: UrlTransformFunction = (url) => {
 }
 
 const generateStaticParams = async () => pageMap.map(({ slug }) => ({ slug: slug ? [slug] : [] }))
+const generateMetadata = genGuideMeta(getContent)
 
 export default PGGraphQLDocs
-export { generateStaticParams }
+export { generateStaticParams, generateMetadata }

@@ -1,13 +1,17 @@
 import { GuideTemplate } from '~/app/guides/GuideTemplate'
 import Param from '~/components/Params'
-import { MDXRemoteGuides } from '~/features/docs/guides/GuidesMdx'
-import { type GuideFrontmatter } from '~/lib/docs'
+import { MDXRemoteGuides, genGuideMeta } from '~/features/docs/guides/GuidesMdx'
 import { getAuthConfigV1 } from '~/lib/mdx/getConfig'
 
 const meta = {
   title: 'Auth Self-hosting Config',
   description: 'How to configure and deploy Supabase Auth.',
-} as GuideFrontmatter
+}
+
+const generateMetadata = genGuideMeta(() => ({
+  pathname: '/guides/self-hosting/auth/config',
+  meta,
+}))
 
 const AuthConfigPage = async () => {
   const spec = getAuthConfigV1()
@@ -54,3 +58,4 @@ const AuthConfigPage = async () => {
 }
 
 export default AuthConfigPage
+export { generateMetadata }

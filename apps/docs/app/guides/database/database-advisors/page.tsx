@@ -4,7 +4,7 @@ import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import rehypeSlug from 'rehype-slug'
 import { GuideTemplate } from '~/app/guides/GuideTemplate'
 import { Heading } from '~/components/CustomHTMLElements'
-import { MDXRemoteGuides } from '~/features/docs/guides/GuidesMdx'
+import { MDXRemoteGuides, genGuideMeta } from '~/features/docs/guides/GuidesMdx'
 import { Tabs, TabPanel } from '~/features/ui/Tabs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
@@ -21,6 +21,11 @@ const meta = {
   title: 'Performance and Security Advisors',
   subtitle: 'Check your database for performance and security issues',
 }
+
+const generateMetadata = genGuideMeta(() => ({
+  pathname: '/guides/database/database-linter',
+  meta,
+}))
 
 const editLink = 'supabase/splinter/tree/main/docs'
 
@@ -150,3 +155,4 @@ const getLints = async () => {
 }
 
 export default DatabaseAdvisorDocs
+export { generateMetadata }

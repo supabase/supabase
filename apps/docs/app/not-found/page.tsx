@@ -1,13 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { DocsSearchResult, type Database } from 'common'
-import { type Metadata } from 'next'
 import { NotFound } from '~/features/recommendations/NotFound'
-
-const metadata: Metadata = {
-  robots: {
-    index: false,
-  },
-}
 
 const NotFoundPage = async ({ searchParams: { page } }: { searchParams: { page?: string } }) => {
   const recommendations = page ? await getRecommendations(page) : null
@@ -32,4 +25,3 @@ const getRecommendations = async (page: string) => {
 }
 
 export default NotFoundPage
-export { metadata }

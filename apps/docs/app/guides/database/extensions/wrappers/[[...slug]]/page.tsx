@@ -5,7 +5,7 @@ import { join, relative, sep } from 'node:path'
 import rehypeSlug from 'rehype-slug'
 import emoji from 'remark-emoji'
 import { GuideTemplate } from '~/app/guides/GuideTemplate'
-import { genGuidesStaticParams } from '~/features/docs/guides/GuidesMdx'
+import { genGuideMeta, genGuidesStaticParams } from '~/features/docs/guides/GuidesMdx'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter } from '~/lib/docs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
@@ -161,6 +161,7 @@ const getContent = async (params: { slug?: string[] }) => {
   }
 
   return {
+    pathname: `/guides/database/extensions/wrappers${params.slug?.length ? `/${params.slug.join('/')}` : ''}`,
     isExternal,
     editLink,
     meta,
@@ -209,5 +210,7 @@ const generateStaticParams = async () => {
   return [...mdxPaths, ...federatedPaths]
 }
 
+const generateMetadata = genGuideMeta(getContent)
+
 export default WrappersDocs
-export { generateStaticParams }
+export { generateStaticParams, generateMetadata }

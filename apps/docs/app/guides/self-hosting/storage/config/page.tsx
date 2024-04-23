@@ -1,13 +1,17 @@
 import { GuideTemplate } from '~/app/guides/GuideTemplate'
 import Param from '~/components/Params'
-import { MDXRemoteGuides } from '~/features/docs/guides/GuidesMdx'
-import { type GuideFrontmatter } from '~/lib/docs'
+import { MDXRemoteGuides, genGuideMeta } from '~/features/docs/guides/GuidesMdx'
 import { getStorageConfigV0 } from '~/lib/mdx/getConfig'
 
 const meta = {
   title: 'Storage Self-hosting Config',
   description: 'How to configure and deploy Supabase Storage.',
-} as GuideFrontmatter
+}
+
+const generateMetadata = genGuideMeta(() => ({
+  pathname: '/guides/self-hosting/storage/config',
+  meta,
+}))
 
 const StorageConfigPage = async () => {
   const spec = getStorageConfigV0()
@@ -54,3 +58,4 @@ const StorageConfigPage = async () => {
 }
 
 export default StorageConfigPage
+export { generateMetadata }

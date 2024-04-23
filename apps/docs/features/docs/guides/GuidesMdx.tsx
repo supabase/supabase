@@ -1,5 +1,7 @@
+import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 import matter from 'gray-matter'
+import { type Metadata, type ResolvingMetadata } from 'next'
 import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { MDXRemote } from 'next-mdx-remote/rsc'
 import { existsSync } from 'node:fs'
@@ -8,9 +10,9 @@ import { extname, join, sep } from 'node:path'
 import { type ComponentProps } from 'react'
 import rehypeKatex from 'rehype-katex'
 import remarkGfm from 'remark-gfm'
-import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
 import remarkMath from 'remark-math'
-import { GUIDES_DIRECTORY, isValidGuideFrontmatter } from '~/lib/docs'
+import { BASE_PATH, MISC_URL } from '~/lib/constants'
+import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
 import { components } from './GuidesMdx.shared'
 
 const PUBLISHED_SECTIONS = [
@@ -53,6 +55,7 @@ const getGuidesMarkdown = async ({ slug }: { slug: string[] }) => {
   }
 
   return {
+    pathname: `/guides/${slug.join('/')}`,
     meta,
     content,
     editLink,
@@ -80,6 +83,42 @@ const genGuidesStaticParams = (directory?: string) => async () => {
   const result = (await Promise.all(promises)).flat()
   return result
 }
+
+type OrPromise<T> = T | Promise<T>
+
+const genGuideMeta =
+  <Params,>(
+    generate: (params: Params) => OrPromise<{ meta: GuideFrontmatter; pathname: string }>
+  ) =>
+  async ({ params }: { params: Params }, parent: ResolvingMetadata): Promise<Metadata> => {
+    const parentAlternates = (await parent).alternates
+    const parentOg = (await parent).openGraph
+
+    const { meta, pathname } = await generate(params)
+
+    // Pathname has form `/guides/(section)/**`
+    const ogType = pathname.split('/')[2]
+
+    return {
+      title: `${meta.title} | Supabase Docs`,
+      description: meta.description || meta.subtitle,
+      // @ts-ignore
+      alternates: {
+        ...parentAlternates,
+        canonical: meta.canonical || `${BASE_PATH}${pathname}`,
+      },
+      openGraph: {
+        ...parentOg,
+        url: `${BASE_PATH}${pathname}`,
+        images: {
+          url: `${MISC_URL}/functions/v1/og-images?site=docs&type=${encodeURIComponent(ogType)}&title=${encodeURIComponent(meta.title)}&description=${encodeURIComponent(meta.description ?? 'undefined')}`,
+          width: 800,
+          height: 600,
+          alt: meta.title,
+        },
+      },
+    }
+  }
 
 const codeHikeOptions: CodeHikeConfig = {
   theme: codeHikeTheme,
@@ -126,4 +165,4 @@ const MDXRemoteGuides = ({ options = {}, ...props }: ComponentProps<typeof MDXRe
   return <MDXRemote components={components} options={finalOptions} {...props} />
 }
 
-export { MDXRemoteGuides, getGuidesMarkdown, genGuidesStaticParams }
+export { MDXRemoteGuides, getGuidesMarkdown, genGuidesStaticParams, genGuideMeta }
