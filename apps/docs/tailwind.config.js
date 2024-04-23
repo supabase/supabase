@@ -6,6 +6,7 @@ module.exports = config({
     './components/**/*.tsx',
     './content/**/*.{ts,tsx,mdx}',
     './docs/**/*.{tsx,mdx}',
+    './features/**/*.{ts,tsx,mdx}',
     './layouts/**/*.tsx',
     './pages/**/*.{tsx,mdx}',
     './../../packages/ui/src/**/*.{tsx,ts,js}',
