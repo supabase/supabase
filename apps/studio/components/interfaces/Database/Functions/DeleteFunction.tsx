@@ -48,7 +48,7 @@ const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
           <>
             <span>This will delete the function </span>
             <span className="text-bold text-foreground">{name}</span>
-            <span> from the schema</span>
+            <span> from the schema </span>
             <span className="text-bold text-foreground">{schema}</span>
           </>
         }
