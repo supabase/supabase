@@ -11,7 +11,6 @@ import * as base64 from "https://denopkg.com/chiefbiiko/base64/mod.ts";
 const accountSid: string | undefined = Deno.env.get("TWILIO_ACCOUNT_SID");
 const authToken: string | undefined = Deno.env.get("TWILIO_AUTH_TOKEN");
 const fromNumber: string = Deno.env.get("TWILIO_PHONE_NUMBER")
-const toNumber: string = Deno.env.get("TWILIO_TO_NUMBER")
 const APP_HASH = Deno.env.get("APP_HASH")
 
 
@@ -51,9 +50,9 @@ const sendTextMessage = async (
     },
     body,
   });
+  
   return response.json();
 };
-
 
 Deno.serve(async (req) => {
   const payload = await req.text()
@@ -61,15 +60,20 @@ Deno.serve(async (req) => {
   const headers = Object.fromEntries(req.headers)
   const wh = new Webhook(base64_secret);
   try {
-    const { user_id, phone, otp } = wh.verify(payload, headers);
-    const messageBody = `Your OTP is: ${otp} <#> Your code: ${APP_HASH}`;
+    const { user, sms } = wh.verify(payload, headers);
+    const messageBody = `Your OTP is: ${sms.OTP} <#> Your code: ${APP_HASH}`;
     const response = await sendTextMessage(
       messageBody,
       accountSid,
       authToken,
       fromNumber,
-      toNumber,
+      user.phone,
     );
+    if (response.status !== 200) {
+            return new Response(JSON.stringify({
+                error: `Failed to send SMS, Error Code: ${response.code} ${response.message} ${response.more_info}`
+            }), { status: response.status, headers: { "Content-Type": "application/json" } });
+        }
     return new Response(JSON.stringify({
        message: "SMS sent successfully."
      }), { headers: { "Content-Type": "application/json" } });
@@ -83,15 +87,3 @@ Deno.serve(async (req) => {
       data,
   )
 })
-
-/* To invoke locally:
-
-   1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
-   2. Make an HTTP request:
-
-   curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/sms_sender' \
-   --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
-   --header 'Content-Type: application/json' \
-   --data '{"name":"Functions"}'
-
- */
