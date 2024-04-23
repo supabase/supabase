@@ -6,6 +6,10 @@ import {
   AlertDescription_Shadcn_,
   Alert_Shadcn_,
   Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -20,7 +24,9 @@ import { GenericSkeletonLoader } from 'ui-patterns'
 import Table from 'components/to-be-cleaned/Table'
 import { useCreateWarehouseAccessToken } from 'data/analytics/warehouse-access-tokens-create-mutation'
 import toast from 'react-hot-toast'
-import { EllipsisVerticalIcon } from '@heroicons/react/16/solid'
+import { ProjectPausedAlert } from 'components/ui/ProjectPausedAlert'
+import { set } from 'lodash'
+import { useDeleteWarehouseAccessToken } from 'data/analytics/warehouse-access-tokens-delete-mutation'
 
 const AccessTokenItem = ({
   token,
@@ -59,31 +65,6 @@ const AccessTokenItem = ({
     </Table.tr>
   )
 }
-const ProjectPausedAlert = ({
-  title = 'Project is paused',
-  description = 'Restore this project to continue',
-}: {
-  title?: string
-  description?: string
-}) => {
-  const params = useParams()
-  const projectRef = params.ref as string
-
-  return (
-    <Alert_Shadcn_ variant="warning">
-      <AlertCircle />
-      <AlertTitle>{title}</AlertTitle>
-      <AlertDescription_Shadcn_>{description}</AlertDescription_Shadcn_>
-      {projectRef && (
-        <div className="mt-3 flex items-center space-x-2">
-          <Button asChild type="default">
-            <Link href={`/project/${projectRef}`}>Restore project</Link>
-          </Button>
-        </div>
-      )}
-    </Alert_Shadcn_>
-  )
-}
 
 const WarehouseAccessTokens = () => {
   const isProjectActive = useIsProjectActive()
@@ -92,6 +73,18 @@ const WarehouseAccessTokens = () => {
 
   const accessTokensQuery = useWarehouseAccessTokensQuery({ projectRef })
   const hasAccessTokens = accessTokensQuery.isSuccess && accessTokensQuery.data.data.length > 0
+  const [tokenToDelete, setTokenToDelete] = React.useState<string | null>(null)
+  const [showDeleteDialog, setShowDeleteDialog] = React.useState(false)
+
+  const deleteWarehouseAccessToken = useDeleteWarehouseAccessToken({
+    projectRef,
+    onSuccess: () => {
+      toast.success('Access token revoked')
+    },
+    onError: () => {
+      toast.error('Failed to revoke access token')
+    },
+  })
 
   const createWarehouseAccessToken = useCreateWarehouseAccessToken({
     projectRef,
@@ -122,7 +115,10 @@ const WarehouseAccessTokens = () => {
           ])}
         >
           {!isProjectActive ? (
-            <ProjectPausedAlert title={''} />
+            <ProjectPausedAlert
+              projectRef={projectRef}
+              description="Restore your project to manage your warehouse access tokens"
+            />
           ) : (
             <>
               {accessTokensQuery.isLoading ? (
@@ -145,7 +141,10 @@ const WarehouseAccessTokens = () => {
                             token={accessToken.token}
                             id={accessToken.id}
                             name={accessToken.description || 'No description'}
-                            onDeleteClick={() => {}}
+                            onDeleteClick={() => {
+                              setShowDeleteDialog(true)
+                              setTokenToDelete(accessToken.id)
+                            }}
                           />
                         ))
                       ) : (
@@ -165,6 +164,38 @@ const WarehouseAccessTokens = () => {
             </>
           )}
         </div>
+        <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <DialogContent className="p-4">
+            <DialogTitle>Revoke warehouse access token</DialogTitle>
+            <DialogDescription>
+              This action is irreversible and requests made with these access tokens will stop
+              working.
+            </DialogDescription>
+            <div className="flex justify-end gap-2">
+              <Button
+                type="outline"
+                onClick={() => {
+                  setShowDeleteDialog(false)
+                  setTokenToDelete(null)
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="danger"
+                loading={deleteWarehouseAccessToken.isLoading}
+                onClick={async () => {
+                  if (!tokenToDelete) return
+                  await deleteWarehouseAccessToken.mutateAsync(tokenToDelete)
+                  setShowDeleteDialog(false)
+                  setTokenToDelete(null)
+                }}
+              >
+                Yes, revoke access keys
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </section>
     </div>
   )
