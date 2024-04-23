@@ -195,7 +195,7 @@ export const REFERENCES: References = {
   csharp: {
     name: 'C#',
     library: 'supabase-csharp',
-    versions: ['v0'],
+    versions: ['v1', 'v0'],
     icon: '/docs/img/libraries/c-sharp-icon.svg',
   },
   swift: {
@@ -2087,6 +2087,13 @@ export const reference_dart_v2 = {
 }
 
 export const reference_csharp_v0 = {
+  icon: 'reference-csharp',
+  title: 'C#',
+  url: 'guides/reference/csharp',
+  parent: '/reference',
+}
+
+export const reference_csharp_v1 = {
   icon: 'reference-csharp',
   title: 'C#',
   url: 'guides/reference/csharp',
