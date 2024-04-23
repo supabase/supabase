@@ -17,15 +17,7 @@ import { useCheckPermissions, usePermissionsLoaded, useUrlState } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import { partition } from 'lodash'
 import type { NextPageWithLayout } from 'types'
-import {
-  Button,
-  IconExternalLink,
-  IconSearch,
-  Input,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Button, IconExternalLink, IconSearch, Input } from 'ui'
 
 /**
  * Filter tables by table name and policy name
@@ -147,27 +139,6 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                 Documentation
               </a>
             </Button>
-
-            <Tooltip_Shadcn_>
-              <TooltipTrigger_Shadcn_ asChild>
-                <Button
-                  type="primary"
-                  disabled={!canCreatePolicies || schemaHasNoTables}
-                  onClick={() => setShowPolicyAiEditor(true)}
-                >
-                  Create a new policy
-                </Button>
-              </TooltipTrigger_Shadcn_>
-              {(!canCreatePolicies || schemaHasNoTables) && (
-                <TooltipContent_Shadcn_ side="bottom">
-                  {!canCreatePolicies
-                    ? 'You need additional permissions to create RLS policies'
-                    : schemaHasNoTables
-                      ? `No table in schema ${schema} to create policies on`
-                      : null}
-                </TooltipContent_Shadcn_>
-              )}
-            </Tooltip_Shadcn_>
           </div>
         </div>
       </div>
