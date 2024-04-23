@@ -142,6 +142,25 @@ const ColumnEditor = ({
       changes.defaultValue = null
     }
 
+    const changedName = !!changes.name
+    if (
+      /**
+       * Can safely ignore the case where name is changed to '' because the
+       * column can't be saved with an empty name anyway.
+       */
+      changedName &&
+      fkRelations.find((fk) => fk.columns.find(({ source }) => source === columnFields?.name))
+    ) {
+      setFkRelations(
+        fkRelations.map((relation) => ({
+          ...relation,
+          columns: relation.columns.map((col) =>
+            col.source === columnFields?.name ? { ...col, source: changes.name! } : col
+          ),
+        }))
+      )
+    }
+
     const updatedColumnFields = { ...columnFields, ...changes } as ColumnField
     setColumnFields(updatedColumnFields)
     updateEditorDirty()
