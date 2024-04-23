@@ -302,7 +302,7 @@ const NavContainer = memo(function NavContainer({ menuId }: { menuId: MenuId }) 
       className={[
         // 'hidden',
         'absolute lg:relative',
-        mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0' : 'w-0 -left-[280px]',
+        mobileMenuOpen ? 'w-[75%] sm:w-[50%] md:w-[33%] left-0 z-20' : 'w-0 -left-[280px]',
         'lg:w-[420px] !lg:left-0',
         // desktop override any left styles
         'lg:left-0',
