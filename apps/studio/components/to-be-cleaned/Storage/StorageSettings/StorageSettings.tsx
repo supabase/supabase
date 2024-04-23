@@ -30,7 +30,7 @@ const StorageSettings = () => {
     isError,
   } = useProjectStorageConfigQuery({ projectRef }, { enabled: IS_PLATFORM })
   const { fileSizeLimit, isFreeTier } = config || {}
-  const { value, unit } = convertFromBytes(fileSizeLimit)
+  const { value, unit } = convertFromBytes(fileSizeLimit ?? 0)
 
   const [selectedUnit, setSelectedUnit] = useState(unit)
   let initialValues = { fileSizeLimit: value, unformattedFileSizeLimit: fileSizeLimit }
