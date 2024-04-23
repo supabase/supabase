@@ -9,8 +9,6 @@ import {
   Alert_Shadcn_,
   Button,
   Checkbox,
-  IconAlertCircle,
-  IconAlertTriangle,
   IconExternalLink,
   IconPlus,
   Input,
@@ -32,6 +30,7 @@ import {
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
 import type { Dictionary } from 'types'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import ActionBar from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
@@ -52,7 +51,6 @@ import {
 import ColumnForeignKey from './ColumnForeignKey'
 import ColumnType from './ColumnType'
 import HeaderTitle from './HeaderTitle'
-import toast from 'react-hot-toast'
 
 export interface ColumnEditorProps {
   column?: PostgresColumn
@@ -361,7 +359,7 @@ const ColumnEditor = ({
           >
             <FormSectionContent loading={false} className="lg:!col-span-8">
               <Alert_Shadcn_>
-                <IconAlertCircle />
+                <WarningIcon />
                 <AlertTitle_Shadcn_>
                   Column encryption has been removed from the GUI
                 </AlertTitle_Shadcn_>
@@ -400,7 +398,7 @@ const ColumnEditor = ({
           >
             <FormSectionContent loading={false} className="lg:!col-span-8">
               <Alert_Shadcn_ variant="warning">
-                <IconAlertTriangle strokeWidth={2} />
+                <WarningIcon strokeWidth={2} />
                 <AlertTitle_Shadcn_>This table uses column-privileges</AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
                   <p>
