@@ -24,6 +24,7 @@ import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
 interface PolicyDetailsV2Props {
   schema: string
   searchString?: string
+  selectedTable?: string
   isEditing: boolean
   form: any
   onUpdateCommand: (command: string) => void
@@ -32,6 +33,7 @@ interface PolicyDetailsV2Props {
 export const PolicyDetailsV2 = ({
   schema,
   searchString,
+  selectedTable,
   isEditing,
   form,
   onUpdateCommand,
@@ -62,7 +64,7 @@ export const PolicyDetailsV2 = ({
     .sort((a, b) => a.name.localeCompare(b.name))
 
   useEffect(() => {
-    if (!isEditing) {
+    if (!isEditing && selectedTable === undefined) {
       const table = tables?.find(
         (table) =>
           table.schema === schema &&
@@ -74,7 +76,7 @@ export const PolicyDetailsV2 = ({
         form.setValue('table', tables[0].name)
       }
     }
-  }, [isEditing, form, searchString, tables, isSuccessTables])
+  }, [isEditing, form, searchString, tables, isSuccessTables, selectedTable])
 
   return (
     <>
