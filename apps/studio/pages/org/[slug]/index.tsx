@@ -74,7 +74,7 @@ const ProjectsPage: NextPageWithLayout = () => {
             {isSuccessProjects && (
               <>
                 {(projects?.length ?? 0) === 0 ? (
-                  <div className="col-span-4 space-y-4 rounded-lg border-2 border-dashed border-gray-300 p-6 text-center">
+                  <div className="col-span-4 space-y-4 rounded-lg border border-muted border-dashed p-6 text-center">
                     <div className="space-y-1">
                       <p>No projects</p>
                       <p className="text-sm text-foreground-light">

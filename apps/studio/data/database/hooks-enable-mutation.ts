@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast'
 
 import { post } from 'data/fetchers'
 import type { ResponseError } from 'types'
-import { databaseKeys } from './keys'
+import { invalidateSchemasQuery } from './schemas-query'
 
 export type HooksEnableVariables = {
   ref: string
@@ -34,7 +34,7 @@ export const useHooksEnableMutation = ({
       async onSuccess(data, variables, context) {
         const { ref } = variables
         await onSuccess?.(data, variables, context)
-        await queryClient.invalidateQueries(databaseKeys.schemaList(ref))
+        await invalidateSchemasQuery(queryClient, ref)
       },
       async onError(data, variables, context) {
         if (onError === undefined) {

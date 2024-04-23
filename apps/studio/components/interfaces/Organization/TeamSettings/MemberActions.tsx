@@ -190,18 +190,16 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
 
       <ConfirmationModal
         visible={isDeleteModalOpen}
-        header="Confirm to remove"
-        buttonLabel="Remove"
-        onSelectCancel={() => setIsDeleteModalOpen(false)}
-        onSelectConfirm={() => {
+        title="Confirm to remove"
+        confirmLabel="Remove"
+        onCancel={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
           handleMemberDelete()
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            This is permanent! Are you sure you want to remove {member.primary_email}
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          This is permanent! Are you sure you want to remove {member.primary_email}
+        </p>
       </ConfirmationModal>
     </>
   )

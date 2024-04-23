@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { Partner } from '~/types/partners'
+import type { Partner } from '~/types/partners'
 
 export default function TileGrid({
   partners,

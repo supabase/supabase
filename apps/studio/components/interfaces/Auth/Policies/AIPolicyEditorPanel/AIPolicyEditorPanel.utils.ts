@@ -1,6 +1,7 @@
 import type { PostgresPolicy } from '@supabase/postgres-meta'
-import { Message } from 'ai/react'
+import type { Message } from 'ai/react'
 import { uuidv4 } from 'lib/helpers'
+import { isEqual } from 'lodash'
 
 export type MessageWithDebug = Message & { isDebug: boolean }
 
@@ -76,4 +77,87 @@ ${policy.definition ? `USING (${policy.definition})` : ''}
 ${policy.check ? `WITH CHECK (${policy.check})` : ''}
 ;
 `.trim()
+}
+
+export const generateCreatePolicyQuery = ({
+  name,
+  schema,
+  table,
+  behavior,
+  command,
+  roles,
+  using,
+  check,
+}: {
+  name: string
+  schema: string
+  table: string
+  behavior: string
+  command: string
+  roles: string
+  using?: string
+  check?: string
+}) => {
+  const querySkeleton = `create policy "${name}" on "${schema}"."${table}" as ${behavior} for ${command} to ${roles}`
+  const query =
+    command === 'insert'
+      ? `${querySkeleton} with check (${check});`
+      : `${querySkeleton} using (${using})${(check ?? '').length > 0 ? `with check (${check});` : ';'}`
+  return query
+}
+
+export const generateAlterPolicyQuery = ({
+  name,
+  newName,
+  schema,
+  table,
+  command,
+  roles,
+  using,
+  check,
+}: {
+  name: string
+  newName: string
+  schema: string
+  table: string
+  command: string
+  roles: string
+  using: string
+  check: string
+}) => {
+  const querySkeleton = `alter policy "${name}" on "${schema}"."${table}" to ${roles}`
+  const query =
+    command === 'insert'
+      ? `${querySkeleton} with check (${check});`
+      : `${querySkeleton} using (${using})${(check ?? '').length > 0 ? `with check (${check});` : ';'}`
+  if (newName === name) return query
+  else return `${query}\n${querySkeleton} rename to "${newName}"`
+}
+
+export const checkIfPolicyHasChanged = (
+  selectedPolicy: PostgresPolicy,
+  policyForm: {
+    name: string
+    roles: string[]
+    check: string | null
+    definition: string | null
+  }
+) => {
+  if (selectedPolicy.command === 'INSERT' && selectedPolicy.check !== policyForm.check) {
+    return true
+  }
+  if (
+    selectedPolicy.command !== 'INSERT' &&
+    (selectedPolicy.definition !== policyForm.definition ||
+      selectedPolicy.check !== policyForm.check)
+  ) {
+    return true
+  }
+  if (selectedPolicy.name !== policyForm.name) {
+    return true
+  }
+  if (!isEqual(selectedPolicy.roles, policyForm.roles)) {
+    return true
+  }
+  return false
 }

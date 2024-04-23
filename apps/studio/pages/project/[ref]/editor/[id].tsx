@@ -24,7 +24,6 @@ const TableEditorPage: NextPageWithLayout = () => {
         theme={resolvedTheme?.includes('dark') ? 'dark' : 'light'}
       />
       <DeleteConfirmationDialogs
-        projectRef={projectRef}
         selectedTable={selectedTable}
         onAfterDeleteTable={(tables) => {
           // For simplicity for now, we just open the first table within the same schema

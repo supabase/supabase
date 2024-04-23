@@ -77,7 +77,7 @@ const SchemaSelector = ({
             Failed to load schemas
           </AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_ className="text-xs mb-2 break-words">
-            Error: {schemasError?.message}
+            Error: {(schemasError as any)?.message}
           </AlertDescription_Shadcn_>
           <Button type="default" size="tiny" onClick={() => refetchSchemas()}>
             Reload schemas
@@ -106,7 +106,7 @@ const SchemaSelector = ({
               </div>
             </Button>
           </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0 popover-trigger-width" side="bottom" align="start">
+          <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start" sameWidthAsTrigger>
             <Command_Shadcn_>
               <CommandInput_Shadcn_ placeholder="Find schema..." />
               <CommandList_Shadcn_>

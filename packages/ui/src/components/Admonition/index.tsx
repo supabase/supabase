@@ -1,5 +1,5 @@
 import { cva } from 'class-variance-authority'
-import { forwardRef } from 'react'
+import React, { forwardRef } from 'react'
 import { cn } from '../../lib/utils/cn'
 import { Alert, AlertDescription, AlertTitle } from './../shadcn/ui/alert'
 
@@ -15,7 +15,7 @@ export interface AdmonitionProps {
     | 'warning'
   label?: string
   title?: string
-  description?: string
+  description?: string | React.ReactNode
 }
 
 const admonitionToAlertMapping: Record<
@@ -105,7 +105,7 @@ export const Admonition = forwardRef<
         <>
           <AlertTitle
             className={cn(
-              'text mt-0.5 flex gap-3 items-center text-sm [&_p]:mb-1.5 [&_p]:mt-0',
+              'text mt-0.5 flex gap-3 text-sm [&_p]:mb-1.5 [&_p]:mt-0',
               !label && 'flex-col'
             )}
           >

@@ -1,0 +1,72 @@
+---
+id: 'storage-bandwidth'
+title: 'Bandwidth & Storage Egress'
+description: 'How to calculate the Bandwidth and Storage Egress'
+subtitle: 'Bandwidth & Storage Egress'
+sidebar_label: 'Bandwidth & Storage Egress'
+---
+
+## Bandwidth & Storage Egress
+
+Free plan Organizations in Supabase have a limit of 5 GB of bandwidth. This limit is calculated by the sum of all the data transferred from the Supabase servers to the client. This includes all the data transferred from the database, storage, and functions.
+
+### Checking Storage Egress Requests in Log Explorer:
+
+We have a template query that you can use to get the number of requests for each object in [Log Explorer](/dashboard/project/_/logs/explorer/templates).
+
+```sql
+select
+  r.method as http_verb,
+  r.path as filepath,
+  count(*) as num_requests
+from
+  edge_logs
+  cross join unnest(metadata) as m
+  cross join unnest(m.request) as r
+  cross join unnest(r.headers) as h
+where (path like '%storage/v1/object/%' or path like '%storage/v1/render/%') and r.method = 'GET'
+group by r.path, r.method
+order by num_requests desc
+limit 100;
+```
+
+Example of the output:
+
+```
+[
+    {"filepath":"/storage/v1/object/sign/large%20bucket/20230902_200037.gif",
+    "http_verb":"GET",
+    "num_requests":100
+    },
+    {"filepath":"/storage/v1/object/public/demob/Sports/volleyball.png",
+    "http_verb":"GET",
+    "num_requests":168
+    }
+]
+```
+
+### Calculating Egress:
+
+If you already know the size of those files, you can calculate the egress by multiplying the number of requests by the size of the file.
+You can also get the size of the file with the following cURL:
+
+```bash
+curl -s -w "%{size_download}\n" -o /dev/null "https://my_project.supabase.co/storage/v1/object/large%20bucket/20230902_200037.gif"
+```
+
+This will return the size of the file in bytes.
+For this example, let's say that `20230902_200037.gif` has a file size of 3 megabytes and `volleyball.png` has a file size of 570 kilobytes.
+
+Now, we have to sum all the egress for all the files to get the total egress:
+
+```
+100 * 3MB = 300MB
+168 * 570KB = 95.76MB
+Total Egress = 395.76MB
+```
+
+You can see that these values can get quite large, so it's important to keep track of the egress and optimize the files.
+
+### Optimizing Egress:
+
+If you are on the pro plan, you can use the [Supabase Image Transformations](/docs/guides/storage/image-transformations) to optimize the images and reduce the egress.

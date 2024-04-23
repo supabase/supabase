@@ -1,0 +1,157 @@
+---
+id: 'serverless-drivers'
+title: 'Serverless Drivers'
+description: 'Connecting to your Postgres database in serverless environments.'
+subtitle: 'Connecting to your Postgres database in serverless environments.'
+---
+
+Supabase provides several options for connecting to your Postgres database from serverless environments.
+
+[supabase-js](/reference/javascript/introduction) is an isomorphic JavaScript client that uses the [auto-generated REST API](/guides/api) and therefore works in any environment that supports HTTPS connections. This API has a built-in [connection pooler](/guides/database/connecting-to-postgres#connection-pooler) and can serve thousands of simultaneous requests, and therefore is ideal for Serverless workloads.
+
+## Vercel Edge Functions
+
+Vercel's [Edge runtime](https://vercel.com/docs/functions/runtimes/edge-runtime) is built on top of the [V8 engine](https://v8.dev/), that provides a limited set of Web Standard APIs.
+
+### Quickstart
+
+Choose one of these Vercel Deploy Templates which use our [Vercel Deploy Integration](https://vercel.com/integrations/supabase) to automatically configure your connection strings as environment variables on your Vercel project!
+
+<div>
+  <div className="grid grid-cols-12 gap-6 not-prose">
+    {[
+      {
+        title: 'supabase-js',
+        hasLightIcon: true,
+        href: 'https://supabase.link/nextjs-with-supabase-starter',
+        description: 'A Next.js App Router template configured with cookie-based auth using Supabase, TypeScript and Tailwind CSS.'
+      },
+      /* { TODO: Link the correct next.js template that uses drizzle ORM with supabase database.
+        hasLightIcon: true,
+        href: 'https://supabase.link/nextjs-supabase-drizzle',
+        description: "Simple Next.js template that uses Supabase as the database and Drizzle as the ORM.",
+      },*/
+      {
+        title: 'Kysely',
+        hasLightIcon: true,
+        href: 'https://supabase.link/nextjs-supabase-kysely',
+        description: 'Simple Next.js template that uses Supabase as the database and Kysely as the query builder.',
+      },
+      /* { TODO: figure out how to get around Prisma accelerate requirement...
+        title: 'Prisma',
+        hasLightIcon: true,
+        href: 'https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fstorage%2Fpostgres-prisma&project-name=postgres-prisma&repository-name=postgres-prisma&demo-title=Vercel%20Postgres%20%2B%20Prisma%20Next.js%20Starter&demo-description=Simple%20Next.js%20template%20that%20uses%20Vercel%20Postgres%20as%20the%20database%20and%20Prisma%20as%20the%20ORM.&demo-url=https%3A%2F%2Fpostgres-prisma.vercel.app%2F&demo-image=https%3A%2F%2Fpostgres-prisma.vercel.app%2Fopengraph-image.png&integration-ids=oac_VqOgBHqhEoFTPzGkPd7L0iH6',
+        description: 'Simple Next.js template that uses Vercel Postgres as the database and Prisma as the ORM.',
+      } */
+    ].map((resource) => {
+      return (
+        <Link
+          href={`${resource.href}`}
+          key={resource.title}
+          className={'col-span-12 md:col-span-4'}
+          passHref
+        >
+          <GlassPanel {...resource} background={false} showIconBg={true}>
+            {resource.description}
+          </GlassPanel>
+        </Link>
+      )
+
+})}
+
+  </div>
+</div>
+
+### Manual configuration
+
+In your [`Database Settings`](https://supabase.com/dashboard/project/_/settings/database), make sure `Use connection pooler` is checked and `Transaction` mode is selected, then copy the URI and save it as the `POSTGRES_URL` environment variable. Remember to replace the password placeholder with your actual database password and add the following suffix `?workaround=supabase-pooler.vercel`.
+
+```txt .env.local
+POSTGRES_URL="postgres://postgres.cfcxynqnhdybqtbhjemm:[YOUR-PASSWORD]@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres?workaround=supabase-pooler.vercel"
+```
+
+<Tabs scrollable defaultActiveId="drizzle" type="underlined" size="small">
+
+<TabPanel id="drizzle" label="Drizzle">
+
+```ts lib/drizzle.ts
+import { pgTable, serial, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core'
+import { InferSelectModel, InferInsertModel } from 'drizzle-orm'
+import { sql } from '@vercel/postgres'
+import { drizzle } from 'drizzle-orm/vercel-postgres'
+
+export const UsersTable = pgTable(
+  'users',
+  {
+    id: serial('id').primaryKey(),
+    name: text('name').notNull(),
+    email: text('email').notNull(),
+    image: text('image').notNull(),
+    createdAt: timestamp('createdAt').defaultNow().notNull(),
+  },
+  (users) => {
+    return {
+      uniqueIdx: uniqueIndex('unique_idx').on(users.email),
+    }
+  }
+)
+
+export type User = InferSelectModel<typeof UsersTable>
+export type NewUser = InferInsertModel<typeof UsersTable>
+
+// Connect to Vercel Postgres
+export const db = drizzle(sql)
+```
+
+</TabPanel>
+<TabPanel id="kysely" label="Kysely">
+
+```ts lib/kysely.ts
+import { Generated, ColumnType } from 'kysely'
+import { createKysely } from '@vercel/postgres-kysely'
+
+interface UserTable {
+  // Columns that are generated by the database should be marked
+  // using the `Generated` type. This way they are automatically
+  // made optional in inserts and updates.
+  id: Generated<number>
+  name: string
+  email: string
+  image: string
+
+  // You can specify a different type for each operation (select, insert and
+  // update) using the `ColumnType<SelectType, InsertType, UpdateType>`
+  // wrapper. Here we define a column `createdAt` that is selected as
+  // a `Date`, can optionally be provided as a `string` in inserts and
+  // can never be updated:
+  createdAt: ColumnType<Date, string | undefined, never>
+}
+
+// Keys of this interface are table names.
+export interface Database {
+  users: UserTable
+}
+
+export const db = createKysely<Database>()
+export { sql } from 'kysely'
+```
+
+</TabPanel>
+</Tabs>
+
+## Cloudflare Workers
+
+Cloudflare's Workers runtime also uses the [V8 engine](https://v8.dev/) but provides polyfills for a subset of Node.js APIs and [TCP Sockets API](https://developers.cloudflare.com/workers/runtime-apis/tcp-sockets/), giving you a couple of options:
+
+- [supabase-js](https://developers.cloudflare.com/workers/databases/native-integrations/supabase/)
+- [Postgres.js](https://github.com/porsager/postgres?tab=readme-ov-file#cloudflare-workers-support)
+- [node-postgres](https://developers.cloudflare.com/workers/tutorials/postgres/)
+
+## Supabase Edge Functions
+
+Supabase Edge Functions uses the [Deno runtime](https://deno.com/) which has native support for TCP connections allowing you to choose your favorite client:
+
+- [supabase-js](/docs/guides/functions/connect-to-postgres#using-supabase-js)
+- [Deno Postgres driver](/docs/guides/functions/connect-to-postgres#using-a-postgres-client)
+- [Postgres.js](https://github.com/porsager/postgres)
+- [Drizzle](/docs/guides/functions/connect-to-postgres#using-drizzle)

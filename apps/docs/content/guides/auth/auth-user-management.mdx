@@ -72,7 +72,7 @@ Supabase Auth provides these [configuration options](/dashboard/project/_/settin
   create policy "policy_name"
   ON public.posts
   for insert to authenticated with check (
-      auth.jwt()->>'email_verified' is true
+      (select auth.jwt()->>'email_verified') is true
   );
   ```
 
