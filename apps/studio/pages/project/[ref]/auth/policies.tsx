@@ -70,6 +70,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const { schema = 'public', search: searchString = '' } = params
   const { project } = useProjectContext()
 
+  const [selectedTable, setSelectedTable] = useState<string>()
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
 
@@ -181,6 +182,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
           tables={filteredTables}
           hasTables={tables.length > 0}
           isLocked={isLocked}
+          onSelectCreatePolicy={(table: string) => {
+            setShowPolicyAiEditor(true)
+            setSelectedTable(table)
+          }}
           onSelectEditPolicy={(policy) => {
             setSelectedPolicyToEdit(policy)
             setShowPolicyAiEditor(true)
@@ -192,8 +197,10 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
         visible={showPolicyAiEditor}
         schema={schema}
         searchString={searchString}
+        selectedTable={selectedTable}
         selectedPolicy={selectedPolicyToEdit}
         onSelectCancel={() => {
+          setSelectedTable(undefined)
           setShowPolicyAiEditor(false)
           setSelectedPolicyToEdit(undefined)
         }}
