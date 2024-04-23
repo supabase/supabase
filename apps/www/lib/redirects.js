@@ -2385,6 +2385,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/auth/column-level-security',
+    destination: '/docs/guides/database/postgres/column-level-security',
+  },
+  {
+    permanent: true,
     source: '/docs/learn/auth-deep-dive/auth-policies',
     destination: '/docs/guides/auth/auth-deep-dive/auth-policies',
   },
@@ -2411,11 +2416,21 @@ module.exports = [
   {
     permanent: false,
     source: '/launch-week',
-    destination: '/special-announcement',
+    destination: '/ga-week',
+  },
+  {
+    permanent: false,
+    source: '/special-announcement',
+    destination: '/ga-week',
   },
   {
     permanent: false,
     source: '/launch-week/tickets/:path*',
-    destination: '/special-announcement/tickets/:path*',
+    destination: '/ga-week/tickets/:path*',
+  },
+  {
+    permanent: false,
+    source: '/special-announcement/tickets/:path*',
+    destination: '/ga-week/tickets/:path*',
   },
 ]

@@ -11,9 +11,11 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import RealtimeStyles from './Realtime.module.css'
+import ProductsNav from '~/components/Products/ProductsNav'
 
-import 'swiper/swiper.min.css'
+import 'swiper/css'
 import { ThemeImage } from 'ui-patterns/ThemeImage'
+import { PRODUCT_NAMES } from 'shared-data/products'
 
 const Cursor = ({ className = '', color = 'none' }) => {
   return (
@@ -58,6 +60,7 @@ function RealtimePage() {
         }}
       />
       <DefaultLayout>
+        <ProductsNav activePage={PRODUCT_NAMES.REALTIME} />
         <ProductHeader
           icon={Solutions['realtime']?.icon}
           title={Solutions['realtime']?.name}

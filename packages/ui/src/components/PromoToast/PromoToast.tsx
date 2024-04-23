@@ -3,8 +3,6 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button, cn } from 'ui'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import CountdownComponent from '../../layout/banners/LW11CountdownBanner/Countdown'
-import announcement from '../../layout/banners/data/Announcement.json'
 import { useTheme } from 'next-themes'
 
 const LW11BGDark =
@@ -41,19 +39,16 @@ const PromoToast = () => {
         visible && 'opacity-100 translate-y-0'
       )}
     >
-      <p className="relative z-10 text-foreground flex flex-col text-2xl w-full leading-7">
-        <span className="text-foreground-lighter">Join us for a</span>
-        <span>Special Announcement</span>
-      </p>
-      <div className="relative z-10 text-foreground-lighter uppercase flex flex-col text-sm w-full font-mono mb-2">
-        <span>APRIL 15-19 / 7AM PT</span>
-        {/* <CountdownComponent date={new Date(announcement.launchDate)} showCard={false} /> */}
+      <div className="relative z-10 text-foreground-lighter flex flex-col text-sm w-full mb-2">
+        <p className="text-foreground flex flex-col text-lg w-full leading-6 mb-1">
+          General Availability Week
+        </p>
       </div>
 
       <div className="relative z-10 flex items-center space-x-2">
         <Button asChild type="secondary">
-          <Link target="_blank" rel="noreferrer" href="https://supabase.com/special-announcement">
-            Claim your ticket
+          <Link target="_blank" rel="noreferrer" href="https://supabase.com/ga-week">
+            Learn more
           </Link>
         </Button>
         <Button type="default" onClick={handleHide}>

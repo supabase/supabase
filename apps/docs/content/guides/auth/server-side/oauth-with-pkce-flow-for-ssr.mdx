@@ -237,7 +237,7 @@ In the server, you need to handle the redirect to the OAuth provider's authentic
 const { data, error } = await supabase.auth.signInWithOAuth({
   provider,
   options: {
-    redirectTo: '/auth/callback',
+    redirectTo: 'http://example.com/auth/callback',
   },
 })
 

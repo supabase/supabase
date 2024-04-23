@@ -1,10 +1,8 @@
 import { useEffect } from 'react'
 
-import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import {
   FormControl_Shadcn_,
   FormField_Shadcn_,
@@ -24,25 +22,28 @@ import {
 import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
 
 interface PolicyDetailsV2Props {
+  schema: string
   searchString?: string
+  selectedTable?: string
   isEditing: boolean
   form: any
   onUpdateCommand: (command: string) => void
 }
 
 export const PolicyDetailsV2 = ({
+  schema,
   searchString,
+  selectedTable,
   isEditing,
   form,
   onUpdateCommand,
 }: PolicyDetailsV2Props) => {
   const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
 
   const { data: tables, isSuccess: isSuccessTables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: snap.selectedSchemaName,
+    schema: schema,
     sortByProperty: 'name',
     includeColumns: true,
   })
@@ -63,10 +64,10 @@ export const PolicyDetailsV2 = ({
     .sort((a, b) => a.name.localeCompare(b.name))
 
   useEffect(() => {
-    if (!isEditing) {
+    if (!isEditing && selectedTable === undefined) {
       const table = tables?.find(
         (table) =>
-          table.schema === snap.selectedSchemaName &&
+          table.schema === schema &&
           (table.id.toString() === searchString || table.name === searchString)
       )
       if (table) {
@@ -75,7 +76,7 @@ export const PolicyDetailsV2 = ({
         form.setValue('table', tables[0].name)
       }
     }
-  }, [isEditing, form, searchString, tables, isSuccessTables])
+  }, [isEditing, form, searchString, tables, isSuccessTables, selectedTable])
 
   return (
     <>
@@ -117,7 +118,7 @@ export const PolicyDetailsV2 = ({
                     onValueChange={(value) => form.setValue('table', value)}
                   >
                     <SelectTrigger_Shadcn_ className="text-sm h-10">
-                      {snap.selectedSchemaName}.{field.value}
+                      {schema}.{field.value}
                     </SelectTrigger_Shadcn_>
                     <SelectContent_Shadcn_>
                       <SelectGroup_Shadcn_>

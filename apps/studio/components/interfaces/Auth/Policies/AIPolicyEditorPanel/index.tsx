@@ -15,7 +15,6 @@ import {
   Checkbox_Shadcn_,
   Form_Shadcn_,
   Label_Shadcn_,
-  Modal,
   ScrollArea,
   Sheet,
   SheetContent,
@@ -45,7 +44,6 @@ import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { BASE_PATH, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AIPolicyChat } from './AIPolicyChat'
 import {
@@ -70,7 +68,9 @@ const DiffEditor = dynamic(
 
 interface AIPolicyEditorPanelProps {
   visible: boolean
+  schema: string
   searchString?: string
+  selectedTable?: string
   selectedPolicy?: PostgresPolicy
   onSelectCancel: () => void
 }
@@ -80,7 +80,9 @@ interface AIPolicyEditorPanelProps {
  */
 export const AIPolicyEditorPanel = memo(function ({
   visible,
+  schema,
   searchString,
+  selectedTable,
   selectedPolicy,
   onSelectCancel,
 }: AIPolicyEditorPanelProps) {
@@ -91,7 +93,6 @@ export const AIPolicyEditorPanel = memo(function ({
   const selectedOrganization = useSelectedOrganization()
 
   const telemetryProps = useTelemetryProps()
-  const state = useTableEditorStateSnapshot()
   const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
   // [Joshen] Hyrid form fields, just spit balling to get a decent POC out
@@ -330,7 +331,7 @@ export const AIPolicyEditorPanel = memo(function ({
     if (selectedPolicy === undefined) {
       const sql = generateCreatePolicyQuery({
         name: name,
-        schema: state.selectedSchemaName,
+        schema,
         table,
         behavior,
         command,
@@ -416,6 +417,8 @@ export const AIPolicyEditorPanel = memo(function ({
         if (selectedPolicy.check && selectedPolicy.command !== 'INSERT') {
           setShowCheckBlock(true)
         }
+      } else if (selectedTable !== undefined) {
+        form.reset({ ...defaultValues, table: selectedTable })
       }
     }
   }, [visible])
@@ -534,7 +537,9 @@ export const AIPolicyEditorPanel = memo(function ({
                   ) : (
                     <>
                       <PolicyDetailsV2
+                        schema={schema}
                         searchString={searchString}
+                        selectedTable={selectedTable}
                         isEditing={selectedPolicy !== undefined}
                         form={form}
                         onUpdateCommand={(command: string) => {
@@ -544,6 +549,7 @@ export const AIPolicyEditorPanel = memo(function ({
                       />
                       <div className="h-full">
                         <LockedCreateQuerySection
+                          schema={schema}
                           selectedPolicy={selectedPolicy}
                           editorOneRef={editorOneRef}
                           editorTwoRef={editorTwoRef}
@@ -670,6 +676,7 @@ export const AIPolicyEditorPanel = memo(function ({
                           <LockedRenameQuerySection
                             oldName={selectedPolicy.name}
                             newName={name}
+                            schema={schema}
                             table={table}
                             lineNumber={
                               8 + expOneLineCount + (showCheckBlock ? expTwoLineCount : 0)
@@ -789,6 +796,7 @@ export const AIPolicyEditorPanel = memo(function ({
                     >
                       <ScrollArea className="h-full w-full">
                         <PolicyTemplates
+                          schema={schema}
                           table={table}
                           selectedPolicy={selectedPolicy}
                           selectedTemplate={selectedDiff}
