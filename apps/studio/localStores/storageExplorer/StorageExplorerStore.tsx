@@ -17,7 +17,12 @@ import { ToastLoader } from 'components/ui/ToastLoader'
 import { configKeys } from 'data/config/keys'
 import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
 import { getQueryClient } from 'data/query-client'
-import { delete_, post } from 'lib/common/fetch'
+import { deleteBucketObject } from 'data/storage/bucket-object-delete-mutation'
+import { downloadBucketObject } from 'data/storage/bucket-object-download-mutation'
+import { getPublicUrlForBucketObject } from 'data/storage/bucket-object-get-public-url-mutation'
+import { signBucketObject } from 'data/storage/bucket-object-sign-mutation'
+import { StorageObject, listBucketObjects } from 'data/storage/bucket-objects-list-mutation'
+import { moveStorageObject } from 'data/storage/object-move-mutation'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
@@ -47,7 +52,7 @@ class StorageExplorerStore {
   sortBy = STORAGE_SORT_BY.NAME
   sortByOrder = 'asc'
   buckets = []
-  selectedBucket = {}
+  selectedBucket: { id?: string } = {}
   columns = []
   openedFolders = []
   selectedItems = []
@@ -74,7 +79,7 @@ class StorageExplorerStore {
   uploadProgress = 0
 
   /* Controllers to abort API calls */
-  abortController = null
+  abortController: AbortController | null = null
 
   constructor(projectRef) {
     makeAutoObservable(this, { supabaseClient: false })
@@ -308,7 +313,9 @@ class StorageExplorerStore {
       .upload(formattedPathToEmptyPlaceholderFile, new File([], EMPTY_FOLDER_PLACEHOLDER_FILE_NAME))
 
     if (pathToFolder.length > 0) {
-      await delete_(`${this.endpoint}/buckets/${this.selectedBucket.id}/objects`, {
+      await deleteBucketObject({
+        projectRef: this.projectRef,
+        bucketId: this.selectedBucket.id,
         paths: [`${pathToFolder}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`],
       })
     }
@@ -629,7 +636,9 @@ class StorageExplorerStore {
       }, Promise.resolve())
 
       if (numberOfFilesUploadedSuccess > 0) {
-        await delete_(`${this.endpoint}/buckets/${this.selectedBucket.id}/objects`, {
+        await deleteBucketObject({
+          projectRef: this.projectRef,
+          bucketId: this.selectedBucket.id,
           paths: [`${pathToFile}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`],
         })
       }
@@ -690,13 +699,16 @@ class StorageExplorerStore {
         const toPath =
           newPathToFile.length > 0 ? `${formattedNewPathToFile}/${item.name}` : item.name
 
-        const res = await post(`${this.endpoint}/buckets/${this.selectedBucket.id}/objects/move`, {
-          from: fromPath,
-          to: toPath,
-        })
-        if (res.error) {
+        try {
+          await moveStorageObject({
+            projectRef: this.projectRef,
+            bucketId: this.selectedBucket.id,
+            from: fromPath,
+            to: toPath,
+          })
+        } catch (error: any) {
           numberOfFilesMovedFail += 1
-          toast.error(res.error.message)
+          toast.error(error.message)
         }
       })
     )
@@ -730,24 +742,27 @@ class StorageExplorerStore {
     const formattedPathToFile = pathToFile.length > 0 ? `${pathToFile}/${fileName}` : fileName
 
     if (this.selectedBucket.public) {
-      const res = await post(
-        `${this.endpoint}/buckets/${this.selectedBucket.id}/objects/public-url`,
-        { path: formattedPathToFile }
-      )
-      if (!res.error) {
-        return res.publicUrl
-      } else {
-        toast.error(`Failed to fetch public file preview: ${res.error.message}`)
+      try {
+        const data = await getPublicUrlForBucketObject({
+          projectRef: this.projectRef,
+          bucketId: this.selectedBucket.id,
+          path: formattedPathToFile,
+        })
+        return data.publicUrl
+      } catch (error: any) {
+        toast.error(`Failed to fetch public file preview: ${error.message}`)
       }
     } else {
-      const res = await post(`${this.endpoint}/buckets/${this.selectedBucket.id}/objects/sign`, {
-        path: formattedPathToFile,
-        expiresIn: expiresIn || DEFAULT_EXPIRY,
-      })
-      if (!res.error) {
-        return res.signedUrl
-      } else {
-        toast.error(`Failed to fetch signed url preview: ${res.error.message}`)
+      try {
+        const data = await signBucketObject({
+          projectRef: this.projectRef,
+          bucketId: this.selectedBucket.id,
+          path: formattedPathToFile,
+          expiresIn: expiresIn || DEFAULT_EXPIRY,
+        })
+        return data.signedUrl
+      } catch (error: any) {
+        toast.error(`Failed to fetch signed url preview: ${error.message}`)
       }
     }
     return null
@@ -784,8 +799,10 @@ class StorageExplorerStore {
     // batch BATCH_SIZE prefixes per request
     const batches = chunk(prefixes, BATCH_SIZE).map((batch) => () => {
       progress = progress + batch.length / prefixes.length
-      return delete_(`${this.endpoint}/buckets/${this.selectedBucket.name}/objects`, {
-        paths: batch,
+      return deleteBucketObject({
+        projectRef: this.projectRef,
+        bucketId: this.selectedBucket.id,
+        paths: batch as string[],
       })
     })
 
@@ -848,20 +865,21 @@ class StorageExplorerStore {
       const fileMimeType = file.metadata?.mimetype ?? null
       return () => {
         return new Promise(async (resolve) => {
-          const res = await post(
-            `${this.endpoint}/buckets/${this.selectedBucket.id}/objects/download`,
-            { path: `${file.prefix}/${file.name}` }
-          )
-          progress = progress + 1 / files.length
+          try {
+            const data = await downloadBucketObject({
+              projectRef: this.projectRef,
+              bucketId: this.selectedBucket.id,
+              path: `${file.prefix}/${file.name}`,
+            })
+            progress = progress + 1 / files.length
 
-          if (!res.error) {
-            const blob = await res.blob()
+            const blob = await data.blob()
             resolve({
               name: file.name,
               prefix: file.prefix,
               blob: new Blob([blob], { type: fileMimeType }),
             })
-          } else {
+          } catch (error) {
             console.error('Failed to download file', `${file.prefix}/${file.name}`)
             resolve(false)
           }
@@ -986,12 +1004,14 @@ class StorageExplorerStore {
       .map((folder) => folder.name)
       .join('/')
     const formattedPathToFile = pathToFile.length > 0 ? `${pathToFile}/${fileName}` : fileName
-    const res = await post(`${this.endpoint}/buckets/${this.selectedBucket.id}/objects/download`, {
-      path: formattedPathToFile,
-    })
+    try {
+      const data = await downloadBucketObject({
+        projectRef: this.projectRef,
+        bucketId: this.selectedBucket.id,
+        path: formattedPathToFile,
+      })
 
-    if (!res.error) {
-      const blob = await res.blob()
+      const blob = await data.blob()
       const newBlob = new Blob([blob], { type: fileMimeType })
 
       if (returnBlob) return { name: fileName, blob: newBlob }
@@ -1008,7 +1028,7 @@ class StorageExplorerStore {
         toast.success(`Downloading ${fileName}`, { id: toastId })
       }
       return true
-    } else {
+    } catch {
       if (toastId) {
         toast.error(`Failed to download ${fileName}`, { id: toastId })
       }
@@ -1028,14 +1048,14 @@ class StorageExplorerStore {
       const fromPath = pathToFile.length > 0 ? `${pathToFile}/${originalName}` : originalName
       const toPath = pathToFile.length > 0 ? `${pathToFile}/${newName}` : newName
 
-      const res = await post(`${this.endpoint}/buckets/${this.selectedBucket.id}/objects/move`, {
-        from: fromPath,
-        to: toPath,
-      })
+      try {
+        const data = await moveStorageObject({
+          projectRef: this.projectRef,
+          bucketId: this.selectedBucket.id,
+          from: fromPath,
+          to: toPath,
+        })
 
-      if (res.error) {
-        toast.error(`Failed to rename file: ${res.error.message}`)
-      } else {
         toast.success(`Successfully renamed "${originalName}" to "${newName}"`)
 
         // Clear file preview cache if the renamed file exists in the cache
@@ -1050,6 +1070,8 @@ class StorageExplorerStore {
         }
 
         await this.refetchAllOpenedFolders()
+      } catch (error) {
+        toast.error(`Failed to rename file: ${error.message}`)
       }
     }
   }
@@ -1077,16 +1099,20 @@ class StorageExplorerStore {
       sortBy: { column: this.sortBy, order: this.sortByOrder },
     }
 
-    const res = await post(
-      `${this.endpoint}/buckets/${this.selectedBucket.id}/objects/list`,
-      { path: prefix, options },
-      { abortSignal: this.abortController.signal }
-    )
+    try {
+      const data = await listBucketObjects(
+        {
+          projectRef: this.projectRef,
+          bucketId: this.selectedBucket.id,
+          path: prefix,
+          options,
+        },
+        this.abortController?.signal
+      )
 
-    this.updateRowStatus(folderName, STORAGE_ROW_STATUS.READY, index)
+      this.updateRowStatus(folderName, STORAGE_ROW_STATUS.READY, index)
 
-    if (!res.error) {
-      const formattedItems = this.formatFolderItems(res)
+      const formattedItems = this.formatFolderItems(data)
       this.pushColumnAtIndex(
         {
           id: folderId || folderName,
@@ -1097,8 +1123,10 @@ class StorageExplorerStore {
         },
         index
       )
-    } else if (!res.error.message.includes('aborted')) {
-      toast.error(`Failed to retrieve folder contents from "${folderName}": ${res.error.message}`)
+    } catch (error: any) {
+      if (!error.message.includes('aborted')) {
+        toast.error(`Failed to retrieve folder contents from "${folderName}": ${error.message}`)
+      }
     }
   }
 
@@ -1113,28 +1141,29 @@ class StorageExplorerStore {
       sortBy: { column: this.sortBy, order: this.sortByOrder },
     }
 
-    const res = await post(
-      `${this.endpoint}/buckets/${this.selectedBucket.id}/objects/list`,
-      { path: prefix, options },
-      { abortSignal: this.abortController.signal }
-    )
+    try {
+      const data = await listBucketObjects(
+        { projectRef: this.projectRef, bucketId: this.selectedBucket.id, path: prefix, options },
+        this.abortController?.signal
+      )
 
-    if (!res.error) {
       // Add items to column
-      const formattedItems = this.formatFolderItems(res)
+      const formattedItems = this.formatFolderItems(data)
       this.columns = this.columns.map((col, idx) => {
         if (idx === index) {
           return {
             ...col,
             items: col.items.concat(formattedItems),
             isLoadingMoreItems: false,
-            hasMoreItems: res.length === LIMIT,
+            hasMoreItems: data.length === LIMIT,
           }
         }
         return col
       })
-    } else if (!res.error.message.includes('aborted')) {
-      toast.error(`Failed to retrieve folder contents from "${folderName}": ${res.error.message}`)
+    } catch (error: any) {
+      if (!error.message.includes('aborted')) {
+        toast.error(`Failed to retrieve folder contents from "${folderName}": ${error.message}`)
+      }
     }
   }
 
@@ -1164,15 +1193,18 @@ class StorageExplorerStore {
           sortBy: { column: this.sortBy, order: this.sortByOrder },
         }
 
-        const res = await post(`${this.endpoint}/buckets/${this.selectedBucket.id}/objects/list`, {
-          path: prefix,
-          options,
-        })
-        if (res.error) {
-          toast.error(`Failed to fetch folders: ${res.error.message}`)
+        try {
+          const data = await listBucketObjects({
+            projectRef: this.projectRef,
+            bucketId: this.selectedBucket.id,
+            path: prefix,
+            options,
+          })
+          return data
+        } catch (error: any) {
+          toast.error(`Failed to fetch folders: ${error.message}`)
           return []
         }
-        return res
       })
     )
 
@@ -1210,16 +1242,21 @@ class StorageExplorerStore {
   // Check parent folder if its empty, if yes, reinstate .emptyFolderPlaceholder
   // Used when deleting folder or deleting files
   validateParentFolderEmpty = async (parentFolderPrefix) => {
-    const res = await post(`${this.endpoint}/buckets/${this.selectedBucket.id}/objects/list`, {
-      path: parentFolderPrefix,
-      options: this.DEFAULT_OPTIONS,
-    })
-    if (!res.error && res.length === 0) {
-      const prefixToPlaceholder = `${parentFolderPrefix}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`
-      await this.supabaseClient.storage
-        .from(this.selectedBucket.name)
-        .upload(prefixToPlaceholder, new File([], EMPTY_FOLDER_PLACEHOLDER_FILE_NAME))
-    }
+    try {
+      const data = await listBucketObjects({
+        projectRef: this.projectRef,
+        bucketId: this.selectedBucket.id,
+        path: parentFolderPrefix,
+        options: this.DEFAULT_OPTIONS,
+      })
+
+      if (data.length === 0) {
+        const prefixToPlaceholder = `${parentFolderPrefix}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`
+        await this.supabaseClient.storage
+          .from(this.selectedBucket.name)
+          .upload(prefixToPlaceholder, new File([], EMPTY_FOLDER_PLACEHOLDER_FILE_NAME))
+      }
+    } catch (error) {}
   }
 
   deleteFolder = async (folder) => {
@@ -1288,14 +1325,14 @@ class StorageExplorerStore {
       return () => {
         return new Promise(async (resolve) => {
           progress = progress + 1 / files.length
-          const res = await post(
-            `${this.endpoint}/buckets/${this.selectedBucket.name}/objects/move`,
-            {
+          try {
+            await moveStorageObject({
+              projectRef: this.projectRef,
+              bucketId: this.selectedBucket.id,
               from: fromPath,
               to: toPath,
-            }
-          )
-          if (res.error) {
+            })
+          } catch (error) {
             hasErrors = true
             toast.error(`Failed to move ${fromPath} to the new folder`)
           }
@@ -1372,15 +1409,19 @@ class StorageExplorerStore {
     let folderContents = []
 
     for (;;) {
-      const res = await post(`${this.endpoint}/buckets/${this.selectedBucket.name}/objects/list`, {
-        path: formattedPathToFolder,
-        options,
-      })
-      folderContents = folderContents.concat(res)
-      options.offset += options.limit
-      if ((res || []).length < options.limit) {
-        break
-      }
+      try {
+        const data = await listBucketObjects({
+          projectRef: this.projectRef,
+          bucketId: this.selectedBucket.id,
+          path: formattedPathToFolder,
+          options,
+        })
+        folderContents = folderContents.concat(data)
+        options.offset += options.limit
+        if ((data || []).length < options.limit) {
+          break
+        }
+      } catch (e) {}
     }
 
     const subfolders = folderContents?.filter((item) => item.id === null) ?? []
@@ -1436,7 +1477,7 @@ class StorageExplorerStore {
     return name
   }
 
-  formatFolderItems = (items = []) => {
+  formatFolderItems = (items: StorageObject[] = []) => {
     const formattedItems =
       (items ?? [])
         ?.filter((item) => item.name !== EMPTY_FOLDER_PLACEHOLDER_FILE_NAME)
