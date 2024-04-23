@@ -44,11 +44,7 @@ const CreateEnumeratedTypeSidePanel = ({
   const initialValues = { name: '', description: '', values: [{ value: '' }] }
   const submitRef = useRef<HTMLButtonElement>(null)
   const { project } = useProjectContext()
-  const {
-    mutate: createEnumeratedType,
-    isLoading: isCreating,
-    isSuccess,
-  } = useEnumeratedTypeCreateMutation({
+  const { mutate: createEnumeratedType, isLoading: isCreating } = useEnumeratedTypeCreateMutation({
     onSuccess: (res, vars) => {
       toast.success(`Successfully created type "${vars.name}"`)
       closePanel()
@@ -56,10 +52,8 @@ const CreateEnumeratedTypeSidePanel = ({
   })
 
   useEffect(() => {
-    if (isSuccess) {
-      form.reset(initialValues)
-    }
-  }, [isSuccess])
+    form.reset(initialValues)
+  }, [visible])
 
   const FormSchema = z.object({
     name: z
