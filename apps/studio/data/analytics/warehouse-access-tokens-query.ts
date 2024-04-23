@@ -1,7 +1,6 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get } from 'lib/common/fetch'
-import { API_URL } from 'lib/constants'
 import { analyticsKeys } from './keys'
+import { get } from 'data/fetchers'
 
 export type WarehouseAccessTokensVariables = {
   projectRef: string
@@ -17,17 +16,21 @@ export async function getWarehouseAccessTokens(
     throw new Error('projectRef is required')
   }
 
-  const response = await get<WarehouseAccessTokensResponse>(
-    `${API_URL}/projects/${projectRef}/analytics/warehouse/access-tokens`,
-    {
-      signal,
-    }
-  )
-  if (response.error) {
-    throw response.error
-  }
+  const response = await get(`/platform/projects/{ref}/analytics/warehouse/access-tokens`, {
+    params: { path: { ref: projectRef } },
+    signal,
+  })
 
-  return response
+  // TODO: remove cast when openapi client generates correct types
+  return response as any as {
+    data: {
+      id: string
+      token: string
+      scopes: string
+      inserted_at: string
+      description?: string
+    }[]
+  }
 }
 
 export type WarehouseAccessTokensData = Awaited<ReturnType<typeof getWarehouseAccessTokens>>
