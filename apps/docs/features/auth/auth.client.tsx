@@ -5,12 +5,11 @@ import { createClient } from '@supabase/supabase-js'
 import { useQueryClient } from '@tanstack/react-query'
 import { AuthProvider, useConstant } from 'common'
 import { type PropsWithChildren, useCallback } from 'react'
-
 import { IS_PLATFORM } from '~/lib/constants'
 import { LOCAL_STORAGE_KEYS, remove } from '~/lib/storage'
 import { useOnLogout } from '~/lib/userAuth'
 
-const AuthContainer = ({ children }: PropsWithChildren) => {
+const AuthContainerInternal = ({ children }: PropsWithChildren) => {
   const supabase = useConstant(() =>
     IS_PLATFORM
       ? createClient(
@@ -52,4 +51,10 @@ const SignOutHandler = ({ children }: PropsWithChildren) => {
   return <>{children}</>
 }
 
-export { AuthContainer, SignOutHandler }
+const AuthContainer = ({ children }: PropsWithChildren) => (
+  <AuthContainerInternal>
+    <SignOutHandler>{children}</SignOutHandler>
+  </AuthContainerInternal>
+)
+
+export { AuthContainer }

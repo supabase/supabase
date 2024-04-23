@@ -120,6 +120,7 @@ function reducer(state: SearchState, action: Action): SearchState {
   if (state.key > action.key) {
     return state
   }
+
   switch (action.type) {
     case 'resultsReturned':
       const allSourcesLoaded = action.sourcesLoaded === NUMBER_SOURCES

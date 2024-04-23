@@ -15,15 +15,11 @@ import {
   MessageSquare,
   Search,
 } from 'lucide-react'
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { useEffect, useRef } from 'react'
 import { Button } from 'ui'
 import { useCommandMenu } from './CommandMenuProvider'
 import { CommandGroup, CommandItem, CommandLabel, TextHighlighter } from './Command.utils'
-
-const NUMBER_SOURCES = 2
-
-const FUNCTIONS_URL = '/functions/v1/'
 
 const questions = [
   'How do I get started with Supabase?',
@@ -50,10 +46,10 @@ const DocsSearch = () => {
       case PageType.Markdown:
       case PageType.Reference:
         if (site === 'docs') {
-          await router.push(link)
+          router.push(link)
           return setIsOpen(false)
         } else if (site === 'website') {
-          await router.push(`/docs${link}`)
+          router.push(`/docs${link}`)
           setIsOpen(false)
         } else {
           window.open(`https://supabase.com/docs${link}`, '_blank')

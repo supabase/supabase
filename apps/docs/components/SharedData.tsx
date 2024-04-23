@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { logConstants } from 'shared-data/'
+import { logConstants } from 'shared-data'
 
 const sharedData = {
   logConstants,

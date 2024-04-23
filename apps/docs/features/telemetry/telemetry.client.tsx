@@ -3,13 +3,11 @@
 import { useTelemetryProps } from 'common'
 import { usePathname } from 'next/navigation'
 import { useCallback, useEffect } from 'react'
-
 import { useConsent } from 'ui-patterns/ConsentToast'
-
-import { IS_PLATFORM } from '~/lib/constants'
+import { BASE_PATH, IS_PLATFORM } from '~/lib/constants'
 import { unauthedAllowedPost } from '~/lib/fetch/fetchWrappers'
 
-const useSendPageTelemetryWithConsentCheck = () => {
+const useSendPageTelemetryWithConsent = () => {
   const { hasAcceptedConsent } = useConsent()
   const telemetryProps = useTelemetryProps()
 
@@ -21,7 +19,7 @@ const useSendPageTelemetryWithConsentCheck = () => {
         body: {
           referrer: document.referrer,
           title: document.title,
-          route,
+          route: `${BASE_PATH}${route}`,
           ga: {
             screen_resolution: telemetryProps?.screenResolution,
             language: telemetryProps?.language,
@@ -40,7 +38,7 @@ const useSendPageTelemetryWithConsentCheck = () => {
 
 const PageTelemetry = () => {
   const pathname = usePathname()
-  const sendPageTelemetry = useSendPageTelemetryWithConsentCheck()
+  const sendPageTelemetry = useSendPageTelemetryWithConsent()
 
   useEffect(() => {
     if (pathname) {

@@ -8,15 +8,13 @@ import { ThemeProvider } from 'common'
 import { type Metadata, type Viewport } from 'next'
 import { PortalToast, TabsProvider } from 'ui'
 import { CommandMenuProvider } from 'ui-patterns/Cmdk'
-
-import { AuthContainer, SignOutHandler } from '~/features/auth/auth.client'
+import { AuthContainer } from '~/features/auth/auth.client'
 import { QueryClientProvider } from '~/features/data/queryClient.client'
-import { RefDocHistoryHandler } from '~/features/docs/reference/navigation.client'
-import { ShortcutPreviewBuild } from '~/features/staging/staging.client'
+import { ShortcutPreviewBuild } from '~/features/envs/staging.client'
 import { PageTelemetry } from '~/features/telemetry/telemetry.client'
-import { favicons } from '~/features/ui/favicons/faviconData'
-import { ThemeSandbox } from '~/features/ui/theme/theme.client'
-import { ScrollRestoration } from '~/features/ui/utils/scroll.client'
+import { favicons } from '~/features/ui/faviconData'
+import { ThemeSandbox } from '~/features/ui/theme.client'
+import { ScrollRestoration } from '~/features/ui/helpers.scroll.client'
 import SiteLayout from '~/layouts/SiteLayout'
 import { BASE_PATH } from '~/lib/constants'
 
@@ -58,28 +56,25 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
     <ShortcutPreviewBuild>
       <QueryClientProvider>
         <AuthContainer>
-          <SignOutHandler>
-            <PageTelemetry />
-            <ScrollRestoration />
-            <RefDocHistoryHandler />
-            <html lang="en">
-              <body>
-                <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-                  <CommandMenuProvider site="docs">
-                    <TabsProvider>
-                      <div className="h-screen flex flex-col">
-                        <SiteLayout>
-                          <PortalToast />
-                          {children}
-                        </SiteLayout>
-                      </div>
-                    </TabsProvider>
-                  </CommandMenuProvider>
-                  <ThemeSandbox />
-                </ThemeProvider>
-              </body>
-            </html>
-          </SignOutHandler>
+          <PageTelemetry />
+          <ScrollRestoration />
+          <html lang="en">
+            <body>
+              <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+                <CommandMenuProvider site="docs">
+                  <TabsProvider>
+                    <div className="h-screen flex flex-col">
+                      <SiteLayout>
+                        <PortalToast />
+                        {children}
+                      </SiteLayout>
+                    </div>
+                  </TabsProvider>
+                </CommandMenuProvider>
+                <ThemeSandbox />
+              </ThemeProvider>
+            </body>
+          </html>
         </AuthContainer>
       </QueryClientProvider>
     </ShortcutPreviewBuild>

@@ -1,16 +1,14 @@
+import { Database } from 'lucide-react'
+import { Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
-
-import { CodeBlock, IconDatabase, Tabs } from 'ui'
-
+import { CodeBlock, Tabs } from 'ui/client'
 import Options from '~/components/Options'
 import Param from '~/components/Params'
+import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
+import { components } from '~/features/docs/mdx.shared'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
-
-import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
-import { Fragment } from 'react'
-import { IRefFunctionSection } from './Reference.types'
-import components from '~/components'
+import type { IRefFunctionSection } from './Reference.types'
 
 const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
   const item = props.spec.functions.find((x: any) => x.id === props.funcData.id)
@@ -167,7 +165,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                                         <div className="bg-background px-5 py-2">
                                           <div className="flex gap-2 items-center">
                                             <div className="text-brand">
-                                              <IconDatabase size={16} />
+                                              <Database size={16} />
                                             </div>
                                             <h5 className="text-xs text-foreground">
                                               {table.name}

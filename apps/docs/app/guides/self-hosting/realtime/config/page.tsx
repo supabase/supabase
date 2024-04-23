@@ -1,6 +1,6 @@
-import { GuideTemplate } from '~/app/guides/GuideTemplate'
 import Param from '~/components/Params'
-import { MDXRemoteGuides, genGuideMeta } from '~/features/docs/guides/GuidesMdx'
+import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
+import { GuideTemplate, MDXRemoteGuides, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { getRealtimeConfigV0 } from '~/lib/mdx/getConfig'
 
 const meta = {
@@ -20,7 +20,9 @@ const RealtimeConfigPage = async () => {
   return (
     <GuideTemplate
       meta={meta}
-      editLink="/supabase/supabase/blob/master/apps/docs/pages/guides/self-hosting/realtime/config.tsx"
+      editLink={newEditLink(
+        'supabase/supabase/blob/master/apps/docs/pages/guides/self-hosting/realtime/config.tsx'
+      )}
     >
       <MDXRemoteGuides source={descriptionMdx} />
 

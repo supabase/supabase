@@ -37,11 +37,14 @@ export async function constructHeaders(
 }
 
 /**
- * [Charis] A bunch of ts-ignore here because there's soemthing on with the
- * type inference, where I can't get it to both:
+ * [Charis] A bunch of ts-ignore here because there's something going on with
+ * the type inference, where I can't get it to both:
  *
  * - Be happy with the passed init argument
- * - Properly infer the types of the fetch responses, as intended
+ * - Properly infer the types of the fetch params and responses, as intended
+ *
+ * Inferring the types of fetch responses seemed far more useful for DX, so I
+ * forced it to accept the init functions in order to preserve that.
  */
 
 // @ts-ignore

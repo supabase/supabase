@@ -9,13 +9,12 @@ import { ThemeProvider } from 'common'
 import { PortalToast, PromoToast, TabsProvider } from 'ui'
 
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
-import { AuthContainer, SignOutHandler } from '~/features/auth/auth.client'
+import { AuthContainer } from '~/features/auth/auth.client'
 import { QueryClientProvider } from '~/features/data/queryClient.client'
-import { RefDocHistoryHandler } from '~/features/docs/reference/navigation.client'
-import { ShortcutPreviewBuild } from '~/features/staging/staging.client'
+import { ShortcutPreviewBuild } from '~/features/envs/staging.client'
 import { PageTelemetry } from '~/features/telemetry/telemetry.client'
-import { ThemeSandbox } from '~/features/ui/theme/theme.client'
-import { ScrollRestoration } from '~/features/ui/utils/scroll.client'
+import { ThemeSandbox } from '~/features/ui/theme.client'
+import { ScrollRestoration } from '~/features/ui/helpers.scroll.client'
 import SiteLayout from '~/layouts/SiteLayout'
 import type { AppPropsWithLayout } from '~/types'
 import { CommandMenuProvider } from 'ui-patterns/Cmdk'
@@ -29,25 +28,22 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       </Head>
       <QueryClientProvider>
         <AuthContainer>
-          <SignOutHandler>
-            <PageTelemetry />
-            <ScrollRestoration />
-            <RefDocHistoryHandler />
-            <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-              <CommandMenuProvider site="docs">
-                <TabsProvider>
-                  <div className="h-screen flex flex-col">
-                    <SiteLayout>
-                      <PortalToast />
-                      <PromoToast />
-                      <Component {...pageProps} />
-                    </SiteLayout>
-                    <ThemeSandbox />
-                  </div>
-                </TabsProvider>
-              </CommandMenuProvider>
-            </ThemeProvider>
-          </SignOutHandler>
+          <PageTelemetry />
+          <ScrollRestoration />
+          <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+            <CommandMenuProvider site="docs">
+              <TabsProvider>
+                <div className="h-screen flex flex-col">
+                  <SiteLayout>
+                    <PortalToast />
+                    <PromoToast />
+                    <Component {...pageProps} />
+                  </SiteLayout>
+                  <ThemeSandbox />
+                </div>
+              </TabsProvider>
+            </CommandMenuProvider>
+          </ThemeProvider>
         </AuthContainer>
       </QueryClientProvider>
     </ShortcutPreviewBuild>

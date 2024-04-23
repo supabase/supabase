@@ -1,8 +1,10 @@
 import { type SerializeOptions } from 'next-mdx-remote/dist/types'
+import { redirect } from 'next/navigation'
 import { isAbsolute, relative } from 'path'
 import rehypeSlug from 'rehype-slug'
-import { GuideTemplate } from '~/app/guides/GuideTemplate'
-import { genGuideMeta } from '~/features/docs/guides/GuidesMdx'
+import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
+import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { notFoundLink } from '~/features/recommendations/NotFound.utils'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
@@ -99,7 +101,11 @@ const pageMap = [
   },
 ]
 
-const PGGraphQLDocs = async ({ params }: { params: { slug?: string[] } }) => {
+interface Params {
+  slug?: string[]
+}
+
+const PGGraphQLDocs = async ({ params }: { params: Params }) => {
   const { meta, ...data } = await getContent(params)
 
   const options = {
@@ -115,16 +121,16 @@ const PGGraphQLDocs = async ({ params }: { params: { slug?: string[] } }) => {
 /**
  * Fetch markdown from external repo and transform links
  */
-const getContent = async ({ slug }: { slug?: string[] }) => {
+const getContent = async ({ slug }: Params) => {
   const page = pageMap.find((page) => page.slug === slug?.at(0))
 
   if (!page) {
-    throw new Error(`No page mapping found for slug '${slug}'`)
+    redirect(notFoundLink(`graphql/${slug ? slug.join('/') : ''}`))
   }
 
   const { remoteFile, meta } = page
 
-  const editLink = `${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`
+  const editLink = newEditLink(`${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`)
 
   const response = await fetch(
     `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
@@ -133,7 +139,7 @@ const getContent = async ({ slug }: { slug?: string[] }) => {
   const content = await response.text()
 
   return {
-    pathname: `/guides/graphql${slug?.length ? `/${slug.join('/')}` : ''}`,
+    pathname: `/guides/graphql${slug?.length ? `/${slug.join('/')}` : ''}` satisfies `/${string}`,
     meta,
     content,
     editLink,

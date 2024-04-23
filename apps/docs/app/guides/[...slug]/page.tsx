@@ -1,13 +1,15 @@
 import { redirect } from 'next/navigation'
-import { sep } from 'node:path'
 import {
+  getGuidesMarkdown,
   genGuideMeta,
   genGuidesStaticParams,
-  getGuidesMarkdown,
-} from '~/features/docs/guides/GuidesMdx'
-import { GuideTemplate } from '../GuideTemplate'
+} from '~/features/docs/GuidesMdx.utils'
+import { GuideTemplate } from '~/features/docs/GuidesMdx.template'
+import { notFoundLink } from '~/features/recommendations/NotFound.utils'
 
-const GuidePage = async ({ params }: { params: { slug: string[] } }) => {
+type Params = { slug: string[] }
+
+const GuidePage = async ({ params }: { params: Params }) => {
   let notFound = false
   let data: Awaited<ReturnType<typeof getGuidesMarkdown>>
 
@@ -22,8 +24,7 @@ const GuidePage = async ({ params }: { params: { slug: string[] } }) => {
   }
 
   if (notFound) {
-    const searchParams = new URLSearchParams({ page: encodeURIComponent(params.slug.join(sep)) })
-    redirect(`/not-found?${searchParams}`)
+    redirect(notFoundLink(params.slug.join('/')))
   }
 
   return <GuideTemplate {...data!} />

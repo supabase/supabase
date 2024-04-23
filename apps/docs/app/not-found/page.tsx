@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { DocsSearchResult, type Database } from 'common'
-import { NotFound } from '~/features/recommendations/NotFound'
+import { NotFound } from '~/features/recommendations/NotFound.client'
 
 const NotFoundPage = async ({ searchParams: { page } }: { searchParams: { page?: string } }) => {
   const recommendations = page ? await getRecommendations(page) : null

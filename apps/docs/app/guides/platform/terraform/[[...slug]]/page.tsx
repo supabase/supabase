@@ -1,7 +1,10 @@
 import matter from 'gray-matter'
 import { type SerializeOptions } from 'next-mdx-remote/dist/types'
+import { redirect } from 'next/navigation'
 import rehypeSlug from 'rehype-slug'
-import { GuideTemplate } from '~/app/guides/GuideTemplate'
+import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
+import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { notFoundLink } from '~/features/recommendations/NotFound.utils'
 import { isValidGuideFrontmatter } from '~/lib/docs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
@@ -13,7 +16,6 @@ import {
   terraformDocsOrg,
   terraformDocsRepo,
 } from '../terraformConstants'
-import { genGuideMeta } from '~/features/docs/guides/GuidesMdx'
 
 // Each external docs page is mapped to a local page
 const pageMap = [
@@ -33,7 +35,11 @@ const pageMap = [
   },
 ]
 
-const TerraformDocs = async ({ params }: { params: { slug?: string[] } }) => {
+interface Params {
+  slug?: string[]
+}
+
+const TerraformDocs = async ({ params }: { params: Params }) => {
   const { meta, ...data } = await getContent(params)
 
   const options = {
@@ -91,17 +97,19 @@ const urlTransform: UrlTransformFunction = (url: string) => {
 /**
  * Fetch markdown from external repo
  */
-const getContent = async ({ slug }: { slug?: string[] }) => {
+const getContent = async ({ slug }: Params) => {
   const [requestedSlug] = slug ?? []
   const page = pageMap.find((page) => page.slug === requestedSlug)
 
   if (!page) {
-    throw new Error(`No page mapping found for slug '${slug}'`)
+    redirect(notFoundLink('platform/terraform' + (slug?.join('/') ?? '')))
   }
 
   const { meta, remoteFile, useRoot } = page
 
-  const editLink = `${terraformDocsOrg}/${terraformDocsRepo}/blob/${terraformDocsBranch}/${useRoot ? '' : `${terraformDocsDocsDir}/`}${remoteFile}`
+  const editLink = newEditLink(
+    `${terraformDocsOrg}/${terraformDocsRepo}/blob/${terraformDocsBranch}/${useRoot ? '' : `${terraformDocsDocsDir}/`}${remoteFile}`
+  )
 
   let response = await fetch(
     `https://raw.githubusercontent.com/${terraformDocsOrg}/${terraformDocsRepo}/${terraformDocsBranch}/${useRoot ? '' : `${terraformDocsDocsDir}/`}${remoteFile}`
@@ -118,7 +126,8 @@ const getContent = async ({ slug }: { slug?: string[] }) => {
   }
 
   return {
-    pathname: `/guides/platform/terraform${slug?.length ? `/${slug.join('/')}` : ''}`,
+    pathname:
+      `/guides/platform/terraform${slug?.length ? `/${slug.join('/')}` : ''}` satisfies `/${string}`,
     meta,
     content,
     editLink,

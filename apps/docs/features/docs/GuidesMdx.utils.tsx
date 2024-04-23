@@ -1,20 +1,21 @@
-import { type CodeHikeConfig, remarkCodeHike } from '@code-hike/mdx'
-import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
 import matter from 'gray-matter'
 import { type Metadata, type ResolvingMetadata } from 'next'
-import { type SerializeOptions } from 'next-mdx-remote/dist/types'
-import { MDXRemote } from 'next-mdx-remote/rsc'
-import { existsSync } from 'node:fs'
+import { redirect } from 'next/navigation'
 import { readFile, readdir } from 'node:fs/promises'
 import { extname, join, sep } from 'node:path'
-import { type ComponentProps } from 'react'
-import rehypeKatex from 'rehype-katex'
-import remarkGfm from 'remark-gfm'
-import remarkMath from 'remark-math'
+import { existsFile } from '~/features/helpers.fs'
+import type { OrPromise } from '~/features/helpers.types'
+import { notFoundLink } from '~/features/recommendations/NotFound.utils'
 import { BASE_PATH, MISC_URL } from '~/lib/constants'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
-import { components } from './GuidesMdx.shared'
+import { newEditLink } from './GuidesMdx.template'
 
+/**
+ * [TODO Charis]
+ *
+ * This is kind of a dumb place for this to be, clean up later as part of
+ * cleaning up navigation menus.
+ */
 const PUBLISHED_SECTIONS = [
   'ai',
   'api',
@@ -31,7 +32,7 @@ const PUBLISHED_SECTIONS = [
   'storage',
 ] as const
 
-const getGuidesMarkdown = async ({ slug }: { slug: string[] }) => {
+const getGuidesMarkdownInternal = async ({ slug }: { slug: string[] }) => {
   const relPath = slug.join(sep).replace(/\/$/, '')
   const fullPath = join(GUIDES_DIRECTORY, relPath + '.mdx')
   /**
@@ -42,12 +43,14 @@ const getGuidesMarkdown = async ({ slug }: { slug: string[] }) => {
     !fullPath.startsWith(GUIDES_DIRECTORY) ||
     !PUBLISHED_SECTIONS.some((section) => relPath.startsWith(section))
   ) {
-    throw Error('Accessing forbidden route. Content must be within the GUIDES_DIRECTORY.')
+    redirect(notFoundLink(slug.join('/')))
   }
 
   const mdx = await readFile(fullPath, 'utf-8')
 
-  const editLink = `supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
+  const editLink = newEditLink(
+    `supabase/supabase/blob/master/apps/docs/content/guides/${relPath}.mdx`
+  )
 
   const { data: meta, content } = matter(mdx)
   if (!isValidGuideFrontmatter(meta)) {
@@ -55,12 +58,32 @@ const getGuidesMarkdown = async ({ slug }: { slug: string[] }) => {
   }
 
   return {
-    pathname: `/guides/${slug.join('/')}`,
+    pathname: `/guides/${slug.join('/')}` satisfies `/${string}`,
     meta,
     content,
     editLink,
   }
 }
+
+/**
+ * Caching this for the entire process is fine because the Markdown content is
+ * baked into each deployment and cannot change. There's also nothing sensitive
+ * here: this is just reading the MDX files from our GitHub repo.
+ */
+const cache = <Args extends unknown[], Output>(fn: (...args: Args) => Promise<Output>) => {
+  const _cache = new Map<string, Output>()
+  return async (...args: Args) => {
+    /**
+     * This is rough but will do because it's just the params object.
+     */
+    const cacheKey = JSON.stringify(args)
+    if (!_cache.has(cacheKey)) {
+      _cache.set(cacheKey, await fn(...args))
+    }
+    return _cache.get(cacheKey)!
+  }
+}
+const getGuidesMarkdown = cache(getGuidesMarkdownInternal)
 
 const genGuidesStaticParams = (directory?: string) => async () => {
   const promises = directory
@@ -73,7 +96,11 @@ const genGuidesStaticParams = (directory?: string) => async () => {
           .map((file) => ({
             slug: [section, ...file.replace(/\.mdx$/, '').split(sep)],
           }))
-          .concat(existsSync(join(GUIDES_DIRECTORY, `${section}.mdx`)) ? [{ slug: [section] }] : [])
+          .concat(
+            (await existsFile(join(GUIDES_DIRECTORY, `${section}.mdx`)))
+              ? [{ slug: [section] }]
+              : []
+          )
       )
 
   /**
@@ -84,17 +111,19 @@ const genGuidesStaticParams = (directory?: string) => async () => {
   return result
 }
 
-type OrPromise<T> = T | Promise<T>
+const pluckPromise = <T, K extends keyof T>(promise: Promise<T>, key: K) =>
+  promise.then((data) => data[key])
 
 const genGuideMeta =
   <Params,>(
-    generate: (params: Params) => OrPromise<{ meta: GuideFrontmatter; pathname: string }>
+    generate: (params: Params) => OrPromise<{ meta: GuideFrontmatter; pathname: `/${string}` }>
   ) =>
   async ({ params }: { params: Params }, parent: ResolvingMetadata): Promise<Metadata> => {
-    const parentAlternates = (await parent).alternates
-    const parentOg = (await parent).openGraph
-
-    const { meta, pathname } = await generate(params)
+    const [parentAlternates, parentOg, { meta, pathname }] = await Promise.all([
+      pluckPromise(parent, 'alternates'),
+      pluckPromise(parent, 'openGraph'),
+      generate(params),
+    ])
 
     // Pathname has form `/guides/(section)/**`
     const ogType = pathname.split('/')[2]
@@ -120,49 +149,4 @@ const genGuideMeta =
     }
   }
 
-const codeHikeOptions: CodeHikeConfig = {
-  theme: codeHikeTheme,
-  lineNumbers: true,
-  showCopyButton: true,
-  skipLanguages: [],
-  autoImport: false,
-}
-
-const mdxOptions: SerializeOptions = {
-  mdxOptions: {
-    useDynamicImport: true,
-    remarkPlugins: [
-      [remarkMath, { singleDollarTextMath: false }],
-      remarkGfm,
-      [remarkCodeHike, codeHikeOptions],
-    ],
-    rehypePlugins: [rehypeKatex as any],
-  },
-}
-
-const MDXRemoteGuides = ({ options = {}, ...props }: ComponentProps<typeof MDXRemote>) => {
-  const { mdxOptions: { remarkPlugins, rehypePlugins, ...otherMdxOptions } = {}, ...otherOptions } =
-    options
-  const {
-    mdxOptions: {
-      remarkPlugins: originalRemarkPlugins,
-      rehypePlugins: originalRehypePlugins,
-      ...originalMdxOptions
-    } = {},
-  } = mdxOptions
-
-  const finalOptions = {
-    ...mdxOptions,
-    ...otherOptions,
-    mdxOptions: {
-      ...originalMdxOptions,
-      ...otherMdxOptions,
-      remarkPlugins: [...(originalRemarkPlugins ?? []), ...(remarkPlugins ?? [])],
-      rehypePlugins: [...(originalRehypePlugins ?? []), ...(rehypePlugins ?? [])],
-    },
-  } as SerializeOptions
-
-  return <MDXRemote components={components} options={finalOptions} {...props} />
-}
-
-export { MDXRemoteGuides, getGuidesMarkdown, genGuidesStaticParams, genGuideMeta }
+export { getGuidesMarkdown, genGuidesStaticParams, genGuideMeta }

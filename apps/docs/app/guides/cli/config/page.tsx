@@ -1,11 +1,11 @@
 import ReactMarkdown from 'react-markdown'
-import { CodeBlock, cn } from 'ui'
+import { CodeBlock } from 'ui/client'
 import { Heading } from '~/components/CustomHTMLElements'
 import { type TOCHeader } from '~/components/GuidesTableOfContents'
-import { Parameter } from '~/lib/refGenerator/refTypes'
+import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
+import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import type { Parameter } from '~/lib/refGenerator/refTypes'
 import specFile from '~/spec/cli_v1_config.yaml' assert { type: 'yml' }
-import { GuideTemplate } from '../../GuideTemplate'
-import { genGuideMeta } from '~/features/docs/guides/GuidesMdx'
 
 const meta = {
   title: 'Supabase CLI config',
@@ -17,15 +17,15 @@ const generateMetadata = genGuideMeta(() => ({
 }))
 
 const tocList: TOCHeader[] = []
-const content = specFile.info.tags.map((tag, id) => {
-  tocList.push({ id, text: tag.title, link: `${tag.id}-config`, level: 2 })
+const content = specFile.info.tags.map((tag: { id: string; title: string }, id: number) => {
+  tocList.push({ id: `${id}`, text: tag.title, link: `${tag.id}-config`, level: 2 })
   return (
     <div>
       <Heading tag="h2">{tag.title} Config</Heading>
       {specFile.parameters
         .filter((param: Parameter) => param.tags && param.tags[0] === tag.id)
-        .map((parameter: Parameter, id) => {
-          tocList.push({ id, text: parameter.id, link: `#${parameter.id}`, level: 3 })
+        .map((parameter: Parameter, id: number) => {
+          tocList.push({ id: `${id}`, text: parameter.id, link: `#${parameter.id}`, level: 3 })
           return <Info parameter={parameter} />
         })}
     </div>
@@ -33,19 +33,13 @@ const content = specFile.info.tags.map((tag, id) => {
 })
 
 const Config = () => {
-  const meta = {
-    title: 'CLI configuration',
-  }
-
-  const editLink = 'supabase/supabase/blob/master/apps/docs/spec/cli_v1_config.yaml'
+  const editLink = newEditLink('supabase/supabase/blob/master/apps/docs/spec/cli_v1_config.yaml')
 
   return (
-    <>
-      <GuideTemplate meta={meta} editLink={editLink}>
-        <ReactMarkdown>{specFile.info.description}</ReactMarkdown>
-        <div>{content}</div>
-      </GuideTemplate>
-    </>
+    <GuideTemplate meta={meta} editLink={editLink}>
+      <ReactMarkdown>{specFile.info.description}</ReactMarkdown>
+      <div>{content}</div>
+    </GuideTemplate>
   )
 }
 

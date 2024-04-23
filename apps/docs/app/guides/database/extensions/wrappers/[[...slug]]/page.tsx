@@ -1,11 +1,11 @@
 import matter from 'gray-matter'
-import { SerializeOptions } from 'next-mdx-remote/dist/types'
+import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import { readFile } from 'node:fs/promises'
-import { join, relative, sep } from 'node:path'
+import { join, relative } from 'node:path'
 import rehypeSlug from 'rehype-slug'
 import emoji from 'remark-emoji'
-import { GuideTemplate } from '~/app/guides/GuideTemplate'
-import { genGuideMeta, genGuidesStaticParams } from '~/features/docs/guides/GuidesMdx'
+import { genGuideMeta, genGuidesStaticParams } from '~/features/docs/GuidesMdx.utils'
+import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter } from '~/lib/docs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
@@ -100,7 +100,11 @@ const pageMap = [
   },
 ]
 
-const WrappersDocs = async ({ params }: { params: { slug?: string[] } }) => {
+interface Params {
+  slug?: string[]
+}
+
+const WrappersDocs = async ({ params }: { params: Params }) => {
   const { isExternal, meta, ...data } = await getContent(params)
 
   const options = isExternal
@@ -123,7 +127,7 @@ const WrappersDocs = async ({ params }: { params: { slug?: string[] } }) => {
 /**
  * Fetch markdown from external repo
  */
-const getContent = async (params: { slug?: string[] }) => {
+const getContent = async (params: Params) => {
   const federatedPage = pageMap.find(
     ({ slug }) => params && slug && params.slug && slug === params.slug.at(0)
   )
@@ -135,14 +139,13 @@ const getContent = async (params: { slug?: string[] }) => {
 
   if (!federatedPage) {
     isExternal = false
-    editLink = `supabase/supabase/apps/docs/content/guides/database/extensions/wrappers/${params?.slug?.join(sep) || 'index'}.mdx`
+    editLink = `supabase/supabase/apps/docs/content/guides/database/extensions/wrappers${params.slug?.length ? `/${params.slug.join('/')}` : ''}.mdx`
     const rawContent = await readFile(
       join(
         GUIDES_DIRECTORY,
         'database',
         'extensions',
-        'wrappers',
-        `${params?.slug?.join(sep) || 'index'}.mdx`
+        `wrappers${params.slug?.length ? `/${params.slug.join('/')}` : ''}.mdx`
       ),
       'utf-8'
     )
@@ -161,9 +164,10 @@ const getContent = async (params: { slug?: string[] }) => {
   }
 
   return {
-    pathname: `/guides/database/extensions/wrappers${params.slug?.length ? `/${params.slug.join('/')}` : ''}`,
+    pathname:
+      `/guides/database/extensions/wrappers${params.slug?.length ? `/${params.slug.join('/')}` : ''}` satisfies `/${string}`,
     isExternal,
-    editLink,
+    editLink: newEditLink(editLink),
     meta,
     content,
   }

@@ -1,8 +1,10 @@
 import { type SerializeOptions } from 'next-mdx-remote/dist/types'
-import { relative } from 'path'
+import { redirect } from 'next/navigation'
+import { relative } from 'node:path'
 import rehypeSlug from 'rehype-slug'
-import { GuideTemplate } from '~/app/guides/GuideTemplate'
-import { genGuideMeta } from '~/features/docs/guides/GuidesMdx'
+import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
+import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { notFoundLink } from '~/features/recommendations/NotFound.utils'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
 import { removeTitle } from '~/lib/mdx/plugins/remarkRemoveTitle'
@@ -47,7 +49,9 @@ const pageMap = [
   },
 ]
 
-const ActionDocs = async ({ params }: { params: { slug: string } }) => {
+type Params = { slug: string }
+
+const ActionDocs = async ({ params }: { params: Params }) => {
   const { meta, ...data } = await getContent(params)
 
   const options = {
@@ -63,16 +67,16 @@ const ActionDocs = async ({ params }: { params: { slug: string } }) => {
 /**
  * Fetch markdown from external repo
  */
-const getContent = async ({ slug }: { slug: string }) => {
+const getContent = async ({ slug }: Params) => {
   const page = pageMap.find(({ slug: validSlug }) => validSlug && validSlug === slug)
 
   if (!page) {
-    throw new Error(`No page mapping found for slug '${slug}'`)
+    redirect(notFoundLink(`cli/github-action/${slug}`))
   }
 
   const { remoteFile, meta } = page
 
-  const editLink = `${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`
+  const editLink = newEditLink(`${org}/${repo}/blob/${branch}/${docsDir}/${remoteFile}`)
 
   const response = await fetch(
     `https://raw.githubusercontent.com/${org}/${repo}/${branch}/${docsDir}/${remoteFile}`
@@ -81,7 +85,7 @@ const getContent = async ({ slug }: { slug: string }) => {
   const content = await response.text()
 
   return {
-    pathname: `/guides/cli/github-action/${slug}`,
+    pathname: `/guides/cli/github-action/${slug}` satisfies `/${string}`,
     meta,
     content,
     editLink,

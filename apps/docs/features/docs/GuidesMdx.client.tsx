@@ -7,7 +7,7 @@
 
 import { MDXProvider } from '@mdx-js/react'
 import { type PropsWithChildren } from 'react'
-import { components } from './GuidesMdx.shared'
+import { components } from '~/features/docs/mdx.shared'
 
 const MDXProviderGuides = ({ children }: PropsWithChildren) => (
   <MDXProvider components={components}>{children}</MDXProvider>

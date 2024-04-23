@@ -8,9 +8,9 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-} from 'ui'
-import { GuideTemplate } from '~/app/guides/GuideTemplate'
-import { genGuideMeta } from '~/features/docs/guides/GuidesMdx'
+} from 'ui/client'
+import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
+import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import {
   terraformDocsBranch,
@@ -352,7 +352,7 @@ function DataSources({ schema }: { schema: any }) {
 const TerraformReferencePage = async () => {
   const { schema } = await getSchema()
 
-  const editLink = 'supabase/terraform-provider-supabase'
+  const editLink = newEditLink('supabase/terraform-provider-supabase')
 
   return (
     <GuideTemplate meta={meta} editLink={editLink}>

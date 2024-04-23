@@ -2,9 +2,9 @@ import { Octokit } from '@octokit/core'
 import { capitalize } from 'lodash'
 import { type SerializeOptions } from 'next-mdx-remote/dist/types'
 import rehypeSlug from 'rehype-slug'
-import { GuideTemplate } from '~/app/guides/GuideTemplate'
 import { Heading } from '~/components/CustomHTMLElements'
-import { MDXRemoteGuides, genGuideMeta } from '~/features/docs/guides/GuidesMdx'
+import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
+import { GuideTemplate, MDXRemoteGuides, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { Tabs, TabPanel } from '~/features/ui/Tabs'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
 import remarkMkDocsAdmonition from '~/lib/mdx/plugins/remarkAdmonition'
@@ -27,7 +27,7 @@ const generateMetadata = genGuideMeta(() => ({
   meta,
 }))
 
-const editLink = 'supabase/splinter/tree/main/docs'
+const editLink = newEditLink('supabase/splinter/tree/main/docs')
 
 const markdownIntro = `
 You can use the Database Performance and Security Advisors to check your database for issues such as missing indexes and improperly set-up RLS policies.
@@ -50,7 +50,7 @@ const DatabaseAdvisorDocs = async () => {
   } as SerializeOptions
 
   return (
-    <GuideTemplate editLink={editLink}>
+    <GuideTemplate meta={meta} editLink={editLink}>
       <MDXRemoteGuides source={markdownIntro} />
       <Heading tag="h2">Available checks</Heading>
       <Tabs listClassNames="flex flex-wrap gap-2 [&>button]:!m-0" queryGroup="lint">
@@ -126,7 +126,7 @@ const getLints = async () => {
 
   if (!Array.isArray(response.data)) {
     throw Error(
-      `Reading a directory, not a file. Should not reach this, solely to appease Typescript.`
+      'Reading a directory, not a file. Should not reach this, solely to appease Typescript.'
     )
   }
 

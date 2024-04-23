@@ -203,96 +203,85 @@ const additionalResources = [
 const HomePage = () => (
   <HomeLayout>
     <div className="flex flex-col">
-      <div>
-        <div className="max-w-xl">
-          <h2
-            id="
-          products"
-            className="group scroll-mt-24"
-          >
-            Products
-          </h2>
+      <h2 id="products">Products</h2>
+      <ul className="grid grid-cols-12 gap-6 not-prose [&_svg]:text-brand-600">
+        {products.map((product) => {
+          return (
+            <li key={product.title} className="col-span-12 md:col-span-4">
+              <Link href={product.href} passHref>
+                <GlassPanel
+                  {...product}
+                  icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />}
+                  background={true}
+                  showIconBg={true}
+                  showLink={false}
+                >
+                  {product.description}
+                </GlassPanel>
+              </Link>
+            </li>
+          )
+        })}
+      </ul>
+
+      <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
+        <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
+          <div className="md:max-w-xs 2xl:max-w-none">
+            <div className="flex items-center gap-3 mb-3 text-brand-600">
+              <h2 id="client-libraries" className="group scroll-mt-24">
+                Client Libraries
+              </h2>
+            </div>
+          </div>
         </div>
 
-        <ul className="grid grid-cols-12 gap-6 not-prose [&_svg]:text-brand-600">
-          {products.map((product) => {
+        <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
+          {clientLibraries.map((library) => {
             return (
-              <li key={product.title} className="col-span-12 md:col-span-4">
-                <Link href={product.href} passHref>
-                  <GlassPanel
-                    {...product}
-                    icon={<HomeMenuIconPicker icon={product.icon} width={18} height={18} />}
-                    background={true}
-                    showIconBg={true}
-                    showLink={false}
-                  >
-                    {product.description}
-                  </GlassPanel>
+              <Link
+                href={library.href}
+                key={library.title}
+                passHref
+                className="col-span-6 md:col-span-4"
+              >
+                <IconPanel
+                  {...library}
+                  icon={<HomeMenuIconPicker icon={library.icon} width={18} height={18} />}
+                  background={true}
+                  showLink={false}
+                />
+              </Link>
+            )
+          })}
+        </div>
+      </div>
+
+      <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
+        <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0">
+          <h2 id="migrate-to-supabase" className="group scroll-mt-24">
+            Migrate to Supabase
+          </h2>
+          <p className="text-foreground-light text-sm p-0 m-0">
+            Bring your existing data, auth and storage to Supabase following our migration guides.
+          </p>
+          <TextLink
+            label="Explore more resources"
+            url="/guides/resources"
+            className="no-underline text-brand text-sm"
+          />
+        </div>
+
+        <ul className="grid col-span-8 grid-cols-12 gap-6 not-prose">
+          {migrationGuides.map((guide) => {
+            return (
+              <li className="col-span-6 md:col-span-4">
+                <Link href={guide.href} key={guide.title} passHref>
+                  <IconPanel {...guide} background={true} showLink={false} />
                 </Link>
               </li>
             )
           })}
         </ul>
-
-        <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
-          <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0 [&_h3]:m-0">
-            <div className="md:max-w-xs 2xl:max-w-none">
-              <div className="flex items-center gap-3 mb-3 text-brand-600">
-                <h2 id="client-libraries" className="group scroll-mt-24">
-                  Client Libraries
-                </h2>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid col-span-8 grid-cols-12 gap-6 not-prose">
-            {clientLibraries.map((library) => {
-              return (
-                <Link
-                  href={library.href}
-                  key={library.title}
-                  passHref
-                  className="col-span-6 md:col-span-4"
-                >
-                  <IconPanel
-                    {...library}
-                    icon={<HomeMenuIconPicker icon={library.icon} width={18} height={18} />}
-                    background={true}
-                    showLink={false}
-                  />
-                </Link>
-              )
-            })}
-          </div>
-        </div>
-
-        <div className="flex flex-col lg:grid grid-cols-12 gap-6 py-12 border-b">
-          <div className="col-span-4 flex flex-col gap-1 [&_h2]:m-0">
-            <h2 id="migrate-to-supabase" className="group scroll-mt-24">
-              Migrate to Supabase
-            </h2>
-            <p className="text-foreground-light text-sm p-0 m-0">
-              Bring your existing data, auth and storage to Supabase following our migration guides.
-            </p>
-            <TextLink
-              label="Explore more resources"
-              url="/guides/resources"
-              className="no-underline text-brand text-sm"
-            />
-          </div>
-
-          <ul className="grid col-span-8 grid-cols-12 gap-6 not-prose">
-            {migrationGuides.map((guide) => {
-              return (
-                <li className="col-span-6 md:col-span-4">
-                  <Link href={guide.href} key={guide.title} passHref>
-                    <IconPanel {...guide} background={true} showLink={false} />
-                  </Link>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
       </div>
 
       <div className="flex flex-col gap-6 py-12 border-b">
