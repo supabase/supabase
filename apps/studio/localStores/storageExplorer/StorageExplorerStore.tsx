@@ -44,7 +44,6 @@ import { IS_PLATFORM } from 'lib/constants'
 import { lookupMime } from 'lib/mime'
 import Link from 'next/link'
 import { Button, SONNER_DEFAULT_DURATION, SonnerProgress } from 'ui'
-import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
 type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
 
@@ -1841,6 +1840,7 @@ class StorageExplorerStore {
   setSelectedItemToRename = (file: { name: string; columnIndex: number }) => {
     this.updateRowStatus(file.name, STORAGE_ROW_STATUS.EDITING, file.columnIndex)
   }
+
   private updateRowStatus = (
     name: string,
     status: STORAGE_ROW_STATUS,
