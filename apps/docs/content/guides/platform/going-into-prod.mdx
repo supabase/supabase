@@ -21,7 +21,10 @@ After developing your project and deciding it's Production Ready, you should run
 - Turn on [SSL Enforcement](/docs/guides/platform/ssl-enforcement)
 - Enable [Network Restrictions](/docs/guides/platform/network-restrictions) for your database.
 - Enable 2FA on GitHub. Since your GitHub account gives you administrative rights to your Supabase project, you should protect it with a strong password and 2FA using a U2F key or a TOTP app.
-- Ensure email confirmations are enabled in the `Settings > Auth` page.
+- Ensure email confirmations are [enabled](https://supabase.com/dashboard/project/_/auth/providers) in the `Settings > Auth` page.
+- Ensure that you've [set the expiry](https://supabase.com/dashboard/project/_/auth/providers) for one-time passwords (OTPs) to a reasonable value that you are comfortable with. We recommend setting this to 3600 seconds (1 hour) or lower.
+- Increase the length of the OTP if you need a higher level of entropy.
+- If your application requires a higher level of security, consider setting up [multi-factor authentication](https://supabase.com/docs/guides/auth/auth-mfa) (MFA) for your users.
 - Use a custom SMTP server for auth emails so that your users can see that the mails are coming from a trusted domain (preferably the same domain that your app is hosted on). Grab SMTP credentials from any major email provider such as SendGrid, AWS SES, etc.
 - Think hard about how _you_ would abuse your service as an attacker, and mitigate.
 - Review these [common cybersecurity threats](https://auth0.com/docs/security/prevent-threats).

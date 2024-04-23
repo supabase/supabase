@@ -595,6 +595,50 @@ export interface paths {
     /** Gets project's usage api requests count */
     get: operations['UsageApiController_getApiRequestsCount']
   }
+  '/platform/projects/{ref}/analytics/warehouse/tenant': {
+    /** Gets project's warehouse tenant from logflare */
+    get: operations['TenantController_getTenant']
+  }
+  '/platform/projects/{ref}/analytics/warehouse/collections': {
+    /** Lists project's warehouse collections from logflare */
+    get: operations['CollectionController_listCollections']
+    /** Create a warehouse collection */
+    post: operations['CollectionController_createCollection']
+  }
+  '/platform/projects/{ref}/analytics/warehouse/collections/{token}': {
+    /** Get a warehouse collection */
+    get: operations['CollectionController_getCollection']
+    /** Delete a warehouse collection */
+    delete: operations['CollectionController_deleteCollection']
+    /** Update a warehouse collection */
+    patch: operations['CollectionController_updateCollection']
+  }
+  '/platform/projects/{ref}/analytics/warehouse/access-tokens': {
+    /** Lists project's warehouse access tokens from logflare */
+    get: operations['AccessTokenController_listAccessTokens']
+    /** Create a warehouse access token */
+    post: operations['AccessTokenController_createAccessToken']
+  }
+  '/platform/projects/{ref}/analytics/warehouse/access-tokens/{token}': {
+    /** Delete a warehouse access token */
+    delete: operations['AccessTokenController_deleteAccessToken']
+  }
+  '/platform/projects/{ref}/analytics/warehouse/endpoints': {
+    /** Lists project's warehouse endpoints from logflare */
+    get: operations['EndpointController_listEndpoints']
+    /** Create a warehouse endpoint */
+    post: operations['EndpointController_createEndpoint']
+  }
+  '/platform/projects/{ref}/analytics/warehouse/endpoints/{token}': {
+    /** Update a warehouse endpoint */
+    put: operations['EndpointController_updateEndpoint']
+    /** Delete a warehouse endpoint */
+    delete: operations['EndpointController_deleteEndpoint']
+  }
+  '/platform/projects/{ref}/analytics/warehouse/query': {
+    /** Lists project's warehouse queries from logflare */
+    get: operations['WarehouseQueryController_runQuery']
+  }
   '/platform/projects/{ref}/config/pgbouncer': {
     /** Gets project's pgbouncer config */
     get: operations['PgbouncerConfigController_getPgbouncerConfig']
@@ -710,6 +754,16 @@ export interface paths {
   '/platform/storage/{ref}/buckets/{id}/objects': {
     /** Deletes objects */
     delete: operations['StorageObjectsController_deleteObjects']
+  }
+  '/platform/storage/{ref}/credentials': {
+    /** Gets project storage credentials */
+    get: operations['StorageS3CredentialsController_getAllCredentials']
+    /** Creates project storage credential */
+    post: operations['StorageS3CredentialsController_createCredential']
+  }
+  '/platform/storage/{ref}/credentials/{id}': {
+    /** Deletes project storage credential */
+    delete: operations['StorageS3CredentialsController_deleteCredential']
   }
   '/platform/stripe/invoices': {
     /** Gets invoices for the given customer */
@@ -868,12 +922,24 @@ export interface paths {
     /** Reset JWT if leaked keys found by GitHub secret scanning */
     post: operations['GithubSecretAlertController_resetJwt']
   }
+  '/system/projects/{ref}/functions/{function_slug}': {
+    /**
+     * Update a function
+     * @description Updates a function with the specified slug and project.
+     */
+    patch: operations['SystemFunctionSlugController_updateFunction']
+  }
   '/system/projects/{ref}/functions': {
     /**
      * List all functions
      * @description Returns all functions you've previously added to the specified project.
      */
     get: operations['SystemFunctionsController_getFunctions']
+    /**
+     * Create a function
+     * @description Creates a function and adds it to the specified project.
+     */
+    post: operations['SystemFunctionsController_createFunction']
     /** Deletes all Edge Functions from a project */
     delete: operations['SystemFunctionsController_systemDeleteAllFunctions']
   }
@@ -947,6 +1013,10 @@ export interface paths {
   '/system/organizations/{slug}/restrictions': {
     /** Updates restriction status of an org */
     put: operations['OrgRestrictionsSystemController_updateRestriction']
+  }
+  '/system/partner-organizations': {
+    /** Creates a partner organization */
+    post: operations['AwsPartnerOrganizationsSystemController_createPartnerOrganization']
   }
   '/system/integrations/vercel/webhooks': {
     /** Processes Vercel event */
@@ -1361,6 +1431,50 @@ export interface paths {
     /** Gets project's usage api requests count */
     get: operations['UsageApiController_getApiRequestsCount']
   }
+  '/v0/projects/{ref}/analytics/warehouse/tenant': {
+    /** Gets project's warehouse tenant from logflare */
+    get: operations['TenantController_getTenant']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/collections': {
+    /** Lists project's warehouse collections from logflare */
+    get: operations['CollectionController_listCollections']
+    /** Create a warehouse collection */
+    post: operations['CollectionController_createCollection']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/collections/{token}': {
+    /** Get a warehouse collection */
+    get: operations['CollectionController_getCollection']
+    /** Delete a warehouse collection */
+    delete: operations['CollectionController_deleteCollection']
+    /** Update a warehouse collection */
+    patch: operations['CollectionController_updateCollection']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/access-tokens': {
+    /** Lists project's warehouse access tokens from logflare */
+    get: operations['AccessTokenController_listAccessTokens']
+    /** Create a warehouse access token */
+    post: operations['AccessTokenController_createAccessToken']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/access-tokens/{token}': {
+    /** Delete a warehouse access token */
+    delete: operations['AccessTokenController_deleteAccessToken']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/endpoints': {
+    /** Lists project's warehouse endpoints from logflare */
+    get: operations['EndpointController_listEndpoints']
+    /** Create a warehouse endpoint */
+    post: operations['EndpointController_createEndpoint']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/endpoints/{token}': {
+    /** Update a warehouse endpoint */
+    put: operations['EndpointController_updateEndpoint']
+    /** Delete a warehouse endpoint */
+    delete: operations['EndpointController_deleteEndpoint']
+  }
+  '/v0/projects/{ref}/analytics/warehouse/query': {
+    /** Lists project's warehouse queries from logflare */
+    get: operations['WarehouseQueryController_runQuery']
+  }
   '/v0/projects/{ref}/config/pgbouncer': {
     /** Gets project's pgbouncer config */
     get: operations['PgbouncerConfigController_getPgbouncerConfig']
@@ -1458,6 +1572,16 @@ export interface paths {
   '/v0/storage/{ref}/buckets/{id}/objects': {
     /** Deletes objects */
     delete: operations['StorageObjectsController_deleteObjects']
+  }
+  '/v0/storage/{ref}/credentials': {
+    /** Gets project storage credentials */
+    get: operations['StorageS3CredentialsController_getAllCredentials']
+    /** Creates project storage credential */
+    post: operations['StorageS3CredentialsController_createCredential']
+  }
+  '/v0/storage/{ref}/credentials/{id}': {
+    /** Deletes project storage credential */
+    delete: operations['StorageS3CredentialsController_deleteCredential']
   }
   '/v1/branches/{branch_id}': {
     /**
@@ -1898,7 +2022,8 @@ export interface components {
       page: string
       isHelpful: boolean
       title: string
-      feedback: string
+      feedback?: string
+      team?: string
     }
     SignUpBody: {
       email: string
@@ -2003,6 +2128,8 @@ export interface components {
       HOOK_CUSTOM_ACCESS_TOKEN_URI: string
       HOOK_SEND_SMS_ENABLED: boolean
       HOOK_SEND_SMS_URI: string
+      HOOK_SEND_EMAIL_ENABLED: boolean
+      HOOK_SEND_EMAIL_URI: string
       EXTERNAL_APPLE_ENABLED: boolean
       EXTERNAL_APPLE_CLIENT_ID: string
       EXTERNAL_APPLE_SECRET: string
@@ -2155,6 +2282,8 @@ export interface components {
       HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
       HOOK_SEND_SMS_ENABLED?: boolean
       HOOK_SEND_SMS_URI?: string
+      HOOK_SEND_EMAIL_ENABLED?: boolean
+      HOOK_SEND_EMAIL_URI?: string
       EXTERNAL_APPLE_ENABLED?: boolean
       EXTERNAL_APPLE_CLIENT_ID?: string
       EXTERNAL_APPLE_SECRET?: string
@@ -3837,6 +3966,30 @@ export interface components {
       >
       result?: Record<string, never>[]
     }
+    LFUser: {
+      token: string
+      metadata: {
+        project_ref?: string
+      }
+    }
+    LFSource: {
+      token: string
+      id: number
+      name: string
+    }
+    LFEndpoint: {
+      token: string
+      id: number
+      name: string
+      description: string
+      query: string
+      language: Record<string, never>
+      sandboxable: boolean | null
+      cache_duration_seconds: number
+      proactive_requerying_seconds: number
+      max_limit: number
+      enable_auth: number
+    }
     PgbouncerConfigResponse: {
       default_pool_size?: number
       ignore_startup_parameters?: string
@@ -3887,11 +4040,14 @@ export interface components {
     }
     UpdatePostgrestConfigBody: {
       max_rows?: number
+      db_pool?: number
       db_extra_search_path?: string
       db_schema?: string
     }
     V1PostgrestConfigResponse: {
       max_rows: number
+      /** @description If `null`, the value is automatically configured based on compute size. */
+      db_pool: number | null
       db_schema: string
       db_extra_search_path: string
     }
@@ -4170,6 +4326,23 @@ export interface components {
     DeleteObjectsBody: {
       paths: string[]
     }
+    GetStorageCredential: {
+      id: string
+      description: string
+      created_at: string
+    }
+    GetStorageCredentialsResponse: {
+      data: components['schemas']['GetStorageCredential'][]
+    }
+    CreateStorageCredentialBody: {
+      description: string
+    }
+    CreateStorageCredentialResponse: {
+      id: string
+      access_key: string
+      secret_key: string
+      description: string
+    }
     Invoice: {
       id: string
       invoice_pdf: string
@@ -4407,6 +4580,11 @@ export interface components {
       public_key: string
       token_name?: string
     }
+    V1UpdateFunctionBody: {
+      name?: string
+      body?: string
+      verify_jwt?: boolean
+    }
     FunctionResponse: {
       id: string
       slug: string
@@ -4420,6 +4598,12 @@ export interface components {
       import_map?: boolean
       entrypoint_path?: string
       import_map_path?: string
+    }
+    V1CreateFunctionBody: {
+      slug: string
+      name: string
+      body: string
+      verify_jwt?: boolean
     }
     SecretResponse: {
       name: string
@@ -4545,6 +4729,7 @@ export interface components {
       /** @enum {string} */
       tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
       price_id?: string
+      skip_free_plan_validations?: boolean
     }
     RestrictionData: {
       grace_period_end?: string
@@ -4574,6 +4759,15 @@ export interface components {
       restriction_status?: 'grace_period' | 'grace_period_over' | 'null' | 'restricted'
       restriction_data?: components['schemas']['RestrictionData']
       message?: string
+    }
+    CreateAwsPartnerOrganizationBody: {
+      primary_email: string
+      name: string
+    }
+    AwsPartnerOrganizationResponse: {
+      id: number
+      slug: string
+      name: string
     }
     GetMetricsBody: {
       /** @enum {string} */
@@ -4716,6 +4910,11 @@ export interface components {
       /** @deprecated */
       kps_enabled?: boolean
       desired_instance_size?: components['schemas']['DesiredInstanceSize']
+      /**
+       * @description Template URL used to create the project from the CLI.
+       * @example https://github.com/supabase/supabase/tree/master/examples/slack-clone/nextjs-slack-clone
+       */
+      template_url?: string
     }
     ApiKeyResponse: {
       name: string
@@ -4766,6 +4965,8 @@ export interface components {
     }
     PostgrestConfigWithJWTSecretResponse: {
       max_rows: number
+      /** @description If `null`, the value is automatically configured based on compute size. */
+      db_pool: number | null
       db_schema: string
       db_extra_search_path: string
       jwt_secret?: string
@@ -5143,8 +5344,10 @@ export interface components {
       hook_password_verification_attempt_uri?: string
       hook_custom_access_token_enabled?: boolean
       hook_custom_access_token_uri?: string
-      hook_custom_sms_provider_enabled?: boolean
-      hook_custom_sms_provider_uri?: string
+      hook_send_sms_enabled?: boolean
+      hook_send_sms_uri?: string
+      hook_send_email_enabled?: boolean
+      hook_send_email_uri?: string
       external_apple_enabled?: boolean
       external_apple_client_id?: string
       external_apple_secret?: string
@@ -5327,12 +5530,6 @@ export interface components {
     V1RestorePitrBody: {
       recovery_time_target_unix: number
     }
-    V1CreateFunctionBody: {
-      slug: string
-      name: string
-      body: string
-      verify_jwt?: boolean
-    }
     FunctionSlugResponse: {
       id: string
       slug: string
@@ -5346,11 +5543,6 @@ export interface components {
       import_map?: boolean
       entrypoint_path?: string
       import_map_path?: string
-    }
-    V1UpdateFunctionBody: {
-      name?: string
-      body?: string
-      verify_jwt?: boolean
     }
     V1StorageBucketResponse: {
       id: string
@@ -9810,6 +10002,270 @@ export interface operations {
       }
     }
   }
+  /** Gets project's warehouse tenant from logflare */
+  TenantController_getTenant: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFUser']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch or provision warehouse tenant */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Lists project's warehouse collections from logflare */
+  CollectionController_listCollections: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFSource'][]
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse collections */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Create a warehouse collection */
+  CollectionController_createCollection: {
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['LFSource']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create warehouse collection */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Get a warehouse collection */
+  CollectionController_getCollection: {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFSource']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse collection */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Delete a warehouse collection */
+  CollectionController_deleteCollection: {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFSource']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to delete warehouse collection */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Update a warehouse collection */
+  CollectionController_updateCollection: {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFSource']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update warehouse collection */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Lists project's warehouse access tokens from logflare */
+  AccessTokenController_listAccessTokens: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFSource'][]
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse access tokens */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Create a warehouse access token */
+  AccessTokenController_createAccessToken: {
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['LFSource']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create warehouse access token */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Delete a warehouse access token */
+  AccessTokenController_deleteAccessToken: {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFSource']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to delete warehouse access token */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Lists project's warehouse endpoints from logflare */
+  EndpointController_listEndpoints: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFEndpoint'][]
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse endpoints */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Create a warehouse endpoint */
+  EndpointController_createEndpoint: {
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['LFEndpoint']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create warehouse endpoint */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Update a warehouse endpoint */
+  EndpointController_updateEndpoint: {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['LFEndpoint']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update warehouse endpoint */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Delete a warehouse endpoint */
+  EndpointController_deleteEndpoint: {
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to delete warehouse endpoint */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Lists project's warehouse queries from logflare */
+  WarehouseQueryController_runQuery: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to fetch warehouse endpoints */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets project's pgbouncer config */
   PgbouncerConfigController_getPgbouncerConfig: {
     parameters: {
@@ -10596,6 +11052,80 @@ export interface operations {
       }
     }
   }
+  /** Gets project storage credentials */
+  StorageS3CredentialsController_getAllCredentials: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetStorageCredentialsResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to get project storage credentials */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates project storage credential */
+  StorageS3CredentialsController_createCredential: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateStorageCredentialBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['CreateStorageCredentialResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create project storage credential */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Deletes project storage credential */
+  StorageS3CredentialsController_deleteCredential: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Storage credential id */
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to delete project storage credential */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Gets invoices for the given customer */
   InvoicesController_getInvoices: {
     parameters: {
@@ -10896,7 +11426,7 @@ export interface operations {
     parameters: {
       query: {
         /** @description Filter results by integration name. Optional */
-        integration_name: string
+        integration_name: unknown
       }
     }
     responses: {
@@ -11456,6 +11986,48 @@ export interface operations {
     }
   }
   /**
+   * Update a function
+   * @description Updates a function with the specified slug and project.
+   */
+  SystemFunctionSlugController_updateFunction: {
+    parameters: {
+      query?: {
+        slug?: string
+        name?: string
+        verify_jwt?: boolean
+        import_map?: boolean
+        entrypoint_path?: string
+        import_map_path?: string
+      }
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Function slug */
+        function_slug: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1UpdateFunctionBody']
+        'application/vnd.denoland.eszip': components['schemas']['V1UpdateFunctionBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['FunctionResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update function with given slug */
+      500: {
+        content: never
+      }
+    }
+  }
+  /**
    * List all functions
    * @description Returns all functions you've previously added to the specified project.
    */
@@ -11476,6 +12048,46 @@ export interface operations {
         content: never
       }
       /** @description Failed to retrieve project's functions */
+      500: {
+        content: never
+      }
+    }
+  }
+  /**
+   * Create a function
+   * @description Creates a function and adds it to the specified project.
+   */
+  SystemFunctionsController_createFunction: {
+    parameters: {
+      query?: {
+        slug?: string
+        name?: string
+        verify_jwt?: boolean
+        import_map?: boolean
+        entrypoint_path?: string
+        import_map_path?: string
+      }
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['V1CreateFunctionBody']
+        'application/vnd.denoland.eszip': components['schemas']['V1CreateFunctionBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['FunctionResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to create project's function */
       500: {
         content: never
       }
@@ -11844,6 +12456,25 @@ export interface operations {
         }
       }
       /** @description Failed to update restriction status */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates a partner organization */
+  AwsPartnerOrganizationsSystemController_createPartnerOrganization: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateAwsPartnerOrganizationBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['AwsPartnerOrganizationResponse']
+        }
+      }
+      /** @description Unexpected error creating a partner organization */
       500: {
         content: never
       }

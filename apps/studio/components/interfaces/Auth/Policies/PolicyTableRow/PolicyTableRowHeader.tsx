@@ -12,12 +12,14 @@ interface PolicyTableRowHeaderProps {
   table: PostgresTable
   isLocked: boolean
   onSelectToggleRLS: (table: PostgresTable) => void
+  onSelectCreatePolicy: () => void
 }
 
 const PolicyTableRowHeader = ({
   table,
   isLocked,
   onSelectToggleRLS = noop,
+  onSelectCreatePolicy,
 }: PolicyTableRowHeaderProps) => {
   const router = useRouter()
   const { ref } = router.query
@@ -73,6 +75,9 @@ const PolicyTableRowHeader = ({
                 </Tooltip.Portal>
               )}
             </Tooltip.Root>
+            <Button type="default" disabled={!canToggleRLS} onClick={() => onSelectCreatePolicy()}>
+              Create policy
+            </Button>
           </div>
         </div>
       )}
