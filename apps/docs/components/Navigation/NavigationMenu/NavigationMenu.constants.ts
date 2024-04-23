@@ -719,6 +719,10 @@ export const database: NavMenuConstant = {
           name: 'Managing tables, views, and data',
           url: '/guides/database/tables',
         },
+        {
+          name: 'Working with arrays',
+          url: '/guides/database/arrays',
+        },
         { name: 'Managing indexes', url: '/guides/database/postgres/indexes' },
         {
           name: 'Querying joins and nested tables',
@@ -1060,6 +1064,10 @@ export const api: NavMenuConstant = {
         {
           name: 'Using custom schemas',
           url: '/guides/api/using-custom-schemas',
+        },
+        {
+          name: 'Converting from SQL to JavaScript API',
+          url: '/guides/api/sql-to-api',
         },
       ],
     },
