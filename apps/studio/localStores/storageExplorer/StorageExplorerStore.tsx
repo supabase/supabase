@@ -501,7 +501,7 @@ class StorageExplorerStore {
             {unit}.
           </p>
           <p className="text-foreground-light">
-            You may change the file size upload limit in the project's storage settings
+            You may change the file size upload limit under Storage in Project Settings.
           </p>
         </div>,
         { duration: 8000 }
