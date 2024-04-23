@@ -667,7 +667,7 @@ export const auth = {
       items: [
         {
           name: 'Part One: JWTs',
-          url: '/guides/auth/auth-deep-dive/auth-deep-dive-jwts',
+          url: '/learn/auth-deep-dive/auth-deep-dive-jwts',
         },
         {
           name: 'Part Two: Row Level Security',
