@@ -41,7 +41,7 @@ const CreateEnumeratedTypeSidePanel = ({
   onClose,
   schema,
 }: CreateEnumeratedTypeSidePanelProps) => {
-  const initialValues = { name: '', description: '', values: [] }
+  const initialValues = { name: '', description: '', values: [{ value: '' }] }
   const submitRef = useRef<HTMLButtonElement>(null)
   const { project } = useProjectContext()
   const {
