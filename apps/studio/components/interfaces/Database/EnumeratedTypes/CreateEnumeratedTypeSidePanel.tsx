@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useFieldArray, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -41,15 +41,25 @@ const CreateEnumeratedTypeSidePanel = ({
   onClose,
   schema,
 }: CreateEnumeratedTypeSidePanelProps) => {
-  const initialValues = { name: '', description: '', values: [{ value: '' }] }
+  const initialValues = { name: '', description: '', values: [] }
   const submitRef = useRef<HTMLButtonElement>(null)
   const { project } = useProjectContext()
-  const { mutate: createEnumeratedType, isLoading: isCreating } = useEnumeratedTypeCreateMutation({
+  const {
+    mutate: createEnumeratedType,
+    isLoading: isCreating,
+    isSuccess,
+  } = useEnumeratedTypeCreateMutation({
     onSuccess: (res, vars) => {
       toast.success(`Successfully created type "${vars.name}"`)
       closePanel()
     },
   })
+
+  useEffect(() => {
+    if (isSuccess) {
+      form.reset(initialValues)
+    }
+  }, [isSuccess])
 
   const FormSchema = z.object({
     name: z
