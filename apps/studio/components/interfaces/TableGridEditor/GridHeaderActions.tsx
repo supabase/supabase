@@ -6,19 +6,19 @@ import { Lock, MousePointer2, PlusCircle } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
-import { Button, Modal, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
+import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import APIDocsButton from 'components/ui/APIDocsButton'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from 'data/database-publications/database-publications-update-mutation'
 import { useTableUpdateMutation } from 'data/tables/table-update-mutation'
 import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
-import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 
 export interface GridHeaderActionsProps {
   table: PostgresTable
@@ -162,7 +162,7 @@ const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeade
                     >
                       <Link
                         passHref
-                        href={`/project/${projectRef}/auth/policies?search=${table.id}`}
+                        href={`/project/${projectRef}/auth/policies?search=${table.id}&schema=${table.schema}`}
                       >
                         Add RLS policy
                       </Link>
@@ -202,7 +202,10 @@ const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeade
                     )
                   }
                 >
-                  <Link passHref href={`/project/${projectRef}/auth/policies?search=${table.id}`}>
+                  <Link
+                    passHref
+                    href={`/project/${projectRef}/auth/policies?search=${table.id}&schema=${table.schema}`}
+                  >
                     Auth {policies.length > 1 ? 'policies' : 'policy'}
                   </Link>
                 </Button>
@@ -267,13 +270,13 @@ const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeade
       <ConfirmationModal
         visible={showEnableRealtime}
         loading={isTogglingRealtime}
-        header={`${isRealtimeEnabled ? 'Disable' : 'Enable'} realtime for ${table.name}`}
-        buttonLabel={`${isRealtimeEnabled ? 'Disable' : 'Enable'} realtime`}
-        buttonLoadingLabel={`${isRealtimeEnabled ? 'Disabling' : 'Enabling'} realtime`}
-        onSelectCancel={() => setShowEnableRealtime(false)}
-        onSelectConfirm={() => toggleRealtime()}
+        title={`${isRealtimeEnabled ? 'Disable' : 'Enable'} realtime for ${table.name}`}
+        confirmLabel={`${isRealtimeEnabled ? 'Disable' : 'Enable'} realtime`}
+        confirmLabelLoading={`${isRealtimeEnabled ? 'Disabling' : 'Enabling'} realtime`}
+        onCancel={() => setShowEnableRealtime(false)}
+        onConfirm={() => toggleRealtime()}
       >
-        <Modal.Content className="py-4 space-y-2">
+        <div className="space-y-2">
           <p className="text-sm">
             Once realtime has been {isRealtimeEnabled ? 'disabled' : 'enabled'}, the table will{' '}
             {isRealtimeEnabled ? 'no longer ' : ''}broadcast any changes to authorized subscribers.
@@ -281,13 +284,13 @@ const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeade
           {!isRealtimeEnabled && (
             <p className="text-sm">
               You may also select which events to broadcast to subscribers on the{' '}
-              <Link href={`/project/${ref}/database/replication`} className="text-brand">
-                database replication
+              <Link href={`/project/${ref}/database/publications`} className="text-brand">
+                database publications
               </Link>{' '}
               settings.
             </p>
           )}
-        </Modal.Content>
+        </div>
       </ConfirmationModal>
 
       <ConfirmModal

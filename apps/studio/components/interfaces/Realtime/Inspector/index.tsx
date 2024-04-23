@@ -32,7 +32,7 @@ export const RealtimeInspector = () => {
     enableBroadcast: true,
   })
 
-  const { logData, sendMessage } = useRealtimeMessages(realtimeConfig)
+  const { logData, sendMessage } = useRealtimeMessages(realtimeConfig, setRealtimeConfig)
 
   return (
     <div className="flex flex-col grow h-full">

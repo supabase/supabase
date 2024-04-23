@@ -10,7 +10,7 @@ version: "3.8"
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20240301-0942bfe
+    image: supabase/studio:20240408-6bf3b81
     restart: unless-stopped
     healthcheck:
       test:
@@ -76,7 +76,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.143.0
+    image: supabase/gotrue:v2.145.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -116,6 +116,7 @@ services:
       GOTRUE_JWT_SECRET: ${JWT_SECRET}
 
       GOTRUE_EXTERNAL_EMAIL_ENABLED: ${ENABLE_EMAIL_SIGNUP}
+      GOTRUE_EXTERNAL_ANONYMOUS_USERS_ENABLED: ${ENABLE_ANONYMOUS_USERS}
       GOTRUE_MAILER_AUTOCONFIRM: ${ENABLE_EMAIL_AUTOCONFIRM}
       # GOTRUE_MAILER_SECURE_EMAIL_CHANGE_ENABLED: true
       # GOTRUE_SMTP_MAX_FREQUENCY: 1s
@@ -156,7 +157,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.25.66
+    image: supabase/realtime:v2.28.32
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -197,7 +198,7 @@ services:
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v0.46.4
+    image: supabase/storage-api:v1.0.6
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -274,7 +275,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.38.0
+    image: supabase/edge-runtime:v1.43.2
     restart: unless-stopped
     depends_on:
       analytics:
@@ -314,7 +315,7 @@ services:
     #     target: /opt/app/rel/logflare/bin/gcloud.json
     #     read_only: true
     environment:
-      LOGFLARE_NODE_HOST:  127.0.0.1
+      LOGFLARE_NODE_HOST: 127.0.0.1
       DB_USERNAME: supabase_admin
       DB_DATABASE: ${POSTGRES_DB}
       DB_HOSTNAME: ${POSTGRES_HOST}
@@ -329,7 +330,6 @@ services:
       POSTGRES_BACKEND_URL: postgresql://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
       POSTGRES_BACKEND_SCHEMA: _analytics
       LOGFLARE_FEATURE_FLAG_OVERRIDE: multibackend=true
-
       # Uncomment to use Big Query backend for analytics
       # GOOGLE_PROJECT_ID: ${GOOGLE_PROJECT_ID}
       # GOOGLE_PROJECT_NUMBER: ${GOOGLE_PROJECT_NUMBER}
@@ -403,7 +403,8 @@ services:
     volumes:
       - ./volumes/logs/vector.yml:/etc/vector/vector.yml:ro
       - ${DOCKER_SOCKET_LOCATION}:/var/run/docker.sock:ro
-
+    environment:
+      LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
     command: [ "--config", "etc/vector/vector.yml" ]
 
 volumes:

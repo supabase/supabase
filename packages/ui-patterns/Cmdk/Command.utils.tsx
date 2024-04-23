@@ -6,7 +6,7 @@ import { cn } from 'ui/src/lib/utils'
 
 import { AlertTriangle } from 'lucide-react'
 import { DetailedHTMLProps, HTMLAttributes, KeyboardEventHandler } from 'react'
-import { DialogContent, Dialog } from 'ui'
+import { Dialog, DialogContent } from 'ui'
 import { Button } from 'ui/src/components/Button'
 import { LoadingLine } from 'ui/src/components/LoadingLine/LoadingLine'
 import { useCommandMenu } from './CommandMenuProvider'
@@ -21,10 +21,6 @@ export const copyToClipboard = (str: string, callback = () => {}) => {
   } else {
     console.warn('Unable to copy to clipboard')
   }
-}
-
-export function escapeDoubleQuotes(str: string) {
-  return str.replaceAll('"', '\\"')
 }
 
 export const Command = React.forwardRef<CommandPrimitiveElement, CommandPrimitiveProps>(

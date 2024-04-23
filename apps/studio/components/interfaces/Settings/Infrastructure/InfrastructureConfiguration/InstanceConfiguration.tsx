@@ -285,24 +285,22 @@ const InstanceConfigurationUI = () => {
       {/* <ConfirmationModal
         size="medium"
         visible={selectedReplicaToRestart !== undefined}
-        header="Confirm to restart selected replica?"
-        buttonLabel="Restart replica"
-        buttonLoadingLabel="Restarting replica"
-        onSelectCancel={() => setSelectedReplicaToRestart(undefined)}
-        onSelectConfirm={() => onConfirmRestartReplica()}
+        title="Confirm to restart selected replica?"
+        confirmLabel="Restart replica"
+        confirmLabelLoading="Restarting replica"
+        onCancel={() => setSelectedReplicaToRestart(undefined)}
+        onConfirm={() => onConfirmRestartReplica()}
       >
-        <Modal.Content className="py-3">
-          <p className="text-sm">Before restarting the replica, consider:</p>
-          <ul className="text-sm text-foreground-light py-1 list-disc mx-4 space-y-1">
-            <li>
-              Network traffic from this region may slow down while the replica is restarting,
-              especially if you have no other replicas in this region
-            </li>
-          </ul>
-          <p className="text-sm mt-2">
-            Are you sure you want to restart this replica (ID: {selectedReplicaToRestart?.id}) now?{' '}
-          </p>
-        </Modal.Content>
+        <p className="text-sm">Before restarting the replica, consider:</p>
+        <ul className="text-sm text-foreground-light py-1 list-disc mx-4 space-y-1">
+          <li>
+            Network traffic from this region may slow down while the replica is restarting,
+            especially if you have no other replicas in this region
+          </li>
+        </ul>
+        <p className="text-sm mt-2">
+          Are you sure you want to restart this replica (ID: {selectedReplicaToRestart?.id}) now?{' '}
+        </p>
       </ConfirmationModal> */}
     </>
   )

@@ -27,7 +27,7 @@ const DeleteRoleModal = ({ role, visible, onClose }: DeleteRoleModalProps) => {
     deleteDatabaseRole({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      id: role.id.toString(),
+      id: role.id,
     })
   }
 

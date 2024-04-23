@@ -134,12 +134,20 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
 }
 
 const Details: FC<PropsWithChildren<ISectionDetails>> = (props) => {
-  return <div className="relative w-full">{props.children}</div>
+  /**
+   * `min-w` is necessary because these are used as grid children, which have
+   * default `min-w-auto`
+   */
+  return <div className="relative w-full min-w-full">{props.children}</div>
 }
 
 const Examples: FC<PropsWithChildren<ISectionExamples>> = (props) => {
+  /**
+   * `min-w` is necessary because these are used as grid children, which have
+   * default `min-w-auto`
+   */
   return (
-    <div className="w-full">
+    <div className="w-full min-w-full">
       <div className="sticky top-24">{props.children}</div>
     </div>
   )
