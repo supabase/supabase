@@ -154,7 +154,7 @@ const Column = ({
                   <CommandList_Shadcn_>
                     <CommandGroup_Shadcn_>
                       {relations.map((relation, idx) => {
-                        const key = String(relation?.id ?? `${column.name}-relation-${idx}`)
+                        const key = String(relation?.id ?? `${column.id}-relation-${idx}`)
                         const status = getRelationStatus(relation)
                         if (status === 'REMOVE') return null
 
