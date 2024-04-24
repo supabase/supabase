@@ -20,7 +20,9 @@
     "tsconfig": "*",
     "ui": "*"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "shared-types": "*"
+  },
   "peerDependencies": {
     "next": "*",
     "react": "*",

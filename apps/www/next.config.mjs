@@ -41,7 +41,7 @@ const nextConfig = {
   basePath: '',
   pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'md', 'mdx'],
   trailingSlash: false,
-  transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'icons'],
+  transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'icons', 'shared-types'],
   images: {
     dangerouslyAllowSVG: true,
     domains: [
