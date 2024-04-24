@@ -162,6 +162,7 @@ async function generateEmbeddings() {
       console.log(`[${path}] Adding ${sections.length} page sections (with embeddings)`)
       for (const { slug, heading, content } of sections) {
         // OpenAI recommends replacing newlines with spaces for best results (specific to embeddings)
+        // force a redeploy
         const input = content.replace(/\n/g, ' ')
 
         try {
