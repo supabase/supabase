@@ -1,25 +1,22 @@
-import { throttle } from 'lodash'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 
-const useSticky = ({
+const useSticky = <Element extends HTMLElement>({
   enabled = true,
   style = {} as CSSStyleDeclaration,
-  scrollContainer,
 }: {
   enabled?: boolean
   style?: CSSStyleDeclaration
-  scrollContainer?: string | HTMLElement
 } = {}) => {
   const [inView, setInView] = useState(false)
-  const stickyRef = useRef<HTMLDivElement>(null)
+  const stickyRef = useRef<Element>(null)
   const { ref: observedRef } = useInView({
     threshold: 0.1,
     onChange: (inView) => (inView ? setInView(true) : setInView(false)),
     skip: !enabled,
   })
 
-  const scrollHandler = useCallback(
+  const handleSticking = useCallback(
     enabled
       ? () => {
           if (!stickyRef.current) return
@@ -45,25 +42,19 @@ const useSticky = ({
               stickyRef.current.style[property] = ''
             }
           }
-          // eslint-disable-next-line react-hooks/exhaustive-deps
         }
       : () => {},
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [enabled, inView, JSON.stringify(style)]
   )
 
-  const throttledScrollHandler = useMemo(() => throttle(scrollHandler, 300), [scrollHandler])
-
-  useEffect(() => {
-    if (!enabled) return
-
-    const elem =
-      scrollContainer instanceof HTMLElement
-        ? scrollContainer
-        : (scrollContainer && document.getElementById(scrollContainer)) || document
-
-    elem.addEventListener('scroll', throttledScrollHandler)
-    return () => elem.removeEventListener('scroll', throttledScrollHandler)
-  }, [enabled, throttledScrollHandler, scrollContainer])
+  /**
+   * Change the sticking behavior when the containing element scrolls in and out
+   * of sight.
+   */
+  useMemo(() => {
+    handleSticking()
+  }, [inView])
 
   return {
     inView,

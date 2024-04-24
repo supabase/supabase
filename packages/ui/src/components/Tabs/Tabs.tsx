@@ -29,7 +29,7 @@ interface TabsProps {
   wrappable?: boolean
   addOnBefore?: React.ReactNode
   addOnAfter?: React.ReactNode
-  stickyTabList?: { scrollContainer?: string | HTMLElement; style?: CSSStyleDeclaration }
+  stickyTabList?: { style?: CSSStyleDeclaration }
   listClassNames?: string
   baseClassNames?: string
 }
@@ -73,7 +73,7 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
       children?.[0]?.props?.id
   )
 
-  const { inView, observedRef, stickyRef } = useSticky({
+  const { inView, observedRef, stickyRef } = useSticky<HTMLDivElement>({
     enabled: !!stickyTabList,
     ...stickyTabList,
   })

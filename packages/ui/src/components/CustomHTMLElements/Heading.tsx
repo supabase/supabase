@@ -44,14 +44,17 @@ const Heading = forwardRef(
       },
     })
 
-    const combinedRef = useCallback((elem: HTMLHeadingElement) => {
-      viewRef(elem)
-      if (typeof forwardedRef === 'function') {
-        forwardedRef(elem)
-      } else if (forwardedRef) {
-        forwardedRef.current = elem
-      }
-    }, [])
+    const combinedRef = useCallback(
+      (elem: HTMLHeadingElement) => {
+        viewRef(elem)
+        if (typeof forwardedRef === 'function') {
+          forwardedRef(elem)
+        } else if (forwardedRef) {
+          forwardedRef.current = elem
+        }
+      },
+      [forwardedRef, viewRef]
+    )
 
     return (
       <HeadingTag id={anchor} ref={combinedRef} className="group scroll-mt-24" {...props}>

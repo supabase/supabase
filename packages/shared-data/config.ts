@@ -38,7 +38,7 @@ const config = {
          */
         validity: {
           value: 1,
-          unit: 'hour1',
+          unit: 'hour',
         },
         /**
          * How many OTPs can be requested per hour.
