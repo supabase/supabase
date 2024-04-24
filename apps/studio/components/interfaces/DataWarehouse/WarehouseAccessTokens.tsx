@@ -14,6 +14,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Input,
   cn,
 } from 'ui'
 import { AlertCircle, Link, MoreVertical, TrashIcon } from 'lucide-react'
@@ -27,22 +28,39 @@ import toast from 'react-hot-toast'
 import { ProjectPausedAlert } from 'components/ui/ProjectPausedAlert'
 import { set } from 'lodash'
 import { useDeleteWarehouseAccessToken } from 'data/analytics/warehouse-access-tokens-delete-mutation'
+import CopyButton from 'components/ui/CopyButton'
 
 const AccessTokenItem = ({
   token,
   id,
   name,
   onDeleteClick,
+  inserted_at,
 }: {
   token: string
   id: string
   name: string
+  inserted_at: string
   onDeleteClick: (id: string) => void
 }) => {
+  const formattedInsertedAt = new Date(inserted_at).toLocaleString()
+
   return (
-    <Table.tr>
+    <Table.tr className="group">
       <Table.td>{name}</Table.td>
-      <Table.td>{token}</Table.td>
+      <Table.td>{inserted_at}</Table.td>
+      <Table.td>
+        <div className="flex gap-1 relative">
+          <Input disabled defaultValue={token} type="password" size="tiny" className="flex-grow" />
+          <div className="w-[88px]">
+            <CopyButton
+              type="outline"
+              text={token}
+              className="group-hover:opacity-100 opacity-0 transition-opacity absolute right-0"
+            />
+          </div>
+        </div>
+      </Table.td>
       <Table.td className="!p-1.5 text-right">
         <DropdownMenu>
           <DropdownMenuTrigger className="h-8 w-8 p-2 focus-visible:outline-none">
@@ -130,6 +148,7 @@ const WarehouseAccessTokens = () => {
                   <Table
                     head={[
                       <Table.th key="desc">Description</Table.th>,
+                      <Table.th key="token">Created at</Table.th>,
                       <Table.th key="token">Token</Table.th>,
                       <Table.th key="actions" />,
                     ]}
@@ -140,10 +159,11 @@ const WarehouseAccessTokens = () => {
                             key={accessToken.id}
                             token={accessToken.token}
                             id={accessToken.id}
+                            inserted_at={accessToken.inserted_at}
                             name={accessToken.description || 'No description'}
                             onDeleteClick={() => {
                               setShowDeleteDialog(true)
-                              setTokenToDelete(accessToken.id)
+                              setTokenToDelete(accessToken.token)
                             }}
                           />
                         ))

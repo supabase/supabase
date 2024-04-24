@@ -1,6 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
+import { PropsWithChildren } from 'react'
 
 import NoPermission from 'components/ui/NoPermission'
 import { ProductMenu } from 'components/ui/ProductMenu'
@@ -78,10 +78,10 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
             <>
               <div className="h-px w-full bg-overlay"></div>
               <div className="py-6">
-                <div className="px-6">
+                <div className="px-6 uppercase font-mono">
                   <Menu.Group title="Warehouse" />
                 </div>
-                <div className="px-3 flex flex-col  editor-product-menu">
+                <div className="px-3 flex flex-col">
                   <div className="space-y-1">
                     <CreateWarehouseCollectionModal />
                     <div className="py-3">

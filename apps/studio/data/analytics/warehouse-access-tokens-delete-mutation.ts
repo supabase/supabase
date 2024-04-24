@@ -2,15 +2,15 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { analyticsKeys } from './keys'
 import { del } from 'data/fetchers'
 
-async function deleteWarehouseAccessToken(ref: string, tokenId: string) {
-  const res = await del(`/platform/projects/{ref}/analytics/warehouse/access-tokens/{tokenId}`, {
+async function deleteWarehouseAccessToken(ref: string, token: string) {
+  const res = await del(`/platform/projects/{ref}/analytics/warehouse/access-tokens/{token}`, {
     params: {
-      path: { ref, tokenId },
+      path: { ref, token },
     },
   })
 
   if (res.error) {
-    console.error(error)
+    console.error(res.error)
     throw res.error
   }
 
@@ -30,7 +30,7 @@ export function useDeleteWarehouseAccessToken({
 }: DeleteAccessTokenArgs) {
   const queryClient = useQueryClient()
   const mutation = useMutation({
-    mutationFn: (tokenId: string) => deleteWarehouseAccessToken(projectRef, tokenId),
+    mutationFn: (token: string) => deleteWarehouseAccessToken(projectRef, token),
     mutationKey: analyticsKeys.warehouseCollections(projectRef),
     onSuccess: (data) => {
       onSuccess(data)

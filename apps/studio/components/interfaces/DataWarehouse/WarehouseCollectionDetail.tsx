@@ -6,6 +6,7 @@ import { Button, IconRefreshCcw, IconRewind } from 'ui'
 import { LogTable } from '../Settings/Logs'
 import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
 import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
+import Link from 'next/link'
 
 export const WarehouseCollectionDetail = () => {
   const router = useRouter()
@@ -47,6 +48,11 @@ export const WarehouseCollectionDetail = () => {
         <LoadingOpacity active={isLoading}>
           <div>
             <h2 className="p-3">{collection?.name}</h2>
+            <Button asChild type={'outline'}>
+              <Link href={`/project/${projectRef}/logs/collections/access-tokens`}>
+                Access tokens
+              </Link>
+            </Button>
             <pre className="overflow-auto max-h-[300px]">{JSON.stringify(collection, null, 2)}</pre>
             <LogTable
               projectRef={projectRef}
