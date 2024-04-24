@@ -18,6 +18,6 @@ export const HIDDEN_EXTENSIONS = [
   'pg_tle',
 ]
 
-export const SEARCH_TERMS = {
+export const SEARCH_TERMS: Record<string, string[]> = {
   vector: ['pgvector', 'pg_vector'],
 }
