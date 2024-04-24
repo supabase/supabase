@@ -105,6 +105,60 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     }
   }
 
+  const EntityTooltipTrigger = ({ entity }: { entity: Entity }) => {
+    console.log(entity)
+    let tooltipContent = null
+
+    switch (entity.type) {
+      case ENTITY_TYPE.TABLE:
+        if (!entity.rls_enabled) {
+          tooltipContent = 'RLS Disabled'
+        }
+        break
+      case ENTITY_TYPE.MATERIALIZED_VIEW:
+        if (entity.schema === 'public') {
+          tooltipContent = 'View is public'
+        }
+        break
+      case ENTITY_TYPE.FOREIGN_TABLE:
+        if (entity.schema === 'public') {
+          tooltipContent = 'Data is in public schema'
+        }
+        break
+      default:
+        break
+    }
+
+    if (tooltipContent) {
+      return (
+        <Tooltip.Root delayDuration={0} disableHoverableContent={true}>
+          <Tooltip.Trigger className="min-w-4" asChild>
+            <Unlock
+              size={14}
+              strokeWidth={2}
+              className={cn('min-w-4', isActive ? 'text-warning-600' : 'text-warning-500')}
+            />
+          </Tooltip.Trigger>
+          <Tooltip.Portal>
+            <Tooltip.Content
+              side="bottom"
+              className={[
+                'rounded bg-alternative py-1 px-2 leading-none shadow',
+                'border border-background',
+                'text-xs text-foreground capitalize',
+              ].join(' ')}
+            >
+              <Tooltip.Arrow className="radix-tooltip-arrow" />
+              {tooltipContent}
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        </Tooltip.Root>
+      )
+    }
+
+    return null
+  }
+
   return (
     <Link
       title={entity.name}
@@ -175,13 +229,14 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         >
           {entity.name}
         </span>
-        {entity.type === ENTITY_TYPE.TABLE && !entity.rls_enabled && (
+        <EntityTooltipTrigger entity={entity} />
+        {/* {entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && (
           <Unlock
             size={14}
             strokeWidth={2}
             className={cn('min-w-4', isActive ? 'text-warning-600' : 'text-warning-500')}
           />
-        )}
+        )} */}
       </div>
 
       {entity.type === ENTITY_TYPE.TABLE && isActive && !isLocked && (
