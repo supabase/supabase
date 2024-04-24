@@ -14,6 +14,7 @@ import {
   cn,
 } from 'ui'
 import pricingAddOn from '~/data/PricingAddOnTable.json'
+import { ComputeBadge } from 'ui-patterns'
 
 const plans = [
   {
@@ -236,17 +237,7 @@ const ComputePricingCalculator = () => {
             >
               <div className="w-full flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                  <Badge
-                    className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
-                    variant={
-                      findIntanceValueByColumn(activeInstance, 'plan') ===
-                      findIntanceValueByColumn(computeInstances[0], 'plan')
-                        ? 'default'
-                        : 'brand'
-                    }
-                  >
-                    {findIntanceValueByColumn(activeInstance, 'plan')}
-                  </Badge>
+                  <ComputeBadge plan={findIntanceValueByColumn(activeInstance, 'plan')} />
                   <p className="text-xs text-foreground-lighter">
                     Project {activeInstance.position + 1}
                   </p>
