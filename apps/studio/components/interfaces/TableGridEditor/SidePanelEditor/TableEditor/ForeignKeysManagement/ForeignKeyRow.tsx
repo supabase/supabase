@@ -2,11 +2,11 @@ import clsx from 'clsx'
 import { useParams } from 'common'
 import Link from 'next/link'
 import SVG from 'react-inlinesvg'
-import { Badge, Button, IconArrowRight, cn } from 'ui'
+import { Badge, Button, cn } from 'ui'
+import { ArrowRight } from 'lucide-react'
 
 import { BASE_PATH } from 'lib/constants'
 import type { ForeignKey } from '../../ForeignKeySelector/ForeignKeySelector.types'
-import { ArrowRight } from 'lucide-react'
 
 interface ForeignKeyProps {
   foreignKey: ForeignKey
