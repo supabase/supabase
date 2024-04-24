@@ -1,18 +1,27 @@
 import { Badge } from 'ui/src/components/shadcn/ui/badge'
 import { components } from 'shared-types/types/api'
+import { cn } from 'ui/src/lib/utils'
 
-export interface ComputeBadgeProps extends React.ComponentProps<typeof Badge> {
-  plan: components['schemas']['DesiredInstanceSize']
+interface ComputeBadgeProps extends React.ComponentProps<typeof Badge> {
+  infraComputeSize: components['schemas']['DbInstanceSize'] | undefined
 }
 
-export function ComputeBadge({ plan, ...props }: ComputeBadgeProps) {
+export function ComputeBadge({ infraComputeSize, className, ...props }: ComputeBadgeProps) {
+  const smallCompute =
+    infraComputeSize?.toLocaleLowerCase() === 'micro' ||
+    infraComputeSize?.toLocaleLowerCase() === 'nano'
+
   return (
     <Badge
-      className="rounded-md w-16 text-center flex justify-center font-mono uppercase"
-      variant={plan.toLowerCase() === 'micro' ? 'default' : 'brand'}
+      className={cn(
+        'rounded-md text-center flex justify-center font-mono uppercase',
+        smallCompute ? 'bg-surface-300 text-foreground' : 'bg-brand text-surface',
+        className
+      )}
+      variant={!infraComputeSize ? 'default' : smallCompute ? 'default' : 'brand'}
       {...props}
     >
-      {plan}
+      {infraComputeSize}
     </Badge>
   )
 }

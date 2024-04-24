@@ -237,7 +237,9 @@ const ComputePricingCalculator = () => {
             >
               <div className="w-full flex justify-between items-center">
                 <div className="flex items-center gap-2">
-                  <ComputeBadge plan={findIntanceValueByColumn(activeInstance, 'plan')} />
+                  <ComputeBadge
+                    infraComputeSize={findIntanceValueByColumn(activeInstance, 'plan')}
+                  />
                   <p className="text-xs text-foreground-lighter">
                     Project {activeInstance.position + 1}
                   </p>

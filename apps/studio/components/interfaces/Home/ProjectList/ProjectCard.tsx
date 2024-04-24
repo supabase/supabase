@@ -8,6 +8,8 @@ import { BASE_PATH } from 'lib/constants'
 import InlineSVG from 'react-inlinesvg'
 import { inferProjectStatus } from './ProjectCard.utils'
 import { ProjectCardStatus } from './ProjectCardStatus'
+import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
 
 export interface ProjectCardProps {
   project: ProjectInfo
@@ -42,7 +44,8 @@ const ProjectCard = ({
           <div className="w-full justify-between space-y-1.5 px-5">
             <p className="flex-shrink truncate text-sm pr-4">{name}</p>
             <span className="text-sm lowercase text-foreground-light">{desc}</span>
-            <div className="flex items-center space-x-1.5">
+            <div className="flex items-center gap-x-1.5">
+              <ComputeBadgeWrapper project={project} />
               {isVercelIntegrated && (
                 <div className="w-fit p-1 border rounded-md flex items-center text-black dark:text-white">
                   <InlineSVG

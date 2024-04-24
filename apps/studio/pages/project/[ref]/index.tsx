@@ -15,6 +15,8 @@ import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 import { Tabs_Shadcn_, TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { ComputeBadgeWrapper } from 'components/ui/ComputeBadgeWrapper'
+import { ProjectInfo } from 'data/projects/projects-query'
 
 const Home: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -46,6 +48,8 @@ const Home: NextPageWithLayout = () => {
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <Connect />}
         </div>
       </div>
+      <ComputeBadgeWrapper project={{ ...project } as ProjectInfo} />
+
       <div className="mx-6">
         <ProjectUpgradeFailedBanner />
       </div>

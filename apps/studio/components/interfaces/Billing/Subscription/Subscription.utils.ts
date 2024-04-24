@@ -1,5 +1,10 @@
-import { IS_PLATFORM } from 'lib/constants'
-import type { OrgSubscription, ProjectSelectedAddon } from 'data/subscriptions/types'
+import { ProjectInfo } from 'data/projects/projects-query'
+import type {
+  OrgSubscription,
+  ProjectAddonVariantMeta,
+  ProjectSelectedAddon,
+} from 'data/subscriptions/types'
+import { INSTANCE_MICRO_SPECS, INSTANCE_NANO_SPECS, IS_PLATFORM } from 'lib/constants'
 
 export const getAddons = (selectedAddons: ProjectSelectedAddon[]) => {
   const computeInstance = selectedAddons.find((addon) => addon.type === 'compute_instance')
@@ -29,4 +34,19 @@ export const billingPartnerLabel = (billingPartner?: string) => {
     default:
       return billingPartner
   }
+}
+
+export const generateComputeInstanceMeta = (
+  computeInstance: ProjectSelectedAddon | undefined,
+  project: ProjectInfo
+) => {
+  const computeMeta = computeInstance?.variant?.meta as ProjectAddonVariantMeta | undefined
+
+  if (!computeMeta && project?.infra_compute_size === 'nano') {
+    return INSTANCE_NANO_SPECS
+  } else if (project?.infra_compute_size === 'micro') {
+    return INSTANCE_MICRO_SPECS
+  }
+
+  return computeMeta
 }
