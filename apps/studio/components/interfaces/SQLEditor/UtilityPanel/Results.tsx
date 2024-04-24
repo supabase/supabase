@@ -55,6 +55,7 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
     return <div className="flex h-full items-center justify-center font-mono text-xs">{name}</div>
   }
 
+  const EST_CHAR_WIDTH = 8.25
   const columns: CalculatedColumn<any>[] = Object.keys(rows?.[0] ?? []).map((key, idx) => ({
     idx,
     key,
@@ -62,7 +63,10 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
     resizable: true,
     parent: undefined,
     level: 0,
-    width: 120,
+    width:
+      typeof rows[0][key] === 'string' || typeof rows[0][key] === 'number'
+        ? Math.min(String(rows[0][key]).length * EST_CHAR_WIDTH, 500)
+        : 120,
     minWidth: 120,
     maxWidth: undefined,
     draggable: false,
