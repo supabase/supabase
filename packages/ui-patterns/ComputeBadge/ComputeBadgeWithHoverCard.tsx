@@ -45,7 +45,7 @@ export function ComputeBadgeWithHoverCard({
           </div>
           <div className="flex flex-col gap-1">
             <p className="text-sm text-foreground">
-              {meta?.cpu_cores ?? '?'}-core {cpuArchitecture}{' '}
+              {/* {meta?.cpu_cores ?? '?'}-core {cpuArchitecture}{' '} */}
             </p>
             <p className="text-sm text-foreground">
               {' '}
