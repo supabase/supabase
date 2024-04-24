@@ -53,6 +53,7 @@ import ColumnForeignKey from './ColumnForeignKey'
 import ColumnType from './ColumnType'
 import HeaderTitle from './HeaderTitle'
 import toast from 'react-hot-toast'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 export interface ColumnEditorProps {
   column?: PostgresColumn
@@ -142,12 +143,9 @@ const ColumnEditor = ({
       changes.defaultValue = null
     }
 
-    const changedName = !!changes.name
+    const changedName = changes.name !== columnFields.name
+
     if (
-      /**
-       * Can safely ignore the case where name is changed to '' because the
-       * column can't be saved with an empty name anyway.
-       */
       changedName &&
       fkRelations.find((fk) => fk.columns.find(({ source }) => source === columnFields?.name))
     ) {
@@ -380,7 +378,7 @@ const ColumnEditor = ({
           >
             <FormSectionContent loading={false} className="lg:!col-span-8">
               <Alert_Shadcn_>
-                <IconAlertCircle />
+                <WarningIcon />
                 <AlertTitle_Shadcn_>
                   Column encryption has been removed from the GUI
                 </AlertTitle_Shadcn_>
@@ -419,7 +417,7 @@ const ColumnEditor = ({
           >
             <FormSectionContent loading={false} className="lg:!col-span-8">
               <Alert_Shadcn_ variant="warning">
-                <IconAlertTriangle strokeWidth={2} />
+                <WarningIcon />
                 <AlertTitle_Shadcn_>This table uses column-privileges</AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
                   <p>
