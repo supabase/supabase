@@ -408,9 +408,9 @@ const ColumnEditor = ({
           </FormSection>
           <SidePanel.Separator />
 
-          {/* TODO: need to pull column privileges in here
-          if any columns are using column-level privileges, show this warning */}
-          <FormSection
+          {/* TODO: need to pull column privileges in here if any columns are using column-level privileges, show this warning */}
+          {/* [Joshen] This shouldn't show up for all tables */}
+          {/* <FormSection
             header={
               <FormSectionLabel className="lg:!col-span-4">Column privileges</FormSectionLabel>
             }
@@ -434,7 +434,7 @@ const ColumnEditor = ({
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             </FormSectionContent>
-          </FormSection>
+          </FormSection> */}
         </>
       )}
     </SidePanel>
