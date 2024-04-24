@@ -58,7 +58,6 @@ export const ComputeBadgeWrapper = ({ project }: { project?: ProjectInfo }) => {
 
   const NANO_PRICE = '$0.0/hour (~$0/month)'
   const HIGHEST_COMPUTE_AVAILABLE = availableCompute?.[availableCompute.length - 1].identifier
-
   const isHighestCompute =
     project?.infra_compute_size === HIGHEST_COMPUTE_AVAILABLE?.replace('ci_', '')
 
@@ -66,13 +65,7 @@ export const ComputeBadgeWrapper = ({ project }: { project?: ProjectInfo }) => {
     <>
       <HoverCard onOpenChange={() => setOpenState(!open)}>
         <HoverCardTrigger className="group">
-          <ComputeBadge
-            infraComputeSize={project?.infra_compute_size}
-            className={cn(
-              'group-data-[state=open]:border-foreground-muted',
-              'group-data-[state=open]:bg-surface-300'
-            )}
-          />
+          <ComputeBadge infraComputeSize={project?.infra_compute_size} />
         </HoverCardTrigger>
         <HoverCardContent side="bottom" align="start" className="p-0 overflow-hidden w-96">
           <div className="p-2 px-5 text-xs text-foreground-lighter">Compute size</div>
