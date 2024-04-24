@@ -38,7 +38,7 @@ export const CreateWarehouseCollectionModal = (props: Props) => {
       <Modal
         size="medium"
         onCancel={() => setIsOpen(!isOpen)}
-        header="Create collection"
+        header="Create an event collection"
         visible={isOpen}
         hideFooter
       >
@@ -62,6 +62,11 @@ export const CreateWarehouseCollectionModal = (props: Props) => {
         >
           <div className="py-4">
             <Modal.Content>
+              <p className="pb-5 text-scale-1100 text-sm">
+                An event collection stores generic timeseries events and metadata in
+                Supabase-managed analytics infrastructure. Events can be then be queried using SQL,
+                without impacting transactional workloads.
+              </p>
               <div className="space-y-6">
                 <Input
                   required
