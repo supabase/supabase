@@ -48,7 +48,7 @@ const AccessTokenItem = ({
   return (
     <Table.tr className="group">
       <Table.td>{name}</Table.td>
-      <Table.td>{inserted_at}</Table.td>
+      <Table.td>{formattedInsertedAt}</Table.td>
       <Table.td>
         <div className="flex gap-1 relative">
           <Input disabled defaultValue={token} type="password" size="tiny" className="flex-grow" />
