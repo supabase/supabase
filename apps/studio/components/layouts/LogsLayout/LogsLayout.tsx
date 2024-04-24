@@ -79,7 +79,7 @@ const LogsLayout = ({ title, children }: PropsWithChildren<LogsLayoutProps>) => 
               <div className="h-px w-full bg-overlay"></div>
               <div className="py-6">
                 <div className="px-6 uppercase font-mono">
-                  <Menu.Group title="Warehouse" />
+                  <Menu.Group title="Events" />
                 </div>
                 <div className="px-3 flex flex-col">
                   <div className="space-y-1">
