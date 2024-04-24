@@ -17,7 +17,7 @@
     "dev:database-design": "turbo run dev --filter=database-design --parallel",
     "lint": "turbo run lint",
     "typecheck": "turbo --continue typecheck",
-    "format": "prettier --write \"apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}\"",
+    "format": "prettier --write \"apps/**/*.{js,jsx,ts,tsx,css,md,mdx,json}\" \"packages/pg-meta/**/*.ts\"",
     "docker:dev": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml up --renew-anon-volumes",
     "docker:up": "cd docker && docker compose up",
     "docker:down": "cd docker && docker compose -f docker-compose.yml -f ./dev/docker-compose.dev.yml down --remove-orphans",
@@ -31,13 +31,13 @@
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts"
   },
   "devDependencies": {
-    "eslint": "^8.56.0",
+    "eslint": "^8.57.0",
     "eslint-config-custom": "*",
     "prettier": "^4.0.0-alpha.8",
     "prettier-plugin-sql-cst": "^0.11.0",
-    "sass": "^1.70.0",
-    "supabase": "^1.142.1",
-    "turbo": "^1.12.4"
+    "sass": "^1.72.0",
+    "supabase": "^1.151.1",
+    "turbo": "^1.13.2"
   },
   "repository": {
     "type": "git",
@@ -45,10 +45,10 @@
   },
   "engines": {
     "npm": ">=9.0.0",
-    "node": ">=18.0.0"
+    "node": ">=20.0.0"
   },
   "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
   "volta": {
-    "node": "18.17.1"
+    "node": "20.11.1"
   }
 }

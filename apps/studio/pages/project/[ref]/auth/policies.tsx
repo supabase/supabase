@@ -1,11 +1,7 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresPolicy, PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { partition } from 'lodash'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
-import { useParams } from 'common'
-import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { Policies } from 'components/interfaces/Auth/Policies'
 import { AIPolicyEditorPanel } from 'components/interfaces/Auth/Policies/AIPolicyEditorPanel'
 import { AuthLayout } from 'components/layouts'
@@ -17,11 +13,19 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useDatabasePoliciesQuery } from 'data/database-policies/database-policies-query'
 import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
+import { useCheckPermissions, usePermissionsLoaded, useUrlState } from 'hooks'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { partition } from 'lodash'
 import type { NextPageWithLayout } from 'types'
-import { Button, IconExternalLink, IconSearch, Input } from 'ui'
+import {
+  Button,
+  IconExternalLink,
+  IconSearch,
+  Input,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
 
 /**
  * Filter tables by table name and policy name
@@ -59,22 +63,16 @@ const onFilterTables = (
 }
 
 const AuthPoliciesPage: NextPageWithLayout = () => {
-  const { search, schema } = useParams()
+  const [params, setParams] = useUrlState<{
+    schema?: string
+    search?: string
+  }>()
+  const { schema = 'public', search: searchString = '' } = params
   const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
-  const [searchString, setSearchString] = useState<string>('')
 
+  const [selectedTable, setSelectedTable] = useState<string>()
   const [showPolicyAiEditor, setShowPolicyAiEditor] = useState(false)
   const [selectedPolicyToEdit, setSelectedPolicyToEdit] = useState<PostgresPolicy>()
-  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
-
-  useEffect(() => {
-    if (search) setSearchString(search)
-  }, [search])
-
-  useEffect(() => {
-    if (schema) snap.setSelectedSchemaName(schema)
-  }, [schema])
 
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
@@ -83,7 +81,7 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   const [protectedSchemas] = partition(schemas, (schema) =>
     EXCLUDED_SCHEMAS.includes(schema?.name ?? '')
   )
-  const selectedSchema = schemas?.find((schema) => schema.name === snap.selectedSchemaName)
+  const selectedSchema = schemas?.find((s) => s.name === schema)
   const isLocked = protectedSchemas.some((s) => s.id === selectedSchema?.id)
 
   const { data: policies } = useDatabasePoliciesQuery({
@@ -100,13 +98,14 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
   } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: snap.selectedSchemaName,
+    schema: schema,
   })
 
   const filteredTables = onFilterTables(tables ?? [], policies ?? [], searchString)
   const canReadPolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'policies')
   const canCreatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
   const isPermissionsLoaded = usePermissionsLoaded()
+  const schemaHasNoTables = (tables ?? []).length === 0
 
   if (isPermissionsLoaded && !canReadPolicies) {
     return <NoPermission isFullPage resourceText="view this project's RLS policies" />
@@ -121,18 +120,20 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
               className="w-[260px]"
               size="small"
               showError={false}
-              selectedSchemaName={snap.selectedSchemaName}
-              onSelectSchema={(schema: string) => {
-                snap.setSelectedSchemaName(schema)
-                setSearchString('')
+              selectedSchemaName={schema}
+              onSelectSchema={(schema) => {
+                setParams({ ...params, search: undefined, schema })
               }}
             />
             <Input
               size="small"
               placeholder="Filter tables and policies"
               className="block w-64 text-sm placeholder-border-muted"
-              value={searchString}
-              onChange={(e) => setSearchString(e.target.value)}
+              value={searchString || ''}
+              onChange={(e) => {
+                const str = e.target.value
+                setParams({ ...params, search: str === '' ? undefined : str })
+              }}
               icon={<IconSearch size="tiny" />}
             />
           </div>
@@ -146,36 +147,27 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
                 Documentation
               </a>
             </Button>
-            {isAiAssistantEnabled && (
-              <Tooltip.Root delayDuration={0}>
-                <Tooltip.Trigger asChild>
-                  <Button
-                    type="primary"
-                    disabled={!canCreatePolicies}
-                    onClick={() => setShowPolicyAiEditor(true)}
-                  >
-                    Create a new policy
-                  </Button>
-                </Tooltip.Trigger>
-                {isPermissionsLoaded && !canCreatePolicies && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content side="bottom">
-                      <Tooltip.Arrow className="radix-tooltip-arrow" />
-                      <div
-                        className={[
-                          'rounded bg-alternative py-1 px-2 leading-none shadow',
-                          'border border-background',
-                        ].join(' ')}
-                      >
-                        <span className="text-xs text-foreground">
-                          You need additional permissions to create RLS policies
-                        </span>
-                      </div>
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
-            )}
+
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <Button
+                  type="primary"
+                  disabled={!canCreatePolicies || schemaHasNoTables}
+                  onClick={() => setShowPolicyAiEditor(true)}
+                >
+                  Create a new policy
+                </Button>
+              </TooltipTrigger_Shadcn_>
+              {(!canCreatePolicies || schemaHasNoTables) && (
+                <TooltipContent_Shadcn_ side="bottom">
+                  {!canCreatePolicies
+                    ? 'You need additional permissions to create RLS policies'
+                    : schemaHasNoTables
+                      ? `No table in schema ${schema} to create policies on`
+                      : null}
+                </TooltipContent_Shadcn_>
+              )}
+            </Tooltip_Shadcn_>
           </div>
         </div>
       </div>
@@ -186,9 +178,14 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
       {isSuccess && (
         <Policies
+          schema={schema}
           tables={filteredTables}
           hasTables={tables.length > 0}
           isLocked={isLocked}
+          onSelectCreatePolicy={(table: string) => {
+            setShowPolicyAiEditor(true)
+            setSelectedTable(table)
+          }}
           onSelectEditPolicy={(policy) => {
             setSelectedPolicyToEdit(policy)
             setShowPolicyAiEditor(true)
@@ -198,8 +195,12 @@ const AuthPoliciesPage: NextPageWithLayout = () => {
 
       <AIPolicyEditorPanel
         visible={showPolicyAiEditor}
+        schema={schema}
+        searchString={searchString}
+        selectedTable={selectedTable}
         selectedPolicy={selectedPolicyToEdit}
         onSelectCancel={() => {
+          setSelectedTable(undefined)
           setShowPolicyAiEditor(false)
           setSelectedPolicyToEdit(undefined)
         }}

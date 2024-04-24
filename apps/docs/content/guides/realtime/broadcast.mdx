@@ -50,6 +50,18 @@ Go to your Supabase project's [API Settings](https://supabase.com/dashboard/proj
     ```
 
   </TabPanel>
+  <TabPanel id="swift" label="Swift">
+
+    ```swift
+    import Supabase
+
+    let SUPABASE_URL = "https://<project>.supabase.co"
+    let SUPABASE_KEY = "<your-anon-key>"
+
+    let client = SupabaseClient(supabaseURL: URL(string: SUPABASE_URL)!, supabaseKey: SUPABASE_KEY)
+    ```
+
+  </TabPanel>
   <TabPanel id="kotlin" label="Kotlin">
 
     ```kotlin
@@ -110,6 +122,22 @@ You can provide a callback for the `broadcast` channel to receive message. In th
         .onBroadcast(
             event: 'test', callback: (payload) => messageReceived(payload))
         .subscribe();
+    ```
+
+  </TabPanel>
+  <TabPanel id="swift" label="Swift">
+
+    ```swift
+    let channelA = await clientA.channel("room-1")
+
+    // Listen for broadcast messages
+    let broadcastStream = await channelA.broadcast(event: "test")
+
+    await channelA.subscribe()
+
+    for await event in broadcastStream {
+      print(event)
+    }
     ```
 
   </TabPanel>
@@ -183,6 +211,22 @@ You can provide a callback for the `broadcast` channel to receive message. In th
         payload: {'message': 'hello, world'},
       );
     });
+    ```
+
+  </TabPanel>
+  <TabPanel id="swift" label="Swift">
+
+    We can send Broadcast messages using `channelB.broadcast()`. Let's set up another client to send messages.
+
+    ```swift
+    let channelB = await clientA.channel("room-1")
+
+    await channelB.subscribe()
+
+    try await channelB.broadcast(
+        event: "test",
+        message: YourMessage(message: "hello, world!")
+    )
     ```
 
   </TabPanel>
@@ -274,6 +318,28 @@ You can pass configuration options while initializing the Supabase Client.
     ```
 
   </TabPanel>
+  <TabPanel id="swift" label="Swift">
+
+    By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `receiveOwnBroadcasts` parameter to `true`.
+
+    ```swift
+    let myChannel = await supabase.channel("room-2") {
+      $0.broadcast.receiveOwnBroadcasts = true
+    }
+
+    let broadcastStream = await myChannel.broadcast(event: "test-my-messages")
+
+    await myChannel.subscribe()
+
+    try await myChannel.broadcast(
+        event: "test-my-messages",
+        payload: YourMessage(
+            message: "talking to myself"
+        )
+    )
+    ```
+
+  </TabPanel>
   <TabPanel id="kotlin" label="Kotlin">
 
     By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `receiveOwnBroadcasts` parameter to `true`.
@@ -362,6 +428,21 @@ You can pass configuration options while initializing the Supabase Client.
     ```
 
   </TabPanel>
+  <TabPanel id="swift" label="Swift">
+
+    You can confirm that Realtime received your message by setting Broadcast's `acknowledgeBroadcasts` config to `true`.
+
+    ```swift
+    let myChannel = await clientD.channel("room-3") {
+      $0.broadcast.acknowledgeBroadcasts = true
+    }
+
+    await myChannel.subscribe()
+
+    await myChannel.broadcast(event: "acknowledge", message: [:])
+    ```
+
+  </TabPanel>
   <TabPanel id="kotlin" label="Kotlin">
 
     By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `acknowledgeBroadcasts` parameter to `true`.
@@ -433,6 +514,18 @@ You can also send a Broadcast message by making an HTTP request to Realtime serv
       },
     );
     print(res);
+    ```
+
+  </TabPanel>
+  <TabPanel id="swift" label="Swift">
+    ```swift
+    let myChannel = await supabase.channel("room-2") {
+      $0.broadcast.acknowledgeBroadcasts = true
+    }
+
+    // No need to subscribe to channel
+
+    await myChannel.broadcast(event: "test", message: ["message": "HI"])
     ```
 
   </TabPanel>

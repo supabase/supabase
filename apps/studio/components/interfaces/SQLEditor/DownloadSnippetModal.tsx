@@ -78,7 +78,7 @@ const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps) => {
                       width={75}
                       options={['CLI', 'NPM']}
                       activeOption={selectedView}
-                      borderOverride="border-gray-100"
+                      borderOverride="border-muted"
                       onClickOption={() =>
                         selectedView === 'CLI' ? setSelectedView('NPM') : setSelectedView('CLI')
                       }

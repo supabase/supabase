@@ -1,0 +1,243 @@
+---
+id: 'auth-anonymous'
+title: 'Anonymous Sign-Ins'
+subtitle: 'Create and use anonymous users to authenticate with Supabase'
+---
+
+[Enable Anonymous Sign-Ins](/dashboard/project/_/settings/auth) to build apps which provide users an authenticated experience without requiring users to enter an email address, password, use an OAuth provider or provide any other PII (Personally Identifiable Information). Later, when ready, the user can link an authentication method to their account.
+
+<Admonition type="note" label="Anonymous user vs the anon key">
+
+Calling `signInAnonymously()` creates an anonymous user. It's just like a permanent user, except the user can't access their account if they sign out, clear browsing data, or use another device.
+
+Like permanent users, the `authenticated` Postgres role will be used when using the Data APIs to access your project. JWTs for these users will have an `is_anonymous` claim which you can use to distinguish in RLS policies.
+
+This is different from the `anon` API key which does not create a user and can be used to implement public access to your database as it uses the `anonymous` Postgres role.
+
+</Admonition>
+
+Anonymous sign-ins can be used to build:
+
+- E-commerce applications, such as shopping carts before check-out
+- Full-feature demos without collecting personal information
+- Temporary or throw-away accounts
+
+<Admonition type="caution">
+
+Review your existing RLS policies before enabling anonymous sign-ins. Anonymous users use the `authenticated` role. To distinguish between anonymous users and permanent users, your policies need to check the `is_anonymous` field of the user's JWT.
+
+See the [Access control section](#access-control) for more details.
+
+</Admonition>
+
+<Admonition type="note" label="Self hosting and local development">
+
+For self-hosting, you can update your project configuration using the files and environment variables provided. See the [local development docs](/docs/guides/cli/config) for more details.
+
+</Admonition>
+
+## Sign in anonymously
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+Call the [`signInAnonymously()`](/docs/reference/javascript/auth-signinanonymously) method:
+
+```js
+const { data, error } = await supabase.auth.signInAnonymously()
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Flutter">
+
+Call the [`signInAnonymously()`](/docs/reference/dart/auth-signinanonymously) method:
+
+```dart
+await supabase.auth.signInAnonymously();
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Call the [`signInAnonymously()`](/docs/reference/swift/auth-signinanonymously) method:
+
+```swift
+let session = try await supabase.auth.signInAnonymously()
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+Call the [`signInAnonymously()`](/docs/reference/kotlin/auth-signinanonymously) method:
+
+```kotlin
+supabase.auth.signInAnonymously()
+```
+
+</TabPanel>
+</Tabs>
+
+## Convert an anonymous user to a permanent user
+
+Converting an anonymous user to a permanent user requires [linking an identity](/docs/guides/auth/auth-identity-linking#manual-linking-beta) to the user. This requires you to [enable manual linking](/dashboard/project/_/settings/auth) in your Supabase project.
+
+### Link an Email / Phone identity
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+You can use the [`updateUser()`](/docs/reference/javascript/auth-updateuser) method to link an email or phone identity to the anonymous user. To add a password for the anonymous user, the user's email or phone number needs to be verified first.
+
+```js
+const { data, error } = await supabase.auth.updateUser({ email: 'example@email.com' })
+
+// verify the user's email by clicking on the email change link
+// or entering the 6-digit OTP sent to the email address
+
+// once the user has been verified, update the password
+const { data, error } = await supabase.auth.updateUser({ password: 'password' })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Flutter">
+
+You can use the [`updateUser()`](/docs/reference/dart/auth-updateuser) method to link an email or phone identity to the anonymous user.
+
+```dart
+await supabase.auth.updateUser(UserAttributes(email: 'example@email.com'));
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+You can use the [`updateUser()`](/docs/reference/swift/auth-updateuser) method to link an email or phone identity to the anonymous user.
+
+```swift
+try await supabase.auth.updateUser(
+  user: UserAttributes(email: "example@email.com")
+)
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+You can use the [`updateUser()`](/docs/reference/kotlin/auth-updateuser) method to link an email or phone identity to the anonymous user.
+
+```kotlin
+supabase.auth.updateUser {
+    email = "example@email.com"
+}
+```
+
+</TabPanel>
+</Tabs>
+
+### Link an OAuth identity
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+You can use the [`linkIdentity()`](/docs/reference/javascript/auth-linkidentity) method to link an oauth identity to the anonymous user.
+
+```js
+const { data, error } = await supabase.auth.linkIdentity({ provider: 'google' })
+```
+
+</TabPanel>
+<TabPanel id="dart" label="Flutter">
+
+You can use the [`linkIdentity()`](/docs/reference/dart/auth-linkidentity) method to link an OAuth identity to the anonymous user.
+
+```dart
+await supabase.auth.linkIdentity(OAuthProvider.google);
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+You can use the [`linkIdentity()`](/docs/reference/swift/auth-linkidentity) method to link an OAuth identity to the anonymous user.
+
+```swift
+try await supabase.auth.linkIdentity(provider: .google)
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+You can use the [`linkIdentity()`](/docs/reference/kotlin/auth-linkidentity) method to link an oauth identity to the anonymous user.
+
+```kotlin
+supabase.auth.linkIdentity(Google)
+```
+
+</TabPanel>
+</Tabs>
+
+## Access control
+
+An anonymous user assumes the `authenticated` role just like a permanent user. You can use row-level security (RLS) policies to differentiate between an anonymous user and a permanent user by checking for the `is_anonymous` claim in the JWT returned by `auth.jwt()`:
+
+```sql
+create policy "Only permanent users can post to the news feed"
+on news_feed as restrictive for insert
+to authenticated
+with check ((select (auth.jwt()->>'is_anonymous')::boolean) is false );
+
+create policy "Anonymous and permanent users can view the news feed"
+on news_feed for select
+to authenticated
+using ( true );
+```
+
+<Admonition variant="note" label="Use restrictive policies">
+
+RLS policies are permissive by default, which means that they are combined using an "OR" operator when multiple policies are applied. It is important to construct restrictive policies to ensure that the checks for an anonymous user are always enforced when combined with other policies.
+
+</Admonition>
+
+## Resolving identity conflicts
+
+Depending on your application requirements, data conflicts can arise when an anonymous user is converted to a permanent user. For example, in the context of an e-commerce application, an anonymous user would be allowed to add items to the shopping cart without signing up / signing in. When they decide to sign-in to an existing account, you will need to decide how you want to resolve data conflicts in the shopping cart:
+
+1. Overwrite the items in the cart with those in the existing account
+2. Overwrite the items in the cart with those from the anonymous user
+3. Merge the items in the cart together
+
+## Abuse prevention and rate limits
+
+Since anonymous users are stored in your database, bad actors can abuse the endpoint to increase your database size drastically. It is strongly recommended to [enable invisible Captcha or Cloudflare Turnstile](/docs/guides/auth/auth-captcha) to prevent abuse for anonymous sign-ins. An IP-based rate limit is enforced at 30 requests per hour which can be modified in your [dashboard](/dashboard/project/_/auth/rate-limits). You can refer to the full list of rate limits [here](/docs/guides/platform/going-into-prod#rate-limiting-resource-allocation--abuse-prevention).
+
+## Automatic cleanup
+
+Automatic cleanup of anonymous users is currently not available. Instead, you can delete anonymous users from your project by running the following SQL:
+
+```sql
+-- deletes anonymous users created more than 30 days ago
+delete from auth.users
+where is_anonymous is true and created_at < now() - interval '30 days';
+```
+
+## Resources
+
+- [Supabase - Get started for free](https://supabase.com)
+- [Supabase JS Client](https://github.com/supabase/supabase-js)
+- [Supabase Flutter Client](https://github.com/supabase/supabase-flutter)
+- [Supabase Kotlin Client](https://github.com/supabase-community/supabase-kt)

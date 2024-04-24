@@ -34,7 +34,7 @@ import toast from 'react-hot-toast'
 import { PortalToast, Toaster } from 'ui'
 import { ConsentToast } from 'ui-patterns/ConsentToast'
 
-import Favicons from 'components/head/Favicons'
+import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import {
   AppBannerWrapper,
   CommandMenuWrapper,
@@ -149,8 +149,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
                 <title>Supabase</title>
                 <meta name="viewport" content="initial-scale=1.0, width=device-width" />
               </Head>
-              <Favicons />
-
+              <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
               <PageTelemetry>
                 <TooltipProvider>
                   <RouteValidationWrapper>

@@ -42,9 +42,9 @@ jobs:
             supabase
 
       - name: Setup node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version-file: '.nvmrc'
 
       - name: Download dependencies
         run: npm ci

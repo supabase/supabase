@@ -178,6 +178,70 @@ const { data, error } = await supabase.from('books').insert([
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Supabase Swift provides a convenience `AnyJSON` type.
+
+```swift
+struct Book {
+    val title: String,
+    val author: String,
+    val metadata: [String: AnyJSON]
+}
+
+try await supabase.from("books")
+  .insert(
+    [
+      Book(
+        title: "The Poky Little Puppy",
+        author: "Janette Sebring Lowrey",
+        metadata: [
+          "description": "Puppy is slower than other, bigger animals.",
+          "price": 5.95,
+          "ages": [3, 6]
+        ]
+      ),
+      Book(
+        title: "Tale of Peter Rabbit",
+        author: "Beatrix Potter",
+        metadata: [
+          "description": "Rabbit eats some vegetables.",
+          "price": 4.49,
+          "ages": [2, 5]
+        ]
+      ),
+      Book(
+        title: "Tootle",
+        author: "Gertrude Crampton",
+        metadata: [
+          "description": "Little toy train has big dreams.",
+          "price": 3.99,
+          "ages": [2, 5]
+        ]
+      ),
+      Book(
+        title: "Green Eggs and Ham",
+        author: "Dr. Seuss",
+        metadata: [
+          "description": "Sam has changing food preferences and eats unusually colored food.",
+          "price": 7.49,
+          "ages": [4, 8]
+        ]
+      ),
+      Book(
+        title: "Harry Potter and the Goblet of Fire",
+        author: "J.K. Rowling",
+        metadata: [
+          "description": "Fourth year of school starts, big drama ensues.",
+          "price": 24.95,
+          "ages": [10, 99]
+        ]
+      )
+    ]
+  )
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -245,6 +309,24 @@ const { data, error } = await supabase.from('books').select(`
     low_age:      metadata->ages->0,
     high_age:     metadata->ages->1
   `)
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+try await supabase
+  .from("books")
+  .select(
+    """
+      title,
+      description:  metadata->description,
+      price:        metadata->price,
+      low_age:      metadata->ages->0,
+      high_age:     metadata->ages->1
+    """
+  )
+  .execute()
 ```
 
 </TabPanel>

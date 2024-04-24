@@ -16,7 +16,7 @@ import CountdownComponent from '../Countdown'
 import LaunchWeekPrizeSection from '../LaunchWeekPrizeSection'
 import TicketPresence from './TicketPresence'
 import TicketActions from './TicketActions'
-import useLwxGame from '../../hooks/useLwxGame'
+import useLwxGame from '../../hooks/useLwGame'
 import LWXGame from './LWXGame'
 
 const TicketingFlow = () => {

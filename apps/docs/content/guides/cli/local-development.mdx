@@ -461,7 +461,17 @@ The buckets and objects themselves are rows in the storage schema so they won't 
 
 ### Local logging
 
-Local logs rely on the Supabase Analytics Server, and are available in the Studio automatically.
+Local logs rely on the Supabase Analytics Server, and are not enabled by default. To enable this, edit your `supabase/config.toml` file and set `enabled` to `true`.
+
+```bash supabase/config.toml
+[analytics]
+# Set enabled to true to see logs in the Logs Explorer
+enabled = true
+port = 54327
+vector_port = 54328
+# Configure one of the supported backends: `postgres`, `bigquery`.
+backend = "postgres"
+```
 
 <Admonition type="note">
 

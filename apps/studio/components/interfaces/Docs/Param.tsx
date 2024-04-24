@@ -56,7 +56,9 @@ const Param = ({
           </div>
         </div>
 
-        <Badge color={required ? 'amber' : 'scale'}>{required ? 'Required' : 'Optional'}</Badge>
+        <Badge variant={required ? 'warning' : 'default'}>
+          {required ? 'Required' : 'Optional'}
+        </Badge>
       </div>
       {format && (
         <div className="grid gap-2 mt-6">

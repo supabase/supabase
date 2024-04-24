@@ -7,29 +7,32 @@ interface InvoiceStatusBadgeProps {
   status: InvoiceStatus
 }
 
-const invoiceStatusMapping: Record<InvoiceStatus, { label: string; badgeColor: string }> = {
+const invoiceStatusMapping: Record<
+  InvoiceStatus,
+  { label: string; badgeVariant: React.ComponentProps<typeof Badge>['variant'] }
+> = {
   [InvoiceStatus.DRAFT]: {
     label: 'Upcoming',
-    badgeColor: 'yellow',
+    badgeVariant: 'warning',
   },
   [InvoiceStatus.PAID]: {
     label: 'Paid',
-    badgeColor: 'green',
+    badgeVariant: 'brand',
   },
   [InvoiceStatus.VOID]: {
     label: 'Forgiven',
-    badgeColor: 'green',
+    badgeVariant: 'brand',
   },
 
   // We do not want to overcomplicate it for the user, so we'll treat uncollectible/open the same from a user perspective
   // it's an outstanding invoice
   [InvoiceStatus.UNCOLLECTIBLE]: {
     label: 'Outstanding',
-    badgeColor: 'red',
+    badgeVariant: 'destructive',
   },
   [InvoiceStatus.OPEN]: {
     label: 'Outstanding',
-    badgeColor: 'red',
+    badgeVariant: 'destructive',
   },
 }
 
@@ -42,8 +45,7 @@ const InvoiceStatusBadge = ({ status }: InvoiceStatusBadgeProps) => {
         <Badge
           size="small"
           className="capitalize"
-          // @ts-ignore
-          color={statusMapping?.badgeColor || 'gray'}
+          variant={statusMapping?.badgeVariant || 'default'}
         >
           {statusMapping?.label || status}
         </Badge>

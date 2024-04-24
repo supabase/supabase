@@ -122,7 +122,7 @@ Now we'll write our policy, again in SQL, but note it's also possible to add via
 ```sql
 CREATE POLICY user_update_own_scores ON my_scores
     FOR ALL
-    USING (auth.uid() = user_id);
+    USING ((select auth.uid()) = user_id);
 ```
 
 Now, assuming you have an active session in your javascript/supabase-js environment you can do:
@@ -149,7 +149,7 @@ Once you get the hang of policies you can start to get a little bit fancy. Let's
 create policy "Only Blizzard staff can update leaderboard"
   on my_scores
   for update using (
-    right(auth.jwt() ->> 'email', 13) = '@blizzard.com'
+    right((select auth.jwt() ->> 'email'), 13) = '@blizzard.com'
   );
 ```
 

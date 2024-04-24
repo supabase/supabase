@@ -1,8 +1,3 @@
-.dark .sbui-default-button--dark-white {
-  @apply shadow-md text-typography-body-light border-gray-50 bg-white #{!important};
-  text-shadow: none !important;
-}
-
 /* Brought over from platform to be cleaned if needed */
 
 /* Form panels */
@@ -440,9 +435,4 @@
   line {
     @apply stroke-foreground-lighter;
   }
-}
-
-// Used on radix popover contents so that the width matches the trigger
-.popover-trigger-width {
-  width: var(--radix-popover-trigger-width);
 }
