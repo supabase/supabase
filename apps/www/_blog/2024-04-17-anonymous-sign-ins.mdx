@@ -1,0 +1,224 @@
+---
+title: 'Supabase Auth now supports Anonymous Sign-ins'
+description: 'Sign in as an anonymous user to authenticate with Supabase'
+author: kangmingtay
+image: ga-week/anonymous-sign-ins/og.png
+thumb: ga-week/anonymous-sign-ins/thumb.png
+categories:
+  - product
+tags:
+  - launch-week
+  - database
+date: '2024-04-17'
+toc_depth: 3
+launchweek: 11
+---
+
+Supabase Auth now supports [anonymous sign-ins](/docs/guides/auth/auth-anonymous), one of our [most-requested features](https://github.com/supabase/auth/issues/68) by the community.
+
+Anonymous sign-ins can be used to create **temporary users** who haven’t signed up for your application yet. This lowers the friction for new users to try out your product since they don’t have to provide any signup credentials.
+
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/WNN7Pp5Ftk4"
+    title="Anonymous sign-ins with Supabase Auth"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowfullscreen
+  />
+</div>
+
+## Enabling Anonymous sign-ins
+
+You can [enable anonymous sign-ins](/dashboard/project/_/settings/auth) for your project today from the dashboard:
+
+<Img
+  alt="Allow anonymous sign ins"
+  src={{
+    light: '/images/blog/ga-week/anonymous-sign-ins/allow-anon-sign-ins--light.png',
+    dark: '/images/blog/ga-week/anonymous-sign-ins/allow-anon-sign-ins.png',
+  }}
+  captionAlign="left"
+  zoomable={false}
+/>
+
+For local development, upgrade your Supabase CLI and add the config to the `config.toml` file:
+
+```toml
+[auth]
+enable_anonymous_sign_ins = true
+```
+
+You can create an anonymous user through the [Javascript](/docs/reference/javascript/auth-signinanonymously), [Flutter](/docs/reference/dart/auth-signinanonymously) or [Swift](/docs/reference/swift/auth-signinanonymously) SDKs today. Here’s how you can create an anonymous user using `supabase-js` .
+
+{/* prettier-ignore */}
+```jsx
+const { data, error } = await supabase
+  .auth
+  .signInAnonymously()
+```
+
+## Terminology
+
+Profiles created with anonymous sign-ins are also `authenticated`!
+
+Once you call `.signInAnonymously()` you have moved the user into an authentication flow, and we treat them like a signed in user:
+
+<Img
+  alt="Integrated pgvector experience"
+  src={{
+    light: '/images/blog/ga-week/anonymous-sign-ins/anonymous-user-lifecycle--light.svg',
+    dark: '/images/blog/ga-week/anonymous-sign-ins/anonymous-user-lifecycle.svg',
+  }}
+  captionAlign="left"
+/>
+
+## Restricting access for anonymous users
+
+Like a permanent user, anonymous users are persisted in the `auth.users` table:
+
+| id                                   | role          | email             | is_anonymous |
+| ------------------------------------ | ------------- | ----------------- | ------------ |
+| e053e470-afa1-4625-8963-37adb862fd11 | authenticated | NULL              | true         |
+| 5563108e-ac81-4063-9288-4f3db068efa1 | authenticated | luke@starwars.com | false        |
+
+An anonymous user can be identified by the `is_anonymous` claim returned in the user’s JWT, which is accessible from your Row Level Security policies (RLS). This is helpful if you want to limit access to certain features in your application.
+
+For example, let’s say that we have an online forum where users can create and read posts.
+
+Given this table to store the posts:
+
+```sql
+create table public.posts (
+  id serial primary key,
+  name text not null,
+  description text
+);
+```
+
+If we only want to allow permanent users to create posts, we can check if the user is anonymous by inspecting the JWT `select auth.jwt() ->> 'is_anonymous'`.
+
+Using this function in an RLS policy:
+
+```sql
+create policy "Only permanent users can create posts"
+on public.posts
+for insert
+to authenticated -- Note: user is still authenticated
+with check (
+  (select auth.jwt() ->> 'is_anonymous')::boolean is false
+);
+```
+
+RLS gives us full flexibility to create a variety of rules.
+
+For example, to allow read access for permanent users for all posts and limit anonymous users to posts created today:
+
+```sql
+create policy "Limit access to anonymous users"
+on public.posts
+for select
+to authenticated -- Note: user is still authenticated
+using (
+  case
+    when (select (auth.jwt() ->> 'is_anonymous'))::boolean is true
+    then (created_at >= current_date)
+  else
+    true
+  end
+);
+```
+
+## Convert an anonymous user to a permanent user
+
+At some point, an anonymous user may decide they want to create a post. This is where we prompt them to sign up for an account which converts them to a permanent user.
+
+<Admonition type='note' title="An anonymous user is considered a permanent user when they have an identity associated to them.">
+
+After they have been converted, the user id remains the same, which means that any data associated with the user’s id would be carried over.
+
+</Admonition>
+
+Supabase Auth provides 2 ways to achieve this:
+
+1. Link an email or phone identity
+2. Link an OAuth identity
+
+### Link an email or phone identity
+
+To link an email or phone identity:
+
+{/* prettier-ignore */}
+```jsx
+const { data, error } = await supabase
+  .auth
+  .updateUser({ email })
+```
+
+### Link an OAuth identity
+
+To link an OAuth identity to an anonymous user, you need to [enable manual linking](/dashboard/project/_/settings/auth) for your project. Learn about how [identity linking](/docs/guides/auth/auth-identity-linking) works with Supabase Auth.
+
+<Img
+  alt="Allow anonymous sign ins"
+  src={{
+    light: '/images/blog/ga-week/anonymous-sign-ins/allow-manual-linking--light.png',
+    dark: '/images/blog/ga-week/anonymous-sign-ins/allow-manual-linking.png',
+  }}
+  captionAlign="left"
+  zoomable={false}
+/>
+
+Once enabled, you can call the `linkIdentity()` method:
+
+{/* prettier-ignore */}
+```jsx
+const { data, error } = await supabase
+  .auth
+  .linkIdentity({ provider: 'google' })
+```
+
+## Impersonating an anonymous user
+
+When creating RLS policies to differentiate access for an anonymous user, you can leverage the [user impersonation feature](/blog/studio-introducing-assistant) in the SQL editor to test out your policies:
+
+<Img
+  alt="Allow anonymous sign ins"
+  src={{
+    light: '/images/blog/ga-week/anonymous-sign-ins/impersonation-role-settings--light.png',
+    dark: '/images/blog/ga-week/anonymous-sign-ins/impersonation-role-settings.png',
+  }}
+  captionAlign="left"
+  caption="Database role settings in the SQL editor. You can impersonate an anonymous user by selecting the user from the dropdown."
+  zoomable={false}
+/>
+
+The [user management screen](/dashboard/project/_/auth/users) provides an option to filter by anonymous users, which can help to know how many anonymous users have been created.
+
+<Img
+  alt="Allow anonymous sign ins"
+  src={{
+    light: '/images/blog/ga-week/anonymous-sign-ins/anon-user-filtering--light.png',
+    dark: '/images/blog/ga-week/anonymous-sign-ins/anon-user-filtering.png',
+  }}
+  captionAlign="left"
+  caption="Filtering by anonymous users on the Users page."
+  zoomable={false}
+/>
+
+## What’s next
+
+Managing anonymous users can be tricky, especially when you have a lot of visitors to your site. We’re working on an “automatic clean-up” option to delete anonymous users that have been inactive for more than 30 days. In the meantime, since anonymous users are stored in the auth schema in your database, you can clean up orphaned anonymous users by running the following query:
+
+```sql
+-- deletes anonymous users created more than 30 days ago
+delete from auth.users
+where is_anonymous is true and created_at < now() - interval '30 days';
+```
+
+We are also working on a [linter](https://github.com/supabase/splinter/pull/28) to check your RLS policies and highlight those that allow anonymous users access - stay tuned for updates later this month!
+
+## Getting started
+
+- Docs: [Anonymous sign-ins](/docs/guides/auth/auth-anonymous)
+- API method references: [Javascript](/docs/reference/javascript/auth-signinanonymously), [Flutter](/docs/reference/dart/auth-signinanonymously), [Swift](/docs/reference/swift/auth-signinanonymously)

@@ -23,7 +23,6 @@ import type {
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
 import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-connection-update-mutate'
-import { useFlag } from 'hooks'
 
 const VercelIntegrationConnectionForm = ({
   connection,
@@ -32,7 +31,6 @@ const VercelIntegrationConnectionForm = ({
   connection: IntegrationProjectConnection
   integration: Integration
 }) => {
-  const enableVercelConnectionsConfig = useFlag('enableVercelConnectionsConfig')
   const config = connection.metadata.supabaseConfig
 
   const FormSchema = z.object({
@@ -61,11 +59,6 @@ const VercelIntegrationConnectionForm = ({
   })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    /**
-     * remove this hardcoded if statement when we are ready to enable this feature
-     */
-    if (!enableVercelConnectionsConfig) return
-
     const metadata = {
       ...connection.metadata,
     }
@@ -101,10 +94,7 @@ const VercelIntegrationConnectionForm = ({
         </Alert_Shadcn_>
       </div>
       <ScaffoldDivider />
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className={cn(!enableVercelConnectionsConfig && 'opacity-30', 'w-full space-y-6')}
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className={cn('w-full space-y-6')}>
         <div>
           {/* {isUpdatingVercelConnection && 'isUpdatingVercelConnection'} */}
           <div className="flex flex-col gap-6 px-8 py-8">
@@ -124,7 +114,6 @@ const VercelIntegrationConnectionForm = ({
                   </div>
                   <FormControl_Shadcn_>
                     <Switch
-                      disabled={!enableVercelConnectionsConfig}
                       checked={field.value}
                       onCheckedChange={(e) => {
                         field.onChange(e)
@@ -151,7 +140,6 @@ const VercelIntegrationConnectionForm = ({
                   </div>
                   <FormControl_Shadcn_>
                     <Switch
-                      disabled={!enableVercelConnectionsConfig}
                       checked={field.value}
                       onCheckedChange={(e) => {
                         field.onChange(e)
@@ -182,7 +170,6 @@ const VercelIntegrationConnectionForm = ({
                   </div>
                   <FormControl_Shadcn_>
                     <Switch
-                      disabled={!enableVercelConnectionsConfig}
                       checked={field.value}
                       onCheckedChange={(e) => {
                         field.onChange(e)
@@ -208,7 +195,6 @@ const VercelIntegrationConnectionForm = ({
                   </div>
                   <FormControl_Shadcn_>
                     <Switch
-                      disabled={!enableVercelConnectionsConfig}
                       checked={field.value}
                       onCheckedChange={(e) => {
                         field.onChange(e)

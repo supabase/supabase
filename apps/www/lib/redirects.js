@@ -2385,6 +2385,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/docs/guides/auth/column-level-security',
+    destination: '/docs/guides/database/postgres/column-level-security',
+  },
+  {
+    permanent: true,
     source: '/docs/learn/auth-deep-dive/auth-policies',
     destination: '/docs/guides/auth/auth-deep-dive/auth-policies',
   },
@@ -2401,6 +2406,36 @@ module.exports = [
   {
     permanent: true,
     source: '/docs/guides/auth/sso/auth-sso-saml',
-    destination: '/guides/auth/enterprise-sso/auth-sso-saml',
+    destination: '/docs/guides/auth/enterprise-sso/auth-sso-saml',
+  },
+  {
+    permanent: true,
+    source: '/contact/mfa',
+    destination: '/docs/guides/auth/auth-mfa',
+  },
+  {
+    permanent: false,
+    source: '/launch-week',
+    destination: '/ga-week',
+  },
+  {
+    permanent: false,
+    source: '/special-announcement',
+    destination: '/ga-week',
+  },
+  {
+    permanent: false,
+    source: '/launch-week/tickets/:path*',
+    destination: '/ga-week/tickets/:path*',
+  },
+  {
+    permanent: false,
+    source: '/special-announcement/tickets/:path*',
+    destination: '/ga-week/tickets/:path*',
+  },
+  {
+    permanent: true,
+    source: '/docs/guides/database/sql-to-api',
+    destination: '/docs/guides/api/sql-to-api',
   },
 ]

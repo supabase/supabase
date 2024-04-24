@@ -14,7 +14,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useDatabaseFunctionCreateMutation } from 'data/database-functions/database-functions-create-mutation'
 import { useDatabaseFunctionUpdateMutation } from 'data/database-functions/database-functions-update-mutation'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import { FormSchema } from 'types'
+import type { FormSchema } from 'types'
 import {
   Button,
   FormControl_Shadcn_,
@@ -60,7 +60,7 @@ const FormSchema = z.object({
   schema: z.string().trim().min(1),
   args: z.array(z.object({ name: z.string().trim().min(1), type: z.string().trim() })),
   behavior: z.enum(['IMMUTABLE', 'STABLE', 'VOLATILE']),
-  definition: z.string().trim(),
+  definition: z.string().trim().min(1),
   language: z.string().trim(),
   return_type: z.string().trim(),
   security_definer: z.boolean(),
@@ -255,7 +255,9 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                           Definition
                         </FormLabel_Shadcn_>
                         <FormDescription_Shadcn_ className="text-sm text-foreground-light">
-                          <p>The language below should be written in `plpgsql`.</p>
+                          <p>
+                            The language below should be written in <code>plpgsql</code>.
+                          </p>
                           {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
                         </FormDescription_Shadcn_>
                       </div>
@@ -272,7 +274,7 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                         />
                       </div>
 
-                      <FormMessage_Shadcn_ />
+                      <FormMessage_Shadcn_ className="px-content" />
                     </FormItem_Shadcn_>
                   )}
                 />
@@ -405,20 +407,18 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
         ) : null}
         <ConfirmationModal
           visible={isClosingPanel}
-          header="Discard changes"
-          buttonLabel="Discard"
-          onSelectCancel={() => setIsClosingPanel(false)}
-          onSelectConfirm={() => {
+          title="Discard changes"
+          confirmLabel="Discard"
+          onCancel={() => setIsClosingPanel(false)}
+          onConfirm={() => {
             setIsClosingPanel(false)
             setVisible(!visible)
           }}
         >
-          <Modal.Content>
-            <p className="py-4 text-sm text-foreground-light">
-              There are unsaved changes. Are you sure you want to close the panel? Your changes will
-              be lost.
-            </p>
-          </Modal.Content>
+          <p className="text-sm text-foreground-light">
+            There are unsaved changes. Are you sure you want to close the panel? Your changes will
+            be lost.
+          </p>
         </ConfirmationModal>
       </SheetContent>
     </Sheet>

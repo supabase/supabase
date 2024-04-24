@@ -139,10 +139,14 @@ You will need to [restart](#restarting-all-services) the services for the change
 You can restart services to pick up any configuration changes by running:
 
 ```sh
-docker compose restart
+# Stop and remove the containers
+docker compose down
+
+# Recreate and start the containers
+docker compose up -d
 ```
 
-Be aware that this will result in downtime while the services are restarting.
+Be aware that this will result in downtime. Simply restarting the services does not apply configuration changes.
 
 ## Stopping all services
 

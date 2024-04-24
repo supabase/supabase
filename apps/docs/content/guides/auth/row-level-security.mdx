@@ -28,7 +28,7 @@ Policies are easy to understand once you get the hang of them. Each policy is at
 ```sql
 create policy "Individuals can view their own todos."
 on todos for select
-using ( auth.uid() = user_id );
+using ( (select auth.uid()) = user_id );
 ```
 
 .. would translate to this whenever a user tries to select from the todos table:
@@ -62,6 +62,12 @@ on profiles for select
 to authenticated
 using ( true );
 ```
+
+<Admonition type="note" label="Anonymous user vs the anon key">
+
+Using the `anon` Postgres role is different from an [anonymous user](/docs/guides/auth/auth-anonymous) in Supabase Auth. An anonymous user assumes the `authenticated` role to access the database and can be differentiated from a permanent user by checking the `is_anonymous` claim in the JWT.
+
+</Admonition>
 
 ## Helper functions
 
@@ -119,6 +125,20 @@ on my_table for select
 using ( true );
 ```
 
+### Protect views using `security_invoker`
+
+Views bypass RLS by default because they are usually created with the `postgres` user. This is a feature of Postgres, which automatically creates views with `security definer`.
+
+In Postgres 15 and above, you can make a view obey the RLS policies of the underlying tables when invoked by `anon` and `authenticated` roles by setting `security_invoker = true`.
+
+```sql
+create view <VIEW_NAME>
+with(security_invoker = true)
+as select <QUERY>
+```
+
+In older versions of Postgres, protect your views by revoking access from the `anon` and `authenticated` roles, or by putting them in an unexposed schema.
+
 ### Using external authorization systems
 
 If you want to use another authorization method for your applications that's also fine. Supabase is "just Postgres", so if your application works with Postgres, then it also works with Supabase. If you take this path, don't put your tables in the `public` schema - instead create a new schema for your tables and functions:
@@ -172,7 +192,7 @@ create policy "Users can update their own profiles"
 on profiles for update
 to authenticated
 using (
-  auth.uid() = id
+  (select auth.uid()) = id
 );
 ```
 
@@ -202,7 +222,7 @@ alter table teams enable row level security;
 create policy "Team members can update team details if they belong to the team"
   on teams
   for update using (
-    auth.uid() in (
+    (select auth.uid()) in (
       select user_id from members
       where team_id = id
     )
@@ -266,7 +286,7 @@ create policy "Only Supabase staff can update the leaderboard"
 on leaderboard
 to authenticated
 for update using (
-  right(auth.jwt() ->> 'email', 13) = '@supabase.com'
+  right((select auth.jwt() ->> 'email'), 13) = '@supabase.com'
 );
 ```
 
@@ -280,7 +300,7 @@ on profiles
 as restrictive
 for update
 to authenticated using (
-  auth.jwt()->>'aal' = 'aal2'
+  (select auth.jwt()->>'aal') = 'aal2'
 );
 ```
 

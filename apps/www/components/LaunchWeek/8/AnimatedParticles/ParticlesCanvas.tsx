@@ -17,7 +17,7 @@ const ParticlesCanvas = () => {
   // to stop unnecessary computations
   const handleScroll = () => {
     if (canvasRef.current && typeof window !== 'undefined') {
-      const rect = (canvasRef.current as HTMLDivElement)?.getBoundingClientRect()
+      const rect = (canvasRef.current as HTMLCanvasElement)?.getBoundingClientRect()
       const isInView = rect.bottom > 0
 
       setAnimate(isInView)

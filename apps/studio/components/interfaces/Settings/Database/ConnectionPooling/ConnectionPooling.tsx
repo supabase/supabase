@@ -21,12 +21,12 @@ import {
   IconExternalLink,
   Input_Shadcn_,
   Listbox,
+  Separator,
 } from 'ui'
 import z from 'zod'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
-import Divider from 'components/ui/Divider'
 import { FormActions } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -71,9 +71,7 @@ export const ConnectionPooling = () => {
   const poolingOptimizations =
     POOLING_OPTIMIZATIONS[
       (computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS) ??
-      project?.infra_compute_size === 'nano'
-        ? 'ci_nano'
-        : 'ci_micro'
+        (project?.infra_compute_size === 'nano' ? 'ci_nano' : 'ci_micro')
     ]
   const defaultPoolSize = poolingOptimizations.poolSize ?? 15
   const defaultMaxClientConn = poolingOptimizations.maxClientConn ?? 200
@@ -200,7 +198,7 @@ export const ConnectionPooling = () => {
                   <ShimmeringLoader className="h-4 w-1/3 col-span-4" delayIndex={i} />
                   <ShimmeringLoader className="h-8 w-full col-span-8" delayIndex={i} />
                 </div>
-                <Divider light />
+                <Separator />
               </Fragment>
             ))}
 

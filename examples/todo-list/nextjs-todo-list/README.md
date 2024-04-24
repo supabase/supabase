@@ -56,16 +56,16 @@ create table todos (
 alter table todos enable row level security;
 
 create policy "Individuals can create todos." on todos for
-    insert with check (auth.uid() = user_id);
+    insert with check ((select auth.uid()) = user_id);
 
 create policy "Individuals can view their own todos. " on todos for
-    select using (auth.uid() = user_id);
+    select using ((select auth.uid()) = user_id);
 
 create policy "Individuals can update their own todos." on todos for
-    update using (auth.uid() = user_id);
+    update using ((select auth.uid()) = user_id);
 
 create policy "Individuals can delete their own todos." on todos for
-    delete using (auth.uid() = user_id);
+    delete using ((select auth.uid()) = user_id);
 ```
 
 ## Authors

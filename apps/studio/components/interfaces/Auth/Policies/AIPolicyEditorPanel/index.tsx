@@ -15,7 +15,6 @@ import {
   Checkbox_Shadcn_,
   Form_Shadcn_,
   Label_Shadcn_,
-  Modal,
   ScrollArea,
   Sheet,
   SheetContent,
@@ -45,7 +44,6 @@ import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { BASE_PATH, OPT_IN_TAGS } from 'lib/constants'
 import { uuidv4 } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { AIPolicyChat } from './AIPolicyChat'
 import {
@@ -70,6 +68,9 @@ const DiffEditor = dynamic(
 
 interface AIPolicyEditorPanelProps {
   visible: boolean
+  schema: string
+  searchString?: string
+  selectedTable?: string
   selectedPolicy?: PostgresPolicy
   onSelectCancel: () => void
 }
@@ -79,6 +80,9 @@ interface AIPolicyEditorPanelProps {
  */
 export const AIPolicyEditorPanel = memo(function ({
   visible,
+  schema,
+  searchString,
+  selectedTable,
   selectedPolicy,
   onSelectCancel,
 }: AIPolicyEditorPanelProps) {
@@ -89,24 +93,27 @@ export const AIPolicyEditorPanel = memo(function ({
   const selectedOrganization = useSelectedOrganization()
 
   const telemetryProps = useTelemetryProps()
-  const state = useTableEditorStateSnapshot()
   const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
 
   // [Joshen] Hyrid form fields, just spit balling to get a decent POC out
   const [using, setUsing] = useState('')
   const [check, setCheck] = useState('')
+  const [fieldError, setFieldError] = useState<string>()
   const [showCheckBlock, setShowCheckBlock] = useState(false)
 
   const monacoOneRef = useRef<Monaco | null>(null)
   const editorOneRef = useRef<IStandaloneCodeEditor | null>(null)
   const [expOneLineCount, setExpOneLineCount] = useState(1)
+  const [expOneContentHeight, setExpOneContentHeight] = useState(0)
 
   const monacoTwoRef = useRef<Monaco | null>(null)
   const editorTwoRef = useRef<IStandaloneCodeEditor | null>(null)
   const [expTwoLineCount, setExpTwoLineCount] = useState(1)
+  const [expTwoContentHeight, setExpTwoContentHeight] = useState(0)
 
   // Use chat id because useChat doesn't have a reset function to clear all messages
   const [chatId, setChatId] = useState(uuidv4())
+  const [tabId, setTabId] = useState<'templates' | 'conversation'>('templates')
 
   const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
   const placeholder = generatePlaceholder(selectedPolicy)
@@ -120,13 +127,13 @@ export const AIPolicyEditorPanel = memo(function ({
   const [debugThread, setDebugThread] = useState<MessageWithDebug[]>([])
   const [assistantVisible, setAssistantPanel] = useState<boolean>(false)
   const [isAssistantChatInputEmpty, setIsAssistantChatInputEmpty] = useState<boolean>(true)
-  const [incomingChange, setIncomingChange] = useState<string | undefined>(undefined)
+  const [incomingChange, setIncomingChange] = useState<string>()
   // Used for confirmation when closing the panel with unsaved changes
   const [isClosingPolicyEditorPanel, setIsClosingPolicyEditorPanel] = useState<boolean>(false)
 
   const formId = 'rls-editor'
   const FormSchema = z.object({
-    name: z.string(),
+    name: z.string().min(1, 'Please provide a name'),
     table: z.string(),
     behavior: z.string(),
     command: z.string(),
@@ -305,13 +312,26 @@ export const AIPolicyEditorPanel = memo(function ({
 
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
     const { name, table, behavior, command, roles } = data
-    const using = editorOneRef.current?.getValue().trim() ?? undefined
-    const check = editorTwoRef.current?.getValue().trim() ?? undefined
+    let using = editorOneRef.current?.getValue().trim() ?? undefined
+    let check = editorTwoRef.current?.getValue().trim()
+
+    // [Terry] b/c editorOneRef will be the check statement in this scenario
+    if (command === 'insert') {
+      check = using
+    }
+
+    if (command === 'insert' && (check === undefined || check.length === 0)) {
+      return setFieldError('Please provide a SQL expression for the WITH CHECK statement')
+    } else if (command !== 'insert' && (using === undefined || using.length === 0)) {
+      return setFieldError('Please provide a SQL expression for the USING statement')
+    } else {
+      setFieldError(undefined)
+    }
 
     if (selectedPolicy === undefined) {
       const sql = generateCreatePolicyQuery({
         name: name,
-        schema: state.selectedSchemaName,
+        schema,
         table,
         behavior,
         command,
@@ -342,7 +362,13 @@ export const AIPolicyEditorPanel = memo(function ({
       if (!isEqual(selectedPolicy.roles, updatedRoles)) payload.roles = updatedRoles
       if (selectedPolicy.definition !== null && selectedPolicy.definition !== using)
         payload.definition = using
-      if (selectedPolicy.check !== null && selectedPolicy.check !== check) payload.check = check
+
+      if (selectedPolicy.command === 'INSERT') {
+        // [Joshen] Cause editorOneRef will be the check statement in this scenario
+        if (selectedPolicy.check !== null && selectedPolicy.check !== using) payload.check = using
+      } else {
+        if (selectedPolicy.check !== null && selectedPolicy.check !== check) payload.check = check
+      }
 
       if (Object.keys(payload).length === 0) return onSelectCancel()
 
@@ -372,6 +398,7 @@ export const AIPolicyEditorPanel = memo(function ({
       setUsing('')
       setCheck('')
       setShowCheckBlock(false)
+      setFieldError(undefined)
 
       form.reset(defaultValues)
     } else {
@@ -390,6 +417,8 @@ export const AIPolicyEditorPanel = memo(function ({
         if (selectedPolicy.check && selectedPolicy.command !== 'INSERT') {
           setShowCheckBlock(true)
         }
+      } else if (selectedTable !== undefined) {
+        form.reset({ ...defaultValues, table: selectedTable })
       }
     }
   }, [visible])
@@ -501,21 +530,26 @@ export const AIPolicyEditorPanel = memo(function ({
                       <RLSCodeEditor
                         id="rls-sql-policy"
                         defaultValue={''}
-                        editorRef={editorOneRef}
                         placeholder={placeholder}
+                        editorRef={editorOneRef}
                       />
                     </div>
                   ) : (
                     <>
                       <PolicyDetailsV2
+                        schema={schema}
+                        searchString={searchString}
+                        selectedTable={selectedTable}
                         isEditing={selectedPolicy !== undefined}
                         form={form}
                         onUpdateCommand={(command: string) => {
+                          setFieldError(undefined)
                           if (!['update', 'all'].includes(command)) setShowCheckBlock(false)
                         }}
                       />
                       <div className="h-full">
                         <LockedCreateQuerySection
+                          schema={schema}
                           selectedPolicy={selectedPolicy}
                           editorOneRef={editorOneRef}
                           editorTwoRef={editorTwoRef}
@@ -523,23 +557,40 @@ export const AIPolicyEditorPanel = memo(function ({
                         />
 
                         <div
-                          className={`py-1 relative ${incomingChange ? 'hidden' : 'block'}`}
+                          className={`mt-1 relative ${incomingChange ? 'hidden' : 'block'}`}
                           style={{
                             height:
-                              expOneLineCount <= 5 ? `${8 + expOneLineCount * 20}px` : '108px',
+                              expOneContentHeight <= 100 ? `${8 + expOneContentHeight}px` : '108px',
                           }}
                         >
                           <RLSCodeEditor
+                            disableTabToUsePlaceholder
                             id="rls-exp-one-editor"
+                            placeholder={
+                              command === 'insert'
+                                ? '-- Provide a SQL expression for the with check statement'
+                                : '-- Provide a SQL expression for the using statement'
+                            }
                             defaultValue={command === 'insert' ? check : using}
                             value={command === 'insert' ? check : using}
                             editorRef={editorOneRef}
                             monacoRef={monacoOneRef as any}
                             lineNumberStart={6}
                             onChange={() => {
+                              setExpOneContentHeight(editorOneRef.current?.getContentHeight() ?? 0)
                               setExpOneLineCount(
                                 editorOneRef.current?.getModel()?.getLineCount() ?? 1
                               )
+                            }}
+                            onMount={() => {
+                              setTimeout(() => {
+                                setExpOneContentHeight(
+                                  editorOneRef.current?.getContentHeight() ?? 0
+                                )
+                                setExpOneLineCount(
+                                  editorOneRef.current?.getModel()?.getLineCount() ?? 1
+                                )
+                              }, 200)
                             }}
                           />
                         </div>
@@ -569,23 +620,40 @@ export const AIPolicyEditorPanel = memo(function ({
                         {showCheckBlock && (
                           <>
                             <div
-                              className={`py-1 relative ${incomingChange ? 'hidden' : 'block'}`}
+                              className={`mt-1 relative ${incomingChange ? 'hidden' : 'block'}`}
                               style={{
                                 height:
-                                  expTwoLineCount <= 5 ? `${8 + expTwoLineCount * 20}px` : '108px',
+                                  expTwoContentHeight <= 100
+                                    ? `${8 + expTwoContentHeight}px`
+                                    : '108px',
                               }}
                             >
                               <RLSCodeEditor
+                                disableTabToUsePlaceholder
                                 id="rls-exp-two-editor"
+                                placeholder="-- Provide a SQL expression for the with check statement"
                                 defaultValue={check}
                                 value={check}
                                 editorRef={editorTwoRef}
                                 monacoRef={monacoTwoRef as any}
                                 lineNumberStart={7 + expOneLineCount}
                                 onChange={() => {
+                                  setExpTwoContentHeight(
+                                    editorTwoRef.current?.getContentHeight() ?? 0
+                                  )
                                   setExpTwoLineCount(
                                     editorTwoRef.current?.getModel()?.getLineCount() ?? 1
                                   )
+                                }}
+                                onMount={() => {
+                                  setTimeout(() => {
+                                    setExpTwoContentHeight(
+                                      editorTwoRef.current?.getContentHeight() ?? 0
+                                    )
+                                    setExpTwoLineCount(
+                                      editorTwoRef.current?.getModel()?.getLineCount() ?? 1
+                                    )
+                                  }, 200)
                                 }}
                               />
                             </div>
@@ -608,11 +676,16 @@ export const AIPolicyEditorPanel = memo(function ({
                           <LockedRenameQuerySection
                             oldName={selectedPolicy.name}
                             newName={name}
+                            schema={schema}
                             table={table}
                             lineNumber={
                               8 + expOneLineCount + (showCheckBlock ? expTwoLineCount : 0)
                             }
                           />
+                        )}
+
+                        {fieldError !== undefined && (
+                          <p className="px-5 py-2 pb-0 text-sm text-red-900">{fieldError}</p>
                         )}
 
                         {supportWithCheck && (
@@ -621,7 +694,10 @@ export const AIPolicyEditorPanel = memo(function ({
                               id="use-check"
                               name="use-check"
                               checked={showCheckBlock}
-                              onCheckedChange={() => setShowCheckBlock(!showCheckBlock)}
+                              onCheckedChange={() => {
+                                setFieldError(undefined)
+                                setShowCheckBlock(!showCheckBlock)
+                              }}
                             />
                             <Label_Shadcn_ className="text-xs cursor-pointer" htmlFor="use-check">
                               Use check expression
@@ -636,7 +712,10 @@ export const AIPolicyEditorPanel = memo(function ({
                     {error !== undefined && (
                       <QueryError
                         error={error}
-                        onSelectDebug={onSelectDebug}
+                        onSelectDebug={() => {
+                          setTabId('conversation')
+                          onSelectDebug()
+                        }}
                         open={errorPanelOpen}
                         setOpen={setErrorPanelOpen}
                       />
@@ -654,6 +733,20 @@ export const AIPolicyEditorPanel = memo(function ({
                         htmlType="submit"
                         loading={isExecuting || isUpdating}
                         disabled={isExecuting || isUpdating || incomingChange !== undefined}
+                        onClick={() => {
+                          if (isAiAssistantEnabled) {
+                            const sql = editorOneRef.current?.getValue().trim()
+                            if (!sql) return onSelectCancel()
+                            executeMutation({
+                              sql: sql,
+                              projectRef: selectedProject?.ref,
+                              connectionString: selectedProject?.connectionString,
+                              handleError: (error) => {
+                                throw error
+                              },
+                            })
+                          }
+                        }}
                       >
                         Save policy
                       </Button>
@@ -669,11 +762,16 @@ export const AIPolicyEditorPanel = memo(function ({
                     'bg-studio'
                   )}
                 >
-                  <Tabs_Shadcn_ defaultValue="templates" className="flex flex-col h-full w-full">
+                  <Tabs_Shadcn_
+                    value={tabId}
+                    defaultValue="templates"
+                    className="flex flex-col h-full w-full"
+                  >
                     <TabsList_Shadcn_ className="flex gap-4 px-content pt-2">
                       <TabsTrigger_Shadcn_
                         key="templates"
                         value="templates"
+                        onClick={() => setTabId('templates')}
                         className="px-0 data-[state=active]:bg-transparent"
                       >
                         Templates
@@ -682,6 +780,7 @@ export const AIPolicyEditorPanel = memo(function ({
                         <TabsTrigger_Shadcn_
                           key="conversation"
                           value="conversation"
+                          onClick={() => setTabId('conversation')}
                           className="px-0 data-[state=active]:bg-transparent"
                         >
                           Assistant
@@ -697,25 +796,35 @@ export const AIPolicyEditorPanel = memo(function ({
                     >
                       <ScrollArea className="h-full w-full">
                         <PolicyTemplates
+                          schema={schema}
+                          table={table}
                           selectedPolicy={selectedPolicy}
                           selectedTemplate={selectedDiff}
                           onSelectTemplate={(value) => {
-                            form.setValue('name', value.name)
-                            form.setValue('behavior', 'permissive')
-                            form.setValue('command', value.command.toLowerCase())
-                            form.setValue('roles', value.roles.join(', ') ?? '')
-
-                            setUsing(`  ${value.definition}`)
-                            setCheck(`  ${value.check}`)
-                            setExpOneLineCount(1)
-                            setExpTwoLineCount(1)
-
-                            if (!['update', 'all'].includes(value.command.toLowerCase())) {
-                              setShowCheckBlock(false)
-                            } else if (value.check.length > 0) {
-                              setShowCheckBlock(true)
+                            if (isAiAssistantEnabled) {
+                              updateEditorWithCheckForDiff({
+                                id: value.id,
+                                content: value.statement,
+                              })
                             } else {
-                              setShowCheckBlock(false)
+                              form.setValue('name', value.name)
+                              form.setValue('behavior', 'permissive')
+                              form.setValue('command', value.command.toLowerCase())
+                              form.setValue('roles', value.roles.join(', ') ?? '')
+
+                              setUsing(`  ${value.definition}`)
+                              setCheck(`  ${value.check}`)
+                              setExpOneLineCount(1)
+                              setExpTwoLineCount(1)
+                              setFieldError(undefined)
+
+                              if (!['update', 'all'].includes(value.command.toLowerCase())) {
+                                setShowCheckBlock(false)
+                              } else if (value.check.length > 0) {
+                                setShowCheckBlock(true)
+                              } else {
+                                setShowCheckBlock(false)
+                              }
                             }
                           }}
                         />
@@ -750,22 +859,20 @@ export const AIPolicyEditorPanel = memo(function ({
 
       <ConfirmationModal
         visible={isClosingPolicyEditorPanel}
-        header="Discard changes"
-        buttonLabel="Discard"
-        onSelectCancel={() => {
+        title="Discard changes"
+        confirmLabel="Discard"
+        onCancel={() => {
           setIsClosingPolicyEditorPanel(false)
         }}
-        onSelectConfirm={() => {
+        onConfirm={() => {
           onSelectCancel()
           setIsClosingPolicyEditorPanel(false)
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            Are you sure you want to close the editor? Any unsaved changes on your policy and
-            conversations with the Assistant will be lost.
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to close the editor? Any unsaved changes on your policy and
+          conversations with the Assistant will be lost.
+        </p>
       </ConfirmationModal>
     </>
   )

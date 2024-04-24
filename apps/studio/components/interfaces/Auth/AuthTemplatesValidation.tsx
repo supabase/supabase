@@ -24,6 +24,7 @@ const CONFIRMATION: FormSchema = {
 - \`{{ .SiteURL }}\` : The URL of the site
 - \`{{ .Email }}\` : The user's email address
 - \`{{ .Data }}\` : The user's \`user_metadata\`
+- \`{{ .RedirectTo }}\` : The URL of \`emailRedirectTo\` passed in options
 `,
     },
   },
@@ -58,6 +59,7 @@ const INVITE: FormSchema = {
 - \`{{ .SiteURL }}\` : The URL of the site
 - \`{{ .Email }}\` : The user's email address
 - \`{{ .Data }}\` : The user's \`user_metadata\`
+- \`{{ .RedirectTo }}\` : The URL of \`redirectTo\` passed in options
 `,
     },
   },
@@ -92,6 +94,7 @@ const MAGIC_LINK: FormSchema = {
 - \`{{ .SiteURL }}\` : The URL of the site
 - \`{{ .Email }}\` : The user's email address
 - \`{{ .Data }}\` : The user's \`user_metadata\`
+- \`{{ .RedirectTo }}\` : The URL of \`emailRedirectTo\` passed in options
 `,
     },
   },
@@ -127,6 +130,7 @@ const EMAIL_CHANGE: FormSchema = {
 - \`{{ .Email }}\` : The original user's email address
 - \`{{ .NewEmail }}\` : The user's new email address
 - \`{{ .Data }}\` : The user's \`user_metadata\`
+- \`{{ .RedirectTo }}\` : The URL of \`emailRedirectTo\` passed in options
 `,
     },
   },
@@ -161,6 +165,7 @@ const RECOVERY: FormSchema = {
 - \`{{ .SiteURL }}\` : The URL of the site
 - \`{{ .Email }}\` : The user's email address
 - \`{{ .Data }}\` : The user's \`user_metadata\`
+- \`{{ .RedirectTo }}\` : The URL of \`redirectTo\` passed in options
 `,
     },
   },

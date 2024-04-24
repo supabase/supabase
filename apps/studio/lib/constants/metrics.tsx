@@ -1,35 +1,41 @@
-import { IconActivity, IconArchive, IconDatabase, IconKey, IconHeart } from 'ui'
+import { Auth, Realtime, Storage } from 'icons'
+import { ActivityIcon, DatabaseIcon, ServerIcon, HeartIcon } from 'lucide-react'
 
 export const METRIC_CATEGORIES = {
   API: {
     label: 'All API usage',
-    icon: <IconActivity />,
+    icon: <ActivityIcon size={16} />,
     key: 'api',
   },
   API_DATABASE: {
     label: 'Database API',
-    icon: <IconDatabase size={16} />,
+    icon: <DatabaseIcon size={16} />,
     key: 'api_database',
   },
   API_AUTH: {
     label: 'Auth API',
-    icon: <IconKey size={16} />,
+    icon: <Auth size={16} />,
     key: 'api_auth',
   },
   API_STORAGE: {
     label: 'Storage API',
-    icon: <IconArchive size={16} />,
+    icon: <Storage size={16} />,
     key: 'api_storage',
   },
   API_REALTIME: {
     label: 'Realtime API',
-    icon: '',
+    icon: <Realtime size={16} />,
     key: 'api_realtime',
   },
   INSTANCE: {
     label: 'Instance health',
-    icon: <IconHeart size={16} />,
+    icon: <HeartIcon size={16} />,
     key: 'instance',
+  },
+  SUPAVISOR: {
+    label: 'Supavisor',
+    icon: <ServerIcon size={16} />,
+    key: 'supavisor',
   },
 }
 
@@ -313,6 +319,14 @@ export const METRICS = [
     label: 'All OPTIONS Requests',
     provider: 'daily-stats',
     category: METRIC_CATEGORIES.API,
+  },
+
+  /** Supavisor */
+  {
+    key: 'total_supavisor_egress_bytes',
+    label: 'Supavisor Egress',
+    provider: 'daily-stats',
+    category: METRIC_CATEGORIES.SUPAVISOR,
   },
 ]
 

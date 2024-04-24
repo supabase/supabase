@@ -9,8 +9,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconChevronLeft,
-  IconChevronRight,
   IconEdit,
   IconMoreVertical,
   IconPlus,
@@ -27,7 +25,7 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useCheckPermissions } from 'hooks'
 import useTable from 'hooks/misc/useTable'
 import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
-import ShimmeringLoader from 'ui-patterns/ShimmeringLoader'
+import { ChevronLeft } from 'lucide-react'
 import ProtectedSchemaWarning from '../ProtectedSchemaWarning'
 
 interface ColumnListProps {
@@ -55,24 +53,12 @@ const ColumnList = ({
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center space-x-2">
-        <div className="flex items-center space-x-2">
-          <h3 className="text-xl text-foreground">Database Tables</h3>
-          <IconChevronRight strokeWidth={1.5} className="text-foreground-light" />
-          {isLoading ? (
-            <ShimmeringLoader className="w-40" />
-          ) : (
-            <h3 className="text-xl text-foreground">{selectedTable?.name}</h3>
-          )}
-        </div>
-      </div>
-
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Button
             asChild
             type="outline"
-            icon={<IconChevronLeft size="small" />}
+            icon={<ChevronLeft size={14} />}
             style={{ padding: '5px' }}
           >
             <Link href={`/project/${ref}/database/tables`} />

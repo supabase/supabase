@@ -1,18 +1,29 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseRolesQuery } from 'data/database-roles/database-roles-query'
 import { useTablesQuery } from 'data/tables/tables-query'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
+import { Check, ChevronsUpDown } from 'lucide-react'
 import {
+  Button,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  Command_Shadcn_,
   FormControl_Shadcn_,
   FormField_Shadcn_,
   FormItem_Shadcn_,
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Input_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
   RadioGroupLargeItem_Shadcn_,
   RadioGroup_Shadcn_,
+  ScrollArea,
   SelectContent_Shadcn_,
   SelectGroup_Shadcn_,
   SelectItem_Shadcn_,
@@ -22,19 +33,29 @@ import {
 import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
 
 interface PolicyDetailsV2Props {
+  schema: string
+  searchString?: string
+  selectedTable?: string
   isEditing: boolean
   form: any
   onUpdateCommand: (command: string) => void
 }
 
-export const PolicyDetailsV2 = ({ isEditing, form, onUpdateCommand }: PolicyDetailsV2Props) => {
+export const PolicyDetailsV2 = ({
+  schema,
+  searchString,
+  selectedTable,
+  isEditing,
+  form,
+  onUpdateCommand,
+}: PolicyDetailsV2Props) => {
   const { project } = useProjectContext()
-  const snap = useTableEditorStateSnapshot()
+  const [open, setOpen] = useState(false)
 
   const { data: tables, isSuccess: isSuccessTables } = useTablesQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
-    schema: snap.selectedSchemaName,
+    schema: schema,
     sortByProperty: 'name',
     includeColumns: true,
   })
@@ -55,13 +76,24 @@ export const PolicyDetailsV2 = ({ isEditing, form, onUpdateCommand }: PolicyDeta
     .sort((a, b) => a.name.localeCompare(b.name))
 
   useEffect(() => {
-    if (isSuccessTables && tables.length > 0) form.setValue('table', tables[0].name)
-  }, [isSuccessTables, tables])
+    if (!isEditing && selectedTable === undefined) {
+      const table = tables?.find(
+        (table) =>
+          table.schema === schema &&
+          (table.id.toString() === searchString || table.name === searchString)
+      )
+      if (table) {
+        form.setValue('table', table.name)
+      } else if (isSuccessTables && tables.length > 0) {
+        form.setValue('table', tables[0].name)
+      }
+    }
+  }, [isEditing, form, searchString, tables, isSuccessTables, selectedTable])
 
   return (
     <>
       <div className="px-5 py-5 flex flex-col gap-y-4 border-b">
-        <div className="flex items-center justify-between gap-4 grid grid-cols-12">
+        <div className="flex items-start justify-between gap-4 grid grid-cols-12">
           <FormField_Shadcn_
             control={form.control}
             name="name"
@@ -92,24 +124,63 @@ export const PolicyDetailsV2 = ({ isEditing, form, onUpdateCommand }: PolicyDeta
                   </p>
                 </FormLabel_Shadcn_>
                 <FormControl_Shadcn_>
-                  <Select_Shadcn_
-                    disabled={isEditing}
-                    value={field.value}
-                    onValueChange={(value) => form.setValue('table', value)}
-                  >
-                    <SelectTrigger_Shadcn_ className="text-sm h-10">
-                      {snap.selectedSchemaName}.{field.value}
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
-                        {(tables ?? []).map((table) => (
-                          <SelectItem_Shadcn_ key={table.id} value={table.name} className="text-sm">
-                            {table.name}
-                          </SelectItem_Shadcn_>
-                        ))}
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_>
+                  <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+                    <PopoverTrigger_Shadcn_ asChild>
+                      <Button
+                        type="default"
+                        className="w-full [&>span]:w-full h-[38px] text-sm"
+                        iconRight={
+                          <ChevronsUpDown
+                            className="text-foreground-muted"
+                            strokeWidth={2}
+                            size={14}
+                          />
+                        }
+                      >
+                        <div className="w-full flex gap-1">
+                          <span className="text-foreground">
+                            {schema}.{field.value}
+                          </span>
+                        </div>
+                      </Button>
+                    </PopoverTrigger_Shadcn_>
+                    <PopoverContent_Shadcn_
+                      className="p-0"
+                      side="bottom"
+                      align="start"
+                      sameWidthAsTrigger
+                    >
+                      <Command_Shadcn_>
+                        <CommandInput_Shadcn_ placeholder="Find a table..." />
+                        <CommandList_Shadcn_>
+                          <CommandEmpty_Shadcn_>No tables found</CommandEmpty_Shadcn_>
+                          <CommandGroup_Shadcn_>
+                            <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>
+                              {(tables ?? []).map((table) => (
+                                <CommandItem_Shadcn_
+                                  key={table.id}
+                                  className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                                  onSelect={() => {
+                                    form.setValue('table', table.name)
+                                    setOpen(false)
+                                  }}
+                                  onClick={() => {
+                                    form.setValue('table', table.name)
+                                    setOpen(false)
+                                  }}
+                                >
+                                  <span className="flex items-center gap-1.5">
+                                    {field.value === table.name ? <Check size={13} /> : ''}
+                                    {table.name}
+                                  </span>
+                                </CommandItem_Shadcn_>
+                              ))}
+                            </ScrollArea>
+                          </CommandGroup_Shadcn_>
+                        </CommandList_Shadcn_>
+                      </Command_Shadcn_>
+                    </PopoverContent_Shadcn_>
+                  </Popover_Shadcn_>
                 </FormControl_Shadcn_>
                 <FormMessage_Shadcn_ />
               </FormItem_Shadcn_>

@@ -13,14 +13,8 @@ import { EmptyBucketModal } from 'components/to-be-cleaned/Storage/EmptyBucketMo
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
 import { useBucketsQuery } from 'data/storage/buckets-query'
 import { useCheckPermissions, useSelectedProject } from 'hooks'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconEdit,
-  Menu,
-} from 'ui'
+import { ArrowUpRight, Edit } from 'lucide-react'
+import { AlertDescription_Shadcn_, AlertTitle_Shadcn_, Alert_Shadcn_, Button, Menu } from 'ui'
 import BucketRow from './BucketRow'
 
 const StorageMenu = () => {
@@ -56,8 +50,8 @@ const StorageMenu = () => {
                 block
                 type="default"
                 icon={
-                  <div className="text-foreground-lighter">
-                    <IconEdit size={14} />
+                  <div className="text-foreground-light">
+                    <Edit size={14} />
                   </div>
                 }
                 disabled={!canCreateBuckets}
@@ -88,7 +82,7 @@ const StorageMenu = () => {
         </div>
         <div className="space-y-6">
           <div>
-            <Menu.Group title="All buckets" />
+            <Menu.Group title={<span className="uppercase font-mono">All buckets</span>} />
 
             {isLoading && (
               <div className="space-y-2 mx-2">
@@ -146,10 +140,18 @@ const StorageMenu = () => {
           </div>
           <div className="h-px w-full bg-border"></div>
           <div>
-            <Menu.Group title="Configuration" />
+            <Menu.Group title={<span className="uppercase font-mono">Configuration</span>} />
             <Link href={`/project/${ref}/storage/policies`} legacyBehavior>
               <Menu.Item rounded active={page === 'policies'}>
                 <p className="truncate">Policies</p>
+              </Menu.Item>
+            </Link>
+            <Link href={`/project/${ref}/settings/storage`}>
+              <Menu.Item rounded>
+                <div className="flex items-center justify-between">
+                  <p className="truncate">Settings</p>
+                  <ArrowUpRight strokeWidth={1} className="h-4 w-4" />
+                </div>
               </Menu.Item>
             </Link>
           </div>
