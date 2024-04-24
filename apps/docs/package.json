@@ -98,6 +98,6 @@
     "tsconfig": "*",
     "tsx": "^4.6.2",
     "typescript": "^5.4.3",
-    "shared-types": "*"
+    "api-types": "*"
   }
 }

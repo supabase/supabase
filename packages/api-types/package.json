@@ -1,5 +1,5 @@
 {
-  "name": "shared-types",
+  "name": "api-types",
   "version": "0.0.0",
   "description": "Types shared between Supabase apps and packages",
   "main": "./index.ts",
