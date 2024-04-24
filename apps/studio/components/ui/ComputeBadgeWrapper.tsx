@@ -61,6 +61,8 @@ export const ComputeBadgeWrapper = ({ project }: { project?: ProjectInfo }) => {
   const isHighestCompute =
     project?.infra_compute_size === HIGHEST_COMPUTE_AVAILABLE?.replace('ci_', '')
 
+  if (!project?.infra_compute_size) return <></>
+
   return (
     <>
       <HoverCard onOpenChange={() => setOpenState(!open)} openDelay={280}>
