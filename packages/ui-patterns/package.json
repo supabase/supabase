@@ -21,7 +21,7 @@
     "ui": "*"
   },
   "devDependencies": {
-    "shared-types": "*"
+    "api-types": "*"
   },
   "peerDependencies": {
     "next": "*",
