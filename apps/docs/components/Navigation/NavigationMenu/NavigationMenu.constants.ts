@@ -195,7 +195,7 @@ export const REFERENCES: References = {
   csharp: {
     name: 'C#',
     library: 'supabase-csharp',
-    versions: ['v0'],
+    versions: ['v1', 'v0'],
     icon: '/docs/img/libraries/c-sharp-icon.svg',
   },
   swift: {
@@ -719,6 +719,10 @@ export const database: NavMenuConstant = {
           name: 'Managing tables, views, and data',
           url: '/guides/database/tables',
         },
+        {
+          name: 'Working with arrays',
+          url: '/guides/database/arrays',
+        },
         { name: 'Managing indexes', url: '/guides/database/postgres/indexes' },
         {
           name: 'Querying joins and nested tables',
@@ -1060,6 +1064,10 @@ export const api: NavMenuConstant = {
         {
           name: 'Using custom schemas',
           url: '/guides/api/using-custom-schemas',
+        },
+        {
+          name: 'Converting from SQL to JavaScript API',
+          url: '/guides/api/sql-to-api',
         },
       ],
     },
@@ -2079,6 +2087,13 @@ export const reference_dart_v2 = {
 }
 
 export const reference_csharp_v0 = {
+  icon: 'reference-csharp',
+  title: 'C#',
+  url: 'guides/reference/csharp',
+  parent: '/reference',
+}
+
+export const reference_csharp_v1 = {
   icon: 'reference-csharp',
   title: 'C#',
   url: 'guides/reference/csharp',

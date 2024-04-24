@@ -9,10 +9,6 @@ import {
   Alert_Shadcn_,
   Button,
   Checkbox,
-  IconAlertCircle,
-  IconAlertTriangle,
-  IconExternalLink,
-  IconPlus,
   Input,
   SidePanel,
   Toggle,
@@ -31,7 +27,9 @@ import {
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
+import { ExternalLink, Plus } from 'lucide-react'
 import type { Dictionary } from 'types'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import ActionBar from '../ActionBar'
 import type { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
@@ -52,8 +50,6 @@ import {
 import ColumnForeignKey from './ColumnForeignKey'
 import ColumnType from './ColumnType'
 import HeaderTitle from './HeaderTitle'
-import toast from 'react-hot-toast'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 export interface ColumnEditorProps {
   column?: PostgresColumn
@@ -242,7 +238,7 @@ const ColumnEditor = ({
                   asChild
                   type="default"
                   size="tiny"
-                  icon={<IconPlus size={14} strokeWidth={2} />}
+                  icon={<Plus size={14} strokeWidth={2} />}
                 >
                   <Link href={`/project/${ref}/database/types`} target="_blank" rel="noreferrer">
                     Create enum types
@@ -252,7 +248,7 @@ const ColumnEditor = ({
                   asChild
                   type="default"
                   size="tiny"
-                  icon={<IconExternalLink size={14} strokeWidth={2} />}
+                  icon={<ExternalLink size={14} strokeWidth={2} />}
                 >
                   <Link
                     href="https://supabase.com/docs/guides/database/tables#data-types"
@@ -393,7 +389,7 @@ const ColumnEditor = ({
                     </Link>{' '}
                     Transparent Column Encryption (TCE).
                   </p>
-                  <Button asChild type="default" icon={<IconExternalLink />} className="mt-2">
+                  <Button asChild type="default" icon={<ExternalLink />} className="mt-2">
                     <Link
                       target="_blank"
                       rel="noreferrer"
