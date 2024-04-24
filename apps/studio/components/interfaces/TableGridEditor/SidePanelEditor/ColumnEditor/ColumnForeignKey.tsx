@@ -53,6 +53,8 @@ const ColumnForeignKey = ({
     }
   }
 
+  console.log({ columns: table?.columns, column })
+
   return (
     <>
       <div className="flex flex-col gap-y-2">
@@ -111,7 +113,10 @@ const ColumnForeignKey = ({
             columns:
               column.isNewColumn && column.name
                 ? (table.columns as any[]).concat(column)
-                : (table.columns as any[]),
+                : (table.columns as any[]).map((c) => {
+                    if (c.id === column.id) return { ...c, name: column.name }
+                    else return c
+                  }),
           }}
           foreignKey={selectedFk}
           onClose={() => {
