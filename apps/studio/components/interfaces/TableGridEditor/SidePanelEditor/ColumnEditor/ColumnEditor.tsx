@@ -9,8 +9,6 @@ import {
   Alert_Shadcn_,
   Button,
   Checkbox,
-  IconExternalLink,
-  IconPlus,
   Input,
   SidePanel,
   Toggle,
@@ -29,6 +27,7 @@ import {
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
+import { ExternalLink, Plus } from 'lucide-react'
 import type { Dictionary } from 'types'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import ActionBar from '../ActionBar'
@@ -140,6 +139,22 @@ const ColumnEditor = ({
       changes.defaultValue = null
     }
 
+    const changedName = 'name' in changes && changes.name !== columnFields.name
+
+    if (
+      changedName &&
+      fkRelations.find((fk) => fk.columns.find(({ source }) => source === columnFields?.name))
+    ) {
+      setFkRelations(
+        fkRelations.map((relation) => ({
+          ...relation,
+          columns: relation.columns.map((col) =>
+            col.source === columnFields?.name ? { ...col, source: changes.name! } : col
+          ),
+        }))
+      )
+    }
+
     const updatedColumnFields = { ...columnFields, ...changes } as ColumnField
     setColumnFields(updatedColumnFields)
     updateEditorDirty()
@@ -223,7 +238,7 @@ const ColumnEditor = ({
                   asChild
                   type="default"
                   size="tiny"
-                  icon={<IconPlus size={14} strokeWidth={2} />}
+                  icon={<Plus size={14} strokeWidth={2} />}
                 >
                   <Link href={`/project/${ref}/database/types`} target="_blank" rel="noreferrer">
                     Create enum types
@@ -233,7 +248,7 @@ const ColumnEditor = ({
                   asChild
                   type="default"
                   size="tiny"
-                  icon={<IconExternalLink size={14} strokeWidth={2} />}
+                  icon={<ExternalLink size={14} strokeWidth={2} />}
                 >
                   <Link
                     href="https://supabase.com/docs/guides/database/tables#data-types"
@@ -374,7 +389,7 @@ const ColumnEditor = ({
                     </Link>{' '}
                     Transparent Column Encryption (TCE).
                   </p>
-                  <Button asChild type="default" icon={<IconExternalLink />} className="mt-2">
+                  <Button asChild type="default" icon={<ExternalLink />} className="mt-2">
                     <Link
                       target="_blank"
                       rel="noreferrer"
@@ -389,16 +404,16 @@ const ColumnEditor = ({
           </FormSection>
           <SidePanel.Separator />
 
-          {/* TODO: need to pull column privileges in here
-          if any columns are using column-level privileges, show this warning */}
-          <FormSection
+          {/* TODO: need to pull column privileges in here if any columns are using column-level privileges, show this warning */}
+          {/* [Joshen] This shouldn't show up for all tables */}
+          {/* <FormSection
             header={
               <FormSectionLabel className="lg:!col-span-4">Column privileges</FormSectionLabel>
             }
           >
             <FormSectionContent loading={false} className="lg:!col-span-8">
               <Alert_Shadcn_ variant="warning">
-                <WarningIcon strokeWidth={2} />
+                <WarningIcon />
                 <AlertTitle_Shadcn_>This table uses column-privileges</AlertTitle_Shadcn_>
                 <AlertDescription_Shadcn_>
                   <p>
@@ -415,7 +430,7 @@ const ColumnEditor = ({
                 </AlertDescription_Shadcn_>
               </Alert_Shadcn_>
             </FormSectionContent>
-          </FormSection>
+          </FormSection> */}
         </>
       )}
     </SidePanel>
