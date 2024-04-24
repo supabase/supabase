@@ -164,7 +164,6 @@ const menus: Menu[] = [
     type: 'reference',
     path: '/reference/csharp',
   },
-  ,
   {
     id: MenuId.RefPythonV2,
     commonSectionsFile: 'common-client-libs-sections.json',
