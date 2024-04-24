@@ -1,15 +1,13 @@
 import * as TabsPrimitive from '@radix-ui/react-tabs'
-import { useRouter } from 'next/router'
+import { useSearchParamsShallow } from 'common'
 import {
   Children,
-  type KeyboardEvent,
-  type MouseEvent,
-  PropsWithChildren,
   useEffect,
   useState,
+  type KeyboardEvent,
+  type MouseEvent,
+  type PropsWithChildren,
 } from 'react'
-
-import { TAB_CHANGE_EVENT_NAME } from '../../lib/events'
 import styleHandler from '../../lib/theme/styleHandler'
 import { useTabGroup } from './TabsProvider'
 
@@ -58,9 +56,8 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   const children = Children.toArray(_children) as PanelPropsProps[]
   const tabIds = children.map((tab) => tab.props.id)
 
-  const router = useRouter()
-  const queryTabs = queryGroup ? router.query[queryGroup] : undefined
-  const [queryTabRaw] = Array.isArray(queryTabs) ? queryTabs : [queryTabs]
+  const searchParams = useSearchParamsShallow()
+  const queryTabRaw = queryGroup && searchParams.get(queryGroup)
   const queryTab = queryTabRaw && tabIds.includes(queryTabRaw) ? queryTabRaw : undefined
 
   const [activeTab, setActiveTab] = useState(
@@ -70,32 +67,12 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
       children?.[0]?.props?.id
   )
 
-  useEffect(() => {
-    /**
-     * [Charis] The query param change is done by manual manipulation of window
-     * location and history, not by router.push (I think to avoid full-page
-     * rerenders). This doesn't reliably trigger rerender of all tabs on the
-     * page, possibly because it bypasses `useRouter`. The only way I could
-     * find of avoiding the full-page rerender but still reacting reliably to
-     * search param changes was to fire a CustomEvent.
-     */
+  const { groupActiveId, setGroupActiveId } = useTabGroup(tabIds)
 
-    function handleChange(e: CustomEvent) {
-      if (
-        e.detail.queryGroup &&
-        e.detail.queryGroup === queryGroup &&
-        tabIds.includes(e.detail.id)
-      ) {
-        setActiveTab(e.detail.id)
-        setGroupActiveId?.(e.detail.id)
-      }
-    }
-
-    window.addEventListener(TAB_CHANGE_EVENT_NAME, handleChange as EventListener)
-    return () => window.removeEventListener(TAB_CHANGE_EVENT_NAME, handleChange as EventListener)
-  }, [])
-
-  // If query param present for the query group, switch to that tab.
+  /**
+   * Can't shortcut the render here by taking this out of useEffect because
+   * `setActiveGroupId` comes from `TabProvider`
+   */
   useEffect(() => {
     if (queryTab) {
       setActiveTab(queryTab)
@@ -103,27 +80,17 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
     }
   }, [queryTab])
 
-  let __styles = styleHandler('tabs')
-
-  const { groupActiveId, setGroupActiveId } = useTabGroup(tabIds)
-
   const active = activeId ?? groupActiveId ?? activeTab
 
-  function onTabClick(currentTarget: EventTarget, id: string) {
-    setActiveTab(id)
-    setGroupActiveId?.(id)
+  let __styles = styleHandler('tabs')
 
+  function onTabClick(id: string) {
     if (queryGroup) {
-      const url = new URL(document.location.href)
-      if (!url.searchParams.getAll('queryGroups')?.includes(queryGroup))
-        url.searchParams.append('queryGroups', queryGroup)
-      url.searchParams.set(queryGroup, id)
-      window.history.replaceState(undefined, '', url)
+      if (!searchParams.getAll('queryGroups').includes(queryGroup)) {
+        searchParams.append('queryGroups', queryGroup)
+      }
+      searchParams.set(queryGroup, id)
     }
-
-    currentTarget.dispatchEvent(
-      new CustomEvent(TAB_CHANGE_EVENT_NAME, { bubbles: true, detail: { queryGroup, id } })
-    )
 
     onClick?.(id)
     if (id !== active) {
@@ -155,14 +122,12 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
           return (
             <TabsPrimitive.Trigger
               onKeyDown={(e: KeyboardEvent<HTMLButtonElement>) => {
-                if (e.keyCode === 13) {
+                if (e.key === 'Enter') {
                   e.preventDefault()
-                  onTabClick(e.currentTarget, tab.props.id)
+                  onTabClick(tab.props.id)
                 }
               }}
-              onClick={(e: MouseEvent<HTMLButtonElement>) =>
-                onTabClick(e.currentTarget, tab.props.id)
-              }
+              onClick={(e: MouseEvent<HTMLButtonElement>) => onTabClick(tab.props.id)}
               key={`${tab.props.id}-tab-button`}
               value={tab.props.id}
               className={triggerClasses.join(' ')}

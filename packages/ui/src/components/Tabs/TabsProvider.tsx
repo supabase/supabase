@@ -1,8 +1,8 @@
 import { xor } from 'lodash'
 import {
-  Dispatch,
-  PropsWithChildren,
-  SetStateAction,
+  type Dispatch,
+  type PropsWithChildren,
+  type SetStateAction,
   createContext,
   useCallback,
   useContext,
