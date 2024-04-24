@@ -584,7 +584,7 @@ export const auth = {
             },
           ],
         },
-        { name: 'Anonymous Signins', url: '/guides/auth/auth-anonymous' },
+        { name: 'Anonymous Sign-Ins', url: '/guides/auth/auth-anonymous' },
         { name: 'Mobile Deep Linking', url: '/guides/auth/native-mobile-deep-linking' },
         {
           name: 'Identity Linking',
@@ -619,7 +619,7 @@ export const auth = {
       items: [
         { name: 'Password Security', url: '/guides/auth/password-security' },
         { name: 'Rate Limits', url: '/guides/auth/rate-limits' },
-        { name: 'Captcha', url: '/guides/auth/auth-captcha' },
+        { name: 'Bot Detection (CAPTCHA)', url: '/guides/auth/auth-captcha' },
         { name: 'JWTs', url: '/guides/auth/jwts' },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         {
