@@ -429,7 +429,7 @@ const nextConfig = {
       'vercel.com',
     ],
   },
-  transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'shared-types', 'icons'],
+  transpilePackages: ['ui', 'ui-patterns', 'common', 'shared-data', 'api-types', 'icons'],
   webpack(config) {
     config.module?.rules
       .find((rule) => rule.oneOf)

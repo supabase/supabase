@@ -68,7 +68,7 @@ const nextConfig = {
     'mdx-mermaid',
     'dayjs',
     'shared-data',
-    'shared-types',
+    'api-types',
     'icons',
   ],
   async headers() {

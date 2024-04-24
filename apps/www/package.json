@@ -86,7 +86,7 @@
     "config": "*",
     "postcss": "^8.4.31",
     "tsconfig": "*",
-    "shared-types": "*"
+    "api-types": "*"
   },
   "license": "MIT"
 }
