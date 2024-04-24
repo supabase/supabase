@@ -30,9 +30,9 @@ const Extensions = () => {
       ? data ?? []
       : (data ?? []).filter((ext) => {
           const nameMatchesSearch = ext.name.toLowerCase().includes(filterString.toLowerCase())
-          const searchTermsMatchesSearch = (
-            SEARCH_TERMS?.[ext.name as keyof typeof SEARCH_TERMS] ?? []
-          ).some((x) => x.includes(filterString.toLowerCase()))
+          const searchTermsMatchesSearch = (SEARCH_TERMS[ext.name] || []).some((x) =>
+            x.includes(filterString.toLowerCase())
+          )
           return nameMatchesSearch || searchTermsMatchesSearch
         })
   const extensionsWithoutHidden = extensions.filter((ext) => !HIDDEN_EXTENSIONS.includes(ext.name))
