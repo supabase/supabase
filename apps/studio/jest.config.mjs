@@ -8,7 +8,7 @@ const createJestConfig = nextJest({
 const config = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleDirectories: ['<rootDir>', 'node_modules'],
-  setupFiles: ['jest-canvas-mock', './tests/setup/radix'],
+  setupFiles: ['jest-canvas-mock', './tests/setup/radix', './tests/setup/ssr'],
   testEnvironment: 'jsdom',
   testTimeout: 10000,
   testRegex: '(.*\\.test.(js|jsx|ts|tsx)$)',
