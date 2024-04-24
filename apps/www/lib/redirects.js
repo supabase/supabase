@@ -2433,4 +2433,9 @@ module.exports = [
     source: '/special-announcement/tickets/:path*',
     destination: '/ga-week/tickets/:path*',
   },
+  {
+    permanent: true,
+    source: '/docs/guides/database/sql-to-api',
+    destination: '/docs/guides/api/sql-to-api',
+  },
 ]

@@ -16,6 +16,13 @@ import { ToastLoader } from 'components/ui/ToastLoader'
 import { delete_, post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
+import { getQueryClient } from 'data/query-client'
+import { configKeys } from 'data/config/keys'
+import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
+import {
+  convertFromBytes,
+  convertToBytes,
+} from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 
 /**
  * This is a preferred method rather than React Context and useStorageExplorerStore().
@@ -459,6 +466,14 @@ class StorageExplorerStore {
   }
 
   uploadFiles = async (files, columnIndex, isDrop = false) => {
+    const queryClient = getQueryClient()
+    const storageConfiguration = queryClient
+      .getQueryCache()
+      .find(configKeys.storage(this.projectRef))?.state.data as
+      | ProjectStorageConfigResponse
+      | undefined
+    const fileSizeLimit = storageConfiguration?.fileSizeLimit
+
     const t1 = new Date()
 
     const autofix = true
@@ -468,12 +483,39 @@ class StorageExplorerStore {
       : Array.from(files)
     const derivedColumnIndex = columnIndex === -1 ? this.getLatestColumnIndex() : columnIndex
 
+    const filesWithinUploadLimit =
+      fileSizeLimit !== undefined
+        ? filesToUpload.filter((file) => file.size <= fileSizeLimit)
+        : filesToUpload
+
+    if (filesWithinUploadLimit.length < filesToUpload.length) {
+      const numberOfFilesRejected = filesToUpload.length - filesWithinUploadLimit
+      const { value, unit } = convertFromBytes(fileSizeLimit)
+
+      toast.error(
+        <div className="flex flex-col gap-y-1">
+          <p className="text-foreground">
+            Failed to upload {numberOfFilesRejected} file{numberOfFilesRejected > 1 ? 's' : ''} as{' '}
+            {numberOfFilesRejected > 1 ? 'their' : 'its'} size
+            {numberOfFilesRejected > 1 ? 's are' : ' is'} beyond the upload limit of {value}
+            {unit}.
+          </p>
+          <p className="text-foreground-light">
+            You may change the file size upload limit under Storage in Project Settings.
+          </p>
+        </div>,
+        { duration: 8000 }
+      )
+
+      if (numberOfFilesRejected === filesToUpload.length) return
+    }
+
     // If we're uploading a folder which name already exists in the same folder that we're uploading to
     // We sanitize the folder name and let all file uploads through. (This is only via drag drop)
     const topLevelFolders = (this.columns?.[derivedColumnIndex]?.items ?? [])
       .filter((item) => !item.id)
       .map((item) => item.name)
-    const formattedFilesToUpload = filesToUpload.map((file) => {
+    const formattedFilesToUpload = filesWithinUploadLimit.map((file) => {
       // If the files are from clicking "Upload button", just take them as they are since users cannot
       // upload folders from clicking that button, only via drag drop
       if (!file.path) return file
