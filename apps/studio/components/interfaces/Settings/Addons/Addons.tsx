@@ -52,6 +52,7 @@ import ComputeInstanceSidePanel from './ComputeInstanceSidePanel'
 import CustomDomainSidePanel from './CustomDomainSidePanel'
 import IPv4SidePanel from './IPv4SidePanel'
 import PITRSidePanel from './PITRSidePanel'
+import { ComputeBadge } from 'ui-patterns'
 
 const Addons = () => {
   const { resolvedTheme } = useTheme()
@@ -236,11 +237,15 @@ const Addons = () => {
                     {isLoading || (computeInstance === undefined && isLoadingProject) ? (
                       <ShimmeringLoader className="w-32" />
                     ) : (
-                      <p>
-                        {computeInstance?.variant.name ??
+                      <div className="flex py-3">
+                        {/* {computeInstance?.variant.name ??
                           capitalize(selectedProject?.infra_compute_size) ??
-                          'Micro'}
-                      </p>
+                          'Micro'} */}
+                        <ComputeBadge
+                          infraComputeSize={selectedProject?.infra_compute_size}
+                          size={'large'}
+                        />
+                      </div>
                     )}
                     <ProjectUpdateDisabledTooltip
                       projectUpdateDisabled={projectUpdateDisabled || computeSizeChangesDisabled}

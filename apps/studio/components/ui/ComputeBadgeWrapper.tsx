@@ -2,18 +2,17 @@ import {
   generateComputeInstanceMeta,
   getAddons,
 } from 'components/interfaces/Billing/Subscription/Subscription.utils'
-import { Project } from 'data/projects/project-detail-query'
+import { ProjectInfo } from 'data/projects/projects-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { getCloudProviderArchitecture } from 'lib/cloudprovider-utils'
-import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
-import { Button, HoverCard, HoverCardContent, HoverCardTrigger, Separator, cn } from 'ui'
+import { Button, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge/ComputeBadge'
 import ShimmeringLoader from './ShimmeringLoader'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { ProjectInfo } from 'data/projects/projects-query'
 
 export const ComputeBadgeWrapper = ({ project }: { project?: ProjectInfo }) => {
+  const router = useRouter()
   // handles the state of the hover card
   // once open it will fetch the addons
   const [open, setOpenState] = useState(false)
@@ -58,14 +57,17 @@ export const ComputeBadgeWrapper = ({ project }: { project?: ProjectInfo }) => {
 
   const NANO_PRICE = '$0.0/hour (~$0/month)'
   const HIGHEST_COMPUTE_AVAILABLE = availableCompute?.[availableCompute.length - 1].identifier
+  const LINK_HREF = `/project/${project?.ref}/settings/addons`
   const isHighestCompute =
     project?.infra_compute_size === HIGHEST_COMPUTE_AVAILABLE?.replace('ci_', '')
 
   return (
     <>
-      <HoverCard onOpenChange={() => setOpenState(!open)}>
-        <HoverCardTrigger className="group">
-          <ComputeBadge infraComputeSize={project?.infra_compute_size} />
+      <HoverCard onOpenChange={() => setOpenState(!open)} openDelay={280}>
+        <HoverCardTrigger className="group" asChild>
+          <button onClick={() => router.push(LINK_HREF)} type="button" role="button">
+            <ComputeBadge infraComputeSize={project?.infra_compute_size} />
+          </button>
         </HoverCardTrigger>
         <HoverCardContent side="bottom" align="start" className="p-0 overflow-hidden w-96">
           <div className="p-2 px-5 text-xs text-foreground-lighter">Compute size</div>
@@ -111,8 +113,13 @@ export const ComputeBadgeWrapper = ({ project }: { project?: ProjectInfo }) => {
                   </p>
                 </div>
                 <div>
-                  <Button type="default" asChild>
-                    <Link href={`/project/${project?.ref}/settings/addons`}>Upgrade compute</Link>
+                  <Button
+                    type="default"
+                    onClick={() => router.push(LINK_HREF)}
+                    htmlType="button"
+                    role="button"
+                  >
+                    Upgrade compute
                   </Button>
                 </div>
               </div>
