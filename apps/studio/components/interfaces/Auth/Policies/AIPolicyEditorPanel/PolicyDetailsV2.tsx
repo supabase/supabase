@@ -181,30 +181,6 @@ export const PolicyDetailsV2 = ({
                       </Command_Shadcn_>
                     </PopoverContent_Shadcn_>
                   </Popover_Shadcn_>
-                  {/* <Select_Shadcn_
-                    disabled={isEditing}
-                    value={field.value}
-                    onValueChange={(value) => form.setValue('table', value)}
-                  >
-                    <SelectTrigger_Shadcn_ className="text-sm h-10">
-                      {schema}.{field.value}
-                    </SelectTrigger_Shadcn_>
-                    <SelectContent_Shadcn_>
-                      <SelectGroup_Shadcn_>
-                        <ScrollArea className={(tables ?? []).length > 7 ? 'h-[200px]' : ''}>
-                          {(tables ?? []).map((table) => (
-                            <SelectItem_Shadcn_
-                              key={table.id}
-                              value={table.name}
-                              className="text-sm"
-                            >
-                              {table.name}
-                            </SelectItem_Shadcn_>
-                          ))}
-                        </ScrollArea>
-                      </SelectGroup_Shadcn_>
-                    </SelectContent_Shadcn_>
-                  </Select_Shadcn_> */}
                 </FormControl_Shadcn_>
                 <FormMessage_Shadcn_ />
               </FormItem_Shadcn_>
