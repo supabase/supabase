@@ -1,5 +1,4 @@
-// @ts-nocheck
-import { createClient } from '@supabase/supabase-js'
+import { SupabaseClient, createClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { chunk, compact, find, findIndex, has, isEqual, some, uniq, uniqBy } from 'lodash'
 import { makeAutoObservable } from 'mobx'
@@ -10,6 +9,7 @@ import {
   STORAGE_ROW_STATUS,
   STORAGE_ROW_TYPES,
   STORAGE_SORT_BY,
+  STORAGE_SORT_BY_ORDER,
   STORAGE_VIEWS,
 } from 'components/to-be-cleaned/Storage/Storage.constants'
 import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
@@ -30,9 +30,9 @@ import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
  * This is a preferred method rather than React Context and useStorageExplorerStore().
  * If we can switch to this method, we can remove the implementation below, and we don't need compose() within the react components
  */
-let store = null
+let store: StorageExplorerStore | null = null
 export function useStorageStore() {
-  if (store === null) store = new StorageExplorerStore(null)
+  if (store === null) store = new StorageExplorerStore()
   return store
 }
 
@@ -46,11 +46,11 @@ const EMPTY_FOLDER_PLACEHOLDER_FILE_NAME = '.emptyFolderPlaceholder'
 const STORAGE_PROGRESS_INFO_TEXT = "Please do not close the browser until it's completed"
 
 class StorageExplorerStore {
-  projectRef = ''
-  loaded = false
-  view = STORAGE_VIEWS.COLUMNS
-  sortBy = STORAGE_SORT_BY.NAME
-  sortByOrder = 'asc'
+  projectRef: string = ''
+  loaded: boolean = false
+  view: STORAGE_VIEWS = STORAGE_VIEWS.COLUMNS
+  sortBy: STORAGE_SORT_BY = STORAGE_SORT_BY.NAME
+  sortByOrder: STORAGE_SORT_BY_ORDER = STORAGE_SORT_BY_ORDER.ASC
   buckets = []
   selectedBucket: { id?: string } = {}
   columns = []
@@ -67,23 +67,26 @@ class StorageExplorerStore {
     sortBy: { column: this.sortBy, order: this.sortByOrder },
   }
 
-  /* Supabase client */
-  supabaseClient = null
+  /* Supabase client, will get initialized immediately after constructing the instance */
+  supabaseClient: SupabaseClient<any, 'public', any> = null as any as SupabaseClient<
+    any,
+    'public',
+    any
+  >
   /* [Joshen] Move towards using API */
-  endpoint = ''
+  endpoint: string = ''
 
   /* FE Cacheing for file previews */
   filePreviewCache = []
 
   /* For file uploads, from 0 to 1 */
-  uploadProgress = 0
+  uploadProgress: number = 0
 
   /* Controllers to abort API calls */
   abortController: AbortController | null = null
 
-  constructor(projectRef) {
+  constructor() {
     makeAutoObservable(this, { supabaseClient: false })
-    this.projectRef = projectRef
 
     // ignore when in a non-browser environment
     if (typeof window !== 'undefined') {
@@ -91,7 +94,12 @@ class StorageExplorerStore {
     }
   }
 
-  initStore(projectRef, url, serviceKey, protocol = PROJECT_ENDPOINT_PROTOCOL) {
+  initStore(
+    projectRef: string,
+    url: string,
+    serviceKey: string,
+    protocol: string = PROJECT_ENDPOINT_PROTOCOL
+  ) {
     this.projectRef = projectRef
     this.endpoint = `${API_URL}/storage/${projectRef}`
     if (serviceKey !== undefined) this.initializeSupabaseClient(serviceKey, url, protocol)
@@ -99,7 +107,7 @@ class StorageExplorerStore {
 
   /* Methods which are commonly used + For better readability */
 
-  initializeSupabaseClient = (serviceKey, serviceEndpoint, protocol) => {
+  initializeSupabaseClient = (serviceKey: string, serviceEndpoint: string, protocol: string) => {
     this.supabaseClient = createClient(
       `${IS_PLATFORM ? 'https' : protocol}://${serviceEndpoint}`,
       serviceKey,
@@ -171,7 +179,7 @@ class StorageExplorerStore {
 
   /* UI specific methods */
 
-  setLoaded = (val) => {
+  setLoaded = (val: boolean) => {
     this.loaded = val
   }
 
@@ -182,20 +190,20 @@ class StorageExplorerStore {
     this.clearSelectedItems()
   }
 
-  setView = (view) => {
+  setView = (view: STORAGE_VIEWS) => {
     this.view = view
     this.closeFilePreview()
     this.updateExplorerPreferences()
   }
 
-  setSortBy = async (sortBy) => {
+  setSortBy = async (sortBy: STORAGE_SORT_BY) => {
     this.sortBy = sortBy
     this.closeFilePreview()
     this.updateExplorerPreferences()
     await this.refetchAllOpenedFolders()
   }
 
-  setSortByOrder = async (sortByOrder) => {
+  setSortByOrder = async (sortByOrder: STORAGE_SORT_BY_ORDER) => {
     this.sortByOrder = sortByOrder
     this.closeFilePreview()
     this.updateExplorerPreferences()
@@ -206,7 +214,7 @@ class StorageExplorerStore {
     this.columns = []
   }
 
-  pushColumnAtIndex = (column, index) => {
+  pushColumnAtIndex = (column, index: number) => {
     this.columns = this.columns.slice(0, index + 1).concat([column])
   }
 
@@ -215,17 +223,17 @@ class StorageExplorerStore {
     this.columns = this.columns.slice(0, this.getLatestColumnIndex())
   }
 
-  popColumnAtIndex = (index) => {
+  popColumnAtIndex = (index: number) => {
     this.columns = this.columns.slice(0, index + 1)
   }
 
-  setColumnIsLoadingMore = (index, isLoadingMoreItems = true) => {
+  setColumnIsLoadingMore = (index: number, isLoadingMoreItems: boolean = true) => {
     this.columns = this.columns.map((col, idx) => {
       return idx === index ? { ...col, isLoadingMoreItems } : col
     })
   }
 
-  pushOpenedFolderAtIndex = (folder, index) => {
+  pushOpenedFolderAtIndex = (folder, index: number) => {
     this.openedFolders = this.openedFolders.slice(0, index).concat(folder)
   }
 
@@ -233,7 +241,7 @@ class StorageExplorerStore {
     this.openedFolders = this.openedFolders.slice(0, this.openedFolders.length - 1)
   }
 
-  popOpenedFoldersAtIndex = (index) => {
+  popOpenedFoldersAtIndex = (index: number) => {
     this.openedFolders = this.openedFolders.slice(0, index + 1)
   }
 
@@ -245,7 +253,7 @@ class StorageExplorerStore {
     this.selectedItems = items
   }
 
-  clearSelectedItems = (columnIndex) => {
+  clearSelectedItems = (columnIndex?: number) => {
     if (columnIndex !== undefined) {
       this.selectedItems = this.selectedItems.filter((item) => item.columnIndex !== columnIndex)
     } else {
@@ -273,7 +281,7 @@ class StorageExplorerStore {
     this.selectedFileCustomExpiry = item
   }
 
-  addNewFolderPlaceholder = (columnIndex) => {
+  addNewFolderPlaceholder = (columnIndex: number) => {
     const isPrepend = true
     const folderName = 'Untitled folder'
     const folderType = STORAGE_ROW_TYPES.FOLDER
@@ -281,7 +289,7 @@ class StorageExplorerStore {
     this.addTempRow(folderType, folderName, STORAGE_ROW_STATUS.EDITING, columnIdx, {}, isPrepend)
   }
 
-  addNewFolder = async (folderName, columnIndex) => {
+  addNewFolder = async (folderName: string, columnIndex: number) => {
     const autofix = false
     const formattedName = this.sanitizeNameForDuplicateInColumn(folderName, autofix, columnIndex)
     if (formattedName === null) return
@@ -469,7 +477,7 @@ class StorageExplorerStore {
     }
   }
 
-  uploadFiles = async (files, columnIndex, isDrop = false) => {
+  uploadFiles = async (files, columnIndex: number, isDrop: boolean = false) => {
     const queryClient = getQueryClient()
     const storageConfiguration = queryClient
       .getQueryCache()
@@ -677,7 +685,7 @@ class StorageExplorerStore {
     )
   }
 
-  moveFiles = async (newPathToFile) => {
+  moveFiles = async (newPathToFile: string) => {
     const newPaths = compact(newPathToFile.split('/'))
     const formattedNewPathToFile = newPaths.join('/')
     let numberOfFilesMovedFail = 0
@@ -736,7 +744,7 @@ class StorageExplorerStore {
     this.clearSelectedItemsToMove()
   }
 
-  fetchFilePreview = async (fileName, expiresIn = 0): Promise<string | null> => {
+  fetchFilePreview = async (fileName: string, expiresIn: number = 0): Promise<string | null> => {
     const includeBucket = false
     const pathToFile = this.getPathAlongOpenedFolders(includeBucket)
     const formattedPathToFile = pathToFile.length > 0 ? `${pathToFile}/${fileName}` : fileName
@@ -1036,7 +1044,7 @@ class StorageExplorerStore {
     }
   }
 
-  renameFile = async (file, newName, columnIndex) => {
+  renameFile = async (file, newName: string, columnIndex: number) => {
     const originalName = file.name
     if (originalName === newName || newName.length === 0) {
       this.updateRowStatus(originalName, STORAGE_ROW_STATUS.READY, columnIndex)
@@ -1078,7 +1086,12 @@ class StorageExplorerStore {
 
   /* Folders CRUD */
 
-  fetchFolderContents = async (folderId, folderName, index, searchString = '') => {
+  fetchFolderContents = async (
+    folderId: string,
+    folderName: string,
+    index: number,
+    searchString: string = ''
+  ) => {
     if (this.selectedBucket.id === undefined) return
 
     this.abortApiCalls()
@@ -1130,7 +1143,7 @@ class StorageExplorerStore {
     }
   }
 
-  fetchMoreFolderContents = async (index, column, searchString = '') => {
+  fetchMoreFolderContents = async (index: number, column, searchString: string = '') => {
     this.setColumnIsLoadingMore(index)
 
     const prefix = this.openedFolders.map((folder) => folder.name).join('/')
@@ -1172,7 +1185,11 @@ class StorageExplorerStore {
     await this.fetchFoldersByPath(paths)
   }
 
-  fetchFoldersByPath = async (paths, searchString = '', showLoading = false) => {
+  fetchFoldersByPath = async (
+    paths: string[],
+    searchString: string = '',
+    showLoading: boolean = false
+  ) => {
     if (this.selectedBucket.id === undefined) return
 
     const pathsWithEmptyPrefix = [''].concat(paths)
@@ -1241,7 +1258,7 @@ class StorageExplorerStore {
 
   // Check parent folder if its empty, if yes, reinstate .emptyFolderPlaceholder
   // Used when deleting folder or deleting files
-  validateParentFolderEmpty = async (parentFolderPrefix) => {
+  validateParentFolderEmpty = async (parentFolderPrefix: string) => {
     try {
       const data = await listBucketObjects({
         projectRef: this.projectRef,
@@ -1281,7 +1298,7 @@ class StorageExplorerStore {
     toast.success(`Successfully deleted ${folder.name}`)
   }
 
-  renameFolder = async (folder, newName, columnIndex) => {
+  renameFolder = async (folder, newName: string, columnIndex: number) => {
     const originalName = folder.name
     if (originalName === newName) {
       return this.updateRowStatus(originalName, STORAGE_ROW_STATUS.READY, columnIndex)
@@ -1444,9 +1461,9 @@ class StorageExplorerStore {
   /* UI Helper functions */
 
   sanitizeNameForDuplicateInColumn = (
-    name,
-    autofix = false,
-    columnIndex = this.getLatestColumnIndex()
+    name: string,
+    autofix: boolean = false,
+    columnIndex: number = this.getLatestColumnIndex()
   ) => {
     const currentColumn = this.columns[columnIndex]
     const currentColumnItems = currentColumn.items.filter(
@@ -1503,7 +1520,14 @@ class StorageExplorerStore {
     return formattedItems
   }
 
-  addTempRow = (type, name, status, columnIndex, metadata = {}, isPrepend = false) => {
+  addTempRow = (
+    type: STORAGE_ROW_TYPES,
+    name: string,
+    status: STORAGE_ROW_STATUS,
+    columnIndex: number,
+    metadata = {},
+    isPrepend: boolean = false
+  ) => {
     const updatedColumns = this.columns.map((column, idx) => {
       if (idx === columnIndex) {
         const tempRow = { type, name, status, metadata }
@@ -1517,7 +1541,7 @@ class StorageExplorerStore {
     this.columns = updatedColumns
   }
 
-  removeTempRows = (columnIndex) => {
+  removeTempRows = (columnIndex: number) => {
     const updatedColumns = this.columns.map((column, idx) => {
       if (idx === columnIndex) {
         const updatedItems = column.items.filter((item) => has(item, 'id'))
@@ -1533,10 +1557,10 @@ class StorageExplorerStore {
   }
 
   updateRowStatus = (
-    name,
-    status,
-    columnIndex = this.getLatestColumnIndex(),
-    updatedName = null
+    name: string,
+    status: STORAGE_ROW_STATUS,
+    columnIndex: number = this.getLatestColumnIndex(),
+    updatedName?: string
   ) => {
     const updatedColumns = this.columns.map((column, idx) => {
       if (idx === columnIndex) {
@@ -1558,9 +1582,9 @@ class StorageExplorerStore {
   }
 
   updateFolderAfterEdit = (
-    folderName,
-    columnIndex = this.getLatestColumnIndex(),
-    status = STORAGE_ROW_STATUS.READY
+    folderName: string,
+    columnIndex: number = this.getLatestColumnIndex(),
+    status: STORAGE_ROW_STATUS = STORAGE_ROW_STATUS.READY
   ) => {
     const updatedColumns = this.columns.map((column, idx) => {
       if (idx === columnIndex) {
@@ -1616,7 +1640,7 @@ class StorageExplorerStore {
     }
   }
 
-  selectRangeItems = (columnIndex, toItemIndex) => {
+  selectRangeItems = (columnIndex: number, toItemIndex: number) => {
     const columnItems = this.columns[columnIndex].items
     const toItem = columnItems[toItemIndex]
     const selectedItemIds = this.selectedItems.map((item) => item.id)
