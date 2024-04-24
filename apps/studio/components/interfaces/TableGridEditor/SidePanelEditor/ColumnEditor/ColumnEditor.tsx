@@ -139,7 +139,7 @@ const ColumnEditor = ({
       changes.defaultValue = null
     }
 
-    const changedName = changes.name !== columnFields.name
+    const changedName = 'name' in changes && changes.name !== columnFields.name
 
     if (
       changedName &&

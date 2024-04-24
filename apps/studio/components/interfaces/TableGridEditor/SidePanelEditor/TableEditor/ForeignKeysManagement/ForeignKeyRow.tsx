@@ -90,7 +90,9 @@ export const ForeignKeyRow = ({
         <div className="flex flex-col gap-y-1">
           {foreignKey.columns.map((x, idx) => (
             <div key={`relation-${idx}}`} className="flex items-center gap-x-2">
-              <code className={cn('text-xs', x.source.length === 0 && 'text-foreground-light')}>
+              <code
+                className={cn('text-xs', (x?.source ?? '').length === 0 && 'text-foreground-light')}
+              >
                 {x.source || '[column_name]'}
               </code>
               <ArrowRight size={16} />

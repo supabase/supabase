@@ -53,8 +53,6 @@ const ColumnForeignKey = ({
     }
   }
 
-  console.log({ columns: table?.columns, column })
-
   return (
     <>
       <div className="flex flex-col gap-y-2">
