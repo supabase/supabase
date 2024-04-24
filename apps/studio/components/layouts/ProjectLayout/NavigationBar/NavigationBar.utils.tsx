@@ -13,6 +13,7 @@ import {
 } from 'icons'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from './NavigationBar'
 import { Settings, FileText, List } from 'lucide-react'
+import { useFlag } from 'hooks'
 
 export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
@@ -101,7 +102,7 @@ export const generateProductRoutes = (
 export const generateOtherRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
   const buildingUrl = `/project/${ref}/building`
-
+  const warehouseFlag = useFlag('warehouse')
   return [
     ...(IS_PLATFORM
       ? [
@@ -115,7 +116,7 @@ export const generateOtherRoutes = (ref?: string, project?: Project): Route[] =>
       : []),
     {
       key: 'logs',
-      label: IS_PLATFORM? 'Logs & Events' : 'Logs',
+      label: IS_PLATFORM && warehouseFlag ? 'Logs & Events' : 'Logs',
       icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/logs/explorer`),
     },
