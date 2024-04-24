@@ -34,11 +34,11 @@ const sendTextMessage = async (
   const encodedCredentials: string = base64.fromUint8Array(
     new TextEncoder().encode(`${accountSid}:${authToken}`),
   );
+
   const body: URLSearchParams = new URLSearchParams({
-    To: toNumber,
+    To: `+${toNumber}`,
     From: fromNumber,
     // Uncomment when testing with a fixed number
-    // Body: '<your_phone_number>'
     Body: messageBody,
   });
 
@@ -54,6 +54,7 @@ const sendTextMessage = async (
   return response.json();
 };
 
+
 Deno.serve(async (req) => {
   const payload = await req.text()
   const base64_secret = Deno.env.get('SEND_SMS_HOOK_SECRET')
@@ -61,7 +62,7 @@ Deno.serve(async (req) => {
   const wh = new Webhook(base64_secret);
   try {
     const { user, sms } = wh.verify(payload, headers);
-    const messageBody = `Your OTP is: ${sms.OTP} <#> Your code: ${APP_HASH}`;
+    const messageBody = `Your OTP is: ${sms.otp} <#> Your code: ${APP_HASH}`;
     const response = await sendTextMessage(
       messageBody,
       accountSid,
@@ -69,7 +70,7 @@ Deno.serve(async (req) => {
       fromNumber,
       user.phone,
     );
-    if (response.status !== 200) {
+    if (response.status !== "queued") {
             return new Response(JSON.stringify({
                 error: `Failed to send SMS, Error Code: ${response.code} ${response.message} ${response.more_info}`
             }), { status: response.status, headers: { "Content-Type": "application/json" } });
@@ -87,3 +88,16 @@ Deno.serve(async (req) => {
       data,
   )
 })
+
+/* To invoke locally:
+
+   1. Run `supabase start` (see: https://supabase.com/docs/reference/cli/supabase-start)
+   2. Make an HTTP request:
+
+   curl -i --location --request POST 'http://127.0.0.1:54321/functions/v1/sms_sender' \
+   --header 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0' \
+   --header 'Content-Type: application/json' \
+   --data '{"name":"Functions"}'
+
+ */
+
