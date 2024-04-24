@@ -297,8 +297,9 @@ function VariableView({ variable, className }: { variable: Variable; className?:
   if (stateSummary === 'loggedIn.selectedProject.dataSuccess') {
     switch (variable) {
       case 'url':
-        variableValue = `${apiData?.autoApiService.protocol || 'https'}://${apiData?.autoApiService
-          .endpoint}`
+        variableValue = `${apiData?.autoApiService.protocol || 'https'}://${
+          apiData?.autoApiService.endpoint
+        }`
         break
       case 'anonKey':
         variableValue = apiData?.autoApiService.defaultApiKey

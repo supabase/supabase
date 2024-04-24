@@ -39,7 +39,7 @@ export async function constructHeaders(
 /**
  * [Charis] A bunch of ts-ignore here because there's soemthing on with the
  * type inference, where I can't get it to both:
- * 
+ *
  * - Be happy with the passed init argument
  * - Properly infer the types of the fetch responses, as intended
  */

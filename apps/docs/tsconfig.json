@@ -33,7 +33,7 @@
     "**/*.ts",
     "**/*.tsx",
     "pages/guides/append-test.js",
-    "jest.config.mjs",
+    "jest.config.mjs"
   ],
   "exclude": ["node_modules"]
 }

@@ -132,7 +132,9 @@ export async function fetchSources() {
       ...partnerIntegrationSources,
       ...guideSources,
     ])
-  ).flat().filter(Boolean)
+  )
+    .flat()
+    .filter(Boolean)
 
   return sources
 }
