@@ -1,5 +1,5 @@
 import { Badge } from 'ui/src/components/shadcn/ui/badge'
-import { components } from 'shared-types/types/api'
+import { components } from 'shared-types'
 import { cn } from 'ui/src/lib/utils'
 
 interface ComputeBadgeProps extends React.ComponentProps<typeof Badge> {
