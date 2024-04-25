@@ -78,7 +78,17 @@ const HeaderPathEdit = ({ loading, isSearching, breadcrumbs, togglePathEdit }: a
   )
 }
 
-const HeaderBreadcrumbs = ({ loading, isSearching, breadcrumbs, selectBreadcrumb }: any) => {
+const HeaderBreadcrumbs = ({
+  loading,
+  isSearching,
+  breadcrumbs,
+  selectBreadcrumb,
+}: {
+  loading: { isLoading: boolean; message: string }
+  isSearching: boolean
+  breadcrumbs: string[]
+  selectBreadcrumb: (i: number) => void
+}) => {
   // Max 5 crumbs, otherwise replace middle segment with ellipsis and only
   // have the first 2 and last 2 crumbs visible
   const ellipsis = '...'
@@ -106,7 +116,7 @@ const HeaderBreadcrumbs = ({ loading, isSearching, breadcrumbs, selectBreadcrumb
     </div>
   ) : (
     <div className={`ml-3 flex items-center ${isSearching && 'max-w-[140px] overflow-x-auto'}`}>
-      {formattedBreadcrumbs.map((crumb: any, idx: number) => (
+      {formattedBreadcrumbs.map((crumb, idx: number) => (
         <div className="flex items-center" key={crumb.name}>
           {idx !== 0 && <IconChevronRight size={10} strokeWidth={2} className="mx-3" />}
           <p
@@ -169,7 +179,7 @@ const FileExplorerHeader = ({
     selectedBucket,
   } = storageExplorerStore
 
-  const breadcrumbs = columns.map((column: any) => column.name)
+  const breadcrumbs = columns.map((column) => column.name)
   const backDisabled = columns.length <= 1
   const canUpdateStorage = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
@@ -225,7 +235,7 @@ const FileExplorerHeader = ({
     onSetPathByString(compact(pathString.split('/')))
   }
 
-  const onSetPathByString = async (paths: any[]) => {
+  const onSetPathByString = async (paths: string[]) => {
     if (paths.length === 0) {
       popColumnAtIndex(0)
       clearOpenedFolders()

@@ -16,6 +16,7 @@ import {
   StorageColumn,
   StorageItem,
   StorageItemMetadata,
+  StorageItemWithColumn,
 } from 'components/to-be-cleaned/Storage/Storage.types'
 import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 import { ToastLoader } from 'components/ui/ToastLoader'
@@ -64,12 +65,10 @@ class StorageExplorerStore {
   selectedBucket: Bucket = {} as Bucket
   columns: StorageColumn[] = []
   openedFolders: StorageItem[] = []
-  selectedItems: (StorageItem & { columnIndex: number })[] = []
-  selectedItemsToDelete: (StorageItem & { columnIndex: number })[] = []
-  selectedItemsToMove: (StorageItem & { columnIndex: number })[] = []
-  selectedFilePreview:
-    | (StorageItem & { columnIndex: number } & { previewUrl: string | undefined })
-    | null = null
+  selectedItems: StorageItemWithColumn[] = []
+  selectedItemsToDelete: StorageItemWithColumn[] = []
+  selectedItemsToMove: StorageItemWithColumn[] = []
+  selectedFilePreview: (StorageItemWithColumn & { previewUrl: string | undefined }) | null = null
   selectedFileCustomExpiry: StorageItem | undefined = undefined
 
   DEFAULT_OPTIONS = {
@@ -259,7 +258,7 @@ class StorageExplorerStore {
     this.openedFolders = []
   }
 
-  setSelectedItems = (items: (StorageItem & { columnIndex: number })[]) => {
+  setSelectedItems = (items: StorageItemWithColumn[]) => {
     this.selectedItems = items
   }
 
@@ -271,7 +270,7 @@ class StorageExplorerStore {
     }
   }
 
-  setSelectedItemsToDelete = (items: (StorageItem & { columnIndex: number })[]) => {
+  setSelectedItemsToDelete = (items: StorageItemWithColumn[]) => {
     this.selectedItemsToDelete = items
   }
 
@@ -279,7 +278,7 @@ class StorageExplorerStore {
     this.selectedItemsToDelete = []
   }
 
-  setSelectedItemsToMove = (items: (StorageItem & { columnIndex: number })[]) => {
+  setSelectedItemsToMove = (items: StorageItemWithColumn[]) => {
     this.selectedItemsToMove = items
   }
 
@@ -339,7 +338,7 @@ class StorageExplorerStore {
     }
   }
 
-  setFilePreview = async (file: StorageItem & { columnIndex: number }) => {
+  setFilePreview = async (file: StorageItemWithColumn) => {
     const size = file.metadata?.size
     const mimeType = file.metadata?.mimetype
 
@@ -799,7 +798,7 @@ class StorageExplorerStore {
 
   // the method accepts either files with column index or with prefix.
   deleteFiles = async (
-    files: (StorageItem & { columnIndex: number; prefix?: string })[],
+    files: (StorageItemWithColumn & { prefix?: string })[],
     isDeleteFolder = false
   ) => {
     this.closeFilePreview()
@@ -879,7 +878,7 @@ class StorageExplorerStore {
     }
   }
 
-  downloadFolder = async (folder: StorageItem & { columnIndex: number }) => {
+  downloadFolder = async (folder: StorageItemWithColumn) => {
     let progress = 0
     const toastId = toast.loading('Retrieving files from folder...')
 
@@ -980,7 +979,7 @@ class StorageExplorerStore {
     )
   }
 
-  downloadSelectedFiles = async (files: (StorageItem & { columnIndex: number })[]) => {
+  downloadSelectedFiles = async (files: StorageItemWithColumn[]) => {
     const lowestColumnIndex = Math.min(...files.map((file) => file.columnIndex))
 
     const formattedFilesWithPrefix: any[] = files.map((file) => {
@@ -1045,11 +1044,7 @@ class StorageExplorerStore {
     toast.success(`Successfully downloaded ${downloadedFiles.length} files`, { id: toastId })
   }
 
-  downloadFile = async (
-    file: StorageItem & { columnIndex: number },
-    showToast = true,
-    returnBlob = false
-  ) => {
+  downloadFile = async (file: StorageItemWithColumn, showToast = true, returnBlob = false) => {
     const fileName: string = file.name
     const fileMimeType = file?.metadata?.mimetype ?? undefined
 
@@ -1335,7 +1330,7 @@ class StorageExplorerStore {
     } catch (error) {}
   }
 
-  deleteFolder = async (folder: StorageItem & { columnIndex: number }) => {
+  deleteFolder = async (folder: StorageItemWithColumn) => {
     const isDeleteFolder = true
     const files = await this.getAllItemsAlongFolder(folder)
     await this.deleteFiles(files as any[], isDeleteFolder)
@@ -1357,11 +1352,7 @@ class StorageExplorerStore {
     toast.success(`Successfully deleted ${folder.name}`)
   }
 
-  renameFolder = async (
-    folder: StorageItem & { columnIndex: number },
-    newName: string,
-    columnIndex: number
-  ) => {
+  renameFolder = async (folder: StorageItemWithColumn, newName: string, columnIndex: number) => {
     const originalName = folder.name
     if (originalName === newName) {
       return this.updateRowStatus(originalName, STORAGE_ROW_STATUS.READY, columnIndex)

@@ -8,6 +8,7 @@ import { useCheckPermissions } from 'hooks'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
 import { IconChevronRight, IconClipboard, IconDownload, IconEdit, IconMove, IconTrash2 } from 'ui'
 import { URL_EXPIRY_DURATION } from '../Storage.constants'
+import { StorageItemWithColumn } from '../Storage.types'
 
 interface ItemContextMenuProps {
   id: string
@@ -28,7 +29,7 @@ const ItemContextMenu = ({ id = '', onCopyUrl = noop }: ItemContextMenuProps) =>
   const isPublic = selectedBucket.public
   const canUpdateFiles = useCheckPermissions(PermissionAction.STORAGE_ADMIN_WRITE, '*')
 
-  const onHandleClick = async (event: any, item: any, expiresIn?: number) => {
+  const onHandleClick = async (event: any, item: StorageItemWithColumn, expiresIn?: number) => {
     if (item.isCorrupted) return
     switch (event) {
       case 'copy':

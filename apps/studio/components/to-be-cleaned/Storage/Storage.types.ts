@@ -21,6 +21,8 @@ export interface StorageItem {
   last_accessed_at: string | null
 }
 
+export type StorageItemWithColumn = StorageItem & { columnIndex: number }
+
 export interface StorageItemMetadata {
   cacheControl: string
   contentLength: number
