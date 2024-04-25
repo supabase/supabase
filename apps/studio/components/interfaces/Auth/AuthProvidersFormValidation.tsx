@@ -35,25 +35,24 @@ const PROVIDER_EMAIL = {
       type: 'boolean',
     },
     MAILER_OTP_EXP: {
-      title: 'Mailer OTP Expiration',
+      title: 'Email OTP Expiration',
       type: 'number',
       description: 'Duration before an email otp / link expires.',
       units: 'seconds',
     },
-    PASSWORD_MIN_LENGTH: {
-      title: 'Min password length',
-      description: 'Users will not be able to use a password shorter than this.',
+    MAILER_OTP_LENGTH: {
+      title: 'Email OTP Length',
       type: 'number',
+      description: 'Number of digits in the email OTP',
+      units: 'number',
     },
   },
   validationSchema: object().shape({
-    PASSWORD_MIN_LENGTH: number()
-      .required('A password is required.')
-      .min(6, 'Password length must be at least 6 characters long'),
     MAILER_OTP_EXP: number()
       .min(0, 'Must be more than 0')
       .max(86400, 'Must be no more than 86400')
       .required('This is required'),
+    MAILER_OTP_LENGTH: number().min(6, 'Must be at least 6').max(10, 'Must be no more than 10'),
   }),
   misc: {
     iconKey: 'email-icon2',
