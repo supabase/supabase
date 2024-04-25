@@ -8,12 +8,14 @@ import toast from 'react-hot-toast'
 import { useParams } from 'common'
 import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import AlertError from 'components/ui/AlertError'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 import { useCheckPermissions, useSelectedProject } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { ResponseError } from 'types'
 import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
@@ -41,7 +43,7 @@ const SideBarContent = () => {
   const [selectedQueries, setSelectedQueries] = useState<string[]>([])
 
   const snap = useSqlEditorStateSnapshot()
-  const { isLoading, isSuccess } = useSqlSnippetsQuery(ref, {
+  const { isLoading, isSuccess, isError, error } = useSqlSnippetsQuery(ref, {
     refetchOnWindowFocus: false,
     staleTime: 300, // 5 minutes
     onSuccess(data) {
@@ -195,37 +197,43 @@ const SideBarContent = () => {
   return (
     <>
       <div className="mt-6">
-        {isLoading ? (
-          <InnerSideBarShimmeringLoaders />
-        ) : isSuccess ? (
-          <div>
-            <div className="flex flex-col gap-4">
-              <Button
-                type="default"
-                className="justify-start mx-4"
-                onClick={() => handleNewQuery()}
-                icon={<Plus className="text-foreground-muted" strokeWidth={1} size={14} />}
-              >
-                New query
-              </Button>
+        <div className="flex flex-col gap-4">
+          <Button
+            type="default"
+            className="justify-start mx-4"
+            onClick={() => handleNewQuery()}
+            icon={<Plus className="text-foreground-muted" strokeWidth={1} size={14} />}
+          >
+            New query
+          </Button>
 
-              <div className="px-2">
-                <InnerSideMenuItem
-                  title="Templates"
-                  isActive={router.asPath === `/project/${ref}/sql/templates`}
-                  href={`/project/${ref}/sql/templates`}
-                >
-                  Templates
-                </InnerSideMenuItem>
-                <InnerSideMenuItem
-                  title="Quickstarts"
-                  isActive={router.asPath === `/project/${ref}/sql/quickstarts`}
-                  href={`/project/${ref}/sql/quickstarts`}
-                >
-                  Quickstarts
-                </InnerSideMenuItem>
-              </div>
+          <div className="px-2">
+            <InnerSideMenuItem
+              title="Templates"
+              isActive={router.asPath === `/project/${ref}/sql/templates`}
+              href={`/project/${ref}/sql/templates`}
+            >
+              Templates
+            </InnerSideMenuItem>
+            <InnerSideMenuItem
+              title="Quickstarts"
+              isActive={router.asPath === `/project/${ref}/sql/quickstarts`}
+              href={`/project/${ref}/sql/quickstarts`}
+            >
+              Quickstarts
+            </InnerSideMenuItem>
+          </div>
 
+          {isLoading && <InnerSideBarShimmeringLoaders />}
+
+          {isError && (
+            <div className="px-4">
+              <AlertError error={error as ResponseError} subject="Failed to load SQL snippets" />
+            </div>
+          )}
+
+          {isSuccess && (
+            <>
               {snippets.length > 0 && (
                 <InnerSideBarFilters className="mx-2">
                   <InnerSideBarFilterSearchInput
@@ -333,9 +341,9 @@ const SideBarContent = () => {
                   </InnerSideMenuCollapsibleContent>
                 </InnerSideMenuCollapsible>
               )}
-            </div>
-          </div>
-        ) : null}
+            </>
+          )}
+        </div>
       </div>
 
       <ConfirmationModal
