@@ -1,6 +1,6 @@
 import { SupabaseClient, createClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
-import { chunk, compact, find, findIndex, has, isEqual, some, uniq, uniqBy } from 'lodash'
+import { chunk, compact, find, findIndex, has, isEqual, isObject, some, uniq, uniqBy } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import toast from 'react-hot-toast'
 import { toast as UiToast } from 'ui'
@@ -119,11 +119,10 @@ class StorageExplorerStore {
         auth: {
           persistSession: false,
           autoRefreshToken: false,
-          multiTab: false,
           detectSessionInUrl: false,
-          localStorage: {
+          storage: {
             getItem: (key) => {
-              return undefined
+              return null
             },
             setItem: (key, value) => {},
             removeItem: (key) => {},
@@ -173,7 +172,7 @@ class StorageExplorerStore {
   }
 
   abortApiCalls = () => {
-    this.abortController.abort()
+    this.abortController?.abort()
     this.abortController = new AbortController()
   }
 
@@ -354,7 +353,7 @@ class StorageExplorerStore {
       const isExpired = existsInCache ? fetchedAt + expiresIn * 1000 < Date.now() : true
 
       if (!isExpired) {
-        this.selectedFilePreview = { ...file, previewUrl: cachedPreview.url }
+        this.selectedFilePreview = { ...file, previewUrl: cachedPreview?.url }
       } else {
         const previewUrl = await this.fetchFilePreview(file.name)
         const formattedPreviewUrl = this.selectedBucket.public
@@ -390,7 +389,7 @@ class StorageExplorerStore {
     } else {
       const signedUrl = await this.fetchFilePreview(file.name, expiresIn)
       try {
-        const formattedUrl = new URL(signedUrl)
+        const formattedUrl = new URL(signedUrl!)
         formattedUrl.searchParams.set('t', new Date().toISOString())
         const fileUrl = formattedUrl.toString()
 
@@ -610,7 +609,7 @@ class StorageExplorerStore {
       } else {
         this.addTempRow(
           STORAGE_ROW_TYPES.FILE,
-          fileName,
+          fileName!,
           STORAGE_ROW_STATUS.LOADING,
           derivedColumnIndex,
           metadata
@@ -879,7 +878,7 @@ class StorageExplorerStore {
       <ToastLoader
         progress={0}
         message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
-        desription={STORAGE_PROGRESS_INFO_TEXT}
+        description={STORAGE_PROGRESS_INFO_TEXT}
       />,
       { id: toastId }
     )
@@ -887,7 +886,14 @@ class StorageExplorerStore {
     const promises = files.map((file) => {
       const fileMimeType = file.metadata?.mimetype ?? null
       return () => {
-        return new Promise(async (resolve) => {
+        return new Promise<
+          | {
+              name: string
+              prefix: string
+              blob: Blob
+            }
+          | boolean
+        >(async (resolve) => {
           try {
             const data = await downloadBucketObject({
               projectRef: this.projectRef,
@@ -911,19 +917,28 @@ class StorageExplorerStore {
     })
 
     const batchedPromises = chunk(promises, 10)
-    const downloadedFiles = await batchedPromises.reduce(async (previousPromise, nextBatch) => {
-      const previousResults = await previousPromise
-      const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
-      toast.loading(
-        <ToastLoader
-          progress={progress * 100}
-          message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
-          desription={STORAGE_PROGRESS_INFO_TEXT}
-        />,
-        { id: toastId }
-      )
-      return (previousResults ?? []).concat(batchResults.map((x) => x.value).filter(Boolean))
-    }, Promise.resolve())
+    const downloadedFiles = await batchedPromises.reduce(
+      async (previousPromise, nextBatch) => {
+        const previousResults = await previousPromise
+        const batchResults = await Promise.allSettled(nextBatch.map((batch) => batch()))
+        toast.loading(
+          <ToastLoader
+            progress={progress * 100}
+            message={`Downloading ${files.length} file${files.length > 1 ? 's' : ''}...`}
+            description={STORAGE_PROGRESS_INFO_TEXT}
+          />,
+          { id: toastId }
+        )
+        return previousResults.concat(batchResults.map((x: any) => x.value).filter(Boolean))
+      },
+      Promise.resolve<
+        {
+          name: string
+          prefix: string
+          blob: Blob
+        }[]
+      >([])
+    )
 
     const zipFileWriter = new BlobWriter('application/zip')
     const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
@@ -942,7 +957,7 @@ class StorageExplorerStore {
     link.setAttribute('download', `${folder.name}.zip`)
     document.body.appendChild(link)
     link.click()
-    link.parentNode.removeChild(link)
+    link.parentNode?.removeChild(link)
 
     toast.success(
       downloadedFiles.length === files.length
@@ -957,7 +972,7 @@ class StorageExplorerStore {
   downloadSelectedFiles = async (files) => {
     const lowestColumnIndex = Math.min(...files.map((file) => file.columnIndex))
 
-    const formattedFilesWithPrefix = files.map((file) => {
+    const formattedFilesWithPrefix: any[] = files.map((file) => {
       const { name, columnIndex } = file
       const pathToFile = this.openedFolders
         .slice(lowestColumnIndex, columnIndex)
@@ -976,10 +991,13 @@ class StorageExplorerStore {
 
     const promises = formattedFilesWithPrefix.map((file) => {
       return () => {
-        return new Promise(async (resolve) => {
+        return new Promise<{ name: string; blob: Blob } | boolean>(async (resolve) => {
           const data = await this.downloadFile(file, showIndividualToast, returnBlob)
           progress = progress + 1 / formattedFilesWithPrefix.length
-          resolve({ ...data, name: file.formattedPathToFile })
+          if (isObject(data)) {
+            resolve({ ...data, name: file.formattedPathToFile })
+          }
+          resolve(false)
         })
       }
     })
@@ -996,8 +1014,8 @@ class StorageExplorerStore {
         />,
         { id: toastId }
       )
-      return (previousResults ?? []).concat(batchResults.map((x) => x.value).filter(Boolean))
-    }, Promise.resolve())
+      return previousResults.concat(batchResults.map((x: any) => x.value).filter(Boolean))
+    }, Promise.resolve<{ name: string; blob: Blob }[]>([]))
 
     const zipFileWriter = new BlobWriter('application/zip')
     const zipWriter = new ZipWriter(zipFileWriter, { bufferedWrite: true })
@@ -1011,13 +1029,13 @@ class StorageExplorerStore {
     link.setAttribute('download', `supabase-files.zip`)
     document.body.appendChild(link)
     link.click()
-    link.parentNode.removeChild(link)
+    link.parentNode?.removeChild(link)
 
     toast.success(`Successfully downloaded ${downloadedFiles.length} files`, { id: toastId })
   }
 
   downloadFile = async (file, showToast = true, returnBlob = false) => {
-    const fileName = file.name
+    const fileName: string = file.name
     const fileMimeType = file?.metadata?.mimetype ?? null
 
     const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
@@ -1045,7 +1063,7 @@ class StorageExplorerStore {
       link.setAttribute('download', `${fileName}`)
       document.body.appendChild(link)
       link.click()
-      link.parentNode.removeChild(link)
+      link.parentNode?.removeChild(link)
       window.URL.revokeObjectURL(blob)
       if (toastId) {
         toast.success(`Downloading ${fileName}`, { id: toastId })
@@ -1355,7 +1373,7 @@ class StorageExplorerStore {
         .concat(pathSegments.slice(columnIndex + 1))
         .join('/')
       return () => {
-        return new Promise(async (resolve) => {
+        return new Promise<void>(async (resolve) => {
           progress = progress + 1 / files.length
           try {
             await moveStorageObject({
@@ -1380,7 +1398,7 @@ class StorageExplorerStore {
       await batchedPromises.reduce(async (previousPromise, nextBatch) => {
         await previousPromise
         await Promise.all(nextBatch.map((batch) => batch()))
-        toast.loader(
+        toast.loading(
           <ToastLoader
             progress={progress * 100}
             message={`Renaming folder to ${newName}`}
@@ -1438,7 +1456,7 @@ class StorageExplorerStore {
       offset: OFFSET,
       sortBy: { column: this.sortBy, order: this.sortByOrder },
     }
-    let folderContents = []
+    let folderContents: StorageObject[] = []
 
     for (;;) {
       try {
@@ -1567,7 +1585,7 @@ class StorageExplorerStore {
     this.columns = updatedColumns
   }
 
-  setSelectedItemToRename = (file) => {
+  setSelectedItemToRename = (file: { name: string; columnIndex: number }) => {
     this.updateRowStatus(file.name, STORAGE_ROW_STATUS.EDITING, file.columnIndex)
   }
 
