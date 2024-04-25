@@ -1,11 +1,12 @@
-import { has } from 'lodash'
-import { useState, useEffect, useRef } from 'react'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { has } from 'lodash'
+import { useEffect, useRef, useState } from 'react'
 import { STORAGE_ROW_TYPES } from '../Storage.constants'
+import { StorageItem } from '../Storage.types'
 import { RowIcon } from './FileExplorerRow'
 
 export interface FileExplorerRowEditingProps {
-  item: any
+  item: StorageItem
   view: string
   columnIndex: number
 }

@@ -33,7 +33,7 @@ const StorageLayout = ({ title, children }: StorageLayoutProps) => {
 
     if (apiService.endpoint) {
       storageExplorerStore.initStore(
-        projectRef,
+        projectRef!,
         apiService.endpoint,
         apiService.serviceApiKey,
         apiService.protocol

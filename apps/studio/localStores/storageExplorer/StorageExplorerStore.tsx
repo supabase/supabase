@@ -1,6 +1,6 @@
 import { SupabaseClient, createClient } from '@supabase/supabase-js'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
-import { chunk, compact, find, findIndex, has, isEqual, isObject, some, uniq, uniqBy } from 'lodash'
+import { chunk, compact, find, findIndex, has, isEqual, isObject, uniq, uniqBy } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import toast from 'react-hot-toast'
 import { toast as UiToast } from 'ui'
@@ -12,6 +12,11 @@ import {
   STORAGE_SORT_BY_ORDER,
   STORAGE_VIEWS,
 } from 'components/to-be-cleaned/Storage/Storage.constants'
+import {
+  StorageColumn,
+  StorageItem,
+  StorageItemMetadata,
+} from 'components/to-be-cleaned/Storage/Storage.types'
 import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 import { ToastLoader } from 'components/ui/ToastLoader'
 import { configKeys } from 'data/config/keys'
@@ -27,7 +32,7 @@ import { moveStorageObject } from 'data/storage/object-move-mutation'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
-type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string | null }
+type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string }
 
 /**
  * This is a preferred method rather than React Context and useStorageExplorerStore().
@@ -57,13 +62,15 @@ class StorageExplorerStore {
   buckets: Bucket[] = []
   // selectedBucket will get initialized with a bucket before using
   selectedBucket: Bucket = {} as Bucket
-  columns = []
-  openedFolders = []
-  selectedItems = []
-  selectedItemsToDelete = []
-  selectedItemsToMove = []
-  selectedFilePreview = {}
-  selectedFileCustomExpiry = undefined
+  columns: StorageColumn[] = []
+  openedFolders: StorageItem[] = []
+  selectedItems: (StorageItem & { columnIndex: number })[] = []
+  selectedItemsToDelete: (StorageItem & { columnIndex: number })[] = []
+  selectedItemsToMove: (StorageItem & { columnIndex: number })[] = []
+  selectedFilePreview:
+    | (StorageItem & { columnIndex: number } & { previewUrl: string | undefined })
+    | null = null
+  selectedFileCustomExpiry: StorageItem | undefined = undefined
 
   DEFAULT_OPTIONS = {
     limit: LIMIT,
@@ -217,7 +224,7 @@ class StorageExplorerStore {
     this.columns = []
   }
 
-  pushColumnAtIndex = (column, index: number) => {
+  pushColumnAtIndex = (column: StorageColumn, index: number) => {
     this.columns = this.columns.slice(0, index + 1).concat([column])
   }
 
@@ -236,7 +243,7 @@ class StorageExplorerStore {
     })
   }
 
-  pushOpenedFolderAtIndex = (folder, index: number) => {
+  pushOpenedFolderAtIndex = (folder: StorageItem, index: number) => {
     this.openedFolders = this.openedFolders.slice(0, index).concat(folder)
   }
 
@@ -252,7 +259,7 @@ class StorageExplorerStore {
     this.openedFolders = []
   }
 
-  setSelectedItems = (items) => {
+  setSelectedItems = (items: (StorageItem & { columnIndex: number })[]) => {
     this.selectedItems = items
   }
 
@@ -264,7 +271,7 @@ class StorageExplorerStore {
     }
   }
 
-  setSelectedItemsToDelete = (items) => {
+  setSelectedItemsToDelete = (items: (StorageItem & { columnIndex: number })[]) => {
     this.selectedItemsToDelete = items
   }
 
@@ -272,7 +279,7 @@ class StorageExplorerStore {
     this.selectedItemsToDelete = []
   }
 
-  setSelectedItemsToMove = (items) => {
+  setSelectedItemsToMove = (items: (StorageItem & { columnIndex: number })[]) => {
     this.selectedItemsToMove = items
   }
 
@@ -280,7 +287,7 @@ class StorageExplorerStore {
     this.selectedItemsToMove = []
   }
 
-  setSelectedFileCustomExpiry = (item) => {
+  setSelectedFileCustomExpiry = (item: StorageItem | undefined) => {
     this.selectedFileCustomExpiry = item
   }
 
@@ -289,7 +296,7 @@ class StorageExplorerStore {
     const folderName = 'Untitled folder'
     const folderType = STORAGE_ROW_TYPES.FOLDER
     const columnIdx = columnIndex === -1 ? this.getLatestColumnIndex() : columnIndex
-    this.addTempRow(folderType, folderName, STORAGE_ROW_STATUS.EDITING, columnIdx, {}, isPrepend)
+    this.addTempRow(folderType, folderName, STORAGE_ROW_STATUS.EDITING, columnIdx, null, isPrepend)
   }
 
   addNewFolder = async (folderName: string, columnIndex: number) => {
@@ -332,7 +339,7 @@ class StorageExplorerStore {
     }
   }
 
-  setFilePreview = async (file) => {
+  setFilePreview = async (file: StorageItem & { columnIndex: number }) => {
     const size = file.metadata?.size
     const mimeType = file.metadata?.mimetype
 
@@ -345,7 +352,7 @@ class StorageExplorerStore {
 
       // Either retrieve file preview from FE cache or retrieve signed url
       this.selectedFilePreview = { ...file, previewUrl: 'loading' }
-      const cachedPreview = find(this.filePreviewCache, { id: file.id })
+      const cachedPreview = this.filePreviewCache.find((cache) => cache.id === file.id)
 
       const fetchedAt = cachedPreview?.fetchedAt ?? null
       const expiresIn = cachedPreview?.expiresIn ?? null
@@ -362,7 +369,7 @@ class StorageExplorerStore {
         this.selectedFilePreview = { ...file, previewUrl: formattedPreviewUrl }
 
         const fileCache: CachedFile = {
-          id: file.id,
+          id: file.id as string,
           url: previewUrl,
           expiresIn: DEFAULT_EXPIRY,
           fetchedAt: Date.now(),
@@ -374,16 +381,16 @@ class StorageExplorerStore {
         }
       }
     } else {
-      this.selectedFilePreview = { ...file, previewUrl: null }
+      this.selectedFilePreview = { ...file, previewUrl: undefined }
     }
   }
 
   closeFilePreview = () => {
-    this.selectedFilePreview = {}
+    this.selectedFilePreview = null
   }
 
-  getFileUrl = async (file, expiresIn = 0) => {
-    const filePreview = find(this.filePreviewCache, { id: file.id })
+  getFileUrl = async (file: StorageItem, expiresIn = 0) => {
+    const filePreview = this.filePreviewCache.find((cache) => cache.id === file.id)
     if (filePreview !== undefined && expiresIn === 0) {
       return filePreview.url
     } else {
@@ -395,7 +402,7 @@ class StorageExplorerStore {
 
         // Also save it to cache
         const fileCache: CachedFile = {
-          id: file.id,
+          id: file.id as string,
           url: fileUrl,
           expiresIn: DEFAULT_EXPIRY,
           fetchedAt: Date.now(),
@@ -584,18 +591,18 @@ class StorageExplorerStore {
     // Upload files in batches
     const promises = formattedFilesToUpload.map((file) => {
       const fileOptions = { cacheControl: '3600' }
-      const metadata = { mimetype: file.type, size: file.size }
+      const metadata = { mimetype: file.type, size: file.size } as StorageItemMetadata
 
       const isWithinFolder = (file?.path ?? '').split('/').length > 1
       const fileName = !isWithinFolder
         ? this.sanitizeNameForDuplicateInColumn(file.name, autofix)
         : file.name
-      const formattedFileName = has(file, ['path']) && isWithinFolder ? file.path : fileName
+      const formattedFileName = file.path && isWithinFolder ? file.path : fileName
       const formattedPathToFile =
-        pathToFile.length > 0 ? `${pathToFile}/${formattedFileName}` : formattedFileName
+        pathToFile.length > 0 ? `${pathToFile}/${formattedFileName}` : (formattedFileName as string)
 
       if (isWithinFolder) {
-        const topLevelFolder = file.path.split('/')[0]
+        const topLevelFolder = file.path?.split('/')[0] || ''
         if (!uploadedTopLevelFolders.includes(topLevelFolder)) {
           this.addTempRow(
             STORAGE_ROW_TYPES.FOLDER,
@@ -695,7 +702,7 @@ class StorageExplorerStore {
 
     const t2 = new Date()
     console.log(
-      `Total time taken for ${formattedFilesToUpload.length} files: ${(t2 - t1) / 1000} seconds`
+      `Total time taken for ${formattedFilesToUpload.length} files: ${((t2 as any) - (t1 as any)) / 1000} seconds`
     )
   }
 
@@ -758,7 +765,7 @@ class StorageExplorerStore {
     this.clearSelectedItemsToMove()
   }
 
-  fetchFilePreview = async (fileName: string, expiresIn: number = 0): Promise<string | null> => {
+  fetchFilePreview = async (fileName: string, expiresIn: number = 0) => {
     const includeBucket = false
     const pathToFile = this.getPathAlongOpenedFolders(includeBucket)
     const formattedPathToFile = pathToFile.length > 0 ? `${pathToFile}/${fileName}` : fileName
@@ -787,16 +794,20 @@ class StorageExplorerStore {
         toast.error(`Failed to fetch signed url preview: ${error.message}`)
       }
     }
-    return null
+    return ''
   }
 
-  deleteFiles = async (files, isDeleteFolder = false) => {
+  // the method accepts either files with column index or with prefix.
+  deleteFiles = async (
+    files: (StorageItem & { columnIndex: number; prefix?: string })[],
+    isDeleteFolder = false
+  ) => {
     this.closeFilePreview()
     let progress = 0
 
     // If every file has the 'prefix' property, then just construct the prefix
     // directly (from delete folder). Otherwise go by the opened folders.
-    const prefixes = !some(files, 'prefix')
+    const prefixes = !files.some((f) => f.prefix)
       ? files.map((file) => {
           const { name, columnIndex } = file
           const pathToFile = this.openedFolders
@@ -868,7 +879,7 @@ class StorageExplorerStore {
     }
   }
 
-  downloadFolder = async (folder) => {
+  downloadFolder = async (folder: StorageItem & { columnIndex: number }) => {
     let progress = 0
     const toastId = toast.loading('Retrieving files from folder...')
 
@@ -969,7 +980,7 @@ class StorageExplorerStore {
     )
   }
 
-  downloadSelectedFiles = async (files) => {
+  downloadSelectedFiles = async (files: (StorageItem & { columnIndex: number })[]) => {
     const lowestColumnIndex = Math.min(...files.map((file) => file.columnIndex))
 
     const formattedFilesWithPrefix: any[] = files.map((file) => {
@@ -1034,9 +1045,13 @@ class StorageExplorerStore {
     toast.success(`Successfully downloaded ${downloadedFiles.length} files`, { id: toastId })
   }
 
-  downloadFile = async (file, showToast = true, returnBlob = false) => {
+  downloadFile = async (
+    file: StorageItem & { columnIndex: number },
+    showToast = true,
+    returnBlob = false
+  ) => {
     const fileName: string = file.name
-    const fileMimeType = file?.metadata?.mimetype ?? null
+    const fileMimeType = file?.metadata?.mimetype ?? undefined
 
     const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
 
@@ -1077,7 +1092,7 @@ class StorageExplorerStore {
     }
   }
 
-  renameFile = async (file, newName: string, columnIndex: number) => {
+  renameFile = async (file: StorageItem, newName: string, columnIndex: number) => {
     const originalName = file.name
     if (originalName === newName || newName.length === 0) {
       this.updateRowStatus(originalName, STORAGE_ROW_STATUS.READY, columnIndex)
@@ -1105,8 +1120,8 @@ class StorageExplorerStore {
         )
         this.filePreviewCache = updatedFilePreviewCache
 
-        if (this.selectedFilePreview.name === originalName) {
-          const { previewUrl, ...fileData } = file
+        if (this.selectedFilePreview?.name === originalName) {
+          const { previewUrl, ...fileData } = file as any
           this.setFilePreview({ ...fileData, name: newName })
         }
 
@@ -1120,7 +1135,7 @@ class StorageExplorerStore {
   /* Folders CRUD */
 
   fetchFolderContents = async (
-    folderId: string,
+    folderId: string | null,
     folderName: string,
     index: number,
     searchString: string = ''
@@ -1163,6 +1178,7 @@ class StorageExplorerStore {
         {
           id: folderId || folderName,
           name: folderName,
+          status: STORAGE_ROW_STATUS.READY,
           items: formattedItems,
           hasMoreItems: formattedItems.length === LIMIT,
           isLoadingMoreItems: false,
@@ -1176,7 +1192,11 @@ class StorageExplorerStore {
     }
   }
 
-  fetchMoreFolderContents = async (index: number, column, searchString: string = '') => {
+  fetchMoreFolderContents = async (
+    index: number,
+    column: StorageColumn,
+    searchString: string = ''
+  ) => {
     this.setColumnIsLoadingMore(index)
 
     const prefix = this.openedFolders.map((folder) => folder.name).join('/')
@@ -1262,6 +1282,7 @@ class StorageExplorerStore {
       const formattedItems = this.formatFolderItems(folderItems)
       return {
         id: null,
+        status: STORAGE_ROW_STATUS.READY,
         name: idx === 0 ? this.selectedBucket.name : pathsWithEmptyPrefix[idx],
         items: formattedItems,
         hasMoreItems: formattedItems.length === LIMIT,
@@ -1273,7 +1294,7 @@ class StorageExplorerStore {
     this.columns = formattedFolders
 
     // Update openedFolders as well
-    const updatedOpenedFolders = paths.map((path, idx) => {
+    const updatedOpenedFolders: StorageItem[] = paths.map((path, idx) => {
       const folderInfo = find(formattedFolders[idx].items, { name: path })
       // Folder doesnt exist, FE just scaffolds a "fake" folder
       if (!folderInfo) {
@@ -1282,6 +1303,11 @@ class StorageExplorerStore {
           name: path,
           type: STORAGE_ROW_TYPES.FOLDER,
           status: STORAGE_ROW_STATUS.READY,
+          metadata: null,
+          isCorrupted: false,
+          created_at: null,
+          updated_at: null,
+          last_accessed_at: null,
         }
       }
       return folderInfo
@@ -1309,10 +1335,10 @@ class StorageExplorerStore {
     } catch (error) {}
   }
 
-  deleteFolder = async (folder) => {
+  deleteFolder = async (folder: StorageItem & { columnIndex: number }) => {
     const isDeleteFolder = true
     const files = await this.getAllItemsAlongFolder(folder)
-    await this.deleteFiles(files, isDeleteFolder)
+    await this.deleteFiles(files as any[], isDeleteFolder)
 
     this.popColumnAtIndex(folder.columnIndex)
     this.popOpenedFoldersAtIndex(folder.columnIndex - 1)
@@ -1331,7 +1357,11 @@ class StorageExplorerStore {
     toast.success(`Successfully deleted ${folder.name}`)
   }
 
-  renameFolder = async (folder, newName: string, columnIndex: number) => {
+  renameFolder = async (
+    folder: StorageItem & { columnIndex: number },
+    newName: string,
+    columnIndex: number
+  ) => {
     const originalName = folder.name
     if (originalName === newName) {
       return this.updateRowStatus(originalName, STORAGE_ROW_STATUS.READY, columnIndex)
@@ -1432,8 +1462,12 @@ class StorageExplorerStore {
     Used specifically for any operation that deals with every file along the folder
     e.g Delete folder, rename folder
   */
-  getAllItemsAlongFolder = async (folder) => {
-    const items = []
+  getAllItemsAlongFolder = async (folder: {
+    name: string
+    columnIndex: number
+    prefix?: string
+  }): Promise<(StorageObject & { prefix: string })[]> => {
+    const items: (StorageObject & { prefix: string })[] = []
 
     let formattedPathToFolder = ''
     const { name, columnIndex, prefix } = folder
@@ -1481,7 +1515,7 @@ class StorageExplorerStore {
 
     const subFolderContents = await Promise.all(
       subfolders.map((folder) =>
-        this.getAllItemsAlongFolder({ ...folder, prefix: formattedPathToFolder })
+        this.getAllItemsAlongFolder({ ...folder, columnIndex: 0, prefix: formattedPathToFolder })
       )
     )
     subFolderContents.map((subfolderContent) => {
@@ -1527,7 +1561,7 @@ class StorageExplorerStore {
     return name
   }
 
-  formatFolderItems = (items: StorageObject[] = []) => {
+  formatFolderItems = (items: StorageObject[] = []): StorageItem[] => {
     const formattedItems =
       (items ?? [])
         ?.filter((item) => item.name !== EMPTY_FOLDER_PLACEHOLDER_FILE_NAME)
@@ -1547,7 +1581,13 @@ class StorageExplorerStore {
               ? STORAGE_ROW_STATUS.LOADING
               : STORAGE_ROW_STATUS.READY
 
-          const itemObj = { ...item, type, status, isCorrupted }
+          const itemObj = {
+            ...item,
+            metadata: item.metadata as any as StorageItemMetadata,
+            type,
+            status,
+            isCorrupted,
+          }
           return itemObj
         }) ?? []
     return formattedItems
@@ -1558,12 +1598,12 @@ class StorageExplorerStore {
     name: string,
     status: STORAGE_ROW_STATUS,
     columnIndex: number,
-    metadata = {},
+    metadata: StorageItemMetadata | null,
     isPrepend: boolean = false
   ) => {
     const updatedColumns = this.columns.map((column, idx) => {
       if (idx === columnIndex) {
-        const tempRow = { type, name, status, metadata }
+        const tempRow = { type, name, status, metadata } as StorageItem
         const updatedItems = isPrepend
           ? [tempRow].concat(column.items)
           : column.items.concat([tempRow])
