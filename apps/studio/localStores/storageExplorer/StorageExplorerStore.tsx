@@ -1070,7 +1070,7 @@ class StorageExplorerStore {
         }
 
         await this.refetchAllOpenedFolders()
-      } catch (error) {
+      } catch (error: any) {
         toast.error(`Failed to rename file: ${error.message}`)
       }
     }
@@ -1162,7 +1162,7 @@ class StorageExplorerStore {
       })
     } catch (error: any) {
       if (!error.message.includes('aborted')) {
-        toast.error(`Failed to retrieve folder contents from "${folderName}": ${error.message}`)
+        toast.error(`Failed to retrieve folder contents from "${prefix}": ${error.message}`)
       }
     }
   }
