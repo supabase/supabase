@@ -13,6 +13,7 @@ import {
 } from 'icons'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from './NavigationBar'
 import { Settings, FileText, List } from 'lucide-react'
+import { useFlag } from 'hooks'
 
 export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
   const isProjectBuilding = project?.status === PROJECT_STATUS.COMING_UP
