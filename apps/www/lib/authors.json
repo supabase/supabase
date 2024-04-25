@@ -423,6 +423,14 @@
     "author_image_url": "https://github.com/imor.png"
   },
   {
+    "author_id": "samrose",
+    "author": "Sam Rose",
+    "username": "samrose",
+    "position": "Engineering",
+    "author_url": "https://github.com/samrose",
+    "author_image_url": "https://github.com/samrose.png"
+  },
+  {
     "author_id": "timabdulla",
     "author": "Tim Abdulla",
     "username": "timabdulla",
