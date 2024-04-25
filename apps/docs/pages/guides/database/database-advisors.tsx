@@ -26,30 +26,30 @@ export const branch = 'main'
 export const docsDir = 'docs'
 
 const meta = {
-  title: 'Database Linter',
+  title: 'Performance and Security Advisors',
   subtitle: 'Check your database for performance and security issues',
 }
 
 const editLink = 'https://github.com/supabase/splinter/tree/main/docs'
 
 const markdownIntro = `
-You can use the Database Linter to check your database for issues such as missing indexes and improperly set-up RLS policies.
+You can use the Database Performance and Security Advisors to check your database for issues such as missing indexes and improperly set-up RLS policies.
 
-## Using the linter
+## Using the Advisors
 
-In the dashboard, navigate to [Database Linter](https://supabase.com/dashboard/project/_/database/linter) under Database. The linter runs automatically. You can also manually rerun it after you've resolved issues.
+In the dashboard, navigate to [Security Advisor](https://supabase.com/dashboard/project/_/database/security-advisor) and [Performance Advisor](https://supabase.com/dashboard/project/_/database/performance-advisor) under Database. The advisors run automatically. You can also manually rerun them after you've resolved issues.
 `.trim()
 
 const getBasename = (path: string) => path.split('/').at(-1).replace(/\.md$/, '')
 
-export default function ProjectLinterDocs({
+export default function DatabaseAdvisorDocs({
   intro,
   lints,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
   return (
     <Layout menuId={MenuId.Database} meta={meta} editLink={editLink}>
       <MDXRemote {...intro} components={components} />
-      <Heading tag="h2">Available lints</Heading>
+      <Heading tag="h2">Available checks</Heading>
       <Tabs listClassNames="flex flex-wrap gap-2 [&>button]:!m-0" queryGroup="lint">
         {lints.map((lint) => (
           <Tabs.Panel
