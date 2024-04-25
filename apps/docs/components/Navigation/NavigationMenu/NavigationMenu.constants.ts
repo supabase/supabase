@@ -898,7 +898,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pg-safeupdate',
         },
         {
-          name: 'pgsodium: Encryption Features',
+          name: 'pgsodium (pending deprecation): Encryption Features',
           url: '/guides/database/extensions/pgsodium',
         },
         {
