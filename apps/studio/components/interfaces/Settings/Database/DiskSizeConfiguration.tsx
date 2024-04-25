@@ -80,9 +80,9 @@ const DiskSizeConfiguration = ({ disabled = false }: DiskSizeConfigurationProps)
   const diskSizeValidationSchema = object({
     'new-disk-size': number()
       .required('Please enter a GB amount you want to resize the disk up to.')
-      .moreThan(Number(currentDiskSize ?? 0), `Must be more than ${currentDiskSize} GB`)
+      .min(Number(currentDiskSize ?? 0), `Must be more than ${currentDiskSize} GB`)
       // to do, update with max_disk_volume_size_gb
-      .lessThan(Number(maxDiskSize), 'Must be no more than 200 GB'),
+      .max(Number(maxDiskSize), 'Must not be more than 200 GB'),
   })
 
   return (
@@ -165,7 +165,7 @@ Read more about [disk management](https://supabase.com/docs/guides/platform/data
           <AlertTitle_Shadcn_>
             {projectSubscriptionData?.plan?.id === 'free'
               ? 'Disk size configuration is not available for projects on the Free plan'
-              : 'Disk size configuration is only available when disabling the spend cap.'}
+              : 'Disk size configuration is only available when the spend cap has been disabled'}
           </AlertTitle_Shadcn_>
           <AlertDescription_Shadcn_>
             {projectSubscriptionData?.plan?.id === 'free' ? (
