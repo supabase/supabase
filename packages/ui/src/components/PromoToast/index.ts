@@ -1,3 +1,5 @@
+'use client'
+
 import PromoToast from './PromoToast'
 
 export { PromoToast }
