@@ -6,7 +6,7 @@
     "paths": {
       "~/*": ["./*"],
       "@ui/*": ["./../../packages/ui/src/*"],
-      "@ui-patterns/*": ["./../../packages/ui-patterns/src/*"]
+      "@ui-patterns/*": ["./../../packages/ui-patterns/*"]
     },
     "target": "ES2021",
     "lib": ["dom", "dom.iterable", "esnext"],

@@ -4,7 +4,7 @@
     "paths": {
       "~/*": ["./*"],
       "@ui/*": ["./../../packages/ui/src/*"],
-      "@ui-patterns/*": ["./../../packages/ui-patterns/src/*"]
+      "@ui-patterns/*": ["./../../packages/ui-patterns/*"]
     },
     "downlevelIteration": true,
     "target": "ES2021",
