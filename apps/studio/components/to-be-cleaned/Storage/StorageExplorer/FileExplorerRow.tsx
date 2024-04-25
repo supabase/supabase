@@ -133,7 +133,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
 
   const isPublic = selectedBucket.public
   const itemWithColumnIndex = { ...item, columnIndex }
-  const isSelected = find(selectedItems, item) !== undefined
+  const isSelected = selectedItems.find((i) => i.id === item.id)
   const isOpened =
     openedFolders.length > columnIndex ? isEqual(openedFolders[columnIndex], item) : false
   const isPreviewed = !isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)
