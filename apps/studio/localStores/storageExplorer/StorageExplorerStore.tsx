@@ -22,6 +22,7 @@ import { downloadBucketObject } from 'data/storage/bucket-object-download-mutati
 import { getPublicUrlForBucketObject } from 'data/storage/bucket-object-get-public-url-mutation'
 import { signBucketObject } from 'data/storage/bucket-object-sign-mutation'
 import { StorageObject, listBucketObjects } from 'data/storage/bucket-objects-list-mutation'
+import { Bucket } from 'data/storage/buckets-query'
 import { moveStorageObject } from 'data/storage/object-move-mutation'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
@@ -53,8 +54,9 @@ class StorageExplorerStore {
   view: STORAGE_VIEWS = STORAGE_VIEWS.COLUMNS
   sortBy: STORAGE_SORT_BY = STORAGE_SORT_BY.NAME
   sortByOrder: STORAGE_SORT_BY_ORDER = STORAGE_SORT_BY_ORDER.ASC
-  buckets = []
-  selectedBucket: { id?: string } = {}
+  buckets: Bucket[] = []
+  // selectedBucket will get initialized with a bucket before using
+  selectedBucket: Bucket = {} as Bucket
   columns = []
   openedFolders = []
   selectedItems = []
@@ -185,7 +187,7 @@ class StorageExplorerStore {
     this.loaded = val
   }
 
-  setSelectedBucket = (bucket) => {
+  setSelectedBucket = (bucket: Bucket) => {
     this.selectedBucket = bucket
     this.clearOpenedFolders()
     this.closeFilePreview()
@@ -410,7 +412,7 @@ class StorageExplorerStore {
 
   /* Methods that involve the storage client library */
   /* Bucket CRUD */
-  openBucket = async (bucket) => {
+  openBucket = async (bucket: Bucket) => {
     const { id, name } = bucket
     const columnIndex = -1
     if (!isEqual(this.selectedBucket, bucket)) {
