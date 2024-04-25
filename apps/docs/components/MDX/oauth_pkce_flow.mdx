@@ -9,7 +9,7 @@ For a PKCE flow, for example in Server-Side Auth, you need an extra step to hand
 >
 <TabPanel id="client" label="Client">
 
-In the browser, `signInWithOAuth` automatically redirects to the SSO provider's authentication endpoint, which then redirects to your endpoint.
+In the browser, `signInWithOAuth` automatically redirects to the OAuth provider's authentication endpoint, which then redirects to your endpoint.
 
 ```js
 await supabase.auth.signInWithOAuth({
