@@ -1,3 +1,4 @@
+import { set } from 'lodash'
 import React from 'react'
 import { Button, Input, Modal } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -9,6 +10,18 @@ type Props = {
 const CreateWarehouseAccessToken = (props: Props) => {
   const [open, setOpen] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
+  const [description, setDescription] = React.useState('')
+
+  async function onConfirm() {
+    setLoading(true)
+
+    await props.onSubmit({
+      description,
+    })
+    setDescription('')
+    setLoading(false)
+    setOpen(false)
+  }
 
   return (
     <>
@@ -24,20 +37,13 @@ const CreateWarehouseAccessToken = (props: Props) => {
         visible={open}
         alignFooter="right"
         loading={loading}
+        onConfirm={onConfirm}
       >
         <Modal.Content className="py-4">
           <form
             onSubmit={async (e) => {
               e.preventDefault()
-              const formData = new FormData(e.target as HTMLFormElement)
-              setLoading(true)
-
-              await props.onSubmit({
-                description: formData.get('description') as string,
-              })
-
-              setLoading(false)
-              setOpen(false)
+              onConfirm()
             }}
           >
             <FormItemLayout
@@ -45,7 +51,15 @@ const CreateWarehouseAccessToken = (props: Props) => {
               description="A short description for identifying what this access token is to be used for."
               isReactForm={false}
             >
-              <Input placeholder="Description" name="description" id="description" />
+              <Input
+                placeholder="Description"
+                name="description"
+                id="description"
+                onChange={(e) => {
+                  setDescription(e.target.value)
+                }}
+                value={description}
+              />
             </FormItemLayout>
           </form>
         </Modal.Content>

@@ -37,7 +37,7 @@ export const useQueryPerformanceQuery = ({
     searchQuery.length > 0 ? `statements.query ~ '${searchQuery}'` : '',
   ]
     .filter((x) => x.length > 0)
-    .join(' OR ')
+    .join(' AND ')
 
   const orderBySql = orderBy && `ORDER BY ${orderBy.column} ${orderBy.order}`
   const sql = baseSQL.sql([], whereSql.length > 0 ? `WHERE ${whereSql}` : undefined, orderBySql)

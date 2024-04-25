@@ -46,8 +46,8 @@ const DeleteFunction = ({ func, visible, setVisible }: DeleteFunctionProps) => {
         confirmString={name}
         text={
           <>
-            This will delete the function
-            <span className="text-bold text-foreground">{name}</span> from the schema
+            <span>This will delete the function</span>{' '}
+            <span className="text-bold text-foreground">{name}</span> <span>from the schema</span>{' '}
             <span className="text-bold text-foreground">{schema}</span>
           </>
         }
