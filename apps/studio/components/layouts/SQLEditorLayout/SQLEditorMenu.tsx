@@ -14,18 +14,8 @@ import { useCheckPermissions, useSelectedProject } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Modal,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import {
   InnerSideBarEmptyPanel,
   InnerSideBarFilterSearchInput,
