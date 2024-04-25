@@ -419,7 +419,7 @@ class StorageExplorerStore {
 
   /* Files CRUD */
 
-  getFile = async (fileEntry) => {
+  getFile = async (fileEntry: FileSystemFileEntry): Promise<File | undefined> => {
     try {
       return await new Promise((resolve, reject) => fileEntry.file(resolve, reject))
     } catch (err) {
@@ -429,23 +429,28 @@ class StorageExplorerStore {
   }
 
   // https://stackoverflow.com/a/53058574
-  getFilesDataTransferItems = async (items) => {
+  getFilesDataTransferItems = async (items: DataTransferItemList) => {
     const { dismiss } = UiToast({ description: 'Retrieving items to upload...' })
-    const files = []
-    const queue = []
+    const files: (File & { path: string })[] = []
+    const queue: FileSystemEntry[] = []
     for (const item of items) {
-      queue.push(item.webkitGetAsEntry())
+      const entry = item.webkitGetAsEntry()
+      if (entry) {
+        queue.push(entry)
+      }
     }
     while (queue.length > 0) {
-      const entry = queue.shift() || {}
-      if (entry.isFile) {
-        const file = await this.getFile(entry)
+      const entry = queue.shift()
+      if (entry && entry.isFile) {
+        const fileEntry = entry as FileSystemFileEntry
+        const file = await this.getFile(fileEntry)
         if (file !== undefined) {
-          file.path = entry.fullPath.slice(1)
-          files.push(file)
+          ;(file as any).path = fileEntry.fullPath.slice(1)
+          files.push(file as File & { path: string })
         }
-      } else if (entry.isDirectory) {
-        queue.push(...(await this.readAllDirectoryEntries(entry.createReader())))
+      } else if (entry && entry.isDirectory) {
+        const dirEntry = entry as FileSystemDirectoryEntry
+        queue.push(...(await this.readAllDirectoryEntries(dirEntry.createReader())))
       }
     }
     dismiss()
@@ -454,10 +459,10 @@ class StorageExplorerStore {
 
   // Get all the entries (files or sub-directories) in a directory
   // by calling readEntries until it returns empty array
-  readAllDirectoryEntries = async (directoryReader) => {
+  readAllDirectoryEntries = async (directoryReader: FileSystemDirectoryReader) => {
     const entries = []
     let readEntries = await this.readEntriesPromise(directoryReader)
-    while (readEntries.length > 0) {
+    while (readEntries && readEntries.length > 0) {
       entries.push(...readEntries)
       readEntries = await this.readEntriesPromise(directoryReader)
     }
@@ -467,9 +472,9 @@ class StorageExplorerStore {
   // Wrap readEntries in a promise to make working with readEntries easier
   // readEntries will return only some of the entries in a directory
   // e.g. Chrome returns at most 100 entries at a time
-  readEntriesPromise = async (directoryReader) => {
+  readEntriesPromise = async (directoryReader: FileSystemDirectoryReader) => {
     try {
-      return await new Promise((resolve, reject) => {
+      return await new Promise<FileSystemEntry[]>((resolve, reject) => {
         directoryReader.readEntries(resolve, reject)
       })
     } catch (err) {
@@ -477,7 +482,11 @@ class StorageExplorerStore {
     }
   }
 
-  uploadFiles = async (files, columnIndex: number, isDrop: boolean = false) => {
+  uploadFiles = async (
+    files: FileList | DataTransferItemList,
+    columnIndex: number,
+    isDrop: boolean = false
+  ) => {
     const queryClient = getQueryClient()
     const storageConfiguration = queryClient
       .getQueryCache()
@@ -490,9 +499,11 @@ class StorageExplorerStore {
 
     const autofix = true
     // We filter out any folders which are just '#' until we can properly encode such characters in the URL
-    const filesToUpload = isDrop
-      ? (await this.getFilesDataTransferItems(files)).filter((file) => !file.path.includes('#/'))
-      : Array.from(files)
+    const filesToUpload: (File & { path?: string })[] = isDrop
+      ? (await this.getFilesDataTransferItems(files as DataTransferItemList)).filter(
+          (file) => !file.path.includes('#/')
+        )
+      : Array.from(files as FileList)
     const derivedColumnIndex = columnIndex === -1 ? this.getLatestColumnIndex() : columnIndex
 
     const filesWithinUploadLimit =
@@ -502,7 +513,7 @@ class StorageExplorerStore {
 
     if (filesWithinUploadLimit.length < filesToUpload.length) {
       const numberOfFilesRejected = filesToUpload.length - filesWithinUploadLimit.length
-      const { value, unit } = convertFromBytes(fileSizeLimit)
+      const { value, unit } = convertFromBytes(fileSizeLimit as number)
 
       toast.error(
         <div className="flex flex-col gap-y-1">
@@ -524,7 +535,7 @@ class StorageExplorerStore {
 
     // If we're uploading a folder which name already exists in the same folder that we're uploading to
     // We sanitize the folder name and let all file uploads through. (This is only via drag drop)
-    const topLevelFolders = (this.columns?.[derivedColumnIndex]?.items ?? [])
+    const topLevelFolders: string[] = (this.columns?.[derivedColumnIndex]?.items ?? [])
       .filter((item) => !item.id)
       .map((item) => item.name)
     const formattedFilesToUpload = filesWithinUploadLimit.map((file) => {
@@ -534,20 +545,20 @@ class StorageExplorerStore {
 
       const path = file.path.split('/')
       const topLevelFolder = path.length > 1 ? path[0] : null
-      if (topLevelFolders.includes(topLevelFolder)) {
+      if (topLevelFolders.includes(topLevelFolder as string)) {
         const newTopLevelFolder = this.sanitizeNameForDuplicateInColumn(
-          topLevelFolder,
+          topLevelFolder as string,
           autofix,
           columnIndex
         )
-        path[0] = newTopLevelFolder
+        path[0] = newTopLevelFolder as string
         file.path = path.join('/')
       }
       return file
     })
 
     this.uploadProgress = 0
-    const uploadedTopLevelFolders = []
+    const uploadedTopLevelFolders: string[] = []
     const numberOfFilesToUpload = formattedFilesToUpload.length
     let numberOfFilesUploadedSuccess = 0
     let numberOfFilesUploadedFail = 0
@@ -603,7 +614,7 @@ class StorageExplorerStore {
       }
 
       return () => {
-        return new Promise(async (resolve) => {
+        return new Promise<void>(async (resolve) => {
           const { error } = await this.supabaseClient.storage
             .from(this.selectedBucket.name)
             .upload(formattedPathToFile, file, fileOptions)
