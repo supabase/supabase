@@ -240,5 +240,3 @@ Vårt tillvägagångssätt för klientbibliotek är modulärt. Varje delbibliote
 ## Översättningar
 
 - [Förteckning över översättningar](/i18n/languages.md) <!--- Keep only this -->
-
-
