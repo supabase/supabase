@@ -269,7 +269,7 @@ const InstanceConfigurationUI = () => {
       <DeployNewReplicaPanel
         visible={showNewReplicaPanel}
         selectedDefaultRegion={newReplicaRegion}
-        onSuccess={() => setRefetchInterval(10000)}
+        onSuccess={() => setRefetchInterval(5000)}
         onClose={() => {
           setNewReplicaRegion(undefined)
           setShowNewReplicaPanel(false)
@@ -278,13 +278,13 @@ const InstanceConfigurationUI = () => {
 
       <DropReplicaConfirmationModal
         selectedReplica={selectedReplicaToDrop}
-        onSuccess={() => setRefetchInterval(4000)} // [JOSHEN] change back to 10s
+        onSuccess={() => setRefetchInterval(5000)}
         onCancel={() => setSelectedReplicaToDrop(undefined)}
       />
 
       <DropAllReplicasConfirmationModal
         visible={showDeleteAllModal}
-        onSuccess={() => setRefetchInterval(10000)}
+        onSuccess={() => setRefetchInterval(5000)}
         onCancel={() => setShowDeleteAllModal(false)}
       />
 
