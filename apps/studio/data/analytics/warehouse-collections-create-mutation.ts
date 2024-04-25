@@ -2,12 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { analyticsKeys } from './keys'
 import { post } from 'data/fetchers'
 
-type CreateCollectionPayload = {
-  name: string
-  id: string
-  token: string
-}
-async function createCollection(ref: string, payload: CreateCollectionPayload) {
+async function createCollection(ref: string, payload: { name: string }) {
   await post(`/platform/projects/{ref}/analytics/warehouse/tenant`, {
     params: {
       path: { ref },
@@ -32,7 +27,7 @@ type CreateCollectionArgs = {
 export function useCreateCollection({ projectRef, onSuccess }: CreateCollectionArgs) {
   const queryClient = useQueryClient()
   const mutation = useMutation({
-    mutationFn: (payload: CreateCollectionPayload) => createCollection(projectRef, payload),
+    mutationFn: (payload: { name: string }) => createCollection(projectRef, payload),
     mutationKey: analyticsKeys.warehouseCollections(projectRef),
     onSuccess: (data) => {
       onSuccess(data)
