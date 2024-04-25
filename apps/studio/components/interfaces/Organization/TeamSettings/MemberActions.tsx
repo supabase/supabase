@@ -1,8 +1,16 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
+import toast from 'react-hot-toast'
+
+import { useParams } from 'common'
+import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
+import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
+import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
+import type { OrganizationMember } from 'data/organizations/organization-members-query'
+import { usePermissionsQuery } from 'data/permissions/permissions-query'
+import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization } from 'hooks'
+import type { Role } from 'types'
 import {
   Button,
   DropdownMenu,
@@ -14,16 +22,7 @@ import {
   IconTrash,
   Modal,
 } from 'ui'
-
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useOrganizationMemberDeleteMutation } from 'data/organizations/organization-member-delete-mutation'
-import { useOrganizationMemberInviteCreateMutation } from 'data/organizations/organization-member-invite-create-mutation'
-import { useOrganizationMemberInviteDeleteMutation } from 'data/organizations/organization-member-invite-delete-mutation'
-import type { OrganizationMember } from 'data/organizations/organization-members-query'
-import { usePermissionsQuery } from 'data/permissions/permissions-query'
-import { useCheckPermissions, useIsFeatureEnabled, useSelectedOrganization, useStore } from 'hooks'
-import type { Role } from 'types'
-import { isInviteExpired } from '../Organization.utils'
 import { useGetRolesManagementPermissions } from './TeamSettings.utils'
 
 interface MemberActionsProps {
@@ -32,9 +31,7 @@ interface MemberActionsProps {
 }
 
 const MemberActions = ({ member, roles }: MemberActionsProps) => {
-  const { ui } = useStore()
   const { slug } = useParams()
-
   const organizationMembersDeletionEnabled = useIsFeatureEnabled('organization_members:delete')
 
   const selectedOrganization = useSelectedOrganization()
@@ -61,10 +58,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
   const { mutate: deleteOrganizationMember, isLoading: isDeletingMember } =
     useOrganizationMemberDeleteMutation({
       onSuccess: () => {
-        ui.setNotification({
-          category: 'success',
-          message: `Successfully removed ${member.primary_email}`,
-        })
+        toast.success(`Successfully removed ${member.primary_email}`)
         setIsDeleteModalOpen(false)
       },
     })
@@ -72,13 +66,10 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
   const { mutate: createOrganizationMemberInvite, isLoading: isCreatingInvite } =
     useOrganizationMemberInviteCreateMutation({
       onSuccess: () => {
-        ui.setNotification({ category: 'success', message: 'Resent the invitation.' })
+        toast.success('Resent the invitation.')
       },
       onError: (error) => {
-        ui.setNotification({
-          category: 'error',
-          message: `Failed to resend invitation: ${error.message}`,
-        })
+        toast.error(`Failed to resend invitation: ${error.message}`)
       },
     })
 
@@ -113,10 +104,7 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
     if (!invitedId) return console.error('Member invited ID is required')
 
     await asyncDeleteMemberInvite({ slug, invitedId })
-    ui.setNotification({
-      category: 'success',
-      message: 'Successfully revoked the invitation.',
-    })
+    toast.success('Successfully revoked the invitation.')
   }
 
   if (!canRemoveMember || (isPendingInviteAcceptance && !canResendInvite && !canRevokeInvite)) {
@@ -202,21 +190,19 @@ const MemberActions = ({ member, roles }: MemberActionsProps) => {
 
       <ConfirmationModal
         visible={isDeleteModalOpen}
-        header="Confirm to remove"
-        buttonLabel="Remove"
-        onSelectCancel={() => setIsDeleteModalOpen(false)}
-        onSelectConfirm={() => {
+        title="Confirm to remove"
+        confirmLabel="Remove"
+        onCancel={() => setIsDeleteModalOpen(false)}
+        onConfirm={() => {
           handleMemberDelete()
         }}
       >
-        <Modal.Content>
-          <p className="py-4 text-sm text-foreground-light">
-            This is permanent! Are you sure you want to remove {member.primary_email}
-          </p>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          This is permanent! Are you sure you want to remove {member.primary_email}
+        </p>
       </ConfirmationModal>
     </>
   )
 }
 
-export default observer(MemberActions)
+export default MemberActions

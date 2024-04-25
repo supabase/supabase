@@ -3,11 +3,13 @@ import { Elements } from '@stripe/react-stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
 import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 import { Modal } from 'ui'
 
 import { useOrganizationPaymentMethodSetupIntent } from 'data/organizations/organization-payment-method-setup-intent-mutation'
-import { useSelectedOrganization, useStore } from 'hooks'
+import { useSelectedOrganization } from 'hooks'
 import { STRIPE_PUBLIC_KEY } from 'lib/constants'
+import { useIsHCaptchaLoaded } from 'stores/hcaptcha-loaded-store'
 import AddPaymentMethodForm from './AddPaymentMethodForm'
 
 interface AddNewPaymentMethodModalProps {
@@ -25,12 +27,11 @@ const AddNewPaymentMethodModal = ({
   onCancel,
   onConfirm,
 }: AddNewPaymentMethodModalProps) => {
-  const { ui } = useStore()
   const { resolvedTheme } = useTheme()
   const [intent, setIntent] = useState<any>()
   const selectedOrganization = useSelectedOrganization()
 
-  const [captchaLoaded, setHCaptchaLoaded] = useState(false)
+  const captchaLoaded = useIsHCaptchaLoaded()
   const [captchaToken, setCaptchaToken] = useState<string | null>(null)
   const [captchaRef, setCaptchaRef] = useState<HCaptcha | null>(null)
 
@@ -39,11 +40,7 @@ const AddNewPaymentMethodModal = ({
       setIntent(intent)
     },
     onError: (error) => {
-      ui.setNotification({
-        category: 'error',
-        error: intent.error,
-        message: `Failed to setup intent: ${error.message}`,
-      })
+      toast.error(`Failed to setup intent: ${error.message}`)
     },
   })
 
@@ -125,7 +122,6 @@ const AddNewPaymentMethodModal = ({
         onExpire={() => {
           setCaptchaToken(null)
         }}
-        onLoad={() => setHCaptchaLoaded(true)}
       />
 
       <Modal

@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
   Alert_Shadcn_,
-  cn,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
@@ -13,6 +13,7 @@ import {
   Form_Shadcn_,
   IconClock,
   Switch,
+  cn,
 } from 'ui'
 import * as z from 'zod'
 
@@ -22,7 +23,6 @@ import type {
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
 import { useVercelConnectionUpdateMutation } from 'data/integrations/vercel-connection-update-mutate'
-import { useFlag, useStore } from 'hooks'
 
 const VercelIntegrationConnectionForm = ({
   connection,
@@ -31,9 +31,6 @@ const VercelIntegrationConnectionForm = ({
   connection: IntegrationProjectConnection
   integration: Integration
 }) => {
-  const enableVercelConnectionsConfig = useFlag('enableVercelConnectionsConfig')
-
-  const { ui } = useStore()
   const config = connection.metadata.supabaseConfig
 
   const FormSchema = z.object({
@@ -57,19 +54,11 @@ const VercelIntegrationConnectionForm = ({
 
   const { mutate: updateVercelConnection } = useVercelConnectionUpdateMutation({
     onSuccess: (data) => {
-      ui.setNotification({
-        category: 'success',
-        message: `Updated Supabase directory`,
-      })
+      toast.success(`Updated Supabase directory`)
     },
   })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
-    /**
-     * remove this hardcoded if statement when we are ready to enable this feature
-     */
-    if (!enableVercelConnectionsConfig) return
-
     const metadata = {
       ...connection.metadata,
     }
@@ -105,10 +94,7 @@ const VercelIntegrationConnectionForm = ({
         </Alert_Shadcn_>
       </div>
       <ScaffoldDivider />
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className={cn(!enableVercelConnectionsConfig && 'opacity-30', 'w-full space-y-6')}
-      >
+      <form onSubmit={form.handleSubmit(onSubmit)} className={cn('w-full space-y-6')}>
         <div>
           {/* {isUpdatingVercelConnection && 'isUpdatingVercelConnection'} */}
           <div className="flex flex-col gap-6 px-8 py-8">
@@ -128,7 +114,6 @@ const VercelIntegrationConnectionForm = ({
                   </div>
                   <FormControl_Shadcn_>
                     <Switch
-                      disabled={!enableVercelConnectionsConfig}
                       checked={field.value}
                       onCheckedChange={(e) => {
                         field.onChange(e)
@@ -155,7 +140,6 @@ const VercelIntegrationConnectionForm = ({
                   </div>
                   <FormControl_Shadcn_>
                     <Switch
-                      disabled={!enableVercelConnectionsConfig}
                       checked={field.value}
                       onCheckedChange={(e) => {
                         field.onChange(e)
@@ -186,7 +170,6 @@ const VercelIntegrationConnectionForm = ({
                   </div>
                   <FormControl_Shadcn_>
                     <Switch
-                      disabled={!enableVercelConnectionsConfig}
                       checked={field.value}
                       onCheckedChange={(e) => {
                         field.onChange(e)
@@ -212,7 +195,6 @@ const VercelIntegrationConnectionForm = ({
                   </div>
                   <FormControl_Shadcn_>
                     <Switch
-                      disabled={!enableVercelConnectionsConfig}
                       checked={field.value}
                       onCheckedChange={(e) => {
                         field.onChange(e)

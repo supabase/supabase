@@ -1,4 +1,3 @@
-import type { Dictionary } from 'types'
 import { isEmpty } from 'lodash'
 
 /**
@@ -8,13 +7,19 @@ import { isEmpty } from 'lodash'
 export function convertArgumentTypes(value: string) {
   const items = value?.split(',')
   if (isEmpty(value) || !items || items?.length == 0) return { value: [] }
-  const temp = items.map((x) => {
-    const str = x.trim()
-    const space = str.indexOf(' ')
-    const name = str.slice(0, space !== 1 ? space : 0)
-    const type = str.slice(space + 1)
-    return { name, type }
-  })
+  const temp = items
+    .map((x) => {
+      const str = x.trim()
+      const splitted = str.split(' ')
+      if (splitted.length === 2) {
+        return { name: splitted[0], type: splitted[1] }
+      }
+      if (splitted.length === 1) {
+        return { name: splitted[0], type: splitted[0] }
+      }
+      console.error('Error while trying to parse function arguments', value)
+    })
+    .filter(Boolean) as { name: string; type: string }[]
   return { value: temp }
 }
 
@@ -22,7 +27,7 @@ export function convertArgumentTypes(value: string) {
  * convert config_params =  {search_path: "auth, public"}
  * to {value: [{name: 'search_path', value: 'auth, public'}]}
  */
-export function convertConfigParams(value: Dictionary<any>) {
+export function convertConfigParams(value: Record<string, string> | null | undefined) {
   const temp = []
   if (value) {
     for (var key in value) {

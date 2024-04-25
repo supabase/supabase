@@ -136,6 +136,28 @@ final data = await supabase.from('countries').select('id, name, cities(id, name)
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+struct Country: Codable {
+  let id: Int
+  let name: String
+  let cities: [City]
+
+  struct City: Codable {
+    let id: Int
+    let name: String
+  }
+}
+
+let countries: [Country] = try await supabase
+  .from("countries")
+  .select("id, name, cities(id, name)")
+  .execute()
+  .value
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -223,6 +245,38 @@ final data = await supabase.from('teams').select('id, team_name, users(id, name)
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+struct Team: Codable {
+  let id: Int
+  let name: String
+  let users: [User]
+
+  struct User: Codable {
+    let id: Int
+    let name: String
+  }
+
+  enum CodingKeys: String, CodingKey {
+    case id, users
+    case name = "team_name"
+  }
+}
+let teams [Team] = try await supabase
+  .from("teams")
+  .select(
+    """
+      id,
+      team_name,
+      users ( id, name )
+    """
+  )
+  .execute()
+  .value
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 ```kotlin
@@ -256,6 +310,109 @@ const Query = `
 
 ```bash
 GET https://[REF].supabase.co/rest/v1/teams?select=id,team_name,users(id,name)
+```
+
+</TabPanel>
+</Tabs>
+
+## Specifying the `ON` clause for joins with multiple foreign keys
+
+For example, if you have a project that tracks when employees check in and out of work shifts:
+
+```sql
+-- Employees
+create table users (
+  "id" serial primary key,
+  "name" text
+);
+
+-- Badge scans
+create table scans (
+  "id" serial primary key,
+  "user_id" int references users,
+  "badge_scan_time" timestamp
+);
+
+-- Work shifts
+create table shifts (
+  "id" serial primary key,
+  "user_id" int references users,
+  "scan_id_start" int references scans, -- clocking in
+  "scan_id_end" int references scans, -- clocking out
+  "attendance_status" text
+);
+```
+
+In this case, you need to explicitly define the join because the joining column on `shifts` is ambiguous.
+
+To fetch all the `shifts` with `scan_id_start` related to a specific `scan`, use the following syntax:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.from('shifts').select(
+  `
+    *,
+    scans:scan_id_start (
+      id,
+      user_id,
+      badge_scan_time
+    )
+  `
+)
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+struct Shift: Codable {
+  let id: Int
+  let userId: Int
+  let attendanceStatus: String?
+
+  let scans: [Scan]
+
+  struct Scan: Codable {
+    let id: Int
+    let userId: Int
+    let badgeScanTime: TimeInterval
+
+    enum CodingKeys: String, CodingKey {
+      case id
+      case userId = "user_id"
+      case badgeScanTime = "badge_scan_time"
+    }
+  }
+
+  enum CodingKeys: String, CodingKey {
+    case id
+    case userId = "user_id"
+    case attendanceStatus = "attendance_status"
+  }
+}
+
+let shifts: [Shift] = try await supabase
+  .from("shifts")
+  .select(
+    """
+      *,
+      scans:scan_id_start (
+        id,
+        user_id,
+        badge_scan_time
+      )
+    """
+  )
+  .execute()
+  .value
 ```
 
 </TabPanel>

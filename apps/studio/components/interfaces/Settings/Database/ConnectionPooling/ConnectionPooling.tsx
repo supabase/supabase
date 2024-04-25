@@ -4,6 +4,7 @@ import { useParams } from 'common'
 import { capitalize } from 'lodash'
 import { Fragment, useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -17,16 +18,15 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
-  IconAlertTriangle,
   IconExternalLink,
   Input_Shadcn_,
   Listbox,
+  Separator,
 } from 'ui'
 import z from 'zod'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AlertError from 'components/ui/AlertError'
-import Divider from 'components/ui/Divider'
 import { FormActions } from 'components/ui/Forms'
 import Panel from 'components/ui/Panel'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -34,7 +34,7 @@ import { useMaxConnectionsQuery } from 'data/database/max-connections-query'
 import { usePoolingConfigurationQuery } from 'data/database/pooling-configuration-query'
 import { usePoolingConfigurationUpdateMutation } from 'data/database/pooling-configuration-update-mutation'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { useCheckPermissions, useStore } from 'hooks'
+import { useCheckPermissions } from 'hooks'
 import { useDatabaseSettingsStateSnapshot } from 'state/database-settings'
 import { SESSION_MODE_DESCRIPTION, TRANSACTION_MODE_DESCRIPTION } from '../Database.constants'
 import { POOLING_OPTIMIZATIONS } from './ConnectionPooling.constants'
@@ -62,7 +62,6 @@ const FormSchema = z.object({
 })
 
 export const ConnectionPooling = () => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const { project } = useProjectContext()
   const snap = useDatabaseSettingsStateSnapshot()
@@ -72,9 +71,7 @@ export const ConnectionPooling = () => {
   const poolingOptimizations =
     POOLING_OPTIMIZATIONS[
       (computeInstance?.variant.identifier as keyof typeof POOLING_OPTIMIZATIONS) ??
-      project?.infra_compute_size === 'nano'
-        ? 'ci_nano'
-        : 'ci_micro'
+        (project?.infra_compute_size === 'nano' ? 'ci_nano' : 'ci_micro')
     ]
   const defaultPoolSize = poolingOptimizations.poolSize ?? 15
   const defaultMaxClientConn = poolingOptimizations.maxClientConn ?? 200
@@ -126,8 +123,7 @@ export const ConnectionPooling = () => {
             max_client_conn: poolingConfiguration?.max_client_conn,
           })
         }
-
-        ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+        toast.success('Successfully saved settings')
       },
     })
 
@@ -167,7 +163,7 @@ export const ConnectionPooling = () => {
                   ? 'Connection Pooling is not available for this project'
                   : 'Connection pooling configuration'}
               </p>
-              <Badge color="scale">Supavisor</Badge>
+              <Badge>Supavisor</Badge>
             </div>
             <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
               <a
@@ -202,7 +198,7 @@ export const ConnectionPooling = () => {
                   <ShimmeringLoader className="h-4 w-1/3 col-span-4" delayIndex={i} />
                   <ShimmeringLoader className="h-8 w-full col-span-8" delayIndex={i} />
                 </div>
-                <Divider light />
+                <Separator />
               </Fragment>
             ))}
 
@@ -237,6 +233,7 @@ export const ConnectionPooling = () => {
                       </FormLabel_Shadcn_>
                       <FormControl_Shadcn_ className="col-span-8">
                         <Listbox
+                          disabled={poolingConfiguration?.pool_mode === 'transaction'}
                           value={field.value}
                           className="w-full"
                           onChange={(value) => field.onChange(value)}
@@ -255,6 +252,36 @@ export const ConnectionPooling = () => {
                           </Listbox.Option>
                         </Listbox>
                       </FormControl_Shadcn_>
+
+                      {poolingConfiguration?.pool_mode === 'transaction' && (
+                        <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
+                          <Alert_Shadcn_>
+                            <AlertTitle_Shadcn_ className="text-foreground">
+                              Pool mode is permanently set to Transaction on port 6543
+                            </AlertTitle_Shadcn_>
+                            <AlertDescription_Shadcn_>
+                              You can use Session mode by connecting to the pooler on port 5432
+                              instead
+                            </AlertDescription_Shadcn_>
+                          </Alert_Shadcn_>
+                        </FormDescription_Shadcn_>
+                      )}
+
+                      {field.value === 'transaction' &&
+                        poolingConfiguration?.pool_mode === 'session' && (
+                          <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
+                            <Alert_Shadcn_>
+                              <AlertTitle_Shadcn_ className="text-foreground">
+                                Pool mode will be set to transaction permanently on port 6543
+                              </AlertTitle_Shadcn_>
+                              <AlertDescription_Shadcn_>
+                                This will take into effect once saved. You can use session mode by
+                                pointing the pooler connection to use port 5432.
+                              </AlertDescription_Shadcn_>
+                            </Alert_Shadcn_>
+                          </FormDescription_Shadcn_>
+                        )}
+
                       <FormDescription_Shadcn_ className="col-start-5 col-span-8 flex flex-col gap-y-2">
                         <p>
                           Specify when a connection can be returned to the pool.{' '}
@@ -263,23 +290,12 @@ export const ConnectionPooling = () => {
                             onClick={() => snap.setShowPoolingModeHelper(true)}
                             className="cursor-pointer underline underline-offset-2"
                           >
-                            Unsure which pooling mode to use?
+                            Learn more about pool modes
                           </span>
+                          .
                         </p>
-                        {field.value === 'session' && (
-                          <Alert_Shadcn_>
-                            <AlertTitle_Shadcn_ className="text-foreground">
-                              Set to transaction mode to use both pooling modes concurrently
-                            </AlertTitle_Shadcn_>
-                            <AlertDescription_Shadcn_>
-                              Session mode can be used concurrently with transaction mode by using
-                              5432 for session and 6543 for session. However, by configuring the
-                              pooler mode to session here, you will not be able to use transaction
-                              mode at the same time.
-                            </AlertDescription_Shadcn_>
-                          </Alert_Shadcn_>
-                        )}
                       </FormDescription_Shadcn_>
+
                       <FormMessage_Shadcn_ className="col-start-5 col-span-8" />
                     </FormItem_Shadcn_>
                   )}
@@ -305,15 +321,15 @@ export const ConnectionPooling = () => {
                         Number(form.getValues('default_pool_size') ?? 15) >
                           maxConnData.maxConnections * 0.8 && (
                           <div className="col-start-5 col-span-8">
-                            <Alert_Shadcn_ variant="warning">
-                              <IconAlertTriangle strokeWidth={2} />
-                              <AlertTitle_Shadcn_>
-                                Pool size is greater than 80% of the max connections (
-                                {maxConnData.maxConnections}) on your database
+                            <Alert_Shadcn_>
+                              <AlertTitle_Shadcn_ className="text-foreground">
+                                Set to transaction mode to use both pooling modes concurrently
                               </AlertTitle_Shadcn_>
                               <AlertDescription_Shadcn_>
-                                This may result in instability and unreliability with your database
-                                connections.
+                                Session mode can be used concurrently with transaction mode by using
+                                5432 for session and 6543 for transaction. However, by configuring
+                                the pooler mode to session here, you will not be able to use
+                                transaction mode at the same time.
                               </AlertDescription_Shadcn_>
                             </Alert_Shadcn_>
                           </div>

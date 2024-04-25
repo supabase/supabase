@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
@@ -10,16 +11,17 @@ import {
   SidePanel,
 } from 'ui'
 
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { Region, useReadReplicaSetUpMutation } from 'data/read-replicas/replica-setup-mutation'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
+import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { AWS_REGIONS, AWS_REGIONS_DEFAULT, AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
 import { AVAILABLE_REPLICA_REGIONS, AWS_REGIONS_VALUES } from './InstanceConfiguration.constants'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import Link from 'next/link'
-import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useSelectedOrganization, useSelectedProject } from 'hooks'
-import { WarningIcon } from 'components/ui/Icons'
-import { getSemanticVersion } from 'lib/helpers'
+import { useBackupsQuery } from 'data/database/backups-query'
+import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
+import { ExternalLink } from 'lucide-react'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
 
@@ -39,10 +41,32 @@ const DeployNewReplicaPanel = ({
   const { ref: projectRef } = useParams()
   const project = useSelectedProject()
   const org = useSelectedOrganization()
+  const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
 
   const { data } = useReadReplicasQuery({ projectRef })
+  const { data: backups } = useBackupsQuery(
+    { projectRef },
+    {
+      refetchInterval,
+      refetchOnWindowFocus: false,
+      onSuccess: (data) => {
+        if (data.walg_enabled) setRefetchInterval(false)
+      },
+    }
+  )
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
+
+  const { mutate: enablePhysicalBackups, isLoading: isEnabling } = useEnablePhysicalBackupsMutation(
+    {
+      onSuccess: () => {
+        toast.success(
+          'Physical backups are currently being enabled, please check back in a few minutes!'
+        )
+        setRefetchInterval(5000)
+      },
+    }
+  )
 
   const { mutate: setUpReplica, isLoading: isSettingUp } = useReadReplicaSetUpMutation({
     onSuccess: () => {
@@ -59,17 +83,17 @@ const DeployNewReplicaPanel = ({
 
   const reachedMaxReplicas = (data ?? []).filter((db) => db.identifier !== projectRef).length >= 2
   const isFreePlan = subscription?.plan.id === 'free'
+  const isWalgEnabled = backups?.walg_enabled
   const currentComputeAddon = addons?.selected_addons.find(
     (addon) => addon.type === 'compute_instance'
   )
-  const currentPitrAddon = addons?.selected_addons.find((addon) => addon.type === 'pitr')
   const canDeployReplica =
     !reachedMaxReplicas &&
     currentPgVersion >= 15 &&
     project?.cloud_provider === 'AWS' &&
     !isFreePlan &&
-    currentComputeAddon !== undefined &&
-    currentPitrAddon !== undefined
+    isWalgEnabled &&
+    currentComputeAddon !== undefined
 
   const computeAddons =
     addons?.available_addons.find((addon) => addon.type === 'compute_instance')?.variants ?? []
@@ -81,7 +105,7 @@ const DeployNewReplicaPanel = ({
   // Will be following the primary's instance size for the time being
   const defaultCompute =
     addons?.selected_addons.find((addon) => addon.type === 'compute_instance')?.variant
-      .identifier ?? 'ci_small'
+      .identifier ?? 'ci_micro'
 
   const [selectedRegion, setSelectedRegion] = useState<string>(defaultRegion)
   const [selectedCompute, setSelectedCompute] = useState(defaultCompute)
@@ -123,44 +147,85 @@ const DeployNewReplicaPanel = ({
       header="Deploy a new read replica"
     >
       <SidePanel.Content className="flex flex-col py-4 gap-y-8">
-        {currentPitrAddon === undefined && (
+        {!isWalgEnabled && (
           <Alert_Shadcn_>
             <WarningIcon />
             <AlertTitle_Shadcn_>
-              Point in time recovery is required to deploy replicas
+              {refetchInterval !== false
+                ? 'Physical backups are currently being enabled'
+                : 'Physical backups are required to deploy replicas'}
             </AlertTitle_Shadcn_>
-            {isFreePlan ? (
-              <AlertDescription_Shadcn_>
-                To enable PITR, you may first upgrade your organization's plan to at least Pro, then
-                purchase the PITR add on for your project via the{' '}
-                <Link
-                  href={`/project/${projectRef}/settings/addons?panel=pitr`}
-                  className="text-brand"
-                >
-                  project settings
-                </Link>
-                .
-              </AlertDescription_Shadcn_>
-            ) : (
-              <AlertDescription_Shadcn_>
-                Enable the add-on in your project's settings first before deploying read replicas.
+            {refetchInterval === false && (
+              <AlertDescription_Shadcn_ className="mb-2">
+                Physical backups are used under the hood to spin up read replicas for your project.
               </AlertDescription_Shadcn_>
             )}
-            <AlertDescription_Shadcn_ className="mt-2">
-              <Button type="default">
-                <Link
-                  href={
-                    isFreePlan
-                      ? `/org/${org?.slug}/billing?panel=subscriptionPlan`
-                      : `/project/${projectRef}/settings/addons?panel=pitr`
-                  }
+            <AlertDescription_Shadcn_>
+              {refetchInterval !== false
+                ? 'This warning will go away once physical backups have been enabled - check back in a few minutes!'
+                : 'Enabling physical backups will take a few minutes, after which you will be able to deploy read replicas.'}
+            </AlertDescription_Shadcn_>
+            {refetchInterval !== false ? (
+              <AlertDescription_Shadcn_ className="mt-2">
+                You may start deploying read replicas thereafter once this is completed.
+              </AlertDescription_Shadcn_>
+            ) : (
+              <AlertDescription_Shadcn_ className="flex items-center gap-x-2 mt-3">
+                <Button
+                  type="default"
+                  loading={isEnabling}
+                  disabled={isEnabling}
+                  onClick={() => {
+                    if (projectRef) enablePhysicalBackups({ ref: projectRef })
+                  }}
                 >
-                  {isFreePlan ? 'Upgrade to Pro' : 'Enable PITR add-on'}
-                </Link>
-              </Button>
+                  Enable physical backups
+                </Button>
+                <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                  <a
+                    href="https://supabase.com/docs/guides/platform/read-replicas#how-are-read-replicas-made"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Documentation
+                  </a>
+                </Button>
+              </AlertDescription_Shadcn_>
+            )}
+          </Alert_Shadcn_>
+        )}
+
+        {currentComputeAddon === undefined && (
+          <Alert_Shadcn_>
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              Project required to at least be on a Small compute
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              <span>
+                This is to ensure that read replicas can keep up with the primary databases'
+                activities.
+              </span>
+              <div className="flex items-center gap-x-2 mt-3">
+                <Button asChild type="default">
+                  <Link href={`/project/${projectRef}/settings/addons?panel=computeInstance`}>
+                    Change compute size
+                  </Link>
+                </Button>
+                <Button asChild type="default" icon={<ExternalLink size={14} />}>
+                  <a
+                    href="https://supabase.com/docs/guides/platform/read-replicas#prerequisites"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Documentation
+                  </a>
+                </Button>
+              </div>
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
+
         {reachedMaxReplicas && (
           <Alert_Shadcn_>
             <WarningIcon />
@@ -172,6 +237,7 @@ const DeployNewReplicaPanel = ({
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
+
         {/* [Joshen] Not particular about this warning as all users on prod are on AWS */}
         {project?.cloud_provider !== 'AWS' && (
           <Alert_Shadcn_>
@@ -185,6 +251,7 @@ const DeployNewReplicaPanel = ({
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
+
         {currentPgVersion < 15 && (
           <Alert_Shadcn_>
             <WarningIcon />
@@ -207,6 +274,7 @@ const DeployNewReplicaPanel = ({
             </AlertDescription_Shadcn_>
           </Alert_Shadcn_>
         )}
+
         <Listbox
           size="small"
           id="region"
@@ -234,26 +302,27 @@ const DeployNewReplicaPanel = ({
           ))}
         </Listbox>
 
-        <Listbox
-          disabled
-          size="small"
-          id="compute"
-          name="compute"
-          value={selectedCompute}
-          onChange={setSelectedCompute}
-          label="Select the instance size for your read replica"
-          descriptionText="Read replicas will be on the same instance size as your primary"
-        >
-          {computeAddons.map((option) => (
-            <Listbox.Option key={option.identifier} label={option.name} value={option.identifier}>
-              {option.name}
-            </Listbox.Option>
-          ))}
-        </Listbox>
+        <div className="flex flex-col gap-y-2">
+          <p className="text-foreground-light text-sm">
+            Read replicas will be on the same compute size as your primary database. Deploying a
+            read replica incurs additional{' '}
+            <span className="text-foreground">{selectedComputeMeta?.name}</span> compute hours.
+            Pricing is still in early access and is subject to change.
+          </p>
 
-        {/* <p className="text-xs text-foreground-light">
-          Show some preview info on cost for deploying this replica here
-        </p> */}
+          <p className="text-foreground-light text-sm">
+            Read more about{' '}
+            <Link
+              href="https://supabase.com/docs/guides/platform/org-based-billing#usage-based-billing-for-compute"
+              target="_blank"
+              rel="noreferrer"
+              className="underline hover:text-foreground transition"
+            >
+              usage-based billing
+            </Link>{' '}
+            for compute.
+          </p>
+        </div>
       </SidePanel.Content>
     </SidePanel>
   )

@@ -5,15 +5,13 @@ import { ReactNode, forwardRef } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Admonition,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
   Alert_Shadcn_,
   Button,
-  DialogContent_Shadcn_,
-  DialogSectionSeparator_Shadcn_,
-  DialogSection_Shadcn_,
-  DialogTitle_Shadcn_,
-  Dialog_Shadcn_,
+  Dialog,
+  DialogContent,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
   FormControl_Shadcn_,
   FormDescription_Shadcn_,
   FormField_Shadcn_,
@@ -21,22 +19,17 @@ import {
   FormLabel_Shadcn_,
   FormMessage_Shadcn_,
   Form_Shadcn_,
-  IconAlertCircle,
   Input_Shadcn_,
   cn,
 } from 'ui'
-import {
-  DIALOG_PADDING_X_SMALL,
-  DIALOG_PADDING_Y_SMALL,
-  DialogHeader,
-} from 'ui/src/components/shadcn/ui/dialog'
+import { DialogHeader } from 'ui/src/components/shadcn/ui/dialog'
 import { z } from 'zod'
 
 export interface TextConfirmModalProps {
   loading: boolean
   visible: boolean
   title: string
-  size?: React.ComponentProps<typeof DialogContent_Shadcn_>['size']
+  size?: React.ComponentProps<typeof DialogContent>['size']
   cancelLabel?: string
   confirmLabel?: string
   confirmPlaceholder: string
@@ -58,8 +51,8 @@ export interface TextConfirmModalProps {
 }
 
 const TextConfirmModal = forwardRef<
-  React.ElementRef<typeof DialogContent_Shadcn_>,
-  React.ComponentPropsWithoutRef<typeof Dialog_Shadcn_> & TextConfirmModalProps
+  React.ElementRef<typeof DialogContent>,
+  React.ComponentPropsWithoutRef<typeof Dialog> & TextConfirmModalProps
 >(
   (
     {
@@ -108,7 +101,7 @@ const TextConfirmModal = forwardRef<
     }
 
     return (
-      <Dialog_Shadcn_
+      <Dialog
         open={visible}
         {...props}
         onOpenChange={() => {
@@ -117,9 +110,9 @@ const TextConfirmModal = forwardRef<
           }
         }}
       >
-        <DialogContent_Shadcn_ ref={ref} className="p-0 gap-0 pb-5" size={size}>
+        <DialogContent ref={ref} className="p-0 gap-0 pb-5 !block" size={size}>
           <DialogHeader className={cn('border-b')} padding={'small'}>
-            <DialogTitle_Shadcn_ className="">{title}</DialogTitle_Shadcn_>
+            <DialogTitle className="">{title}</DialogTitle>
           </DialogHeader>
           {alert && (
             <Admonition
@@ -132,17 +125,17 @@ const TextConfirmModal = forwardRef<
           )}
           {children && (
             <>
-              <DialogSection_Shadcn_ padding={'small'}>{children}</DialogSection_Shadcn_>
-              <DialogSectionSeparator_Shadcn_ />
+              <DialogSection padding={'small'}>{children}</DialogSection>
+              <DialogSectionSeparator />
             </>
           )}
           {/* // older prop from before refactor */}
           {text !== undefined && (
             <>
-              <DialogSection_Shadcn_ className="p-5" padding={'small'}>
+              <DialogSection className="p-5" padding={'small'}>
                 <p className="text-foreground-light text-sm">{text}</p>
-              </DialogSection_Shadcn_>
-              <DialogSectionSeparator_Shadcn_ />
+              </DialogSection>
+              <DialogSectionSeparator />
             </>
           )}
           <Form_Shadcn_ {...form}>
@@ -164,13 +157,14 @@ const TextConfirmModal = forwardRef<
                   </FormItem_Shadcn_>
                 )}
               />
-              <div className="flex justify-end gap-2">
+              <div className="flex gap-2">
                 {!blockDeleteButton && (
                   <Button size="medium" block type="default" disabled={loading}>
                     {cancelLabel}
                   </Button>
                 )}
                 <Button
+                  block
                   size="medium"
                   type={
                     variant === 'destructive'
@@ -180,17 +174,17 @@ const TextConfirmModal = forwardRef<
                         : 'primary'
                   }
                   htmlType="submit"
-                  block
                   loading={loading}
                   disabled={loading}
+                  className="truncate"
                 >
                   {confirmLabel}
                 </Button>
               </div>
             </form>
           </Form_Shadcn_>
-        </DialogContent_Shadcn_>
-      </Dialog_Shadcn_>
+        </DialogContent>
+      </Dialog>
     )
   }
 )

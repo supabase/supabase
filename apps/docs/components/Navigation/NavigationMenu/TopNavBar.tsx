@@ -2,7 +2,8 @@ import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { FC } from 'react'
-import { Button, IconCommand, IconGitHub, IconSearch, SearchButton } from 'ui'
+import { Button, IconCommand, IconGitHub, IconSearch } from 'ui'
+import { SearchButton } from 'ui-patterns/Cmdk'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
 import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
@@ -14,7 +15,7 @@ const TopNavBar: FC = () => {
   return (
     <nav
       aria-label="top bar"
-      className="h-[60px] border-b backdrop-blur backdrop-filter bg bg-opacity-75"
+      className="h-[var(--desktop-header-height,60px)] border-b backdrop-blur backdrop-filter bg bg-opacity-75"
     >
       <div className="px-5 max-w-7xl mx-auto flex gap-3 justify-between items-center h-full">
         <div className="lg:hidden">

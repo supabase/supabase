@@ -1,6 +1,7 @@
-import { useCallback } from 'react'
-
 import { useParams } from 'common'
+import { useCallback } from 'react'
+import toast from 'react-hot-toast'
+
 import { IntegrationConnectionItem } from 'components/interfaces/Integrations/IntegrationConnection'
 import { EmptyIntegrationConnection } from 'components/interfaces/Integrations/IntegrationPanels'
 import { Markdown } from 'components/interfaces/Markdown'
@@ -11,19 +12,17 @@ import {
   ScaffoldSectionDetail,
 } from 'components/layouts/Scaffold'
 import { useBranchesDisableMutation } from 'data/branches/branches-disable-mutation'
+import { useBranchesQuery } from 'data/branches/branches-query'
 import { useGitHubConnectionDeleteMutation } from 'data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
 import type {
   IntegrationName,
   IntegrationProjectConnection,
 } from 'data/integrations/integrations.types'
-import { useSelectedOrganization, useSelectedProject, useStore } from 'hooks'
-import { OPT_IN_TAGS } from 'lib/constants'
+import { useFlag, useSelectedOrganization, useSelectedProject } from 'hooks'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import { cn } from 'ui'
 import { IntegrationImageHandler } from '../IntegrationsSettings'
 import GitHubIntegrationConnectionForm from './GitHubIntegrationConnectionForm'
-import { useBranchesQuery } from 'data/branches/branches-query'
 
 const GitHubTitle = `GitHub Connections`
 
@@ -40,7 +39,6 @@ The GitHub app will watch for changes in your repository such as file changes, b
 `
 
 const GitHubSection = () => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const project = useSelectedProject()
   const org = useSelectedOrganization()
@@ -51,17 +49,15 @@ const GitHubSection = () => {
 
   const { mutate: deleteGitHubConnection } = useGitHubConnectionDeleteMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: 'Successfully deleted Github connection',
-      })
+      toast.success('Successfully deleted Github connection')
     },
   })
 
   const { mutate: disableBranching } = useBranchesDisableMutation()
 
+  const hasAccessToBranching = useFlag<boolean>('branchManagement')
+
   const previewBranches = (branches ?? []).filter((branch) => !branch.is_default)
-  const hasAccessToBranching = org?.opt_in_tags?.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) ?? false
   const isBranch = project?.parent_project_ref !== undefined
   const isBranchingEnabled =
     project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
@@ -153,7 +149,7 @@ const GitHubSection = () => {
                           name: connection.repository.name,
                           supabaseConfig: {
                             supabaseDirectory: connection.workdir,
-                            supabaseChangesOnly: connection.supabase_changes_only,
+                            supabaseChangesOnly: (connection as any).supabase_changes_only, //[Joshen] potentially API codegen issue
                           },
                         } as any,
                       }}

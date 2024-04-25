@@ -1,11 +1,10 @@
-import { observer } from 'mobx-react-lite'
-
 import {
   AccountInformation,
   AnalyticsSettings,
-  ThemeSettingsOld,
   ThemeSettings,
+  ThemeSettingsOld,
 } from 'components/interfaces/Account/Preferences'
+import { AccountDeletion } from 'components/interfaces/Account/Preferences/AccountDeletion'
 import { ProfileInformation } from 'components/interfaces/Account/Preferences/ProfileInformation'
 import { AccountLayout } from 'components/layouts'
 import AlertError from 'components/ui/AlertError'
@@ -39,7 +38,7 @@ User.getLayout = (page) => (
 
 export default User
 
-const ProfileCard = observer(() => {
+const ProfileCard = () => {
   const profileUpdateEnabled = useIsFeatureEnabled('profile:update')
 
   const { profile, error, isLoading, isError, isSuccess } = useProfile()
@@ -76,6 +75,10 @@ const ProfileCard = observer(() => {
       <section>
         <AnalyticsSettings />
       </section>
+
+      <section>
+        <AccountDeletion />
+      </section>
     </article>
   )
-})
+}

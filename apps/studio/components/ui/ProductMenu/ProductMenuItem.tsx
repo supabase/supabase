@@ -1,12 +1,13 @@
 import Link from 'next/link'
 import { ReactNode } from 'react'
-import { Button, Menu } from 'ui'
+import { Badge, Button, Menu } from 'ui'
 
 interface ProductMenuItemProps {
   name: string | ReactNode
   isActive: boolean
   isExternal?: boolean
   icon?: ReactNode
+  rightIcon?: ReactNode
   url?: string
   target?: '_blank' | '_self'
   onClick?: () => void
@@ -20,6 +21,7 @@ const ProductMenuItem = ({
   isActive,
   isExternal,
   icon,
+  rightIcon,
   url = '',
   target = '_self',
   onClick,
@@ -35,10 +37,9 @@ const ProductMenuItem = ({
           className={'flex items-center gap-2 truncate w-full ' + textClassName}
         >
           <span className="truncate">{name} </span>
-          {label !== undefined && (
-            <span className="text-orange-800 text-xs font-normal truncate">{label}</span>
-          )}
+          {label !== undefined && <Badge variant="warning">{label}</Badge>}
         </div>
+        {rightIcon && <div>{rightIcon}</div>}
       </div>
     </Menu.Item>
   )

@@ -104,3 +104,27 @@ reindex table concurrently persons;
 ```
 
 Take note that `reindex` can be used inside a transaction, but `reindex [index/table] concurrently` cannot.
+
+## Index Advisor
+
+Indexes can improve query performance of your tables as they grow. The Supabase Dashboard offers an Index Advisor, which suggests potential indexes to add to your tables.
+
+For more information on the Index Advisor and its suggestions, see the [`index_advisor` extension](/docs/guides/database/extensions/index_advisor).
+
+To use the Dashboard Index Advisor:
+
+1. Go to the [Query Performance](/dashboard/project/_/database/query-performance) page.
+1. Click on a query to bring up the Details side panel.
+1. Select the Indexes tab.
+1. Enable Index Advisor if prompted.
+
+### Understanding Index Advisor results
+
+The Indexes tab shows the existing indexes used in the selected query. Note that indexes suggested in the "New Index Recommendations" section may not be used when you create them. Postgres' query planner may intentionally ignore an available index if it determines that the query will be faster without. For example, on a small table, a sequential scan might be faster than an index scan. In that case, the planner will switch to using the index as the table size grows, helping to future proof the query.
+
+If additional indexes might improve your query, the Index Advisor shows the suggested indexes with the estimated improvement in startup and total costs:
+
+- Startup cost is the cost to fetch the first row
+- Total cost is the cost to fetch all the rows
+
+Costs are in arbitrary units, where a single sequential page read costs 1.0 units.

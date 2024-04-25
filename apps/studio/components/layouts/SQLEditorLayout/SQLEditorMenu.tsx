@@ -1,21 +1,22 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
 import { partition } from 'lodash'
 import { Plus } from 'lucide-react'
-import { observer } from 'mobx-react-lite'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  Modal,
-  TooltipContent_Shadcn_,
-  TooltipTrigger_Shadcn_,
-  Tooltip_Shadcn_,
-} from 'ui'
+
+import { useParams } from 'common'
+import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
+import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
+import AlertError from 'components/ui/AlertError'
+import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
+import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
+import { useCheckPermissions, useSelectedProject } from 'hooks'
+import { uuidv4 } from 'lib/helpers'
+import { useProfile } from 'lib/profile'
+import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { ResponseError } from 'types'
+import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import {
   InnerSideBarEmptyPanel,
@@ -28,21 +29,10 @@ import {
   InnerSideMenuItem,
   InnerSideMenuSeparator,
 } from 'ui-patterns/InnerSideMenu'
-
-import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.constants'
-import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
-import { WarningIcon } from 'components/ui/Icons'
-import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
-import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
-import { useCheckPermissions, useSelectedProject, useStore } from 'hooks'
-import { uuidv4 } from 'lib/helpers'
-import { useProfile } from 'lib/profile'
-import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import QueryItem from './QueryItem'
 import { selectItemsInRange } from './SQLEditorLayout.utils'
 
-const SideBarContent = observer(() => {
-  const { ui } = useStore()
+const SideBarContent = () => {
   const { ref, id: activeId } = useParams()
   const router = useRouter()
   const { profile } = useProfile()
@@ -53,7 +43,7 @@ const SideBarContent = observer(() => {
   const [selectedQueries, setSelectedQueries] = useState<string[]>([])
 
   const snap = useSqlEditorStateSnapshot()
-  const { isLoading, isSuccess } = useSqlSnippetsQuery(ref, {
+  const { isLoading, isSuccess, isError, error } = useSqlSnippetsQuery(ref, {
     refetchOnWindowFocus: false,
     staleTime: 300, // 5 minutes
     onSuccess(data) {
@@ -179,10 +169,7 @@ const SideBarContent = observer(() => {
     if (!ref) return console.error('Project is required')
     if (!profile) return console.error('Profile is required')
     if (!canCreateSQLSnippet) {
-      return ui.setNotification({
-        category: 'info',
-        message: 'Your queries will not be saved as you do not have sufficient permissions',
-      })
+      return toast('Your queries will not be saved as you do not have sufficient permissions')
     }
 
     try {
@@ -198,10 +185,7 @@ const SideBarContent = observer(() => {
       router.push(`/project/${ref}/sql/${snippet.id}`)
       setSearchText('')
     } catch (error: any) {
-      ui.setNotification({
-        category: 'error',
-        message: `Failed to create new query: ${error.message}`,
-      })
+      toast.error(`Failed to create new query: ${error.message}`)
     }
   }
 
@@ -213,37 +197,43 @@ const SideBarContent = observer(() => {
   return (
     <>
       <div className="mt-6">
-        {isLoading ? (
-          <InnerSideBarShimmeringLoaders />
-        ) : isSuccess ? (
-          <div>
-            <div className="flex flex-col gap-4">
-              <Button
-                type="default"
-                className="justify-start mx-4"
-                onClick={() => handleNewQuery()}
-                icon={<Plus className="text-foreground-muted" strokeWidth={1} size={14} />}
-              >
-                New query
-              </Button>
+        <div className="flex flex-col gap-4">
+          <Button
+            type="default"
+            className="justify-start mx-4"
+            onClick={() => handleNewQuery()}
+            icon={<Plus className="text-foreground-muted" strokeWidth={1} size={14} />}
+          >
+            New query
+          </Button>
 
-              <div className="px-2">
-                <InnerSideMenuItem
-                  title="Templates"
-                  isActive={router.asPath === `/project/${ref}/sql/templates`}
-                  href={`/project/${ref}/sql/templates`}
-                >
-                  Templates
-                </InnerSideMenuItem>
-                <InnerSideMenuItem
-                  title="Quickstarts"
-                  isActive={router.asPath === `/project/${ref}/sql/quickstarts`}
-                  href={`/project/${ref}/sql/quickstarts`}
-                >
-                  Quickstarts
-                </InnerSideMenuItem>
-              </div>
+          <div className="px-2">
+            <InnerSideMenuItem
+              title="Templates"
+              isActive={router.asPath === `/project/${ref}/sql/templates`}
+              href={`/project/${ref}/sql/templates`}
+            >
+              Templates
+            </InnerSideMenuItem>
+            <InnerSideMenuItem
+              title="Quickstarts"
+              isActive={router.asPath === `/project/${ref}/sql/quickstarts`}
+              href={`/project/${ref}/sql/quickstarts`}
+            >
+              Quickstarts
+            </InnerSideMenuItem>
+          </div>
 
+          {isLoading && <InnerSideBarShimmeringLoaders />}
+
+          {isError && (
+            <div className="px-4">
+              <AlertError error={error as ResponseError} subject="Failed to load SQL snippets" />
+            </div>
+          )}
+
+          {isSuccess && (
+            <>
               {snippets.length > 0 && (
                 <InnerSideBarFilters className="mx-2">
                   <InnerSideBarFilterSearchInput
@@ -281,6 +271,7 @@ const SideBarContent = observer(() => {
                         <QueryItem
                           key={tabInfo.id}
                           tabInfo={tabInfo}
+                          onDeleteQuery={postDeleteCleanup}
                           hasQueriesSelected={selectedQueries.length > 0}
                         />
                       ))}
@@ -350,44 +341,33 @@ const SideBarContent = observer(() => {
                   </InnerSideMenuCollapsibleContent>
                 </InnerSideMenuCollapsible>
               )}
-            </div>
-          </div>
-        ) : null}
+            </>
+          )}
+        </div>
       </div>
 
       <ConfirmationModal
-        header="Confirm to delete query"
-        buttonLabel={`Delete ${selectedQueries.length.toLocaleString()} quer${selectedQueries.length > 1 ? 'ies' : 'y'}`}
-        buttonLoadingLabel="Deleting query"
+        title="Confirm to delete query"
+        confirmLabel={`Delete ${selectedQueries.length.toLocaleString()} quer${selectedQueries.length > 1 ? 'ies' : 'y'}`}
+        confirmLabelLoading="Deleting query"
         size="medium"
         loading={isDeleting}
         visible={showDeleteModal}
-        onSelectConfirm={onConfirmDelete}
-        onSelectCancel={() => setShowDeleteModal(false)}
-        danger
+        onConfirm={onConfirmDelete}
+        onCancel={() => setShowDeleteModal(false)}
+        variant={'destructive'}
+        alert={{
+          title: 'This action cannot be undone',
+          description: 'The selected SQL snippets cannot be recovered once deleted',
+        }}
       >
-        <Modal.Content>
-          <div className="my-6">
-            <div className="text-sm text-foreground-light grid gap-4">
-              <div className="grid gap-y-4">
-                <Alert_Shadcn_ variant="destructive">
-                  <WarningIcon />
-                  <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-                  <AlertDescription_Shadcn_>
-                    The selected SQL snippets cannot be recovered once deleted
-                  </AlertDescription_Shadcn_>
-                </Alert_Shadcn_>
-                <p>
-                  Are you sure you want to delete the selected {selectedQueries.length} quer
-                  {selectedQueries.length > 1 ? 'ies' : 'y'}?
-                </p>
-              </div>
-            </div>
-          </div>
-        </Modal.Content>
+        <p className="text-sm text-foreground-light">
+          Are you sure you want to delete the selected {selectedQueries.length} quer
+          {selectedQueries.length > 1 ? 'ies' : 'y'}?
+        </p>
       </ConfirmationModal>
     </>
   )
-})
+}
 
 export default SideBarContent

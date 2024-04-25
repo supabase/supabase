@@ -1,11 +1,11 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, isUndefined, noop } from 'lodash'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Alert, Badge, Button, Checkbox, IconBookOpen, Input, Modal, SidePanel } from 'ui'
+import toast from 'react-hot-toast'
+import { Alert, Badge, Button, Checkbox, Input, SidePanel } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useDatabasePublicationsQuery } from 'data/database-publications/database-publications-query'
 import {
   CONSTRAINT_TYPE,
@@ -17,8 +17,9 @@ import {
   useForeignKeyConstraintsQuery,
 } from 'data/database/foreign-key-constraints-query'
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
-import { useIsFeatureEnabled, useStore } from 'hooks'
+import { useIsFeatureEnabled } from 'hooks'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
+import { ExternalLink } from 'lucide-react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SpreadsheetImport } from '../'
 import ActionBar from '../ActionBar'
@@ -75,7 +76,6 @@ const TableEditor = ({
   updateEditorDirty = noop,
 }: TableEditorProps) => {
   const snap = useTableEditorStateSnapshot()
-  const { ui } = useStore()
   const { project } = useProjectContext()
   const isNewRecord = isUndefined(table)
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
@@ -171,15 +171,15 @@ const TableEditor = ({
     if (tableFields) {
       const errors: any = validateFields(tableFields)
       if (errors.columns) {
-        ui.setNotification({ category: 'error', message: errors.columns, duration: 4000 })
+        toast.error(errors.columns)
       }
       setErrors(errors)
 
       if (isEmpty(errors)) {
         const payload = {
-          name: tableFields.name,
+          name: tableFields.name.trim(),
           schema: snap.selectedSchemaName,
-          comment: tableFields.comment,
+          comment: tableFields.comment?.trim(),
           ...(!isNewRecord && { rls_enabled: tableFields.isRLSEnabled }),
         }
         const configuration = {
@@ -191,8 +191,11 @@ const TableEditor = ({
           existingForeignKeyRelations: foreignKeys,
           primaryKey,
         }
+        const columns = tableFields.columns.map((column) => {
+          return { ...column, name: column.name.trim() }
+        })
 
-        saveChanges(payload, tableFields.columns, fkRelations, isNewRecord, configuration, resolve)
+        saveChanges(payload, columns, fkRelations, isNewRecord, configuration, resolve)
       } else {
         resolve()
       }
@@ -276,7 +279,7 @@ const TableEditor = ({
           label={
             <div className="flex items-center space-x-2">
               <span>Enable Row Level Security (RLS)</span>
-              <Badge color="gray">Recommended</Badge>
+              <Badge>Recommended</Badge>
             </div>
           }
           // @ts-ignore
@@ -303,23 +306,20 @@ const TableEditor = ({
             title="Policies are required to query data"
           >
             <p>
-              You need to write an access policy before you can query data from this table. Without
-              a policy, querying this table will result in an <u>empty array</u> of results.
+              You need to create an access policy before you can query data from this table. Without
+              a policy, querying this table will return an{' '}
+              <u className="text-foreground">empty array</u> of results.{' '}
+              {isNewRecord ? 'You can create policies after saving this table.' : ''}
             </p>
-            {isNewRecord && (
-              <p className="mt-3">You can create policies after you create this table.</p>
-            )}
-            <p className="mt-4">
-              <Button asChild type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                <Link
-                  href="https://supabase.com/docs/guides/auth/row-level-security"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  RLS Documentation
-                </Link>
-              </Button>
-            </p>
+            <Button asChild type="default" icon={<ExternalLink />} className="mt-4">
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href="https://supabase.com/docs/guides/auth/row-level-security"
+              >
+                RLS Documentation
+              </a>
+            </Button>
           </Alert>
         ) : (
           <Alert
@@ -332,17 +332,15 @@ const TableEditor = ({
               {tableFields.name ? `The table ${tableFields.name}` : 'Your table'} will be publicly
               writable and readable
             </p>
-            <p className="mt-4">
-              <Button asChild type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                <Link
-                  href="https://supabase.com/docs/guides/auth/row-level-security"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  RLS Documentation
-                </Link>
-              </Button>
-            </p>
+            <Button asChild type="default" icon={<ExternalLink />} className="mt-4">
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href="https://supabase.com/docs/guides/auth/row-level-security"
+              >
+                RLS Documentation
+              </a>
+            </Button>
           </Alert>
         )}
         {realtimeEnabled && (
@@ -360,6 +358,7 @@ const TableEditor = ({
       <SidePanel.Content className="space-y-10 py-6">
         {!isDuplicating && (
           <ColumnManagement
+            table={tableFields}
             columns={tableFields?.columns}
             relations={fkRelations}
             enumTypes={enumTypes}
@@ -371,6 +370,7 @@ const TableEditor = ({
               onUpdateField({ columns: DEFAULT_COLUMNS })
               setImportContent(undefined)
             }}
+            onUpdateFkRelations={onUpdateFkRelations}
           />
         )}
         {isDuplicating && (
@@ -399,18 +399,16 @@ const TableEditor = ({
 
         <ConfirmationModal
           visible={rlsConfirmVisible}
-          header="Turn off Row Level Security"
-          buttonLabel="Confirm"
+          title="Turn off Row Level Security"
+          confirmLabel="Confirm"
           size="medium"
-          onSelectCancel={() => setRlsConfirmVisible(false)}
-          onSelectConfirm={() => {
+          onCancel={() => setRlsConfirmVisible(false)}
+          onConfirm={() => {
             onUpdateField({ isRLSEnabled: !tableFields.isRLSEnabled })
             setRlsConfirmVisible(false)
           }}
         >
-          <Modal.Content>
-            <RLSDisableModalContent />
-          </Modal.Content>
+          <RLSDisableModalContent />
         </ConfirmationModal>
       </SidePanel.Content>
 
