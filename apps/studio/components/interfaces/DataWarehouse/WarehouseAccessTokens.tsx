@@ -156,7 +156,7 @@ const WarehouseAccessTokens = () => {
                       hasAccessTokens ? (
                         accessTokensQuery.data.data.map((accessToken) => (
                           <AccessTokenItem
-                            key={accessToken.id}
+                            key={accessToken.id + '-wh-access-token'}
                             token={accessToken.token}
                             id={accessToken.id}
                             inserted_at={accessToken.inserted_at}
