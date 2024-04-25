@@ -26,6 +26,8 @@ import { moveStorageObject } from 'data/storage/object-move-mutation'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
 
+type CachedFile = { id: string; fetchedAt: number; expiresIn: number; url: string | null }
+
 /**
  * This is a preferred method rather than React Context and useStorageExplorerStore().
  * If we can switch to this method, we can remove the implementation below, and we don't need compose() within the react components
@@ -77,7 +79,7 @@ class StorageExplorerStore {
   endpoint: string = ''
 
   /* FE Cacheing for file previews */
-  filePreviewCache = []
+  filePreviewCache: CachedFile[] = []
 
   /* For file uploads, from 0 to 1 */
   uploadProgress: number = 0
@@ -129,7 +131,7 @@ class StorageExplorerStore {
     )
   }
 
-  updateFileInPreviewCache = (fileCache) => {
+  updateFileInPreviewCache = (fileCache: CachedFile) => {
     const updatedFilePreviewCache = this.filePreviewCache.map((file) => {
       if (file.id === fileCache.id) return fileCache
       return file
@@ -137,7 +139,7 @@ class StorageExplorerStore {
     this.filePreviewCache = updatedFilePreviewCache
   }
 
-  addFileToPreviewCache = (fileCache) => {
+  addFileToPreviewCache = (fileCache: CachedFile) => {
     const updatedFilePreviewCache = this.filePreviewCache.concat([fileCache])
     this.filePreviewCache = updatedFilePreviewCache
   }
@@ -358,7 +360,7 @@ class StorageExplorerStore {
           : previewUrl
         this.selectedFilePreview = { ...file, previewUrl: formattedPreviewUrl }
 
-        const fileCache = {
+        const fileCache: CachedFile = {
           id: file.id,
           url: previewUrl,
           expiresIn: DEFAULT_EXPIRY,
@@ -391,7 +393,7 @@ class StorageExplorerStore {
         const fileUrl = formattedUrl.toString()
 
         // Also save it to cache
-        const fileCache = {
+        const fileCache: CachedFile = {
           id: file.id,
           url: fileUrl,
           expiresIn: DEFAULT_EXPIRY,
