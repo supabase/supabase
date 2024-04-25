@@ -138,7 +138,7 @@ services:
       # See: https://supabase.com/docs/guides/auth/auth-hooks#hook-custom-access-token for details
       # GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_ENABLED="true"
       # GOTRUE_HOOK_CUSTOM_ACCESS_TOKEN_URI="pg-functions://postgres/public/custom_access_token_hook"
-      
+
       # GOTRUE_HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED="true"
       # GOTRUE_HOOK_MFA_VERIFICATION_ATTEMPT_URI="pg-functions://postgres/public/mfa_verification_attempt"
 
@@ -339,6 +339,7 @@ services:
       LOGFLARE_API_KEY: ${LOGFLARE_API_KEY}
       LOGFLARE_SINGLE_TENANT: true
       LOGFLARE_SUPABASE_MODE: true
+      LOGFLARE_MIN_CLUSTER_SIZE: 1
 
       # Comment variables to use Big Query backend for analytics
       POSTGRES_BACKEND_URL: postgresql://supabase_admin:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
