@@ -207,7 +207,7 @@ Another crucial aspect of SLA Buddy is its ability to monitor support events sea
 
 The shift information about Support Engineers is hosted in a Google Calendar. This information is retrieved using the following function:
 
-```jsx
+```sql
 CREATE OR REPLACE FUNCTION "public"."get_embedded_event_names"
 	("date_param" timestamp with time zone DEFAULT "now"())
   RETURNS "jsonb"
