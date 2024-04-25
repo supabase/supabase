@@ -221,16 +221,16 @@ where
     and (
         (
             -- Example: auth.uid()
-            qual  ~ '(auth)\.(uid|jwt|role|email)\(\)'
+            qual  ~ '(auth)\\.(uid|jwt|role|email)\\(\\)'
             -- Example: select auth.uid()
-            and lower(qual) !~ 'select\s+(auth)\.(uid|jwt|role|email)\(\)'
+            and lower(qual) !~ 'select\\s+(auth)\\.(uid|jwt|role|email)\\(\\)'
         )
         or
         (
             -- Example: auth.uid()
-            with_check  ~ '(auth)\.(uid|jwt|role|email)\(\)'
+            with_check  ~ '(auth)\\.(uid|jwt|role|email)\\(\\)'
             -- Example: select auth.uid()
-            and lower(with_check) !~ 'select\s+(auth)\.(uid|jwt|role|email)\(\)'
+            and lower(with_check) !~ 'select\\s+(auth)\\.(uid|jwt|role|email)\\(\\)'
         )
     ))
 union all

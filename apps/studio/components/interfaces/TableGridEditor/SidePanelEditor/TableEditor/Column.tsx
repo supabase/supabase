@@ -1,13 +1,33 @@
-import { noop } from 'lodash'
-import { Checkbox, IconMenu, IconSettings, IconX, Input, Popover } from 'ui'
+import { Link, Menu, Plus, Settings, X } from 'lucide-react'
+import {
+  Badge,
+  Button,
+  Checkbox,
+  CommandGroup_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  CommandSeparator_Shadcn_,
+  Command_Shadcn_,
+  Input,
+  Popover,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  cn,
+} from 'ui'
 
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
 import type { EnumeratedType } from 'data/enumerated-types/enumerated-types-query'
 import { EMPTY_ARR, EMPTY_OBJ } from 'lib/void'
+import { useState } from 'react'
 import { typeExpressionSuggestions } from '../ColumnEditor/ColumnEditor.constants'
 import type { Suggestion } from '../ColumnEditor/ColumnEditor.types'
 import ColumnType from '../ColumnEditor/ColumnType'
 import InputWithSuggestions from '../ColumnEditor/InputWithSuggestions'
+import { ForeignKey } from '../ForeignKeySelector/ForeignKeySelector.types'
 import type { ColumnField } from '../SidePanelEditor.types'
+import { checkIfRelationChanged } from './ForeignKeysManagement/ForeignKeysManagement.utils'
 
 /**
  * [Joshen] For context:
@@ -29,6 +49,7 @@ import type { ColumnField } from '../SidePanelEditor.types'
 
 interface ColumnProps {
   column: ColumnField
+  relations: ForeignKey[]
   enumTypes: EnumeratedType[]
   isNewRecord: boolean
   hasForeignKeys: boolean
@@ -36,18 +57,23 @@ interface ColumnProps {
   dragHandleProps?: any
   onUpdateColumn: (changes: Partial<ColumnField>) => void
   onRemoveColumn: () => void
+  onEditForeignKey: (relation?: ForeignKey) => void
 }
 
 const Column = ({
   column = EMPTY_OBJ as ColumnField,
+  relations = EMPTY_ARR as ForeignKey[],
   enumTypes = EMPTY_ARR as EnumeratedType[],
   isNewRecord = false,
   hasForeignKeys = false,
   hasImportContent = false,
   dragHandleProps = EMPTY_OBJ,
-  onUpdateColumn = noop,
-  onRemoveColumn = noop,
+  onUpdateColumn,
+  onRemoveColumn,
+  onEditForeignKey,
 }: ColumnProps) => {
+  const { project } = useProjectContext()
+  const [open, setOpen] = useState(false)
   const suggestions: Suggestion[] = typeExpressionSuggestions?.[column.format] ?? []
 
   const settingsCount = [
@@ -57,26 +83,142 @@ const Column = ({
     column.isArray ? 1 : 0,
   ].reduce((a, b) => a + b, 0)
 
+  const { data } = useForeignKeyConstraintsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: column.schema,
+  })
+
+  const getRelationStatus = (fk: ForeignKey) => {
+    const existingRelation = (data ?? []).find((x) => x.id === fk.id)
+    const stateRelation = relations.find((x) => x.id === fk.id)
+
+    if (stateRelation?.toRemove) return 'REMOVE'
+    if (existingRelation === undefined && stateRelation !== undefined) return 'ADD'
+    if (existingRelation !== undefined && stateRelation !== undefined) {
+      const hasUpdated = checkIfRelationChanged(existingRelation, stateRelation)
+      if (hasUpdated) return 'UPDATE'
+      else return undefined
+    }
+  }
+
+  const hasChangesInRelations = relations
+    .map((r) => getRelationStatus(r))
+    .some((x) => x !== undefined)
+
   return (
     <div className="flex w-full items-center">
       <div className={`w-[5%] ${!isNewRecord ? 'hidden' : ''}`}>
         <div className="cursor-drag" {...dragHandleProps}>
-          <IconMenu strokeWidth={1} size={15} />
+          <Menu strokeWidth={1} size={16} />
         </div>
       </div>
       <div className="w-[25%]">
         <div className="flex w-[95%] items-center justify-between">
           <Input
-            value={column.name}
             size="small"
+            value={column.name}
             title={column.name}
             disabled={hasImportContent}
             placeholder="column_name"
-            className={`table-editor-columns-input bg-surface-100 lg:gap-0 ${
+            className={cn(
+              '[&>div>div>div>input]:py-1.5 [&>div>div>div>input]:border-r-transparent [&>div>div>div>input]:rounded-r-none',
               hasImportContent ? 'opacity-50' : ''
-            } rounded-md`}
+            )}
             onChange={(event: any) => onUpdateColumn({ name: event.target.value })}
           />
+          {relations.filter((r) => !r.toRemove).length === 0 ? (
+            <Button
+              type="dashed"
+              className="rounded-l-none h-[30px] py-0 px-2"
+              onClick={() => onEditForeignKey()}
+            >
+              <Link size={12} />
+            </Button>
+          ) : (
+            <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button type="default" className="rounded-l-none h-[30px] py-0 px-2">
+                  <Link size={12} />
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_
+                className={cn('p-0', hasChangesInRelations ? 'w-96' : 'w-72')}
+                side="bottom"
+                align="end"
+              >
+                <div className="text-xs px-2 pt-2">
+                  Involved in {relations.length} foreign key{relations.length > 1 ? 's' : ''}
+                </div>
+                <Command_Shadcn_>
+                  <CommandList_Shadcn_>
+                    <CommandGroup_Shadcn_>
+                      {relations.map((relation, idx) => {
+                        const key = String(relation?.id ?? `${column.id}-relation-${idx}`)
+                        const status = getRelationStatus(relation)
+                        if (status === 'REMOVE') return null
+
+                        return (
+                          <CommandItem_Shadcn_
+                            key={key}
+                            value={key}
+                            className="cursor-pointer w-full"
+                            onSelect={() => onEditForeignKey(relation)}
+                            onClick={() => onEditForeignKey(relation)}
+                          >
+                            {status === undefined ? (
+                              <div className="w-full flex items-center justify-between truncate">
+                                {relation.name}
+                              </div>
+                            ) : (
+                              <div className="flex items-center gap-x-2 truncate">
+                                <Badge variant={status === 'ADD' ? 'brand' : 'warning'}>
+                                  {status}
+                                </Badge>
+                                <p className="truncate">
+                                  {relation.name || (
+                                    <>
+                                      To{' '}
+                                      {relation.columns
+                                        .filter((c) => c.source === column.name)
+                                        .map((c) => {
+                                          return (
+                                            <code key={`${c.source}-${c.target}`}>
+                                              {relation.schema}.{relation.table}.{c.target}
+                                            </code>
+                                          )
+                                        })}
+                                      {relation.columns.length > 1 && (
+                                        <>
+                                          and {relation.columns.length - 1} other column
+                                          {relation.columns.length > 2 ? 's' : ''}
+                                        </>
+                                      )}
+                                    </>
+                                  )}
+                                </p>
+                              </div>
+                            )}
+                          </CommandItem_Shadcn_>
+                        )
+                      })}
+                    </CommandGroup_Shadcn_>
+                    <CommandSeparator_Shadcn_ />
+                    <CommandGroup_Shadcn_>
+                      <CommandItem_Shadcn_
+                        className="cursor-pointer w-full gap-x-2"
+                        onSelect={() => onEditForeignKey()}
+                        onClick={() => onEditForeignKey()}
+                      >
+                        <Plus size={14} strokeWidth={1.5} />
+                        <p>Add foreign key relation</p>
+                      </CommandItem_Shadcn_>
+                    </CommandGroup_Shadcn_>
+                  </CommandList_Shadcn_>
+                </Command_Shadcn_>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
+          )}
         </div>
       </div>
       <div className="w-[25%]">
@@ -200,12 +342,12 @@ const Column = ({
             >
               <div className="group flex items-center -space-x-1">
                 {settingsCount > 0 && (
-                  <div className="rounded-full bg-foreground py-0.5 px-2 text-xs text-background">
+                  <div className="rounded-full bg-foreground h-4 w-4 flex items-center justify-center text-xs text-background">
                     {settingsCount}
                   </div>
                 )}
                 <div className="text-foreground-light transition-colors group-hover:text-foreground">
-                  <IconSettings size={18} strokeWidth={1} />
+                  <Settings size={16} strokeWidth={1} />
                 </div>
               </div>
             </Popover>
@@ -215,7 +357,7 @@ const Column = ({
       {!hasImportContent && (
         <div className="flex w-[5%] justify-end">
           <button className="cursor-pointer" onClick={() => onRemoveColumn()}>
-            <IconX strokeWidth={1} />
+            <X size={16} strokeWidth={1} />
           </button>
         </div>
       )}

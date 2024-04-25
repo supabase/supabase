@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { DragDropContext, Droppable, DroppableProvided } from 'react-beautiful-dnd'
 import { useFieldArray, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
@@ -50,6 +50,10 @@ const CreateEnumeratedTypeSidePanel = ({
       closePanel()
     },
   })
+
+  useEffect(() => {
+    form.reset(initialValues)
+  }, [visible])
 
   const FormSchema = z.object({
     name: z

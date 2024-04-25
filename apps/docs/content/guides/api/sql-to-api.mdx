@@ -4,7 +4,9 @@ title: 'Converting SQL to JavaScript API'
 description: 'Implementing common SQL patterns in the JavaScript API'
 ---
 
-{/* @TODO: this one is a very daunting read on first attempt. Need to check what is the purpose of it */}
+Many common SQL queries can be written using the JavaScript API, provided by the SDK to wrap Data API calls. Below are a few examples of conversions between SQL and JavaScript patterns.
+
+## Select statement with basic clauses
 
 Select a set of columns from a single table with where, order by, and limit clauses.
 
@@ -28,6 +30,8 @@ const { data, error } = await supabase
   .limit(20)
 ```
 
+## Select statement with complex Boolean Logic clause
+
 Select all columns from a single table with a complex where clause: OR AND OR
 
 ```sql
@@ -42,7 +46,6 @@ const { data, error } = await supabase
   .select() // or .select('*')
   .or('team_id.eq.CHN,team_id.is.null')
   .or('age.gt.35,age.is.null') // additional filters imply "AND"
-  .not('team_id', 'eq', 'STL')
 ```
 
 Select all columns from a single table with a complex where clause: AND OR AND
@@ -58,21 +61,6 @@ const { data, error } = await supabase
   .from('players')
   .select() // or .select('*')
   .or('and(team_id.eq.CHN,age.gt.35),and(team_id.neq.CHN,.not.age.is.null)')
-```
-
-Get a count of rows, but don't return any data.
-
-```sql
-select count(*)
-from players
-where team_id = 'NYM';
-```
-
-```js
-const { count, error } = await supabase
-  .from('players')
-  .select('*', { count: 'exact', head: true }) // exact, planned, or executed
-  .eq('team_id', 'NYM')
 ```
 
 ## Resources

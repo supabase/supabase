@@ -70,6 +70,7 @@ interface AIPolicyEditorPanelProps {
   visible: boolean
   schema: string
   searchString?: string
+  selectedTable?: string
   selectedPolicy?: PostgresPolicy
   onSelectCancel: () => void
 }
@@ -81,6 +82,7 @@ export const AIPolicyEditorPanel = memo(function ({
   visible,
   schema,
   searchString,
+  selectedTable,
   selectedPolicy,
   onSelectCancel,
 }: AIPolicyEditorPanelProps) {
@@ -415,6 +417,8 @@ export const AIPolicyEditorPanel = memo(function ({
         if (selectedPolicy.check && selectedPolicy.command !== 'INSERT') {
           setShowCheckBlock(true)
         }
+      } else if (selectedTable !== undefined) {
+        form.reset({ ...defaultValues, table: selectedTable })
       }
     }
   }, [visible])
@@ -535,6 +539,7 @@ export const AIPolicyEditorPanel = memo(function ({
                       <PolicyDetailsV2
                         schema={schema}
                         searchString={searchString}
+                        selectedTable={selectedTable}
                         isEditing={selectedPolicy !== undefined}
                         form={form}
                         onUpdateCommand={(command: string) => {

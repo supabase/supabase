@@ -164,10 +164,7 @@ export function ChartConfig({ results = { rows: [] }, config, onConfigChange }: 
                 id="cumulative"
                 name="cumulative"
                 checked={config.cumulative}
-                onClick={(e) => {
-                  console.log(e)
-                  onConfigChange({ ...config, cumulative: !config.cumulative })
-                }}
+                onClick={() => onConfigChange({ ...config, cumulative: !config.cumulative })}
               />
               <Label_Shadcn_ className="text-foreground-light p-1.5" htmlFor="cumulative">
                 Cumulative
