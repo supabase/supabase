@@ -472,16 +472,35 @@ export interface paths {
     get: operations['ProjectsController_getProjectByFlyExtensionId']
   }
   '/platform/projects/{ref}/content': {
-    /** Gets project's content */
+    /**
+     * Gets project's content
+     * @deprecated
+     */
     get: operations['ContentController_getContent']
     /** Updates project's content */
-    put: operations['ContentController_updateWholeContent']
+    put: operations['ContentController_updateWholeContentV2']
     /** Creates project's content */
-    post: operations['ContentController_createContent']
+    post: operations['ContentController_createContentV2']
     /** Deletes project's contents */
     delete: operations['ContentController_deleteContents']
-    /** Updates project's content */
-    patch: operations['ContentController_updateContent']
+  }
+  '/platform/projects/{ref}/content/{id}': {
+    /** Gets project's content by the given id */
+    get: operations['ContentController_getContentById']
+  }
+  '/platform/projects/{ref}/content/folders': {
+    /** Gets project's content root folder */
+    get: operations['ContentFoldersController_getRootFolder']
+    /** Creates project's content folder */
+    post: operations['ContentFoldersController_createFolder']
+    /** Deletes project's content folders */
+    delete: operations['ContentFoldersController_DeleteFolder']
+  }
+  '/platform/projects/{ref}/content/folders/{id}': {
+    /** Gets project's content folder */
+    get: operations['ContentFoldersController_getFolder']
+    /** Updates project's content folder */
+    patch: operations['ContentFoldersController_updateFolder']
   }
   '/platform/projects/{ref}/daily-stats': {
     /** Gets daily project stats */
@@ -1328,16 +1347,21 @@ export interface paths {
     get: operations['V0ProjectsMetricsController_getProjectsMetrics']
   }
   '/v0/projects/{ref}/content': {
-    /** Gets project's content */
+    /**
+     * Gets project's content
+     * @deprecated
+     */
     get: operations['ContentController_getContent']
     /** Updates project's content */
-    put: operations['ContentController_updateWholeContent']
+    put: operations['ContentController_updateWholeContentV2']
     /** Creates project's content */
-    post: operations['ContentController_createContent']
+    post: operations['ContentController_createContentV2']
     /** Deletes project's contents */
     delete: operations['ContentController_deleteContents']
-    /** Updates project's content */
-    patch: operations['ContentController_updateContent']
+  }
+  '/v0/projects/{ref}/content/{id}': {
+    /** Gets project's content by the given id */
+    get: operations['ContentController_getContentById']
   }
   '/v0/projects/{ref}/databases': {
     /** Gets non-removed databases of a specified project */
@@ -1913,20 +1937,16 @@ export interface paths {
     post: operations['ExtensionsController_provisionResource']
   }
   '/partners/flyio/organizations/{organization_id}': {
-    /** Gets details of the organization linked to the provided Fly organization id */
+    /** Gets information about the organization */
     get: operations['OrganizationsController_getOrganization']
   }
   '/partners/flyio/organizations/{organization_id}/extensions': {
-    /** Gets all databases that belong to the given Fly organization id */
+    /** Gets all databases that belong to the Fly organization */
     get: operations['OrganizationsController_getOrgExtensions']
   }
   '/partners/flyio/organizations/{organization_id}/sso': {
     /** Starts Fly single sign on */
     get: operations['OrganizationsController_startFlyioSSO']
-  }
-  '/partners/flyio/organizations/{organization_id}/subscription': {
-    /** Updates organization subscription linked to the provided Fly organization id */
-    put: operations['OrganizationsController_updateOrganization']
   }
   '/partners/flyio/organizations/{organization_id}/billing': {
     /** Gets the organizations current unbilled charges */
@@ -2848,10 +2868,7 @@ export interface components {
         stripeAccount?: string
       }
     }
-    /**
-     * @description Organization subscription plan
-     * @enum {string}
-     */
+    /** @enum {string} */
     BillingPlanId: 'free' | 'pro' | 'team' | 'enterprise'
     BillingSubscriptionPlan: {
       id: components['schemas']['BillingPlanId']
@@ -3690,15 +3707,28 @@ export interface components {
       description?: string
       project_id: number
       owner_id: number
-      last_updated_by: number
+      last_updated_by?: number
     }
     GetUserContentResponse: {
       data: components['schemas']['GetUserContentObject'][]
     }
-    CreateContentParams: {
+    GetUserContentByIdResponse: {
+      folder_id?: string
       id: string
+      inserted_at: string
+      updated_at: string
+      type: Record<string, never>
+      visibility: Record<string, never>
       name: string
-      description: string
+      description?: string
+      project_id: number
+      owner_id: number
+      last_updated_by?: number
+    }
+    CreateContentBody: {
+      id?: string
+      name: string
+      description?: string
       /** @enum {string} */
       type: 'sql' | 'report' | 'log_sql'
       /** @enum {string} */
@@ -3716,12 +3746,37 @@ export interface components {
       description?: string
       project_id: number
       owner_id: number
-      last_updated_by: number
+      last_updated_by?: number
     }
-    UpsertContentParams: {
-      id: string
+    CreateContentBodyV2: {
+      id?: string
       name: string
-      description: string
+      description?: string
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
+      content?: Record<string, never>
+      owner_id?: number
+      folder_id?: string
+    }
+    UserContentObjectV2: {
+      id: string
+      inserted_at: string
+      updated_at: string
+      type: Record<string, never>
+      visibility: Record<string, never>
+      name: string
+      description?: string
+      project_id: number
+      owner_id: number
+      last_updated_by?: number
+      folder_id?: string
+    }
+    UpsertContentBody: {
+      id?: string
+      name: string
+      description?: string
       /** @enum {string} */
       type: 'sql' | 'report' | 'log_sql'
       /** @enum {string} */
@@ -3730,19 +3785,61 @@ export interface components {
       owner_id?: number
       project_id: number
     }
-    UpdateContentParams: {
+    UpsertContentBodyV2: {
       id?: string
-      name?: string
+      name: string
       description?: string
       /** @enum {string} */
-      type?: 'sql' | 'report' | 'log_sql'
+      type: 'sql' | 'report' | 'log_sql'
       /** @enum {string} */
-      visibility?: 'user' | 'project' | 'org' | 'public'
+      visibility: 'user' | 'project' | 'org' | 'public'
       content?: Record<string, never>
       owner_id?: number
+      project_id: number
+      folder_id?: string
     }
     BulkDeleteUserContentResponse: {
       id: string
+    }
+    UserContentFolder: {
+      id: string
+      name: string
+      project_id: number
+      owner_id: number
+      parent_id?: string | null
+    }
+    UserContentObjectMeta: {
+      id: string
+      inserted_at: string
+      updated_at: string
+      type: Record<string, never>
+      visibility: Record<string, never>
+      name: string
+      description?: string
+      project_id: number
+      owner_id: number
+      last_updated_by?: number
+      folder_id?: string
+    }
+    GetUserContentFolderResponse: {
+      data: {
+        folders?: components['schemas']['UserContentFolder'][]
+        contents?: components['schemas']['UserContentObjectMeta'][]
+      }
+    }
+    CreateContentFolderBody: {
+      name: string
+      parent_id?: string
+    }
+    CreateUserContentFolderResponse: {
+      id: string
+      name: string
+      project_id: number
+      owner_id: number
+      parent_id?: string | null
+    }
+    UpdateContentFolderBody: {
+      name: string
     }
     DatabaseDetailResponse: {
       /** @enum {string} */
@@ -4052,11 +4149,10 @@ export interface components {
       db_schema?: string
     }
     V1PostgrestConfigResponse: {
-      max_rows: number
-      /** @description If `null`, the value is automatically configured based on compute size. */
+      max_rows: number | null
       db_pool: number | null
-      db_schema: string
-      db_extra_search_path: string
+      db_schema: string | null
+      db_extra_search_path: string | null
     }
     PostgresConfigResponse: {
       statement_timeout?: string
@@ -4067,8 +4163,6 @@ export interface components {
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
-      max_standby_archive_delay?: string
-      max_standby_streaming_delay?: string
       max_worker_processes?: number
       shared_buffers?: string
       work_mem?: string
@@ -4084,8 +4178,6 @@ export interface components {
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
-      max_standby_archive_delay?: string
-      max_standby_streaming_delay?: string
       max_worker_processes?: number
       shared_buffers?: string
       work_mem?: string
@@ -4740,7 +4832,6 @@ export interface components {
       /** @enum {string} */
       tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
       price_id?: string
-      skip_free_plan_validations?: boolean
     }
     RestrictionData: {
       grace_period_end?: string
@@ -4981,11 +5072,10 @@ export interface components {
       root_key: string
     }
     PostgrestConfigWithJWTSecretResponse: {
-      max_rows: number
-      /** @description If `null`, the value is automatically configured based on compute size. */
+      max_rows: number | null
       db_pool: number | null
-      db_schema: string
-      db_extra_search_path: string
+      db_schema: string | null
+      db_extra_search_path: string | null
       jwt_secret?: string
     }
     V1ProjectRefResponse: {
@@ -5623,7 +5713,7 @@ export interface components {
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
       name: string
-      description: string | null
+      description?: string
       project: components['schemas']['SnippetProject']
       owner: components['schemas']['SnippetUser']
       updated_by: components['schemas']['SnippetUser']
@@ -5645,7 +5735,7 @@ export interface components {
       /** @enum {string} */
       visibility: 'user' | 'project' | 'org' | 'public'
       name: string
-      description: string | null
+      description?: string
       project: components['schemas']['SnippetProject']
       owner: components['schemas']['SnippetUser']
       updated_by: components['schemas']['SnippetUser']
@@ -5764,10 +5854,6 @@ export interface components {
        * @example fly_123456789
        */
       supabase_org_id: string
-    }
-    UpdateFlyOrganizationSubscriptionBody: {
-      /** @example pro */
-      plan: components['schemas']['BillingPlanId']
     }
     ResourceBillingItem: {
       /**
@@ -9278,7 +9364,10 @@ export interface operations {
       }
     }
   }
-  /** Gets project's content */
+  /**
+   * Gets project's content
+   * @deprecated
+   */
   ContentController_getContent: {
     parameters: {
       path: {
@@ -9299,17 +9388,15 @@ export interface operations {
     }
   }
   /** Updates project's content */
-  ContentController_updateWholeContent: {
+  ContentController_updateWholeContentV2: {
     requestBody: {
       content: {
-        'application/json': components['schemas']['UpsertContentParams']
+        'application/json': components['schemas']['UpsertContentBodyV2']
       }
     }
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['UserContentObject']
-        }
+        content: never
       }
       /** @description Failed to update project's content */
       500: {
@@ -9318,7 +9405,7 @@ export interface operations {
     }
   }
   /** Creates project's content */
-  ContentController_createContent: {
+  ContentController_createContentV2: {
     parameters: {
       path: {
         /** @description Project ref */
@@ -9327,13 +9414,13 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['CreateContentParams']
+        'application/json': components['schemas']['CreateContentBodyV2']
       }
     }
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['UserContentObject'][]
+          'application/json': components['schemas']['UserContentObjectV2']
         }
       }
       /** @description Failed to create project's content */
@@ -9365,25 +9452,132 @@ export interface operations {
       }
     }
   }
-  /** Updates project's content */
-  ContentController_updateContent: {
+  /** Gets project's content by the given id */
+  ContentController_getContentById: {
     parameters: {
-      query: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Content id */
         id: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateContentParams']
       }
     }
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['UserContentObject'][]
+          'application/json': components['schemas']['GetUserContentByIdResponse']
         }
       }
-      /** @description Failed to update project's content */
+      /** @description Failed to retrieve project's content by the given id */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets project's content root folder */
+  ContentFoldersController_getRootFolder: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetUserContentFolderResponse']
+        }
+      }
+      /** @description Failed to retrieve project's content root folder */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Creates project's content folder */
+  ContentFoldersController_createFolder: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CreateContentFolderBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['CreateUserContentFolderResponse']
+        }
+      }
+      /** @description Failed to create project's content folder */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Deletes project's content folders */
+  ContentFoldersController_DeleteFolder: {
+    parameters: {
+      query: {
+        ids: string[]
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to delete project's content folders */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets project's content folder */
+  ContentFoldersController_getFolder: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Content folder id */
+        id: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['GetUserContentFolderResponse']
+        }
+      }
+      /** @description Failed to retrieve project's content folder */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates project's content folder */
+  ContentFoldersController_updateFolder: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Content folder id */
+        id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateContentFolderBody']
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to update project's content folder */
       500: {
         content: never
       }
@@ -14252,7 +14446,7 @@ export interface operations {
       }
     }
   }
-  /** Gets details of the organization linked to the provided Fly organization id */
+  /** Gets information about the organization */
   OrganizationsController_getOrganization: {
     parameters: {
       path: {
@@ -14267,7 +14461,7 @@ export interface operations {
       }
     }
   }
-  /** Gets all databases that belong to the given Fly organization id */
+  /** Gets all databases that belong to the Fly organization */
   OrganizationsController_getOrgExtensions: {
     parameters: {
       path: {
@@ -14287,24 +14481,6 @@ export interface operations {
     parameters: {
       path: {
         organization_id: string
-      }
-    }
-    responses: {
-      200: {
-        content: never
-      }
-    }
-  }
-  /** Updates organization subscription linked to the provided Fly organization id */
-  OrganizationsController_updateOrganization: {
-    parameters: {
-      path: {
-        organization_id: string
-      }
-    }
-    requestBody: {
-      content: {
-        'application/json': components['schemas']['UpdateFlyOrganizationSubscriptionBody']
       }
     }
     responses: {

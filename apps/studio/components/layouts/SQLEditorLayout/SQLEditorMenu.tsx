@@ -31,6 +31,7 @@ import {
 } from 'ui-patterns/InnerSideMenu'
 import QueryItem from './QueryItem'
 import { selectItemsInRange } from './SQLEditorLayout.utils'
+import { useSQLSnippetFoldersQuery } from 'data/content/folders-query'
 
 const SideBarContent = () => {
   const { ref, id: activeId } = useParams()
@@ -50,6 +51,9 @@ const SideBarContent = () => {
       if (ref) snap.setRemoteSnippets(data.snippets, ref)
     },
   })
+
+  const { data } = useSQLSnippetFoldersQuery({ projectRef: ref })
+  console.log({ data })
 
   const { mutate: deleteContent, isLoading: isDeleting } = useContentDeleteMutation({
     onSuccess: (data) => postDeleteCleanup(data),
