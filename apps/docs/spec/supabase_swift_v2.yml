@@ -2954,6 +2954,95 @@ functions:
           By default, the data is returned in JSON format, but can also be returned as Comma Separated Values.
         hideCodeBlock: true
         isSpotlight: true
+  - id: explain
+    title: Using Explain
+    description: |
+      For debugging slow queries, you can get the [Postgres `EXPLAIN` execution plan](https://www.postgresql.org/docs/current/sql-explain.html) of a query
+      using the `explain()` method. This works on any query, even for `rpc()` or writes.
+
+      Explain is not enabled by default as it can reveal sensitive information about your database.
+      It's best to only enable this for testing environments but if you wish to enable it for production you can provide additional protection by using a `pre-request` function.
+
+      Follow the [Performance Debugging Guide](/docs/guides/database/debugging-performance) to enable the functionality on your project.
+    examples:
+      - id: get-execution-plan
+        name: Get the execution plan
+        code: |
+          ```swift
+          try await supabase
+            .from("countries")
+            .select()
+            .explain()
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          Aggregate  (cost=33.34..33.36 rows=1 width=112)
+            ->  Limit  (cost=0.00..18.33 rows=1000 width=40)
+                  ->  Seq Scan on countries  (cost=0.00..22.00 rows=1200 width=40)
+          ```
+        description: |
+          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
+        hideCodeBlock: true
+        isSpotlight: true
+
+      - id: get-execution-plan-with-analyze-and-verbose
+        name: Get the execution plan with analyze and verbose
+        code: |
+          ```swift
+          try await supabase
+            .from("countries")
+            .select()
+            .explain(
+              analyze: true,
+              verbose: true
+            )
+            .execute()
+            .value
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Afghanistan'),
+              (2, 'Albania'),
+              (3, 'Algeria');
+            ```
+        response: |
+          ```
+          Aggregate  (cost=33.34..33.36 rows=1 width=112) (actual time=0.041..0.041 rows=1 loops=1)
+            Output: NULL::bigint, count(ROW(countries.id, countries.name)), COALESCE(json_agg(ROW(countries.id, countries.name)), '[]'::json), NULLIF(current_setting('response.headers'::text, true), ''::text), NULLIF(current_setting('response.status'::text, true), ''::text)
+            ->  Limit  (cost=0.00..18.33 rows=1000 width=40) (actual time=0.005..0.006 rows=3 loops=1)
+                  Output: countries.id, countries.name
+                  ->  Seq Scan on public.countries  (cost=0.00..22.00 rows=1200 width=40) (actual time=0.004..0.005 rows=3 loops=1)
+                        Output: countries.id, countries.name
+          Query Identifier: -4730654291623321173
+          Planning Time: 0.407 ms
+          Execution Time: 0.119 ms
+          ```
+        description: |
+          By default, the data is returned in TEXT format, but can also be returned as JSON by using the `format` parameter.
+        hideCodeBlock: true
+        isSpotlight: false
   - id: invoke
     title: invoke()
     description: |
@@ -2997,6 +3086,18 @@ functions:
 
           print(type(of: response)) // String?
           ```
+      - id: invocation-with-streamed-response
+        name: Invocation with streamed response
+        description: |
+          - Use this method to return an `AsyncStream<Data>` when the function returns `Content-Type` = `text/event-stream`.
+        isSpotlight: true
+        code: |
+          ```swift
+          var response = Data()
+          for try await data try await supabase.functions._invokeWithStreamedResponse("hello") {
+            response.append(data)
+          }
+          ```
       - id: error-handling
         name: Error handling
         description: |
@@ -3037,6 +3138,37 @@ functions:
                 headers: [
                   "my-custom-header": "my-custom-header-value"
                 ]
+              )
+            )
+          ```
+      - id: regional-invocation
+        name: Invoking a Function in the UsEast1 region
+        description: |
+          Here are the available regions:
+          - `FunctionRegion.any`
+          - `FunctionRegion.apNortheast1`
+          - `FunctionRegion.apNortheast2`
+          - `FunctionRegion.apSouth1`
+          - `FunctionRegion.apSoutheast1`
+          - `FunctionRegion.apSoutheast2`
+          - `FunctionRegion.caCentral1`
+          - `FunctionRegion.euCentral1`
+          - `FunctionRegion.euWest1`
+          - `FunctionRegion.euWest2`
+          - `FunctionRegion.euWest3`
+          - `FunctionRegion.saEast1`
+          - `FunctionRegion.usEast1`
+          - `FunctionRegion.usWest1`
+          - `FunctionRegion.usWest2`
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.functions
+            .invoke(
+              "hello",
+              options: FunctionInvokeOptions(
+                body: ["foo": "bar"],
+                region: .usEast1
               )
             )
           ```
@@ -3084,6 +3216,7 @@ functions:
       - By default, listening to database changes is disabled for new projects due to database performance and security concerns. You can turn it on by managing Realtime's [replication](/docs/guides/api#realtime-api-overview).
       - You can receive the "previous" data for updates and deletes by setting the table's `REPLICA IDENTITY` to `FULL` (e.g., `ALTER TABLE your_table REPLICA IDENTITY FULL;`).
       - Row level security is not applied to delete statements. When RLS is enabled and replica identity is set to full, only the primary key is sent to clients.
+      - Use AsyncStream or callbacks for listening to changes.
     examples:
       - id: listen-to-broadcast
         name: Listen to broadcast messages
@@ -3113,6 +3246,31 @@ functions:
           }
           ```
 
+      - id: listen-to-broadcast-callback
+        name: Listen to broadcast messages using callback
+        isSpotlight: true
+        code: |
+          ```swift
+          let channel = await supabase.channel("room1")
+
+          let subscription = await channel.onBroadcast(event: "cursor-pos") { message in 
+            print("Cursor position received", message.payload)
+          }
+
+          await channel.subscribe()
+
+          await channel.broadcast(
+            event: "cursor-pos",
+            message: [
+              "x": .double(.random(in: 0...1)),
+              "y": .double(.random(in: 0...1))
+            ]
+          )
+
+          // remove subscription some time later
+          subscription.remove()
+          ```
+
       - id: listen-to-presence-updates
         name: Listen to presence updates
         code: |
@@ -3139,6 +3297,30 @@ functions:
             try await channel.track(PresenceState(username: "John"))
           }
 
+      - id: listen-to-presence-updates-callback
+        name: Listen to presence updates using callback
+        code: |
+          ```swift
+          struct PresenceState: Codable {
+            let username: String
+          }
+
+          let channel = await supabase.channel("channelId") 
+
+          let subscription = await channel.onPresenceChange() { presence in 
+            let joins = try presence.decodeJoins(as: PresenceState.self)
+            let leaves = try presence.decodeLeaves(as: PresenceState.self)
+          }
+
+          await channel.subscribe()
+
+          // Send your own state
+          try await channel.track(PresenceState(username: "John"))
+
+          // remove subscription some time later
+          subscription.remove()
+          ```
+
       - id: listen-to-all-database-changes
         name: Listen to all database changes
         code: |
@@ -3157,6 +3339,26 @@ functions:
               case .update(let action): print("Updated": \(action.oldRecord) with \(action.record)")
             }
           }
+          ```
+      - id: listen-to-all-database-changes-callback
+        name: Listen to all database changes using callback
+        code: |
+          ```swift
+          let channel = await supabase.channel("channelId") 
+
+          let subscription = await channel.onPostgresChange(AnyAction.self, schema: "public") { change in 
+            switch change {
+              case .delete(let action): print("Deleted: \(action.oldRecord)")
+              case .insert(let action): print("Inserted: \(action.record)")
+              case .select(let action): print("Selected: \(action.record)")
+              case .update(let action): print("Updated": \(action.oldRecord) with \(action.record)")
+            }
+          }
+
+          await channel.subscribe()
+
+          // remove subscription some time later
+          subscription.remove()
           ```
       - id: listen-to-a-specific-table
         name: Listen to a specific table
@@ -3181,6 +3383,30 @@ functions:
             }
           }
           ```
+      - id: listen-to-a-specific-table-callback
+        name: Listen to a specific table using callback
+        code: |
+          ```swift
+          let channel = await supabase.channel("channelId") 
+
+          let subscription = await channel.onPostgresChange(
+            AnyAction.self, 
+            schema: "public",
+            table: "users"
+          ) { change in 
+            switch change {
+              case .delete(let action): print("Deleted: \(action.oldRecord)")
+              case .insert(let action): print("Inserted: \(action.record)")
+              case .select(let action): print("Selected: \(action.record)")
+              case .update(let action): print("Updated": \(action.oldRecord) with \(action.record)")
+            }
+          }
+
+          await channel.subscribe()
+
+          // remove subscription some time later
+          subscription.remove()
+          ```
       - id: listen-to-inserts
         name: Listen to inserts
         code: |
@@ -3198,6 +3424,25 @@ functions:
           for await insert in insertions {
             print("Inserted: \(insert.record)")
           }
+          ```
+      - id: listen-to-inserts-callback
+        name: Listen to inserts using callback
+        code: |
+          ```swift
+          let channel = await supabase.channel("channelId") 
+
+          let subscription = await channel.onPostgresChange(
+            InsertAction.self, 
+            schema: "public",
+            table: "users"
+          ) { insert in 
+            print("Inserted: \(insert.record)")
+          }
+
+          await channel.subscribe()
+
+          // remove subscription some time later
+          subscription.remove()
           ```
       - id: listen-to-updates
         name: Listen to updates
@@ -3224,6 +3469,32 @@ functions:
              print("Updated: \(update.oldRecord) with \(update.record)")
            }
            ```
+      - id: listen-to-updates-callback
+        name: Listen to updates using callback
+        description: |
+          By default, Supabase will send only the updated record. If you want to receive the previous values as well you can
+          enable full replication for the table you are listening too:
+
+          ```sql
+          alter table "your_table" replica identity full;
+          ```
+        code: |
+          ```swift
+           let channel = await supabase.channel("channelId") 
+           
+           let subscription = await channel.onPostgresChange(
+             UpdateAction.self, 
+             schema: "public",
+             table: "users"
+           ) { update in 
+            print("Updated: \(update.oldRecord) with \(update.record)")
+           }
+
+           await channel.subscribe()
+           
+           // remove subscription some time later
+          subscription.remove()
+           ```
       - id: listen-to-deletes
         name: Listen to deletes
         description: |
@@ -3249,6 +3520,32 @@ functions:
             print("Deleted: \(deletion.oldRecord)")
           }
           ```
+      - id: listen-to-deletes-callback
+        name: Listen to deletes using callback
+        description: |
+          By default, Supabase does not send deleted records. If you want to receive the deleted record you can
+          enable full replication for the table you are listening too:
+
+          ```sql
+          alter table "your_table" replica identity full;
+          ```
+        code: |
+          ```swift
+          let channel = await supabase.channel("channelId") 
+
+          let subscription = await channel.onPostgresChange(
+            DeleteAction.self, 
+            schema: "public",
+            table: "users"
+          ) { deletion in
+            print("Deleted: \(deletion.oldRecord)")
+          }
+
+          await channel.subscribe()
+
+          // remove subscription some time later
+          subscription.remove()
+          ```
       - id: listening-to-row-level-changes
         name: Listen to row level changes
         code: |
@@ -3267,6 +3564,26 @@ functions:
           for await deletion in deletions {
             print("Deleted: \(deletion.oldRecord)")
           }
+          ```
+      - id: listening-to-row-level-changes-callback
+        name: Listen to row level changes using callback
+        code: |
+          ```swift
+          let channel = await supabase.channel("channelId") 
+
+          let subscription = await channel.onPostgresChange(
+            DeleteAction.self, 
+            schema: "public",
+            table: "users",
+            filter: "id=eq.1"
+          ) { deletion in 
+            print("Deleted: \(deletion.oldRecord)")
+          }
+
+          await channel.subscribe()
+
+          // remove subscription some time later
+          subscription.remove()
           ```
 
   - id: remove-channel

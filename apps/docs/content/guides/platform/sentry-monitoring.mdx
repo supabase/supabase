@@ -212,7 +212,6 @@ Sentry.init({
     }),
     new Sentry.Integrations.Undici({
       shouldCreateSpanForRequest: (url) => {
-        console.log('server', `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest`, url)
         return !url.startsWith(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest`)
       },
     }),

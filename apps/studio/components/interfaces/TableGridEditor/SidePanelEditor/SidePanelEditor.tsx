@@ -351,7 +351,6 @@ const SidePanelEditor = ({
         })
       }
     } catch (error: any) {
-      console.log({ error })
       toast.error(`Failed to update realtime for ${table.name}: ${error.message}`)
     }
   }
