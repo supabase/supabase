@@ -5,7 +5,7 @@ import { ResponseError } from 'types'
 import { contentKeys } from './keys'
 import { components } from 'api-types'
 
-export type SQLSnippetFolder = components['schemas']['GetUserContentFolderResponse']
+export type SQLSnippetFolder = components['schemas']['GetUserContentFolderResponse']['data']
 
 export async function getSQLSnippetFolders(
   { projectRef }: { projectRef: string | undefined },
@@ -19,7 +19,7 @@ export async function getSQLSnippetFolders(
   })
 
   if (error) throw handleError(error)
-  return data
+  return data.data
 }
 
 export type SQLSnippetFoldersData = Awaited<ReturnType<typeof getSQLSnippetFolders>>
