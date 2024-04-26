@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      TF_VAR_linked_project: ${{ secrets.SUPABASE_PROJECT_ID }}
+      TF_VAR_linked_project: xguihxuzqibwxjnimxev
       TF_VAR_git_branch: ${{ github.head_ref }}
       TF_CLI_ARGS_apply: -target=supabase_settings.preview
     defaults:

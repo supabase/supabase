@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - "supabase/**"
+      - "supabase/remotes/**"
   workflow_dispatch:
 
 jobs:
@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-      TF_VAR_linked_project: ${{ secrets.SUPABASE_PROJECT_ID }}
+      TF_VAR_linked_project: xguihxuzqibwxjnimxev
     defaults:
       run:
         working-directory: supabase/remotes
