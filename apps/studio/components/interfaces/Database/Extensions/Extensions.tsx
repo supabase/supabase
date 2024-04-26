@@ -13,7 +13,7 @@ import { useDatabaseExtensionsQuery } from 'data/database-extensions/database-ex
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import ExtensionCard from './ExtensionCard'
 import ExtensionCardSkeleton from './ExtensionCardSkeleton'
-import { HIDDEN_EXTENSIONS, SEARCH_TERMS } from './Extensions.constants'
+import { HIDDEN_EXTENSIONS } from './Extensions.constants'
 
 const Extensions = () => {
   const { filter } = useParams()
@@ -25,16 +25,17 @@ const Extensions = () => {
     connectionString: project?.connectionString,
   })
 
+  const formattedExtensions = (data ?? []).map((ext) => {
+    if (ext.name === 'vector') return { ...ext, name: 'pgvector' }
+    else return ext
+  })
+
   const extensions =
     filterString.length === 0
-      ? data ?? []
-      : (data ?? []).filter((ext) => {
-          const nameMatchesSearch = ext.name.toLowerCase().includes(filterString.toLowerCase())
-          const searchTermsMatchesSearch = (SEARCH_TERMS[ext.name] || []).some((x) =>
-            x.includes(filterString.toLowerCase())
-          )
-          return nameMatchesSearch || searchTermsMatchesSearch
-        })
+      ? formattedExtensions
+      : formattedExtensions.filter((ext) =>
+          ext.name.toLowerCase().includes(filterString.toLowerCase())
+        )
   const extensionsWithoutHidden = extensions.filter((ext) => !HIDDEN_EXTENSIONS.includes(ext.name))
   const [enabledExtensions, disabledExtensions] = partition(
     extensionsWithoutHidden,
