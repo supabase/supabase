@@ -23,6 +23,7 @@ import {
   Toggle,
 } from 'ui'
 import SchemaFunctionSelector from './SchemaFunctionSelector'
+import randomBytes from 'randomBytes'
 
 export interface ComboBoxOption {
   id: string
@@ -30,9 +31,17 @@ export interface ComboBoxOption {
   displayName: string
 }
 
+export function generateAuthHookSecret() {
+  const secretByteLength = 60
+  const buffer = randomBytes(secretByteLength)
+  const base64String = buffer.toString('base64')
+  return `v1,whsec_${base64String}`
+}
+
 export function HookSelector<Opt extends ComboBoxOption>({
   uriId,
   enabledId,
+  secretId,
   values,
   setFieldValue,
   descriptionTextPostgres,
@@ -41,6 +50,7 @@ export function HookSelector<Opt extends ComboBoxOption>({
 }: {
   uriId: string
   enabledId: string
+  secretId: string
   values: any
   setFieldValue: (field: string, value: any) => void
   descriptionTextWeb: string
@@ -55,7 +65,9 @@ export function HookSelector<Opt extends ComboBoxOption>({
 
   const [tabValue, setTabValue] = useState(initialTabValue)
   const [httpsValues, setHttpsValues] = useState(
-    tabValue === 'https' ? { [uriId]: values[uriId], [enabledId]: values[enabledId] } : {}
+    tabValue === 'https'
+      ? { [uriId]: values[uriId], [enabledId]: values[enabledId], [secretId]: values[secretId] }
+      : {}
   )
   const [postgresValues, setPostgresValues] = useState(
     tabValue !== 'https' ? { [uriId]: values[uriId], [enabledId]: values[enabledId] } : {}
@@ -66,11 +78,17 @@ export function HookSelector<Opt extends ComboBoxOption>({
       value={tabValue}
       onValueChange={(value) => {
         if (value === 'https') {
+          // Preserve state when switching fields
           setPostgresValues({ [uriId]: values[uriId], [enabledId]: values[enabledId] })
           setFieldValue(uriId, httpsValues[uriId], false)
           setFieldValue(enabledId, httpsValues[enabledId], false)
+          setFieldValue(secretId, httpsValues[secretId], false)
         } else {
-          setHttpsValues({ [uriId]: values[uriId], [enabledId]: values[enabledId] })
+          setHttpsValues({
+            [uriId]: values[uriId],
+            [enabledId]: values[enabledId],
+            [secretId]: values[secretId],
+          })
           setFieldValue(uriId, postgresValues[uriId], false)
           setFieldValue(enabledId, postgresValues[enabledId], false)
         }
@@ -96,15 +114,41 @@ export function HookSelector<Opt extends ComboBoxOption>({
             disabled={disabled}
           />
           {values[uriId] && (
-            <Toggle
-              key={enabledId + '/web'}
-              id={enabledId}
-              name={enabledId}
-              size="medium"
-              label="Enable this web (HTTPS) endpoint"
-              layout="flex"
-              disabled={disabled}
-            />
+            <>
+              <div className="flex items-center space-x-2 w-full">
+                <Input
+                  key={secretId + '/web'}
+                  id={secretId}
+                  label="HTTPS Hook Secret"
+                  descriptionText={'Enter or generate a hook secret. '}
+                  disabled={disabled}
+                  className="w-4/5"
+                />
+
+                <Button
+                  size="small"
+                  type="secondary"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    const authHookSecret = generateAuthHookSecret()
+                    setFieldValue(secretId, authHookSecret, false)
+                  }}
+                  className="w-1/5 text-xs text-black bg-red-900"
+                  disabled={disabled}
+                >
+                  Generate Secret
+                </Button>
+              </div>
+              <Toggle
+                key={enabledId + '/web'}
+                id={enabledId}
+                name={enabledId}
+                size="medium"
+                label="Enable this web (HTTPS) endpoint"
+                layout="flex"
+                disabled={disabled}
+              />
+            </>
           )}
         </div>
       </TabsContent>

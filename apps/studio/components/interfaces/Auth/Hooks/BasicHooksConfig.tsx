@@ -30,10 +30,15 @@ import HookSelector from './HookSelector'
 const schema = object({
   HOOKS_CUSTOM_ACCESS_TOKEN_ENABLED: boolean(),
   HOOKS_CUSTOM_ACCESS_TOKEN_URI: string().url(),
+  HOOKS_CUSTOM_ACCESS_TOKEN_SECRETS: string(),
   HOOKS_SEND_SMS_ENABLED: boolean(),
   HOOKS_SEND_SMS_URI: string().url(),
+  HOOKS_SEND_SMS_SECRETS: string(),
+  HOOKS_SEND_SMS_URI: string(),
   HOOKS_SEND_EMAIL_ENABLED: boolean(),
   HOOKS_SEND_EMAIL_URI: string().url(),
+  HOOKS_SEND_EMAIL_URI: string(),
+  HOOKS_SEND_EMAIL_SECRETS: string(),
 })
 
 const formId = 'auth-basic-hooks-form'
@@ -54,10 +59,13 @@ const BasicHooksConfig = () => {
   const INITIAL_VALUES = {
     HOOK_CUSTOM_ACCESS_TOKEN_ENABLED: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_ENABLED || false,
     HOOK_CUSTOM_ACCESS_TOKEN_URI: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_URI || '',
-    HOOK_SEND_SMS_ENABLED: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_ENABLED || false,
-    HOOK_SEND_SMS_URI: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_URI || '',
+    HOOK_CUSTOM_ACCESS_TOKEN_SECRETS: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_SECRETS || '',
+    HOOK_SEND_SMS_ENABLED: authConfig?.HOOK_SEND_SMS_ENABLED || false,
+    HOOK_SEND_SMS_URI: authConfig?.HOOK_SEND_SMS_URI || '',
+    HOOK_SEND_SMS_SECRETS: authConfig?.HOOK_SEND_SMS_SECRETS || '',
     HOOK_SEND_EMAIL_ENABLED: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_ENABLED || false,
     HOOK_SEND_EMAIL_URI: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_URI || '',
+    HOOK_SEND_EMAIL_SECRETS: authConfig?.HOOK_SEND_EMAIL_SECRETS || '',
   }
 
   const onSubmit = (values: any, { resetForm }: any) => {
@@ -73,6 +81,17 @@ const BasicHooksConfig = () => {
 
     if (payload.HOOK_SEND_EMAIL_URI === '') {
       payload.HOOK_SEND_EMAIL_URI = null
+    }
+
+    if (payload.HOOK_CUSTOM_ACCESS_TOKEN_SECRETS === '') {
+      payload.HOOK_CUSTOM_ACCESS_TOKEN_SECRETS = null
+    }
+    if (payload.HOOK_SEND_SMS_SECRETS === '') {
+      payload.HOOK_SEND_SMS_SECRETS = null
+    }
+
+    if (payload.HOOK_SEND_EMAIL_SECRETS === '') {
+      payload.HOOK_SEND_EMAIL_SECRETS = null
     }
 
     updateAuthConfig(
@@ -140,8 +159,9 @@ const BasicHooksConfig = () => {
               >
                 <FormSectionContent loading={isLoading}>
                   <HookSelector
-                    uriId={'HOOK_CUSTOM_ACCESS_TOKEN_URI'}
-                    enabledId={'HOOK_CUSTOM_ACCESS_TOKEN_ENABLED'}
+                    uriId="HOOK_CUSTOM_ACCESS_TOKEN_URI"
+                    enabledId="HOOK_CUSTOM_ACCESS_TOKEN_ENABLED"
+                    secretId="HOOK_CUSTOM_ACCESS_TOKEN_SECRETS"
                     descriptionTextPostgres="Select the function to be called by Supabase Auth each time a new JWT is created. It should return the claims you wish to be present in the JWT."
                     descriptionTextWeb="Supabase Auth will send a HTTP POST request to this URL each time a new JWT is created. It should return the claims you wish to be present in the JWT."
                     values={values}
@@ -155,6 +175,7 @@ const BasicHooksConfig = () => {
                   <HookSelector
                     uriId="HOOK_SEND_SMS_URI"
                     enabledId="HOOK_SEND_SMS_ENABLED"
+                    secretId="HOOK_SEND_SMS_SECRETS"
                     descriptionTextPostgres="Select the function to be called by Supabase Auth each time an SMS message needs to be sent."
                     descriptionTextWeb="Supabase Auth will send a HTTP POST request to this URL each time an SMS message needs to be sent."
                     values={values}
@@ -167,6 +188,7 @@ const BasicHooksConfig = () => {
                   <HookSelector
                     uriId="HOOK_SEND_EMAIL_URI"
                     enabledId="HOOK_SEND_EMAIL_ENABLED"
+                    secretId="HOOK_SEND_EMAIL_SECRETS"
                     descriptionTextPostgres="Select the function to be called by Supabase Auth each time an email message needs to be sent."
                     descriptionTextWeb="Supabase Auth will send a HTTP POST request to this URL each time an email message needs to be sent."
                     values={values}
