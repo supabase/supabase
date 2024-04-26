@@ -36,6 +36,19 @@ const FeedbackWidget = ({
   screenshot,
   setScreenshot,
 }: FeedbackWidgetProps) => {
+  const FEEDBACK_STORAGE_KEY = 'feedback_content'
+
+  useEffect(() => {
+    const storedFeedback = localStorage.getItem(FEEDBACK_STORAGE_KEY)
+    if (storedFeedback) {
+      setFeedback(storedFeedback)
+    }
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem(FEEDBACK_STORAGE_KEY, feedback)
+  }, [feedback])
+
   const router = useRouter()
   const { ref, slug } = useParams()
   const inputRef = useRef<any>(null)
