@@ -12,17 +12,14 @@ import {
   STORAGE_SORT_BY,
   STORAGE_VIEWS,
 } from 'components/to-be-cleaned/Storage/Storage.constants'
+import { convertFromBytes } from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 import { ToastLoader } from 'components/ui/ToastLoader'
+import { configKeys } from 'data/config/keys'
+import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
+import { getQueryClient } from 'data/query-client'
 import { delete_, post } from 'lib/common/fetch'
 import { API_URL, IS_PLATFORM } from 'lib/constants'
 import { PROJECT_ENDPOINT_PROTOCOL } from 'pages/api/constants'
-import { getQueryClient } from 'data/query-client'
-import { configKeys } from 'data/config/keys'
-import { ProjectStorageConfigResponse } from 'data/config/project-storage-config-query'
-import {
-  convertFromBytes,
-  convertToBytes,
-} from 'components/to-be-cleaned/Storage/StorageSettings/StorageSettings.utils'
 
 /**
  * This is a preferred method rather than React Context and useStorageExplorerStore().
@@ -489,7 +486,7 @@ class StorageExplorerStore {
         : filesToUpload
 
     if (filesWithinUploadLimit.length < filesToUpload.length) {
-      const numberOfFilesRejected = filesToUpload.length - filesWithinUploadLimit
+      const numberOfFilesRejected = filesToUpload.length - filesWithinUploadLimit.length
       const { value, unit } = convertFromBytes(fileSizeLimit)
 
       toast.error(
