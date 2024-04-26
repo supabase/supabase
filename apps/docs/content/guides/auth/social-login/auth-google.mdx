@@ -219,10 +219,9 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
     ### Configuration [#expo-configuration-native-app]
 
     1. Configure OAuth credentials for your Google Cloud project in the [Credentials](https://console.cloud.google.com/apis/credentials) page of the console. When creating a new OAuth client ID, choose _Android_ or _iOS_ depending on the mobile operating system your app is built for.
-
-    - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
-    - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple AppStore.
-
+        - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
+          - You will have a different set of SHA-1 certificate fingerprint for testing locally and going to production. Make sure to add both to the Google Cloud Console. and add all of the Client IDs to Supabase dashboard.
+        - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple AppStore.
     2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
     3. Finally, add the client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_.
 
@@ -286,6 +285,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
     1. Configure Web, Android, and iOS OAuth credentials. Follow the Platform integration instructions on the [README of google_sign_in package](https://pub.dev/packages/google_sign_in#platform-integration) for Android and iOS.
         - For both Android and iOS, you will need to create a Web client ID in the [Google Cloud Console](https://console.cloud.google.com/apis/credentials).
         - For Android, use the instructions on screen to provide the SHA-1 certificate fingerprint used to sign your Android app.
+          - You will have a different set of SHA-1 certificate fingerprint for testing locally and going to production. Make sure to add both to the Google Cloud Console. and add all of the Client IDs to Supabase dashboard.
         - For iOS, use the instructions on screen to provide the app Bundle ID, and App Store ID and Team ID if the app is already published on the Apple AppStore.
     2. Configure the [OAuth Consent Screen](https://console.cloud.google.com/apis/credentials/consent). This information is shown to the user when giving consent to your app. In particular, make sure you have set up links to your app's privacy policy and terms of service.
     3. Add only the web client ID from step 1 in the [Google provider on the Supabase Dashboard](https://supabase.com/dashboard/project/_/auth/providers), under _Authorized Client IDs_. If you need iOS support, enable the `Skip nonce check` option.
@@ -311,7 +311,7 @@ Before you can use Sign in with Google, you need to obtain a [Google Cloud Platf
 
     ## Google sign-in for Web, macOS, Windows, and Linux
 
-    Google sign-in with Supabase on Web, macOS, Windows, and Linux is done through the [signInWithOAuth](/docs/reference/dart/auth-signinwithoauth) method.
+    Google sign-in with Supabase on Web, macOS, Windows, and Linux is done through the [signInWithOAuth](docs/reference/dart/auth-signinwithoauth) method.
 
     This method of signing in is web based, and will open a browser window to perform the sign in. For non-web platforms, the user is brought back to the app via [deep linking](/docs/guides/auth/native-mobile-deep-linking?platform=flutter).
 
