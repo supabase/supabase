@@ -28,7 +28,6 @@ const NavigationIconLink = forwardRef<HTMLAnchorElement, NavigationIconButtonPro
       'group-data-[state=expanded]:-space-x-2',
       'text-foreground-lighter hover:text-foreground ',
       'hover:bg-surface-200',
-      'bg-surface-75',
       `${isActive ? '!bg-selection !text-foreground shadow-sm' : ''}`,
       'group/item',
     ]

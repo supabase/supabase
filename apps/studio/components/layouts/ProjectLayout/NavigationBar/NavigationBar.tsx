@@ -106,7 +106,7 @@ const NavigationBar = () => {
           if (!userDropdownOpen) snap.setNavigationPanelOpen(false)
         }}
       >
-        <ul className="flex flex-col gap-y-1 justify-start px-2">
+        <div className="flex flex-col gap-y-1 justify-start px-2">
           {(!navLayoutV2 || !IS_PLATFORM) && (
             <Link
               href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
@@ -120,61 +120,63 @@ const NavigationBar = () => {
               />
             </Link>
           )}
-          <NavigationIconLink
-            isActive={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
-            route={{
-              key: 'HOME',
-              label: 'Home',
-              icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-              link: `/project/${projectRef}`,
-            }}
-            onClick={onCloseNavigationIconLink}
-          />
-          <Separator className="my-1 bg-border-muted" />
-          {toolRoutes.map((route) => (
+          <ul className="flex bg-surface-75 z-10 flex-col gap-y-1 justify-start">
             <NavigationIconLink
-              key={route.key}
-              route={route}
-              isActive={activeRoute === route.key}
+              isActive={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
+              route={{
+                key: 'HOME',
+                label: 'Home',
+                icon: <Home size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+                link: `/project/${projectRef}`,
+              }}
               onClick={onCloseNavigationIconLink}
             />
-          ))}
-          <Separator className="my-1 bg-border-muted" />
-          {productRoutes.map((route) => (
-            <NavigationIconLink
-              key={route.key}
-              route={route}
-              isActive={activeRoute === route.key}
-              onClick={onCloseNavigationIconLink}
-            />
-          ))}
-          <Separator className="my-1 bg-border-muted" />
-          {otherRoutes.map((route) => {
-            if (route.key === 'api' && isNewAPIDocsEnabled) {
-              return (
-                <NavigationIconButton
-                  key={route.key}
-                  onClick={() => {
-                    snap.setShowProjectApiDocs(true)
-                    snap.setNavigationPanelOpen(false)
-                  }}
-                  icon={<FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
-                >
-                  Project API
-                </NavigationIconButton>
-              )
-            } else {
-              return (
-                <NavigationIconLink
-                  key={route.key}
-                  route={route}
-                  isActive={activeRoute === route.key}
-                  onClick={onCloseNavigationIconLink}
-                />
-              )
-            }
-          })}
-        </ul>
+            <Separator className="my-1 bg-border-muted" />
+            {toolRoutes.map((route) => (
+              <NavigationIconLink
+                key={route.key}
+                route={route}
+                isActive={activeRoute === route.key}
+                onClick={onCloseNavigationIconLink}
+              />
+            ))}
+            <Separator className="my-1 bg-border-muted" />
+            {productRoutes.map((route) => (
+              <NavigationIconLink
+                key={route.key}
+                route={route}
+                isActive={activeRoute === route.key}
+                onClick={onCloseNavigationIconLink}
+              />
+            ))}
+            <Separator className="my-1 bg-border-muted" />
+            {otherRoutes.map((route) => {
+              if (route.key === 'api' && isNewAPIDocsEnabled) {
+                return (
+                  <NavigationIconButton
+                    key={route.key}
+                    onClick={() => {
+                      snap.setShowProjectApiDocs(true)
+                      snap.setNavigationPanelOpen(false)
+                    }}
+                    icon={<FileText size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+                  >
+                    Project API
+                  </NavigationIconButton>
+                )
+              } else {
+                return (
+                  <NavigationIconLink
+                    key={route.key}
+                    route={route}
+                    isActive={activeRoute === route.key}
+                    onClick={onCloseNavigationIconLink}
+                  />
+                )
+              }
+            })}
+          </ul>
+        </div>
 
         <ul className="flex flex-col px-2 gap-y-1">
           {settingsRoutes.map((route) => (
