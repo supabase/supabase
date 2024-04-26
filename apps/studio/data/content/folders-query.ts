@@ -5,7 +5,9 @@ import { ResponseError } from 'types'
 import { contentKeys } from './keys'
 import { components } from 'api-types'
 
-export type SQLSnippetFolder = components['schemas']['GetUserContentFolderResponse']['data']
+export type SnippetFolderResponse = components['schemas']['GetUserContentFolderResponse']['data']
+export type SnippetFolder = components['schemas']['UserContentFolder']
+export type Snippet = components['schemas']['UserContentObjectMeta']
 
 export async function getSQLSnippetFolders(
   { projectRef }: { projectRef: string | undefined },

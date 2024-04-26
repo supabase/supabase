@@ -13,6 +13,9 @@ export type StateSnippet = {
   projectRef: string
 }
 
+// [Joshen] Gonna prefix all the methods that are involved in folder organization with V2
+// So that eventually the clean up is easier
+
 export const sqlEditorState = proxy({
   snippets: {} as {
     [key: string]: StateSnippet
@@ -44,6 +47,7 @@ export const sqlEditorState = proxy({
         .sort((a, b) => a.name?.localeCompare(b.name))
     )
   },
+
   reorderSnippets: (projectRef: string) => {
     sqlEditorState.orders[projectRef] = sqlEditorState
       .orderSnippets(
@@ -63,6 +67,7 @@ export const sqlEditorState = proxy({
       sqlEditorState.addSnippet(snippet, projectRef)
     })
   },
+
   addSnippet: (snippet: SqlSnippet, projectRef: string) => {
     if (snippet.id && !sqlEditorState.snippets[snippet.id]) {
       sqlEditorState.snippets[snippet.id] = {
@@ -82,6 +87,7 @@ export const sqlEditorState = proxy({
     }
     sqlEditorState.loaded[projectRef] = true
   },
+
   removeSnippet: (id: string) => {
     const { [id]: snippet, ...otherSnippets } = sqlEditorState.snippets
     sqlEditorState.snippets = otherSnippets
@@ -95,27 +101,32 @@ export const sqlEditorState = proxy({
 
     sqlEditorState.needsSaving.delete(id)
   },
+
   updateSnippet: (id: string, snippet: SqlSnippet) => {
     if (sqlEditorState.snippets[id]) {
       sqlEditorState.snippets[id].snippet = snippet
       sqlEditorState.needsSaving.add(id)
     }
   },
+
   setSplitSizes: (id: string, splitSizes: number[]) => {
     if (sqlEditorState.snippets[id]) {
       sqlEditorState.snippets[id].splitSizes = splitSizes
     }
   },
+
   collapseUtilityPanel: (id: string) => {
     if (sqlEditorState.snippets[id]) {
       sqlEditorState.snippets[id].splitSizes = [100, 0]
     }
   },
+
   restoreUtilityPanel: (id: string) => {
     if (sqlEditorState.snippets[id]) {
       sqlEditorState.snippets[id].splitSizes = [50, 50]
     }
   },
+
   setSql: (id: string, sql: string) => {
     if (sqlEditorState.snippets[id]) {
       sqlEditorState.snippets[id].snippet.content.sql = sql
@@ -133,6 +144,7 @@ export const sqlEditorState = proxy({
       sqlEditorState.needsSaving.add(id)
     }
   },
+
   shareSnippet: (id: string, visibility: 'user' | 'project' | 'org' | 'public') => {
     if (sqlEditorState.snippets[id]) {
       const { snippet, projectRef } = sqlEditorState.snippets[id]
@@ -143,9 +155,11 @@ export const sqlEditorState = proxy({
       sqlEditorState.needsSaving.add(id)
     }
   },
+
   addNeedsSaving: (id: string) => {
     sqlEditorState.needsSaving.add(id)
   },
+
   resetResult: (id: string) => {
     if (sqlEditorState.results[id]) {
       sqlEditorState.results[id] = []
@@ -161,12 +175,14 @@ export const sqlEditorState = proxy({
       sqlEditorState.results[id].unshift({ rows: [], error })
     }
   },
+
   addFavorite: (id: string) => {
     if (sqlEditorState.snippets[id]) {
       sqlEditorState.snippets[id].snippet.content.favorite = true
       sqlEditorState.needsSaving.add(id)
     }
   },
+
   removeFavorite: (id: string) => {
     if (sqlEditorState.snippets[id]) {
       sqlEditorState.snippets[id].snippet.content.favorite = false
