@@ -39,6 +39,15 @@ const FeedbackWidget = ({
   const FEEDBACK_STORAGE_KEY = 'feedback_content'
   const SCREENSHOT_STORAGE_KEY = 'screenshot'
 
+  const router = useRouter()
+  const { ref, slug } = useParams()
+  const inputRef = useRef<any>(null)
+  const uploadButtonRef = useRef()
+
+  const [isSending, setSending] = useState(false)
+  const [isSavingScreenshot, setIsSavingScreenshot] = useState(false)
+  const { mutateAsync: submitFeedback } = useSendFeedbackMutation()
+
   useEffect(() => {
     const storedFeedback = localStorage.getItem(FEEDBACK_STORAGE_KEY)
     if (storedFeedback) {
@@ -60,15 +69,6 @@ const FeedbackWidget = ({
       localStorage.setItem(SCREENSHOT_STORAGE_KEY, screenshot)
     }
   }, [screenshot])
-
-  const router = useRouter()
-  const { ref, slug } = useParams()
-  const inputRef = useRef<any>(null)
-  const uploadButtonRef = useRef()
-
-  const [isSending, setSending] = useState(false)
-  const [isSavingScreenshot, setIsSavingScreenshot] = useState(false)
-  const { mutateAsync: submitFeedback } = useSendFeedbackMutation()
 
   useEffect(() => {
     inputRef?.current?.focus()
