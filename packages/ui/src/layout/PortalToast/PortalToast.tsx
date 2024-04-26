@@ -1,3 +1,5 @@
+'use client'
+
 import { X } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import { Toaster, ToastBar, toast } from 'react-hot-toast'

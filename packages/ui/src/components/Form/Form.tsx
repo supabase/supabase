@@ -1,3 +1,5 @@
+'use client'
+
 import { useReducer } from 'react'
 import { useFormik, FormikConfig } from 'formik'
 import { FormContextProvider } from './FormContext'

@@ -1,3 +1,5 @@
+'use client'
+
 import { xor } from 'lodash'
 import {
   Dispatch,

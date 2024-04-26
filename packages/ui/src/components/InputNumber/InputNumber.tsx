@@ -1,3 +1,5 @@
+'use client'
+
 import React, { useEffect } from 'react'
 
 // import { IconChevronDown } from '../Icon/icons/IconChevronDown'
