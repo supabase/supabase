@@ -61,11 +61,13 @@ const EnterpriseHooksConfig = () => {
     HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED:
       authConfig?.HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED || false,
     HOOK_MFA_VERIFICATION_ATTEMPT_URI: authConfig?.HOOK_MFA_VERIFICATION_ATTEMPT_URI || '',
+    HOOK_MFA_VERIFICATION_SECRETS: authConfig?.HOOK_MFA_VERIFICATION_SECRETS || '',
     // remove as any when the types are merged in
     HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED:
       (authConfig as any)?.HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED || false,
     HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI:
       (authConfig as any)?.HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI || '',
+    HOOK_PASSWORD_VERIFICATION_ATTEMPT_SECRETS: authConfig?.HOOK_PASSWORD_VERIFICATION_ATTEMPT_SECRETS || '',
   }
 
   const onSubmit = (values: any, { resetForm }: any) => {
@@ -75,6 +77,14 @@ const EnterpriseHooksConfig = () => {
     }
     if (payload.HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI === '') {
       payload.HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI = null
+    }
+
+    if (payload.HOOK_MFA_VERIFICATION_ATTEMPT_SECRETS === '') {
+      payload.HOOK_MFA_VERIFICATION_ATTEMPT_SECRETS = null
+    }
+
+    if (payload.HOOK_PASSWORD_VERIFICATION_ATTEMPT_SECRETS === '') {
+      payload.HOOK_PASSWORD_VERIFICATION_ATTEMPT_SECRETS = null
     }
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
@@ -153,6 +163,7 @@ const EnterpriseHooksConfig = () => {
                     <HookSelector
                       uriId="HOOK_MFA_VERIFICATION_ATTEMPT_URI"
                       enabledId="HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED"
+                      secretId="HOOK_MFA_VERIFICATION_ATTEMPT_SECRETS"
                       descriptionTextPostgres="Select the function to be called by Supabase Auth each time a user tries to verify an MFA factor. Return a decision on whether to reject the attempt and future ones, or to allow the user to keep trying."
                       descriptionTextWeb="Supabase Auth will send a HTTP POST request to this URL each time a user tries to verify an MFA factor. Return a decision on whether to reject the attempt and future ones, or to allow the user to keep trying."
                       values={values}
@@ -170,6 +181,7 @@ const EnterpriseHooksConfig = () => {
                     <HookSelector
                       uriId="HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI"
                       enabledId="HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED"
+                      secretId="HOOK_PASSWORD_VERIFICATION_ATTEMPT_SECRETS"
                       descriptionTextPostgres="Select the function to be called by Supabase Auth each time a user tries to sign in with a password. Return a decision whether to allow the user to reject the attempt, or to allow the user to keep trying."
                       descriptionTextWeb="Supabase Auth will send a HTTP POST request to this URL each time a user tries to sign in with a password. Return a decision whether to allow the user to reject the attempt, or to allow the user to keep trying."
                       values={values}

@@ -121,6 +121,7 @@ export function HookSelector<Opt extends ComboBoxOption>({
                   id={secretId}
                   label="HTTPS Hook Secret"
                   descriptionText={'Enter or generate a hook secret. '}
+                  copy
                   disabled={disabled}
                   className="w-4/5"
                 />
@@ -133,7 +134,7 @@ export function HookSelector<Opt extends ComboBoxOption>({
                     const authHookSecret = generateAuthHookSecret()
                     setFieldValue(secretId, authHookSecret, false)
                   }}
-                  className="w-1/5 text-xs text-black bg-red-900"
+                  className="w-1/5 py-1 px-3 text-black font-light text-xs bg-gray-700"
                   disabled={disabled}
                 >
                   Generate Secret
