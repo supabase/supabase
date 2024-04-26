@@ -23,6 +23,7 @@ import { passwordStrength } from 'lib/helpers'
 import { getInitialMigrationSQLFromGitHubRepo } from 'lib/integration-utils'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 import type { NextPageWithLayout } from 'types'
+import * as Sentry from '@sentry/nextjs'
 
 const VercelIntegration: NextPageWithLayout = () => {
   return (
@@ -203,12 +204,11 @@ const CreateProject = () => {
         const projectDetails = vercelProjects?.find((x: any) => x.id === foreignProjectId)
 
         try {
-          const { id: connectionId } = await createConnections({
+          const connection = {
             organizationIntegrationId: organizationIntegration?.id,
             connection: {
               foreign_project_id: foreignProjectId,
               supabase_project_ref: newProjectRef,
-              integration_id: '0',
               metadata: {
                 ...projectDetails,
                 supabaseConfig: {
@@ -219,8 +219,26 @@ const CreateProject = () => {
               },
             },
             orgSlug: selectedOrganization?.slug,
-          })
+          }
 
+          // TODO(kamil): Remove once "missing connection name" bug has been squashed.
+          if (!projectDetails?.name) {
+            Sentry.captureMessage('Vercel connection is missing name', {
+              contexts: {
+                connection: connection,
+                data: {
+                  projectDetails,
+                  vercelProjects,
+                  foreignProjectId,
+                },
+                source: {
+                  file: 'deploy-button/new-project.tsx',
+                },
+              },
+            })
+          }
+
+          const { id: connectionId } = await createConnections(connection)
           await syncEnvs({ connectionId })
         } catch (error) {
           console.error('An error occurred during createConnections:', error)
