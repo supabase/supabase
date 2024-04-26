@@ -132,6 +132,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     downloadFile,
     downloadFolder,
     selectRangeItems,
+    selectedFilePreview,
   } = storageExplorerStore
   const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
 
