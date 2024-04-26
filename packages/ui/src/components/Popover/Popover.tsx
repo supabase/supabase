@@ -1,3 +1,5 @@
+'use client'
+
 import type * as RadixPopoverTypes from '@radix-ui/react-popover'
 import * as RadixPopover from '@radix-ui/react-popover'
 import * as React from 'react'
