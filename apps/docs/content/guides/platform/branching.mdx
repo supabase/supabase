@@ -18,20 +18,19 @@ When you're ready to ship your changes, merge your branch to update your product
 
 If you understand Git, you already understand Supabase Branching.
 
-<Admonition
-  type="note"
-  label="Branching is Early Access only, and only available on the Pro Plan and above."
->
-
-Branching will move to Public Beta in future, but only available for Pro plan and above.
-
-</Admonition>
-
 ## How branching works
 
 Supabase Branching works with Git. You can test changes in a separate, temporary environment without affecting your production setup. When you're ready to ship your changes, merge your branch to update your production instance with the new changes.
 
 You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials. Preview Environments pause automatically after 5 minutes of inactivity.
+
+<Admonition type="caution" label="Some features may not work as expected on Preview Branches">
+
+Due to Preview Branches running on Fly Postgres instances, some features like `pg-cron` are not fully supported.
+
+For a full list of limitations, see [Fly Postgres limitations](/docs/guides/platform/fly-postgres#limitations).
+
+</Admonition>
 
 <figure className="max-w-[700px] mx-auto">
   <Image

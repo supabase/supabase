@@ -24,7 +24,7 @@ Add new icons into ./src/raw-icons
 
 Make sure there are no inline stroke/border/fill colors (see below)
 
-run this in ./internal/build-icons
+run this in ./packages/build-icons
 
 ```bash
 npm run build

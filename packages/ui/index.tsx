@@ -85,6 +85,7 @@ export * from './src/components/shadcn/ui/separator'
 export * from './src/components/shadcn/ui/context-menu'
 export * from './src/components/shadcn/ui/sheet'
 export * from './src/components/shadcn/ui/badge'
+export * from './src/components/shadcn/ui/input-otp'
 
 export {
   Command as Command_Shadcn_,
@@ -375,3 +376,6 @@ export * from './src/components/Icon/icons/IconZap'
 
 // Export hooks
 export * from './src/lib/Hooks'
+
+// Shared constants/utils
+export { TAB_CHANGE_EVENT_NAME } from './src/lib/events'

@@ -1,22 +1,18 @@
 import { MDXProvider } from '@mdx-js/react'
+import 'katex/dist/katex.min.css'
+import { ExternalLink } from 'lucide-react'
 import { NextSeo } from 'next-seo'
-import { usePathname } from 'next/navigation'
 import { useRouter } from 'next/router'
-import { FC, useEffect, useRef, useState } from 'react'
+import { type FC } from 'react'
 
-import { IconExternalLink, cn } from 'ui'
-import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
+import { cn } from 'ui'
 
 import components from '~/components'
-import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
 import { FooterHelpCalloutType } from '~/components/FooterHelpCallout'
 import GuidesTableOfContents from '~/components/GuidesTableOfContents'
 import { type MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
-import useHash from '~/hooks/useHash'
-import { Feedback } from '~/components/Feedback'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { MainSkeleton } from '~/layouts/MainSkeleton'
-import 'katex/dist/katex.min.css'
 
 interface Props {
   meta: {
@@ -39,43 +35,12 @@ interface Props {
 }
 
 const Layout: FC<Props> = (props) => {
-  const pathname = usePathname()
-  const [hash] = useHash()
-
-  const articleRef = useRef()
-  const [tocList, setTocList] = useState([])
-
   const { asPath } = useRouter()
   const router = useRouter()
 
   const menuId = props.menuId
 
   const EDIT_BUTTON_EXCLUDE_LIST = ['/404']
-
-  useEffect(() => {
-    if (hash && tocList.length > 0) {
-      highlightSelectedTocItem(hash as string)
-    }
-  }, [hash, JSON.stringify(tocList)])
-
-  useEffect(() => {
-    const articleEl = articleRef.current as HTMLElement
-
-    if (!articleRef.current) return
-    const headings = Array.from(articleEl.querySelectorAll('h2, h3'))
-    const newHeadings = headings
-      .filter((heading) => heading.id)
-      .map((heading) => {
-        const text = heading.textContent.replace('#', '')
-        const link = heading.querySelector('a').getAttribute('href')
-        const level = heading.tagName === 'H2' ? 2 : 3
-        return { text, link, level }
-      })
-    setTocList(newHeadings)
-  }, [pathname]) // needed to recalculate the toc when path changes
-
-  const hasTableOfContents = tocList.length > 0
-  const tocVideoPreview = `http://img.youtube.com/vi/${props.meta?.tocVideo}/0.jpg`
 
   // page type, ie, Auth, Database, Storage etc
   const ogPageType = asPath.split('/')[2]
@@ -141,10 +106,9 @@ const Layout: FC<Props> = (props) => {
                 <p className="text-brand tracking-wider mb-3">{props.meta.breadcrumb}</p>
               )}
               <article
-                ref={articleRef}
-                className={`${
-                  props.meta?.hide_table_of_contents || !hasTableOfContents ? '' : ''
-                } prose max-w-none`}
+                // Used to get headings for the table of contents
+                id="sb-docs-guide-main-article"
+                className="prose max-w-none"
               >
                 <h1 className="mb-0">{props.meta.title}</h1>
                 {props.meta?.subtitle && (
@@ -166,35 +130,23 @@ const Layout: FC<Props> = (props) => {
                     `}
                         className="text-sm transition flex items-center gap-1 text-scale-1000 hover:text-scale-1200 w-fit"
                       >
-                        Edit this page on GitHub <IconExternalLink size={14} strokeWidth={1.5} />
+                        Edit this page on GitHub <ExternalLink size={14} strokeWidth={1.5} />
                       </a>
                     </div>
                   </div>
                 )}
               </article>
             </div>
-            {!props.hideToc && hasTableOfContents && !props.meta?.hide_table_of_contents && (
-              <div
+            {!props.hideToc && !props.meta?.hide_table_of_contents && (
+              <GuidesTableOfContents
+                video={props.meta?.tocVideo}
                 className={cn(
                   'col-span-3 self-start',
-                  'border-overlay bg-background',
-                  'thin-scrollbar overflow-y-auto hidden md:block md:col-span-3 px-2',
-                  'sticky top-[calc(var(--mobile-header-height,40px)+2rem)] lg:top-[calc(var(--desktop-header-height,60px)+2rem)]'
+                  'hidden md:block md:col-span-3',
+                  'sticky top-[calc(var(--mobile-header-height,40px)+2rem)] lg:top-[calc(var(--desktop-header-height,60px)+2rem)]',
+                  'max-h-[calc(100vh-60px-5rem)]'
                 )}
-              >
-                <div className="border-l">
-                  {props.meta?.tocVideo && !!tocVideoPreview && (
-                    <div className="relative mb-6 pl-5">
-                      <ExpandableVideo imgUrl={tocVideoPreview} videoId={props.meta.tocVideo} />
-                    </div>
-                  )}
-                  <Feedback key={pathname} />
-                  <span className="block font-mono text-xs uppercase text-foreground px-5 mb-6">
-                    On this page
-                  </span>
-                  <GuidesTableOfContents list={tocList} />
-                </div>
-              </div>
+              />
             )}
           </div>
         </LayoutMainContent>

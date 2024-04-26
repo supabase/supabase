@@ -43,34 +43,27 @@ const DropReplicaConfirmationModal = ({
 
   return (
     <ConfirmationModal
-      danger
+      variant="destructive"
       size="medium"
       loading={isRemoving}
       visible={selectedReplica !== undefined}
-      header={`Confirm to drop selected replica? (ID: ${formattedId})`}
-      buttonLabel="Drop replica"
-      buttonLoadingLabel="Dropping replica"
-      onSelectCancel={() => onCancel()}
-      onSelectConfirm={() => onConfirmRemove()}
+      title={`Confirm to drop selected replica? (ID: ${formattedId})`}
+      confirmLabel="Drop replica"
+      confirmLabelLoading="Dropping replica"
+      onCancel={() => onCancel()}
+      onConfirm={() => onConfirmRemove()}
+      alert={{
+        title: 'This action cannot be undone',
+        description: 'You may still deploy a new replica in this region thereafter',
+      }}
     >
-      <Modal.Content className="py-3">
-        <Alert_Shadcn_ variant="warning">
-          <IconAlertTriangle strokeWidth={2} />
-          <AlertTitle_Shadcn_>This action cannot be undone</AlertTitle_Shadcn_>
-          <AlertDescription_Shadcn_>
-            You may still deploy a new replica in this region thereafter
-          </AlertDescription_Shadcn_>
-        </Alert_Shadcn_>
-        <div className="text-sm px-1 pt-4">
-          <p>Before deleting this replica, consider:</p>
-          <ul className="text-foreground-light py-1 list-disc mx-4 space-y-1">
-            <li>
-              Network traffic from this region may slow down, especially if you have no other
-              replicas in this region
-            </li>
-          </ul>
-        </div>
-      </Modal.Content>
+      <p className="text-sm">Before deleting this replica, consider:</p>
+      <ul className="text-sm text-foreground-light py-1 list-disc mx-4 space-y-1">
+        <li>
+          Network traffic from this region may slow down, especially if you have no other replicas
+          in this region
+        </li>
+      </ul>
     </ConfirmationModal>
   )
 }

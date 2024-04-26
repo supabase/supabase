@@ -20,6 +20,9 @@
     "tsconfig": "*",
     "ui": "*"
   },
+  "devDependencies": {
+    "api-types": "*"
+  },
   "peerDependencies": {
     "next": "*",
     "react": "*",

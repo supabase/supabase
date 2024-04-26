@@ -22,7 +22,7 @@ functions:
       Initializing a new client is pretty straightforward. Find your project url and public key from the
       admin panel and pass it into your client initialization function.
 
-      `supabase-csharp` is heavily dependent on Models deriving from `BaseModel`. To interact with the API, one must have the associated model (see example) specified.
+      `Supabase` is heavily dependent on Models deriving from `BaseModel`. To interact with the API, one must have the associated model (see example) specified.
 
       Leverage `Table`, `PrimaryKey`, and `Column` attributes to specify names of classes/properties that are different from their C# Versions.
 
