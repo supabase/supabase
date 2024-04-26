@@ -19,7 +19,6 @@ import { BASE_PATH, PROJECT_STATUS } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
 import { useIntegrationInstallationSnapshot } from 'state/integration-installation'
 import type { NextPageWithLayout, Organization } from 'types'
-import * as Sentry from '@sentry/nextjs'
 
 const VERCEL_ICON = (
   <img src={`${BASE_PATH}/img/icons/vercel-icon.svg`} alt="Vercel Icon" className="w-4" />
@@ -129,18 +128,6 @@ const VercelIntegration: NextPageWithLayout = () => {
 
   const onCreateConnections = useCallback(
     (vars: any) => {
-      // TODO(kamil): Remove once "missing connection name" bug has been squashed.
-      if (!vars.connection?.metadata?.name) {
-        Sentry.captureMessage('Vercel connection is missing name', {
-          contexts: {
-            connection: vars.connection,
-            source: {
-              file: 'marketplace/choose-project.tsx',
-            },
-          },
-        })
-      }
-
       createConnections({
         ...vars,
         connection: {
