@@ -155,7 +155,7 @@ const InfrastructureInfo = () => {
                       <Input
                         readOnly
                         disabled
-                        label="GoTrue version"
+                        label="Auth version"
                         value={project?.serviceVersions?.gotrue ?? ''}
                       />
                     )}

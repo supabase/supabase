@@ -25,13 +25,16 @@ const Extensions = () => {
     connectionString: project?.connectionString,
   })
 
+  const formattedExtensions = (data ?? []).map((ext) => {
+    if (ext.name === 'vector') return { ...ext, name: 'pgvector' }
+    else return ext
+  })
+
   const extensions =
     filterString.length === 0
-      ? data ?? []
-      : (data ?? []).filter((ext) =>
-          // if the filter string contains pg, ignore it since some of the extensions may be listed without the
-          // pg prefix (pgvector is listed as vector)
-          ext.name.includes(filterString.replace('pg', ''))
+      ? formattedExtensions
+      : formattedExtensions.filter((ext) =>
+          ext.name.toLowerCase().includes(filterString.toLowerCase())
         )
   const extensionsWithoutHidden = extensions.filter((ext) => !HIDDEN_EXTENSIONS.includes(ext.name))
   const [enabledExtensions, disabledExtensions] = partition(
