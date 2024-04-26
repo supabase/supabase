@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { Button } from 'ui/client'
+import { Button } from 'ui'
 
 const ErrorPage = () => (
   <div className="h-full w-full flex flex-col gap-8 p-8 items-center justify-center">

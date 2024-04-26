@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, type ComponentProps } from 'react'
-import { Tabs as TabsPrimitive } from 'ui/client'
+import { Tabs as TabsPrimitive } from 'ui'
 import { useTocRerenderTrigger } from '~/components/GuidesTableOfContents'
 
 const TabPanel = TabsPrimitive.Panel

@@ -8,7 +8,7 @@ import {
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
-} from 'ui/client'
+} from 'ui'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'

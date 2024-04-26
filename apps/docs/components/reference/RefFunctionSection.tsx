@@ -1,7 +1,7 @@
 import { Database } from 'lucide-react'
 import { Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
-import { CodeBlock, Tabs } from 'ui/client'
+import { CodeBlock, Tabs } from 'ui'
 import Options from '~/components/Options'
 import Param from '~/components/Params'
 import RefDetailCollapse from '~/components/reference/RefDetailCollapse'

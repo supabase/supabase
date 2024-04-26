@@ -1,5 +1,5 @@
 import { FC, PropsWithChildren } from 'react'
-import { cn } from 'ui/server'
+import { cn } from 'ui'
 
 interface IStep {
   title: string

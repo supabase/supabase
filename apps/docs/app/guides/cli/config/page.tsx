@@ -1,5 +1,5 @@
 import ReactMarkdown from 'react-markdown'
-import { CodeBlock } from 'ui/client'
+import { CodeBlock } from 'ui'
 import { Heading } from '~/components/CustomHTMLElements'
 import { type TOCHeader } from '~/components/GuidesTableOfContents'
 import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
