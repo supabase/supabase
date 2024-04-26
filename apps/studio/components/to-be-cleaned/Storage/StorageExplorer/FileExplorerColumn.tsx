@@ -219,7 +219,6 @@ const FileExplorerColumn = ({
           columnIndex: index,
           selectedItems,
           openedFolders,
-          selectedFilePreview,
         }}
         ItemComponent={FileExplorerRow}
         getItemSize={(index) => (index !== 0 && index === columnItems.length ? 85 : 37)}

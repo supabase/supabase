@@ -1,5 +1,6 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { find, isEmpty, isEqual } from 'lodash'
+import { useCallback } from 'react'
 import { useContextMenu } from 'react-contexify'
 import SVG from 'react-inlinesvg'
 
@@ -47,6 +48,7 @@ import {
 import { StorageItem, StorageItemWithColumn } from '../Storage.types'
 import FileExplorerRowEditing from './FileExplorerRowEditing'
 import { copyPathToFolder } from './StorageExplorer.utils'
+import { fetchFileUrl } from './useFetchFileUrlQuery'
 import { useCopyUrl } from './useCopyUrl'
 
 export const RowIcon = ({
@@ -101,7 +103,6 @@ export interface FileExplorerRowProps {
   columnIndex: number
   selectedItems: StorageItemWithColumn[]
   openedFolders: StorageItem[]
-  selectedFilePreview: (StorageItemWithColumn & { previewUrl: string | undefined }) | null
 }
 
 const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
@@ -111,11 +112,10 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
   columnIndex = 0,
   selectedItems = [],
   openedFolders = [],
-  selectedFilePreview,
 }) => {
   const storageExplorerStore = useStorageStore()
   const {
-    getFileUrl,
+    projectRef,
     popColumnAtIndex,
     pushOpenedFolderAtIndex,
     popOpenedFoldersAtIndex,
@@ -133,6 +133,7 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     downloadFolder,
     selectRangeItems,
     selectedFilePreview,
+    getPathAlongOpenedFolders,
   } = storageExplorerStore
   const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
 
@@ -177,6 +178,22 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
     closeFilePreview()
   }
 
+  const getFileUrl = useCallback(
+    (expiresIn?: URL_EXPIRY_DURATION) => {
+      const pathToFile = getPathAlongOpenedFolders(false)
+      const formattedPathToFile = [pathToFile, itemWithColumnIndex.name].join('/')
+
+      return fetchFileUrl(
+        formattedPathToFile,
+        projectRef,
+        selectedBucket.id,
+        selectedBucket.public,
+        expiresIn
+      )
+    },
+    [itemWithColumnIndex.name, projectRef, selectedBucket.id, selectedBucket.public]
+  )
+
   const rowOptions =
     item.type === STORAGE_ROW_TYPES.FOLDER
       ? [
@@ -218,8 +235,8 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
                       {
                         name: 'Get URL',
                         icon: <Clipboard size={14} strokeWidth={1} />,
-                        onClick: () =>
-                          onCopyUrl(itemWithColumnIndex.name, getFileUrl(itemWithColumnIndex)),
+                        onClick: async () =>
+                          onCopyUrl(itemWithColumnIndex.name, await getFileUrl()),
                       },
                     ]
                   : [
@@ -229,26 +246,26 @@ const FileExplorerRow: ItemRenderer<StorageItem, FileExplorerRowProps> = ({
                         children: [
                           {
                             name: 'Expire in 1 week',
-                            onClick: () =>
+                            onClick: async () =>
                               onCopyUrl(
                                 itemWithColumnIndex.name,
-                                getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.WEEK)
+                                await getFileUrl(URL_EXPIRY_DURATION.WEEK)
                               ),
                           },
                           {
                             name: 'Expire in 1 month',
-                            onClick: () =>
+                            onClick: async () =>
                               onCopyUrl(
                                 itemWithColumnIndex.name,
-                                getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.MONTH)
+                                await getFileUrl(URL_EXPIRY_DURATION.MONTH)
                               ),
                           },
                           {
                             name: 'Expire in 1 year',
-                            onClick: () =>
+                            onClick: async () =>
                               onCopyUrl(
                                 itemWithColumnIndex.name,
-                                getFileUrl(itemWithColumnIndex, URL_EXPIRY_DURATION.YEAR)
+                                await getFileUrl(URL_EXPIRY_DURATION.YEAR)
                               ),
                           },
                           {

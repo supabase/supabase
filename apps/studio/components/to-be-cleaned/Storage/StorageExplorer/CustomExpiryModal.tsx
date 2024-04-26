@@ -4,7 +4,14 @@ import { Button, Form, Input, Listbox, Modal } from 'ui'
 
 import { DATETIME_FORMAT } from 'lib/constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
+import { useCallback } from 'react'
+import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { useCopyUrl } from './useCopyUrl'
+import { fetchFileUrl } from './useFetchFileUrlQuery'
+
+export interface CustomExpiryModalProps {
+  onCopyUrl: (name: string, url: string) => void
+}
 
 const unitMap = {
   days: 3600 * 24,
@@ -16,10 +23,32 @@ const unitMap = {
 const CustomExpiryModal = () => {
   const storageExplorerStore = useStorageStore()
   const { onCopyUrl } = useCopyUrl(storageExplorerStore.projectRef)
-  const { getFileUrl, selectedFileCustomExpiry, setSelectedFileCustomExpiry } = storageExplorerStore
+  const {
+    projectRef,
+    selectedFileCustomExpiry,
+    selectedBucket,
+    setSelectedFileCustomExpiry,
+    getPathAlongOpenedFolders,
+  } = storageExplorerStore
 
   const visible = selectedFileCustomExpiry !== undefined
   const onClose = () => setSelectedFileCustomExpiry(undefined)
+
+  const getFileUrl = useCallback(
+    (expiresIn?: URL_EXPIRY_DURATION) => {
+      const pathToFile = getPathAlongOpenedFolders(false)
+      const formattedPathToFile = [pathToFile, selectedFileCustomExpiry?.name].join('/')
+
+      return fetchFileUrl(
+        formattedPathToFile,
+        projectRef,
+        selectedBucket.id,
+        selectedBucket.public,
+        expiresIn
+      )
+    },
+    [selectedFileCustomExpiry?.name, projectRef, selectedBucket.id, selectedBucket.public]
+  )
 
   return (
     <Modal
@@ -38,8 +67,7 @@ const CustomExpiryModal = () => {
           setSubmitting(true)
           await onCopyUrl(
             selectedFileCustomExpiry!.name,
-            getFileUrl(
-              selectedFileCustomExpiry!,
+            await getFileUrl(
               values.expiresIn * unitMap[values.units as 'days' | 'weeks' | 'months' | 'years']
             )
           )
