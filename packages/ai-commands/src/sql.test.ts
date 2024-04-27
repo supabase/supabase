@@ -1,17 +1,23 @@
 import { describe, expect, test } from '@jest/globals'
 import { codeBlock } from 'common-tags'
-import OpenAI from 'openai'
 import { collectStream, extractMarkdownSql, formatSql, getPolicyInfo } from '../test/util'
+import { createOpenAiClient } from './openai'
 import { debugSql, editSql, generateSql, titleSql } from './sql'
-import { chatRlsPolicy } from './sql.edge'
+import { chatRlsPolicy, generateV2 } from './sql.edge'
 
-const openAiKey = process.env.OPENAI_KEY
-const openai = new OpenAI({ apiKey: openAiKey })
+const { openai, model, error } = createOpenAiClient()
+
+if (error) {
+  throw error
+}
+
+console.info(`Running AI tests against model '${model}'`)
 
 describe('generate', () => {
   test('single table with specified columns', async () => {
     const { sql, title } = await generateSql(
       openai,
+      model,
       'create a table to track employees with name, email, and position'
     )
 
@@ -24,6 +30,7 @@ describe('edit', () => {
   test('add length constraint', async () => {
     const { sql } = await editSql(
       openai,
+      model,
       'force name to be at least 4 characters',
       codeBlock`
         create table employees (
@@ -42,6 +49,7 @@ describe('debug', () => {
   test('fix order of operations', async () => {
     const { sql } = await debugSql(
       openai,
+      model,
       'relation "departments" does not exist',
       codeBlock`
         create table employees (
@@ -64,6 +72,7 @@ describe('debug', () => {
   test('fix typos', async () => {
     const { sql, solution } = await debugSql(
       openai,
+      model,
       'syntax error at or near "fromm"',
       codeBlock`
         select * fromm employees;
@@ -79,6 +88,7 @@ describe('title', () => {
   test('title matches content', async () => {
     const { title, description } = await titleSql(
       openai,
+      model,
       codeBlock`
         create table employees (
           id bigint primary key generated always as identity,
@@ -103,6 +113,7 @@ describe('rls chat', () => {
   test('select policy using table definition', async () => {
     const responseStream = await chatRlsPolicy(
       openai,
+      model,
       [
         {
           role: 'user',
@@ -129,5 +140,34 @@ describe('rls chat', () => {
     await expect(name).toMatchCriteria(
       'policy says that users can select their own todos (not insert, update, delete, etc)'
     )
+  })
+})
+
+describe('sql chat', () => {
+  test('single table with specified columns', async () => {
+    const responseStream = await generateV2(openai, model, [
+      {
+        role: 'user',
+        content: 'create a table to track employees with name, email, and position',
+      },
+    ])
+    const responseText = await collectStream(responseStream)
+    const [sql] = extractMarkdownSql(responseText)
+
+    expect(sql).toMatchSnapshot()
+  })
+
+  test('table referencing users creates fk to auth.users', async () => {
+    const responseStream = await generateV2(openai, model, [
+      {
+        role: 'user',
+        content: 'create a todos table and track author',
+      },
+    ])
+
+    const responseText = await collectStream(responseStream)
+    const [sql] = extractMarkdownSql(responseText)
+
+    expect(sql).toMatchSnapshot()
   })
 })

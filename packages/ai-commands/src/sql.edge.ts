@@ -3,13 +3,8 @@ import { OpenAIStream } from 'ai'
 import { codeBlock, oneLine, stripIndent } from 'common-tags'
 import OpenAI from 'openai'
 
-import { ApplicationError, ContextLengthError, UserError } from './errors'
-import { getChatRequestTokenCount, getMaxTokenCount, tokenizer } from './tokenizer'
-
-interface Message {
-  role: 'user' | 'assistant'
-  content: string
-}
+import { ApplicationError, ContextLengthError } from './errors'
+import { Message, capMessages, countTokens } from './tokenizer'
 
 /**
  * Responds to a conversation about building an RLS policy.
@@ -18,6 +13,7 @@ interface Message {
  */
 export async function chatRlsPolicy(
   openai: OpenAI,
+  model: string,
   messages: Message[],
   entityDefinitions?: string[],
   policyDefinition?: string
@@ -26,7 +22,7 @@ export async function chatRlsPolicy(
     {
       role: 'system',
       content: stripIndent`
-        You're an Postgres expert in writing row level security policies. Your purpose is to 
+        You're a Postgres expert in writing row level security policies. Your purpose is to 
         generate a policy with the constraints given by the user. You will be provided a schema 
         on which the policy should be applied.
 
@@ -35,18 +31,18 @@ export async function chatRlsPolicy(
         - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
         - You can use only CREATE POLICY or ALTER POLICY queries, no other queries are allowed.
         - You can add short explanations to your messages.
-        - The result should be a valid markdown. The SQL code should be wrapped in \`\`\`.
+        - The result should be a valid markdown. The SQL code should be wrapped in \`\`\` (including sql language tag).
         - Always use "auth.uid()" instead of "current_user".
         - You can't use "USING" expression on INSERT policies.
         - Only use "WITH CHECK" expression on INSERT or UPDATE policies.
-        - The policy name should be short text explaining the policy, enclosed in double quotes.
+        - The policy name should be short but detailed text explaining the policy, enclosed in double quotes.
         - Always put explanations as separate text. Never use inline SQL comments. 
         - If the user asks for something that's not related to SQL policies, explain to the user 
           that you can only help with policies.
         
         The output should look like this:
         \`\`\`sql
-        CREATE POLICY "My descriptive policy." ON users FOR INSERT USING (user_name = current_user) WITH (true);
+        CREATE POLICY "My descriptive policy." ON books FOR INSERT USING (author_id = auth.uid()) WITH (true);
         \`\`\`
       `,
     },
@@ -77,7 +73,7 @@ export async function chatRlsPolicy(
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-0125',
+      model,
       messages: initMessages,
       max_tokens: 1024,
       temperature: 0,
@@ -101,24 +97,37 @@ export async function chatRlsPolicy(
  */
 export async function generateV2(
   openai: OpenAI,
+  model: string,
   messages: Message[],
   existingSql?: string,
   entityDefinitions?: string[]
 ): Promise<ReadableStream<Uint8Array>> {
-  const initMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+  const initMessages: Message[] = [
     {
       role: 'system',
       content: stripIndent`
+      You are a Supabase Postgres SQL generator. The user will have a conversation with you and your job is to generate SQL
+      in the Postgres dialect. Be friendly and relatable, complementing the user when appropriate, but don't go overboard.
+
       The generated SQL (must be valid SQL).
       - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
       - Prefer creating foreign key references in the create statement
+      - When creating new tables, always add foreign key references inline (ie. "my_column my_type references ..." on a single line)
+      - Include all necessary tables and create them in the correct order (eg. book references author, so create author before book)
       - Prefer 'text' over 'varchar'
       - Prefer 'timestamp with time zone' over 'date'
       - Use vector(384) data type for any embedding/vector related query
       - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
       - Always use semicolons
+      - There is a built-in auth.users table with a uuid id column (but it's immutable)
+        - Prefer referencing auth.users directly via FK instead of creating a new users table
+        - Only create your own users table if you need to store additional data about the user such as avatar
+        - If you do create your own users table, prefer to call it "profiles" and add a FK to auth.users. You must also create a trigger function
+          that automatically creates the profile when there is a new auth.user
+      - Sprinkle in detailed explanations throughout your answer, digging into "why" each snippet is necessary
+        - Explanations should live outside of code blocks
       - Output as markdown
-      - Always include code snippets if available
+      - Always include code snippets if available (including sql language tag, ie. \`\`\`sql\n...\n\`\`\`)
       `,
     },
   ]
@@ -148,7 +157,7 @@ export async function generateV2(
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-0125',
+      model,
       messages: initMessages,
       max_tokens: 1024,
       temperature: 0,
@@ -167,6 +176,9 @@ export async function generateV2(
 
 export async function clippy(
   openai: OpenAI,
+  openaiEmbedding: OpenAI,
+  model: string,
+  embeddingModel: string,
   supabaseClient: SupabaseClient<any, 'public', any>,
   messages: Message[]
 ) {
@@ -188,25 +200,9 @@ export async function clippy(
     throw new Error("No message with role 'user'")
   }
 
-  // Moderate the content to comply with OpenAI T&C
-  const moderationResponses = await Promise.all(
-    contextMessages.map((message) => openai.moderations.create({ input: message.content }))
-  )
-
-  for (const moderationResponse of moderationResponses) {
-    const [results] = moderationResponse.results
-
-    if (results.flagged) {
-      throw new UserError('Flagged content', {
-        flagged: true,
-        categories: results.categories,
-      })
-    }
-  }
-
-  const embeddingResponse = await openai.embeddings
+  const embeddingResponse = await openaiEmbedding.embeddings
     .create({
-      model: 'text-embedding-ada-002',
+      model: embeddingModel,
       input: userMessage.content.replaceAll('\n', ' '),
     })
     .catch((error: any) => {
@@ -235,8 +231,7 @@ export async function clippy(
   for (let i = 0; i < pageSections.length; i++) {
     const pageSection = pageSections[i]
     const content = pageSection.content
-    const encoded = tokenizer.encode(content)
-    tokenCount += encoded.length
+    tokenCount += await countTokens(content, model)
 
     if (tokenCount >= 1500) {
       break
@@ -245,7 +240,7 @@ export async function clippy(
     contextText += `${content.trim()}\n---\n`
   }
 
-  const initMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
+  const initMessages: Message[] = [
     {
       role: 'system',
       content: codeBlock`
@@ -307,20 +302,19 @@ export async function clippy(
     },
   ]
 
-  const model = 'gpt-3.5-turbo-0301'
-  const maxCompletionTokenCount = 1024
+  const maxCompletionTokens = 1024
 
-  const completionMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = capMessages(
+  const completionMessages: Message[] = await capMessages(
     initMessages,
     contextMessages,
-    maxCompletionTokenCount,
-    model
+    model,
+    maxCompletionTokens
   )
 
   const completionOptions = {
     model,
     messages: completionMessages,
-    max_tokens: 1024,
+    max_tokens: maxCompletionTokens,
     temperature: 0,
     stream: true,
   }
@@ -341,33 +335,4 @@ export async function clippy(
   }
 
   return response
-}
-
-/**
- * Remove context messages until the entire request fits
- * the max total token count for that model.
- *
- * Accounts for both message and completion token counts.
- */
-function capMessages(
-  initMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-  contextMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[],
-  maxCompletionTokenCount: number,
-  model: string
-) {
-  const maxTotalTokenCount = getMaxTokenCount(model)
-  const cappedContextMessages = [...contextMessages]
-  let tokenCount =
-    getChatRequestTokenCount([...initMessages, ...cappedContextMessages], model) +
-    maxCompletionTokenCount
-
-  // Remove earlier context messages until we fit
-  while (tokenCount >= maxTotalTokenCount) {
-    cappedContextMessages.shift()
-    tokenCount =
-      getChatRequestTokenCount([...initMessages, ...cappedContextMessages], model) +
-      maxCompletionTokenCount
-  }
-
-  return [...initMessages, ...cappedContextMessages]
 }

@@ -16,6 +16,7 @@
     "@supabase/ssr": "^0.1.0",
     "@tanstack/react-query": "^5.13.4",
     "ai": "^2.2.31",
+    "ai-commands": "*",
     "common": "*",
     "config": "*",
     "dayjs": "^1.11.10",

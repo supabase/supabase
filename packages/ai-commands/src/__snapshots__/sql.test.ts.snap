@@ -32,9 +32,9 @@ exports[`edit add length constraint 1`] = `
 exports[`generate single table with specified columns 1`] = `
 "create table employees (
   id bigint primary key generated always as identity,
-  name text,
-  email text,
-  position text
+  name text not null,
+  email text unique not null,
+  position text not null
 );"
 `;
 
@@ -45,4 +45,26 @@ exports[`rls chat select policy using table definition 1`] = `
   "table": "todos",
   "usingExpression": "user_id = auth.uid ()",
 }
+`;
+
+exports[`sql chat single table with specified columns 1`] = `
+"create table employees (
+  id bigint primary key generated always as identity,
+  name text not null,
+  email text unique not null,
+  position text not null,
+  created_at timestamp with time zone default current_timestamp,
+  updated_at timestamp with time zone default current_timestamp
+);"
+`;
+
+exports[`sql chat table referencing users creates fk to auth.users 1`] = `
+"create table todos (
+  id bigint primary key generated always as identity,
+  title text not null,
+  description text,
+  created_at timestamp with time zone default current_timestamp,
+  author_id uuid references auth.users (id),
+  completed boolean default false
+);"
 `;

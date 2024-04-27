@@ -1,18 +1,9 @@
 import { ContextLengthError, titleSql } from 'ai-commands'
+import { createOpenAiClient } from 'ai-commands/src/openai'
 import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { OpenAI } from 'openai'
-
-const openAiKey = process.env.OPENAI_KEY
-const openai = new OpenAI({ apiKey: openAiKey })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (!openAiKey) {
-    return res.status(500).json({
-      error: 'No OPENAI_KEY set. Create this environment variable to use AI features.',
-    })
-  }
-
   const { method } = req
 
   switch (method) {
@@ -25,12 +16,18 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 }
 
 export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+  const { openai, model, error } = createOpenAiClient()
+
+  if (error) {
+    return res.status(500).json({ error: error.message })
+  }
+
   const {
     body: { sql },
   } = req
 
   try {
-    const result = await titleSql(openai, sql)
+    const result = await titleSql(openai, model, sql)
     return res.json(result)
   } catch (error) {
     if (error instanceof Error) {

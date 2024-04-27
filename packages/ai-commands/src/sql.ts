@@ -9,13 +9,6 @@ const generateSqlSchema = SchemaBuilder.emptySchema()
   .addString('sql', {
     description: stripIndent`
       The generated SQL (must be valid SQL).
-      - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
-      - Prefer creating foreign key references in the create statement
-      - Prefer 'text' over 'varchar'
-      - Prefer 'timestamp with time zone' over 'date'
-      - Use vector(384) data type for any embedding/vector related query
-      - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
-      - Always use semicolons
     `,
   })
   .addString('title', {
@@ -28,16 +21,6 @@ const generateSqlSchema = SchemaBuilder.emptySchema()
 const editSqlSchema = SchemaBuilder.emptySchema().addString('sql', {
   description: stripIndent`
       The modified SQL (must be valid SQL).
-      - Assume the query hasn't been executed yet
-      - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
-      - When creating tables, always add foreign key references inline
-      - Prefer 'text' over 'varchar'
-      - Prefer 'timestamp with time zone' over 'date'
-      - Use vector(384) data type for any embedding/vector related query
-      - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
-      - Use real examples when possible
-      - Add constraints if requested
-      - Always use semicolons
     `,
 })
 
@@ -83,28 +66,12 @@ const completionFunctions = {
   },
   debugSql: {
     name: 'debugSql',
-    description: stripIndent`
-      Debugs a Postgres SQL error. Returns the fixed SQL and a solution explaining it.
-      - Create extensions if they are missing (only for valid extensions)
-      - Suggest creating tables if they are missing
-      - Include all of the original SQL
-      - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
-      - When creating tables, always add foreign key references inline
-      - Prefer 'text' over 'varchar'
-      - Prefer 'timestamp with time zone' over 'date'
-      - Use vector(384) data type for any embedding/vector related query
-      - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
-      - Always use semicolons
-    `,
+    description: 'Debugs a Postgres SQL error. Returns the fixed SQL and a solution explaining it.',
     parameters: debugSqlSchema.schema as Record<string, unknown>,
   },
   generateTitle: {
     name: 'generateTitle',
-    description: stripIndent`
-      Generates a short title and summarized description for a Postgres SQL snippet.
-      
-      The description should describe why this table was created (eg. "Table to track todos")
-    `,
+    description: 'Generates a short title and summarized description for a Postgres SQL snippet.',
     parameters: generateTitleSchema.schema as Record<string, unknown>,
   },
 } satisfies Record<string, OpenAI.Chat.Completions.ChatCompletionCreateParams.Function>
@@ -114,10 +81,35 @@ const completionFunctions = {
  *
  * @returns The generated SQL along with a title for it.
  */
-export async function generateSql(openai: OpenAI, prompt: string, entityDefinitions?: string[]) {
+export async function generateSql(
+  openai: OpenAI,
+  model: string,
+  prompt: string,
+  entityDefinitions?: string[]
+) {
   const hasEntityDefinitions = entityDefinitions !== undefined && entityDefinitions.length > 0
 
   const completionMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = []
+
+  completionMessages.push({
+    role: 'system',
+    content: stripIndent`
+      You are a Postgres SQL generator. You must generate Postgres SQL based on a natural language prompt
+
+      The generated SQL (must be valid SQL).
+        - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
+        - Prefer creating foreign key references in the create statement
+        - When creating new tables, always add foreign key references inline (ie. "my_column my_type references ..." on a single line)
+        - Include all necessary tables and create them in the correct order (eg. book references author, so create author before book)
+        - Prefer 'text' over 'varchar'
+        - Prefer 'timestamp with time zone' over 'date'
+        - Use vector(384) data type for any embedding/vector related query
+        - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
+        - Always use semicolons
+
+        Response must contain only JSON satisfying the 'tool_calls'.
+    `,
+  })
 
   if (hasEntityDefinitions) {
     completionMessages.push({
@@ -136,7 +128,7 @@ export async function generateSql(openai: OpenAI, prompt: string, entityDefiniti
 
   try {
     const completionResponse = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-0125',
+      model,
       messages: completionMessages,
       max_tokens: 1024,
       temperature: 0,
@@ -188,6 +180,7 @@ export async function generateSql(openai: OpenAI, prompt: string, entityDefiniti
  */
 export async function editSql(
   openai: OpenAI,
+  model: string,
   prompt: string,
   sql: string,
   entityDefinitions?: string[]
@@ -195,6 +188,27 @@ export async function editSql(
   const hasEntityDefinitions = entityDefinitions !== undefined && entityDefinitions.length > 0
 
   const completionMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = []
+
+  completionMessages.push({
+    role: 'system',
+    content: stripIndent`
+      You are a Postgres SQL editor. You must edit Postgres SQL based on the user's instructions.
+
+      - Assume the query hasn't been executed yet
+      - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
+      - When creating new tables, always add foreign key references inline (ie. "my_column my_type references ..." on a single line)
+      - Include all necessary tables and create them in the correct order (eg. book references author, so create author before book)
+      - Prefer 'text' over 'varchar'
+      - Prefer 'timestamp with time zone' over 'date'
+      - Use vector(384) data type for any embedding/vector related query
+      - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
+      - Use real examples when possible
+      - Add constraints if requested
+      - Always use semicolons
+
+      Response must contain only JSON satisfying the 'tool_calls'.
+    `,
+  })
 
   if (hasEntityDefinitions) {
     completionMessages.push({
@@ -222,7 +236,7 @@ export async function editSql(
 
   try {
     const completionResponse = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-0125',
+      model,
       messages: completionMessages,
       max_tokens: 2048,
       temperature: 0,
@@ -274,6 +288,7 @@ export async function editSql(
  */
 export async function debugSql(
   openai: OpenAI,
+  model: string,
   errorMessage: string,
   sql: string,
   entityDefinitions?: string[]
@@ -281,6 +296,25 @@ export async function debugSql(
   const hasEntityDefinitions = entityDefinitions !== undefined && entityDefinitions.length > 0
 
   const completionMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = []
+
+  completionMessages.push({
+    role: 'system',
+    content: stripIndent`
+      You are a Postgres SQL debugger. You must fix the user's SQL and a provide solution explaining it.
+
+      - Create extensions if they are missing (only for valid extensions)
+      - Suggest creating tables if they are missing
+      - Include all of the original SQL
+      - For primary keys, always use "id bigint primary key generated always as identity" (not serial)
+      - When creating tables, always add foreign key references inline
+      - Prefer 'text' over 'varchar'
+      - Prefer 'timestamp with time zone' over 'date'
+      - Use vector(384) data type for any embedding/vector related query
+      - Always use double apostrophe in SQL strings (eg. 'Night''s watch')
+      - Always use semicolons
+      - Do not mix up the user's error with "tool use failed"
+    `,
+  })
 
   if (hasEntityDefinitions) {
     completionMessages.push({
@@ -311,7 +345,7 @@ export async function debugSql(
 
   try {
     const completionResponse = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-0125',
+      model,
       messages: completionMessages,
       max_tokens: 2048,
       temperature: 0,
@@ -361,17 +395,29 @@ export async function debugSql(
  *
  * @returns A title and description for the SQL snippet.
  */
-export async function titleSql(openai: OpenAI, sql: string) {
-  const completionMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [
-    {
-      role: 'user',
-      content: sql,
-    },
-  ]
+export async function titleSql(openai: OpenAI, model: string, sql: string) {
+  const completionMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = []
+
+  completionMessages.push({
+    role: 'system',
+    content: stripIndent`
+      You are a Postgres SQL title/description generator.
+      You must generates a short title and summarized description for a Postgres SQL snippet.
+
+      - The title should be short but still address all parts of the code.
+      - The description should describe why this table was created (eg. "Table to track todos")
+      while addressing all parts of the code.
+    `,
+  })
+
+  completionMessages.push({
+    role: 'user',
+    content: sql,
+  })
 
   try {
     const completionResponse = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-0125',
+      model,
       messages: completionMessages,
       max_tokens: 1024,
       temperature: 0,

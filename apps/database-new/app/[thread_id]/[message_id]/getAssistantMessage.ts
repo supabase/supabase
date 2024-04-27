@@ -1,16 +1,11 @@
 import { stripIndent } from 'common-tags'
-import { cookies } from 'next/headers'
 import OpenAI from 'openai'
 
 // import is weird, what's up with this?
 import { createClient } from '@/lib/supabase/server'
+import { createOpenAiClient } from 'ai-commands'
 import { ContextLengthError } from '../../../../../packages/ai-commands/src/errors'
 import { getMessages } from './getMessages'
-
-// Create an OpenAI API client (that's edge friendly!)
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
 
 // Set the runtime to edge for best performance
 export const runtime = 'edge'
@@ -26,6 +21,12 @@ export type AiAssistantMessage = {
  * it.
  */
 export const getAssistantResponse = async (threadId: string, messageId: string) => {
+  const { openai, model, error: openAiError } = createOpenAiClient()
+
+  if (openAiError) {
+    throw openAiError
+  }
+
   const supabase = createClient()
 
   const { data: message, error } = await supabase
@@ -91,7 +92,7 @@ export const getAssistantResponse = async (threadId: string, messageId: string) 
 
     try {
       const response = await openai.chat.completions.create({
-        model: 'gpt-3.5-turbo-16k-0613',
+        model,
         messages: initMessages,
         max_tokens: 1024,
         temperature: 0,

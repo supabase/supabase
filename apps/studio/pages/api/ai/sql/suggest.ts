@@ -1,25 +1,11 @@
 import { StreamingTextResponse } from 'ai'
 import { chatRlsPolicy } from 'ai-commands/edge'
+import { createOpenAiClient } from 'ai-commands/src/openai'
 import { NextRequest } from 'next/server'
-import OpenAI from 'openai'
 
 export const runtime = 'edge'
 
-const openAiKey = process.env.OPENAI_KEY
-
 export default async function handler(req: NextRequest) {
-  if (!openAiKey) {
-    return new Response(
-      JSON.stringify({
-        error: 'No OPENAI_KEY set. Create this environment variable to use AI features.',
-      }),
-      {
-        status: 500,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
-  }
-
   const { method } = req
 
   switch (method) {
@@ -37,7 +23,19 @@ export default async function handler(req: NextRequest) {
 }
 
 async function handlePost(request: NextRequest) {
-  const openai = new OpenAI({ apiKey: openAiKey })
+  const { openai, model, error } = createOpenAiClient()
+
+  if (error) {
+    return new Response(
+      JSON.stringify({
+        error: error.message,
+      }),
+      {
+        status: 500,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
+  }
 
   const body = await (request.json() as Promise<{
     messages: { content: string; role: 'user' | 'assistant' }[]
@@ -48,7 +46,7 @@ async function handlePost(request: NextRequest) {
   const { messages, entityDefinitions, policyDefinition } = body
 
   try {
-    const stream = await chatRlsPolicy(openai, messages, entityDefinitions, policyDefinition)
+    const stream = await chatRlsPolicy(openai, model, messages, entityDefinitions, policyDefinition)
     return new StreamingTextResponse(stream)
   } catch (error) {
     console.error(error)

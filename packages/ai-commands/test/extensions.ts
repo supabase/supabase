@@ -1,14 +1,15 @@
 import { expect } from '@jest/globals'
 import { codeBlock } from 'common-tags'
-import OpenAI from 'openai'
+import { createOpenAiClient } from '../src/openai'
 
-const openAiKey = process.env.OPENAI_KEY
-const openai = new OpenAI({ apiKey: openAiKey })
+const { openai, model, error } = createOpenAiClient()
+
+if (error) {
+  throw error
+}
 
 expect.extend({
   async toMatchCriteria(received: string, criteria: string) {
-    const model = 'gpt-4-1106-preview'
-
     const completionResponse = await openai.chat.completions.create({
       model,
       messages: [
@@ -21,7 +22,9 @@ expect.extend({
             - \`{ "pass": true, "reason": "<reason>" }\` if 'Received' adheres to the test 'Criteria'
             - \`{ "pass": false, "reason": "<reason>" }\` if 'Received' does not adhere to the test 'Criteria'
 
+            Be critical and make sure every part of 'Criteria' is addressed in 'Received'.
             The "reason" must explain exactly which part of 'Received' did or did not pass the test 'Criteria'.
+            Be detailed as to why you failed the test.
           `,
         },
         {
