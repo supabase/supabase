@@ -137,3 +137,5 @@ export interface DatetimeHelper {
   default?: boolean
   disabled?: boolean
 }
+
+export type LogsOrder = 'latest-first' | 'oldest-first'
