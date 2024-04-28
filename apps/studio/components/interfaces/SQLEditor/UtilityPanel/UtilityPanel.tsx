@@ -2,7 +2,6 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import toast from 'react-hot-toast'
 
-import { useContentQuery } from 'data/content/content-query'
 import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
 import { contentKeys } from 'data/content/keys'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
@@ -38,7 +37,6 @@ const UtilityPanel = ({
 }: UtilityPanelProps) => {
   const snap = useSqlEditorStateSnapshot()
   const { ref } = useParams()
-  const { data } = useContentQuery(ref)
   const snippet = snap.snippets[id]?.snippet
 
   const queryKeys = contentKeys.list(ref)

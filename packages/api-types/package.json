@@ -1,0 +1,15 @@
+{
+  "name": "api-types",
+  "version": "0.0.0",
+  "description": "Types shared between Supabase apps and packages",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "codegen": "openapi-typescript http://localhost:8080/api-json -o types/api.d.ts && prettier --write types/api.d.ts"
+  },
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "openapi-typescript": "^6.7.4"
+  }
+}

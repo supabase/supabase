@@ -9,10 +9,8 @@ interface FilterPopoverProps {
   name: string
   variant?: 'rectangular' | 'rounded'
   onSaveFilters: (options: string[]) => void
+  disabled?: boolean
 }
-
-// [Joshen] Form + Checkbox.Group doesn't seem to work properly RE form state
-// hence why the manual implementation here as a workaround
 
 export const FilterPopover = ({
   options = [],
@@ -22,6 +20,7 @@ export const FilterPopover = ({
   name,
   variant = 'rectangular',
   onSaveFilters,
+  disabled,
 }: FilterPopoverProps) => {
   const [open, setOpen] = useState(false)
   const [selectedOptions, setSelectedOptions] = useState<string[]>([])
@@ -35,6 +34,7 @@ export const FilterPopover = ({
     <Popover
       side="bottom"
       align="start"
+      disabled={disabled}
       open={open}
       onOpenChange={() => setOpen(!open)}
       header={<div className="prose text-xs">Select {name.toLowerCase()}</div>}

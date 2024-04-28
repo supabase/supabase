@@ -9,14 +9,21 @@ When using Supabase with server-side languages and frameworks - such as Next.js,
 
 ## Framework quickstarts
 
-<div className="grid cols-[repeat(auto-fit,min-max(250px,1fr)] gap-6 mb-6 not-prose">
+<div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-6 mb-6 not-prose">
   {[
     {
       title: 'Next.js',
       href: '/guides/auth/server-side/nextjs',
       description:
-        'Automatically configure Supabase to use cookies, making your user and their session available on the client and server.',
+        'Automatically configure Supabase in Next.js to use cookies, making your user and their session available on the client and server.',
       icon: '/docs/img/icons/nextjs-icon',
+    },
+    {
+      title: 'SvelteKit',
+      href: '/guides/auth/server-side/sveltekit',
+      description:
+        'Automatically configure Supabase in SvelteKit to use cookies, making your user and their session available on the client and server.',
+      icon: '/docs/img/icons/svelte-icon',
     },
   ].map((item) => {
     return (

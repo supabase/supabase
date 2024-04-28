@@ -195,7 +195,7 @@ Read more about [PostgREST's pre-request function](https://postgrest.org/en/stab
 >
 <TabPanel id="rate-limit-per-ip" label="Rate limit per IP">
 
-You can only rate-limit `POST`, `PUT`, `PATCH` and `DELETE` requests. This is because `GET` and `HEAD` requests run in read-only mode, and will be served by [Read Replicas](/guides/platform/read-replicas) which do not support writing to the database.
+You can only rate-limit `POST`, `PUT`, `PATCH` and `DELETE` requests. This is because `GET` and `HEAD` requests run in read-only mode, and will be served by [Read Replicas](/docs/guides/platform/read-replicas) which do not support writing to the database.
 
 Outline:
 
@@ -265,7 +265,7 @@ alter role authenticator
 notify pgrst, 'reload config';
 ```
 
-To clear old entries in the `private.rate_limits` table, set up a [pg_cron](/guides/database/extensions/pg_cron) job to clean them up.
+To clear old entries in the `private.rate_limits` table, set up a [pg_cron](/docs/guides/database/extensions/pg_cron) job to clean them up.
 
 </TabPanel>
 

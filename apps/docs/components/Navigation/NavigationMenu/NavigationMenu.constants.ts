@@ -195,7 +195,7 @@ export const REFERENCES: References = {
   csharp: {
     name: 'C#',
     library: 'supabase-csharp',
-    versions: ['v0'],
+    versions: ['v1', 'v0'],
     icon: '/docs/img/libraries/c-sharp-icon.svg',
   },
   swift: {
@@ -610,10 +610,6 @@ export const auth = {
         { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
         { name: 'Row Level Security', url: '/guides/auth/row-level-security' },
         {
-          name: 'Column Level Security',
-          url: '/guides/auth/column-level-security',
-        },
-        {
           name: 'Custom Claims & RBAC',
           url: '/guides/auth/custom-claims-and-role-based-access-control-rbac',
         },
@@ -627,6 +623,10 @@ export const auth = {
         {
           name: 'Next.js guide',
           url: '/guides/auth/server-side/nextjs',
+        },
+        {
+          name: 'SvelteKit guide',
+          url: '/guides/auth/server-side/sveltekit',
         },
         {
           name: 'Creating a client',
@@ -719,6 +719,10 @@ export const database: NavMenuConstant = {
           name: 'Managing tables, views, and data',
           url: '/guides/database/tables',
         },
+        {
+          name: 'Working with arrays',
+          url: '/guides/database/arrays',
+        },
         { name: 'Managing indexes', url: '/guides/database/postgres/indexes' },
         {
           name: 'Querying joins and nested tables',
@@ -775,6 +779,10 @@ export const database: NavMenuConstant = {
           name: 'Superuser Access and Unsupported Operations',
           url: '/guides/database/postgres/roles-superuser',
         },
+        {
+          name: 'Column level privileges',
+          url: '/guides/database/postgres/column-level-security',
+        },
       ],
     },
     {
@@ -794,8 +802,8 @@ export const database: NavMenuConstant = {
           url: '/guides/database/query-optimization',
         },
         {
-          name: 'Database linter',
-          url: '/guides/database/database-linter',
+          name: 'Database Advisors',
+          url: '/guides/database/database-advisors',
         },
         {
           name: 'Debugging and monitoring',
@@ -890,7 +898,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pg-safeupdate',
         },
         {
-          name: 'pgsodium: Encryption Features',
+          name: 'pgsodium (pending deprecation): Encryption Features',
           url: '/guides/database/extensions/pgsodium',
         },
         {
@@ -1056,6 +1064,10 @@ export const api: NavMenuConstant = {
         {
           name: 'Using custom schemas',
           url: '/guides/api/using-custom-schemas',
+        },
+        {
+          name: 'Converting from SQL to JavaScript API',
+          url: '/guides/api/sql-to-api',
         },
       ],
     },
@@ -1339,6 +1351,10 @@ export const storage: NavMenuConstant = {
       url: undefined,
       items: [
         {
+          name: 'Ownership',
+          url: '/guides/storage/security/ownership',
+        },
+        {
           name: 'Access Control',
           url: '/guides/storage/security/access-control',
         },
@@ -1356,6 +1372,10 @@ export const storage: NavMenuConstant = {
           name: 'Resumable Uploads',
           url: '/guides/storage/uploads/resumable-uploads',
         },
+        {
+          name: 'S3 Uploads',
+          url: '/guides/storage/uploads/s3-uploads',
+        },
         { name: 'Limits', url: '/guides/storage/uploads/file-limits' },
       ],
     },
@@ -1368,6 +1388,26 @@ export const storage: NavMenuConstant = {
           name: 'Image Transformations',
           url: '/guides/storage/serving/image-transformations',
         },
+        {
+          name: 'Bandwidth & Storage Egress',
+          url: '/guides/storage/serving/bandwidth',
+        },
+      ],
+    },
+    {
+      name: 'Management',
+      url: undefined,
+      items: [
+        { name: 'Copy / Move Objects', url: '/guides/storage/management/copy-move-objects' },
+        { name: 'Delete Objects', url: '/guides/storage/management/delete-objects' },
+      ],
+    },
+    {
+      name: 'S3',
+      url: undefined,
+      items: [
+        { name: 'Authentication', url: '/guides/storage/s3/authentication' },
+        { name: 'API Compatibility', url: '/guides/storage/s3/compatibility' },
       ],
     },
     {
@@ -1396,6 +1436,7 @@ export const storage: NavMenuConstant = {
           name: 'Helper Functions',
           url: '/guides/storage/schema/helper-functions',
         },
+        { name: 'Custom Roles', url: '/guides/storage/schema/custom-roles' },
       ],
     },
     {
@@ -2046,6 +2087,13 @@ export const reference_dart_v2 = {
 }
 
 export const reference_csharp_v0 = {
+  icon: 'reference-csharp',
+  title: 'C#',
+  url: 'guides/reference/csharp',
+  parent: '/reference',
+}
+
+export const reference_csharp_v1 = {
   icon: 'reference-csharp',
   title: 'C#',
   url: 'guides/reference/csharp',

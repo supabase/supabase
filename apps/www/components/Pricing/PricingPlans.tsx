@@ -1,12 +1,12 @@
 import React, { FC } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Button, IconCheck, cn } from 'ui'
+import { Button, cn, IconCheck } from 'ui'
 import Telemetry, { TelemetryEvent } from '~/lib/telemetry'
 import { useTelemetryProps } from 'common/hooks/useTelemetryProps'
 
 import gaEvents from '~/lib/gaEvents'
-import { plans } from 'shared-data/plans'
+import { pickFeatures, pickFooter, plans } from 'shared-data/plans'
 
 const PricingPlans: FC = () => {
   const router = useRouter()
@@ -23,6 +23,8 @@ const PricingPlans: FC = () => {
           {plans.map((plan) => {
             const isPromoPlan = plan.name === 'Pro'
             const isTeamPlan = plan.name === 'Team'
+            const features = pickFeatures(plan)
+            const footer = pickFooter(plan)
 
             return (
               <div
@@ -140,7 +142,7 @@ const PricingPlans: FC = () => {
                     <p className="text-foreground-lighter text-[13px] mt-2 mb-4">{plan.preface}</p>
                   )}
                   <ul className="text-[13px] flex-1 text-foreground-lighter">
-                    {plan.features.map((feature) => (
+                    {features.map((feature) => (
                       <li
                         key={typeof feature === 'string' ? feature : feature[0]}
                         className="flex flex-col py-2 first:mt-0"
@@ -169,9 +171,9 @@ const PricingPlans: FC = () => {
 
                   <div className="flex flex-col gap-6 mt-auto prose">
                     <div className="space-y-2 mt-12">
-                      {plan.footer && (
+                      {footer && (
                         <p className="text-[13px] leading-5 text-foreground-lighter whitespace-pre-wrap mb-0">
-                          {plan.footer}
+                          {footer}
                         </p>
                       )}
                     </div>

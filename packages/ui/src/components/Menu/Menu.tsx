@@ -95,7 +95,7 @@ export function Item({
 interface GroupProps {
   children?: React.ReactNode
   icon?: React.ReactNode
-  title: string
+  title: React.ReactNode
 }
 
 export function Group({ children, icon, title }: GroupProps) {
