@@ -2,7 +2,6 @@ import { useRouter } from 'next/router'
 import { Button, cn } from 'ui'
 import announcement from '../data/Announcement.json'
 import Link from 'next/link'
-import { isBrowser } from 'common'
 
 export function LW11CountdownBanner() {
   const router = useRouter()
@@ -10,7 +9,6 @@ export function LW11CountdownBanner() {
   const isLaunchWeekPage = router.pathname === '/ga-week'
   const isLaunchWeekSection =
     router.pathname.includes('/launch-week') || router.pathname.includes('/ga-week')
-  const siteUrl = isBrowser && window.location.origin
 
   if (isLaunchWeekPage || isHomePage) return null
 

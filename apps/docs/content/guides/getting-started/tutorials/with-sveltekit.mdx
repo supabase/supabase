@@ -85,22 +85,27 @@ export const handle: Handle = async ({ event, resolve }) => {
   })
 
   /**
-   * Unlike `supabase.auth.getSession`, which is unsafe on the server because it
-   * doesn't validate the JWT, this function validates the JWT by first calling
-   * `getUser` and aborts early if the JWT signature is invalid.
+   * Unlike `supabase.auth.getSession()`, which returns the session _without_
+   * validating the JWT, this function also calls `getUser()` to validate the
+   * JWT before returning the session.
    */
   event.locals.safeGetSession = async () => {
+    const {
+      data: { session },
+    } = await event.locals.supabase.auth.getSession()
+    if (!session) {
+      return { session: null, user: null }
+    }
+
     const {
       data: { user },
       error,
     } = await event.locals.supabase.auth.getUser()
     if (error) {
+      // JWT validation has failed
       return { session: null, user: null }
     }
 
-    const {
-      data: { session },
-    } = await event.locals.supabase.auth.getSession()
     return { session, user }
   }
 
@@ -143,17 +148,21 @@ Create a new `src/routes/+layout.server.ts` file to handle the session on the se
 // src/routes/+layout.server.ts
 import type { LayoutServerLoad } from './$types'
 
-export const load: LayoutServerLoad = async ({ locals: { safeGetSession } }) => {
+export const load = (async ({ locals: { safeGetSession } }) => {
   const { session, user } = await safeGetSession()
 
   return {
     session,
     user,
   }
-}
+}) satisfies LayoutServerLoad
 ```
 
-> Start your dev server (`npm run dev`) in order to generate the `./$types` files we are referencing in our project.
+<Admonition type="tip">
+
+Start your dev server (`npm run dev`) in order to generate the `./$types` files we are referencing in our project.
+
+</Admonition>
 
 Create a new `src/routes/+layout.ts` file to handle the session and the supabase object on the client-side.
 
@@ -163,7 +172,7 @@ import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from '$env/static/publi
 import type { LayoutLoad } from './$types'
 import { createBrowserClient, isBrowser, parse } from '@supabase/ssr'
 
-export const load: LayoutLoad = async ({ fetch, data, depends }) => {
+export const load = (async ({ fetch, data, depends }) => {
   depends('supabase:auth')
 
   const supabase = createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
@@ -192,7 +201,7 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
   } = await supabase.auth.getSession()
 
   return { supabase, session }
-}
+}) satisfies LayoutLoad
 ```
 
 Update your `src/routes/+layout.svelte`:

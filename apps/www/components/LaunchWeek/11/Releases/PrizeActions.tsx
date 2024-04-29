@@ -8,7 +8,7 @@ export default function PrizeActions() {
         <Link href="/ga-week#ticket">Claim your ticket</Link>
       </Button>
       <Button onClick={() => null} type="default" size="tiny">
-        <Link href="/blog/<link-to-hackathon-blog-post>">Join Hackathon</Link>
+        <Link href="/blog/supabase-oss-hackathon">Join Hackathon</Link>
       </Button>
     </div>
   )

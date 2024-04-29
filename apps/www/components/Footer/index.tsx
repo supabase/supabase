@@ -33,7 +33,7 @@ const Footer = (props: Props) => {
       className={cn(
         'bg-alternative',
         isLaunchWeek && 'bg-[#060809]',
-        isGAWeek && 'dark:bg-[#060809]',
+        isGAWeek && 'dark:bg-alternative',
         props.className
       )}
       aria-labelledby="footerHeading"

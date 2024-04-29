@@ -31,6 +31,12 @@ You can enable the IPv4 add-on in your project [add-on settings](https://supabas
   Generally, this should be less than a minute.
 </Admonition>
 
+## Read Replicas
+
+When the IPv4 add-on is enabled, an IPv4 address is provisioned for each database in your project.
+
+By default, this is only the Primary database for your project. If [Read replicas](/docs/guides/platform/read-replicas) are being used, each replica also gets its own IPv4 address, with a corresponding $4 charge.
+
 ## Caveats
 
 For regular use-cases like a restart or compute size changes, the IPv4 address remains unchanged.

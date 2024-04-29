@@ -21,7 +21,7 @@ import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import { PRICING_TIER_PRODUCT_IDS } from 'lib/constants'
 import { formatCurrency } from 'lib/helpers'
 import Telemetry from 'lib/telemetry'
-import { plans as subscriptionsPlans } from 'shared-data/plans'
+import { pickFeatures, pickFooter, plans as subscriptionsPlans } from 'shared-data/plans'
 import { useOrgSettingsPageStateSnapshot } from 'state/organization-settings'
 import {
   Button,
@@ -39,6 +39,7 @@ import ExitSurveyModal from './ExitSurveyModal'
 import UpgradeSurveyModal from './UpgradeModal'
 import MembersExceedLimitModal from './MembersExceedLimitModal'
 import PaymentMethodSelection from './PaymentMethodSelection'
+import { billingPartnerLabel } from 'components/interfaces/Billing/Subscription/Subscription.utils'
 
 const PlanUpdateSidePanel = () => {
   const router = useRouter()
@@ -94,6 +95,7 @@ const PlanUpdateSidePanel = () => {
   )
 
   const billingViaPartner = subscription?.billing_via_partner === true
+  const billingPartner = subscription?.billing_partner
   const paymentViaInvoice = subscription?.payment_method_type === 'invoice'
 
   const {
@@ -194,7 +196,8 @@ const PlanUpdateSidePanel = () => {
               const price = planMeta?.price ?? 0
               const isDowngradeOption = planMeta?.change_type === 'downgrade'
               const isCurrentPlan = planMeta?.id === subscription?.plan?.id
-              const features = billingViaPartner ? plan.featuresPartner : plan.features
+              const features = pickFeatures(plan, billingPartner)
+              const footer = pickFooter(plan, billingPartner)
 
               if (plan.id === 'tier_enterprise') {
                 return (
@@ -202,7 +205,7 @@ const PlanUpdateSidePanel = () => {
                     key={plan.id}
                     plan={plan}
                     isCurrentPlan={isCurrentPlan}
-                    billingViaPartner={billingViaPartner}
+                    billingPartner={billingPartner}
                   />
                 )
               }
@@ -222,7 +225,7 @@ const PlanUpdateSidePanel = () => {
                           Current plan
                         </div>
                       ) : plan.nameBadge ? (
-                        <div className="text-xs bg-brand-400 text-brand rounded px-2 py-0.5">
+                        <div className="text-xs bg-brand-400 text-brand-600 rounded px-2 py-0.5">
                           {plan.nameBadge}
                         </div>
                       ) : (
@@ -325,11 +328,9 @@ const PlanUpdateSidePanel = () => {
                     </ul>
                   </div>
 
-                  {(plan.footer || (billingViaPartner && plan.footerPartner)) && (
+                  {footer && (
                     <div className="border-t pt-4 mt-4">
-                      <p className="text-foreground-light text-xs">
-                        {billingViaPartner ? plan.footerPartner || plan.footer : plan.footer}
-                      </p>
+                      <p className="text-foreground-light text-xs">{footer}</p>
                     </div>
                   )}
                 </div>
@@ -545,8 +546,9 @@ const PlanUpdateSidePanel = () => {
           ) : (
             <div className="py-4 space-y-2">
               <p className="text-sm">
-                This organization is billed through our partner Fly.io and you will be charged by
-                them directly.
+                This organization is billed through our partner{' '}
+                {billingPartnerLabel(subscription?.billing_partner)} and you will be charged by them
+                directly.
               </p>
               {subscriptionPreview?.billed_via_partner &&
                 subscriptionPreview?.plan_change_type === 'downgrade' && (

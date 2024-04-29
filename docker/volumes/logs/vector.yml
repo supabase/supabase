@@ -141,7 +141,7 @@ transforms:
     source: |-
       .metadata.host = "db-default"
       .metadata.parsed.timestamp = .timestamp
-      
+
       parsed, err = parse_regex(.event_message, r'.*(?P<level>INFO|NOTICE|WARNING|ERROR|LOG|FATAL|PANIC?):.*', numeric_groups: true)
 
       if err != null || parsed == null {
@@ -165,7 +165,7 @@ sinks:
     method: 'post'
     request:
       retry_max_duration_secs: 10
-    uri: 'http://analytics:4000/api/logs?source_name=gotrue.logs.prod&api_key=your-super-secret-and-long-logflare-key'
+    uri: 'http://analytics:4000/api/logs?source_name=gotrue.logs.prod&api_key=${LOGFLARE_API_KEY?LOGFLARE_API_KEY is required}'
   logflare_realtime:
     type: 'http'
     inputs:
@@ -175,7 +175,7 @@ sinks:
     method: 'post'
     request:
       retry_max_duration_secs: 10
-    uri: 'http://analytics:4000/api/logs?source_name=realtime.logs.prod&api_key=your-super-secret-and-long-logflare-key'
+    uri: 'http://analytics:4000/api/logs?source_name=realtime.logs.prod&api_key=${LOGFLARE_API_KEY?LOGFLARE_API_KEY is required}'
   logflare_rest:
     type: 'http'
     inputs:
@@ -185,7 +185,7 @@ sinks:
     method: 'post'
     request:
       retry_max_duration_secs: 10
-    uri: 'http://analytics:4000/api/logs?source_name=postgREST.logs.prod&api_key=your-super-secret-and-long-logflare-key'
+    uri: 'http://analytics:4000/api/logs?source_name=postgREST.logs.prod&api_key=${LOGFLARE_API_KEY?LOGFLARE_API_KEY is required}'
   logflare_db:
     type: 'http'
     inputs:
@@ -198,7 +198,7 @@ sinks:
     # We must route the sink through kong because ingesting logs before logflare is fully initialised will
     # lead to broken queries from studio. This works by the assumption that containers are started in the
     # following order: vector > db > logflare > kong
-    uri: 'http://kong:8000/analytics/v1/api/logs?source_name=postgres.logs&api_key=your-super-secret-and-long-logflare-key'
+    uri: 'http://kong:8000/analytics/v1/api/logs?source_name=postgres.logs&api_key=${LOGFLARE_API_KEY?LOGFLARE_API_KEY is required}'
   logflare_functions:
     type: 'http'
     inputs:
@@ -208,7 +208,7 @@ sinks:
     method: 'post'
     request:
       retry_max_duration_secs: 10
-    uri: 'http://analytics:4000/api/logs?source_name=deno-relay-logs&api_key=your-super-secret-and-long-logflare-key'
+    uri: 'http://analytics:4000/api/logs?source_name=deno-relay-logs&api_key=${LOGFLARE_API_KEY?LOGFLARE_API_KEY is required}'
   logflare_storage:
     type: 'http'
     inputs:
@@ -218,7 +218,7 @@ sinks:
     method: 'post'
     request:
       retry_max_duration_secs: 10
-    uri: 'http://analytics:4000/api/logs?source_name=storage.logs.prod.2&api_key=your-super-secret-and-long-logflare-key'
+    uri: 'http://analytics:4000/api/logs?source_name=storage.logs.prod.2&api_key=${LOGFLARE_API_KEY?LOGFLARE_API_KEY is required}'
   logflare_kong:
     type: 'http'
     inputs:
@@ -229,4 +229,4 @@ sinks:
     method: 'post'
     request:
       retry_max_duration_secs: 10
-    uri: 'http://analytics:4000/api/logs?source_name=cloudflare.logs.prod&api_key=your-super-secret-and-long-logflare-key'
+    uri: 'http://analytics:4000/api/logs?source_name=cloudflare.logs.prod&api_key=${LOGFLARE_API_KEY?LOGFLARE_API_KEY is required}'

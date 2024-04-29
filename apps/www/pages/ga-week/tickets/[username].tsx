@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { NextSeo } from 'next-seo'
 import { GetStaticProps, GetStaticPaths } from 'next'
 import Link from 'next/link'
@@ -15,6 +15,7 @@ import DefaultLayout from '~/components/Layouts/Default'
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { TicketState, ConfDataContext, UserData } from '~/components/LaunchWeek/hooks/use-conf-data'
 import LW11Background from '~/components/LaunchWeek/11/LW11Background'
+import { useTheme } from 'next-themes'
 
 const LW11TicketContainer = dynamic(
   () => import('~/components/LaunchWeek/11/Ticket/TicketContainer')
@@ -39,8 +40,21 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
   const PAGE_URL = `${SPECIAL_ANNOUNCEMENT_URL}/tickets/${username}`
 
   const [session] = useState<Session | null>(null)
-
   const [ticketState, setTicketState] = useState<TicketState>('ticket')
+  const { resolvedTheme, setTheme } = useTheme()
+
+  const isDark = resolvedTheme?.includes('dark')
+  const isDarkTheme = resolvedTheme === 'dark'
+
+  useEffect(() => {
+    isDarkTheme && setTheme('deep-dark')
+  }, [isDarkTheme])
+
+  useEffect(() => {
+    return () => {
+      isDark && setTheme('dark')
+    }
+  }, [])
 
   if (!ticketNumber) {
     return <Error statusCode={404} />
@@ -73,7 +87,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
           setTicketState,
         }}
       >
-        <DefaultLayout>
+        <DefaultLayout className="bg-alternative">
           <div className="relative -mt-[65px] overflow-hidden">
             <SectionContainer className="relative !pt-8 lg:!pt-10 z-10 flex flex-col xl:flex-row items-center xl:justify-center xl:items-center gap-8 md:gap-10 xl:gap-20 text-foreground text-center md:text-left">
               <div className="w-auto min-h-[400px] pt-24 flex items-center">
@@ -97,7 +111,7 @@ export default function UsernamePage({ user, ogImageUrl }: Props) {
           <SectionContainer className="!pt-4 !pb-0">
             <LaunchWeekPrizeSection />
           </SectionContainer>
-          <CTABanner className="!bg-[#060809] border-t-0" />
+          <CTABanner className="!bg-alternative border-t-0" />
         </DefaultLayout>
       </ConfDataContext.Provider>
     </>

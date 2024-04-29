@@ -9,9 +9,9 @@ import CardButton from 'components/ui/CardButton'
 import CopyButton from 'components/ui/CopyButton'
 import NoSearchResults from 'components/ui/NoSearchResults'
 import { getGeneralPolicyTemplates } from '../PolicyEditorModal/PolicyEditorModal.constants'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 
 interface PolicyTemplatesProps {
+  schema: string
   table: string
   selectedPolicy?: PostgresPolicy
   selectedTemplate?: string
@@ -19,17 +19,14 @@ interface PolicyTemplatesProps {
 }
 
 export const PolicyTemplates = ({
+  schema,
   table,
   selectedPolicy,
   selectedTemplate,
   onSelectTemplate,
 }: PolicyTemplatesProps) => {
   const [search, setSearch] = useState('')
-  const state = useTableEditorStateSnapshot()
-  const templates = getGeneralPolicyTemplates(
-    state.selectedSchemaName,
-    table.length > 0 ? table : 'table_name'
-  )
+  const templates = getGeneralPolicyTemplates(schema, table.length > 0 ? table : 'table_name')
 
   const baseTemplates =
     selectedPolicy !== undefined

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRightIcon } from '@heroicons/react/outline'
@@ -13,6 +13,14 @@ import { DayLink } from '.'
 const DaySection = ({ day, className }: { day: WeekDayProps; className?: string }) => {
   const isMobile = useBreakpoint(639)
   const cssGroup = 'group/d' + day.d
+
+  const [isMounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!isMounted) return null
 
   return (
     <section
@@ -30,7 +38,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
         <div
           className={cn(
             'text-sm inline uppercase font-mono dark:text-foreground-muted tracking-[0.1rem]',
-            day.shipped && 'text-foreground'
+            day.shipped && '!text-foreground'
           )}
         >
           {day.dd}, {day.date}
@@ -53,7 +61,7 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
             href={day.blog!}
             className={cn(
               `
-              bg-[#111415] hover:bg-[#121516] sm:!bg-transparent
+              dark:bg-[#111415] hover:dark:bg-[#121516] sm:!bg-transparent
               min-h-[210px] group sm:aspect-[3.67/1] relative overflow-hidden flex-1 flex flex-col justify-between
               hover:border-strong transition-colors border border-muted
               rounded-xl text-2xl bg-contain shadow-lg`,
@@ -82,11 +90,12 @@ const DaySection = ({ day, className }: { day: WeekDayProps; className?: string 
                         <Image
                           src={!!layer.mobileImg && isMobile ? layer.mobileImg : layer.img}
                           className={`
-                            absolute opacity-50 lg:opacity-100 object-cover
+                            absolute md:opacity-50 lg:opacity-100 object-cover
                             w-full h-full z-0 transition-all duration-300
                             object-center sm:object-right
                           `}
                           fill
+                          sizes="100%"
                           quality={100}
                           alt={day.title}
                         />

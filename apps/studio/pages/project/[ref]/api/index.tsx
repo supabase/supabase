@@ -7,6 +7,7 @@ import { GeneralContent, ResourceContent, RpcContent } from 'components/interfac
 import LangSelector from 'components/interfaces/Docs/LangSelector'
 import { DocsLayout } from 'components/layouts'
 import { useProjectApiQuery } from 'data/config/project-api-query'
+import { useCustomDomainsQuery } from 'data/custom-domains/custom-domains-query'
 import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
 import { snakeToCamel } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
@@ -79,6 +80,7 @@ const DocView = observer(() => {
     error: jsonSchemaError,
     refetch,
   } = useProjectJsonSchemaQuery({ projectRef })
+  const { data: customDomainData } = useCustomDomainsQuery({ projectRef })
 
   useEffect(() => {
     PageState.setJsonSchema(jsonSchema)
@@ -104,10 +106,15 @@ const DocView = observer(() => {
       </div>
     )
 
+  const endpoint =
+    customDomainData?.customDomain?.status === 'active'
+      ? `https://${customDomainData.customDomain?.hostname}`
+      : `${data.autoApiService.protocol ?? 'https'}://${data.autoApiService.endpoint ?? '-'}`
+
   // Data Loaded
   const autoApiService = {
     ...data.autoApiService,
-    endpoint: `${data.autoApiService.protocol ?? 'https'}://${data.autoApiService.endpoint ?? '-'}`,
+    endpoint,
   }
 
   const { paths, definitions } = PageState.jsonSchema

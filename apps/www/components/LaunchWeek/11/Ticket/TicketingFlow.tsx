@@ -1,12 +1,9 @@
-import React, { useEffect, useRef } from 'react'
-import dynamic from 'next/dynamic'
-import Image from 'next/image'
-import { AnimatePresence, m, LazyMotion, domAnimation, useInView } from 'framer-motion'
+import React, { useRef } from 'react'
+import { AnimatePresence, m, LazyMotion, domAnimation } from 'framer-motion'
 import { Badge, cn } from 'ui'
 import { DEFAULT_TRANSITION, INITIAL_BOTTOM, getAnimation } from '~/lib/animations'
-import { LW11_DATE, LW11_LAUNCH_DATE, LW11_LAUNCH_DATE_END } from '~/lib/constants'
+import { LW11_DATE, LW11_LAUNCH_DATE_END } from '~/lib/constants'
 import useWinningChances from '../../hooks/useWinningChances'
-import useLwGame from '../../hooks/useLwGame'
 
 import useConfData from '~/components/LaunchWeek/hooks/use-conf-data'
 import SectionContainer from '~/components/Layouts/SectionContainer'
@@ -16,16 +13,13 @@ import TicketForm from './TicketForm'
 import CountdownComponent from '../Countdown'
 import TicketActions from './TicketActions'
 
-const LWGame = dynamic(() => import('./LW11Game'))
-
 const TicketingFlow = () => {
   const sectionRef = useRef<HTMLDivElement>(null)
-  const { ticketState, userData, showCustomizationForm } = useConfData()
-  const { isGameMode, setIsGameMode } = useLwGame(ticketState !== 'ticket' || showCustomizationForm)
+  const { ticketState, userData } = useConfData()
 
-  const isLoading = !isGameMode && ticketState === 'loading'
-  const isRegistering = !isGameMode && ticketState === 'registration'
-  const hasTicket = !isGameMode && ticketState === 'ticket'
+  const isLoading = ticketState === 'loading'
+  const isRegistering = ticketState === 'registration'
+  const hasTicket = ticketState === 'ticket'
   const hasPlatinumTicket = userData.platinum
   const hasSecretTicket = userData.secret
   const metadata = userData?.metadata
@@ -36,14 +30,6 @@ const TicketingFlow = () => {
   const exit = { opacity: 0, transition: { ...transition, duration: 0.2 } }
 
   const winningChances = useWinningChances()
-
-  const isInView = useInView(sectionRef)
-
-  useEffect(() => {
-    if (!isInView) setIsGameMode(false)
-
-    return () => setIsGameMode(false)
-  }, [isInView])
 
   return (
     <>
@@ -88,24 +74,15 @@ const TicketingFlow = () => {
                     exit={exit}
                     className={cn(
                       'w-full min-h-[400px] max-w-md mx-auto flex flex-col justify-center gap-8 lg:gap-12 opacity-0 invisible',
-                      !isGameMode && !hasTicket && 'opacity-100 visible'
+                      !hasTicket && 'opacity-100 visible'
                     )}
                   >
                     <div className="flex flex-col gap-2">
-                      <h2 className="text-foreground text-2xl">Claim your ticket</h2>
-                    </div>
-                    <div className="flex flex-col gap-1 font-mono text-sm">
+                      <h2 className="text-foreground text-2xl">Time to participate has expired</h2>
                       <span className="font-mono text-foreground-lighter text-xs leading-3">
-                        Time to participate
+                        See you next Launch Week.
                       </span>
-                      <CountdownComponent
-                        date={LW11_LAUNCH_DATE_END}
-                        showCard={false}
-                        className="[&_*]:leading-4"
-                        size="large"
-                      />
                     </div>
-                    <TicketForm />
                   </m.div>
                 )}
                 {hasTicket && (
@@ -130,7 +107,7 @@ const TicketingFlow = () => {
                           ) : (
                             <p className="text-2xl mb-1">Thanks for sharing!</p>
                           )}
-                          <p className="text-[#8B9092]">
+                          <p className="text-foreground-lighter">
                             Stay tuned after GA Week to find out if you're a lucky winner.
                           </p>
                         </div>
@@ -139,7 +116,7 @@ const TicketingFlow = () => {
                           {!hasSecretTicket && (
                             <p className="text-2xl mb-1">@{userData.username}, you're in!</p>
                           )}
-                          <p className="text-[#8B9092]">
+                          <p className="text-foreground-lighter">
                             Now share your ticket to have a chance of winning AirPods Max and other
                             limited swag.
                           </p>
@@ -147,7 +124,7 @@ const TicketingFlow = () => {
                       ) : (
                         <div>
                           <p className="text-2xl mb-1">@{userData.username}, almost there!</p>
-                          <p className="text-[#8B9092]">
+                          <p className="text-foreground-lighter">
                             Keep sharing to max out your chances of winning AirPods Max and other
                             limited swag.
                           </p>
@@ -163,17 +140,6 @@ const TicketingFlow = () => {
                         <CountdownComponent date={LW11_LAUNCH_DATE_END} showCard={false} />
                       </div>
                     </div>
-                  </m.div>
-                )}
-                {isInView && !showCustomizationForm && isGameMode && (
-                  <m.div
-                    key="ticket"
-                    initial={initial}
-                    animate={animate}
-                    exit={exit}
-                    className="w-full flex justify-center text-foreground !h-[500px]"
-                  >
-                    <LWGame setIsGameMode={setIsGameMode} />
                   </m.div>
                 )}
               </AnimatePresence>
