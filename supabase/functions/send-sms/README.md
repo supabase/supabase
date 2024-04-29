@@ -1,6 +1,6 @@
 # Supabase Send SMS Auth Hook
 
-Use this Hook to send a message with an [AppHash](https://developers.google.com/identity/sms-retriever/verify#computing_your_apps_hash_string) via Twilio Programmable Messaging. The App Hash identifies a mobile application and is embedded it an SMS to allow an Android application to determine that the message was intended for the Application. In turn, this allows for the App to fetch specific information, such as OTP codes, to perform autofill so that the user does not have to exit the application to retrieve information from a message.
+Use this Hook with the **Send SMS** Extension Point to send a message with an [AppHash](https://developers.google.com/identity/sms-retriever/verify#computing_your_apps_hash_string) via Twilio Programmable Messaging. The App Hash identifies a mobile application and is embedded it an SMS to allow an Android application to determine that the message was intended for the Application. In turn, this allows for the App to fetch specific information, such as OTP codes, to perform autofill so that the user does not have to exit the application to retrieve information from a message.
 
 
 
