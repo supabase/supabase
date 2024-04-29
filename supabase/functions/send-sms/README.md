@@ -1,10 +1,12 @@
 # Supabase Send SMS Auth Hook
 
-Use this edge function in an Auth Hook with the Send SMS Extension Point. In this example, we use the hook to send a message with an [AppHash](https://developers.google.com/identity/sms-retriever/verify#computing_your_apps_hash_string) via Twilio Programmable Messaging. The App Hash allows for autofill of OTP codes in an Android Application without having to exit the application to check SMS messages.
+Use this Hook to send a message with an [AppHash](https://developers.google.com/identity/sms-retriever/verify#computing_your_apps_hash_string) via Twilio Programmable Messaging. The App Hash identifies a mobile application and is embedded it an SMS to allow an Android application to determine that the message was intended for the Application. In turn, this allows for the App to fetch specific information, such as OTP codes, to perform autofill so that the user does not have to exit the application to retrieve information from a message.
+
+
 
 ## Configuration
 
-Copy this folder to your CLI project. In this case, my folder is located at `~/Desktop/auth_hooks/` so I will run:
+Copy this folder to the functions directory of your CLI project. In this case, my folder is located at `~/Desktop/auth_hooks/` so I will run:
 
 ```bash
 cp -r ../send_sms/ ~/Desktop/auth_hooks/supabase/functions/send_sms/`
@@ -18,27 +20,46 @@ TWILIO_AUTH_TOKEN=""
 TWILIO_PHONE_NUMBER=""
 ```
 
-You will need the following addtional configuration variables:
+Generate an `AppHash` via [these steps set out by Google](https://developers.google.com/identity/sms-retriever/verify#computing_your_apps_hash_string) and insert the AppHash into your `.env.local`
 
 ```bash
 APP_HASH="<YOUR_APP_HASH>"
-SEND_SMS_HOOK_SECRET="whsec_<standard_base64_encoded_string>"
 ```
 
-Generate the Hook secret with [Base64 encoding tool](https://www.base64encode.net/). It should follow the format `whsec_<base64_encoded_string_of_more_than_60_bytes>` Note that we use standard Base64 encoding which includes the `+`, `/`, and `=` characters - this is distinct from `Base64URLEncoding` which replaces `+` with `-` and `/` with `_`. Under base64 encoding, a string such as `supabasefunctionsareawesome` would correspond to a secret of `whsec_c3VwYWJhc2VmdW5jdGlvbnNhcmVhd2Vzb21l`
+Next, head to the `Auth > Hooks > Send SMS > HTTP > Secret > Generate Secret` page to generate a secret. The Hook Secret should start with the version identifier, `v1,` followed by the signing prefix, `whsec_`, and finally the base64 secret. For instance, if your secret is `<secret>` then  you should include the following line
 
-## Local Development
+```bash
+SEND_SMS_HOOK_SECRET=v1,whsec_<secret>
+```
 
-Writing the hook consists of two steps: Developing the Hook and connecting it to Supabase Auth.
+in your `.env.local file`. We specify the secret above to illustrate. 
 
-### Develop the Hook
 
-Use [this tool](https://www.standardwebhooks.com/simulate) to generate a sample cURL command to test the hook.
+## Testing The Hook
 
-Set the destination URL to: `https://127.0.0.1:54321/functions/v1/<your_function_name>`
+Supabase follows the Standard Webhooks Specification which is a set of guidelines used to align how webhooks are implemented. The specification describes how to secure the payload to guard against malicious attackers. Constructing a specification compliant payload can be tricky so we use [the Simulate tool](https://www.standardwebhooks.com/simulate) provided by the specification Standard Webhooks Specification to test our Hook. You can use any HTTP function as a hook. However, in the spirit of dogfooding, we will describe the use of the tool with a Supabase Edge Function.
 
-Use a raw payload with the following shape:
 
+### The Standard Webhooks Verification Tool
+
+You can use the tool with an Edge Function run locally, via the CLI, or an Edge Function deployed on the platform. We will term deployed functions as "Production" functions. In both cases, you will need to specify the following details:
+
+### Destination URL
+
+This is the endpoint where your Hook is running
+
+**Local**: `https://127.0.0.1:54321/functions/v1/<your_function_name>`
+
+**Production**: `https://<project-ref>.functions.supabase.co/<function-name>`
+
+### Raw Payload
+
+Payload that Auth sends to the Hook. For the Send SMS Hook, we have the following fields:
+
+1. User - contains information describing a user, including their phone number, which we wish to send a message to.
+2. SMS - contains the One Time Pin.
+
+For convenience, we have attached a mock payload below. Ensure that you fill in the corresponding `phone` and `otp` entries:
 ```
 {
   "user": {
@@ -82,32 +103,66 @@ Use a raw payload with the following shape:
 }
 ```
 
-Ensure that you periodically refresh the timestamp to ensure you don't run into verification errors
+### Signature
 
-### Connect to Supabase Auth
+This is an identifier generated using the timestamp, payload, and secret to ensure the authenticity of the sender. Periodically refresh the timestamp to ensure that you have a valid signature. 
 
-Serve the function locally.
+Use the `SEND_SMS_HOOK_SECRET` from the `.env.local` file. This step is the same for both local and production functions.
 
-```
-supabase functions serve --no-verify-jwt --env-file ./supabase/functions/.env.local
-```
 
-Modify the `config.toml` to ensure that Supabase Auth registers the Hook
+
+## Connect to Supabase Auth
+
+After testing the hook you can connect the hook. Again, the flow will differ slightly for local and production functions. Note that we disable JWT verification for the function - the user may not be signed in at this point and may not have a JWT. Security guarantees are instead provided through the checks discussed in the [Standard Webhook Specification](https://github.com/standard-webhooks/standard-webhooks/blob/main/spec/standard-webhooks.md)
+
+
+**Local**
+
+Modify your `config.toml` to ensure that Supabase Auth registers your Edge Function
 
 ```
 [auth.hook.send_sms]
 enabled = true
 uri = "http://host.docker.internal:54321/functions/v1/sms_sender"
-secret= "env(SEND_SMS_HOOK_SECRET)"
+secret = "env(SEND_SMS_HOOK_SECRET)"
 ```
 
-## Production
 
-### Deploy the Function
+Start the function
+```
+supabase functions serve --no-verify-jwt --env-file ./supabase/functions/.env.local
+```
 
-Head to the `Auth > Hooks > Send SMS` page to copy the corresponding secret. Input the corresponding URL for the function and push all secrets to your remote setup and deploy the function
+
+**Production**
+
+Register your secrets with the platform
 
 ```
 supabase secrets set --env-file ./supabase/.env.local
+```
+
+Deploy your function if you have yet to do so
+
+```
 supabase functions deploy --no-verify-jwt
 ```
+
+After connecting the Hook, test the Hook to see if it is functioning as expected.
+
+You can do so via a curl request
+
+```bash
+curl -X POST http://localhost:9999/otp -H "Content-Type: application/json" -d '{"phone": "<your_phone_number>"}'
+```
+
+or via the client library
+
+```
+const { data, error } = await supabase.auth.signUp({
+  phone: '123456789',
+  password: 'example-password',
+})
+```
+
+If your projects is configured to send SMS confirmations, and the Hook is working as expected, you should receive a message with the App Hash.
