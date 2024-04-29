@@ -62,6 +62,30 @@ To try it yourself,
 
 You can view the logs for the Edge Runtime, by visiting Fly.io’s Dashboard > Your App > Metrics. Also, you can serve edge-runtime from multiple regions by running `fly regions add [REGION]`.
 
+## Configuration of SECRET_KEY_BASE
+
+When self-hosting Supabase, it's important to properly configure the SECRET_KEY_BASE parameter. This value is essential for securing your Supabase instance. Below, we outline how to set the value and provide guidance on best practices.
+
+### Purpose of SECRET_KEY_BASE
+
+SECRET_KEY_BASE is a crucial component of Supabase's security infrastructure. It is used for cryptographic functions and securing various aspects of your deployment, including session management and CSRF protection.
+
+### Setting the Value of SECRET_KEY_BASE
+
+To configure SECRET_KEY_BASE, follow these steps:
+
+1. **Generate a Secret Key**: Use a secure method to generate a random secret key. You can use tools like `openssl` or built-in methods in your programming language.
+2. **Set the Environment Variable**: Assign the generated secret key to the SECRET_KEY_BASE environment variable. This can typically be done in your deployment environment's configuration settings or through a configuration file.
+3. **Restart Supabase**: After setting the environment variable, restart your Supabase instance to apply the changes.
+
+### Handling Hardcoded Secrets
+
+While SECRET_KEY_BASE should ideally be managed as an environment variable, you may encounter hardcoded values for secrets in the codebase. It's important to review and handle these securely. Consider using a dedicated secrets management tool or encrypting sensitive configuration files.
+
+### Updating Self-Hosted Documentation
+
+Ensure that your self-hosted documentation reflects the configuration of SECRET_KEY_BASE and provides clear guidance on securing your Supabase instance. Regularly review and update your documentation to incorporate any changes or best practices.
+
   </RefSubLayout.Details>
 
   <RefSubLayout.Examples>
