@@ -71,7 +71,7 @@ const LogsFilterPopover = ({
                   Clear
                 </Button>
                 <Button loading={isSubmitting} type="primary" htmlType="submit">
-                  Save
+                  Apply
                 </Button>
               </div>
             </>
