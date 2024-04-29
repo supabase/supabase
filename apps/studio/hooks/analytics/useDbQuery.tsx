@@ -8,7 +8,6 @@ import {
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { executeSql } from 'data/sql/execute-sql-query'
-import { IS_PLATFORM } from 'lib/constants'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 export interface DbQueryHook<T = any> {
@@ -40,12 +39,10 @@ const useDbQuery = ({
 
   const state = useDatabaseSelectorStateSnapshot()
   const { data: databases } = useReadReplicasQuery({ projectRef: project?.ref })
-  const connectionString =
-    IS_PLATFORM && project?.is_read_replicas_enabled
-      ? (databases || []).find((db) => db.identifier === state.selectedDatabaseId)?.connectionString
-      : project?.connectionString
-  const identifier =
-    IS_PLATFORM && project?.is_read_replicas_enabled ? state.selectedDatabaseId : project?.ref
+  const connectionString = project?.is_read_replicas_enabled
+    ? (databases || []).find((db) => db.identifier === state.selectedDatabaseId)?.connectionString
+    : project?.connectionString
+  const identifier = project?.is_read_replicas_enabled ? state.selectedDatabaseId : project?.ref
 
   const resolvedSql = typeof sql === 'function' ? sql([]) : sql
 
