@@ -139,7 +139,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   const orderBy = 'order by timestamp desc'
   switch (table) {
     case 'edge_logs':
-      return `select id, timestamp, event_message, request.method, request.path, response.status_code
+      return `select id, identifier, timestamp, event_message, request.method, request.path, response.status_code
   from ${table}
   ${joins}
   ${where}
@@ -148,7 +148,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   `
 
     case 'postgres_logs':
-      return `select host, postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table}
+      return `select identifier, postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table}
   ${joins}
   ${where}
   ${orderBy}

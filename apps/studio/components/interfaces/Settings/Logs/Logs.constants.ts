@@ -277,14 +277,14 @@ const _SQL_FILTER_COMMON = {
 export const SQL_FILTER_TEMPLATES: any = {
   postgres_logs: {
     ..._SQL_FILTER_COMMON,
-    database: (value: string) => `host = 'db-${value}'`,
+    database: (value: string) => `identifier = '${value}'`,
     'severity.error': `parsed.error_severity in ('ERROR', 'FATAL', 'PANIC')`,
     'severity.noError': `parsed.error_severity not in ('ERROR', 'FATAL', 'PANIC')`,
     'severity.log': `parsed.error_severity = 'LOG'`,
   },
   edge_logs: {
     ..._SQL_FILTER_COMMON,
-    database: (value: string) => `request.host like '${value}%'`,
+    database: (value: string) => `identifier = '${value}'`,
     'status_code.error': `response.status_code between 500 and 599`,
     'status_code.success': `response.status_code between 200 and 299`,
     'status_code.warning': `response.status_code between 400 and 499`,
