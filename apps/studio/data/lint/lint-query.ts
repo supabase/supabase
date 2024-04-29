@@ -2,6 +2,8 @@ import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
 import { executeSql } from '../sql/execute-sql-query'
 import { lintKeys } from './keys'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
+import { ProjectAuthConfigData } from '../auth/auth-config-query'
 
 export const LINT_SQL = /* SQL */ `set local search_path = '';
 
@@ -817,12 +819,57 @@ export type Lint = {
 export type ProjectLintsVariables = {
   projectRef?: string
   connectionString?: string
+  authConfig?: ProjectAuthConfigData
 }
 
 const getProjectLints = async (
-  { projectRef, connectionString }: ProjectLintsVariables,
+  { projectRef, connectionString, authConfig }: ProjectLintsVariables,
   signal?: AbortSignal
 ) => {
+  console.log('success 2')
+  let lints: Lint[] = []
+
+  console.log('what linty', authConfig)
+  // [Alaister]: checking this client side for speed, but should be moved into the query if possible
+  if (authConfig?.EXTERNAL_EMAIL_ENABLED) {
+    console.log('first true')
+    if (authConfig.MAILER_OTP_EXP > 3600) {
+      console.log('second true')
+      lints.push({
+        name: 'auth_otp_long_expiry',
+        level: 'WARN',
+        facing: 'EXTERNAL',
+        categories: ['SECURITY'],
+        description: 'OTP expiry exceeds recommended threshold',
+        detail:
+          'We have detected that you have enabled the email provider with the OTP expiry set to more than an hour. It is recommended to set this value to less than an hour.',
+        cache_key: 'auth_otp_long_expiry',
+        remediation: 'https://supabase.com/docs/guides/platform/going-into-prod#security',
+        metadata: {
+          type: 'auth',
+          entity: 'Auth',
+        },
+      })
+    }
+
+    if (authConfig.EXTERNAL_PHONE_ENABLED && authConfig.SMS_OTP_LENGTH <= 6) {
+      lints.push({
+        name: 'auth_otp_short_length',
+        level: 'WARN',
+        facing: 'EXTERNAL',
+        categories: ['SECURITY'],
+        description: 'OTP length is less than recommended threshold',
+        detail: 'We have detected that you have set the OTP length to less than 6 characters',
+        cache_key: 'auth_otp_short_length',
+        remediation: 'https://supabase.com/docs/guides/platform/going-into-prod#security',
+        metadata: {
+          type: 'auth',
+          entity: 'Auth',
+        },
+      })
+    }
+  }
+
   const { result } = await executeSql(
     {
       projectRef,
@@ -832,8 +879,10 @@ const getProjectLints = async (
     },
     signal
   )
+  console.log('pre lints linty', lints)
+  lints = lints.concat(result)
 
-  return result
+  return lints
 }
 
 export type ProjectLintsData = Lint[]
@@ -841,13 +890,21 @@ export type ProjectLintsError = unknown
 
 export const useProjectLintsQuery = <TData = ProjectLintsData>(
   { projectRef, connectionString }: ProjectLintsVariables,
-  { enabled, ...options }: UseQueryOptions<ProjectLintsData, ProjectLintsError, TData> = {}
-) =>
-  useQuery<ProjectLintsData, ProjectLintsError, TData>(
+  { enabled = true, ...options }: UseQueryOptions<ProjectLintsData, ProjectLintsError, TData> = {}
+) => {
+  const { data: authConfig, isSuccess } = useAuthConfigQuery({ projectRef })
+
+  console.log('success 1', { isSuccess })
+  console.log('the authconfig', authConfig)
+
+  return useQuery<ProjectLintsData, ProjectLintsError, TData>(
     lintKeys.lint(projectRef),
-    ({ signal }) => getProjectLints({ projectRef, connectionString }, signal),
+    ({ signal }) =>
+      getProjectLints({ projectRef, connectionString, authConfig: authConfig! }, signal),
     {
-      enabled: enabled && typeof projectRef !== 'undefined',
+      enabled: enabled && isSuccess && typeof projectRef !== 'undefined',
+
       ...options,
     }
   )
+}
