@@ -115,15 +115,15 @@ export function HookSelector<Opt extends ComboBoxOption>({
           />
           {values[uriId] && (
             <>
-              <div className="flex items-center space-x-2 w-full">
+              <div className="flex space-x-2 w-full">
                 <Input
                   key={secretId + '/web'}
                   id={secretId}
                   label="HTTPS Hook Secret"
-                  descriptionText={'Enter or generate a hook secret. '}
+                  descriptionText="Enter a base64 encoded hook secret with a prefix 'v1,whsec_'. 'v1' denotes the signature version, and 'whsec_' signifies a symmetric secret."
                   copy
                   disabled={disabled}
-                  className="w-4/5"
+                  className="w-4/5 align-center"
                 />
 
                 <Button
@@ -134,7 +134,7 @@ export function HookSelector<Opt extends ComboBoxOption>({
                     const authHookSecret = generateAuthHookSecret()
                     setFieldValue(secretId, authHookSecret, false)
                   }}
-                  className="w-1/5 py-1 px-3 text-black font-light text-xs bg-gray-700"
+                  className="w-1/5 h-1/5 py-1 px-3 text-black font-light text-xs bg-gray-700 mt-7"
                   disabled={disabled}
                 >
                   Generate Secret
