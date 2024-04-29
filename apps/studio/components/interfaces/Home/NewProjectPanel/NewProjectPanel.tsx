@@ -222,6 +222,9 @@ const NewProjectPanel = () => {
                       </p>
                     </div>
                     <div className="flex items-center space-x-2">
+                      <Button type="default" asChild>
+                        <Link href={`/project/${ref}/realtime/inspector`}>Explore Realtime</Link>
+                      </Button>
                       <Button
                         className="translate-y-[1px]"
                         icon={<IconExternalLink size={14} />}
