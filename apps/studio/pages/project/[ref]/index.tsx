@@ -14,6 +14,9 @@ import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
 
+import SecurityStatus from 'components/interfaces/Home/SecurityStatus'
+import ProjectHomeLints from 'components/interfaces/Home/ProjectHomeLints'
+
 const Home: NextPageWithLayout = () => {
   const project = useSelectedProject()
 
@@ -39,19 +42,21 @@ const Home: NextPageWithLayout = () => {
       <div className="flex items-center justify-between mx-6 space-x-6">
         <h1 className="text-3xl">{projectName}</h1>
         <div className="flex items-center gap-x-3">
+          {<SecurityStatus />}
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <ServiceStatus />}
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <Connect />}
         </div>
       </div>
-
       <div className="mx-6">
         <ProjectUpgradeFailedBanner />
       </div>
-
       {project?.status === PROJECT_STATUS.INACTIVE && <ProjectPausedState />}
-
       <div className="mx-6">
         {IS_PLATFORM && project?.status !== PROJECT_STATUS.INACTIVE && <ProjectUsageSection />}
+      </div>
+
+      <div className="mx-auto max-w-4xl">
+        <ProjectHomeLints />
       </div>
 
       {project?.status !== PROJECT_STATUS.INACTIVE && (

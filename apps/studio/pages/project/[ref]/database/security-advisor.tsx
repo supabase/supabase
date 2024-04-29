@@ -9,7 +9,6 @@ import LinterFilters from 'components/interfaces/Linter/LinterFilters'
 import LinterPageFooter from 'components/interfaces/Linter/LinterPageFooter'
 import { DatabaseLayout } from 'components/layouts'
 import { FormHeader } from 'components/ui/Forms'
-import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { Lint, useProjectLintsQuery } from 'data/lint/lint-query'
 import { useSelectedProject } from 'hooks'
 import type { NextPageWithLayout } from 'types'
@@ -45,7 +44,6 @@ const ProjectLints: NextPageWithLayout = () => {
 
   const refetch = () => {
     refetchLintsQuery()
-    //refetchAuthConfigQuery()
   }
 
   const activeLints = (data ?? []).filter((lint) => lint.categories.includes('SECURITY'))
