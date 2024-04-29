@@ -1,8 +1,8 @@
-import { useQueryClient } from '@tanstack/react-query'
+import { EllipsisHorizontalIcon } from '@heroicons/react/16/solid'
 import { useParams } from 'common'
 import { useDeleteCollection } from 'data/analytics/warehouse-collections-delete-mutation'
 import { useUpdateCollection } from 'data/analytics/warehouse-collections-update-mutation'
-import { useSelectedProject } from 'hooks'
+import { EditIcon, TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React from 'react'
@@ -15,9 +15,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconChevronDown,
-  IconEdit2,
-  IconTrash,
   Input,
   Label_Shadcn_,
   Modal,
@@ -72,8 +69,8 @@ export const WarehouseMenuItem = ({ item }: Props) => {
             <Button
               loading={isLoading}
               type="text"
-              className="px-1 opacity-50 hover:opacity-100 bg-transparent"
-              icon={<IconChevronDown size="tiny" strokeWidth={2} />}
+              className="px-1 opacity-50 hover:opacity-100 !bg-transparent"
+              icon={<EllipsisHorizontalIcon />}
             />
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -88,7 +85,7 @@ export const WarehouseMenuItem = ({ item }: Props) => {
                 setShowUpdateDialog(true)
               }}
             >
-              <IconEdit2 size="tiny" />
+              <EditIcon size="14" />
               <div>Rename</div>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -97,7 +94,7 @@ export const WarehouseMenuItem = ({ item }: Props) => {
                 setDeleteDialog(true)
               }}
             >
-              <IconTrash size="tiny" />
+              <TrashIcon size="14" />
               <div>Delete</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
