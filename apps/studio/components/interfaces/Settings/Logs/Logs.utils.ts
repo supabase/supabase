@@ -81,7 +81,7 @@ const genWhereStatement = (table: LogsTableName, filters: Filters) => {
     if (value !== undefined && typeof template === 'function') {
       return template(value)
     } else if (template === undefined) {
-      // resolve unknwon filters (possibly from filter overrides)
+      // resolve unknown filters (possibly from filter overrides)
       // no template, set a default
       if (typeof value === 'string') {
         return `${dotKey} = '${value}'`
@@ -105,12 +105,6 @@ const genWhereStatement = (table: LogsTableName, filters: Filters) => {
         (typeof filters[rootKey] === 'string' && (filters[rootKey] as string).length === 0)
       ) {
         return null
-      } else if (rootKey === 'database') {
-        return table === 'edge_logs'
-          ? `(request.host like '${filters[rootKey]}%')`
-          : table === 'supavisor_logs'
-            ? `(m.project like '${filters[rootKey]}%')`
-            : null
       } else if (typeof filters[rootKey] === 'object') {
         // join all statements with an OR
         const nestedStatements = getDotKeys(filters[rootKey] as Filters, rootKey)
@@ -154,7 +148,7 @@ export const genDefaultQuery = (table: LogsTableName, filters: Filters) => {
   `
 
     case 'postgres_logs':
-      return `select postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table}
+      return `select host, postgres_logs.timestamp, id, event_message, parsed.error_severity from ${table}
   ${joins}
   ${where}
   ${orderBy}
