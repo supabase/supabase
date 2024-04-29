@@ -802,8 +802,8 @@ export const database: NavMenuConstant = {
           url: '/guides/database/query-optimization',
         },
         {
-          name: 'Database linter',
-          url: '/guides/database/database-linter',
+          name: 'Database Advisors',
+          url: '/guides/database/database-advisors',
         },
         {
           name: 'Debugging and monitoring',
@@ -898,7 +898,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pg-safeupdate',
         },
         {
-          name: 'pgsodium: Encryption Features',
+          name: 'pgsodium (pending deprecation): Encryption Features',
           url: '/guides/database/extensions/pgsodium',
         },
         {
