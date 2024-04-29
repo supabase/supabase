@@ -38,7 +38,11 @@ const DropReplicaConfirmationModal = ({
     if (!projectRef) return console.error('Project is required')
     if (selectedReplica === undefined) return toast.error('No replica selected')
 
-    await removeReadReplica({ projectRef, identifier: selectedReplica.identifier })
+    await removeReadReplica({
+      projectRef,
+      identifier: selectedReplica.identifier,
+      invalidateReplicaQueries: true,
+    })
   }
 
   return (
