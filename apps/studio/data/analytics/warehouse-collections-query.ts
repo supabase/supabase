@@ -1,5 +1,4 @@
-import { initial } from 'lodash'
-import { QueryOptions, useQuery } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
 import { analyticsKeys } from './keys'
 

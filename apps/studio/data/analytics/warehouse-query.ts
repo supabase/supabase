@@ -23,7 +23,11 @@ export async function getWarehouseQuery(
     signal,
   })
 
-  return response
+  return {
+    // TODO: Remove the type assertion once the generated OpenAPI client is typed
+    data: response.data as unknown as any[],
+    error: response.error,
+  }
 }
 
 export type WarehouseQueryData = Awaited<ReturnType<typeof getWarehouseQuery>>

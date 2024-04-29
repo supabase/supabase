@@ -12,7 +12,10 @@ export const WarehouseCollectionDetail = () => {
   const router = useRouter()
   const collectionToken = router.query.collectionToken as string
   const projectRef = router.query.ref as string
-  const { data: collections } = useWarehouseCollectionsQuery({ projectRef }, { enabled: true })
+  const { data: collections, isLoading: collectionsLoading } = useWarehouseCollectionsQuery(
+    { projectRef },
+    { enabled: true }
+  )
   const collection = (collections || []).find((c) => c.token === collectionToken)
   const [params, setParams] = React.useState({
     sql: `select current_timestamp() as 'time'`,
@@ -31,29 +34,51 @@ export const WarehouseCollectionDetail = () => {
     }
   }, [collection])
 
-  const { isLoading, data, isError, refetch } = useWarehouseQueryQuery(
-    { projectRef, sql: params.sql },
-    { enabled: !!params.sql }
-  )
-  const results = data?.data?.result || []
+  const {
+    isLoading: queryLoading,
+    data: queryData,
+    isError,
+    refetch,
+  } = useWarehouseQueryQuery({ ref: projectRef, sql: params.sql }, { enabled: !!params.sql })
+
+  const formatResults = (results: any) => {
+    const r = results.map(({ timestamp, ...r }: any) => {
+      return {
+        timestamp: new Date(timestamp).toLocaleString(),
+        ...r,
+      }
+    })
+    console.log({ r, results })
+
+    return r
+  }
+
+  const results = formatResults(queryData?.data.result)
+
   const isLoadingOlder = false
   function loadOlder() {
     console.log('loadOlder')
   }
+
+  const isLoading = queryLoading || collectionsLoading
 
   return (
     <>
       <div className="relative flex flex-col flex-grow h-full">
         <ShimmerLine active={isLoading} />
         <LoadingOpacity active={isLoading}>
-          <div>
-            <h2 className="p-3">{collection?.name}</h2>
-            <Button asChild type={'outline'}>
-              <Link href={`/project/${projectRef}/logs/collections/access-tokens`}>
-                Access tokens
-              </Link>
-            </Button>
-            <pre className="overflow-auto max-h-[300px]">{JSON.stringify(collection, null, 2)}</pre>
+          <div className="flex flex-col w-full">
+            <div className="flex justify-between items-center pr-3">
+              <h2 className="p-3">{collection?.name}</h2>
+              <div className="flex items-center gap-2">
+                <Button asChild type={'text'}>
+                  <Link href={`/project/${projectRef}/logs/collections/access-tokens`}>
+                    Access tokens
+                  </Link>
+                </Button>
+                <Button type="outline">Connect</Button>
+              </div>
+            </div>
             <LogTable
               projectRef={projectRef}
               isLoading={isLoading}
@@ -65,6 +90,7 @@ export const WarehouseCollectionDetail = () => {
             />
           </div>
         </LoadingOpacity>
+
         {!isError && (
           <div className="border-t flex flex-row justify-between p-2">
             <Button

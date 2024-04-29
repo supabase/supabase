@@ -18,6 +18,7 @@ import {
   IconEye,
   IconEyeOff,
   IconPlay,
+  cn,
 } from 'ui'
 
 import CSVButton from 'components/ui/CSVButton'
@@ -53,6 +54,7 @@ interface Props {
   hasEditorValue?: boolean
   hideHeader?: boolean
   maxHeight?: string
+  className?: string
 }
 type LogMap = { [id: string]: LogData }
 
@@ -75,6 +77,7 @@ const LogTable = ({
   hasEditorValue,
   hideHeader = false,
   maxHeight,
+  className,
 }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
@@ -212,7 +215,12 @@ const LogTable = ({
   }
 
   const LogsExplorerTableHeader = () => (
-    <div className="flex w-full items-center justify-between border-t  bg-surface-100 px-5 py-2">
+    <div
+      className={cn(
+        'flex w-full items-center justify-between border-t  bg-surface-100 px-5 py-2',
+        className
+      )}
+    >
       <div className="flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
