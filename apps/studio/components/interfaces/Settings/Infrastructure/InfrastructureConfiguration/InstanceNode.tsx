@@ -225,8 +225,13 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
                     <TooltipTrigger_Shadcn_>
                       <HelpCircle size={16} />
                     </TooltipTrigger_Shadcn_>
-                    <TooltipContent_Shadcn_ side="bottom" className="w-60 text-center">
-                      Replica failed to initialize. Please drop this replica, and spin up a new one.
+                    <TooltipContent_Shadcn_
+                      side="bottom"
+                      align="end"
+                      alignOffset={-70}
+                      className="w-60 text-center"
+                    >
+                      Replica failed to initialize. Please drop this replica and spin up a new one.
                     </TooltipContent_Shadcn_>
                   </Tooltip_Shadcn_>
                 </>
