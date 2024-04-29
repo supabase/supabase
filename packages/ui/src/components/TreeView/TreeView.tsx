@@ -1,6 +1,6 @@
 import { ChevronRight, FolderClosed, FolderOpen } from 'lucide-react'
-import { ComponentPropsWithoutRef, forwardRef, useEffect, useRef, useState } from 'react'
-import TreeViewPrimitive from 'react-accessible-treeview'
+import { ComponentPropsWithoutRef, ReactNode, forwardRef, useEffect, useRef, useState } from 'react'
+import TreeViewPrimitive, { flattenTree } from 'react-accessible-treeview'
 import { cn } from '../../lib/utils'
 import { Input } from '../shadcn/ui/input'
 
@@ -23,6 +23,8 @@ const TreeViewItem = forwardRef<
     xPadding: number
     /** name of entity */
     name: string
+    /** icon of entity */
+    icon?: ReactNode
     /** Specifies if the item is being edited, shows an input */
     isEditing?: boolean
     /** Callback for when the item is edited */
@@ -38,6 +40,7 @@ const TreeViewItem = forwardRef<
       isSelected = false,
       xPadding = 16,
       name = '',
+      icon,
       isEditing = false,
       onEditSubmit,
       ...props
@@ -49,7 +52,6 @@ const TreeViewItem = forwardRef<
 
     useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
-        console.log('handleClickOutside')
         if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
           onEditSubmit?.(localValueState)
         }
@@ -143,17 +145,19 @@ const TreeViewItem = forwardRef<
             />
           </>
         ) : (
-          <SQL_ICON
-            className={cn(
-              'transition-colors',
-              'fill-foreground-muted',
-              'group-aria-selected:fill-foreground',
-              'w-5 h-5',
-              '-ml-0.5'
-            )}
-            size={16}
-            strokeWidth={1.5}
-          />
+          icon || (
+            <SQL_ICON
+              className={cn(
+                'transition-colors',
+                'fill-foreground-muted',
+                'group-aria-selected:fill-foreground',
+                'w-5 h-5',
+                '-ml-0.5'
+              )}
+              size={16}
+              strokeWidth={1.5}
+            />
+          )
         )}
         <span className={cn(isEditing && 'hidden')}>{name}</span>
         <form autoFocus onSubmit={handleSubmit} className={cn(!isEditing && 'hidden')}>
@@ -216,4 +220,4 @@ const TreeViewFolderIcon = forwardRef<SVGSVGElement, LucideSVGProps & { isOpen?:
   }
 )
 
-export { TreeView, TreeViewFolderIcon, TreeViewItem }
+export { TreeView, TreeViewFolderIcon, TreeViewItem, flattenTree }
