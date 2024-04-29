@@ -48,7 +48,7 @@ function Toggle({
 }: Props) {
   const __styles = styleHandler('toggle')
 
-  const { values, errors, handleBlur, touched, fieldLevelValidation, setFieldValue } =
+  const { formContextOnChange, values, errors, handleBlur, touched, fieldLevelValidation } =
     useFormContext()
 
   if (values && !checked) checked = values[id || name]
@@ -83,8 +83,24 @@ function Toggle({
 
     setIntChecked(!intChecked)
 
+    /*
+     * Create change event for formik
+     * formik expects an input change event
+     */
+    let event: any = {}
+    event.target = {
+      type: 'checkbox',
+      name: name,
+      id: id,
+      value: !active,
+      checked: !active,
+      // outerHTML: undefined,
+      // options: undefined,
+      // multiple: undefined,
+    }
+
     // update form
-    setFieldValue(id || name, !active)
+    if (formContextOnChange) formContextOnChange(event)
     // run field level validation
     if (validation) fieldLevelValidation(id, validation(!intChecked))
   }

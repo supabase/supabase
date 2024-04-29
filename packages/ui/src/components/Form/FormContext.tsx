@@ -7,7 +7,6 @@ interface ContextProps {
   handleBlur: ((e: React.FocusEvent<any, any>) => void) | null
   touched: any
   fieldLevelValidation: any
-  setFieldValue: ((id: string, value: any) => void) | null
 }
 
 interface Provider extends ContextProps {
@@ -23,19 +22,10 @@ const FormContext = createContext<ContextProps>({
   handleBlur: null,
   touched: null,
   fieldLevelValidation: null,
-  setFieldValue: null,
 })
 
 export const FormContextProvider = (props: Provider) => {
-  const {
-    formContextOnChange,
-    values,
-    errors,
-    handleBlur,
-    touched,
-    fieldLevelValidation,
-    setFieldValue,
-  } = props
+  const { formContextOnChange, values, errors, handleBlur, touched, fieldLevelValidation } = props
 
   const value = {
     formContextOnChange: formContextOnChange,
@@ -44,7 +34,6 @@ export const FormContextProvider = (props: Provider) => {
     handleBlur: handleBlur,
     touched: touched,
     fieldLevelValidation: fieldLevelValidation,
-    setFieldValue,
   }
 
   return <FormContext.Provider value={value}>{props.children}</FormContext.Provider>
