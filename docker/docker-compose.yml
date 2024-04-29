@@ -10,7 +10,7 @@ version: "3.8"
 services:
   studio:
     container_name: supabase-studio
-    image: supabase/studio:20240408-6bf3b81
+    image: supabase/studio:20240422-5cf8f30
     restart: unless-stopped
     healthcheck:
       test:
@@ -289,7 +289,7 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.43.2
+    image: supabase/edge-runtime:v1.45.2
     restart: unless-stopped
     depends_on:
       analytics:

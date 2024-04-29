@@ -36,6 +36,9 @@ const FeedbackWidget = ({
   screenshot,
   setScreenshot,
 }: FeedbackWidgetProps) => {
+  const FEEDBACK_STORAGE_KEY = 'feedback_content'
+  const SCREENSHOT_STORAGE_KEY = 'screenshot'
+
   const router = useRouter()
   const { ref, slug } = useParams()
   const inputRef = useRef<any>(null)
@@ -46,11 +49,40 @@ const FeedbackWidget = ({
   const { mutateAsync: submitFeedback } = useSendFeedbackMutation()
 
   useEffect(() => {
+    const storedFeedback = localStorage.getItem(FEEDBACK_STORAGE_KEY)
+    if (storedFeedback) {
+      setFeedback(storedFeedback)
+    }
+
+    const storedScreenshot = localStorage.getItem(SCREENSHOT_STORAGE_KEY)
+    if (storedScreenshot) {
+      setScreenshot(storedScreenshot)
+    }
+  }, [])
+
+  useEffect(() => {
+    localStorage.setItem(FEEDBACK_STORAGE_KEY, feedback)
+  }, [feedback])
+
+  useEffect(() => {
+    if (screenshot) {
+      localStorage.setItem(SCREENSHOT_STORAGE_KEY, screenshot)
+    }
+  }, [screenshot])
+
+  useEffect(() => {
     inputRef?.current?.focus()
   }, [inputRef])
 
   function onFeedbackChange(e: any) {
     setFeedback(e.target.value)
+  }
+
+  const clearFeedback = () => {
+    setFeedback('')
+    setScreenshot(undefined)
+    localStorage.removeItem(FEEDBACK_STORAGE_KEY)
+    localStorage.removeItem(SCREENSHOT_STORAGE_KEY)
   }
 
   const captureScreenshot = async () => {
@@ -66,7 +98,10 @@ const FeedbackWidget = ({
     // Give time for dropdown to close
     await timeout(100)
     toPng(document.body, { filter })
-      .then((dataUrl: any) => setScreenshot(dataUrl))
+      .then((dataUrl: any) => {
+        localStorage.setItem(SCREENSHOT_STORAGE_KEY, dataUrl)
+        setScreenshot(dataUrl)
+      })
       .catch((error: any) => toast.error('Failed to capture screenshot'))
       .finally(() => {
         setIsSavingScreenshot(false)
@@ -79,7 +114,11 @@ const FeedbackWidget = ({
 
     const reader = new FileReader()
     reader.onload = function (event) {
-      setScreenshot(event.target?.result as string)
+      const dataUrl = event.target?.result
+      if (typeof dataUrl === 'string') {
+        setScreenshot(dataUrl)
+        localStorage.setItem(SCREENSHOT_STORAGE_KEY, dataUrl)
+      }
     }
     reader.readAsDataURL(file)
     event.target.value = ''
@@ -105,6 +144,9 @@ const FeedbackWidget = ({
           pathname: router.asPath,
         })
         setFeedback('')
+        setScreenshot(undefined)
+        localStorage.removeItem(FEEDBACK_STORAGE_KEY)
+        localStorage.removeItem(SCREENSHOT_STORAGE_KEY)
         toast.success(
           'Feedback sent. Thank you!\n\nPlease be aware that we do not provide responses to feedback. If you require assistance or a reply, consider submitting a support ticket.'
         )
@@ -133,6 +175,9 @@ const FeedbackWidget = ({
             Cancel
           </Button>
           <div className="flex items-center space-x-2">
+            <Button type="default" onClick={clearFeedback}>
+              Clear
+            </Button>
             {screenshot !== undefined ? (
               <div
                 style={{ backgroundImage: `url("${screenshot}")` }}
