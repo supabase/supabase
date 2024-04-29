@@ -72,7 +72,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
                 title={extension.name}
                 className="h-5 m-0 text-sm truncate cursor-pointer text-foreground"
               >
-                {extension.name}
+                {extension.altName || extension.name}
               </h3>
               <p className="text-sm text-foreground-light">
                 {extension?.installed_version ?? extension.default_version}
@@ -85,12 +85,12 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
                     .find((item: any) => item.name === extension.name)
                     ?.link.startsWith('/guides')
                     ? siteUrl === 'http://localhost:8082'
-                      ? `http://localhost:3001/docs${
-                          extensions.find((item: any) => item.name === extension.name)?.link
-                        }`
-                      : `https://supabase.com/docs${
-                          extensions.find((item: any) => item.name === extension.name)?.link
-                        }`
+                      ? `http://localhost:3001/docs${extensions.find(
+                          (item: any) => item.name === extension.name
+                        )?.link}`
+                      : `https://supabase.com/docs${extensions.find(
+                          (item: any) => item.name === extension.name
+                        )?.link}`
                     : extensions.find((item: any) => item.name === extension.name)?.link ?? ''
                 }
                 className="max-w-[85%] cursor-default zans"
