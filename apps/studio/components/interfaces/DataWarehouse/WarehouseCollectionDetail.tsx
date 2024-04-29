@@ -42,6 +42,10 @@ export const WarehouseCollectionDetail = () => {
   } = useWarehouseQueryQuery({ ref: projectRef, sql: params.sql }, { enabled: !!params.sql })
 
   const formatResults = (results: any) => {
+    if (!results || !results.length) {
+      return []
+    }
+
     const r = results.map(({ timestamp, ...r }: any) => {
       return {
         timestamp: new Date(timestamp).toLocaleString(),
