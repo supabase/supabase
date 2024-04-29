@@ -20,7 +20,7 @@ import { useCommandMenu } from '../CommandMenuProvider'
 import { SAMPLE_QUERIES } from '../Command.constants'
 import SQLOutputActions from './SQLOutputActions'
 import { generatePrompt } from './GenerateSQL.utils'
-import { ExcludeSchemaAlert, IncludeSchemaAlert, AiWarning } from '../Command.alerts'
+import { ExcludeSchemaAlert, IncludeSchemaAlert } from '../Command.alerts'
 
 const GenerateSQL = () => {
   const [includeSchemaMetadata, setIncludeSchemaMetadata] = useState(false)
@@ -167,7 +167,6 @@ const GenerateSQL = () => {
                             >
                               {answer}
                             </CodeBlock>
-                            <AiWarning className="!rounded-t-none border-muted" />
                           </div>
                           {message.status === MessageStatus.Complete && (
                             <SQLOutputActions answer={answer} messages={messages.slice(0, i + 1)} />
@@ -253,7 +252,6 @@ const GenerateSQL = () => {
       </div>
 
       <div className="absolute bottom-0 w-full bg-background pt-4">
-        {/* {messages.length > 0 && !hasError && <AiWarning className="mb-4 mx-4" />} */}
         {allowSendingSchemaMetadata && (
           <div className="mb-4">
             {messages.length === 0 ? (

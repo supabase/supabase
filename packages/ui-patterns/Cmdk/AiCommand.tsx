@@ -22,8 +22,6 @@ import {
 } from 'ui'
 import { AiIconChat } from './Command.icons'
 import { CommandGroup, CommandItem, useAutoInputFocus, useHistoryKeys } from './Command.utils'
-
-import { AiWarning } from './Command.alerts'
 import { useCommandMenu } from './CommandMenuProvider'
 
 import ReactMarkdown from 'react-markdown'
@@ -454,7 +452,6 @@ const AiCommand = () => {
         <div className="[overflow-anchor:auto] h-px w-full"></div>
       </div>
       <div className="absolute bottom-0 w-full bg-background py-3">
-        {messages.length > 0 && !hasError && <AiWarning className="mb-3 mx-3" />}
         <Input
           className="bg-alternative rounded mx-3 [&_input]:pr-32 md:[&_input]:pr-40"
           inputRef={inputRef}
