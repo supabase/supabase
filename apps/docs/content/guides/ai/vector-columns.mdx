@@ -24,18 +24,18 @@ Vectors in Supabase are enabled via [pgvector](https://github.com/pgvector/pgvec
 
 1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
-3. Search for "vector" and enable the extension.
+3. Search for "pgvector" and enable the extension.
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
 
 ```sql
- -- Example: enable the "vector" extension.
+ -- Example: enable the pgvector extension.
 create extension vector
 with
   schema extensions;
 
--- Example: disable the "vector" extension
+-- Example: disable the pgvector extension
 drop
   extension if exists vector;
 ```
