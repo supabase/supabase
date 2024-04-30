@@ -121,10 +121,10 @@ const supabase: Handle = async ({ event, resolve }) => {
   return resolve(event, {
     filterSerializedResponseHeaders(name) {
       /**
-       * Supabase libraries use the `content-range` header, so we need to
-       * tell SvelteKit to pass it through.
+       * Supabase libraries use the `content-range` and `x-supabase-api-version`
+       * headers, so we need to tell SvelteKit to pass it through.
        */
-      return name === 'content-range'
+      return name === 'content-range' || name === 'x-supabase-api-version'
     },
   })
 }
