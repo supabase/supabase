@@ -107,7 +107,7 @@ export const DeleteAccountButton = () => {
               <DialogSection className="!pt-0">
                 <span className="text-sm text-foreground flex flex-col gap-y-2">
                   Before submitting an account deletion request, please ensure that your account is
-                  not part of any organization. This can be done by leaving leaving or deleting the
+                  not part of any organization. This can be done by leaving or deleting the
                   organizations that you are a part of.
                 </span>
                 <Button

@@ -4,12 +4,11 @@ import { toast } from 'react-hot-toast'
 import { post } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { replicaKeys } from './keys'
-import type { Database } from './replicas-query'
 
 export type ReadReplicaRemoveVariables = {
   projectRef: string
   identifier: string
-  skipInvalidateOnSuccess?: boolean
+  invalidateReplicaQueries: boolean
 }
 
 export async function removeReadReplica({ projectRef, identifier }: ReadReplicaRemoveVariables) {
@@ -40,18 +39,13 @@ export const useReadReplicaRemoveMutation = ({
     (vars) => removeReadReplica(vars),
     {
       async onSuccess(data, variables, context) {
-        const { projectRef, identifier, skipInvalidateOnSuccess } = variables
+        const { projectRef, invalidateReplicaQueries } = variables
 
-        if (skipInvalidateOnSuccess === false) {
-          // [Joshen] Just FYI, will remove this once API changes to remove the need for optimistic rendering
-          queryClient.setQueriesData<any>(replicaKeys.list(projectRef), (old: any) => {
-            return old.filter((db: Database) => db.identifier !== identifier)
-          })
-
-          setTimeout(async () => {
-            await queryClient.invalidateQueries(replicaKeys.list(projectRef))
-            await queryClient.invalidateQueries(replicaKeys.loadBalancers(projectRef))
-          }, 5000)
+        if (invalidateReplicaQueries) {
+          await Promise.all([
+            queryClient.invalidateQueries(replicaKeys.list(projectRef)),
+            queryClient.invalidateQueries(replicaKeys.loadBalancers(projectRef)),
+          ])
         }
 
         await onSuccess?.(data, variables, context)
