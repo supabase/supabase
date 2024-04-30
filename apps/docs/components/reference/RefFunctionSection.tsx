@@ -1,16 +1,14 @@
+import { Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
-
-import { CodeBlock, IconDatabase, Tabs } from 'ui'
-
+import { CodeBlock, IconDatabase } from 'ui'
+import components from '~/components'
 import Options from '~/components/Options'
 import Param from '~/components/Params'
+import { Tabs, TabPanel } from '~/components/Tabs'
+import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { extractTsDocNode, generateParameters } from '~/lib/refGenerator/helpers'
-
-import RefDetailCollapse from '~/components/reference/RefDetailCollapse'
-import { Fragment } from 'react'
 import { IRefFunctionSection } from './Reference.types'
-import components from '~/components'
 
 const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
   const item = props.spec.functions.find((x: any) => x.id === props.funcData.id)
@@ -138,7 +136,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                       const tables = staticExample?.data?.tables
 
                       return (
-                        <Tabs.Panel
+                        <TabPanel
                           id={example.id}
                           key={exampleIndex}
                           label={example.name}
@@ -219,7 +217,7 @@ const RefFunctionSection: React.FC<IRefFunctionSection> = (props) => {
                               </div>
                             </RefDetailCollapse>
                           )}
-                        </Tabs.Panel>
+                        </TabPanel>
                       )
                     })}
                 </Tabs>
