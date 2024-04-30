@@ -26,7 +26,7 @@ const Extensions = () => {
   })
 
   const formattedExtensions = (data ?? []).map((ext) => {
-    if (ext.name === 'vector') return { ...ext, name: 'pgvector' }
+    if (ext.name === 'vector') return { ...ext, altName: 'pgvector' }
     else return ext
   })
 
@@ -34,7 +34,7 @@ const Extensions = () => {
     filterString.length === 0
       ? formattedExtensions
       : formattedExtensions.filter((ext) =>
-          ext.name.toLowerCase().includes(filterString.toLowerCase())
+          (ext?.altName ?? ext.name).toLowerCase().includes(filterString.toLowerCase())
         )
   const extensionsWithoutHidden = extensions.filter((ext) => !HIDDEN_EXTENSIONS.includes(ext.name))
   const [enabledExtensions, disabledExtensions] = partition(

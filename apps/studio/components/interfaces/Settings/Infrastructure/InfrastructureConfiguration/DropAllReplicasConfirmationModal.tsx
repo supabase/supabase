@@ -1,18 +1,11 @@
 import { useParams } from 'common'
 import toast from 'react-hot-toast'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  IconAlertTriangle,
-  Modal,
-} from 'ui'
 
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
-import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'
-import { Database, useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useQueryClient } from '@tanstack/react-query'
 import { replicaKeys } from 'data/read-replicas/keys'
+import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface DropAllReplicasConfirmationModalProps {
   visible: boolean
@@ -38,20 +31,19 @@ const DropAllReplicasConfirmationModal = ({
     const replicas = databases.filter((db) => db.identifier !== projectRef)
     await Promise.all(
       replicas.map((db) =>
-        removeReadReplica({ projectRef, identifier: db.identifier, skipInvalidateOnSuccess: true })
+        removeReadReplica({
+          projectRef,
+          identifier: db.identifier,
+          invalidateReplicaQueries: false,
+        })
       )
     )
     toast.success(`Tearing down all read replicas`)
 
-    queryClient.setQueriesData<any>(replicaKeys.list(projectRef), (old: Database[]) => {
-      return old.filter((db: Database) => db.identifier === projectRef)
-    })
-    queryClient.setQueriesData<any>(replicaKeys.loadBalancers(projectRef), (old: Database[]) => [])
-
-    setTimeout(async () => {
-      await queryClient.invalidateQueries(replicaKeys.list(projectRef))
-      await queryClient.invalidateQueries(replicaKeys.loadBalancers(projectRef))
-    }, 5000)
+    await Promise.all([
+      queryClient.invalidateQueries(replicaKeys.list(projectRef)),
+      queryClient.invalidateQueries(replicaKeys.loadBalancers(projectRef)),
+    ])
 
     onSuccess()
     onCancel()
