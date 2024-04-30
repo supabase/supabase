@@ -51,7 +51,7 @@ export const PRICING_TIER_PRODUCT_IDS = {
 }
 
 export const DEFAULT_PROVIDER: CloudProvider =
-  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? 'FLY' : 'AWS'
+  process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' ? 'AWS' : 'FLY'
 
 export const PROVIDERS = {
   FLY: {
