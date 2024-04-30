@@ -38,6 +38,7 @@ import {
 } from 'lib/constants'
 import { passwordStrength, pluckObjectFields } from 'lib/helpers'
 import type { NextPageWithLayout } from 'types'
+import { useProjectsQuery } from 'data/projects/projects-query'
 
 type DesiredInstanceSize = components['schemas']['DesiredInstanceSize']
 
@@ -73,6 +74,11 @@ const Wizard: NextPageWithLayout = () => {
   const { data: orgSubscription } = useOrgSubscriptionQuery({
     orgSlug: slug,
   })
+
+  const { data: allProjects } = useProjectsQuery({})
+  const orgProjectCount = (allProjects || []).filter(
+    (proj) => proj.organization_id === currentOrg?.id
+  ).length
 
   const {
     mutate: createProject,
@@ -205,20 +211,6 @@ const Wizard: NextPageWithLayout = () => {
     delayedCheckPasswordStrength(password)
   }
 
-  // [Fran] Enforce APSE1 region on staging
-  function getAvailableRegions(cloudProvider: CloudProvider): Region {
-    if (cloudProvider === 'AWS') {
-      return process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-        ? pluckObjectFields(AWS_REGIONS, ['SOUTHEAST_ASIA'])
-        : AWS_REGIONS
-      // to do - may need to pluck regions for staging for FLY also
-    } else if (cloudProvider === 'FLY') {
-      return FLY_REGIONS
-    }
-
-    throw new Error('Invalid cloud provider')
-  }
-
   const sizes: DesiredInstanceSize[] = [
     'micro',
     'small',
@@ -234,67 +226,77 @@ const Wizard: NextPageWithLayout = () => {
 
   const instanceSizeSpecs: Record<
     DesiredInstanceSize,
-    { label: string; ram: string; cpu: string; price: string }
+    { label: string; ram: string; cpu: string; price: string; monthlyPriceUsd: number }
   > = {
     micro: {
       label: 'Micro',
       ram: '1 GB',
       cpu: '2-core ARM',
       price: '$0.01344/hour (~$10/month)',
+      monthlyPriceUsd: 10,
     },
     small: {
       label: 'Small',
       ram: '2 GB',
       cpu: '2-core ARM',
       price: '$0.0206/hour (~$15/month)',
+      monthlyPriceUsd: 15,
     },
     medium: {
       label: 'Medium',
       ram: '4 GB',
       cpu: '2-core ARM',
       price: '$0.0822/hour (~$60/month)',
+      monthlyPriceUsd: 60,
     },
     large: {
       label: 'Large',
       ram: '8 GB',
       cpu: '2-core ARM',
       price: '$0.1517/hour (~$110/month)',
+      monthlyPriceUsd: 110,
     },
     xlarge: {
       label: 'XL',
       ram: '16 GB',
       cpu: '4-core ARM',
       price: '$0.2877/hour (~$210/month)',
+      monthlyPriceUsd: 210,
     },
     '2xlarge': {
       label: '2XL',
       ram: '32 GB',
       cpu: '8-core ARM',
       price: '$0.562/hour (~$410/month)',
+      monthlyPriceUsd: 410,
     },
     '4xlarge': {
       label: '4XL',
       ram: '64 GB',
       cpu: '16-core ARM',
       price: '$1.32/hour (~$960/month)',
+      monthlyPriceUsd: 960,
     },
     '8xlarge': {
       label: '8XL',
       ram: '128 GB',
       cpu: '32-core ARM',
       price: '$2.562/hour (~$1,870/month)',
+      monthlyPriceUsd: 1870,
     },
     '12xlarge': {
       label: '12XL',
       ram: '192 GB',
       cpu: '48-core ARM',
       price: '$3.836/hour (~$2,800/month)',
+      monthlyPriceUsd: 2800,
     },
     '16xlarge': {
       label: '16XL',
       ram: '256 GB',
       cpu: '64-core ARM',
       price: '$5.12/hour (~$3,730/month)',
+      monthlyPriceUsd: 3730,
     },
   }
 
@@ -469,10 +471,6 @@ const Wizard: NextPageWithLayout = () => {
                             Select the size for your dedicated database. You can always change this
                             later.
                           </p>
-                          <p className="mt-1">
-                            Your organization has $10/month in Compute Credits to cover one instance
-                            on Micro Compute or parts of any other instance size.
-                          </p>
                         </>
                       }
                     >
@@ -537,6 +535,52 @@ const Wizard: NextPageWithLayout = () => {
                     selectedRegion={dbRegion}
                     onSelectRegion={setDbRegion}
                   />
+                </Panel.Content>
+
+                <Panel.Content className="text-sm text-foreground-lighter">
+                  {/* Show info when launching a new project in a paid org that already has at least one project */}
+                  {orgSubscription?.plan?.id !== 'free' && orgProjectCount > 0 && (
+                    <div>
+                      <p>
+                        Launching this project will exceed your{' '}
+                        <Link
+                          href="https://supabase.com/docs/guides/platform/org-based-billing#compute-credits"
+                          target="_blank"
+                          className="underline"
+                        >
+                          monthly compute credits
+                        </Link>
+                        .
+                      </p>
+                      <p className="font-bold">
+                        Your monthly spend will increase by at least $
+                        {instanceSizeSpecs[instanceSize].monthlyPriceUsd}.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* Show info when launching the first project in an org, but it exceeds the compute credits */}
+                  {orgSubscription?.plan?.id !== 'free' &&
+                    orgProjectCount === 0 &&
+                    instanceSizeSpecs[instanceSize].monthlyPriceUsd > 10 && (
+                      <div>
+                        <p>
+                          Launching this project will exceed your{' '}
+                          <Link
+                            href="https://supabase.com/docs/guides/platform/org-based-billing#compute-credits"
+                            target="_blank"
+                            className="underline"
+                          >
+                            monthly compute credits
+                          </Link>
+                          .
+                        </p>
+                        <p className="font-bold">
+                          Your monthly spend will increase by at least $
+                          {instanceSizeSpecs[instanceSize].monthlyPriceUsd - 10}.
+                        </p>
+                      </div>
+                    )}
                 </Panel.Content>
               </>
             )}
