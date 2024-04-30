@@ -8,7 +8,6 @@ import {
   Dialog,
   DialogContent,
   DialogTrigger,
-  IconFastForward,
   IconRefreshCcw,
   IconRewind,
   Input,
@@ -17,13 +16,19 @@ import { LogTable } from '../Settings/Logs'
 import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
 import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
 import Link from 'next/link'
-import { RefreshCwIcon } from 'lucide-react'
-import { BackwardIcon } from '@heroicons/react/16/solid'
+import { useWarehouseAccessTokensQuery } from 'data/analytics/warehouse-access-tokens-query'
+import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components/shadcn/ui/select'
+import { TestCollectionDialog } from './TestCollectionDialog'
 
 export const WarehouseCollectionDetail = () => {
   const router = useRouter()
   const collectionToken = router.query.collectionToken as string
   const projectRef = router.query.ref as string
+  const accessTokens = useWarehouseAccessTokensQuery({ projectRef })
+  const [testAccessToken, setTestAccessToken] = React.useState('')
+
+  const isDevEnv = process.env.NODE_ENV === 'development'
+
   const { data: collections, isLoading: collectionsLoading } = useWarehouseCollectionsQuery(
     { projectRef },
     { enabled: true }
@@ -96,54 +101,12 @@ export const WarehouseCollectionDetail = () => {
                     Access tokens
                   </Link>
                 </Button>
-                <Dialog>
-                  <DialogTrigger>
-                    <Button type="outline">Connect</Button>
-                  </DialogTrigger>
-                  <DialogContent className="p-3">
-                    <h2>Send events to this collection using the following endpoint</h2>
-                    <Input
-                      copy
-                      className="font-mono tracking-tighter"
-                      value={`https://api.logflare.app/logs?source=${collectionToken}`}
-                    />
-                    <p className="flex items-center">
-                      Replace <code className="inline text-xs">[ACCESS_TOKEN]</code> with your
-                      access token.
-                    </p>
-                    <CodeBlock language="bash" className="language-bash prose dark:prose-dark max-">
-                      {`
-curl -X "POST" "https://api.logflare.app/logs?source=${collectionToken}" \\
--H 'Content-Type: application/json' \\
--H 'X-API-KEY: [ACCESS_TOKEN]' \\
--d $'{
-  "event_message": "This is another log message.",
-  "metadata": {
-    "ip_address": "100.100.100.100",
-    "request_method": "POST",
-    "custom_user_data": {
-      "vip": true,
-      "id": 38,
-      "login_count": 154,
-      "company": "Supabase",
-      "address": {
-        "zip": "11111",
-        "st": "NY",
-        "street": "123 W Main St",
-        "city": "New York"
-      }
-    },
-    "datacenter": "aws",
-    "request_headers": {
-      "connection": "close",
-      "user_agent": "chrome"
-    }
-  }
-}'
-                      `}
-                    </CodeBlock>
-                  </DialogContent>
-                </Dialog>
+                {isDevEnv && (
+                  <TestCollectionDialog
+                    accessTokens={accessTokens.data?.data || []}
+                    collectionToken={collectionToken}
+                  />
+                )}
               </div>
             </div>
             <LogTable
@@ -172,9 +135,6 @@ curl -X "POST" "https://api.logflare.app/logs?source=${collectionToken}" \\
               </Button>
               {pagination.offset !== 0 && (
                 <>
-                  <span className="text-xs">
-                    Showing {pagination.offset + 1} - {pagination.offset + pagination.limit}
-                  </span>
                   <Button
                     onClick={() => setPagination({ ...pagination, offset: 0 })}
                     type="default"
