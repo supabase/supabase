@@ -59,7 +59,7 @@ This is the endpoint where your Hook is running.
 Payload that Auth sends to the Hook. For the Send SMS Hook, the payload contains these entries:
 
 1. `user` - contains information describing a user, including their phone number, which we wish to send a message to.
-2. `sms` - contains metadata specific to SMS sending, including the One Time Pin.
+2. `sms` - contains metadata specific to SMS sending, including the One Time Pin which is typically six digits long.
 
 For convenience, we have attached a mock payload below. Ensure that you fill in the corresponding `phone` and `otp` entries:
 

@@ -1,6 +1,6 @@
 # Supabase Send Email Auth Hook
 
-Use this edge function in an Auth Hook with the Send Email Extension Point. In this example, we use the hook to make use of Postmark as an email provider.
+Use this Hook with the **Send Email** Extension Point to send emails with Internationalization support. In this example, we make the arbitrary choice of using Postmark as an email provider - in practice any email sender will work.
 
 ## Configuration
 
@@ -10,32 +10,51 @@ Copy this folder to your CLI project. In this case, my folder is located at `~/D
 cp -r ../send-email/ ~/Desktop/auth_hooks/supabase/functions/send-email/`
 ```
 
-Copy the following environment variables from [the Twilio Console](https://console.twilio.com/) into your `.env.local` file:
+Copy the following environment variables from [Postmark](https://postmarkapp.com/) into your `.env.local` file:
 
 ```bash
 POSTMARK_SERVER_TOKEN=""
 ```
 
-You will need the following addtional configuration variables:
+Next, head to the `Auth > Hooks > Send Email > HTTP > Secret > Generate Secret` page to generate a secret. The Hook Secret should start with the version identifier, `v1,` followed by the signing prefix, `whsec_`, and finally the base64 secret. For instance, if your secret is `<secret>` then  you should include the following line
+
 
 ```bash
-APP_HASH="<YOUR_APP_HASH>"
-SEND_SMS_HOOK_SECRET="whsec_<standard_base64_encoded_string>"
+SEND_EMAIL_HOOK_SECRET="whsec_<standard_base64_encoded_string>"
 ```
 
-Generate the Hook secret with [Base64 encoding tool](https://www.base64encode.net/). It should follow the format `whsec_<base64_encoded_string_of_more_than_60_bytes>` Note that we use standard Base64 encoding which includes the `+`, `/`, and `=` characters - this is distinct from `Base64URLEncoding` which replaces `+` with `-` and `/` with `_`. Under base64 encoding, a string such as `supabasefunctionsareawesome` would correspond to a secret of `whsec_c3VwYWJhc2VmdW5jdGlvbnNhcmVhd2Vzb21l`
+in your `.env.local file`.
 
-## Local Development
+## Testing The Hook
 
-Writing the hook consists of two steps: Developing the Hook and connecting it to Supabase Auth.
+Supabase follows the Standard Webhooks Specification, which is a set of guidelines used to align how webhooks are implemented. The specification describes how to secure a payload to guard against malicious attackers. Constructing a specification compliant payload can be tricky, so we use [the Simulate tool](https://www.standardwebhooks.com/simulate) provided by the specification Standard Webhooks Specification to test our Hook. In practice, you can use any HTTP function as a hook. However, for convenience and also in the spirit of dogfooding, we will describe the use of the tool with a Supabase Edge Function.
 
-### Develop the Hook
 
-Use [this tool](https://www.standardwebhooks.com/simulate) to generate a sample cURL command to test the hook.
+### The Standard Webhooks Verification Tool
 
-Set the destination URL to: `https://127.0.0.1:54321/functions/v1/<your_function_name>`
+You can use the tool with an Edge Function run locally, via the CLI, or an Edge Function deployed on the platform. We will term deployed Edge Functions as "Production" functions. 
 
-Use a raw payload with the following shape:
+For both Local and Production Edge Functions you will need to fill the following fields:
+
+### Destination URL
+
+This is the endpoint where your Hook is running.
+
+**Local**: `https://127.0.0.1:54321/functions/v1/<your_function_name>`
+
+**Production**: `https://<project-ref>.functions.supabase.co/<function-name>`
+
+
+### Raw Payload
+
+Payload that Auth sends to the Hook. For the Send SMS Hook, the payload contains these entries:
+
+1. `user` - contains information describing a user, including their phone number, which we wish to send a message to.
+2. `email_data` - contains metadata specific to email sending. The `token` entry typically contains a six digit numeric pin.
+
+For convenience, we have attached a mock payload below. Ensure that you fill in the corresponding `email` and `token` entries:
+
+
 
 ```
 {
@@ -43,7 +62,7 @@ Use a raw payload with the following shape:
     "id": "c5135635-e6d7-428b-baee-0b0c4c710af2",
     "aud": "authenticated",
     "role": "authenticated",
-    "email": "youremail@email.com",
+    "email": "<your-email>",
     "phone": "",
     "app_metadata": {
       "provider": "email",
@@ -52,7 +71,7 @@ Use a raw payload with the following shape:
       ]
     },
     "user_metadata": {
-      "email": "youremail@email.com",
+      "email": "<your-email>",
       "email_verified": false,
       "phone_verified": false,
       "sub": "c5135635-e6d7-428b-baee-0b0c4c710af2"
@@ -63,7 +82,7 @@ Use a raw payload with the following shape:
         "id": "c5135635-e6d7-428b-baee-0b0c4c710af2",
         "user_id": "c5135635-e6d7-428b-baee-0b0c4c710af2",
         "identity_data": {
-          "email": "youremail@email.com",
+          "email": "<your-email>",
           "email_verified": false,
           "phone_verified": false,
           "sub": "c5135635-e6d7-428b-baee-0b0c4c710af2"
@@ -72,7 +91,7 @@ Use a raw payload with the following shape:
         "last_sign_in_at": "2024-04-24T12:07:25.029407681Z",
         "created_at": "2024-04-24T12:07:25.029445Z",
         "updated_at": "2024-04-24T12:07:25.029445Z",
-        "email": "youremail@email.com"
+        "email": "<your-email>"
       }
     ],
     "created_at": "2024-04-24T12:07:25.022509Z",
@@ -80,7 +99,7 @@ Use a raw payload with the following shape:
     "is_anonymous": false
   },
   "email_data": {
-    "token": "123456",
+    "token": "<otp>",
     "token_hash": "",
     "redirect_to": "http://localhost:3000/",
     "email_action_type": "signup",
@@ -91,32 +110,78 @@ Use a raw payload with the following shape:
 }
 ```
 
-Ensure that you periodically refresh the timestamp to ensure you don't run into verification errors
 
-### Connect to Supabase Auth
+### Signature
 
-Serve the function locally.
+This is an identifier generated using the timestamp, payload, and secret to ensure the authenticity of the sender. Periodically refresh the timestamp in the `Signature` section in order to ensure that you have a valid signature. 
 
-```
-supabase functions serve send-email --no-verify-jwt --env-file ./supabase/functions/.env.local
-```
+Use the `SEND_EMAIL_HOOK_SECRET` from the `.env.local` file. This step is the same for both local and production functions.
 
-Modify the `config.toml` to ensure that Supabase Auth registers the Hook
+
+
+## Connect to Supabase Auth
+
+Connect the Edge Function as an Auth Hook after testing it. As the Hook runs on all cases where an SMS is sent, the user may not be signed in at point of Hook Invocation which in turn means that they might not have a JWT. We specify the `--no-verify-jwt` flag to adjust for this and allow for Auth to access the Hook. Security guarantees are instead provided through the checks discussed in the [Standard Webhook Specification](https://github.com/standard-webhooks/standard-webhooks/blob/main/spec/standard-webhooks.md)
+
+
+**Local**
+
+Modify your `config.toml` to ensure that Supabase Auth registers your Edge Function
 
 ```
 [auth.hook.send_sms]
 enabled = true
 uri = "http://host.docker.internal:54321/functions/v1/sms_sender"
-secret= "env(SEND_SMS_HOOK_SECRET)"
+secret = "env(SEND_EMAIL_HOOK_SECRET)"
 ```
 
-## Production
 
-### Deploy the Function
+Start the function
+```
+supabase functions serve send-email --no-verify-jwt --env-file ./supabase/functions/.env.local
+```
 
-Head to the `Auth > Hooks > Send SMS` page to copy the corresponding secret. Input the corresponding URL for the function and push all secrets to your remote setup and deploy the function
+
+**Production**
+
+Register your secrets with the platform
 
 ```
 supabase secrets set --env-file ./supabase/.env.local
+```
+
+Deploy your function if you have yet to do so
+
+```
 supabase functions deploy send-email --no-verify-jwt
 ```
+
+After connecting the Hook, test the Hook to see if it is functioning as expected.
+
+You can do so via a curl request
+
+```bash
+curl -X POST http://localhost:9999/signup \
+  -H "Content-Type: application/json" \
+  -d '{"email": "<your_email>", "password": "<your-password>", "options": {"data": {"i18n": "es"}}}'
+```
+
+or via the client library
+
+```
+
+const { data, error } = await supabase.auth.signUp(
+  {
+    email: 'example@email.com',
+    password: 'example-password',
+    options: {
+      data: {
+        i18n: 'es',
+      }
+    }
+  }
+)
+
+```
+
+You should recieve an email as in Spanish if it is working as expected
