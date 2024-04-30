@@ -168,7 +168,7 @@ const Connect = () => {
         <DialogContent className={cn('sm:max-w-5xl p-0')}>
           <DialogHeader className="pb-0">
             <DialogTitle>Connect to your project</DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-foreground-lighter">
               Get the connection strings and environment variables for your app
             </DialogDescription>
           </DialogHeader>
