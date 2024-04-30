@@ -1,5 +1,5 @@
 import clientLibsCommonSections from '~/spec/common-client-libs-sections.json'
-import spec from '~/spec/supabase_csharp_v0.yml' assert { type: 'yml' }
+import spec from '~/spec/supabase_csharp_v1.yml' assert { type: 'yml' }
 import RefSectionHandler from '~/components/reference/RefSectionHandler'
 import { flattenSections } from '~/lib/helpers'
 import handleRefGetStaticPaths from '~/lib/mdx/handleRefStaticPaths'
@@ -12,7 +12,7 @@ const libraryPath = '/csharp'
 export default function CSharpReference(props) {
   return (
     <RefSectionHandler
-      menuId={MenuId.RefCSharpV0}
+      menuId={MenuId.RefCSharpV1}
       sections={sections}
       spec={spec}
       pageProps={props}
