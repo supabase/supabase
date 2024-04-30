@@ -24,8 +24,14 @@ const JoinOrganizationPage = () => {
   const [error, setError] = useState<any>()
   const [tokenValidationInfo, setTokenValidationInfo] = useState<TokenInfo>(undefined)
   const [tokenInfoLoaded, setTokenInfoLoaded] = useState(false)
-  const { token_does_not_exist, email_match, expired_token, organization_name, invite_id } =
-    tokenValidationInfo || {}
+  const {
+    token_does_not_exist,
+    sso_mismatch,
+    email_match,
+    expired_token,
+    organization_name,
+    invite_id,
+  } = tokenValidationInfo || {}
 
   const loginRedirectLink = `/?returnTo=${encodeURIComponent(`/join?token=${token}&slug=${slug}`)}`
 
@@ -93,6 +99,7 @@ const JoinOrganizationPage = () => {
 
   const isError =
     error ||
+    !!(tokenInfoLoaded && sso_mismatch) ||
     !!(tokenInfoLoaded && token_does_not_exist) ||
     (tokenInfoLoaded && !email_match) ||
     (tokenInfoLoaded && expired_token)
@@ -111,6 +118,14 @@ const JoinOrganizationPage = () => {
 
     const message = error ? (
       <p>There was an error requesting details for this invitation. ({error.message})</p>
+    ) : sso_mismatch ? (
+      <>
+        <p>SSO providers do not match.</p>
+        <p className="text-foreground-lighter">
+          This invitation comes from a different identity provider than the one you are currently
+          logged in with. Please use the same SSO provider instead.
+        </p>
+      </>
     ) : token_does_not_exist ? (
       <>
         <p>The invite token is invalid.</p>
