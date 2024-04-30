@@ -7,7 +7,7 @@ Use this edge function in an Auth Hook with the Send Email Extension Point. In t
 Copy this folder to your CLI project. In this case, my folder is located at `~/Desktop/auth_hooks/` so I will run:
 
 ```bash
-cp -r ../send_sms/ ~/Desktop/auth_hooks/supabase/functions/send_sms/`
+cp -r ../send-email/ ~/Desktop/auth_hooks/supabase/functions/send-email/`
 ```
 
 Copy the following environment variables from [the Twilio Console](https://console.twilio.com/) into your `.env.local` file:
@@ -98,7 +98,7 @@ Ensure that you periodically refresh the timestamp to ensure you don't run into 
 Serve the function locally.
 
 ```
-supabase functions serve --no-verify-jwt --env-file ./supabase/functions/.env.local
+supabase functions serve send-email --no-verify-jwt --env-file ./supabase/functions/.env.local
 ```
 
 Modify the `config.toml` to ensure that Supabase Auth registers the Hook
@@ -118,5 +118,5 @@ Head to the `Auth > Hooks > Send SMS` page to copy the corresponding secret. Inp
 
 ```
 supabase secrets set --env-file ./supabase/.env.local
-supabase functions deploy --no-verify-jwt
+supabase functions deploy send-email --no-verify-jwt
 ```

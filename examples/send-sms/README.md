@@ -133,7 +133,7 @@ secret = "env(SEND_SMS_HOOK_SECRET)"
 
 Start the function
 ```
-supabase functions serve --no-verify-jwt --env-file ./supabase/functions/.env.local
+supabase functions serve send-sms --no-verify-jwt --env-file ./supabase/functions/.env.local
 ```
 
 
@@ -148,7 +148,7 @@ supabase secrets set --env-file ./supabase/.env.local
 Deploy your function if you have yet to do so
 
 ```
-supabase functions deploy --no-verify-jwt
+supabase functions deploy send-sms --no-verify-jwt
 ```
 
 After connecting the Hook, test the Hook to see if it is functioning as expected.
