@@ -40,7 +40,7 @@ const PostgrestConfig = () => {
   )
 
   const formId = 'project-postgres-config'
-  const initialValues = { db_schema: '', max_rows: '', db_extra_search_path: '' }
+  const initialValues = { db_schema: '', max_rows: '', db_extra_search_path: '', db_pool: '' }
 
   const updateConfig = async (updatedConfig: typeof initialValues) => {
     if (!projectRef) return console.error('Project ref is required')
@@ -49,6 +49,7 @@ const PostgrestConfig = () => {
       dbSchema: updatedConfig.db_schema,
       maxRows: updatedConfig.max_rows,
       dbExtraSearchPath: updatedConfig.db_extra_search_path,
+      dbPool: updatedConfig.db_pool || null,
     })
   }
 
@@ -83,6 +84,7 @@ const PostgrestConfig = () => {
               db_schema: config.db_schema,
               max_rows: config.max_rows,
               db_extra_search_path: config.db_extra_search_path ?? '',
+              db_pool: config.db_pool || null,
             }
             resetForm({ values, initialValues: values })
           }
@@ -174,6 +176,17 @@ const PostgrestConfig = () => {
                         size="small"
                         disabled={!canUpdatePostgrestConfig}
                         descriptionText="The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests."
+                      />
+                    </FormSectionContent>
+                  </FormSection>
+                  <FormSection header={<FormSectionLabel>Pool size</FormSectionLabel>}>
+                    <FormSectionContent loading={false}>
+                      <InputNumber
+                        id="db_pool"
+                        size="small"
+                        disabled={!canUpdatePostgrestConfig}
+                        descriptionText="Number of maximum connections to keep open in the Data API server's database pool. Unset to let it be configured automatically based on compute size."
+                        placeholder="Configured automatically based on compute size"
                       />
                     </FormSectionContent>
                   </FormSection>
