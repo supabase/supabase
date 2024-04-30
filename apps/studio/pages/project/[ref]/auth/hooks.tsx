@@ -1,9 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 
-import BasicHooksConfig from 'components/interfaces/Auth/Hooks/BasicHooksConfig'
-import EnterpriseHooksConfig from 'components/interfaces/Auth/Hooks/EnterpriseHooksConfig'
+import { HooksListing } from 'components/interfaces/Auth/Hooks/HooksListing'
 import { AuthLayout } from 'components/layouts'
-import { FormsContainer } from 'components/ui/Forms'
 import NoPermission from 'components/ui/NoPermission'
 import { useCheckPermissions, usePermissionsLoaded } from 'hooks'
 import type { NextPageWithLayout } from 'types'
@@ -16,12 +14,9 @@ const Hooks: NextPageWithLayout = () => {
     return <NoPermission isFullPage resourceText="access your project's auth hooks" />
   } else {
     return (
-      <FormsContainer>
-        <div className="flex flex-col gap-8">
-          <BasicHooksConfig />
-          <EnterpriseHooksConfig />
-        </div>
-      </FormsContainer>
+      <div className="mx-auto max-w-4xl px-5 pt-12 pb-20">
+        <HooksListing />
+      </div>
     )
   }
 }

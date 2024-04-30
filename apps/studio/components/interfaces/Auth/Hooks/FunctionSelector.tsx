@@ -11,8 +11,6 @@ import {
   CommandList_Shadcn_,
   Command_Shadcn_,
   IconCheck,
-  IconCode,
-  IconLoader,
   PopoverContent_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
@@ -22,6 +20,7 @@ import {
 import { convertArgumentTypes } from 'components/interfaces/Database/Functions/Functions.utils'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { useDatabaseFunctionsQuery } from 'data/database-functions/database-functions-query'
+import { Code } from 'lucide-react'
 
 interface FunctionSelectorProps {
   className?: string
@@ -62,15 +61,8 @@ const FunctionSelector = ({
   return (
     <div className={className}>
       {isLoading && (
-        <Button
-          type="outline"
-          className="w-full [&>span]:w-full"
-          icon={<IconLoader className="animate-spin" size={12} />}
-          disabled={!!disabled}
-        >
-          <div className="w-full flex space-x-3 py-0.5">
-            <p className="text-xs text-foreground-light">Loading functions...</p>
-          </div>
+        <Button type="default" className="justify-start" block size={size} loading>
+          Loading functions...
         </Button>
       )}
 
@@ -93,22 +85,22 @@ const FunctionSelector = ({
           <PopoverTrigger_Shadcn_ asChild>
             <Button
               size={size}
-              type="outline"
+              type="default"
               className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
               iconRight={
-                <IconCode className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
+                <Code className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
               }
               disabled={!!disabled}
             >
-              <div className="w-full flex space-x-3 py-0.5">
-                <p className="text-xs text-foreground-light">function</p>
-                <p className="text-xs">
-                  {selectedFunctionName === '*' ? 'All functions' : selectedFunctionName}
+              <div className="w-full flex gap-1">
+                <p className="text-foreground-lighter">function:</p>
+                <p className="text-foreground">
+                  {selectedFunctionName === '*' ? 'All schemas' : selectedFunctionName}
                 </p>
               </div>
             </Button>
           </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start">
+          <PopoverContent_Shadcn_ className="p-0" side="bottom" align="start" sameWidthAsTrigger>
             <Command_Shadcn_>
               <CommandInput_Shadcn_ placeholder="Search functions..." />
               <CommandList_Shadcn_>
