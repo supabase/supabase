@@ -2679,6 +2679,7 @@ export interface components {
     InviteResponse: {
       organization_name: string
       invite_id: string
+      sso_mismatch: boolean
       token_does_not_exist: boolean
       email_match: boolean
       authorized_user: boolean
