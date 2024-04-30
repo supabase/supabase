@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.163.6
+  version: 1.164.1
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -1280,6 +1280,7 @@ commands:
       - local-dev
     links: []
     subcommands:
+      - supabase-migration-fetch
       - supabase-migration-list
       - supabase-migration-new
       - supabase-migration-repair
@@ -1525,6 +1526,27 @@ commands:
         name: -p, --password <string>
         description: Password to your remote Postgres database.
         default_value: ''
+  - id: supabase-migration-fetch
+    title: supabase migration fetch
+    summary: Fetch migration files from history table
+    tags: []
+    links: []
+    usage: supabase migration fetch [flags]
+    subcommands: []
+    flags:
+      - id: db-url
+        name: --db-url <string>
+        description: |
+          Fetches migrations from the database specified by the connection string (must be percent-encoded).
+        default_value: ''
+      - id: linked
+        name: --linked
+        description: Fetches migration history from the linked project.
+        default_value: 'true'
+      - id: local
+        name: --local
+        description: Fetches migration history from the local database.
+        default_value: 'false'
   - id: supabase-logout
     title: supabase logout
     summary: Log out and delete access tokens locally
