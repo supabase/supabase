@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import { ExternalLink } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
@@ -11,17 +12,16 @@ import {
   SidePanel,
 } from 'ui'
 
-import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
+import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
+import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import { Region, useReadReplicaSetUpMutation } from 'data/read-replicas/replica-setup-mutation'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization, useSelectedProject } from 'hooks'
 import { AWS_REGIONS, AWS_REGIONS_DEFAULT, AWS_REGIONS_KEYS, BASE_PATH } from 'lib/constants'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import { AVAILABLE_REPLICA_REGIONS, AWS_REGIONS_VALUES } from './InstanceConfiguration.constants'
-import { useBackupsQuery } from 'data/database/backups-query'
-import { useEnablePhysicalBackupsMutation } from 'data/database/enable-physical-backups-mutation'
-import { ExternalLink } from 'lucide-react'
 
 // [Joshen] FYI this is purely for AWS only, need to update to support Fly eventually
 
@@ -44,16 +44,17 @@ const DeployNewReplicaPanel = ({
   const [refetchInterval, setRefetchInterval] = useState<number | false>(false)
 
   const { data } = useReadReplicasQuery({ projectRef })
-  const { data: backups } = useBackupsQuery(
-    { projectRef },
+  useProjectDetailQuery(
+    { ref: projectRef },
     {
       refetchInterval,
       refetchOnWindowFocus: false,
       onSuccess: (data) => {
-        if (data.walg_enabled) setRefetchInterval(false)
+        if (data.is_physical_backups_enabled) setRefetchInterval(false)
       },
     }
   )
+
   const { data: addons, isSuccess } = useProjectAddonsQuery({ projectRef })
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: org?.slug })
 
@@ -83,7 +84,7 @@ const DeployNewReplicaPanel = ({
 
   const reachedMaxReplicas = (data ?? []).filter((db) => db.identifier !== projectRef).length >= 2
   const isFreePlan = subscription?.plan.id === 'free'
-  const isWalgEnabled = backups?.walg_enabled
+  const isWalgEnabled = project?.is_physical_backups_enabled
   const currentComputeAddon = addons?.selected_addons.find(
     (addon) => addon.type === 'compute_instance'
   )
