@@ -8,7 +8,7 @@ import { useTocRerenderTrigger } from '~/components/GuidesTableOfContents'
 const TabsWithQueryParams = withQueryParams(TabsPrimitive)
 
 const TabPanel = TabsPrimitive.Panel
-const Tabs = ({ onChange, ...props }: ComponentProps<typeof TabsPrimitive>) => {
+const Tabs = ({ onChange, ...props }: ComponentProps<typeof TabsWithQueryParams>) => {
   const rerenderToc = useTocRerenderTrigger()
   const onChangeInternal = useCallback(
     (...args: Parameters<typeof onChange>) => {
