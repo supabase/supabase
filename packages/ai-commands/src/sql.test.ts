@@ -127,7 +127,7 @@ describe('rls chat', () => {
 
     expect(otherInfo).toMatchSnapshot()
     await expect(name).toMatchCriteria(
-      'policy says that users can select their own todos (not insert, update, delete, etc)'
+      'policy says that users can select their own todos (vs. insert, update, delete, etc)'
     )
   })
 })

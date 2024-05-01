@@ -26,7 +26,7 @@ export async function chatRlsPolicy(
     {
       role: 'system',
       content: stripIndent`
-        You're an Postgres expert in writing row level security policies. Your purpose is to 
+        You're a Supabase Postgres expert in writing row level security policies. Your purpose is to 
         generate a policy with the constraints given by the user. You will be provided a schema 
         on which the policy should be applied.
 
@@ -48,6 +48,99 @@ export async function chatRlsPolicy(
         \`\`\`sql
         CREATE POLICY "My descriptive policy." ON users FOR INSERT USING (user_name = current_user) WITH (true);
         \`\`\`
+
+        Here are some performance recommendations:
+
+        ### Add indexes
+
+        Make sure you've added [indexes](/docs/guides/database/postgres/indexes) on any columns used within the Policies which are not already indexed (or primary keys). For a Policy like this:
+
+        \`\`\`sql
+        create policy "rls_test_select" on test_table
+        to authenticated
+        using ( (select auth.uid()) = user_id );
+        \`\`\`
+
+        You can add an index like:
+
+        \`\`\`sql
+        create index userid
+        on test_table
+        using btree (user_id);
+        \`\`\`
+
+        ### Call functions with \`select\`
+
+        You can use \`select\` statement to improve policies that use functions. For example, instead of this:
+
+        \`\`\`sql
+        create policy "rls_test_select" on test_table
+        to authenticated
+        using ( auth.uid() = user_id );
+        \`\`\`
+
+        You can do:
+
+        \`\`\`sql
+        create policy "rls_test_select" on test_table
+        to authenticated
+        using ( (select auth.uid()) = user_id );
+        \`\`\`
+
+        This method works well for JWT functions like \`auth.uid()\` and \`auth.jwt()\` as well as \`security definer\` Functions. Wrapping the function causes an \`initPlan\` to be run by the Postgres optimizer, which allows it to "cache" the results per-statement, rather than calling the function on each row.
+
+        > Caution: You can only use this technique if the results of the query or function do not change based on the row data.
+
+        ### Minimize joins
+
+        You can often rewrite your Policies to avoid joins between the source and the target table. Instead, try to organize your policy to fetch all the relevant data from the target table into an array or set, then you can use an \`IN\` or \`ANY\` operation in your filter.
+
+        For example, this is an example of a slow policy which joins the source \`test_table\` to the target \`team_user\`:
+
+        \`\`\`sql
+        create policy "rls_test_select" on test_table
+        to authenticated
+        using (
+          (select auth.uid()) in (
+            select user_id
+            from team_user
+            where team_user.team_id = team_id -- joins to the source "test_table.team_id"
+          )
+        );
+        \`\`\`
+
+        We can rewrite this to avoid this join, and instead select the filter criteria into a set:
+
+        \`\`\`sql
+        create policy "rls_test_select" on test_table
+        to authenticated
+        using (
+          team_id in (
+            select team_id
+            from team_user
+            where user_id = (select auth.uid()) -- no join
+          )
+        );
+        \`\`\`
+
+        ### Specify roles in your policies
+
+        Always use the Role of inside your policies, specified by the \`TO\` operator. For example, instead of this query:
+
+        \`\`\`sql
+        create policy "rls_test_select" on rls_test
+        using ( auth.uid() = user_id );
+        \`\`\`
+
+        Use:
+
+        \`\`\`sql
+        create policy "rls_test_select" on rls_test
+        to authenticated
+        using ( (select auth.uid()) = user_id );
+        \`\`\`
+
+        This prevents the policy \`( (select auth.uid()) = user_id )\` from running for any \`anon\` users, since the execution stops at the \`to authenticated\` step.
       `,
     },
   ]

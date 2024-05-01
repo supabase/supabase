@@ -1,0 +1,28 @@
+{
+  "name": "sql-to-rest",
+  "version": "0.0.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "license": "MIT",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@gregnr/libpg-query": "^13.4.0-dev.12"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.23.6",
+    "@babel/preset-env": "^7.23.6",
+    "@jest/globals": "^29.7.0",
+    "@types/common-tags": "^1.8.4",
+    "babel-jest": "^29.7.0",
+    "babel-plugin-transform-import-meta": "^2.2.1",
+    "common-tags": "^1.8.2",
+    "jest": "^29.7.0",
+    "sql-formatter": "^15.0.2",
+    "ts-jest": "^29.1.1",
+    "tsconfig": "*",
+    "typescript": "^5.4.3"
+  }
+}

@@ -42,7 +42,15 @@ exports[`rls chat select policy using table definition 1`] = `
 {
   "checkExpression": undefined,
   "command": "select",
+  "roles": [
+    "authenticated",
+  ],
   "table": "todos",
-  "usingExpression": "user_id = auth.uid ()",
+  "usingExpression": "
+  user_id = (
+    select
+      auth.uid ()
+  )
+",
 }
 `;
