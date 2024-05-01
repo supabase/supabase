@@ -213,7 +213,11 @@ const Connect = () => {
                       <ConnectDropdown
                         state={selectedParent}
                         updateState={handleParentChange}
-                        label={connectionObject === FRAMEWORKS || connectionObject === MOBILES ? 'Framework' : 'Tool'}
+                        label={
+                          connectionObject === FRAMEWORKS || connectionObject === MOBILES
+                            ? 'Framework'
+                            : 'Tool'
+                        }
                         items={connectionObject}
                       />
                       {selectedParent && hasChildOptions && (
