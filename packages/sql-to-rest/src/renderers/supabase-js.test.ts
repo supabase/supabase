@@ -1,7 +1,7 @@
 import { describe, expect, test } from '@jest/globals'
-import { stripIndents } from 'common-tags'
+import { stripIndent, stripIndents } from 'common-tags'
 import { processSql } from '../processor'
-import { renderHttp } from './http'
+import { renderSupabaseJs } from './supabase-js'
 
 describe('select', () => {
   test('specified columns', async () => {
@@ -14,10 +14,13 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe('/books?select=title,description')
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select('title, description')
+    `)
   })
 
   test('inline target expression fails', async () => {
@@ -48,10 +51,13 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe('/books?select=my_title:title')
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select('my_title:title')
+    `)
   })
 
   test('equal', async () => {
@@ -65,10 +71,14 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe('/books?title=eq.Cheese')
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .eq('title', 'Cheese')
+    `)
   })
 
   test('not equal', async () => {
@@ -80,12 +90,15 @@ describe('select', () => {
       where
         title != 'Cheese'
     `
-
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe('/books?title=neq.Cheese')
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .neq('title', 'Cheese')
+    `)
   })
 
   test('not wrapped equal', async () => {
@@ -101,10 +114,14 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe('/books?title=not.eq.Cheese')
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .not('title', 'eq', 'Cheese')
+    `)
   })
 
   test('null', async () => {
@@ -118,10 +135,14 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe('/books?title=is.null')
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .is('title', null)
+    `)
   })
 
   test('not null', async () => {
@@ -135,10 +156,14 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe('/books?title=not.is.null')
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .not('title', 'is', null)
+    `)
   })
 
   test('greater than', async () => {
@@ -152,10 +177,14 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe('/books?pages=gt.10')
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .gt('pages', 10)
+    `)
   })
 
   test('greater than or equal', async () => {
@@ -169,10 +198,14 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe('/books?pages=gte.10')
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .gte('pages', 10)
+    `)
   })
 
   test('less than', async () => {
@@ -186,10 +219,14 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe('/books?pages=lt.10')
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .lt('pages', 10)
+    `)
   })
 
   test('less than or equal', async () => {
@@ -203,10 +240,14 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe('/books?pages=lte.10')
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .lte('pages', 10)
+    `)
   })
 
   test('"and" expression', async () => {
@@ -221,10 +262,15 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe('/books?title=eq.Cheese&description=ilike.*salsa*')
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .eq('title', 'Cheese')
+        .ilike('description', '%salsa%')
+    `)
   })
 
   test('"or" expression', async () => {
@@ -239,10 +285,14 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe('/books?or=(title.eq.Cheese,title.eq.Salsa)')
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .or('title.eq.Cheese, title.eq.Salsa')
+    `)
   })
 
   test('negated "and" expression', async () => {
@@ -259,10 +309,14 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe('/books?not.and=(title.eq.Cheese,description.ilike.*salsa*)')
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .or('not.and(title.eq.Cheese, description.ilike.%salsa%)')
+    `)
   })
 
   test('negated "or" expression', async () => {
@@ -279,10 +333,14 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe('/books?not.or=(title.eq.Cheese,title.eq.Salsa)')
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .or('not.or(title.eq.Cheese, title.eq.Salsa)')
+    `)
   })
 
   test('"and" expression with nested "or"', async () => {
@@ -300,12 +358,15 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe(
-      '/books?title=like.T*&or=(description.ilike.*tacos*,description.ilike.*salsa*)'
-    )
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .like('title', 'T%')
+        .or('description.ilike.%tacos%, description.ilike.%salsa%')
+    `)
   })
 
   test('negated "and" expression with nested "or"', async () => {
@@ -325,12 +386,14 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe(
-      '/books?not.and=(title.like.T*,or(description.ilike.*tacos*,description.ilike.*salsa*))'
-    )
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .or('not.and(title.like.T%, or(description.ilike.%tacos%, description.ilike.%salsa%))')
+    `)
   })
 
   test('negated "and" expression with negated nested "or"', async () => {
@@ -350,12 +413,14 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe(
-      '/books?not.and=(title.like.T*,not.or(description.ilike.*tacos*,description.ilike.*salsa*))'
-    )
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .or('not.and(title.like.T%, not.or(description.ilike.%tacos%, description.ilike.%salsa%))')
+    `)
   })
 
   test('order of operations', async () => {
@@ -371,11 +436,13 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { code } = renderSupabaseJs(statement)
 
-    expect(method).toBe('GET')
-    expect(path).toBe(
-      '/books?or=(and(title.like.T*,description.ilike.*tacos*),description.ilike.*salsa*)'
-    )
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .or('and(title.like.T%, description.ilike.%tacos%), description.ilike.%salsa%')
+    `)
   })
 })

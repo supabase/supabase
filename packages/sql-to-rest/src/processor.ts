@@ -23,12 +23,66 @@ export type BaseFilter = {
   negate: boolean
 }
 
-export type ColumnFilter = BaseFilter & {
+export type BaseColumnFilter = BaseFilter & {
   type: 'column'
   column: string
-  operator: Operator
+}
+
+export type EqColumnFilter = BaseColumnFilter & {
+  operator: 'eq'
+  value: string | number
+}
+
+export type NeqColumnFilter = BaseColumnFilter & {
+  operator: 'neq'
+  value: string | number
+}
+
+export type GtColumnFilter = BaseColumnFilter & {
+  operator: 'gt'
+  value: number
+}
+
+export type GteColumnFilter = BaseColumnFilter & {
+  operator: 'gte'
+  value: number
+}
+
+export type LtColumnFilter = BaseColumnFilter & {
+  operator: 'lt'
+  value: number
+}
+
+export type LteColumnFilter = BaseColumnFilter & {
+  operator: 'lte'
+  value: number
+}
+
+export type LikeColumnFilter = BaseColumnFilter & {
+  operator: 'like'
   value: string
 }
+
+export type IlikeColumnFilter = BaseColumnFilter & {
+  operator: 'ilike'
+  value: string
+}
+
+export type IsColumnFilter = BaseColumnFilter & {
+  operator: 'is'
+  value: null
+}
+
+export type ColumnFilter =
+  | EqColumnFilter
+  | NeqColumnFilter
+  | GtColumnFilter
+  | GteColumnFilter
+  | LtColumnFilter
+  | LteColumnFilter
+  | LikeColumnFilter
+  | IlikeColumnFilter
+  | IsColumnFilter
 
 export type LogicalFilter = BaseFilter & {
   type: 'logical'
@@ -176,19 +230,15 @@ function processWhereClause(expression: WhereClauseExpression): Filter {
     const operator = mapOperatorSymbol(operatorSymbol)
 
     const column = field.String.str
-    let value: string
+    let value: any
 
     if ('String' in expression.A_Expr.rexpr.A_Const.val) {
       value = expression.A_Expr.rexpr.A_Const.val.String.str
     } else if ('Integer' in expression.A_Expr.rexpr.A_Const.val) {
-      value = expression.A_Expr.rexpr.A_Const.val.Integer.ival.toString()
+      value = expression.A_Expr.rexpr.A_Const.val.Integer.ival
     } else {
       const [valType] = Object.keys(expression.A_Expr.rexpr.A_Const.val)
       throw new Error(`WHERE clause values must be String or Integer types, received '${valType}'`)
-    }
-
-    if (operator === 'like' || operator === 'ilike') {
-      value = value.replaceAll('%', '*')
     }
 
     return {
@@ -216,7 +266,7 @@ function processWhereClause(expression: WhereClauseExpression): Filter {
 
     const negate = expression.NullTest.nulltesttype === 'IS_NOT_NULL'
     const operator = 'is'
-    const value = 'null'
+    const value = null
 
     return {
       type: 'column',
