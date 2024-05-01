@@ -1,5 +1,12 @@
 import * as TabsPrimitive from '@radix-ui/react-tabs'
-import { Children, useMemo, useState, type KeyboardEvent, type PropsWithChildren } from 'react'
+import {
+  Children,
+  useMemo,
+  useState,
+  type KeyboardEvent,
+  type PropsWithChildren,
+  type RefObject,
+} from 'react'
 import styleHandler from '../../lib/theme/styleHandler'
 import { useSticky } from './Tabs.utils'
 
@@ -17,9 +24,12 @@ export interface TabsProps {
   wrappable?: boolean
   addOnBefore?: React.ReactNode
   addOnAfter?: React.ReactNode
-  stickyTabList?: { style?: CSSStyleDeclaration }
   listClassNames?: string
   baseClassNames?: string
+  refs?: {
+    base: RefObject<HTMLDivElement> | ((elem: HTMLDivElement | null) => void)
+    list: RefObject<HTMLDivElement> | ((elem: HTMLDivElement | null) => void)
+  }
 }
 
 interface TabsSubComponents {
@@ -38,9 +48,9 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   wrappable,
   addOnBefore,
   addOnAfter,
-  stickyTabList,
   listClassNames,
   baseClassNames,
+  refs,
   children: _children,
 }) => {
   const children = Children.toArray(_children) as PanelPropsProps[]
@@ -52,11 +62,6 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
       children?.[0]?.props?.id
   )
 
-  const { inView, observedRef, stickyRef } = useSticky<HTMLDivElement>({
-    enabled: !!stickyTabList,
-    ...stickyTabList,
-  })
-
   useMemo(() => {
     if (activeId && activeId !== activeTab) setActiveTab(activeId)
   }, [activeId])
@@ -64,23 +69,6 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
   let __styles = styleHandler('tabs')
 
   function onTabClick(id: string) {
-    if (stickyTabList && inView && stickyRef.current) {
-      let elem = stickyRef.current as Element | null
-      while (elem && !elem.matches('[role="tabpanel"][data-state="active"]')) {
-        elem = elem.nextElementSibling
-      }
-      if (!elem) return
-
-      const top = elem.getBoundingClientRect().top
-      ;(elem as HTMLElement).style.scrollMarginTop = 'calc(var(--header-height)*3)'
-      if (top < 0)
-        elem.scrollIntoView({
-          behavior: window.matchMedia('(prefers-reduced-motion: no-preference)').matches
-            ? 'smooth'
-            : 'instant',
-        })
-    }
-
     onClick?.(id)
     if (id !== activeTab) {
       onChange?.(id)
@@ -97,9 +85,9 @@ const Tabs: React.FC<PropsWithChildren<TabsProps>> & TabsSubComponents = ({
     <TabsPrimitive.Root
       value={activeTab}
       className={[__styles.base, baseClassNames].join(' ')}
-      ref={observedRef}
+      ref={refs?.base}
     >
-      <TabsPrimitive.List className={listClasses.join(' ')} ref={stickyRef}>
+      <TabsPrimitive.List className={listClasses.join(' ')} ref={refs?.list}>
         {addOnBefore}
         {children.map((tab) => {
           const isActive = activeTab === tab.props.id
