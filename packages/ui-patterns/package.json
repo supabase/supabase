@@ -27,7 +27,8 @@
     "remark-gfm": "^4.0.0",
     "sql-formatter": "^15.3.1",
     "tsconfig": "*",
-    "ui": "*"
+    "ui": "*",
+	"valtio": "*"
   },
   "devDependencies": {
     "@types/common-tags": "^1.8.4",
