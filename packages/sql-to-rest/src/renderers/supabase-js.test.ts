@@ -445,4 +445,63 @@ describe('select', () => {
         .or('and(title.like.T%, description.ilike.%tacos%), description.ilike.%salsa%')
     `)
   })
+
+  test('limit', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      limit
+        5
+    `
+
+    const statement = await processSql(sql)
+    const { code } = renderSupabaseJs(statement)
+
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .limit(5)
+    `)
+  })
+
+  test('offset without limit fails', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      offset
+        10
+    `
+
+    const statement = await processSql(sql)
+
+    expect(() => renderSupabaseJs(statement)).toThrowError()
+  })
+
+  test('limit and offset', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      limit
+        5
+      offset
+        10
+    `
+
+    const statement = await processSql(sql)
+    const { code } = renderSupabaseJs(statement)
+
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .range(10, 15)
+    `)
+  })
 })

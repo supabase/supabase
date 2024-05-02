@@ -1,5 +1,6 @@
 import { parseQuery } from 'libpg-query'
 import {
+  A_Const,
   ParsedQuery,
   SelectResTarget,
   SelectStmt,
@@ -14,9 +15,14 @@ export type Select = {
   from: string
   targets: Target[]
   filter?: Filter
+  limit?: Limit
 }
 
-export type Operator = 'eq' | 'neq' | 'gt' | 'gte' | 'lt' | 'lte' | 'like' | 'ilike' | 'is'
+export type Limit = {
+  count?: number
+  offset?: number
+}
+
 export type LogicalOperator = 'and' | 'or'
 
 export type BaseFilter = {
@@ -163,11 +169,14 @@ function processSelectStmt(stmt: SelectStmt): Select {
     ? processWhereClause(stmt.SelectStmt.whereClause)
     : undefined
 
+  const limit = processLimit(stmt)
+
   return {
     type: 'select',
     from,
     targets,
     filter,
+    limit,
   }
 }
 
@@ -315,6 +324,36 @@ function processWhereClause(expression: WhereClauseExpression): Filter {
   } else {
     const [expressionType] = Object.keys(expression)
     throw new Error(`Unknown WHERE clause expression '${expressionType}'`)
+  }
+}
+
+function processLimit(selectStmt: SelectStmt): Limit | undefined {
+  let count: number | undefined = undefined
+  let offset: number | undefined = undefined
+
+  if (selectStmt.SelectStmt.limitCount) {
+    if (!('ival' in selectStmt.SelectStmt.limitCount.A_Const)) {
+      throw new Error(`Limit count expected to be an integer`)
+    }
+
+    count = selectStmt.SelectStmt.limitCount.A_Const.ival.ival
+  }
+
+  if (selectStmt.SelectStmt.limitOffset) {
+    if (!('ival' in selectStmt.SelectStmt.limitOffset.A_Const)) {
+      throw new Error(`Limit offset expected to be an integer`)
+    }
+
+    offset = selectStmt.SelectStmt.limitOffset.A_Const.ival.ival
+  }
+
+  if (count === undefined && offset === undefined) {
+    return undefined
+  }
+
+  return {
+    count,
+    offset,
   }
 }
 

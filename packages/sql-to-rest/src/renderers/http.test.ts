@@ -395,4 +395,57 @@ describe('select', () => {
       '/books?or=(and(title.like.T*,description.ilike.*tacos*),description.ilike.*salsa*)'
     )
   })
+
+  test('limit', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      limit
+        5
+    `
+
+    const statement = await processSql(sql)
+    const { method, path } = renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(path).toBe('/books?limit=5')
+  })
+
+  test('offset', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      offset
+        10
+    `
+
+    const statement = await processSql(sql)
+    const { method, path } = renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(path).toBe('/books?offset=10')
+  })
+
+  test('limit and offset', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      limit
+        5
+      offset
+        10
+    `
+
+    const statement = await processSql(sql)
+    const { method, path } = renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(path).toBe('/books?limit=5&offset=10')
+  })
 })

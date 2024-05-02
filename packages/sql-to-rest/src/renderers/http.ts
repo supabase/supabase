@@ -18,7 +18,7 @@ export function renderHttp(processed: Statement): HttpRequest {
 }
 
 function formatSelect(select: Select): HttpRequest {
-  const { from, targets, filter } = select
+  const { from, targets, filter, limit } = select
   const params = new URLSearchParams()
 
   if (targets.length > 0) {
@@ -42,6 +42,15 @@ function formatSelect(select: Select): HttpRequest {
 
   if (filter) {
     formatSelectFilterRoot(params, filter)
+  }
+
+  if (limit) {
+    if (limit.count !== undefined) {
+      params.set('limit', limit.count.toString())
+    }
+    if (limit.offset !== undefined) {
+      params.set('offset', limit.offset.toString())
+    }
   }
 
   let path = `/${from}`

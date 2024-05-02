@@ -158,6 +158,8 @@ export type SelectStmt = {
     groupDistinct?: boolean
     havingClause?: any[]
     limitOption: string
+    limitCount?: A_Const
+    limitOffset?: A_Const
     op: string
   }
 }

@@ -17,7 +17,7 @@ export function renderSupabaseJs(processed: Statement): SupabaseJsQuery {
 }
 
 function formatSelect(select: Select): SupabaseJsQuery {
-  const { from, targets, filter } = select
+  const { from, targets, filter, limit } = select
   const lines = ['const { data, error } = await supabase', `.from('${from}')`]
 
   if (targets.length > 0) {
@@ -40,6 +40,16 @@ function formatSelect(select: Select): SupabaseJsQuery {
 
   if (filter) {
     formatSelectFilterRoot(lines, filter)
+  }
+
+  if (limit) {
+    if (limit.count !== undefined && limit.offset === undefined) {
+      lines.push(`.limit(${limit.count})`)
+    } else if (limit.count === undefined && limit.offset !== undefined) {
+      throw new Error(`supabase-js doesn't support an offset without a limit`)
+    } else if (limit.count !== undefined && limit.offset !== undefined) {
+      lines.push(`.range(${limit.offset}, ${limit.offset + limit.count})`)
+    }
   }
 
   // Join lines together and indent
