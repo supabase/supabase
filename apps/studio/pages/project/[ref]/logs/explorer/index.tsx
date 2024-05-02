@@ -221,17 +221,15 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         <ResizableHandle withHandle />
         <ResizablePanel collapsible minSize={5} className="flex flex-col flex-grow">
           <LoadingOpacity active={isLoading}>
-            <div className="flex flex-grow">
-              <LogTable
-                onRun={handleRun}
-                onSave={handleOnSave}
-                hasEditorValue={Boolean(editorValue)}
-                params={params}
-                data={logData}
-                error={error}
-                projectRef={projectRef as string}
-              />
-            </div>
+            <LogTable
+              onRun={handleRun}
+              onSave={handleOnSave}
+              hasEditorValue={Boolean(editorValue)}
+              params={params}
+              data={logData}
+              error={error}
+              projectRef={projectRef as string}
+            />
           </LoadingOpacity>
           <div className="flex flex-row justify-end mt-2">
             <UpgradePrompt show={showUpgradePrompt} setShowUpgradePrompt={setShowUpgradePrompt} />
