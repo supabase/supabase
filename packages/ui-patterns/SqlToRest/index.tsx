@@ -21,15 +21,15 @@ export default function SqlToRest() {
   const [errorMessage, setErrorMessage] = useState<string>()
 
   const monaco = useMonaco()
-  const { resolvedTheme } = useTheme()
-  const isDark = resolvedTheme?.includes('dark') ?? false
+  const { theme } = useTheme()
+  const isDark = theme?.includes('dark') ?? false
 
   useLayoutEffect(() => {
-    if (monaco && resolvedTheme) {
-      const mode = getTheme(resolvedTheme)
+    if (monaco && theme) {
+      const mode = getTheme(theme)
       monaco.editor.defineTheme('supabase', mode)
     }
-  }, [resolvedTheme, monaco])
+  }, [theme, monaco])
 
   const process = useCallback(async (sql: string) => {
     setSql(sql)
