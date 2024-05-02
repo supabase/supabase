@@ -36,7 +36,7 @@ const SqlEditor: NextPageWithLayout = () => {
 
   useContentIdQuery(
     { projectRef: ref, id },
-    { enabled: enableFolders, onSuccess: (data) => console.log(data) }
+    { enabled: enableFolders && id !== 'new', onSuccess: (data) => console.log(data) }
   )
 
   const [intellisenseEnabled] = useLocalStorageQuery(
