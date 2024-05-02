@@ -7,12 +7,20 @@ import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { Statement, processSql, renderHttp, renderSupabaseJs } from 'sql-to-rest'
 import { CodeBlock, Collapsible, Tabs, cn } from 'ui'
 
-const defaultValue = `select
-  *
-from
-  books
-where
-  title = 'Cheese'
+const defaultValue = stripIndent`
+  select
+    title as "myTitle",
+    description
+  from
+    books
+  where
+    description ilike '%cheese%'
+  order by
+    title desc
+  limit
+    5
+  offset
+    10
 `
 
 type Faq = {
@@ -81,8 +89,8 @@ export default function SqlToRest() {
   }, [process])
 
   return (
-    <div className="flex justify-between gap-4 mt-4">
-      <div className="flex-1 flex flex-col gap-4">
+    <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4 mt-4">
+      <div className="flex flex-col gap-4">
         <div>Enter SQL to convert:</div>
         <div
           className={cn('h-96 py-4 border rounded-md', isDark ? 'bg-[#1f1f1f]' : 'bg-[#f0f0f0]')}
@@ -108,7 +116,7 @@ export default function SqlToRest() {
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col gap-4">
+      <div className="flex flex-col gap-4">
         <Tabs defaultActiveId="http" queryGroup="language">
           <Tabs.Panel id="http" label="HTTP" className="flex flex-col gap-4">
             <CodeBlock language="bash" hideLineNumbers className="self-stretch">
