@@ -38,7 +38,7 @@ export const LockedCreateQuerySection = ({
             Use options above to edit
           </p>
         </div>
-        <Button
+        {/* <Button
           type="default"
           onClick={() => {
             const query = isEditing
@@ -72,7 +72,7 @@ export const LockedCreateQuerySection = ({
           }}
         >
           Open in SQL Editor
-        </Button>
+        </Button> */}
       </div>
       <div className="flex items-start" style={{ fontSize: '14px' }}>
         <p className="px-6 font-mono text-sm text-foreground-light select-none">1</p>
