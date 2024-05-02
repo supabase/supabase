@@ -29,6 +29,17 @@ function useTable(id?: number) {
     }
   )
 
+  const partitionTableResult = useTableQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      id: entity?.id,
+    },
+    {
+      enabled: entity?.type === ENTITY_TYPE.PARTITIONED_TABLE,
+    }
+  )
+
   const viewResult = useViewQuery(
     {
       projectRef: project?.ref,
@@ -65,6 +76,8 @@ function useTable(id?: number) {
   switch (entity?.type) {
     case ENTITY_TYPE.TABLE:
       return tableResult
+    case ENTITY_TYPE.PARTITIONED_TABLE:
+      return partitionTableResult
     case ENTITY_TYPE.VIEW:
       return viewResult
     case ENTITY_TYPE.MATERIALIZED_VIEW:
