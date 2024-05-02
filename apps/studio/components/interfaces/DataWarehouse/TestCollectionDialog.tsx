@@ -1,5 +1,5 @@
 import { SelectContent, SelectItem, SelectTrigger, Select } from '@ui/components/shadcn/ui/select'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button, CodeBlock, Dialog, DialogContent, DialogTrigger, Input } from 'ui'
 
 export function TestCollectionDialog({
@@ -14,6 +14,18 @@ export function TestCollectionDialog({
   collectionToken: string
 }) {
   const [testAccessToken, setTestAccessToken] = useState('')
+
+  useEffect(() => {
+    if (accessTokens.length > 0) {
+      setTestAccessToken(accessTokens[0].token)
+    }
+  }, [])
+
+  if (accessTokens.length === 0) {
+    return <></>
+  }
+
+  const selectedAccessToken = accessTokens.find((token) => token.token === testAccessToken)
 
   return (
     <Dialog>
@@ -30,7 +42,7 @@ export function TestCollectionDialog({
         <Select value={testAccessToken} onValueChange={setTestAccessToken}>
           <SelectTrigger>
             <span className="text-ellipsis">
-              {testAccessToken.slice(0, 8) + '...' || 'Access token'}
+              {selectedAccessToken?.description || 'Access token'}
             </span>
           </SelectTrigger>
           <SelectContent>
