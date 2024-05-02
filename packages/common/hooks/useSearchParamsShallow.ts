@@ -32,6 +32,8 @@ const useSearchParamsShallow = () => {
     [id]
   )
 
+  useEffect(() => () => clearTimeout(timeoutHandle.current), [])
+
   const [localParams, setLocalParams] = useReducer(reducer, undefined, () => new URLSearchParams())
 
   useEffect(() => {
