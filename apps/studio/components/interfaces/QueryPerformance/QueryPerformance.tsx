@@ -113,7 +113,7 @@ export const QueryPerformance = ({
 
   useEffect(() => {
     state.setSelectedDatabaseId(ref)
-  }, [])
+  }, [ref])
 
   return (
     <>
