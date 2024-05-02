@@ -1,6 +1,6 @@
 export type String = {
   String: {
-    str: string
+    sval: string
   }
 }
 
@@ -15,10 +15,23 @@ export type A_Star = {
 }
 
 export type A_Const = {
-  A_Const: {
-    val: String | Integer
-    location: number
-  }
+  A_Const: { location: number } & (
+    | {
+        sval: {
+          sval: string
+        }
+      }
+    | {
+        ival: {
+          ival: number
+        }
+      }
+    | {
+        fval: {
+          fval: string
+        }
+      }
+  )
 }
 
 /**

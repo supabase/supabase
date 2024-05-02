@@ -11,6 +11,7 @@
   "compilerOptions": {
     "types": [
       "./test/extensions.d.ts"
-    ]
+    ],
+    "moduleResolution": "bundler"
   }
 }

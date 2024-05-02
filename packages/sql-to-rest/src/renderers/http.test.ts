@@ -141,6 +141,23 @@ describe('select', () => {
     expect(path).toBe('/books?title=not.is.null')
   })
 
+  test('float type', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      where
+        pages > 10.1
+    `
+
+    const statement = await processSql(sql)
+    const { method, path } = renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(path).toBe('/books?pages=gt.10.1')
+  })
+
   test('greater than', async () => {
     const sql = stripIndents`
       select

@@ -1,11 +1,11 @@
-import { parseQuery } from '@gregnr/libpg-query'
+import { parseQuery } from 'libpg-query'
 import {
   ParsedQuery,
   SelectResTarget,
   SelectStmt,
   Stmt,
   WhereClauseExpression,
-} from './types/pg-query'
+} from './types/libpg-query'
 
 export type Statement = Select
 
@@ -190,7 +190,7 @@ function processTargetList(targetList: SelectResTarget[]): Target[] {
     if ('A_Star' in field) {
       column = '*'
     } else if ('String' in field) {
-      column = field.String.str
+      column = field.String.sval
     } else {
       const [fieldType] = Object.keys(field)
       throw new Error(`Unsupported ColumnRef field type '${fieldType}'`)
@@ -226,19 +226,22 @@ function processWhereClause(expression: WhereClauseExpression): Filter {
     }
 
     const [name] = expression.A_Expr.name
-    const operatorSymbol = name.String.str
+    const operatorSymbol = name.String.sval
     const operator = mapOperatorSymbol(operatorSymbol)
 
-    const column = field.String.str
+    const column = field.String.sval
     let value: any
 
-    if ('String' in expression.A_Expr.rexpr.A_Const.val) {
-      value = expression.A_Expr.rexpr.A_Const.val.String.str
-    } else if ('Integer' in expression.A_Expr.rexpr.A_Const.val) {
-      value = expression.A_Expr.rexpr.A_Const.val.Integer.ival
+    if ('sval' in expression.A_Expr.rexpr.A_Const) {
+      value = expression.A_Expr.rexpr.A_Const.sval.sval
+    } else if ('ival' in expression.A_Expr.rexpr.A_Const) {
+      value = expression.A_Expr.rexpr.A_Const.ival.ival
+    } else if ('fval' in expression.A_Expr.rexpr.A_Const) {
+      value = parseFloat(expression.A_Expr.rexpr.A_Const.fval.fval)
     } else {
-      const [valType] = Object.keys(expression.A_Expr.rexpr.A_Const.val)
-      throw new Error(`WHERE clause values must be String or Integer types, received '${valType}'`)
+      throw new Error(
+        `WHERE clause values must be a string (sval), integer (ival), or float (fval)`
+      )
     }
 
     return {
@@ -262,7 +265,7 @@ function processWhereClause(expression: WhereClauseExpression): Filter {
       throw new Error(`WHERE clause fields must be String type, received '${fieldType}'`)
     }
 
-    const column = field.String.str
+    const column = field.String.sval
 
     const negate = expression.NullTest.nulltesttype === 'IS_NOT_NULL'
     const operator = 'is'

@@ -9,7 +9,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "@gregnr/libpg-query": "^13.4.0-dev.12"
+    "libpg-query": "^15.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.23.6",
