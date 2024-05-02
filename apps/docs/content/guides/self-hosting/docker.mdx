@@ -20,12 +20,11 @@ Follow these steps to start Supabase locally:
 ```sh
 # Get the code
 git clone --filter=blob:none --no-checkout https://github.com/supabase/supabase
-pushd supabase && git sparse-checkout set --cone docker
-git checkout master
-popd
+cd supabase
+git sparse-checkout set --cone docker && git checkout master
 
 # Go to the docker folder
-cd supabase/docker
+cd docker
 
 # Copy the fake env vars
 cp .env.example .env
