@@ -11,6 +11,7 @@
     "@monaco-editor/react": "^4.6.0",
     "cmdk": "^0.2.1",
     "common": "*",
+    "common-tags": "^1.8.2",
     "lodash": "*",
     "lucide-react": "*",
     "monaco-editor": "*",
@@ -24,6 +25,7 @@
     "ui": "*"
   },
   "devDependencies": {
+    "@types/common-tags": "^1.8.4",
     "api-types": "*"
   },
   "peerDependencies": {

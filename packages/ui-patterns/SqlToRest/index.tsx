@@ -1,9 +1,11 @@
 import Editor, { useMonaco } from '@monaco-editor/react'
+import { stripIndent } from 'common-tags'
+import { ChevronUp } from 'lucide-react'
 import type { editor } from 'monaco-editor'
 import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
-import { processSql, renderHttp, renderSupabaseJs } from 'sql-to-rest'
-import { CodeBlock, Tabs, cn } from 'ui'
+import { Statement, processSql, renderHttp, renderSupabaseJs } from 'sql-to-rest'
+import { CodeBlock, Collapsible, Tabs, cn } from 'ui'
 
 const defaultValue = `select
   *
@@ -13,12 +15,29 @@ where
   title = 'Cheese'
 `
 
+type Faq = {
+  condition: (statement: Statement) => boolean
+  question: string
+  answer: string
+}
+
+const faqs: Faq[] = [
+  {
+    condition: (statement: Statement) => statement.targets.some((target) => target.alias),
+    question: 'Why is my alias lower case?',
+    answer: stripIndent`
+      Postgres converts all identifiers to lowercase by default. To keep casing, wrap your alias in double quotes.
+    `,
+  },
+]
+
 export default function SqlToRest() {
   const [sql, setSql] = useState(defaultValue)
   const [httpRequest, setHttpRequest] = useState('')
   const [curlRequest, setCurlRequest] = useState('')
   const [jsCode, setJsCode] = useState('')
   const [errorMessage, setErrorMessage] = useState<string>()
+  const [relevantFaqs, setRelevantFaqs] = useState<Faq[]>([])
 
   const monaco = useMonaco()
   const { theme } = useTheme()
@@ -45,6 +64,7 @@ export default function SqlToRest() {
       setHttpRequest(`${method} ${path}`)
       setCurlRequest(`curl -X ${method} ${path}`)
       setJsCode(code)
+      setRelevantFaqs(faqs.filter((faq) => faq.condition(statement)))
     } catch (error) {
       if (!(error instanceof Error)) {
         console.error(error)
@@ -88,7 +108,7 @@ export default function SqlToRest() {
         </div>
       </div>
 
-      <div className="flex-1 flex-col gap-2">
+      <div className="flex-1 flex flex-col gap-4">
         <Tabs defaultActiveId="http" queryGroup="language">
           <Tabs.Panel id="http" label="HTTP" className="flex flex-col gap-4">
             <CodeBlock language="bash" hideLineNumbers className="self-stretch">
@@ -107,6 +127,22 @@ export default function SqlToRest() {
           </Tabs.Panel>
         </Tabs>
         {errorMessage && <div className="text-red-900">{errorMessage}</div>}
+
+        {relevantFaqs.map((faq) => (
+          <Collapsible className="flex flex-col items-stretch justify-start bg-surface-100 rounded border border-default px-4">
+            <Collapsible.Trigger asChild>
+              <button type="button" className="flex justify-between items-center p-3">
+                <span className="text-sm">{faq.question}</span>
+                <ChevronUp className="transition data-open-parent:rotate-0 data-closed-parent:rotate-180" />
+              </button>
+            </Collapsible.Trigger>
+            <Collapsible.Content>
+              <div className="text-foreground flex flex-col justify-start items-center px-3 pb-4">
+                <p className="text-sm m-0">{faq.answer}</p>
+              </div>
+            </Collapsible.Content>
+          </Collapsible>
+        ))}
       </div>
     </div>
   )
