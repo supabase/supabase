@@ -14,7 +14,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
@@ -51,7 +51,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
@@ -71,7 +71,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
@@ -91,7 +91,7 @@ describe('select', () => {
         title != 'Cheese'
     `
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
@@ -114,7 +114,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
@@ -135,7 +135,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
@@ -156,7 +156,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
@@ -177,7 +177,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
@@ -198,7 +198,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
@@ -219,7 +219,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
@@ -240,7 +240,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
@@ -262,7 +262,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
@@ -285,7 +285,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
@@ -309,13 +309,15 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
         .from('books')
         .select()
-        .or('not.and(title.eq.Cheese, description.ilike.%salsa%)')
+        .or(
+          'not.and(title.eq.Cheese, description.ilike.%salsa%)',
+        )
     `)
   })
 
@@ -333,13 +335,15 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
         .from('books')
         .select()
-        .or('not.or(title.eq.Cheese, title.eq.Salsa)')
+        .or(
+          'not.or(title.eq.Cheese, title.eq.Salsa)',
+        )
     `)
   })
 
@@ -358,14 +362,16 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
         .from('books')
         .select()
         .like('title', 'T%')
-        .or('description.ilike.%tacos%, description.ilike.%salsa%')
+        .or(
+          'description.ilike.%tacos%, description.ilike.%salsa%',
+        )
     `)
   })
 
@@ -386,13 +392,15 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
         .from('books')
         .select()
-        .or('not.and(title.like.T%, or(description.ilike.%tacos%, description.ilike.%salsa%))')
+        .or(
+          'not.and(title.like.T%, or(description.ilike.%tacos%, description.ilike.%salsa%))',
+        )
     `)
   })
 
@@ -413,13 +421,15 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
         .from('books')
         .select()
-        .or('not.and(title.like.T%, not.or(description.ilike.%tacos%, description.ilike.%salsa%))')
+        .or(
+          'not.and(title.like.T%, not.or(description.ilike.%tacos%, description.ilike.%salsa%))',
+        )
     `)
   })
 
@@ -436,13 +446,15 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
         .from('books')
         .select()
-        .or('and(title.like.T%, description.ilike.%tacos%), description.ilike.%salsa%')
+        .or(
+          'and(title.like.T%, description.ilike.%tacos%), description.ilike.%salsa%',
+        )
     `)
   })
 
@@ -457,7 +469,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
@@ -479,7 +491,7 @@ describe('select', () => {
 
     const statement = await processSql(sql)
 
-    expect(() => renderSupabaseJs(statement)).toThrowError()
+    expect(renderSupabaseJs(statement)).rejects.toThrowError()
   })
 
   test('limit and offset', async () => {
@@ -495,13 +507,165 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { code } = renderSupabaseJs(statement)
+    const { code } = await renderSupabaseJs(statement)
 
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
         .from('books')
         .select()
         .range(10, 15)
+    `)
+  })
+
+  test('order by', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      order by
+        title
+    `
+
+    const statement = await processSql(sql)
+    const { code } = await renderSupabaseJs(statement)
+
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .order('title')
+    `)
+  })
+
+  test('order by multiple columns', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      order by
+        title,
+        description
+    `
+
+    const statement = await processSql(sql)
+    const { code } = await renderSupabaseJs(statement)
+
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .order('title')
+        .order('description')
+    `)
+  })
+
+  test('order by asc', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      order by
+        title asc
+    `
+
+    const statement = await processSql(sql)
+    const { code } = await renderSupabaseJs(statement)
+
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .order('title', { ascending: true })
+    `)
+  })
+
+  test('order by desc', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      order by
+        title desc
+    `
+
+    const statement = await processSql(sql)
+    const { code } = await renderSupabaseJs(statement)
+
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .order('title', { ascending: false })
+    `)
+  })
+
+  test('order by nulls first', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      order by
+        title nulls first
+    `
+
+    const statement = await processSql(sql)
+    const { code } = await renderSupabaseJs(statement)
+
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .order('title', { nullsFirst: true })
+    `)
+  })
+
+  test('order by nulls last', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      order by
+        title nulls last
+    `
+
+    const statement = await processSql(sql)
+    const { code } = await renderSupabaseJs(statement)
+
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .order('title', { nullsFirst: false })
+    `)
+  })
+
+  test('order by desc nulls last', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      order by
+        title desc nulls last
+    `
+
+    const statement = await processSql(sql)
+    const { code } = await renderSupabaseJs(statement)
+
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .order('title', {
+          ascending: false,
+          nullsFirst: false,
+        })
     `)
   })
 })

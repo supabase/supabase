@@ -36,8 +36,8 @@ export default function SqlToRest() {
 
     try {
       const statement = await processSql(sql)
-      const { method, path } = renderHttp(statement)
-      const { code } = renderSupabaseJs(statement)
+      const { method, path } = await renderHttp(statement)
+      const { code } = await renderSupabaseJs(statement)
 
       setErrorMessage(undefined)
       setHttpRequest(`${method} ${path}`)

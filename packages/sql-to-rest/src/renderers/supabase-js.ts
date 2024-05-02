@@ -1,4 +1,7 @@
 import { Filter, Select, Statement } from '../processor'
+import * as prettier from 'prettier/standalone'
+import * as babel from 'prettier/plugins/babel'
+import * as estree from 'prettier/plugins/estree'
 
 export type SupabaseJsQuery = {
   code: string
@@ -7,7 +10,7 @@ export type SupabaseJsQuery = {
 /**
  * Renders a `Statement` as a supabase-js query.
  */
-export function renderSupabaseJs(processed: Statement): SupabaseJsQuery {
+export async function renderSupabaseJs(processed: Statement): Promise<SupabaseJsQuery> {
   switch (processed.type) {
     case 'select':
       return formatSelect(processed)
@@ -16,8 +19,8 @@ export function renderSupabaseJs(processed: Statement): SupabaseJsQuery {
   }
 }
 
-function formatSelect(select: Select): SupabaseJsQuery {
-  const { from, targets, filter, limit } = select
+async function formatSelect(select: Select): Promise<SupabaseJsQuery> {
+  const { from, targets, filter, sorts, limit } = select
   const lines = ['const { data, error } = await supabase', `.from('${from}')`]
 
   if (targets.length > 0) {
@@ -42,6 +45,21 @@ function formatSelect(select: Select): SupabaseJsQuery {
     formatSelectFilterRoot(lines, filter)
   }
 
+  if (sorts) {
+    for (const sort of sorts) {
+      if (!sort.direction && !sort.nulls) {
+        lines.push(`.order('${sort.column}')`)
+      } else {
+        const options = {
+          ascending: sort.direction ? sort.direction === 'asc' : undefined,
+          nullsFirst: sort.nulls ? sort.nulls === 'first' : undefined,
+        }
+
+        lines.push(`.order('${sort.column}', ${JSON.stringify(options)})`)
+      }
+    }
+  }
+
   if (limit) {
     if (limit.count !== undefined && limit.offset === undefined) {
       lines.push(`.limit(${limit.count})`)
@@ -52,11 +70,18 @@ function formatSelect(select: Select): SupabaseJsQuery {
     }
   }
 
-  // Join lines together and indent
-  const code = lines.map((line, index) => (index > 0 ? `  ${line}` : line)).join('\n')
+  // Join lines together and format
+  const code = await prettier.format(lines.join('\n'), {
+    parser: 'babel',
+    plugins: [babel, estree],
+    printWidth: 40,
+    semi: false,
+    singleQuote: true,
+    trailingComma: 'all',
+  })
 
   return {
-    code,
+    code: code.trim(),
   }
 }
 

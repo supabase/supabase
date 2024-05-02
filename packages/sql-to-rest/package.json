@@ -6,10 +6,12 @@
   "license": "MIT",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "test": "NODE_OPTIONS=--experimental-vm-modules jest"
   },
   "dependencies": {
-    "libpg-query": "^15.1.0"
+    "@babel/parser": "^7.24.5",
+    "libpg-query": "^15.1.0",
+    "prettier": "^3.2.5"
   },
   "devDependencies": {
     "@babel/core": "^7.23.6",

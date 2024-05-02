@@ -14,7 +14,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?select=title,description')
@@ -48,7 +48,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?select=my_title:title')
@@ -65,7 +65,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?title=eq.Cheese')
@@ -82,7 +82,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?title=neq.Cheese')
@@ -101,7 +101,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?title=not.eq.Cheese')
@@ -118,7 +118,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?title=is.null')
@@ -135,7 +135,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?title=not.is.null')
@@ -152,7 +152,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?pages=gt.10.1')
@@ -169,7 +169,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?pages=gt.10')
@@ -186,7 +186,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?pages=gte.10')
@@ -203,7 +203,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?pages=lt.10')
@@ -220,7 +220,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?pages=lte.10')
@@ -238,7 +238,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?title=eq.Cheese&description=ilike.*salsa*')
@@ -256,7 +256,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?or=(title.eq.Cheese,title.eq.Salsa)')
@@ -276,7 +276,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?not.and=(title.eq.Cheese,description.ilike.*salsa*)')
@@ -296,7 +296,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?not.or=(title.eq.Cheese,title.eq.Salsa)')
@@ -317,7 +317,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe(
@@ -342,7 +342,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe(
@@ -367,7 +367,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe(
@@ -388,7 +388,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe(
@@ -407,7 +407,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?limit=5')
@@ -424,7 +424,7 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?offset=10')
@@ -443,9 +443,129 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = renderHttp(statement)
+    const { method, path } = await renderHttp(statement)
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?limit=5&offset=10')
+  })
+
+  test('order by', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      order by
+        title
+    `
+
+    const statement = await processSql(sql)
+    const { method, path } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(path).toBe('/books?order=title')
+  })
+
+  test('order by multiple columns', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      order by
+        title,
+        description
+    `
+
+    const statement = await processSql(sql)
+    const { method, path } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(path).toBe('/books?order=title,description')
+  })
+
+  test('order by asc', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      order by
+        title asc
+    `
+
+    const statement = await processSql(sql)
+    const { method, path } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(path).toBe('/books?order=title.asc')
+  })
+
+  test('order by desc', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      order by
+        title desc
+    `
+
+    const statement = await processSql(sql)
+    const { method, path } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(path).toBe('/books?order=title.desc')
+  })
+
+  test('order by nulls first', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      order by
+        title nulls first
+    `
+
+    const statement = await processSql(sql)
+    const { method, path } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(path).toBe('/books?order=title.nullsfirst')
+  })
+
+  test('order by nulls last', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      order by
+        title nulls last
+    `
+
+    const statement = await processSql(sql)
+    const { method, path } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(path).toBe('/books?order=title.nullslast')
+  })
+
+  test('order by desc nulls last', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      order by
+        title desc nulls last
+    `
+
+    const statement = await processSql(sql)
+    const { method, path } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(path).toBe('/books?order=title.desc.nullslast')
   })
 })

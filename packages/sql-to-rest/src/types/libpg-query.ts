@@ -142,6 +142,14 @@ export type RangeVar = {
 
 export type WhereClauseExpression = A_Expr | BoolExpr | NullTest
 
+export type SortBy = {
+  SortBy: {
+    node: ColumnRef
+    sortby_dir: string
+    sortby_nulls: string
+  }
+}
+
 /**
  * Select statement.
  *
@@ -157,6 +165,7 @@ export type SelectStmt = {
     groupClause?: any[]
     groupDistinct?: boolean
     havingClause?: any[]
+    sortClause?: SortBy[]
     limitOption: string
     limitCount?: A_Const
     limitOffset?: A_Const

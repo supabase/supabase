@@ -1,9 +1,9 @@
 import { parseQuery } from 'libpg-query'
 import {
-  A_Const,
   ParsedQuery,
   SelectResTarget,
   SelectStmt,
+  SortBy,
   Stmt,
   WhereClauseExpression,
 } from './types/libpg-query'
@@ -15,6 +15,7 @@ export type Select = {
   from: string
   targets: Target[]
   filter?: Filter
+  sorts?: Sort[]
   limit?: Limit
 }
 
@@ -104,6 +105,12 @@ export type Target = {
   alias?: string
 }
 
+export type Sort = {
+  column: string
+  direction?: 'asc' | 'desc'
+  nulls?: 'first' | 'last'
+}
+
 /**
  * Coverts SQL into a PostgREST-compatible `Statement`.
  *
@@ -169,6 +176,8 @@ function processSelectStmt(stmt: SelectStmt): Select {
     ? processWhereClause(stmt.SelectStmt.whereClause)
     : undefined
 
+  const sorts = processSortClause(stmt.SelectStmt.sortClause ?? [])
+
   const limit = processLimit(stmt)
 
   return {
@@ -176,6 +185,7 @@ function processSelectStmt(stmt: SelectStmt): Select {
     from,
     targets,
     filter,
+    sorts,
     limit,
   }
 }
@@ -324,6 +334,63 @@ function processWhereClause(expression: WhereClauseExpression): Filter {
   } else {
     const [expressionType] = Object.keys(expression)
     throw new Error(`Unknown WHERE clause expression '${expressionType}'`)
+  }
+}
+
+function processSortClause(sorts: SortBy[]): Sort[] {
+  return sorts.map((sortBy) => {
+    if (!('ColumnRef' in sortBy.SortBy.node)) {
+      throw new Error('ORDER BY clause only accepts columns')
+    }
+
+    const { fields } = sortBy.SortBy.node.ColumnRef
+
+    if (fields.length > 1) {
+      throw new Error('Only one field supported per column')
+    }
+
+    const [field] = fields
+
+    if (!('String' in field)) {
+      const [fieldType] = Object.keys(field)
+      throw new Error(`ORDER BY clause fields must be String type, received '${fieldType}'`)
+    }
+
+    const column = field.String.sval
+    const direction = mapSortByDirection(sortBy.SortBy.sortby_dir)
+    const nulls = mapSortByNulls(sortBy.SortBy.sortby_nulls)
+
+    return {
+      column,
+      direction,
+      nulls,
+    }
+  })
+}
+
+function mapSortByDirection(direction: string) {
+  switch (direction) {
+    case 'SORTBY_ASC':
+      return 'asc'
+    case 'SORTBY_DESC':
+      return 'desc'
+    case 'SORTBY_DEFAULT':
+      return undefined
+    default:
+      throw new Error(`Unknown sort by direction '${direction}'`)
+  }
+}
+
+function mapSortByNulls(nulls: string) {
+  switch (nulls) {
+    case 'SORTBY_NULLS_FIRST':
+      return 'first'
+    case 'SORTBY_NULLS_LAST':
+      return 'last'
+    case 'SORTBY_NULLS_DEFAULT':
+      return undefined
+    default:
+      throw new Error(`Unknown sort by nulls '${nulls}'`)
   }
 }
 

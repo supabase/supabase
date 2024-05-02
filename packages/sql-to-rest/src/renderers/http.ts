@@ -8,7 +8,7 @@ export type HttpRequest = {
 /**
  * Renders a `Statement` as an HTTP request.
  */
-export function renderHttp(processed: Statement): HttpRequest {
+export async function renderHttp(processed: Statement): Promise<HttpRequest> {
   switch (processed.type) {
     case 'select':
       return formatSelect(processed)
@@ -17,8 +17,8 @@ export function renderHttp(processed: Statement): HttpRequest {
   }
 }
 
-function formatSelect(select: Select): HttpRequest {
-  const { from, targets, filter, limit } = select
+async function formatSelect(select: Select): Promise<HttpRequest> {
+  const { from, targets, filter, sorts, limit } = select
   const params = new URLSearchParams()
 
   if (targets.length > 0) {
@@ -42,6 +42,27 @@ function formatSelect(select: Select): HttpRequest {
 
   if (filter) {
     formatSelectFilterRoot(params, filter)
+  }
+
+  if (sorts) {
+    const columns = []
+
+    for (const sort of sorts) {
+      let value = sort.column
+
+      if (sort.direction) {
+        value += `.${sort.direction}`
+      }
+      if (sort.nulls) {
+        value += `.nulls${sort.nulls}`
+      }
+
+      columns.push(value)
+    }
+
+    if (columns.length > 0) {
+      params.set('order', columns.join(','))
+    }
   }
 
   if (limit) {
