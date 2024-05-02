@@ -23,6 +23,57 @@ functions:
       The Supabase client is your entrypoint to the rest of the Supabase functionality
       and is the easiest way to interact with everything we offer within the Supabase ecosystem.
 
+    params:
+      - name: supabase_url
+        isOptional: false
+        type: string
+        description: The unique Supabase URL which is supplied when you create a new project in your project dashboard.
+      - name: supabase_key
+        isOptional: false
+        type: string
+        description: The unique Supabase Key which is supplied when you create a new project in your project dashboard.
+      - name: options
+        isOptional: true
+        type: ClientOptions
+        description: Options to change the Auth behaviors.
+        subContent:
+          - name: schema
+            isOptional: true
+            type: string
+            description: The Postgres schema which your tables belong to. Must be on the list of exposed schemas in Supabase. Defaults to 'public'.
+          - name: headers
+            isOptional: true
+            type: dictionary
+            description: Optional headers for initializing the client.
+          - name: auto_refresh_token
+            isOptional: true
+            type: bool
+            description: Whether to automatically refresh the token when it expires. Defaults to `true`.
+          - name: persist_session
+            isOptional: true
+            type: bool
+            description: Whether to persist a logged in session to storage.
+          - name: storage
+            isOptional: true
+            type: SyncSupportedStorage
+            description: A storage provider. Used to store the logged in session.
+          - name: realtime
+            isOptional: true
+            type: string
+            description: Options passed to the realtime-py instance.
+          - name: postgrest_client_timeout
+            isOptional: true
+            type: int, float, Timeout
+            description: Timeout passed to the SyncPostgrestClient instance.
+          - name: storage_client_timeout
+            isOptional: true
+            type: int, float, Timeout
+            description: Timeout passed to the SyncStorageClient instance.
+          - name: flow_type
+            isOptional: true
+            type: AuthFlowType
+            description: flow type to use for authentication.
+
     examples:
       - id: create-client
         name: create_client()
@@ -364,8 +415,7 @@ functions:
       - `setSession()` takes in a refresh token and uses it to get a new session.
       - The refresh token can only be used once to obtain a new session.
       - [Refresh token rotation](/docs/reference/auth/config#refresh_token_rotation_enabled) is enabled by default on all projects to guard against replay attacks.
-      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](https://supabase.com/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
-      - If you are using React Native, you will need to install a Buffer polyfill via a library such as [rn-nodeify](https://github.com/tradle/rn-nodeify) to properly use the library.
+      - You can configure the [`REFRESH_TOKEN_REUSE_INTERVAL`](/docs/reference/auth/config#refresh_token_reuse_interval) which provides a short window in which the same refresh token can be used multiple times in the event of concurrency or offline issues.
     examples:
       - id: set-session
         name: Refresh the session
@@ -378,7 +428,6 @@ functions:
     title: 'refresh_session()'
     notes: |
       - This method will refresh the session whether the current one is expired or not.
-      - Both examples destructure `user` and `session` from `data`. This is not required; so `const { data, error } =` is also valid.
     examples:
       - id: refresh-session
         name: Refresh session using the current session
@@ -389,8 +438,19 @@ functions:
   - id: select
     title: 'Fetch data: select()'
     notes: |
-      - By default, Supabase projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](https://supabase.com/dashboard/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests.
+      - By default, Supabase projects return a maximum of 1,000 rows. This setting can be changed in your project's [API settings](/dashboard/project/_/settings/api). It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
+      - `select()` can be combined with [Filters](/docs/reference/python/using-filters)
+      - `select()` can be combined with [Modifiers](/docs/reference/python/using-modifiers)
       - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
+    params:
+      - name: columns
+        isOptional: true
+        type: string
+        description: The columns to retrieve, defaults to `*`.
+      - name: count
+        isOptional: true
+        type: CountMethod
+        description: The property to use to get the count of rows returned.
     examples:
       - id: getting-your-data
         name: Getting your data
@@ -742,12 +802,29 @@ functions:
 
   - id: insert
     title: 'Create data: insert()'
+    params:
+      - name: json
+        isOptional: false
+        type: dict, list
+        description: The values to insert. Pass an dict to insert a single row or an list to insert multiple rows.
+      - name: count
+        isOptional: true
+        type: CountMethod
+        description: The property to use to get the count of rows returned.
+      - name: returning
+        isOptional: true
+        type: ReturnMethod
+        description:  Either 'minimal' or 'representation'
+      - name: default_to_null
+        isOptional: true
+        type: bool
+        description:  Make missing fields default to `null`. Otherwise, use the default value for the column. Only applies for bulk inserts.
     examples:
       - id: create-a-record
         name: Create a record
         code: |
           ```python
-          data, count = supabase.table('countries')
+          data, count = supabase.table("countries")
             .insert({"id": 1, "name": "Denmark"})
             .execute()
           ```
@@ -763,18 +840,78 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+      - id: bulk-create
+        name: Bulk create
+        code: |
+          ```python
+          data, count = supabase.table("countries")
+            .insert([
+              { "id": 1, "name": "Nepal" },
+              { "id": 1, "name": "Vietnam" },
+            ])
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+            ```
+        response: |
+          ```json
+          {
+            "error": {
+              "code": "23505",
+              "details": "Key (id)=(1) already exists.",
+              "hint": null,
+              "message": "duplicate key value violates unique constraint \"countries_pkey\""
+            },
+            "status": 409,
+            "statusText": "Conflict"
+          }
+          ```
+        description: |
+          A bulk create operation is handled in a single transaction.
+          If any of the inserts fail, none of the rows are inserted.
+        hideCodeBlock: true
   - id: update
     title: 'Modify data: update()'
     notes: |
       - `update()` should always be combined with [Filters](/docs/reference/python/using-filters) to target the item(s) you wish to update.
+    params:
+      - name: json
+        isOptional: false
+        type: dict, list
+        description: The values to insert. Pass an dict to insert a single row or an list to insert multiple rows.
+      - name: count
+        isOptional: true
+        type: CountMethod
+        description: The property to use to get the count of rows returned.
+      - name: returning
+        isOptional: true
+        type: ReturnMethod
+        description:  Either 'minimal' or 'representation'.
+      - name: ignore_duplicates
+        isOptional: true
+        type: bool
+        description:  Whether duplicate rows should be ignored.
+      - name: on_conflict
+        isOptional: true
+        type: bool
+        description:  Specified columns to be made to work with UNIQUE constraint.
+      - name: default_to_null
+        isOptional: true
+        type: bool
+        description: |
+          Make missing fields default to `null`. Otherwise, use the default value for the column. This only applies when inserting new rows, not when merging with existing rows under `ignore_duplicates: false`. This also only applies when doing bulk upserts.
     examples:
       - id: updating-your-data
         name: Updating your data
         code: |
           ```python
-          data, count = supabase.table('countries')
-            .update({'name': 'Australia'})
-            .eq('id', 1)
+          data, count = supabase.table("countries")
+            .update({"name": "Australia"})
+            .eq("id", 1)
             .execute()
           ```
         data:
@@ -794,10 +931,68 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+      - id: updating-json-data
+        name: Updating JSON data
+        code: |
+          ```python
+          data, count = supabase
+            .table("users")
+            .update({
+              "address": {
+                "street": "Melrose Place",
+                "postcode": 90210
+              }
+            })
+            .eq("address->postcode", 90210)
+            .execute()
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 primary key,
+                name text,
+                address jsonb
+              );
+
+            insert into
+              users (id, name, address)
+            values
+              (1, 'Michael', '{ "postcode": 90210 }');
+            ```
+        response: |
+          ```
+          APIResponse(data=[{'id': 1, 'name': 'Michael', 'address': {'street': 'Melrose Place', 'postcode': 90210}}] count=None)
+          ```
+        description: |
+          Postgres offers some [operators](/docs/guides/database/json#query-the-jsonb-data) for working with JSON data. Currently, it is only possible to update the entire JSON document.
+        hideCodeBlock: true
   - id: upsert
     title: 'Upsert data: upsert()'
     notes: |
       - Primary keys must be included in the `values` dict to use upsert.
+    params:
+      - name: json
+        isOptional: false
+        type: dict, list
+        description: The values to insert. Pass an dict to insert a single row or an list to insert multiple rows.
+      - name: count
+        isOptional: true
+        type: CountMethod
+        description: The property to use to get the count of rows returned.
+      - name: returning
+        isOptional: true
+        type: ReturnMethod
+        description:  Either 'minimal' or 'representation'.
+      - name: ignore_duplicates
+        isOptional: true
+        type: bool
+        description:  Whether duplicate rows should be ignored.
+      - name: on_conflict
+        isOptional: true
+        type: bool
+        description:  Specified columns to be made to work with UNIQUE constraint.
     examples:
       - id: upsert-your-data
         name: Upsert your data
@@ -847,6 +1042,46 @@ functions:
           ```
           APIResponse(data=[{'id': 1, 'name': 'Albania'}, {'id': 2, 'name': 'Algeria'}], count=None)
           ```
+        hideCodeBlock: true
+      - id: upserting-into-tables-with-constraints
+        name: Upserting into tables with constraints
+        code: |
+          ```python
+          data, count = supabase
+            .table('users')
+            .upsert({ id: 42, handle: 'saoirse', display_name: 'Saoirse' }, on_conflict='handle')
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              users (
+                id int8 generated by default as identity primary key,
+                handle text not null unique,
+                display_name text
+              );
+
+            insert into
+              users (id, handle, display_name)
+            values
+              (1, 'saoirse', null);
+            ```
+        response: |
+          ```json
+          {
+            "error": {
+              "code": "23505",
+              "details": "Key (handle)=(saoirse) already exists.",
+              "hint": null,
+              "message": "duplicate key value violates unique constraint \"users_handle_key\""
+            },
+            "status": 409,
+            "statusText": "Conflict"
+          }
+          ```
+        description: |
+          In the following query, `upsert()` implicitly uses the `id`(primary key) column to determine conflicts. If there is no existing row with the same `id`, `upsert()` inserts a new row, which will fail in this case as there is already a row with `handle` `"saoirse"`.
+          Using the `on_conflict` option, you can instruct `upsert()` to use another column with a unique constraint to determine conflicts.
         hideCodeBlock: true
 
   - id: delete
