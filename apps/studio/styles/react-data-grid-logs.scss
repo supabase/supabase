@@ -27,7 +27,7 @@
 }
 
 .data-grid--logs-explorer {
-  @apply transition-all overflow-x-scroll pb-12;
+  @apply overflow-x-scroll pb-12;
 
   .rdg-cell,
   .rdg-cell span {
