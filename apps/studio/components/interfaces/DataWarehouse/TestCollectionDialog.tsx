@@ -43,34 +43,25 @@ export function TestCollectionDialog({
         </Select>
         <CodeBlock language="bash" className="language-bash prose dark:prose-dark max-">
           {`
-curl -X "POST" "https://api.logflare.app/logs?source=${collectionToken}" \\
--H 'Content-Type: application/json' \\
--H 'X-API-KEY: ${testAccessToken || 'ACCESS_TOKEN'}' \\
--d $'{
-"event_message": "This is another log message.",
-"metadata": {
-"ip_address": "100.100.100.100",
-"request_method": "POST",
-"custom_user_data": {
-"vip": true,
-"id": 38,
-"login_count": 154,
-"company": "Supabase",
-"address": {
-"zip": "11111",
-"st": "NY",
-"street": "123 W Main St",
-"city": "New York"
-}
-},
-"datacenter": "aws",
-"request_headers": {
-"connection": "close",
-"user_agent": "chrome"
-}
-}
-}'
-      `}
+  curl -X "POST" "https://api.logflare.app/logs?source=${collectionToken}" \\
+  -H 'Content-Type: application/json' \\
+  -H 'X-API-KEY: ${testAccessToken || 'ACCESS_TOKEN'}' \\
+  -d $'{
+    "event_message": "Hello world",
+    "metadata": {
+      "ip_address": "100.100.100.100",
+      "request_method": "POST",
+      "custom_user_data": {
+        "foo": "bar"
+      },
+      "datacenter": "aws",
+      "request_headers": {
+        "connection": "close",
+        "user_agent": "chrome"
+      }
+    }
+  }'
+`}
         </CodeBlock>
       </DialogContent>
     </Dialog>

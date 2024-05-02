@@ -61,6 +61,7 @@ export const WarehouseCollectionDetail = () => {
     data: queryData,
     isError,
     refetch,
+    isRefetching,
   } = useWarehouseQueryQuery({ ref: projectRef, sql: params.sql }, { enabled: !!params.sql })
 
   const formatResults = (results: any) => {
@@ -70,7 +71,7 @@ export const WarehouseCollectionDetail = () => {
 
     const r = results.map(({ timestamp, ...r }: any) => {
       return {
-        timestamp: new Date(timestamp).toLocaleString(),
+        timestamp: new Date(timestamp / 1000).toLocaleString(),
         ...r,
       }
     })
@@ -85,7 +86,7 @@ export const WarehouseCollectionDetail = () => {
     setPagination({ ...pagination, offset: pagination.offset + pagination.limit })
   }
 
-  const isLoading = queryLoading || collectionsLoading
+  const isLoading = queryLoading || collectionsLoading || isRefetching
 
   return (
     <>
@@ -112,7 +113,6 @@ export const WarehouseCollectionDetail = () => {
             <LogTable
               projectRef={projectRef}
               isLoading={isLoading}
-              hideHeader={true}
               data={results}
               params={params}
               error={isError ? 'Error loading data' : undefined}
