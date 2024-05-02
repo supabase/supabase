@@ -8,7 +8,6 @@ import {
   type RefObject,
 } from 'react'
 import styleHandler from '../../lib/theme/styleHandler'
-import { useSticky } from './Tabs.utils'
 
 export interface TabsProps {
   type?: 'pills' | 'underlined' | 'cards' | 'rounded-pills'
