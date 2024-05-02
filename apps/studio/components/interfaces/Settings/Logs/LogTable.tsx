@@ -146,10 +146,6 @@ const LogTable = ({
         columns = AuthColumnRenderer
         break
 
-      case 'warehouse':
-        columns = WarehouseColumnRenderer
-        break
-
       default:
         if (firstRow && isDefaultLogPreviewFormat(firstRow)) {
           columns = DefaultPreviewColumnRenderer
