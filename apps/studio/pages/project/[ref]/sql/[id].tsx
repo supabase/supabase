@@ -15,10 +15,11 @@ import { SQLEditorLayout } from 'components/layouts'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import getPgsqlCompletionProvider from 'components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
 import getPgsqlSignatureHelpProvider from 'components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
-import { useLocalStorageQuery } from 'hooks'
+import { useFlag, useLocalStorageQuery } from 'hooks'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useContentIdQuery } from 'data/content/content-id-query'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
@@ -28,9 +29,15 @@ const SqlEditor: NextPageWithLayout = () => {
   const { project } = useProjectContext()
   const snap = useSqlEditorStateSnapshot()
   const appSnap = useAppStateSnapshot()
+  const enableFolders = useFlag('sqlFolderOrganization')
 
   const snippets = useSnippets(ref)
   const { mutateAsync: formatQuery } = useFormatQueryMutation()
+
+  useContentIdQuery(
+    { projectRef: ref, id },
+    { enabled: enableFolders, onSuccess: (data) => console.log(data) }
+  )
 
   const [intellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,

@@ -62,6 +62,7 @@ import {
   createSqlSnippetSkeleton,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
+import { Settings, X } from 'lucide-react'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
@@ -248,6 +249,7 @@ const SQLEditor = () => {
   const snippet = id ? snap.snippets[id] : null
 
   const isLoading = urlId === 'new' ? false : !(id && ref && snap.loaded[ref])
+  console.log({ isLoading })
 
   /**
    * Sets the snippet title using AI.
@@ -802,15 +804,15 @@ const SQLEditor = () => {
                                 setIsSchemaSuggestionDismissed(true)
                                 appSnap.setShowAiSettingsModal(true)
                               }}
-                              className="text-brand-600 hover:text-brand-600 transition"
+                              className="text-brand-500 hover:text-brand-600 transition"
                             >
-                              <IconSettings className="cursor-pointer" />
+                              <Settings size={20} className="cursor-pointer" />
                             </button>
                             <button
                               className="transition text-brand-500 hover:text-brand-600"
                               onClick={() => setIsAiOpen(false)}
                             >
-                              <IconX size={21} />
+                              <X size={21} />
                             </button>
                           </>
                         )}

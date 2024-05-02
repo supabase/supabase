@@ -484,7 +484,7 @@ export interface paths {
     /** Deletes project's contents */
     delete: operations['ContentController_deleteContents']
   }
-  '/platform/projects/{ref}/content/{id}': {
+  '/platform/projects/{ref}/content/item/{id}': {
     /** Gets project's content by the given id */
     get: operations['ContentController_getContentById']
   }
@@ -1359,7 +1359,7 @@ export interface paths {
     /** Deletes project's contents */
     delete: operations['ContentController_deleteContents']
   }
-  '/v0/projects/{ref}/content/{id}': {
+  '/v0/projects/{ref}/content/item/{id}': {
     /** Gets project's content by the given id */
     get: operations['ContentController_getContentById']
   }
@@ -1937,16 +1937,20 @@ export interface paths {
     post: operations['ExtensionsController_provisionResource']
   }
   '/partners/flyio/organizations/{organization_id}': {
-    /** Gets information about the organization */
+    /** Gets details of the organization linked to the provided Fly organization id */
     get: operations['OrganizationsController_getOrganization']
   }
   '/partners/flyio/organizations/{organization_id}/extensions': {
-    /** Gets all databases that belong to the Fly organization */
+    /** Gets all databases that belong to the given Fly organization id */
     get: operations['OrganizationsController_getOrgExtensions']
   }
   '/partners/flyio/organizations/{organization_id}/sso': {
     /** Starts Fly single sign on */
     get: operations['OrganizationsController_startFlyioSSO']
+  }
+  '/partners/flyio/organizations/{organization_id}/subscription': {
+    /** Updates organization subscription linked to the provided Fly organization id */
+    put: operations['OrganizationsController_updateOrganization']
   }
   '/partners/flyio/organizations/{organization_id}/billing': {
     /** Gets the organizations current unbilled charges */
@@ -2122,6 +2126,7 @@ export interface components {
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: boolean
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL: number
       MAILER_OTP_EXP: number
+      MAILER_OTP_LENGTH: number
       SMS_AUTOCONFIRM: boolean
       SMS_MAX_FREQUENCY: number
       SMS_OTP_EXP: number
@@ -2276,6 +2281,7 @@ export interface components {
       SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION?: boolean
       SECURITY_REFRESH_TOKEN_REUSE_INTERVAL?: number
       MAILER_OTP_EXP?: number
+      MAILER_OTP_LENGTH?: number
       SMS_AUTOCONFIRM?: boolean
       SMS_MAX_FREQUENCY?: number
       SMS_OTP_EXP?: number
@@ -3637,7 +3643,10 @@ export interface components {
     GetProjectByFlyExtensionIdResponse: {
       ref: string
     }
-    /** @enum {string} */
+    /**
+     * @description Desired instance size, will use default size if not defined. Paid plans only.
+     * @enum {string}
+     */
     DesiredInstanceSize:
       | 'micro'
       | 'small'
@@ -4149,10 +4158,11 @@ export interface components {
       db_schema?: string
     }
     V1PostgrestConfigResponse: {
-      max_rows: number | null
+      max_rows: number
+      /** @description If `null`, the value is automatically configured based on compute size. */
       db_pool: number | null
-      db_schema: string | null
-      db_extra_search_path: string | null
+      db_schema: string
+      db_extra_search_path: string
     }
     PostgresConfigResponse: {
       statement_timeout?: string
@@ -4163,6 +4173,8 @@ export interface components {
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
+      max_standby_archive_delay?: string
+      max_standby_streaming_delay?: string
       max_worker_processes?: number
       shared_buffers?: string
       work_mem?: string
@@ -4178,6 +4190,8 @@ export interface components {
       max_parallel_maintenance_workers?: number
       max_parallel_workers?: number
       max_parallel_workers_per_gather?: number
+      max_standby_archive_delay?: string
+      max_standby_streaming_delay?: string
       max_worker_processes?: number
       shared_buffers?: string
       work_mem?: string
@@ -4832,6 +4846,7 @@ export interface components {
       /** @enum {string} */
       tier: 'tier_payg' | 'tier_pro' | 'tier_free' | 'tier_team' | 'tier_enterprise'
       price_id?: string
+      skip_free_plan_validations?: boolean
     }
     RestrictionData: {
       grace_period_end?: string
@@ -5072,10 +5087,11 @@ export interface components {
       root_key: string
     }
     PostgrestConfigWithJWTSecretResponse: {
-      max_rows: number | null
+      max_rows: number
+      /** @description If `null`, the value is automatically configured based on compute size. */
       db_pool: number | null
-      db_schema: string | null
-      db_extra_search_path: string | null
+      db_schema: string
+      db_extra_search_path: string
       jwt_secret?: string
     }
     V1ProjectRefResponse: {
@@ -5300,6 +5316,7 @@ export interface components {
       mailer_allow_unverified_email_sign_ins: boolean | null
       mailer_autoconfirm: boolean | null
       mailer_otp_exp: number | null
+      mailer_otp_length: number | null
       mailer_secure_email_change_enabled: boolean | null
       mailer_subjects_confirmation: string | null
       mailer_subjects_email_change: string | null
@@ -5423,6 +5440,7 @@ export interface components {
       security_update_password_require_reauthentication?: boolean
       security_refresh_token_reuse_interval?: number
       mailer_otp_exp?: number
+      mailer_otp_length?: number
       sms_autoconfirm?: boolean
       sms_max_frequency?: number
       sms_otp_exp?: number
@@ -5788,6 +5806,47 @@ export interface components {
       /** @description Supabase project services health status */
       services: components['schemas']['ServiceHealthResponse'][]
     }
+    /**
+     * @description Organization subscription plan
+     * @enum {string}
+     */
+    SelfServePlanId: 'free' | 'pro' | 'team'
+    FlyResourceProvisioningBody: {
+      /** @description A UNIX epoch timestamp value */
+      timestamp: number
+      /** @description A random unique string identifying the individual request */
+      nonce: string
+      /** @description The full request target URL */
+      url: string
+      /** @description Name of the extension */
+      name: string
+      /** @description Unique ID representing the extension */
+      id: string
+      /** @description Unique ID representing an organization */
+      organization_id: string
+      /** @description Display name for an organization */
+      organization_name: string
+      /** @description Obfuscated email that routes to the provisioning user */
+      user_email: string
+      /** @description Unique ID representing an user */
+      user_id: string
+      /** @description The three-letter, primary Fly.io region where the target app intends to write from */
+      primary_region: string
+      /** @description An IPv6 address on the customer network assigned to this extension */
+      ip_address: string
+      /**
+       * @description An array of Fly.io region codes where read replicas should be provisioned
+       * @default []
+       */
+      read_regions: string[]
+      /** @description Database password (Optional, don't send to generate one) */
+      db_pass?: string
+      /** @example large */
+      desired_instance_size?: components['schemas']['DesiredInstanceSize']
+      /** @example pro */
+      organization_plan?: components['schemas']['SelfServePlanId']
+      user_name: string
+    }
     ResourceProvisioningConfigResponse: {
       /**
        * @description PSQL connection string
@@ -5854,6 +5913,10 @@ export interface components {
        * @example fly_123456789
        */
       supabase_org_id: string
+    }
+    UpdateFlyOrganizationSubscriptionBody: {
+      /** @example pro */
+      plan: components['schemas']['SelfServePlanId']
     }
     ResourceBillingItem: {
       /**
@@ -9477,6 +9540,9 @@ export interface operations {
   /** Gets project's content root folder */
   ContentFoldersController_getRootFolder: {
     parameters: {
+      query?: {
+        type?: 'sql' | 'report' | 'log_sql'
+      }
       path: {
         /** @description Project ref */
         ref: string
@@ -14438,6 +14504,11 @@ export interface operations {
   }
   /** Creates a database */
   ExtensionsController_provisionResource: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['FlyResourceProvisioningBody']
+      }
+    }
     responses: {
       201: {
         content: {
@@ -14446,7 +14517,7 @@ export interface operations {
       }
     }
   }
-  /** Gets information about the organization */
+  /** Gets details of the organization linked to the provided Fly organization id */
   OrganizationsController_getOrganization: {
     parameters: {
       path: {
@@ -14461,7 +14532,7 @@ export interface operations {
       }
     }
   }
-  /** Gets all databases that belong to the Fly organization */
+  /** Gets all databases that belong to the given Fly organization id */
   OrganizationsController_getOrgExtensions: {
     parameters: {
       path: {
@@ -14481,6 +14552,24 @@ export interface operations {
     parameters: {
       path: {
         organization_id: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+    }
+  }
+  /** Updates organization subscription linked to the provided Fly organization id */
+  OrganizationsController_updateOrganization: {
+    parameters: {
+      path: {
+        organization_id: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdateFlyOrganizationSubscriptionBody']
       }
     }
     responses: {

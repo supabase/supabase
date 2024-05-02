@@ -9,7 +9,6 @@ import { untitledSnippetTitle } from 'components/interfaces/SQLEditor/SQLEditor.
 import { createSqlSnippetSkeleton } from 'components/interfaces/SQLEditor/SQLEditor.utils'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import { useFolderCreateMutation } from 'data/content/folder-create-mutation'
-import { useSQLSnippetFoldersQuery } from 'data/content/folders-query'
 import { SqlSnippet, useSqlSnippetsQuery } from 'data/content/sql-snippets-query'
 import { useCheckPermissions, useFlag, useSelectedProject } from 'hooks'
 import { uuidv4 } from 'lib/helpers'
@@ -19,7 +18,7 @@ import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { InnerSideMenuItem } from 'ui-patterns/InnerSideMenu'
 import { SQLEditorNavV1 } from './SQLEditorNavV1'
-import SQLEditorNavV2 from './SQLEditorNavV2'
+import { SQLEditorNav as SQLEditorNavV2 } from './SQLEditorNavV2/SQLEditorNav'
 
 const SideBarContent = () => {
   const router = useRouter()
@@ -41,18 +40,6 @@ const SideBarContent = () => {
       if (ref) snap.setRemoteSnippets(data.snippets, ref)
     },
   })
-
-  useSQLSnippetFoldersQuery(
-    { projectRef: ref },
-    {
-      enabled: enableFolders,
-      refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000, // 5 minutes.
-      onSuccess(data) {
-        if (ref) console.log(data)
-      },
-    }
-  )
 
   const { mutate: createFolder, isLoading: isCreating } = useFolderCreateMutation({
     onSuccess: () => {
