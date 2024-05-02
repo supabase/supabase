@@ -15,10 +15,11 @@ export function useDeleteCollection({
   const queryClient = useQueryClient()
   const mutation = useMutation({
     mutationFn: async () => {
-      await del(
-        `/platform/projects/${projectRef}/analytics/warehouse/collections/${collectionToken}`,
-        {}
-      )
+      await del(`/platform/projects/{ref}/analytics/warehouse/collections/{token}`, {
+        params: {
+          path: { ref: projectRef, token: collectionToken },
+        } as any, // TODO: remove cast when openapi client generates correct types
+      })
 
       const keysToInvalidate = analyticsKeys.warehouseCollections(projectRef)
       queryClient.invalidateQueries(keysToInvalidate)

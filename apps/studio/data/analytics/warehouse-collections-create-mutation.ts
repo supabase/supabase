@@ -3,18 +3,18 @@ import { analyticsKeys } from './keys'
 import { post } from 'data/fetchers'
 
 async function createCollection(ref: string, payload: { name: string }) {
-  await post(`/platform/projects/{ref}/analytics/warehouse/tenant`, {
-    params: {
-      path: { ref },
-    },
-  })
+  // await post(`/platform/projects/{ref}/analytics/warehouse/tenant`, {
+  //   params: {
+  //     path: { ref },
+  //   },
+  // })
 
   const res = await post(`/platform/projects/{ref}/analytics/warehouse/collections`, {
     params: {
       path: { ref },
     },
     body: payload,
-  })
+  } as any) // TODO: Remove cast when openapi types get generated correctly
 
   return res
 }
