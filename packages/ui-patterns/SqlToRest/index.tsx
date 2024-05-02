@@ -22,12 +22,14 @@ export default function SqlToRest() {
 
   const monaco = useMonaco()
   const { theme } = useTheme()
-  const isDark = theme?.includes('dark') ?? false
+  const isDark = theme?.includes('dark') ?? true
 
   useLayoutEffect(() => {
     if (monaco && theme) {
-      const mode = getTheme(theme)
-      monaco.editor.defineTheme('supabase', mode)
+      const lightMode = getTheme(false)
+      const darkMode = getTheme(true)
+      monaco.editor.defineTheme('supabase-light', lightMode)
+      monaco.editor.defineTheme('supabase-dark', darkMode)
     }
   }, [theme, monaco])
 
@@ -67,7 +69,7 @@ export default function SqlToRest() {
         >
           <Editor
             language="pgsql"
-            theme="supabase"
+            theme={isDark ? 'supabase-dark' : 'supabase-light'}
             value={sql}
             options={{
               tabSize: 2,
@@ -111,9 +113,7 @@ export default function SqlToRest() {
 }
 
 // TODO: this was copied from studio - find a way to share it between sites
-export const getTheme = (theme: string): editor.IStandaloneThemeData => {
-  const isDarkMode = theme.includes('dark')
-  // [TODO] Probably need better theming for light mode
+export const getTheme = (isDarkMode: boolean): editor.IStandaloneThemeData => {
   return {
     base: isDarkMode ? 'vs-dark' : 'vs', // can also be vs-dark or hc-black
     inherit: true, // can also be false to completely replace the builtin rules
