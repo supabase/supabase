@@ -130,7 +130,7 @@ const TableGridEditor = ({
 
   const entityType = useEntityType(selectedTable?.id)
   const columnsRef = useLatest(selectedTable?.columns ?? EMPTY_ARR)
-
+  console.log('zans entityType', selectedTable)
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable) {
     return <Loading />
@@ -260,14 +260,12 @@ const TableGridEditor = ({
         schema={selectedTable.schema}
         table={gridTable}
         headerActions={
-          isTableSelected || isViewSelected || canEditViaTableEditor ? (
-            <GridHeaderActions
-              table={selectedTable as PostgresTable}
-              canEditViaTableEditor={canEditViaTableEditor}
-              isViewSelected={isViewSelected}
-              isTableSelected={isTableSelected}
-            />
-          ) : null
+          <GridHeaderActions
+            table={selectedTable as TableLike}
+            canEditViaTableEditor={canEditViaTableEditor}
+            // isViewSelected={isViewSelected}
+            // isTableSelected={isTableSelected}
+          />
         }
         onAddColumn={snap.onAddColumn}
         onEditColumn={onSelectEditColumn}

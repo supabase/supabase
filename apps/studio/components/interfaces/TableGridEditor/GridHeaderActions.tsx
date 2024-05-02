@@ -2,7 +2,7 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Lock, MousePointer2, PlusCircle } from 'lucide-react'
+import { Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
@@ -19,15 +19,28 @@ import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
+import { TableLike } from 'hooks/misc/useTable'
+import useEntityType from 'hooks/misc/useEntityType'
+import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 
 export interface GridHeaderActionsProps {
   table: PostgresTable
   canEditViaTableEditor: boolean
-  isViewSelected: boolean
-  isTableSelected: boolean
+  // isViewSelected: boolean
+  // isTableSelected: boolean
 }
 
-const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeaderActionsProps) => {
+//const GridHeaderActions = ({ table, isViewSelected, isTableSelected  }: GridHeaderActionsProps) => {
+const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
+  const entityType = useEntityType(table?.id)
+
+  const isTable = entityType?.type === ENTITY_TYPE.TABLE
+  const isView =
+    entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
+  const isForeignTable = entityType?.type === ENTITY_TYPE.FOREIGN_TABLE
+
+  console.log('zans2 entityType', entityType)
+  console.log('zans2 table', table)
   const { ref } = useParams()
   const { project } = useProjectContext()
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
@@ -148,7 +161,7 @@ const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeade
           </Tooltip.Root>
         )}
 
-        {isTableSelected ? (
+        {isTable ? (
           table.rls_enabled ? (
             <>
               {policies.length < 1 && !isLocked ? (
@@ -247,9 +260,62 @@ const GridHeaderActions = ({ table, isViewSelected, isTableSelected }: GridHeade
           )
         ) : null}
 
+        {/* need to check if view is security invoker or definer */}
+        {isView && (
+          <Popover_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
+            <PopoverTrigger_Shadcn_ asChild>
+              <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
+                View is public
+              </Button>
+            </PopoverTrigger_Shadcn_>
+            <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
+              <h3 className="flex items-center gap-2">
+                <Unlock size={16} /> Secure your View
+              </h3>
+              <div className="grid gap-2 mt-4 text-foreground-light text-sm">
+                <p>This view is created with security definer......etc.....</p>
+
+                <div className="mt-2">
+                  <Button type="default" asChild>
+                    <Link href="">Do something</Link>
+                  </Button>
+                </div>
+              </div>
+            </PopoverContent_Shadcn_>
+          </Popover_Shadcn_>
+        )}
+
+        {/* Need to check if in public schema here too */}
+        {isForeignTable && (
+          <Popover_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
+            <PopoverTrigger_Shadcn_ asChild>
+              <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
+                Foreign table is public
+              </Button>
+            </PopoverTrigger_Shadcn_>
+            <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
+              <h3 className="flex items-center gap-2">
+                <Unlock size={16} /> Secure Foreign table
+              </h3>
+              <div className="grid gap-2 mt-4 text-foreground-light text-sm">
+                <p>
+                  Foreign tables do not enforce RLS. Move them to a private schema not exposed to
+                  Postgrest or disable Postgrest.
+                </p>
+
+                <div className="mt-2">
+                  <Button type="default" asChild>
+                    <Link href="https://github.com/orgs/supabase/discussions/21647">Read more</Link>
+                  </Button>
+                </div>
+              </div>
+            </PopoverContent_Shadcn_>
+          </Popover_Shadcn_>
+        )}
+
         <RoleImpersonationPopover serviceRoleLabel="postgres" />
 
-        {realtimeEnabled && !isViewSelected && (
+        {isTable && realtimeEnabled && (
           <Button
             type="default"
             icon={

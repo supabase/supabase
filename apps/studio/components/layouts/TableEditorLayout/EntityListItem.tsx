@@ -106,13 +106,18 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   }
 
   const EntityTooltipTrigger = ({ entity }: { entity: Entity }) => {
-    console.log(entity)
+    console.log('entitylistitem zans entity', entity)
     let tooltipContent = null
 
     switch (entity.type) {
       case ENTITY_TYPE.TABLE:
         if (!entity.rls_enabled) {
           tooltipContent = 'RLS Disabled'
+        }
+        break
+      case ENTITY_TYPE.VIEW:
+        if (entity.schema === 'public') {
+          tooltipContent = 'View is public'
         }
         break
       case ENTITY_TYPE.MATERIALIZED_VIEW:
@@ -145,7 +150,7 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
               className={[
                 'rounded bg-alternative py-1 px-2 leading-none shadow',
                 'border border-background',
-                'text-xs text-foreground capitalize',
+                'text-xs text-foreground',
               ].join(' ')}
             >
               <Tooltip.Arrow className="radix-tooltip-arrow" />

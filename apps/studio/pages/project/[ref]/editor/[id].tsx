@@ -15,7 +15,7 @@ const TableEditorPage: NextPageWithLayout = () => {
   const id = _id ? Number(_id) : undefined
 
   const { data: selectedTable, isLoading } = useTable(id)
-
+  console.log('always selected table', selectedTable)
   return (
     <>
       <TableGridEditor
