@@ -15,7 +15,6 @@ import { useSelectedOrganization } from 'hooks'
 import { BASE_PATH } from 'lib/constants'
 import { EMPTY_ARR } from 'lib/void'
 import { useSidePanelsStateSnapshot } from 'state/side-panels'
-import * as Sentry from '@sentry/nextjs'
 
 const VERCEL_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 512 512" className="w-6">
@@ -101,18 +100,6 @@ const SidePanelVercelProjectLinker = () => {
 
   const onCreateConnections = useCallback(
     (vars: any) => {
-      // TODO(kamil): Remove once "missing connection name" bug has been squashed.
-      if (!vars.connection?.metadata?.name) {
-        Sentry.captureMessage('Vercel connection is missing name', {
-          contexts: {
-            connection: vars.connection,
-            source: {
-              file: 'Organization/IntegrationSettings/SidePanelVercelProjectLinker.tsx',
-            },
-          },
-        })
-      }
-
       createConnections({
         ...vars,
         connection: {
