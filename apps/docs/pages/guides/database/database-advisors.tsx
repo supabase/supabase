@@ -8,10 +8,10 @@ import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
 
 import codeHikeTheme from 'config/code-hike.theme.json' assert { type: 'json' }
-import { Tabs } from 'ui'
 
 import components from '~/components'
 import { Heading } from '~/components/CustomHTMLElements'
+import { TabPanel, Tabs } from '~/components/Tabs'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import Layout from '~/layouts/DefaultGuideLayout'
 import { UrlTransformFunction, linkTransform } from '~/lib/mdx/plugins/rehypeLinkTransform'
@@ -52,7 +52,7 @@ export default function DatabaseAdvisorDocs({
       <Heading tag="h2">Available checks</Heading>
       <Tabs listClassNames="flex flex-wrap gap-2 [&>button]:!m-0" queryGroup="lint">
         {lints.map((lint) => (
-          <Tabs.Panel
+          <TabPanel
             key={lint.path}
             id={lint.path}
             label={capitalize(getBasename(lint.path).replace(/_/g, ' '))}
@@ -60,7 +60,7 @@ export default function DatabaseAdvisorDocs({
             <section id={getBasename(lint.path)}>
               <MDXRemote {...lint.content} components={components} />
             </section>
-          </Tabs.Panel>
+          </TabPanel>
         ))}
       </Tabs>
     </Layout>
