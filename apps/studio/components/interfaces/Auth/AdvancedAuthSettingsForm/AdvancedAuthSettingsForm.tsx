@@ -25,6 +25,8 @@ import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { IS_PLATFORM } from 'lib/constants'
+import UpgradeToPro from 'components/ui/UpgradeToPro'
 
 const schema = object({
   JWT_EXP: number()
@@ -65,7 +67,8 @@ const AdvancedAuthSettingsForm = () => {
   })
 
   const isTeamsEnterprisePlan =
-    isSuccessSubscription && subscription?.plan?.id !== 'free' && subscription?.plan?.id !== 'pro'
+    isSuccessSubscription && subscription.plan.id !== 'free' && subscription.plan.id !== 'pro'
+  const promptTeamsEnterpriseUpgrade = IS_PLATFORM && !isTeamsEnterprisePlan
 
   const INITIAL_VALUES = {
     SITE_URL: authConfig?.SITE_URL,
@@ -194,36 +197,54 @@ const AdvancedAuthSettingsForm = () => {
                   />
                 </FormSectionContent>
               </FormSection>
-              {isTeamsEnterprisePlan && (
-                <FormSection
-                  header={<FormSectionLabel>Max Direct Database Connections</FormSectionLabel>}
-                >
-                  <FormSectionContent loading={isLoading}>
-                    <InputNumber
-                      id="DB_MAX_POOL_SIZE"
-                      size="small"
-                      label="Max direct database connections used by Auth"
-                      descriptionText="Auth will take up no more than this number of connections from the total number of available connections to serve requests. These connections are not reserved, so when unused they are released."
-                      actions={<span className="mr-3 text-foreground-lighter">connections</span>}
-                      disabled={!canUpdateConfig}
+
+              <FormSection
+                header={<FormSectionLabel>Max Direct Database Connections</FormSectionLabel>}
+              >
+                <FormSectionContent loading={isLoading}>
+                  {promptTeamsEnterpriseUpgrade && (
+                    <UpgradeToPro
+                      primaryText="Upgrade to Teams or Enterprise"
+                      secondaryText="Max Direct Database Connections settings are only available on the Teams plan and up."
+                      buttonText="Upgrade to Teams"
+                      projectRef={projectRef!}
+                      organizationSlug={organization!.slug}
                     />
-                  </FormSectionContent>
-                </FormSection>
-              )}
-              {isTeamsEnterprisePlan && (
-                <FormSection header={<FormSectionLabel>Max Request Duration</FormSectionLabel>}>
-                  <FormSectionContent loading={isLoading}>
-                    <InputNumber
-                      id="API_MAX_REQUEST_DURATION"
-                      size="small"
-                      label="Maximum time allowed for an Auth request to last"
-                      descriptionText="Number of seconds to wait for an Auth request to complete before canceling it. In certain high-load situations setting a larger or smaller value can be used to control load-shedding. Recommended: 10 seconds."
-                      actions={<span className="mr-3 text-foreground-lighter">seconds</span>}
-                      disabled={!canUpdateConfig}
+                  )}
+
+                  <InputNumber
+                    id="DB_MAX_POOL_SIZE"
+                    size="small"
+                    label="Max direct database connections used by Auth"
+                    descriptionText="Auth will take up no more than this number of connections from the total number of available connections to serve requests. These connections are not reserved, so when unused they are released."
+                    actions={<span className="mr-3 text-foreground-lighter">connections</span>}
+                    disabled={!canUpdateConfig || !isTeamsEnterprisePlan}
+                  />
+                </FormSectionContent>
+              </FormSection>
+
+              <FormSection header={<FormSectionLabel>Max Request Duration</FormSectionLabel>}>
+                <FormSectionContent loading={isLoading}>
+                  {promptTeamsEnterpriseUpgrade && (
+                    <UpgradeToPro
+                      primaryText="Upgrade to Teams or Enterprise"
+                      secondaryText="Max Request Duration settings are only available on the Teams plan and up."
+                      buttonText="Upgrade to Teams"
+                      projectRef={projectRef!}
+                      organizationSlug={organization!.slug}
                     />
-                  </FormSectionContent>
-                </FormSection>
-              )}
+                  )}
+
+                  <InputNumber
+                    id="API_MAX_REQUEST_DURATION"
+                    size="small"
+                    label="Maximum time allowed for an Auth request to last"
+                    descriptionText="Number of seconds to wait for an Auth request to complete before canceling it. In certain high-load situations setting a larger or smaller value can be used to control load-shedding. Recommended: 10 seconds."
+                    actions={<span className="mr-3 text-foreground-lighter">seconds</span>}
+                    disabled={!canUpdateConfig || !isTeamsEnterprisePlan}
+                  />
+                </FormSectionContent>
+              </FormSection>
             </FormPanel>
           </>
         )
