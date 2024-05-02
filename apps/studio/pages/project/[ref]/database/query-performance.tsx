@@ -14,11 +14,14 @@ import { DatabaseLayout } from 'components/layouts'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
 import { FormHeader } from 'components/ui/Forms'
 import type { NextPageWithLayout } from 'types'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 
 const QueryPerformanceReport: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref: projectRef } = useParams()
+  const { project } = useProjectContext()
 
+  const showReadReplicasUI = project?.is_read_replicas_enabled
   const config = PRESET_CONFIG[Presets.QUERY_PERFORMANCE]
   const hooks = queriesFactory(config.queries, projectRef ?? 'default')
   const queryHitRate = hooks.queryHitRate()
@@ -49,7 +52,7 @@ const QueryPerformanceReport: NextPageWithLayout = () => {
         className="py-4 px-6 !mb-0"
         title="Query Performance"
         docsUrl="https://supabase.com/docs/guides/platform/performance#examining-query-performance"
-        actions={<DatabaseSelector />}
+        actions={showReadReplicasUI ? <DatabaseSelector /> : null}
       />
       <QueryPerformance queryHitRate={queryHitRate} queryPerformanceQuery={queryPerformanceQuery} />
     </div>
