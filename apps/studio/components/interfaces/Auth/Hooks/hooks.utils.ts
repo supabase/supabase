@@ -5,9 +5,9 @@ export const extractMethod = (
   secret?: string
 ):
   | { type: 'postgres'; schema: string; functionName: string }
-  | { type: 'web'; url: string; secret: string } => {
+  | { type: 'https'; url: string; secret: string } => {
   if (uri.startsWith('https')) {
-    return { type: 'web', url: uri, secret: secret || '' }
+    return { type: 'https', url: uri, secret: secret || '' }
   } else {
     const [_proto, _x, _db, schema, functionName] = (uri || '').split('/')
 
@@ -24,6 +24,6 @@ export const isValidHook = (h: Hook) => {
     (h.method.type === 'postgres' &&
       h.method.schema.length > 0 &&
       h.method.functionName.length > 0) ||
-    (h.method.type === 'web' && h.method.url.startsWith('https') && h.method.secret.length > 0)
+    (h.method.type === 'https' && h.method.url.startsWith('https') && h.method.secret.length > 0)
   )
 }

@@ -54,6 +54,6 @@ export interface Hook {
   secretsKey: string
   method:
     | { type: 'postgres'; schema: string; functionName: string }
-    | { type: 'web'; url: string; secret: string }
+    | { type: 'https'; url: string; secret: string }
   enterprise: boolean
 }

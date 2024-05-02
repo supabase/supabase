@@ -50,7 +50,7 @@ const FORM_ID = 'create-edit-auth-hook'
 const FormSchema = z.object({
   hookType: z.string(),
   selectedType: z.string(),
-  webValues: z.object({
+  httpsValues: z.object({
     url: z.string(),
     secret: z.string(),
   }),
@@ -69,7 +69,7 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
     defaultValues: {
       hookType: title || '',
       selectedType: 'postgres',
-      webValues: {
+      httpsValues: {
         url: '',
         secret: '',
       },
@@ -92,9 +92,9 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
         form.reset({
           hookType: definition.title,
           selectedType: values.type,
-          webValues: {
-            url: (values.type === 'web' && values.url) || '',
-            secret: (values.type === 'web' && values.secret) || '',
+          httpsValues: {
+            url: (values.type === 'https' && values.url) || '',
+            secret: (values.type === 'https' && values.secret) || '',
           },
           postgresValues: {
             schema: (values.type === 'postgres' && values.schema) || 'public',
@@ -105,7 +105,7 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
         form.reset({
           hookType: title || '',
           selectedType: 'postgres',
-          webValues: {
+          httpsValues: {
             url: '',
             secret: '',
           },
@@ -133,13 +133,13 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
     if (values.selectedType === 'postgres') {
       url = `pg-functions://postgres/${values.postgresValues.schema}/${values.postgresValues.functionName}`
     } else {
-      url = values.webValues.url
+      url = values.httpsValues.url
     }
 
     const payload = {
       [enabledLabel]: true,
       [uriLabel]: url,
-      [secretsLabel]: values.selectedType === 'web' ? values.webValues.secret : null,
+      [secretsLabel]: values.selectedType === 'https' ? values.httpsValues.secret : null,
     }
 
     updateAuthConfig(
@@ -211,15 +211,15 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
                         }
                       />
                       <Radio
-                        key="web"
-                        id="web"
-                        value="web"
+                        key="https"
+                        id="https"
+                        value="https"
                         label=""
                         beforeLabel={
                           <div className="flex items-center space-x-5">
                             <div className="flex-col space-y-0">
                               <div className="flex space-x-2">
-                                <p className="text-foreground">Web</p>
+                                <p className="text-foreground">HTTPS</p>
                               </div>
                               <p className="text-foreground-light">
                                 Used to call any HTTPS endpoint.
@@ -285,9 +285,9 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
             ) : (
               <>
                 <FormField_Shadcn_
-                  key="webValues.url"
+                  key="httpsValues.url"
                   control={form.control}
-                  name="webValues.url"
+                  name="httpsValues.url"
                   render={({ field }) => (
                     <FormItemLayout
                       label="URL"
@@ -301,9 +301,9 @@ export const CreateHookSheet = ({ visible, onClose, title, authConfig }: CreateH
                   )}
                 />
                 <FormField_Shadcn_
-                  key="webValues.secret"
+                  key="httpsValues.secret"
                   control={form.control}
-                  name="webValues.secret"
+                  name="httpsValues.secret"
                   render={({ field }) => (
                     <FormItemLayout
                       label="Secret"
