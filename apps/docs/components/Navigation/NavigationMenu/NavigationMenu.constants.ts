@@ -1025,7 +1025,7 @@ export const api: NavMenuConstant = {
       items: [],
     },
     {
-      name: 'SQL to REST API Tool',
+      name: 'SQL to REST API Converter',
       url: '/guides/api/sql-to-rest',
       items: [],
     },

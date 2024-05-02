@@ -3,7 +3,7 @@ import type { editor } from 'monaco-editor'
 import { useTheme } from 'next-themes'
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react'
 import { processSql, renderHttp, renderSupabaseJs } from 'sql-to-rest'
-import { CodeBlock, Tabs } from 'ui'
+import { CodeBlock, Tabs, cn } from 'ui'
 
 const defaultValue = `select
   *
@@ -22,6 +22,7 @@ export default function SqlToRest() {
 
   const monaco = useMonaco()
   const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme?.includes('dark') ?? false
 
   useLayoutEffect(() => {
     if (monaco && resolvedTheme) {
@@ -31,7 +32,6 @@ export default function SqlToRest() {
   }, [resolvedTheme, monaco])
 
   const process = useCallback(async (sql: string) => {
-    console.log({ sql })
     setSql(sql)
 
     try {
@@ -59,31 +59,37 @@ export default function SqlToRest() {
   }, [process])
 
   return (
-    <div className="flex justify-between gap-4">
-      <div className="flex-1 h-96 py-4 border rounded-md bg-[#1e1e1e]">
-        <Editor
-          language="pgsql"
-          theme="supabase"
-          value={sql}
-          options={{
-            tabSize: 2,
-            minimap: {
-              enabled: false,
-            },
-          }}
-          onChange={async (sql) => {
-            if (!sql) {
-              return
-            }
-            await process(sql)
-          }}
-        />
+    <div className="flex justify-between gap-4 mt-4">
+      <div className="flex-1 flex flex-col gap-4">
+        <div>Enter SQL to convert:</div>
+        <div
+          className={cn('h-96 py-4 border rounded-md', isDark ? 'bg-[#1f1f1f]' : 'bg-[#f0f0f0]')}
+        >
+          <Editor
+            language="pgsql"
+            theme="supabase"
+            value={sql}
+            options={{
+              tabSize: 2,
+              minimap: {
+                enabled: false,
+              },
+              fontSize: 13,
+            }}
+            onChange={async (sql) => {
+              if (!sql) {
+                return
+              }
+              await process(sql)
+            }}
+          />
+        </div>
       </div>
 
       <div className="flex-1 flex-col gap-2">
-        <Tabs defaultActiveId="http">
+        <Tabs defaultActiveId="http" queryGroup="language">
           <Tabs.Panel id="http" label="HTTP" className="flex flex-col gap-4">
-            <CodeBlock language="bash" hideLineNumbers className="self-stretch" hideCopy>
+            <CodeBlock language="bash" hideLineNumbers className="self-stretch">
               {httpRequest}
             </CodeBlock>
           </Tabs.Panel>
