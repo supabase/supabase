@@ -106,7 +106,6 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   }
 
   const EntityTooltipTrigger = ({ entity }: { entity: Entity }) => {
-    console.log('entitylistitem zans entity', entity)
     let tooltipContent = null
 
     switch (entity.type) {

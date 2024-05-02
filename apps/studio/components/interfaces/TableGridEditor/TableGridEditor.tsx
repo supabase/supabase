@@ -263,8 +263,6 @@ const TableGridEditor = ({
           <GridHeaderActions
             table={selectedTable as TableLike}
             canEditViaTableEditor={canEditViaTableEditor}
-            // isViewSelected={isViewSelected}
-            // isTableSelected={isTableSelected}
           />
         }
         onAddColumn={snap.onAddColumn}

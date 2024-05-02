@@ -4,7 +4,7 @@ import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { Lock, MousePointer2, PlusCircle, Unlock } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
 import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
 
@@ -19,30 +19,41 @@ import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import ConfirmModal from 'ui-patterns/Dialogs/ConfirmDialog'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
-import { TableLike } from 'hooks/misc/useTable'
 import useEntityType from 'hooks/misc/useEntityType'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
+import { useProjectLintsQuery } from 'data/lint/lint-query'
 
 export interface GridHeaderActionsProps {
   table: PostgresTable
   canEditViaTableEditor: boolean
-  // isViewSelected: boolean
-  // isTableSelected: boolean
 }
 
 //const GridHeaderActions = ({ table, isViewSelected, isTableSelected  }: GridHeaderActionsProps) => {
 const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const entityType = useEntityType(table?.id)
+  const { ref } = useParams()
+  const { project } = useProjectContext()
+
+  // need project lints to get security status for views
+  const { data: lints } = useProjectLintsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
 
   const isTable = entityType?.type === ENTITY_TYPE.TABLE
   const isView =
     entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
+
+  const viewIsSecurityDefiner =
+    entityType?.type === ENTITY_TYPE.VIEW &&
+    lints?.some(
+      (lint) =>
+        (lint?.metadata?.name === entityType.name && lint?.level === 'ERROR') ||
+        lint?.level === 'WARN'
+    )
+
   const isForeignTable = entityType?.type === ENTITY_TYPE.FOREIGN_TABLE
 
-  console.log('zans2 entityType', entityType)
-  console.log('zans2 table', table)
-  const { ref } = useParams()
-  const { project } = useProjectContext()
   const realtimeEnabled = useIsFeatureEnabled('realtime:all')
   const isLocked = EXCLUDED_SCHEMAS.includes(table.schema)
 
@@ -261,7 +272,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
         ) : null}
 
         {/* need to check if view is security invoker or definer */}
-        {isView && (
+        {isView && viewIsSecurityDefiner && (
           <Popover_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
             <PopoverTrigger_Shadcn_ asChild>
               <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
@@ -285,8 +296,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           </Popover_Shadcn_>
         )}
 
-        {/* Need to check if in public schema here too */}
-        {isForeignTable && (
+        {isForeignTable && entityType.schema === 'public' && (
           <Popover_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
             <PopoverTrigger_Shadcn_ asChild>
               <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
