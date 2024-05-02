@@ -1,5 +1,14 @@
 import { CLIENT_LIBRARIES } from 'common/constants'
-import { HelpCircle } from 'lucide-react'
+import {
+  HelpCircle,
+  Hash,
+  MessageSquare,
+  Book,
+  AlertTriangle,
+  Search,
+  ChevronRight,
+  Github,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
@@ -39,6 +48,20 @@ import MultiSelect from 'ui-patterns/MultiSelect'
 import DisabledStateForFreeTier from './DisabledStateForFreeTier'
 import { CATEGORY_OPTIONS, SERVICE_OPTIONS, SEVERITY_OPTIONS } from './Support.constants'
 import { formatMessage, uploadAttachments } from './SupportForm.utils'
+import {
+  type DocsSearchResult as Page,
+  type DocsSearchResultSection as PageSection,
+  DocsSearchResultType as PageType,
+  useDocsSearch,
+} from 'common'
+
+import {
+  CommandGroup,
+  CommandItem,
+  CommandLabel,
+  TextHighlighter,
+} from 'ui-patterns/Cmdk/Command.utils'
+import { useCommandMenu } from 'ui-patterns/Cmdk'
 
 const MAX_ATTACHMENTS = 5
 const INCLUDE_DISCUSSIONS = ['Problem', 'Database_unresponsive']
@@ -48,8 +71,78 @@ export interface SupportFormProps {
 }
 
 const SupportForm = ({ setSentCategory }: SupportFormProps) => {
+  const { handleDocsSearchDebounced, searchState, searchState: state } = useDocsSearch() // Initialize the docs search
+  const [subject, setSubject] = useState('') // State for the subject field
+  const [docsResults, setDocsResults] = useState<DocsSearchResult[]>([]) // State for the docs results
+
+  //const { search, setSearch, inputRef, site, setIsOpen } = useCommandMenu()
+  const router = useRouter()
+
+  // async function openLink(pageType: PageType, link: string) {
+  //   switch (pageType) {
+  //     case PageType.Markdown:
+  //     case PageType.Reference:
+  //       if (site === 'docs') {
+  //         await router.push(link)
+  //         return setIsOpen(false)
+  //       } else if (site === 'website') {
+  //         await router.push(`/docs${link}`)
+  //         setIsOpen(false)
+  //       } else {
+  //         window.open(`https://supabase.com/docs${link}`, '_blank')
+  //         setIsOpen(false)
+  //       }
+  //       break
+  //     case PageType.Integration:
+  //       if (site === 'website') {
+  //         router.push(link)
+  //         setIsOpen(false)
+  //       } else {
+  //         window.open(`https://supabase.com${link}`, '_blank')
+  //         setIsOpen(false)
+  //       }
+  //       break
+  //     case PageType.GithubDiscussion:
+  //       window.open(link, '_blank')
+  //       setIsOpen(false)
+  //       break
+  //     default:
+  //       throw new Error(`Unknown page type '${pageType}'`)
+  //   }
+  // }
+
+  // Trigger a debounced search when the subject changes
+  useEffect(() => {
+    if (subject.trim().length > 0) {
+      handleDocsSearchDebounced(subject.trim())
+    }
+  }, [subject])
+
+  // Update the docs results based on the search state
+  useEffect(() => {
+    if (searchState.status === 'fullResults') {
+      setDocsResults(searchState.results)
+    } else if (searchState.status === 'noResults' || searchState.status === 'error') {
+      setDocsResults([])
+    }
+  }, [searchState])
+
   const { isReady } = useRouter()
-  const { ref, slug, subject, category, message } = useParams()
+  const { ref, slug, category, message } = useParams()
+
+  const ChevronArrow = () => (
+    <ChevronRight
+      strokeWidth={1.5}
+      className="
+        text-foreground-muted
+        opacity-0
+        -left-4
+        group-aria-selected:scale-[101%]
+        group-aria-selected:opacity-100
+        group-aria-selected:left-0
+      "
+    />
+  )
 
   const uploadButtonRef = useRef()
   const enableFreeSupport = useFlag('enableFreeSupport')
@@ -220,6 +313,10 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   ]
 
   const ipv4MigrationStringMatched = ipv4MigrationStrings.some((str) => textAreaValue.includes(str))
+  const hasResults =
+    state.status === 'fullResults' ||
+    state.status === 'partialResults' ||
+    (state.status === 'loading' && state.staleResults.length > 0)
 
   useEffect(() => {
     if (!uploadedFiles) return
@@ -237,6 +334,28 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
       if (selectedProjectFromUrl !== undefined) setSelectedProjectRef(selectedProjectFromUrl.ref)
     }
   }, [isSuccessProjects])
+
+  const IconContainer = (
+    props: React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement>
+  ) => (
+    <div
+      className="
+        transition
+        w-6 h-6
+        bg-alternative
+        group-aria-selected:scale-[105%]
+        group-aria-selected:bg-foreground
+        text-foreground
+        group-aria-selected:text-background
+        rounded flex
+        items-center
+        justify-center
+
+        group-aria-selected:[&_svg]:scale-[103%]
+        "
+      {...props}
+    />
+  )
 
   return (
     <Form id="support-form" initialValues={initialValues} validate={onValidate} onSubmit={onSubmit}>
@@ -548,6 +667,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         id="subject"
                         label="Subject"
                         placeholder="Summary of the problem you have"
+                        onChange={(e) => setSubject(e.target.value)}
                         descriptionText={
                           values.subject.length > 0 &&
                           INCLUDE_DISCUSSIONS.includes(values.category) ? (
@@ -569,6 +689,80 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                         }
                       />
                     </div>
+
+                    {docsResults.length > 0 && hasResults && (
+                      <div>
+                        {docsResults.map((page, i) => (
+                          <CommandGroup
+                            key={`${page.path}-group`}
+                            heading=""
+                            value={`${encodeURIComponent(page.title)}-group-index-${i}`}
+                            forceMount={true}
+                          >
+                            <CommandItem
+                              key={`${page.path}-item`}
+                              value={`${encodeURIComponent(page.title)}-item-index-${i}`}
+                              type="block-link"
+                              //onSelect={() => openLink(page.type, formatPageUrl(page))}
+                              forceMount={true}
+                            >
+                              <div className="grow flex gap-3 items-center">
+                                <IconContainer>{getPageIcon(page)}</IconContainer>
+                                <div className="flex flex-col gap-0">
+                                  <CommandLabel>
+                                    <TextHighlighter text={page.title} query="test" />
+                                  </CommandLabel>
+                                  {(page.description || page.subtitle) && (
+                                    <div className="text-xs text-foreground-muted">
+                                      <TextHighlighter
+                                        text={page.description || page.subtitle}
+                                        query="test"
+                                      />
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                              <ChevronArrow />
+                            </CommandItem>
+
+                            {page.sections.length > 0 && (
+                              <div className="border-l border-default ml-3 pt-3">
+                                <CommandItem
+                                  className="ml-3 mb-3"
+                                  // onSelect={() =>
+                                  //   openLink(page.type, formatSectionUrl(page, page.section))
+                                  // }
+                                  key={`${page.path}__${page.heading}-item`}
+                                  value={`${encodeURIComponent(page.title)}__${encodeURIComponent(page.heading)}-item-index-${page.id}`}
+                                  forceMount={true}
+                                  type="block-link"
+                                >
+                                  <div className="grow flex gap-3 items-center">
+                                    <IconContainer>{getPageSectionIcon(page)}</IconContainer>
+                                    <div className="flex flex-col gap-2">
+                                      <cite>
+                                        <TextHighlighter
+                                          className="not-italic text-xs rounded-full px-2 py-1 bg-overlay-hover text-foreground"
+                                          text={page.title}
+                                          query="test"
+                                        />
+                                      </cite>
+                                      {page.heading && (
+                                        <CommandLabel>
+                                          <TextHighlighter text={page.heading} query="test" />
+                                        </CommandLabel>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <ChevronArrow />
+                                </CommandItem>
+                              </div>
+                            )}
+                          </CommandGroup>
+                        ))}
+                      </div>
+                    )}
+
                     {values.category === 'Problem' && (
                       <div className="px-6">
                         <Listbox
@@ -826,3 +1020,56 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
 }
 
 export default SupportForm
+
+export function formatPageUrl(page: Page) {
+  switch (page.type) {
+    case PageType.Markdown:
+    case PageType.Reference:
+    case PageType.Integration:
+    case PageType.GithubDiscussion:
+      return page.path
+    default:
+      throw new Error(`Unknown page type '${page.type}'`)
+  }
+}
+
+export function formatSectionUrl(page: Page, section: PageSection) {
+  switch (page.type) {
+    case PageType.Markdown:
+    case PageType.GithubDiscussion:
+      return `${formatPageUrl(page)}#${section.slug ?? ''}`
+    case PageType.Reference:
+      return `${formatPageUrl(page)}/${section.slug ?? ''}`
+    case PageType.Integration:
+      // [Charis] Markdown headings on integrations pages don't have slugs yet
+      return formatPageUrl(page)
+    default:
+      throw new Error(`Unknown page type '${page.type}'`)
+  }
+}
+
+export function getPageIcon(page: Page) {
+  switch (page.type) {
+    case PageType.Markdown:
+    case PageType.Reference:
+    case PageType.Integration:
+      return <Book strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+    case PageType.GithubDiscussion:
+      return <Github strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+    default:
+      throw new Error(`Unknown page type '${page.type}'`)
+  }
+}
+
+export function getPageSectionIcon(page: Page) {
+  switch (page.type) {
+    case PageType.Markdown:
+    case PageType.Reference:
+    case PageType.Integration:
+      return <Hash strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+    case PageType.GithubDiscussion:
+      return <MessageSquare strokeWidth={1.5} className="!mr-0 !w-4 !h-4" />
+    default:
+      throw new Error(`Unknown page type '${page.type}'`)
+  }
+}
