@@ -135,12 +135,11 @@ export function processMdxForSearch(_content: string, options?: { yaml?: boolean
     mdastExtensions: [mdxFromMarkdown()],
   })
 
-  let meta: Record<string, unknown> = {}
+  let meta: Record<string, unknown>
   if (options?.yaml) {
     meta = frontmatter
   } else {
-    const extractedMeta = extractMetaExport(mdxTree)
-    if (extractedMeta) meta = extractedMeta
+    meta = extractMetaExport(mdxTree)
   }
 
   const serializableMeta: Json = meta && JSON.parse(JSON.stringify(meta))
@@ -174,8 +173,7 @@ export function processMdxForSearch(_content: string, options?: { yaml?: boolean
     const [firstNode] = tree.children
     const content = toMarkdown(tree)
 
-    const rawHeading: string | undefined =
-      firstNode.type === 'heading' ? toString(firstNode) : undefined
+    const rawHeading: string = firstNode.type === 'heading' ? toString(firstNode) : undefined
 
     if (!rawHeading) {
       return { content }

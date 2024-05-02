@@ -24,7 +24,7 @@ export function extractTsDocNode(nodeToFind: string, definition: any) {
 }
 
 export function generateParameters(tsDefinition: any) {
-  let functionDeclaration: any = null
+  let functionDeclaration = null
   if (tsDefinition.kindString == 'Method') {
     functionDeclaration = tsDefinition
   } else if (tsDefinition.kindString == 'Constructor') {
@@ -46,7 +46,7 @@ function recurseThroughParams(paramDefinition: any) {
   const param = { ...paramDefinition }
   const labelParams = generateLabelParam(param)
 
-  let children: any[] | undefined = undefined
+  let children: any[]
   if (param.type?.type === 'literal') {
     // skip: literal types have no children
   } else if (param.type?.type === 'intrinsic') {

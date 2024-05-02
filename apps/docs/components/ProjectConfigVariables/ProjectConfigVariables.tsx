@@ -113,13 +113,13 @@ function OrgProjectSelector() {
     () =>
       stateSummary !== 'loggedIn.dataSuccess.hasData'
         ? []
-        : projects!.map((project) => {
-            const organization = organizations!.find((org) => org.id === project.organization_id)
+        : projects.map((project) => {
+            const organization = organizations.find((org) => org.id === project.organization_id)
             return {
               // @ts-ignore -- problem in OpenAPI spec -- project has ref property
               id: project.ref,
-              value: toOrgProjectValue(organization!, project),
-              displayName: toDisplayNameOrgProject(organization!, project),
+              value: toOrgProjectValue(organization, project),
+              displayName: toDisplayNameOrgProject(organization, project),
             }
           }),
     [organizations, projects, stateSummary]
@@ -130,8 +130,8 @@ function OrgProjectSelector() {
       const storedMaybeOrgId = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_ORG)
       const storedMaybeProjectRef = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_PROJECT)
 
-      let storedOrg: Org | undefined = undefined
-      let storedProject: Project | undefined = undefined
+      let storedOrg: Org
+      let storedProject: Project
       if (storedMaybeOrgId && storedMaybeProjectRef) {
         // @ts-ignore -- problem in OpenAPI spec -- org id is returned as number, not string
         storedOrg = organizations.find((org) => org.id === Number(storedMaybeOrgId))
@@ -142,11 +142,9 @@ function OrgProjectSelector() {
       if (storedOrg && storedProject && storedProject.organization_id === storedOrg.id) {
         setSelectedOrgProject(storedOrg, storedProject)
       } else {
-        const firstProject = projects?.[0]
-        const matchingOrg = firstProject
-          ? organizations?.find((org) => org.id === firstProject.organization_id)
-          : undefined
-        if (matchingOrg) setSelectedOrgProject(matchingOrg, firstProject!)
+        const firstProject = projects[0]
+        const matchingOrg = organizations.find((org) => org.id === firstProject.organization_id)
+        if (matchingOrg) setSelectedOrgProject(matchingOrg, firstProject)
       }
     }
   }, [organizations, projects, selectedOrg, selectedProject, setSelectedOrgProject, stateSummary])
@@ -168,7 +166,7 @@ function OrgProjectSelector() {
         const [orgId, projectRef] = fromOrgProjectValue(optionValue)
         if (!orgId || !projectRef) return
 
-        const org = organizations!.find((org) => org.id === orgId)
+        const org = organizations.find((org) => org.id === orgId)
         // @ts-ignore -- problem in OpenAPI spec -- project has ref property
         const project = projects.find((project) => project.ref === projectRef)
 
@@ -212,7 +210,7 @@ function BranchSelector() {
   const formattedData: ComboBoxOption[] =
     stateSummary !== 'loggedIn.branches.dataSuccess.hasData'
       ? []
-      : data!.map((branch) => ({
+      : data.map((branch) => ({
           id: branch.id,
           displayName: branch.name,
           value: toBranchValue(branch),
@@ -222,18 +220,18 @@ function BranchSelector() {
     if (stateSummary === 'loggedIn.branches.dataSuccess.hasData' && !selectedBranch) {
       const storedMaybeBranchId = retrieve('local', LOCAL_STORAGE_KEYS.SAVED_BRANCH)
 
-      let storedBranch: Branch | undefined = undefined
+      let storedBranch: Branch
       if (storedMaybeBranchId) {
-        storedBranch = data!.find((branch) => branch.id === storedMaybeBranchId)
+        storedBranch = data.find((branch) => branch.id === storedMaybeBranchId)
       }
 
       if (storedBranch) {
         setSelectedBranch(storedBranch)
       } else {
-        const productionBranch = data!.find(
+        const productionBranch = data.find(
           (branch) => branch.project_ref === branch.parent_project_ref
         )
-        setSelectedBranch(productionBranch ?? data![0])
+        setSelectedBranch(productionBranch ?? data[0])
       }
     }
   }, [data, selectedBranch, setSelectedBranch, stateSummary])
@@ -253,7 +251,7 @@ function BranchSelector() {
       onSelectOption={(option) => {
         const [branchId] = fromBranchValue(option)
         if (branchId) {
-          const branch = data!.find((branch) => branch.id === branchId)
+          const branch = data.find((branch) => branch.id === branchId)
           if (branch) setSelectedBranch(branch)
         }
       }}
@@ -295,16 +293,16 @@ function VariableView({ variable, className }: { variable: Variable; className?:
             ? 'loggedIn.selectedProject.dataError'
             : 'loggedIn.selectedProject.dataSuccess'
 
-  let variableValue: string | undefined = undefined
+  let variableValue: string = null
   if (stateSummary === 'loggedIn.selectedProject.dataSuccess') {
     switch (variable) {
       case 'url':
-        variableValue = `${apiData?.autoApiService.protocol || 'https'}://${
-          apiData?.autoApiService.endpoint
+        variableValue = `${apiData.autoApiService.protocol || 'https'}://${
+          apiData.autoApiService.endpoint
         }`
         break
       case 'anonKey':
-        variableValue = apiData?.autoApiService.defaultApiKey
+        variableValue = apiData.autoApiService.defaultApiKey
         break
     }
   }

@@ -23,7 +23,7 @@ function getLinkTarget(link: string): LinkTarget {
 }
 
 function getUniqueTags(json: Extension[]): string[] {
-  const tags: Array<string> = []
+  const tags = []
   for (const item of json) {
     if (item.tags) {
       tags.push(...item.tags)
