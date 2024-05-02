@@ -1,4 +1,4 @@
-import { Button, Toggle } from 'ui'
+import { Button, Input, Toggle } from 'ui'
 import { Hook } from './hooks.constants'
 
 interface HookCardProps {
@@ -23,29 +23,59 @@ export const HookCard = ({
         <span className="text-sm text-foreground-light">{hook.subtitle}</span>
         <div className="text-sm flex flex-row space-x-5 py-4">
           {hook.method.type === 'postgres' ? (
-            <>
-              <div className="flex flex-col">
-                <span className="text-foreground-light">schema</span>
-                <span className="text-foreground-light">function</span>
+            <div className="flex flex-col w-full space-y-2">
+              <div className="flex flex-row items-center">
+                <span className="text-foreground-light w-20">schema</span>
+                <Input
+                  title={hook.method.schema}
+                  copy
+                  readOnly
+                  disabled
+                  className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
+                  value={hook.method.schema}
+                  onCopy={() => {}}
+                />
               </div>
-              <div className="flex flex-col overflow-y-auto">
-                <span title={hook.method.schema}>{hook.method.schema}</span>
-                <span title={hook.method.functionName}>{hook.method.functionName}</span>
+              <div className="flex flex-row items-center">
+                <span className="text-foreground-light w-20">function</span>
+                <Input
+                  title={hook.method.functionName}
+                  copy
+                  readOnly
+                  disabled
+                  className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
+                  value={hook.method.functionName}
+                  onCopy={() => {}}
+                />
               </div>
-            </>
+            </div>
           ) : (
-            <>
-              <div className="flex flex-col">
-                <span className="text-foreground-light">endpoint</span>
-                <span className="text-foreground-light">secret</span>
+            <div className="flex flex-col w-full space-y-2">
+              <div className="flex flex-row items-center">
+                <span className="text-foreground-light w-20">endpoint</span>
+                <Input
+                  title={hook.method.url}
+                  copy
+                  readOnly
+                  disabled
+                  className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
+                  value={hook.method.url}
+                  onCopy={() => {}}
+                />
               </div>
-              <div className="flex flex-col overflow-y-auto">
-                <span title={hook.method.url}>{hook.method.url}</span>
-                <span className="truncate" title={hook.method.secret}>
-                  {hook.method.secret}
-                </span>
+              <div className="flex flex-row items-center">
+                <span className="text-foreground-light w-20">secret</span>
+                <Input
+                  copy
+                  title={hook.method.secret}
+                  reveal={true}
+                  readOnly
+                  disabled
+                  className="input-mono [&>div>div>div>input]:text-xs [&>div>div>div>input]:opacity-100 flex-1"
+                  value={hook.method.secret}
+                />
               </div>
-            </>
+            </div>
           )}
         </div>
         <div className="flex flex-row gap-2">
