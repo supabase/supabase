@@ -3,7 +3,7 @@ import { analyticsKeys } from './keys'
 import { post } from 'data/fetchers'
 
 type CreateWarehouseAccessToken = {
-  name: string
+  description: string
 }
 async function createWarehouseAccessToken(ref: string, payload: CreateWarehouseAccessToken) {
   const res = await post(`/platform/projects/{ref}/analytics/warehouse/access-tokens`, {
@@ -11,9 +11,9 @@ async function createWarehouseAccessToken(ref: string, payload: CreateWarehouseA
       path: { ref },
     },
     body: payload,
-  })
+  } as any)
+  // TODO: remove type casts when openapi client generates correct types
 
-  // TODO: remove cast when openapi client generates correct types
   return res as any as {
     id: string
     token: string

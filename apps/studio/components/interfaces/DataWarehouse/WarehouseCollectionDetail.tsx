@@ -2,22 +2,12 @@ import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
-import {
-  Button,
-  CodeBlock,
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-  IconRefreshCcw,
-  IconRewind,
-  Input,
-} from 'ui'
+import { Button, IconRefreshCcw, IconRewind } from 'ui'
 import { LogTable } from '../Settings/Logs'
 import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
 import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
 import Link from 'next/link'
 import { useWarehouseAccessTokensQuery } from 'data/analytics/warehouse-access-tokens-query'
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@ui/components/shadcn/ui/select'
 import { TestCollectionDialog } from './TestCollectionDialog'
 
 export const WarehouseCollectionDetail = () => {
@@ -25,7 +15,6 @@ export const WarehouseCollectionDetail = () => {
   const collectionToken = router.query.collectionToken as string
   const projectRef = router.query.ref as string
   const accessTokens = useWarehouseAccessTokensQuery({ projectRef })
-  const [testAccessToken, setTestAccessToken] = React.useState('')
 
   const isDevEnv = process.env.NODE_ENV === 'development'
 
@@ -75,7 +64,6 @@ export const WarehouseCollectionDetail = () => {
         ...r,
       }
     })
-    console.log({ r, results })
 
     return r
   }
@@ -111,6 +99,7 @@ export const WarehouseCollectionDetail = () => {
               </div>
             </div>
             <LogTable
+              hasEditorValue={false}
               projectRef={projectRef}
               isLoading={isLoading}
               data={results}

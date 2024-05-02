@@ -33,13 +33,13 @@ import CopyButton from 'components/ui/CopyButton'
 const AccessTokenItem = ({
   token,
   id,
-  name,
+  description,
   onDeleteClick,
   inserted_at,
 }: {
   token: string
   id: string
-  name: string
+  description: string
   inserted_at: string
   onDeleteClick: (id: string) => void
 }) => {
@@ -47,7 +47,7 @@ const AccessTokenItem = ({
 
   return (
     <Table.tr className="group">
-      <Table.td>{name}</Table.td>
+      <Table.td className="max-w-[240px]">{description}</Table.td>
       <Table.td>{formattedInsertedAt}</Table.td>
       <Table.td>
         <div className="flex gap-1 relative">
@@ -120,7 +120,7 @@ const WarehouseAccessTokens = () => {
           actions={
             <CreateWarehouseAccessToken
               onSubmit={async ({ description }) => {
-                await createWarehouseAccessToken.mutateAsync({ name: description })
+                await createWarehouseAccessToken.mutateAsync({ description: description })
               }}
             />
           }
@@ -147,7 +147,7 @@ const WarehouseAccessTokens = () => {
                 <div className="overflow-x-auto">
                   <Table
                     head={[
-                      <Table.th key="desc">Description</Table.th>,
+                      <Table.th key="name">Name</Table.th>,
                       <Table.th key="token">Created at</Table.th>,
                       <Table.th key="token">Token</Table.th>,
                       <Table.th key="actions" />,
@@ -160,7 +160,7 @@ const WarehouseAccessTokens = () => {
                             token={accessToken.token}
                             id={accessToken.id}
                             inserted_at={accessToken.inserted_at}
-                            name={accessToken.description || 'No description'}
+                            description={accessToken.description || 'No description'}
                             onDeleteClick={() => {
                               setShowDeleteDialog(true)
                               setTokenToDelete(accessToken.token)

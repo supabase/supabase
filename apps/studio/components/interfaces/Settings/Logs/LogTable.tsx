@@ -37,6 +37,7 @@ import type { LogData, QueryType } from './Logs.types'
 import DefaultErrorRenderer from './LogsErrorRenderers/DefaultErrorRenderer'
 import ResourcesExceededErrorRenderer from './LogsErrorRenderers/ResourcesExceededErrorRenderer'
 import { motion } from 'framer-motion'
+import { WarehouseColumnRenderer } from './LogColumnRenderers/WarehouseColumnRenderer'
 
 interface Props {
   data?: Array<LogData | Object>
@@ -143,6 +144,10 @@ const LogTable = ({
 
       case 'auth':
         columns = AuthColumnRenderer
+        break
+
+      case 'warehouse':
+        columns = WarehouseColumnRenderer
         break
 
       default:

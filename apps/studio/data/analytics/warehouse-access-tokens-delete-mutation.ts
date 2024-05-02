@@ -6,12 +6,12 @@ async function deleteWarehouseAccessToken(ref: string, token: string) {
   const res = await del(`/platform/projects/{ref}/analytics/warehouse/access-tokens/{token}`, {
     params: {
       path: { ref, token },
-    },
+    } as any, // TODO: remove cast when openapi client generates correct types
   })
 
   if (res.error) {
-    console.error(res.error)
-    throw res.error
+    console.error(res)
+    throw res
   }
 
   return res

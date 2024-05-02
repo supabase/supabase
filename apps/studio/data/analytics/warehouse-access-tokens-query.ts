@@ -26,7 +26,6 @@ export async function getWarehouseAccessTokens(
     data: {
       id: string
       token: string
-      scopes: string
       inserted_at: string
       description?: string
     }[]
