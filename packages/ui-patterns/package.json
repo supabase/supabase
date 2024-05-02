@@ -8,15 +8,18 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.6.0",
     "cmdk": "^0.2.1",
     "common": "*",
     "lodash": "*",
     "lucide-react": "*",
+    "monaco-editor": "*",
     "next-themes": "*",
     "react-error-boundary": "^4.0.12",
     "react-hot-toast": "*",
     "react-tooltip": "*",
     "reactflow": "*",
+    "sql-to-rest": "*",
     "tsconfig": "*",
     "ui": "*"
   },

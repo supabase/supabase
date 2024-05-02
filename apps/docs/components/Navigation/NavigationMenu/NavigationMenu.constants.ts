@@ -1025,6 +1025,11 @@ export const api: NavMenuConstant = {
       items: [],
     },
     {
+      name: 'SQL to REST API Tool',
+      url: '/guides/api/sql-to-rest',
+      items: [],
+    },
+    {
       name: 'Guides',
       url: '/guides/api',
       items: [
