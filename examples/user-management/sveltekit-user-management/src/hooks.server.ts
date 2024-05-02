@@ -43,8 +43,8 @@ export const handle: Handle = async ({ event, resolve }) => {
   }
 
   return resolve(event, {
-    filterSerializedResponseHeaders(name) {
-      return name === 'content-range'
+    filterSerializedResponseHeaders(name: string) {
+      return name === 'content-range' || name === 'x-supabase-api-version'
     },
   })
 }

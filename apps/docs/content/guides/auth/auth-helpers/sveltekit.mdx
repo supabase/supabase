@@ -96,7 +96,7 @@ export const handle = async ({ event, resolve }) => {
 
   return resolve(event, {
     filterSerializedResponseHeaders(name) {
-      return name === 'content-range'
+      return name === 'content-range' || name === 'x-supabase-api-version'
     },
   })
 }
@@ -143,7 +143,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   return resolve(event, {
     filterSerializedResponseHeaders(name) {
-      return name === 'content-range'
+      return name === 'content-range' || name === 'x-supabase-api-version'
     },
   })
 }
@@ -154,7 +154,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 <Admonition type="note">
 
-Note that we are specifying filterSerializedResponseHeaders here. We need to tell SvelteKit that supabase needs the content-range header.
+Note that we are specifying filterSerializedResponseHeaders here. We need to tell SvelteKit that supabase needs the `content-range` and `x-supabase-api-version` headers.
 
 </Admonition>
 
@@ -679,7 +679,7 @@ async function supabase({ event, resolve }) {
 
   return resolve(event, {
     filterSerializedResponseHeaders(name) {
-      return name === 'content-range'
+      return name === 'content-range' || name === 'x-supabase-api-version'
     },
   })
 }
@@ -747,7 +747,7 @@ async function supabase({ event, resolve }) {
 
   return resolve(event, {
     filterSerializedResponseHeaders(name) {
-      return name === 'content-range'
+      return name === 'content-range' || name === 'x-supabase-api-version'
     },
   })
 }
@@ -972,7 +972,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
   return resolve(event, {
     filterSerializedResponseHeaders(name) {
-      return name === 'content-range'
+      return name === 'content-range' || name === 'x-supabase-api-version'
     },
   })
 }
