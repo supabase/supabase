@@ -95,7 +95,7 @@ export const useTableRowDeleteMutation = ({
             const initialMessage = isMultipleRows
               ? `Unable to delete rows as one of them is currently referenced by a foreign key constraint from the table \`${referencingTable}\`.`
               : `Unable to delete row as it is currently referenced by a foreign key constraint from the table \`${referencingTable}\`.`
-            const resolutionCTA = `Set a cascade behaviour on the foreign key relation \`${fkName}\` in the \`${referencingTable}\` table to automatically respond when row(s) are being deleted in the \`${sourceTable}\` table.`
+            const resolutionCTA = `Set an on delete behavior on the foreign key relation \`${fkName}\` in the \`${referencingTable}\` table to automatically respond when row(s) are being deleted in the \`${sourceTable}\` table.`
 
             UiToast({
               variant: 'default',
