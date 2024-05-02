@@ -16,7 +16,7 @@ import { Button, cn } from 'ui'
 import { useSendFeedbackMutation } from '~/lib/fetch/feedback'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { FeedbackModal, type FeedbackFields } from './FeedbackModal'
-import { getSanitizedTabParams } from './Feedback.utils'
+import { getNotionTeam, getSanitizedTabParams } from './Feedback.utils'
 
 const FeedbackButton = forwardRef<
   HTMLButtonElement,
@@ -125,6 +125,7 @@ function Feedback() {
       title,
       // @ts-expect-error -- can't click this button without having a state.response
       isHelpful: state.response === 'yes',
+      team: getNotionTeam(pathname),
     })
     setModalOpen(false)
     refocusButton()

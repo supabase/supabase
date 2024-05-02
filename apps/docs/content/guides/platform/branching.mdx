@@ -24,6 +24,14 @@ Supabase Branching works with Git. You can test changes in a separate, temporary
 
 You can run multiple Preview Branches for every Supabase project. Branches contain all the Supabase features with their own API credentials. Preview Environments pause automatically after 5 minutes of inactivity.
 
+<Admonition type="caution" label="Some features may not work as expected on Preview Branches">
+
+Due to Preview Branches running on Fly Postgres instances, some features like `pg-cron` are not fully supported.
+
+For a full list of limitations, see [Fly Postgres limitations](/docs/guides/platform/fly-postgres#limitations).
+
+</Admonition>
+
 <figure className="max-w-[700px] mx-auto">
   <Image
     className="hidden dark:block"

@@ -1,9 +1,8 @@
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { isEmpty, isUndefined, noop } from 'lodash'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
-import { Alert, Badge, Button, Checkbox, IconBookOpen, Input, Modal, SidePanel } from 'ui'
+import { Alert, Badge, Button, Checkbox, Input, SidePanel } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -20,6 +19,7 @@ import {
 import { useEnumeratedTypesQuery } from 'data/enumerated-types/enumerated-types-query'
 import { useIsFeatureEnabled } from 'hooks'
 import { EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS } from 'lib/constants/schemas'
+import { ExternalLink } from 'lucide-react'
 import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { SpreadsheetImport } from '../'
 import ActionBar from '../ActionBar'
@@ -306,23 +306,20 @@ const TableEditor = ({
             title="Policies are required to query data"
           >
             <p>
-              You need to write an access policy before you can query data from this table. Without
-              a policy, querying this table will result in an <u>empty array</u> of results.
+              You need to create an access policy before you can query data from this table. Without
+              a policy, querying this table will return an{' '}
+              <u className="text-foreground">empty array</u> of results.{' '}
+              {isNewRecord ? 'You can create policies after saving this table.' : ''}
             </p>
-            {isNewRecord && (
-              <p className="mt-3">You can create policies after you create this table.</p>
-            )}
-            <p className="mt-4">
-              <Button asChild type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                <Link
-                  href="https://supabase.com/docs/guides/auth/row-level-security"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  RLS Documentation
-                </Link>
-              </Button>
-            </p>
+            <Button asChild type="default" icon={<ExternalLink />} className="mt-4">
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href="https://supabase.com/docs/guides/auth/row-level-security"
+              >
+                RLS Documentation
+              </a>
+            </Button>
           </Alert>
         ) : (
           <Alert
@@ -335,17 +332,15 @@ const TableEditor = ({
               {tableFields.name ? `The table ${tableFields.name}` : 'Your table'} will be publicly
               writable and readable
             </p>
-            <p className="mt-4">
-              <Button asChild type="default" icon={<IconBookOpen strokeWidth={1.5} />}>
-                <Link
-                  href="https://supabase.com/docs/guides/auth/row-level-security"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  RLS Documentation
-                </Link>
-              </Button>
-            </p>
+            <Button asChild type="default" icon={<ExternalLink />} className="mt-4">
+              <a
+                target="_blank"
+                rel="noreferrer"
+                href="https://supabase.com/docs/guides/auth/row-level-security"
+              >
+                RLS Documentation
+              </a>
+            </Button>
           </Alert>
         )}
         {realtimeEnabled && (
@@ -363,6 +358,7 @@ const TableEditor = ({
       <SidePanel.Content className="space-y-10 py-6">
         {!isDuplicating && (
           <ColumnManagement
+            table={tableFields}
             columns={tableFields?.columns}
             relations={fkRelations}
             enumTypes={enumTypes}
@@ -374,6 +370,7 @@ const TableEditor = ({
               onUpdateField({ columns: DEFAULT_COLUMNS })
               setImportContent(undefined)
             }}
+            onUpdateFkRelations={onUpdateFkRelations}
           />
         )}
         {isDuplicating && (

@@ -206,7 +206,7 @@ If the tool doesn't exist, we build and open source it ourselves.
 - [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
 - [PostgreSQL](https://www.postgresql.org/) is an object-relational database system with over 30 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance.
 
-For the system to work cohesively, some services require additional configuration within the Postgres database. For example, the APIs and Auth system require several [default roles](/docs/guides/database/postgres-roles) and the `pgjwt` Postgres extension. 
+For the system to work cohesively, some services require additional configuration within the Postgres database. For example, the APIs and Auth system require several [default roles](/docs/guides/database/postgres/roles) and the `pgjwt` Postgres extension. 
 
 You can find all the default extensions inside the [schema migration scripts repo](https://github.com/supabase/postgres/tree/develop/migrations). These scripts are mounted at `/docker-entrypoint-initdb.d` to run automatically when starting the database container.
 
