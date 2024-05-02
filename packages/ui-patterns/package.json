@@ -18,6 +18,7 @@
     "next-themes": "*",
     "react-error-boundary": "^4.0.12",
     "react-hot-toast": "*",
+    "react-markdown": "^9.0.1",
     "react-tooltip": "*",
     "reactflow": "*",
     "sql-to-rest": "*",

@@ -14,10 +14,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?select=title,description')
+    expect(fullPath).toBe('/books?select=title,description')
   })
 
   test('inline target expression fails', async () => {
@@ -48,10 +48,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?select=my_title:title')
+    expect(fullPath).toBe('/books?select=my_title:title')
   })
 
   test('remove alias when it matches column name', async () => {
@@ -63,10 +63,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?select=title')
+    expect(fullPath).toBe('/books?select=title')
   })
 
   test('equal', async () => {
@@ -80,10 +80,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?title=eq.Cheese')
+    expect(fullPath).toBe('/books?title=eq.Cheese')
   })
 
   test('not equal', async () => {
@@ -97,10 +97,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?title=neq.Cheese')
+    expect(fullPath).toBe('/books?title=neq.Cheese')
   })
 
   test('not wrapped equal', async () => {
@@ -116,10 +116,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?title=not.eq.Cheese')
+    expect(fullPath).toBe('/books?title=not.eq.Cheese')
   })
 
   test('null', async () => {
@@ -133,10 +133,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?title=is.null')
+    expect(fullPath).toBe('/books?title=is.null')
   })
 
   test('not null', async () => {
@@ -150,10 +150,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?title=not.is.null')
+    expect(fullPath).toBe('/books?title=not.is.null')
   })
 
   test('float type', async () => {
@@ -167,10 +167,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?pages=gt.10.1')
+    expect(fullPath).toBe('/books?pages=gt.10.1')
   })
 
   test('greater than', async () => {
@@ -184,10 +184,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?pages=gt.10')
+    expect(fullPath).toBe('/books?pages=gt.10')
   })
 
   test('greater than or equal', async () => {
@@ -201,10 +201,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?pages=gte.10')
+    expect(fullPath).toBe('/books?pages=gte.10')
   })
 
   test('less than', async () => {
@@ -218,10 +218,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?pages=lt.10')
+    expect(fullPath).toBe('/books?pages=lt.10')
   })
 
   test('less than or equal', async () => {
@@ -235,10 +235,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?pages=lte.10')
+    expect(fullPath).toBe('/books?pages=lte.10')
   })
 
   test('"and" expression', async () => {
@@ -253,10 +253,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?title=eq.Cheese&description=ilike.*salsa*')
+    expect(fullPath).toBe('/books?title=eq.Cheese&description=ilike.*salsa*')
   })
 
   test('"or" expression', async () => {
@@ -271,10 +271,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?or=(title.eq.Cheese,title.eq.Salsa)')
+    expect(fullPath).toBe('/books?or=(title.eq.Cheese,title.eq.Salsa)')
   })
 
   test('negated "and" expression', async () => {
@@ -291,10 +291,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?not.and=(title.eq.Cheese,description.ilike.*salsa*)')
+    expect(fullPath).toBe('/books?not.and=(title.eq.Cheese,description.ilike.*salsa*)')
   })
 
   test('negated "or" expression', async () => {
@@ -311,10 +311,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?not.or=(title.eq.Cheese,title.eq.Salsa)')
+    expect(fullPath).toBe('/books?not.or=(title.eq.Cheese,title.eq.Salsa)')
   })
 
   test('"and" expression with nested "or"', async () => {
@@ -332,10 +332,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe(
+    expect(fullPath).toBe(
       '/books?title=like.T*&or=(description.ilike.*tacos*,description.ilike.*salsa*)'
     )
   })
@@ -357,10 +357,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe(
+    expect(fullPath).toBe(
       '/books?not.and=(title.like.T*,or(description.ilike.*tacos*,description.ilike.*salsa*))'
     )
   })
@@ -382,10 +382,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe(
+    expect(fullPath).toBe(
       '/books?not.and=(title.like.T*,not.or(description.ilike.*tacos*,description.ilike.*salsa*))'
     )
   })
@@ -403,10 +403,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe(
+    expect(fullPath).toBe(
       '/books?or=(and(title.like.T*,description.ilike.*tacos*),description.ilike.*salsa*)'
     )
   })
@@ -422,10 +422,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?limit=5')
+    expect(fullPath).toBe('/books?limit=5')
   })
 
   test('offset', async () => {
@@ -439,10 +439,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?offset=10')
+    expect(fullPath).toBe('/books?offset=10')
   })
 
   test('limit and offset', async () => {
@@ -458,10 +458,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?limit=5&offset=10')
+    expect(fullPath).toBe('/books?limit=5&offset=10')
   })
 
   test('order by', async () => {
@@ -475,10 +475,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?order=title')
+    expect(fullPath).toBe('/books?order=title')
   })
 
   test('order by multiple columns', async () => {
@@ -493,10 +493,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?order=title,description')
+    expect(fullPath).toBe('/books?order=title,description')
   })
 
   test('order by asc', async () => {
@@ -510,10 +510,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?order=title.asc')
+    expect(fullPath).toBe('/books?order=title.asc')
   })
 
   test('order by desc', async () => {
@@ -527,10 +527,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?order=title.desc')
+    expect(fullPath).toBe('/books?order=title.desc')
   })
 
   test('order by nulls first', async () => {
@@ -544,10 +544,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?order=title.nullsfirst')
+    expect(fullPath).toBe('/books?order=title.nullsfirst')
   })
 
   test('order by nulls last', async () => {
@@ -561,10 +561,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?order=title.nullslast')
+    expect(fullPath).toBe('/books?order=title.nullslast')
   })
 
   test('order by desc nulls last', async () => {
@@ -578,10 +578,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?order=title.desc.nullslast')
+    expect(fullPath).toBe('/books?order=title.desc.nullslast')
   })
 
   test('cast', async () => {
@@ -593,10 +593,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?select=pages::pg_catalog.float8')
+    expect(fullPath).toBe('/books?select=pages::pg_catalog.float8')
   })
 
   test('cast with alias', async () => {
@@ -608,10 +608,10 @@ describe('select', () => {
     `
 
     const statement = await processSql(sql)
-    const { method, path } = await renderHttp(statement)
+    const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(path).toBe('/books?select=partialPages:pages::pg_catalog.float8')
+    expect(fullPath).toBe('/books?select=partialPages:pages::pg_catalog.float8')
   })
 
   test('cast in where clause fails', async () => {

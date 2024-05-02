@@ -44,7 +44,7 @@ async function formatSelect(select: Select): Promise<SupabaseJsQuery> {
         return value
       })
 
-      lines.push(`.select('${renderedTargets.join(', ')}')`)
+      lines.push(`.select(${JSON.stringify(renderedTargets.join(', '))})`)
     }
   }
 
@@ -55,14 +55,14 @@ async function formatSelect(select: Select): Promise<SupabaseJsQuery> {
   if (sorts) {
     for (const sort of sorts) {
       if (!sort.direction && !sort.nulls) {
-        lines.push(`.order('${sort.column}')`)
+        lines.push(`.order(${JSON.stringify(sort.column)})`)
       } else {
         const options = {
           ascending: sort.direction ? sort.direction === 'asc' : undefined,
           nullsFirst: sort.nulls ? sort.nulls === 'first' : undefined,
         }
 
-        lines.push(`.order('${sort.column}', ${JSON.stringify(options)})`)
+        lines.push(`.order(${JSON.stringify(sort.column)}, ${JSON.stringify(options)})`)
       }
     }
   }
@@ -98,13 +98,15 @@ function formatSelectFilterRoot(lines: string[], filter: Filter) {
   if (filter.negate) {
     if (filter.type === 'column') {
       const value = typeof filter.value === 'string' ? `'${filter.value}'` : filter.value
-      lines.push(`.not('${filter.column}', '${filter.operator}', ${value})`)
+      lines.push(
+        `.not(${JSON.stringify(filter.column)}, ${JSON.stringify(filter.operator)}, ${JSON.stringify(filter.value)})`
+      )
     }
     // supabase-js doesn't support negated logical operators.
     // We work around this by wrapping the filter in an 'or'
     // with only 1 value
     else if (filter.type === 'logical') {
-      lines.push(`.or('${formatSelectFilter(filter)}')`)
+      lines.push(`.or(${JSON.stringify(formatSelectFilter(filter))})`)
     }
     return
   }
@@ -112,7 +114,9 @@ function formatSelectFilterRoot(lines: string[], filter: Filter) {
   // Column filter, eg. .eq('title', 'Cheese')
   if (type === 'column') {
     const value = typeof filter.value === 'string' ? `'${filter.value}'` : filter.value
-    lines.push(`.${filter.operator}('${filter.column}', ${value})`)
+    lines.push(
+      `.${filter.operator}(${JSON.stringify(filter.column)}, ${JSON.stringify(filter.value)})`
+    )
   }
 
   // Logical operator filter, eg. .or('title.eq.Cheese,title.eq.Salsa')
@@ -127,7 +131,7 @@ function formatSelectFilterRoot(lines: string[], filter: Filter) {
     // Otherwise use the .or(...) method
     else if (filter.operator === 'or') {
       lines.push(
-        `.or('${filter.values.map((subFilter) => formatSelectFilter(subFilter)).join(', ')}')`
+        `.or(${JSON.stringify(filter.values.map((subFilter) => formatSelectFilter(subFilter)).join(', '))})`
       )
     }
   } else {

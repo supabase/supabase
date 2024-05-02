@@ -3,6 +3,8 @@ import { Filter, Select, Statement } from '../processor'
 export type HttpRequest = {
   method: 'GET'
   path: string
+  params: URLSearchParams
+  fullPath: string
 }
 
 /**
@@ -81,32 +83,50 @@ async function formatSelect(select: Select): Promise<HttpRequest> {
     }
   }
 
-  let path = `/${from}`
-
-  if (params.size > 0) {
-    path += `?${encodeParams(params, ['*', '(', ')', ',', ':'])}`
-  }
+  const path = `/${from}`
 
   return {
     method: 'GET',
     path,
+    params,
+    get fullPath() {
+      if (params.size > 0) {
+        return `${path}?${uriEncodeParams(params)}`
+      }
+      return path
+    },
   }
 }
 
 /**
- * URL encodes query parameters with an optional character whitelist
+ * URI encodes query parameters with an optional character whitelist
  * that should not be encoded.
  */
-function encodeParams(params: URLSearchParams, characterWhitelist: string[] = []) {
-  let urlEncodedParams = params.toString()
+function uriEncodeParams(
+  params: URLSearchParams,
+  characterWhitelist: string[] = ['*', '(', ')', ',', ':']
+) {
+  return uriDecodeCharacters(params.toString(), characterWhitelist)
+}
+
+/**
+ * URI encodes a string with an optional character whitelist
+ * that should not be encoded.
+ */
+export function uriEncode(value: string, characterWhitelist: string[] = ['*', '(', ')', ',', ':']) {
+  return uriDecodeCharacters(encodeURIComponent(value), characterWhitelist)
+}
+
+function uriDecodeCharacters(value: string, characterWhitelist: string[]) {
+  let newValue = value
 
   // Convert whitelisted characters back from their hex representation (eg. '%2A' -> '*')
   for (const char of characterWhitelist) {
     const hexCode = char.charCodeAt(0).toString(16).toUpperCase()
-    urlEncodedParams = urlEncodedParams.replaceAll(`%${hexCode}`, char)
+    newValue = newValue.replaceAll(`%${hexCode}`, char)
   }
 
-  return urlEncodedParams
+  return newValue
 }
 
 function formatSelectFilterRoot(params: URLSearchParams, filter: Filter) {
