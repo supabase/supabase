@@ -2127,14 +2127,19 @@ export interface components {
       SMS_TEST_OTP_VALID_UNTIL: string
       HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED: boolean
       HOOK_MFA_VERIFICATION_ATTEMPT_URI: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_SECRETS: string
       HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED: boolean
       HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_SECRETS: string
       HOOK_CUSTOM_ACCESS_TOKEN_ENABLED: boolean
       HOOK_CUSTOM_ACCESS_TOKEN_URI: string
+      HOOK_CUSTOM_ACCESS_TOKEN_SECRETS: string
       HOOK_SEND_SMS_ENABLED: boolean
       HOOK_SEND_SMS_URI: string
+      HOOK_SEND_SMS_SECRETS: string
       HOOK_SEND_EMAIL_ENABLED: boolean
       HOOK_SEND_EMAIL_URI: string
+      HOOK_SEND_EMAIL_SECRETS: string
       EXTERNAL_APPLE_ENABLED: boolean
       EXTERNAL_APPLE_CLIENT_ID: string
       EXTERNAL_APPLE_SECRET: string
@@ -2199,6 +2204,8 @@ export interface components {
       EXTERNAL_ZOOM_ENABLED: boolean
       EXTERNAL_ZOOM_CLIENT_ID: string
       EXTERNAL_ZOOM_SECRET: string
+      DB_MAX_POOL_SIZE: number | null
+      API_MAX_REQUEST_DURATION: number | null
     }
     UpdateGoTrueConfigBody: {
       SITE_URL?: string
@@ -2282,14 +2289,19 @@ export interface components {
       SMS_TEMPLATE?: string
       HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
       HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_SECRETS?: string
       HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED?: boolean
       HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_SECRETS?: string
       HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean
       HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
+      HOOK_CUSTOM_ACCESS_TOKEN_SECRETS?: string
       HOOK_SEND_SMS_ENABLED?: boolean
       HOOK_SEND_SMS_URI?: string
+      HOOK_SEND_SMS_SECRETS?: string
       HOOK_SEND_EMAIL_ENABLED?: boolean
       HOOK_SEND_EMAIL_URI?: string
+      HOOK_SEND_EMAIL_SECRETS?: string
       EXTERNAL_APPLE_ENABLED?: boolean
       EXTERNAL_APPLE_CLIENT_ID?: string
       EXTERNAL_APPLE_SECRET?: string
@@ -2354,6 +2366,8 @@ export interface components {
       EXTERNAL_ZOOM_ENABLED?: boolean
       EXTERNAL_ZOOM_CLIENT_ID?: string
       EXTERNAL_ZOOM_SECRET?: string
+      DB_MAX_POOL_SIZE?: number
+      API_MAX_REQUEST_DURATION?: number
     }
     UserBody: {
       id?: string
@@ -2679,8 +2693,8 @@ export interface components {
     InviteResponse: {
       organization_name: string
       invite_id: string
-      sso_mismatch: boolean
       token_does_not_exist: boolean
+      sso_mismatch: boolean
       email_match: boolean
       authorized_user: boolean
       expired_token: boolean
@@ -5138,6 +5152,8 @@ export interface components {
       connection_string?: string
     }
     AuthConfigResponse: {
+      api_max_request_duration: number | null
+      db_max_pool_size: number | null
       disable_signup: boolean | null
       external_anonymous_users_enabled: boolean | null
       external_apple_additional_client_ids: string | null
@@ -5208,10 +5224,19 @@ export interface components {
       external_zoom_secret: string | null
       hook_custom_access_token_enabled: boolean | null
       hook_custom_access_token_uri: string | null
+      hook_custom_access_token_secrets: string | null
       hook_mfa_verification_attempt_enabled: boolean | null
       hook_mfa_verification_attempt_uri: string | null
+      hook_mfa_verification_attempt_secrets: string | null
       hook_password_verification_attempt_enabled: boolean | null
       hook_password_verification_attempt_uri: string | null
+      hook_password_verification_attempt_secrets: string | null
+      hook_send_sms_enabled: boolean | null
+      hook_send_sms_uri: string | null
+      hook_send_sms_secrets: string | null
+      hook_send_email_enabled: boolean | null
+      hook_send_email_uri: string | null
+      hook_send_email_secrets: string | null
       jwt_exp: number | null
       mailer_allow_unverified_email_sign_ins: boolean | null
       mailer_autoconfirm: boolean | null
@@ -5222,14 +5247,14 @@ export interface components {
       mailer_subjects_email_change: string | null
       mailer_subjects_invite: string | null
       mailer_subjects_magic_link: string | null
-      mailer_subjects_recovery: string | null
       mailer_subjects_reauthentication: string | null
+      mailer_subjects_recovery: string | null
       mailer_templates_confirmation_content: string | null
       mailer_templates_email_change_content: string | null
       mailer_templates_invite_content: string | null
       mailer_templates_magic_link_content: string | null
-      mailer_templates_recovery_content: string | null
       mailer_templates_reauthentication_content: string | null
+      mailer_templates_recovery_content: string | null
       mfa_max_enrolled_factors: number | null
       password_hibp_enabled: boolean | null
       password_min_length: number | null
@@ -5365,14 +5390,19 @@ export interface components {
       sms_template?: string
       hook_mfa_verification_attempt_enabled?: boolean
       hook_mfa_verification_attempt_uri?: string
+      hook_mfa_verification_attempt_secrets?: string
       hook_password_verification_attempt_enabled?: boolean
       hook_password_verification_attempt_uri?: string
+      hook_password_verification_attempt_secrets?: string
       hook_custom_access_token_enabled?: boolean
       hook_custom_access_token_uri?: string
+      hook_custom_access_token_secrets?: string
       hook_send_sms_enabled?: boolean
       hook_send_sms_uri?: string
+      hook_send_sms_secrets?: string
       hook_send_email_enabled?: boolean
       hook_send_email_uri?: string
+      hook_send_email_secrets?: string
       external_apple_enabled?: boolean
       external_apple_client_id?: string
       external_apple_secret?: string
@@ -5437,6 +5467,8 @@ export interface components {
       external_zoom_enabled?: boolean
       external_zoom_client_id?: string
       external_zoom_secret?: string
+      db_max_pool_size?: number
+      api_max_request_duration?: number
     }
     CreateThirdPartyAuthBody: {
       oidc_issuer_url?: string
@@ -9623,6 +9655,7 @@ export interface operations {
         startDate: string
         endDate: string
         interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
+        databaseIdentifier?: string
       }
       path: {
         /** @description Project ref */
