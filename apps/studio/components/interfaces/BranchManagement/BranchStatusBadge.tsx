@@ -14,6 +14,7 @@ const UNHEALTHY_STATUES: Status[] = [
   'INIT_FAILED',
   'UNKNOWN',
   'MIGRATIONS_FAILED',
+  'FUNCTIONS_FAILED',
 ]
 const WAITING_STATUSES: Status[] = [
   'COMING_UP',
