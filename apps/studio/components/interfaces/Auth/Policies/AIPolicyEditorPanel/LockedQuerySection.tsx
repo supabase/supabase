@@ -42,11 +42,11 @@ export const LockedCreateQuerySection = ({
           type="default"
           onClick={() => {
             const query = isEditing
-              ? generateCreatePolicyQuery({
-                  name,
+              ? generateAlterPolicyQuery({
+                  name: '',
+                  newName: name,
                   schema,
                   table,
-                  behavior,
                   command,
                   roles: roles.length === 0 ? 'public' : roles,
                   using: (editorOneRef.current?.getValue() ?? undefined)?.trim(),
@@ -55,11 +55,11 @@ export const LockedCreateQuerySection = ({
                       ? (editorOneRef.current?.getValue() ?? undefined)?.trim()
                       : (editorTwoRef.current?.getValue() ?? undefined)?.trim(),
                 })
-              : generateAlterPolicyQuery({
-                  name: '',
-                  newName: name,
+              : generateCreatePolicyQuery({
+                  name,
                   schema,
                   table,
+                  behavior,
                   command,
                   roles: roles.length === 0 ? 'public' : roles,
                   using: (editorOneRef.current?.getValue() ?? undefined)?.trim(),
