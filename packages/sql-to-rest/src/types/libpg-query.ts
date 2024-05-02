@@ -91,6 +91,18 @@ export type ColumnRef = {
   }
 }
 
+export type TypeCast = {
+  TypeCast: {
+    arg: ColumnRef
+    typeName: {
+      names: String[]
+      typemod: number
+      location: number
+    }
+    location: number
+  }
+}
+
 /**
  * Result target, used in target list of pre-transformed parse trees (select, insert, update).
  *
@@ -98,7 +110,7 @@ export type ColumnRef = {
  */
 export type SelectResTarget = {
   ResTarget: {
-    val: ColumnRef | A_Expr
+    val: ColumnRef | TypeCast | A_Expr
     name?: string
     location: number
   }

@@ -30,11 +30,18 @@ async function formatSelect(select: Select): Promise<SupabaseJsQuery> {
     if (firstTarget.column === '*' && targets.length === 1) {
       lines.push('.select()')
     } else {
-      const renderedTargets = targets.map(({ column, alias }) => {
-        if (alias) {
-          return `${alias}:${column}`
+      const renderedTargets = targets.map(({ column, alias, cast }) => {
+        let value = column
+
+        if (alias && alias !== column) {
+          value = `${alias}:${value}`
         }
-        return column
+
+        if (cast) {
+          value = `${value}::${cast}`
+        }
+
+        return value
       })
 
       lines.push(`.select('${renderedTargets.join(', ')}')`)

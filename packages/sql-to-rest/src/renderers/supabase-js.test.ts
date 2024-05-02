@@ -60,6 +60,24 @@ describe('select', () => {
     `)
   })
 
+  test('remove alias when it matches column name', async () => {
+    const sql = stripIndents`
+      select
+        title as title
+      from
+        books
+    `
+
+    const statement = await processSql(sql)
+    const { code } = await renderSupabaseJs(statement)
+
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select('title')
+    `)
+  })
+
   test('equal', async () => {
     const sql = stripIndents`
       select
@@ -491,7 +509,7 @@ describe('select', () => {
 
     const statement = await processSql(sql)
 
-    expect(renderSupabaseJs(statement)).rejects.toThrowError()
+    await expect(renderSupabaseJs(statement)).rejects.toThrowError()
   })
 
   test('limit and offset', async () => {
@@ -667,5 +685,69 @@ describe('select', () => {
           nullsFirst: false,
         })
     `)
+  })
+
+  test('cast', async () => {
+    const sql = stripIndents`
+      select
+        pages::float
+      from
+        books
+    `
+
+    const statement = await processSql(sql)
+    const { code } = await renderSupabaseJs(statement)
+
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select('pages::pg_catalog.float8')
+    `)
+  })
+
+  test('cast with alias', async () => {
+    const sql = stripIndents`
+      select
+        pages::float as "partialPages"
+      from
+        books
+    `
+
+    const statement = await processSql(sql)
+    const { code } = await renderSupabaseJs(statement)
+
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select(
+          'partialPages:pages::pg_catalog.float8',
+        )
+    `)
+  })
+
+  test('cast in where clause fails', async () => {
+    const sql = stripIndents`
+      select
+        pages
+      from
+        books
+      where
+        pages::float > 10.0
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('cast in order by clause fails', async () => {
+    const sql = stripIndents`
+      select
+        pages
+      from
+        books
+      order by
+        pages::float desc
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
   })
 })

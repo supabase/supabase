@@ -29,11 +29,18 @@ async function formatSelect(select: Select): Promise<HttpRequest> {
       params.set(
         'select',
         targets
-          .map(({ column, alias }) => {
-            if (alias) {
-              return `${alias}:${column}`
+          .map(({ column, alias, cast }) => {
+            let value = column
+
+            if (alias && alias !== column) {
+              value = `${alias}:${value}`
             }
-            return column
+
+            if (cast) {
+              value = `${value}::${cast}`
+            }
+
+            return value
           })
           .join(',')
       )

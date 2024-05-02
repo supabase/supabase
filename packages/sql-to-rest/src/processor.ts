@@ -1,5 +1,6 @@
 import { parseQuery } from 'libpg-query'
 import {
+  ColumnRef,
   ParsedQuery,
   SelectResTarget,
   SelectStmt,
@@ -103,6 +104,7 @@ export type Target = {
   type: 'target'
   column: string
   alias?: string
+  cast?: string
 }
 
 export type Sort = {
@@ -192,11 +194,22 @@ function processSelectStmt(stmt: SelectStmt): Select {
 
 function processTargetList(targetList: SelectResTarget[]): Target[] {
   return targetList.map((resTarget) => {
-    if (!('ColumnRef' in resTarget.ResTarget.val)) {
+    let columnRef: ColumnRef
+    let cast: string | undefined
+
+    if ('TypeCast' in resTarget.ResTarget.val) {
+      cast = resTarget.ResTarget.val.TypeCast.typeName.names
+        .map((name) => name.String.sval)
+        .join('.')
+
+      columnRef = resTarget.ResTarget.val.TypeCast.arg
+    } else if ('ColumnRef' in resTarget.ResTarget.val) {
+      columnRef = resTarget.ResTarget.val
+    } else {
       throw new Error('Only columns allowed in select targets')
     }
 
-    const { fields } = resTarget.ResTarget.val.ColumnRef
+    const { fields } = columnRef.ColumnRef
 
     if (fields.length > 1) {
       throw new Error('Only one field supported per column')
@@ -221,12 +234,21 @@ function processTargetList(targetList: SelectResTarget[]): Target[] {
       type: 'target',
       column,
       alias,
+      cast,
     }
   })
 }
 
 function processWhereClause(expression: WhereClauseExpression): Filter {
   if ('A_Expr' in expression) {
+    if ('TypeCast' in expression.A_Expr.lexpr) {
+      throw new Error('Casting is not supported in the WHERE clause')
+    }
+
+    if (!('ColumnRef' in expression.A_Expr.lexpr)) {
+      throw new Error('Only columns allowed in WHERE clause')
+    }
+
     const { fields } = expression.A_Expr.lexpr.ColumnRef
 
     if (fields.length > 1) {
@@ -339,6 +361,10 @@ function processWhereClause(expression: WhereClauseExpression): Filter {
 
 function processSortClause(sorts: SortBy[]): Sort[] {
   return sorts.map((sortBy) => {
+    if ('TypeCast' in sortBy.SortBy.node) {
+      throw new Error('Casting is not supported in the ORDER BY clause')
+    }
+
     if (!('ColumnRef' in sortBy.SortBy.node)) {
       throw new Error('ORDER BY clause only accepts columns')
     }

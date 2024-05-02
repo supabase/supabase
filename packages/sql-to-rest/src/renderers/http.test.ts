@@ -54,6 +54,21 @@ describe('select', () => {
     expect(path).toBe('/books?select=my_title:title')
   })
 
+  test('remove alias when it matches column name', async () => {
+    const sql = stripIndents`
+      select
+        title as title
+      from
+        books
+    `
+
+    const statement = await processSql(sql)
+    const { method, path } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(path).toBe('/books?select=title')
+  })
+
   test('equal', async () => {
     const sql = stripIndents`
       select
@@ -567,5 +582,61 @@ describe('select', () => {
 
     expect(method).toBe('GET')
     expect(path).toBe('/books?order=title.desc.nullslast')
+  })
+
+  test('cast', async () => {
+    const sql = stripIndents`
+      select
+        pages::float
+      from
+        books
+    `
+
+    const statement = await processSql(sql)
+    const { method, path } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(path).toBe('/books?select=pages::pg_catalog.float8')
+  })
+
+  test('cast with alias', async () => {
+    const sql = stripIndents`
+      select
+        pages::float as "partialPages"
+      from
+        books
+    `
+
+    const statement = await processSql(sql)
+    const { method, path } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(path).toBe('/books?select=partialPages:pages::pg_catalog.float8')
+  })
+
+  test('cast in where clause fails', async () => {
+    const sql = stripIndents`
+      select
+        pages
+      from
+        books
+      where
+        pages::float > 10.0
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('cast in order by clause fails', async () => {
+    const sql = stripIndents`
+      select
+        pages
+      from
+        books
+      order by
+        pages::float desc
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
   })
 })
