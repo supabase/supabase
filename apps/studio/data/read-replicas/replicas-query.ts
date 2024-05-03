@@ -5,6 +5,7 @@ import { get } from 'data/fetchers'
 import { useProjectDetailQuery } from 'data/projects/project-detail-query'
 import type { ResponseError } from 'types'
 import { replicaKeys } from './keys'
+import { IS_PLATFORM } from 'common'
 
 export type ReadReplicasVariables = {
   projectRef?: string
@@ -37,7 +38,11 @@ export const useReadReplicasQuery = <TData = ReadReplicasData>(
     replicaKeys.list(projectRef),
     ({ signal }) => getReadReplicas({ projectRef }, signal),
     {
-      enabled: enabled && data?.is_read_replicas_enabled && typeof projectRef !== 'undefined',
+      enabled:
+        enabled &&
+        IS_PLATFORM &&
+        data?.is_read_replicas_enabled &&
+        typeof projectRef !== 'undefined',
       ...options,
     }
   )
