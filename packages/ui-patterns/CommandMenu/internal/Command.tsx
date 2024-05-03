@@ -1,8 +1,15 @@
 import { useRouter } from 'next/navigation'
-import { type PropsWithChildren, type ReactNode, forwardRef } from 'react'
+import {
+  type PropsWithChildren,
+  type ReactNode,
+  forwardRef,
+  useEffect,
+  useRef,
+  useTransition,
+} from 'react'
 
 import { CommandItem_Shadcn_, cn } from 'ui'
-import { useSetCommandMenuVisible, useSetIsCommandNavigating } from '../api/hooks/viewHooks'
+import { useSetCommandMenuVisible } from '../api/hooks/viewHooks'
 
 type ICommand = IActionCommand | IRouteCommand
 
@@ -81,8 +88,17 @@ const CommandItem = forwardRef<
   PropsWithChildren<CommandItemProps>
 >(({ children, className, command: _command, ...props }, ref) => {
   const router = useRouter()
-  const setIsNavigating = useSetIsCommandNavigating()
+  const [isPending, startTransition] = useTransition()
+  const prevIsPending = useRef(isPending)
   const setIsOpen = useSetCommandMenuVisible()
+
+  useEffect(() => {
+    if (prevIsPending.current && !isPending) {
+      // Router transition just finished
+      setIsOpen(false)
+    }
+    prevIsPending.current = isPending
+  }, [isPending])
 
   const command = _command as ICommand // strip the readonly applied from the proxy
 
@@ -97,7 +113,7 @@ const CommandItem = forwardRef<
             ? () => {
                 command.route.startsWith('http')
                   ? (window.open(command.route, '_blank', 'noreferrer,noopener'), setIsOpen(false))
-                  : (router.push(command.route), setIsNavigating(true))
+                  : startTransition(() => router.push(command.route))
               }
             : () => {}
       }
