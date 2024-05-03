@@ -1,5 +1,5 @@
 import { AlertTriangle, ArrowLeft } from 'lucide-react'
-import { type PropsWithChildren, forwardRef, useEffect, useState } from 'react'
+import { type PropsWithChildren, forwardRef, useEffect, useState, useRef } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 
 import { Button, Command_Shadcn_, Dialog, DialogContent, cn } from 'ui'
@@ -84,10 +84,13 @@ const PageSwitch = ({ children }: PropsWithChildren) => {
 
 const useAnimateOnChange = (value: unknown, duration: number) => {
   const [animate, setAnimate] = useState(false)
+  const timeoutHandle = useRef<ReturnType<typeof setTimeout>>()
 
   useEffect(() => {
     setAnimate(true)
-    setTimeout(() => setAnimate(false), duration)
+    timeoutHandle.current = setTimeout(() => setAnimate(false), duration)
+
+    return () => clearTimeout(timeoutHandle.current)
   }, [value])
 
   return animate
