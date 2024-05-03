@@ -257,11 +257,7 @@ val metadata = user?.userMetadata
 
 ### Using triggers
 
-If you want to add a row to your `public.profiles` table every time a user signs up, you can use triggers.
-If the trigger fails however, it could block the user sign ups - so make sure that the code is well-tested.
-
-Note that if the name of your profiles table contains any capitization you must put it in quotes. For example, `public."Profiles"`.
-If you get an error when signing up a new user you can debug the error using the [Auth logs explorer](https://app.supabase.com/project/_/logs/auth-logs).
+If you want to add a row to your `public.profiles` table every time a user signs up, you can use triggers. If the trigger fails however, it could block the user sign ups - so make sure that the code is well-tested.
 
 Example:
 
@@ -284,3 +280,11 @@ create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 ```
+
+<Admonition type="tip">
+
+If the name of your profiles table contains capital letters, you must put it in quotes, for example `public."Profiles"`. This is a [Postgres standard](https://www.postgresql.org/docs/current/sql-syntax-lexical.html#:~:text=Quoting%20an%20identifier%20also%20makes%20it%20case%2Dsensitive%2C%20whereas%20unquoted%20names%20are%20always%20folded%20to%20lower%20case.), where unquoted names are always converted to lowercase.
+
+You can troubleshoot any errors by viewing the [Auth logs](/dashboard/project/_/logs/auth-logs).
+
+</Admonition>
