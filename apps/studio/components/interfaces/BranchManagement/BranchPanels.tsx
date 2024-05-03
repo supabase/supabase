@@ -265,7 +265,7 @@ export const BranchRow = ({
               </DropdownMenuTrigger>
               <DropdownMenuContent className="p-0 w-56" side="bottom" align="end">
                 <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild={isBranchActiveHealthy}>
+                  <TooltipTrigger_Shadcn_ asChild={isBranchActiveHealthy} className="w-full">
                     <DropdownMenuItem
                       className="gap-x-2"
                       onSelect={() => setShowConfirmResetModal(true)}
@@ -285,7 +285,7 @@ export const BranchRow = ({
                 </Tooltip_Shadcn_>
 
                 <Tooltip_Shadcn_>
-                  <TooltipTrigger_Shadcn_ asChild={isBranchActiveHealthy}>
+                  <TooltipTrigger_Shadcn_ asChild={isBranchActiveHealthy} className="w-full">
                     <DropdownMenuItem
                       className="gap-x-2"
                       onSelect={() => setShowBranchModeSwitch(true)}
