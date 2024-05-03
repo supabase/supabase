@@ -76,7 +76,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.145.0
+    image: supabase/gotrue:v2.149.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -354,7 +354,7 @@ services:
   # Comment out everything below this point if you are using an external Postgres database
   db:
     container_name: supabase-db
-    image: supabase/postgres:15.1.0.147
+    image: supabase/postgres:15.1.1.41
     healthcheck:
       test: pg_isready -U postgres -h localhost
       interval: 5s
