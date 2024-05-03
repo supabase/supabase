@@ -16,7 +16,7 @@ export const WarehouseCollectionDetail = () => {
   const projectRef = router.query.ref as string
   const accessTokens = useWarehouseAccessTokensQuery({ projectRef })
 
-  const isDevEnv = process.env.NODE_ENV === 'development'
+  const notProd = process.env.NODE_ENV !== 'production'
 
   const { data: collections, isLoading: collectionsLoading } = useWarehouseCollectionsQuery(
     { projectRef },
@@ -90,7 +90,7 @@ export const WarehouseCollectionDetail = () => {
                     Access tokens
                   </Link>
                 </Button>
-                {isDevEnv && (
+                {notProd && (
                   <TestCollectionDialog
                     accessTokens={accessTokens.data?.data || []}
                     collectionToken={collectionToken}
