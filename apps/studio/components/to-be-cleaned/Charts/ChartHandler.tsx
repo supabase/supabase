@@ -5,11 +5,12 @@ import { Button } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AreaChart from 'components/ui/Charts/AreaChart'
+import { AnalyticsInterval } from 'data/analytics/constants'
 import {
   InfraMonitoringAttribute,
-  InfraMonitoringInterval,
   useInfraMonitoringQuery,
 } from 'data/analytics/infra-monitoring-query'
+import { useProjectDailyStatsQuery } from 'data/analytics/project-daily-stats-query'
 import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
@@ -19,7 +20,7 @@ import { BarChart } from './ChartRenderer'
 interface ChartHandlerProps {
   label: string
   attribute: string
-  provider: string
+  provider: 'infra-monitoring' | 'daily-stats'
   startDate: string
   endDate: string
   interval: string
@@ -65,24 +66,50 @@ const ChartHandler = ({
   const { project } = useProjectContext()
   const isReadReplicasEnabled = project?.is_read_replicas_enabled
   const state = useDatabaseSelectorStateSnapshot()
+  const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
 
   const databaseIdentifier = isReadReplicasEnabled ? state.selectedDatabaseId : undefined
 
-  const { data: fetchedData, isLoading: isFetching } = useInfraMonitoringQuery(
+  const { data: dailyStatsData, isLoading: isFetchingDailyStats } = useProjectDailyStatsQuery(
     {
       projectRef: ref as string,
       attribute: attribute as InfraMonitoringAttribute,
       startDate,
       endDate,
-      interval: interval as InfraMonitoringInterval,
+      interval: interval as AnalyticsInterval,
       databaseIdentifier,
     },
-    { enabled: data === undefined }
+    { enabled: provider === 'daily-stats' && data === undefined }
   )
 
-  const [chartStyle, setChartStyle] = useState<string>(defaultChartStyle)
-  const chartData = data || fetchedData
-  const loading = isLoading || isFetching
+  const { data: infraMonitoringData, isLoading: isFetchingInfraMonitoring } =
+    useInfraMonitoringQuery(
+      {
+        projectRef: ref as string,
+        attribute: attribute as InfraMonitoringAttribute,
+        startDate,
+        endDate,
+        interval: interval as AnalyticsInterval,
+        databaseIdentifier,
+      },
+      { enabled: provider === 'infra-monitoring' && data === undefined }
+    )
+
+  const chartData =
+    data ||
+    (provider === 'infra-monitoring'
+      ? infraMonitoringData
+      : provider === 'daily-stats'
+        ? dailyStatsData
+        : undefined)
+
+  const loading =
+    isLoading ||
+    (provider === 'infra-monitoring'
+      ? isFetchingInfraMonitoring
+      : provider === 'daily-stats'
+        ? isFetchingDailyStats
+        : isLoading)
 
   const shouldHighlightMaxValue =
     provider === 'daily-stats' &&
@@ -90,8 +117,7 @@ const ChartHandler = ({
     !attribute.includes('egress') &&
     chartData !== undefined &&
     'maximum' in chartData
-  const shoudHighlightTotalGroupedValue =
-    provider === 'log-stats' && chartData !== undefined && 'totalGrouped' in chartData
+  const shouldHighlightTotalGroupedValue = chartData !== undefined && 'totalGrouped' in chartData
 
   const _highlightedValue =
     highlightedValue !== undefined
@@ -100,7 +126,7 @@ const ChartHandler = ({
         ? chartData?.maximum
         : provider === 'daily-stats'
           ? chartData?.total
-          : shoudHighlightTotalGroupedValue
+          : shouldHighlightTotalGroupedValue
             ? chartData?.totalGrouped?.[attribute]
             : (chartData?.data[chartData?.data.length - 1] as any)?.[attribute as any]
 

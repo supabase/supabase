@@ -1,4 +1,3 @@
-import * as Tooltip from '@radix-ui/react-tooltip'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import dayjs from 'dayjs'
 import { groupBy, isNull } from 'lodash'
@@ -11,29 +10,28 @@ import {
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuPortal,
+  DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-  DropdownMenuSub,
   DropdownMenuTrigger,
-  IconArrowRight,
-  IconHome,
-  IconPlus,
-  IconSave,
-  IconSettings,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import { Loading } from 'components/ui/Loading'
 import NoPermission from 'components/ui/NoPermission'
+import { useContentQuery } from 'data/content/content-query'
 import { useCheckPermissions, useIsFeatureEnabled } from 'hooks'
 import { METRICS, METRIC_CATEGORIES, TIME_PERIODS_REPORTS } from 'lib/constants/metrics'
 import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
+import { ArrowRight, Home, Plus, Save, Settings } from 'lucide-react'
 import { useProjectContentStore } from 'stores/projectContentStore'
 import GridResize from './GridResize'
 import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
-import { useContentQuery } from 'data/content/content-query'
 
 const DEFAULT_CHART_COLUMN_COUNT = 12
 const DEFAULT_CHART_ROW_COUNT = 4
@@ -291,7 +289,7 @@ const Reports = () => {
           return (
             <DropdownMenuSub key={cat.key}>
               <DropdownMenuSubTrigger className="space-x-2">
-                {cat.icon ? cat.icon : <IconHome size="tiny" />}
+                {cat.icon ? cat.icon : <Home size={14} />}
                 <p>{cat.label}</p>
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
@@ -339,7 +337,7 @@ const Reports = () => {
                 {dayjs(startDate).format('MMM D, YYYY')}
               </span>
               <span className="text-foreground-lighter">
-                <IconArrowRight size={12} />
+                <ArrowRight size={12} />
               </span>
               <span className="text-sm text-foreground-light">
                 {dayjs(endDate).format('MMM D, YYYY')}
@@ -358,7 +356,7 @@ const Reports = () => {
             <Button
               type={!hasEdits ? 'default' : 'primary'}
               disabled={!hasEdits}
-              icon={<IconSave />}
+              icon={<Save />}
               onClick={() => saveReport()}
               loading={saving}
             >
@@ -369,7 +367,7 @@ const Reports = () => {
           {canUpdateReport ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<IconSettings />}>
+                <Button type="default" iconRight={<Settings size={14} />}>
                   <span>Add / Remove charts</span>
                 </Button>
               </DropdownMenuTrigger>
@@ -378,28 +376,16 @@ const Reports = () => {
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
-            <Tooltip.Root delayDuration={0}>
-              <Tooltip.Trigger asChild>
-                <Button disabled type="default" iconRight={<IconSettings />}>
+            <Tooltip_Shadcn_>
+              <TooltipTrigger_Shadcn_ asChild>
+                <Button disabled type="default" iconRight={<Settings size={14} />}>
                   Add / Remove charts
                 </Button>
-              </Tooltip.Trigger>
-              <Tooltip.Portal>
-                <Tooltip.Content side="bottom">
-                  <Tooltip.Arrow className="radix-tooltip-arrow" />
-                  <div
-                    className={[
-                      'rounded bg-alternative py-1 px-2 leading-none shadow',
-                      'border border-background',
-                    ].join(' ')}
-                  >
-                    <span className="text-xs text-foreground">
-                      You need additional permissions to update this project's report
-                    </span>
-                  </div>
-                </Tooltip.Content>
-              </Tooltip.Portal>
-            </Tooltip.Root>
+              </TooltipTrigger_Shadcn_>
+              <TooltipContent_Shadcn_ side="bottom" className="w-56 text-center" align="end">
+                You need additional permissions to update this project's report
+              </TooltipContent_Shadcn_>
+            </Tooltip_Shadcn_>
           )}
         </div>
       </div>
@@ -409,7 +395,7 @@ const Reports = () => {
           {canUpdateReport ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button type="default" iconRight={<IconPlus />}>
+                <Button type="default" iconRight={<Plus size={14} />}>
                   <span>
                     {config.layout.length <= 0 ? 'Add your first chart' : 'Add another chart'}
                   </span>
