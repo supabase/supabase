@@ -166,8 +166,7 @@ export const getAddForeignKeySQL = ({
         const onUpdateSql = getOnUpdateSql(updateAction)
         return `
       ALTER TABLE "${table.schema}"."${table.name}"
-      ADD CONSTRAINT "${table.schema}_${table.name}_${relation.columns.map((x) => x.source).join('_')}_fkey"
-      FOREIGN KEY (${relation.columns.map((column) => `"${column.source}"`).join(',')})
+      ADD FOREIGN KEY (${relation.columns.map((column) => `"${column.source}"`).join(',')})
       REFERENCES "${relation.schema}"."${relation.table}" (${relation.columns.map((column) => `"${column.target}"`).join(',')})
       ${onUpdateSql}
       ${onDeleteSql}

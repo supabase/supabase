@@ -58,9 +58,10 @@
     "common-tags": "^1.8.2",
     "date-fns": "^2.30.0",
     "formik": "^2.2.9",
+    "input-otp": "^1.2.3",
     "lodash": "^4.17.21",
     "lucide-react": "^0.338.0",
-    "next-themes": "^0.2.1",
+    "next-themes": "^0.3.0",
     "openai": "^4.17.0",
     "postcss": "^8.4.31",
     "prop-types": "^15.7.2",
@@ -82,7 +83,8 @@
     "tailwindcss-animate": "^1.0.6",
     "tailwindcss-radix": "^2.0.0",
     "yup": "^1.4.0",
-    "zod": "^3.22.3"
+    "zod": "^3.22.3",
+    "react-accessible-treeview": "^2.8.3"
   },
   "devDependencies": {
     "@babel/plugin-syntax-flow": "^7.21.4",

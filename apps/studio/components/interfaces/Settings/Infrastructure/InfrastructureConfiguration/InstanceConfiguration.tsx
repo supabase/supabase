@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { partition } from 'lodash'
-import { Globe2, Loader2, Network } from 'lucide-react'
+import { ChevronDown, Globe2, Loader2, Network } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import ReactFlow, { Background, Edge, ReactFlowProvider, useReactFlow } from 'reactflow'
@@ -12,7 +12,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  IconChevronDown,
 } from 'ui'
 
 import AlertError from 'components/ui/AlertError'
@@ -24,11 +23,12 @@ import { timeout } from 'lib/helpers'
 import { useSubscriptionPageStateSnapshot } from 'state/subscription-page'
 import ComputeInstanceSidePanel from '../../Addons/ComputeInstanceSidePanel'
 import DeployNewReplicaPanel from './DeployNewReplicaPanel'
+import DropAllReplicasConfirmationModal from './DropAllReplicasConfirmationModal'
 import DropReplicaConfirmationModal from './DropReplicaConfirmationModal'
+import { REPLICA_STATUS } from './InstanceConfiguration.constants'
 import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceConfiguration.utils'
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
-import DropAllReplicasConfirmationModal from './DropAllReplicasConfirmationModal'
 
 // [Joshen] Just FYI, UI assumes single provider for primary + replicas
 // [Joshen] Idea to visualize grouping based on region: https://reactflow.dev/examples/layout/sub-flows
@@ -38,7 +38,7 @@ const InstanceConfigurationUI = () => {
   const reactFlow = useReactFlow()
   const { resolvedTheme } = useTheme()
   const { ref: projectRef } = useParams()
-  const numComingUp = useRef<number>()
+  const numTransition = useRef<number>()
   const snap = useSubscriptionPageStateSnapshot()
 
   const [view, setView] = useState<'flow' | 'map'>('flow')
@@ -76,13 +76,21 @@ const InstanceConfigurationUI = () => {
     {
       refetchInterval: refetchInterval as any,
       refetchOnWindowFocus: false,
-      onSuccess: async (data) => {
-        const comingUpReplicas = data.filter((db) => db.status === 'COMING_UP')
-        const hasTransientStatus = comingUpReplicas.length > 0
+      onSuccess: async (res) => {
+        const fixedStatues = [
+          REPLICA_STATUS.ACTIVE_HEALTHY,
+          REPLICA_STATUS.ACTIVE_UNHEALTHY,
+          REPLICA_STATUS.INIT_READ_REPLICA_FAILED,
+        ]
+        const replicasInTransition = res.filter((db) => !fixedStatues.includes(db.status))
+        const hasTransientStatus = replicasInTransition.length > 0
 
         // If any replica's status has changed, refetch databases
-        if (numComingUp.current !== comingUpReplicas.length) {
-          numComingUp.current = comingUpReplicas.length
+        if (
+          numTransition.current !== replicasInTransition.length ||
+          res.length !== (data ?? []).length
+        ) {
+          numTransition.current = replicasInTransition.length
           await refetchReplicas()
           setTimeout(() => refetchLoadBalancers(), 2000)
         }
@@ -192,7 +200,7 @@ const InstanceConfigurationUI = () => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       type="default"
-                      icon={<IconChevronDown size={16} />}
+                      icon={<ChevronDown size={16} />}
                       className="px-1 rounded-l-none border-l-0"
                     />
                   </DropdownMenuTrigger>
@@ -261,7 +269,7 @@ const InstanceConfigurationUI = () => {
       <DeployNewReplicaPanel
         visible={showNewReplicaPanel}
         selectedDefaultRegion={newReplicaRegion}
-        onSuccess={() => setRefetchInterval(10000)}
+        onSuccess={() => setRefetchInterval(5000)}
         onClose={() => {
           setNewReplicaRegion(undefined)
           setShowNewReplicaPanel(false)
@@ -270,13 +278,13 @@ const InstanceConfigurationUI = () => {
 
       <DropReplicaConfirmationModal
         selectedReplica={selectedReplicaToDrop}
-        onSuccess={() => setRefetchInterval(10000)}
+        onSuccess={() => setRefetchInterval(5000)}
         onCancel={() => setSelectedReplicaToDrop(undefined)}
       />
 
       <DropAllReplicasConfirmationModal
         visible={showDeleteAllModal}
-        onSuccess={() => setRefetchInterval(10000)}
+        onSuccess={() => setRefetchInterval(5000)}
         onCancel={() => setShowDeleteAllModal(false)}
       />
 
@@ -285,24 +293,22 @@ const InstanceConfigurationUI = () => {
       {/* <ConfirmationModal
         size="medium"
         visible={selectedReplicaToRestart !== undefined}
-        header="Confirm to restart selected replica?"
-        buttonLabel="Restart replica"
-        buttonLoadingLabel="Restarting replica"
-        onSelectCancel={() => setSelectedReplicaToRestart(undefined)}
-        onSelectConfirm={() => onConfirmRestartReplica()}
+        title="Confirm to restart selected replica?"
+        confirmLabel="Restart replica"
+        confirmLabelLoading="Restarting replica"
+        onCancel={() => setSelectedReplicaToRestart(undefined)}
+        onConfirm={() => onConfirmRestartReplica()}
       >
-        <Modal.Content className="py-3">
-          <p className="text-sm">Before restarting the replica, consider:</p>
-          <ul className="text-sm text-foreground-light py-1 list-disc mx-4 space-y-1">
-            <li>
-              Network traffic from this region may slow down while the replica is restarting,
-              especially if you have no other replicas in this region
-            </li>
-          </ul>
-          <p className="text-sm mt-2">
-            Are you sure you want to restart this replica (ID: {selectedReplicaToRestart?.id}) now?{' '}
-          </p>
-        </Modal.Content>
+        <p className="text-sm">Before restarting the replica, consider:</p>
+        <ul className="text-sm text-foreground-light py-1 list-disc mx-4 space-y-1">
+          <li>
+            Network traffic from this region may slow down while the replica is restarting,
+            especially if you have no other replicas in this region
+          </li>
+        </ul>
+        <p className="text-sm mt-2">
+          Are you sure you want to restart this replica (ID: {selectedReplicaToRestart?.id}) now?{' '}
+        </p>
       </ConfirmationModal> */}
     </>
   )

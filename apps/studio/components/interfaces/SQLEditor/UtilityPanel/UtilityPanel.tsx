@@ -1,17 +1,15 @@
-import { useMemo, useState } from 'react'
-import ResultsDropdown from './ResultsDropdown'
-import UtilityActions from './UtilityActions'
-import UtilityTabResults from './UtilityTabResults'
+import { useQueryClient } from '@tanstack/react-query'
+import { useParams } from 'common'
+import toast from 'react-hot-toast'
+
+import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
+import { contentKeys } from 'data/content/keys'
 import { useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { TabsContent_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_, Tabs_Shadcn_ } from 'ui'
 import { ChartConfig } from './ChartConfig'
-import { useContentUpsertMutation } from 'data/content/content-upsert-mutation'
-import { useContentQuery } from 'data/content/content-query'
-import { useParams } from 'common'
-import { useQueryClient } from '@tanstack/react-query'
-import toast from 'react-hot-toast'
-import { contentKeys } from 'data/content/keys'
-import { SqlSnippets } from 'types'
+import ResultsDropdown from './ResultsDropdown'
+import UtilityActions from './UtilityActions'
+import UtilityTabResults from './UtilityTabResults'
 
 export type UtilityPanelProps = {
   id: string
@@ -39,7 +37,6 @@ const UtilityPanel = ({
 }: UtilityPanelProps) => {
   const snap = useSqlEditorStateSnapshot()
   const { ref } = useParams()
-  const { data } = useContentQuery(ref)
   const snippet = snap.snippets[id]?.snippet
 
   const queryKeys = contentKeys.list(ref)
@@ -111,7 +108,7 @@ const UtilityPanel = ({
   }
 
   return (
-    <Tabs_Shadcn_ defaultValue="results" className="w-full h-full">
+    <Tabs_Shadcn_ defaultValue="results" className="w-full h-full flex flex-col">
       <TabsList_Shadcn_ className="flex justify-between px-2">
         <div>
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
@@ -125,7 +122,7 @@ const UtilityPanel = ({
             Chart
           </TabsTrigger_Shadcn_>
         </div>
-        <div className="flex gap-1 h-full">
+        <div className="flex gap-1 h-full items-center">
           {result && result.rows && <ResultsDropdown id={id} />}
           <UtilityActions
             id={id}

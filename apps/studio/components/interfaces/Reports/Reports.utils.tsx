@@ -10,7 +10,7 @@ export const queryParamsToObject = (params: string) => {
 }
 
 // generate hooks based on preset config
-type PresetHookResult = LogsQueryHook | DbQueryHook
+export type PresetHookResult = LogsQueryHook | DbQueryHook
 type PresetHooks = Record<keyof PresetConfig['queries'], () => PresetHookResult>
 
 export const queriesFactory = <T extends string>(
@@ -22,7 +22,7 @@ export const queriesFactory = <T extends string>(
       if (queryType === 'db') {
         return {
           ...acc,
-          [k]: () => useDbQuery(sql),
+          [k]: () => useDbQuery({ sql }),
         }
       } else {
         return {

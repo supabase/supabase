@@ -42,7 +42,7 @@ const ConnectDropdown = ({
     <>
       <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
         <div className="flex ">
-          <span className="flex items-center text-foreground-muted px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
+          <span className="flex items-center text-foreground-lighter px-3 rounded-lg rounded-r-none text-xs border border-button border-r-0">
             {label}
           </span>
           <PopoverTrigger_Shadcn_ asChild>

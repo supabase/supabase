@@ -47,6 +47,8 @@ enabled = true
 port = 54323
 # External URL of the API server that frontend connects to.
 api_url = "http://localhost"
+# OpenAI API Key to use for Supabase AI in the Supabase Studio.
+openai_api_key = "env(OPENAI_API_KEY)"
 
 # Email testing server. Emails sent with the local dev setup are not actually sent - rather, they
 # are monitored, and you can view the emails that would have been sent from the web interface.

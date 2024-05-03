@@ -1,8 +1,9 @@
 import ReactMarkdown from 'react-markdown'
-import { CodeBlock, IconChevronRight, Tabs } from 'ui'
+import { CodeBlock, IconChevronRight } from 'ui'
 import spec from '~/spec/cli_v1_commands.yaml' assert { type: 'yml' }
 import Options from '~/components/Options'
 import Param from '~/components/Params'
+import { Tabs, TabPanel } from '~/components/Tabs'
 import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import RefDetailCollapse from './RefDetailCollapse'
 
@@ -142,7 +143,7 @@ const CliCommandSection = (props) => {
                 command.examples.map((example) => {
                   const exampleId = `${command.id}-${example.id}`
                   return (
-                    <Tabs.Panel
+                    <TabPanel
                       id={exampleId}
                       key={exampleId}
                       label={example.name}
@@ -181,12 +182,12 @@ const CliCommandSection = (props) => {
                           </div>
                         </RefDetailCollapse>
                       )}
-                    </Tabs.Panel>
+                    </TabPanel>
                   )
                 })
               ) : (
                 // TODO: remove this block once all commands have examples
-                <Tabs.Panel
+                <TabPanel
                   id={`${command.id}-basic-usage`}
                   key={`${command.id}-basic-usage`}
                   label="Basic usage"
@@ -199,7 +200,7 @@ const CliCommandSection = (props) => {
                   >
                     {command.usage}
                   </CodeBlock>
-                </Tabs.Panel>
+                </TabPanel>
               )}
             </Tabs>
           </div>

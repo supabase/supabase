@@ -3,11 +3,11 @@ import { Lock } from 'lucide-react'
 import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
-import { useTableEditorStateSnapshot } from 'state/table-editor'
 import { Button } from 'ui'
 import { generateAlterPolicyQuery, generateCreatePolicyQuery } from './AIPolicyEditorPanel.utils'
 
 interface LockedCreateQuerySection {
+  schema: string
   selectedPolicy?: PostgresPolicy
   formFields: { name: string; table: string; behavior: string; command: string; roles: string }
   editorOneRef: any
@@ -15,6 +15,7 @@ interface LockedCreateQuerySection {
 }
 
 export const LockedCreateQuerySection = ({
+  schema,
   selectedPolicy,
   formFields,
   editorOneRef,
@@ -22,7 +23,6 @@ export const LockedCreateQuerySection = ({
 }: LockedCreateQuerySection) => {
   const router = useRouter()
   const { ref } = useParams()
-  const state = useTableEditorStateSnapshot()
 
   const isEditing = selectedPolicy !== undefined
   const { name, table, behavior, command, roles } = formFields
@@ -38,15 +38,15 @@ export const LockedCreateQuerySection = ({
             Use options above to edit
           </p>
         </div>
-        <Button
+        {/* <Button
           type="default"
           onClick={() => {
             const query = isEditing
-              ? generateCreatePolicyQuery({
-                  name,
-                  schema: state.selectedSchemaName,
+              ? generateAlterPolicyQuery({
+                  name: '',
+                  newName: name,
+                  schema,
                   table,
-                  behavior,
                   command,
                   roles: roles.length === 0 ? 'public' : roles,
                   using: (editorOneRef.current?.getValue() ?? undefined)?.trim(),
@@ -55,11 +55,11 @@ export const LockedCreateQuerySection = ({
                       ? (editorOneRef.current?.getValue() ?? undefined)?.trim()
                       : (editorTwoRef.current?.getValue() ?? undefined)?.trim(),
                 })
-              : generateAlterPolicyQuery({
-                  name: '',
-                  newName: name,
-                  schema: state.selectedSchemaName,
+              : generateCreatePolicyQuery({
+                  name,
+                  schema,
                   table,
+                  behavior,
                   command,
                   roles: roles.length === 0 ? 'public' : roles,
                   using: (editorOneRef.current?.getValue() ?? undefined)?.trim(),
@@ -72,7 +72,7 @@ export const LockedCreateQuerySection = ({
           }}
         >
           Open in SQL Editor
-        </Button>
+        </Button> */}
       </div>
       <div className="flex items-start" style={{ fontSize: '14px' }}>
         <p className="px-6 font-mono text-sm text-foreground-light select-none">1</p>
@@ -84,7 +84,7 @@ export const LockedCreateQuerySection = ({
       <div className="flex items-start" style={{ fontSize: '14px' }}>
         <p className="px-6 font-mono text-sm text-foreground-light select-none">2</p>
         <p className="font-mono tracking-tighter">
-          <span className="text-[#569cd6]">on</span> "{state.selectedSchemaName}"."
+          <span className="text-[#569cd6]">on</span> "{schema}"."
           {table}"
         </p>
       </div>
@@ -124,16 +124,16 @@ export const LockedCreateQuerySection = ({
 export const LockedRenameQuerySection = ({
   oldName,
   newName,
+  schema,
   table,
   lineNumber,
 }: {
   oldName: string
   newName: string
+  schema: string
   table: string
   lineNumber: number
 }) => {
-  const state = useTableEditorStateSnapshot()
-
   return (
     <div className="bg-surface-300 py-1">
       <div className="flex items-center" style={{ fontSize: '14px' }}>
@@ -153,7 +153,7 @@ export const LockedRenameQuerySection = ({
           </p>
         </div>
         <p className="font-mono tracking-tighter">
-          <span className="text-[#569cd6]">on</span> "{state.selectedSchemaName}"."{table}"
+          <span className="text-[#569cd6]">on</span> "{schema}"."{table}"
         </p>
       </div>
       <div className="flex items-center" style={{ fontSize: '14px' }}>

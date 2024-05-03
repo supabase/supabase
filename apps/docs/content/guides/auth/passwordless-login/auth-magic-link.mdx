@@ -4,7 +4,7 @@ title: 'Login With Magic Link'
 description: 'Use Supabase to authenticate your users using magic links.'
 ---
 
-Magic links are a form of passwordless logins where users click on a link sent to their email address to log in to their accounts. Magic links only work with email addresses and are one-time use only. By default, a user can only request a magic link once every 60 seconds and they expire after 24 hours.
+Magic links are a form of passwordless logins where users click on a link sent to their email address to log in to their accounts. Magic links only work with email addresses and are one-time use only. By default, a user can only request a magic link once every 60 seconds and they expire after 1 hour.
 
 Set up Magic Link logins for your Supabase application.
 
@@ -18,6 +18,8 @@ Set up Magic Link logins for your Supabase application.
 <Admonition type="caution">
 
 When using Magic Links in [the PKCE Flow](/blog/supabase-auth-sso-pkce#introducing-pkce), keep in mind that links can only be opened from the same browser that they are sent from (as defined in the PKCE spec). Consequently, a magic link sent from Chrome on Desktop will be invalid if used on a Mobile Device.
+
+The same applies for Magic Links in mobile devices. Magic Links can only be opened on the device they are sent from.
 
 </Admonition>
 
@@ -77,6 +79,19 @@ Future<void> signInWithEmail() async {
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+When your user signs in, call [signInWithOTP()](/docs/reference/swift/auth-signinwithotp) with their email address:
+
+```swift
+try await supabase.auth.signInWithOTP(
+  email: "example@email.com",
+  redirectTo: URL(string: "https://example.com/welcome"),
+  // set this to false if you do not want the user to be automatically signed up
+  shouldCreateUser: false
+)
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 To start the sign in process call [signInWith(OTP)](/docs/reference/kotlin/auth-signinwithotp) with their email address:
@@ -120,6 +135,14 @@ Future<void> signOut() async {
 ```
 
 </TabPanel>
+<TabPanel id="swift" label="Swift">
+When your user signs out, call [signOut()](/docs/reference/swift/auth-signout) to remove them from the local storage:
+
+```swift
+try await supabase.auth.signOut()
+```
+
+</TabPanel>
 <TabPanel id="kotlin" label="Kotlin">
 
 When your user signs out, call [logout()](/docs/reference/kotlin/auth-signout) to remove them from the browser session and any objects from localStorage:
@@ -135,6 +158,6 @@ suspend fun logout() {
 
 ## Resources
 
-- [Supabase Account - Free Plan OK](https://supabase.com)
+- [Supabase - Get started for free](https://supabase.com)
 - [Supabase JS Client](https://github.com/supabase/supabase-js)
 - [Supabase Flutter Client](https://github.com/supabase/supabase-flutter)

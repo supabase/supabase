@@ -3,6 +3,7 @@ import type { PostgresPolicy } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
 import {
+  Badge,
   Button,
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +17,8 @@ import {
 
 import Panel from 'components/ui/Panel'
 import { useCheckPermissions } from 'hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 
 interface PolicyRowProps {
   policy: PostgresPolicy
@@ -30,6 +33,15 @@ const PolicyRow = ({
 }: PolicyRowProps) => {
   const canUpdatePolicies = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'policies')
 
+  const { project } = useProjectContext()
+  const { data: authConfig } = useAuthConfigQuery({ projectRef: project?.ref })
+
+  // TODO(km): Simple check for roles that allow authenticated access.
+  // In the future, we'll use splinter to return proper warnings for policies that allow anonymous user access.
+  const appliesToAnonymousUsers =
+    authConfig?.EXTERNAL_ANONYMOUS_USERS_ENABLED &&
+    (policy.roles.includes('authenticated') || policy.roles.includes('public'))
+
   return (
     <Panel.Content
       className={['flex border-overlay', 'w-full space-x-4 border-b py-4 lg:items-center'].join(
@@ -40,6 +52,9 @@ const PolicyRow = ({
         <div className="flex items-center space-x-4">
           <p className="font-mono text-xs text-foreground-light">{policy.command}</p>
           <p className="text-sm text-foreground">{policy.name}</p>
+          {appliesToAnonymousUsers ? (
+            <Badge color="yellow">Applies to anonymous users</Badge>
+          ) : null}
         </div>
         <div className="flex items-center space-x-2">
           <p className="text-foreground-light text-sm">Applied to:</p>
