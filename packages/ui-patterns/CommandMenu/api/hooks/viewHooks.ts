@@ -28,6 +28,18 @@ const useToggleCommandMenu = () => {
   return toggleOpen
 }
 
+const useIsCommandNavigating = () => {
+  const { viewState } = useCommandContext()
+  const { isNavigating } = useSnapshot(viewState)
+  return isNavigating
+}
+
+const useSetIsCommandNavigating = () => {
+  const { viewState } = useCommandContext()
+  const { setIsNavigating } = useSnapshot(viewState)
+  return setIsNavigating
+}
+
 const useCommandMenuSize = () => {
   const { viewState } = useCommandContext()
   const { size } = useSnapshot(viewState)
@@ -51,6 +63,8 @@ export {
   useCommandMenuVisible,
   useSetCommandMenuVisible,
   useToggleCommandMenu,
+  useIsCommandNavigating,
+  useSetIsCommandNavigating,
   useCommandMenuSize,
   useSetCommandMenuSize,
 }
