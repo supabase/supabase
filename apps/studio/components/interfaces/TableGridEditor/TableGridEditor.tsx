@@ -130,7 +130,7 @@ const TableGridEditor = ({
 
   const entityType = useEntityType(selectedTable?.id)
   const columnsRef = useLatest(selectedTable?.columns ?? EMPTY_ARR)
-  console.log('zans entityType', selectedTable)
+
   // NOTE: DO NOT PUT HOOKS AFTER THIS LINE
   if (isLoadingSelectedTable) {
     return <Loading />

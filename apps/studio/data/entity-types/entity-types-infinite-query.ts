@@ -51,10 +51,6 @@ export async function getEntityTypes(
         obj_description(c.oid) as "comment",
         count(*) over() as "count",
         c.relrowsecurity as "rls_enabled",
-        (coalesce(array_position(c.reloptions, 'security_invoker=1') > 0,
-                  array_position(c.reloptions, 'security_invoker=true') > 0,
-                  array_position(c.reloptions, 'security_invoker=yes') > 0,
-                  array_position(c.reloptions, 'security_invoker=on') > 0)) as "security_invoker"
       from
         pg_namespace nc
         join pg_class c on nc.oid = c.relnamespace
@@ -84,8 +80,7 @@ export async function getEntityTypes(
             'name', r.name,
             'type', r.type,
             'comment', r.comment,
-            'rls_enabled', r.rls_enabled,
-            'security_invoker', r.security_invoker
+            'rls_enabled', r.rls_enabled
           )
           order by ${outerOrderBy}
         ), '[]'::jsonb),

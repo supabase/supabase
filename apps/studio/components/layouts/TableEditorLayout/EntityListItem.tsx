@@ -234,13 +234,6 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
           {entity.name}
         </span>
         <EntityTooltipTrigger entity={entity} />
-        {/* {entity.type === ENTITY_TYPE.MATERIALIZED_VIEW && (
-          <Unlock
-            size={14}
-            strokeWidth={2}
-            className={cn('min-w-4', isActive ? 'text-warning-600' : 'text-warning-500')}
-          />
-        )} */}
       </div>
 
       {entity.type === ENTITY_TYPE.TABLE && isActive && !isLocked && (
