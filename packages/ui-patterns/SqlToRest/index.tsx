@@ -66,13 +66,13 @@ type Faq = {
 
 const faqs: Faq[] = [
   {
-    id: 'curl-g-flag',
+    id: 'curl-flags',
     condition: (result) => result.language === 'curl' && result.method === 'GET',
-    question: 'What does `-G` mean?',
+    question: 'What do `-G` and `-d` do?',
     answer: stripIndent`
-      In \`curl\`, \`-d\` (short for \`--data-urlencode\`) is usually used to add payload to \`POST\` requests.
+      In \`curl\`, \`-d\` is short for \`--data-urlencode\` and is usually used to add payload to \`POST\` requests.
 
-      The \`-G\` flag tells \`curl\` to allow \`-d\` in \`GET\` requests and apply the data as query parameters.
+      The \`-G\` flag tells \`curl\` to apply the \`-d\` data as \`GET\` request query parameters instead, which is a bit more readable than adding them directly to the path.
     `,
   },
   {
