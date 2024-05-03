@@ -1,7 +1,7 @@
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
 import { X } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 
 import { useParams } from 'common'
@@ -10,6 +10,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { useLocalStorageQuery } from 'hooks'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
   TabsList_Shadcn_,
@@ -39,8 +40,10 @@ export const QueryPerformance = ({
   queryPerformanceQuery,
 }: QueryPerformanceProps) => {
   const router = useRouter()
-  const { preset } = useParams()
+  const { ref, preset } = useParams()
   const { project } = useProjectContext()
+  const state = useDatabaseSelectorStateSnapshot()
+
   const [page, setPage] = useState<QUERY_PERFORMANCE_REPORT_TYPES>(
     (preset as QUERY_PERFORMANCE_REPORT_TYPES) ?? QUERY_PERFORMANCE_REPORT_TYPES.MOST_TIME_CONSUMING
   )
@@ -107,6 +110,10 @@ export const QueryPerformance = ({
     mostTimeConsumingQueries,
     slowestExecutionTime,
   ])
+
+  useEffect(() => {
+    state.setSelectedDatabaseId(ref)
+  }, [ref])
 
   return (
     <>
