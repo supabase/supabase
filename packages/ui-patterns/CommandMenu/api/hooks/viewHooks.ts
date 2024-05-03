@@ -16,7 +16,7 @@ const useCommandMenuVisible = () => {
   return open
 }
 
-const useSetCommandMenuOpen = () => {
+const useSetCommandMenuVisible = () => {
   const { viewState } = useCommandContext()
   const { setOpen } = useSnapshot(viewState)
   return setOpen
@@ -61,7 +61,7 @@ const useSetCommandMenuSize = (newSize: DialogSize) => {
 export {
   useCommandMenuInitiated,
   useCommandMenuVisible,
-  useSetCommandMenuOpen,
+  useSetCommandMenuVisible,
   useToggleCommandMenu,
   useIsCommandNavigating,
   useSetIsCommandNavigating,

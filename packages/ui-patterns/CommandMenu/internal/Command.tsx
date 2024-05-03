@@ -2,7 +2,7 @@ import { useRouter } from 'next/navigation'
 import { type PropsWithChildren, type ReactNode, forwardRef } from 'react'
 
 import { CommandItem_Shadcn_, cn } from 'ui'
-import { useSetCommandMenuOpen, useSetIsCommandNavigating } from '../api/hooks/viewHooks'
+import { useSetCommandMenuVisible, useSetIsCommandNavigating } from '../api/hooks/viewHooks'
 
 type ICommand = IActionCommand | IRouteCommand
 
@@ -82,7 +82,7 @@ const CommandItem = forwardRef<
 >(({ children, className, command: _command, ...props }, ref) => {
   const router = useRouter()
   const setIsNavigating = useSetIsCommandNavigating()
-  const setIsOpen = useSetCommandMenuOpen()
+  const setIsOpen = useSetCommandMenuVisible()
 
   const command = _command as ICommand // strip the readonly applied from the proxy
 

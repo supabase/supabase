@@ -6,7 +6,11 @@ import { Button, Command_Shadcn_, Dialog, DialogContent, cn } from 'ui'
 
 import { useCurrentPage, usePageComponent, usePopPage } from './hooks/pagesHooks'
 import { useQuery, useSetQuery } from './hooks/queryHooks'
-import { useCommandMenuSize, useCommandMenuVisible, useSetCommandMenuOpen } from './hooks/viewHooks'
+import {
+  useCommandMenuSize,
+  useCommandMenuVisible,
+  useSetCommandMenuVisible,
+} from './hooks/viewHooks'
 import { PageType } from './utils'
 
 const Breadcrumb = () => {
@@ -91,7 +95,7 @@ const useAnimateOnChange = (value: unknown, duration: number) => {
 
 const CommandMenu = ({ children }: PropsWithChildren) => {
   const open = useCommandMenuVisible()
-  const setOpen = useSetCommandMenuOpen()
+  const setOpen = useSetCommandMenuVisible()
 
   const size = useCommandMenuSize()
 

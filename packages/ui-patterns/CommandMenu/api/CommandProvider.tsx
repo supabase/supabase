@@ -4,7 +4,7 @@ import { useConstant } from 'common'
 
 import {
   useIsCommandNavigating,
-  useSetCommandMenuOpen,
+  useSetCommandMenuVisible,
   useSetIsCommandNavigating,
   useToggleCommandMenu,
 } from './hooks/viewHooks'
@@ -36,7 +36,7 @@ const CommandProviderInternal = ({ children }: PropsWithChildren) => {
 
 const CommandShortcut = () => {
   const toggleOpen = useToggleCommandMenu()
-  const setIsOpen = useSetCommandMenuOpen()
+  const setIsOpen = useSetCommandMenuVisible()
   const setIsNavigating = useSetIsCommandNavigating()
   const isNavigating = useIsCommandNavigating()
   const router = useRouter()
