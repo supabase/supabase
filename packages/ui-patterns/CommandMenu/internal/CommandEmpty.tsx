@@ -1,11 +1,11 @@
-import { type PropsWithChildren, type RefObject, useMemo, useState } from 'react'
+import { type PropsWithChildren, type RefObject, useEffect, useRef, useState } from 'react'
 
 import { cn } from 'ui'
 
 import { useQuery } from '../api/hooks/queryHooks'
 
 /**
- * Hacking a bug around cmdk where the empty state will show even when there
+ * Hacking around a bug in cmdk where the empty state will show even when there
  * are force-mounted items.
  */
 const CommandEmpty = ({
@@ -20,11 +20,14 @@ const CommandEmpty = ({
   const query = useQuery()
 
   const [render, setRender] = useState(false)
-  useMemo(() => {
+  const timeoutHandle = useRef<ReturnType<typeof setTimeout>>()
+  useEffect(() => {
     if (!query) setRender(false)
-    setTimeout(() => {
+    timeoutHandle.current = setTimeout(() => {
       setRender(!listRef?.current?.querySelector('[cmdk-item]'))
     })
+
+    return () => clearTimeout(timeoutHandle.current)
   }, [query])
 
   return (

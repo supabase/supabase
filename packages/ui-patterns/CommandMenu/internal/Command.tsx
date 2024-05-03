@@ -6,7 +6,7 @@ import { useSetCommandMenuVisible, useSetIsCommandNavigating } from '../api/hook
 
 type ICommand = IActionCommand | IRouteCommand
 
-type IBaseCommand = {
+interface IBaseCommand {
   id: string
   name: string
   badge?: () => ReactNode
@@ -28,11 +28,11 @@ type IBaseCommand = {
   defaultHidden?: boolean
 }
 
-type IActionCommand = IBaseCommand & {
+interface IActionCommand extends IBaseCommand {
   action: () => void
 }
 
-type IRouteCommand = IBaseCommand & {
+interface IRouteCommand extends IBaseCommand {
   route: `/${string}` | `http${string}`
 }
 

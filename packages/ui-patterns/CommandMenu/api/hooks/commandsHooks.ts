@@ -5,7 +5,7 @@ import { useSnapshot } from 'valtio'
 import type { ICommand, ICommandSectionName, UseCommandOptions } from '../types'
 import { useCommandContext } from '../../internal/Context'
 import { useCurrentPage } from './pagesHooks'
-import { PageDefinition, isCommandsPage } from '../../internal/state/pagesState'
+import { type PageDefinition, isCommandsPage } from '../../internal/state/pagesState'
 
 const useCommands = () => {
   const { commandsState } = useCommandContext()

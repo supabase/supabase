@@ -66,16 +66,14 @@ const initCommandsState = () => {
   return state
 }
 
-/**
- * [Charis] This may be a premature optimization, but since this runs so many
- * times, I'm doing this imperatively to cut down on array initialization.
- * Haven't actually measured, YOLO.
- */
 const orderSectionFirst = (sections: ICommandSection[], idx: number) => {
-  const result = Array.from({ length: sections.length }) satisfies ICommandSection[]
+  const result = [sections[idx]]
 
-  result[0] = sections[idx]
-
+  /**
+   * [Charis] This may be a premature optimization, but since this runs many
+   * times, I'm doing this imperatively to cut down on array initialization.
+   * Haven't actually measured, YOLO.
+   */
   let j = 1
   for (let i = 0; i < idx; i++) {
     result[j++] = sections[i]

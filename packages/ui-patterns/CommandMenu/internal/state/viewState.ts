@@ -17,7 +17,7 @@ type IViewState = {
 const initViewState = () => {
   const state: IViewState = proxy({
     initiated: false,
-    init: () => !state.initiated && (state.initiated = true),
+    init: () => void (!state.initiated && (state.initiated = true)),
     open: false,
     setOpen: (open) => {
       state.init()
