@@ -24,18 +24,18 @@ Vectors in Supabase are enabled via [pgvector](https://github.com/pgvector/pgvec
 
 1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
 2. Click on **Extensions** in the sidebar.
-3. Search for "vector" and enable the extension.
+3. Search for "pgvector" and enable the extension.
 
 </TabPanel>
 <TabPanel id="sql" label="SQL">
 
 ```sql
- -- Example: enable the "vector" extension.
+ -- Example: enable the pgvector extension.
 create extension vector
 with
   schema extensions;
 
--- Example: disable the "vector" extension
+-- Example: disable the pgvector extension
 drop
   extension if exists vector;
 ```
@@ -109,7 +109,7 @@ Similarity search is the most common use case for vectors. `pgvector` support 3 
 
 Choosing the right operator depends on your needs. Dot product tends to be the fastest if your vectors are normalized. For more information on how embeddings work and how they relate to each other, see [What are Embeddings?](/docs/guides/ai/concepts#what-are-embeddings).
 
-Supabase client libraries like `supabase-js` connect to your Postgres instance via [PostgREST](docs/guides/getting-started/architecture#postgrest-api). PostgREST does not currently support `pgvector` similarity operators, so we'll need to wrap our query in a Postgres function and call it via the `rpc()` method:
+Supabase client libraries like `supabase-js` connect to your Postgres instance via [PostgREST](/docs/guides/getting-started/architecture#postgrest-api). PostgREST does not currently support `pgvector` similarity operators, so we'll need to wrap our query in a Postgres function and call it via the `rpc()` method:
 
 ```sql
 create or replace function match_documents (

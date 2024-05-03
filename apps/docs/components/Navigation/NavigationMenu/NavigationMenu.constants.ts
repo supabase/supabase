@@ -195,7 +195,7 @@ export const REFERENCES: References = {
   csharp: {
     name: 'C#',
     library: 'supabase-csharp',
-    versions: ['v0'],
+    versions: ['v1', 'v0'],
     icon: '/docs/img/libraries/c-sharp-icon.svg',
   },
   swift: {
@@ -625,6 +625,10 @@ export const auth = {
           url: '/guides/auth/server-side/nextjs',
         },
         {
+          name: 'SvelteKit guide',
+          url: '/guides/auth/server-side/sveltekit',
+        },
+        {
           name: 'Creating a client',
           url: '/guides/auth/server-side/creating-a-client',
         },
@@ -715,6 +719,10 @@ export const database: NavMenuConstant = {
           name: 'Managing tables, views, and data',
           url: '/guides/database/tables',
         },
+        {
+          name: 'Working with arrays',
+          url: '/guides/database/arrays',
+        },
         { name: 'Managing indexes', url: '/guides/database/postgres/indexes' },
         {
           name: 'Querying joins and nested tables',
@@ -773,7 +781,7 @@ export const database: NavMenuConstant = {
         },
         {
           name: 'Column level privileges',
-          url: '/guides/database/postgres/column-level-privileges',
+          url: '/guides/database/postgres/column-level-security',
         },
       ],
     },
@@ -794,8 +802,8 @@ export const database: NavMenuConstant = {
           url: '/guides/database/query-optimization',
         },
         {
-          name: 'Database linter',
-          url: '/guides/database/database-linter',
+          name: 'Database Advisors',
+          url: '/guides/database/database-advisors',
         },
         {
           name: 'Debugging and monitoring',
@@ -890,7 +898,7 @@ export const database: NavMenuConstant = {
           url: '/guides/database/extensions/pg-safeupdate',
         },
         {
-          name: 'pgsodium: Encryption Features',
+          name: 'pgsodium (pending deprecation): Encryption Features',
           url: '/guides/database/extensions/pgsodium',
         },
         {
@@ -1056,6 +1064,10 @@ export const api: NavMenuConstant = {
         {
           name: 'Using custom schemas',
           url: '/guides/api/using-custom-schemas',
+        },
+        {
+          name: 'Converting from SQL to JavaScript API',
+          url: '/guides/api/sql-to-api',
         },
       ],
     },
@@ -1375,6 +1387,10 @@ export const storage: NavMenuConstant = {
         {
           name: 'Image Transformations',
           url: '/guides/storage/serving/image-transformations',
+        },
+        {
+          name: 'Bandwidth & Storage Egress',
+          url: '/guides/storage/serving/bandwidth',
         },
       ],
     },
@@ -2071,6 +2087,13 @@ export const reference_dart_v2 = {
 }
 
 export const reference_csharp_v0 = {
+  icon: 'reference-csharp',
+  title: 'C#',
+  url: 'guides/reference/csharp',
+  parent: '/reference',
+}
+
+export const reference_csharp_v1 = {
   icon: 'reference-csharp',
   title: 'C#',
   url: 'guides/reference/csharp',

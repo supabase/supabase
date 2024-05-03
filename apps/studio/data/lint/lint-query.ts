@@ -1,16 +1,18 @@
 import { UseQueryOptions, useQuery } from '@tanstack/react-query'
+
 import { executeSql } from '../sql/execute-sql-query'
 import { lintKeys } from './keys'
 
-export const LINT_SQL = `set local search_path = '';
+export const LINT_SQL = /* SQL */ `set local search_path = '';
 
 (
 with foreign_keys as (
     select
-        cl.relnamespace::regnamespace as schema_,
-        cl.oid::regclass as table_,
+        cl.relnamespace::regnamespace::text as schema_name,
+        cl.relname as table_name,
+        cl.oid as table_oid,
         ct.conname as fkey_name,
-        ct.conkey col_attnums
+        ct.conkey as col_attnums
     from
         pg_catalog.pg_constraint ct
         join pg_catalog.pg_class cl -- fkey owning table
@@ -27,12 +29,11 @@ with foreign_keys as (
 ),
 index_ as (
     select
-        indrelid::regclass as table_,
-        indrelid as table_oid,
+        pi.indrelid as table_oid,
         indexrelid::regclass as index_,
         string_to_array(indkey::text, ' ')::smallint[] as col_attnums
     from
-        pg_catalog.pg_index
+        pg_catalog.pg_index pi
     where
         indisvalid
 )
@@ -44,41 +45,42 @@ select
     'Identifies foreign key constraints without a covering index, which can impact database performance.' as description,
     format(
         'Table \`%s.%s\` has a foreign key \`%s\` without a covering index. This can lead to suboptimal query performance.',
-        fk.schema_,
-        fk.table_,
+        fk.schema_name,
+        fk.table_name,
         fk.fkey_name
     ) as detail,
     'https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys' as remediation,
     jsonb_build_object(
-        'schema', fk.schema_,
-        'name', fk.table_,
+        'schema', fk.schema_name,
+        'name', fk.table_name,
         'type', 'table',
         'fkey_name', fk.fkey_name,
         'fkey_columns', fk.col_attnums
     ) as metadata,
-    format('unindexed_foreign_keys_%s_%s_%s', fk.schema_, fk.table_, fk.fkey_name) as cache_key
+    format('unindexed_foreign_keys_%s_%s_%s', fk.schema_name, fk.table_name, fk.fkey_name) as cache_key
 from
     foreign_keys fk
     left join index_ idx
-        on fk.table_ = idx.table_
+        on fk.table_oid = idx.table_oid
         and fk.col_attnums = idx.col_attnums
     left join pg_catalog.pg_depend dep
         on idx.table_oid = dep.objid
         and dep.deptype = 'e'
 where
     idx.index_ is null
-    and fk.schema_::text not in (
+    and fk.schema_name not in (
         '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and dep.objid is null -- exclude tables owned by extensions
 order by
-    fk.table_,
+    fk.schema_name,
+    fk.table_name,
     fk.fkey_name)
 union all
 (
 select
     'auth_users_exposed' as name,
-    'WARN' as level,
+    'ERROR' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
     'Detects if auth.users is exposed to anon or authenticated roles via a view or materialized view in the public schema, potentially compromising user data security.' as description,
@@ -88,22 +90,22 @@ select
     ) as detail,
     'https://supabase.com/docs/guides/database/database-linter?lint=0002_auth_users_exposed' as remediation,
     jsonb_build_object(
-        'schema', 'public',
+        'schema', n.nspname,
         'name', c.relname,
         'type', 'view',
         'exposed_to', array_remove(array_agg(DISTINCT case when pg_catalog.has_table_privilege('anon', c.oid, 'SELECT') then 'anon' when pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT') then 'authenticated' end), null)
     ) as metadata,
-    format('auth_users_exposed_%s_%s', 'public', c.relname) as cache_key
+    format('auth_users_exposed_%s_%s', n.nspname, c.relname) as cache_key
 from
     -- Identify the oid for auth.users
-	pg_catalog.pg_class auth_users_pg_class
+    pg_catalog.pg_class auth_users_pg_class
     join pg_catalog.pg_namespace auth_users_pg_namespace
-		on auth_users_pg_class.relnamespace = auth_users_pg_namespace.oid
-		and auth_users_pg_class.relname = 'users'
-		and auth_users_pg_namespace.nspname = 'auth'
-	-- Depends on auth.users
+        on auth_users_pg_class.relnamespace = auth_users_pg_namespace.oid
+        and auth_users_pg_class.relname = 'users'
+        and auth_users_pg_namespace.nspname = 'auth'
+    -- Depends on auth.users
     join pg_catalog.pg_depend d
-    	on d.refobjid = auth_users_pg_class.oid
+        on d.refobjid = auth_users_pg_class.oid
     join pg_catalog.pg_rewrite r
         on r.oid = d.objid
     join pg_catalog.pg_class c
@@ -114,7 +116,6 @@ from
         on d.refobjid = pg_class_auth_users.oid
 where
     d.deptype = 'n'
-    and n.nspname = 'public'
     and (
       pg_catalog.has_table_privilege('anon', c.oid, 'SELECT')
       or pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT')
@@ -159,41 +160,16 @@ where
         )
     )
 group by
-    c.relname, c.oid)
+    n.nspname,
+    c.relname,
+    c.oid)
 union all
-(/*
-Usage of auth.uid(), auth.role() ... are common in RLS policies.
-
-A naive policy like
-
-    create policy "rls_test_select" on test_table
-    to authenticated
-    using ( auth.uid() = user_id )
-
-will re-evaluate the auth.uid() function for every row. That can result in 100s of times slower performance
-https://supabase.com/docs/guides/database/postgres/row-level-security#call-functions-with-select
-
-To resolve that issue, the function calls can be wrapped like "(select auth.uid())" which causes the value to
-be executed exactly 1 time per query
-
-For example:
-
-    create policy "rls_test_select" on test_table
-    to authenticated
-    using ( (select auth.uid()) = user_id )
-
-NOTE:
-    This lint requires search_path = '' or 'auth' not in search_path
-    because qual and with_check are dependent on search_path to determine if function calls include the "auth" schema
-*/
-
-
-
+(
 with policies as (
     select
-        nsp.nspname as schema_,
-        polrelid::regclass table_,
-        pc.relrowsecurity is_rls_active,
+        nsp.nspname as schema_name,
+        pb.tablename as table_name,
+        pc.relrowsecurity as is_rls_active,
         polname as policy_name,
         polpermissive as is_permissive, -- if not, then restrictive
         (select array_agg(r::regrole) from unnest(polroles) as x(r)) as roles,
@@ -224,37 +200,58 @@ select
     array['PERFORMANCE'] as categories,
     'Detects if calls to \`auth.<function>()\` in RLS policies are being unnecessarily re-evaluated for each row' as description,
     format(
-        'Table \`%s\` has a row level security policy \`%s\` that re-evaluates an auth.<function>() for each row. This produces suboptimal query performance at scale. Resolve the issue by replacing \`auth.<function>()\` with \`(select auth.<function>())\`. See [docs](https://supabase.com/docs/guides/database/postgres/row-level-security#call-functions-with-select) for more info.',
-        table_,
+        'Table \`%s.%s\` has a row level security policy \`%s\` that re-evaluates an auth.<function>() for each row. This produces suboptimal query performance at scale. Resolve the issue by replacing \`auth.<function>()\` with \`(select auth.<function>())\`. See [docs](https://supabase.com/docs/guides/database/postgres/row-level-security#call-functions-with-select) for more info.',
+        schema_name,
+        table_name,
         policy_name
     ) as detail,
     'https://supabase.com/docs/guides/database/database-linter?lint=0003_auth_rls_initplan' as remediation,
     jsonb_build_object(
-        'schema', schema_,
-        'name', table_,
+        'schema', schema_name,
+        'name', table_name,
         'type', 'table'
     ) as metadata,
-    format('auth_rls_init_plan_%s_%s_%s', schema_, table_, policy_name) as cache_key
+    format('auth_rls_init_plan_%s_%s_%s', schema_name, table_name, policy_name) as cache_key
 from
     policies
 where
     is_rls_active
-    and schema_::text not in (
+    and schema_name not in (
         '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and (
+        -- Example: auth.uid()
         (
-            -- Example: auth.uid()
-            qual  ~ '(auth)\.(uid|jwt|role|email)\(\)'
-            -- Example: select auth.uid()
-            and lower(qual) !~ 'select\s+(auth)\.(uid|jwt|role|email)\(\)'
+            qual like '%auth.uid()%'
+            and lower(qual) not like '%select auth.uid()%'
         )
-        or
-        (
-            -- Example: auth.uid()
-            with_check  ~ '(auth)\.(uid|jwt|role|email)\(\)'
-            -- Example: select auth.uid()
-            and lower(with_check) !~ 'select\s+(auth)\.(uid|jwt|role|email)\(\)'
+        or (
+            qual like '%auth.jwt()%'
+            and lower(qual) not like '%select auth.jwt()%'
+        )
+        or (
+            qual like '%auth.role()%'
+            and lower(qual) not like '%select auth.role()%'
+        )
+        or (
+            qual like '%auth.email()%'
+            and lower(qual) not like '%select auth.email()%'
+        )
+        or (
+            with_check like '%auth.uid()%'
+            and lower(with_check) not like '%select auth.uid()%'
+        )
+        or (
+            with_check like '%auth.jwt()%'
+            and lower(with_check) not like '%select auth.jwt()%'
+        )
+        or (
+            with_check like '%auth.role()%'
+            and lower(with_check) not like '%select auth.role()%'
+        )
+        or (
+            with_check like '%auth.email()%'
+            and lower(with_check) not like '%select auth.email()%'
         )
     ))
 union all
@@ -401,6 +398,7 @@ from
     ) act(cmd)
 where
     c.relkind = 'r' -- regular tables
+    and p.polpermissive -- policy is permissive
     and n.nspname not in (
         '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
@@ -419,7 +417,7 @@ union all
 (
 select
     'policy_exists_rls_disabled' as name,
-    'INFO' as level,
+    'ERROR' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
     'Detects cases where row level security (RLS) policies have been created, but RLS has not been enabled for the underlying table.' as description,
@@ -563,7 +561,7 @@ union all
 (
 select
     'security_definer_view' as name,
-    'WARN' as level,
+    'ERROR' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
     'Detects views that are SECURITY DEFINER meaning that they ignore row level security (RLS) policies.' as description,
@@ -592,17 +590,23 @@ from
         and dep.deptype = 'e'
 where
     c.relkind = 'v'
-    and n.nspname = 'public'
+    and (
+        pg_catalog.has_table_privilege('anon', c.oid, 'SELECT')
+        or pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT')
+    )
+    and n.nspname not in (
+        'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgsodium', 'pgsodium_masks', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'storage', 'supabase_functions', 'supabase_migrations', 'vault'
+    )
     and dep.objid is null -- exclude views owned by extensions
-	and not (
-		lower(coalesce(c.reloptions::text,'{}'))::text[]
-		&& array[
-			'security_invoker=1',
-			'security_invoker=true',
-			'security_invoker=yes',
-			'security_invoker=on'
-		]
-	))
+    and not (
+        lower(coalesce(c.reloptions::text,'{}'))::text[]
+        && array[
+            'security_invoker=1',
+            'security_invoker=true',
+            'security_invoker=yes',
+            'security_invoker=on'
+        ]
+    ))
 union all
 (
 select
@@ -672,9 +676,15 @@ from
         on c.relnamespace = n.oid
 where
     c.relkind = 'r' -- regular tables
-    and n.nspname = 'public'
     -- RLS is disabled
-    and not c.relrowsecurity)
+    and not c.relrowsecurity
+    and (
+        pg_catalog.has_table_privilege('anon', c.oid, 'SELECT')
+        or pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT')
+    )
+    and n.nspname not in (
+        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+    ))
 union all
 (
 select
@@ -703,7 +713,65 @@ where
     -- plpgsql is installed by default in public and outside user control
     -- confirmed safe
     pe.extname not in ('plpgsql')
-    and pe.extnamespace::regnamespace::text = 'public')`.trim()
+    -- Scoping this to public is not optimal. Ideally we would use the postgres
+    -- search path. That currently isn't available via SQL. In other lints
+    -- we have used has_schema_privilege('anon', 'extensions', 'USAGE') but that
+    -- is not appropriate here as it would evaluate true for the extensions schema
+    and pe.extnamespace::regnamespace::text = 'public')
+union all
+(
+with policies as (
+    select
+        nsp.nspname as schema_name,
+        pb.tablename as table_name,
+        polname as policy_name,
+        qual,
+        with_check
+    from
+        pg_catalog.pg_policy pa
+        join pg_catalog.pg_class pc
+            on pa.polrelid = pc.oid
+        join pg_catalog.pg_namespace nsp
+            on pc.relnamespace = nsp.oid
+        join pg_catalog.pg_policies pb
+            on pc.relname = pb.tablename
+            and nsp.nspname = pb.schemaname
+            and pa.polname = pb.policyname
+)
+select
+    'rls_references_user_metadata' as name,
+    'ERROR' as level,
+    'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
+    'Detects when Supabase Auth user_metadata is referenced insecurely in a row level security (RLS) policy.' as description,
+    format(
+        'Table \`%s.%s\` has a row level security policy \`%s\` that references Supabase Auth \`user_metadata\`. \`user_metadata\` is editable by end users and should never be used in a security context.',
+        schema_name,
+        table_name,
+        policy_name
+    ) as detail,
+    'https://supabase.com/docs/guides/database/database-linter?lint=0015_rls_references_user_metadata' as remediation,
+    jsonb_build_object(
+        'schema', schema_name,
+        'name', table_name,
+        'type', 'table'
+    ) as metadata,
+    format('rls_references_user_metadata_%s_%s_%s', schema_name, table_name, policy_name) as cache_key
+from
+    policies
+where
+    schema_name not in (
+        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+    )
+    and (
+        -- Example: auth.jwt() -> 'user_metadata'
+        -- False positives are possible, but it isn't practical to string match
+        -- If false positive rate is too high, this expression can iterate
+        qual like '%auth.jwt()%user_metadata%'
+        or qual like '%current_setting(%request.jwt.claims%)%user_metadata%'
+        or with_check like '%auth.jwt()%user_metadata%'
+        or with_check like '%current_setting(%request.jwt.claims%)%user_metadata%'
+    ))`.trim()
 
 // Array of all lint rules we handle right now.
 export const LINT_TYPES = [
@@ -720,6 +788,9 @@ export const LINT_TYPES = [
   'function_search_path_mutable',
   'rls_disabled_in_public',
   'extension_in_public',
+  'auth_otp_long_expiry',
+  'auth_otp_short_length',
+  'rls_references_user_metadata',
 ] as const
 
 export type LINT_TYPES = (typeof LINT_TYPES)[number]
@@ -735,7 +806,8 @@ export type Lint = {
   metadata: {
     schema?: string
     name?: string
-    type?: 'table' | 'view'
+    entity?: string
+    type?: 'table' | 'view' | 'auth' | 'function' | 'extension'
     fkey_name?: string
     fkey_columns?: number[]
   } | null

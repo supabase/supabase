@@ -103,9 +103,6 @@ const DeleteConfirmationDialogs = ({
       }
       toast.success(`Successfully deleted selected row(s)`)
     },
-    onError: (error) => {
-      toast.error(`Failed to delete row: ${error.message}`)
-    },
     onSettled: () => {
       snap.closeConfirmationDialog()
     },

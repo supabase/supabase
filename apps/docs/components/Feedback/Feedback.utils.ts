@@ -1,6 +1,40 @@
 import { pick } from 'lodash'
 
 /**
+ * Gets the Notion team to send feedback to based on the pathname.
+ */
+const getNotionTeam = (pathname: string) => {
+  const DEFAULT_TEAM = 'team-docs'
+
+  // Pathname has format `/guides/(team)/**`
+  const pathParts = pathname.split('/')
+
+  if (pathParts[1] !== 'guides' || !pathParts[2]) return DEFAULT_TEAM
+
+  switch (pathParts[2]) {
+    case 'database':
+      return 'team-postgres'
+    case 'auth':
+      return 'team-auth'
+    case 'storage':
+      return 'team-storage'
+    case 'functions':
+      return 'team-functions'
+    case 'realtime':
+      return 'team-realtime'
+    case 'ai':
+      return 'team-ai'
+    case 'cli':
+      return 'team-cli'
+
+    // Ignoring platform for now because that section is a mix of teams.
+    case 'platform':
+    default:
+      return DEFAULT_TEAM
+  }
+}
+
+/**
  * Gets the tab selection state from the URL search params.
  *
  * Sanitizes by including only those search params that are explicitly marked
@@ -13,4 +47,4 @@ const getSanitizedTabParams = () => {
   return pick(Object.fromEntries(searchParams.entries()), queryGroups)
 }
 
-export { getSanitizedTabParams }
+export { getNotionTeam, getSanitizedTabParams }

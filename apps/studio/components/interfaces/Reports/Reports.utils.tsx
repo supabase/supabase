@@ -22,7 +22,7 @@ export const queriesFactory = <T extends string>(
       if (queryType === 'db') {
         return {
           ...acc,
-          [k]: () => useDbQuery(sql),
+          [k]: () => useDbQuery({ sql }),
         }
       } else {
         return {

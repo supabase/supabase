@@ -18,7 +18,15 @@ async function fetchStorageCredentials({ projectRef }: FetchStorageCredentials) 
     },
   })
 
-  return res.data
+  // Generated types by openapi are wrong so we need to cast it.
+  return res.data as any as {
+    data: {
+      id: string
+      created_at: string
+      access_key: string
+      description: string
+    }[]
+  }
 }
 
 type StorageCredentialsQuery = {
