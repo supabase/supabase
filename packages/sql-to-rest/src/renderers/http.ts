@@ -1,3 +1,4 @@
+import { stripIndent } from 'common-tags'
 import { Filter, Select, Statement } from '../processor'
 
 export type HttpRequest = {
@@ -179,4 +180,29 @@ function formatSelectFilter(filter: Filter): string {
   } else {
     throw new Error(`Unknown filter type '${type}'`)
   }
+}
+
+export function formatHttp(baseUrl: string, httpRequest: HttpRequest) {
+  const { method, fullPath } = httpRequest
+  const baseUrlObject = new URL(baseUrl)
+
+  return stripIndent`
+    ${method} ${baseUrlObject.pathname}${fullPath} HTTP/1.1
+    Host: ${baseUrlObject.host}
+  `
+}
+
+export function formatCurl(baseUrl: string, httpRequest: HttpRequest) {
+  const { method, path, params } = httpRequest
+  const lines: string[] = []
+  const baseUrlObject = new URL(baseUrl)
+
+  if (method === 'GET') {
+    lines.push(`curl -G ${baseUrlObject.toString()}${path}`)
+    for (const [key, value] of params) {
+      lines.push(`  -d "${uriEncode(key)}=${uriEncode(value)}"`)
+    }
+  }
+
+  return lines.join(' \\\n')
 }

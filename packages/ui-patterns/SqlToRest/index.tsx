@@ -16,10 +16,11 @@ import {
   HttpRequest,
   Statement,
   SupabaseJsQuery,
+  formatCurl,
+  formatHttp,
   processSql,
   renderHttp,
   renderSupabaseJs,
-  uriEncode,
 } from 'sql-to-rest'
 import { CodeBlock, Collapsible, Tabs, cn } from 'ui'
 import { Result, faqs } from './faqs'
@@ -260,29 +261,4 @@ function getTheme(isDarkMode: boolean): editor.IStandaloneThemeData {
     ],
     colors: { 'editor.background': isDarkMode ? '#1f1f1f' : '#f0f0f0' },
   }
-}
-
-function formatHttp(baseUrl: string, httpRequest: HttpRequest) {
-  const { method, fullPath } = httpRequest
-  const baseUrlObject = new URL(baseUrl)
-
-  return stripIndent`
-    ${method} ${baseUrlObject.pathname}${fullPath} HTTP/1.1
-    Host: ${baseUrlObject.host}
-  `
-}
-
-function formatCurl(baseUrl: string, httpRequest: HttpRequest) {
-  const { method, path, params } = httpRequest
-  const lines: string[] = []
-  const baseUrlObject = new URL(baseUrl)
-
-  if (method === 'GET') {
-    lines.push(`curl -G ${baseUrlObject.toString()}${path}`)
-    for (const [key, value] of params) {
-      lines.push(`  -d "${uriEncode(key)}=${uriEncode(value)}"`)
-    }
-  }
-
-  return lines.join(' \\\n')
 }
