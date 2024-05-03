@@ -92,7 +92,11 @@ const faqs: Faq[] = [
   },
 ]
 
-export default function SqlToRest() {
+export interface SqlToRestProps {
+  baseUrl?: string
+}
+
+export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }: SqlToRestProps) {
   const monaco = useMonaco()
   const { theme } = useTheme()
   const isDark = theme?.includes('dark') ?? true
@@ -117,15 +121,15 @@ export default function SqlToRest() {
     if (!httpRequest) {
       return
     }
-    return formatHttp(httpRequest)
-  }, [httpRequest])
+    return formatHttp(baseUrl, httpRequest)
+  }, [httpRequest, baseUrl])
 
   const curlCommand = useMemo(() => {
     if (!httpRequest) {
       return
     }
-    return formatCurl(httpRequest)
-  }, [httpRequest])
+    return formatCurl(baseUrl, httpRequest)
+  }, [httpRequest, baseUrl])
 
   const jsCommand = useMemo(() => {
     if (!jsQuery) {
@@ -310,22 +314,27 @@ function getTheme(isDarkMode: boolean): editor.IStandaloneThemeData {
   }
 }
 
-function formatHttp(httpRequest: HttpRequest) {
+function formatHttp(baseUrl: string, httpRequest: HttpRequest) {
   const { method, fullPath } = httpRequest
+  const baseUrlObject = new URL(baseUrl)
 
-  return `${method} ${fullPath} HTTP/1.1`
+  return stripIndent`
+    ${method} ${baseUrlObject.pathname}${fullPath} HTTP/1.1
+    Host: ${baseUrlObject.host}
+  `
 }
 
-function formatCurl(httpRequest: HttpRequest) {
+function formatCurl(baseUrl: string, httpRequest: HttpRequest) {
   const { method, path, params } = httpRequest
   const lines: string[] = []
+  const baseUrlObject = new URL(baseUrl)
 
   if (method === 'GET') {
-    lines.push(`curl -G ${path}`)
+    lines.push(`curl -G ${baseUrlObject.toString()}${path}`)
     for (const [key, value] of params) {
       lines.push(`  -d "${uriEncode(key)}=${uriEncode(value)}"`)
     }
   }
 
-  return lines.join(' \\ \n')
+  return lines.join(' \\\n')
 }
