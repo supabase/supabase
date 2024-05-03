@@ -114,7 +114,8 @@ const useApiReport = () => {
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
-  const showReadReplicasUI = project?.is_read_replicas_enabled
+  // [Joshen] TODO: Once API support is out
+  const showReadReplicasUI = false // project?.is_read_replicas_enabled
 
   const queryHooks = queriesFactory<keyof typeof PRESET_CONFIG.api.queries>(
     PRESET_CONFIG.api.queries,

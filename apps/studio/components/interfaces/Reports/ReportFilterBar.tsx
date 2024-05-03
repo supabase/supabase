@@ -85,7 +85,8 @@ const ReportFilterBar = ({
   datepickerHelpers,
 }: ReportFilterBarProps) => {
   const { project } = useProjectContext()
-  const showReadReplicasUI = project?.is_read_replicas_enabled
+  // [Joshen] TODO: Once API  support is out
+  const showReadReplicasUI = false // project?.is_read_replicas_enabled
 
   const filterKeys = [
     'request.path',

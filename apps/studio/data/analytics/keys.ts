@@ -115,18 +115,20 @@ export const analyticsKeys = {
       startDate,
       endDate,
       interval,
+      databaseIdentifier,
     }: {
       attribute?: string
       startDate?: string
       endDate?: string
       interval?: string
+      databaseIdentifier?: string
     }
   ) =>
     [
       'projects',
       projectRef,
       'infra-monitoring',
-      { attribute, startDate, endDate, interval },
+      { attribute, startDate, endDate, interval, databaseIdentifier },
     ] as const,
   usageApiCounts: (projectRef: string | undefined, interval: string | undefined) =>
     ['projects', projectRef, 'usage.api-counts', interval] as const,

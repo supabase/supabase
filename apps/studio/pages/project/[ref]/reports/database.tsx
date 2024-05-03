@@ -1,14 +1,9 @@
 import { useParams } from 'common/hooks'
 import dayjs from 'dayjs'
+import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import {
-  AlertDescription_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  IconArrowRight,
-  IconExternalLink,
-} from 'ui'
+import { AlertDescription_Shadcn_, Alert_Shadcn_, Button, IconExternalLink } from 'ui'
 
 import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
@@ -18,6 +13,7 @@ import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectConte
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import DateRangePicker from 'components/to-be-cleaned/DateRangePicker'
 import Table from 'components/to-be-cleaned/Table'
+import DatabaseSelector from 'components/ui/DatabaseSelector'
 import Panel from 'components/ui/Panel'
 import { useDatabaseSizeQuery } from 'data/database/database-size-query'
 import type { DbQueryHook } from 'hooks/analytics/useDbQuery'
@@ -45,19 +41,27 @@ const DatabaseUsage = () => {
   const { project } = useProjectContext()
   const [dateRange, setDateRange] = useState<any>(undefined)
 
+  const showReadReplicasUI = project?.is_read_replicas_enabled
+
+  const report = useDatabaseReport()
   const { data } = useDatabaseSizeQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
   const databaseSizeBytes = data?.result[0].db_size ?? 0
 
-  const report = useDatabaseReport()
-
   return (
     <>
       <div>
         <section>
-          <Panel title={<h2>Database health</h2>}>
+          <Panel
+            title={
+              <div className="w-full flex items-center justify-between">
+                <h2>Database health</h2>
+                {showReadReplicasUI && <DatabaseSelector />}
+              </div>
+            }
+          >
             <Panel.Content>
               <div className="mb-4 flex items-center space-x-3">
                 <DateRangePicker
@@ -68,12 +72,12 @@ const DatabaseUsage = () => {
                   onChange={setDateRange}
                 />
                 {dateRange && (
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center gap-x-2">
                     <p className="text-foreground-light">
                       {dayjs(dateRange.period_start.date).format('MMMM D, hh:mma')}
                     </p>
                     <p className="text-foreground-light">
-                      <IconArrowRight size={12} />
+                      <ArrowRight size={12} />
                     </p>
                     <p className="text-foreground-light">
                       {dayjs(dateRange.period_end.date).format('MMMM D, hh:mma')}
