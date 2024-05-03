@@ -651,11 +651,16 @@ let { data, error } = await supabase.auth.admin.inviteUserByEmail('someone@email
 `,
     },
   }),
-  authThirdPartyLogin: () => ({
+  authThirdPartyLogin: (endpoint: string, apiKey: string) => ({
     title: 'Third Party Login',
     bash: {
       language: 'bash',
-      code: ``,
+      code: `
+curl -X GET '${endpoint}/auth/v1/authorize?provider=github' \\
+-H "apikey: ${apiKey}" \\
+-H "Authorization: Bearer USER_TOKEN" \\
+-H "Content-Type: application/json"
+`,
     },
     js: {
       language: 'js',
