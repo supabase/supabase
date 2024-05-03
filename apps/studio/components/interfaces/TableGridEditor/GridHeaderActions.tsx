@@ -22,13 +22,13 @@ import { RoleImpersonationPopover } from '../RoleImpersonationSelector'
 import useEntityType from 'hooks/misc/useEntityType'
 import { ENTITY_TYPE } from 'data/entity-types/entity-type-constants'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { TableLike } from 'hooks/misc/useTable'
 
 export interface GridHeaderActionsProps {
-  table: PostgresTable
+  table: TableLike
   canEditViaTableEditor: boolean
 }
 
-//const GridHeaderActions = ({ table, isViewSelected, isTableSelected  }: GridHeaderActionsProps) => {
 const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const entityType = useEntityType(table?.id)
   const { ref } = useParams()
@@ -41,8 +41,8 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   })
 
   const isTable = entityType?.type === ENTITY_TYPE.TABLE
-  const isView =
-    entityType?.type === ENTITY_TYPE.VIEW || entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
+  const isMaterializedView = entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
+  const isView = entityType?.type === ENTITY_TYPE.VIEW
 
   const viewIsSecurityDefiner =
     entityType?.type === ENTITY_TYPE.VIEW &&
@@ -132,7 +132,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const onToggleRLS = async () => {
     const payload = {
       id: table.id,
-      rls_enabled: !table.rls_enabled,
+      rls_enabled: !(table as PostgresTable).rls_enabled,
     }
 
     updateTable({
@@ -173,7 +173,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
         )}
 
         {isTable ? (
-          table.rls_enabled ? (
+          (table as PostgresTable).rls_enabled ? (
             <>
               {policies.length < 1 && !isLocked ? (
                 <Tooltip.Root delayDuration={0}>
@@ -284,11 +284,56 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                 <Unlock size={16} /> Secure your View
               </h3>
               <div className="grid gap-2 mt-4 text-foreground-light text-sm">
-                <p>This view is created with security definer......etc.....</p>
+                <p>
+                  Postgres' default setting for views is SECURITY DEFINER which means they use the
+                  permissions of the view's creator, rather than the permissions of the querying
+                  user when executing the view's underlying query.
+                </p>
+                <p>
+                  Creating a view in the public schema makes that view accessible via your project's
+                  APIs.
+                </p>
 
                 <div className="mt-2">
                   <Button type="default" asChild>
-                    <Link href="">Do something</Link>
+                    <Link
+                      target="_blank"
+                      href="https://supabase.com/docs/guides/database/database-advisors?lint=0010_security_definer_view"
+                    >
+                      Learn more
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            </PopoverContent_Shadcn_>
+          </Popover_Shadcn_>
+        )}
+
+        {isMaterializedView && entityType.schema === 'public' && (
+          <Popover_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
+            <PopoverTrigger_Shadcn_ asChild>
+              <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
+                View is public
+              </Button>
+            </PopoverTrigger_Shadcn_>
+            <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
+              <h3 className="flex items-center gap-2">
+                <Unlock size={16} /> Secure your View
+              </h3>
+              <div className="grid gap-2 mt-4 text-foreground-light text-sm">
+                <p>
+                  Materialized view is in the public schema and can be queried by anon and
+                  authenticated roles
+                </p>
+
+                <div className="mt-2">
+                  <Button type="default" asChild>
+                    <Link
+                      target="_blank"
+                      href="https://supabase.com/docs/guides/database/database-linter?lint=0016_materialized_view_in_api"
+                    >
+                      Learn more
+                    </Link>
                   </Button>
                 </div>
               </div>
@@ -315,7 +360,9 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
 
                 <div className="mt-2">
                   <Button type="default" asChild>
-                    <Link href="https://github.com/orgs/supabase/discussions/21647">Read more</Link>
+                    <Link target="_blank" href="https://github.com/orgs/supabase/discussions/21647">
+                      Read more
+                    </Link>
                   </Button>
                 </div>
               </div>
@@ -369,16 +416,18 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
         </div>
       </ConfirmationModal>
 
-      <ConfirmModal
-        danger={table.rls_enabled}
-        visible={rlsConfirmModalOpen}
-        title="Confirm to enable Row Level Security"
-        description="Are you sure you want to enable Row Level Security for this table?"
-        buttonLabel="Enable RLS"
-        buttonLoadingLabel="Updating"
-        onSelectCancel={closeConfirmModal}
-        onSelectConfirm={onToggleRLS}
-      />
+      {entityType?.type === ENTITY_TYPE.TABLE && (
+        <ConfirmModal
+          danger={(table as PostgresTable).rls_enabled}
+          visible={rlsConfirmModalOpen}
+          title="Confirm to enable Row Level Security"
+          description="Are you sure you want to enable Row Level Security for this table?"
+          buttonLabel="Enable RLS"
+          buttonLoadingLabel="Updating"
+          onSelectCancel={closeConfirmModal}
+          onSelectConfirm={onToggleRLS}
+        />
+      )}
     </>
   )
 }
