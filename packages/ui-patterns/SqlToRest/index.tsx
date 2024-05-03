@@ -237,12 +237,12 @@ export default function SqlToRest() {
           queryGroup="language"
         >
           <Tabs.Panel id="http" label="HTTP" className="flex flex-col gap-4">
-            <CodeBlock language="bash" hideLineNumbers className="self-stretch">
+            <CodeBlock language="http" hideLineNumbers className="self-stretch">
               {rawHttp}
             </CodeBlock>
           </Tabs.Panel>
           <Tabs.Panel id="curl" label="cURL" className="flex flex-col gap-4">
-            <CodeBlock language="bash" hideLineNumbers className="self-stretch">
+            <CodeBlock language="curl" hideLineNumbers className="self-stretch">
               {curlCommand}
             </CodeBlock>
           </Tabs.Panel>

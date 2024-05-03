@@ -15,10 +15,24 @@ import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
 import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
+import http from 'react-syntax-highlighter/dist/cjs/languages/hljs/http'
+import curl from 'highlightjs-curl'
 
 export interface CodeBlockProps {
   title?: ReactNode
-  language?: 'js' | 'jsx' | 'sql' | 'py' | 'bash' | 'ts' | 'dart' | 'json' | 'csharp' | 'kotlin'
+  language?:
+    | 'js'
+    | 'jsx'
+    | 'sql'
+    | 'py'
+    | 'bash'
+    | 'ts'
+    | 'dart'
+    | 'json'
+    | 'csharp'
+    | 'kotlin'
+    | 'curl'
+    | 'http'
   linesToHighlight?: number[]
   hideCopy?: boolean
   hideLineNumbers?: boolean
@@ -75,6 +89,8 @@ export const CodeBlock = ({
   SyntaxHighlighter.registerLanguage('csharp', csharp)
   SyntaxHighlighter.registerLanguage('json', json)
   SyntaxHighlighter.registerLanguage('kotlin', kotlin)
+  SyntaxHighlighter.registerLanguage('curl', curl)
+  SyntaxHighlighter.registerLanguage('http', http)
 
   const large = false
   // don't show line numbers if bash == lang
