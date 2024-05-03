@@ -80,7 +80,7 @@ union all
 (
 select
     'auth_users_exposed' as name,
-    'WARN' as level,
+    'ERROR' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
     'Detects if auth.users is exposed to anon or authenticated roles via a view or materialized view in the public schema, potentially compromising user data security.' as description,
@@ -417,7 +417,7 @@ union all
 (
 select
     'policy_exists_rls_disabled' as name,
-    'INFO' as level,
+    'ERROR' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
     'Detects cases where row level security (RLS) policies have been created, but RLS has not been enabled for the underlying table.' as description,
@@ -561,7 +561,7 @@ union all
 (
 select
     'security_definer_view' as name,
-    'WARN' as level,
+    'ERROR' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
     'Detects views that are SECURITY DEFINER meaning that they ignore row level security (RLS) policies.' as description,
@@ -591,8 +591,8 @@ from
 where
     c.relkind = 'v'
     and (
-        pg_catalog.has_schema_privilege('anon', n.nspname, 'USAGE')
-        or pg_catalog.has_schema_privilege('authenticated', n.nspname, 'USAGE')
+        pg_catalog.has_table_privilege('anon', c.oid, 'SELECT')
+        or pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT')
     )
     and n.nspname not in (
         'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgsodium', 'pgsodium_masks', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'storage', 'supabase_functions', 'supabase_migrations', 'vault'
@@ -679,8 +679,8 @@ where
     -- RLS is disabled
     and not c.relrowsecurity
     and (
-        pg_catalog.has_schema_privilege('anon', n.nspname, 'USAGE')
-        or pg_catalog.has_schema_privilege('authenticated', n.nspname, 'USAGE')
+        pg_catalog.has_table_privilege('anon', c.oid, 'SELECT')
+        or pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT')
     )
     and n.nspname not in (
         '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'

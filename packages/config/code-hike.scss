@@ -107,6 +107,7 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 19px;
+  width: 100% !important;
   letter-spacing: 0;
   border-radius: 0;
   background-color: unset;
@@ -255,7 +256,13 @@
   flex-direction: column;
   position: relative;
   overflow: hidden;
-  font-family: Ubuntu, Droid Sans, -apple-system, BlinkMacSystemFont, Segoe WPC, Segoe UI,
+  font-family:
+    Ubuntu,
+    Droid Sans,
+    -apple-system,
+    BlinkMacSystemFont,
+    Segoe WPC,
+    Segoe UI,
     sans-serif;
   -moz-column-break-inside: avoid;
   break-inside: avoid;
@@ -312,7 +319,13 @@
 }
 .ch-frame,
 .ch-simple-frame {
-  font-family: Ubuntu, Droid Sans, -apple-system, BlinkMacSystemFont, Segoe WPC, Segoe UI,
+  font-family:
+    Ubuntu,
+    Droid Sans,
+    -apple-system,
+    BlinkMacSystemFont,
+    Segoe WPC,
+    Segoe UI,
     sans-serif;
   -moz-column-break-inside: avoid;
   break-inside: avoid;
@@ -321,7 +334,9 @@
 .ch-simple-frame {
   border-radius: 6px;
   overflow: hidden;
-  box-shadow: 0 13px 27px -5px rgba(50, 50, 93, 0.25), 0 8px 16px -8px rgba(0, 0, 0, 0.3),
+  box-shadow:
+    0 13px 27px -5px rgba(50, 50, 93, 0.25),
+    0 8px 16px -8px rgba(0, 0, 0, 0.3),
     0 -6px 16px -6px rgba(0, 0, 0, 0.025);
 }
 .ch-frame-content {
