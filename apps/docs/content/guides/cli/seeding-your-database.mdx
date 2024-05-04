@@ -74,7 +74,7 @@ import { copycat } from '@snaplet/copycat'
 const seed = await createSeedClient();
 
 await seed.posts([{
-  title: "There is a lot of snow around here!"
+  title: "There is a lot of snow around here!",
   createdBy: {
     email: (ctx) =>
       copycat.email(ctx.seed, {
