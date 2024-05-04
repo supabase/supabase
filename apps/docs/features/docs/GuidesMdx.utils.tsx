@@ -32,7 +32,7 @@ const PUBLISHED_SECTIONS = [
   'storage',
 ] as const
 
-const getGuidesMarkdownInternal = async ({ slug }: { slug: string[] }) => {
+const getGuidesMarkdown = async ({ slug }: { slug: string[] }) => {
   const relPath = slug.join(sep).replace(/\/$/, '')
   const fullPath = join(GUIDES_DIRECTORY, relPath + '.mdx')
   /**
@@ -64,26 +64,6 @@ const getGuidesMarkdownInternal = async ({ slug }: { slug: string[] }) => {
     editLink,
   }
 }
-
-/**
- * Caching this for the entire process is fine because the Markdown content is
- * baked into each deployment and cannot change. There's also nothing sensitive
- * here: this is just reading the MDX files from our GitHub repo.
- */
-const cache = <Args extends unknown[], Output>(fn: (...args: Args) => Promise<Output>) => {
-  const _cache = new Map<string, Output>()
-  return async (...args: Args) => {
-    /**
-     * This is rough but will do because it's just the params object.
-     */
-    const cacheKey = JSON.stringify(args)
-    if (!_cache.has(cacheKey)) {
-      _cache.set(cacheKey, await fn(...args))
-    }
-    return _cache.get(cacheKey)!
-  }
-}
-const getGuidesMarkdown = cache(getGuidesMarkdownInternal)
 
 const genGuidesStaticParams = (directory?: string) => async () => {
   const promises = directory
