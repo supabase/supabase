@@ -1,12 +1,13 @@
 import matter from 'gray-matter'
 import { type Metadata, type ResolvingMetadata } from 'next'
 import { redirect } from 'next/navigation'
+import { watch } from 'node:fs'
 import { readFile, readdir } from 'node:fs/promises'
-import { extname, join, sep } from 'node:path'
+import { extname, join, resolve, sep } from 'node:path'
 import { existsFile } from '~/features/helpers.fs'
 import type { OrPromise } from '~/features/helpers.types'
 import { notFoundLink } from '~/features/recommendations/NotFound.utils'
-import { BASE_PATH, MISC_URL } from '~/lib/constants'
+import { BASE_PATH, IS_DEV, MISC_URL } from '~/lib/constants'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
 import { newEditLink } from './GuidesMdx.template'
 
@@ -68,14 +69,23 @@ const getGuidesMarkdownInternal = async ({ slug }: { slug: string[] }) => {
 /**
  * Caching this for the entire process is fine because the Markdown content is
  * baked into each deployment and cannot change. There's also nothing sensitive
- * here: this is just reading the MDX files from our GitHub repo.
+ * here: this is just reading the public MDX files from the codebase.
+ *
+ * Unlike Next.js' unstable cache, this doesn't persist between deployments,
+ * which we don't want because the content _will_ change.
  */
 const cache = <Args extends unknown[], Output>(fn: (...args: Args) => Promise<Output>) => {
   const _cache = new Map<string, Output>()
+
+  if (IS_DEV) {
+    watch(resolve(GUIDES_DIRECTORY), { recursive: true }, (_, filename) => {
+      if (!filename) return
+      const cacheKey = [{ slug: filename.replace(/\.mdx$/, '').split(sep) }]
+      _cache.delete(JSON.stringify(cacheKey))
+    })
+  }
+
   return async (...args: Args) => {
-    /**
-     * This is rough but will do because it's just the params object.
-     */
     const cacheKey = JSON.stringify(args)
     if (!_cache.has(cacheKey)) {
       _cache.set(cacheKey, await fn(...args))
