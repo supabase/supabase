@@ -109,7 +109,7 @@ const days: (isDark?: boolean) => WeekDayProps[] = (isDark = true) => [
       {
         icon: products.realtime.icon[16],
         title: 'Realtime',
-        description: 'Syncronize and broadcast events',
+        description: 'Synchronize and broadcast events',
         url: 'https://supabase.com/docs/guides/realtime',
       },
       {

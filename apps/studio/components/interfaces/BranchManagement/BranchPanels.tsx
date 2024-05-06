@@ -23,6 +23,9 @@ import {
   IconExternalLink,
   IconMoreVertical,
   IconShield,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import BranchStatusBadge from './BranchStatusBadge'
@@ -114,6 +117,8 @@ export const BranchRow = ({
       },
     }
   )
+
+  const isBranchActiveHealthy = data?.status === 'ACTIVE_HEALTHY'
 
   const [showBranchModeSwitch, setShowBranchModeSwitch] = useState(false)
 
@@ -259,29 +264,53 @@ export const BranchRow = ({
                 <Button type="text" icon={<IconMoreVertical />} className="px-1" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="p-0 w-56" side="bottom" align="end">
-                <DropdownMenuItem
-                  className="gap-x-2"
-                  onSelect={() => setShowConfirmResetModal(true)}
-                  onClick={() => setShowConfirmResetModal(true)}
-                >
-                  <RefreshCw size={14} />
-                  Reset Branch
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="gap-x-2"
-                  onSelect={() => setShowBranchModeSwitch(true)}
-                  onClick={() => setShowBranchModeSwitch(true)}
-                >
-                  {branch.persistent ? (
-                    <>
-                      <Clock size={14} /> Switch to ephemeral
-                    </>
-                  ) : (
-                    <>
-                      <Infinity size={14} className="scale-110" /> Switch to persistent
-                    </>
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild={isBranchActiveHealthy} className="w-full">
+                    <DropdownMenuItem
+                      className="gap-x-2"
+                      onSelect={() => setShowConfirmResetModal(true)}
+                      onClick={() => setShowConfirmResetModal(true)}
+                      disabled={isResetting || !isBranchActiveHealthy}
+                    >
+                      <RefreshCw size={14} />
+                      Reset Branch
+                    </DropdownMenuItem>
+                  </TooltipTrigger_Shadcn_>
+                  {!isBranchActiveHealthy && (
+                    <TooltipContent_Shadcn_ side="top">
+                      Branch is still initializing. Please wait for the branch to become healthy
+                      before resetting
+                    </TooltipContent_Shadcn_>
                   )}
-                </DropdownMenuItem>
+                </Tooltip_Shadcn_>
+
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild={isBranchActiveHealthy} className="w-full">
+                    <DropdownMenuItem
+                      className="gap-x-2"
+                      onSelect={() => setShowBranchModeSwitch(true)}
+                      onClick={() => setShowBranchModeSwitch(true)}
+                      disabled={!isBranchActiveHealthy}
+                    >
+                      {branch.persistent ? (
+                        <>
+                          <Clock size={14} /> Switch to ephemeral
+                        </>
+                      ) : (
+                        <>
+                          <Infinity size={14} className="scale-110" /> Switch to persistent
+                        </>
+                      )}
+                    </DropdownMenuItem>
+                  </TooltipTrigger_Shadcn_>
+                  {!isBranchActiveHealthy && (
+                    <TooltipContent_Shadcn_ side="top">
+                      Branch is still initializing. Please wait for the branch to become healthy
+                      before switching modes
+                    </TooltipContent_Shadcn_>
+                  )}
+                </Tooltip_Shadcn_>
+
                 <DropdownMenuItem
                   className="gap-x-2"
                   onSelect={() => onSelectDeleteBranch?.()}
