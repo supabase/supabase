@@ -1,7 +1,10 @@
 import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { ExternalLink } from 'lucide-react'
 import { toast } from 'react-hot-toast'
+import { Button, toast as UiToast } from 'ui'
 
 import { Query, SupaRow } from 'components/grid'
+import { Markdown } from 'components/interfaces/Markdown'
 import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import type { Table } from 'data/tables/table-query'
@@ -78,7 +81,52 @@ export const useTableRowDeleteMutation = ({
       },
       async onError(data, variables, context) {
         if (onError === undefined) {
-          toast.error(`Failed to delete table row: ${data.message}`)
+          const { table, rows } = variables
+          const isFkError = data.message.includes('violates foreign key constraint')
+          const isMultipleRows = rows.length > 1
+
+          if (isFkError) {
+            const sourceTable = table.name
+            const referencingTable = data.message.split('on table ')[2].replaceAll('"', '')
+            const fkName = data.message
+              .split('foreign key constraint')[1]
+              .split('on table')[0]
+              .replaceAll('"', '')
+            const initialMessage = isMultipleRows
+              ? `Unable to delete rows as one of them is currently referenced by a foreign key constraint from the table \`${referencingTable}\`.`
+              : `Unable to delete row as it is currently referenced by a foreign key constraint from the table \`${referencingTable}\`.`
+            const resolutionCTA = `Set an on delete behavior on the foreign key relation \`${fkName}\` in the \`${referencingTable}\` table to automatically respond when row(s) are being deleted in the \`${sourceTable}\` table.`
+
+            UiToast({
+              variant: 'default',
+              style: { flexDirection: 'column' },
+              title: (
+                <Markdown content={initialMessage} className="text-foreground [&>p]:m-0" />
+              ) as any,
+              description: <Markdown content={resolutionCTA} className="[&>p]:m-0" />,
+              action: (
+                <div className="w-full flex gap-x-2 !mx-0 mt-3">
+                  {/* [Joshen] Ideally we also are able to add this CTA but we can't guarantee this info without an on-demand fetch */}
+                  {/* <Button asChild key="cta-1" type="default">
+                    <Link href={`/project/${projectRef}/editor`}>
+                      View "{referencingTable}" table
+                    </Link>
+                  </Button> */}
+                  <Button asChild type="outline" icon={<ExternalLink />}>
+                    <a
+                      target="_blank"
+                      rel="noreferrer"
+                      href="https://supabase.com/docs/guides/database/postgres/cascade-deletes"
+                    >
+                      Documentation
+                    </a>
+                  </Button>
+                </div>
+              ),
+            })
+          } else {
+            toast.error(`Failed to delete table row: ${data.message}`)
+          }
         } else {
           onError(data, variables, context)
         }
