@@ -19,7 +19,12 @@ describe('select', () => {
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
         .from('books')
-        .select('title, description')
+        .select(
+          \`
+          title,
+          description
+          \`,
+        )
     `)
   })
 

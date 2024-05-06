@@ -1,12 +1,15 @@
+import { oneLine } from 'common-tags'
 import { parseQuery } from 'libpg-query'
 import {
   ColumnRef,
+  FromExpression,
   ParsedQuery,
+  PgString,
   SelectResTarget,
   SelectStmt,
   SortBy,
   Stmt,
-  WhereClauseExpression,
+  WhereExpression,
 } from './types/libpg-query'
 
 export type Statement = Select
@@ -100,12 +103,38 @@ export type LogicalFilter = BaseFilter & {
 
 export type Filter = ColumnFilter | LogicalFilter
 
-export type Target = {
-  type: 'target'
+/**
+ * Represents a direct column target in the select.
+ */
+export type ColumnTarget = {
+  type: 'column-target'
   column: string
   alias?: string
   cast?: string
 }
+
+export type JoinedColumn = {
+  relation: string
+  column: string
+}
+
+/**
+ * Represents a resource embedding (joined) target in the select.
+ */
+export type EmbeddedTarget = {
+  type: 'embedded-target'
+  relation: string
+  targets: Target[]
+  joinType: 'left' | 'inner'
+  joinedColumns: {
+    left: JoinedColumn
+    right: JoinedColumn
+  }
+  alias?: string
+  flatten?: boolean
+}
+
+export type Target = ColumnTarget | EmbeddedTarget
 
 export type Sort = {
   column: string
@@ -123,8 +152,6 @@ export type Sort = {
  */
 export async function processSql(sql: string) {
   const result: ParsedQuery = await parseQuery(sql)
-
-  console.dir(result, { depth: null })
 
   if (result.stmts.length === 0) {
     throw new Error('Expected a statement, but received none')
@@ -165,14 +192,14 @@ function processSelectStmt(stmt: SelectStmt): Select {
   }
 
   if (stmt.SelectStmt.fromClause.length > 1) {
-    throw new Error('Only one relation supported in from clause')
+    throw new Error('Only one FROM source is supported')
   }
 
-  const [rangeVar] = stmt.SelectStmt.fromClause
+  const [fromClause] = stmt.SelectStmt.fromClause
 
-  const from = rangeVar.RangeVar.relname
+  const { from, alias, embeddedTargets } = processFromClause(fromClause)
 
-  const targets = processTargetList(stmt.SelectStmt.targetList)
+  const targets = processTargetList(stmt.SelectStmt.targetList, alias ?? from, embeddedTargets)
 
   const filter = stmt.SelectStmt.whereClause
     ? processWhereClause(stmt.SelectStmt.whereClause)
@@ -192,8 +219,172 @@ function processSelectStmt(stmt: SelectStmt): Select {
   }
 }
 
-function processTargetList(targetList: SelectResTarget[]): Target[] {
-  return targetList.map((resTarget) => {
+function processFromClause(fromClause: FromExpression): {
+  from: string
+  alias?: string
+  embeddedTargets: EmbeddedTarget[]
+} {
+  if ('RangeVar' in fromClause) {
+    return {
+      from: fromClause.RangeVar.relname,
+      alias: fromClause.RangeVar.alias?.aliasname,
+      embeddedTargets: [],
+    }
+  } else if ('JoinExpr' in fromClause) {
+    const joinType = mapJoinType(fromClause.JoinExpr.jointype)
+    const { from, alias, embeddedTargets } = processFromClause(fromClause.JoinExpr.larg)
+
+    const joinedRelationAlias = fromClause.JoinExpr.rarg.RangeVar.alias?.aliasname
+    const joinedRelation = joinedRelationAlias ?? fromClause.JoinExpr.rarg.RangeVar.relname
+
+    const existingRelations = [
+      alias ?? from,
+      ...embeddedTargets.map((t) => t.alias ?? t.relation),
+      joinedRelation,
+    ]
+
+    if (!('A_Expr' in fromClause.JoinExpr.quals)) {
+      throw new Error(`Expected join qualifier to be an expression comparing columns`)
+    }
+
+    let leftQualifierRelation
+    let rightQualifierRelation
+
+    const joinQualifierExpression = fromClause.JoinExpr.quals.A_Expr
+
+    if (!('ColumnRef' in joinQualifierExpression.lexpr)) {
+      throw new Error(`Expected left side of join qualifier to be a column reference`)
+    }
+
+    if (
+      !joinQualifierExpression.lexpr.ColumnRef.fields.every(
+        (field): field is PgString => 'String' in field
+      )
+    ) {
+      throw new Error(`Expected left column reference of join qualifier to contain String fields`)
+    }
+
+    const leftColumnFields = joinQualifierExpression.lexpr.ColumnRef.fields.map(
+      (field) => field.String.sval
+    )
+
+    // Relation and column names are last two parts of the qualified name
+    const [leftRelationName] = leftColumnFields.slice(-2, -1)
+    const [leftColumnName] = leftColumnFields.slice(-1)
+
+    if (!leftRelationName) {
+      leftQualifierRelation = alias ?? from
+    } else if (existingRelations.includes(leftRelationName)) {
+      leftQualifierRelation = leftRelationName
+    } else if (leftRelationName === joinedRelation) {
+      leftQualifierRelation = joinedRelation
+    } else {
+      throw new Error(
+        `Left side of join qualifier references a different relation (${leftRelationName}) than the join (${existingRelations.join(', ')})`
+      )
+    }
+
+    if (!('ColumnRef' in joinQualifierExpression.rexpr)) {
+      throw new Error(`Expected right side of join qualifier to be a column reference`)
+    }
+
+    if (
+      !joinQualifierExpression.rexpr.ColumnRef.fields.every(
+        (field): field is PgString => 'String' in field
+      )
+    ) {
+      throw new Error(`Expected right column reference of join qualifier to contain String fields`)
+    }
+
+    const rightColumnFields = joinQualifierExpression.rexpr.ColumnRef.fields.map(
+      (field) => field.String.sval
+    )
+
+    // Relation and column names are last two parts of the qualified name
+    const [rightRelationName] = rightColumnFields.slice(-2, -1)
+    const [rightColumnName] = rightColumnFields.slice(-1)
+
+    if (!rightRelationName) {
+      rightQualifierRelation = alias ?? from
+    } else if (existingRelations.includes(rightRelationName)) {
+      rightQualifierRelation = rightRelationName
+    } else if (rightRelationName === joinedRelation) {
+      rightQualifierRelation = joinedRelation
+    } else {
+      throw new Error(
+        `Right side of join qualifier references a different relation (${rightRelationName}) than the join (${existingRelations.join(', ')})`
+      )
+    }
+
+    if (rightQualifierRelation === leftQualifierRelation) {
+      // TODO: support for recursive relationships
+      throw new Error(`Join qualifier cannot compare columns from same relation`)
+    }
+
+    if (rightQualifierRelation !== joinedRelation && leftQualifierRelation !== joinedRelation) {
+      throw new Error(`Join qualifier must reference a column from the joined table`)
+    }
+
+    const [qualifierOperatorString] = joinQualifierExpression.name
+
+    if (qualifierOperatorString.String.sval !== '=') {
+      throw new Error(`Expected join qualifier operator to be '='`)
+    }
+
+    let left: JoinedColumn
+    let right: JoinedColumn
+
+    // If left qualifier referenced the joined relation, swap left and right
+    if (rightQualifierRelation === joinedRelation) {
+      left = {
+        relation: leftQualifierRelation,
+        column: leftColumnName,
+      }
+      right = {
+        relation: rightQualifierRelation,
+        column: rightColumnName,
+      }
+    } else {
+      right = {
+        relation: leftQualifierRelation,
+        column: leftColumnName,
+      }
+      left = {
+        relation: rightQualifierRelation,
+        column: rightColumnName,
+      }
+    }
+
+    const embeddedTarget: EmbeddedTarget = {
+      type: 'embedded-target',
+      relation: fromClause.JoinExpr.rarg.RangeVar.relname,
+      alias: fromClause.JoinExpr.rarg.RangeVar.alias?.aliasname,
+      joinType,
+      targets: [], // these will be filled in later when processing the select target list
+      flatten: true,
+      joinedColumns: {
+        left,
+        right,
+      },
+    }
+
+    return {
+      from,
+      alias,
+      embeddedTargets: [...embeddedTargets, embeddedTarget],
+    }
+  } else {
+    const [fieldType] = Object.keys(fromClause)
+    throw new Error(`Unsupported FROM clause type '${fieldType}'`)
+  }
+}
+
+function processTargetList(
+  targetList: SelectResTarget[],
+  from: string,
+  embeddedTargets: EmbeddedTarget[]
+): Target[] {
+  const flattenedColumnTargets: ColumnTarget[] = targetList.map((resTarget) => {
     let columnRef: ColumnRef
     let cast: string | undefined
 
@@ -211,35 +402,94 @@ function processTargetList(targetList: SelectResTarget[]): Target[] {
 
     const { fields } = columnRef.ColumnRef
 
-    if (fields.length > 1) {
-      throw new Error('Only one field supported per column')
-    }
-
-    const [field] = fields
-
-    let column: string
-
-    if ('A_Star' in field) {
-      column = '*'
-    } else if ('String' in field) {
-      column = field.String.sval
-    } else {
-      const [fieldType] = Object.keys(field)
-      throw new Error(`Unsupported ColumnRef field type '${fieldType}'`)
-    }
+    const column = fields
+      .map((field) => {
+        if ('String' in field) {
+          return field.String.sval
+        } else if ('A_Star' in field) {
+          return '*'
+        } else {
+          const [fieldType] = Object.keys(field)
+          throw new Error(`Unsupported ColumnRef field type '${fieldType}'`)
+        }
+      })
+      .join('.')
 
     const alias = resTarget.ResTarget.name
 
     return {
-      type: 'target',
+      type: 'column-target',
       column,
       alias,
       cast,
     }
   })
+
+  // Transfer resource embedding columns and to `embeddedTargets`
+  const columnTargets = flattenedColumnTargets.filter((target) => {
+    const qualifiedName = target.column.split('.')
+
+    // Relation and column names are last two parts of the qualified name
+    const [relationName] = qualifiedName.slice(-2, -1)
+    const [columnName] = qualifiedName.slice(-1)
+
+    if (relationName === from) {
+      return true
+    }
+
+    if (relationName) {
+      const embeddedTarget = embeddedTargets.find(
+        (t) => (!t.alias && t.relation === relationName) || t.alias === relationName
+      )
+
+      if (!embeddedTarget) {
+        throw new Error(
+          oneLine`
+            Found foreign column '${target.column}' in target list without a join to that relation.
+            Did you forget to join that relation or alias it to something else?
+          `
+        )
+      }
+
+      // Strip relation from column name
+      target.column = columnName
+
+      embeddedTarget.targets.push(target)
+      return false
+    }
+
+    return true
+  })
+
+  // Nest embedded targets within each other based on the relations in their join qualifiers
+  const nestedEmbeddedTargets = embeddedTargets.reduce<EmbeddedTarget[]>(
+    (output, embeddedTarget) => {
+      // If the embedded target was joined with the primary relation, return it
+      if (embeddedTarget.joinedColumns.left.relation === from) {
+        return [...output, embeddedTarget]
+      }
+
+      // Otherwise identify the correct parent and nest it within its targets
+      const parent = embeddedTargets.find(
+        (t) => (t.alias ?? t.relation) === embeddedTarget.joinedColumns.left.relation
+      )
+
+      if (!parent) {
+        throw new Error(
+          `Something went wrong, could not find parent embedded target for nested embedded target '${embeddedTarget.relation}'`
+        )
+      }
+
+      parent.targets.push(embeddedTarget)
+      return output
+    },
+    []
+  )
+
+  return [...columnTargets, ...nestedEmbeddedTargets]
 }
 
-function processWhereClause(expression: WhereClauseExpression): Filter {
+function processWhereClause(expression: WhereExpression): Filter {
   if ('A_Expr' in expression) {
     if ('TypeCast' in expression.A_Expr.lexpr) {
       throw new Error('Casting is not supported in the WHERE clause')
@@ -250,10 +500,6 @@ function processWhereClause(expression: WhereClauseExpression): Filter {
     }
 
     const { fields } = expression.A_Expr.lexpr.ColumnRef
-
-    if (fields.length > 1) {
-      throw new Error('Only one field supported per column')
-    }
 
     const [field] = fields
 
@@ -270,8 +516,13 @@ function processWhereClause(expression: WhereClauseExpression): Filter {
     const operatorSymbol = name.String.sval
     const operator = mapOperatorSymbol(operatorSymbol)
 
-    const column = field.String.sval
+    const stringFields = fields.filter((field): field is PgString => 'String' in field)
+    const column = stringFields.map((field) => field.String.sval).join('.')
     let value: any
+
+    if (!('A_Const' in expression.A_Expr.rexpr)) {
+      throw new Error(`Expected right side of WHERE clause expression to be a constant`)
+    }
 
     if ('sval' in expression.A_Expr.rexpr.A_Const) {
       value = expression.A_Expr.rexpr.A_Const.sval.sval
@@ -295,10 +546,6 @@ function processWhereClause(expression: WhereClauseExpression): Filter {
   } else if ('NullTest' in expression) {
     const { fields } = expression.NullTest.arg.ColumnRef
 
-    if (fields.length > 1) {
-      throw new Error('Only one field supported per column')
-    }
-
     const [field] = fields
 
     if (!('String' in field)) {
@@ -306,7 +553,8 @@ function processWhereClause(expression: WhereClauseExpression): Filter {
       throw new Error(`WHERE clause fields must be String type, received '${fieldType}'`)
     }
 
-    const column = field.String.sval
+    const stringFields = fields.filter((field): field is PgString => 'String' in field)
+    const column = stringFields.map((field) => field.String.sval).join('.')
 
     const negate = expression.NullTest.nulltesttype === 'IS_NOT_NULL'
     const operator = 'is'
@@ -371,10 +619,6 @@ function processSortClause(sorts: SortBy[]): Sort[] {
 
     const { fields } = sortBy.SortBy.node.ColumnRef
 
-    if (fields.length > 1) {
-      throw new Error('Only one field supported per column')
-    }
-
     const [field] = fields
 
     if (!('String' in field)) {
@@ -382,7 +626,8 @@ function processSortClause(sorts: SortBy[]): Sort[] {
       throw new Error(`ORDER BY clause fields must be String type, received '${fieldType}'`)
     }
 
-    const column = field.String.sval
+    const stringFields = fields.filter((field): field is PgString => 'String' in field)
+    const column = stringFields.map((field) => field.String.sval).join('.')
     const direction = mapSortByDirection(sortBy.SortBy.sortby_dir)
     const nulls = mapSortByNulls(sortBy.SortBy.sortby_nulls)
 
@@ -447,6 +692,17 @@ function processLimit(selectStmt: SelectStmt): Limit | undefined {
   return {
     count,
     offset,
+  }
+}
+
+function mapJoinType(joinType: string) {
+  switch (joinType) {
+    case 'JOIN_INNER':
+      return 'inner'
+    case 'JOIN_LEFT':
+      return 'left'
+    default:
+      throw new Error(`Unsupported join type '${joinType}'`)
   }
 }
 

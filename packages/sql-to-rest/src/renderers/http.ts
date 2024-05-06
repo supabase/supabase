@@ -1,5 +1,6 @@
 import { stripIndent } from 'common-tags'
 import { Filter, Select, Statement } from '../processor'
+import { renderTargets } from './util'
 
 export type HttpRequest = {
   method: 'GET'
@@ -28,25 +29,12 @@ async function formatSelect(select: Select): Promise<HttpRequest> {
     const [firstTarget] = targets
 
     // Exclude "select=*" if it's the only target
-    if (firstTarget.column !== '*' || targets.length !== 1) {
-      params.set(
-        'select',
-        targets
-          .map(({ column, alias, cast }) => {
-            let value = column
-
-            if (alias && alias !== column) {
-              value = `${alias}:${value}`
-            }
-
-            if (cast) {
-              value = `${value}::${cast}`
-            }
-
-            return value
-          })
-          .join(',')
-      )
+    if (
+      firstTarget.type !== 'column-target' ||
+      firstTarget.column !== '*' ||
+      targets.length !== 1
+    ) {
+      params.set('select', renderTargets(targets))
     }
   }
 
@@ -105,7 +93,7 @@ async function formatSelect(select: Select): Promise<HttpRequest> {
  */
 function uriEncodeParams(
   params: URLSearchParams,
-  characterWhitelist: string[] = ['*', '(', ')', ',', ':']
+  characterWhitelist: string[] = ['*', '(', ')', ',', ':', '!']
 ) {
   return uriDecodeCharacters(params.toString(), characterWhitelist)
 }
@@ -114,7 +102,10 @@ function uriEncodeParams(
  * URI encodes a string with an optional character whitelist
  * that should not be encoded.
  */
-export function uriEncode(value: string, characterWhitelist: string[] = ['*', '(', ')', ',', ':']) {
+export function uriEncode(
+  value: string,
+  characterWhitelist: string[] = ['*', '(', ')', ',', ':', '!']
+) {
   return uriDecodeCharacters(encodeURIComponent(value), characterWhitelist)
 }
 

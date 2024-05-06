@@ -1,10 +1,10 @@
-export type String = {
+export type PgString = {
   String: {
     sval: string
   }
 }
 
-export type Integer = {
+export type PgInteger = {
   Integer: {
     ival: number
   }
@@ -56,9 +56,9 @@ export type A_Expr = {
       | 'AEXPR_NOT_BETWEEN'
       | 'AEXPR_BETWEEN_SYM'
       | 'AEXPR_NOT_BETWEEN_SYM'
-    name: String[]
-    lexpr: ColumnRef
-    rexpr: A_Const
+    name: PgString[]
+    lexpr: A_Const | ColumnRef
+    rexpr: A_Const | ColumnRef
     location: number
   }
 }
@@ -86,7 +86,7 @@ export type NullTest = {
 
 export type ColumnRef = {
   ColumnRef: {
-    fields: (String | A_Star)[]
+    fields: (PgString | A_Star)[]
     location: number
   }
 }
@@ -95,7 +95,7 @@ export type TypeCast = {
   TypeCast: {
     arg: ColumnRef
     typeName: {
-      names: String[]
+      names: PgString[]
       typemod: number
       location: number
     }
@@ -148,11 +148,21 @@ export type RangeVar = {
     /**
      * table alias & optional column aliases
      */
-    alias?: string
+    alias?: { aliasname: string }
   }
 }
 
-export type WhereClauseExpression = A_Expr | BoolExpr | NullTest
+export type JoinExpr = {
+  JoinExpr: {
+    jointype: 'JOIN_INNER' | 'JOIN_LEFT'
+    larg: FromExpression
+    rarg: RangeVar
+    quals: A_Expr | A_Const
+  }
+}
+
+export type FromExpression = RangeVar | JoinExpr
+export type WhereExpression = A_Expr | BoolExpr | NullTest
 
 export type SortBy = {
   SortBy: {
@@ -170,10 +180,10 @@ export type SortBy = {
 export type SelectStmt = {
   SelectStmt: {
     targetList: SelectResTarget[]
-    fromClause?: RangeVar[]
+    fromClause?: FromExpression[]
     distinctClause?: any[]
     intoClause?: any[]
-    whereClause?: WhereClauseExpression
+    whereClause?: WhereExpression
     groupClause?: any[]
     groupDistinct?: boolean
     havingClause?: any[]

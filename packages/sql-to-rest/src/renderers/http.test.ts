@@ -639,4 +639,366 @@ describe('select', () => {
 
     await expect(processSql(sql)).rejects.toThrowError()
   })
+
+  test('multiple from relations fail', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        authors.name
+      from
+        books, authors
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('left join', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        authors.name
+      from
+        books
+      left join
+        authors
+          on author_id = authors.id
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?select=*,...authors(name)')
+  })
+
+  test('implicit inner join', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        authors.name
+      from
+        books
+      join
+        authors
+          on author_id = authors.id
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?select=*,...authors!inner(name)')
+  })
+
+  test('explicit inner join', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        authors.name
+      from
+        books
+      inner join
+        authors
+          on author_id = authors.id
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?select=*,...authors!inner(name)')
+  })
+
+  test('join that is not inner or left fails', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        authors.name
+      from
+        books
+      right join
+        authors
+          on author_id = authors.id
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('join on aliased relation', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        a.name
+      from
+        books
+      join
+        authors as a
+          on author_id = a.id
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?select=*,...a:authors!inner(name)')
+  })
+
+  test('join using primary relation in qualifier', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        authors.name
+      from
+        books
+      join
+        authors
+          on books.author_id = authors.id
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?select=*,...authors!inner(name)')
+  })
+
+  test('join using alias on primary relation', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        a.name
+      from
+        books b
+      join
+        authors as a
+          on b.author_id = a.id
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?select=*,...a:authors!inner(name)')
+  })
+
+  // TODO: add support for recursive relationships
+  test('join using same relation in qualifier fails', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        authors.name
+      from
+        books
+      join
+        authors
+          on authors.id = authors.another_author_id
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('join using unknown relation in qualifier fails', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        authors.name
+      from
+        books
+      join
+        authors
+          on movies.author_id = authors.id
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('join on aliased relation with target on original relation fails', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        authors.name
+      from
+        books
+      join
+        authors as a
+          on author_id = authors.id
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('foreign column in target list without join fails', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        authors.name
+      from
+        books
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('join with non-expression qualifier fails', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        authors.name
+      from
+        books
+      join
+        authors
+          on true
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('join with left side constant qualifier fails', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        authors.name
+      from
+        books
+      join
+        authors
+          on 1 = authors.id
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('join with right side constant qualifier fails', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        authors.name
+      from
+        books
+      join
+        authors
+          on author_id = 1
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('join with non-equal qualifier operator fails', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        authors.name
+      from
+        books
+      join
+        authors
+          on author_id > authors.id
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('join nested relations', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        authors.name
+      from
+        books
+      join
+        authors
+          on author_id = authors.id
+      join
+        editors
+          on authors.editor_id = editors.id
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?select=*,...authors!inner(name,...editors!inner())')
+  })
+
+  test('join qualifier missing column from joined relation fails', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        authors.name
+      from
+        books
+      join
+        authors
+          on author_id = authors.id
+      join
+        editors
+          on authors.editor_id = author_id
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('join qualifier columns work on either side of equation', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        authors.name
+      from
+        books
+      join
+        authors
+          on authors.id = author_id
+      join
+        editors
+          on editors.id = authors.editor_id
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?select=*,...authors!inner(name,...editors!inner())')
+  })
+
+  test('join multiple relations', async () => {
+    const sql = stripIndents`
+      select
+        *,
+        author.name
+      from
+        books
+          join authors author
+            on author_id = author.id
+          join editors editor
+            on author.editor_id = editor.id
+          join viewers viewer
+            on viewer_id = viewer.id
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe(
+      '/books?select=*,...author:authors!inner(name,...editor:editors!inner()),...viewer:viewers!inner()'
+    )
+  })
+
+  test('select all columns from joined table', async () => {
+    const sql = stripIndents`
+      select
+        author.*
+      from
+        books
+          left join authors author
+            on author_id = author.id
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?select=...author:authors(*)')
+  })
 })

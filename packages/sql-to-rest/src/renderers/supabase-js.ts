@@ -1,7 +1,8 @@
-import { Filter, Select, Statement } from '../processor'
-import * as prettier from 'prettier/standalone'
 import * as babel from 'prettier/plugins/babel'
 import * as estree from 'prettier/plugins/estree'
+import * as prettier from 'prettier/standalone'
+import { Filter, Select, Statement } from '../processor'
+import { renderTargets } from './util'
 
 export type SupabaseJsQuery = {
   code: string
@@ -27,24 +28,18 @@ async function formatSelect(select: Select): Promise<SupabaseJsQuery> {
     const [firstTarget] = targets
 
     // Remove '*' from select() if it's the only target
-    if (firstTarget.column === '*' && targets.length === 1) {
+    if (
+      firstTarget.type === 'column-target' &&
+      firstTarget.column === '*' &&
+      targets.length === 1
+    ) {
       lines.push('.select()')
+    } else if (targets.length > 1) {
+      lines.push(
+        `.select(\n    \`\n${renderTargets(targets, { initialIndent: 4, indent: 2 })}\n    \`\n )`
+      )
     } else {
-      const renderedTargets = targets.map(({ column, alias, cast }) => {
-        let value = column
-
-        if (alias && alias !== column) {
-          value = `${alias}:${value}`
-        }
-
-        if (cast) {
-          value = `${value}::${cast}`
-        }
-
-        return value
-      })
-
-      lines.push(`.select(${JSON.stringify(renderedTargets.join(', '))})`)
+      lines.push(`.select(${JSON.stringify(renderTargets(targets))})`)
     }
   }
 
