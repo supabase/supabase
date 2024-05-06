@@ -843,7 +843,7 @@ export type ProjectLintsData = Lint[]
 export type ProjectLintsError = unknown
 
 export const useProjectLintsQuery = <TData = ProjectLintsData>(
-  { projectRef, connectionString }: ProjectLintsVariables,
+  { projectRef, connectionString }: Omit<ProjectLintsVariables, 'exposedSchemas'>,
   { enabled = true, ...options }: UseQueryOptions<ProjectLintsData, ProjectLintsError, TData> = {}
 ) => {
   const { data, isSuccess } = useProjectPostgrestConfigQuery({ projectRef })
