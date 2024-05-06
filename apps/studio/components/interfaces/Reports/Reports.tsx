@@ -220,7 +220,7 @@ const Reports = () => {
             <Button
               type="default"
               onClick={() => setConfig(currentReport?.content)}
-              loading={isSaving}
+              disabled={isSaving}
             >
               Cancel
             </Button>
