@@ -23,6 +23,7 @@ import {
   renderSupabaseJs,
 } from 'sql-to-rest'
 import { CodeBlock, Collapsible, Tabs, cn } from 'ui'
+import { Alert } from 'ui/src/components/shadcn/ui/alert'
 import { Result, faqs } from './faqs'
 
 const defaultValue = stripIndent`
@@ -146,7 +147,7 @@ export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }
         return
       }
 
-      setErrorMessage(error.message)
+      setErrorMessage(sentenceCase(error.message))
     }
   }, [])
 
@@ -158,7 +159,7 @@ export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }
   return (
     <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4 mt-4">
       <div className="flex flex-col gap-4">
-        <div>Enter SQL to convert:</div>
+        <div className="font-medium">Enter SQL to translate</div>
         <div
           className={cn('h-96 py-4 border rounded-md', isDark ? 'bg-[#1f1f1f]' : 'bg-[#f0f0f0]')}
         >
@@ -181,9 +182,14 @@ export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }
             }}
           />
         </div>
+
+        {errorMessage && <Alert className="text-red-900">{errorMessage}</Alert>}
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div
+        className={cn('flex flex-col gap-4', errorMessage ? 'opacity-25 pointer-events-none' : '')}
+      >
+        <div className="font-medium">Choose language to translate to</div>
         <Tabs
           activeId={currentLanguage}
           onChange={(id: string) => setCurrentLanguage(id)}
@@ -205,8 +211,8 @@ export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }
             </CodeBlock>
           </Tabs.Panel>
         </Tabs>
-        {errorMessage && <div className="text-red-900">{errorMessage}</div>}
 
+        <h3 className="my-1 text-md text-inherit">FAQs</h3>
         {relevantFaqs.map((faq) => (
           <Collapsible
             key={faq.id}
@@ -261,4 +267,8 @@ function getTheme(isDarkMode: boolean): editor.IStandaloneThemeData {
     ],
     colors: { 'editor.background': isDarkMode ? '#1f1f1f' : '#f0f0f0' },
   }
+}
+
+function sentenceCase(value: string) {
+  return value[0].toUpperCase() + value.slice(1)
 }
