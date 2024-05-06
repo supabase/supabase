@@ -315,6 +315,7 @@ const Reports = () => {
               endDate={endDate}
               interval={config.interval}
               editableReport={config}
+              onRemoveChart={popChart}
               setEditableReport={setConfig}
             />
           )}

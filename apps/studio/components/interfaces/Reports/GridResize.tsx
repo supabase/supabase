@@ -1,13 +1,31 @@
+import { X } from 'lucide-react'
 import RGL, { WidthProvider } from 'react-grid-layout'
-import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
+
+import { useParams } from 'common'
 import ChartHandler from 'components/to-be-cleaned/Charts/ChartHandler'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { useParams } from 'common'
-import { Badge } from 'ui'
+import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
+import { LAYOUT_COLUMN_COUNT } from './Reports.constants'
 
 const ReactGridLayout = WidthProvider(RGL)
 
-const GridResize = ({ startDate, endDate, interval, editableReport, setEditableReport }: any) => {
+interface GridResizeProps {
+  startDate: string
+  endDate: string
+  interval: string
+  editableReport: any
+  onRemoveChart: ({ metric }: { metric: { key: string } }) => void
+  setEditableReport: (payload: any) => void
+}
+
+const GridResize = ({
+  startDate,
+  endDate,
+  interval,
+  editableReport,
+  onRemoveChart,
+  setEditableReport,
+}: GridResizeProps) => {
   const { ref } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
 
@@ -55,7 +73,19 @@ const GridResize = ({ startDate, endDate, interval, editableReport, setEditableR
                 provider={x.provider}
                 label={`${x.label}${ref !== state.selectedDatabaseId ? (x.provider === 'infra-monitoring' ? ' of replica' : ' on project') : ''}`}
                 customDateFormat={'MMM D, YYYY'}
-              />
+              >
+                <Tooltip_Shadcn_>
+                  <TooltipTrigger_Shadcn_ asChild>
+                    <Button
+                      type="text"
+                      icon={<X />}
+                      className="ml-2 px-1"
+                      onClick={() => onRemoveChart({ metric: { key: x.attribute } })}
+                    />
+                  </TooltipTrigger_Shadcn_>
+                  <TooltipContent_Shadcn_ side="bottom">Remove chart</TooltipContent_Shadcn_>
+                </Tooltip_Shadcn_>
+              </ChartHandler>
 
               <div className="absolute inset-x-0 top-3 ">
                 <div className="flex justify-around">

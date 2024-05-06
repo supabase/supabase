@@ -151,7 +151,6 @@ const ChartHandler = ({
   return (
     <div className="h-full w-full">
       <div className="absolute right-6 z-50 flex justify-between">
-        <div className="space-y-3">{children}</div>
         {!hideChartType && (
           <div>
             <div className="flex w-full space-x-3">
@@ -164,6 +163,7 @@ const ChartHandler = ({
             </div>
           </div>
         )}
+        {children}
       </div>
 
       {chartStyle === 'bar' ? (
