@@ -11,7 +11,7 @@ import { AuthProvider, ThemeProvider, useTelemetryProps, useThemeSandbox } from 
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useState, type PropsWithChildren } from 'react'
-import { PortalToast, PromoToast, TabsProvider } from 'ui'
+import { PortalToast, PromoToast } from 'ui'
 import { CommandProvider } from 'ui-patterns/CommandMenu'
 import { useConsent } from 'ui-patterns/ConsentToast'
 
@@ -226,16 +226,14 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
           <SignOutHandler>
             <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
               <CommandProvider>
-                <TabsProvider>
-                  <div className="h-screen flex flex-col">
-                    <SiteLayout>
-                      <PortalToast />
-                      <PromoToast />
-                      <Component {...pageProps} />
-                      <DocsCommandMenu />
-                    </SiteLayout>
-                  </div>
-                </TabsProvider>
+                <div className="h-screen flex flex-col">
+                  <SiteLayout>
+                    <PortalToast />
+                    <PromoToast />
+                    <Component {...pageProps} />
+                    <DocsCommandMenu />
+                  </SiteLayout>
+                </div>
               </CommandProvider>
             </ThemeProvider>
           </SignOutHandler>
