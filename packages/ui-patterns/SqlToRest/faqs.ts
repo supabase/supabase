@@ -48,7 +48,7 @@ export const faqs: Faq[] = [
   {
     id: 'what-is-supabase-js',
     condition: (result) => result.language === 'js',
-    question: 'How do I use this code?',
+    question: 'What library is this?',
     answer: stripIndent`
       This snippet uses [\`supabase-js\`](https://github.com/supabase/supabase-js), a JavaScript/TypeScript client that provides a convenient SDK wrapper around your project's API.
 
