@@ -4,10 +4,11 @@
 
 // Basic UI things
 import Link from 'next/link'
-import { Accordion, Admonition, Alert, Button, CodeBlock, markdownComponents, Tabs } from 'ui'
+import { Accordion, Admonition, Alert, Button, CodeBlock, markdownComponents } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 import { IconPanel } from 'ui-patterns/IconPanel'
 import { ThemeImage } from 'ui-patterns/ThemeImage'
+import { TabPanel, Tabs } from '~/components/Tabs'
 
 // Common components
 import { CH } from '@code-hike/mdx/components'
@@ -152,8 +153,8 @@ const components = {
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
   StepHikeCompact,
-  TabPanel: (props: any) => <Tabs.Panel {...props}>{props.children}</Tabs.Panel>,
-  Tabs: (props: any) => <Tabs wrappable {...props} />,
+  TabPanel,
+  Tabs,
 }
 
 export default components
