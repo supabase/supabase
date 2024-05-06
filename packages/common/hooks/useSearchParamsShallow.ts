@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useMemo, useReducer, useRef, useState } from 'react'
+import { useCallback, useEffect, useId, useMemo, useReducer, useRef } from 'react'
 
 /**
  * Stores state in search params while bypassing Next Router.
@@ -31,6 +31,8 @@ const useSearchParamsShallow = () => {
     },
     [id]
   )
+
+  useEffect(() => () => clearTimeout(timeoutHandle.current), [])
 
   const [localParams, setLocalParams] = useReducer(reducer, undefined, () => new URLSearchParams())
 

@@ -2,23 +2,15 @@
 
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-
-import { cn, TAB_CHANGE_EVENT_NAME } from 'ui'
-import { ExpandableVideo } from 'ui-patterns'
-
-import { highlightSelectedTocItem } from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
-import useHash from '~/hooks/useHash'
-import { useRerenderOnEvt } from '~/hooks/useManualRerender'
-import { removeAnchor } from './CustomHTMLElements/CustomHTMLElements.utils'
-import { Feedback } from './Feedback'
+import { cn } from 'ui'
+import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
 import { proxy, useSnapshot } from 'valtio'
-
-export interface TOCHeader {
-  id: string
-  text: string
-  link: string
-  level: number
-}
+import {
+  highlightSelectedTocItem,
+  removeAnchor,
+} from '~/components/CustomHTMLElements/CustomHTMLElements.utils'
+import { Feedback } from '~/components/Feedback'
+import useHash from '~/hooks/useHash'
 
 const formatSlug = (slug: string) => {
   // [Joshen] We will still provide support for headers declared like this:
@@ -60,6 +52,13 @@ const useSubscribeTocRerender = () => {
 const useTocRerenderTrigger = () => {
   const { toggleRenderFlag } = useSnapshot(tocRenderSwitch)
   return toggleRenderFlag
+}
+
+interface TOCHeader {
+  id?: string
+  text: string
+  link: string
+  level: number
 }
 
 const GuidesTableOfContents = ({
@@ -105,7 +104,7 @@ const GuidesTableOfContents = ({
     return () => clearTimeout(timeoutHandle)
     /**
      * window.location.href needed to recalculate toc when page changes,
-     * useRerenderOnEvt below will guarantee rerender on change
+     * `useSubscribeTocRerender` above will trigger the rerender
      */
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [overrideToc, typeof window !== 'undefined' && window.location.href])
@@ -116,12 +115,6 @@ const GuidesTableOfContents = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hash, JSON.stringify(displayedList)])
-
-  /**
-   * Displayed headings may change if the tab changes, so the table of contents
-   * needs to rerender.
-   */
-  useRerenderOnEvt(TAB_CHANGE_EVENT_NAME)
 
   if (!displayedList.length) return
 
@@ -155,3 +148,4 @@ const GuidesTableOfContents = ({
 
 export default GuidesTableOfContents
 export { useTocRerenderTrigger }
+export type { TOCHeader }

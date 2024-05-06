@@ -2,10 +2,13 @@
 
 import { useCallback, type ComponentProps } from 'react'
 import { Tabs as TabsPrimitive } from 'ui'
+import { withQueryParams } from 'ui-patterns/ComplexTabs'
 import { useTocRerenderTrigger } from '~/components/GuidesTableOfContents'
 
+const TabsWithQueryParams = withQueryParams(TabsPrimitive)
+
 const TabPanel = TabsPrimitive.Panel
-const Tabs = ({ onChange, ...props }: ComponentProps<typeof TabsPrimitive>) => {
+const Tabs = ({ onChange, ...props }: ComponentProps<typeof TabsWithQueryParams>) => {
   const rerenderToc = useTocRerenderTrigger()
   const onChangeInternal = useCallback(
     (...args: Parameters<typeof onChange>) => {
@@ -15,7 +18,7 @@ const Tabs = ({ onChange, ...props }: ComponentProps<typeof TabsPrimitive>) => {
     [rerenderToc, onChange]
   )
 
-  return <TabsPrimitive wrappable onChange={onChangeInternal} {...props} />
+  return <TabsWithQueryParams wrappable onChange={onChangeInternal} {...props} />
 }
 
 export { Tabs, TabPanel }

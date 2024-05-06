@@ -6,7 +6,7 @@ import '../styles/prism-okaidia.scss'
 
 import Head from 'next/head'
 import { ThemeProvider } from 'common'
-import { PortalToast, PromoToast, TabsProvider } from 'ui'
+import { PortalToast, PromoToast } from 'ui'
 
 import MetaFaviconsPagesRouter from 'common/MetaFavicons/pages-router'
 import { AuthContainer } from '~/features/auth/auth.client'
@@ -32,16 +32,14 @@ function MyApp({ Component, pageProps }: AppPropsWithLayout) {
           <ScrollRestoration />
           <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
             <CommandMenuProvider site="docs">
-              <TabsProvider>
-                <div className="h-screen flex flex-col">
-                  <SiteLayout>
-                    <PortalToast />
-                    <PromoToast />
-                    <Component {...pageProps} />
-                  </SiteLayout>
-                  <ThemeSandbox />
-                </div>
-              </TabsProvider>
+              <div className="h-screen flex flex-col">
+                <SiteLayout>
+                  <PortalToast />
+                  <PromoToast />
+                  <Component {...pageProps} />
+                </SiteLayout>
+                <ThemeSandbox />
+              </div>
             </CommandMenuProvider>
           </ThemeProvider>
         </AuthContainer>

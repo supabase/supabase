@@ -6,7 +6,7 @@ import '../styles/prism-okaidia.scss'
 
 import { ThemeProvider } from 'common'
 import { type Metadata, type Viewport } from 'next'
-import { PortalToast, TabsProvider } from 'ui'
+import { PortalToast } from 'ui'
 import { CommandMenuProvider } from 'ui-patterns/Cmdk'
 import { AuthContainer } from '~/features/auth/auth.client'
 import { QueryClientProvider } from '~/features/data/queryClient.client'
@@ -62,14 +62,12 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
             <body>
               <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
                 <CommandMenuProvider site="docs">
-                  <TabsProvider>
-                    <div className="h-screen flex flex-col">
-                      <SiteLayout>
-                        <PortalToast />
-                        {children}
-                      </SiteLayout>
-                    </div>
-                  </TabsProvider>
+                  <div className="h-screen flex flex-col">
+                    <SiteLayout>
+                      <PortalToast />
+                      {children}
+                    </SiteLayout>
+                  </div>
                 </CommandMenuProvider>
                 <ThemeSandbox />
               </ThemeProvider>
