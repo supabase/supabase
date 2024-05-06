@@ -24,7 +24,9 @@ import {
 } from 'sql-to-rest'
 import { CodeBlock, Collapsible, Tabs, cn } from 'ui'
 import { Alert } from 'ui/src/components/shadcn/ui/alert'
-import { Result, faqs } from './faqs'
+import { assumptions } from './assumptions'
+import { faqs } from './faqs'
+import { ResultBundle } from './util'
 
 const defaultValue = stripIndent`
   select
@@ -101,7 +103,7 @@ export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }
           return []
         }
 
-        const result: Result = {
+        const result: ResultBundle = {
           type: 'http',
           language: currentLanguage,
           statement,
@@ -115,7 +117,7 @@ export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }
           return []
         }
 
-        const result: Result = {
+        const result: ResultBundle = {
           type: 'supabase-js',
           language: currentLanguage,
           statement,
@@ -123,6 +125,46 @@ export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }
         }
 
         return faqs.filter((faq) => faq.condition(result))
+      }
+      default:
+        return []
+    }
+  }, [currentLanguage, statement, httpRequest, jsQuery])
+
+  const relevantAssumptions = useMemo(() => {
+    if (!statement) {
+      return []
+    }
+
+    switch (currentLanguage) {
+      case 'http':
+      case 'curl': {
+        if (!httpRequest) {
+          return []
+        }
+
+        const result: ResultBundle = {
+          type: 'http',
+          language: currentLanguage,
+          statement,
+          ...httpRequest,
+        }
+
+        return assumptions.filter((a) => a.condition(result)).flatMap((a) => a.assumptions(result))
+      }
+      case 'js': {
+        if (!jsQuery) {
+          return []
+        }
+
+        const result: ResultBundle = {
+          type: 'supabase-js',
+          language: currentLanguage,
+          statement,
+          ...jsQuery,
+        }
+
+        return assumptions.filter((a) => a.condition(result)).flatMap((a) => a.assumptions(result))
       }
       default:
         return []
@@ -212,39 +254,56 @@ export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }
           </Tabs.Panel>
         </Tabs>
 
-        <h3 className="my-1 text-md text-inherit">FAQs</h3>
-        {relevantFaqs.map((faq) => (
-          <Collapsible
-            key={faq.id}
-            className="flex flex-col items-stretch justify-start bg-surface-100 rounded border border-default px-4"
-          >
-            <Collapsible.Trigger asChild>
-              <button type="button" className="flex justify-between items-center p-3">
-                <Markdown
-                  className="text-sm text-left"
-                  components={{
-                    p: ({ children }: PropsWithChildren) => <p className="m-0">{children}</p>,
-                  }}
-                >
-                  {faq.question}
-                </Markdown>
-                <ChevronUp className="transition data-open-parent:rotate-0 data-closed-parent:rotate-180" />
-              </button>
-            </Collapsible.Trigger>
-            <Collapsible.Content>
-              <div className="text-foreground flex flex-col justify-start items-center px-3 pb-4">
-                <Markdown
-                  className="text-sm"
-                  components={{
-                    code: (props: any) => <CodeBlock hideLineNumbers {...props} />,
-                  }}
-                >
-                  {faq.answer}
-                </Markdown>
-              </div>
-            </Collapsible.Content>
-          </Collapsible>
-        ))}
+        {relevantAssumptions.length > 0 && (
+          <div>
+            <h3 className="my-1 text-base text-inherit">Assumptions</h3>
+            <ol className="my-0 text-foreground">
+              {relevantAssumptions.map((assumption) => (
+                <li>
+                  <Markdown className="text-sm">{assumption}</Markdown>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+
+        {relevantFaqs.length > 0 && (
+          <>
+            <h3 className="my-1 text-base text-inherit">FAQs</h3>
+            {relevantFaqs.map((faq) => (
+              <Collapsible
+                key={faq.id}
+                className="flex flex-col items-stretch justify-start bg-surface-100 rounded border border-default px-4"
+              >
+                <Collapsible.Trigger asChild>
+                  <button type="button" className="flex justify-between items-center p-3">
+                    <Markdown
+                      className="text-sm text-left"
+                      components={{
+                        p: ({ children }: PropsWithChildren) => <p className="m-0">{children}</p>,
+                      }}
+                    >
+                      {faq.question}
+                    </Markdown>
+                    <ChevronUp className="transition data-open-parent:rotate-0 data-closed-parent:rotate-180" />
+                  </button>
+                </Collapsible.Trigger>
+                <Collapsible.Content>
+                  <div className="text-foreground flex flex-col justify-start items-center px-3 pb-4">
+                    <Markdown
+                      className="text-sm"
+                      components={{
+                        code: (props: any) => <CodeBlock hideLineNumbers {...props} />,
+                      }}
+                    >
+                      {faq.answer}
+                    </Markdown>
+                  </div>
+                </Collapsible.Content>
+              </Collapsible>
+            ))}
+          </>
+        )}
       </div>
     </div>
   )

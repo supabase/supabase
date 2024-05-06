@@ -1,27 +1,9 @@
 import { stripIndent } from 'common-tags'
-import { ColumnFilter, Filter, HttpRequest, Statement, SupabaseJsQuery } from 'sql-to-rest'
-
-export type BaseResult = {
-  statement: Statement
-}
-
-export type HttpResult = BaseResult &
-  HttpRequest & {
-    type: 'http'
-    language: 'http' | 'curl'
-  }
-
-export type SupabaseJsResult = BaseResult &
-  SupabaseJsQuery & {
-    type: 'supabase-js'
-    language: 'js'
-  }
-
-export type Result = HttpResult | SupabaseJsResult
+import { ResultBundle, someFilter } from './util'
 
 export type Faq = {
   id: string
-  condition: (result: Result) => boolean
+  condition: (result: ResultBundle) => boolean
   question: string
   answer: string
 }
@@ -209,15 +191,3 @@ export const faqs: Faq[] = [
     `,
   },
 ]
-
-function someFilter(filter: Filter, predicate: (filter: ColumnFilter) => boolean): boolean {
-  const { type } = filter
-
-  if (type === 'column') {
-    return predicate(filter)
-  } else if (type === 'logical') {
-    return filter.values.some((f) => someFilter(f, predicate))
-  } else {
-    throw new Error(`Unknown filter type '${type}'`)
-  }
-}
