@@ -1,3 +1,5 @@
+'use client'
+
 import * as TabsPrimitive from '@radix-ui/react-tabs'
 import { Children, useMemo, useState, type KeyboardEvent, type PropsWithChildren } from 'react'
 import styleHandler from '../../lib/theme/styleHandler'
