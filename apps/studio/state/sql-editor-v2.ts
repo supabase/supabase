@@ -8,10 +8,15 @@ export type StateSnippetFolder = {
   folder: SnippetFolder
 }
 
+// [Joshen] API codegen is somehow missing the content property
+export interface SnippetContent extends Snippet {
+  content?: any
+}
+
 export type StateSnippet = {
   projectRef: string
   splitSizes: number[]
-  snippet: Snippet
+  snippet: SnippetContent
 }
 
 export const sqlEditorState = proxy({
@@ -41,6 +46,19 @@ export const sqlEditorState = proxy({
   // Stores the state of each snippet
   savingStates: {} as {
     [snippetId: string]: 'IDLE' | 'UPDATING' | 'UPDATING_FAILED'
+  },
+
+  loadRemoteSnippet: ({
+    projectRef,
+    folderId,
+    snippet,
+  }: {
+    projectRef: string
+    folderId: string
+    snippet: Snippet
+  }) => {
+    console.log('loadRemoteSnippet', snippet)
+    sqlEditorState.addSnippet({ projectRef, folderId, snippet })
   },
 
   // Utils to sort snippets alphabetically

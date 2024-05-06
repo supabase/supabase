@@ -82,20 +82,18 @@ const TreeViewItem = forwardRef<
         aria-expanded={isExpanded}
         {...props}
         className={cn(
-          'relative',
+          'group relative',
           'transition-colors',
+          'h-[28px]',
           'flex items-center gap-3',
           'text-sm',
-          'cursor-pointer',
-          'select-none',
+          'cursor-pointer select-none',
           'text-foreground-light',
-          'aria-selected:text-foreground',
+          'hover:bg-control',
           'aria-expanded:bg-control',
-          'aria-selected:!bg-selection',
-          'data-[state=open]:bg-control', // bg state for context menu open
-          'group',
-          'h-[28px]',
-          'hover:bg-control'
+          isSelected ? 'text-foreground' : '', // [Joshen Temp]: aria-selected:text-foreground not working as aria-selected property not rendered in DOM,
+          isSelected ? '!bg-selection' : '', // [Joshen Temp]: aria-selected:!bg-selection not working as aria-selected property not rendered in DOM
+          'data-[state=open]:bg-control' // bg state for context menu open
         )}
         style={{
           paddingLeft:
@@ -119,7 +117,9 @@ const TreeViewItem = forwardRef<
             }
           ></div>
         )}
-        <div className="absolute left-0 h-full w-0.5 group-aria-selected:bg-foreground"></div>
+        {/* [Joshen] Temp fix */}
+        {isSelected && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
+        {/* <div className="absolute left-0 h-full w-0.5 group-aria-selected:bg-foreground" /> */}
         {isBranch ? (
           <>
             <ChevronRight

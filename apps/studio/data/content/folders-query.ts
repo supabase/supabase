@@ -8,6 +8,7 @@ import { components } from 'api-types'
 export type SnippetFolderResponse = components['schemas']['GetUserContentFolderResponse']['data']
 export type SnippetFolder = components['schemas']['UserContentFolder']
 export type Snippet = components['schemas']['UserContentObjectMeta']
+export type SnippetDetail = components['schemas']['UserContentObjectV2']
 
 export async function getSQLSnippetFolders(
   { projectRef, folderId }: { projectRef?: string; folderId?: string },

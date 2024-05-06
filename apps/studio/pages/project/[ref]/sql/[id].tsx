@@ -20,15 +20,18 @@ import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useSnippets, useSqlEditorStateSnapshot } from 'state/sql-editor'
 import { useContentIdQuery } from 'data/content/content-id-query'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 
 const SqlEditor: NextPageWithLayout = () => {
   const router = useRouter()
   const monaco = useMonaco()
   const { id, ref, content } = useParams()
-
   const { project } = useProjectContext()
-  const snap = useSqlEditorStateSnapshot()
+
   const appSnap = useAppStateSnapshot()
+  const snap = useSqlEditorStateSnapshot()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+
   const enableFolders = useFlag('sqlFolderOrganization')
 
   const snippets = useSnippets(ref)
@@ -36,7 +39,11 @@ const SqlEditor: NextPageWithLayout = () => {
 
   useContentIdQuery(
     { projectRef: ref, id },
-    { enabled: enableFolders && id !== 'new', onSuccess: (data) => console.log(data) }
+    {
+      enabled: enableFolders && id !== 'new',
+      onSuccess: (data) =>
+        snapV2.loadRemoteSnippet({ projectRef: ref as string, folderId: 'root', snippet: data }),
+    }
   )
 
   const [intellisenseEnabled] = useLocalStorageQuery(

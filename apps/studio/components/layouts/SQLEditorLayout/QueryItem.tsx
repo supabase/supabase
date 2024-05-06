@@ -3,17 +3,10 @@ import { noop } from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 import toast from 'react-hot-toast'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Checkbox_Shadcn_,
   HoverCardContent_Shadcn_,
   HoverCardTrigger_Shadcn_,
   HoverCard_Shadcn_,
-  IconAlertTriangle,
-  IconEye,
-  IconUnlock,
-  Modal,
   cn,
 } from 'ui'
 import { InnerSideMenuItem } from 'ui-patterns'
@@ -25,10 +18,9 @@ import SimpleCodeBlock from 'components/to-be-cleaned/SimpleCodeBlock'
 import CopyButton from 'components/ui/CopyButton'
 import { useContentDeleteMutation } from 'data/content/content-delete-mutation'
 import type { SqlSnippet } from 'data/content/sql-snippets-query'
-import { useSqlEditorStateSnapshot } from 'state/sql-editor'
-import { CriticalIcon, WarningIcon } from 'ui-patterns/Icons/StatusIcons'
-import { QueryItemActions } from './QueryItemActions'
 import { Eye, Unlock } from 'lucide-react'
+import { useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { QueryItemActions } from './QueryItemActions'
 
 export interface QueryItemProps {
   tabInfo: SqlSnippet

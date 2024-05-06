@@ -29,6 +29,7 @@ import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
 import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-editor'
+import { useSqlEditorV2StateSnapshot } from 'state/sql-editor-v2'
 import {
   AiIconAnimation,
   IconCornerDownLeft,
@@ -97,11 +98,22 @@ const SQLEditor = () => {
   const organization = useSelectedOrganization()
   const appSnap = useAppStateSnapshot()
   const snap = useSqlEditorStateSnapshot()
+  const snapV2 = useSqlEditorV2StateSnapshot()
+  const getImpersonatedRole = useGetImpersonatedRole()
   const databaseSelectorState = useDatabaseSelectorStateSnapshot()
 
+  const enableFolders = useFlag('sqlFolderOrganization')
   const aiAssistantFlag = useFlag('sqlEditorConversationalAi')
   const aiAssistantFeaturePreview = useIsSQLEditorAiAssistantEnabled()
   const isAiAssistantOn = aiAssistantFlag && aiAssistantFeaturePreview
+
+  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
+  const [isAiOpen, setIsAiOpen] = useLocalStorageQuery('supabase_sql-editor-ai-open', true)
+  const [, setAiQueryCount] = useLocalStorageQuery('supabase_sql-editor-ai-query-count', 0)
+  const [, setIsSchemaSuggestionDismissed] = useLocalStorageQuery(
+    'supabase_sql-editor-ai-schema-suggestion-dismissed',
+    false
+  )
 
   const { mutate: formatQuery } = useFormatQueryMutation()
   const { mutateAsync: generateSql, isLoading: isGenerateSqlLoading } = useSqlGenerateMutation()
@@ -110,14 +122,21 @@ const SQLEditor = () => {
   const { mutateAsync: generateSqlTitle } = useSqlTitleGenerateMutation()
 
   const [aiInput, setAiInput] = useState('')
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
   const [selectedMessage, setSelectedMessage] = useState<string>()
   const [debugSolution, setDebugSolution] = useState<string>()
   const [sourceSqlDiff, setSourceSqlDiff] = useState<ContentDiff>()
   const [pendingTitle, setPendingTitle] = useState<string>()
   const [hasSelection, setHasSelection] = useState<boolean>(false)
-  const inputRef = useRef<HTMLInputElement>(null)
+  const [isAcceptDiffLoading, setIsAcceptDiffLoading] = useState(false)
+  const [selectedDiffType, setSelectedDiffType] = useState<DiffType | undefined>(undefined)
+  const [isFirstRender, setIsFirstRender] = useState(true)
+  const [lineHighlights, setLineHighlights] = useState<string[]>([])
 
-  const showReadReplicasUI = project?.is_read_replicas_enabled
+  const inputRef = useRef<HTMLInputElement>(null)
+  const editorRef = useRef<IStandaloneCodeEditor | null>(null)
+  const monacoRef = useRef<Monaco | null>(null)
+  const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const { data: databases, isSuccess: isSuccessReadReplicas } = useReadReplicasQuery({
@@ -126,45 +145,15 @@ const SQLEditor = () => {
 
   // Customers on HIPAA plans should not have access to Supabase AI
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
-
-  const [isAiOpen, setIsAiOpen] = useLocalStorageQuery('supabase_sql-editor-ai-open', true)
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
-
-  const selectedOrganization = useSelectedOrganization()
-  const selectedProject = useSelectedProject()
-  const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
-  const [hasEnabledAISchema] = useLocalStorageQuery(LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA, true)
-  const [isAcceptDiffLoading, setIsAcceptDiffLoading] = useState(false)
-  const [, setAiQueryCount] = useLocalStorageQuery('supabase_sql-editor-ai-query-count', 0)
-  const [, setIsSchemaSuggestionDismissed] = useLocalStorageQuery(
-    'supabase_sql-editor-ai-schema-suggestion-dismissed',
-    false
-  )
-
+  const showReadReplicasUI = project?.is_read_replicas_enabled
+  const isOptedInToAI = organization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
-
-  const [selectedDiffType, setSelectedDiffType] = useState<DiffType | undefined>(undefined)
-  const [isFirstRender, setIsFirstRender] = useState(true)
-  const [lineHighlights, setLineHighlights] = useState<string[]>([])
-
   const isAiLoading = isGenerateSqlLoading || isEditSqlLoading
-
-  // Used for cleaner framer motion transitions
-  useEffect(() => {
-    setIsFirstRender(false)
-  }, [])
-
-  useEffect(() => {
-    if (isSuccessReadReplicas) {
-      const primaryDatabase = databases.find((db) => db.identifier === ref)
-      databaseSelectorState.setSelectedDatabaseId(primaryDatabase?.identifier)
-    }
-  }, [isSuccessReadReplicas, databases, ref])
 
   const { data, refetch: refetchEntityDefinitions } = useEntityDefinitionsQuery(
     {
-      projectRef: selectedProject?.ref,
-      connectionString: selectedProject?.connectionString,
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
     },
     { enabled: includeSchemaMetadata }
   )
@@ -172,10 +161,6 @@ const SQLEditor = () => {
   const entityDefinitions = includeSchemaMetadata ? data?.map((def) => def.sql.trim()) : undefined
 
   const isDiffOpen = !!sourceSqlDiff
-
-  const editorRef = useRef<IStandaloneCodeEditor | null>(null)
-  const monacoRef = useRef<Monaco | null>(null)
-  const diffEditorRef = useRef<IStandaloneDiffEditor | null>(null)
 
   const {
     messages: chatMessages,
@@ -244,10 +229,11 @@ const SQLEditor = () => {
     },
   })
 
-  const snippet = id ? snap.snippets[id] : null
-
-  const isLoading = urlId === 'new' ? false : !(id && ref && snap.loaded[ref])
-  console.log({ isLoading })
+  const snippet = id ? (enableFolders ? snapV2.snippets[id] : snap.snippets[id]) : null
+  const snippetIsLoading = enableFolders
+    ? !(id in snapV2.snippets)
+    : !(id && ref && snap.loaded[ref])
+  const isLoading = urlId === 'new' ? false : snippetIsLoading
 
   /**
    * Sets the snippet title using AI.
@@ -255,7 +241,6 @@ const SQLEditor = () => {
   const setAiTitle = useCallback(
     async (id: string, sql: string) => {
       const { title } = await generateSqlTitle({ sql })
-
       snap.renameSnippet(id, title)
     },
     [generateSqlTitle, snap]
@@ -298,8 +283,6 @@ const SQLEditor = () => {
       )
     }
   }, [formatQuery, id, isDiffOpen, project, snap])
-
-  const getImpersonatedRole = useGetImpersonatedRole()
 
   const executeQuery = useCallback(
     async (force: boolean = false) => {
@@ -511,6 +494,18 @@ const SQLEditor = () => {
     setSourceSqlDiff(undefined)
     setPendingTitle(undefined)
   }, [debugSolution, telemetryProps, router])
+
+  // Used for cleaner framer motion transitions
+  useEffect(() => {
+    setIsFirstRender(false)
+  }, [])
+
+  useEffect(() => {
+    if (isSuccessReadReplicas) {
+      const primaryDatabase = databases.find((db) => db.identifier === ref)
+      databaseSelectorState.setSelectedDatabaseId(primaryDatabase?.identifier)
+    }
+  }, [isSuccessReadReplicas, databases, ref])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {

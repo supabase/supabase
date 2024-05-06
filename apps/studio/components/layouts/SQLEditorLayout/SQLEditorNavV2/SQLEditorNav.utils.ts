@@ -24,13 +24,13 @@ export const formatFolderResponseForTreeView = (
   const { folders, contents } = response
   const formattedFolders =
     folders?.map((folder) => {
-      const { id, name, ...metadata } = folder
-      return { id, name, parent: 0, isBranch: true, children: [], metadata }
+      const { id, name } = folder
+      return { id, name, parent: 0, isBranch: true, children: [], metadata: folder }
     }) || []
   const formattedContents =
     contents?.map((content) => {
-      const { id, name, ...metadata } = content
-      return { id, name, parent: 0, children: [], metadata }
+      const { id, name } = content
+      return { id, name, parent: 0, children: [], metadata: content }
     }) || []
 
   const root = {

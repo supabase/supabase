@@ -76,7 +76,7 @@ export interface paths {
   }
   '/platform/auth/{ref}/invite': {
     /** Sends an invite to the given email */
-    post: operations['InviteController_sendInvite']
+    post: operations['AuthInviteController_sendInvite']
   }
   '/platform/auth/{ref}/magiclink': {
     /** Sends a magic link to the given email */
@@ -170,7 +170,7 @@ export interface paths {
   }
   '/platform/organizations/{slug}/roles': {
     /** Gets the given organization's roles */
-    get: operations['RolesController_addMember']
+    get: operations['OrganizationRolesController_addMember']
   }
   '/platform/organizations/{slug}/tax-ids': {
     /** Gets the given organization's tax IDs */
@@ -210,11 +210,11 @@ export interface paths {
   }
   '/platform/organizations/{slug}/members/invite': {
     /** Gets invited users */
-    get: operations['InviteController_getInvitedUsers']
+    get: operations['OrganizationInviteController_getInvitedUsers']
     /** Invites user */
-    post: operations['InviteController_inviteUser']
+    post: operations['OrganizationInviteController_inviteUser']
     /** Delete invited user */
-    delete: operations['InviteController_deleteInvitedUser']
+    delete: operations['OrganizationInviteController_deleteInvitedUser']
   }
   '/platform/organizations/{slug}/members/join': {
     /** Gets invite */
@@ -528,11 +528,11 @@ export interface paths {
   }
   '/platform/projects/{ref}/api/rest': {
     /** Gets project OpenApi */
-    get: operations['ApiController_projectOpenApi']
+    get: operations['ProjectsApiController_projectOpenApi']
   }
   '/platform/projects/{ref}/api/graphql': {
     /** Queries project Graphql */
-    post: operations['ApiController_projectGraphql']
+    post: operations['ProjectsApiController_projectGraphql']
   }
   '/platform/projects/{ref}/infra-monitoring': {
     /** Gets project's usage metrics */
@@ -572,7 +572,7 @@ export interface paths {
   }
   '/platform/projects/{ref}/status': {
     /** Gets project's status */
-    get: operations['StatusController_getStatus']
+    get: operations['ProjectStatusController_getStatus']
   }
   '/platform/projects/{ref}/update': {
     /**
@@ -722,7 +722,7 @@ export interface paths {
      * Gets project's settings
      * @deprecated
      */
-    get: operations['SettingsController_getProjectApi']
+    get: operations['PropsSettingsController_getProjectApi']
   }
   '/platform/storage/{ref}/buckets/{id}': {
     /** Gets bucket */
@@ -815,11 +815,11 @@ export interface paths {
     post: operations['TelemetryPageController_sendServerPage']
   }
   '/platform/telemetry/activity': {
-    /** Sends mixpanel server activity */
+    /** Sends server activity */
     post: operations['TelemetryActivityController_sendServerActivity']
   }
   '/platform/telemetry/pageview': {
-    /** Send mixpanel page event */
+    /** Send pageview event */
     post: operations['TelemetryPageviewController_sendServerPageViewed']
   }
   '/platform/vercel/token': {
@@ -842,11 +842,11 @@ export interface paths {
   }
   '/platform/integrations': {
     /** Gets user's integrations */
-    get: operations['IntegrationsController_getProjectConnections']
+    get: operations['IntegrationsController_getUserInstallations']
   }
   '/platform/integrations/{slug}': {
     /** Gets integration with the given organization slug */
-    get: operations['IntegrationsController_getProjectConnectionsForOrg']
+    get: operations['IntegrationsController_getUserInstallationForOrg']
   }
   '/platform/integrations/vercel': {
     /**
@@ -921,7 +921,7 @@ export interface paths {
   }
   '/system/auth/{ref}/templates/{template}': {
     /** Gets GoTrue template */
-    get: operations['AuthTemplateController_getTemplate']
+    get: operations['SystemAuthTemplateController_getTemplate']
   }
   '/system/database/{ref}/owner/owner-reassign': {
     /** Gets the status of owner reassignment */
@@ -942,6 +942,11 @@ export interface paths {
     post: operations['GithubSecretAlertController_resetJwt']
   }
   '/system/projects/{ref}/functions/{function_slug}': {
+    /**
+     * Delete a function
+     * @description Deletes a function with the specified slug from the specified project.
+     */
+    delete: operations['SystemFunctionSlugController_deleteFunction']
     /**
      * Update a function
      * @description Updates a function with the specified slug and project.
@@ -1013,7 +1018,7 @@ export interface paths {
   }
   '/system/projects': {
     /** Create a project */
-    post: operations['ProjectsController_createProject']
+    post: operations['SystemProjectsController_createProject']
   }
   '/system/organizations/{slug}/usage': {
     /** Gets usage stats */
@@ -1081,7 +1086,7 @@ export interface paths {
   }
   '/v0/auth/{ref}/invite': {
     /** Sends an invite to the given email */
-    post: operations['InviteController_sendInvite']
+    post: operations['AuthInviteController_sendInvite']
   }
   '/v0/auth/{ref}/magiclink': {
     /** Sends a magic link to the given email */
@@ -1159,15 +1164,15 @@ export interface paths {
   }
   '/v0/organizations/{slug}/roles': {
     /** Gets the given organization's roles */
-    get: operations['RolesController_addMember']
+    get: operations['OrganizationRolesController_addMember']
   }
   '/v0/organizations/{slug}/members/invite': {
     /** Gets invited users */
-    get: operations['InviteController_getInvitedUsers']
+    get: operations['OrganizationInviteController_getInvitedUsers']
     /** Invites user */
-    post: operations['InviteController_inviteUser']
+    post: operations['OrganizationInviteController_inviteUser']
     /** Delete invited user */
-    delete: operations['InviteController_deleteInvitedUser']
+    delete: operations['OrganizationInviteController_deleteInvitedUser']
   }
   '/v0/organizations/{slug}/members/join': {
     /** Gets invite */
@@ -1385,11 +1390,11 @@ export interface paths {
   }
   '/v0/projects/{ref}/api/rest': {
     /** Gets project OpenApi */
-    get: operations['ApiController_projectOpenApi']
+    get: operations['ProjectsApiController_projectOpenApi']
   }
   '/v0/projects/{ref}/api/graphql': {
     /** Queries project Graphql */
-    post: operations['ApiController_projectGraphql']
+    post: operations['ProjectsApiController_projectGraphql']
   }
   '/v0/projects/{ref}/infra-monitoring': {
     /** Gets project's usage metrics */
@@ -1429,7 +1434,7 @@ export interface paths {
   }
   '/v0/projects/{ref}/status': {
     /** Gets project's status */
-    get: operations['StatusController_getStatus']
+    get: operations['ProjectStatusController_getStatus']
   }
   '/v0/projects/{ref}/analytics/endpoints/functions.inv-stats': {
     /** Gets a project's function invocation statistics */
@@ -1703,13 +1708,13 @@ export interface paths {
   }
   '/v1/projects/{ref}/postgrest': {
     /** Gets project's postgrest config */
-    get: operations['PostgrestConfigController_getPostgRESTConfig']
+    get: operations['V1PostgrestConfigController_getPostgRESTConfig']
     /** Updates project's postgrest config */
-    patch: operations['PostgrestConfigController_updatePostgRESTConfig']
+    patch: operations['V1PostgrestConfigController_updatePostgRESTConfig']
   }
   '/v1/projects/{ref}': {
     /** Deletes the given project */
-    delete: operations['ProjectsRefController_deleteProject']
+    delete: operations['V1ProjectsRefController_deleteProject']
   }
   '/v1/projects/{ref}/secrets': {
     /**
@@ -1739,7 +1744,7 @@ export interface paths {
      * Generate TypeScript types
      * @description Returns the TypeScript types of your schema for use with supabase-js.
      */
-    get: operations['TypesController_getTypescriptTypes']
+    get: operations['V1TypesController_getTypescriptTypes']
   }
   '/v1/projects/{ref}/vanity-subdomain': {
     /** Gets current vanity subdomain config */
@@ -1890,9 +1895,9 @@ export interface paths {
      * List all organizations
      * @description Returns a list of organizations that you currently belong to.
      */
-    get: operations['OrganizationsController_getOrganizations']
+    get: operations['V1OrganizationsController_getOrganizations']
     /** Create an organization */
-    post: operations['OrganizationsController_createOrganization']
+    post: operations['V1OrganizationsController_createOrganization']
   }
   '/v1/organizations/{slug}/members': {
     /** List members of an organization */
@@ -1934,23 +1939,23 @@ export interface paths {
   }
   '/partners/flyio/extensions': {
     /** Creates a database */
-    post: operations['ExtensionsController_provisionResource']
+    post: operations['FlyExtensionsController_provisionResource']
   }
   '/partners/flyio/organizations/{organization_id}': {
     /** Gets details of the organization linked to the provided Fly organization id */
-    get: operations['OrganizationsController_getOrganization']
+    get: operations['FlyOrganizationsController_getOrganization']
   }
   '/partners/flyio/organizations/{organization_id}/extensions': {
     /** Gets all databases that belong to the given Fly organization id */
-    get: operations['OrganizationsController_getOrgExtensions']
+    get: operations['FlyOrganizationsController_getOrgExtensions']
   }
   '/partners/flyio/organizations/{organization_id}/sso': {
     /** Starts Fly single sign on */
-    get: operations['OrganizationsController_startFlyioSSO']
+    get: operations['FlyOrganizationsController_startFlyioSSO']
   }
   '/partners/flyio/organizations/{organization_id}/subscription': {
     /** Updates organization subscription linked to the provided Fly organization id */
-    put: operations['OrganizationsController_updateOrganization']
+    put: operations['FlyOrganizationsController_updateOrganization']
   }
   '/partners/flyio/organizations/{organization_id}/billing': {
     /** Gets the organizations current unbilled charges */
@@ -2151,14 +2156,19 @@ export interface components {
       SMS_TEST_OTP_VALID_UNTIL: string
       HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED: boolean
       HOOK_MFA_VERIFICATION_ATTEMPT_URI: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_SECRETS: string
       HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED: boolean
       HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_SECRETS: string
       HOOK_CUSTOM_ACCESS_TOKEN_ENABLED: boolean
       HOOK_CUSTOM_ACCESS_TOKEN_URI: string
+      HOOK_CUSTOM_ACCESS_TOKEN_SECRETS: string
       HOOK_SEND_SMS_ENABLED: boolean
       HOOK_SEND_SMS_URI: string
+      HOOK_SEND_SMS_SECRETS: string
       HOOK_SEND_EMAIL_ENABLED: boolean
       HOOK_SEND_EMAIL_URI: string
+      HOOK_SEND_EMAIL_SECRETS: string
       EXTERNAL_APPLE_ENABLED: boolean
       EXTERNAL_APPLE_CLIENT_ID: string
       EXTERNAL_APPLE_SECRET: string
@@ -2223,6 +2233,8 @@ export interface components {
       EXTERNAL_ZOOM_ENABLED: boolean
       EXTERNAL_ZOOM_CLIENT_ID: string
       EXTERNAL_ZOOM_SECRET: string
+      DB_MAX_POOL_SIZE: number | null
+      API_MAX_REQUEST_DURATION: number | null
     }
     UpdateGoTrueConfigBody: {
       SITE_URL?: string
@@ -2306,14 +2318,19 @@ export interface components {
       SMS_TEMPLATE?: string
       HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED?: boolean
       HOOK_MFA_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_MFA_VERIFICATION_ATTEMPT_SECRETS?: string
       HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED?: boolean
       HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI?: string
+      HOOK_PASSWORD_VERIFICATION_ATTEMPT_SECRETS?: string
       HOOK_CUSTOM_ACCESS_TOKEN_ENABLED?: boolean
       HOOK_CUSTOM_ACCESS_TOKEN_URI?: string
+      HOOK_CUSTOM_ACCESS_TOKEN_SECRETS?: string
       HOOK_SEND_SMS_ENABLED?: boolean
       HOOK_SEND_SMS_URI?: string
+      HOOK_SEND_SMS_SECRETS?: string
       HOOK_SEND_EMAIL_ENABLED?: boolean
       HOOK_SEND_EMAIL_URI?: string
+      HOOK_SEND_EMAIL_SECRETS?: string
       EXTERNAL_APPLE_ENABLED?: boolean
       EXTERNAL_APPLE_CLIENT_ID?: string
       EXTERNAL_APPLE_SECRET?: string
@@ -2378,6 +2395,8 @@ export interface components {
       EXTERNAL_ZOOM_ENABLED?: boolean
       EXTERNAL_ZOOM_CLIENT_ID?: string
       EXTERNAL_ZOOM_SECRET?: string
+      DB_MAX_POOL_SIZE?: number
+      API_MAX_REQUEST_DURATION?: number
     }
     UserBody: {
       id?: string
@@ -2704,6 +2723,7 @@ export interface components {
       organization_name: string
       invite_id: string
       token_does_not_exist: boolean
+      sso_mismatch: boolean
       email_match: boolean
       authorized_user: boolean
       expired_token: boolean
@@ -3637,6 +3657,7 @@ export interface components {
       subscription_id: string
       is_branch_enabled: boolean
       is_read_replicas_enabled: boolean
+      is_physical_backups_enabled: boolean
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
     }
@@ -3692,6 +3713,7 @@ export interface components {
       subscription_id: string
       is_branch_enabled: boolean
       is_read_replicas_enabled: boolean
+      is_physical_backups_enabled: boolean
       preview_branch_refs: string[]
       disk_volume_size_gb?: number
       endpoint: string
@@ -3949,6 +3971,7 @@ export interface components {
       is_branch_enabled: boolean
       parent_project_ref?: string
       is_read_replicas_enabled: boolean
+      is_physical_backups_enabled: boolean
       v2MaintenanceWindow: {
         start?: string
         end?: string
@@ -5238,6 +5261,8 @@ export interface components {
       connection_string?: string
     }
     AuthConfigResponse: {
+      api_max_request_duration: number | null
+      db_max_pool_size: number | null
       disable_signup: boolean | null
       external_anonymous_users_enabled: boolean | null
       external_apple_additional_client_ids: string | null
@@ -5308,10 +5333,19 @@ export interface components {
       external_zoom_secret: string | null
       hook_custom_access_token_enabled: boolean | null
       hook_custom_access_token_uri: string | null
+      hook_custom_access_token_secrets: string | null
       hook_mfa_verification_attempt_enabled: boolean | null
       hook_mfa_verification_attempt_uri: string | null
+      hook_mfa_verification_attempt_secrets: string | null
       hook_password_verification_attempt_enabled: boolean | null
       hook_password_verification_attempt_uri: string | null
+      hook_password_verification_attempt_secrets: string | null
+      hook_send_sms_enabled: boolean | null
+      hook_send_sms_uri: string | null
+      hook_send_sms_secrets: string | null
+      hook_send_email_enabled: boolean | null
+      hook_send_email_uri: string | null
+      hook_send_email_secrets: string | null
       jwt_exp: number | null
       mailer_allow_unverified_email_sign_ins: boolean | null
       mailer_autoconfirm: boolean | null
@@ -5322,14 +5356,14 @@ export interface components {
       mailer_subjects_email_change: string | null
       mailer_subjects_invite: string | null
       mailer_subjects_magic_link: string | null
-      mailer_subjects_recovery: string | null
       mailer_subjects_reauthentication: string | null
+      mailer_subjects_recovery: string | null
       mailer_templates_confirmation_content: string | null
       mailer_templates_email_change_content: string | null
       mailer_templates_invite_content: string | null
       mailer_templates_magic_link_content: string | null
-      mailer_templates_recovery_content: string | null
       mailer_templates_reauthentication_content: string | null
+      mailer_templates_recovery_content: string | null
       mfa_max_enrolled_factors: number | null
       password_hibp_enabled: boolean | null
       password_min_length: number | null
@@ -5465,14 +5499,19 @@ export interface components {
       sms_template?: string
       hook_mfa_verification_attempt_enabled?: boolean
       hook_mfa_verification_attempt_uri?: string
+      hook_mfa_verification_attempt_secrets?: string
       hook_password_verification_attempt_enabled?: boolean
       hook_password_verification_attempt_uri?: string
+      hook_password_verification_attempt_secrets?: string
       hook_custom_access_token_enabled?: boolean
       hook_custom_access_token_uri?: string
+      hook_custom_access_token_secrets?: string
       hook_send_sms_enabled?: boolean
       hook_send_sms_uri?: string
+      hook_send_sms_secrets?: string
       hook_send_email_enabled?: boolean
       hook_send_email_uri?: string
+      hook_send_email_secrets?: string
       external_apple_enabled?: boolean
       external_apple_client_id?: string
       external_apple_secret?: string
@@ -5537,6 +5576,8 @@ export interface components {
       external_zoom_enabled?: boolean
       external_zoom_client_id?: string
       external_zoom_secret?: string
+      db_max_pool_size?: number
+      api_max_request_duration?: number
     }
     CreateThirdPartyAuthBody: {
       oidc_issuer_url?: string
@@ -6158,19 +6199,13 @@ export interface operations {
       }
     }
   }
-  /** Gets project's status */
+  /** Get infrastructure status */
   StatusController_getStatus: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
     responses: {
       200: {
         content: never
       }
-      /** @description Failed to get project's status */
+      /** @description Failed to retrieve infrastructure status */
       500: {
         content: never
       }
@@ -6249,7 +6284,7 @@ export interface operations {
     }
   }
   /** Sends an invite to the given email */
-  InviteController_sendInvite: {
+  AuthInviteController_sendInvite: {
     parameters: {
       path: {
         /** @description Project ref */
@@ -6749,18 +6784,15 @@ export interface operations {
       }
     }
   }
-  /**
-   * List all organizations
-   * @description Returns a list of organizations that you currently belong to.
-   */
+  /** Gets user's organizations */
   OrganizationsController_getOrganizations: {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['OrganizationResponseV1'][]
+          'application/json': components['schemas']['OrganizationResponse'][]
         }
       }
-      /** @description Unexpected error listing organizations */
+      /** @description Failed to retrieve user's organizations */
       500: {
         content: never
       }
@@ -6890,7 +6922,7 @@ export interface operations {
     }
   }
   /** Gets the given organization's roles */
-  RolesController_addMember: {
+  OrganizationRolesController_addMember: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -7160,7 +7192,7 @@ export interface operations {
     }
   }
   /** Gets invited users */
-  InviteController_getInvitedUsers: {
+  OrganizationInviteController_getInvitedUsers: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -7180,7 +7212,7 @@ export interface operations {
     }
   }
   /** Invites user */
-  InviteController_inviteUser: {
+  OrganizationInviteController_inviteUser: {
     parameters: {
       path: {
         /** @description Organization slug */
@@ -7205,7 +7237,7 @@ export interface operations {
     }
   }
   /** Delete invited user */
-  InviteController_deleteInvitedUser: {
+  OrganizationInviteController_deleteInvitedUser: {
     parameters: {
       query: {
         invited_id: number
@@ -9775,7 +9807,7 @@ export interface operations {
     }
   }
   /** Gets project OpenApi */
-  ApiController_projectOpenApi: {
+  ProjectsApiController_projectOpenApi: {
     parameters: {
       path: {
         /** @description Project ref */
@@ -9798,7 +9830,7 @@ export interface operations {
     }
   }
   /** Queries project Graphql */
-  ApiController_projectGraphql: {
+  ProjectsApiController_projectGraphql: {
     parameters: {
       header: {
         'x-graphql-authorization': string
@@ -9843,6 +9875,7 @@ export interface operations {
         startDate: string
         endDate: string
         interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
+        databaseIdentifier?: string
       }
       path: {
         /** @description Project ref */
@@ -9950,7 +9983,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['V1ProjectRefResponse']
+          'application/json': components['schemas']['ProjectRefResponse']
         }
       }
       403: {
@@ -10044,6 +10077,24 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve project's settings */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Gets project's status */
+  ProjectStatusController_getStatus: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      /** @description Failed to get project's status */
       500: {
         content: never
       }
@@ -10626,7 +10677,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['PostgrestConfigWithJWTSecretResponse']
+          'application/json': components['schemas']['PostgrestConfigResponse']
         }
       }
       403: {
@@ -10944,6 +10995,29 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve JWT secret update status */
+      500: {
+        content: never
+      }
+    }
+  }
+  /**
+   * Gets project's settings
+   * @deprecated
+   */
+  PropsSettingsController_getProjectApi: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['SettingsResponse']
+        }
+      }
+      /** @description Failed to retrieve project's settings */
       500: {
         content: never
       }
@@ -11550,7 +11624,7 @@ export interface operations {
       }
     }
   }
-  /** Sends mixpanel server activity */
+  /** Sends server activity */
   TelemetryActivityController_sendServerActivity: {
     requestBody: {
       content: {
@@ -11561,13 +11635,13 @@ export interface operations {
       201: {
         content: never
       }
-      /** @description Failed to send mixpanel server activity */
+      /** @description Failed to send server activity */
       500: {
         content: never
       }
     }
   }
-  /** Send mixpanel page event */
+  /** Send pageview event */
   TelemetryPageviewController_sendServerPageViewed: {
     requestBody: {
       content: {
@@ -11578,7 +11652,7 @@ export interface operations {
       201: {
         content: never
       }
-      /** @description Failed to send mixpanel page event */
+      /** @description Failed to send pageview event */
       500: {
         content: never
       }
@@ -11703,7 +11777,7 @@ export interface operations {
     }
   }
   /** Gets user's integrations */
-  IntegrationsController_getProjectConnections: {
+  IntegrationsController_getUserInstallations: {
     parameters: {
       query: {
         /** @description Filter results by integration name. Optional */
@@ -11723,7 +11797,7 @@ export interface operations {
     }
   }
   /** Gets integration with the given organization slug */
-  IntegrationsController_getProjectConnectionsForOrg: {
+  IntegrationsController_getUserInstallationForOrg: {
     parameters: {
       path: {
         slug: string
@@ -12094,7 +12168,7 @@ export interface operations {
     }
   }
   /** Gets GoTrue template */
-  AuthTemplateController_getTemplate: {
+  SystemAuthTemplateController_getTemplate: {
     parameters: {
       path: {
         ref: string
@@ -12261,6 +12335,32 @@ export interface operations {
         content: never
       }
       /** @description Failed to reset JWT */
+      500: {
+        content: never
+      }
+    }
+  }
+  /**
+   * Delete a function
+   * @description Deletes a function with the specified slug from the specified project.
+   */
+  SystemFunctionSlugController_deleteFunction: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+        /** @description Function slug */
+        function_slug: string
+      }
+    }
+    responses: {
+      200: {
+        content: never
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to delete function with given slug */
       500: {
         content: never
       }
@@ -12630,6 +12730,21 @@ export interface operations {
     responses: {
       201: {
         content: never
+      }
+    }
+  }
+  /** Create a project */
+  SystemProjectsController_createProject: {
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['SystemCreateProjectBody']
+      }
+    }
+    responses: {
+      201: {
+        content: {
+          'application/json': components['schemas']['SystemProjectResponse']
+        }
       }
     }
   }
@@ -13323,6 +13438,76 @@ export interface operations {
       }
     }
   }
+  /** Gets project's postgrest config */
+  V1PostgrestConfigController_getPostgRESTConfig: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['PostgrestConfigWithJWTSecretResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to retrieve project's postgrest config */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Updates project's postgrest config */
+  V1PostgrestConfigController_updatePostgRESTConfig: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdatePostgrestConfigBody']
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['V1PostgrestConfigResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+      /** @description Failed to update project's postgrest config */
+      500: {
+        content: never
+      }
+    }
+  }
+  /** Deletes the given project */
+  V1ProjectsRefController_deleteProject: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['V1ProjectRefResponse']
+        }
+      }
+      403: {
+        content: never
+      }
+    }
+  }
   /**
    * List all secrets
    * @description Returns all secrets you've previously added to the specified project.
@@ -13464,7 +13649,7 @@ export interface operations {
    * Generate TypeScript types
    * @description Returns the TypeScript types of your schema for use with supabase-js.
    */
-  TypesController_getTypescriptTypes: {
+  V1TypesController_getTypescriptTypes: {
     parameters: {
       query?: {
         included_schemas?: string
@@ -14331,8 +14516,25 @@ export interface operations {
       }
     }
   }
+  /**
+   * List all organizations
+   * @description Returns a list of organizations that you currently belong to.
+   */
+  V1OrganizationsController_getOrganizations: {
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['OrganizationResponseV1'][]
+        }
+      }
+      /** @description Unexpected error listing organizations */
+      500: {
+        content: never
+      }
+    }
+  }
   /** Create an organization */
-  OrganizationsController_createOrganization: {
+  V1OrganizationsController_createOrganization: {
     requestBody: {
       content: {
         'application/json': components['schemas']['CreateOrganizationBodyV1']
@@ -14503,7 +14705,7 @@ export interface operations {
     }
   }
   /** Creates a database */
-  ExtensionsController_provisionResource: {
+  FlyExtensionsController_provisionResource: {
     requestBody: {
       content: {
         'application/json': components['schemas']['FlyResourceProvisioningBody']
@@ -14518,7 +14720,7 @@ export interface operations {
     }
   }
   /** Gets details of the organization linked to the provided Fly organization id */
-  OrganizationsController_getOrganization: {
+  FlyOrganizationsController_getOrganization: {
     parameters: {
       path: {
         organization_id: string
@@ -14533,7 +14735,7 @@ export interface operations {
     }
   }
   /** Gets all databases that belong to the given Fly organization id */
-  OrganizationsController_getOrgExtensions: {
+  FlyOrganizationsController_getOrgExtensions: {
     parameters: {
       path: {
         organization_id: string
@@ -14548,7 +14750,7 @@ export interface operations {
     }
   }
   /** Starts Fly single sign on */
-  OrganizationsController_startFlyioSSO: {
+  FlyOrganizationsController_startFlyioSSO: {
     parameters: {
       path: {
         organization_id: string
@@ -14561,7 +14763,7 @@ export interface operations {
     }
   }
   /** Updates organization subscription linked to the provided Fly organization id */
-  OrganizationsController_updateOrganization: {
+  FlyOrganizationsController_updateOrganization: {
     parameters: {
       path: {
         organization_id: string
