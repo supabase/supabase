@@ -50,7 +50,7 @@ export async function getEntityTypes(
         end as "type_sort",
         obj_description(c.oid) as "comment",
         count(*) over() as "count",
-        c.relrowsecurity as "rls_enabled",
+        c.relrowsecurity as "rls_enabled"
       from
         pg_namespace nc
         join pg_class c on nc.oid = c.relnamespace
