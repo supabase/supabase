@@ -109,15 +109,14 @@ const UtilityPanel = ({
 
   return (
     <Tabs_Shadcn_ defaultValue="results" className="w-full h-full flex flex-col">
-      <TabsList_Shadcn_ className="flex justify-between px-2">
-        <div>
+      <TabsList_Shadcn_ className="flex justify-between gap-2 px-2">
+        <div className="flex gap-4">
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="results">
             Results{' '}
             {!isExecuting &&
               (result?.rows ?? []).length > 0 &&
               `(${result.rows.length.toLocaleString()})`}
           </TabsTrigger_Shadcn_>
-
           <TabsTrigger_Shadcn_ className="py-3 text-xs" value="chart">
             Chart
           </TabsTrigger_Shadcn_>
