@@ -187,6 +187,7 @@ export type SelectStmt = {
     groupClause?: any[]
     groupDistinct?: boolean
     havingClause?: any[]
+    withClause?: any
     sortClause?: SortBy[]
     limitOption: string
     limitCount?: A_Const
@@ -195,8 +196,26 @@ export type SelectStmt = {
   }
 }
 
+export type InsertStmt = {
+  InsertStmt: {}
+}
+
+export type UpdateStmt = {
+  UpdateStmt: {}
+}
+
+export type DeleteStmt = {
+  DeleteStmt: {}
+}
+
+export type ExplainStmt = {
+  ExplainStmt: {
+    query: SelectStmt | InsertStmt | UpdateStmt | DeleteStmt
+  }
+}
+
 export type Stmt = {
-  stmt: SelectStmt
+  stmt: SelectStmt | InsertStmt | UpdateStmt | DeleteStmt | ExplainStmt
 }
 
 export type ParsedQuery = {

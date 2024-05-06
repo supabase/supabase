@@ -170,19 +170,19 @@ export async function processSql(sql: string) {
  * Converts a pg-query `Stmt` into a PostgREST-compatible `Statement`.
  */
 function processStmt({ stmt }: Stmt): Statement {
-  const keys = Object.keys(stmt) as unknown as (keyof typeof stmt)[]
-
-  if (keys.length > 1) {
-    throw new Error(`stmt contains multiple statements: ${JSON.stringify(keys)}`)
-  }
-
-  const [stmtType] = keys
-
-  switch (stmtType) {
-    case 'SelectStmt':
-      return processSelectStmt(stmt)
-    default:
-      throw new Error(`Unsupported stmt type '${stmtType}'`)
+  if ('SelectStmt' in stmt) {
+    return processSelectStmt(stmt)
+  } else if ('InsertStmt' in stmt) {
+    throw new Error(`Insert statements are not yet supported by the translator`)
+  } else if ('UpdateStmt' in stmt) {
+    throw new Error(`Update statements are not yet supported by the translator`)
+  } else if ('DeleteStmt' in stmt) {
+    throw new Error(`Delete statements are not yet supported by the translator`)
+  } else if ('ExplainStmt' in stmt) {
+    throw new Error(`Explain statements are not yet supported by the translator`)
+  } else {
+    const [stmtType] = Object.keys(stmt)
+    throw new Error(`Unsupported stmt type '${stmtType}'`)
   }
 }
 
@@ -193,6 +193,10 @@ function processSelectStmt(stmt: SelectStmt): Select {
 
   if (stmt.SelectStmt.fromClause.length > 1) {
     throw new Error('Only one FROM source is supported')
+  }
+
+  if (stmt.SelectStmt.withClause) {
+    throw new Error('WITH clauses are not supported')
   }
 
   const [fromClause] = stmt.SelectStmt.fromClause
