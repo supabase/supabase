@@ -112,3 +112,8 @@ export const sqlEditorState = proxy({
     sqlEditorState.needsSaving.delete(id)
   },
 })
+
+export const getSqlEditorV2StateSnapshot = () => snapshot(sqlEditorState)
+
+export const useSqlEditorV2StateSnapshot = (options?: Parameters<typeof useSnapshot>[1]) =>
+  useSnapshot(sqlEditorState, options)

@@ -24,6 +24,7 @@ import { uuidv4 } from 'lib/helpers'
 import { useProfile } from 'lib/profile'
 import { wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import Telemetry from 'lib/telemetry'
+import { Settings, X } from 'lucide-react'
 import { useAppStateSnapshot } from 'state/app-state'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { isRoleImpersonationEnabled, useGetImpersonatedRole } from 'state/role-impersonation-state'
@@ -31,8 +32,6 @@ import { getSqlEditorStateSnapshot, useSqlEditorStateSnapshot } from 'state/sql-
 import {
   AiIconAnimation,
   IconCornerDownLeft,
-  IconSettings,
-  IconX,
   Input_Shadcn_,
   Loading,
   ResizableHandle,
@@ -62,7 +61,6 @@ import {
   createSqlSnippetSkeleton,
 } from './SQLEditor.utils'
 import UtilityPanel from './UtilityPanel/UtilityPanel'
-import { Settings, X } from 'lucide-react'
 
 // Load the monaco editor client-side only (does not behave well server-side)
 const MonacoEditor = dynamic(() => import('./MonacoEditor'), { ssr: false })
