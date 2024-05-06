@@ -27,6 +27,7 @@ import {
   cn,
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
+import { useProjectLintsQuery } from 'data/lint/lint-query'
 
 export interface EntityListItemProps {
   id: number
@@ -44,6 +45,22 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const snap = useTableEditorStateSnapshot()
 
   const isActive = Number(id) === entity.id
+
+  // need project lints to get security status for views
+  const { data: lints } = useProjectLintsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const viewIsSecurityDefiner =
+    entity?.type === ENTITY_TYPE.VIEW &&
+    lints?.some(
+      (lint) =>
+        (lint?.metadata?.name === entity.name &&
+          lint?.name === 'security_definer_view' &&
+          lint?.level === 'ERROR') ||
+        lint?.level === 'WARN'
+    )
 
   const formatTooltipText = (entityType: string) => {
     return Object.entries(ENTITY_TYPE)
@@ -115,19 +132,19 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         }
         break
       case ENTITY_TYPE.VIEW:
-        if (entity.schema === 'public') {
+        if (viewIsSecurityDefiner) {
           tooltipContent = 'View is public'
         }
         break
       case ENTITY_TYPE.MATERIALIZED_VIEW:
+        // not sure yet what this check should be
         if (entity.schema === 'public') {
           tooltipContent = 'View is public'
         }
         break
       case ENTITY_TYPE.FOREIGN_TABLE:
-        if (entity.schema === 'public') {
-          tooltipContent = 'Data is in public schema'
-        }
+        tooltipContent = 'RLS is not enforced on foreign tables'
+
         break
       default:
         break

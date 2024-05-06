@@ -44,11 +44,14 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
   const isMaterializedView = entityType?.type === ENTITY_TYPE.MATERIALIZED_VIEW
   const isView = entityType?.type === ENTITY_TYPE.VIEW
 
+  // check if current entity is a view and has an associated security definer lint
   const viewIsSecurityDefiner =
     entityType?.type === ENTITY_TYPE.VIEW &&
     lints?.some(
       (lint) =>
-        (lint?.metadata?.name === entityType.name && lint?.level === 'ERROR') ||
+        (lint?.metadata?.name === entityType.name &&
+          lint?.name === 'security_definer_view' &&
+          lint?.level === 'ERROR') ||
         lint?.level === 'WARN'
     )
 
