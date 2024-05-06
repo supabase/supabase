@@ -127,12 +127,13 @@ function formatSelectFilterRoot(params: URLSearchParams, filter: Filter) {
 
   // Column filter, eg. "title=eq.Cheese"
   if (type === 'column') {
+    let value = filter.value
     // Convert '%' to URL-safe '*'
     if (filter.operator === 'like' || filter.operator === 'ilike') {
-      filter.value = filter.value.replaceAll('%', '*')
+      value = filter.value.replaceAll('%', '*')
     }
 
-    params.set(filter.column, `${maybeNot}${filter.operator}.${filter.value}`)
+    params.set(filter.column, `${maybeNot}${filter.operator}.${value}`)
   }
   // Logical operator filter, eg. "or=(title.eq.Cheese,title.eq.Salsa)""
   else if (type === 'logical') {
@@ -160,12 +161,14 @@ function formatSelectFilter(filter: Filter): string {
   const maybeNot = filter.negate ? 'not.' : ''
 
   if (type === 'column') {
+    let value = filter.value
+
     // Convert '%' to URL-safe '*'
     if (filter.operator === 'like' || filter.operator === 'ilike') {
-      filter.value = filter.value.replaceAll('%', '*')
+      value = filter.value.replaceAll('%', '*')
     }
 
-    return `${maybeNot}${filter.column}.${filter.operator}.${filter.value}`
+    return `${maybeNot}${filter.column}.${filter.operator}.${value}`
   } else if (type === 'logical') {
     return `${maybeNot}${filter.operator}(${filter.values.map((subFilter) => formatSelectFilter(subFilter)).join(',')})`
   } else {

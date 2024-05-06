@@ -1,5 +1,5 @@
 import { stripIndent } from 'common-tags'
-import { HttpRequest, Statement, SupabaseJsQuery } from 'sql-to-rest'
+import { ColumnFilter, Filter, HttpRequest, Statement, SupabaseJsQuery } from 'sql-to-rest'
 
 export type BaseResult = {
   statement: Statement
@@ -72,7 +72,7 @@ export const faqs: Faq[] = [
       statement.targets.some((target) => target.alias),
     question: 'How do aliases work?',
     answer: stripIndent`
-      PostgREST supports aliasing columns by prefixing the column name with an alias and a colon:
+      PostgREST supports [renaming columns](https://postgrest.org/en/latest/references/api/tables_views.html#renaming-columns) by prefixing the column name with an alias and a colon:
 
       *Request*
 
@@ -112,6 +112,89 @@ export const faqs: Faq[] = [
     `,
   },
   {
+    id: 'how-do-joins-work',
+    condition: ({ statement }) =>
+      // Show this if there is at least one resource embedding
+      statement.targets.some((target) => target.type === 'embedded-target'),
+    question: 'How do joins work?',
+    answer: stripIndent`
+      PostgREST supports joins through [resource embeddings](https://postgrest.org/en/latest/references/api/resource_embedding.html). Resource embeddings are defined within the \`select\` field using the syntax:
+
+      \`\`\`bash
+      /books?select=authors(name)
+      \`\`\`
+
+      The above query will join \`books\` with \`authors\` and select the name of the author who wrote the book. The fields inside the parenthesis refer to those in the joined table.
+
+      Some important notes about resource embeddings:
+      - A [foreign key](https://postgrest.org/en/latest/references/api/resource_embedding.html#foreign-key-joins) _must_ exist between the tables, otherwise PostgREST won't know how to join them
+      - Because of this, not all joins are supported - only those that join on the foreign key columns
+      - Joins are \`LEFT\` by default. To perform an \`INNER\` join, add \`!inner\` to the embedded resource:
+          \`\`\`bash
+          /books?select=author!inner(name)
+          \`\`\`
+          PostgREST only supports \`LEFT\` and \`INNER\` joins.
+      - Resource embeddings are nested by default:
+
+          *Request*
+
+          \`\`\`bash
+          /books?select=title,author(name)
+          \`\`\`
+
+          *Response*
+
+          \`\`\`json
+          {
+            "title": "The Cheese Tax",
+            "author": {
+              "name": "Bobby Bobson"
+            }
+          }
+          \`\`\`
+
+          To flatten the resource embedding into its parent, use the [spread syntax](https://postgrest.org/en/latest/references/api/resource_embedding.html#spread-embedded-resource):
+
+          *Request*
+
+          \`\`\`bash
+          /books?select=...author(authorName:name)
+          \`\`\`
+
+          *Response*
+
+          \`\`\`json
+          {
+            "authorName": "Bobby Bobson"
+          }
+          \`\`\`
+
+          Note that we also aliased the author's name as \`authorName\` for better clarity (otherwise it would have been just \`name\`).
+
+          Only many-to-one and one-to-one relationships support the spread syntax.
+
+    `,
+  },
+  {
+    id: 'why-percent-sign-conversion',
+    condition: ({ type, statement }) =>
+      // Show this if this is an HTTP render, there is a like/ilike filter, and at least one filter contains '%' character
+      type === 'http' &&
+      !!statement.filter &&
+      someFilter(
+        statement.filter,
+        (filter) =>
+          ['like', 'ilike'].includes(filter.operator) &&
+          typeof filter.value === 'string' &&
+          filter.value.includes('%')
+      ),
+    question: 'Why is `%` getting converted to `*`?',
+    answer: stripIndent`
+      PostgREST [supports](https://postgrest.org/en/latest/references/api/tables_views.html#operators) \`*\` as an alias for \`%\` in \`LIKE\` and \`ILIKE\` expressions to avoid URL encoding.
+
+    `,
+  },
+  {
     id: 'why-range-supabase-js',
     condition: (result) =>
       // Show this if viewing the JS code and there is both a limit and offset
@@ -126,3 +209,15 @@ export const faqs: Faq[] = [
     `,
   },
 ]
+
+function someFilter(filter: Filter, predicate: (filter: ColumnFilter) => boolean): boolean {
+  const { type } = filter
+
+  if (type === 'column') {
+    return predicate(filter)
+  } else if (type === 'logical') {
+    return filter.values.some((f) => someFilter(f, predicate))
+  } else {
+    throw new Error(`Unknown filter type '${type}'`)
+  }
+}
