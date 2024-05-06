@@ -26,6 +26,7 @@ import { CreateHookSheet } from './CreateHookSheet'
 import { HookCard } from './HookCard'
 import { HOOKS_DEFINITIONS, Hook } from './hooks.constants'
 import { extractMethod, isValidHook } from './hooks.utils'
+import Link from 'next/link'
 
 export const HooksListing = () => {
   const { ref: projectRef } = useParams()
@@ -82,31 +83,40 @@ export const HooksListing = () => {
                 Add hook
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-76" align="end">
-              {nonEnterpriseHookOptions.map((h) => (
-                <DropdownMenuItem key={h.title} onClick={() => setSelectedHook(h.title)}>
-                  {h.title}
-                </DropdownMenuItem>
-              ))}
-
+            <DropdownMenuContent className="w-76 p-0" align="end">
+              <div className="p-1">
+                {nonEnterpriseHookOptions.map((h) => (
+                  <DropdownMenuItem key={h.title} onClick={() => setSelectedHook(h.title)}>
+                    {h.title}
+                  </DropdownMenuItem>
+                ))}
+              </div>
               {nonEnterpriseHookOptions.length > 0 && <DropdownMenuSeparator />}
-              {subscription?.plan.id !== 'enterprise' && (
-                <DropdownMenuLabel>
-                  <p className="text-foreground-lighter">Enterprise plan required</p>
-                  <p className="text-foreground-lighter">
-                    The following hooks are not availble on your plan.
-                  </p>
-                </DropdownMenuLabel>
-              )}
-              {enterpriseHookOptions.map((h) => (
-                <DropdownMenuItem
-                  key={h.title}
-                  disabled={true}
-                  onClick={() => setSelectedHook(h.title)}
-                >
-                  {h.title}
-                </DropdownMenuItem>
-              ))}
+
+              <div className="bg-surface-200 p-1 -mt-1">
+                {subscription?.plan.id !== 'enterprise' && (
+                  <DropdownMenuLabel className="grid gap-1 bg-surface-200">
+                    <p className="text-foreground-light">Enterprise plan required</p>
+                    <p className="text-foreground-lighter text-xs">
+                      The following hooks are not availble on{' '}
+                      <Link href="#" className="underline">
+                        your plan
+                      </Link>
+                      .
+                    </p>
+                  </DropdownMenuLabel>
+                )}
+                {enterpriseHookOptions.map((h) => (
+                  <DropdownMenuItem
+                    key={h.title}
+                    disabled={true}
+                    className="cursor-not-allowed"
+                    onClick={() => setSelectedHook(h.title)}
+                  >
+                    {h.title}
+                  </DropdownMenuItem>
+                ))}
+              </div>
             </DropdownMenuContent>
           </DropdownMenu>
         }

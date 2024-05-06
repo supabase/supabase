@@ -1,14 +1,5 @@
 export const HOOKS_DEFINITIONS = [
   {
-    title: 'Customize Access Token (JWT) Claims hook',
-    subtitle:
-      'Will be called by Supabase Auth each time a new JWT is created. It should return the claims you wish to be present in the JWT.',
-    enabledKey: 'HOOK_CUSTOM_ACCESS_TOKEN_ENABLED',
-    uriKey: 'HOOK_CUSTOM_ACCESS_TOKEN_URI',
-    secretsKey: 'HOOK_CUSTOM_ACCESS_TOKEN_SECRETS',
-    enterprise: false,
-  },
-  {
     title: 'Send SMS hook',
     subtitle: 'Will be called by Supabase Auth each time an SMS message needs to be sent.',
     enabledKey: 'HOOK_SEND_SMS_ENABLED',
@@ -24,7 +15,15 @@ export const HOOKS_DEFINITIONS = [
     secretsKey: 'HOOK_SEND_EMAIL_SECRETS',
     enterprise: false,
   },
-
+  {
+    title: 'Customize Access Token (JWT) Claims hook',
+    subtitle:
+      'Will be called by Supabase Auth each time a new JWT is created. It should return the claims you wish to be present in the JWT.',
+    enabledKey: 'HOOK_CUSTOM_ACCESS_TOKEN_ENABLED',
+    uriKey: 'HOOK_CUSTOM_ACCESS_TOKEN_URI',
+    secretsKey: 'HOOK_CUSTOM_ACCESS_TOKEN_SECRETS',
+    enterprise: false,
+  },
   {
     title: 'MFA Verification Attempt hook',
     subtitle:
