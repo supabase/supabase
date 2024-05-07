@@ -43,7 +43,6 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
         }),
       }
     })
-    setOpen(false)
   }
 
   return (

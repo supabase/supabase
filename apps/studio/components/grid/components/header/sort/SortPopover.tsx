@@ -37,7 +37,6 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
         sort: appliedSorts.map((sort) => `${sort.column}:${sort.ascending ? 'asc' : 'desc'}`),
       }
     })
-    setOpen(false)
   }
 
   return (
