@@ -54,17 +54,17 @@ export interface SqlToRestProps {
 
 export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }: SqlToRestProps) {
   const monaco = useMonaco()
-  const { theme } = useTheme()
-  const isDark = theme?.includes('dark') ?? true
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme?.includes('dark') ?? true
 
   useLayoutEffect(() => {
-    if (monaco && theme) {
+    if (monaco) {
       const lightMode = getTheme(false)
       const darkMode = getTheme(true)
       monaco.editor.defineTheme('supabase-light', lightMode)
       monaco.editor.defineTheme('supabase-dark', darkMode)
     }
-  }, [theme, monaco])
+  }, [monaco])
 
   const [sql, setSql] = useState(defaultValue)
   const [statement, setStatement] = useState<Statement>()
