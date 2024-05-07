@@ -29,7 +29,9 @@ import {
 import { CodeBlock, Collapsible, Tabs, cn } from 'ui'
 import { Alert } from 'ui/src/components/shadcn/ui/alert'
 import { assumptions } from './assumptions'
+import { BaseUrlDialog } from './base-url-dialog'
 import { faqs } from './faqs'
+import { transformRenderer } from './syntax-highlighter/transform-renderer'
 import { ResultBundle } from './util'
 
 const defaultValue = stripIndent`
@@ -49,10 +51,12 @@ const defaultValue = stripIndent`
 `
 
 export interface SqlToRestProps {
-  baseUrl?: string
+  defaultBaseUrl?: string
 }
 
-export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }: SqlToRestProps) {
+export default function SqlToRest({
+  defaultBaseUrl = 'http://localhost:54321/rest/v1',
+}: SqlToRestProps) {
   const monaco = useMonaco()
   const { resolvedTheme } = useTheme()
   const isDark = resolvedTheme?.includes('dark') ?? true
@@ -78,6 +82,33 @@ export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }
   const [unsupportedError, setUnsupportedError] = useState<UnsupportedError>()
   const [httpRenderError, setHttpRenderError] = useState<RenderError>()
   const [supabaseJsRenderError, setSupabaseJsRenderError] = useState<RenderError>()
+
+  const [isBaseUrlDialogOpen, setIsBaseUrlDialogOpen] = useState(false)
+  const [baseUrl, setBaseUrl] = useState(defaultBaseUrl)
+
+  const baseUrlObject = useMemo(() => {
+    try {
+      return new URL(baseUrl)
+    } catch (err) {
+      return undefined
+    }
+  }, [baseUrl])
+
+  const codeBlockRenderer = useMemo(
+    () =>
+      transformRenderer({
+        search: (text) => !!baseUrlObject && text.includes(baseUrlObject.host),
+        wrapper: ({ children }) => (
+          <span
+            className="cursor-pointer border-b border-dotted border-neutral-500"
+            onClick={() => setIsBaseUrlDialogOpen(true)}
+          >
+            {children}
+          </span>
+        ),
+      }),
+    [baseUrlObject]
+  )
 
   const rawHttp = useMemo(() => {
     if (!httpRequest) {
@@ -287,6 +318,12 @@ export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }
           </Alert>
         )}
       </div>
+      <BaseUrlDialog
+        defaultValue={baseUrl}
+        onChange={(value) => setBaseUrl(value)}
+        open={isBaseUrlDialogOpen}
+        onOpenChange={(open) => setIsBaseUrlDialogOpen(open)}
+      />
 
       <div
         className={cn(
@@ -309,8 +346,9 @@ export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }
               hideLineNumbers
               className={cn(
                 'self-stretch',
-                httpRenderError ? 'opacity-25 pointer-events-none' : ''
+                httpRenderError || !baseUrlObject ? 'opacity-25 pointer-events-none' : ''
               )}
+              renderer={codeBlockRenderer}
             >
               {curlCommand}
             </CodeBlock>
@@ -324,6 +362,7 @@ export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }
                 'self-stretch',
                 httpRenderError ? 'opacity-25 pointer-events-none' : ''
               )}
+              renderer={codeBlockRenderer}
             >
               {rawHttp}
             </CodeBlock>

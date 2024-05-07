@@ -2,21 +2,21 @@ import { Check, Copy } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import { Children, ReactNode, useState } from 'react'
 import * as CopyToClipboard from 'react-copy-to-clipboard'
-import { Light as SyntaxHighlighter } from 'react-syntax-highlighter'
+import { Light as SyntaxHighlighter, SyntaxHighlighterProps } from 'react-syntax-highlighter'
 import { Button, cn } from 'ui'
 import { monokaiCustomTheme } from './CodeBlock.utils'
 
+import curl from 'highlightjs-curl'
 import bash from 'react-syntax-highlighter/dist/cjs/languages/hljs/bash'
 import csharp from 'react-syntax-highlighter/dist/cjs/languages/hljs/csharp'
 import dart from 'react-syntax-highlighter/dist/cjs/languages/hljs/dart'
+import http from 'react-syntax-highlighter/dist/cjs/languages/hljs/http'
 import js from 'react-syntax-highlighter/dist/cjs/languages/hljs/javascript'
 import json from 'react-syntax-highlighter/dist/cjs/languages/hljs/json'
 import kotlin from 'react-syntax-highlighter/dist/cjs/languages/hljs/kotlin'
 import py from 'react-syntax-highlighter/dist/cjs/languages/hljs/python'
 import sql from 'react-syntax-highlighter/dist/cjs/languages/hljs/sql'
 import ts from 'react-syntax-highlighter/dist/cjs/languages/hljs/typescript'
-import http from 'react-syntax-highlighter/dist/cjs/languages/hljs/http'
-import curl from 'highlightjs-curl'
 
 export interface CodeBlockProps {
   title?: ReactNode
@@ -39,6 +39,7 @@ export interface CodeBlockProps {
   className?: string
   value?: string
   children?: string
+  renderer?: SyntaxHighlighterProps['renderer']
 }
 
 export const CodeBlock = ({
@@ -50,6 +51,7 @@ export const CodeBlock = ({
   children,
   hideCopy = false,
   hideLineNumbers = false,
+  renderer,
 }: CodeBlockProps) => {
   const { resolvedTheme } = useTheme()
   const isDarkTheme = resolvedTheme?.includes('dark')!
@@ -145,6 +147,7 @@ export const CodeBlock = ({
               paddingTop: '4px',
               paddingBottom: '4px',
             }}
+            renderer={renderer}
           >
             {codeValue}
           </SyntaxHighlighter>
