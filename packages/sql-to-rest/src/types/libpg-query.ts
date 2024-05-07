@@ -57,8 +57,8 @@ export type A_Expr = {
       | 'AEXPR_BETWEEN_SYM'
       | 'AEXPR_NOT_BETWEEN_SYM'
     name: PgString[]
-    lexpr: A_Const | ColumnRef
-    rexpr: A_Const | ColumnRef
+    lexpr: A_Const | A_Expr | ColumnRef
+    rexpr: A_Const | A_Expr | ColumnRef
     location: number
   }
 }
@@ -84,9 +84,11 @@ export type NullTest = {
   }
 }
 
+export type Field = PgString | A_Star
+
 export type ColumnRef = {
   ColumnRef: {
-    fields: (PgString | A_Star)[]
+    fields: Field[]
     location: number
   }
 }

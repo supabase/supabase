@@ -1,7 +1,9 @@
 import { oneLine } from 'common-tags'
 import { parseQuery } from 'libpg-query'
 import {
+  A_Expr,
   ColumnRef,
+  Field,
   FromExpression,
   ParsedQuery,
   PgString,
@@ -400,24 +402,27 @@ function processTargetList(
       columnRef = resTarget.ResTarget.val.TypeCast.arg
     } else if ('ColumnRef' in resTarget.ResTarget.val) {
       columnRef = resTarget.ResTarget.val
+    } else if ('A_Expr' in resTarget.ResTarget.val) {
+      try {
+        const column = renderJsonExpression(resTarget.ResTarget.val)
+        const alias = resTarget.ResTarget.name
+
+        return {
+          type: 'column-target',
+          column,
+          alias,
+          cast,
+        }
+      } catch (err) {
+        throw new Error(`Expressions not supported in select target`)
+      }
     } else {
       throw new Error('Only columns allowed in select targets')
     }
 
     const { fields } = columnRef.ColumnRef
 
-    const column = fields
-      .map((field) => {
-        if ('String' in field) {
-          return field.String.sval
-        } else if ('A_Star' in field) {
-          return '*'
-        } else {
-          const [fieldType] = Object.keys(field)
-          throw new Error(`Unsupported ColumnRef field type '${fieldType}'`)
-        }
-      })
-      .join('.')
+    const column = renderFields(fields)
 
     const alias = resTarget.ResTarget.name
 
@@ -499,34 +504,43 @@ function processWhereClause(expression: WhereExpression): Filter {
       throw new Error('Casting is not supported in the WHERE clause')
     }
 
-    if (!('ColumnRef' in expression.A_Expr.lexpr)) {
-      throw new Error('Only columns allowed in WHERE clause')
-    }
+    let column: string
 
-    const { fields } = expression.A_Expr.lexpr.ColumnRef
+    if ('A_Expr' in expression.A_Expr.lexpr) {
+      try {
+        column = renderJsonExpression(expression.A_Expr.lexpr)
+      } catch (err) {
+        throw new Error(`Non column expressions not supported in WHERE clause`)
+      }
+    } else if ('ColumnRef' in expression.A_Expr.lexpr) {
+      const { fields } = expression.A_Expr.lexpr.ColumnRef
 
-    const [field] = fields
+      const [field] = fields
 
-    if (!('String' in field)) {
-      const [fieldType] = Object.keys(field)
-      throw new Error(`WHERE clause fields must be String type, received '${fieldType}'`)
-    }
+      if (!('String' in field)) {
+        const [fieldType] = Object.keys(field)
+        throw new Error(`WHERE clause fields must be String type, received '${fieldType}'`)
+      }
 
-    if (expression.A_Expr.name.length > 1) {
-      throw new Error('Only one operator name supported per expression')
+      if (expression.A_Expr.name.length > 1) {
+        throw new Error('Only one operator name supported per expression')
+      }
+
+      const stringFields = fields.filter((field): field is PgString => 'String' in field)
+      column = stringFields.map((field) => field.String.sval).join('.')
+    } else {
+      throw new Error(`Non column values not supported in WHERE clause`)
     }
 
     const [name] = expression.A_Expr.name
     const operatorSymbol = name.String.sval
     const operator = mapOperatorSymbol(operatorSymbol)
 
-    const stringFields = fields.filter((field): field is PgString => 'String' in field)
-    const column = stringFields.map((field) => field.String.sval).join('.')
-    let value: any
-
     if (!('A_Const' in expression.A_Expr.rexpr)) {
       throw new Error(`Expected right side of WHERE clause expression to be a constant`)
     }
+
+    let value: any
 
     if ('sval' in expression.A_Expr.rexpr.A_Const) {
       value = expression.A_Expr.rexpr.A_Const.sval.sval
@@ -731,4 +745,61 @@ function mapOperatorSymbol(operatorSymbol: string) {
     default:
       throw new Error(`Unsupported operator symbol '${operatorSymbol}'`)
   }
+}
+
+function renderFields(fields: Field[]) {
+  return fields
+    .map((field) => {
+      if ('String' in field) {
+        return field.String.sval
+      } else if ('A_Star' in field) {
+        return '*'
+      } else {
+        const [fieldType] = Object.keys(field)
+        throw new Error(`Unsupported ColumnRef field type '${fieldType}'`)
+      }
+    })
+    .join('.')
+}
+
+function renderJsonExpression(expression: A_Expr): string {
+  if (expression.A_Expr.name.length > 1) {
+    throw new Error('Only one operator name supported per expression')
+  }
+
+  const [name] = expression.A_Expr.name
+  const operator = name.String.sval
+
+  if (!['->', '->>'].includes(operator)) {
+    throw new Error(`Invalid JSON operator`)
+  }
+
+  let left: string
+  let right: string
+
+  if ('A_Const' in expression.A_Expr.lexpr) {
+    if ('sval' in expression.A_Expr.lexpr.A_Const) {
+      left = expression.A_Expr.lexpr.A_Const.sval.sval
+    } else {
+      throw new Error('Invalid JSON path')
+    }
+  } else if ('A_Expr' in expression.A_Expr.lexpr) {
+    left = renderJsonExpression(expression.A_Expr.lexpr)
+  } else if ('ColumnRef' in expression.A_Expr.lexpr) {
+    left = renderFields(expression.A_Expr.lexpr.ColumnRef.fields)
+  } else {
+    throw new Error('Invalid JSON path')
+  }
+
+  if ('A_Const' in expression.A_Expr.rexpr) {
+    if ('sval' in expression.A_Expr.rexpr.A_Const) {
+      right = expression.A_Expr.rexpr.A_Const.sval.sval
+    } else {
+      throw new Error('Invalid JSON path')
+    }
+  } else {
+    throw new Error('Invalid JSON path')
+  }
+
+  return `${left}${operator}${right}`
 }

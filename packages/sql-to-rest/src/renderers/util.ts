@@ -52,3 +52,36 @@ export function renderTargets(
     })
     .join(',' + maybeNewline)
 }
+
+export const defaultCharacterWhitelist = ['*', '(', ')', ',', ':', '!', '>', '-']
+
+/**
+ * URI encodes query parameters with an optional character whitelist
+ * that should not be encoded.
+ */
+export function uriEncodeParams(
+  params: URLSearchParams,
+  characterWhitelist: string[] = defaultCharacterWhitelist
+) {
+  return uriDecodeCharacters(params.toString(), characterWhitelist)
+}
+
+/**
+ * URI encodes a string with an optional character whitelist
+ * that should not be encoded.
+ */
+export function uriEncode(value: string, characterWhitelist: string[] = defaultCharacterWhitelist) {
+  return uriDecodeCharacters(encodeURIComponent(value), characterWhitelist)
+}
+
+function uriDecodeCharacters(value: string, characterWhitelist: string[]) {
+  let newValue = value
+
+  // Convert whitelisted characters back from their hex representation (eg. '%2A' -> '*')
+  for (const char of characterWhitelist) {
+    const hexCode = char.charCodeAt(0).toString(16).toUpperCase()
+    newValue = newValue.replaceAll(`%${hexCode}`, char)
+  }
+
+  return newValue
+}

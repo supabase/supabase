@@ -1001,4 +1001,36 @@ describe('select', () => {
     expect(method).toBe('GET')
     expect(fullPath).toBe('/books?select=...author:authors(*)')
   })
+
+  test('select json column', async () => {
+    const sql = stripIndents`
+      select
+        address->'city'->>'name'
+      from
+        books
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?select=address->city->>name')
+  })
+
+  test('filter by json column', async () => {
+    const sql = stripIndents`
+      select
+        address->'city'->>'name'
+      from
+        books
+      where
+        address->'city'->>'code' = 'SFO'
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?select=address->city->>name&address->city->>code=eq.SFO')
+  })
 })

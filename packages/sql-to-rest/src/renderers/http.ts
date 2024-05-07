@@ -1,6 +1,6 @@
 import { stripIndent } from 'common-tags'
 import { Filter, Select, Statement } from '../processor'
-import { renderTargets } from './util'
+import { renderTargets, uriEncode, uriEncodeParams } from './util'
 
 export type HttpRequest = {
   method: 'GET'
@@ -85,40 +85,6 @@ async function formatSelect(select: Select): Promise<HttpRequest> {
       return path
     },
   }
-}
-
-/**
- * URI encodes query parameters with an optional character whitelist
- * that should not be encoded.
- */
-function uriEncodeParams(
-  params: URLSearchParams,
-  characterWhitelist: string[] = ['*', '(', ')', ',', ':', '!']
-) {
-  return uriDecodeCharacters(params.toString(), characterWhitelist)
-}
-
-/**
- * URI encodes a string with an optional character whitelist
- * that should not be encoded.
- */
-export function uriEncode(
-  value: string,
-  characterWhitelist: string[] = ['*', '(', ')', ',', ':', '!']
-) {
-  return uriDecodeCharacters(encodeURIComponent(value), characterWhitelist)
-}
-
-function uriDecodeCharacters(value: string, characterWhitelist: string[]) {
-  let newValue = value
-
-  // Convert whitelisted characters back from their hex representation (eg. '%2A' -> '*')
-  for (const char of characterWhitelist) {
-    const hexCode = char.charCodeAt(0).toString(16).toUpperCase()
-    newValue = newValue.replaceAll(`%${hexCode}`, char)
-  }
-
-  return newValue
 }
 
 function formatSelectFilterRoot(params: URLSearchParams, filter: Filter) {
