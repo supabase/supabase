@@ -1,6 +1,7 @@
 import * as babel from 'prettier/plugins/babel'
 import * as estree from 'prettier/plugins/estree'
 import * as prettier from 'prettier/standalone'
+import { RenderError } from '../errors'
 import { Filter, Select, Statement } from '../processor'
 import { renderTargets } from './util'
 
@@ -16,7 +17,7 @@ export async function renderSupabaseJs(processed: Statement): Promise<SupabaseJs
     case 'select':
       return formatSelect(processed)
     default:
-      throw new Error(`Unsupported statement type '${processed.type}'`)
+      throw new RenderError(`Unsupported statement type '${processed.type}'`, 'supabase-js')
   }
 }
 
@@ -66,7 +67,7 @@ async function formatSelect(select: Select): Promise<SupabaseJsQuery> {
     if (limit.count !== undefined && limit.offset === undefined) {
       lines.push(`.limit(${limit.count})`)
     } else if (limit.count === undefined && limit.offset !== undefined) {
-      throw new Error(`supabase-js doesn't support an offset without a limit`)
+      throw new RenderError(`supabase-js doesn't support an offset without a limit`, 'supabase-js')
     } else if (limit.count !== undefined && limit.offset !== undefined) {
       lines.push(`.range(${limit.offset}, ${limit.offset + limit.count})`)
     }
@@ -92,7 +93,6 @@ function formatSelectFilterRoot(lines: string[], filter: Filter) {
 
   if (filter.negate) {
     if (filter.type === 'column') {
-      const value = typeof filter.value === 'string' ? `'${filter.value}'` : filter.value
       lines.push(
         `.not(${JSON.stringify(filter.column)}, ${JSON.stringify(filter.operator)}, ${JSON.stringify(filter.value)})`
       )
@@ -108,7 +108,6 @@ function formatSelectFilterRoot(lines: string[], filter: Filter) {
 
   // Column filter, eg. .eq('title', 'Cheese')
   if (type === 'column') {
-    const value = typeof filter.value === 'string' ? `'${filter.value}'` : filter.value
     lines.push(
       `.${filter.operator}(${JSON.stringify(filter.column)}, ${JSON.stringify(filter.value)})`
     )
@@ -130,7 +129,7 @@ function formatSelectFilterRoot(lines: string[], filter: Filter) {
       )
     }
   } else {
-    throw new Error(`Unknown filter type '${type}'`)
+    throw new RenderError(`Unknown filter type '${type}'`, 'supabase-js')
   }
 }
 
@@ -143,6 +142,6 @@ function formatSelectFilter(filter: Filter): string {
   } else if (type === 'logical') {
     return `${maybeNot}${filter.operator}(${filter.values.map((subFilter) => formatSelectFilter(subFilter)).join(', ')})`
   } else {
-    throw new Error(`Unknown filter type '${type}'`)
+    throw new RenderError(`Unknown filter type '${type}'`, 'supabase-js')
   }
 }

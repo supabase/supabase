@@ -1,5 +1,6 @@
 import { oneLine } from 'common-tags'
 import { parseQuery } from 'libpg-query'
+import { ParsingError, UnimplementedError, UnsupportedError } from './errors'
 import {
   A_Expr,
   ColumnRef,
@@ -153,19 +154,29 @@ export type Sort = {
  * can be rendered to various targets (HTTP, supabase-js, etc).
  */
 export async function processSql(sql: string) {
-  const result: ParsedQuery = await parseQuery(sql)
+  try {
+    const result: ParsedQuery = await parseQuery(sql)
 
-  if (result.stmts.length === 0) {
-    throw new Error('Expected a statement, but received none')
+    if (result.stmts.length === 0) {
+      throw new UnsupportedError('Expected a statement, but received none')
+    }
+
+    if (result.stmts.length > 1) {
+      throw new UnsupportedError('Expected a single statement, but received multiple')
+    }
+
+    const [statement] = result.stmts.map((stmt) => processStmt(stmt))
+
+    return statement
+  } catch (err) {
+    if (err instanceof Error && 'cursorPosition' in err) {
+      const parsingError = new ParsingError(err.message)
+      Object.assign(parsingError, err)
+      throw parsingError
+    } else {
+      throw err
+    }
   }
-
-  if (result.stmts.length > 1) {
-    throw new Error('Expected a single statement, but received multiple')
-  }
-
-  const [statement] = result.stmts.map((stmt) => processStmt(stmt))
-
-  return statement
 }
 
 /**
@@ -175,30 +186,30 @@ function processStmt({ stmt }: Stmt): Statement {
   if ('SelectStmt' in stmt) {
     return processSelectStmt(stmt)
   } else if ('InsertStmt' in stmt) {
-    throw new Error(`Insert statements are not yet supported by the translator`)
+    throw new UnimplementedError(`Insert statements are not yet supported by the translator`)
   } else if ('UpdateStmt' in stmt) {
-    throw new Error(`Update statements are not yet supported by the translator`)
+    throw new UnimplementedError(`Update statements are not yet supported by the translator`)
   } else if ('DeleteStmt' in stmt) {
-    throw new Error(`Delete statements are not yet supported by the translator`)
+    throw new UnimplementedError(`Delete statements are not yet supported by the translator`)
   } else if ('ExplainStmt' in stmt) {
-    throw new Error(`Explain statements are not yet supported by the translator`)
+    throw new UnimplementedError(`Explain statements are not yet supported by the translator`)
   } else {
     const [stmtType] = Object.keys(stmt)
-    throw new Error(`Unsupported stmt type '${stmtType}'`)
+    throw new UnsupportedError(`Unsupported stmt type '${stmtType}'`)
   }
 }
 
 function processSelectStmt(stmt: SelectStmt): Select {
   if (!stmt.SelectStmt.fromClause) {
-    throw new Error('A relation must be included in a from clause')
+    throw new UnsupportedError('The query must have a from clause')
   }
 
   if (stmt.SelectStmt.fromClause.length > 1) {
-    throw new Error('Only one FROM source is supported')
+    throw new UnsupportedError('Only one FROM source is supported')
   }
 
   if (stmt.SelectStmt.withClause) {
-    throw new Error('WITH clauses are not supported')
+    throw new UnsupportedError('WITH clauses are not supported')
   }
 
   const [fromClause] = stmt.SelectStmt.fromClause
@@ -250,7 +261,7 @@ function processFromClause(fromClause: FromExpression): {
     ]
 
     if (!('A_Expr' in fromClause.JoinExpr.quals)) {
-      throw new Error(`Expected join qualifier to be an expression comparing columns`)
+      throw new UnsupportedError(`Expected join qualifier to be an expression comparing columns`)
     }
 
     let leftQualifierRelation
@@ -259,7 +270,7 @@ function processFromClause(fromClause: FromExpression): {
     const joinQualifierExpression = fromClause.JoinExpr.quals.A_Expr
 
     if (!('ColumnRef' in joinQualifierExpression.lexpr)) {
-      throw new Error(`Expected left side of join qualifier to be a column reference`)
+      throw new UnsupportedError(`Expected left side of join qualifier to be a column reference`)
     }
 
     if (
@@ -267,7 +278,9 @@ function processFromClause(fromClause: FromExpression): {
         (field): field is PgString => 'String' in field
       )
     ) {
-      throw new Error(`Expected left column reference of join qualifier to contain String fields`)
+      throw new UnsupportedError(
+        `Expected left column reference of join qualifier to contain String fields`
+      )
     }
 
     const leftColumnFields = joinQualifierExpression.lexpr.ColumnRef.fields.map(
@@ -285,13 +298,13 @@ function processFromClause(fromClause: FromExpression): {
     } else if (leftRelationName === joinedRelation) {
       leftQualifierRelation = joinedRelation
     } else {
-      throw new Error(
+      throw new UnsupportedError(
         `Left side of join qualifier references a different relation (${leftRelationName}) than the join (${existingRelations.join(', ')})`
       )
     }
 
     if (!('ColumnRef' in joinQualifierExpression.rexpr)) {
-      throw new Error(`Expected right side of join qualifier to be a column reference`)
+      throw new UnsupportedError(`Expected right side of join qualifier to be a column reference`)
     }
 
     if (
@@ -299,7 +312,9 @@ function processFromClause(fromClause: FromExpression): {
         (field): field is PgString => 'String' in field
       )
     ) {
-      throw new Error(`Expected right column reference of join qualifier to contain String fields`)
+      throw new UnsupportedError(
+        `Expected right column reference of join qualifier to contain String fields`
+      )
     }
 
     const rightColumnFields = joinQualifierExpression.rexpr.ColumnRef.fields.map(
@@ -317,24 +332,24 @@ function processFromClause(fromClause: FromExpression): {
     } else if (rightRelationName === joinedRelation) {
       rightQualifierRelation = joinedRelation
     } else {
-      throw new Error(
+      throw new UnsupportedError(
         `Right side of join qualifier references a different relation (${rightRelationName}) than the join (${existingRelations.join(', ')})`
       )
     }
 
     if (rightQualifierRelation === leftQualifierRelation) {
       // TODO: support for recursive relationships
-      throw new Error(`Join qualifier cannot compare columns from same relation`)
+      throw new UnsupportedError(`Join qualifier cannot compare columns from same relation`)
     }
 
     if (rightQualifierRelation !== joinedRelation && leftQualifierRelation !== joinedRelation) {
-      throw new Error(`Join qualifier must reference a column from the joined table`)
+      throw new UnsupportedError(`Join qualifier must reference a column from the joined table`)
     }
 
     const [qualifierOperatorString] = joinQualifierExpression.name
 
     if (qualifierOperatorString.String.sval !== '=') {
-      throw new Error(`Expected join qualifier operator to be '='`)
+      throw new UnsupportedError(`Expected join qualifier operator to be '='`)
     }
 
     let left: JoinedColumn
@@ -381,7 +396,7 @@ function processFromClause(fromClause: FromExpression): {
     }
   } else {
     const [fieldType] = Object.keys(fromClause)
-    throw new Error(`Unsupported FROM clause type '${fieldType}'`)
+    throw new UnsupportedError(`Unsupported FROM clause type '${fieldType}'`)
   }
 }
 
@@ -414,10 +429,10 @@ function processTargetList(
           cast,
         }
       } catch (err) {
-        throw new Error(`Expressions not supported in select target`)
+        throw new UnsupportedError(`Expressions not supported in select target`)
       }
     } else {
-      throw new Error('Only columns allowed in select targets')
+      throw new UnsupportedError('Only columns allowed in select targets')
     }
 
     const { fields } = columnRef.ColumnRef
@@ -452,7 +467,7 @@ function processTargetList(
       )
 
       if (!embeddedTarget) {
-        throw new Error(
+        throw new UnsupportedError(
           oneLine`
             Found foreign column '${target.column}' in target list without a join to that relation.
             Did you forget to join that relation or alias it to something else?
@@ -484,7 +499,7 @@ function processTargetList(
       )
 
       if (!parent) {
-        throw new Error(
+        throw new UnsupportedError(
           `Something went wrong, could not find parent embedded target for nested embedded target '${embeddedTarget.relation}'`
         )
       }
@@ -501,7 +516,7 @@ function processTargetList(
 function processWhereClause(expression: WhereExpression): Filter {
   if ('A_Expr' in expression) {
     if ('TypeCast' in expression.A_Expr.lexpr) {
-      throw new Error('Casting is not supported in the WHERE clause')
+      throw new UnsupportedError('Casting is not supported in the WHERE clause')
     }
 
     let column: string
@@ -510,7 +525,7 @@ function processWhereClause(expression: WhereExpression): Filter {
       try {
         column = renderJsonExpression(expression.A_Expr.lexpr)
       } catch (err) {
-        throw new Error(`Non column expressions not supported in WHERE clause`)
+        throw new UnsupportedError(`Non column expressions not supported in WHERE clause`)
       }
     } else if ('ColumnRef' in expression.A_Expr.lexpr) {
       const { fields } = expression.A_Expr.lexpr.ColumnRef
@@ -519,17 +534,19 @@ function processWhereClause(expression: WhereExpression): Filter {
 
       if (!('String' in field)) {
         const [fieldType] = Object.keys(field)
-        throw new Error(`WHERE clause fields must be String type, received '${fieldType}'`)
+        throw new UnsupportedError(
+          `WHERE clause fields must be String type, received '${fieldType}'`
+        )
       }
 
       if (expression.A_Expr.name.length > 1) {
-        throw new Error('Only one operator name supported per expression')
+        throw new UnsupportedError('Only one operator name supported per expression')
       }
 
       const stringFields = fields.filter((field): field is PgString => 'String' in field)
       column = stringFields.map((field) => field.String.sval).join('.')
     } else {
-      throw new Error(`Non column values not supported in WHERE clause`)
+      throw new UnsupportedError(`Non column values not supported in WHERE clause`)
     }
 
     const [name] = expression.A_Expr.name
@@ -537,7 +554,7 @@ function processWhereClause(expression: WhereExpression): Filter {
     const operator = mapOperatorSymbol(operatorSymbol)
 
     if (!('A_Const' in expression.A_Expr.rexpr)) {
-      throw new Error(`Expected right side of WHERE clause expression to be a constant`)
+      throw new UnsupportedError(`Expected right side of WHERE clause expression to be a constant`)
     }
 
     let value: any
@@ -549,7 +566,7 @@ function processWhereClause(expression: WhereExpression): Filter {
     } else if ('fval' in expression.A_Expr.rexpr.A_Const) {
       value = parseFloat(expression.A_Expr.rexpr.A_Const.fval.fval)
     } else {
-      throw new Error(
+      throw new UnsupportedError(
         `WHERE clause values must be a string (sval), integer (ival), or float (fval)`
       )
     }
@@ -568,7 +585,7 @@ function processWhereClause(expression: WhereExpression): Filter {
 
     if (!('String' in field)) {
       const [fieldType] = Object.keys(field)
-      throw new Error(`WHERE clause fields must be String type, received '${fieldType}'`)
+      throw new UnsupportedError(`WHERE clause fields must be String type, received '${fieldType}'`)
     }
 
     const stringFields = fields.filter((field): field is PgString => 'String' in field)
@@ -595,7 +612,7 @@ function processWhereClause(expression: WhereExpression): Filter {
     } else if (expression.BoolExpr.boolop === 'NOT_EXPR') {
       operator = 'not'
     } else {
-      throw new Error(`Unknown boolop '${expression.BoolExpr.boolop}'`)
+      throw new UnsupportedError(`Unknown boolop '${expression.BoolExpr.boolop}'`)
     }
 
     const values = expression.BoolExpr.args.map((arg) => processWhereClause(arg))
@@ -604,7 +621,7 @@ function processWhereClause(expression: WhereExpression): Filter {
     // we just return the child directly and set negate=true on it.
     if (operator === 'not') {
       if (values.length > 1) {
-        throw new Error(
+        throw new UnsupportedError(
           `NOT expressions expected to have only 1 child. Received ${values.length} children`
         )
       }
@@ -621,18 +638,18 @@ function processWhereClause(expression: WhereExpression): Filter {
     }
   } else {
     const [expressionType] = Object.keys(expression)
-    throw new Error(`Unknown WHERE clause expression '${expressionType}'`)
+    throw new UnsupportedError(`Unknown WHERE clause expression '${expressionType}'`)
   }
 }
 
 function processSortClause(sorts: SortBy[]): Sort[] {
   return sorts.map((sortBy) => {
     if ('TypeCast' in sortBy.SortBy.node) {
-      throw new Error('Casting is not supported in the ORDER BY clause')
+      throw new UnsupportedError('Casting is not supported in the ORDER BY clause')
     }
 
     if (!('ColumnRef' in sortBy.SortBy.node)) {
-      throw new Error('ORDER BY clause only accepts columns')
+      throw new UnsupportedError('ORDER BY clause only accepts columns')
     }
 
     const { fields } = sortBy.SortBy.node.ColumnRef
@@ -641,7 +658,9 @@ function processSortClause(sorts: SortBy[]): Sort[] {
 
     if (!('String' in field)) {
       const [fieldType] = Object.keys(field)
-      throw new Error(`ORDER BY clause fields must be String type, received '${fieldType}'`)
+      throw new UnsupportedError(
+        `ORDER BY clause fields must be String type, received '${fieldType}'`
+      )
     }
 
     const stringFields = fields.filter((field): field is PgString => 'String' in field)
@@ -666,7 +685,7 @@ function mapSortByDirection(direction: string) {
     case 'SORTBY_DEFAULT':
       return undefined
     default:
-      throw new Error(`Unknown sort by direction '${direction}'`)
+      throw new UnsupportedError(`Unknown sort by direction '${direction}'`)
   }
 }
 
@@ -679,7 +698,7 @@ function mapSortByNulls(nulls: string) {
     case 'SORTBY_NULLS_DEFAULT':
       return undefined
     default:
-      throw new Error(`Unknown sort by nulls '${nulls}'`)
+      throw new UnsupportedError(`Unknown sort by nulls '${nulls}'`)
   }
 }
 
@@ -689,7 +708,7 @@ function processLimit(selectStmt: SelectStmt): Limit | undefined {
 
   if (selectStmt.SelectStmt.limitCount) {
     if (!('ival' in selectStmt.SelectStmt.limitCount.A_Const)) {
-      throw new Error(`Limit count expected to be an integer`)
+      throw new UnsupportedError(`Limit count expected to be an integer`)
     }
 
     count = selectStmt.SelectStmt.limitCount.A_Const.ival.ival
@@ -697,7 +716,7 @@ function processLimit(selectStmt: SelectStmt): Limit | undefined {
 
   if (selectStmt.SelectStmt.limitOffset) {
     if (!('ival' in selectStmt.SelectStmt.limitOffset.A_Const)) {
-      throw new Error(`Limit offset expected to be an integer`)
+      throw new UnsupportedError(`Limit offset expected to be an integer`)
     }
 
     offset = selectStmt.SelectStmt.limitOffset.A_Const.ival.ival
@@ -720,7 +739,7 @@ function mapJoinType(joinType: string) {
     case 'JOIN_LEFT':
       return 'left'
     default:
-      throw new Error(`Unsupported join type '${joinType}'`)
+      throw new UnsupportedError(`Unsupported join type '${joinType}'`)
   }
 }
 
@@ -743,7 +762,7 @@ function mapOperatorSymbol(operatorSymbol: string) {
     case '~~*':
       return 'ilike'
     default:
-      throw new Error(`Unsupported operator symbol '${operatorSymbol}'`)
+      throw new UnsupportedError(`Unsupported operator symbol '${operatorSymbol}'`)
   }
 }
 
@@ -756,7 +775,7 @@ function renderFields(fields: Field[]) {
         return '*'
       } else {
         const [fieldType] = Object.keys(field)
-        throw new Error(`Unsupported ColumnRef field type '${fieldType}'`)
+        throw new UnsupportedError(`Unsupported ColumnRef field type '${fieldType}'`)
       }
     })
     .join('.')
@@ -764,14 +783,14 @@ function renderFields(fields: Field[]) {
 
 function renderJsonExpression(expression: A_Expr): string {
   if (expression.A_Expr.name.length > 1) {
-    throw new Error('Only one operator name supported per expression')
+    throw new UnsupportedError('Only one operator name supported per expression')
   }
 
   const [name] = expression.A_Expr.name
   const operator = name.String.sval
 
   if (!['->', '->>'].includes(operator)) {
-    throw new Error(`Invalid JSON operator`)
+    throw new UnsupportedError(`Invalid JSON operator`)
   }
 
   let left: string
@@ -781,24 +800,24 @@ function renderJsonExpression(expression: A_Expr): string {
     if ('sval' in expression.A_Expr.lexpr.A_Const) {
       left = expression.A_Expr.lexpr.A_Const.sval.sval
     } else {
-      throw new Error('Invalid JSON path')
+      throw new UnsupportedError('Invalid JSON path')
     }
   } else if ('A_Expr' in expression.A_Expr.lexpr) {
     left = renderJsonExpression(expression.A_Expr.lexpr)
   } else if ('ColumnRef' in expression.A_Expr.lexpr) {
     left = renderFields(expression.A_Expr.lexpr.ColumnRef.fields)
   } else {
-    throw new Error('Invalid JSON path')
+    throw new UnsupportedError('Invalid JSON path')
   }
 
   if ('A_Const' in expression.A_Expr.rexpr) {
     if ('sval' in expression.A_Expr.rexpr.A_Const) {
       right = expression.A_Expr.rexpr.A_Const.sval.sval
     } else {
-      throw new Error('Invalid JSON path')
+      throw new UnsupportedError('Invalid JSON path')
     }
   } else {
-    throw new Error('Invalid JSON path')
+    throw new UnsupportedError('Invalid JSON path')
   }
 
   return `${left}${operator}${right}`

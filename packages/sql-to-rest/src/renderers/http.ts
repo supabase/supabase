@@ -1,4 +1,5 @@
 import { stripIndent } from 'common-tags'
+import { RenderError } from '../errors'
 import { Filter, Select, Statement } from '../processor'
 import { renderTargets, uriEncode, uriEncodeParams } from './util'
 
@@ -17,7 +18,7 @@ export async function renderHttp(processed: Statement): Promise<HttpRequest> {
     case 'select':
       return formatSelect(processed)
     default:
-      throw new Error(`Unsupported statement type '${processed.type}'`)
+      throw new RenderError(`Unsupported statement type '${processed.type}'`, 'http')
   }
 }
 
@@ -118,7 +119,7 @@ function formatSelectFilterRoot(params: URLSearchParams, filter: Filter) {
       )
     }
   } else {
-    throw new Error(`Unknown filter type '${type}'`)
+    throw new RenderError(`Unknown filter type '${type}'`, 'http')
   }
 }
 
@@ -138,7 +139,7 @@ function formatSelectFilter(filter: Filter): string {
   } else if (type === 'logical') {
     return `${maybeNot}${filter.operator}(${filter.values.map((subFilter) => formatSelectFilter(subFilter)).join(',')})`
   } else {
-    throw new Error(`Unknown filter type '${type}'`)
+    throw new RenderError(`Unknown filter type '${type}'`, 'http')
   }
 }
 

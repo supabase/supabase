@@ -1,6 +1,6 @@
 import Editor, { useMonaco } from '@monaco-editor/react'
 import { stripIndent } from 'common-tags'
-import { ChevronUp } from 'lucide-react'
+import { ChevronUp, GitPullRequest } from 'lucide-react'
 import type { editor } from 'monaco-editor'
 import { useTheme } from 'next-themes'
 import {
@@ -14,8 +14,12 @@ import {
 import Markdown from 'react-markdown'
 import {
   HttpRequest,
+  ParsingError,
+  RenderError,
   Statement,
   SupabaseJsQuery,
+  UnimplementedError,
+  UnsupportedError,
   formatCurl,
   formatHttp,
   processSql,
@@ -64,10 +68,16 @@ export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }
 
   const [sql, setSql] = useState(defaultValue)
   const [statement, setStatement] = useState<Statement>()
+  const [currentLanguage, setCurrentLanguage] = useState('http')
+
   const [httpRequest, setHttpRequest] = useState<HttpRequest>()
   const [jsQuery, setJsQuery] = useState<SupabaseJsQuery>()
-  const [errorMessage, setErrorMessage] = useState<string>()
-  const [currentLanguage, setCurrentLanguage] = useState('http')
+
+  const [parsingError, setParsingError] = useState<ParsingError>()
+  const [unimplementedError, setUnimplementedError] = useState<UnimplementedError>()
+  const [unsupportedError, setUnsupportedError] = useState<UnsupportedError>()
+  const [httpRenderError, setHttpRenderError] = useState<RenderError>()
+  const [supabaseJsRenderError, setSupabaseJsRenderError] = useState<RenderError>()
 
   const rawHttp = useMemo(() => {
     if (!httpRequest) {
@@ -179,17 +189,39 @@ export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }
       const httpRequest = await renderHttp(statement)
       const jsQuery = await renderSupabaseJs(statement)
 
-      setErrorMessage(undefined)
+      setParsingError(undefined)
+      setUnimplementedError(undefined)
+      setUnsupportedError(undefined)
+      setHttpRenderError(undefined)
+      setSupabaseJsRenderError(undefined)
+
       setStatement(statement)
       setHttpRequest(httpRequest)
       setJsQuery(jsQuery)
     } catch (error) {
-      if (!(error instanceof Error)) {
-        console.error(error)
-        return
-      }
+      setParsingError(undefined)
+      setUnimplementedError(undefined)
+      setUnsupportedError(undefined)
+      setHttpRenderError(undefined)
+      setSupabaseJsRenderError(undefined)
 
-      setErrorMessage(sentenceCase(error.message))
+      if (error instanceof ParsingError) {
+        setParsingError(error)
+      } else if (error instanceof UnimplementedError) {
+        setUnimplementedError(error)
+      } else if (error instanceof UnsupportedError) {
+        setUnsupportedError(error)
+      } else if (error instanceof RenderError) {
+        if (error.renderer === 'http') {
+          setHttpRenderError(error)
+        } else if (error.renderer === 'supabase-js') {
+          setSupabaseJsRenderError(error)
+        } else {
+          console.error(error)
+        }
+      } else {
+        console.error(error)
+      }
     }
   }, [])
 
@@ -225,11 +257,44 @@ export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }
           />
         </div>
 
-        {errorMessage && <Alert className="text-red-900">{errorMessage}</Alert>}
+        {parsingError && <Alert className="text-red-900">{parsingError.message}</Alert>}
+        {unsupportedError && (
+          <Alert className="text-red-900">
+            <div>{unsupportedError.message}.</div>
+            <div className="prose text-sm mt-2">
+              PostgREST doesn't support this query. If you're unable to modify the query, wrap it in
+              a stored procedure and call it using the{' '}
+              <a href="https://postgrest.org/en/v12/references/api/stored_procedures.html#stored-procedures">
+                RPC
+              </a>{' '}
+              endpoint.
+            </div>
+          </Alert>
+        )}
+        {unimplementedError && (
+          <Alert className="text-orange-1000">
+            {unimplementedError.message}.
+            <div className="mt-2 text-white flex gap-1 leading-6">
+              <GitPullRequest className="inline-block" width={16} />
+              <a
+                href="https://github.com/supabase/supabase/issues/new/choose"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Create a PR
+              </a>
+            </div>
+          </Alert>
+        )}
       </div>
 
       <div
-        className={cn('flex flex-col gap-4', errorMessage ? 'opacity-25 pointer-events-none' : '')}
+        className={cn(
+          'flex flex-col gap-4',
+          parsingError || unsupportedError || unimplementedError
+            ? 'opacity-25 pointer-events-none'
+            : ''
+        )}
       >
         <div className="font-medium">Choose language to translate to</div>
         <Tabs
@@ -238,72 +303,107 @@ export default function SqlToRest({ baseUrl = 'http://localhost:54321/rest/v1' }
           queryGroup="language"
         >
           <Tabs.Panel id="curl" label="cURL" className="flex flex-col gap-4">
-            <CodeBlock language="curl" hideLineNumbers className="self-stretch">
+            {httpRenderError && <Alert className="text-red-900">{httpRenderError.message}</Alert>}
+            <CodeBlock
+              language="curl"
+              hideLineNumbers
+              className={cn(
+                'self-stretch',
+                httpRenderError ? 'opacity-25 pointer-events-none' : ''
+              )}
+            >
               {curlCommand}
             </CodeBlock>
           </Tabs.Panel>
           <Tabs.Panel id="http" label="HTTP" className="flex flex-col gap-4">
-            <CodeBlock language="http" hideLineNumbers className="self-stretch">
+            {httpRenderError && <Alert className="text-red-900">{httpRenderError.message}</Alert>}
+            <CodeBlock
+              language="http"
+              hideLineNumbers
+              className={cn(
+                'self-stretch',
+                httpRenderError ? 'opacity-25 pointer-events-none' : ''
+              )}
+            >
               {rawHttp}
             </CodeBlock>
           </Tabs.Panel>
-          <Tabs.Panel id="js" label="JavaScript">
-            <CodeBlock language="js" hideLineNumbers className="self-stretch">
+          <Tabs.Panel id="js" label="JavaScript" className="flex flex-col gap-4">
+            {supabaseJsRenderError && (
+              <Alert className="text-red-900">{supabaseJsRenderError.message}</Alert>
+            )}
+            <CodeBlock
+              language="js"
+              hideLineNumbers
+              className={cn(
+                'self-stretch',
+                supabaseJsRenderError ? 'opacity-25 pointer-events-none' : ''
+              )}
+            >
               {jsCommand}
             </CodeBlock>
           </Tabs.Panel>
         </Tabs>
+        <div
+          className={cn(
+            'flex flex-col gap-4',
+            ((currentLanguage === 'http' || currentLanguage === 'curl') && httpRenderError) ||
+              (currentLanguage === 'js' && supabaseJsRenderError)
+              ? 'opacity-25 pointer-events-none'
+              : ''
+          )}
+        >
+          {relevantAssumptions.length > 0 && (
+            <div>
+              <h3 className="my-1 text-base text-inherit">Assumptions</h3>
+              <ol className="my-0 text-foreground">
+                {relevantAssumptions.map((assumption) => (
+                  <li>
+                    <Markdown className="text-sm">{assumption}</Markdown>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
 
-        {relevantAssumptions.length > 0 && (
-          <div>
-            <h3 className="my-1 text-base text-inherit">Assumptions</h3>
-            <ol className="my-0 text-foreground">
-              {relevantAssumptions.map((assumption) => (
-                <li>
-                  <Markdown className="text-sm">{assumption}</Markdown>
-                </li>
+          {relevantFaqs.length > 0 && (
+            <>
+              <h3 className="my-1 text-base text-inherit">FAQs</h3>
+              {relevantFaqs.map((faq) => (
+                <Collapsible
+                  key={faq.id}
+                  className="flex flex-col items-stretch justify-start bg-surface-100 rounded border border-default px-4"
+                >
+                  <Collapsible.Trigger asChild>
+                    <button type="button" className="flex justify-between items-center p-3">
+                      <Markdown
+                        className="text-sm text-left"
+                        components={{
+                          p: ({ children }: PropsWithChildren) => <p className="m-0">{children}</p>,
+                        }}
+                      >
+                        {faq.question}
+                      </Markdown>
+                      <ChevronUp className="transition data-open-parent:rotate-0 data-closed-parent:rotate-180" />
+                    </button>
+                  </Collapsible.Trigger>
+                  <Collapsible.Content>
+                    <div className="text-foreground flex flex-col justify-start items-center px-3 pb-4">
+                      <Markdown
+                        className="text-sm"
+                        components={{
+                          code: (props: any) => <CodeBlock hideLineNumbers {...props} />,
+                        }}
+                      >
+                        {faq.answer}
+                      </Markdown>
+                    </div>
+                  </Collapsible.Content>
+                </Collapsible>
               ))}
-            </ol>
-          </div>
-        )}
-
-        {relevantFaqs.length > 0 && (
-          <>
-            <h3 className="my-1 text-base text-inherit">FAQs</h3>
-            {relevantFaqs.map((faq) => (
-              <Collapsible
-                key={faq.id}
-                className="flex flex-col items-stretch justify-start bg-surface-100 rounded border border-default px-4"
-              >
-                <Collapsible.Trigger asChild>
-                  <button type="button" className="flex justify-between items-center p-3">
-                    <Markdown
-                      className="text-sm text-left"
-                      components={{
-                        p: ({ children }: PropsWithChildren) => <p className="m-0">{children}</p>,
-                      }}
-                    >
-                      {faq.question}
-                    </Markdown>
-                    <ChevronUp className="transition data-open-parent:rotate-0 data-closed-parent:rotate-180" />
-                  </button>
-                </Collapsible.Trigger>
-                <Collapsible.Content>
-                  <div className="text-foreground flex flex-col justify-start items-center px-3 pb-4">
-                    <Markdown
-                      className="text-sm"
-                      components={{
-                        code: (props: any) => <CodeBlock hideLineNumbers {...props} />,
-                      }}
-                    >
-                      {faq.answer}
-                    </Markdown>
-                  </div>
-                </Collapsible.Content>
-              </Collapsible>
-            ))}
-          </>
-        )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   )
@@ -326,8 +426,4 @@ function getTheme(isDarkMode: boolean): editor.IStandaloneThemeData {
     ],
     colors: { 'editor.background': isDarkMode ? '#1f1f1f' : '#f0f0f0' },
   }
-}
-
-function sentenceCase(value: string) {
-  return value[0].toUpperCase() + value.slice(1)
 }
