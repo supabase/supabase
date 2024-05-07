@@ -41,6 +41,7 @@ const NotificationsPopoverV2 = () => {
   const rowHeights = useRef<{ [key: number]: number }>({})
 
   const { data: projects } = useProjectsQuery()
+  console.log({ projects })
   const { data: organizations } = useOrganizationsQuery()
   const {
     data,
@@ -70,7 +71,7 @@ const NotificationsPopoverV2 = () => {
     useNotificationsArchiveAllMutation({
       onSuccess: () => toast.success('Successfully archived all notifications'),
     })
-
+  console.log({ projects })
   const notifications = useMemo(() => data?.pages.flatMap((page) => page) ?? [], [data?.pages])
   const hasNewNotifications = summary?.unread_count ?? 0 > 0
   const hasWarning = summary?.has_warning
@@ -81,7 +82,7 @@ const NotificationsPopoverV2 = () => {
       updateNotifications({ ids: markedRead.current, status: 'seen' })
     }
   }
-
+  console.log({ notifications })
   return (
     <Popover_Shadcn_
       modal={false}

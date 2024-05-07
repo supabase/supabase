@@ -37,23 +37,46 @@ export type NotificationData = {
 
 export async function getNotifications(options: NotificationVariables, signal?: AbortSignal) {
   const { status, filters, page = 0, limit = NOTIFICATIONS_PAGE_LIMIT } = options
-  const { data, error } = await get('/platform/notifications', {
-    params: {
-      // @ts-ignore
-      query: {
-        offset: page * limit,
-        limit,
-        ...(status !== undefined ? { status } : { status: ['new', 'seen'] }),
-        ...(filters.priority.length > 0 ? { priority: filters.priority } : {}),
-        ...(filters.organizations.length > 0 ? { org_slug: filters.organizations } : {}),
-        ...(filters.projects.length > 0 ? { project_ref: filters.projects } : {}),
+  // const { data, error } = await get('/platform/notifications', {
+  //   params: {
+  //     // @ts-ignore
+  //     query: {
+  //       offset: page * limit,
+  //       limit,
+  //       ...(status !== undefined ? { status } : { status: ['new', 'seen'] }),
+  //       ...(filters.priority.length > 0 ? { priority: filters.priority } : {}),
+  //       ...(filters.organizations.length > 0 ? { org_slug: filters.organizations } : {}),
+  //       ...(filters.projects.length > 0 ? { project_ref: filters.projects } : {}),
+  //     },
+  //   },
+  //   headers: { Version: '2' },
+  //   signal,
+  // })
+
+  // if (error) throw error
+
+  const data = [
+    {
+      status: 'seen',
+      priority: 'Warning',
+      data: {
+        title: 'Security Recommendation',
+        actions: [{ url: '/project/[ref]/database/security-advisor', label: 'Security Advisor' }],
+        message:
+          'The way you have configured your database is open to the public, please check the notifications in the Security Advisor page.',
+        project_ref: 'yxrbshyrkjhbbglmsqyj',
       },
     },
-    headers: { Version: '2' },
-    signal,
-  })
 
-  if (error) throw error
+    // {
+    //   title: 'Security Recommendation',
+    //   actions: [{ url: '/project/[ref]/database/security-advisor', label: 'Security Advisor' }],
+    //   message:
+    //     'The way you have configured your database is open to the public, please check the notifications in the Security Advisor page.',
+    //   project_ref: 'pnlhfnllpxpapxrdkihw',
+    // },
+    // Add more notifications as needed
+  ]
 
   return data
 }

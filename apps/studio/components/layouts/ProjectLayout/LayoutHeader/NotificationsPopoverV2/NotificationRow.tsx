@@ -36,7 +36,7 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
   const ref = useRef<HTMLDivElement>(null)
   const { ref: viewRef, inView } = useInView()
   const { status, priority } = notification
-
+  console.log('the', { notification })
   const data = notification.data as NotificationData
   const project = data.project_ref !== undefined ? getProject(data.project_ref) : undefined
   const organization =
@@ -133,6 +133,7 @@ const NotificationRow: ItemRenderer<Notification, NotificationRowProps> = ({
             {data.actions.map((action, idx) => {
               const key = `${notification.id}-action-${idx}`
               if (action.url !== undefined) {
+                console.log({ action }, project)
                 const url = action.url.includes('[ref]')
                   ? action.url.replace('[ref]', project?.ref ?? '_')
                   : action.url.includes('[slug]')
