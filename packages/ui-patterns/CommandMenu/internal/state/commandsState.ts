@@ -1,14 +1,13 @@
 import { proxy } from 'valtio'
-
 import { type ICommand } from '../Command'
-import { type ICommandSectionName, type ICommandSection, section$new } from '../CommandSection'
+import { type ICommandSection, section$new } from '../CommandSection'
 
 type OrderSectionInstruction = (sections: ICommandSection[], idx: number) => ICommandSection[]
 type OrderCommandsInstruction = (
   commands: ICommand[],
   commandsToInsert: ICommand[]
 ) => Array<ICommand>
-type UseCommandOptions = {
+type CommandOptions = {
   deps?: any[]
   enabled?: boolean
   forceMountSection?: boolean
@@ -19,9 +18,9 @@ type UseCommandOptions = {
 type ICommandsState = {
   commandSections: ICommandSection[]
   registerSection: (
-    sectionName: ICommandSectionName,
+    sectionName: string,
     commands: ICommand[],
-    options?: UseCommandOptions
+    options?: CommandOptions
   ) => () => void
 }
 
@@ -63,27 +62,15 @@ const initCommandsState = () => {
       }
     },
   })
+
   return state
 }
 
-const orderSectionFirst = (sections: ICommandSection[], idx: number) => {
-  const result = [sections[idx]]
-
-  /**
-   * [Charis] This may be a premature optimization, but since this runs many
-   * times, I'm doing this imperatively to cut down on array initialization.
-   * Haven't actually measured, YOLO.
-   */
-  let j = 1
-  for (let i = 0; i < idx; i++) {
-    result[j++] = sections[i]
-  }
-  for (let i = idx + 1; i < sections.length; i++) {
-    result[j++] = sections[i]
-  }
-
-  return result
-}
+const orderSectionFirst = (sections: ICommandSection[], idx: number) => [
+  sections[idx],
+  ...sections.slice(0, idx),
+  ...sections.slice(idx + 1),
+]
 
 export { initCommandsState, orderSectionFirst }
-export type { ICommandsState, UseCommandOptions }
+export type { ICommandsState, CommandOptions }

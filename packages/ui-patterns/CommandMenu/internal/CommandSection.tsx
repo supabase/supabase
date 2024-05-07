@@ -1,25 +1,23 @@
 import { type ICommand } from './Command'
 
-type ICommandSectionName = string
-
 type ICommandSection = {
   id: string
-  name: ICommandSectionName
-  forceMount?: boolean
+  name: string
+  forceMount: boolean
   commands: Array<ICommand>
 }
 
-const toSectionId_ = (str: string) => str.toLowerCase().replace(/\s+/g, '-')
+const toSectionId = (str: string) => str.toLowerCase().replace(/\s+/g, '-')
 
 const section$new = (
-  name: ICommandSectionName,
+  name: string,
   { forceMount = false, id }: { forceMount?: boolean; id?: string } = {}
 ): ICommandSection => ({
-  id: id ?? toSectionId_(name),
+  id: id ?? toSectionId(name),
   name,
   forceMount,
   commands: [],
 })
 
-export { section$new, toSectionId_ }
-export type { ICommandSection, ICommandSectionName }
+export { section$new }
+export type { ICommandSection }
