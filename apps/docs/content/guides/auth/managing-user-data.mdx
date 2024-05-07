@@ -39,7 +39,7 @@ To update your `public.profiles` table every time a user signs up, set up a trig
 create function public.handle_new_user()
 returns trigger
 language plpgsql
-security definer set search_path = public
+security definer set search_path = ''
 as $$
 begin
   insert into public.profiles (id, first_name, last_name)
