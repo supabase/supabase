@@ -290,7 +290,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
               {isSuccessTableColumns && (
                 <MultiSelectV2
                   options={columnOptions}
-                  placeholder=""
+                  placeholder="Choose which columns to create an index on"
                   searchPlaceholder="Search for a column"
                   value={selectedColumns}
                   onChange={setSelectedColumns}
