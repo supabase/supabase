@@ -1,7 +1,10 @@
 import * as Tooltip from '@radix-ui/react-tooltip'
-import Panel from 'components/ui/Panel'
+import { ExternalLink, HelpCircle } from 'lucide-react'
 import { NextRouter, useRouter } from 'next/router'
-import { Button, IconExternalLink, IconHelpCircle, Loading } from 'ui'
+
+import { useParams } from 'common'
+import Panel from 'components/ui/Panel'
+import { Button, Loading, cn } from 'ui'
 import { LogsEndpointParams } from '../Settings/Logs'
 import type { BaseReportParams, ReportQueryType } from './Reports.types'
 
@@ -27,15 +30,16 @@ export interface ReportWidgetRendererProps<T = any> extends ReportWidgetProps<T>
   projectRef: string
 }
 
-const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
+const ReportWidget = (props: ReportWidgetProps) => {
   const router = useRouter()
-  const { ref } = router.query
+  const { ref } = useParams()
   const projectRef = ref as string
+
   return (
     <Panel
       noMargin
       noHideOverflow
-      className={'pb-0 ' + props.className}
+      className={cn('pb-0', props.className)}
       bodyClassName="h-full"
       wrapWithLoading={false}
     >
@@ -47,11 +51,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
               {props?.tooltip && (
                 <Tooltip.Root delayDuration={0}>
                   <Tooltip.Trigger>
-                    <IconHelpCircle
-                      className="text-foreground-light"
-                      size="tiny"
-                      strokeWidth={1.5}
-                    />
+                    <HelpCircle className="text-foreground-light" size={14} />
                   </Tooltip.Trigger>
                   <Tooltip.Portal>
                     <Tooltip.Content side="bottom">
@@ -76,7 +76,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
               <Tooltip.Trigger asChild>
                 <Button
                   type="default"
-                  icon={<IconExternalLink strokeWidth={1.5} />}
+                  icon={<ExternalLink />}
                   className="px-1"
                   onClick={() => {
                     const isDbQueryType = props.queryType === 'db'
@@ -95,10 +95,7 @@ const ReportWidget: React.FC<ReportWidgetProps> = (props) => {
                       query.ite = props.params!.iso_timestamp_end
                     }
 
-                    router.push({
-                      pathname,
-                      query,
-                    })
+                    router.push({ pathname, query })
                   }}
                 />
               </Tooltip.Trigger>

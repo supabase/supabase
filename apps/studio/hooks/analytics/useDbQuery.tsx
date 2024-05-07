@@ -6,7 +6,9 @@ import {
   ReportQuery,
 } from 'components/interfaces/Reports/Reports.types'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { executeSql } from 'data/sql/execute-sql-query'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 export interface DbQueryHook<T = any> {
   isLoading: boolean
@@ -21,13 +23,26 @@ export interface DbQueryHook<T = any> {
   resolvedSql: string
 }
 
-const useDbQuery = (
-  sql: ReportQuery['sql'] | string,
-  params: BaseReportParams = DEFAULT_QUERY_PARAMS,
-  where?: string,
+// [Joshen] Atm this is being used only in query performance
+const useDbQuery = ({
+  sql,
+  params = DEFAULT_QUERY_PARAMS,
+  where,
+  orderBy,
+}: {
+  sql: ReportQuery['sql'] | string
+  params?: BaseReportParams
+  where?: string
   orderBy?: string
-): DbQueryHook => {
+}): DbQueryHook => {
   const { project } = useProjectContext()
+  const state = useDatabaseSelectorStateSnapshot()
+
+  const { data: databases } = useReadReplicasQuery({ projectRef: project?.ref })
+  const connectionString = project?.is_read_replicas_enabled
+    ? (databases || []).find((db) => db.identifier === state.selectedDatabaseId)?.connectionString
+    : project?.connectionString
+  const identifier = project?.is_read_replicas_enabled ? state.selectedDatabaseId : project?.ref
 
   const resolvedSql = typeof sql === 'function' ? sql([]) : sql
 
@@ -38,12 +53,12 @@ const useDbQuery = (
     isRefetching,
     refetch,
   } = useQuery(
-    ['projects', project?.ref, 'db', { ...params, sql: resolvedSql }, where, orderBy],
+    ['projects', project?.ref, 'db', { ...params, sql: resolvedSql, identifier }, where, orderBy],
     ({ signal }) => {
       return executeSql(
         {
           projectRef: project?.ref,
-          connectionString: project?.connectionString,
+          connectionString: connectionString || project?.connectionString,
           sql: resolvedSql,
         },
         signal

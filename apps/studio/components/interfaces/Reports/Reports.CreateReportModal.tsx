@@ -46,7 +46,6 @@ export const CreateReportModal = ({ visible, onCancel, afterSubmit }: CreateRepo
         },
       })
       toast.success('New report created')
-
       const newReportId = res[0].id
       router.push(`/project/${ref}/reports/${newReportId}`)
       afterSubmit()

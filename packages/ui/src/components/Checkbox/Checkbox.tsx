@@ -1,3 +1,5 @@
+'use client'
+
 import React from 'react'
 
 import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'

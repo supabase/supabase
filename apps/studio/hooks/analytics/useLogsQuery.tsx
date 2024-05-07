@@ -1,17 +1,21 @@
 import { useQuery } from '@tanstack/react-query'
+import { Dispatch, SetStateAction, useState } from 'react'
+
 import {
   EXPLORER_DATEPICKER_HELPERS,
   genQueryParams,
   getDefaultHelper,
 } from 'components/interfaces/Settings/Logs'
-import { Dispatch, SetStateAction, useState } from 'react'
 import type {
-  LogsEndpointParams,
-  Logs,
   LogData,
+  Logs,
+  LogsEndpointParams,
 } from 'components/interfaces/Settings/Logs/Logs.types'
-import { API_URL } from 'lib/constants'
+import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { get, isResponseOk } from 'lib/common/fetch'
+import { API_URL } from 'lib/constants'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
+
 export interface LogsQueryHook {
   params: LogsEndpointParams
   isLoading: boolean
@@ -27,6 +31,10 @@ const useLogsQuery = (
   projectRef: string,
   initialParams: Partial<LogsEndpointParams> = {}
 ): LogsQueryHook => {
+  // [Joshen] TODO once API is unblocked
+  const state = useDatabaseSelectorStateSnapshot()
+  const { data: databases } = useReadReplicasQuery({ projectRef })
+
   const defaultHelper = getDefaultHelper(EXPLORER_DATEPICKER_HELPERS)
   const [params, setParams] = useState<LogsEndpointParams>({
     sql: initialParams?.sql || '',

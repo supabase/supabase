@@ -52,8 +52,9 @@ const SignInForm = () => {
 
         toast.success(`Signed in successfully!`, { id: toastId })
         await queryClient.resetQueries()
-
-        router.push(getReturnToPath())
+        const returnTo = getReturnToPath()
+        // since we're already on the /sign-in page, prevent redirect loops
+        router.push(returnTo === '/sign-in' ? '/projects' : returnTo)
       } catch (error) {
         toast.error((error as AuthError).message, { id: toastId })
       }

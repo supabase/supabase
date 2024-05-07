@@ -1,7 +1,3 @@
-'use client'
-
-import * as React from 'react'
-
 // Markdown components
 
 export * from './src/lib/Markdown'
