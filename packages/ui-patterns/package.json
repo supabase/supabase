@@ -21,6 +21,7 @@
     "react-markdown": "^9.0.1",
     "react-tooltip": "*",
     "reactflow": "*",
+    "remark-gfm": "^4.0.0",
     "sql-to-rest": "*",
     "tsconfig": "*",
     "ui": "*"
