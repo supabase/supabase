@@ -84,7 +84,7 @@ export const HooksListing = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-76 p-0" align="end">
-              <div className="p-1">
+              <div className="p-2">
                 {nonEnterpriseHookOptions.map((h) => (
                   <DropdownMenuItem key={h.title} onClick={() => setSelectedHook(h.title)}>
                     {h.title}
@@ -93,7 +93,7 @@ export const HooksListing = () => {
               </div>
               {nonEnterpriseHookOptions.length > 0 && <DropdownMenuSeparator />}
 
-              <div className="bg-surface-200 p-1 -mt-1">
+              <div className="bg-surface-200 p-2 -mt-2">
                 {subscription?.plan.id !== 'enterprise' && (
                   <DropdownMenuLabel className="grid gap-1 bg-surface-200">
                     <p className="text-foreground-light">Enterprise plan required</p>
