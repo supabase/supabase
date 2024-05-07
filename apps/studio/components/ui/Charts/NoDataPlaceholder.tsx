@@ -1,4 +1,4 @@
-import { IconBarChart2 } from 'ui'
+import { BarChart2 } from 'lucide-react'
 import { useChartSize } from './Charts.utils'
 
 interface Props {
@@ -23,7 +23,7 @@ const NoDataPlaceholder: React.FC<Props> = ({
       // extra 20 px for the x ticks
       style={{ minHeight: minHeight + 20 }}
     >
-      <IconBarChart2 className="text-border-stronger" />
+      <BarChart2 size={20} className="text-border-stronger" />
       <div>
         <p className="text-foreground-light text-xs">{title}</p>
         {message && <p className="text-foreground-lighter text-xs">{message}</p>}

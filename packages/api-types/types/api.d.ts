@@ -796,11 +796,11 @@ export interface paths {
     post: operations['TelemetryPageController_sendServerPage']
   }
   '/platform/telemetry/activity': {
-    /** Sends mixpanel server activity */
+    /** Sends server activity */
     post: operations['TelemetryActivityController_sendServerActivity']
   }
   '/platform/telemetry/pageview': {
-    /** Send mixpanel page event */
+    /** Send pageview event */
     post: operations['TelemetryPageviewController_sendServerPageViewed']
   }
   '/platform/vercel/token': {
@@ -11404,7 +11404,7 @@ export interface operations {
       }
     }
   }
-  /** Sends mixpanel server activity */
+  /** Sends server activity */
   TelemetryActivityController_sendServerActivity: {
     requestBody: {
       content: {
@@ -11415,13 +11415,13 @@ export interface operations {
       201: {
         content: never
       }
-      /** @description Failed to send mixpanel server activity */
+      /** @description Failed to send server activity */
       500: {
         content: never
       }
     }
   }
-  /** Send mixpanel page event */
+  /** Send pageview event */
   TelemetryPageviewController_sendServerPageViewed: {
     requestBody: {
       content: {
@@ -11432,7 +11432,7 @@ export interface operations {
       201: {
         content: never
       }
-      /** @description Failed to send mixpanel page event */
+      /** @description Failed to send pageview event */
       500: {
         content: never
       }

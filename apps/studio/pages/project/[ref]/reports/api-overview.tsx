@@ -25,6 +25,8 @@ import { ReportsLayout } from 'components/layouts'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 export const ApiReport: NextPageWithLayout = () => {
   const report = useApiReport()
@@ -108,7 +110,12 @@ export const ApiReport: NextPageWithLayout = () => {
 
 // hook to fetch data
 const useApiReport = () => {
+  const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
+  const state = useDatabaseSelectorStateSnapshot()
+
+  // [Joshen] TODO: Once API support is out
+  const showReadReplicasUI = false // project?.is_read_replicas_enabled
 
   const queryHooks = queriesFactory<keyof typeof PRESET_CONFIG.api.queries>(
     PRESET_CONFIG.api.queries,
