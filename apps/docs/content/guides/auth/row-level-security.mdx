@@ -257,11 +257,11 @@ create function private.get_teams_for_authenticated_user()
 returns setof bigint
 language sql
 security definer
-set search_path = public
+set search_path = ''
 stable
 as $$
   select team_id
-  from members
+  from public.members
   where user_id = auth.uid()
 $$;
 
