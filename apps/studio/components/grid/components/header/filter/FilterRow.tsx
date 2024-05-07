@@ -4,6 +4,7 @@ import { Button, IconChevronDown, IconX, Input } from 'ui'
 import { DropdownControl } from 'components/grid/components/common'
 import type { Filter, FilterOperator, SupaTable } from 'components/grid/types'
 import { FilterOperatorOptions } from './Filter.constants'
+import { X } from 'lucide-react'
 
 export interface FilterRowProps {
   table: SupaTable
@@ -84,9 +85,9 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: 
         onKeyDown={onKeyDown}
       />
       <Button
-        icon={<IconX strokeWidth={1.5} size={14} />}
-        size="tiny"
         type="text"
+        className="px-1"
+        icon={<X strokeWidth={1.5} size={14} />}
         onClick={() => onDelete(filterIdx)}
       />
     </div>
