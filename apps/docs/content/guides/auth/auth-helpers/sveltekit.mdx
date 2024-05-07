@@ -784,7 +784,7 @@ export const handle: Handle = sequence(supabase, authorization)
 
 ### Client-side data fetching with RLS
 
-For [row level security](https://supabase.com/docs/guides/auth/row-level-security) to work properly when fetching data client-side, you need to use `supabaseClient` from `PageData` and only run your query once the session is defined client-side:
+For [row level security](https://supabase.com/docs/guides/database/postgres/row-level-security) to work properly when fetching data client-side, you need to use `supabaseClient` from `PageData` and only run your query once the session is defined client-side:
 
 ```svelte src/routes/+page.svelte
 <script lang="ts">

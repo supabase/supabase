@@ -1,7 +1,5 @@
 ---
-id: 'sessions'
-title: 'User Sessions'
-description: 'Control and manage user sessions.'
+title: 'User sessions'
 ---
 
 Supabase Auth provides fine-grained control over your user's sessions.
@@ -30,31 +28,14 @@ A session terminates, depending on configuration, when:
 
 Every access token contains a `session_id` claim, a UUID, uniquely identifying the session of the user. You can correlate this ID with the primary key of the `auth.sessions` table.
 
-## Sign out and scopes
+## Initiating a session
 
-Supabase Auth allows you to specify three different scopes for when a user invokes the [sign out API](/docs/reference/javascript/auth-signout) in your application:
+A session is initiated when a user signs in. The session is stored in the `auth.sessions` table, and your app should receive the access and refresh tokens.
 
-- `global` (default) when all sessions active for the user are terminated.
-- `local` which only terminates the current session for the user but keep sessions on other devices or browsers active.
-- `others` to terminate all but the current session for the user.
+There are two flows for initiating a session and receiving the tokens:
 
-You can invoke these by providing the `scope` option:
-
-```typescript
-// defaults to the global scope
-await supabase.auth.signOut()
-
-// sign out from the current session only
-await supabase.auth.signOut({ scope: 'local' })
-```
-
-Upon sign out, all refresh tokens and potentially other database objects related to the affected sessions are destroyed and the client library removes the session stored in the browser.
-
-<Admonition type="caution">
-
-Access tokens of revoked sessions remain valid until their expiry time, encoded in the `exp` claim. The user won't be immediately logged out and will only be logged out when the access token expires.
-
-</Admonition>
+- [Implicit flow](/docs/guides/auth/sessions/implicit-flow)
+- [PKCE flow](/docs/guides/auth/sessions/pkce-flow)
 
 ## Limiting session lifetime and number of allowed sessions per user
 
