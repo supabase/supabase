@@ -156,9 +156,10 @@ export function formatCurl(baseUrl: string, httpRequest: HttpRequest) {
   const { method, path, params } = httpRequest
   const lines: string[] = []
   const baseUrlObject = new URL(baseUrl)
+  const maybeGFlag = params.size > 0 ? '-G ' : ''
 
   if (method === 'GET') {
-    lines.push(`curl -G ${baseUrlObject.toString()}${path}`)
+    lines.push(`curl ${maybeGFlag}${baseUrlObject.toString()}${path}`)
     for (const [key, value] of params) {
       lines.push(`  -d "${uriEncode(key)}=${uriEncode(value)}"`)
     }

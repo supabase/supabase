@@ -39,7 +39,8 @@ export const faqs: Faq[] = [
   },
   {
     id: 'curl-flags',
-    condition: (result) => result.language === 'curl' && result.method === 'GET',
+    condition: (result) =>
+      result.language === 'curl' && result.method === 'GET' && result.params.size > 0,
     question: 'What do `-G` and `-d` do?',
     answer: stripIndent`
       In \`curl\`, \`-d\` is short for \`--data-urlencode\` and is typically used to add payload to \`POST\` requests.
