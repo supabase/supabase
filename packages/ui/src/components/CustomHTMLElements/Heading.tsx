@@ -1,11 +1,13 @@
-import { HTMLAttributes, forwardRef, useCallback } from 'react'
+'use client'
+
+import { forwardRef, useCallback, type HTMLAttributes } from 'react'
+import { useInView } from 'react-intersection-observer'
 import {
   getAnchor,
   removeAnchor,
   highlightSelectedTocItem,
   unHighlightSelectedTocItems,
 } from './CustomHTMLElements.utils'
-import { useInView } from 'react-intersection-observer'
 
 /**
  * [Joshen] The trick with rootMargin

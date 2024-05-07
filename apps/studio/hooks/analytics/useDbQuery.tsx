@@ -36,8 +36,8 @@ const useDbQuery = ({
   orderBy?: string
 }): DbQueryHook => {
   const { project } = useProjectContext()
-
   const state = useDatabaseSelectorStateSnapshot()
+
   const { data: databases } = useReadReplicasQuery({ projectRef: project?.ref })
   const connectionString = project?.is_read_replicas_enabled
     ? (databases || []).find((db) => db.identifier === state.selectedDatabaseId)?.connectionString
