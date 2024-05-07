@@ -87,6 +87,7 @@ const TableEditor = ({
   const enumTypes = (types ?? []).filter(
     (type) => !EXCLUDED_SCHEMAS_WITHOUT_EXTENSIONS.includes(type.schema)
   )
+  console.log({ types, enumTypes })
 
   const { data: publications } = useDatabasePublicationsQuery({
     projectRef: project?.ref,
