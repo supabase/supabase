@@ -44,7 +44,7 @@ const VercelIntegrationConnectionForm = ({
   })
 
   const { mutate: updateVercelConnection } = useVercelConnectionUpdateMutation({
-    onSuccess: () => toast.success(`Updated Supabase directory`),
+    onSuccess: () => toast.success(`Updated Vercel connection`),
   })
 
   function onSubmit(data: z.infer<typeof FormSchema>) {
