@@ -81,7 +81,7 @@ app.use(router.allowedMethods());
 
 app.listen({ port: 3000 });
 
-```
+````
 
 </TabPanel>
 
@@ -103,7 +103,7 @@ return new Response('Hello World!')
 
 Deno.serve(app.fetch);
 
-```
+````
 
 </TabPanel>
 
@@ -203,7 +203,7 @@ const id = req.params.id
 // delete task
 })
 
-```
+````
 </TabPanel>
 
 <TabPanel id="oak" label="Oak">
@@ -267,15 +267,15 @@ app.use(router.routes());
 app.use(router.allowedMethods());
 
 app.listen({ port: 3000 });
-```
+````
 
 </TabPanel>
 
 <TabPanel id="hono" label="Hono">
 
 ```ts
-import { Hono } from 'https://deno.land/x/hono/mod.ts';
-import type { Context } from 'https://deno.land/x/hono/mod.ts';
+import { Hono } from 'https://deno.land/x/hono/mod.ts'
+import type { Context } from 'https://deno.land/x/hono/mod.ts'
 
 // You can set the basePath with Hono
 const functionName = 'routing'
@@ -283,41 +283,40 @@ const app = new Hono().basePath(`/${functionName}`)
 
 // /tasks/id
 app.get('/:id', async (c: Context) => {
-const id = c.req.param('id');
-const task = {}; // Fetch task by id here
-if (task) {
-return new Response(JSON.stringify(task));
-} else {
-return new Response('Task not found', { status: 404 });
-}
-});
+  const id = c.req.param('id')
+  const task = {} // Fetch task by id here
+  if (task) {
+    return new Response(JSON.stringify(task))
+  } else {
+    return new Response('Task not found', { status: 404 })
+  }
+})
 
 app.patch('/:id', async (c: Context) => {
-const id = c.req.param('id');
-const body = await c.req.body();
-const updates = body.value;
-const task = {}; // Fetch task by id here
-if (task) {
-Object.assign(task, updates);
-return new Response(JSON.stringify(task));
-} else {
-return new Response('Task not found', { status: 404 });
-}
-});
+  const id = c.req.param('id')
+  const body = await c.req.body()
+  const updates = body.value
+  const task = {} // Fetch task by id here
+  if (task) {
+    Object.assign(task, updates)
+    return new Response(JSON.stringify(task))
+  } else {
+    return new Response('Task not found', { status: 404 })
+  }
+})
 
 app.delete('/:id', async (c: Context) => {
-const id = c.req.param('id');
-const task = {}; // Fetch task by id here
-if (task) {
-// Delete task
-return new Response('Task deleted successfully');
-} else {
-return new Response('Task not found', { status: 404 });
-}
-});
+  const id = c.req.param('id')
+  const task = {} // Fetch task by id here
+  if (task) {
+    // Delete task
+    return new Response('Task deleted successfully')
+  } else {
+    return new Response('Task not found', { status: 404 })
+  }
+})
 
-Deno.serve(app.fetch);
-
+Deno.serve(app.fetch)
 ```
 
 </TabPanel>
@@ -326,90 +325,90 @@ Deno.serve(app.fetch);
 
 ```ts
 interface Task {
- id: string;
- name: string;
+  id: string
+  name: string
 }
 
-let tasks: Task[] = [];
+let tasks: Task[] = []
 
-const router = new Map<string, (req: Request) => Promise<Response>>();
+const router = new Map<string, (req: Request) => Promise<Response>>()
 
 async function getAllTasks(): Promise<Response> {
- return new Response(JSON.stringify(tasks));
+  return new Response(JSON.stringify(tasks))
 }
 
 async function getTask(id: string): Promise<Response> {
- const task = tasks.find(t => t.id === id);
- if (task) {
-    return new Response(JSON.stringify(task));
- } else {
-    return new Response('Task not found', { status: 404 });
- }
+  const task = tasks.find((t) => t.id === id)
+  if (task) {
+    return new Response(JSON.stringify(task))
+  } else {
+    return new Response('Task not found', { status: 404 })
+  }
 }
 
 async function createTask(req: Request): Promise<Response> {
- const id = Math.random().toString(36).substring(7);
- const task = { id, name: ''};
- tasks.push(task);
- return new Response(JSON.stringify(task), { status: 201 });
+  const id = Math.random().toString(36).substring(7)
+  const task = { id, name: '' }
+  tasks.push(task)
+  return new Response(JSON.stringify(task), { status: 201 })
 }
 
 async function updateTask(id: string, req: Request): Promise<Response> {
- const index = tasks.findIndex(t => t.id === id);
- if (index !== -1) {
-    tasks[index] = { ...tasks[index] };
-    return new Response(JSON.stringify(tasks[index]));
- } else {
-    return new Response('Task not found', { status: 404 });
- }
+  const index = tasks.findIndex((t) => t.id === id)
+  if (index !== -1) {
+    tasks[index] = { ...tasks[index] }
+    return new Response(JSON.stringify(tasks[index]))
+  } else {
+    return new Response('Task not found', { status: 404 })
+  }
 }
 
 async function deleteTask(id: string): Promise<Response> {
- const index = tasks.findIndex(t => t.id === id);
- if (index !== -1) {
-    tasks.splice(index, 1);
-    return new Response('Task deleted successfully');
- } else {
-    return new Response('Task not found', { status: 404 });
- }
+  const index = tasks.findIndex((t) => t.id === id)
+  if (index !== -1) {
+    tasks.splice(index, 1)
+    return new Response('Task deleted successfully')
+  } else {
+    return new Response('Task not found', { status: 404 })
+  }
 }
 
 Deno.serve(async (req) => {
-  const url = new URL(req.url);
-  const method = req.method;
+  const url = new URL(req.url)
+  const method = req.method
   // Extract the last part of the path as the command
-  const command = url.pathname.split("/").pop();
+  const command = url.pathname.split('/').pop()
   // Assuming the last part of the path is the task ID
-  const id = command;
+  const id = command
   try {
-     switch (method) {
-       case 'GET':
-         if (id) {
-           return getTask(id);
-         } else {
-           return getAllTasks();
-         }
-       case 'POST':
-         return createTask(req);
-       case 'PUT':
-         if (id) {
-           return updateTask(id, req);
-         } else {
-           return new Response('Bad Request', { status: 400 });
-         }
-       case 'DELETE':
-         if (id) {
-           return deleteTask(id);
-         } else {
-           return new Response('Bad Request', { status: 400 });
-         }
-       default:
-         return new Response('Method Not Allowed', { status: 405 });
-     }
+    switch (method) {
+      case 'GET':
+        if (id) {
+          return getTask(id)
+        } else {
+          return getAllTasks()
+        }
+      case 'POST':
+        return createTask(req)
+      case 'PUT':
+        if (id) {
+          return updateTask(id, req)
+        } else {
+          return new Response('Bad Request', { status: 400 })
+        }
+      case 'DELETE':
+        if (id) {
+          return deleteTask(id)
+        } else {
+          return new Response('Bad Request', { status: 400 })
+        }
+      default:
+        return new Response('Method Not Allowed', { status: 405 })
+    }
   } catch (error) {
-     return new Response(`Internal Server Error: ${error}`, { status: 500 });
+    return new Response(`Internal Server Error: ${error}`, { status: 500 })
   }
- });
+})
 ```
 
 </TabPanel>
