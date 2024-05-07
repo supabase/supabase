@@ -12,7 +12,6 @@ declare global {
 export type PolicyInfo = {
   name: string
   table: string
-  roles: string[]
   command?: string
   usingExpression?: string
   checkExpression?: string
@@ -76,11 +75,6 @@ export async function getPolicyInfo(sql: string) {
 
   const createPolicyStatement = stmt.CreatePolicyStmt
 
-  const roles = createPolicyStatement.roles
-    .map(({ RoleSpec }: any) => RoleSpec)
-    .filter(({ roletype }: any) => roletype === 'ROLESPEC_CSTRING')
-    .map(({ rolename }: any) => rolename)
-
   if (!createPolicyStatement) {
     throw new Error('Expected a create policy statement')
   }
@@ -102,7 +96,6 @@ export async function getPolicyInfo(sql: string) {
   const policyInfo: PolicyInfo = {
     name: createPolicyStatement.policy_name,
     table: createPolicyStatement.table.relname,
-    roles,
     command: createPolicyStatement.cmd_name,
     usingExpression,
     checkExpression,
