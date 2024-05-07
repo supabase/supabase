@@ -1,8 +1,8 @@
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
+import { X } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
-import { X } from 'lucide-react'
 
 import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -10,6 +10,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { useLocalStorageQuery } from 'hooks'
 import { DbQueryHook } from 'hooks/analytics/useDbQuery'
 import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import {
   Button,
   TabsList_Shadcn_,
@@ -28,7 +29,6 @@ import { PresetHookResult } from '../Reports/Reports.utils'
 import { QUERY_PERFORMANCE_REPORT_TYPES } from './QueryPerformance.constants'
 import { QueryPerformanceFilterBar } from './QueryPerformanceFilterBar'
 import { QueryPerformanceGrid } from './QueryPerformanceGrid'
-import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 interface QueryPerformanceProps {
   queryHitRate: PresetHookResult
