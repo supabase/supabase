@@ -30,6 +30,7 @@ import {
   SelectValue_Shadcn_,
   Select_Shadcn_,
   SidePanel,
+  cn,
 } from 'ui'
 import { MultiSelectOption } from 'ui-patterns/MultiSelect'
 import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
@@ -59,7 +60,7 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const { data: entities } = useEntityTypesQuery({
+  const { data: entities, isLoading } = useEntityTypesQuery({
     schema: selectedSchema,
     sort: 'alphabetical',
     search: undefined,
@@ -211,6 +212,7 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
             name="select-table"
             description={
               isSelectEntityDisabled &&
+              !isLoading &&
               'Create a table in this schema via the Table or SQL editor first'
             }
             isReactForm={false}
@@ -220,21 +222,28 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
               open={tableDropdownOpen}
               onOpenChange={setTableDropdownOpen}
             >
-              <PopoverTrigger_Shadcn_ asChild disabled={isSelectEntityDisabled}>
-                <Button
-                  type="default"
-                  size={'medium'}
-                  className={`w-full [&>span]:w-full text-left`}
-                  iconRight={
-                    <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
-                  }
-                >
-                  {selectedEntity !== undefined && selectedEntity !== ''
-                    ? selectedEntity
-                    : isSelectEntityDisabled
-                      ? 'No tables available in schema'
-                      : 'Choose a table'}
-                </Button>
+              <PopoverTrigger_Shadcn_ asChild disabled={isSelectEntityDisabled || isLoading}>
+                {isLoading ? (
+                  <ShimmeringLoader className="h-[38px]" />
+                ) : (
+                  <Button
+                    type="default"
+                    size="medium"
+                    className={cn(
+                      'w-full [&>span]:w-full text-left',
+                      selectedEntity === '' && 'text-foreground-lighter'
+                    )}
+                    iconRight={
+                      <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
+                    }
+                  >
+                    {selectedEntity !== undefined && selectedEntity !== ''
+                      ? selectedEntity
+                      : isSelectEntityDisabled
+                        ? 'No tables available in schema'
+                        : 'Choose a table'}
+                  </Button>
+                )}
               </PopoverTrigger_Shadcn_>
               <PopoverContent_Shadcn_
                 className="p-0"
