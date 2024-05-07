@@ -8,8 +8,8 @@ import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
 import type { Filter, SupaTable } from 'components/grid/types'
 import {
   Button,
-  Popover,
   PopoverContent_Shadcn_,
+  PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
@@ -49,11 +49,10 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
     <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
-          asChild
           type={(filters || []).length > 0 ? 'link' : 'text'}
           icon={<FilterIcon strokeWidth={1.5} className="text-foreground-light" />}
         >
-          <span>{btnText}</span>
+          {btnText}
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start">
@@ -136,7 +135,7 @@ const FilterOverlay = ({ table, filters: filtersFromUrl, onApplyFilters }: Filte
           </div>
         )}
       </div>
-      <Popover.Separator />
+      <PopoverSeparator_Shadcn_ />
       <div className="px-3 flex flex-row justify-between">
         <Button icon={<Plus />} type="text" onClick={onAddFilter}>
           Add filter

@@ -9,8 +9,8 @@ import { DropdownControl } from 'components/grid/components/common'
 import type { Sort, SupaTable } from 'components/grid/types'
 import {
   Button,
-  Popover,
   PopoverContent_Shadcn_,
+  PopoverSeparator_Shadcn_,
   PopoverTrigger_Shadcn_,
   Popover_Shadcn_,
 } from 'ui'
@@ -43,11 +43,10 @@ const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
     <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
       <PopoverTrigger_Shadcn_ asChild>
         <Button
-          asChild
           type={(sorts || []).length > 0 ? 'link' : 'text'}
           icon={<List strokeWidth={1.5} className="text-foreground-light" />}
         >
-          <span>{btnText}</span>
+          {btnText}
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start">
@@ -134,7 +133,7 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, onApplySorts }: SortOverlayPr
         </div>
       )}
 
-      <Popover.Separator />
+      <PopoverSeparator_Shadcn_ />
       <div className="px-3 flex flex-row justify-between">
         {columns && columns.length > 0 ? (
           <DropdownControl
@@ -144,12 +143,11 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, onApplySorts }: SortOverlayPr
             align="start"
           >
             <Button
-              asChild
               type="text"
               iconRight={<ChevronDown />}
               className="sb-grid-dropdown__item-trigger"
             >
-              <span>{`Pick ${sorts.length > 1 ? 'another' : 'a'} column to sort by`}</span>
+              Pick {sorts.length > 1 ? 'another' : 'a'} column to sort by
             </Button>
           </DropdownControl>
         ) : (
