@@ -15,14 +15,6 @@ To combine multiple endpoints into a single Edge Function, you can use web appli
 
 Let's dive into some examples.
 
-<Tabs
-  scrollable
-  size="small"
-  type="underlined"
-  defaultActiveId="hono"
-  queryGroup="framework"
->
-
 ## Routing with Frameworks
 
 Here's a simple hello world example using some popular web frameworks.
@@ -35,6 +27,13 @@ supabase functions new hello-world
 
 Copy and paste the following code:
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="hono"
+  queryGroup="framework"
+>
 <TabPanel id="expressjs" label="Express">
 
 ```ts
@@ -82,9 +81,10 @@ app.use(router.allowedMethods());
 
 app.listen({ port: 3000 });
 
-````
+```
 
 </TabPanel>
+
 <TabPanel id="hono" label="Hono">
 ```ts
 import { Hono } from 'https://deno.land/x/hono/mod.ts';
@@ -103,9 +103,10 @@ return new Response('Hello World!')
 
 Deno.serve(app.fetch);
 
-````
+```
 
 </TabPanel>
+
 <TabPanel id="deno" label="Deno">
 ```ts
 Deno.serve(async (req) => {
@@ -121,7 +122,9 @@ Deno.serve(async (req) => {
 ```
 
 </TabPanel>
+
 </Tabs>
+
 You will notice in the above example, we created two routes - `GET` and `POST`. The path for both routes are defined as `/hello-world`.
 If you run a server outside of Edge Functions, you'd usually set the root path as `/` .
 However, within Edge Functions, paths should always be prefixed with the function name (in this case `hello-world`).
@@ -200,9 +203,11 @@ const id = req.params.id
 // delete task
 })
 
-````
+```
 </TabPanel>
+
 <TabPanel id="oak" label="Oak">
+
 ```ts
 import { Application } from "jsr:@oak/oak/application";
 import { Router } from "jsr:@oak/oak/router";
@@ -262,10 +267,12 @@ app.use(router.routes());
 app.use(router.allowedMethods());
 
 app.listen({ port: 3000 });
-````
+```
 
 </TabPanel>
+
 <TabPanel id="hono" label="Hono">
+
 ```ts
 import { Hono } from 'https://deno.land/x/hono/mod.ts';
 import type { Context } from 'https://deno.land/x/hono/mod.ts';
@@ -311,9 +318,12 @@ return new Response('Task not found', { status: 404 });
 
 Deno.serve(app.fetch);
 
-````
+```
+
 </TabPanel>
+
 <TabPanel id="deno" label="Deno">
+
 ```ts
 interface Task {
  id: string;
@@ -400,10 +410,11 @@ Deno.serve(async (req) => {
      return new Response(`Internal Server Error: ${error}`, { status: 500 });
   }
  });
-````
+```
 
 </TabPanel>
 </Tabs>
+
 ## URL Patterns API
 
 If you prefer not to use a web framework, you can directly use [URLPattern API](https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API) within your Edge Functions to implement routing.
