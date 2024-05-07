@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { useEffect, useMemo, useState } from 'react'
 import toast from 'react-hot-toast'
 
-import { SelectValue } from '@ui/components/shadcn/ui/select'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import { CodeEditor } from 'components/ui/CodeEditor'
 import ShimmeringLoader from 'components/ui/ShimmeringLoader'
@@ -11,9 +10,19 @@ import { useSchemasQuery } from 'data/database/schemas-query'
 import { useTableColumnsQuery } from 'data/database/table-columns-query'
 import { useEntityTypesQuery } from 'data/entity-types/entity-types-infinite-query'
 import { useExecuteSqlMutation } from 'data/sql/execute-sql-mutation'
+import { Check, ChevronsUpDown } from 'lucide-react'
 import {
   Button,
-  Input,
+  CommandEmpty_Shadcn_,
+  CommandGroup_Shadcn_,
+  CommandInput_Shadcn_,
+  CommandItem_Shadcn_,
+  CommandList_Shadcn_,
+  Command_Shadcn_,
+  PopoverContent_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+  ScrollArea,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectSeparator_Shadcn_,
@@ -22,7 +31,8 @@ import {
   Select_Shadcn_,
   SidePanel,
 } from 'ui'
-import MultiSelect, { MultiSelectOption } from 'ui-patterns/MultiSelect'
+import { MultiSelectOption } from 'ui-patterns/MultiSelect'
+import { MultiSelectV2 } from 'ui-patterns/MultiSelect/MultiSelectV2'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { INDEX_TYPES } from './Indexes.constants'
 
@@ -37,6 +47,8 @@ const CreateIndexSidePanel = ({ visible, onClose }: CreateIndexSidePanelProps) =
   const [selectedEntity, setSelectedEntity] = useState<string | undefined>(undefined)
   const [selectedColumns, setSelectedColumns] = useState<string[]>([])
   const [selectedIndexType, setSelectedIndexType] = useState<string>(INDEX_TYPES[0].value)
+  const [schemaDropdownOpen, setSchemaDropdownOpen] = useState(false)
+  const [tableDropdownOpen, setTableDropdownOpen] = useState(false)
 
   const { refetch: refetchIndexes } = useIndexesQuery({
     schema: selectedSchema,
@@ -136,22 +148,62 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
       <div className="py-6 space-y-6">
         <SidePanel.Content className="space-y-6">
           <FormItemLayout label="Select a schema" name="select-schema" isReactForm={false}>
-            <Select_Shadcn_
-              value={selectedSchema}
-              onValueChange={setSelectedSchema}
-              name="select-schema"
+            <Popover_Shadcn_
+              modal={false}
+              open={schemaDropdownOpen}
+              onOpenChange={setSchemaDropdownOpen}
             >
-              <SelectTrigger_Shadcn_ size="small">
-                <SelectValue_Shadcn_>{selectedSchema}</SelectValue_Shadcn_>
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                {(schemas ?? []).map((schema) => (
-                  <SelectItem_Shadcn_ key={schema.name} value={schema.name}>
-                    {schema.name}
-                  </SelectItem_Shadcn_>
-                ))}
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+              <PopoverTrigger_Shadcn_ asChild>
+                <Button
+                  type="default"
+                  size={'medium'}
+                  className={`w-full [&>span]:w-full text-left`}
+                  iconRight={
+                    <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
+                  }
+                >
+                  {selectedSchema !== undefined && selectedSchema !== ''
+                    ? selectedSchema
+                    : 'Choose a schema'}
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_
+                className="p-0"
+                side="bottom"
+                align="start"
+                sameWidthAsTrigger
+              >
+                <Command_Shadcn_>
+                  <CommandInput_Shadcn_ placeholder="Find schema..." />
+                  <CommandList_Shadcn_>
+                    <CommandEmpty_Shadcn_>No schemas found</CommandEmpty_Shadcn_>
+                    <CommandGroup_Shadcn_>
+                      <ScrollArea className={(schemas || []).length > 7 ? 'h-[210px]' : ''}>
+                        {(schemas ?? []).map((schema) => (
+                          <CommandItem_Shadcn_
+                            key={schema.name}
+                            className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                            onSelect={() => {
+                              setSelectedSchema(schema.name)
+                              setSchemaDropdownOpen(false)
+                            }}
+                            onClick={() => {
+                              setSelectedSchema(schema.name)
+                              setSchemaDropdownOpen(false)
+                            }}
+                          >
+                            <span>{schema.name}</span>
+                            {selectedEntity === schema.name && (
+                              <Check className="text-brand" strokeWidth={2} size={16} />
+                            )}
+                          </CommandItem_Shadcn_>
+                        ))}
+                      </ScrollArea>
+                    </CommandGroup_Shadcn_>
+                  </CommandList_Shadcn_>
+                </Command_Shadcn_>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
           </FormItemLayout>
 
           <FormItemLayout
@@ -163,36 +215,71 @@ CREATE INDEX ON "${selectedSchema}"."${selectedEntity}" USING ${selectedIndexTyp
             }
             isReactForm={false}
           >
-            <Select_Shadcn_
-              disabled={isSelectEntityDisabled}
-              value={selectedEntity}
-              onValueChange={setSelectedEntity}
-              name="select-table"
+            <Popover_Shadcn_
+              modal={false}
+              open={tableDropdownOpen}
+              onOpenChange={setTableDropdownOpen}
             >
-              <SelectTrigger_Shadcn_ size="small">
-                <SelectValue
-                  placeholder={
-                    isSelectEntityDisabled ? 'No tables available in schema' : 'Choose a table'
+              <PopoverTrigger_Shadcn_ asChild disabled={isSelectEntityDisabled}>
+                <Button
+                  type="default"
+                  size={'medium'}
+                  className={`w-full [&>span]:w-full text-left`}
+                  iconRight={
+                    <ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />
                   }
                 >
-                  {selectedEntity}
-                </SelectValue>
-              </SelectTrigger_Shadcn_>
-              <SelectContent_Shadcn_>
-                {(entityTypes ?? []).map((entity) => (
-                  <SelectItem_Shadcn_ key={entity.name} value={entity.name}>
-                    {entity.name}
-                  </SelectItem_Shadcn_>
-                ))}
-              </SelectContent_Shadcn_>
-            </Select_Shadcn_>
+                  {selectedEntity !== undefined && selectedEntity !== ''
+                    ? selectedEntity
+                    : isSelectEntityDisabled
+                      ? 'No tables available in schema'
+                      : 'Choose a table'}
+                </Button>
+              </PopoverTrigger_Shadcn_>
+              <PopoverContent_Shadcn_
+                className="p-0"
+                side="bottom"
+                align="start"
+                sameWidthAsTrigger
+              >
+                <Command_Shadcn_>
+                  <CommandInput_Shadcn_ placeholder="Find table..." />
+                  <CommandList_Shadcn_>
+                    <CommandEmpty_Shadcn_>No tables found</CommandEmpty_Shadcn_>
+                    <CommandGroup_Shadcn_>
+                      <ScrollArea className={(entityTypes || []).length > 7 ? 'h-[210px]' : ''}>
+                        {(entityTypes ?? []).map((entity) => (
+                          <CommandItem_Shadcn_
+                            key={entity.name}
+                            className="cursor-pointer flex items-center justify-between space-x-2 w-full"
+                            onSelect={() => {
+                              setSelectedEntity(entity.name)
+                              setTableDropdownOpen(false)
+                            }}
+                            onClick={() => {
+                              setSelectedEntity(entity.name)
+                              setTableDropdownOpen(false)
+                            }}
+                          >
+                            <span>{entity.name}</span>
+                            {selectedEntity === entity.name && (
+                              <Check className="text-brand" strokeWidth={2} size={16} />
+                            )}
+                          </CommandItem_Shadcn_>
+                        ))}
+                      </ScrollArea>
+                    </CommandGroup_Shadcn_>
+                  </CommandList_Shadcn_>
+                </Command_Shadcn_>
+              </PopoverContent_Shadcn_>
+            </Popover_Shadcn_>
           </FormItemLayout>
 
           {selectedEntity && (
             <FormItemLayout label="Select up to 32 columns" isReactForm={false}>
               {isLoadingTableColumns && <ShimmeringLoader className="py-4" />}
               {isSuccessTableColumns && (
-                <MultiSelect
+                <MultiSelectV2
                   options={columnOptions}
                   placeholder=""
                   searchPlaceholder="Search for a column"
