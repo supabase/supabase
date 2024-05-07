@@ -30,7 +30,7 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
       ? `Filtered by ${filters.length} rule${filters.length > 1 ? 's' : ''}`
       : 'Filter'
 
-  const applyFilters = (appliedFilters: Filter[]) => {
+  const onApplyFilters = (appliedFilters: Filter[]) => {
     setParams((prevParams) => {
       return {
         ...prevParams,
@@ -58,7 +58,7 @@ const FilterPopover = ({ table, filters, setParams }: FilterPopoverProps) => {
         </Button>
       </PopoverTrigger_Shadcn_>
       <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start">
-        <FilterOverlay table={table} filters={filters} onApplyFilters={applyFilters} />
+        <FilterOverlay table={table} filters={filters} onApplyFilters={onApplyFilters} />
       </PopoverContent_Shadcn_>
     </Popover_Shadcn_>
   )

@@ -30,7 +30,7 @@ const FilterRow = ({ table, filter, filterIdx, onChange, onDelete, onKeyDown }: 
         : 'Enter a value'
 
   return (
-    <div className="sb-grid-filter-row px-3">
+    <div className="flex w-full items-center justify-between gap-x-1 px-3">
       <DropdownControl
         align="start"
         options={columnOptions}
