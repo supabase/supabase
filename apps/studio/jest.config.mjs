@@ -8,18 +8,17 @@ const createJestConfig = nextJest({
 const config = {
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   moduleDirectories: ['<rootDir>', 'node_modules'],
-  setupFiles: ['jest-canvas-mock', './tests/setup/radix'],
-  testEnvironment: 'jsdom',
-  testTimeout: 10000,
-  testRegex: '(.*\\.test.(js|jsx|ts|tsx)$)',
   maxConcurrency: 3,
   maxWorkers: '50%',
   moduleNameMapper: {
-    '\\.(css)$': '<rootDir>/__mocks__/styleMock.js',
     '^@ui/(.*)$': '<rootDir>/../../packages/ui/src/$1',
+    '\\.(css|less|sass|scss)$': '<rootDir>/__mocks__/styleMock.js',
+    'react-markdown': '<rootDir>/__mocks__/react-markdown.js',
   },
-  setupFiles: ['./jest.polyfills.js'],
-  transformIgnorePatterns: ['node_modules/(?!react-markdown/)'],
+  testEnvironment: 'jsdom',
+  testTimeout: 10000,
+  testRegex: '(.*\\.test.(js|jsx|ts|tsx)$)',
+  setupFiles: ['jest-canvas-mock', './tests/setup/radix', './tests/setup/polyfills'],
 }
 
 export default createJestConfig(config)

@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 
 import { useParams } from 'common'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { LogsExplorerPage } from 'pages/project/[ref]/logs/explorer/index'
+// import { LogsExplorerPage } from 'pages/project/[ref]/logs/explorer/index'
 import { clickDropdown, render } from 'tests/helpers'
 import { logDataFixture } from '../../fixtures'
 
