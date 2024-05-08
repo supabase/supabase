@@ -10,6 +10,7 @@ import {
   TooltipContent_Shadcn_,
   TooltipTrigger_Shadcn_,
   Tooltip_Shadcn_,
+  cn,
 } from 'ui'
 import { LogsEndpointParams } from '../Settings/Logs'
 import type { BaseReportParams, ReportQueryType } from './Reports.types'
@@ -38,13 +39,14 @@ export interface ReportWidgetRendererProps<T = any> extends ReportWidgetProps<T>
 
 const ReportWidget = (props: ReportWidgetProps) => {
   const router = useRouter()
-  const { ref: projectRef } = useParams()
+  const { ref } = useParams()
+  const projectRef = ref as string
 
   return (
     <Panel
       noMargin
       noHideOverflow
-      className={'pb-0 ' + props.className}
+      className={cn('pb-0', props.className)}
       bodyClassName="h-full"
       wrapWithLoading={false}
     >
@@ -69,7 +71,7 @@ const ReportWidget = (props: ReportWidgetProps) => {
               <TooltipTrigger_Shadcn_ asChild>
                 <Button
                   type="default"
-                  icon={<ExternalLink strokeWidth={1.5} />}
+                  icon={<ExternalLink />}
                   className="px-1"
                   onClick={() => {
                     const isDbQueryType = props.queryType === 'db'

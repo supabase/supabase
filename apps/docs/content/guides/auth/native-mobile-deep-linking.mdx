@@ -1,17 +1,17 @@
 ---
 title: 'Native Mobile Deep Linking'
-description: 'Learn how to handle deep linking for OAuth and email based login.'
+subtitle: 'Set up Deep Linking for mobile applications.'
 tocVideo: '8TZ6O1C8ujE'
 ---
 
-In certain auth scenarios you will need to handle linking back into your application to finish the user's sign in.
+Many Auth methods involve a redirect to your app. For example:
 
-### When do you need to setup deep links
+- Signup confirmation emails, Magic Link signins, and password reset emails contain a link that redirects to your app.
+- In OAuth signins, an automatic redirect occurs to your app.
 
-- Magic link login.
-- Have `confirm email` enabled and are using email login.
-- Resetting password for email login.
-- Calling `.signInWithOAuth()` method.
+With Deep Linking, you can configure this redirect to open a specific page. This is necessary if, for example, you need to display a form for password reset, or to manually exchange a token hash.
+
+## Setting up Deep Linking
 
 <Tabs
   scrollable

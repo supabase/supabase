@@ -471,19 +471,19 @@ export const SocialLoginItems = [
 
 export const PhoneLoginsItems = [
   {
-    name: 'MessageBird SMS Login',
+    name: 'MessageBird',
     icon: '/docs/img/icons/messagebird-icon',
     linkDescription: 'Communication between businesses and their customers — across any channel.',
     url: '/guides/auth/phone-login/messagebird',
   },
   {
-    name: 'Twilio SMS Login',
+    name: 'Twilio',
     icon: '/docs/img/icons/twilio-icon',
     url: '/guides/auth/phone-login/twilio',
     linkDescription: 'Customer engagement platform used by hundreds of thousands of businesses.',
   },
   {
-    name: 'Vonage SMS Login',
+    name: 'Vonage',
     icon: '/docs/img/icons/vonage-icon',
     url: '/guides/auth/phone-login/vonage',
     linkDescription:
@@ -492,7 +492,7 @@ export const PhoneLoginsItems = [
     hasLightIcon: true,
   },
   {
-    name: 'Textlocal SMS Login (Community Supported)',
+    name: 'Textlocal (Community Supported)',
     icon: '/docs/img/icons/textlocal-icon',
     url: '/guides/auth/phone-login/textlocal',
     linkDescription: 'Textlocal is a cloud-based SMS platform offering bulk messaging services.',
@@ -508,83 +508,71 @@ export const auth = {
       url: '/guides/auth',
     },
     {
-      name: 'Redirect URLs',
-      url: '/guides/auth/concepts/redirect-urls',
+      name: 'Architecture',
+      url: '/guides/auth/architecture',
     },
     {
-      name: 'Quickstarts',
+      name: 'Getting Started',
       items: [
-        { name: 'Next.js', url: '/guides/auth/quickstarts/nextjs', items: [] },
+        {
+          name: 'Next.js',
+          url: '/guides/auth/quickstarts/nextjs',
+        },
         { name: 'React', url: '/guides/auth/quickstarts/react', items: [] },
         {
           name: 'React Native',
           url: '/guides/auth/quickstarts/react-native',
-          items: [],
         },
       ],
     },
     {
-      name: 'Authentication',
-      url: undefined,
+      name: 'Concepts',
       items: [
-        { name: 'Anonymous Sign-Ins', url: '/guides/auth/auth-anonymous' },
-        { name: 'Email Login', url: '/guides/auth/auth-email' },
+        { name: 'Users', url: '/guides/auth/users' },
+        { name: 'Identities', url: '/guides/auth/identities' },
         {
-          name: 'Passwordless Login',
-          url: '/guides/auth/passwordless-login',
+          name: 'Sessions',
+          url: '/guides/auth/sessions',
           items: [
-            {
-              name: 'Email Magic Link',
-              url: '/guides/auth/passwordless-login/auth-magic-link',
-            },
-            {
-              name: 'Email OTP',
-              url: '/guides/auth/passwordless-login/auth-email-otp',
-            },
-            { name: 'Phone OTP', url: '/guides/auth/phone-login' },
+            { name: 'Implicit flow', url: '/guides/auth/sessions/implicit-flow' },
+            { name: 'PKCE flow', url: '/guides/auth/sessions/pkce-flow' },
           ],
         },
+      ],
+    },
+    {
+      name: 'Flows (How-tos)',
+      items: [
+        {
+          name: 'Server-Side Rendering',
+          url: '/guides/auth/server-side',
+          items: [
+            { name: 'Next.js guide', url: '/guides/auth/server-side/nextjs' },
+            {
+              name: 'SvelteKit guide',
+              url: '/guides/auth/server-side/sveltekit',
+            },
+            { name: 'Creating a client', url: '/guides/auth/server-side/creating-a-client' },
+            {
+              name: 'Migrating from Auth Helpers',
+              url: '/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
+            },
+            {
+              name: 'Advanced guide',
+              url: '/guides/auth/server-side/advanced-guide',
+            },
+          ],
+        },
+        { name: 'Password-based', url: '/guides/auth/passwords' },
+        { name: 'Email (Magic Link or OTP)', url: '/guides/auth/auth-email-passwordless' },
         {
           name: 'Phone Login',
           url: '/guides/auth/phone-login',
-          items: [...PhoneLoginsItems],
         },
         {
           name: 'Social Login (OAuth)',
           url: '/guides/auth/social-login',
-          items: [
-            {
-              name: 'Native Mobile OAuth',
-              url: '/guides/auth/native-mobile-deep-linking',
-            },
-            ...SocialLoginItems,
-          ],
-        },
-        {
-          name: 'Native Mobile Login',
-          url: '/guides/auth/native-mobile-login',
-          items: [
-            ...NativeMobileLoginItems,
-            {
-              name: 'OAuth Deep Linking',
-              url: '/guides/auth/native-mobile-deep-linking',
-            },
-          ],
-        },
-        {
-          name: 'User Sessions',
-          url: '/guides/auth/sessions',
-        },
-        { name: 'Passwords', url: '/guides/auth/passwords' },
-        {
-          name: 'User Management',
-          url: '/guides/auth/auth-user-management',
-          items: [
-            {
-              name: 'Identity Linking',
-              url: '/guides/auth/auth-identity-linking',
-            },
-          ],
+          items: [...SocialLoginItems],
         },
         {
           name: 'Enterprise SSO',
@@ -596,57 +584,51 @@ export const auth = {
             },
           ],
         },
-        { name: 'Email Templates', url: '/guides/auth/auth-email-templates' },
-        { name: 'Auth Hooks', url: '/guides/auth/auth-hooks' },
+        { name: 'Anonymous Sign-Ins', url: '/guides/auth/auth-anonymous' },
+        { name: 'Mobile Deep Linking', url: '/guides/auth/native-mobile-deep-linking' },
+        {
+          name: 'Identity Linking',
+          url: '/guides/auth/auth-identity-linking',
+        },
+        { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
+        {
+          name: 'Signout',
+          url: '/guides/auth/signout',
+        },
       ],
     },
     {
-      name: 'Authorization',
-      url: undefined,
+      name: 'Configuration',
       items: [
-        { name: 'Enable Captcha Protection', url: '/guides/auth/auth-captcha' },
-        { name: 'Configuring Custom SMTP', url: '/guides/auth/auth-smtp' },
-        { name: 'Managing User Data', url: '/guides/auth/managing-user-data' },
-        { name: 'Multi-Factor Authentication', url: '/guides/auth/auth-mfa' },
-        { name: 'Row Level Security', url: '/guides/auth/row-level-security' },
+        {
+          name: 'General Configuration',
+          url: '/guides/auth/general-configuration',
+        },
+        { name: 'Email Templates', url: '/guides/auth/auth-email-templates' },
+        {
+          name: 'Redirect URLs',
+          url: '/guides/auth/redirect-urls',
+        },
+        { name: 'Auth Hooks', url: '/guides/auth/auth-hooks' },
+        { name: 'Custom SMTP', url: '/guides/auth/auth-smtp' },
+        { name: 'User Management', url: '/guides/auth/managing-user-data' },
+      ],
+    },
+    {
+      name: 'Security',
+      items: [
+        { name: 'Password Security', url: '/guides/auth/password-security' },
+        { name: 'Rate Limits', url: '/guides/auth/rate-limits' },
+        { name: 'Bot Detection (CAPTCHA)', url: '/guides/auth/auth-captcha' },
+        { name: 'JWTs', url: '/guides/auth/jwts' },
+        { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
+        {
+          name: 'Column Level Security',
+          url: '/guides/database/postgres/column-level-security',
+        },
         {
           name: 'Custom Claims & RBAC',
-          url: '/guides/auth/custom-claims-and-role-based-access-control-rbac',
-        },
-      ],
-    },
-    {
-      name: 'Server-side Auth',
-      url: undefined,
-      items: [
-        { name: 'Overview', url: '/guides/auth/server-side/overview' },
-        {
-          name: 'Next.js guide',
-          url: '/guides/auth/server-side/nextjs',
-        },
-        {
-          name: 'SvelteKit guide',
-          url: '/guides/auth/server-side/sveltekit',
-        },
-        {
-          name: 'Creating a client',
-          url: '/guides/auth/server-side/creating-a-client',
-        },
-        {
-          name: 'Email Auth with PKCE flow',
-          url: '/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr',
-        },
-        {
-          name: 'OAuth with PKCE flow',
-          url: '/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
-        },
-        {
-          name: 'Server-side Rendering',
-          url: '/guides/auth/server-side-rendering',
-        },
-        {
-          name: 'Migrating from Auth Helpers',
-          url: '/guides/auth/server-side/migrating-to-ssr-from-auth-helpers',
+          url: '/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
         },
       ],
     },
@@ -658,29 +640,6 @@ export const auth = {
         {
           name: 'Flutter Auth UI',
           url: '/guides/auth/auth-helpers/flutter-auth-ui',
-        },
-      ],
-    },
-    {
-      name: 'Deep Dive',
-      url: undefined,
-      items: [
-        {
-          name: 'Part One: JWTs',
-          url: '/guides/auth/auth-deep-dive/auth-deep-dive-jwts',
-        },
-        {
-          name: 'Part Two: Row Level Security',
-          url: '/guides/auth/auth-deep-dive/auth-row-level-security',
-        },
-        {
-          name: 'Part Three: Policies',
-          url: '/guides/auth/auth-deep-dive/auth-policies',
-        },
-        { name: 'Part Four: GoTrue', url: '/guides/auth/auth-deep-dive/auth-gotrue' },
-        {
-          name: 'Part Five: Google OAuth',
-          url: '/guides/auth/auth-deep-dive/auth-google-oauth',
         },
       ],
     },
@@ -769,6 +728,14 @@ export const database: NavMenuConstant = {
         {
           name: 'Row Level Security',
           url: '/guides/database/postgres/row-level-security',
+        },
+        {
+          name: 'Column Level Security',
+          url: '/guides/database/postgres/column-level-security',
+        },
+        {
+          name: 'Custom Claims & RBAC',
+          url: '/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
         },
         {
           name: 'Managing Postgres Roles',

@@ -84,6 +84,9 @@ const LogTable = ({
     if (!firstRow) return {}
 
     const { timestamp, ...rest } = firstRow || {}
+
+    if (!timestamp) return firstRow
+
     return { timestamp, ...rest }
   }
 
