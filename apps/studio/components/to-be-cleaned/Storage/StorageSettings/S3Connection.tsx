@@ -376,17 +376,21 @@ function StorageCredItem({
         <div className="flex items-center justify-between">
           <span className="text-ellipsis font-mono cursor-default">{access_key}</span>
           <span className="w-24 text-right opacity-0 group-hover:opacity-100 transition-opacity">
-            <CopyButton text={access_key} type="outline" />
+            <CopyButton text={access_key} type="default" />
           </span>
         </div>
       </td>
       <td>{daysSince(created_at)}</td>
-      <td>
+      <td className="text-right">
         <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center justify-end w-full">
-            <MoreVertical />
+          <DropdownMenuTrigger asChild>
+            <Button
+              icon={<MoreVertical size={14} strokeWidth={1} />}
+              type="text"
+              className="px-0 text-foreground-muted hover:text-foreground"
+            ></Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent className="max-w-40">
+          <DropdownMenuContent className="max-w-40" align="end">
             <DropdownMenuItem
               className="flex gap-1.5 "
               onClick={(e) => {
@@ -395,7 +399,7 @@ function StorageCredItem({
               }}
             >
               <TrashIcon size="14" />
-              Revoke keys
+              Revoke key
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
