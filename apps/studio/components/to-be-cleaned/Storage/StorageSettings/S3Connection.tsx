@@ -389,7 +389,7 @@ function StorageCredItem({
             <Button
               icon={<MoreVertical size={14} strokeWidth={1} />}
               type="text"
-              className="px-0 text-foreground-muted hover:text-foreground"
+              className="px-0 text-foreground-lighter hover:text-foreground"
             ></Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="max-w-40" align="end">
