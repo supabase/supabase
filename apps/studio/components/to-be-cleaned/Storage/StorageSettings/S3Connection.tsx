@@ -371,7 +371,9 @@ function StorageCredItem({
 
   return (
     <tr className="h-8 text-ellipsis group">
-      <td>{description}</td>
+      <td>
+        <span className="text-foreground">{description}</span>
+      </td>
       <td>
         <div className="flex items-center justify-between">
           <span className="text-ellipsis font-mono cursor-default">{access_key}</span>
