@@ -308,12 +308,15 @@ export const S3Connection = () => {
       </div>
 
       <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
-        <DialogContent className="p-4">
-          <DialogTitle>Revoke S3 access keys</DialogTitle>
-          <DialogDescription>
-            This action is irreversible and requests made with these access keys will stop working.
-          </DialogDescription>
-          <div className="flex justify-end gap-2">
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Revoke S3 access keys</DialogTitle>
+            <DialogDescription>
+              This action is irreversible and requests made with these access keys will stop
+              working.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex justify-end gap-1">
             <Button
               type="outline"
               onClick={() => {
@@ -335,7 +338,7 @@ export const S3Connection = () => {
             >
               Yes, revoke access keys
             </Button>
-          </div>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
