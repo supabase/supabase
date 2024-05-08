@@ -106,6 +106,7 @@ export const WarehouseCollectionDetail = () => {
               params={params}
               error={isError ? 'Error loading data' : undefined}
               maxHeight="calc(100vh - 139px)"
+              hideHeader={true}
             />
           </div>
         </LoadingOpacity>

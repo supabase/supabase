@@ -52,9 +52,9 @@ interface Props {
   onRun?: () => void
   onSave?: () => void
   hasEditorValue?: boolean
-  hideHeader?: boolean
   maxHeight?: string
   className?: string
+  hideHeader?: boolean
 }
 type LogMap = { [id: string]: LogData }
 
@@ -75,9 +75,9 @@ const LogTable = ({
   onRun,
   onSave,
   hasEditorValue,
-  hideHeader = false,
   maxHeight,
   className,
+  hideHeader = false,
 }: Props) => {
   const [focusedLog, setFocusedLog] = useState<LogData | null>(null)
   const firstRow: LogData | undefined = data?.[0] as LogData
@@ -179,10 +179,6 @@ const LogTable = ({
       setFocusedLog(null)
     }
   }, [stringData])
-
-  if (!queryType) {
-    hideHeader = true
-  }
 
   // [Joshen] Hmm quite hacky now, but will do
   const _maxHeight =
