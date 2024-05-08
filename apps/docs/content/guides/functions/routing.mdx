@@ -67,12 +67,12 @@ import { Router } from "jsr:@oak/oak@15/router";
 const router = new Router();
 
 router.get("/hello-world", (ctx) => {
-return new Response("Hello World!", {status: 200});
+  return new Response("Hello World!", {status: 200});
 });
 
 router.post("/hello-world", async (ctx) => {
-const { name } = await ctx.request.body.json();
-ctx.response.body = `Hello ${name}!`;
+  const { name } = await ctx.request.body.json();
+  ctx.response.body = `Hello ${name}!`;
 });
 
 const app = new Application();
@@ -93,12 +93,12 @@ import type { Context } from 'https://deno.land/x/hono/mod.ts';
 const app = new Hono();
 
 app.post('/hello-world', async (c: Context) => {
-const { name } = await c.req.json();
-return new Response(`Hello ${name}!`)
+  const { name } = await c.req.json();
+  return new Response(`Hello ${name}!`)
 });
 
 app.get('/hello-world', (c: Context) => {
-return new Response('Hello World!')
+  return new Response('Hello World!')
 });
 
 Deno.serve(app.fetch);
