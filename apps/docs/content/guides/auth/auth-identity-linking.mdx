@@ -5,23 +5,6 @@ description: 'Manage the identities associated with your user'
 subtitle: 'Manage the identities associated with your user'
 ---
 
-## The user identity
-
-The user identity represents an authentication method associated to the user. For example, if a user signs in using their email, an email identity will be associated with the user.
-
-The user identity object contains the following attributes:
-
-| Attributes      | Type     | Description                                                                                                                                                                                                                              |
-| --------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| id              | `string` | The provider id returned by the provider. If the provider is an OAuth provider, the id refers to the user's account with the OAuth provider. If the provider is `email` or `phone`, the id is the user's id from the `auth.users` table. |
-| user_id         | `string` | The user's id that the identity is linked to.                                                                                                                                                                                            |
-| identity_data   | `object` | The identity metadata.                                                                                                                                                                                                                   |
-| identity_id     | `string` | The unique id of the identity.                                                                                                                                                                                                           |
-| provider        | `string` | The provider name.                                                                                                                                                                                                                       |
-| created_at      | `string` | The timestamp that the identity was created.                                                                                                                                                                                             |
-| last_sign_in_at | `string` | The timestamp that the identity was last used to sign in.                                                                                                                                                                                |
-| updated_at      | `string` | The timestamp that the identity was last updated.                                                                                                                                                                                        |
-
 ## Identity linking strategies
 
 Currently, Supabase Auth supports 2 strategies to link an identity to a user:
