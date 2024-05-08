@@ -2,10 +2,16 @@ import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
 import type { ResponseError } from 'types'
 import { databaseExtensionsKeys } from './keys'
+import { components } from 'api-types'
 
 export type DatabaseExtensionsVariables = {
   projectRef?: string
   connectionString?: string
+}
+
+export type Extension = components['schemas']['PostgresExtension']
+export interface DatabaseExtension extends Extension {
+  altName?: string
 }
 
 export async function getDatabaseExtensions(
@@ -31,7 +37,7 @@ export async function getDatabaseExtensions(
   })
 
   if (error) throw error
-  return data
+  return data as DatabaseExtension[]
 }
 
 export type DatabaseExtensionsData = Awaited<ReturnType<typeof getDatabaseExtensions>>
