@@ -1,50 +1,41 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
 import { CreateReportModal } from 'components/interfaces/Reports/Reports.CreateReportModal'
 import { ReportsLayout } from 'components/layouts'
 import ProductEmptyState from 'components/to-be-cleaned/ProductEmptyState'
 import { Loading } from 'components/ui/Loading'
+import { useContentQuery } from 'data/content/content-query'
 import { useCheckPermissions } from 'hooks'
 import { useProfile } from 'lib/profile'
-import { useProjectContentStore } from 'stores/projectContentStore'
 import type { NextPageWithLayout } from 'types'
 
 export const UserReportPage: NextPageWithLayout = () => {
-  const [loading, setLoading] = useState(true)
-
   const router = useRouter()
   const { ref } = useParams()
 
   const { profile } = useProfile()
   const [showCreateReportModal, setShowCreateReportModal] = useState(false)
 
-  const contentStore = useProjectContentStore(ref)
+  const { isLoading } = useContentQuery(ref, {
+    onSuccess: (data) => {
+      const reports = data.content
+        .filter((x) => x.type === 'report')
+        .sort((a, b) => a.name.localeCompare(b.name))
+      if (reports.length > 1) router.push(`/project/${ref}/reports/${reports[0].id}`)
+    },
+  })
+
   const canCreateReport = useCheckPermissions(PermissionAction.CREATE, 'user_content', {
     resource: { type: 'report', owner_id: profile?.id },
     subject: { id: profile?.id },
   })
 
-  async function loadReports() {
-    await contentStore.load()
-    const reports = contentStore.reports()
-
-    if (reports.length >= 1) {
-      router.push(`/project/${ref}/reports/${reports[0].id}`)
-    } else {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    loadReports()
-  }, [ref])
-
   return (
     <div className="mx-auto my-32 w-full max-w-7xl flex-grow space-y-16">
-      {loading ? (
+      {isLoading ? (
         <Loading />
       ) : (
         <>
@@ -67,12 +58,8 @@ export const UserReportPage: NextPageWithLayout = () => {
           </ProductEmptyState>
           <CreateReportModal
             visible={showCreateReportModal}
-            onCancel={() => {
-              setShowCreateReportModal(false)
-            }}
-            afterSubmit={() => {
-              setShowCreateReportModal(false)
-            }}
+            onCancel={() => setShowCreateReportModal(false)}
+            afterSubmit={() => setShowCreateReportModal(false)}
           />
         </>
       )}
