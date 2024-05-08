@@ -57,15 +57,34 @@ export async function getNotifications(options: NotificationVariables, signal?: 
 
   const data = [
     {
+      id: '8cc59e3b-f3ee-466b-a1e6-963074dc26f6',
+      inserted_at: '2024-04-25T11:56:45.051518+00:00',
       status: 'seen',
       priority: 'Warning',
+      name: 'success.rls-misconfig-enterprise-team.20240425',
       data: {
         title: 'Security Recommendation',
         actions: [{ url: '/project/[ref]/database/security-advisor', label: 'Security Advisor' }],
         message:
           'The way you have configured your database is open to the public, please check the notifications in the Security Advisor page.',
+        project_ref: 'pnlhfnllpxpapxrdkihw',
+      },
+      meta: null,
+    },
+    {
+      id: '8ce59e3b-f3ee-466b-a1e6-963074dc26f6',
+      inserted_at: '2024-04-25T11:56:45.051518+00:00',
+      status: 'seen',
+      priority: 'Warning',
+      name: 'success.rls-misconfig-enterprise-team.20240425',
+      data: {
+        title: 'Security Recommendation 2',
+        actions: [{ url: '/project/[ref]/database/security-advisor', label: 'Security Advisor' }],
+        message:
+          'The way you have configured your database is open to the public, please check the notifications in the Security Advisor page.',
         project_ref: 'yxrbshyrkjhbbglmsqyj',
       },
+      meta: null,
     },
 
     // {
