@@ -2,9 +2,9 @@ import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
 import { executeSql } from '../sql/execute-sql-query'
 import { lintKeys } from './keys'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 
 export const LINT_SQL = /* SQL */ `set local search_path = '';
-
 (
 with foreign_keys as (
     select
@@ -817,17 +817,20 @@ export type Lint = {
 export type ProjectLintsVariables = {
   projectRef?: string
   connectionString?: string
+  exposedSchemas?: string
 }
 
 const getProjectLints = async (
-  { projectRef, connectionString }: ProjectLintsVariables,
+  { projectRef, connectionString, exposedSchemas }: ProjectLintsVariables,
   signal?: AbortSignal
 ) => {
+  const exposedSchemasPrepend = `set local pgrst.db_schemas='${exposedSchemas}';`
+
   const { result } = await executeSql(
     {
       projectRef,
       connectionString,
-      sql: LINT_SQL,
+      sql: exposedSchemasPrepend?.concat(LINT_SQL),
       queryKey: lintKeys.lint(projectRef),
     },
     signal
@@ -840,14 +843,20 @@ export type ProjectLintsData = Lint[]
 export type ProjectLintsError = unknown
 
 export const useProjectLintsQuery = <TData = ProjectLintsData>(
-  { projectRef, connectionString }: ProjectLintsVariables,
-  { enabled, ...options }: UseQueryOptions<ProjectLintsData, ProjectLintsError, TData> = {}
-) =>
-  useQuery<ProjectLintsData, ProjectLintsError, TData>(
+  { projectRef, connectionString }: Omit<ProjectLintsVariables, 'exposedSchemas'>,
+  { enabled = true, ...options }: UseQueryOptions<ProjectLintsData, ProjectLintsError, TData> = {}
+) => {
+  const { data, isSuccess } = useProjectPostgrestConfigQuery({ projectRef })
+
+  const exposedSchemas = data?.db_schema
+
+  return useQuery<ProjectLintsData, ProjectLintsError, TData>(
     lintKeys.lint(projectRef),
-    ({ signal }) => getProjectLints({ projectRef, connectionString }, signal),
+    ({ signal }) =>
+      getProjectLints({ projectRef, connectionString, exposedSchemas: exposedSchemas! }, signal),
     {
-      enabled: enabled && typeof projectRef !== 'undefined',
+      enabled: enabled && isSuccess && typeof projectRef !== 'undefined',
       ...options,
     }
   )
+}
