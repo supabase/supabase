@@ -91,8 +91,10 @@ const GuidesTableOfContents = ({
       const newHeadings = headings
         .filter((heading) => heading.id)
         .map((heading) => {
-          const text = heading.textContent?.replace('#', '')
+          const text = heading.textContent.replace('#', '')
           const link = heading.querySelector('a')?.getAttribute('href')
+          if (!link) return null
+
           const level = heading.tagName === 'H2' ? 2 : 3
 
           return { text, link, level } as Partial<TOCHeader>

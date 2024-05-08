@@ -7,17 +7,21 @@ import { Button } from 'ui'
 import { Admonition } from 'ui'
 import { AppleSecretGenerator } from '~/components/AppleSecretGenerator'
 import AuthProviders from '~/components/AuthProviders'
+import { AuthSmsProviderConfig } from '~/components/AuthSmsProviderConfig'
+import { CostWarning } from '~/components/AuthSmsProviderConfig/AuthSmsProviderConfig.Warnings'
 import ButtonCard from '~/components/ButtonCard'
 import { Heading } from '~/components/CustomHTMLElements'
 import { Extensions } from '~/components/Extensions'
 import { JwtGenerator } from '~/components/JwtGenerator'
 import {
+  AuthRateLimits,
   DatabaseSetup,
   GetSessionWarning,
   HuggingFaceDeployment,
   KotlinProjectSetup,
   MigrationWarnings,
   ProjectSetup,
+  OAuthPkceFlow,
   QuickstartIntro,
   SocialProviderSettingsSupabase,
   SocialProviderSetup,
@@ -36,11 +40,14 @@ const components = {
   Accordion,
   AccordionItem,
   Admonition,
+  AuthRateLimits,
+  AuthSmsProviderConfig,
   AppleSecretGenerator,
   AuthProviders,
   Button,
   ButtonCard,
   CH,
+  CostWarning,
   DatabaseSetup,
   Extensions,
   GetSessionWarning,
@@ -56,6 +63,7 @@ const components = {
   Mermaid,
   MigrationWarnings,
   NavData,
+  OAuthPkceFlow,
   ProjectConfigVariables,
   ProjectSetup,
   QuickstartIntro,
