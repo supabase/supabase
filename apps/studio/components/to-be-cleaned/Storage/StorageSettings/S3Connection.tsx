@@ -1,7 +1,9 @@
 import { differenceInDays } from 'date-fns'
 import React from 'react'
 import toast from 'react-hot-toast'
-
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import {
   useIsProjectActive,
@@ -28,6 +30,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  Form_Shadcn_,
   IconMoreVertical,
   cn,
 } from 'ui'
@@ -43,6 +46,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@ui/components/shadcn/ui/tooltip'
+import { FormField, FormMessage } from '@ui/components/shadcn/ui/form'
 
 export const S3Connection = () => {
   const [openCreateCred, setOpenCreateCred] = React.useState(false)
@@ -82,6 +86,24 @@ export const S3Connection = () => {
   }
 
   const s3connectionUrl = getConnectionURL()
+
+  const FormSchema = z.object({
+    description: z.string().min(3, {
+      message: 'Description must be at least 3 characters long',
+    }),
+  })
+
+  const form = useForm<z.infer<typeof FormSchema>>({
+    resolver: zodResolver(FormSchema),
+    defaultValues: {
+      description: '',
+    },
+  })
+
+  async function onSubmit(data: z.infer<typeof FormSchema>) {
+    await createS3AccessKey.mutateAsync(data)
+    setShowSuccess(true)
+  }
 
   return (
     <>
@@ -201,37 +223,33 @@ export const S3Connection = () => {
                         and bypass any existing RLS policies.
                       </DialogDescription>
                     </div>
-                    <form
-                      onSubmit={async (e) => {
-                        e.preventDefault()
-
-                        const formData = new FormData(e.target as HTMLFormElement)
-                        const description = formData.get('description') as string
-
-                        await createS3AccessKey.mutateAsync({ description })
-                        setShowSuccess(true)
-                      }}
-                    >
-                      <FormItemLayout label="Description" isReactForm={false}>
-                        <Input
-                          autoComplete="off"
-                          placeholder="My test key"
-                          type="text"
+                    <Form_Shadcn_ {...form}>
+                      <form onSubmit={form.handleSubmit(onSubmit)}>
+                        <FormField
                           name="description"
-                          required
+                          render={({ field }) => (
+                            <FormItemLayout label="Description">
+                              <Input
+                                autoComplete="off"
+                                placeholder="My test key"
+                                type="text"
+                                {...form.register('description')}
+                              />
+                            </FormItemLayout>
+                          )}
                         />
-                      </FormItemLayout>
 
-                      <div className="flex justify-end">
-                        <Button
-                          className="mt-4"
-                          htmlType="submit"
-                          loading={createS3AccessKey.isLoading}
-                        >
-                          Create access key
-                        </Button>
-                      </div>
-                    </form>
+                        <div className="flex justify-end">
+                          <Button
+                            className="mt-4"
+                            htmlType="submit"
+                            loading={createS3AccessKey.isLoading}
+                          >
+                            Create access key
+                          </Button>
+                        </div>
+                      </form>
+                    </Form_Shadcn_>
                   </>
                 )}
               </DialogContent>
