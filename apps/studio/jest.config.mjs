@@ -14,6 +14,8 @@ const config = {
     '^@ui/(.*)$': '<rootDir>/../../packages/ui/src/$1',
     '\\.(css|less|sass|scss)$': '<rootDir>/__mocks__/styleMock.js',
     'react-markdown': '<rootDir>/__mocks__/react-markdown.js',
+    'sse.js': '<rootDir>/__mocks__/sse.js',
+    'react-dnd': '<rootDir>/__mocks__/react-dnd.js',
   },
   testEnvironment: 'jsdom',
   testTimeout: 10000,

@@ -12,6 +12,11 @@ import { logDataFixture } from '../../fixtures'
 
 jest.mock('common')
 
+// [Joshen] Am temporarily commenting out the breaking tests due to:
+// "TypeError: _fetch.get.mockReset is not a function" error from Jest
+// just so we get our jest unit/UI tests up and running first
+// Need to figure out how to mock the "get" method from lib/common/fetch properly
+
 const defaultRouterMock = () => {
   const router = jest.fn()
   router.query = { ref: '123' }

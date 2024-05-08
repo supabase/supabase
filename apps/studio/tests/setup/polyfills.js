@@ -9,4 +9,5 @@ Object.defineProperties(globalThis, {
       escape: (v) => v,
     },
   },
+  TransformStream: { value: null },
 })
