@@ -54,7 +54,7 @@ You can use any HTTP endpoint as a Hook, including an endpoint on your applicati
 </TabPanel>
 </Tabs>
 
-## Hook Security Model
+### Hook Security Model
 
 <Tabs
   scrollable
@@ -200,9 +200,141 @@ Note that all responses, including errors responses, need a `Content-Type` of `a
 
 Outside of runtime errors, both HTTP Hooks and Postgres Hooks return timeout errors. Postgres Hooks have **two** seconds to complete processing while HTTP Hooks should complete in **five** seconds. As both HTTP Hooks and Postgres Hooks are run in a transaction do limit the duration of execution to avoid delays in authentication process.
 
-### Connect a hook
+## Developing A Hook
 
-In the dashboard, navigate to [`Authentication > Hooks (Beta)`](/dashboard/project/_/auth/hooks) and select the appropriate PostgreSQL function from the dropdown menu.
+Next we’ll walk through how to develop a Hook locally and then deploy it to the cloud. As a recap, here’s a list of available Hooks
+
+| Hook                          | Name                          | When it is called                                  | What it Does                                                                                              |
+| ----------------------------- | ----------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| Send SMS                      | send_sms                      | Each Time an SMS is sent                           | Allows you to customize message content and SMS Provider                                                  |
+| Send Email                    | send_email                    | Each Time an Email is sent                         | Allows you to customize message content and Email Provider                                                |
+| Custom Access Token           | custom_access_token           | Each time a new JWT is created                     | Returns the claims you wish to be present in the JWT.                                                     |
+| MFA Verification Attempt      | mfa_verification_attempt      | Each time a user tries to verify an MFA factor.    | Returns a decision on whether to reject the attempt and future ones, or to allow the user to keep trying. |
+| Password Verification Attempt | password_verification_attempt | Each time a user tries to sign in with a password. | Return a decision whether to allow the user to reject the attempt, or to allow the user to keep trying.   |
+
+Edit config.toml to connect an Auth Hook to the local Auth setup
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  queryGroup="language"
+>
+<TabPanel id="postgres-connect-hook-locally" label="SQL">
+Modify the `auth.hook.<hook_name>` field and set `uri` to a value of `pg-functions://postgres/<schema>/<function_name>`
+
+```
+[auth.hook.<hook_name>]
+enabled = true
+uri = "pg-functions://...."
+
+```
+
+You need to assign additional permissions so that Supabase Auth can access the hook as well as the tables it interacts with.
+
+The `supabase_auth_admin` role does not have permissions to the `public` schema. You need to grant the role permission to execute your hook function:
+
+```sql
+grant execute
+  on function public.custom_access_token_hook
+  to supabase_auth_admin;
+
+```
+
+You also need to grant usage to `supabase_auth_admin`:
+
+```sql
+grant usage on schema public to supabase_auth_admin;
+
+```
+
+Also revoke permissions from the `authenticated` and `anon` roles to ensure the function is not accessible by Supabase Serverless APIs.
+
+```sql
+revoke execute
+  on function public.custom_access_token_hook
+  from authenticated, anon;
+
+```
+
+For security, we recommend against the use the `security definer` tag. The `security definer` tag specifies that the function is to be executed with the privileges of the user that owns it. When a function is created via the Supabase dashboard with the tag, it will have the extensive permissions of the `postgres` role which make it easier for undesirable actions to occur.
+
+We recommend that you do not use any tag and explicitly grant permissions to `supabase_auth_admin` as described above.
+
+Read more about `security definer` tag [in our database guide](https://www.notion.so/docs/guides/database/functions#security-definer-vs-invoker).
+
+There are no restrictions as to what language can be used to write a Postgres Hook. If [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html) is too difficult consider using the [plv8](https://www.notion.so/docs/guides/database/extensions/plv8) extension which lets you use JavaScript to define functions.
+
+Once done, save your Auth Hook as a migration in order to version the Auth Hook and share it with other team members. Run [`supabase migration new`](https://supabase.com/docs/reference/cli/supabase-migration-new) to create a migration.
+
+<Admonition type="caution">
+  If you're using the Supabase SQL Editor, there's an issue when using the `?` (*Does the string
+  exist as a top-level key within the JSON value?*) operator. Use a direct connection to the
+  database if you need to use it when defining a function.
+</Admonition>
+Here is an example hook signature:
+
+```sql
+create or replace function public.custom_access_token_hook(event jsonb)
+returns jsonb
+language plpgsql
+as $$
+declare
+  -- Insert variables here
+begin
+  -- Insert logic here
+  return event;
+end;
+$$;
+
+```
+
+You can visit `SQL Editor > Templates` for hook templates.
+
+</TabPanel>
+<TabPanel id="https-connect-hook-locally" label="HTTP">
+Modify the `auth.hook.<hook_name>` field and set `uri` to a valid HTTP URI. We’ll be developing a `send_sms`  hook and will modify the fields accordingly.
+
+```
+[auth.hook.send_sms]
+enabled = true
+uri = "http://host.docker.internal:54321/functions/v1/sms_sender"
+secret = "env(SEND_SMS_HOOK_SECRET)"
+
+```
+
+In this case we use `host.docker.internal` which is a special DNS name used in Docker to allow a container to access the host machine's network. This allows the Auth container to reach the Functions container
+
+Fill in the Hook Secret
+
+```jsx
+SEND_EMAIL_HOOK_SECRET = 'v1,whsec_<base64_standard_secret>'
+```
+
+As a recap `v1` denotes the version of the hook while `whsec_` signifies that we’re using a symmetric secret. The secret is encoded via standard Base64 and can contain the characters `+`, `/` and `=`
+
+Start the function locally:
+
+```bash
+supabase functions serve send-sms --no-verify-jwt --env-file ./supabase/functions/.env.local
+```
+
+We disable JWT verification via the `--no-verify-jwt` as some hooks are run before a JWT is issued. Payload authenticity is instead protected via the appended security headers associated with the Standard Webhooks Standard.
+
+Note that payloads are sent uncompressed (Encoding: `identity`) in order to accurately track Content Length. In addition, there is a 20kb payload limit to guard against payload stuffing attacks.
+
+</TabPanel>
+</Tabs>
+
+### Debugging Your Hook
+
+Test the Postgres Function in isolation before enabling the hook by connecting to your database with `psql` and running `select <your_function_name>`. Where necessary, use [`RAISE` statements](https://www.postgresql.org/docs/current/plpgsql-errors-and-messages.html) to print information to the terminal.
+
+## Deploying a Hook
+
+In the dashboard, navigate to [`Authentication > Hooks (Beta)`](/dashboard/project/_/auth/hooks) and select the appropriate function type (SQL or HTTP) from the dropdown menu.
+
+## Available Hooks
 
 ## Hook: MFA verification attempt
 
@@ -787,25 +919,3 @@ revoke execute
 
 </TabPanel>
 </Tabs>
-
-## Local Development
-
-Unlike the hosted platform, the local development dashboard does not have a user interface for linking a Hook. Instead, edit `config.toml` to link an Auth Hook and run it with your local setup. Modify the `auth.hook.<hook_name>` field and set `uri` to a value of `pg-functions://postgres/<schema>/<function_name>`
-
-For instance, the `config.toml` for a Custom Access Token Hook which uses the function `public.custom_access_token_hook`:
-
-```
-...
-
-[auth.hook.custom_access_token]
-enabled = true
-uri = "pg-functions://postgres/public/custom_access_token_hook"
-
-...
-```
-
-Save your Auth Hook as a migration in order to version the Auth Hook and share it with other team members. Run [`supabase migration new`](https://supabase.com/docs/reference/cli/supabase-migration-new) to create a migration.
-
-### Debugging Your Hook
-
-Test the Postgres Function in isolation before enabling the hook by connecting to your database with `psql` and running `select <your_function_name>`. Where necessary, use [`RAISE` statements](https://www.postgresql.org/docs/current/plpgsql-errors-and-messages.html) to print information to the terminal.
