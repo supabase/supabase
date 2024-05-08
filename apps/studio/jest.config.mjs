@@ -18,6 +18,8 @@ const config = {
     '\\.(css)$': '<rootDir>/__mocks__/styleMock.js',
     '^@ui/(.*)$': '<rootDir>/../../packages/ui/src/$1',
   },
+  setupFiles: ['./jest.polyfills.js'],
+  transformIgnorePatterns: ['node_modules/(?!react-markdown/)'],
 }
 
 export default createJestConfig(config)
