@@ -1,5 +1,6 @@
 import { stripIndent } from 'common-tags'
-import { ResultBundle, someFilter } from './util'
+import { someFilter } from 'sql-to-rest'
+import { ResultBundle } from './util'
 
 export type Faq = {
   id: string

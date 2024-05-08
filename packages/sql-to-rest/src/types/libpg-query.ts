@@ -195,7 +195,7 @@ export type SelectStmt = {
     distinctClause?: any[]
     intoClause?: any[]
     whereClause?: WhereExpression
-    groupClause?: any[]
+    groupClause?: ColumnRef[]
     groupDistinct?: boolean
     havingClause?: any[]
     withClause?: any

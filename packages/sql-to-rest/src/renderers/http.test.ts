@@ -1149,4 +1149,63 @@ describe('select', () => {
     expect(method).toBe('GET')
     expect(fullPath).toBe('/orders?select=order_details->tax_amount::numeric.sum()')
   })
+
+  test('group by aggregates', async () => {
+    const sql = stripIndents`
+      select
+        sum(amount),
+        category
+      from
+        orders
+      group by
+        category
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/orders?select=amount.sum(),category')
+  })
+
+  test('group by without select target fails', async () => {
+    const sql = stripIndents`
+      select
+        sum(amount)
+      from
+        orders
+      group by
+        category
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('group by with having fails', async () => {
+    const sql = stripIndents`
+      select
+        sum(amount),
+        category
+      from
+        orders
+      group by
+        category
+          having sum(amount) > 1000
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('group by without aggregate fails', async () => {
+    const sql = stripIndents`
+      select
+        category
+      from
+        orders
+      group by
+        category
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
 })

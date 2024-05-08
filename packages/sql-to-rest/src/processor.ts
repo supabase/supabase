@@ -226,11 +226,33 @@ function processSelectStmt(stmt: SelectStmt): Select {
     throw new UnsupportedError('CTEs are not supported')
   }
 
+  if (stmt.SelectStmt.havingClause) {
+    throw new UnsupportedError('The HAVING clause is not supported')
+  }
+
   const [fromClause] = stmt.SelectStmt.fromClause
 
   const { from, alias, embeddedTargets } = processFromClause(fromClause)
 
   const targets = processTargetList(stmt.SelectStmt.targetList, alias ?? from, embeddedTargets)
+
+  const groupByColumns =
+    stmt.SelectStmt.groupClause?.map((columnRef) => renderFields(columnRef.ColumnRef.fields)) ?? []
+
+  if (
+    !groupByColumns.every((column) => someTarget(targets, (target) => target.column === column))
+  ) {
+    throw new Error(`Every group by column must also exist as a select target`)
+  }
+
+  if (
+    groupByColumns.length > 0 &&
+    !someTarget(targets, (target) => target.type === 'aggregate-target')
+  ) {
+    throw new Error(
+      `There must be at least one aggregate function in the select target list when using group by`
+    )
+  }
 
   const filter = stmt.SelectStmt.whereClause
     ? processWhereClause(stmt.SelectStmt.whereClause)
@@ -933,4 +955,57 @@ function processJsonTarget(expression: A_Expr): ColumnTarget {
     column: `${left}${operator}${right}`,
     cast,
   }
+}
+
+/**
+ * Recursively iterates through PostgREST filters and checks if the predicate
+ * matches any of them (ie. `some()`).
+ */
+export function someFilter(filter: Filter, predicate: (filter: ColumnFilter) => boolean): boolean {
+  const { type } = filter
+
+  if (type === 'column') {
+    return predicate(filter)
+  } else if (type === 'logical') {
+    return filter.values.some((f) => someFilter(f, predicate))
+  } else {
+    throw new Error(`Unknown filter type '${type}'`)
+  }
+}
+
+/**
+ * Recursively iterates through a PostgREST target list and checks if the predicate
+ * matches any of them (ie. `some()`).
+ */
+export function someTarget(
+  targets: Target[],
+  predicate: (target: ColumnTarget | AggregateTarget) => boolean
+): boolean {
+  return targets.some((target) => {
+    const { type } = target
+
+    if (type === 'column-target' || type === 'aggregate-target') {
+      return predicate(target)
+    } else if (type === 'embedded-target') {
+      return someTarget(target.targets, predicate)
+    } else {
+      throw new Error(`Unknown target type '${type}'`)
+    }
+  })
+}
+
+/**
+ * Recursively flattens PostgREST embedded targets.
+ */
+export function flattenTargets(targets: Target[]): Target[] {
+  return targets.flatMap((target) => {
+    const { type } = target
+    if (type === 'column-target' || type === 'aggregate-target') {
+      return target
+    } else if (type === 'embedded-target') {
+      return [target, ...flattenTargets(target.targets)]
+    } else {
+      throw new Error(`Unknown target type '${type}'`)
+    }
+  })
 }
