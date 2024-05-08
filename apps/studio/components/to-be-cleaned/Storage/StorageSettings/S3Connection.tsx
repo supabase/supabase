@@ -161,25 +161,26 @@ export const S3Connection = () => {
                       </DialogDescription>
                     </DialogHeader>
                     <DialogSectionSeparator />
-                    <FormItemLayout label="Access key ID" isReactForm={false}>
-                      <Input
-                        className="input-mono"
-                        readOnly
-                        copy
-                        disabled
-                        value={createS3AccessKey.data?.data?.access_key}
-                      />
-                    </FormItemLayout>
-                    <FormItemLayout label={'Secret access key'} isReactForm={false}>
-                      <Input
-                        className="input-mono"
-                        readOnly
-                        copy
-                        disabled
-                        value={createS3AccessKey.data?.data?.secret_key}
-                      />
-                    </FormItemLayout>
-                    <DialogSectionSeparator />
+                    <DialogSection className="flex flex-col gap-4">
+                      <FormItemLayout label="Access key ID" isReactForm={false}>
+                        <Input
+                          className="input-mono"
+                          readOnly
+                          copy
+                          disabled
+                          value={createS3AccessKey.data?.data?.access_key}
+                        />
+                      </FormItemLayout>
+                      <FormItemLayout label={'Secret access key'} isReactForm={false}>
+                        <Input
+                          className="input-mono"
+                          readOnly
+                          copy
+                          disabled
+                          value={createS3AccessKey.data?.data?.secret_key}
+                        />
+                      </FormItemLayout>
+                    </DialogSection>
                     <DialogFooter>
                       <Button
                         onClick={() => {
