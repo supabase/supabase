@@ -47,7 +47,9 @@ export const S3Connection = () => {
   const [openCreateCred, setOpenCreateCred] = React.useState(false)
   const [showSuccess, setShowSuccess] = React.useState(false)
   const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false)
-  const [deleteCredId, setDeleteCredId] = React.useState<string | null>(null)
+  const [deleteCred, setDeleteCred] = React.useState<{ id: string; description: string } | null>(
+    null
+  )
 
   const { ref: projectRef } = useParams()
   const { project, isLoading: projectIsLoading } = useProjectContext()
@@ -283,7 +285,7 @@ export const S3Connection = () => {
                             description={cred.description}
                             id={cred.id}
                             onDeleteClick={() => {
-                              setDeleteCredId(cred.id)
+                              setDeleteCred(cred)
                               setOpenDeleteDialog(true)
                             }}
                           />
@@ -310,7 +312,9 @@ export const S3Connection = () => {
       <Dialog open={openDeleteDialog} onOpenChange={setOpenDeleteDialog}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Revoke S3 access keys</DialogTitle>
+            <DialogTitle>
+              Revoke <code>{deleteCred?.description}</code> credential
+            </DialogTitle>
             <DialogDescription>
               This action is irreversible and requests made with these access keys will stop
               working.
@@ -321,7 +325,7 @@ export const S3Connection = () => {
               type="outline"
               onClick={() => {
                 setOpenDeleteDialog(false)
-                setDeleteCredId(null)
+                setDeleteCred(null)
               }}
             >
               Cancel
@@ -330,8 +334,8 @@ export const S3Connection = () => {
               type="danger"
               loading={deleteS3AccessKey.isLoading}
               onClick={async () => {
-                if (!deleteCredId) return
-                await deleteS3AccessKey.mutateAsync({ id: deleteCredId })
+                if (!deleteCred) return
+                await deleteS3AccessKey.mutateAsync({ id: deleteCred.id })
                 setOpenDeleteDialog(false)
                 toast.success('S3 access keys revoked')
               }}
@@ -392,7 +396,7 @@ function StorageCredItem({
             <Button
               icon={<MoreVertical size={14} strokeWidth={1} />}
               type="text"
-              className="px-0 text-foreground-lighter hover:text-foreground"
+              className="px-1.5 text-foreground-lighter hover:text-foreground"
             ></Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="max-w-40" align="end">
