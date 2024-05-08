@@ -67,12 +67,12 @@ import { Router } from "jsr:@oak/oak@15/router";
 const router = new Router();
 
 router.get("/hello-world", (ctx) => {
-  return new Response("Hello World!", {status: 200});
+return new Response("Hello World!", {status: 200});
 });
 
 router.post("/hello-world", async (ctx) => {
-  const { name } = await ctx.request.body.json();
-  ctx.response.body = `Hello ${name}!`;
+const { name } = await ctx.request.body.json();
+ctx.response.body = `Hello ${name}!`;
 });
 
 const app = new Application();
