@@ -21,7 +21,7 @@ This repo will demonstrate how to:
 
 ## Getting Started
 
-Before running this app, you need to create a Supabase project and copy [your credentials](https://supabase.io/docs/guides/with-nuxt-3#get-the-api-keys) to `.env`. Remeber to set the `.env` virables in the `nuxt.cofig` file. Check the `.env-example` file in this example repo here.
+Iniate a new project in Nuxt 3 with `npx nuxi@latest init <project-name>`.
 
 ### 4. Env vars
 
