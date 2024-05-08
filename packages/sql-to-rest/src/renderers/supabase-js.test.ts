@@ -706,7 +706,7 @@ describe('select', () => {
     expect(code).toBe(stripIndent`
       const { data, error } = await supabase
         .from('books')
-        .select('pages::pg_catalog.float8')
+        .select('pages::float')
     `)
   })
 
@@ -725,7 +725,7 @@ describe('select', () => {
       const { data, error } = await supabase
         .from('books')
         .select(
-          'partialPages:pages::pg_catalog.float8',
+          'partialPages:pages::float',
         )
     `)
   })

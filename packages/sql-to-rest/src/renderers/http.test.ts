@@ -596,7 +596,7 @@ describe('select', () => {
     const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(fullPath).toBe('/books?select=pages::pg_catalog.float8')
+    expect(fullPath).toBe('/books?select=pages::float')
   })
 
   test('cast with alias', async () => {
@@ -611,7 +611,7 @@ describe('select', () => {
     const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(fullPath).toBe('/books?select=partialPages:pages::pg_catalog.float8')
+    expect(fullPath).toBe('/books?select=partialPages:pages::pg_catalog.float')
   })
 
   test('cast in where clause fails', async () => {
@@ -1017,6 +1017,21 @@ describe('select', () => {
     expect(fullPath).toBe('/books?select=address->city->>name')
   })
 
+  test('select json column with cast', async () => {
+    const sql = stripIndents`
+      select
+        order_details->'tax_amount'::numeric
+      from
+        orders
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/orders?select=order_details->tax_amount::numeric')
+  })
+
   test('filter by json column', async () => {
     const sql = stripIndents`
       select
@@ -1032,5 +1047,106 @@ describe('select', () => {
 
     expect(method).toBe('GET')
     expect(fullPath).toBe('/books?select=address->city->>name&address->city->>code=eq.SFO')
+  })
+
+  test('aggregate', async () => {
+    const sql = stripIndents`
+      select
+        sum(amount)
+      from
+        orders
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/orders?select=amount.sum()')
+  })
+
+  test('aggregate with alias', async () => {
+    const sql = stripIndents`
+      select
+        sum(amount) as total
+      from
+        orders
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/orders?select=total:amount.sum()')
+  })
+
+  test('aggregate with input cast', async () => {
+    const sql = stripIndents`
+      select
+        sum(amount::float)
+      from
+        orders
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/orders?select=amount::float.sum()')
+  })
+
+  test('aggregate with output cast', async () => {
+    const sql = stripIndents`
+      select
+        sum(amount)::float
+      from
+        orders
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/orders?select=amount.sum()::float')
+  })
+
+  test('aggregate with input and output cast', async () => {
+    const sql = stripIndents`
+      select
+        sum(amount::int)::float
+      from
+        orders
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/orders?select=amount::int.sum()::float')
+  })
+
+  test('unsupported aggregate fails', async () => {
+    const sql = stripIndents`
+      select
+        custom_sum(amount::int)::float
+      from
+        orders
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('aggregate on a json target', async () => {
+    const sql = stripIndents`
+      select
+        sum(order_details->'tax_amount'::numeric)
+      from
+        orders
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/orders?select=order_details->tax_amount::numeric.sum()')
   })
 })

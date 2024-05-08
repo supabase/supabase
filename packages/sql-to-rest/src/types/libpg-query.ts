@@ -57,8 +57,8 @@ export type A_Expr = {
       | 'AEXPR_BETWEEN_SYM'
       | 'AEXPR_NOT_BETWEEN_SYM'
     name: PgString[]
-    lexpr: A_Const | A_Expr | ColumnRef
-    rexpr: A_Const | A_Expr | ColumnRef
+    lexpr: A_Const | A_Expr | ColumnRef | TypeCast
+    rexpr: A_Const | A_Expr | ColumnRef | TypeCast
     location: number
   }
 }
@@ -95,12 +95,21 @@ export type ColumnRef = {
 
 export type TypeCast = {
   TypeCast: {
-    arg: ColumnRef
+    arg: ColumnRef | A_Const
     typeName: {
       names: PgString[]
       typemod: number
       location: number
     }
+    location: number
+  }
+}
+
+export type FuncCall = {
+  FuncCall: {
+    funcname: PgString[]
+    args: (TypeCast | ColumnRef | FuncCall | A_Expr)[]
+    funcformat: string
     location: number
   }
 }
@@ -112,7 +121,7 @@ export type TypeCast = {
  */
 export type SelectResTarget = {
   ResTarget: {
-    val: ColumnRef | TypeCast | A_Expr
+    val: ColumnRef | TypeCast | A_Expr | FuncCall
     name?: string
     location: number
   }

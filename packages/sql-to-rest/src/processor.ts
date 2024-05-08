@@ -6,12 +6,14 @@ import {
   ColumnRef,
   Field,
   FromExpression,
+  FuncCall,
   ParsedQuery,
   PgString,
   SelectResTarget,
   SelectStmt,
   SortBy,
   Stmt,
+  TypeCast,
   WhereExpression,
 } from './types/libpg-query'
 
@@ -137,7 +139,19 @@ export type EmbeddedTarget = {
   flatten?: boolean
 }
 
-export type Target = ColumnTarget | EmbeddedTarget
+/**
+ * Represents a aggregate column target in the select.
+ */
+export type AggregateTarget = {
+  type: 'aggregate-target'
+  column: string
+  functionName: string
+  alias?: string
+  inputCast?: string
+  outputCast?: string
+}
+
+export type Target = ColumnTarget | AggregateTarget | EmbeddedTarget
 
 export type Sort = {
   column: string
@@ -209,7 +223,7 @@ function processSelectStmt(stmt: SelectStmt): Select {
   }
 
   if (stmt.SelectStmt.withClause) {
-    throw new UnsupportedError('WITH clauses are not supported')
+    throw new UnsupportedError('CTEs are not supported')
   }
 
   const [fromClause] = stmt.SelectStmt.fromClause
@@ -405,51 +419,14 @@ function processTargetList(
   from: string,
   embeddedTargets: EmbeddedTarget[]
 ): Target[] {
-  const flattenedColumnTargets: ColumnTarget[] = targetList.map((resTarget) => {
-    let columnRef: ColumnRef
-    let cast: string | undefined
+  const flattenedColumnTargets: (ColumnTarget | AggregateTarget)[] = targetList.map((resTarget) => {
+    const target = processQueryTarget(resTarget.ResTarget.val)
+    target.alias = resTarget.ResTarget.name
 
-    if ('TypeCast' in resTarget.ResTarget.val) {
-      cast = resTarget.ResTarget.val.TypeCast.typeName.names
-        .map((name) => name.String.sval)
-        .join('.')
-
-      columnRef = resTarget.ResTarget.val.TypeCast.arg
-    } else if ('ColumnRef' in resTarget.ResTarget.val) {
-      columnRef = resTarget.ResTarget.val
-    } else if ('A_Expr' in resTarget.ResTarget.val) {
-      try {
-        const column = renderJsonExpression(resTarget.ResTarget.val)
-        const alias = resTarget.ResTarget.name
-
-        return {
-          type: 'column-target',
-          column,
-          alias,
-          cast,
-        }
-      } catch (err) {
-        throw new UnsupportedError(`Expressions not supported in select target`)
-      }
-    } else {
-      throw new UnsupportedError('Only columns allowed in select targets')
-    }
-
-    const { fields } = columnRef.ColumnRef
-
-    const column = renderFields(fields)
-
-    const alias = resTarget.ResTarget.name
-
-    return {
-      type: 'column-target',
-      column,
-      alias,
-      cast,
-    }
+    return target
   })
 
-  // Transfer resource embedding columns and to `embeddedTargets`
+  // Transfer resource embedding columns to `embeddedTargets`
   const columnTargets = flattenedColumnTargets.filter((target) => {
     const qualifiedName = target.column.split('.')
 
@@ -513,6 +490,91 @@ function processTargetList(
   return [...columnTargets, ...nestedEmbeddedTargets]
 }
 
+function processQueryTarget(
+  queryTarget: TypeCast | ColumnRef | FuncCall | A_Expr
+): ColumnTarget | AggregateTarget {
+  if ('TypeCast' in queryTarget) {
+    const cast = renderDataType(queryTarget.TypeCast.typeName.names)
+
+    if ('A_Const' in queryTarget.TypeCast.arg) {
+      throw new UnsupportedError(
+        'Only columns, JSON fields, and aggregates are supported as query targets'
+      )
+    }
+
+    const nestedTarget = processQueryTarget(queryTarget.TypeCast.arg)
+
+    const { type } = nestedTarget
+
+    if (type === 'aggregate-target') {
+      return {
+        ...nestedTarget,
+        outputCast: cast,
+      }
+    } else if (type === 'column-target') {
+      return {
+        ...nestedTarget,
+        cast,
+      }
+    } else {
+      throw new UnsupportedError(`Cannot process target with type '${type}'`)
+    }
+  } else if ('ColumnRef' in queryTarget) {
+    return {
+      type: 'column-target',
+      column: renderFields(queryTarget.ColumnRef.fields),
+    }
+  } else if ('A_Expr' in queryTarget) {
+    try {
+      return processJsonTarget(queryTarget)
+    } catch (err) {
+      const maybeJsonHint =
+        err instanceof Error && err.message === 'Invalid JSON path'
+          ? ' Did you forget to quote a JSON path?'
+          : ''
+      throw new UnsupportedError(`Expressions not supported as targets.${maybeJsonHint}`)
+    }
+  } else if ('FuncCall' in queryTarget) {
+    const functionName = renderFields(queryTarget.FuncCall.funcname)
+    const supportedAggregateFunctions = ['avg', 'count', 'max', 'min', 'sum']
+
+    if (!supportedAggregateFunctions.includes(functionName)) {
+      throw new UnsupportedError(
+        `Only the following aggregate functions are supported: ${JSON.stringify(supportedAggregateFunctions)}`
+      )
+    }
+
+    if (functionName !== 'count' && queryTarget.FuncCall.args.length === 0) {
+      throw new UnsupportedError(`Aggregate function '${functionName}' requires a column argument`)
+    }
+
+    if (queryTarget.FuncCall.args.length > 1) {
+      throw new UnsupportedError(`Aggregate functions only accept one argument`)
+    }
+
+    const [arg] = queryTarget.FuncCall.args
+
+    const nestedTarget = processQueryTarget(arg)
+
+    if (nestedTarget.type === 'aggregate-target') {
+      throw new UnsupportedError(`Aggregate functions cannot contain another function`)
+    }
+
+    const { cast, ...columnTarget } = nestedTarget
+
+    return {
+      ...columnTarget,
+      type: 'aggregate-target',
+      functionName,
+      inputCast: cast,
+    }
+  } else {
+    throw new UnsupportedError(
+      'Only columns, JSON fields, and aggregates are supported as query targets'
+    )
+  }
+}
+
 function processWhereClause(expression: WhereExpression): Filter {
   if ('A_Expr' in expression) {
     if ('TypeCast' in expression.A_Expr.lexpr) {
@@ -523,7 +585,8 @@ function processWhereClause(expression: WhereExpression): Filter {
 
     if ('A_Expr' in expression.A_Expr.lexpr) {
       try {
-        column = renderJsonExpression(expression.A_Expr.lexpr)
+        const target = processJsonTarget(expression.A_Expr.lexpr)
+        column = target.column
       } catch (err) {
         throw new UnsupportedError(`Non column expressions not supported in WHERE clause`)
       }
@@ -774,14 +837,45 @@ function renderFields(fields: Field[]) {
       } else if ('A_Star' in field) {
         return '*'
       } else {
-        const [fieldType] = Object.keys(field)
-        throw new UnsupportedError(`Unsupported ColumnRef field type '${fieldType}'`)
+        const [internalType] = Object.keys(field)
+        throw new UnsupportedError(
+          `Unsupported internal type '${internalType}' for data type names`
+        )
       }
     })
     .join('.')
 }
 
-function renderJsonExpression(expression: A_Expr): string {
+function renderDataType(names: PgString[]) {
+  const [first, ...rest] = names
+
+  if (first.String.sval === 'pg_catalog' && rest.length === 1) {
+    const [name] = rest
+
+    // The PG parser converts some data types, eg. int -> pg_catalog.int4
+    // so we'll map those back
+    switch (name.String.sval) {
+      case 'int2':
+        return 'smallint'
+      case 'int4':
+        return 'int'
+      case 'int8':
+        return 'bigint'
+      case 'float8':
+        return 'float'
+      default:
+        return name.String.sval
+    }
+  } else if (rest.length > 0) {
+    throw new UnsupportedError(
+      `Casts can only reference data types by their unqualified name (not schema-qualified)`
+    )
+  } else {
+    return first.String.sval
+  }
+}
+
+function processJsonTarget(expression: A_Expr): ColumnTarget {
   if (expression.A_Expr.name.length > 1) {
     throw new UnsupportedError('Only one operator name supported per expression')
   }
@@ -793,6 +887,7 @@ function renderJsonExpression(expression: A_Expr): string {
     throw new UnsupportedError(`Invalid JSON operator`)
   }
 
+  let cast: string | undefined = undefined
   let left: string
   let right: string
 
@@ -803,7 +898,8 @@ function renderJsonExpression(expression: A_Expr): string {
       throw new UnsupportedError('Invalid JSON path')
     }
   } else if ('A_Expr' in expression.A_Expr.lexpr) {
-    left = renderJsonExpression(expression.A_Expr.lexpr)
+    const { column } = processJsonTarget(expression.A_Expr.lexpr)
+    left = column
   } else if ('ColumnRef' in expression.A_Expr.lexpr) {
     left = renderFields(expression.A_Expr.lexpr.ColumnRef.fields)
   } else {
@@ -816,9 +912,25 @@ function renderJsonExpression(expression: A_Expr): string {
     } else {
       throw new UnsupportedError('Invalid JSON path')
     }
+  } else if ('TypeCast' in expression.A_Expr.rexpr) {
+    cast = renderDataType(expression.A_Expr.rexpr.TypeCast.typeName.names)
+
+    if ('A_Const' in expression.A_Expr.rexpr.TypeCast.arg) {
+      if ('sval' in expression.A_Expr.rexpr.TypeCast.arg.A_Const) {
+        right = expression.A_Expr.rexpr.TypeCast.arg.A_Const.sval.sval
+      } else {
+        throw new UnsupportedError('Invalid JSON path')
+      }
+    } else {
+      throw new UnsupportedError('Invalid JSON path')
+    }
   } else {
     throw new UnsupportedError('Invalid JSON path')
   }
 
-  return `${left}${operator}${right}`
+  return {
+    type: 'column-target',
+    column: `${left}${operator}${right}`,
+    cast,
+  }
 }

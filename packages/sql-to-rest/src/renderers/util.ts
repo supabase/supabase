@@ -25,6 +25,25 @@ export function renderTargets(
         value = `${indentation}${value}`
 
         return value
+      } else if (target.type === 'aggregate-target') {
+        const { column, alias, functionName, inputCast, outputCast } = target
+        let value = column
+
+        if (alias && alias !== column) {
+          value = `${alias}:${value}`
+        }
+
+        if (inputCast) {
+          value = `${value}::${inputCast}`
+        }
+
+        value = `${indentation}${value}.${functionName}()`
+
+        if (outputCast) {
+          value = `${value}::${outputCast}`
+        }
+
+        return value
       } else if (target.type === 'embedded-target') {
         const { relation, alias, joinType, targets, flatten } = target
         let value = relation
