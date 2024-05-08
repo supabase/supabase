@@ -102,7 +102,6 @@ return new Response('Hello World!')
 });
 
 Deno.serve(app.fetch);
-
 ````
 
 </TabPanel>
@@ -175,35 +174,36 @@ Keep in mind paths must be prefixed by function name (ie. `tasks` in this exampl
 ```ts
 import express from 'npm:express@4.18.2'
 
-const app = express()
-app.use(express.json())
+const app = express();
+app.use(express.json());
 
 app.get('/tasks', async (req, res) => {
 // return all tasks
-})
+});
 
 app.post('/tasks', async (req, res) => {
 // create a task
-})
+});
 
 app.get('/tasks/:id', async (req, res) => {
 const id = req.params.id
 const task = {} // get task
 
 res.json(task)
-})
+});
 
 app.patch('/tasks/:id', async (req, res) => {
 const id = req.params.id
 // modify task
-})
+});
 
 app.delete('/tasks/:id', async (req, res) => {
 const id = req.params.id
 // delete task
-})
+});
 
 ````
+
 </TabPanel>
 
 <TabPanel id="oak" label="Oak">
@@ -278,8 +278,8 @@ import { Hono } from 'https://deno.land/x/hono/mod.ts'
 import type { Context } from 'https://deno.land/x/hono/mod.ts'
 
 // You can set the basePath with Hono
-const functionName = 'routing'
-const app = new Hono().basePath(`/${functionName}`)
+const functionName = 'tasks';
+const app = new Hono().basePath(`/${functionName}`);
 
 // /tasks/id
 app.get('/:id', async (c: Context) => {
@@ -290,7 +290,7 @@ app.get('/:id', async (c: Context) => {
   } else {
     return new Response('Task not found', { status: 404 })
   }
-})
+});
 
 app.patch('/:id', async (c: Context) => {
   const id = c.req.param('id')
@@ -303,7 +303,7 @@ app.patch('/:id', async (c: Context) => {
   } else {
     return new Response('Task not found', { status: 404 })
   }
-})
+});
 
 app.delete('/:id', async (c: Context) => {
   const id = c.req.param('id')
@@ -314,9 +314,9 @@ app.delete('/:id', async (c: Context) => {
   } else {
     return new Response('Task not found', { status: 404 })
   }
-})
+});
 
-Deno.serve(app.fetch)
+Deno.serve(app.fetch);
 ```
 
 </TabPanel>
@@ -408,7 +408,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     return new Response(`Internal Server Error: ${error}`, { status: 500 })
   }
-})
+});
 ```
 
 </TabPanel>
