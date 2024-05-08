@@ -1,7 +1,4 @@
-import { differenceInDays } from 'date-fns'
-import React from 'react'
-import toast from 'react-hot-toast'
-
+import { AlertTitle } from '@ui/components/shadcn/ui/alert'
 import { useParams } from 'common'
 import {
   useIsProjectActive,
@@ -15,6 +12,11 @@ import { useProjectApiQuery } from 'data/config/project-api-query'
 import { useS3AccessKeyCreateMutation } from 'data/storage/s3-access-key-create-mutation'
 import { useS3AccessKeyDeleteMutation } from 'data/storage/s3-access-key-delete-mutation'
 import { useStorageCredentialsQuery } from 'data/storage/s3-access-key-query'
+import { differenceInDays } from 'date-fns'
+import { AlertCircle, MoreVertical, TrashIcon } from 'lucide-react'
+import Link from 'next/link'
+import React from 'react'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   Alert_Shadcn_,
@@ -22,27 +24,24 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
   DialogTrigger,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  IconMoreVertical,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
   cn,
 } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { AlertTitle } from '@ui/components/shadcn/ui/alert'
-import Link from 'next/link'
-import { AlertCircle, TrashIcon } from 'lucide-react'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@ui/components/shadcn/ui/tooltip'
 
 export const S3Connection = () => {
   const [openCreateCred, setOpenCreateCred] = React.useState(false)
@@ -130,23 +129,22 @@ export const S3Connection = () => {
                 if (!open) setShowSuccess(false)
               }}
             >
-              <DialogTrigger asChild>
-                <Button disabled={!isProjectActive} type="outline">
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>New access key</TooltipTrigger>
-                      {!isProjectActive && (
-                        <TooltipContent>
-                          Restore your project to create new access keys
-                        </TooltipContent>
-                      )}
-                    </Tooltip>
-                  </TooltipProvider>
-                </Button>
-              </DialogTrigger>
+              <Tooltip_Shadcn_>
+                <TooltipTrigger_Shadcn_ asChild>
+                  <DialogTrigger asChild>
+                    <Button type="default" disabled={!isProjectActive}>
+                      New access key
+                    </Button>
+                  </DialogTrigger>
+                </TooltipTrigger_Shadcn_>
+                {!isProjectActive && (
+                  <TooltipContent_Shadcn_>
+                    Restore your project to create new access keys
+                  </TooltipContent_Shadcn_>
+                )}
+              </Tooltip_Shadcn_>
 
               <DialogContent
-                className="p-4"
                 onInteractOutside={(e) => {
                   if (showSuccess) {
                     e.preventDefault()
@@ -155,14 +153,14 @@ export const S3Connection = () => {
               >
                 {showSuccess ? (
                   <>
-                    <div className="flex flex-col gap-y-2">
+                    <DialogHeader>
                       <DialogTitle>Save your new S3 access keys</DialogTitle>
                       <DialogDescription>
                         You won't be able to see them again. If you lose these access keys, you'll
                         need to create a new ones.
                       </DialogDescription>
-                    </div>
-
+                    </DialogHeader>
+                    <DialogSectionSeparator />
                     <FormItemLayout label="Access key ID" isReactForm={false}>
                       <Input
                         className="input-mono"
@@ -181,7 +179,8 @@ export const S3Connection = () => {
                         value={createS3AccessKey.data?.data?.secret_key}
                       />
                     </FormItemLayout>
-                    <div className="flex justify-end">
+                    <DialogSectionSeparator />
+                    <DialogFooter>
                       <Button
                         onClick={() => {
                           setOpenCreateCred(false)
@@ -190,17 +189,18 @@ export const S3Connection = () => {
                       >
                         Done
                       </Button>
-                    </div>
+                    </DialogFooter>
                   </>
                 ) : (
                   <>
-                    <div className="flex flex-col gap-y-2">
+                    <DialogHeader>
                       <DialogTitle>Create new S3 access keys</DialogTitle>
                       <DialogDescription>
                         S3 access keys provide full access to all S3 operations across all buckets
                         and bypass any existing RLS policies.
                       </DialogDescription>
-                    </div>
+                    </DialogHeader>
+                    <DialogSectionSeparator />
                     <form
                       onSubmit={async (e) => {
                         e.preventDefault()
@@ -212,25 +212,23 @@ export const S3Connection = () => {
                         setShowSuccess(true)
                       }}
                     >
-                      <FormItemLayout label="Description" isReactForm={false}>
-                        <Input
-                          autoComplete="off"
-                          placeholder="My test key"
-                          type="text"
-                          name="description"
-                          required
-                        />
-                      </FormItemLayout>
+                      <DialogSection>
+                        <FormItemLayout label="Description" isReactForm={false}>
+                          <Input
+                            autoComplete="off"
+                            placeholder="My test key"
+                            type="text"
+                            name="description"
+                            required
+                          />
+                        </FormItemLayout>
+                      </DialogSection>
 
-                      <div className="flex justify-end">
-                        <Button
-                          className="mt-4"
-                          htmlType="submit"
-                          loading={createS3AccessKey.isLoading}
-                        >
+                      <DialogFooter>
+                        <Button htmlType="submit" loading={createS3AccessKey.isLoading}>
                           Create access key
                         </Button>
-                      </div>
+                      </DialogFooter>
                     </form>
                   </>
                 )}
@@ -385,7 +383,7 @@ function StorageCredItem({
       <td>
         <DropdownMenu>
           <DropdownMenuTrigger className="flex items-center justify-end w-full">
-            <IconMoreVertical />
+            <MoreVertical />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="max-w-40">
             <DropdownMenuItem
