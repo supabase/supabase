@@ -2503,6 +2503,9 @@ functions:
         rows visible through `SELECT` policies are deleted. Note that by default
         no rows are visible, so you need at least one `SELECT`/`ALL` policy that
         makes the rows visible.
+      - When using `delete().in()`, specify an array of values to target multiple rows with a single query. This is particularly useful for batch deleting entries that share common criteria, such as deleting users by their IDs. Ensure that the array you provide accurately represents all records you intend to delete to avoid unintended data removal.
+
+
     examples:
       - id: delete-records
         name: Delete records
@@ -2512,6 +2515,11 @@ functions:
             .from('countries')
             .delete()
             .eq('id', 1)
+
+          const { error: multiError } = await supabase
+            .from('countries')
+            .delete()
+            .in('id', [1, 2, 3])  
           ```
         data:
           sql: |
@@ -2522,7 +2530,7 @@ functions:
             insert into
               countries (id, name)
             values
-              (1, 'Spain');
+              (1, 'Spain'), (2, 'France'), (3, 'Germany');
             ```
         response: |
           ```json
