@@ -919,3 +919,28 @@ revoke execute
 
 </TabPanel>
 </Tabs>
+
+## Hook: Send SMS
+
+The send sms hook runs before an SMS is sent and allows you to use an alternative SMS provider or to pick a region specific sender.
+
+**Inputs**
+
+- `user` User attempting to sign in. Correlate this to the `auth.users` table.
+- `sms` Metadata specific to the SMS sending process. Includes the OTP.
+
+**Outputs**
+
+- No outputs are required other than an indication of success or failure
+
+## Hook: Send Email
+
+The send sms hook runs before any email is sent and allows you to use an alternative SMS provider or to pick a region specific sender.
+**Inputs**
+
+- `user` User attempting to sign in. Correlate this to the `auth.users` table.
+- `email` Metadata specific to the email sending process. Includes the OTP and `token_hash`.
+
+**Outputs**
+
+- No outputs are required other than an indication of success or failure
