@@ -212,7 +212,7 @@ CREATE OR REPLACE FUNCTION "public"."get_embedded_event_names"
 	("date_param" timestamp with time zone DEFAULT "now"())
   RETURNS "jsonb"
   LANGUAGE "plpgsql" SECURITY DEFINER
-  SET "search_path" TO 'public', 'extensions', 'vault'
+  SET "search_path" TO ''
   AS $$
 DECLARE
   target_date timestamp with time zone := COALESCE(date_param, now());
@@ -233,7 +233,7 @@ BEGIN
 
   api_url := base_url || '&timeMin=' || time_min || '&timeMax=' || time_max;
 
-  select "content"::jsonb into response from http_get(api_url);
+  select "content"::jsonb into response from extensions.http_get(api_url);
   events := response->'items'; -- Remove the typecast to ::jsonb
 
   SELECT ARRAY_AGG(event->>'summary')
