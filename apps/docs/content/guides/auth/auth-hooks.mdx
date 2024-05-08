@@ -18,6 +18,8 @@ You can use hooks at specific points along an Auth flow to perform custom behavi
 | Hook                          | Available on Plan    |
 | ----------------------------- | -------------------- |
 | Custom Access Token           | Free, Pro            |
+| Send SMS                      | Free, Pro            |
+| Send Email                    | Free, Pro            |
 | MFA Verification Attempt      | Teams and Enterprise |
 | Password Verification Attempt | Teams and Enterprise |
 
@@ -27,40 +29,40 @@ You can connect a hook to Supabase Auth to signal to Supabase Auth that it shoul
 
 ### What is a hook
 
-A hook is a [Postgres Function](https://www.postgresql.org/docs/current/sql-createfunction.html) with a single argument -- the `event` of type [JSONB]() -- and which returns a JSONB object.
+A Hook is a primitive invoked by Supabase Auth at a point in the flow by providing an event object. The Hook returns an object which provides instructions on how Supabase Auth should continue processing. While the Hook interface is protocol agnostic, we only allow for Postgres and HTTP Hooks on Supabase.
 
-This function is invoked by Supabase Auth at its point in the flow by providing an event object. The object returned by the function gives instructions on how Supabase Auth should continue processing.
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  queryGroup="language"
+>
+<TabPanel id="postgres-what-is-a-hook" label="SQL">
 
-To access properties of the `event` argument, you can use the [JSON operators and functions](https://www.postgresql.org/docs/current/functions-json.html).
+A Postgres Hook is a function which takes a single argument -- the event of type JSONB -- and which returns a JSONB object. A Postgres Hook runs on Supabase Auth and does not leave the instance.
 
-There are no restrictions as to what language can be used to write Auth Hooks. If [PL/pgSQL](https://www.postgresql.org/docs/current/plpgsql.html) is too difficult consider using the [plv8](/docs/guides/database/extensions/plv8) extension which lets you use JavaScript to define functions.
+</TabPanel>
+<TabPanel id="https-what-is-a-hook" label="HTTP">
+A HTTP Hook is an endpoint which takes in a JSON event payload and returns a JSON response. HTTP Hooks in Supabase follow the Standard Webhooks Specification, which is a set of guidelines aligning how hooks are implemented. The specification attaches three security headers to guarantee authenticity of the payload:
 
-<Admonition type="caution">
-  If you're using the Supabase SQL Editor, there's an issue when using the `?` (*Does the string
-  exist as a top-level key within the JSON value?*) operator. Use a direct connection to the
-  database if you need to use it when defining a function.
-</Admonition>
+- `webhook-id`: the unique webhook identifier described in the sections above.
+- `webhook-timestamp`: integer unix timestamp (seconds since epoch).
+- `webhook-signature`: the signature(s) of this webhook. This is generated from body of the hook.
 
-Here is an example hook signature:
+You can use any HTTP endpoint as a Hook, including an endpoint on your application. However, out of convenience and in the spirit of dog fooding Supabase, we will use a Supabase Edge Function.
 
-```sql
-create or replace function public.custom_access_token_hook(event jsonb)
-returns jsonb
-language plpgsql
-as $$
-declare
-  -- Insert variables here
-begin
-  -- Insert logic here
-  return event;
-end;
-$$;
-```
+</TabPanel>
+</Tabs>
 
-You can visit `SQL Editor > Templates` for hook templates.
+## Hook Security Model
 
-### Hook grants and roles
-
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  queryGroup="language"
+>
+<TabPanel id="postgres-hook-security-model" label="SQL">
 You need to assign additional permissions so that Supabase Auth can access the hook as well as the tables it interacts with.
 
 The `supabase_auth_admin` role does not have permissions to the `public` schema. You need to grant the role permission to execute your hook function:
@@ -91,7 +93,37 @@ We recommend that you do not use any tag and explicitly grant permissions to `su
 
 Read more about `security definer` tag [in our database guide](/docs/guides/database/functions#security-definer-vs-invoker).
 
-### Hook errors
+</TabPanel>
+<TabPanel id="https-hook-security-model" label="HTTP">
+Each Hook has a dedicated `HOOK_SECRET` used to sign the payload. Ensure that you create an entry in your `.env.local` file for each Hook that you have. In this case, let’s assume we’re adding a  `SEND_SMS` Hook
+
+```bash
+SEND_SMS_HOOK_SECRET="v1,whsec_<base-64-secret>"
+```
+
+`v1` denotes the version of the hook while `whsec_` signifies that we’re using a symmetric secret. The secret is encoded via standard Base64 and can contain the characters `+`, `/` and `=`
+
+Use the secret in conjunction with the Standard Webhooks package to verify the Payload at the start of every function:
+
+```jsx
+
+import { Webhook } from "https://esm.sh/standardwebhooks@1.0.0"
+
+Deno.serve(async (req) => {
+	  const payload = await req.text()
+	  const sendSMSHookSecret = Deno.env.get('SEND_SMS_HOOK_SECRET')
+	  // Extract headers and security specific fields
+	  const headers = Object.fromEntries(req.headers)
+	  const wh = new Webhook(sendSMSHookSecret);
+	  const { user, sms } = wh.verify(payload, headers);
+	  ...
+
+```
+
+</TabPanel>
+</Tabs>
+
+## Hook Errors
 
 You should return an error when facing a runtime error. Runtime errors are specific to your application and arise from specific business rules rather than programmer errors.
 
@@ -100,6 +132,14 @@ Runtime errors could happen when:
 - The user does not have appropriate permissions
 - The event payload received does not have required claims.
 - The user has performed an action which violates a business rule.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  queryGroup="language"
+>
+<TabPanel id="postgres-hook-errors" label="SQL">
 
 The error is a JSON object and has the following properties:
 
@@ -120,9 +160,45 @@ Here's an example:
 
 When an error is returned, the error is propagated from the hook to Supabase Auth and translated into a HTTP error which is returned to your application. Supabase Auth will only take into account the error and disregard the rest of the payload.
 
-### Timeouts
+</TabPanel>
 
-Ensure that your hooks complete within **2 seconds** to avoid any errors.
+<TabPanel id="https-hook-errors" label="HTTP">
+HTTP Hooks support a limited set of status codes:
+
+| HTTP Status Code | Description                                                   | Example Usage                                  |
+| ---------------- | ------------------------------------------------------------- | ---------------------------------------------- |
+| 200, 202, 204    | Valid response, proceed                                       | Successful processing of the request           |
+| 429, 503         | Retryable errors with Retry-after header supported            | Temporary server overload or maintenance       |
+| 403, 400         | Treated as internal Server Errors and return a 500 Error Code | Malformed requests or insufficient permissions |
+
+There are both retryable and non-retryable errors. On a retryable error, HTTP Hooks will attempt up to three retries with a backoff of two seconds while a Postgres Hook will fail on error. Here’s an overview of a HTTP retry schedule:
+
+| Time Since Start (HH:MM:SS) | Event                   | Notes                                             |
+| --------------------------- | ----------------------- | ------------------------------------------------- |
+| 00:00:00                    | Initial Attempt         | Initial invocation begins.                        |
+| 00:00:05                    | Initial Attempt Timeout | Initial invocation must complete.                 |
+| 00:00:07                    | Retry Start #1          | After 2 sec delay, 1st retry begins.              |
+| 00:00:12                    | Retry Timeout #1        | First retry timeout.                              |
+| 00:00:14                    | Retry Start #2          | After 2 sec delay, 2nd retry begins.              |
+| 00:00:19                    | Retry Timeout #2        | Second retry timeout. Returns an error on failure |
+
+Return a retryable error by attaching a appropriate status code (`429`, `503` ) and a non-empty `retry-after` header
+
+```jsx
+return new Response(
+  JSON.stringify({
+    error: `Failed to process the request: ${error}`,
+  }),
+  { status: 429, headers: { 'Content-Type': 'application/json', 'retry-after': 'true' } }
+)
+```
+
+Note that all responses, including errors responses, need a `Content-Type` of `application/json` - not specifying the appropriate `Content-Type` will result in an error being returned.
+
+</TabPanel>
+</Tabs>
+
+Outside of runtime errors, both HTTP Hooks and Postgres Hooks return timeout errors. Postgres Hooks have **two** seconds to complete processing while HTTP Hooks should complete in **five** seconds. As both HTTP Hooks and Postgres Hooks are run in a transaction do limit the duration of execution to avoid delays in authentication process.
 
 ### Connect a hook
 
