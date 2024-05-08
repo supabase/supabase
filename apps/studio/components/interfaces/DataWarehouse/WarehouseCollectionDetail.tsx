@@ -114,25 +114,29 @@ export const WarehouseCollectionDetail = () => {
         {!isError && (
           <div className="border-t flex flex-row justify-between p-2">
             <div className="flex items-center gap-2">
-              <Button
-                onClick={loadOlder}
-                icon={<IconRewind />}
-                type="default"
-                loading={isLoading}
-                disabled={isLoading}
-              >
-                Load older
-              </Button>
-              {pagination.offset !== 0 && (
+              {results.length > 0 && (
                 <>
                   <Button
-                    onClick={() => setPagination({ ...pagination, offset: 0 })}
+                    onClick={loadOlder}
+                    icon={<IconRewind />}
                     type="default"
                     loading={isLoading}
                     disabled={isLoading}
                   >
-                    Load latest
+                    Load older
                   </Button>
+                  {pagination.offset !== 0 && (
+                    <>
+                      <Button
+                        onClick={() => setPagination({ ...pagination, offset: 0 })}
+                        type="default"
+                        loading={isLoading}
+                        disabled={isLoading}
+                      >
+                        Load latest
+                      </Button>
+                    </>
+                  )}
                 </>
               )}
             </div>
