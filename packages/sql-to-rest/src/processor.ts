@@ -139,17 +139,31 @@ export type EmbeddedTarget = {
   flatten?: boolean
 }
 
-/**
- * Represents a aggregate column target in the select.
- */
-export type AggregateTarget = {
+export type BaseAggregateTarget = {
   type: 'aggregate-target'
-  column: string
-  functionName: string
   alias?: string
-  inputCast?: string
   outputCast?: string
 }
+
+export type ColumnAggregateTarget = BaseAggregateTarget & {
+  functionName: string
+  column: string
+  inputCast?: string
+}
+
+/**
+ * Special case `count()` aggregate target that works
+ * with no column attached.
+ */
+export type CountAggregateTarget = BaseAggregateTarget & {
+  type: 'aggregate-target'
+  functionName: 'count'
+}
+
+/**
+ * Represents a aggregate target in the select.
+ */
+export type AggregateTarget = CountAggregateTarget | ColumnAggregateTarget
 
 export type Target = ColumnTarget | AggregateTarget | EmbeddedTarget
 
@@ -434,6 +448,12 @@ function processTargetList(
 
   // Transfer resource embedding columns to `embeddedTargets`
   const columnTargets = flattenedColumnTargets.filter((target) => {
+    // Account for the special case when the aggregate doesn't have a column attached
+    // ie. `count()`: should always be applied to the top level relation
+    if (target.type === 'aggregate-target' && !('column' in target)) {
+      return true
+    }
+
     const qualifiedName = target.column.split('.')
 
     // Relation and column names are last two parts of the qualified name
@@ -550,11 +570,19 @@ function processQueryTarget(
       )
     }
 
-    if (functionName !== 'count' && queryTarget.FuncCall.args.length === 0) {
+    // The `count(*)` special case that has no columns attached
+    if (functionName === 'count' && !queryTarget.FuncCall.args && queryTarget.FuncCall.agg_star) {
+      return {
+        type: 'aggregate-target',
+        functionName,
+      }
+    }
+
+    if (!queryTarget.FuncCall.args) {
       throw new UnsupportedError(`Aggregate function '${functionName}' requires a column argument`)
     }
 
-    if (queryTarget.FuncCall.args.length > 1) {
+    if (queryTarget.FuncCall.args && queryTarget.FuncCall.args.length > 1) {
       throw new UnsupportedError(`Aggregate functions only accept one argument`)
     }
 
@@ -1024,6 +1052,11 @@ function validateGroupClause(groupClause: ColumnRef[], targets: Target[], from: 
   if (
     !groupByColumns.every((column) =>
       someTarget(targets, (target, parent) => {
+        // The `count()` special case aggregate has no column attached
+        if (!('column' in target)) {
+          return false
+        }
+
         const paths = parent
           ? // joined columns have to be prefixed with their relation
             [[parent.alias ?? parent.relation, target.column]]
@@ -1045,6 +1078,7 @@ function validateGroupClause(groupClause: ColumnRef[], targets: Target[], from: 
       if (target.type === 'aggregate-target') {
         return true
       }
+
       const paths = parent
         ? // joined columns have to be prefixed with their relation
           [[parent.alias ?? parent.relation, target.column]]

@@ -10,6 +10,7 @@ export function renderTargets(
 
   return targets
     .map((target) => {
+      // Regular columns
       if (target.type === 'column-target') {
         const { column, alias, cast } = target
         let value = column
@@ -25,7 +26,26 @@ export function renderTargets(
         value = `${indentation}${value}`
 
         return value
-      } else if (target.type === 'aggregate-target') {
+      }
+      // Special case for `count()` that has no column attached
+      else if (target.type === 'aggregate-target' && !('column' in target)) {
+        const { functionName, alias, outputCast } = target
+        let value = `${functionName}()`
+
+        if (alias) {
+          value = `${alias}:${value}`
+        }
+
+        if (outputCast) {
+          value = `${value}::${outputCast}`
+        }
+
+        value = `${indentation}${value}`
+
+        return value
+      }
+      // Aggregate functions
+      else if (target.type === 'aggregate-target') {
         const { column, alias, functionName, inputCast, outputCast } = target
         let value = column
 
@@ -37,14 +57,18 @@ export function renderTargets(
           value = `${value}::${inputCast}`
         }
 
-        value = `${indentation}${value}.${functionName}()`
+        value = `${value}.${functionName}()`
 
         if (outputCast) {
           value = `${value}::${outputCast}`
         }
 
+        value = `${indentation}${value}`
+
         return value
-      } else if (target.type === 'embedded-target') {
+      }
+      // Resource embeddings (joined tables)
+      else if (target.type === 'embedded-target') {
         const { relation, alias, joinType, targets, flatten } = target
         let value = relation
 

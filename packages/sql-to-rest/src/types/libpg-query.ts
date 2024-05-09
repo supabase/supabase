@@ -108,7 +108,8 @@ export type TypeCast = {
 export type FuncCall = {
   FuncCall: {
     funcname: PgString[]
-    args: (TypeCast | ColumnRef | FuncCall | A_Expr)[]
+    args?: (TypeCast | ColumnRef | FuncCall | A_Expr)[]
+    agg_star?: boolean
     funcformat: string
     location: number
   }

@@ -1283,4 +1283,82 @@ describe('select', () => {
     expect(method).toBe('GET')
     expect(fullPath).toBe('/profiles?select=region,age.max(),age.min')
   })
+
+  test('count on column', async () => {
+    const sql = stripIndents`
+      select
+        count(avatar)
+      from
+        profiles
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/profiles?select=avatar.count()')
+  })
+
+  test('count on all rows', async () => {
+    const sql = stripIndents`
+      select
+        count(*)
+      from
+        profiles
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/profiles?select=count()')
+  })
+
+  test('count on all rows with alias', async () => {
+    const sql = stripIndents`
+      select
+        count(*) as total
+      from
+        profiles
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/profiles?select=total:count()')
+  })
+
+  test('count on all rows with cast', async () => {
+    const sql = stripIndents`
+      select
+        count(*)::float
+      from
+        profiles
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/profiles?select=count()::float')
+  })
+
+  test('count on all rows with group by', async () => {
+    const sql = stripIndents`
+      select
+        region,
+        count(*)
+      from
+        profiles
+      group by
+        region
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/profiles?select=region,count()')
+  })
 })
