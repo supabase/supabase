@@ -78,28 +78,52 @@ functions:
           ```
         response: |
           ```
-          User(id='88866100-591e-4473-a4d8-f9344b2b394c',
-          app_metadata={'provider': 'email', 'providers': ['email']}, 
-          user_metadata={'email': 'users_email@email.com',
-          'email_verified': False, 'phone_verified': False,
-          'sub': '88866869-591e-4473-a4d8-f9344b2b394c'},
-          aud='authenticated', 
-          confirmation_sent_at=datetime.datetime(2024, 5, 7, 15, 35, 51, 424791, tzinfo=TzInfo(UTC)),
-          recovery_sent_at=None, email_change_sent_at=None, 
-          new_email=None, invited_at=None, action_link=None,
-          email='nostalgicpascal3@getsafesurfer.com', 
-          phone='', created_at=datetime.datetime(2024, 5, 7, 15, 35, 51, 408610, tzinfo=TzInfo(UTC)), 
-          confirmed_at=None, email_confirmed_at=None, 
-          phone_confirmed_at=None, last_sign_in_at=None, role='authenticated', 
-          updated_at=datetime.datetime(2024, 5, 7, 15, 35, 52, 772763, tzinfo=TzInfo(UTC)), 
-          identities=[UserIdentity(id='88866869-591e-4473-a4d8-f9344b2b394c', 
-          user_id='88866869-591e-4473-a4d8-f9344b2b394c', 
-          identity_data={'email': 'nostalgicpascal3@getsafesurfer.com', 
-          'email_verified': False, 'phone_verified': False, 
-          'sub': '88866100-591e-4473-a4d8-f9344b2b394c'}, provider='email', 
-          created_at=datetime.datetime(2024, 5, 7, 15, 35, 51, 419280, tzinfo=TzInfo(UTC)), 
-          last_sign_in_at=datetime.datetime(2024, 5, 7, 15, 35, 51, 419228, tzinfo=TzInfo(UTC)), 
-          updated_at=datetime.datetime(2024, 5, 7, 15, 35, 51, 419280, tzinfo=TzInfo(UTC)))], factors=None) 
+          User(
+            id='11111111-1111-1111-1111-111111111111',
+            app_metadata={
+              'provider': 'email',
+              'providers': ['email']
+            }, 
+            user_metadata={
+              'email': 'users_email@email.com',
+              'email_verified': False,
+              'phone_verified': False,
+              'sub': '11111111-1111-1111-1111-111111111111'
+            },
+            aud='authenticated', 
+            confirmation_sent_at=datetime.datetime(2024, 1, 1, 1, 0, 0, 0, tzinfo=TzInfo(UTC)),
+            recovery_sent_at=None,
+            email_change_sent_at=None, 
+            new_email=None,
+            invited_at=None,
+            action_link=None,
+            email='users_email@email.com', 
+            phone='',
+            created_at=datetime.datetime(2024, 1, 1, 1, 0, 0, 0, tzinfo=TzInfo(UTC)), 
+            confirmed_at=None,
+            email_confirmed_at=None, 
+            phone_confirmed_at=None,
+            last_sign_in_at=None,
+            role='authenticated', 
+            updated_at=datetime.datetime(2024, 1, 1, 1, 0, 0, 0, tzinfo=TzInfo(UTC)), 
+            identities=[
+              UserIdentity(
+                id='22222222-2222-2222-2222-222222222222', 
+                user_id='11111111-1111-1111-1111-111111111111', 
+                identity_data={
+                  'email': 'users_email@email.com', 
+                  'email_verified': False,
+                  'phone_verified': False, 
+                  'sub': '11111111-1111-1111-1111-111111111111'
+                },
+                provider='email', 
+                created_at=datetime.datetime(2024, 1, 1, 1, 0, 0, 0, tzinfo=TzInfo(UTC)), 
+                last_sign_in_at=datetime.datetime(2024, 1, 1, 1, 0, 0, 0, tzinfo=TzInfo(UTC)), 
+                updated_at=datetime.datetime(2024, 1, 1, 1, 0, 0, 0, tzinfo=TzInfo(UTC))
+              )
+            ],
+            factors=None
+          ) 
           session=None
           ```
       - id: sign-up-with-additional-user-metadata
