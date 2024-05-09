@@ -116,6 +116,8 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   useEffect(() => {
     if (subject.trim().length > 0) {
       handleDocsSearchDebounced(subject.trim())
+    } else {
+      setDocsResults([])
     }
   }, [subject])
 
@@ -716,7 +718,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                                     {(page.description || page.subtitle) && (
                                       <div className="text-xs text-foreground-muted">
                                         <TextHighlighter
-                                          text={page.description || page.subtitle}
+                                          text={page.description || page.subtitle || ''}
                                           query="test"
                                         />
                                       </div>
