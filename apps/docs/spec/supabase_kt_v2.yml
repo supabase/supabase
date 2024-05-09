@@ -4498,6 +4498,8 @@ functions:
               println("My country is $it")
           }
           ```
+        description: |
+          The flow will end if the row is deleted.
   - id: subscribe
     description: |
       Subscribe to realtime changes in your database.
