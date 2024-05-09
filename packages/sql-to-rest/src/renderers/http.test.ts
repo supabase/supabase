@@ -259,6 +259,24 @@ describe('select', () => {
     expect(fullPath).toBe('/books?title=eq.Cheese&description=ilike.*salsa*')
   })
 
+  test('"and" expression using the same column multiple times', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      where
+        pages > 100 and
+        pages < 1000
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?pages=gt.100&pages=lt.1000')
+  })
+
   test('"or" expression', async () => {
     const sql = stripIndents`
       select

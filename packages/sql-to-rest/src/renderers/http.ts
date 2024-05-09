@@ -100,7 +100,7 @@ function formatSelectFilterRoot(params: URLSearchParams, filter: Filter) {
       value = filter.value.replaceAll('%', '*')
     }
 
-    params.set(filter.column, `${maybeNot}${filter.operator}.${value}`)
+    params.append(filter.column, `${maybeNot}${filter.operator}.${value}`)
   }
   // Logical operator filter, eg. "or=(title.eq.Cheese,title.eq.Salsa)""
   else if (type === 'logical') {
@@ -113,7 +113,7 @@ function formatSelectFilterRoot(params: URLSearchParams, filter: Filter) {
     }
     // Otherwise use the <operator>=(...) syntax
     else {
-      params.set(
+      params.append(
         `${maybeNot}${filter.operator}`,
         `(${filter.values.map((subFilter) => formatSelectFilter(subFilter)).join(',')})`
       )
