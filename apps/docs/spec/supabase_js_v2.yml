@@ -2503,9 +2503,11 @@ functions:
         rows visible through `SELECT` policies are deleted. Note that by default
         no rows are visible, so you need at least one `SELECT`/`ALL` policy that
         makes the rows visible.
+      - When using `delete().in()`, specify an array of values to target multiple rows with a single query. This is particularly useful for batch deleting entries that share common criteria, such as deleting users by their IDs. Ensure that the array you provide accurately represents all records you intend to delete to avoid unintended data removal.
+
     examples:
       - id: delete-records
-        name: Delete records
+        name: Delete a single record
         code: |
           ```ts
           const { error } = await supabase
@@ -2533,6 +2535,36 @@ functions:
           ```
         hideCodeBlock: true
         isSpotlight: true
+
+      - id: delete-multiple-records
+        name: Delete multiple records
+        code: |
+          ```ts
+          const { error } = await supabase
+            .from('countries')
+            .delete()
+            .in('id', [1, 2, 3])
+          ```
+        data:
+          sql: |
+            ```sql
+            create table
+              countries (id int8 primary key, name text);
+
+            insert into
+              countries (id, name)
+            values
+              (1, 'Spain'), (2, 'France'), (3, 'Germany');
+            ```
+        response: |
+          ```json
+          {
+            "status": 204,
+            "statusText": "No Content"
+          }
+          ```
+        hideCodeBlock: false
+        isSpotlight: false
 
   - id: rpc
     title: 'Postgres functions: rpc()'
