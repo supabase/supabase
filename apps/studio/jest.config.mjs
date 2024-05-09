@@ -21,6 +21,8 @@ const config = {
     'hooks/analytics/useLogsQuery': '<rootDir>/__mocks__/hooks/analytics/useLogsQuery',
     'data/reports/api-report-query': '<rootDir>/__mocks__/hooks/useApiReport',
     'data/reports/storage-report-query': '<rootDir>/__mocks__/hooks/useStorageReport',
+    'data/subscriptions/org-subscription-query':
+      '<rootDir>/__mocks__/data/subscriptions/org-subscription-query',
   },
   testEnvironment: 'jsdom',
   testTimeout: 10000,

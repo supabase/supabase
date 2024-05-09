@@ -218,7 +218,7 @@ const PreviewFilterPanel = ({
           <DatabaseSelector onSelectId={onSelectedDatabaseChange} />
         </div>
       ) : (
-        <Button data-testid="explore-button" asChild type="default" onClick={onExploreClick}>
+        <Button asChild type="default" onClick={onExploreClick}>
           <Link href={queryUrl}>Explore via query</Link>
         </Button>
       )}

@@ -1,8 +1,7 @@
-import { get } from 'lib/common/fetch'
+import { screen } from '@testing-library/react'
+
 import { render } from '../../../helpers'
-import { waitFor, screen } from '@testing-library/react'
 import { StorageReport } from 'pages/project/[ref]/reports/storage'
-import userEvent from '@testing-library/user-event'
 
 // [Joshen] Mock data for ApiReport is in __mocks__/hooks/useStorageReport
 // I don't think this is an ideal set up as the mock data is not clear in this file itself
