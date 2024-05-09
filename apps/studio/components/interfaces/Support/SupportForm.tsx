@@ -57,6 +57,7 @@ import {
 } from 'common'
 
 import {
+  Command,
   CommandGroup,
   CommandItem,
   CommandLabel,
@@ -72,9 +73,9 @@ export interface SupportFormProps {
 }
 
 const SupportForm = ({ setSentCategory }: SupportFormProps) => {
-  const { handleDocsSearchDebounced, searchState, searchState: state } = useDocsSearch() // Initialize the docs search
-  const [subject, setSubject] = useState('') // State for the subject field
-  const [docsResults, setDocsResults] = useState<DocsSearchResult[]>([]) // State for the docs results
+  const { handleDocsSearchDebounced, searchState, searchState: state } = useDocsSearch()
+  const [subject, setSubject] = useState('')
+  const [docsResults, setDocsResults] = useState<Page[]>([])
 
   const { search, setSearch, inputRef, site, setIsOpen } = useCommandMenu()
   const router = useRouter()
@@ -112,14 +113,12 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
     }
   }
 
-  // Trigger a debounced search when the subject changes
   useEffect(() => {
     if (subject.trim().length > 0) {
       handleDocsSearchDebounced(subject.trim())
     }
   }, [subject])
 
-  // Update the docs results based on the search state
   useEffect(() => {
     if (searchState.status === 'fullResults') {
       setDocsResults(searchState.results)
@@ -694,7 +693,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     {docsResults.length > 0 && hasResults && (
                       <div>
                         {docsResults.map((page, i) => (
-                          <Command_Shadcn_ key="docs-search">
+                          <Command key="docs-search">
                             <CommandGroup
                               key={`${page.path}-group`}
                               heading=""
@@ -766,7 +765,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                                 </div>
                               )}
                             </CommandGroup>
-                          </Command_Shadcn_>
+                          </Command>
                         ))}
                       </div>
                     )}
