@@ -76,7 +76,7 @@ services:
 
   auth:
     container_name: supabase-auth
-    image: supabase/gotrue:v2.149.0
+    image: supabase/gotrue:v2.151.0
     depends_on:
       db:
         # Disable this if you are using an external Postgres database
@@ -182,9 +182,14 @@ services:
       test:
         [
           "CMD",
-          "bash",
-          "-c",
-          "printf \\0 > /dev/tcp/localhost/4000"
+          "curl",
+          "-sSfL",
+          "--head",
+          "-o",
+          "/dev/null",
+          "-H",
+          "Authorization: Bearer ${ANON_KEY}",
+          "http://localhost:4000/api/tenants/realtime-dev/health"
         ]
       timeout: 5s
       interval: 5s
