@@ -35,27 +35,13 @@ import { faqs } from './faqs'
 import { transformRenderer } from './syntax-highlighter/transform-renderer'
 import { ResultBundle } from './util'
 
-const defaultValue = stripIndent`
-  select
-    title as "myTitle",
-    description
-  from
-    books
-  where
-    description ilike '%cheese%'
-  order by
-    title desc
-  limit
-    5
-  offset
-    10
-`
-
 export interface SqlToRestProps {
+  defaultValue?: string
   defaultBaseUrl?: string
 }
 
 export default function SqlToRest({
+  defaultValue,
   defaultBaseUrl = 'http://localhost:54321/rest/v1',
 }: SqlToRestProps) {
   const monaco = useMonaco()
@@ -71,7 +57,7 @@ export default function SqlToRest({
     }
   }, [monaco])
 
-  const [sql, setSql] = useState(defaultValue)
+  const [sql, setSql] = useState(defaultValue ?? '')
   const [statement, setStatement] = useState<Statement>()
   const [currentLanguage, setCurrentLanguage] = useState('curl')
 
@@ -280,7 +266,8 @@ export default function SqlToRest({
               },
               fontSize: 13,
             }}
-            onMount={(editor, monaco) => {
+            onMount={async (editor, monaco) => {
+              // Register pgsql formatter
               monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
                 async provideDocumentFormattingEdits(model) {
                   const currentCode = editor.getValue()
@@ -296,9 +283,14 @@ export default function SqlToRest({
                   ]
                 },
               })
+
+              // Format on cmd+s
               editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, async () => {
                 await editor.getAction('editor.action.formatDocument').run()
               })
+
+              // Run format on the initial value
+              await editor.getAction('editor.action.formatDocument').run()
             }}
             onChange={async (sql) => {
               if (!sql) {
