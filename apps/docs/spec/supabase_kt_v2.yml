@@ -4433,6 +4433,71 @@ functions:
               parameter("Key", "Value") //url parameter
           }
           ```
+  - id: stream
+    title: 'stream()'
+    description: |
+      Return real-time data from your table as a [Flow](https://kotlinlang.org/docs/flow.html).
+      - Realtime is disabled by default for new tables. You can turn it on by [managing replication](/docs/guides/realtime/postgres-changes#replication-setup).
+      - `selectAsFlow` and `selectSingleValueAsFlow` will emit the initial data and then listen for changes.
+      - Takes in a `filter` parameter to filter the data and a `primaryKey` parameter to cache the data by the primary key.
+      - This method requires both the `Realtime` and `Postgrest` plugins to be installed.
+      - The type parameter `T` must be a [serializable class](/docs/reference/kotlin/installing#serialization).
+    params:
+      - name: primaryKey
+        isOptional: false
+        type: KProperty1<Data, Value> or PrimaryKey<Data>
+        description: The primary key to cache the data by. Can be a property reference or a custom primary key.
+      - name: channelName
+        isOptional: true
+        type: String
+        description: The name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be used
+      - name: filter
+        isOptional: true
+        type: PostgrestFilterBuilder.() -> Unit or FilterOperation
+        description: The filter to apply to the data.
+    examples:
+      - id: select-as-flow
+        name: Listen for changes in multiple rows
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val flow: Flow<List<Country>> = supabase.from("countries").selectAsFlow(Country::id)
+          flow.collect {
+              for (country in it) {
+                  println(country.name)
+              }
+          }
+          ```
+      - id: select-as-flow-filter
+        name: Listen for changes in multiple rows with a filter
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val flow: Flow<List<Country>> = supabase.from("countries").selectAsFlow(
+              Country::id,
+              filter = FilterOperation("name", FilterOperator.ILIKE, "a%")
+          )
+          flow.collect {
+              for (country in it) {
+                  println(country.name)
+              }
+          }
+          ```
+      - id: select-single-value-as-flow
+        name: Listen for changes in a single row
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val flow: Flow<Country> = supabase.from("countries").selectSingleValueAsFlow(Country::id) {
+              //You can use the same methods as in the `select` method, but the result is limited to a single row
+              Country::id eq 1
+              //or
+              eq("id", 1)
+          }
+          flow.collect {
+              println("My country is $it")
+          }
+          ```
   - id: subscribe
     description: |
       Subscribe to realtime changes in your database.
