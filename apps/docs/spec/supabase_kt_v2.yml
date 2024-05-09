@@ -4489,7 +4489,7 @@ functions:
         code: |
           ```kotlin
           val flow: Flow<Country> = supabase.from("countries").selectSingleValueAsFlow(Country::id) {
-              //You can use the same methods as in the `select` method, but the result is limited to a single row
+              //You can use the same filter methods as in the `select` method, but the result is limited to a single row
               Country::id eq 1
               //or
               eq("id", 1)
