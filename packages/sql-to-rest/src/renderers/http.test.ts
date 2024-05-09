@@ -611,7 +611,7 @@ describe('select', () => {
     const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(fullPath).toBe('/books?select=partialPages:pages::pg_catalog.float')
+    expect(fullPath).toBe('/books?select=partialPages:pages::float')
   })
 
   test('cast in where clause fails', async () => {
@@ -1281,7 +1281,7 @@ describe('select', () => {
     const { method, fullPath } = await renderHttp(statement)
 
     expect(method).toBe('GET')
-    expect(fullPath).toBe('/profiles?select=region,age.max(),age.min')
+    expect(fullPath).toBe('/profiles?select=region,age.max(),age.min()')
   })
 
   test('count on column', async () => {
