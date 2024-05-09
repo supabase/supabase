@@ -13,6 +13,7 @@ import { useSelectedProject } from 'hooks'
 import { IS_PLATFORM, PROJECT_STATUS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
 import type { NextPageWithLayout } from 'types'
+import { Button } from 'ui'
 
 const Home: NextPageWithLayout = () => {
   const project = useSelectedProject()
@@ -39,6 +40,7 @@ const Home: NextPageWithLayout = () => {
       <div className="flex items-center justify-between mx-6 space-x-6">
         <h1 className="text-3xl">{projectName}</h1>
         <div className="flex items-center gap-x-3">
+          <Button onClick={() => console.log(xxx)}>Click</Button>
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <ServiceStatus />}
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <Connect />}
         </div>
