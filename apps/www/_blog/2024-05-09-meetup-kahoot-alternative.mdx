@@ -23,15 +23,15 @@ To make the meetups more engaging, we prepared an interactive quiz game that eve
 
 The Kahoot alternative that we built is a simplified version of Kahoot. Mainly having fewer features on the admin side of things, but as an individual player participating, the experience should be similar to the actual Kahoot.
 
-The game has two screens: the host screen and the player screen. The host can start a game by choosing one of the available quiz sets. Because we had meetups from around the globe, we created the same 10-question quiz sets in 4 different languages. 
+The game has two screens: the host screen and the player screen. The host can start a game by choosing one of the available quiz sets. Because we had meetups from around the globe, we created the same 10-question quiz sets in 4 different languages.
 
 ![Dashboard](/images/blog/oss-kahoot-alternative/dashboard.png)
 
 Once the host clicks the button to start a game, a lobby screen with a QR code appears. The players can scan the QR codes with their phones, name themselves, and enter the game.
 
-The host can start the quiz game once everyone in the room has entered the lobby. The players are shown the question first and then the choices five seconds later for each question. They answer the quiz on their phones, and the sooner they answer, the more points they get. 
+The host can start the quiz game once everyone in the room has entered the lobby. The players are shown the question first and then the choices five seconds later for each question. They answer the quiz on their phones, and the sooner they answer, the more points they get.
 
-Once all the questions are answered, the points are summed up, and the leaderboard is shown on the screen. 
+Once all the questions are answered, the points are summed up, and the leaderboard is shown on the screen.
 
 Actual leaderboard from the Tokyo meetup.
 
@@ -43,9 +43,9 @@ I will not go into every implementation detail, as it would be long, but you can
 
 ### Auth
 
-For authentication, we used the brand new [anonymous sign-in](https://supabase.com/docs/guides/auth/auth-anonymous) feature to sign in the players automatically in the background. This way, players don’t feel the friction after scanning the QR code and can get started with the game quickly. It also allows us to set a row-level security policy to ensure players have limited read and write permissions in the game. 
+For authentication, we used the brand new [anonymous sign-in](https://supabase.com/docs/guides/auth/auth-anonymous) feature to sign in the players automatically in the background. This way, players don’t feel the friction after scanning the QR code and can get started with the game quickly. It also allows us to set a row-level security policy to ensure players have limited read and write permissions in the game.
 
-When a user registers for a game, we check if the user is already signed in, and if not, the app signs them in. 
+When a user registers for a game, we check if the user is already signed in, and if not, the app signs them in.
 
 ```tsx
 const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
@@ -68,7 +68,7 @@ The database stores everything that happens in the app. We have 6 different tabl
 
 ### Realtime
 
-Realtime is the core of the app. The critical feature of Kahoot is to keep all the connected clients in sync with the game state, so we heavily relied on Realtime to share the game states. The admin subscribes to Postgres changes on the `participants`, `games`, and `answers` table. The subscription on the `participants` table is used when it first displays the list of participants on the lobby screen. The subscription on the games table is used to listen to the game state as the admin clicks the next button to move through the questions. Subscriptions on the answers table count how many people have answered the question so that the results can be displayed when everyone has answered the question. 
+Realtime is the core of the app. The critical feature of Kahoot is to keep all the connected clients in sync with the game state, so we heavily relied on Realtime to share the game states. The admin subscribes to Postgres changes on the `participants`, `games`, and `answers` table. The subscription on the `participants` table is used when it first displays the list of participants on the lobby screen. The subscription on the games table is used to listen to the game state as the admin clicks the next button to move through the questions. Subscriptions on the answers table count how many people have answered the question so that the results can be displayed when everyone has answered the question.
 
 Within the host page, we chain multiple Postgres changes listeners like the following to bundle the Realtime subscriptions into one.
 
@@ -108,19 +108,43 @@ supabase
 
 ## The Results
 
-Through this open-source app created using Next.js and Supabase, we brought everyone together during meetups worldwide by providing an engaging experience. 
+Through this open-source app created using Next.js and Supabase, we brought everyone together during meetups worldwide by providing an engaging experience.
 
-Thanks to everyone who participated. I hope you enjoyed it, and a massive thank you to everyone who hosted the meetups. 
+Thanks to everyone who participated. I hope you enjoyed it, and a massive thank you to everyone who hosted the meetups.
 
-<blockquote class="twitter-tweet" data-media-max-width="560"><p lang="en" dir="ltr">I had a blast at the <a href="[https://twitter.com/supabase?ref_src=twsrc^tfw](https://twitter.com/supabase?ref_src=twsrc%5Etfw)">@supabase</a> Singapore meetup tonight 💚🇸🇬🙌<br><br>Thanks everyone for joining and special shoutout to <a href="[https://twitter.com/sweekiat_lim?ref_src=twsrc^tfw](https://twitter.com/sweekiat_lim?ref_src=twsrc%5Etfw)">@sweekiat_lim</a> from <a href="[https://twitter.com/pebblely_ai?ref_src=twsrc^tfw](https://twitter.com/pebblely_ai?ref_src=twsrc%5Etfw)">@pebblely_ai</a> for presenting their incredible journey 🚀<br><br>This community 💚⚡️💚 <a href="https://t.co/E9DIIRj9To">[pic.twitter.com/E9DIIRj9To](http://pic.twitter.com/E9DIIRj9To)</a></p>— Thor 雷神 ⚡️ (@thorwebdev) <a href="[https://twitter.com/thorwebdev/status/1781318494388375911?ref_src=twsrc^tfw](https://twitter.com/thorwebdev/status/1781318494388375911?ref_src=twsrc%5Etfw)">April 19, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<blockquote class="twitter-tweet">
+  <p lang="en" dir="ltr">
+    I’m proud of my second place showing at the Salt Lake City{' '}
+    <a href="[https://twitter.com/supabase?ref_src=twsrc^tfw](https://twitter.com/supabase?ref_src=twsrc%5Etfw)">
+      @supabase
+    </a>{' '}
+    meetup hosted by{' '}
+    <a href="[https://twitter.com/KyleRummens?ref_src=twsrc^tfw](https://twitter.com/KyleRummens?ref_src=twsrc%5Etfw)">
+      @KyleRummens
+    </a>
+    . <a href="https://t.co/Uzk4q3aJyy">[pic.twitter.com/Uzk4q3aJyy](http://pic.twitter.com/Uzk4q3aJyy)</a>
+  </p>
+  — Tristan Rhodes (@tristanbob) <a href="[https://twitter.com/tristanbob/status/1781340495899406511?ref_src=twsrc^tfw](https://twitter.com/tristanbob/status/1781340495899406511?ref_src=twsrc%5Etfw)">April 19, 2024</a>
+</blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">I’m proud of my second place showing at the Salt Lake City <a href="[https://twitter.com/supabase?ref_src=twsrc^tfw](https://twitter.com/supabase?ref_src=twsrc%5Etfw)">@supabase</a> meetup hosted by <a href="[https://twitter.com/KyleRummens?ref_src=twsrc^tfw](https://twitter.com/KyleRummens?ref_src=twsrc%5Etfw)">@KyleRummens</a>. <a href="https://t.co/Uzk4q3aJyy">[pic.twitter.com/Uzk4q3aJyy](http://pic.twitter.com/Uzk4q3aJyy)</a></p>— Tristan Rhodes (@tristanbob) <a href="[https://twitter.com/tristanbob/status/1781340495899406511?ref_src=twsrc^tfw](https://twitter.com/tristanbob/status/1781340495899406511?ref_src=twsrc%5Etfw)">April 19, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-
-<blockquote class="twitter-tweet"><p lang="en" dir="ltr">I’m proud of my second place showing at the Salt Lake City <a href="[https://twitter.com/supabase?ref_src=twsrc^tfw](https://twitter.com/supabase?ref_src=twsrc%5Etfw)">@supabase</a> meetup hosted by <a href="[https://twitter.com/KyleRummens?ref_src=twsrc^tfw](https://twitter.com/KyleRummens?ref_src=twsrc%5Etfw)">@KyleRummens</a>. <a href="https://t.co/Uzk4q3aJyy">[pic.twitter.com/Uzk4q3aJyy](http://pic.twitter.com/Uzk4q3aJyy)</a></p>— Tristan Rhodes (@tristanbob) <a href="[https://twitter.com/tristanbob/status/1781340495899406511?ref_src=twsrc^tfw](https://twitter.com/tristanbob/status/1781340495899406511?ref_src=twsrc%5Etfw)">April 19, 2024</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+<blockquote class="twitter-tweet">
+  <p lang="en" dir="ltr">
+    I’m proud of my second place showing at the Salt Lake City{' '}
+    <a href="[https://twitter.com/supabase?ref_src=twsrc^tfw](https://twitter.com/supabase?ref_src=twsrc%5Etfw)">
+      @supabase
+    </a>{' '}
+    meetup hosted by{' '}
+    <a href="[https://twitter.com/KyleRummens?ref_src=twsrc^tfw](https://twitter.com/KyleRummens?ref_src=twsrc%5Etfw)">
+      @KyleRummens
+    </a>
+    . <a href="https://t.co/Uzk4q3aJyy">[pic.twitter.com/Uzk4q3aJyy](http://pic.twitter.com/Uzk4q3aJyy)</a>
+  </p>
+  — Tristan Rhodes (@tristanbob) <a href="[https://twitter.com/tristanbob/status/1781340495899406511?ref_src=twsrc^tfw](https://twitter.com/tristanbob/status/1781340495899406511?ref_src=twsrc%5Etfw)">April 19, 2024</a>
+</blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 
 ## Contributing to open source
 
-Kahoot is a complex app with many features, and many of those features are missing from this alternative app. Especially on the host dashboard, there are a lot of things that could/ should be added, like adding/ editing quz sets or looking back on past game results. Again, the GitHub repo can be found [here](https://github.com/supabase-community/kahoot-alternative), and we are always welcome to receive pull requests. If you want to get into Open source, a casual project like this is a great starting point. Any kind of PR is welcome. Adding/ editing docs/ readme is greatly appreciated, as well. If unsure where to start, ping us about the issue, and we can help you. 
+Kahoot is a complex app with many features, and many of those features are missing from this alternative app. Especially on the host dashboard, there are a lot of things that could/ should be added, like adding/ editing quz sets or looking back on past game results. Again, the GitHub repo can be found [here](https://github.com/supabase-community/kahoot-alternative), and we are always welcome to receive pull requests. If you want to get into Open source, a casual project like this is a great starting point. Any kind of PR is welcome. Adding/ editing docs/ readme is greatly appreciated, as well. If unsure where to start, ping us about the issue, and we can help you.
 
 ## Resources
 
