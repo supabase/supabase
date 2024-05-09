@@ -42,7 +42,13 @@ const Home: NextPageWithLayout = () => {
       <div className="flex items-center justify-between mx-6 space-x-6">
         <h1 className="text-3xl">{projectName}</h1>
         <div className="flex items-center gap-x-3">
-          <Button onClick={() => console.log((xxx as any).name)}>Click</Button>
+          <Button
+            onClick={() => {
+              throw new Error('Crashed')
+            }}
+          >
+            Click
+          </Button>
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <ServiceStatus />}
           {IS_PLATFORM && project?.status === PROJECT_STATUS.ACTIVE_HEALTHY && <Connect />}
         </div>
