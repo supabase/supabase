@@ -981,7 +981,7 @@ export function someFilter(filter: Filter, predicate: (filter: ColumnFilter) => 
   } else if (type === 'logical') {
     return filter.values.some((f) => someFilter(f, predicate))
   } else {
-    throw new Error(`Unknown filter type '${type}'`)
+    throw new UnsupportedError(`Unknown filter type '${type}'`)
   }
 }
 
@@ -1002,7 +1002,7 @@ export function everyTarget(
     } else if (type === 'embedded-target') {
       return everyTarget(target.targets, predicate, target)
     } else {
-      throw new Error(`Unknown target type '${type}'`)
+      throw new UnsupportedError(`Unknown target type '${type}'`)
     }
   })
 }
@@ -1024,7 +1024,7 @@ export function someTarget(
     } else if (type === 'embedded-target') {
       return someTarget(target.targets, predicate, target)
     } else {
-      throw new Error(`Unknown target type '${type}'`)
+      throw new UnsupportedError(`Unknown target type '${type}'`)
     }
   })
 }
@@ -1040,7 +1040,7 @@ export function flattenTargets(targets: Target[]): Target[] {
     } else if (type === 'embedded-target') {
       return [target, ...flattenTargets(target.targets)]
     } else {
-      throw new Error(`Unknown target type '${type}'`)
+      throw new UnsupportedError(`Unknown target type '${type}'`)
     }
   })
 }
@@ -1069,7 +1069,7 @@ function validateGroupClause(groupClause: ColumnRef[], targets: Target[], from: 
       })
     )
   ) {
-    throw new Error(`Every group by column must also exist as a select target`)
+    throw new UnsupportedError(`Every group by column must also exist as a select target`)
   }
 
   if (
@@ -1090,14 +1090,16 @@ function validateGroupClause(groupClause: ColumnRef[], targets: Target[], from: 
       return groupByColumns.some((column) => qualifiedNames.includes(column))
     })
   ) {
-    throw new Error(`Every non-aggregate select target must also exist in the group by clause`)
+    throw new UnsupportedError(
+      `Every non-aggregate select target must also exist in the group by clause`
+    )
   }
 
   if (
     groupByColumns.length > 0 &&
     !someTarget(targets, (target) => target.type === 'aggregate-target')
   ) {
-    throw new Error(
+    throw new UnsupportedError(
       `There must be at least one aggregate function in the select target list when using group by`
     )
   }
