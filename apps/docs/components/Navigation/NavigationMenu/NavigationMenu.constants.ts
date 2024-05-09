@@ -1284,12 +1284,7 @@ export const realtime: NavMenuConstant = {
       items: [
         { name: 'Quotas', url: '/guides/realtime/quotas' },
         { name: 'Architecture', url: '/guides/realtime/architecture' },
-        { name: 'Message Protocol', url: '/guides/realtime/protocol' },
-        {
-          name: 'Bring Your Own Database',
-          url: '/guides/realtime/bring-your-own-database',
-          items: [],
-        },
+        { name: 'Message Protocol', url: '/guides/realtime/protocol', items: [] },
       ],
     },
   ],
