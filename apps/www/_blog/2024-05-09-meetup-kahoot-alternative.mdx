@@ -47,7 +47,7 @@ For authentication, we used the brand new [anonymous sign-in](https://supabase.c
 
 When a user registers for a game, we check if the user is already signed in, and if not, the app signs them in.
 
-```tsx
+```typescript
 const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
 
 let userId: string | null = null
@@ -72,7 +72,7 @@ Realtime is the core of the app. The critical feature of Kahoot is to keep all t
 
 Within the host page, we chain multiple Postgres changes listeners like the following to bundle the realtime subscriptions into one.
 
-```tsx
+```typescript
 supabase
   .channel('game')
   .on(
