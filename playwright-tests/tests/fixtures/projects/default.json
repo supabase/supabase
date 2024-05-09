@@ -1,0 +1,28 @@
+{
+  "cloud_provider": "AWS",
+  "db_host": "db.projectref.supabase.co",
+  "id": 2137,
+  "inserted_at": "2023-01-30T16:07:16.040884",
+  "name": "[LIVE] supabase-com",
+  "organization_id": 1,
+  "ref": "projectref",
+  "region": "us-east-1",
+  "status": "ACTIVE_HEALTHY",
+  "subscription_id": "sub_subscription_id",
+  "connectionString": "connectionString",
+  "restUrl": "https://projectref.supabase.co/rest/v1/",
+  "volumeSizeGb": 8,
+  "maxDatabasePreprovisionGb": null,
+  "lastDatabaseResizeAt": null,
+  "is_branch_enabled": true,
+  "is_read_replicas_enabled": true,
+  "is_physical_backups_enabled": false,
+  "infra_compute_size": "micro",
+  "kpsVersion": "supabase-postgres-15.1.0.33",
+  "dbVersion": "supabase-postgres-15.1.0.33",
+  "serviceVersions": {
+    "gotrue": "2.150.1",
+    "postgrest": "10.2.0",
+    "supabase-postgres": "15.1.0.33"
+  }
+}

@@ -1,0 +1,29 @@
+[
+  {
+    "id": 25491,
+    "ref": "default",
+    "name": "Segment Production",
+    "status": "ACTIVE_HEALTHY",
+    "organization_id": 1,
+    "inserted_at": "2021-06-16T04:03:09.700217",
+    "subscription_id": "sub_subscription_id",
+    "cloud_provider": "AWS",
+    "region": "us-east-1",
+    "disk_volume_size_gb": 2373,
+    "size": "m6g.large",
+    "db_user_supabase": "db_user_supabase",
+    "db_pass_supabase": "db_pass_supabase",
+    "db_dns_name": "12.123.123.123",
+    "db_host": "db.projectref.supabase.co",
+    "db_port": 5432,
+    "db_name": "postgres",
+    "ssl_enforced": false,
+    "read_replicas_enabled": false,
+    "walg_enabled": true,
+    "infra_compute_size": "large",
+    "preview_branch_refs": [],
+    "is_branch_enabled": false,
+    "is_read_replicas_enabled": false,
+    "is_physical_backups_enabled": true
+  }
+]
