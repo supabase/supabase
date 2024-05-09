@@ -96,21 +96,21 @@ const NavigationBar = () => {
       <nav
         data-state={snap.navigationPanelOpen ? 'expanded' : 'collapsed'}
         className={cn(
-          'group py-2 z-10 h-full w-14 data-[state=expanded]:w-[13rem]',
+          'group z-10 h-full w-14 data-[state=expanded]:w-[13rem]',
           'border-r bg-studio border-default data-[state=expanded]:shadow-xl',
           'transition-width duration-200',
-          'hide-scrollbar flex flex-col justify-between overflow-y-auto'
+          'hide-scrollbar flex flex-col overflow-y-auto'
         )}
         onMouseEnter={() => snap.setNavigationPanelOpen(true)}
         onMouseLeave={() => {
           if (!userDropdownOpen) snap.setNavigationPanelOpen(false)
         }}
       >
-        <ul className="flex flex-col gap-y-1 justify-start px-2">
-          {(!navLayoutV2 || !IS_PLATFORM) && (
+        {(!navLayoutV2 || !IS_PLATFORM) && (
+          <div className="sticky top-0 mb-1 py-1 px-2 flex h-[48px] bg-studio z-50">
             <Link
               href={IS_PLATFORM ? '/projects' : `/project/${projectRef}`}
-              className="mx-2 flex items-center h-[40px]"
+              className="mx-2 flex items-center h-[48px]"
               onClick={onCloseNavigationIconLink}
             >
               <img
@@ -119,7 +119,9 @@ const NavigationBar = () => {
                 className="absolute h-[40px] w-6 cursor-pointer rounded"
               />
             </Link>
-          )}
+          </div>
+        )}
+        <ul className="flex flex-col gap-y-1 justify-start px-2">
           <NavigationIconLink
             isActive={isUndefined(activeRoute) && !isUndefined(router.query.ref)}
             route={{
