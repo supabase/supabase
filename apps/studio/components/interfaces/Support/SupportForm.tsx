@@ -122,7 +122,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   }, [subject])
 
   useEffect(() => {
-    if (searchState.status === 'fullResults') {
+    if (subject.trim().length > 0 && searchState.status === 'fullResults') {
       setDocsResults(searchState.results)
     } else if (searchState.status === 'noResults' || searchState.status === 'error') {
       setDocsResults([])
@@ -695,7 +695,7 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     {docsResults.length > 0 && hasResults && (
                       <div>
                         {docsResults.map((page, i) => (
-                          <Command key="docs-search">
+                          <Command key={page.id}>
                             <CommandGroup
                               key={`${page.path}-group`}
                               heading=""
