@@ -1124,7 +1124,7 @@ describe('select', () => {
     expect(fullPath).toBe('/orders?select=amount::int.sum()::float')
   })
 
-  test('unsupported aggregate fails', async () => {
+  test('unsupported aggregate function fails', async () => {
     const sql = stripIndents`
       select
         custom_sum(amount::int)::float
@@ -1181,6 +1181,33 @@ describe('select', () => {
     await expect(processSql(sql)).rejects.toThrowError()
   })
 
+  test('aggregate with another target column but no group by fails', async () => {
+    const sql = stripIndents`
+      select
+        sum(amount),
+        category
+      from
+        orders
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
+  test('aggregate with missing group by column fails', async () => {
+    const sql = stripIndents`
+      select
+        sum(amount),
+        category,
+        name
+      from
+        orders
+      group by
+        category
+    `
+
+    await expect(processSql(sql)).rejects.toThrowError()
+  })
+
   test('group by with having fails', async () => {
     const sql = stripIndents`
       select
@@ -1190,22 +1217,70 @@ describe('select', () => {
         orders
       group by
         category
-          having sum(amount) > 1000
+      having sum(amount) > 1000
     `
 
     await expect(processSql(sql)).rejects.toThrowError()
   })
 
-  test('group by without aggregate fails', async () => {
+  test('group by a joined column', async () => {
     const sql = stripIndents`
       select
-        category
+        sum(amount),
+        customer.region
       from
         orders
+      join
+        customers customer
+      on customer_id = customer.id
       group by
-        category
+        customer.region
     `
 
-    await expect(processSql(sql)).rejects.toThrowError()
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/orders?select=amount.sum(),...customer:customers!inner(region)')
+  })
+
+  test('aggregate on a joined column', async () => {
+    const sql = stripIndents`
+      select
+        name,
+        avg(orders.amount) as average_spend
+      from
+        customers
+      join
+        orders
+      on id = orders.customer_id
+      group by
+        name
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/customers?select=name,...orders!inner(average_spend:amount.avg())')
+  })
+
+  test('aliased primary relation in group by', async () => {
+    const sql = stripIndents`
+      select
+        region,
+        max(age),
+        min(age)
+      from
+        profiles p
+      group by
+        p.region
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/profiles?select=region,age.max(),age.min')
   })
 })

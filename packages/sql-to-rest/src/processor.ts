@@ -236,23 +236,7 @@ function processSelectStmt(stmt: SelectStmt): Select {
 
   const targets = processTargetList(stmt.SelectStmt.targetList, alias ?? from, embeddedTargets)
 
-  const groupByColumns =
-    stmt.SelectStmt.groupClause?.map((columnRef) => renderFields(columnRef.ColumnRef.fields)) ?? []
-
-  if (
-    !groupByColumns.every((column) => someTarget(targets, (target) => target.column === column))
-  ) {
-    throw new Error(`Every group by column must also exist as a select target`)
-  }
-
-  if (
-    groupByColumns.length > 0 &&
-    !someTarget(targets, (target) => target.type === 'aggregate-target')
-  ) {
-    throw new Error(
-      `There must be at least one aggregate function in the select target list when using group by`
-    )
-  }
+  validateGroupClause(stmt.SelectStmt.groupClause ?? [], targets, alias ?? from)
 
   const filter = stmt.SelectStmt.whereClause
     ? processWhereClause(stmt.SelectStmt.whereClause)
@@ -975,19 +959,42 @@ export function someFilter(filter: Filter, predicate: (filter: ColumnFilter) => 
 
 /**
  * Recursively iterates through a PostgREST target list and checks if the predicate
+ * matches every one of them (ie. `some()`).
+ */
+export function everyTarget(
+  targets: Target[],
+  predicate: (target: ColumnTarget | AggregateTarget, parent?: EmbeddedTarget) => boolean,
+  parent?: EmbeddedTarget
+): boolean {
+  return targets.every((target) => {
+    const { type } = target
+
+    if (type === 'column-target' || type === 'aggregate-target') {
+      return predicate(target, parent)
+    } else if (type === 'embedded-target') {
+      return everyTarget(target.targets, predicate, target)
+    } else {
+      throw new Error(`Unknown target type '${type}'`)
+    }
+  })
+}
+
+/**
+ * Recursively iterates through a PostgREST target list and checks if the predicate
  * matches any of them (ie. `some()`).
  */
 export function someTarget(
   targets: Target[],
-  predicate: (target: ColumnTarget | AggregateTarget) => boolean
+  predicate: (target: ColumnTarget | AggregateTarget, parent?: EmbeddedTarget) => boolean,
+  parent?: EmbeddedTarget
 ): boolean {
   return targets.some((target) => {
     const { type } = target
 
     if (type === 'column-target' || type === 'aggregate-target') {
-      return predicate(target)
+      return predicate(target, parent)
     } else if (type === 'embedded-target') {
-      return someTarget(target.targets, predicate)
+      return someTarget(target.targets, predicate, target)
     } else {
       throw new Error(`Unknown target type '${type}'`)
     }
@@ -1008,4 +1015,56 @@ export function flattenTargets(targets: Target[]): Target[] {
       throw new Error(`Unknown target type '${type}'`)
     }
   })
+}
+
+function validateGroupClause(groupClause: ColumnRef[], targets: Target[], from: string) {
+  const groupByColumns =
+    groupClause.map((columnRef) => renderFields(columnRef.ColumnRef.fields)) ?? []
+
+  if (
+    !groupByColumns.every((column) =>
+      someTarget(targets, (target, parent) => {
+        const paths = parent
+          ? // joined columns have to be prefixed with their relation
+            [[parent.alias ?? parent.relation, target.column]]
+          : // top-level columns can be optionally prefixed with the primary table
+            [[target.column], [from, target.column]]
+
+        const qualifiedNames = paths.map((path) => path.join('.'))
+
+        return qualifiedNames.includes(column)
+      })
+    )
+  ) {
+    throw new Error(`Every group by column must also exist as a select target`)
+  }
+
+  if (
+    someTarget(targets, (target) => target.type === 'aggregate-target') &&
+    !everyTarget(targets, (target, parent) => {
+      if (target.type === 'aggregate-target') {
+        return true
+      }
+      const paths = parent
+        ? // joined columns have to be prefixed with their relation
+          [[parent.alias ?? parent.relation, target.column]]
+        : // top-level columns can be optionally prefixed with the primary table
+          [[target.column], [from, target.column]]
+
+      const qualifiedNames = paths.map((path) => path.join('.'))
+
+      return groupByColumns.some((column) => qualifiedNames.includes(column))
+    })
+  ) {
+    throw new Error(`Every non-aggregate select target must also exist in the group by clause`)
+  }
+
+  if (
+    groupByColumns.length > 0 &&
+    !someTarget(targets, (target) => target.type === 'aggregate-target')
+  ) {
+    throw new Error(
+      `There must be at least one aggregate function in the select target list when using group by`
+    )
+  }
 }
