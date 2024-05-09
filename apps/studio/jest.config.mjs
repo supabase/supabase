@@ -20,6 +20,7 @@ const config = {
     'lib/common/fetch': '<rootDir>/__mocks__/lib/common/fetch',
     'hooks/analytics/useLogsQuery': '<rootDir>/__mocks__/hooks/analytics/useLogsQuery',
     'data/reports/api-report-query': '<rootDir>/__mocks__/hooks/useApiReport',
+    'data/reports/storage-report-query': '<rootDir>/__mocks__/hooks/useStorageReport',
   },
   testEnvironment: 'jsdom',
   testTimeout: 10000,

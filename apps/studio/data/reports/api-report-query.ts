@@ -1,11 +1,12 @@
+import { isEqual } from 'lodash'
+import { useEffect, useState } from 'react'
+
 import { useParams } from 'common'
 import { PRESET_CONFIG } from 'components/interfaces/Reports/Reports.constants'
 import { ReportFilterItem } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import { LogsEndpointParams } from 'components/interfaces/Settings/Logs'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { isEqual } from 'lodash'
-import { useEffect, useState } from 'react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 export const useApiReport = () => {
