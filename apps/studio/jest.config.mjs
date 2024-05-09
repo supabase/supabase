@@ -18,7 +18,7 @@ const config = {
     'react-dnd': '<rootDir>/__mocks__/react-dnd.js',
     // [Joshen] There's bound to be a better way to do this and we'll need to figure this out
     'lib/common/fetch': '<rootDir>/__mocks__/lib/common/fetch',
-    'hooks/analytics/useLogsQuery': '<rootDir>/__mocks__/hooks/analytics/useLogsQuery',
+    // 'hooks/analytics/useLogsQuery': '<rootDir>/__mocks__/hooks/analytics/useLogsQuery',
     'data/reports/api-report-query': '<rootDir>/__mocks__/hooks/useApiReport',
     'data/reports/storage-report-query': '<rootDir>/__mocks__/hooks/useStorageReport',
     'data/subscriptions/org-subscription-query':

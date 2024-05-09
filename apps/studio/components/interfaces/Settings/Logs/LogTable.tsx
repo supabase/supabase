@@ -280,6 +280,7 @@ const LogTable = ({
           </Tooltip.Root>
         )}
         <Button
+          title="run-logs-query"
           type={hasEditorValue ? 'primary' : 'alternative'}
           disabled={!hasEditorValue}
           onClick={onRun}
