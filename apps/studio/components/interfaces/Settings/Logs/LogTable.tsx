@@ -335,6 +335,7 @@ const LogTable = ({
       {!queryType && <LogsExplorerTableHeader />}
       <div className={`flex h-full flex-row ${!queryType ? 'border-l border-r' : ''}`}>
         <DataGrid
+          role="table"
           style={{ height: '100%' }}
           className={`
             flex-1 flex-grow h-full

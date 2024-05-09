@@ -1,14 +1,13 @@
-import { screen } from '@testing-library/react'
+import { findByRole, findByText, fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useRouter } from 'next/router'
-
+import {get} from "lib/common/fetch"
 // [Joshen] Am temporarily commenting out the breaking tests due to:
 // "TypeError: _fetch.get.mockReset is not a function" error from Jest
 // just so we get our jest unit/UI tests up and running first
 // Need to figure out how to mock the "get" method from lib/common/fetch properly
-
 const defaultRouterMock = () => {
   const router = jest.fn()
   router.query = {}
@@ -47,7 +46,7 @@ jest.mock('data/subscriptions/org-subscription-query', () => ({
 
 beforeEach(() => {
   // reset mocks between tests
-  // get.mockReset()
+  get.mockReset()
 
   useRouter.mockReset()
   const routerReturnValue = defaultRouterMock()
@@ -63,7 +62,7 @@ const defaultRendererFallbacksCases = [
   'api',
   'database',
   'auth',
-  'pgbouncer',
+  'supavisor',
   'postgrest',
   'storage',
   'realtime',
@@ -82,184 +81,186 @@ const defaultRendererFallbacksCases = [
   selectionTexts: [/some message/],
 }))
 
-// test.each([
-//   {
-//     queryType: 'api',
-//     tableName: undefined,
-//     tableLog: logDataFixture({
-//       path: 'some-path',
-//       method: 'POST',
-//       status_code: '400',
-//       metadata: undefined,
-//     }),
-//     selectionLog: logDataFixture({
-//       metadata: [{ request: [{ method: 'POST' }] }],
-//     }),
-//     tableTexts: [/POST/, /some\-path/, /400/],
-//     selectionTexts: [/POST/, /Timestamp/, RegExp(`${new Date().getFullYear()}.+`, 'g')],
-//   },
+test.each([
+  {
+    queryType: 'api',
+    tableName: undefined,
+    tableLog: logDataFixture({
+      path: 'some-path',
+      method: 'POST',
+      status_code: '400',
+      metadata: undefined,
+    }),
+    selectionLog: logDataFixture({
+      metadata: [{ request: [{ method: 'POST' }] }],
+    }),
+    tableTexts: [/POST/, /some\-path/, /400/],
+    selectionTexts: [/POST/, /Timestamp/, RegExp(`${new Date().getFullYear()}.+`, 'g')],
+  },
 
-//   {
-//     queryType: 'database',
-//     tableName: undefined,
-//     tableLog: logDataFixture({
-//       error_severity: 'ERROR',
-//       event_message: 'some db event',
-//       metadata: undefined,
-//     }),
-//     selectionLog: logDataFixture({
-//       metadata: [
-//         {
-//           parsed: [
-//             {
-//               application_type: 'client backend',
-//               error_severity: 'ERROR',
-//               hint: 'some pg hint',
-//             },
-//           ],
-//         },
-//       ],
-//     }),
-//     tableTexts: [/ERROR/, /some db event/],
-//     selectionTexts: [
-//       /client backend/,
-//       /some pg hint/,
-//       /ERROR/,
-//       /Timestamp/,
-//       RegExp(`${new Date().getFullYear()}.+`, 'g'),
-//     ],
-//   },
-//   {
-//     queryType: 'auth',
-//     tableName: undefined,
-//     tableLog: logDataFixture({
-//       event_message: 'some event_message',
-//       level: 'info',
-//       path: '/auth-path',
-//       msg: 'some metadata_msg',
-//       level: 'info',
-//       status: 300,
-//       metadata: undefined,
-//     }),
-//     selectionLog: logDataFixture({
-//       event_message: 'some event_message',
-//       metadata: {
-//         msg: 'some metadata_msg',
-//         path: '/auth-path',
-//         level: 'info',
-//         status: 300,
-//       },
-//     }),
-//     tableTexts: [/auth\-path/, /some metadata_msg/, /INFO/],
-//     selectionTexts: [
-//       /auth\-path/,
-//       /some metadata_msg/,
-//       /INFO/,
-//       /300/,
-//       /Timestamp/,
-//       RegExp(`${new Date().getFullYear()}.+`, 'g'),
-//     ],
-//   },
-//   ...defaultRendererFallbacksCases,
-//   // these all use teh default selection/table renderers
-//   ...['pgbouncer', 'postgrest', 'storage', 'realtime', 'supavisor'].map((queryType) => ({
-//     queryType,
-//     tableName: undefined,
-//     tableLog: logDataFixture({
-//       event_message: 'some message',
-//       metadata: undefined,
-//     }),
-//     selectionLog: logDataFixture({
-//       metadata: [{ some: [{ nested: 'value' }] }],
-//     }),
-//     tableTexts: [/some message/],
-//     selectionTexts: [/some/, /nested/, /value/, RegExp(`${new Date().getFullYear()}.+`, 'g')],
-//   })),
-// ])(
-//   'selection $queryType $queryType, $tableName , can display log data and metadata $testName',
-//   async ({ queryType, tableName, tableLog, selectionLog, tableTexts, selectionTexts }) => {
-//     get.mockImplementation((url) => {
-//       // counts
-//       if (url.includes('count')) {
-//         return { result: [{ count: 0 }] }
-//       }
-//       // single
-//       if (url.includes('where+id')) {
-//         return { result: [selectionLog] }
-//       }
-//       // table
-//       return { result: [tableLog] }
-//     })
-//     render(<LogsPreviewer projectRef="123" queryType={queryType} tableName={tableName} />)
+  {
+    queryType: 'database',
+    tableName: undefined,
+    tableLog: logDataFixture({
+      error_severity: 'ERROR',
+      event_message: 'some db event',
+      metadata: undefined,
+    }),
+    selectionLog: logDataFixture({
+      metadata: [
+        {
+          parsed: [
+            {
+              application_type: 'client backend',
+              error_severity: 'ERROR',
+              hint: 'some pg hint',
+            },
+          ],
+        },
+      ],
+    }),
+    tableTexts: [/ERROR/, /some db event/],
+    selectionTexts: [
+      /client backend/,
+      /some pg hint/,
+      /ERROR/,
+      /Timestamp/,
+      RegExp(`${new Date().getFullYear()}.+`, 'g'),
+    ],
+  },
+  {
+    queryType: 'auth',
+    tableName: undefined,
+    tableLog: logDataFixture({
+      event_message: 'some event_message',
+      level: 'info',
+      path: '/auth-path',
+      msg: 'some metadata_msg',
+      level: 'info',
+      status: 300,
+      metadata: undefined,
+    }),
+    selectionLog: logDataFixture({
+      event_message: 'some event_message',
+      metadata: {
+        msg: 'some metadata_msg',
+        path: '/auth-path',
+        level: 'info',
+        status: 300,
+      },
+    }),
+    tableTexts: [/auth\-path/, /some metadata_msg/, /INFO/],
+    selectionTexts: [
+      /auth\-path/,
+      /some metadata_msg/,
+      /INFO/,
+      /300/,
+      /Timestamp/,
+      RegExp(`${new Date().getFullYear()}.+`, 'g'),
+    ],
+  },
+  ...defaultRendererFallbacksCases,
+  // these all use teh default selection/table renderers
+  ...['supavisor', 'postgrest', 'storage', 'realtime', 'supavisor'].map((queryType) => ({
+    queryType,
+    tableName: undefined,
+    tableLog: logDataFixture({
+      event_message: 'some message',
+      metadata: undefined,
+    }),
+    selectionLog: logDataFixture({
+      metadata: [{ some: [{ nested: 'value' }] }],
+    }),
+    tableTexts: [/some message/],
+    selectionTexts: [/some/, /nested/, /value/, RegExp(`${new Date().getFullYear()}.+`, 'g')],
+  })),
+])(
+  'selection $queryType $queryType, $tableName , can display log data and metadata $testName',
+  async ({ queryType, tableName, tableLog, selectionLog, tableTexts, selectionTexts }) => {
+    get.mockImplementation((url) => {
+      // counts
+      if (url.includes('count')) {
+        return { result: [{ count: 0 }] }
+      }
+      // single
+      if (url.includes('where+id')) {
+        return { result: [selectionLog] }
+      }
+      // table
+      return { result: [tableLog] }
+    })
+    render(<LogsPreviewer projectRef="123" queryType={queryType} tableName={tableName} />)
 
-//     await waitFor(() => {
-//       expect(get).toHaveBeenCalledWith(
-//         expect.stringContaining('iso_timestamp_start'),
-//         expect.anything()
-//       )
-//       expect(get).not.toHaveBeenCalledWith(
-//         expect.stringContaining('iso_timestamp_end'),
-//         expect.anything()
-//       )
-//     })
-//     // reset mock so that we can check for selection call
-//     get.mockClear()
+    await waitFor(() => {
+      expect(get).toHaveBeenCalledWith(
+        expect.stringContaining('iso_timestamp_start'),
+        expect.anything()
+      )
+      expect(get).not.toHaveBeenCalledWith(
+        expect.stringContaining('iso_timestamp_end'),
+        expect.anything()
+      )
+    })
+    // reset mock so that we can check for selection call
+    get.mockClear()
 
-//     for (const text of tableTexts) {
-//       await screen.findByText(text)
-//     }
-//     const row = await screen.findByText(tableTexts[0])
-//     fireEvent.click(row)
+    for (const text of tableTexts) {
+      await screen.findByText(text)
+    }
+    const row = await screen.findByText(tableTexts[0])
+    fireEvent.click(row)
 
-//     await waitFor(() => {
-//       expect(get).toHaveBeenCalledWith(
-//         expect.stringContaining('iso_timestamp_start'),
-//         expect.anything()
-//       )
-//       expect(get).not.toHaveBeenCalledWith(
-//         expect.stringContaining('iso_timestamp_end'),
-//         expect.anything()
-//       )
-//     })
+    await waitFor(() => {
+      expect(get).toHaveBeenCalledWith(
+        expect.stringContaining('iso_timestamp_start'),
+        expect.anything()
+      )
+      expect(get).not.toHaveBeenCalledWith(
+        expect.stringContaining('iso_timestamp_end'),
+        expect.anything()
+      )
+    })
 
-//     for (const text of selectionTexts) {
-//       await screen.findAllByText(text)
-//     }
-//   }
-// )
+    for (const text of selectionTexts) {
+      await screen.findAllByText(text)
+    }
+  }
+)
 
-// test('Search will trigger a log refresh', async () => {
-//   get.mockImplementation((url) => {
-//     if (url.includes('something')) {
-//       return {
-//         result: [logDataFixture({ id: 'some-event-id' })],
-//       }
-//     }
-//     return { result: [] }
-//   })
-//   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
+test('Search will trigger a log refresh', async () => {
+  get.mockImplementation((url) => {
+    if (url.includes('something')) {
+      console.log("emitting log")
+      return {
+        result: [logDataFixture({ id: 'some-event-id-123', event_message: "some-message" })],
+      }
+    }
+    return { result: [] }
+  })
+  render(<LogsPreviewer projectRef="123" queryType="auth" />)
 
-//   userEvent.type(screen.getByPlaceholderText(/Search events/), 'something{enter}')
+  userEvent.type(screen.getByPlaceholderText(/Search events/), 'something{enter}')
 
-//   await waitFor(
-//     () => {
-//       expect(get).toHaveBeenCalledWith(expect.stringContaining('something'), expect.anything())
+  await waitFor(
+    () => {
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('something'), expect.anything())
 
-//       // updates router query params
-//       const router = useRouter()
-//       expect(router.push).toHaveBeenCalledWith(
-//         expect.objectContaining({
-//           pathname: expect.any(String),
-//           query: expect.objectContaining({
-//             s: expect.stringContaining('something'),
-//           }),
-//         })
-//       )
-//     },
-//     { timeout: 1500 }
-//   )
-//   await screen.findByText(/some-event-id/)
-// })
+      // updates router query params
+      const router = useRouter()
+      expect(router.push).toHaveBeenCalledWith(
+        expect.objectContaining({
+          pathname: expect.any(String),
+          query: expect.objectContaining({
+            s: expect.stringContaining('something'),
+          }),
+        })
+      )
+    },
+    { timeout: 1500 }
+  )
+  const table = await screen.findByRole("table")
+  await findByText(table, /some-message/,  {selector: "*"}, {timeout: 1500})
+})
 
 // test('poll count for new messages', async () => {
 //   get.mockImplementation((url) => {
@@ -445,6 +446,10 @@ const defaultRendererFallbacksCases = [
 // })
 
 test('bug: nav to explorer preserves newlines', async () => {
+
+  get.mockImplementation((url) => {
+    return { result: [] }
+  })
   render(<LogsPreviewer projectRef="123" tableName={LogsTableName.EDGE} />)
   const router = useRouter()
   const button = await screen.findByText(/Explore via query/)

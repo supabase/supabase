@@ -17,6 +17,7 @@ const columns: Column<LogData>[] = [
         return defaultRenderCell(props)
       }
 
+      console.log({props})
       return (
         <RowLayout>
           <TimestampLocalFormatter value={props.row.timestamp!} />
