@@ -23,6 +23,7 @@
     "react-tooltip": "*",
     "reactflow": "*",
     "remark-gfm": "^4.0.0",
+    "sql-formatter": "^15.3.1",
     "sql-to-rest": "*",
     "tsconfig": "*",
     "ui": "*"

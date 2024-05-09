@@ -12,6 +12,7 @@ import {
   useState,
 } from 'react'
 import Markdown from 'react-markdown'
+import { format } from 'sql-formatter'
 import {
   HttpRequest,
   ParsingError,
@@ -278,6 +279,26 @@ export default function SqlToRest({
                 enabled: false,
               },
               fontSize: 13,
+            }}
+            onMount={(editor, monaco) => {
+              monaco.languages.registerDocumentFormattingEditProvider('pgsql', {
+                async provideDocumentFormattingEdits(model) {
+                  const currentCode = editor.getValue()
+                  const formattedCode = format(currentCode, {
+                    language: 'postgresql',
+                    keywordCase: 'lower',
+                  })
+                  return [
+                    {
+                      range: model.getFullModelRange(),
+                      text: formattedCode,
+                    },
+                  ]
+                },
+              })
+              editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, async () => {
+                await editor.getAction('editor.action.formatDocument').run()
+              })
             }}
             onChange={async (sql) => {
               if (!sql) {
