@@ -72,7 +72,7 @@ export default function SqlToRest({
 
   const [sql, setSql] = useState(defaultValue)
   const [statement, setStatement] = useState<Statement>()
-  const [currentLanguage, setCurrentLanguage] = useState('http')
+  const [currentLanguage, setCurrentLanguage] = useState('curl')
 
   const [httpRequest, setHttpRequest] = useState<HttpRequest>()
   const [jsQuery, setJsQuery] = useState<SupabaseJsQuery>()
@@ -299,8 +299,8 @@ export default function SqlToRest({
               {unsupportedError.message}. {unsupportedError.hint}
             </div>
             <div className="prose text-sm mt-2">
-              PostgREST doesn't support this query. If you're unable to modify the query, wrap it in
-              a stored procedure and call it using the{' '}
+              PostgREST doesn't support this query. If you're sure the syntax is correct and are
+              unable to modify it, wrap it in a stored procedure and call it using the{' '}
               <a href="https://postgrest.org/en/v12/references/api/stored_procedures.html#stored-procedures">
                 RPC
               </a>{' '}
