@@ -83,6 +83,16 @@ export type IlikeColumnFilter = BaseColumnFilter & {
   value: string
 }
 
+export type MatchColumnFilter = BaseColumnFilter & {
+  operator: 'match'
+  value: string
+}
+
+export type ImatchColumnFilter = BaseColumnFilter & {
+  operator: 'imatch'
+  value: string
+}
+
 export type IsColumnFilter = BaseColumnFilter & {
   operator: 'is'
   value: null
@@ -97,6 +107,8 @@ export type ColumnFilter =
   | LteColumnFilter
   | LikeColumnFilter
   | IlikeColumnFilter
+  | MatchColumnFilter
+  | ImatchColumnFilter
   | IsColumnFilter
 
 export type LogicalFilter = BaseFilter & {
@@ -855,6 +867,10 @@ function mapOperatorSymbol(operatorSymbol: string) {
       return 'like'
     case '~~*':
       return 'ilike'
+    case '~':
+      return 'match'
+    case '~*':
+      return 'imatch'
     default:
       throw new UnsupportedError(`Unsupported operator symbol '${operatorSymbol}'`)
   }

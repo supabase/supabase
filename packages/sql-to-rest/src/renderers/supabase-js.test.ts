@@ -273,6 +273,90 @@ describe('select', () => {
     `)
   })
 
+  test('like', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      where
+        description like 'Cheese%'
+    `
+
+    const statement = await processSql(sql)
+    const { code } = await renderSupabaseJs(statement)
+
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .like('description', 'Cheese%')
+    `)
+  })
+
+  test('ilike', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      where
+        description ilike '%cheese%'
+    `
+
+    const statement = await processSql(sql)
+    const { code } = await renderSupabaseJs(statement)
+
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .ilike('description', '%cheese%')
+    `)
+  })
+
+  test('match', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      where
+      description ~ '^[a-zA-Z]+'
+    `
+
+    const statement = await processSql(sql)
+    const { code } = await renderSupabaseJs(statement)
+
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .match('description', '^[a-zA-Z]+')
+    `)
+  })
+
+  test('imatch', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      where
+      description ~* '^[a-z]+'
+    `
+
+    const statement = await processSql(sql)
+    const { code } = await renderSupabaseJs(statement)
+
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .imatch('description', '^[a-z]+')
+    `)
+  })
+
   test('"and" expression', async () => {
     const sql = stripIndents`
       select

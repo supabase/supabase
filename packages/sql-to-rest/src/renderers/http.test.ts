@@ -241,6 +241,74 @@ describe('select', () => {
     expect(fullPath).toBe('/books?pages=lte.10')
   })
 
+  test('like', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      where
+        description like 'Cheese%'
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?description=like.Cheese*')
+  })
+
+  test('ilike', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      where
+        description ilike '%cheese%'
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?description=ilike.*cheese*')
+  })
+
+  test('match', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      where
+        description ~ '^[a-zA-Z]+'
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?description=match.%5E[a-zA-Z]%2B')
+  })
+
+  test('imatch', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      where
+        description ~* '^[a-z]+'
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?description=imatch.%5E[a-z]%2B')
+  })
+
   test('"and" expression', async () => {
     const sql = stripIndents`
       select

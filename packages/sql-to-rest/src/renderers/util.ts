@@ -96,7 +96,7 @@ export function renderTargets(
     .join(',' + maybeNewline)
 }
 
-export const defaultCharacterWhitelist = ['*', '(', ')', ',', ':', '!', '>', '-']
+export const defaultCharacterWhitelist = ['*', '(', ')', ',', ':', '!', '>', '-', '[', ']']
 
 /**
  * URI encodes query parameters with an optional character whitelist
