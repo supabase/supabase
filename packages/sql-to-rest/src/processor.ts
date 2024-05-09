@@ -1,4 +1,3 @@
-import { oneLine } from 'common-tags'
 import { parseQuery } from 'libpg-query'
 import { ParsingError, UnimplementedError, UnsupportedError } from './errors'
 import {
@@ -471,10 +470,8 @@ function processTargetList(
 
       if (!embeddedTarget) {
         throw new UnsupportedError(
-          oneLine`
-            Found foreign column '${target.column}' in target list without a join to that relation.
-            Did you forget to join that relation or alias it to something else?
-          `
+          `Found foreign column '${target.column}' in target list without a join to that relation`,
+          'Did you forget to join that relation or alias it to something else?'
         )
       }
 
@@ -556,9 +553,9 @@ function processQueryTarget(
     } catch (err) {
       const maybeJsonHint =
         err instanceof Error && err.message === 'Invalid JSON path'
-          ? ' Did you forget to quote a JSON path?'
-          : ''
-      throw new UnsupportedError(`Expressions not supported as targets.${maybeJsonHint}`)
+          ? 'Did you forget to quote a JSON path?'
+          : undefined
+      throw new UnsupportedError(`Expressions not supported as targets`, maybeJsonHint)
     }
   } else if ('FuncCall' in queryTarget) {
     const functionName = renderFields(queryTarget.FuncCall.funcname)
@@ -719,7 +716,7 @@ function processWhereClause(expression: WhereExpression): Filter {
     if (operator === 'not') {
       if (values.length > 1) {
         throw new UnsupportedError(
-          `NOT expressions expected to have only 1 child. Received ${values.length} children`
+          `NOT expressions expected to have only 1 child, but received ${values.length} children`
         )
       }
       const [filter] = values

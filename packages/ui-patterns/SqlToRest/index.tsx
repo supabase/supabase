@@ -291,7 +291,9 @@ export default function SqlToRest({
         {parsingError && <Alert className="text-red-900">{parsingError.message}</Alert>}
         {unsupportedError && (
           <Alert className="text-red-900">
-            <div>{unsupportedError.message}.</div>
+            <div>
+              {unsupportedError.message}. {unsupportedError.hint}
+            </div>
             <div className="prose text-sm mt-2">
               PostgREST doesn't support this query. If you're unable to modify the query, wrap it in
               a stored procedure and call it using the{' '}

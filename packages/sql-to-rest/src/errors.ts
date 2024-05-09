@@ -12,6 +12,13 @@ export class UnimplementedError extends Error {
 
 export class UnsupportedError extends Error {
   name = 'UnsupportedError'
+
+  constructor(
+    message: string,
+    public hint?: string
+  ) {
+    super(message)
+  }
 }
 
 export class RenderError extends Error {

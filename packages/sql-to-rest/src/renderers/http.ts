@@ -104,7 +104,7 @@ function formatSelectFilterRoot(params: URLSearchParams, filter: Filter) {
   }
   // Logical operator filter, eg. "or=(title.eq.Cheese,title.eq.Salsa)""
   else if (type === 'logical') {
-    // The `and` operator is a a special case where we can format each nested
+    // The `and` operator is a special case where we can format each nested
     // filter as a separate query param as long as the `and` is not negated
     if (filter.operator === 'and' && !filter.negate) {
       for (const subFilter of filter.values) {
