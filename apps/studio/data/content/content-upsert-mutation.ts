@@ -7,7 +7,7 @@ import type { ResponseError } from 'types'
 import type { Content } from './content-query'
 import { contentKeys } from './keys'
 
-export type UpsertContentPayload = Omit<components['schemas']['UpsertContentParams'], 'content'> & {
+export type UpsertContentPayload = Omit<components['schemas']['UpsertContentBody'], 'content'> & {
   content: Content['content']
 }
 

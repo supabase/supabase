@@ -6,18 +6,13 @@ import type { ResponseError } from 'types'
 import type { UpdateConnectionPayload } from './integrations.types'
 import { integrationKeys } from './keys'
 
-export async function updateVercelConnection({
-  id,
-  metadata,
-  organizationIntegrationId,
-}: UpdateConnectionPayload) {
+export async function updateVercelConnection({ id, envSyncTargets }: UpdateConnectionPayload) {
   const { data, error } = await patch('/platform/integrations/vercel/connections/{connection_id}', {
     params: {
       path: { connection_id: id },
     },
     body: {
-      // @ts-expect-error
-      metadata,
+      env_sync_targets: envSyncTargets,
     },
   })
 

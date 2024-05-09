@@ -25,6 +25,14 @@ The templating system provides the following variables for use:
 | `{{ .RedirectTo }}`      | Contains the redirect URL passed when `signUp`, `signInWithOtp`, `signInWithOAuth`, `resetPasswordForEmail` or `inviteUserByEmail` is called. The redirect URL allow list can be configured in your project's [authentication settings](/dashboard/project/_/auth/url-configuration). |
 | `{{ .Data }}`            | Contains metadata from `auth.users.user_metadata`. Use this to personalize the email message.                                                                                                                                                                                         |
 
+## Editing email templates
+
+On self-hosted Supabase projects, edit your email templates on the [Email Templates](/dashboard/project/_/auth/templates) page. On self-hosted projects or in local development, edit your [configuration files](/docs/guides/cli/customizing-email-templates).
+
+## Mobile Deep Linking
+
+For mobile applications, you might need to link or redirect to a specific page within your app. See the [Mobile Deep Linking guide](/docs/guides/auth/native-mobile-deep-linking) to set this up.
+
 ## Limitations
 
 ### Email prefetching

@@ -5,7 +5,6 @@ import { lintKeys } from './keys'
 import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 
 export const LINT_SQL = /* SQL */ `set local search_path = '';
-
 (
 with foreign_keys as (
     select
@@ -826,6 +825,7 @@ const getProjectLints = async (
   signal?: AbortSignal
 ) => {
   const exposedSchemasPrepend = `set local pgrst.db_schemas='${exposedSchemas}';`
+
   const { result } = await executeSql(
     {
       projectRef,
