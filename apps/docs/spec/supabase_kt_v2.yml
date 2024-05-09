@@ -4442,6 +4442,7 @@ functions:
       - Takes in a `filter` parameter to filter the data and a `primaryKey` parameter to cache the data by the primary key.
       - This method requires both the `Realtime` and `Postgrest` plugins to be installed.
       - The type parameter `T` must be a [serializable class](/docs/reference/kotlin/installing#serialization).
+      - If you want more control over the realtime updates, you can use the `Realtime` plugin directly.
     params:
       - name: primaryKey
         isOptional: false
