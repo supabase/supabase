@@ -96,6 +96,38 @@ export const faqs: Faq[] = [
     `,
   },
   {
+    id: 'how-does-and-work',
+    condition: ({ statement }) =>
+      // Show this if there is at least one `AND` operator
+      !!statement.filter &&
+      statement.filter.type === 'logical' &&
+      statement.filter.operator === 'and',
+    question: 'How does the `AND` operator work?',
+    answer: stripIndent`
+      PostgREST treats each \`AND\` expression as a separate query parameter.
+      
+      For example the following SQL:
+
+      \`\`\`sql
+      select
+        *
+      from
+        books
+      where
+        description ilike '%cheese%' and
+        pages > 100
+      \`\`\`
+
+      is equivalent to this API request:
+
+      \`\`\`bash
+      /books?description=ilike.*cheese*&pages=gt.100
+      \`\`\`
+
+      There are exceptions when you have nested \`AND\` expressions, but otherwise this provides an API most consistent with other REST APIs.
+    `,
+  },
+  {
     id: 'how-do-joins-work',
     condition: ({ statement }) =>
       // Show this if there is at least one resource embedding
