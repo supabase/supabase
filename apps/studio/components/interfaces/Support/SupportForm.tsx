@@ -30,6 +30,7 @@ import { useProfile } from 'lib/profile'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
+  Command_Shadcn_,
   Alert_Shadcn_,
   Button,
   Checkbox,
@@ -75,41 +76,41 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
   const [subject, setSubject] = useState('') // State for the subject field
   const [docsResults, setDocsResults] = useState<DocsSearchResult[]>([]) // State for the docs results
 
-  //const { search, setSearch, inputRef, site, setIsOpen } = useCommandMenu()
+  const { search, setSearch, inputRef, site, setIsOpen } = useCommandMenu()
   const router = useRouter()
 
-  // async function openLink(pageType: PageType, link: string) {
-  //   switch (pageType) {
-  //     case PageType.Markdown:
-  //     case PageType.Reference:
-  //       if (site === 'docs') {
-  //         await router.push(link)
-  //         return setIsOpen(false)
-  //       } else if (site === 'website') {
-  //         await router.push(`/docs${link}`)
-  //         setIsOpen(false)
-  //       } else {
-  //         window.open(`https://supabase.com/docs${link}`, '_blank')
-  //         setIsOpen(false)
-  //       }
-  //       break
-  //     case PageType.Integration:
-  //       if (site === 'website') {
-  //         router.push(link)
-  //         setIsOpen(false)
-  //       } else {
-  //         window.open(`https://supabase.com${link}`, '_blank')
-  //         setIsOpen(false)
-  //       }
-  //       break
-  //     case PageType.GithubDiscussion:
-  //       window.open(link, '_blank')
-  //       setIsOpen(false)
-  //       break
-  //     default:
-  //       throw new Error(`Unknown page type '${pageType}'`)
-  //   }
-  // }
+  async function openLink(pageType: PageType, link: string) {
+    switch (pageType) {
+      case PageType.Markdown:
+      case PageType.Reference:
+        if (site === 'docs') {
+          await router.push(link)
+          return setIsOpen(false)
+        } else if (site === 'website') {
+          await router.push(`/docs${link}`)
+          setIsOpen(false)
+        } else {
+          window.open(`https://supabase.com/docs${link}`, '_blank')
+          setIsOpen(false)
+        }
+        break
+      case PageType.Integration:
+        if (site === 'website') {
+          router.push(link)
+          setIsOpen(false)
+        } else {
+          window.open(`https://supabase.com${link}`, '_blank')
+          setIsOpen(false)
+        }
+        break
+      case PageType.GithubDiscussion:
+        window.open(link, '_blank')
+        setIsOpen(false)
+        break
+      default:
+        throw new Error(`Unknown page type '${pageType}'`)
+    }
+  }
 
   // Trigger a debounced search when the subject changes
   useEffect(() => {
@@ -693,72 +694,79 @@ const SupportForm = ({ setSentCategory }: SupportFormProps) => {
                     {docsResults.length > 0 && hasResults && (
                       <div>
                         {docsResults.map((page, i) => (
-                          <CommandGroup
-                            key={`${page.path}-group`}
-                            heading=""
-                            value={`${encodeURIComponent(page.title)}-group-index-${i}`}
-                            forceMount={true}
-                          >
-                            <CommandItem
-                              key={`${page.path}-item`}
-                              value={`${encodeURIComponent(page.title)}-item-index-${i}`}
-                              type="block-link"
-                              //onSelect={() => openLink(page.type, formatPageUrl(page))}
+                          <Command_Shadcn_ key="docs-search">
+                            <CommandGroup
+                              key={`${page.path}-group`}
+                              heading=""
+                              value={`${encodeURIComponent(page.title)}-group-index-${i}`}
                               forceMount={true}
                             >
-                              <div className="grow flex gap-3 items-center">
-                                <IconContainer>{getPageIcon(page)}</IconContainer>
-                                <div className="flex flex-col gap-0">
-                                  <CommandLabel>
-                                    <TextHighlighter text={page.title} query="test" />
-                                  </CommandLabel>
-                                  {(page.description || page.subtitle) && (
-                                    <div className="text-xs text-foreground-muted">
-                                      <TextHighlighter
-                                        text={page.description || page.subtitle}
-                                        query="test"
-                                      />
-                                    </div>
-                                  )}
-                                </div>
-                              </div>
-                              <ChevronArrow />
-                            </CommandItem>
-
-                            {page.sections.length > 0 && (
-                              <div className="border-l border-default ml-3 pt-3">
-                                <CommandItem
-                                  className="ml-3 mb-3"
-                                  // onSelect={() =>
-                                  //   openLink(page.type, formatSectionUrl(page, page.section))
-                                  // }
-                                  key={`${page.path}__${page.heading}-item`}
-                                  value={`${encodeURIComponent(page.title)}__${encodeURIComponent(page.heading)}-item-index-${page.id}`}
-                                  forceMount={true}
-                                  type="block-link"
-                                >
-                                  <div className="grow flex gap-3 items-center">
-                                    <IconContainer>{getPageSectionIcon(page)}</IconContainer>
-                                    <div className="flex flex-col gap-2">
-                                      <cite>
+                              <CommandItem
+                                key={`${page.path}-item`}
+                                value={`${encodeURIComponent(page.title)}-item-index-${i}`}
+                                type="block-link"
+                                onSelect={() => openLink(page.type, formatPageUrl(page))}
+                                forceMount={true}
+                              >
+                                <div className="grow flex gap-3 items-center">
+                                  <IconContainer>{getPageIcon(page)}</IconContainer>
+                                  <div className="flex flex-col gap-0">
+                                    <CommandLabel>
+                                      <TextHighlighter text={page.title} query="test" />
+                                    </CommandLabel>
+                                    {(page.description || page.subtitle) && (
+                                      <div className="text-xs text-foreground-muted">
                                         <TextHighlighter
-                                          className="not-italic text-xs rounded-full px-2 py-1 bg-overlay-hover text-foreground"
-                                          text={page.title}
+                                          text={page.description || page.subtitle}
                                           query="test"
                                         />
-                                      </cite>
-                                      {page.heading && (
-                                        <CommandLabel>
-                                          <TextHighlighter text={page.heading} query="test" />
-                                        </CommandLabel>
-                                      )}
-                                    </div>
+                                      </div>
+                                    )}
                                   </div>
-                                  <ChevronArrow />
-                                </CommandItem>
-                              </div>
-                            )}
-                          </CommandGroup>
+                                </div>
+                                <ChevronArrow />
+                              </CommandItem>
+
+                              {page.sections.length > 0 && (
+                                <div className="border-l border-default ml-3 pt-3">
+                                  {page.sections.map((section: PageSection, index: number) => (
+                                    <CommandItem
+                                      className="ml-3 mb-3"
+                                      onSelect={() =>
+                                        openLink(page.type, formatSectionUrl(page, section))
+                                      }
+                                      key={`${page.path}__${section.heading}-item-${index}`}
+                                      value={`${encodeURIComponent(page.title)}__${encodeURIComponent(section.heading)}-item-index-${page.id}`}
+                                      forceMount={true}
+                                      type="block-link"
+                                    >
+                                      <div className="grow flex gap-3 items-center">
+                                        <IconContainer>{getPageSectionIcon(page)}</IconContainer>
+                                        <div className="flex flex-col gap-2">
+                                          <cite>
+                                            <TextHighlighter
+                                              className="not-italic text-xs rounded-full px-2 py-1 bg-overlay-hover text-foreground"
+                                              text={page.title}
+                                              query="test"
+                                            />
+                                          </cite>
+                                          {section.heading && (
+                                            <CommandLabel>
+                                              <TextHighlighter
+                                                text={section.heading}
+                                                query="query"
+                                              />
+                                            </CommandLabel>
+                                          )}
+                                        </div>
+                                      </div>
+                                      <ChevronArrow />
+                                    </CommandItem>
+                                  ))}
+                                </div>
+                              )}
+                            </CommandGroup>
+                          </Command_Shadcn_>
                         ))}
                       </div>
                     )}
