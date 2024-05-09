@@ -94,13 +94,24 @@ function formatSelectFilterRoot(params: URLSearchParams, filter: Filter) {
 
   // Column filter, eg. "title=eq.Cheese"
   if (type === 'column') {
-    let value = filter.value
     // Convert '%' to URL-safe '*'
     if (filter.operator === 'like' || filter.operator === 'ilike') {
-      value = filter.value.replaceAll('%', '*')
+      const value = filter.value.replaceAll('%', '*')
+      params.append(filter.column, `${maybeNot}${filter.operator}.${value}`)
+    } else if (filter.operator === 'in') {
+      const value = filter.value
+        .map((value) => {
+          // If an 'in' value contains a comma, wrap in double quotes
+          if (value.toString().includes(',')) {
+            return `"${value}"`
+          }
+          return value
+        })
+        .join(',')
+      params.append(filter.column, `${maybeNot}${filter.operator}.(${value})`)
+    } else {
+      params.append(filter.column, `${maybeNot}${filter.operator}.${filter.value}`)
     }
-
-    params.append(filter.column, `${maybeNot}${filter.operator}.${value}`)
   }
   // Logical operator filter, eg. "or=(title.eq.Cheese,title.eq.Salsa)""
   else if (type === 'logical') {

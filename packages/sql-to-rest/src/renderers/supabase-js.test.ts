@@ -322,7 +322,7 @@ describe('select', () => {
       from
         books
       where
-      description ~ '^[a-zA-Z]+'
+        description ~ '^[a-zA-Z]+'
     `
 
     const statement = await processSql(sql)
@@ -343,7 +343,7 @@ describe('select', () => {
       from
         books
       where
-      description ~* '^[a-z]+'
+        description ~* '^[a-z]+'
     `
 
     const statement = await processSql(sql)
@@ -354,6 +354,27 @@ describe('select', () => {
         .from('books')
         .select()
         .imatch('description', '^[a-z]+')
+    `)
+  })
+
+  test('in operator', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      where
+        category in ('fiction', 'sci-fi')
+    `
+
+    const statement = await processSql(sql)
+    const { code } = await renderSupabaseJs(statement)
+
+    expect(code).toBe(stripIndent`
+      const { data, error } = await supabase
+        .from('books')
+        .select()
+        .in('category', ['fiction', 'sci-fi'])
     `)
   })
 

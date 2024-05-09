@@ -309,6 +309,40 @@ describe('select', () => {
     expect(fullPath).toBe('/books?description=imatch.%5E[a-z]%2B')
   })
 
+  test('in operator', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      where
+        category in ('fiction', 'sci-fi')
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?category=in.(fiction,sci-fi)')
+  })
+
+  test('in operator with comma', async () => {
+    const sql = stripIndents`
+      select
+        *
+      from
+        books
+      where
+        category in ('a,b,c', 'd,e,f')
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/books?category=in.(%22a,b,c%22,%22d,e,f%22)')
+  })
+
   test('"and" expression', async () => {
     const sql = stripIndents`
       select

@@ -58,7 +58,7 @@ export type A_Expr = {
       | 'AEXPR_NOT_BETWEEN_SYM'
     name: PgString[]
     lexpr: A_Const | A_Expr | ColumnRef | TypeCast
-    rexpr: A_Const | A_Expr | ColumnRef | TypeCast
+    rexpr: A_Const | A_Expr | ColumnRef | TypeCast | List
     location: number
   }
 }
@@ -102,6 +102,12 @@ export type TypeCast = {
       location: number
     }
     location: number
+  }
+}
+
+export type List = {
+  List: {
+    items: A_Const[]
   }
 }
 

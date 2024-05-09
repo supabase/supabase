@@ -1,6 +1,7 @@
 import { parseQuery } from 'libpg-query'
 import { ParsingError, UnimplementedError, UnsupportedError } from './errors'
 import {
+  A_Const,
   A_Expr,
   ColumnRef,
   Field,
@@ -55,22 +56,22 @@ export type NeqColumnFilter = BaseColumnFilter & {
 
 export type GtColumnFilter = BaseColumnFilter & {
   operator: 'gt'
-  value: number
+  value: string | number
 }
 
 export type GteColumnFilter = BaseColumnFilter & {
   operator: 'gte'
-  value: number
+  value: string | number
 }
 
 export type LtColumnFilter = BaseColumnFilter & {
   operator: 'lt'
-  value: number
+  value: string | number
 }
 
 export type LteColumnFilter = BaseColumnFilter & {
   operator: 'lte'
-  value: number
+  value: string | number
 }
 
 export type LikeColumnFilter = BaseColumnFilter & {
@@ -98,6 +99,11 @@ export type IsColumnFilter = BaseColumnFilter & {
   value: null
 }
 
+export type InColumnFilter = BaseColumnFilter & {
+  operator: 'in'
+  value: (string | number)[]
+}
+
 export type ColumnFilter =
   | EqColumnFilter
   | NeqColumnFilter
@@ -110,6 +116,7 @@ export type ColumnFilter =
   | MatchColumnFilter
   | ImatchColumnFilter
   | IsColumnFilter
+  | InColumnFilter
 
 export type LogicalFilter = BaseFilter & {
   type: 'logical'
@@ -655,34 +662,75 @@ function processWhereClause(expression: WhereExpression): Filter {
       throw new UnsupportedError(`Non column values not supported in WHERE clause`)
     }
 
+    const kind = expression.A_Expr.kind
     const [name] = expression.A_Expr.name
     const operatorSymbol = name.String.sval
-    const operator = mapOperatorSymbol(operatorSymbol)
+    const operator = mapOperatorSymbol(kind, operatorSymbol)
 
-    if (!('A_Const' in expression.A_Expr.rexpr)) {
-      throw new UnsupportedError(`Expected right side of WHERE clause expression to be a constant`)
-    }
+    if (
+      operator === 'eq' ||
+      operator === 'neq' ||
+      operator === 'gt' ||
+      operator === 'gte' ||
+      operator === 'lt' ||
+      operator === 'lte'
+    ) {
+      if (!('A_Const' in expression.A_Expr.rexpr)) {
+        throw new UnsupportedError(
+          `Expected right side of WHERE clause '${operatorSymbol}' expression to be a constant`
+        )
+      }
 
-    let value: any
+      const value = parseConstant(expression.A_Expr.rexpr)
+      return {
+        type: 'column',
+        column,
+        operator,
+        negate: false,
+        value,
+      }
+    } else if (
+      operator === 'like' ||
+      operator === 'ilike' ||
+      operator === 'match' ||
+      operator === 'imatch'
+    ) {
+      if (!('A_Const' in expression.A_Expr.rexpr) || !('sval' in expression.A_Expr.rexpr.A_Const)) {
+        throw new UnsupportedError(
+          `Expected right side of WHERE clause '${operator}' expression to be a string constant`
+        )
+      }
 
-    if ('sval' in expression.A_Expr.rexpr.A_Const) {
-      value = expression.A_Expr.rexpr.A_Const.sval.sval
-    } else if ('ival' in expression.A_Expr.rexpr.A_Const) {
-      value = expression.A_Expr.rexpr.A_Const.ival.ival
-    } else if ('fval' in expression.A_Expr.rexpr.A_Const) {
-      value = parseFloat(expression.A_Expr.rexpr.A_Const.fval.fval)
+      const value = expression.A_Expr.rexpr.A_Const.sval.sval
+
+      return {
+        type: 'column',
+        column,
+        operator,
+        negate: false,
+        value,
+      }
+    } else if (operator === 'in') {
+      if (
+        !('List' in expression.A_Expr.rexpr) ||
+        !expression.A_Expr.rexpr.List.items.every((item) => 'A_Const' in item)
+      ) {
+        throw new UnsupportedError(
+          `Expected right side of WHERE clause '${operator}' expression to be a list of constants`
+        )
+      }
+
+      const value = expression.A_Expr.rexpr.List.items.map((item) => parseConstant(item))
+
+      return {
+        type: 'column',
+        column,
+        operator,
+        negate: false,
+        value,
+      }
     } else {
-      throw new UnsupportedError(
-        `WHERE clause values must be a string (sval), integer (ival), or float (fval)`
-      )
-    }
-
-    return {
-      type: 'column',
-      column,
-      operator,
-      negate: false,
-      value,
+      throw new UnsupportedError(`Unsupported operator '${operator}'`)
     }
   } else if ('NullTest' in expression) {
     const { fields } = expression.NullTest.arg.ColumnRef
@@ -849,30 +897,54 @@ function mapJoinType(joinType: string) {
   }
 }
 
-function mapOperatorSymbol(operatorSymbol: string) {
-  switch (operatorSymbol) {
-    case '=':
-      return 'eq'
-    case '<>':
-      return 'neq'
-    case '>':
-      return 'gt'
-    case '>=':
-      return 'gte'
-    case '<':
-      return 'lt'
-    case '<=':
-      return 'lte'
-    case '~~':
-      return 'like'
-    case '~~*':
-      return 'ilike'
-    case '~':
-      return 'match'
-    case '~*':
-      return 'imatch'
-    default:
-      throw new UnsupportedError(`Unsupported operator symbol '${operatorSymbol}'`)
+function mapOperatorSymbol(kind: A_Expr['A_Expr']['kind'], operatorSymbol: string) {
+  switch (kind) {
+    case 'AEXPR_OP': {
+      switch (operatorSymbol) {
+        case '=':
+          return 'eq'
+        case '<>':
+          return 'neq'
+        case '>':
+          return 'gt'
+        case '>=':
+          return 'gte'
+        case '<':
+          return 'lt'
+        case '<=':
+          return 'lte'
+        case '~':
+          return 'match'
+        case '~*':
+          return 'imatch'
+        default:
+          throw new UnsupportedError(`Unsupported operator '${operatorSymbol}'`)
+      }
+    }
+    case 'AEXPR_LIKE': {
+      switch (operatorSymbol) {
+        case '~~':
+          return 'like'
+        default:
+          throw new UnsupportedError(`Unsupported operator '${operatorSymbol}'`)
+      }
+    }
+    case 'AEXPR_ILIKE': {
+      switch (operatorSymbol) {
+        case '~~*':
+          return 'ilike'
+        default:
+          throw new UnsupportedError(`Unsupported operator '${operatorSymbol}'`)
+      }
+    }
+    case 'AEXPR_IN': {
+      switch (operatorSymbol) {
+        case '=':
+          return 'in'
+        default:
+          throw new UnsupportedError(`Unsupported operator '${operatorSymbol}'`)
+      }
+    }
   }
 }
 
@@ -1115,5 +1187,16 @@ function validateGroupClause(groupClause: ColumnRef[], targets: Target[], from: 
     throw new UnsupportedError(
       `There must be at least one aggregate function in the select target list when using group by`
     )
+  }
+}
+function parseConstant(constant: A_Const) {
+  if ('sval' in constant.A_Const) {
+    return constant.A_Const.sval.sval
+  } else if ('ival' in constant.A_Const) {
+    return constant.A_Const.ival.ival
+  } else if ('fval' in constant.A_Const) {
+    return parseFloat(constant.A_Const.fval.fval)
+  } else {
+    throw new UnsupportedError(`Constant values must be a string, integer, or float`)
   }
 }
