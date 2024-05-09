@@ -288,7 +288,11 @@ export default function SqlToRest({
           />
         </div>
 
-        {parsingError && <Alert className="text-red-900">{parsingError.message}</Alert>}
+        {parsingError && (
+          <Alert className="text-red-900">
+            {parsingError.message}. {parsingError.hint}
+          </Alert>
+        )}
         {unsupportedError && (
           <Alert className="text-red-900">
             <div>

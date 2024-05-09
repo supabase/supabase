@@ -1,7 +1,10 @@
 export class ParsingError extends Error {
   name = 'ParsingError'
 
-  constructor(message: string) {
+  constructor(
+    message: string,
+    public hint?: string
+  ) {
     super(sentenceCase(message))
   }
 }

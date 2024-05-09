@@ -216,12 +216,28 @@ export async function processSql(sql: string) {
     return statement
   } catch (err) {
     if (err instanceof Error && 'cursorPosition' in err) {
-      const parsingError = new ParsingError(err.message)
+      const hint = getParsingErrorHint(err.message)
+      const parsingError = new ParsingError(err.message, hint)
+
       Object.assign(parsingError, err)
       throw parsingError
     } else {
       throw err
     }
+  }
+}
+
+/**
+ * Returns hints for common parsing errors.
+ */
+function getParsingErrorHint(message: string) {
+  switch (message) {
+    case 'syntax error at or near "from"':
+      return 'Did you leave a trailing comma in the select target list?'
+    case 'syntax error at or near "where"':
+      return 'Do you have an incomplete join in the FROM clause?'
+    default:
+      undefined
   }
 }
 
