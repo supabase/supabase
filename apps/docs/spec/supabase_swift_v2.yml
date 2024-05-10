@@ -496,6 +496,14 @@ functions:
           ```swift
           try await supabase.auth.session
           ```
+      - id: get-current-session-no-validation
+        name: Get the current session without validation
+        isSpotlight: true
+        description: The session returned by this property may be expired.
+        code: |
+          ```swift
+          let session = supabase.auth.currentSession
+          ```
   - id: get-user
     title: "user()"
     description: |
@@ -516,6 +524,14 @@ functions:
         code: |
           ```swift
           let user = try await supabase.auth.user(jwt: "custom-jwt")
+          ```
+      - id: get-current-user
+        name: Get current user
+        isSpotlight: true
+        description: The user returned by this property may be outdated.
+        code: |
+          ```swift
+          let user = supabase.auth.currentUser
           ```
   - id: update-user
     title: "updateUser()"
@@ -3206,6 +3222,21 @@ functions:
                 headers: [
                   "my-custom-header": "my-custom-header-value"
                 ]
+              )
+            )
+          ```
+      - id: additional-query-params
+        name: Pass additional query params
+        description: |
+          You can pass additional query params when invoking a function.
+        isSpotlight: true
+        code: |
+          ```swift
+          let response = try await supabase.functions
+            .invoke(
+              "hello",
+              options: FunctionInvokeOptions(
+                query: [URLQueryItem(name: "key", value: "value")]
               )
             )
           ```
