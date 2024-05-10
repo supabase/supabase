@@ -107,7 +107,7 @@ export const BranchRow = ({
   const { data } = useBranchQuery(
     { projectRef, id: branch.id },
     {
-      enabled: branch.status === 'CREATING_PROJECT' && inView,
+      enabled: inView,
       refetchInterval(data) {
         if (data?.status !== 'ACTIVE_HEALTHY') {
           return 1000 * 3 // 3 seconds
