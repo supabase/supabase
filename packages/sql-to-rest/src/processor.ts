@@ -690,7 +690,8 @@ function processWhereClause(expression: WhereExpression): Filter {
     ) {
       if (!('A_Const' in expression.A_Expr.rexpr)) {
         throw new UnsupportedError(
-          `Right side of WHERE clause '${operatorSymbol}' expression must be a constant`
+          `Right side of WHERE clause '${operatorSymbol}' expression must be a constant`,
+          `Did you forget to wrap your value in single quotes?`
         )
       }
 
