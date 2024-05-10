@@ -396,7 +396,7 @@
     "link": "/guides/database/extensions/uuid-ossp"
   },
   {
-    "name": "pgvector",
+    "name": "vector",
     "comment": "vector data type with similarity search",
     "tags": ["AI", "Data Type", "Search"],
     "link": "/guides/database/extensions/pgvector"
