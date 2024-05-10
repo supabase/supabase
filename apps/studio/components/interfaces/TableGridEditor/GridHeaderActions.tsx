@@ -364,7 +364,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
                 <div className="mt-2">
                   <Button type="default" asChild>
                     <Link target="_blank" href="https://github.com/orgs/supabase/discussions/21647">
-                      Read more
+                      Learn more
                     </Link>
                   </Button>
                 </div>
