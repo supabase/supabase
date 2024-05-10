@@ -248,16 +248,17 @@ function processStmt({ stmt }: Stmt): Statement {
   if ('SelectStmt' in stmt) {
     return processSelectStmt(stmt)
   } else if ('InsertStmt' in stmt) {
-    throw new UnimplementedError(`Insert statements are not yet supported by the translator`)
+    throw new UnimplementedError(`Insert statements are not yet implemented by the translator`)
   } else if ('UpdateStmt' in stmt) {
-    throw new UnimplementedError(`Update statements are not yet supported by the translator`)
+    throw new UnimplementedError(`Update statements are not yet implemented by the translator`)
   } else if ('DeleteStmt' in stmt) {
-    throw new UnimplementedError(`Delete statements are not yet supported by the translator`)
+    throw new UnimplementedError(`Delete statements are not yet implemented by the translator`)
   } else if ('ExplainStmt' in stmt) {
-    throw new UnimplementedError(`Explain statements are not yet supported by the translator`)
+    throw new UnimplementedError(`Explain statements are not yet implemented by the translator`)
   } else {
     const [stmtType] = Object.keys(stmt)
-    throw new UnsupportedError(`Unsupported stmt type '${stmtType}'`)
+    const statementType = stmtType.replace(/Stmt$/, '')
+    throw new UnsupportedError(`${statementType} statements are not supported`)
   }
 }
 
@@ -329,7 +330,7 @@ function processFromClause(fromClause: FromExpression): {
     ]
 
     if (!('A_Expr' in fromClause.JoinExpr.quals)) {
-      throw new UnsupportedError(`Expected join qualifier to be an expression comparing columns`)
+      throw new UnsupportedError(`Join qualifier must be an expression comparing columns`)
     }
 
     let leftQualifierRelation
@@ -338,7 +339,7 @@ function processFromClause(fromClause: FromExpression): {
     const joinQualifierExpression = fromClause.JoinExpr.quals.A_Expr
 
     if (!('ColumnRef' in joinQualifierExpression.lexpr)) {
-      throw new UnsupportedError(`Expected left side of join qualifier to be a column reference`)
+      throw new UnsupportedError(`Left side of join qualifier must be a column`)
     }
 
     if (
@@ -346,9 +347,7 @@ function processFromClause(fromClause: FromExpression): {
         (field): field is PgString => 'String' in field
       )
     ) {
-      throw new UnsupportedError(
-        `Expected left column reference of join qualifier to contain String fields`
-      )
+      throw new UnsupportedError(`Left side column of join qualifier must contain String fields`)
     }
 
     const leftColumnFields = joinQualifierExpression.lexpr.ColumnRef.fields.map(
@@ -372,7 +371,7 @@ function processFromClause(fromClause: FromExpression): {
     }
 
     if (!('ColumnRef' in joinQualifierExpression.rexpr)) {
-      throw new UnsupportedError(`Expected right side of join qualifier to be a column reference`)
+      throw new UnsupportedError(`Right side of join qualifier must be a column`)
     }
 
     if (
@@ -380,9 +379,7 @@ function processFromClause(fromClause: FromExpression): {
         (field): field is PgString => 'String' in field
       )
     ) {
-      throw new UnsupportedError(
-        `Expected right column reference of join qualifier to contain String fields`
-      )
+      throw new UnsupportedError(`Right side column of join qualifier must contain String fields`)
     }
 
     const rightColumnFields = joinQualifierExpression.rexpr.ColumnRef.fields.map(
@@ -417,7 +414,7 @@ function processFromClause(fromClause: FromExpression): {
     const [qualifierOperatorString] = joinQualifierExpression.name
 
     if (qualifierOperatorString.String.sval !== '=') {
-      throw new UnsupportedError(`Expected join qualifier operator to be '='`)
+      throw new UnsupportedError(`Join qualifier operator must be '='`)
     }
 
     let left: JoinedColumn
@@ -654,7 +651,7 @@ function processWhereClause(expression: WhereExpression): Filter {
         const target = processJsonTarget(expression.A_Expr.lexpr)
         column = target.column
       } catch (err) {
-        throw new UnsupportedError(`Non column expressions not supported in WHERE clause`)
+        throw new UnsupportedError(`Left side of WHERE clause must be a column`)
       }
     } else if ('ColumnRef' in expression.A_Expr.lexpr) {
       const { fields } = expression.A_Expr.lexpr.ColumnRef
@@ -675,7 +672,7 @@ function processWhereClause(expression: WhereExpression): Filter {
       const stringFields = fields.filter((field): field is PgString => 'String' in field)
       column = stringFields.map((field) => field.String.sval).join('.')
     } else {
-      throw new UnsupportedError(`Non column values not supported in WHERE clause`)
+      throw new UnsupportedError(`Left side of WHERE clause must be a column`)
     }
 
     const kind = expression.A_Expr.kind
@@ -693,7 +690,7 @@ function processWhereClause(expression: WhereExpression): Filter {
     ) {
       if (!('A_Const' in expression.A_Expr.rexpr)) {
         throw new UnsupportedError(
-          `Expected right side of WHERE clause '${operatorSymbol}' expression to be a constant`
+          `Right side of WHERE clause '${operatorSymbol}' expression must be a constant`
         )
       }
 
@@ -713,7 +710,7 @@ function processWhereClause(expression: WhereExpression): Filter {
     ) {
       if (!('A_Const' in expression.A_Expr.rexpr) || !('sval' in expression.A_Expr.rexpr.A_Const)) {
         throw new UnsupportedError(
-          `Expected right side of WHERE clause '${operator}' expression to be a string constant`
+          `Right side of WHERE clause '${operator}' expression must be a string constant`
         )
       }
 
@@ -732,7 +729,7 @@ function processWhereClause(expression: WhereExpression): Filter {
         !expression.A_Expr.rexpr.List.items.every((item) => 'A_Const' in item)
       ) {
         throw new UnsupportedError(
-          `Expected right side of WHERE clause '${operator}' expression to be a list of constants`
+          `Right side of WHERE clause '${operator}' expression must be a list of constants`
         )
       }
 
@@ -792,7 +789,7 @@ function processWhereClause(expression: WhereExpression): Filter {
     if (operator === 'not') {
       if (values.length > 1) {
         throw new UnsupportedError(
-          `NOT expressions expected to have only 1 child, but received ${values.length} children`
+          `NOT expressions must have only 1 child, but received ${values.length} children`
         )
       }
       const [filter] = values
@@ -807,8 +804,7 @@ function processWhereClause(expression: WhereExpression): Filter {
       values,
     }
   } else {
-    const [expressionType] = Object.keys(expression)
-    throw new UnsupportedError(`Unknown WHERE clause expression '${expressionType}'`)
+    throw new UnsupportedError(`The WHERE clause must contain an expression`)
   }
 }
 
@@ -829,7 +825,7 @@ function processSortClause(sorts: SortBy[]): Sort[] {
     if (!('String' in field)) {
       const [fieldType] = Object.keys(field)
       throw new UnsupportedError(
-        `ORDER BY clause fields must be String type, received '${fieldType}'`
+        `ORDER BY column fields must be String type, received '${fieldType}'`
       )
     }
 
@@ -878,7 +874,7 @@ function processLimit(selectStmt: SelectStmt): Limit | undefined {
 
   if (selectStmt.SelectStmt.limitCount) {
     if (!('ival' in selectStmt.SelectStmt.limitCount.A_Const)) {
-      throw new UnsupportedError(`Limit count expected to be an integer`)
+      throw new UnsupportedError(`Limit count must be an integer`)
     }
 
     count = selectStmt.SelectStmt.limitCount.A_Const.ival.ival
@@ -886,7 +882,7 @@ function processLimit(selectStmt: SelectStmt): Limit | undefined {
 
   if (selectStmt.SelectStmt.limitOffset) {
     if (!('ival' in selectStmt.SelectStmt.limitOffset.A_Const)) {
-      throw new UnsupportedError(`Limit offset expected to be an integer`)
+      throw new UnsupportedError(`Limit offset must be an integer`)
     }
 
     offset = selectStmt.SelectStmt.limitOffset.A_Const.ival.ival
@@ -1192,7 +1188,7 @@ function validateGroupClause(groupClause: ColumnRef[], targets: Target[], from: 
     })
   ) {
     throw new UnsupportedError(
-      `Every non-aggregate select target must also exist in the group by clause`
+      `Every non-aggregate select target must also exist in a group by clause`
     )
   }
 
