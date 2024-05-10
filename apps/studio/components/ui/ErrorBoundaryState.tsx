@@ -13,7 +13,7 @@ export const ErrorBoundaryState = ({ error, resetErrorBoundary }: FallbackProps)
     <div className="w-screen h-screen flex items-center justify-center flex-col gap-y-3">
       <div className="flex items-center flex-col gap-y-1">
         <p className="text-sm">
-          Application error: a client-side exception has occured (see browser console for more
+          Application error: a client-side exception has occurred (see browser console for more
           information)
         </p>
         <p className="text-sm text-foreground-light">Error: {error.message}</p>
