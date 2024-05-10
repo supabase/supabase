@@ -338,7 +338,7 @@ const EditWrapper = () => {
                     ) : (
                       <div className="space-y-2">
                         {wrapperTables.map((table, i) => {
-                          const label = wrapperMeta.tables[table.index].label
+                          const label = wrapperMeta.tables[table.index]?.label
 
                           return (
                             <div
