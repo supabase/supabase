@@ -353,11 +353,7 @@ export default function SqlToRest({
         )}
       >
         <div className="font-medium">Choose language to translate to</div>
-        <Tabs
-          activeId={currentLanguage}
-          onChange={(id: string) => setCurrentLanguage(id)}
-          queryGroup="language"
-        >
+        <Tabs activeId={currentLanguage} onChange={(id: string) => setCurrentLanguage(id)}>
           <Tabs.Panel id="curl" label="cURL" className="flex flex-col gap-4">
             {httpRenderError && <Alert className="text-red-900">{httpRenderError.message}</Alert>}
             <CodeBlock
