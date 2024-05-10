@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import LogTable from 'components/interfaces/Settings/Logs/LogTable'
 import { waitFor, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -34,7 +35,7 @@ test('can display log data', async () => {
 })
 
 test('can run if no queryType provided', async () => {
-  const mockRun = jest.fn()
+  const mockRun = vi.fn()
 
   render(
     <LogTable
@@ -179,7 +180,7 @@ test.each([
 })
 
 test('toggle histogram', async () => {
-  const mockFn = jest.fn()
+  const mockFn = vi.fn()
   render(<LogTable onHistogramToggle={mockFn} isHistogramShowing={true} />)
   const toggle = await screen.getByText(/Histogram/)
   userEvent.click(toggle)

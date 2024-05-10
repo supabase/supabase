@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { PREVIEWER_DATEPICKER_HELPERS } from 'components/interfaces/Settings/Logs'
@@ -61,7 +62,7 @@ test('renders datepicker selected dates in local time', async () => {
 })
 
 test('datepicker onChange will return ISO string of selected dates', async () => {
-  const mockFn = jest.fn()
+  const mockFn = vi.fn()
   render(<DatePickers helpers={PREVIEWER_DATEPICKER_HELPERS} to={''} from={''} onChange={mockFn} />)
   // renders time locally
   userEvent.click(await screen.findByText('Custom'))

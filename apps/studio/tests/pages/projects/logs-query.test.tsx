@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import dayjs from 'dayjs'
@@ -16,21 +17,21 @@ import { logDataFixture } from '../../fixtures'
 // Need to figure out how to mock the "get" method from lib/common/fetch properly
 
 const defaultRouterMock = () => {
-  const router = jest.fn()
+  const router = vi.fn()
   router.query = { ref: '123' }
-  router.push = jest.fn()
+  router.push = vi.fn()
   router.pathname = 'logs/path'
   return router
 }
 useRouter.mockReturnValue(defaultRouterMock())
 
-jest.mock('common', () => ({
+vi.mock('common', () => ({
   IS_PLATFORM: true,
-  useParams: jest.fn().mockReturnValue({}),
-  useIsLoggedIn: jest.fn(),
+  useParams: vi.fn().mockReturnValue({}),
+  useIsLoggedIn: vi.fn(),
 }))
-jest.mock('lib/gotrue', () => ({
-  auth: { onAuthStateChange: jest.fn() },
+vi.mock('lib/gotrue', () => ({
+  auth: { onAuthStateChange: vi.fn() },
 }))
 
 beforeEach(() => {

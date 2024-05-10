@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import { act, findByRole, findByText, fireEvent, screen, waitFor } from '@testing-library/react'
 import { wait } from '@testing-library/user-event/dist/utils'
 import userEvent from '@testing-library/user-event'
@@ -8,9 +9,9 @@ import { useRouter } from 'next/router'
 import { get } from 'lib/common/fetch'
 
 const defaultRouterMock = () => {
-  const router = jest.fn()
+  const router = vi.fn()
   router.query = {}
-  router.push = jest.fn()
+  router.push = vi.fn()
   router.pathname = 'logs/path'
   return router
 }
@@ -28,12 +29,12 @@ import { render } from '../../helpers'
 
 // [Joshen] There's gotta be a much better way to mock these things so that it applies for ALL tests
 // Since these are easily commonly used things across all pages/components that we might be testing for
-jest.mock('common', () => ({
-  useParams: jest.fn().mockReturnValue({}),
-  useIsLoggedIn: jest.fn(),
+vi.mock('common', () => ({
+  useParams: vi.fn().mockReturnValue({}),
+  useIsLoggedIn: vi.fn(),
 }))
-jest.mock('lib/gotrue', () => ({
-  auth: { onAuthStateChange: jest.fn() },
+vi.mock('lib/gotrue', () => ({
+  auth: { onAuthStateChange: vi.fn() },
 }))
 
 beforeEach(() => {

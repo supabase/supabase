@@ -1,3 +1,4 @@
+import { vi } from 'vitest'
 import {
   generateRowObjectFromFields,
   parseValue,
@@ -90,7 +91,7 @@ describe('parseValue', () => {
     const originalValue = 'some value'
     const format = 'some format'
     // Mocking an error occurring during parsing
-    JSON.stringify = jest.fn(() => {
+    JSON.stringify = vi.fn(() => {
       throw new Error('Mocked error')
     })
     expect(parseValue(originalValue, format)).toEqual(originalValue)
