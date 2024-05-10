@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import toast from 'react-hot-toast'
 import { extensions } from 'shared-data'
-import { Badge, IconExternalLink, IconLoader, Toggle } from 'ui'
+import { Badge, IconExternalLink, IconLoader, Modal, Toggle } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -72,7 +72,7 @@ const ExtensionCard = ({ extension }: ExtensionCardProps) => {
                 title={extension.name}
                 className="h-5 m-0 text-sm truncate cursor-pointer text-foreground"
               >
-                {extension.altName || extension.name}
+                {extension.name}
               </h3>
               <p className="text-sm text-foreground-light">
                 {extension?.installed_version ?? extension.default_version}
