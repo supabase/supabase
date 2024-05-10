@@ -2,6 +2,7 @@ import { defineConfig } from 'vitest/config'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { fileURLToPath } from 'url'
 import { resolve } from 'path'
+import react from '@vitejs/plugin-react'
 
 // Some tools like Vitest VSCode extensions, have trouble with resolving relative paths,
 // as they use the directory of the test file as `cwd`, which makes them believe that
@@ -9,14 +10,21 @@ import { resolve } from 'path'
 const dirname = fileURLToPath(new URL('.', import.meta.url))
 
 export default defineConfig({
-  plugins: [tsconfigPaths()],
+  plugins: [
+    react(),
+    tsconfigPaths({
+      projects: ['.'],
+    }),
+  ],
   test: {
-    include: [resolve(dirname, './tests/**/*.test.js'), resolve(dirname, './tests/**/*.test.ts')],
+    globals: true,
+    environment: 'jsdom', // TODO(kamil): This should be set per test via header in .tsx files only
+    include: [resolve(dirname, './tests/**/*.test.{ts,tsx}')],
     restoreMocks: true,
-    // setupFiles: [
-    //   resolve(dirname, './test/env.ts'),
-    //   resolve(dirname, './test/mocks.ts'),
-    //   resolve(dirname, './test/setup.ts'),
-    // ],
+    setupFiles: [
+      resolve(dirname, './tests/setup/testing-library-matchers.js'),
+      resolve(dirname, './tests/setup/polyfills.js'),
+      resolve(dirname, './tests/setup/radix.js'),
+    ],
   },
 })
