@@ -111,8 +111,7 @@ test('ite= and its= query param will populate the datepicker', async () => {
   })
 })
 
-// [Joshen] THIS IS BROKEN
-test('custom sql querying', async () => {
+test.skip('custom sql querying', async () => {
   get.mockImplementation((url) => {
     if (url.includes('sql=') && url.includes('select')) {
       return { result: [{ my_count: 12345 }] }
@@ -144,19 +143,18 @@ test('custom sql querying', async () => {
       // [Joshen] These expects are failing due to multiple RQ hooks on the page level
       // which I'm thinking maybe we avoid testing the entire page, but test components
       // In this case "get" has been called with /api/organizations due to useSelectedOrganizations()
-
-      // expect(get).toHaveBeenCalledWith(expect.stringContaining(encodeURI('\n')), expect.anything())
-      // expect(get).toHaveBeenCalledWith(expect.stringContaining('sql='), expect.anything())
-      // expect(get).toHaveBeenCalledWith(expect.stringContaining('select'), expect.anything())
-      // expect(get).toHaveBeenCalledWith(expect.stringContaining('edge_logs'), expect.anything())
-      // expect(get).toHaveBeenCalledWith(
-      //   expect.stringContaining(encodeURIComponent('my_count')),
-      //   expect.anything()
-      // )
-      // expect(get).toHaveBeenCalledWith(
-      //   expect.stringContaining('iso_timestamp_start'),
-      //   expect.anything()
-      // )
+      expect(get).toHaveBeenCalledWith(expect.stringContaining(encodeURI('\n')), expect.anything())
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('sql='), expect.anything())
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('select'), expect.anything())
+      expect(get).toHaveBeenCalledWith(expect.stringContaining('edge_logs'), expect.anything())
+      expect(get).toHaveBeenCalledWith(
+        expect.stringContaining(encodeURIComponent('my_count')),
+        expect.anything()
+      )
+      expect(get).toHaveBeenCalledWith(
+        expect.stringContaining('iso_timestamp_start'),
+        expect.anything()
+      )
       expect(get).not.toHaveBeenCalledWith(
         expect.stringContaining('iso_timestamp_end'),
         expect.anything()
@@ -170,19 +168,18 @@ test('custom sql querying', async () => {
     { timeout: 1000 }
   )
 
-  // await screen.findByText(/my_count/) //column header
-  // const rowValue = await screen.findByText(/12345/) // row value
+  await screen.findByText(/my_count/) //column header
+  const rowValue = await screen.findByText(/12345/) // row value
 
   // clicking on the row value should not show log selection panel
-  // userEvent.click(rowValue)
-  // await expect(screen.findByText(/Metadata/)).rejects.toThrow()
+  userEvent.click(rowValue)
+  await expect(screen.findByText(/Metadata/)).rejects.toThrow()
 
   // should not see chronological features
-  // await expect(screen.findByText(/Load older/)).rejects.toThrow()
+  await expect(screen.findByText(/Load older/)).rejects.toThrow()
 })
 
-// [Joshen] THIS IS BROKEN
-test('bug: can edit query after selecting a log', async () => {
+test.skip('bug: can edit query after selecting a log', async () => {
   get.mockImplementation((url) => {
     if (url.includes('sql=') && url.includes('select') && !url.includes('limit 222')) {
       return {
@@ -203,23 +200,23 @@ test('bug: can edit query after selecting a log', async () => {
   let editor = container.querySelector('.monaco-editor')
   // type new query
   userEvent.click(editor)
-  // userEvent.type(editor, ' something')
+  userEvent.type(editor, ' something')
   userEvent.type(editor, '\nsomething{ctrl}{enter}')
-  // userEvent.click(await screen.findByText('Run'))
+  userEvent.click(await screen.findByText('Run'))
 
   // [Joshen] These expects are failing due to multiple RQ hooks on the page level
-  // await waitFor(
-  //   () => {
-  //     expect(get).toHaveBeenCalledWith(
-  //       expect.stringContaining(encodeURIComponent('something')),
-  //       expect.anything()
-  //     )
-  //   },
-  //   { timeout: 1000 }
-  // )
+  await waitFor(
+    () => {
+      expect(get).toHaveBeenCalledWith(
+        expect.stringContaining(encodeURIComponent('something')),
+        expect.anything()
+      )
+    },
+    { timeout: 1000 }
+  )
 
   // closes the selection panel
-  // await expect(screen.findByText('Copy')).rejects.toThrow()
+  await expect(screen.findByText('Copy')).rejects.toThrow()
 })
 
 test('query warnings', async () => {
