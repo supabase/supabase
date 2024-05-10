@@ -9,6 +9,8 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
+  DialogHeader,
   DialogTitle,
   DropdownMenu,
   DropdownMenuContent,
@@ -185,13 +187,15 @@ const WarehouseAccessTokens = () => {
           )}
         </div>
         <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-          <DialogContent className="p-4">
-            <DialogTitle>Revoke warehouse access token</DialogTitle>
-            <DialogDescription>
-              This action is irreversible and requests made with these access tokens will stop
-              working.
-            </DialogDescription>
-            <div className="flex justify-end gap-2">
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Revoke warehouse access token</DialogTitle>
+              <DialogDescription>
+                This action is irreversible and requests made with these access tokens will stop
+                working.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
               <Button
                 type="outline"
                 onClick={() => {
@@ -213,7 +217,7 @@ const WarehouseAccessTokens = () => {
               >
                 Yes, revoke access keys
               </Button>
-            </div>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </section>

@@ -2,7 +2,17 @@ import LoadingOpacity from 'components/ui/LoadingOpacity'
 import ShimmerLine from 'components/ui/ShimmerLine'
 import { useRouter } from 'next/router'
 import React, { useEffect } from 'react'
-import { Button, IconRefreshCcw, IconRewind } from 'ui'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  IconRefreshCcw,
+  IconRewind,
+} from 'ui'
 import { LogTable } from '../Settings/Logs'
 import { useWarehouseQueryQuery } from 'data/analytics/warehouse-query'
 import { useWarehouseCollectionsQuery } from 'data/analytics/warehouse-collections-query'
@@ -90,12 +100,13 @@ export const WarehouseCollectionDetail = () => {
                     Access tokens
                   </Link>
                 </Button>
-                {notProd && (
-                  <TestCollectionDialog
-                    accessTokens={accessTokens.data?.data || []}
-                    collectionToken={collectionToken}
-                  />
-                )}
+
+                <TestCollectionDialog
+                  accessTokens={accessTokens.data?.data || []}
+                  collectionToken={collectionToken}
+                  projectRef={projectRef}
+                  collections={collections || []}
+                />
               </div>
             </div>
             <LogTable
