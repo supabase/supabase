@@ -112,6 +112,7 @@ export {
   FormDescription as FormDescription_Shadcn_,
   FormMessage as FormMessage_Shadcn_,
   FormField as FormField_Shadcn_,
+  useWatch as useWatch_Shadcn_,
 } from './src/components/shadcn/ui/form'
 
 export {
