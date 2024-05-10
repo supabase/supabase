@@ -1,5 +1,4 @@
 import Editor, { useMonaco } from '@monaco-editor/react'
-import { stripIndent } from 'common-tags'
 import { ChevronUp, GitPullRequest } from 'lucide-react'
 import type { editor } from 'monaco-editor'
 import { useTheme } from 'next-themes'
@@ -360,7 +359,7 @@ export default function SqlToRest({
               language="curl"
               hideLineNumbers
               className={cn(
-                'self-stretch',
+                'self-stretch  overflow-y-hidden',
                 httpRenderError || !baseUrlObject ? 'opacity-25 pointer-events-none' : ''
               )}
               renderer={codeBlockRenderer}
@@ -374,7 +373,7 @@ export default function SqlToRest({
               language="http"
               hideLineNumbers
               className={cn(
-                'self-stretch',
+                'self-stretch overflow-y-hidden',
                 httpRenderError ? 'opacity-25 pointer-events-none' : ''
               )}
               renderer={codeBlockRenderer}
@@ -390,9 +389,10 @@ export default function SqlToRest({
               language="js"
               hideLineNumbers
               className={cn(
-                'self-stretch',
+                'self-stretch overflow-y-hidden',
                 supabaseJsRenderError ? 'opacity-25 pointer-events-none' : ''
               )}
+              renderer={codeBlockRenderer}
             >
               {jsCommand}
             </CodeBlock>

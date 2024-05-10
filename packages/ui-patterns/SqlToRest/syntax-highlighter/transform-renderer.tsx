@@ -1,5 +1,9 @@
+import { LazyMotion, m } from 'framer-motion'
 import { PropsWithChildren } from 'react'
 import { SyntaxHighlighterProps, createElement } from 'react-syntax-highlighter'
+
+// Make sure to return the specific export containing the feature bundle.
+const loadFramerFeatures = () => import('./framer-features').then((res) => res.default)
 
 type RendererElementNode = {
   type: 'element'
@@ -39,7 +43,7 @@ export function transformRenderer({
   wrapper,
 }: TransformRendererProps): SyntaxHighlighterProps['renderer'] {
   return ({ rows, stylesheet, useInlineStyles }) => {
-    return (rows as RendererNode[]).map((node, i) => {
+    const newRows = (rows as RendererNode[]).map((node, i) => {
       const element = createElement({
         node,
         stylesheet,
@@ -51,8 +55,14 @@ export function transformRenderer({
         return element
       }
 
-      if (!search(mergeValues([node]))) {
-        return element
+      const line = mergeValues([node])
+
+      if (!search(line)) {
+        return (
+          <m.div key={line} layoutId={line}>
+            {element}
+          </m.div>
+        )
       }
 
       const children = splitSpaceElements(node.children)
@@ -89,13 +99,21 @@ export function transformRenderer({
 
       node.children = nodeChildren
 
-      return createElement({
+      const reactElement = createElement({
         node,
         stylesheet,
         useInlineStyles,
         key: `code-segment-${i}`,
       })
+
+      return (
+        <m.div key={line} layoutId={line}>
+          {reactElement}
+        </m.div>
+      )
     })
+
+    return <LazyMotion features={loadFramerFeatures}>{newRows}</LazyMotion>
   }
 }
 
