@@ -17,6 +17,14 @@ You need the following installed in your system: [Git](https://git-scm.com/downl
 
 Follow these steps to start Supabase locally:
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="general"
+>
+<TabPanel id="general" label="General">
+
 ```sh
 # Get the code
 git clone --depth 1 https://github.com/supabase/supabase
@@ -33,6 +41,31 @@ docker compose pull
 # Start the services (in detached mode)
 docker compose up -d
 ```
+
+</TabPanel>
+<TabPanel id="advanced" label="Advanced">
+
+```sh
+# Get the code using git sparse checkout
+git clone --filter=blob:none --no-checkout https://github.com/supabase/supabase
+cd supabase
+git sparse-checkout set --cone docker && git checkout master
+
+# Go to the docker folder
+cd docker
+
+# Copy the fake env vars
+cp .env.example .env
+
+# Pull the latest images
+docker compose pull
+
+# Start the services (in detached mode)
+docker compose up -d
+```
+
+</TabPanel>
+</Tabs>
 
 After all the services have started you can see them running in the background:
 

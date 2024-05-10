@@ -89,7 +89,13 @@ const LogTable = ({
 
   // move timestamp to the first column
   function getFirstRow() {
-    return firstRow || {}
+    if (!firstRow) return {}
+
+    const { timestamp, ...rest } = firstRow || {}
+
+    if (!timestamp) return firstRow
+
+    return { timestamp, ...rest }
   }
 
   const columnNames = Object.keys(getFirstRow() || {})

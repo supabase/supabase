@@ -1,6 +1,19 @@
 import { SelectContent, SelectItem, SelectTrigger, Select } from '@ui/components/shadcn/ui/select'
 import { useEffect, useState } from 'react'
-import { Button, CodeBlock, Dialog, DialogContent, DialogTrigger, Input } from 'ui'
+import {
+  Button,
+  CodeBlock,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  DialogTrigger,
+  Input,
+} from 'ui'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 export function TestCollectionDialog({
   accessTokens,
@@ -19,7 +32,7 @@ export function TestCollectionDialog({
     if (accessTokens.length > 0) {
       setTestAccessToken(accessTokens[0].token)
     }
-  }, [])
+  }, [accessTokens])
 
   if (accessTokens.length === 0) {
     return <></>
@@ -32,34 +45,45 @@ export function TestCollectionDialog({
       <DialogTrigger>
         <Button type="outline">Connect</Button>
       </DialogTrigger>
-      <DialogContent className="p-3">
-        <h2>Send events to this collection using the following endpoint</h2>
-        <Input
-          copy
-          className="font-mono tracking-tighter"
-          value={`https://api.logflare.app/logs?source=${collectionToken}`}
-        />
-        <Select value={testAccessToken} onValueChange={setTestAccessToken}>
-          <SelectTrigger>
-            <span className="text-ellipsis">
-              {selectedAccessToken?.description || 'Access token'}
-            </span>
-          </SelectTrigger>
-          <SelectContent>
-            {accessTokens?.map((token: any) => (
-              <SelectItem key={token.id} value={token.token}>
-                {token.description || 'No description'}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <CodeBlock language="bash" className="language-bash prose dark:prose-dark max-">
-          {`
-  curl -X "POST" "https://api.logflare.app/logs?source=${collectionToken}" \\
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Send events to this collection</DialogTitle>
+          <DialogDescription>
+            Use the following curl command to send events to this collection
+          </DialogDescription>
+        </DialogHeader>
+        <DialogSectionSeparator />
+        <DialogSection className="flex flex-col gap-4 overflow-auto">
+          <FormItemLayout label="Endpoint URL" isReactForm={false}>
+            <Input
+              copy
+              className="font-mono tracking-tighter"
+              value={`https://api.logflare.app/logs?source=${collectionToken}`}
+            />
+          </FormItemLayout>
+          <FormItemLayout label="Token" isReactForm={false}>
+            <Select value={testAccessToken} onValueChange={setTestAccessToken}>
+              <SelectTrigger>
+                <span className="text-ellipsis">
+                  {selectedAccessToken?.description || 'Access token'}
+                </span>
+              </SelectTrigger>
+              <SelectContent>
+                {accessTokens?.map((token: any) => (
+                  <SelectItem key={token.id} value={token.token}>
+                    {token.description || 'No description'}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </FormItemLayout>
+          <div>
+            <CodeBlock className="p-1 language-bash prose" language="bash">
+              {`curl -X "POST" "https://api.logflare.app/logs?source=${collectionToken}" \\
   -H 'Content-Type: application/json' \\
   -H 'X-API-KEY: ${testAccessToken || 'ACCESS_TOKEN'}' \\
   -d $'{
-    "event_message": "Hello world",
+    "event_message": "Test event message",
     "metadata": {
       "ip_address": "100.100.100.100",
       "request_method": "POST",
@@ -74,7 +98,9 @@ export function TestCollectionDialog({
     }
   }'
 `}
-        </CodeBlock>
+            </CodeBlock>
+          </div>
+        </DialogSection>
       </DialogContent>
     </Dialog>
   )
