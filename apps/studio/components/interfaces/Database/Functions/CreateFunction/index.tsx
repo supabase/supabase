@@ -1,11 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PostgresFunction } from '@supabase/postgres-meta'
 import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
-import { useEffect, useState } from 'react'
+import { Plus, Trash } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
 import z from 'zod'
-import { Plus, Trash } from 'lucide-react'
 
 import { POSTGRES_DATA_TYPES } from 'components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
@@ -25,8 +25,8 @@ import {
   FormMessage_Shadcn_,
   Form_Shadcn_,
   Input_Shadcn_,
-  Modal,
   Radio,
+  ScrollArea,
   SelectContent_Shadcn_,
   SelectItem_Shadcn_,
   SelectTrigger_Shadcn_,
@@ -34,12 +34,12 @@ import {
   Select_Shadcn_,
   Separator,
   Sheet,
-  ScrollArea,
   SheetContent,
   SheetFooter,
   SheetSection,
   Toggle,
   cn,
+  useWatch_Shadcn_,
 } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -256,7 +256,11 @@ const CreateFunction = ({ func, visible, setVisible }: CreateFunctionProps) => {
                         </FormLabel_Shadcn_>
                         <FormDescription_Shadcn_ className="text-sm text-foreground-light">
                           <p>
-                            The language below should be written in <code>plpgsql</code>.
+                            The language below should be written in{' '}
+                            <code>
+                              <FormLanguage />
+                            </code>
+                            .
                           </p>
                           {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
                         </FormDescription_Shadcn_>
@@ -593,15 +597,32 @@ const FormFieldConfigParams = ({ readonly }: FormFieldConfigParamsProps) => {
   )
 }
 
+const ALL_ALLOWED_LANGUAGES = ['plpgsql', 'sql', 'plcoffee', 'plv8', 'plls']
+
 const FormFieldLanguage = () => {
   const { project } = useProjectContext()
 
-  const { data } = useDatabaseExtensionsQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const { data: enabledExtensions } = useDatabaseExtensionsQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      select(data) {
+        return partition(data, (ext) => !isNull(ext.installed_version))[0]
+      },
+    }
+  )
 
-  const [enabledExtensions] = partition(data ?? [], (ext) => !isNull(ext.installed_version))
+  const allowedLanguages = useMemo(() => {
+    return ALL_ALLOWED_LANGUAGES.filter((lang) => {
+      if (lang.startsWith('pl')) {
+        return enabledExtensions?.find((ex) => ex.name === lang) !== undefined
+      }
+
+      return true
+    })
+  }, [enabledExtensions])
 
   return (
     <FormField_Shadcn_
@@ -614,19 +635,21 @@ const FormFieldLanguage = () => {
               <SelectValue_Shadcn_ />
             </SelectTrigger_Shadcn_>
             <SelectContent_Shadcn_>
-              {enabledExtensions
-                .filter((ex) => {
-                  return ex.name.startsWith('pl')
-                })
-                .map((option) => (
-                  <SelectItem_Shadcn_ value={option.name} key={option.name}>
-                    {option.name}
-                  </SelectItem_Shadcn_>
-                ))}
+              {allowedLanguages.map((option) => (
+                <SelectItem_Shadcn_ value={option} key={option}>
+                  {option}
+                </SelectItem_Shadcn_>
+              ))}
             </SelectContent_Shadcn_>
           </Select_Shadcn_>
         </FormItemLayout>
       )}
     />
   )
+}
+
+const FormLanguage = () => {
+  const language = useWatch_Shadcn_({ name: 'language' })
+
+  return language
 }

@@ -10,6 +10,7 @@ import {
   FieldValues,
   FormProvider,
   useFormContext,
+  useWatch,
 } from 'react-hook-form'
 
 import { cn } from '../../../lib/utils/cn'
@@ -172,4 +173,5 @@ export {
   FormLabel,
   FormMessage,
   useFormField,
+  useWatch,
 }

@@ -3945,8 +3945,7 @@ functions:
               supabaseKey = "supabaseKey"
           ) {
               install(Auth) {
-                  autoLoadFromStorage = false
-                  alwaysAutoRefresh = false
+                  minimalSettings() //disables session saving and auto-refreshing
               }
               // install other plugins (these will use the service role key)
           }
@@ -4380,6 +4379,10 @@ functions:
           isOptional: true
           type: T
           description: The body to send with the request. T can be any serializable type.
+        - name: region
+          isOptional: true
+          type: FunctionRegion
+          description: The region where the function is invoked. Defaults to `Functions.Config#defaultRegion`.
         - name: headers
           isOptional: true
           type: Headers
@@ -4430,6 +4433,74 @@ functions:
               parameter("Key", "Value") //url parameter
           }
           ```
+  - id: stream
+    title: 'stream()'
+    description: |
+      Return real-time data from your table as a [Flow](https://kotlinlang.org/docs/flow.html).
+      - Realtime is disabled by default for new tables. You can turn it on by [managing replication](/docs/guides/realtime/postgres-changes#replication-setup).
+      - `selectAsFlow` and `selectSingleValueAsFlow` will emit the initial data and then listen for changes.
+      - Takes in a `filter` parameter to filter the data and a `primaryKey` parameter to cache the data by the primary key.
+      - This method requires both the `Realtime` and `Postgrest` plugins to be installed.
+      - The type parameter `T` must be a [serializable class](/docs/reference/kotlin/installing#serialization).
+      - If you want more control over the realtime updates, you can use the `Realtime` plugin directly.
+    params:
+      - name: primaryKey
+        isOptional: false
+        type: KProperty1<Data, Value> or PrimaryKey<Data>
+        description: The primary key to cache the data by. Can be a property reference or a custom primary key.
+      - name: channelName
+        isOptional: true
+        type: String
+        description: The name of the channel to use for the realtime updates. If null, a channel name following the format "schema:table:id" will be used
+      - name: filter
+        isOptional: true
+        type: PostgrestFilterBuilder.() -> Unit or FilterOperation
+        description: The filter to apply to the data.
+    examples:
+      - id: select-as-flow
+        name: Listen for changes in multiple rows
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val flow: Flow<List<Country>> = supabase.from("countries").selectAsFlow(Country::id)
+          flow.collect {
+              for (country in it) {
+                  println(country.name)
+              }
+          }
+          ```
+      - id: select-as-flow-filter
+        name: Listen for changes in multiple rows with a filter
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val flow: Flow<List<Country>> = supabase.from("countries").selectAsFlow(
+              Country::id,
+              filter = FilterOperation("name", FilterOperator.ILIKE, "a%")
+          )
+          flow.collect {
+              for (country in it) {
+                  println(country.name)
+              }
+          }
+          ```
+      - id: select-single-value-as-flow
+        name: Listen for changes in a single row
+        isSpotlight: true
+        code: |
+          ```kotlin
+          val flow: Flow<Country> = supabase.from("countries").selectSingleValueAsFlow(Country::id) {
+              //You can use the same filter methods as in the `select` method, but the result is limited to a single row
+              Country::id eq 1
+              //or
+              eq("id", 1)
+          }
+          flow.collect {
+              println("My country is $it")
+          }
+          ```
+        description: |
+          The flow will end if the row is deleted.
   - id: subscribe
     description: |
       Subscribe to realtime changes in your database.
@@ -5027,6 +5098,10 @@ functions:
         isOptional: false
         type: String
         description: The new path of the file.
+      - name: destinationBucket
+        isOptional: true
+        type: String
+        description: The destination bucket of the file.
     examples:
       - id: move-file
         name: Move file
@@ -5053,6 +5128,10 @@ functions:
         isOptional: false
         type: String
         description: The new path of the file.
+      - name: destinationBucket
+        isOptional: true
+        type: String
+        description: The destination bucket of the file.
     examples:
       - id: copy-file
         name: Copy file
