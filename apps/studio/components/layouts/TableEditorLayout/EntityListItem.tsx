@@ -56,10 +56,18 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
     entity?.type === ENTITY_TYPE.VIEW &&
     lints?.some(
       (lint) =>
-        (lint?.metadata?.name === entity.name &&
-          lint?.name === 'security_definer_view' &&
-          lint?.level === 'ERROR') ||
-        lint?.level === 'WARN'
+        lint?.metadata?.name === entity.name &&
+        lint?.name === 'security_definer_view' &&
+        (lint?.level === 'ERROR' || lint?.level === 'WARN')
+    )
+
+  const materializedViewMaybeAccessible =
+    entity?.type === ENTITY_TYPE.MATERIALIZED_VIEW &&
+    lints?.some(
+      (lint) =>
+        lint?.metadata?.name === entity.name &&
+        lint?.name === 'materialized_view_in_api' &&
+        (lint?.level === 'ERROR' || lint?.level === 'WARN')
     )
 
   const formatTooltipText = (entityType: string) => {
@@ -137,10 +145,10 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
         }
         break
       case ENTITY_TYPE.MATERIALIZED_VIEW:
-        // not sure yet what this check should be
-        if (entity.schema === 'public') {
-          tooltipContent = 'View is public'
+        if (materializedViewMaybeAccessible) {
+          tooltipContent = 'Materialized View is public'
         }
+
         break
       case ENTITY_TYPE.FOREIGN_TABLE:
         tooltipContent = 'RLS is not enforced on foreign tables'
