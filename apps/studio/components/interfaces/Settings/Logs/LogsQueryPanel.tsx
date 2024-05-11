@@ -83,7 +83,7 @@ const LogsQueryPanel = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button type="default" iconRight={<IconChevronDown />}>
-                  <span>Insert source</span>
+                  Insert source
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="start">
@@ -105,7 +105,7 @@ const LogsQueryPanel = ({
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button type="default" iconRight={<IconChevronDown />}>
-                  <span>Templates</span>
+                  Templates
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="bottom" align="start">
