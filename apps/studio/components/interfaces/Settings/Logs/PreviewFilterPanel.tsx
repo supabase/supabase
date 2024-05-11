@@ -77,6 +77,7 @@ const PreviewFilterPanel = ({
     <Tooltip_Shadcn_ delayDuration={100}>
       <TooltipTrigger_Shadcn_ asChild>
         <Button
+          title="refresh"
           type="default"
           className="px-1.5"
           icon={

@@ -1,5 +1,4 @@
 import { formatSortURLParams, formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
-import { format } from 'path'
 
 // Sort URL syntax: `column:order`
 describe('SupabaseGrid.utils: formatSortURLParams', () => {
