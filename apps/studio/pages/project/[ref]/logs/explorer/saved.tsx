@@ -17,8 +17,9 @@ export const LogsSavedPage: NextPageWithLayout = () => {
     return <Loading active={true}>{null}</Loading>
   }
 
-  let saved = [...(data?.content ?? [])].filter((c) => c.type === 'log_sql')
-  saved.sort((a, b) => a.name.localeCompare(b.name))
+  const saved = [...(data?.content ?? [])]
+    .filter((c) => c.type === 'log_sql')
+    .sort((a, b) => a.name.localeCompare(b.name))
 
   return (
     <div className="mx-auto w-full px-5 py-6 h-full">
