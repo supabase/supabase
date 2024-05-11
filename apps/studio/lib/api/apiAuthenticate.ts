@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { readOnly } from './supabaseClient'
-import { SupaResponse, User } from 'types'
+import type { SupaResponse, User } from 'types'
 import { getAuth0Id, getAuthUser, getIdentity } from 'lib/gotrue'
 
 /**

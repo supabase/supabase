@@ -9,6 +9,7 @@ export type UserData = {
   ticketNumber?: number
   username?: string
   name?: string
+  platinum?: boolean
   golden?: boolean
   referrals?: number
   bg_image_id?: number
@@ -17,9 +18,12 @@ export type UserData = {
     company?: string
     location?: string
     hasSecretTicket?: boolean
+    hasSharedSecret?: boolean
+    hideAvatar?: boolean
   }
   sharedOnTwitter?: string
   sharedOnLinkedIn?: string
+  secret?: boolean
 }
 
 type ConfDataContextType = {

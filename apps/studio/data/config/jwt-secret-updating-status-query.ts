@@ -2,7 +2,6 @@ import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
 import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { configKeys } from './keys'
 
 export type JwtSecretUpdatingStatusVariables = {
@@ -75,18 +74,4 @@ export const useJwtSecretUpdatingStatusQuery = <TData = JwtSecretUpdatingStatusD
       ...options,
     }
   )
-}
-
-export const useJwtSecretUpdatingStatusPrefetch = ({
-  projectRef,
-}: JwtSecretUpdatingStatusVariables) => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    if (projectRef) {
-      client.prefetchQuery(configKeys.jwtSecretUpdatingStatus(projectRef), ({ signal }) =>
-        getJwtSecretUpdatingStatus({ projectRef }, signal)
-      )
-    }
-  }, [projectRef])
 }

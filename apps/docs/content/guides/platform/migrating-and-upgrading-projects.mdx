@@ -1,0 +1,266 @@
+---
+id: 'migrating-and-upgrading-projects'
+title: 'Migrating and Upgrading Projects'
+description: 'Upgrade your project to the latest version of Supabase.'
+sidebar_label: 'Migrating and upgrading'
+---
+
+Supabase ships fast and we endeavor to add all new features to existing projects wherever possible.
+In some cases, access to new features require upgrading or migrating your Supabase project.
+
+## Upgrade your project
+
+There are a few methods available to upgrade your project.
+
+### `pg_upgrade`
+
+<Admonition type="note">
+
+This upgrade method is currently in Beta.
+
+</Admonition>
+
+pg_upgrade performs an in-place upgrade on your database. For projects larger than 1GB, pg_upgrade is generally faster than a pause+restore cycle, and the speed advantage grows with the size of the database.
+
+1. Plan for an appropriate downtime window, and ensure you have reviewed the [caveats](#caveats) section of this document before executing the upgrade.
+1. Use the "Upgrade project" button on the [Infrastructure](https://supabase.com/dashboard/project/_/settings/infrastructure) section of your dashboard.
+
+Additionally, if a pg_upgrade upgrade should fail, your original DB would be brought back up online and be able to service requests.
+
+As a rough rule of thumb, pg_upgrade operates at ~100mbps (when executing an upgrade on your data). Using the size of your database, you can use this metric to derive an approximate sense of the downtime window necessary for the upgrade. During this window, you should plan for your DB and associated services to be unavailable.
+
+### Pause + restore
+
+<Admonition type="note">
+
+We recommend using the pg_upgrade method, as it is faster, and more reliable. Additionally, only Free-tier projects are eligible to use the Pause + Restore method.
+
+</Admonition>
+
+When you pause and restore a project, the restored database includes the latest features. This method _does_ include downtime, so be aware that your project will be inaccessible for a short period of time.
+
+1. On the [General Settings](https://supabase.com/dashboard/project/_/settings/general) page in the Dashboard, click **Pause project**. You will be redirected to the home screen as your project is pausing. This process can take several minutes.
+1. After your project is paused, click **Restore project**. The restoration can take several minutes depending on how much data your database has. You will receive an email once the restoration is complete.
+
+Note that a pause + restore upgrade involves tearing down your project's resources before bringing them back up again. If the restore process should fail, manual intervention from Supabase support will be required to bring your project back online.
+
+### Caveats
+
+Regardless of the upgrade method, a few caveats apply:
+
+#### Logical replication
+
+If you are using logical replication, the replication slots will not be preserved by the upgrade process. You will need to manually recreate them after the upgrade with the method `pg_create_logical_replication_slot`. Refer to the Postgres docs on [Replication Management Functions](https://www.postgresql.org/docs/current/functions-admin.html#FUNCTIONS-REPLICATION) for more details about the method.
+
+#### Breaking changes
+
+Newer versions of services can break functionality or change the performance characteristics you rely on. If your project is eligible for an upgrade, you will be able to find your current service versions from within [the Supabase dashboard](https://supabase.com/dashboard/project/_/settings/infrastructure).
+
+Breaking changes are generally only present in major version upgrades of Postgres and PostgREST. You can find their respective release notes at:
+
+- [Postgres](https://www.postgresql.org/docs/release/)
+- [PostgREST](https://github.com/PostgREST/postgrest/releases)
+
+If you are upgrading from a significantly older version, you will need to consider the release notes for any intermediary releases as well.
+
+#### Disk sizing
+
+When upgrading, the Supabase platform will "right-size" your disk based on the current size of the database. For example, if your database is 100GB in size, and you have a 200GB disk, the upgrade will reduce the disk size to 120GB (1.2x the size of your database).
+
+#### Objects dependent on Postgres extensions
+
+pg_upgrade does not support upgrading of databases containing reg\* data types referencing system OIDs.
+If you have created any objects that depend on the following extensions, you will need to recreate them after the upgrade.
+
+#### Extensions
+
+pg_upgrade does not currently support upgrading of databases using extensions older than the following versions:
+
+- TimescaleDB 2.9.1
+- plv8 3.1.5
+
+To upgrade to a newer version of Postgres, you will need to drop the extensions before the upgrade, and recreate them after the upgrade.
+
+#### Authentication method changes - deprecating md5 in favor of scram-sha-256
+
+The md5 hashing method has [known weaknesses](https://en.wikipedia.org/wiki/MD5#Security) that make it unsuitable for cryptography.
+As such, we are deprecating md5 in favor of [scram-sha-256](https://www.postgresql.org/docs/current/auth-password.html), which is the default and most secure authentication method used in the latest Postgres versions.
+
+We automatically migrate Supabase-managed roles' passwords to scram-sha-256 during the upgrade process, but you will need to manually migrate the passwords of any custom roles you have created, else you won't be able to connect using them after the upgrade.
+
+To identify roles using the md5 hashing method and migrate their passwords, you can use the following SQL statements after the upgrade:
+
+```sql
+-- List roles using md5 hashing method
+SELECT
+  rolname
+FROM pg_authid
+WHERE rolcanlogin = true
+  AND rolpassword LIKE 'md5%';
+
+-- Migrate a role's password to scram-sha-256
+ALTER ROLE <role_name> WITH PASSWORD '<password>';
+```
+
+#### Database size reduction
+
+As part of the upgrade process, maintenance operations such as [vacuuming](https://www.postgresql.org/docs/current/routine-vacuuming.html#ROUTINE-VACUUMING) are also executed. This can result in a reduction in the reported database size.
+
+#### Post-upgrade validation
+
+Supabase performs extensive pre- and post-upgrade validations to ensure that the database has been correctly upgraded. However, you should plan for your own application-level validations, as there might be changes you might not have anticipated, and this should be budgeted for when planning your downtime window.
+
+## Migrate your project
+
+Migrating projects can be achieved using the Supabase CLI. This is particularly useful for older projects (e.g. to use a newer Postgres version).
+
+### Before you begin
+
+- Install [Postgres](https://www.postgresql.org/download/) so you can run `psql` and `pg_dump`.
+- Install the latest version of [Supabase CLI](/docs/guides/cli#installation).
+- Create a new [Supabase project](https://supabase.com/dashboard).
+- Install [Docker Desktop](https://www.docker.com) for your platform.
+- Set environment variables for the old project's database URL as `$OLD_DB_URL` and the new project's as `$NEW_DB_URL`.
+  To find the database URL for a project, go to the project's dashboard page [Project Settings/Database](https://supabase.com/dashboard/project/_/settings/database) and look under `Connection string`. If your network provider supports IPv6, you can disable `Use connection pooling`. Otherwise, enable `Use connection pooling`. For the pooler mode, `Transaction` will work.
+
+### Backup your old database
+
+1. Run the following command from your terminal:
+
+```bash
+supabase db dump --db-url "$OLD_DB_URL" -f roles.sql --role-only
+supabase db dump --db-url "$OLD_DB_URL" -f schema.sql
+supabase db dump --db-url "$OLD_DB_URL" -f data.sql --use-copy --data-only
+```
+
+### Restore to your new project
+
+In your new project:
+
+1. Enable [Database Webhooks](https://supabase.com/dashboard/project/_/database/hooks) if you enabled them in your old project.
+2. Enable any [extensions](https://supabase.com/dashboard/project/_/database/extensions) that were enabled in your old project.
+
+If you use [column encryption](/docs/guides/database/column-encryption), first copy the root encryption key to your new project using your [Personal Access Token](https://supabase.com/dashboard/account/tokens).
+
+```bash
+export OLD_PROJECT_REF="<old_project_ref>"
+export NEW_PROJECT_REF="<new_project_ref>"
+export SUPABASE_ACCESS_TOKEN="<personal_access_token>"
+
+curl "https://api.supabase.com/v1/projects/$OLD_PROJECT_REF/pgsodium" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" |
+curl "https://api.supabase.com/v1/projects/$NEW_PROJECT_REF/pgsodium" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -X PUT --json @-
+```
+
+Then run the following command from your terminal:
+
+```bash
+psql \
+  --single-transaction \
+  --variable ON_ERROR_STOP=1 \
+  --file roles.sql \
+  --file schema.sql \
+  --command 'SET session_replication_role = replica' \
+  --file data.sql \
+  --dbname "$NEW_DB_URL"
+```
+
+Setting the `session_replication_role` to `replica` disables all triggers so that columns are not double encrypted.
+
+Troubleshooting notes:
+
+- If you have created any [custom roles](https://supabase.com/dashboard/project/_/database/roles) with `login` attribute, you have to manually set their passwords in the new project.
+- If you run into any permission errors related to `supabase_admin` during restore, edit the `schema.sql` file and comment out any lines containing `ALTER ... OWNER TO "supabase_admin"`.
+
+### Preserving migration history
+
+If you were using Supabase CLI for managing migrations on your old database and would like to preserve the migration history in your newly restored project, you need to insert the migration records separately using the following commands.
+
+```bash
+supabase db dump --db-url "$OLD_DB_URL" -f history_schema.sql --schema supabase_migrations
+supabase db dump --db-url "$OLD_DB_URL" -f history_data.sql --use-copy --data-only --schema supabase_migrations
+psql \
+  --single-transaction \
+  --variable ON_ERROR_STOP=1 \
+  --file history_schema.sql \
+  --file history_data.sql \
+  --dbname "$NEW_DB_URL"
+```
+
+### Schema changes to `auth` and `storage`
+
+If you have modified the `auth` and `storage` schemas in your old project, such as adding triggers or RLS policies, you have to restore them separately. The Supabase CLI can help you diff the changes to these schemas using the following commands.
+
+```bash
+supabase link --project-ref "$OLD_PROJECT_REF"
+supabase db diff --linked --schema auth,storage > changes.sql
+```
+
+### Enable publication on tables
+
+Replication for Realtime is disabled for all tables in your new project. On the [Publications](https://supabase.com/dashboard/project/_/database/publications) page in the Dashboard, select your new project and enable replication for tables that were enabled in your old project.
+
+### Migrate storage objects
+
+The new project has the old project's Storage buckets, but the Storage objects need to be migrated manually. Use this script to move storage objects from one project to another.
+
+```js
+// npm install @supabase/supabase-js@1
+const { createClient } = require('@supabase/supabase-js')
+
+const OLD_PROJECT_URL = 'https://xxx.supabase.co'
+const OLD_PROJECT_SERVICE_KEY = 'old-project-service-key-xxx'
+
+const NEW_PROJECT_URL = 'https://yyy.supabase.co'
+const NEW_PROJECT_SERVICE_KEY = 'new-project-service-key-yyy'
+
+;(async () => {
+  const oldSupabaseRestClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY, {
+    db: {
+      schema: 'storage',
+    },
+  })
+  const oldSupabaseClient = createClient(OLD_PROJECT_URL, OLD_PROJECT_SERVICE_KEY)
+  const newSupabaseClient = createClient(NEW_PROJECT_URL, NEW_PROJECT_SERVICE_KEY)
+
+  // make sure you update max_rows in postgrest settings if you have a lot of objects
+  // or paginate here
+  const { data: oldObjects, error } = await oldSupabaseRestClient.from('objects').select()
+  if (error) {
+    console.log('error getting objects from old bucket')
+    throw error
+  }
+
+  for (const objectData of oldObjects) {
+    console.log(`moving ${objectData.id}`)
+    try {
+      const { data, error: downloadObjectError } = await oldSupabaseClient.storage
+        .from(objectData.bucket_id)
+        .download(objectData.name)
+      if (downloadObjectError) {
+        throw downloadObjectError
+      }
+
+      const { _, error: uploadObjectError } = await newSupabaseClient.storage
+        .from(objectData.bucket_id)
+        .upload(objectData.name, data, {
+          upsert: true,
+          contentType: objectData.metadata.mimetype,
+          cacheControl: objectData.metadata.cacheControl,
+        })
+      if (uploadObjectError) {
+        throw uploadObjectError
+      }
+    } catch (err) {
+      console.log('error moving ', objectData)
+      console.log(err)
+    }
+  }
+})()
+```
+
+### Transfer to a different organization
+
+Note that project migration is for transferring your projects to different regions. If you need to move your project to a different organization without touching the infrastructure, see [project transfers](/docs/guides/platform/project-transfer).

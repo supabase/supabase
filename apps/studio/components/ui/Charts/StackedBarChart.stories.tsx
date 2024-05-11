@@ -1,13 +1,12 @@
 import React from 'react'
-import { ComponentStory, ComponentMeta } from '@storybook/react'
+import { StoryObj } from '@storybook/react'
 import dayjs from 'dayjs'
 import Chart from './StackedBarChart'
-import { StackedChartProps } from './Charts.types'
 import { DEFAULT_STACK_COLORS, genStackColorScales } from './Charts.constants'
 
 export default {
   title: 'Charts/StackedBarChart',
-} as ComponentMeta<typeof Chart>
+} as StoryObj<typeof Chart>
 
 const DATA = [290, 430, 649, 422, 321].flatMap((value, index) => [
   {

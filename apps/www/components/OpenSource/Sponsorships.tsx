@@ -19,7 +19,6 @@ const Sponsorships = ({ sponsorships }: { sponsorships: any[] }) => {
         {sponsorships.map((link) => (
           <Link href={link.url} key={link.name} target="_blank">
             <Panel
-              outerClassName=""
               innerClassName={cn(
                 'relative group flex flex-col gap-2 p-4 ',
                 link.isGithub ? 'md:min-h-[170px] md:h-[200px]' : 'min-h-[120px] md:h-[140px]'

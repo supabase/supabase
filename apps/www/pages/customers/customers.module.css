@@ -1,11 +1,8 @@
 .bg-visual {
   animation: fadeIn 3s ease-out both;
   background-image:
-    /* Bg glow */ radial-gradient(
-      80% 100% at 50% 75%,
-      #3ecf8e10 0%,
-      #0d0e1200 100%
-    ),
+    /* Bg glow */
+    radial-gradient(80% 100% at 50% 75%, #3ecf8e10 0%, #0d0e1200 100%),
     radial-gradient(40% 70% at 50% 80%, #3ecf8e20 0%, #3ecf8e00 100%),
     /* radial-gradient(100% 100% at 50% 80%, #1c1c1c50 0%, #3ecf8e00 100%), */
       /* Stars from left to right =================================== */

@@ -1,12 +1,11 @@
-import { Alert, Input } from 'ui'
-import { observer } from 'mobx-react-lite'
 import { NewAccessToken } from 'data/access-tokens/access-tokens-create-mutation'
+import { Alert, Input } from 'ui'
 
 interface NewTokenBannerProps {
   token: NewAccessToken
 }
 
-const NewTokenBanner = observer(({ token }: NewTokenBannerProps) => {
+const NewTokenBanner = ({ token }: NewTokenBannerProps) => {
   return (
     <Alert withIcon variant="success" title="Successfully generated a new token!">
       <div className="w-full space-y-2">
@@ -25,6 +24,6 @@ const NewTokenBanner = observer(({ token }: NewTokenBannerProps) => {
       </div>
     </Alert>
   )
-})
+}
 
 export default NewTokenBanner

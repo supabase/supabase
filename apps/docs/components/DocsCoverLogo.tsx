@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { type PropsWithChildren } from 'react'
 import { LazyMotion, domAnimation, m } from 'framer-motion'
 
-const DocsCoverLogo = () => {
+const DocsCoverLogo = (props: PropsWithChildren) => {
   const pathMotionConfig = {
     initial: { pathLength: 0 },
     animate: { pathLength: 1 },
@@ -22,7 +22,7 @@ const DocsCoverLogo = () => {
   }
 
   return (
-    <div className="w-[60px] md:w-[150px] [&_svg]">
+    <div className="w-[60px] md:w-[150px] [&_svg]" {...props}>
       <LazyMotion features={domAnimation}>
         <m.svg
           width="100%"

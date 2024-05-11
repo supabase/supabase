@@ -46,8 +46,10 @@ To start using Wrappers on the Supabase platform, check out the [Wrappers docs](
 
 - [Airtable](https://supabase.com/docs/guides/database/extensions/wrappers/airtable) (Read-only): query your Airtable bases with [support for jsonb](https://github.com/supabase/wrappers/pull/181)
 - [AWS S3](https://supabase.com/docs/guides/database/extensions/wrappers/s3) (Read-only): with support for CSV, JSON, and Parquet
-- [Clerk](https://github.com/tembo-io/clerk_fdw) (from the team at [Tembo](https://tembo.io/))
+- [Clerk](https://github.com/tembo-io/clerk_fdw) (from the team at [Tembo](https://tembo.io/)). Not yet available on our platform since it is a community wrapper, see below for details.
 - And a WIP Wrapper for [Auth0](https://github.com/supabase/wrappers/pull/183)
+
+We cannot support community Wrappers inside the Supabase Dashboard until the Wrappers API is stabilized. You can vote your favorite Wrapper if you'd like it to be added to Supabase in the future. If you have developed a Wrapper that you want inside the Supabase Dashboard, please contribute it as a PR in [the wrappers repo](https://github.com/supabase/wrappers). Once we release Wrappers 1.0, we will support community Wrappers within the Supabase Dashboard.
 
 More improvements and updates can be found on [Wrappers release page](https://github.com/supabase/wrappers/releases), including support for Query Pushdown, Remote Subqueries, and Usage Statistics which we’ll explore below.
 

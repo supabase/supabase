@@ -1,4 +1,4 @@
-import { PostgresRole } from '@supabase/postgres-meta'
+import type { PostgresRole } from '@supabase/postgres-meta'
 import toast from 'react-hot-toast'
 import { Modal } from 'ui'
 
@@ -27,7 +27,7 @@ const DeleteRoleModal = ({ role, visible, onClose }: DeleteRoleModalProps) => {
     deleteDatabaseRole({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      id: role.id.toString(),
+      id: role.id,
     })
   }
 

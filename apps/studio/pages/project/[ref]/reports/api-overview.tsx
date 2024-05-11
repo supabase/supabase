@@ -1,34 +1,36 @@
-import { observer } from 'mobx-react-lite'
+import { useParams } from 'common'
+import { isEqual } from 'lodash'
+import { useEffect, useState } from 'react'
 import { NextPageWithLayout } from 'types'
-import { ReportFilterItem } from 'components/interfaces/Reports/Reports.types'
-import { ReportsLayout } from 'components/layouts'
+
+import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
+import ReportHeader from 'components/interfaces/Reports/ReportHeader'
+import ReportPadding from 'components/interfaces/Reports/ReportPadding'
+import ReportWidget from 'components/interfaces/Reports/ReportWidget'
 import {
   PRESET_CONFIG,
   REPORTS_DATEPICKER_HELPERS,
 } from 'components/interfaces/Reports/Reports.constants'
-import ReportWidget from 'components/interfaces/Reports/ReportWidget'
+import { ReportFilterItem } from 'components/interfaces/Reports/Reports.types'
 import { queriesFactory } from 'components/interfaces/Reports/Reports.utils'
 import {
-  TotalRequestsChartRenderer,
   ErrorCountsChartRenderer,
+  NetworkTrafficRenderer,
   ResponseSpeedChartRenderer,
   TopApiRoutesRenderer,
-  NetworkTrafficRenderer,
+  TotalRequestsChartRenderer,
 } from 'components/interfaces/Reports/renderers/ApiRenderers'
-import { useState, useEffect } from 'react'
-import ReportHeader from 'components/interfaces/Reports/ReportHeader'
 import { DatePickerToFrom, LogsEndpointParams } from 'components/interfaces/Settings/Logs'
-import ReportFilterBar from 'components/interfaces/Reports/ReportFilterBar'
-import { useParams } from 'common'
-import { isEqual } from 'lodash'
+import { ReportsLayout } from 'components/layouts'
 import ShimmerLine from 'components/ui/ShimmerLine'
-import ReportPadding from 'components/interfaces/Reports/ReportPadding'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useSelectedOrganization } from 'hooks'
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 
 export const ApiReport: NextPageWithLayout = () => {
-  const organization = useSelectedOrganization()
   const report = useApiReport()
+  const organization = useSelectedOrganization()
 
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const plan = subscription?.plan
@@ -42,7 +44,7 @@ export const ApiReport: NextPageWithLayout = () => {
 
   return (
     <ReportPadding>
-      <ReportHeader title="API" isLoading={report.isLoading} onRefresh={report.refresh} />
+      <ReportHeader title="API" />
       <div className="w-full flex flex-col gap-1">
         <ReportFilterBar
           onRemoveFilters={report.removeFilters}
@@ -108,7 +110,12 @@ export const ApiReport: NextPageWithLayout = () => {
 
 // hook to fetch data
 const useApiReport = () => {
+  const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
+  const state = useDatabaseSelectorStateSnapshot()
+
+  // [Joshen] TODO: Once API support is out
+  const showReadReplicasUI = false // project?.is_read_replicas_enabled
 
   const queryHooks = queriesFactory<keyof typeof PRESET_CONFIG.api.queries>(
     PRESET_CONFIG.api.queries,
@@ -223,4 +230,4 @@ const useApiReport = () => {
 
 ApiReport.getLayout = (page) => <ReportsLayout>{page}</ReportsLayout>
 
-export default observer(ApiReport)
+export default ApiReport

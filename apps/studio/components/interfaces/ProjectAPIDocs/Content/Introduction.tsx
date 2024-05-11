@@ -4,7 +4,7 @@ import { Button, IconCopy, Input } from 'ui'
 import { useProjectApiQuery } from 'data/config/project-api-query'
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
-import { ContentProps } from './Content.types'
+import type { ContentProps } from './Content.types'
 import { copyToClipboard } from 'lib/helpers'
 import { useEffect, useState } from 'react'
 

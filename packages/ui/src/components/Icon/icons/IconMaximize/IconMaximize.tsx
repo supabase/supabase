@@ -9,5 +9,12 @@
     return <IconBase icon={Maximize} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { maximize } from 'lucide-react'
+  */
   export default IconMaximize
   

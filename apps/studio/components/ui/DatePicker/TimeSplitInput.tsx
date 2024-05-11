@@ -3,7 +3,7 @@ import { IconClock } from 'ui'
 
 import { format } from 'date-fns'
 
-import { TimeSplitInputProps, TimeType } from './DatePicker.types'
+import type { TimeSplitInputProps, TimeType } from './DatePicker.types'
 
 const TimeSplitInput = ({
   type,

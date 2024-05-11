@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast'
 
 import { del } from 'data/fetchers'
 import { projectKeys } from 'data/projects/keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { deleteBranch } from './branch-delete-mutation'
 import { branchKeys } from './keys'
 

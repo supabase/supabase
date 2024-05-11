@@ -1,7 +1,10 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText } from 'ui'
 
+import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge'
 import { InvoiceStatus } from 'components/interfaces/Billing/Invoices.types'
 import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
 import Table from 'components/to-be-cleaned/Table'
@@ -11,14 +14,12 @@ import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { getInvoice } from 'data/invoices/invoice-query'
 import { useInvoicesCountQuery } from 'data/invoices/invoices-count-query'
 import { useInvoicesQuery } from 'data/invoices/invoices-query'
-import { useCheckPermissions, useSelectedOrganization, useStore } from 'hooks'
-import { Button, IconChevronLeft, IconChevronRight, IconDownload, IconFileText } from 'ui'
-import InvoiceStatusBadge from 'components/interfaces/Billing/InvoiceStatusBadge'
+import { useCheckPermissions, useSelectedOrganization } from 'hooks'
+import { formatCurrency } from 'lib/helpers'
 
 const PAGE_LIMIT = 10
 
 const InvoicesSettings = () => {
-  const { ui } = useStore()
   const [page, setPage] = useState(1)
 
   const selectedOrganization = useSelectedOrganization()
@@ -48,10 +49,7 @@ const InvoicesSettings = () => {
       const invoice = await getInvoice({ id })
       if (invoice?.invoice_pdf) window.open(invoice.invoice_pdf, '_blank')
     } catch (error: any) {
-      ui.setNotification({
-        category: 'info',
-        message: `Failed to fetch the selected invoice: ${error.message}`,
-      })
+      toast.error(`Failed to fetch the selected invoice: ${error.message}`)
     }
   }
 
@@ -98,17 +96,19 @@ const InvoicesSettings = () => {
                         <p>{new Date(x.period_end * 1000).toLocaleString()}</p>
                       </Table.td>
                       <Table.td>
-                        <p>${x.subtotal / 100}</p>
+                        <p>{formatCurrency(x.subtotal / 100)}</p>
                       </Table.td>
                       <Table.td>
                         <p>{x.number}</p>
                       </Table.td>
                       <Table.td>
-                        <InvoiceStatusBadge status={x.status} />
+                        <InvoiceStatusBadge status={x.status as InvoiceStatus} />
                       </Table.td>
                       <Table.td className="align-right">
                         <div className="flex items-center justify-end space-x-2">
-                          {[InvoiceStatus.UNCOLLECTIBLE, InvoiceStatus.OPEN].includes(x.status) && (
+                          {[InvoiceStatus.UNCOLLECTIBLE, InvoiceStatus.OPEN].includes(
+                            x.status as InvoiceStatus
+                          ) && (
                             <Button asChild>
                               <Link
                                 href={`https://redirect.revops.supabase.com/pay-invoice/${x.id}`}

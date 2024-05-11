@@ -6,7 +6,7 @@ import { executeSql } from 'data/sql/execute-sql-query'
 import { sqlKeys } from 'data/sql/keys'
 import { ImpersonationRole, wrapWithRoleImpersonation } from 'lib/role-impersonation'
 import { isRoleImpersonationEnabled } from 'state/role-impersonation-state'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { formatFilterValue } from './utils'
 
 export type TableRowDeleteAllVariables = {

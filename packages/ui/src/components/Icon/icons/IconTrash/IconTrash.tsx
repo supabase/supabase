@@ -9,5 +9,12 @@
     return <IconBase icon={Trash} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { trash } from 'lucide-react'
+  */
   export default IconTrash
   

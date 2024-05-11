@@ -7,7 +7,7 @@ import FolderContextMenu from './FolderContextMenu'
 import ColumnContextMenu from './ColumnContextMenu'
 import FileExplorerColumn from './FileExplorerColumn'
 import { noop } from 'lodash'
-import { StorageColumn } from '../Storage.types'
+import type { StorageColumn } from '../Storage.types'
 
 export interface FileExplorerProps {
   view: string

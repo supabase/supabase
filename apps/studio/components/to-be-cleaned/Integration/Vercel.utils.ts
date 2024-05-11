@@ -1,59 +1,49 @@
 import { post, get } from 'lib/common/fetch'
 import { INTEGRATION_ENVS_ALIAS } from 'lib/vercelConfigs'
-import { Dictionary } from 'types'
 import { API_URL } from 'lib/constants'
 
-export async function fetchVercelProjects({
-  vercelTeamId,
+async function doFetchVercelProjects({
   vercelToken,
+  vercelTeamId,
+  id,
 }: {
-  vercelTeamId?: string
   vercelToken: string
-}): Promise<{ data?: Dictionary<any>[]; error?: string }> {
+  vercelTeamId?: string
+  id?: string
+}) {
   let url = `${API_URL}/vercel/projects`
+  if (id) {
+    url += `/${id}`
+  }
   if (vercelTeamId && vercelTeamId != 'null') {
     const query = new URLSearchParams({ teamId: vercelTeamId }).toString()
-    url = `${url}?${query}`
-  }
-  const response = await get(url, {
-    headers: { vercel_authorization: `Bearer ${vercelToken}` },
-  })
-  if (response.error != null) {
-    return { error: `Retrieve vercel projects failed. ${response.error?.message}` }
-  }
-  return { data: response }
-}
-
-/**
- * /v6/projects/:id returns project alias with domain info.
- * We need this to setup Supabase Auth site url on project creation.
- *
- * Do not update to /v8/projects/:id as it doesn't return alias info
- */
-export async function fetchVercelProject({
-  id,
-  vercelTeamId,
-  vercelToken,
-}: {
-  id: string
-  vercelTeamId?: string
-  vercelToken: string
-}): Promise<{ data?: Dictionary<any>; error?: string }> {
-  let url = `${API_URL}/vercel/projects`
-  if (vercelTeamId && vercelTeamId != 'null') {
-    const query = new URLSearchParams({ id, teamId: vercelTeamId }).toString()
-    url = `${url}?${query}`
-  } else {
-    const query = new URLSearchParams({ id }).toString()
     url = `${url}?${query}`
   }
   const data = await get(url, {
     headers: { vercel_authorization: `Bearer ${vercelToken}` },
   })
   if (data.error != null) {
-    return { error: `Retrieve vercel project failed. ${data.error.message}` }
+    return { error: `Retrieve vercel project${id ? '' : 's'} failed. ${data.error.message}` }
   }
   return { data }
+}
+
+export async function fetchVercelProjects(params: { vercelToken: string; vercelTeamId?: string }) {
+  return (await doFetchVercelProjects(params)) as {
+    data?: Record<string, any>[]
+    error?: string
+  }
+}
+
+export async function fetchVercelProject(params: {
+  id: string
+  vercelToken: string
+  vercelTeamId?: string
+}) {
+  return (await doFetchVercelProjects(params)) as {
+    data?: Record<string, any>
+    error?: string
+  }
 }
 
 export async function fetchVercelProjectEnvs({
@@ -64,7 +54,7 @@ export async function fetchVercelProjectEnvs({
   id: string
   vercelTeamId?: string
   vercelToken: string
-}): Promise<{ data?: Dictionary<any>[]; error?: string }> {
+}): Promise<{ data?: Record<string, any>[]; error?: string }> {
   let url = `${API_URL}/vercel/projects/envs`
   if (vercelTeamId && vercelTeamId != 'null') {
     const query = new URLSearchParams({ projectId: id, teamId: vercelTeamId }).toString()

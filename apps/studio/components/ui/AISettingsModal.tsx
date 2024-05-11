@@ -1,53 +1,45 @@
 import Link from 'next/link'
-import { Alert, IconExternalLink, Modal, Toggle } from 'ui'
+import toast from 'react-hot-toast'
+import {
+  AlertDescription_Shadcn_,
+  AlertTitle_Shadcn_,
+  Alert_Shadcn_,
+  Button,
+  Modal,
+  Toggle,
+} from 'ui'
 
-import { useLocalStorageQuery, useSelectedOrganization, useStore } from 'hooks'
-import { IS_PLATFORM, OPT_IN_TAGS } from 'lib/constants'
+import { useLocalStorageQuery, useSelectedOrganization } from 'hooks'
+import { IS_PLATFORM, LOCAL_STORAGE_KEYS, OPT_IN_TAGS } from 'lib/constants'
 import { useAppStateSnapshot } from 'state/app-state'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 const AISettingsModal = () => {
   const snap = useAppStateSnapshot()
-
   const selectedOrganization = useSelectedOrganization()
   const isOptedInToAI = selectedOrganization?.opt_in_tags?.includes(OPT_IN_TAGS.AI_SQL) ?? false
+
   const [hasEnabledAISchema, setHasEnabledAISchema] = useLocalStorageQuery(
-    'supabase_sql-editor-ai-schema-enabled',
+    LOCAL_STORAGE_KEYS.SQL_EDITOR_AI_SCHEMA,
     true
   )
-  const { ui } = useStore()
 
   const includeSchemaMetadata = (isOptedInToAI || !IS_PLATFORM) && hasEnabledAISchema
 
   const handleOptInToggle = () => {
     setHasEnabledAISchema((prev) => !prev)
-    ui.setNotification({ category: 'success', message: 'Successfully saved settings' })
+    toast.success('Successfully saved settings')
   }
 
   return (
     <Modal
-      header="Supabase AI Settings"
       hideFooter
+      header="Supabase AI Settings"
       visible={snap.showAiSettingsModal}
       onCancel={() => snap.setShowAiSettingsModal(false)}
     >
-      <div className="flex flex-col items-start justify-between gap-4 px-6 py-3">
-        {IS_PLATFORM && !isOptedInToAI && selectedOrganization && (
-          <Alert
-            variant="warning"
-            title="This option is only available if your organization has opted-in to sending anonymous data to OpenAI."
-          >
-            <Link
-              href={`/org/${selectedOrganization.slug}/general`}
-              className="flex flex-row gap-1 items-center"
-              target="_blank"
-              rel="noopener"
-            >
-              Go to your organization's settings to opt-in.
-              <IconExternalLink className="inline-block w-3 h-3" />
-            </Link>
-          </Alert>
-        )}
-        <div className="flex justify-between gap-8 mr-8 my-4">
+      <div className="flex flex-col items-start justify-between gap-y-4 px-6 py-3">
+        <div className="flex justify-between gap-x-8 mr-8 my-4">
           <Toggle
             disabled={IS_PLATFORM && !isOptedInToAI}
             checked={includeSchemaMetadata}
@@ -61,6 +53,31 @@ const AISettingsModal = () => {
             </p>
           </div>
         </div>
+        {IS_PLATFORM && !isOptedInToAI && selectedOrganization && (
+          <Alert_Shadcn_ variant="warning">
+            <WarningIcon />
+            <AlertTitle_Shadcn_>
+              Your organization does not allow sending anonymous data to OpenAI
+            </AlertTitle_Shadcn_>
+            <AlertDescription_Shadcn_>
+              This option is only available if your organization has opted-in to sending anonymous
+              data to OpenAI. You may configure your opt-in preferences through your organization's
+              settings.
+            </AlertDescription_Shadcn_>
+            <AlertDescription_Shadcn_ className="mt-3">
+              <Button asChild type="default">
+                <Link
+                  target="_blank"
+                  rel="noreferrer"
+                  href={`/org/${selectedOrganization.slug}/general`}
+                  className="flex flex-row gap-1 items-center"
+                >
+                  Head to organization settings
+                </Link>
+              </Button>
+            </AlertDescription_Shadcn_>
+          </Alert_Shadcn_>
+        )}
       </div>
     </Modal>
   )

@@ -1,13 +1,13 @@
-import { observer } from 'mobx-react-lite'
-import { Menu, Item, Separator, Submenu } from 'react-contexify'
-import 'react-contexify/dist/ReactContexify.css'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { IconClipboard, IconEdit, IconMove, IconDownload, IconTrash2, IconChevronRight } from 'ui'
+import { noop } from 'lodash'
+import { observer } from 'mobx-react-lite'
+import { Item, Menu, Separator, Submenu } from 'react-contexify'
+import 'react-contexify/dist/ReactContexify.css'
 
 import { useCheckPermissions } from 'hooks'
-import { URL_EXPIRY_DURATION } from '../Storage.constants'
 import { useStorageStore } from 'localStores/storageExplorer/StorageExplorerStore'
-import { noop } from 'lodash'
+import { IconChevronRight, IconClipboard, IconDownload, IconEdit, IconMove, IconTrash2 } from 'ui'
+import { URL_EXPIRY_DURATION } from '../Storage.constants'
 
 interface ItemContextMenuProps {
   id: string

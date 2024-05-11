@@ -27,7 +27,7 @@ const Options: FC<PropsWithChildren<IOptions>> & OptionsSubComponents = (props) 
         ].join(' ')}
         onClick={() => setOpen(!open)}
       >
-        <div className="">
+        <div>
           <div className={[!open ? 'rotate-45' : 'rotate-0'].join(' ')}>
             <IconXCircle size={14} />
           </div>

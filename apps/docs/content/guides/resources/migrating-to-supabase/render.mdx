@@ -1,0 +1,84 @@
+---
+title: 'Migrate from Render to Supabase'
+description: 'Migrate your Render Postgres database to Supabase.'
+---
+
+Render is a popular Web Hosting service in the online services category that also has a managed Postgres service. Render has a great developer experience, allowing users to deploy straight from GitHub or GitLab. This is the core of their product and they do it really well. However, when it comes to Postgres databases, it may not be the best option.
+
+Supabase is one of the best free alternative to Render Postgres. Supabase provide all the backend features developers need to build a product: a Postgres database, authentication, instant APIs, edge functions, realtime subscriptions, and storage. Postgres is the core of Supabase—for example, you can use row-level security and there are more than 40 Postgres extensions available.
+
+This guide demonstrates how to migrate from Render to Supabase to get the most out of Postgres while gaining access to all the features you need to build a project.
+
+## Retrieve your Render database credentials [#retrieve-render-credentials]
+
+1. Log in to your [Render account](https://render.com) and select the project you want to migrate.
+1. Click **Dashboard** in the menu and click in your **Postgres** database.
+1. Scroll down in the **Info** tab.
+1. Click on **PSQL Command** and edit it adding the content after `PSQL_COMMAND=`.
+
+![Copying PSQL command from Render dashboard](/docs/img/guides/resources/migrating-to-supabase/render/render_dashboard.png)
+Example:
+
+```bash
+%env PSQL_COMMAND=PGPASSWORD=RgaMDfTS_password_FTPa7 psql -h dpg-a_server_in.oregon-postgres.render.com -U my_db_pxl0_user my_db_pxl0
+```
+
+## Retrieve your Supabase connection string [#retrieve-supabase-connection-string]
+
+1. If you're new to Supabase, [create a project](https://supabase.com/dashboard).
+   Make a note of your password, you will need this later. If you forget it, you can [reset it here](https://supabase.com/dashboard/project/_/settings/database).
+
+1. Go to the [Database settings](https://supabase.com/dashboard/project/_/settings/database) for your project in the Supabase Dashboard.
+1. Under **Connection string**, make sure `Use connection pooling` is enabled. Copy the URI and replace the password placeholder with your database password.
+
+## Migrate the database
+
+The fastest way to migrate your database is with the Supabase migration tool on [Google Colab](https://colab.research.google.com/github/mansueli/Supa-Migrate/blob/main/Migrate_Postgres_Supabase.ipynb). Alternatively, you can use the [pg_dump](https://www.postgresql.org/docs/current/app-pgdump.html) and [psql](https://www.postgresql.org/docs/current/app-psql.html) command line tools, which are included in a full PostgreSQL installation.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="colab"
+  queryGroup="migrate-method"
+>
+<TabPanel id="colab" label="Migrate using Colab">
+
+1. Set the environment variables (`PSQL_COMMAND`, `SUPABASE_HOST`, `SUPABASE_PASSWORD`) in the Colab notebook.
+1. Run the first two steps in [the notebook](https://colab.research.google.com/github/mansueli/Supa-Migrate/blob/main/Migrate_Postgres_Supabase.ipynb) in order. The first sets the variables and the second installs PSQL and the migration script.
+1. Run the third step to start the migration. This will take a few minutes.
+
+</TabPanel>
+<TabPanel id="cli" label="Migrate using CLI tools">
+
+### Export your Render database to a file in console [#export-render-database]
+
+Use `pg_dump` with your Render credentials to export your Render database to a file (e.g., `render_dump.sql`).
+
+```bash
+pg_dump --clean --if-exists --quote-all-identifiers \
+ -h $RENDER_HOST -U $RENDER_USER -d $RENDER_DATABASE \
+ --no-owner --no-privileges > render_dump.sql
+```
+
+### Import the database to your Supabase project [#import-database-to-supabase]
+
+Use `psql` to import the Render database file to your Supabase project.
+
+```bash
+psql -d "$YOUR_CONNECTION_STRING" -f render_dump.sql
+```
+
+### Additional options
+
+- To only migrate a single database schema, add the `--schema=PATTERN` parameter to your `pg_dump` command.
+- To exclude a schema: `--exclude-schema=PATTERN`.
+- To only migrate a single table: `--table=PATTERN`.
+- To exclude a table: `--exclude-table=PATTERN`.
+
+Run `pg_dump --help` for a full list of options.
+
+</TabPanel>
+</Tabs>
+
+<MigrationWarnings />

@@ -4,8 +4,8 @@ import { useParams } from 'common'
 import { EmptyState, SidePanelEditor } from 'components/interfaces/TableGridEditor'
 import { TableEditorLayout } from 'components/layouts'
 import { ProjectContextFromParamsProvider } from 'components/layouts/ProjectLayout/ProjectContext'
-import { Table } from 'data/tables/table-query'
-import { NextPageWithLayout } from 'types'
+import type { Table } from 'data/tables/table-query'
+import type { NextPageWithLayout } from 'types'
 
 const TableEditorPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()

@@ -1,0 +1,209 @@
+---
+id: 'functions-quickstart'
+title: 'Developing Edge Functions locally'
+description: 'Get started with Edge Functions on your local machine.'
+subtitle: 'Get started with Edge Functions on your local machine.'
+tocVideo: '5OWH9c4u68M'
+---
+
+Let's create a basic Edge Function on your local machine and then invoke it using the Supabase CLI.
+
+## Initialize a project
+
+Create a new Supabase project in a folder on your local machine:
+
+```bash
+supabase init
+```
+
+<Admonition type="tip" label="CLI not installed?">
+
+Check out the [CLI Docs](/docs/guides/cli) to learn how to install the Supabase CLI on your local machine.
+
+</Admonition>
+
+<Admonition type="tip">
+
+If you're using VS code you can have the CLI automatically create helpful Deno settings when running `supabase init`. Simply select `y` when prompted "Generate VS Code settings for Deno? [y/N]"!
+
+</Admonition>
+
+## Create an Edge Function
+
+Let's create a new Edge Function called `hello-world` inside your project:
+
+```bash
+supabase functions new hello-world
+```
+
+This creates a function stub in your `supabase` folder:
+
+```bash
+└── supabase
+    ├── functions
+    │   └── hello-world
+    │   │   └── index.ts ## Your function code
+    └── config.toml
+```
+
+## How to write the code
+
+The generated function uses native [Deno.serve](https://docs.deno.com/runtime/manual/runtime/http_server_apis) to handle requests. It gives you access to `Request` and `Response` objects.
+
+Here's the generated Hello World Edge Function, that accepts a name in the `Request` and responds with a greeting:
+
+```tsx
+Deno.serve(async (req) => {
+  const { name } = await req.json()
+  const data = {
+    message: `Hello ${name}!`,
+  }
+
+  return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } })
+})
+```
+
+## Running Edge Functions locally
+
+You can run your Edge Function locally using [`supabase functions serve`](/docs/reference/cli/usage#supabase-functions-serve):
+
+```bash
+supabase start # start the supabase stack
+supabase functions serve # start the Functions watcher
+```
+
+The `functions serve` command has hot-reloading capabilities. It will watch for any changes to your files and restart the Deno server.
+
+## Invoking Edge Functions locally
+
+While serving your local Edge Function, you can invoke it using curl or one of the client libraries.
+To call the function from a browser you need to handle CORS requests. See [CORS](/docs/guides/functions/cors).
+
+<CH.Code>
+
+```bash cURL
+curl --request POST 'http://localhost:54321/functions/v1/hello-world' \
+  --header 'Authorization: Bearer SUPABASE_ANON_KEY' \
+  --header 'Content-Type: application/json' \
+  --data '{ "name":"Functions" }'
+```
+
+```js JavaScript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_ANON_KEY)
+
+const { data, error } = await supabase.functions.invoke('hello-world', {
+  body: { name: 'Functions' },
+})
+```
+
+</CH.Code>
+
+<Admonition type="tip" label="Where is my SUPABASE_ANON_KEY?">
+
+Run `supabase status` to see your local credentials.
+
+</Admonition>
+
+You should see the response `{ "message":"Hello Functions!" }`.
+
+If you execute the function with a different payload, the response will change.
+
+Modify the `--data '{"name":"Functions"}'` line to `--data '{"name":"World"}'` and try invoking the command again.
+
+## Next steps
+
+Check out the [Deploy to Production](/docs/guides/functions/deploy) guide to make your Edge Function available to the world.
+
+Read on for some common development tips.
+
+## Development tips
+
+Here are a few recommendations when developing Edge Functions.
+
+### Skipping authorization checks
+
+By default, Edge Functions require a valid JWT in the authorization header. If you want to use Edge Functions without Authorization checks (commonly used for Stripe webhooks), you can pass the `--no-verify-jwt` flag when serving your Edge Functions locally.
+
+```bash
+supabase functions serve hello-world --no-verify-jwt
+```
+
+Be careful when using this flag, as it will allow anyone to invoke your Edge Function without a valid JWT. The Supabase client libraries automatically handle authorization.
+
+### Using HTTP methods
+
+Edge Functions support `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, and `OPTIONS`. A Function can be designed to perform different actions based on a request's HTTP method. See the [example on building a RESTful service](https://github.com/supabase/supabase/tree/master/examples/edge-functions/supabase/functions/restful-tasks) to learn how to handle different HTTP methods in your Function.
+
+<Admonition type="caution" label="HTML not supported">
+
+HTML content is not supported. `GET` requests that return `text/html` will be rewritten to `text/plain`.
+
+</Admonition>
+
+### Naming Edge Functions
+
+We recommend using hyphens to name functions because hyphens are the most URL-friendly of all the naming conventions (snake_case, camelCase, PascalCase).
+
+### Organizing your Edge Functions
+
+We recommend developing “fat functions”. This means that you should develop few large functions, rather than many small functions. One common pattern when developing Functions is that you need to share code between two or more Functions. To do this, you can store any shared code in a folder prefixed with an underscore (`_`). We also recommend a separate folder for [Unit Tests](/docs/guides/functions/unit-test) including the name of the function followed by a `-test` suffix.
+We recommend this folder structure:
+
+```bash
+└── supabase
+    ├── functions
+    │   ├── import_map.json # A top-level import map to use across functions.
+    │   ├── _shared
+    │   │   ├── supabaseAdmin.ts # Supabase client with SERVICE_ROLE key.
+    │   │   └── supabaseClient.ts # Supabase client with ANON key.
+    │   │   └── cors.ts # Reusable CORS headers.
+    │   ├── function-one # Use hyphens to name functions.
+    │   │   └── index.ts
+    │   └── function-two
+    │   │   └── index.ts
+    │   └── tests
+    │       └── function-one-test.ts
+    │       └── function-two-test.ts
+    ├── migrations
+    └── config.toml
+```
+
+### Using config.toml
+
+Individual function configuration like [JWT verification](/docs/guides/cli/config#functions.function_name.verify_jwt) and [import map location](/docs/guides/cli/config#functions.function_name.import_map) can be set via the `config.toml` file.
+
+```toml supabase/config.toml
+[functions.hello-world]
+verify_jwt = false
+import_map = './import_map.json'
+```
+
+### Error handling
+
+The `supabase-js` library provides several error types that you can use to handle errors that might occur when invoking Edge Functions:
+
+```js
+import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from '@supabase/supabase-js'
+
+const { data, error } = await supabase.functions.invoke('hello', {
+  headers: { 'my-custom-header': 'my-custom-header-value' },
+  body: { foo: 'bar' },
+})
+
+if (error instanceof FunctionsHttpError) {
+  const errorMessage = await error.context.json()
+  console.log('Function returned an error', errorMessage)
+} else if (error instanceof FunctionsRelayError) {
+  console.log('Relay error:', error.message)
+} else if (error instanceof FunctionsFetchError) {
+  console.log('Fetch error:', error.message)
+}
+```
+
+### Database Functions vs Edge Functions
+
+For data-intensive operations we recommend using [Database Functions](/docs/guides/database/functions), which are executed within your database and can be called remotely using the [REST and GraphQL API](/docs/guides/api).
+
+For use-cases which require low-latency we recommend [Edge Functions](/docs/guides/functions), which are globally-distributed and can be written in TypeScript.

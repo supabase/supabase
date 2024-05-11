@@ -60,11 +60,4 @@ const DatabaseApiSelectionRender = ({ log }: any) => {
   )
 }
 
-export const DatabaseApiSelectionHeaderRender = (log: any) => {
-  const method = log?.metadata[0]?.request[0]?.method
-  const path = log?.metadata[0]?.request[0]?.path
-
-  return `${method} ${path}`
-}
-
 export default DatabaseApiSelectionRender

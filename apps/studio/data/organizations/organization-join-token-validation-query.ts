@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'data/fetchers'
-import { components } from 'data/api'
-import { ResponseError } from 'types'
+import type { components } from 'data/api'
+import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
 
 export type OrganizationJoinTokenValidationVariables = {
@@ -30,7 +30,7 @@ export type OrganizationJoinTokenValidationData = Awaited<
 export type OrganizationJoinTokenValidationError = ResponseError
 
 export const useOrganizationJoinTokenValidationQuery = <
-  TData = OrganizationJoinTokenValidationData
+  TData = OrganizationJoinTokenValidationData,
 >(
   { slug, token }: OrganizationJoinTokenValidationVariables,
   {

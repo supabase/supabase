@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect } from 'react'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -21,8 +22,7 @@ import {
 } from 'components/ui/Forms'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
-import { useCheckPermissions, useFlag, useStore } from 'hooks'
-
+import { useCheckPermissions } from 'hooks'
 import SchemaFunctionSelector from './SchemaFunctionSelector'
 
 const schema = object({
@@ -33,7 +33,6 @@ const schema = object({
 const formId = 'auth-basic-hooks-form'
 
 const BasicHooksConfig = () => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -43,19 +42,12 @@ const BasicHooksConfig = () => {
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
-
-  const customizeAccessTokenReleased = useFlag('authHooksCustomizeAccessToken')
-
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
 
   // TODO: Remove as any once these properties are defined in Auth Config types
   const INITIAL_VALUES = {
-    ...(customizeAccessTokenReleased
-      ? {
-          HOOK_CUSTOM_ACCESS_TOKEN_ENABLED: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_ENABLED || false,
-          HOOK_CUSTOM_ACCESS_TOKEN_URI: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_URI || '',
-        }
-      : null),
+    HOOK_CUSTOM_ACCESS_TOKEN_ENABLED: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_ENABLED || false,
+    HOOK_CUSTOM_ACCESS_TOKEN_URI: authConfig?.HOOK_CUSTOM_ACCESS_TOKEN_URI || '',
   }
 
   const onSubmit = (values: any, { resetForm }: any) => {
@@ -68,17 +60,9 @@ const BasicHooksConfig = () => {
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
       {
-        onError: () => {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to update settings`,
-          })
-        },
+        onError: () => toast.error(`Failed to update settings`),
         onSuccess: () => {
-          ui.setNotification({
-            category: 'success',
-            message: `Successfully updated settings`,
-          })
+          toast.success(`Successfully updated settings`)
           resetForm({ values: values, initialValues: values })
         },
       }
@@ -142,23 +126,15 @@ const BasicHooksConfig = () => {
                     descriptionText="Select the function to be called by Supabase Auth each time a new JWT is created. It should return the claims you wish to be present in the JWT."
                     values={values}
                     setFieldValue={setFieldValue}
-                    disabled={!canUpdateConfig || !customizeAccessTokenReleased}
+                    disabled={!canUpdateConfig}
                   />
-                  {!customizeAccessTokenReleased && (
-                    <Alert_Shadcn_ variant="default">
-                      <AlertTitle_Shadcn_>Coming soon!</AlertTitle_Shadcn_>
-                      <AlertDescription_Shadcn_>
-                        This hook is not available yet on your project.
-                      </AlertDescription_Shadcn_>
-                    </Alert_Shadcn_>
-                  )}
                   {values.HOOK_CUSTOM_ACCESS_TOKEN_URI && (
                     <Toggle
                       id="HOOK_CUSTOM_ACCESS_TOKEN_ENABLED"
                       size="medium"
                       label="Enable hook"
                       layout="flex"
-                      disabled={!canUpdateConfig || !customizeAccessTokenReleased}
+                      disabled={!canUpdateConfig}
                     />
                   )}
                 </FormSectionContent>

@@ -1,9 +1,11 @@
-import * as React from 'react'
-import * as RadixPopover from '@radix-ui/react-popover'
-import type * as RadixPopoverTypes from '@radix-ui/react-popover/'
+'use client'
 
-import { IconX } from '../Icon/icons/IconX'
+import type * as RadixPopoverTypes from '@radix-ui/react-popover'
+import * as RadixPopover from '@radix-ui/react-popover'
+import * as React from 'react'
+
 import styleHandler from '../../lib/theme/styleHandler'
+import { IconX } from '../Icon/icons/IconX'
 
 interface RootProps {
   align?: RadixPopoverTypes.PopoverContentProps['align']
@@ -12,6 +14,7 @@ interface RootProps {
   children?: React.ReactNode
   className?: string
   defaultOpen?: boolean
+  disabled?: boolean
   modal?: boolean
   onOpenChange?: RadixPopoverTypes.PopoverProps['onOpenChange']
   open?: boolean
@@ -42,6 +45,7 @@ function Popover({
   header,
   footer,
   size = 'content',
+  disabled,
 }: RootProps) {
   const __styles = styleHandler('popover')
 
@@ -59,6 +63,7 @@ function Popover({
     >
       <RadixPopover.Trigger
         // className={DropdownStyles['sbui-popover__trigger']}
+        disabled={disabled}
         className={__styles.trigger}
         aria-label={ariaLabel}
       >

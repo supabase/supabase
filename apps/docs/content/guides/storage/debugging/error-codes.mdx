@@ -1,0 +1,124 @@
+---
+id: 'storage-errors-codes'
+title: 'Error Codes'
+description: 'Supabase Error Codes'
+subtitle: 'Learn about the Storage error codes and how to resolve them'
+sidebar_label: 'Debugging'
+---
+
+## Storage Error Codes
+
+<Admonition type="note">
+  We are transitioning to a new error code system. For backwards compatibility you'll still be able
+  to see the old error codes
+</Admonition>
+
+Error codes in Storage are returned as part of the response body. They are useful for debugging and understanding what went wrong with your request.
+The error codes are returned in the following format:
+
+```json
+{
+  "code": "error_code",
+  "message": "error_message"
+}
+```
+
+Here is the full list of error codes and their descriptions:
+
+| ErrorCode                 | Description                                                     | StatusCode | Resolution                                                                                                                                                                                           |
+| ------------------------- | --------------------------------------------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| NoSuchBucket              | The specified bucket does not exist.                            | 404        | Verify the bucket name and ensure it exists in the system, if it exists you don't have permissions to access it.                                                                                     |
+| NoSuchKey                 | The specified key does not exist.                               | 404        | Check the key name and ensure it exists in the specified bucket, if it exists you don't have permissions to access it.                                                                               |
+| NoSuchUpload              | The specified upload does not exist.                            | 404        | The uploadID provided might not exists or the Upload was previously aborted                                                                                                                          |
+| InvalidJWT                | The provided JWT (JSON Web Token) is invalid.                   | 401        | The JWT provided might be expired or malformed, provide a valid JWT                                                                                                                                  |
+| InvalidRequest            | The request is not properly formed.                             | 400        | Review the request parameters and structure, ensure they meet the API's requirements, the error message will provide more details                                                                    |
+| TenantNotFound            | The specified tenant does not exist.                            | 404        | The Storage service had issues while provisioning, please [Contact Support](https://supabase.com/dashboard/support/new)                                                                              |
+| EntityTooLarge            | The entity being uploaded is too large.                         | 413        | Verify the max-file-limit is equal or higher to the resource you are trying to upload, you can change this value on the [Project Setting](https://supabase.com/dashboard/project/_/settings/storage) |
+| InternalError             | An internal server error occurred.                              | 500        | Investigate server logs to identify the cause of the internal error. If you think it's a Storage error please [Contact Support](https://supabase.com/dashboard/support/new)                          |
+| ResourceAlreadyExists     | The specified resource already exists.                          | 409        | Use a different name or identifier for the resource to avoid conflicts. Use `x-upsert:true` header to overwrite the resource.                                                                        |
+| InvalidBucketName         | The specified bucket name is invalid.                           | 400        | Ensure the bucket name follows the naming conventions and does not contain invalid characters.                                                                                                       |
+| InvalidKey                | The specified key is invalid.                                   | 400        | Verify the key name and ensure it follows the naming conventions.                                                                                                                                    |
+| InvalidRange              | The specified range is not valid.                               | 416        | Make sure that range provided is within the file size boundary and follow the [HTTP Range spec](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Range)                                     |
+| InvalidMimeType           | The specified MIME type is not valid.                           | 400        | Provide a valid MIME type, ensure using the standard MIME type format                                                                                                                                |
+| InvalidUploadId           | The specified upload ID is invalid.                             | 400        | The upload ID provided is invalid or missing. Make sure to provide a active uploadID                                                                                                                 |
+| KeyAlreadyExists          | The specified key already exists.                               | 409        | Use a different key name to avoid conflicts with existing keys. Use `x-upsert:true` header to overwrite the resource.                                                                                |
+| BucketAlreadyExists       | The specified bucket already exists.                            | 409        | Choose a unique name for the bucket that does not conflict with existing buckets.                                                                                                                    |
+| DatabaseTimeout           | Timeout occurred while accessing the database.                  | 504        | Investigate database performance and increase the default pool size. If this error still occurs please upgrade your instance                                                                         |
+| InvalidSignature          | The signature provided does not match the calculated signature. | 403        | Check that you are providing the correct signature format, for more information refer to [SignatureV4](https://docs.aws.amazon.com/AmazonS3/latest/API/sig-v4-authenticating-requests.html)          |
+| SignatureDoesNotMatch     | The request signature does not match the calculated signature.  | 403        | Check your credentials, access key id / access secret key / region that are all correct, refer to [S3 Authentication](/docs/guides/storage/s3/authentication).                                       |
+| AccessDenied              | Access to the specified resource is denied.                     | 403        | Check that you have the correct RLS policy to allow access to this resource                                                                                                                          |
+| ResourceLocked            | The specified resource is locked.                               | 423        | This resource cannot be altered while there is a lock. Wait and try the request again                                                                                                                |
+| DatabaseError             | An error occurred while accessing the database.                 | 500        | Investigate database logs and system configuration to identify and address the database error.                                                                                                       |
+| MissingContentLength      | The Content-Length header is missing.                           | 411        | Ensure the Content-Length header is included in the request with the correct value.                                                                                                                  |
+| MissingParameter          | A required parameter is missing in the request.                 | 400        | Provide all required parameters in the request to fulfill the API's requirements. The message field will contain more details                                                                        |
+| InvalidUploadSignature    | The provided upload signature is invalid.                       | 403        | The MultiPartUpload record was altered while the upload was ongoing, the signature do not match. Do not alter the upload record                                                                      |
+| LockTimeout               | Timeout occurred while waiting for a lock.                      | 423        | The lock couldn't be acquired within the specified timeout. Wait and try the request again                                                                                                           |
+| S3Error                   | An error occurred related to Amazon S3.                         | -          | Refer to Amazon S3 documentation or [Contact Support](https://supabase.com/dashboard/support/new) for assistance with resolving the S3 error.                                                        |
+| S3InvalidAccessKeyId      | The provided AWS access key ID is invalid.                      | 403        | Verify the AWS access key ID provided and ensure it is correct and active.                                                                                                                           |
+| S3MaximumCredentialsLimit | The maximum number of credentials has been reached.             | 400        | The maximum limit of credentials is reached.                                                                                                                                                         |
+| InvalidChecksum           | The checksum of the entity does not match.                      | 400        | Recalculate the checksum of the entity and ensure it matches the one provided in the request.                                                                                                        |
+| MissingPart               | A part of the entity is missing.                                | 400        | Ensure all parts of the entity are included in the request before completing the operation.                                                                                                          |
+| SlowDown                  | The request rate is too high and has been throttled.            | 503        | Reduce the request rate or implement exponential backoff and retry mechanisms to handle throttling.                                                                                                  |
+
+## Legacy Error Codes
+
+As we are transitioning to a new error code system, you might still see the following error format:
+
+```json
+{
+  "httpStatusCode": 400,
+  "code": "error_code",
+  "message": "error_message"
+}
+```
+
+Here's a list of the most common error codes and their potential resolutions:
+
+### 404 not_found
+
+Indicates that the resource is not found or you don't have the correct permission to access it
+**Resolution:**
+
+- Add a RLS policy to grant permission to the resource. See our [Access Control docs](/docs/guides/storage/uploads/access-control) for more information.
+- Ensure you include the user `Authorization` header
+- Verify the object exists
+
+### 409 already_exists
+
+Indicates that the resource already exists.
+**Resolution:**
+
+- Use the `upsert` functionality in order to overwrite the file. Find out more [here](/docs/guides/storage/uploads/standard-uploads#overwriting-files).
+
+### 403 unauthorized
+
+You don't have permission to action this request
+**Resolution:**
+
+- Add RLS policy to grant permission. See our [Access Control docs](/docs/guides/storage/uploads/access-control) for more information.
+- Ensure you include the user `Authorization` header
+
+### 429 too many requests
+
+This problem typically arises when a large number of clients are concurrently interacting with the Storage service, and the pooler has reached its `max_clients` limit.
+
+**Resolution:**
+
+- Increase the max_clients limits of the pooler.
+- Upgrade to a bigger project compute instance [here](https://supabase.com/dashboard/project/_/settings/addons).
+
+### 544 database_timeout
+
+This problem arises when a high number of clients are concurrently using the Storage service, and Postgres doesn't have enough available connections to efficiently handle requests to Storage.
+
+**Resolution:**
+
+- Increase the pool_size limits of the pooler.
+- Upgrade to a bigger project compute instance [here](https://supabase.com/dashboard/project/_/settings/addons).
+
+### 500 internal_server_error
+
+This issue occurs where there is a unhandled error.
+**Resolution:**
+
+- File a support ticket to Storage team [here](https://supabase.com/dashboard/support/new)

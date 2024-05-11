@@ -1,0 +1,548 @@
+---
+title: 'Broadcast'
+subtitle: 'Send and receive messages using Realtime Broadcast'
+description: 'Send and receive messages using Realtime Broadcast'
+---
+
+Let's explore how to implement Realtime Broadcast to send messages between clients.
+
+## Usage
+
+You can use the Supabase client libraries to send and receive Broadcast messages.
+
+### Initialize the client
+
+Go to your Supabase project's [API Settings](https://supabase.com/dashboard/project/_/settings/api) and grab the `URL` and `anon` public API key.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+  <TabPanel id="js" label="JavaScript">
+
+    ```js
+    import { createClient } from '@supabase/supabase-js'
+
+    const SUPABASE_URL = 'https://<project>.supabase.co'
+    const SUPABASE_KEY = '<your-anon-key>'
+
+    const client = createClient(SUPABASE_URL, SUPABASE_KEY)
+    ```
+
+  </TabPanel>
+  <TabPanel id="dart" label="Dart">
+
+    ```dart
+    import 'package:supabase_flutter/supabase_flutter.dart';
+
+    void main() async {
+      Supabase.initialize(
+        url: 'https://<project>.supabase.co',
+        anonKey: '<your-anon-key>',
+      );
+      runApp(MyApp());
+    }
+
+    final supabase = Supabase.instance.client;
+    ```
+
+  </TabPanel>
+  <TabPanel id="swift" label="Swift">
+
+    ```swift
+    import Supabase
+
+    let SUPABASE_URL = "https://<project>.supabase.co"
+    let SUPABASE_KEY = "<your-anon-key>"
+
+    let client = SupabaseClient(supabaseURL: URL(string: SUPABASE_URL)!, supabaseKey: SUPABASE_KEY)
+    ```
+
+  </TabPanel>
+  <TabPanel id="kotlin" label="Kotlin">
+
+    ```kotlin
+    val supabaseUrl = "https://<project>.supabase.co"
+    val supabaseKey = "<your-anon-key>"
+    val supabase = createSupabaseClient(supabaseUrl, supabaseKey) {
+        install(Realtime)
+    }
+    ```
+
+  </TabPanel>
+</Tabs>
+
+### Listening to broadcast messages
+
+You can provide a callback for the `broadcast` channel to receive message. In this example we will receive any `broadcast` messages in `room-1`:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+  <TabPanel id="js" label="JavaScript">
+
+    {/* prettier-ignore */}
+    ```js
+    // Join a room/topic. Can be anything except for 'realtime'.
+    const channelA = clientA.channel('room-1')
+
+    // Simple function to log any messages we receive
+    function messageReceived(payload) {
+      console.log(payload)
+    }
+
+    // Subscribe to the Channel
+    channelA
+      .on(
+        'broadcast',
+        { event: 'test' },
+        (payload) => messageReceived(payload)
+      )
+      .subscribe()
+    ```
+
+  </TabPanel>
+  <TabPanel id="dart" label="Dart">
+
+    ```dart
+    // Simple function to log any messages we receive
+    void messageReceived(payload) {
+      print(payload);
+    }
+
+    // Subscribe to the Channel
+    channelA
+        .onBroadcast(
+            event: 'test', callback: (payload) => messageReceived(payload))
+        .subscribe();
+    ```
+
+  </TabPanel>
+  <TabPanel id="swift" label="Swift">
+
+    ```swift
+    let channelA = await clientA.channel("room-1")
+
+    // Listen for broadcast messages
+    let broadcastStream = await channelA.broadcast(event: "test")
+
+    await channelA.subscribe()
+
+    for await event in broadcastStream {
+      print(event)
+    }
+    ```
+
+  </TabPanel>
+  <TabPanel id="kotlin" label="Kotlin">
+
+    ```kotlin
+    val channelA = clientA.channel("room-1")
+
+    //Listen for broadcast messages
+    val broadcastFlow: Flow<JsonObject> = channelA.broadcastFlow<JsonObject>("test")
+        .onEach {
+            println(it)
+        }
+        .launchIn(yourCoroutineScope) //you can also use .collect { } here
+
+    channelA.subscribe()
+    ```
+
+  </TabPanel>
+</Tabs>
+
+### Sending broadcast messages
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+  <TabPanel id="js" label="JavaScript">
+
+    We can send Broadcast messages using `channelB.send()`. Let's set up another client to send messages.
+
+    {/* prettier-ignore */}
+    ```js
+    // Join a room/topic. Can be anything except for 'realtime'.
+    const channelB = clientA.channel('room-1')
+
+    channelB.subscribe((status) => {
+      // Wait for successful connection
+      if (status !== 'SUBSCRIBED') {
+        return null
+      }
+
+      // Send a message once the client is subscribed
+      channelB.send({
+        type: 'broadcast',
+        event: 'test',
+        payload: { message: 'hello, world' },
+      })
+    })
+    ```
+
+  </TabPanel>
+  <TabPanel id="dart" label="Dart">
+
+    ```dart
+    // Join a room/topic. Can be anything except for 'realtime'.
+    final channelB = supabase.channel('room-1');
+
+    channelB.subscribe((status, error) {
+      // Wait for successful connection
+      if (status != RealtimeSubscribeStatus.subscribed) {
+        return;
+      }
+
+      // Send a message once the client is subscribed
+      channelB.sendBroadcastMessage(
+        event: 'test',
+        payload: {'message': 'hello, world'},
+      );
+    });
+    ```
+
+  </TabPanel>
+  <TabPanel id="swift" label="Swift">
+
+    We can send Broadcast messages using `channelB.broadcast()`. Let's set up another client to send messages.
+
+    ```swift
+    let channelB = await clientA.channel("room-1")
+
+    await channelB.subscribe()
+
+    try await channelB.broadcast(
+        event: "test",
+        message: YourMessage(message: "hello, world!")
+    )
+    ```
+
+  </TabPanel>
+  <TabPanel id="kotlin" label="Kotlin">
+
+    We can send Broadcast messages using `channelB.broadcast()`. Let's set up another client to send messages.
+
+    ```kotlin
+    val channelB = clientA.channel("room-1")
+
+    channelB.subscribe(blockUntilSubscribed = true) //You can also use the channelA.status flow instead, but this parameter will block the coroutine until the status is joined.
+
+    channelB.broadcast(
+        event = "test",
+        payload = YourMessage(message = "hello, world!")
+    )
+    ```
+
+  </TabPanel>
+</Tabs>
+
+Before sending messages we need to ensure the client is connected, which we have done within the `subscribe()` callback.
+
+## Broadcast options
+
+You can pass configuration options while initializing the Supabase Client.
+
+### Self-send messages
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+  <TabPanel id="js" label="JavaScript">
+
+    By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `self` parameter to `true`.
+
+    {/* prettier-ignore */}
+    ```js
+    const myChannel = supabase.channel('room-2', {
+      config: {
+        broadcast: { self: true },
+      },
+    })
+
+    myChannel.on(
+      'broadcast',
+      { event: 'test-my-messages' },
+      (payload) => console.log(payload)
+    )
+
+    myChannel.subscribe((status) => {
+      if (status !== 'SUBSCRIBED') { return }
+      channelC.send({
+        type: 'broadcast',
+        event: 'test-my-messages',
+        payload: { message: 'talking to myself' },
+      })
+    })
+    ```
+
+  </TabPanel>
+  <TabPanel id="dart" label="Dart">
+
+    ```dart
+    final myChannel = supabase.channel(
+      'room-2',
+      opts: const RealtimeChannelConfig(
+        self: true,
+      ),
+    );
+
+    myChannel.onBroadcast(
+      event: 'test-my-messages',
+      callback: (payload) => print(payload),
+    );
+
+    myChannel.subscribe((status, error) {
+      if (status != RealtimeSubscribeStatus.subscribed) return;
+      // channelC.send({
+      myChannel.sendBroadcastMessage(
+        event: 'test-my-messages',
+        payload: {'message': 'talking to myself'},
+      );
+    });
+    ```
+
+  </TabPanel>
+  <TabPanel id="swift" label="Swift">
+
+    By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `receiveOwnBroadcasts` parameter to `true`.
+
+    ```swift
+    let myChannel = await supabase.channel("room-2") {
+      $0.broadcast.receiveOwnBroadcasts = true
+    }
+
+    let broadcastStream = await myChannel.broadcast(event: "test-my-messages")
+
+    await myChannel.subscribe()
+
+    try await myChannel.broadcast(
+        event: "test-my-messages",
+        payload: YourMessage(
+            message: "talking to myself"
+        )
+    )
+    ```
+
+  </TabPanel>
+  <TabPanel id="kotlin" label="Kotlin">
+
+    By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `receiveOwnBroadcasts` parameter to `true`.
+
+    ```kotlin
+    val myChannel = supabase.channel("room-2") {
+        broadcast {
+            receiveOwnBroadcasts = true
+        }
+    }
+
+    val broadcastFlow: Flow<JsonObject> = myChannel.broadcastFlow<JsonObject>("test-my-messages")
+        .onEach {
+            println(it)
+        }
+        .launchIn(yourCoroutineScope)
+
+    myChannel.subscribe(blockUntilSubscribed = true) //You can also use the myChannel.status flow instead, but this parameter will block the coroutine until the status is joined.
+
+    myChannel.broadcast(
+        event = "test-my-messages",
+        payload = YourMessage(
+            message = "talking to myself"
+        )
+    )
+    ```
+
+  </TabPanel>
+</Tabs>
+
+### Acknowledge messages
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+  <TabPanel id="js" label="JavaScript">
+
+    You can confirm that Realtime received your message by setting Broadcast's `ack` config to `true`.
+
+    {/* prettier-ignore */}
+    ```js
+    const myChannel = clientD.channel('room-3', {
+      config: {
+        broadcast: { ack: true },
+      },
+    })
+
+    myChannel.subscribe(async (status) => {
+      if (status !== 'SUBSCRIBED') { return }
+
+      const serverResponse = await myChannel.send({
+        type: 'broadcast',
+        event: 'acknowledge',
+        payload: {},
+      })
+
+      console.log('serverResponse', serverResponse)
+    })
+    ```
+
+  </TabPanel>
+  <TabPanel id="dart" label="Dart">
+
+    ```dart
+    final myChannel = supabase.channel('room-3',opts: const RealtimeChannelConfig(
+      ack: true,
+    ),
+
+    );
+
+    myChannel.subscribe( (status, error) async {
+      if (status != RealtimeSubscribeStatus.subscribed) return;
+
+      final serverResponse = await myChannel.sendBroadcastMessage(
+
+        event: 'acknowledge',
+        payload: {},
+      );
+
+      print('serverResponse: $serverResponse');
+    });
+    ```
+
+  </TabPanel>
+  <TabPanel id="swift" label="Swift">
+
+    You can confirm that Realtime received your message by setting Broadcast's `acknowledgeBroadcasts` config to `true`.
+
+    ```swift
+    let myChannel = await clientD.channel("room-3") {
+      $0.broadcast.acknowledgeBroadcasts = true
+    }
+
+    await myChannel.subscribe()
+
+    await myChannel.broadcast(event: "acknowledge", message: [:])
+    ```
+
+  </TabPanel>
+  <TabPanel id="kotlin" label="Kotlin">
+
+    By default, broadcast messages are only sent to other clients. You can broadcast messages back to the sender by setting Broadcast's `acknowledgeBroadcasts` parameter to `true`.
+
+    ```kotlin
+    val myChannel = supabase.channel("room-2") {
+        broadcast {
+            acknowledgeBroadcasts = true
+        }
+    }
+
+    myChannel.subscribe(blockUntilSubscribed = true) //You can also use the myChannel.status flow instead, but this parameter will block the coroutine until the status is joined.
+
+    myChannel.broadcast(event = "acknowledge", buildJsonObject {  })
+    ```
+
+  </TabPanel>
+</Tabs>
+
+Use this to guarantee that the server has received the message before resolving `channelD.send`'s promise. If the `ack` config is not set to `true` when creating the channel, the promise returned by `channelD.send` will resolve immediately.
+
+### Send messages using REST calls
+
+You can also send a Broadcast message by making an HTTP request to Realtime servers. This is useful when you want to send messages from your server or client without having to first establish a WebSocket connection.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+  <TabPanel id="js" label="JavaScript">
+    <Admonition type="note">
+
+    This is currently available only in the Supabase JavaScript client version 2.37.0 and later.
+
+    </Admonition>
+
+    ```js
+    const channel = client.channel('test-channel')
+
+    // No need to subscribe to channel
+
+    channel
+    .send({
+    type: 'broadcast',
+    event: 'test',
+    payload: { message: 'Hi' },
+    })
+    .then((resp) => console.log(resp))
+
+    // Remember to clean up the channel
+
+    client.removeChannel(channel)
+
+    ```
+
+  </TabPanel>
+  <TabPanel id="dart" label="Dart">
+    ```dart
+    // No need to subscribe to channel
+
+    final channel = supabase.channel('test-channel');
+    final res = await channel.sendBroadcastMessage(
+      event: "test",
+      payload: {
+        'message': 'Hi',
+      },
+    );
+    print(res);
+    ```
+
+  </TabPanel>
+  <TabPanel id="swift" label="Swift">
+    ```swift
+    let myChannel = await supabase.channel("room-2") {
+      $0.broadcast.acknowledgeBroadcasts = true
+    }
+
+    // No need to subscribe to channel
+
+    await myChannel.broadcast(event: "test", message: ["message": "HI"])
+    ```
+
+  </TabPanel>
+  <TabPanel id="kotlin" label="Kotlin">
+    ```kotlin
+    val myChannel = supabase.channel("room-2") {
+        broadcast {
+            acknowledgeBroadcasts = true
+        }
+    }
+
+    // No need to subscribe to channel
+
+    myChannel.broadcast(event = "test", buildJsonObject {
+        put("message", "Hi")
+    })
+    ```
+
+  </TabPanel>
+</Tabs>

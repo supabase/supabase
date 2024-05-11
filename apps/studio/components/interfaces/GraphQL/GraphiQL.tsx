@@ -46,6 +46,7 @@ import {
 } from 'ui'
 import { RoleImpersonationSelector } from '../RoleImpersonationSelector'
 import styles from './graphiql.module.css'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
 
 export interface GraphiQLProps {
   fetcher: Fetcher
@@ -71,7 +72,7 @@ interface GraphiQLInterfaceProps {
   theme: 'dark' | 'light'
 }
 
-export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
+const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const editorContext = useEditorContext({ nonNull: true })
   const executionContext = useExecutionContext({ nonNull: true })
   const schemaContext = useSchemaContext({ nonNull: true })
@@ -84,7 +85,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
   const canReadJWTSecret = useCheckPermissions(PermissionAction.READ, 'field.jwt_secret')
 
   const [rlsBypassedWarningDismissed, setRlsBypassedWarningDismissed] = useLocalStorage(
-    'graphiql-rls-bypass-warning-dismissed',
+    LOCAL_STORAGE_KEYS.GRAPHIQL_RLS_BYPASS_WARNING,
     false
   )
 
@@ -100,7 +101,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
     direction: 'horizontal',
     initiallyHidden: pluginContext?.visiblePlugin ? undefined : 'second',
     onHiddenElementChange: (resizableElement) => {
-      if (resizableElement === 'first') {
+      if (resizableElement === 'second') {
         pluginContext?.setVisiblePlugin(null)
       }
     },
@@ -207,7 +208,7 @@ export const GraphiQLInterface = ({ theme }: GraphiQLInterfaceProps) => {
         <div className="graphiql-main">
           <div
             ref={pluginResize.firstRef}
-            style={{ minWidth: 0 }}
+            style={{ minWidth: '750px' }}
             className={clsx('graphiql-sessions', styles.graphiqlSessions)}
           >
             <div

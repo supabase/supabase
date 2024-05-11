@@ -1,46 +1,41 @@
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import { Badge, IconDiscord, IconGitHubSolid, IconTwitterX, IconYoutubeSolid, cn } from 'ui'
 import Image from 'next/image'
 import { useRouter } from 'next/router'
-import ThemeToggle from '@ui/components/ThemeProvider/ThemeToggle'
 import { CheckIcon } from '@heroicons/react/outline'
 import SectionContainer from '../Layouts/SectionContainer'
 
 import footerData from 'data/Footer'
 import * as supabaseLogoWordmarkDark from 'common/assets/images/supabase-logo-wordmark--dark.png'
 import * as supabaseLogoWordmarkLight from 'common/assets/images/supabase-logo-wordmark--light.png'
+import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 interface Props {
   className?: string
+  hideFooter?: boolean
 }
 
 const Footer = (props: Props) => {
   const { resolvedTheme } = useTheme()
   const { pathname } = useRouter()
 
-  const isLaunchWeek = pathname.includes('launch-week')
+  const isLaunchWeek = pathname.includes('/launch-week')
+  const isGAWeek = pathname.includes('/ga-week')
   const forceDark = isLaunchWeek || pathname === '/'
 
-  /**
-   * Temporary fix for next-theme client side bug
-   * https://github.com/pacocoursey/next-themes/issues/169
-   * TODO: remove when bug has been fixed
-   */
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
+  if (props.hideFooter) {
     return null
   }
 
   return (
     <footer
-      className={cn('bg-alternative', isLaunchWeek && 'bg-[#060809]', props.className)}
+      className={cn(
+        'bg-alternative',
+        isLaunchWeek && 'bg-[#060809]',
+        isGAWeek && 'dark:bg-alternative',
+        props.className
+      )}
       aria-labelledby="footerHeading"
     >
       <h2 id="footerHeading" className="sr-only">
@@ -72,16 +67,20 @@ const Footer = (props: Props) => {
           <div className="space-y-8 xl:col-span-1">
             <Link href="#" as="/" className="w-40">
               <Image
-                src={
-                  forceDark
-                    ? supabaseLogoWordmarkDark
-                    : mounted && resolvedTheme?.includes('dark')
-                    ? supabaseLogoWordmarkDark
-                    : supabaseLogoWordmarkLight
-                }
+                src={supabaseLogoWordmarkLight}
                 width={160}
                 height={30}
-                alt="Supabase"
+                alt="Supabase Logo"
+                className="dark:hidden"
+                priority
+              />
+              <Image
+                src={supabaseLogoWordmarkDark}
+                width={160}
+                height={30}
+                alt="Supabase Logo"
+                className="hidden dark:block"
+                priority
               />
             </Link>
             <div className="flex space-x-5">
@@ -137,9 +136,7 @@ const Footer = (props: Props) => {
                             {link.text}
                             {!link.url && !Component && (
                               <div className="ml-2 inline text-xs xl:ml-0 xl:block 2xl:ml-2 2xl:inline">
-                                <Badge color="scale" size="small">
-                                  Coming soon
-                                </Badge>
+                                <Badge size="small">Coming soon</Badge>
                               </div>
                             )}
                           </div>

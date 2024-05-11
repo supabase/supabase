@@ -21,17 +21,12 @@ const EmptyState = ({}: EmptyStateProps) => {
   )
 
   const { project } = useProjectContext()
-  const { data } = useEntityTypesQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-      schema: snap.selectedSchemaName,
-      sort,
-    },
-    {
-      keepPreviousData: true,
-    }
-  )
+  const { data } = useEntityTypesQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+    schema: snap.selectedSchemaName,
+    sort,
+  })
 
   const totalCount = data?.pages?.[0].data.count ?? 0
 

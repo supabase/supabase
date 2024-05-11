@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from 'react'
-import { FormLayout } from '../../lib/Layout/FormLayout'
-import { CheckboxContext } from './CheckboxContext'
-// @ts-ignore
-import CheckboxStyles from './Checkbox.module.css'
+'use client'
 
-import defaultTheme from '../../lib/theme/defaultTheme'
+import React from 'react'
 
-import { useFormContext } from '../Form/FormContext'
+import { FormLayout } from '../../lib/Layout/FormLayout/FormLayout'
 import styleHandler from '../../lib/theme/styleHandler'
+import { useFormContext } from '../Form/FormContext'
+import CheckboxStyles from './Checkbox.module.css'
+import { CheckboxContext } from './CheckboxContext'
 
 export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   afterLabel?: string
@@ -77,6 +76,7 @@ function Group({
                 return (
                   <Checkbox
                     id={option.id}
+                    key={option.id}
                     value={option.value}
                     label={option.label}
                     beforeLabel={option.beforeLabel}
@@ -122,13 +122,13 @@ export function Checkbox({
         const markupId = id
           ? id
           : name
-          ? name
-          : label
-          ? label
-              .toLowerCase()
-              .replace(/^[^A-Z0-9]+/gi, '')
-              .replace(/ /g, '-')
-          : undefined
+            ? name
+            : label
+              ? label
+                  .toLowerCase()
+                  .replace(/^[^A-Z0-9]+/gi, '')
+                  .replace(/ /g, '-')
+              : undefined
 
         // @ts-ignore
         size = parentSize ? parentSize : size

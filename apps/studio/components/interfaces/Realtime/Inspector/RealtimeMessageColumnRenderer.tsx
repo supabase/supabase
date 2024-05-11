@@ -1,7 +1,7 @@
 import { Column } from 'react-data-grid'
 import { IconAlertTriangle, IconBroadcast, IconDatabaseChanges, IconPresence, cn } from 'ui'
 
-import { LogData, PreviewLogData } from './Messages.types'
+import type { LogData, PreviewLogData } from './Messages.types'
 import { RowLayout } from './MessagesFormatters'
 import { isErrorLog } from './MessagesTable'
 

@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { Button, Modal } from 'ui'
 
@@ -13,7 +12,7 @@ import Table from 'components/to-be-cleaned/Table'
 import AlertError from 'components/ui/AlertError'
 import { GenericSkeletonLoader } from 'components/ui/ShimmeringLoader'
 import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const PageLayout: NextPageWithLayout = () => {
   const { ref } = useParams()
@@ -97,4 +96,4 @@ const PageLayout: NextPageWithLayout = () => {
 
 PageLayout.getLayout = (page) => <FunctionsLayout>{page}</FunctionsLayout>
 
-export default observer(PageLayout)
+export default PageLayout

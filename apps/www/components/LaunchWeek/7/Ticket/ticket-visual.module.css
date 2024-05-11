@@ -1,7 +1,9 @@
 .visual {
   transform: translateZ(0);
   background-image: linear-gradient(154.77deg, #cb88ff 29.4%, #cb88ff 120.47%);
-  box-shadow: 0px 1px 27px #9e44ef10, 0 0 0 1px rgba(121, 89, 134, 0.237),
+  box-shadow:
+    0px 1px 27px #9e44ef10,
+    0 0 0 1px rgba(121, 89, 134, 0.237),
     inset 0 0px 0 -2px rgba(0, 0, 0, 0.55);
   /* border: 1px solid rgba(0, 0, 0, 0.05); */
   border-radius: 16px;

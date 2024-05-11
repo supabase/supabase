@@ -2,7 +2,7 @@ import InfrastructureActivity from 'components/interfaces/Settings/Infrastructur
 import InfrastructureInfo from 'components/interfaces/Settings/Infrastructure/InfrastructureInfo'
 import { SettingsLayout } from 'components/layouts'
 import { ScaffoldDivider } from 'components/layouts/Scaffold'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 
 const ProjectInfrastructure: NextPageWithLayout = () => {
   return (

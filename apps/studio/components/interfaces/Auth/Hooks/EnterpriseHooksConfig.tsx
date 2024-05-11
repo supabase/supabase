@@ -1,6 +1,7 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useEffect } from 'react'
+import toast from 'react-hot-toast'
 import {
   AlertDescription_Shadcn_,
   AlertTitle_Shadcn_,
@@ -23,8 +24,7 @@ import UpgradeToPro from 'components/ui/UpgradeToPro'
 import { useAuthConfigQuery } from 'data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from 'data/auth/auth-config-update-mutation'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
-import { useCheckPermissions, useFlag, useSelectedOrganization, useStore } from 'hooks'
-
+import { useCheckPermissions, useSelectedOrganization } from 'hooks'
 import SchemaFunctionSelector from './SchemaFunctionSelector'
 
 const schema = object({
@@ -37,7 +37,6 @@ const schema = object({
 const FORM_ID = 'enterprise-hooks-config'
 
 const EnterpriseHooksConfig = () => {
-  const { ui } = useStore()
   const { ref: projectRef } = useParams()
   const {
     data: authConfig,
@@ -47,36 +46,25 @@ const EnterpriseHooksConfig = () => {
     isSuccess,
   } = useAuthConfigQuery({ projectRef })
   const { mutate: updateAuthConfig, isLoading: isUpdatingConfig } = useAuthConfigUpdateMutation()
-
   const canUpdateConfig = useCheckPermissions(PermissionAction.UPDATE, 'custom_config_gotrue')
-  const mfaVerificationAttemptReleased = useFlag('authHookMFAVerification')
-  const passwordVerificationAttemptReleased = useFlag('authHookPasswordVerification')
 
   const organization = useSelectedOrganization()
   const { data: subscription, isSuccess: isSuccessSubscription } = useOrgSubscriptionQuery({
-    orgSlug: organization!.slug,
+    orgSlug: organization?.slug,
   })
 
   const isTeamsEnterprisePlan =
     isSuccessSubscription && subscription?.plan?.id !== 'free' && subscription?.plan?.id !== 'pro'
 
   const INITIAL_VALUES = {
-    ...(mfaVerificationAttemptReleased
-      ? {
-          HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED:
-            authConfig?.HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED || false,
-          HOOK_MFA_VERIFICATION_ATTEMPT_URI: authConfig?.HOOK_MFA_VERIFICATION_ATTEMPT_URI || '',
-        }
-      : null),
-    ...(passwordVerificationAttemptReleased
-      ? {
-          // remove as any when the types are merged in
-          HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED:
-            (authConfig as any)?.HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED || false,
-          HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI:
-            (authConfig as any)?.HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI || '',
-        }
-      : null),
+    HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED:
+      authConfig?.HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED || false,
+    HOOK_MFA_VERIFICATION_ATTEMPT_URI: authConfig?.HOOK_MFA_VERIFICATION_ATTEMPT_URI || '',
+    // remove as any when the types are merged in
+    HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED:
+      (authConfig as any)?.HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED || false,
+    HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI:
+      (authConfig as any)?.HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI || '',
   }
 
   const onSubmit = (values: any, { resetForm }: any) => {
@@ -91,16 +79,10 @@ const EnterpriseHooksConfig = () => {
       { projectRef: projectRef!, config: payload },
       {
         onError: () => {
-          ui.setNotification({
-            category: 'error',
-            message: `Failed to update settings`,
-          })
+          toast.error(`Failed to update settings`)
         },
         onSuccess: () => {
-          ui.setNotification({
-            category: 'success',
-            message: `Successfully updated settings`,
-          })
+          toast.success(`Successfully updated settings`)
           resetForm({ values: values, initialValues: values })
         },
       }
@@ -155,12 +137,12 @@ const EnterpriseHooksConfig = () => {
                 </div>
               }
             >
-              {!isTeamsEnterprisePlan && (
+              {!isTeamsEnterprisePlan && organization !== undefined && (
                 <UpgradeToPro
                   primaryText="Upgrade plan"
                   secondaryText="Configuring Enterprise Hooks requires a Teams or Enterprise plan."
                   projectRef={projectRef!}
-                  organizationSlug={organization!.slug}
+                  organizationSlug={organization.slug}
                   buttonText="Upgrade"
                 />
               )}
@@ -172,31 +154,15 @@ const EnterpriseHooksConfig = () => {
                       descriptionText="Select the function to be called by Supabase Auth each time a user tries to verify an MFA factor. Return a decision on whether to reject the attempt and future ones, or to allow the user to keep trying."
                       values={values}
                       setFieldValue={setFieldValue}
-                      disabled={
-                        !canUpdateConfig ||
-                        !isTeamsEnterprisePlan ||
-                        !mfaVerificationAttemptReleased
-                      }
+                      disabled={!canUpdateConfig || !isTeamsEnterprisePlan}
                     />
-                    {!mfaVerificationAttemptReleased && (
-                      <Alert_Shadcn_ variant="default">
-                        <AlertTitle_Shadcn_>Coming soon!</AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_>
-                          This hook is not available yet on your project.
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
-                    )}
                     {values.HOOK_MFA_VERIFICATION_ATTEMPT_URI && (
                       <Toggle
                         id="HOOK_MFA_VERIFICATION_ATTEMPT_ENABLED"
                         size="small"
                         label="Enable hook"
                         layout="flex"
-                        disabled={
-                          !canUpdateConfig ||
-                          !isTeamsEnterprisePlan ||
-                          !mfaVerificationAttemptReleased
-                        }
+                        disabled={!canUpdateConfig || !isTeamsEnterprisePlan}
                       />
                     )}
                   </FormSectionContent>
@@ -212,31 +178,15 @@ const EnterpriseHooksConfig = () => {
                       descriptionText="Select the function to be called by Supabase Auth each time a user tries to sign in with a password. Return a decision whether to allow the user to reject the attempt, or to allow the user to keep trying."
                       values={values}
                       setFieldValue={setFieldValue}
-                      disabled={
-                        !canUpdateConfig ||
-                        !isTeamsEnterprisePlan ||
-                        !passwordVerificationAttemptReleased
-                      }
+                      disabled={!canUpdateConfig || !isTeamsEnterprisePlan}
                     />
-                    {!passwordVerificationAttemptReleased && (
-                      <Alert_Shadcn_ variant="default">
-                        <AlertTitle_Shadcn_>Coming soon!</AlertTitle_Shadcn_>
-                        <AlertDescription_Shadcn_>
-                          This hook is not available yet on your project.
-                        </AlertDescription_Shadcn_>
-                      </Alert_Shadcn_>
-                    )}
                     {values.HOOK_PASSWORD_VERIFICATION_ATTEMPT_URI && (
                       <Toggle
                         id="HOOK_PASSWORD_VERIFICATION_ATTEMPT_ENABLED"
                         size="small"
                         label="Enable hook"
                         layout="flex"
-                        disabled={
-                          !canUpdateConfig ||
-                          !isTeamsEnterprisePlan ||
-                          !passwordVerificationAttemptReleased
-                        }
+                        disabled={!canUpdateConfig || !isTeamsEnterprisePlan}
                       />
                     )}
                   </FormSectionContent>

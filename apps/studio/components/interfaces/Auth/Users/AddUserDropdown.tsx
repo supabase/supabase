@@ -15,8 +15,8 @@ import {
 
 import { useCheckPermissions } from 'hooks'
 import { IS_PLATFORM } from 'lib/constants'
-import CreateUserModal from './CreateUserModal'
 import InviteUserModal from './InviteUserModal'
+import CreateUserModal from './CreateUserModal'
 
 export type AddUserDropdownProps = {
   projectKpsVersion?: string

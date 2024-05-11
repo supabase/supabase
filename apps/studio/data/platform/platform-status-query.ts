@@ -1,7 +1,6 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 import { get } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
-import { useCallback } from 'react'
 import { platformKeys } from './keys'
 
 export type PlatformStatusResponse = {
@@ -30,11 +29,3 @@ export const usePlatformStatusQuery = <TData = PlatformStatusData>(
     ({ signal }) => getPlatformStatus(signal),
     options
   )
-
-export const usePlatformStatusPrefetch = () => {
-  const client = useQueryClient()
-
-  return useCallback(() => {
-    client.prefetchQuery(platformKeys.status(), ({ signal }) => getPlatformStatus(signal))
-  }, [])
-}

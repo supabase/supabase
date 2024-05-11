@@ -1,4 +1,4 @@
-import { Button, IconGrid, IconLayers, IconMenu, ThemeImage } from 'ui'
+import { Button, IconGrid, IconLayers, IconMenu } from 'ui'
 import ApiExamples from 'data/products/realtime/api-examples'
 import AppExamples from 'data/products/realtime/app-examples'
 import Solutions from 'data/Solutions'
@@ -11,8 +11,11 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import APISection from '~/components/Sections/APISection'
 import ProductHeader from '~/components/Sections/ProductHeader'
 import RealtimeStyles from './Realtime.module.css'
+import ProductsNav from '~/components/Products/ProductsNav'
 
-import 'swiper/swiper.min.css'
+import 'swiper/css'
+import { ThemeImage } from 'ui-patterns/ThemeImage'
+import { PRODUCT_NAMES } from 'shared-data/products'
 
 const Cursor = ({ className = '', color = 'none' }) => {
   return (
@@ -57,6 +60,7 @@ function RealtimePage() {
         }}
       />
       <DefaultLayout>
+        <ProductsNav activePage={PRODUCT_NAMES.REALTIME} />
         <ProductHeader
           icon={Solutions['realtime']?.icon}
           title={Solutions['realtime']?.name}
@@ -201,7 +205,7 @@ function RealtimePage() {
                       objectFit="contain"
                     />
                     <div className="prose">
-                      <h4 className="">{example.title}</h4>
+                      <h4>{example.title}</h4>
                       <p className="text-sm">{example.description}</p>
                     </div>
                   </div>

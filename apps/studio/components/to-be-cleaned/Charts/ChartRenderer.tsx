@@ -41,10 +41,16 @@ const Header = ({
   let FOCUS_FORMAT = customDateFormat
     ? customDateFormat
     : format == '%'
-    ? DATE_FORMAT__WITH_TIME
-    : DATE_FORMAT__DATE_ONLY
+      ? DATE_FORMAT__WITH_TIME
+      : DATE_FORMAT__DATE_ONLY
 
   let title = ''
+
+  const isByteAttribute =
+    format === 'bytes' ||
+    attribute.includes('ingress') ||
+    attribute.includes('egress') ||
+    attribute.includes('bytes')
 
   if (focus) {
     if (!data) {
@@ -52,11 +58,7 @@ const Header = ({
     } else if (format === '%') {
       title = Number(data[focus]?.[attribute]).toFixed(2)
     } else {
-      if (
-        attribute.includes('ingress') ||
-        attribute.includes('egress') ||
-        attribute.includes('bytes')
-      ) {
+      if (isByteAttribute) {
         title = formatBytes(data[focus]?.[attribute])
       } else {
         title = data[focus]?.[attribute]?.toLocaleString()
@@ -66,11 +68,7 @@ const Header = ({
     if (format === '%' && highlightedValue) {
       title = highlightedValue.toFixed(2)
     } else {
-      if (
-        attribute.includes('ingress') ||
-        attribute.includes('egress') ||
-        attribute.includes('bytes')
-      ) {
+      if (isByteAttribute) {
         title = formatBytes(highlightedValue)
       } else {
         title = highlightedValue?.toLocaleString()
@@ -91,7 +89,7 @@ const Header = ({
       }
     >
       {title}
-      <span className="text-lg">{format}</span>
+      {!isByteAttribute && <span className="text-lg">{format}</span>}
     </h5>
   )
   const date = (

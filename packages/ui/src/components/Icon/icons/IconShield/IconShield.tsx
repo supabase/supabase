@@ -9,5 +9,12 @@
     return <IconBase icon={Shield} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { shield } from 'lucide-react'
+  */
   export default IconShield
   

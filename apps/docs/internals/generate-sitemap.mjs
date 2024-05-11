@@ -45,7 +45,6 @@ async function generate() {
               <url>
                   <loc>${`https://supabase.com/docs/${path}`}</loc>
                   <changefreq>weekly</changefreq>
-                  <changefreq>0.5</changefreq>
               </url>
             `
           })
@@ -53,7 +52,7 @@ async function generate() {
     </urlset>
     `
 
-  const formatted = prettier.format(sitemap, {
+  const formatted = await prettier.format(sitemap, {
     ...prettierConfig,
     parser: 'html',
   })

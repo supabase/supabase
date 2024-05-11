@@ -3,7 +3,7 @@ import { toast } from 'react-hot-toast'
 
 import { post } from 'data/fetchers'
 import { usageKeys } from 'data/usage/keys'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type TempDisableReadOnlyModeVariables = {
   projectRef: string

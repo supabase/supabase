@@ -31,7 +31,7 @@ Row Level Security needs to be defined only once to implement authentication and
 ```sql
 create policy "Users can only view their own documents."
 on docs for select
-using ( auth.uid() = user_id );
+using ( (select auth.uid()) = user_id );
 ```
 
 The RLS policy above will be enforced, no matter if you use the REST API, edge functions or other methods of accessing your data.

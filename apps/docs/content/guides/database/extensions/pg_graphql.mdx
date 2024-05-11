@@ -1,0 +1,111 @@
+---
+id: 'pg_graphql'
+title: 'pg_graphql: GraphQL for PostgreSQL'
+description: 'A GraphQL Interface for PostgreSQL'
+---
+
+[pg_graphql](https://supabase.github.io/pg_graphql/) is PostgreSQL extension for interacting with the database using [GraphQL](https://graphql.org) instead of SQL.
+
+The extension reflects a GraphQL schema from the existing SQL schema and exposes it through a SQL function, `graphql.resolve(...)`. This enables any programming language that can connect to PostgreSQL to query the database via GraphQL with no additional servers, processes, or libraries.
+
+The `pg_graphql` resolve method is designed to interop with [PostgREST](https://postgrest.org/en/stable/index.html), the tool that underpins the Supabase API, such that the `graphql.resolve` function can be called via RPC to safely and performantly expose the GraphQL API over HTTP/S.
+
+For more information about how the SQL schema is reflected into a GraphQL schema, see the [pg_graphql API docs](https://supabase.github.io/pg_graphql/api/).
+
+## Enable the extension
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+  queryGroup="database-method"
+>
+<TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [Database](https://supabase.com/dashboard/project/_/database/tables) page in the Dashboard.
+2. Click on **Extensions** in the sidebar.
+3. Search for "pg_graphql" and enable the extension.
+
+</TabPanel>
+<TabPanel id="sql" label="SQL">
+
+{/* prettier-ignore */}
+```sql
+-- Enable the "pg_graphql" extension
+create extension pg_graphql;
+
+-- Disable the "pg_graphql" extension
+drop extension if exists pg_graphql;
+```
+
+Even though the SQL code is `create extension`, this is the equivalent of "enabling the extension".
+To disable an extension you can call `drop extension`.
+
+</TabPanel>
+</Tabs>
+
+## Usage
+
+Given a table
+
+{/* prettier-ignore */}
+```sql
+create table "Blog"(
+  id serial primary key,
+  name text not null,
+  description text,
+);
+
+insert into "Blog"(name)
+values ('My Blog');
+```
+
+The reflected GraphQL schema can be queried immediately as
+
+{/* prettier-ignore */}
+```sql
+select
+  graphql.resolve($$
+    {
+      blogCollection(first: 1) {
+        edges {
+          node {
+            id,
+            name
+          }
+        }
+      }
+    }
+  $$);
+```
+
+returning the JSON
+
+{/* prettier-ignore */}
+```json
+{
+  "data": {
+    "blogCollection": {
+      "edges": [
+        {
+          "node": {
+            "id": 1
+            "name": "My Blog"
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+Note that `pg_graphql` fully supports schema introspection so you can connect any GraphQL IDE or schema inspection tool to see the full set of fields and arguments available in the API.
+
+## API
+
+- [`graphql.resolve`](https://supabase.github.io/pg_graphql/sql_interface/): A SQL function for executing GraphQL queries.
+
+## Resources
+
+- Official [`pg_graphql` documentation](https://github.com/supabase/pg_graphql)

@@ -126,7 +126,7 @@ const LayoutComparison = ({ components, props }: Props) => {
               </div>
             </div>
           </div>
-          <div className="">
+          <div>
             {/* Content */}
             <div className="prose prose-docs max-w-none">
               <MDXRemote {...content} components={components} />

@@ -11,7 +11,23 @@
 
 .page {
   width: 1700px;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
-    'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', 'Noto Sans', 'Noto Sans JP',
-    'Noto Sans KR', 'Noto Sans SC', 'Noto Sans TC', 'Noto Sans HK', sans-serif;
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'Roboto',
+    'Oxygen',
+    'Ubuntu',
+    'Cantarell',
+    'Fira Sans',
+    'Droid Sans',
+    'Helvetica Neue',
+    'Noto Sans',
+    'Noto Sans JP',
+    'Noto Sans KR',
+    'Noto Sans SC',
+    'Noto Sans TC',
+    'Noto Sans HK',
+    sans-serif;
 }

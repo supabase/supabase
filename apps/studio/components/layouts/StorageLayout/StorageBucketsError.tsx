@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import Link from 'next/link'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { Alert, Button } from 'ui'
 
 export interface StorageBucketsErrorProps {

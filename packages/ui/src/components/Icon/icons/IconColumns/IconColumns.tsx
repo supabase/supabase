@@ -9,5 +9,12 @@
     return <IconBase icon={Columns} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { columns } from 'lucide-react'
+  */
   export default IconColumns
   

@@ -1,10 +1,21 @@
-import { cn } from '@ui/lib/utils'
 import { cva } from 'class-variance-authority'
-import { PropsWithChildren } from 'react'
+import React, { forwardRef } from 'react'
+import { cn } from '../../lib/utils/cn'
 import { Alert, AlertDescription, AlertTitle } from './../shadcn/ui/alert'
+
 export interface AdmonitionProps {
-  type: 'note' | 'tip' | 'caution' | 'danger' | 'deprecation'
+  type:
+    | 'note'
+    | 'tip'
+    | 'caution'
+    | 'danger'
+    | 'deprecation'
+    | 'default'
+    | 'destructive'
+    | 'warning'
   label?: string
+  title?: string
+  description?: string | React.ReactNode
 }
 
 const admonitionToAlertMapping: Record<
@@ -16,6 +27,9 @@ const admonitionToAlertMapping: Record<
   caution: 'warning',
   danger: 'destructive',
   deprecation: 'warning',
+  default: 'default',
+  warning: 'warning',
+  destructive: 'destructive',
 }
 
 const InfoIcon = () => (
@@ -68,40 +82,46 @@ const admonitionBase = cva('', {
   },
 })
 
-export const Admonition = ({
-  type = 'note',
-  label,
-  children,
-}: PropsWithChildren<AdmonitionProps>) => {
+export const Admonition = forwardRef<
+  React.ElementRef<typeof Alert>,
+  React.ComponentPropsWithoutRef<typeof Alert> & AdmonitionProps
+>(({ type = 'note', label, title, description, children, ...props }, ref) => {
   const typeMapped = admonitionToAlertMapping[type]
 
   return (
     <Alert
+      ref={ref}
+      variant={typeMapped}
+      {...props}
       className={cn(
         'mb-2',
         admonitionSVG({ type: typeMapped }),
-        admonitionBase({ type: typeMapped })
+        admonitionBase({ type: typeMapped }),
+        props.className
       )}
-      variant={typeMapped}
     >
       {typeMapped === 'warning' || typeMapped === 'destructive' ? <WarningIcon /> : <InfoIcon />}
-      {label ? (
+      {label || title ? (
         <>
           <AlertTitle
             className={cn(
-              'text mt-0.5 flex gap-3 items-center text-sm [&_p]:mb-1.5 [&_p]:mt-0',
+              'text mt-0.5 flex gap-3 text-sm [&_p]:mb-1.5 [&_p]:mt-0',
               !label && 'flex-col'
             )}
           >
-            {label}
+            {label || title}
           </AlertTitle>
+          {description && <AlertDescription>{description}</AlertDescription>}
+          {/* // children is to handle Docs and MDX issues with children and <p> elements */}
           {children && (
             <AlertDescription className="mt-3 [&_p]:mb-1.5 [&_p]:mt-0">{children}</AlertDescription>
           )}
         </>
       ) : (
-        <div className="text mt [&_p]:mb-1.5 [&_p]:mt-0 mt-0.5 [&_p]:last:mb-0">{children}</div>
+        <div className="text mt [&_p]:mb-1.5 [&_p]:mt-0 mt-0.5 [&_p:last-child]:mb-0">
+          {children}
+        </div>
       )}
     </Alert>
   )
-}
+})

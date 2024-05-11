@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { NextPageWithLayout } from 'types'
+import type { NextPageWithLayout } from 'types'
 import { FormHeader } from 'components/ui/Forms'
 import { AccountLayout } from 'components/layouts'
 import {

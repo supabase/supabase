@@ -1,7 +1,7 @@
 import { useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { post } from 'lib/common/fetch'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { serviceStatusKeys } from './keys'
 import { API_URL } from 'lib/constants'
 
@@ -46,6 +46,7 @@ export const usePostgresServiceStatusQuery = <TData = PostgresServiceStatusData>
     {
       enabled:
         enabled && typeof projectRef !== 'undefined' && typeof connectionString !== 'undefined',
+      staleTime: 0,
       ...options,
     }
   )

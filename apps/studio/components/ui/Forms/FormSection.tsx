@@ -81,7 +81,7 @@ const FormSectionContent = ({
         ${className}
       `}
     >
-      {loading ? Children.map(children, (child) => <Shimmer />) : children}
+      {loading ? Children.map(children, () => <Shimmer />) : children}
     </div>
   )
 }

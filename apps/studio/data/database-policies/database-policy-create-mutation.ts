@@ -2,9 +2,9 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { databasePoliciesKeys } from './keys'
-import { components } from 'data/api'
+import type { components } from 'data/api'
 
 type CreatePolicyBody = components['schemas']['CreatePolicyBody']
 

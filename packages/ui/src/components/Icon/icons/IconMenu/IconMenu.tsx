@@ -9,5 +9,12 @@
     return <IconBase icon={Menu} {...props} />
   }
 
+  /**
+  * @deprecated This icon component should not be used.
+  * Please use lucide react icons instead.
+  * 
+  * Replace with:
+  * import { menu } from 'lucide-react'
+  */
   export default IconMenu
   

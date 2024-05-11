@@ -1,6 +1,6 @@
 import { withAuth } from 'hooks'
 import { ReactNode, useMemo } from 'react'
-import ProjectLayout from '../'
+import { ProjectLayout } from '../'
 import SQLEditorMenu from './SQLEditorMenu'
 
 export interface SQLEditorLayoutProps {
@@ -17,6 +17,7 @@ const SQLEditorLayout = ({ title, children }: SQLEditorLayoutProps) => {
       product="SQL Editor"
       productMenu={productMenu}
       isBlocking={false}
+      resizableSidebar
     >
       {children}
     </ProjectLayout>

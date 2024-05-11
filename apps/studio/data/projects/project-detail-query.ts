@@ -1,9 +1,9 @@
 import { QueryClient, useQuery, UseQueryOptions } from '@tanstack/react-query'
 
 import { get } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
-import { components } from 'data/api'
+import type { components } from 'data/api'
 
 export type ProjectDetailVariables = { ref?: string }
 
@@ -44,6 +44,15 @@ export const useProjectDetailQuery = <TData = ProjectDetailData>(
     {
       enabled: enabled && typeof ref !== 'undefined',
       staleTime: 30 * 1000, // 30 seconds
+      refetchInterval(data) {
+        const status = data && (data as unknown as ProjectDetailData).status
+
+        if (status === 'COMING_UP' || status === 'UNKNOWN') {
+          return 5 * 1000 // 5 seconds
+        }
+
+        return false
+      },
       ...options,
     }
   )

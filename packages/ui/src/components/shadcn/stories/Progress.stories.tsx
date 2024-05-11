@@ -1,6 +1,6 @@
-import { Progress } from '@ui/components/shadcn/ui/progress'
 import { Meta } from '@storybook/react'
 import * as React from 'react'
+import { Progress } from '../ui/progress'
 
 const meta: Meta = {
   title: 'shadcn/Progress',

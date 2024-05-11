@@ -2,7 +2,7 @@ import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react
 import { toast } from 'react-hot-toast'
 
 import { post } from 'data/fetchers'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
 import { projectKeys } from 'data/projects/keys'
 
@@ -52,6 +52,7 @@ export const useBranchCreateMutation = ({
         const { projectRef } = variables
         await queryClient.invalidateQueries(branchKeys.list(projectRef))
         await queryClient.invalidateQueries(projectKeys.detail(projectRef))
+        await queryClient.invalidateQueries(projectKeys.list())
         await onSuccess?.(data, variables, context)
       },
       async onError(data, variables, context) {

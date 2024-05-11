@@ -3,7 +3,7 @@ import { patch } from 'lib/common/fetch'
 import { API_URL } from 'lib/constants'
 import { organizationKeys } from './keys'
 import { toast } from 'react-hot-toast'
-import { ResponseError } from 'types'
+import type { ResponseError } from 'types'
 
 export type OrganizationMemberUpdateVariables = {
   slug: string

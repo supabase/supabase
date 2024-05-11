@@ -1,9 +1,11 @@
 import { isEmpty, noop } from 'lodash'
 import { useEffect, useState } from 'react'
-import { Modal } from 'ui'
+import toast from 'react-hot-toast'
 
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import { useStore } from 'hooks'
+import { LOCAL_STORAGE_KEYS } from 'lib/constants'
+import { useAppStateSnapshot } from 'state/app-state'
+import { Modal } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { POLICY_MODAL_VIEWS } from '../Policies.constants'
 import {
   PolicyFormField,
@@ -28,6 +30,7 @@ interface PolicyEditorModalProps {
   schema: string
   table: string
   selectedPolicyToEdit: any
+  showAssistantPreview?: boolean
   onSelectCancel: () => void
   onCreatePolicy: (payload: PostgresPolicyCreatePayload) => Promise<boolean>
   onUpdatePolicy: (payload: PostgresPolicyUpdatePayload) => Promise<boolean>
@@ -39,12 +42,13 @@ const PolicyEditorModal = ({
   schema = '',
   table = '',
   selectedPolicyToEdit = {},
+  showAssistantPreview = false,
   onSelectCancel = noop,
   onCreatePolicy,
   onUpdatePolicy,
   onSaveSuccess = noop,
 }: PolicyEditorModalProps) => {
-  const { ui } = useStore()
+  const snap = useAppStateSnapshot()
 
   const newPolicyTemplate: PolicyFormField = {
     schema,
@@ -91,6 +95,12 @@ const PolicyEditorModal = ({
   const onReviewPolicy = () => setView(POLICY_MODAL_VIEWS.REVIEW)
   const onSelectBackFromTemplates = () => setView(previousView)
 
+  const onToggleFeaturePreviewModal = () => {
+    snap.setSelectedFeaturePreview(LOCAL_STORAGE_KEYS.UI_PREVIEW_RLS_AI_ASSISTANT)
+    snap.setShowFeaturePreviewModal(!snap.showFeaturePreviewModal)
+    onSelectCancel()
+  }
+
   const onUseTemplate = (template: PolicyTemplate) => {
     setPolicyFormFields({
       ...policyFormFields,
@@ -113,36 +123,21 @@ const PolicyEditorModal = ({
     const { name, definition, check, command } = policyFormFields
 
     if (name.length === 0) {
-      return ui.setNotification({ category: 'error', message: 'Do give your policy a name' })
+      return toast.error('Please provide a name for your policy')
     }
     if (!command) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'You will need to allow at one operation in your policy',
-        duration: 4000,
-      })
+      return toast.error('Please select an operation for your policy')
     }
     if (['SELECT', 'DELETE'].includes(command) && !definition) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'Did you forget to provide a USING expression for your policy?',
-        duration: 4000,
-      })
+      return toast.error('Please provide a USING expression for your policy')
     }
     if (command === 'INSERT' && !check) {
-      return ui.setNotification({
-        category: 'error',
-        message: 'Did you forget to provide a WITH CHECK expression for your policy?',
-        duration: 4000,
-      })
+      return toast.error('Please provide a WITH CHECK expression for your policy')
     }
     if (command === 'UPDATE' && !definition && !check) {
-      return ui.setNotification({
-        category: 'error',
-        message:
-          'You will need to provide either a USING, or WITH CHECK expression, or both for your policy',
-        duration: 4000,
-      })
+      return toast.error(
+        'Please provide either a USING, or WITH CHECK expression, or both for your policy'
+      )
     }
     const policySQLStatement = createSQLPolicy(policyFormFields, selectedPolicyToEdit)
     setPolicyStatementForReview(policySQLStatement)
@@ -171,9 +166,8 @@ const PolicyEditorModal = ({
 
   return (
     <Modal
-      size={view === POLICY_MODAL_VIEWS.SELECTION ? 'medium' : 'xxlarge'}
-      closable
       hideFooter
+      size={view === POLICY_MODAL_VIEWS.SELECTION ? 'medium' : 'xxlarge'}
       visible={visible}
       contentStyle={{ padding: 0 }}
       header={[
@@ -183,35 +177,37 @@ const PolicyEditorModal = ({
           isNewPolicy={isNewPolicy}
           schema={schema}
           table={table}
+          showAssistantPreview={showAssistantPreview}
           onSelectBackFromTemplates={onSelectBackFromTemplates}
+          onToggleFeaturePreviewModal={onToggleFeaturePreviewModal}
         />,
       ]}
       onCancel={isClosingPolicyEditor}
     >
-      <div className="">
+      <div>
         <ConfirmationModal
           visible={isClosingPolicyEditorModal}
-          header="Discard changes"
-          buttonLabel="Discard"
-          onSelectCancel={() => setIsClosingPolicyEditorModal(false)}
-          onSelectConfirm={() => {
+          title="Discard changes"
+          confirmLabel="Discard"
+          onCancel={() => setIsClosingPolicyEditorModal(false)}
+          onConfirm={() => {
             onSelectCancel()
             setIsClosingPolicyEditorModal(false)
             setIsDirty(false)
           }}
         >
-          <Modal.Content>
-            <p className="py-4 text-sm text-foreground-light">
-              There are unsaved changes. Are you sure you want to close the editor? Your changes
-              will be lost.
-            </p>
-          </Modal.Content>
+          <p className="text-sm text-foreground-light">
+            There are unsaved changes. Are you sure you want to close the editor? Your changes will
+            be lost.
+          </p>
         </ConfirmationModal>
         {view === POLICY_MODAL_VIEWS.SELECTION ? (
           <PolicySelection
             description="Write rules with PostgreSQL's policies to fit your unique business needs."
             onViewTemplates={onViewTemplates}
             onViewEditor={onViewEditor}
+            showAssistantPreview={showAssistantPreview}
+            onToggleFeaturePreviewModal={onToggleFeaturePreviewModal}
           />
         ) : view === POLICY_MODAL_VIEWS.EDITOR ? (
           <PolicyEditor
@@ -223,7 +219,7 @@ const PolicyEditorModal = ({
           />
         ) : view === POLICY_MODAL_VIEWS.TEMPLATES ? (
           <PolicyTemplates
-            templates={getGeneralPolicyTemplates(schema, table)}
+            templates={getGeneralPolicyTemplates(schema, table).filter((policy) => !policy.preview)}
             templatesNote="* References a specific column in the table"
             onUseTemplate={onUseTemplate}
           />
@@ -233,9 +229,7 @@ const PolicyEditorModal = ({
             onSelectBack={onViewEditor}
             onSelectSave={onReviewSave}
           />
-        ) : (
-          <div />
-        )}
+        ) : null}
       </div>
     </Modal>
   )

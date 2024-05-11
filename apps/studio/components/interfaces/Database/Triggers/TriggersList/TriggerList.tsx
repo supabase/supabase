@@ -67,7 +67,7 @@ const TriggerList = ({
   if (_triggers.length === 0 && filterString.length > 0) {
     return (
       <Table.tr key={schema}>
-        <Table.td colSpan={5}>
+        <Table.td colSpan={6}>
           <p className="text-sm text-foreground">No results found</p>
           <p className="text-sm text-foreground-light">
             Your search for "{filterString}" did not return any results
@@ -100,7 +100,7 @@ const TriggerList = ({
           </Table.td>
 
           <Table.td className="hidden xl:table-cell">
-            <div className="flex space-x-2">
+            <div className="flex gap-2 flex-wrap">
               {x.events.map((event: string) => (
                 <Badge key={event}>{`${x.activation} ${event}`}</Badge>
               ))}

@@ -11,8 +11,8 @@ import {
   SidePanel,
 } from 'ui'
 
-import { PostgresTable } from '@supabase/postgres-meta'
-import { SpreadsheetData } from './SpreadsheetImport.types'
+import type { PostgresTable } from '@supabase/postgres-meta'
+import type { SpreadsheetData } from './SpreadsheetImport.types'
 import SpreadsheetPreviewGrid from './SpreadsheetPreviewGrid'
 
 const MAX_ROWS = 20
@@ -63,8 +63,8 @@ const SpreadsheetImportPreview = ({
           <div className="py-1 flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <p className="text-sm">Preview data to be imported</p>
-              {!isCompatible && <Badge color="red">Data incompatible</Badge>}
-              {errors.length > 0 && <Badge color="yellow">{errors.length} issues found</Badge>}
+              {!isCompatible && <Badge variant="destructive">Data incompatible</Badge>}
+              {errors.length > 0 && <Badge variant="warning">{errors.length} issues found</Badge>}
             </div>
             <Button
               type="text"
@@ -107,8 +107,8 @@ const SpreadsheetImportPreview = ({
                   {previewHeaders.length === 0
                     ? 'No headers have been selected'
                     : previewRows.length === 0
-                    ? 'Your CSV contains no data'
-                    : ''}
+                      ? 'Your CSV contains no data'
+                      : ''}
                 </p>
               </div>
             )}

@@ -1,0 +1,155 @@
+---
+id: 'unit-test'
+title: 'Testing your Edge Functions'
+description: 'Writing Unit Tests for Edge Functions using Deno Test'
+subtitle: 'Writing Unit Tests for Edge Functions using Deno Test'
+---
+
+Testing is an essential step in the development process to ensure the correctness and performance of your Edge Functions.
+
+## Testing in Deno
+
+Deno has a built-in test runner that you can use for testing JavaScript or TypeScript code. You can read the [official documentation](https://docs.deno.com/runtime/manual/basics/testing/) for more information and details about the available testing functions.
+
+## Folder structure
+
+We recommend creating your testing in a `supabase/tests` directory, using the same name as the Function followed by `-test.ts`:
+
+```bash
+└── supabase
+    ├── functions
+    │   ├── function-one
+    │   │   └── index.ts
+    │   └── function-two
+    │   │   └── index.ts
+    │   └── tests
+    │       └── function-one-test.ts  # Tests for function-one
+    │       └── function-two-test.ts  # Tests for function-two
+    └── config.toml
+```
+
+## Example script
+
+The following script is a good example to get started with testing your Edge Functions:
+
+```typescript function-one-test.ts
+// Import required libraries and modules
+import {
+  assert,
+  assertExists,
+  assertEquals,
+} from 'https://deno.land/std@0.192.0/testing/asserts.ts'
+import { createClient, SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.23.0'
+import { delay } from 'https://deno.land/x/delay@v0.2.0/mod.ts'
+
+// Set up the configuration for the Supabase client
+const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
+const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+const options = {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+    detectSessionInUrl: false,
+  },
+}
+
+// Test the creation and functionality of the Supabase client
+const testClientCreation = async () => {
+  var client: SupabaseClient = createClient(supabaseUrl, supabaseKey, options)
+
+  // Verify if the Supabase URL and key are provided
+  if (!supabaseUrl) throw new Error('supabaseUrl is required.')
+  if (!supabaseKey) throw new Error('supabaseKey is required.')
+
+  // Test a simple query to the database
+  const { data: table_data, error: table_error } = await client
+    .from('my_table')
+    .select('*')
+    .limit(1)
+  if (table_error) {
+    throw new Error('Invalid Supabase client: ' + table_error.message)
+  }
+  assert(table_data, 'Data should be returned from the query.')
+}
+
+// Test the 'hello-world' function
+const testHelloWorld = async () => {
+  var client: SupabaseClient = createClient(supabaseUrl, supabaseKey, options)
+
+  // Invoke the 'hello-world' function with a parameter
+  const { data: func_data, error: func_error } = await client.functions.invoke('hello-world', {
+    body: { name: 'bar' },
+  })
+
+  // Check for errors from the function invocation
+  if (func_error) {
+    throw new Error('Invalid response: ' + func_error.message)
+  }
+
+  // Log the response from the function
+  console.log(JSON.stringify(func_data, null, 2))
+
+  // Assert that the function returned the expected result
+  assertEquals(func_data.message, 'Hello bar!')
+}
+
+// Register and run the tests
+Deno.test('Client Creation Test', testClientCreation)
+Deno.test('Hello-world Function Test', testHelloWorld)
+```
+
+This test case consists of two parts. The first part tests the client library and verifies that the database can be connected to and returns values from a table (`my_table`). The second part tests the edge function and checks if the received value matches the expected value. Here's a brief overview of the code:
+
+- We import various testing functions from the Deno standard library, including `assert`, `assertExists`, and `assertEquals`.
+- We import the `createClient` and `SupabaseClient` classes from the `@supabase/supabase-js` library to interact with the Supabase client.
+- We define the necessary configuration for the Supabase client, including the Supabase URL, API key, and authentication options.
+- The `testClientCreation` function tests the creation of a Supabase client instance and queries the database for data from a table. It verifies that data is returned from the query.
+- The `testHelloWorld` function tests the "Hello-world" Edge Function by invoking it using the Supabase client's `functions.invoke` method. It checks if the response message matches the expected greeting.
+- We run the tests using the `Deno.test` function, providing a descriptive name for each test case and the corresponding test function.
+
+<Admonition type="important">
+
+Please make sure to replace the placeholders (`supabaseUrl`, `supabaseKey`, `my_table`) with the actual values relevant to your Supabase setup.
+
+</Admonition>
+
+## Running Edge Functions locally
+
+To locally test and debug Edge Functions, you can utilize the Supabase CLI. Let's explore how to run Edge Functions locally using the Supabase CLI:
+
+1. Ensure that the Supabase server is running by executing the following command:
+
+   ```bash
+   supabase start
+   ```
+
+2. In your terminal, use the following command to serve the Edge Functions locally:
+
+   ```bash
+   supabase functions serve
+   ```
+
+   This command starts a local server that runs your Edge Functions, enabling you to test and debug them in a development environment.
+
+3. Create the environment variables file:
+
+   ```bash
+   # creates the file
+   touch .env.local
+   # adds the SUPABASE_URL secret
+   echo "SUPABASE_URL=http://localhost:54321" >> .env.local
+   # adds the SUPABASE_ANON_KEY secret
+   echo "SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0" >> .env.local
+   # Alternatively, you can open it in your editor:
+   open .env.local
+   ```
+
+4. To run the tests, use the following command in your terminal:
+
+   ```bash
+   deno test --allow-all supabase/functions/function-one-test.ts --env-file .env.local
+   ```
+
+## Resources
+
+- Full guide on Testing Supabase Edge Functions on [Mansueli's tips](https://blog.mansueli.com/testing-supabase-edge-functions-with-deno-test)

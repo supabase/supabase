@@ -32,7 +32,7 @@ const PolicyEditor = ({
   const selectedRoles = (policyFormFields?.roles ?? []).filter((role: string) => role !== 'public')
 
   return (
-    <div className="">
+    <div>
       <div className="space-y-8 py-8">
         <Modal.Content>
           <PolicyName

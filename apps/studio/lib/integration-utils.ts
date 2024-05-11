@@ -1,5 +1,5 @@
-import { Integration } from 'data/integrations/integrations.types'
-import { SupaResponse } from 'types'
+import type { Integration } from 'data/integrations/integrations.types'
+import type { SupaResponse } from 'types'
 import { isResponseOk } from './common/fetch'
 
 async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponse<T>> {
@@ -128,7 +128,7 @@ export function getIntegrationConfigurationUrl(integration: Integration) {
   return ''
 }
 
-export function getVercelConfigurationUrl(integration: VercelIntegration) {
+function getVercelConfigurationUrl(integration: VercelIntegration) {
   return `https://vercel.com/dashboard/${
     integration.metadata?.account.type === 'Team'
       ? `${integration.metadata?.account.team_slug}/`
@@ -136,7 +136,7 @@ export function getVercelConfigurationUrl(integration: VercelIntegration) {
   }integrations/${integration.metadata?.configuration_id}`
 }
 
-export function getGitHubConfigurationUrl(integration: GitHubIntegration) {
+function getGitHubConfigurationUrl(integration: GitHubIntegration) {
   return `https://github.com/${
     integration.metadata?.account.type === 'Organization'
       ? `organizations/${integration.metadata?.account.name}/`

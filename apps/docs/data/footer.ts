@@ -1,4 +1,5 @@
-import { IconCheckCircle, IconLifeBuoy, PrivacySettings } from 'ui'
+import { IconCheckCircle, IconLifeBuoy } from 'ui'
+import { PrivacySettings } from 'ui-patterns/PrivacySettings'
 
 export const primaryLinks = [
   {
@@ -22,10 +23,13 @@ export const primaryLinks = [
 ]
 
 export const secondaryLinks = [
-  { title: 'Contributing', url: '/handbook/contributing' },
+  {
+    title: 'Contributing',
+    url: 'https://github.com/supabase/supabase/blob/master/apps/docs/DEVELOPERS.md',
+  },
   {
     title: 'Author Styleguide',
-    url: 'https://github.com/supabase/supabase/blob/master/DEVELOPERS.md',
+    url: 'https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md',
   },
   { title: 'Open Source', url: 'https://supabase.com/open-source' },
   { title: 'SupaSquad', url: 'https://supabase.com/supasquad' },

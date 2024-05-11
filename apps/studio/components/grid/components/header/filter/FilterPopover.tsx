@@ -5,7 +5,7 @@ import { KeyboardEvent, useCallback, useMemo, useState } from 'react'
 import { Button, IconFilter, IconPlus, Popover } from 'ui'
 
 import { formatFilterURLParams } from 'components/grid/SupabaseGrid.utils'
-import { Filter, SupaTable } from 'components/grid/types'
+import type { Filter, SupaTable } from 'components/grid/types'
 import { FilterOperatorOptions } from './Filter.constants'
 import FilterRow from './FilterRow'
 

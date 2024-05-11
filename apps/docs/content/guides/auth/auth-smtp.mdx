@@ -1,0 +1,38 @@
+---
+id: 'auth-smtp'
+title: 'Configure a Custom SMTP'
+description: 'Moving towards production: Configuring a custom SMTP provider'
+---
+
+## Auth SMTP
+
+At present, you can trial the Supabase platform by sending up to **3** emails per hour via the built-in service. The default email service as a whole is offered on a best effort basis: we will do our best to maintain it and will review usage of the service on a regular basis to see if the email service should be continued.
+
+As you progress toward production, you may find yourself wanting for a custom SMTP service in order to increase your limits. A custom SMTP server will allow you to set your own cap on the number of emails sent per hour.
+
+Beyond rate limits, an SMTP server might also help with:
+
+- Deliverability and Reputation Management
+- Scalability
+- Analytics and Tracking
+- Compliance and Anti Spam measures
+
+## How to set up SMTP
+
+Head over to [Auth Settings Page](https://supabase.com/dashboard/project/_/settings/auth) and hit "Enable Custom SMTP" under the SMTP Provider section.
+
+Fill in fields below with the relevant details obtained from your custom SMTP provider:
+
+![SMTP settings](/docs/img/guides/auth-smtp/smtp.png)
+
+## How to update email rate limits
+
+After adding a custom SMTP provider, you can head over to [Auth > Rate Limits](https://supabase.com/dashboard/project/_/auth/rate-limits) to configure the rate limits for sending emails.
+
+### SMTP providers
+
+You can use Supabase Auth with any major SMTP provider of your choosing. Some SMTP providers you could consider using are:
+
+- [Twilio SendGrid](https://docs.sendgrid.com/for-developers/sending-email/integrating-with-the-smtp-api)
+- [AWS SES](https://docs.aws.amazon.com/ses/latest/dg/send-email-smtp.html)
+- [Resend](https://resend.com/docs/dashboard/emails/introduction)

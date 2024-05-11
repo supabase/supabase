@@ -8,7 +8,7 @@ import SectionContainer from '~/components/Layouts/SectionContainer'
 import BecomeAPartner from '~/components/Partners/BecomeAPartner'
 import PartnerLinkBox from '~/components/Partners/PartnerLinkBox'
 import supabase from '~/lib/supabaseMisc'
-import { Partner } from '~/types/partners'
+import type { Partner } from '~/types/partners'
 import TileGrid from '../../../components/Partners/TileGrid'
 
 export async function getStaticProps() {
@@ -25,7 +25,7 @@ export async function getStaticProps() {
       partners,
     },
     // TODO: consider using Next.js' On-demand Revalidation with Supabase Database Webhooks instead
-    revalidate: 18000, // In seconds - refresh every 5 hours
+    revalidate: 1800, // 30 minutes
   }
 }
 

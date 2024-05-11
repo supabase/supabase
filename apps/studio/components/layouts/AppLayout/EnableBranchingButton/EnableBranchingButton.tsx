@@ -1,10 +1,14 @@
-import { Button, IconGitBranch } from 'ui'
+import {
+  Button,
+  IconGitBranch,
+  TooltipContent_Shadcn_,
+  TooltipTrigger_Shadcn_,
+  Tooltip_Shadcn_,
+} from 'ui'
 
-import { useSelectedOrganization } from 'hooks'
-import BranchingWaitlistPopover from './BranchingWaitlistPopover'
-
-import { OPT_IN_TAGS } from 'lib/constants'
+import { useFlag, useSelectedProject } from 'hooks'
 import { useAppStateSnapshot } from 'state/app-state'
+import BranchingWaitListPopover from './BranchingWaitListPopover'
 
 interface EnableBranchingButtonProps {
   isNewNav?: boolean
@@ -12,23 +16,32 @@ interface EnableBranchingButtonProps {
 
 const EnableBranchingButton = ({ isNewNav = false }: EnableBranchingButtonProps) => {
   const snap = useAppStateSnapshot()
-  const selectedOrg = useSelectedOrganization()
+  const project = useSelectedProject()
 
-  const hasAccessToBranching =
-    selectedOrg?.opt_in_tags?.includes(OPT_IN_TAGS.PREVIEW_BRANCHES) ?? false
+  const hasAccessToBranching = useFlag<boolean>('branchManagement')
 
   if (!hasAccessToBranching) {
-    return <BranchingWaitlistPopover isNewNav={isNewNav} />
+    return <BranchingWaitListPopover isNewNav={isNewNav} />
   }
 
   return (
-    <Button
-      type={isNewNav ? 'default' : 'text'}
-      icon={<IconGitBranch strokeWidth={1.5} />}
-      onClick={() => snap.setShowEnableBranchingModal(true)}
-    >
-      Enable branching
-    </Button>
+    <Tooltip_Shadcn_>
+      <TooltipTrigger_Shadcn_ asChild>
+        <Button
+          type={isNewNav ? 'default' : 'text'}
+          icon={<IconGitBranch strokeWidth={1.5} />}
+          disabled={project?.status !== 'ACTIVE_HEALTHY'}
+          onClick={() => snap.setShowEnableBranchingModal(true)}
+        >
+          Enable branching
+        </Button>
+      </TooltipTrigger_Shadcn_>
+      {project?.status !== 'ACTIVE_HEALTHY' && (
+        <TooltipContent_Shadcn_ side="bottom">
+          Unpause your project to enable branching
+        </TooltipContent_Shadcn_>
+      )}
+    </Tooltip_Shadcn_>
   )
 }
 

@@ -1,0 +1,167 @@
+---
+title: 'pgvector 0.6.0: 30x faster with parallel index builds'
+description: 'pgvector 0.6.0 brings a significant improvement: parallel index builds for HNSW. Building an HNSW index is now up to 30x faster for unlogged tables.'
+author: egor_romanov
+image: 2024-01-30-pgvector-fast-builds/pgvector6.png
+thumb: 2024-01-30-pgvector-fast-builds/pgvector6.png
+categories:
+  - engineering
+tags:
+  - AI
+  - performance
+  - postgres
+date: '2024-01-30'
+toc_depth: 3
+---
+
+pgvector 0.6.0 was released today, with a significant improvement: parallel builds for HNSW indexes. Building an HNSW index is now up to 30x faster for unlogged tables.
+
+This release is a huge step forward for pgvector, making it easier to tune HNSW build parameters and increase search accuracy and performance.
+
+## HNSW indexes in pgvector
+
+We explored [how HNSW works](https://supabase.com/blog/increase-performance-pgvector-hnsw#how-does-hnsw-work) in an earlier post, so as a quick recap: HNSW is an algorithm for approximate nearest neighbor search. It uses proximity graphs and consists of two parts: hierarchical and navigatable small world. It operates over multiple layers with different densities or distances between nodes, where layers represent different connection lengths between nodes. Thus allowing HNSW to search, insert, and delete in linearithmic time.
+
+## pgvector parallel index builds
+
+Prior to 0.6.0, pgvector only supported building indexes using a single thread - a big bottleneck for large datasets. For example, building an index for 1 million vectors of 1536 dimensions would take around 1 hour and 27 minutes (with `'m'=16, 'ef_construction'=200`).
+
+With parallel index builds you can build an index for the same dataset in 9.5 minutes - 9 times faster:
+
+<div>
+  <Img
+    alt="pgvector 0.6.0 vs 0.5.1 performance comparison with 9x faster build time"
+    src={{
+      light: '/images/blog/2024-01-30-pgvector-fast-builds/fastbuilds-comparison--light.png',
+      dark: '/images/blog/2024-01-30-pgvector-fast-builds/fastbuilds-comparison--dark.png',
+    }}
+  />
+</div>
+
+## Performance comparison: pgvector 0.5 vs 0.6
+
+We tested index build time with the [dbpedia-entities-openai-1M](https://huggingface.co/datasets/KShivendu/dbpedia-entities-openai-1M) dataset (1 million vectors, 1536 dimensions) to compare the performance of parallel and single-threaded index HNSW builds. At the same time, we verified that the resulting indexes are the same in terms of accuracy and queries per second (QPS).
+
+We ran benchmarks on various database sizes to see the impact of parallel builds:
+
+- 4XL instance (16 cores 64GB RAM)
+- 16XL instance (64 cores 256GB RAM)
+
+### 4XL instance (16 cores 64GB RAM)
+
+This benchmark used the following parameters:
+
+|                                  | 0.5.1 | 0.6.0 |
+| -------------------------------- | ----- | ----- |
+| mainenance_work_mem              | 30GB  | 30GB  |
+| max_parallel_maintenance_workers | -     | 15    |
+
+`max_parallel_maintenance_workers` controls how many parallel threads are used to build an index. In further sections we will refer to the total number of workers, including the leader.
+
+<BlogCollapsible title="Results">
+
+    {/* prettier-ignore */}
+    ```markdown
+    | Parameters                         | ef_search | Build time         | QPS  | Accuracy | Build time         | QPS  | Accuracy |
+    | ---------------------------------- | --------- | ------------------ | ---- | -------- | ------------------ | ---- | -------- |
+    |                                    |           | **pgvector 0.5.1** |      |          | **pgvector 0.6.0** |      |          |
+    | m=16, ef_construction=64 (default) | 40        | 38m 46s            | 1186 | 0.915    | 5m 25s             | 1190 | 0.912    |
+    | m=16, ef_construction=64 (default) | 100       | 38m 46s            | 960  | 0.957    | 5m 25s             | 977  | 0.957    |
+    | m=16, ef_construction=64 (default) | 200       | 38m 46s            | 804  | 0.974    | 5m 25s             | 802  | 0.974    |
+    | m=24, ef_construction=100          | 40        | 1h 8m 43s          | 1091 | 0.950    | 8m 33s             | 1097 | 0.951    |
+    | m=24, ef_construction=100          | 100       | 1h 8m 43s          | 877  | 0.978    | 8m 33s             | 901  | 0.978    |
+    | m=24, ef_construction=100          | 200       | 1h 8m 43s          | 697  | 0.988    | 8m 33s             | 712  | 0.988    |
+    | m=16, ef_construction=200          | 40        | 1h 27m 30s         | 1144 | 0.939    | 9m 28s             | 1163 | 0.940    |
+    | m=16, ef_construction=200          | 100       | 1h 27m 30s         | 924  | 0.977    | 9m 28s             | 940  | 0.977    |
+    | m=16, ef_construction=200          | 200       | 1h 27m 30s         | 760  | 0.988    | 9m 28s             | 764  | 0.988    |
+    ```
+
+</BlogCollapsible>
+
+<div>
+  <Img
+    alt="pgvector 0.6.0 vs 0.5.1 performance comparison with different build parameters"
+    src={{
+      light: '/images/blog/2024-01-30-pgvector-fast-builds/build-params--light.png',
+      dark: '/images/blog/2024-01-30-pgvector-fast-builds/build-params--dark.png',
+    }}
+  />
+</div>
+
+The index build time is 7-9 times faster for 0.6.0, while queries per second and accuracy stay the same for both versions:
+
+- `v0.5.1`: averaged 938 QPS and 0.963 accuracy across all benchmarks.
+- `v0.6.0`: averaged 950 QPS and 0.963 accuracy across all benchmarks.
+
+### 16XL instance (64 cores 256GB RAM)
+
+You can further improve index build performance using a more powerful instance (up to 13.5x for these parameters).
+
+<BlogCollapsible title="Results">
+
+    {/* prettier-ignore */}
+    ```markdown
+    | Parameters                          | Workers | Index build time | ef_search | QPS  | Accuracy |
+    | ----------------------------------- | ------- | ---------------- | --------- | ---- | -------- |
+    | m=16, ef_construction=64 (defaults) | 64      | 5m 07s           | 100       | 2086 | 0.956    |
+    | m=16, ef_construction=64 (defaults) | 32      | 4m 27s           | 100       | 2082 | 0.958    |
+    | m=16, ef_construction=64 (defaults) | 16      | 5m 13s           | 100       | 2085 | 0.956    |
+    | m=16, ef_construction=64 (defaults) | 8       | 7m 18s           | 100       | 2092 | 0.956    |
+    | m=16, ef_construction=64 (defaults) | 1       | 17m 29s          | 100       | 2091 | 0.958    |
+    | m=24, ef_construction=100           | 64      | 5m 37s           | 100       | 1820 | 0.977    |
+    | m=24, ef_construction=100           | 32      | 5m 52s           | 100       | 1818 | 0.976    |
+    | m=24, ef_construction=100           | 16      | 8m 01s           | 100       | 1806 | 0.978    |
+    | m=24, ef_construction=100           | 8       | 11m 10s          | 100       | 1821 | 0.977    |
+    | m=24, ef_construction=100           | 1       | 31m 32s          | 100       | 1838 | 0.977    |
+    | m=16, ef_construction=200           | 64      | 6m 28s           | 100       | 1952 | 0.977    |
+    | m=16, ef_construction=200           | 32      | 7m 27s           | 100       | 1944 | 0.976    |
+    | m=16, ef_construction=200           | 16      | 12m 44s          | 100       | 1950 | 0.977    |
+    | m=16, ef_construction=200           | 8       | 12m 55s          | 100       | 1957 | 0.977    |
+    | m=16, ef_construction=200           | 1       | 39m 40s          | 100       | 1968 | 0.977    |
+    ```
+
+</BlogCollapsible>
+
+<div>
+  <Img
+    alt="pgvector 0.6.0 build times with different workers count"
+    src={{
+      light: '/images/blog/2024-01-30-pgvector-fast-builds/workers--light.png',
+      dark: '/images/blog/2024-01-30-pgvector-fast-builds/workers--dark.png',
+    }}
+  />
+</div>
+
+The index build time is not linearly proportional to the number of cores used. A sensible default for `max_parallel_maintenance_workers` is `CPU count / 2` , the default we set on the Supabase platform. Accuracy and QPS are not affected by `max_parallel_maintenance_workers`.
+
+<Admonition type="note" label="Pro tip: optimizing your bills">
+
+The trick is to use a large database while you build the index and then switch back to a cheaper instance after the index is built.
+
+</Admonition>
+
+### Embeddings with unlogged tables
+
+Building time can be reduced _even further_ using unlogged tables.
+
+An unlogged table in Postgres is a table whose modifications are not recorded in the write-ahead log (trading performance for data reliability). Unlogged tables are a great option for embeddings because the raw data is often stored separately and the embeddings can be recreated from the source data at any time.
+
+One of the steps of index creation is the final scan and WAL writing. This is generally short but not parallelizable. Using unlogged tables allows you to skip the WAL, with an impressive impact:
+
+| ef_construction | Build time: v0.5.1 | Build time: v0.6.0 (unlogged) | Improvement |
+| --------------- | ------------------ | ----------------------------- | ----------- |
+| 64              | 38m 08s            | 1m 38s                        | 23x         |
+| 100             | 1h 06m 59s         | 2m 10s                        | 31x         |
+| 200             | 1h 27m 45s         | 3m 37s                        | 24x         |
+
+## Getting started
+
+pgvector 0.6.0 was [just released](https://github.com/pgvector/pgvector/releases/tag/v0.6.0) and will be available on Supabase projects soon. Again, a special shout out to Andrew Kane and everyone else who [worked on parallel index builds](https://github.com/pgvector/pgvector/issues/409).
+
+## More pgvector and AI resources
+
+- [pgvector v0.5.0: Faster semantic search with HNSW indexes](https://supabase.com/blog/increase-performance-pgvector-hnsw)
+- [How to build ChatGPT Plugin from scratch with Supabase Edge Runtime](https://supabase.com/blog/building-chatgpt-plugins-template)
+- [Docs pgvector: Embeddings and vector similarity](https://supabase.com/docs/guides/database/extensions/pgvector)
+- [Choosing Compute Add-on for AI workloads](https://supabase.com/docs/guides/ai/choosing-compute-addon)
+- [pgvector: Fewer dimensions are better](https://supabase.com/blog/fewer-dimensions-are-better-pgvector)

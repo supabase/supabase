@@ -1,6 +1,6 @@
-import { PropsWithChildren } from 'react'
-import { RenderCellProps } from 'react-data-grid'
-import { SupaRow } from '../../types'
+import type { PropsWithChildren } from 'react'
+import type { RenderCellProps } from 'react-data-grid'
+import type { SupaRow } from '../../types'
 import { NullValue } from '../common'
 
 export const BooleanFormatter = (p: PropsWithChildren<RenderCellProps<SupaRow, unknown>>) => {

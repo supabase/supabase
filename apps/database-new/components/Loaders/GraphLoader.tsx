@@ -1,8 +1,6 @@
 import { Loader2 } from 'lucide-react'
-// output numbers from 1-6 in a span tag
-// const numbers = Array.from({ length: 6 }, (_, i) => i + 1)
 
-const GraphLoader = async () => {
+const GraphLoader = () => {
   return (
     <div className="h-full w-full text-muted justify-start border-l">
       <div className="flex gap-4">

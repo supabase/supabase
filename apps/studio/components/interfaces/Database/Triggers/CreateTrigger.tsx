@@ -1,26 +1,9 @@
-import { PostgresFunction } from '@supabase/postgres-meta'
 import { has, isEmpty, mapValues, union, without } from 'lodash'
 import { makeAutoObservable } from 'mobx'
 import { observer, useLocalObservable } from 'mobx-react-lite'
 import { createContext, useContext, useEffect, useState } from 'react'
 import toast from 'react-hot-toast'
 import SVG from 'react-inlinesvg'
-
-import { Dictionary } from 'types'
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import ConfirmationModal from 'components/ui/ConfirmationModal'
-import FormEmptyBox from 'components/ui/FormBoxEmpty'
-import NoTableState from 'components/ui/States/NoTableState'
-import {
-  DatabaseFunction,
-  useDatabaseFunctionsQuery,
-} from 'data/database-functions/database-functions-query'
-import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
-import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
-import { useTablesQuery } from 'data/tables/tables-query'
-import { useStore } from 'hooks'
-import { BASE_PATH } from 'lib/constants'
-import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
 import {
   Badge,
   Button,
@@ -33,6 +16,21 @@ import {
   Modal,
   SidePanel,
 } from 'ui'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+
+import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
+import FormEmptyBox from 'components/ui/FormBoxEmpty'
+import NoTableState from 'components/ui/States/NoTableState'
+import {
+  DatabaseFunction,
+  useDatabaseFunctionsQuery,
+} from 'data/database-functions/database-functions-query'
+import { useDatabaseTriggerCreateMutation } from 'data/database-triggers/database-trigger-create-mutation'
+import { useDatabaseTriggerUpdateMutation } from 'data/database-triggers/database-trigger-update-mutation'
+import { useTablesQuery } from 'data/tables/tables-query'
+import { BASE_PATH } from 'lib/constants'
+import { EXCLUDED_SCHEMAS } from 'lib/constants/schemas'
+import type { Dictionary } from 'types'
 import ChooseFunctionForm from './ChooseFunctionForm'
 
 class CreateTriggerFormState {
@@ -238,7 +236,6 @@ interface CreateTriggerProps {
 
 const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => {
   const { project } = useProjectContext()
-  const { ui, meta } = useStore()
   const [isClosingPanel, setIsClosingPanel] = useState(false)
   const _localState = useLocalObservable(() => new CreateTriggerStore())
 
@@ -348,7 +345,7 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
         onConfirm={handleSubmit}
       >
         {hasPublicTables ? (
-          <div className="">
+          <div>
             <CreateTriggerContext.Provider value={_localState}>
               <div className="my-6 space-y-10">
                 {_localState.isEditing ? (
@@ -386,20 +383,18 @@ const CreateTrigger = ({ trigger, visible, setVisible }: CreateTriggerProps) => 
             </CreateTriggerContext.Provider>
             <ConfirmationModal
               visible={isClosingPanel}
-              header="Discard changes"
-              buttonLabel="Discard"
-              onSelectCancel={() => setIsClosingPanel(false)}
-              onSelectConfirm={() => {
+              title="Discard changes"
+              confirmLabel="Discard"
+              onCancel={() => setIsClosingPanel(false)}
+              onConfirm={() => {
                 setIsClosingPanel(false)
                 setVisible(!visible)
               }}
             >
-              <Modal.Content>
-                <p className="py-4 text-sm text-foreground-light">
-                  There are unsaved changes. Are you sure you want to close the panel? Your changes
-                  will be lost.
-                </p>
-              </Modal.Content>
+              <p className="text-sm text-foreground-light">
+                There are unsaved changes. Are you sure you want to close the panel? Your changes
+                will be lost.
+              </p>
             </ConfirmationModal>
           </div>
         ) : (
@@ -461,7 +456,7 @@ const SelectEnabledMode = observer(({}) => {
         label="Origin"
       >
         Origin
-        <span className="block text-foreground-lighter">This is a default behaviour</span>
+        <span className="block text-foreground-lighter">This is a default behavior</span>
       </Listbox.Option>
       <Listbox.Option
         addOnBefore={({ active, selected }: any) => {

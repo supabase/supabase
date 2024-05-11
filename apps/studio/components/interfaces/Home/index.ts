@@ -1,5 +1,3 @@
-import ClientLibrary from './ClientLibrary'
-import ExampleProject from './ExampleProject'
-import NewProjectPanel from './NewProjectPanel/NewProjectPanel'
-
-export { ClientLibrary, ExampleProject, NewProjectPanel }
+export { default as ClientLibrary } from './ClientLibrary'
+export { default as ExampleProject } from './ExampleProject'
+export { default as NewProjectPanel } from './NewProjectPanel/NewProjectPanel'

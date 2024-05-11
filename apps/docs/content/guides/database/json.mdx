@@ -1,0 +1,394 @@
+---
+id: 'json'
+title: 'Managing JSON and unstructured data'
+description: 'Using the JSON data type in Postgres.'
+subtitle: 'Using the JSON data type in Postgres.'
+---
+
+Postgres supports storing and querying unstructured data.
+
+## JSON vs JSONB
+
+Postgres supports two types of JSON columns: `json` (stored as a string) and `jsonb` (stored as a binary). The recommended type is `jsonb` for almost all cases.
+
+- `json` stores an exact copy of the input text. Database functions must reparse the content on each execution.
+- `jsonb` stores database in a decomposed binary format. While this makes it slightly slower to input due to added conversion overhead, it is significantly faster to process, since no reparsing is needed.
+
+## When to use JSON/JSONB
+
+Generally you should use a `jsonb` column when you have data that is unstructured or has a variable schema. For example, if you wanted to store responses for various webhooks, you might not know the format of the response when creating the table. Instead, you could store the `payload` as a `jsonb` object in a single column.
+
+Don't go overboard with `json/jsonb` columns. They are a useful tool, but most of the benefits of a relational database come from the ability to query and join structured data, and the referential integrity that brings.
+
+## Create JSONB columns
+
+`json/jsonb` is just another "data type" for Postgres columns. You can create a `jsonb` column in the same way you would create a `text` or `int` column:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="database-method"
+>
+<TabPanel id="sql" label="SQL">
+
+```sql
+create table books (
+  id serial primary key,
+  title text,
+  author text,
+  metadata jsonb
+);
+```
+
+</TabPanel>
+<TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [Table Editor](https://supabase.com/dashboard/project/_/editor) page in the Dashboard.
+2. Click **New Table** and create a table called `books`.
+3. Include a primary key with the following properties and click save:
+
+- Name: `id`
+  - Type: `int8`
+  - Default value: `Automatically generate as indentity`
+- **title** column
+  - Name: `title`
+  - Type: `text`
+- **author** column
+  - Name: `author`
+  - Type: `text`
+- **metadata** column
+  - Name: `metadata`
+  - Type: `jsonb`
+
+</TabPanel>
+</Tabs>
+
+## Inserting JSON data
+
+You can insert JSON data in the same way that you insert any other data. The data must be valid JSON.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="database-method"
+>
+<TabPanel id="sql" label="SQL">
+
+```sql
+insert into books
+  (title, author, metadata)
+values
+  (
+    'The Poky Little Puppy',
+    'Janette Sebring Lowrey',
+    '{"description":"Puppy is slower than other, bigger animals.","price":5.95,"ages":[3,6]}'
+  ),
+  (
+    'The Tale of Peter Rabbit',
+    'Beatrix Potter',
+    '{"description":"Rabbit eats some vegetables.","price":4.49,"ages":[2,5]}'
+  ),
+  (
+    'Tootle',
+    'Gertrude Crampton',
+    '{"description":"Little toy train has big dreams.","price":3.99,"ages":[2,5]}'
+  ),
+  (
+    'Green Eggs and Ham',
+    'Dr. Seuss',
+    '{"description":"Sam has changing food preferences and eats unusually colored food.","price":7.49,"ages":[4,8]}'
+  ),
+  (
+    'Harry Potter and the Goblet of Fire',
+    'J.K. Rowling',
+    '{"description":"Fourth year of school starts, big drama ensues.","price":24.95,"ages":[10,99]}'
+  );
+```
+
+</TabPanel>
+<TabPanel id="dashboard" label="Dashboard">
+
+1. Go to the [Table Editor](https://supabase.com/dashboard/project/_/editor) page in the Dashboard.
+2. Select the `books` table in the sidebar.
+3. Click **+ Insert row** and add 5 rows with the following properties:
+
+| id  | title                               | author                 | metadata                                                                                                              |
+| --- | ----------------------------------- | ---------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| 1   | The Poky Little Puppy               | Janette Sebring Lowrey | `json {"ages":[3,6],"price":5.95,"description":"Puppy is slower than other, bigger animals."}`                        |
+| 2   | The Tale of Peter Rabbit            | Beatrix Potter         | `json {"ages":[2,5],"price":4.49,"description":"Rabbit eats some vegetables."}`                                       |
+| 3   | Tootle                              | Gertrude Crampton      | `json {"ages":[2,5],"price":3.99,"description":"Little toy train has big dreams."}`                                   |
+| 4   | Green Eggs and Ham                  | Dr. Seuss              | `json {"ages":[4,8],"price":7.49,"description":"Sam has changing food preferences and eats unusually colored food."}` |
+| 5   | Harry Potter and the Goblet of Fire | J.K. Rowling           | `json {"ages":[10,99],"price":24.95,"description":"Fourth year of school starts, big drama ensues."}`                 |
+
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.from('books').insert([
+  {
+    title: 'The Poky Little Puppy',
+    author: 'Janette Sebring Lowrey',
+    metadata: {
+      description: 'Puppy is slower than other, bigger animals.',
+      price: 5.95,
+      ages: [3, 6],
+    },
+  },
+  {
+    title: 'The Tale of Peter Rabbit',
+    author: 'Beatrix Potter',
+    metadata: {
+      description: 'Rabbit eats some vegetables.',
+      price: 4.49,
+      ages: [2, 5],
+    },
+  },
+  {
+    title: 'Tootle',
+    author: 'Gertrude Crampton',
+    metadata: {
+      description: 'Little toy train has big dreams.',
+      price: 3.99,
+      ages: [2, 5],
+    },
+  },
+  {
+    title: 'Green Eggs and Ham',
+    author: 'Dr. Seuss',
+    metadata: {
+      description: 'Sam has changing food preferences and eats unusually colored food.',
+      price: 7.49,
+      ages: [4, 8],
+    },
+  },
+  {
+    title: 'Harry Potter and the Goblet of Fire',
+    author: 'J.K. Rowling',
+    metadata: {
+      description: 'Fourth year of school starts, big drama ensues.',
+      price: 24.95,
+      ages: [10, 99],
+    },
+  },
+])
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+Supabase Swift provides a convenience `AnyJSON` type.
+
+```swift
+struct Book {
+    val title: String,
+    val author: String,
+    val metadata: [String: AnyJSON]
+}
+
+try await supabase.from("books")
+  .insert(
+    [
+      Book(
+        title: "The Poky Little Puppy",
+        author: "Janette Sebring Lowrey",
+        metadata: [
+          "description": "Puppy is slower than other, bigger animals.",
+          "price": 5.95,
+          "ages": [3, 6]
+        ]
+      ),
+      Book(
+        title: "Tale of Peter Rabbit",
+        author: "Beatrix Potter",
+        metadata: [
+          "description": "Rabbit eats some vegetables.",
+          "price": 4.49,
+          "ages": [2, 5]
+        ]
+      ),
+      Book(
+        title: "Tootle",
+        author: "Gertrude Crampton",
+        metadata: [
+          "description": "Little toy train has big dreams.",
+          "price": 3.99,
+          "ages": [2, 5]
+        ]
+      ),
+      Book(
+        title: "Green Eggs and Ham",
+        author: "Dr. Seuss",
+        metadata: [
+          "description": "Sam has changing food preferences and eats unusually colored food.",
+          "price": 7.49,
+          "ages": [4, 8]
+        ]
+      ),
+      Book(
+        title: "Harry Potter and the Goblet of Fire",
+        author: "J.K. Rowling",
+        metadata: [
+          "description": "Fourth year of school starts, big drama ensues.",
+          "price": 24.95,
+          "ages": [10, 99]
+        ]
+      )
+    ]
+  )
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+@Serializable
+data class BookMetadata(
+    val description: String,
+    val price: Double,
+    val ages: List<Int>
+)
+
+@Serializable
+data class Book(
+    val title: String,
+    val author: String,
+    val metadata: BookMetadata
+)
+```
+
+```kotlin
+val data = supabase.from("books").insert(listOf(
+    Book("The Poky Little Puppy", "Janette Sebring Lowrey", BookMetadata("Puppy is slower than other, bigger animals.", 5.95, listOf(3, 6))),
+    Book("Tale of Peter Rabbit", "Beatrix Potter", BookMetadata("Rabbit eats some vegetables.", 4.49, listOf(2, 5))),
+    Book("Tootle", "Gertrude Crampton", BookMetadata("Little toy train has big dreams.", 3.99, listOf(2, 5))),
+    Book("Green Eggs and Ham", "Dr. Seuss", BookMetadata("Sam has changing food preferences and eats unusually colored food.", 7.49, listOf(4, 8))),
+    Book("Harry Potter and the Goblet of Fire", "J.K. Rowling", BookMetadata("Fourth year of school starts, big drama ensues.", 24.95, listOf(10, 99)))
+))
+```
+
+</TabPanel>
+</Tabs>
+
+## Query JSON data
+
+Querying JSON data is similar to querying other data, with a few other features to access nested values.
+
+Postgres support a range of [JSON functions and operators](https://www.postgresql.org/docs/current/functions-json.html). For example, the `->` operator returns values as `jsonb` data. If you want the data returned as `text`, use the `->>` operator.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="sql"
+  queryGroup="language"
+>
+<TabPanel id="sql" label="SQL">
+
+```sql
+select
+  title,
+  metadata ->> 'description' as description, -- returned as text
+  metadata -> 'price' as price,
+  metadata -> 'ages' -> 0 as low_age,
+  metadata -> 'ages' -> 1 as high_age
+from books;
+```
+
+</TabPanel>
+<TabPanel id="js" label="JavaScript">
+
+```js
+const { data, error } = await supabase.from('books').select(`
+    title,
+    description:  metadata->description,
+    price:        metadata->price,
+    low_age:      metadata->ages->0,
+    high_age:     metadata->ages->1
+  `)
+```
+
+</TabPanel>
+<TabPanel id="swift" label="Swift">
+
+```swift
+try await supabase
+  .from("books")
+  .select(
+    """
+      title,
+      description:  metadata->description,
+      price:        metadata->price,
+      low_age:      metadata->ages->0,
+      high_age:     metadata->ages->1
+    """
+  )
+  .execute()
+```
+
+</TabPanel>
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+val data = supabase.from("books").select(Columns.raw("""
+    title,
+    description: metadata->description,
+    price: metadata->price,
+    low_age: metadata->ages->0,
+    high_age: metadata->ages->1
+""".trimIndent()))
+```
+
+</TabPanel>
+<TabPanel id="result" label="Result">
+
+| title                               | description                                                        | price | low_age | high_age |
+| ----------------------------------- | ------------------------------------------------------------------ | ----- | ------- | -------- |
+| The Poky Little Puppy               | Puppy is slower than other, bigger animals.                        | 5.95  | 3       | 6        |
+| The Tale of Peter Rabbit            | Rabbit eats some vegetables.                                       | 4.49  | 2       | 5        |
+| Tootle                              | Little toy train has big dreams.                                   | 3.99  | 2       | 5        |
+| Green Eggs and Ham                  | Sam has changing food preferences and eats unusually colored food. | 7.49  | 4       | 8        |
+| Harry Potter and the Goblet of Fire | Fourth year of school starts, big drama ensues.                    | 24.95 | 10      | 99       |
+
+</TabPanel>
+</Tabs>
+
+## Validating JSON data
+
+Supabase provides the [`pg_jsonschema` extension](/docs/guides/database/extensions/pg_jsonschema) that adds the ability to validate `json` and `jsonb` data types against [JSON Schema](https://json-schema.org/) documents.
+
+Once you have enabled the extension, you can add a "check constraint" to your table to validate the JSON data:
+
+```sql
+create table customers (
+  id serial primary key,
+  metadata json
+);
+
+alter table customers
+add constraint check_metadata check (
+  json_matches_schema(
+    '{
+        "type": "object",
+        "properties": {
+            "tags": {
+                "type": "array",
+                "items": {
+                    "type": "string",
+                    "maxLength": 16
+                }
+            }
+        }
+    }',
+    metadata
+  )
+);
+```
+
+## Resources
+
+- [Postgres: JSON Functions and Operators](https://www.postgresql.org/docs/current/functions-json.html)
+- [Postgres JSON types](https://www.postgresql.org/docs/current/datatype-json.html)

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
-import { AutoApiService } from 'data/config/project-api-query'
+import type { AutoApiService } from 'data/config/project-api-query'
 import { makeRandomString } from 'lib/helpers'
 import CodeSnippet from '../CodeSnippet'
 import Snippets from '../Snippets'
@@ -216,7 +216,10 @@ export default function UserManagement({
           </p>
         </article>
         <article className="code">
-          <CodeSnippet selectedLang={selectedLang} snippet={Snippets.authThirdPartyLogin()} />
+          <CodeSnippet
+            selectedLang={selectedLang}
+            snippet={Snippets.authThirdPartyLogin(autoApiService.endpoint, keyToShow)}
+          />
         </article>
       </div>
 

@@ -22,8 +22,8 @@ export const createSQLPolicy = (
     definition: definition
       ? definition.replace(/\s+/g, ' ').trim()
       : definition === undefined
-      ? null
-      : definition,
+        ? null
+        : definition,
     check: check ? check.replace(/\s+/g, ' ').trim() : check === undefined ? null : check,
   }
 
@@ -58,9 +58,7 @@ export const createSQLPolicy = (
   return {}
 }
 
-export const createSQLStatementForCreatePolicy = (
-  policyFormFields: PolicyFormField
-): PolicyForReview => {
+const createSQLStatementForCreatePolicy = (policyFormFields: PolicyFormField): PolicyForReview => {
   const { name, definition, check, command, schema, table } = policyFormFields
   const roles = policyFormFields.roles.length === 0 ? ['public'] : policyFormFields.roles
   const description = `Add policy for the ${command} operation under the policy "${name}"`

@@ -3,13 +3,13 @@ import apiWrapper from 'lib/api/apiWrapper'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { OpenAI } from 'openai'
 
-const openAiKey = process.env.OPENAI_KEY
+const openAiKey = process.env.OPENAI_API_KEY
 const openai = new OpenAI({ apiKey: openAiKey })
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (!openAiKey) {
     return res.status(500).json({
-      error: 'No OPENAI_KEY set. Create this environment variable to use AI features.',
+      error: 'No OPENAI_API_KEY set. Create this environment variable to use AI features.',
     })
   }
 

@@ -1,12 +1,12 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { isEmpty } from 'lodash'
-import { observer } from 'mobx-react-lite'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
 
-import { useParams } from 'common/hooks'
+import { useParams } from 'common'
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import {
   FormActions,
@@ -16,12 +16,13 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from 'components/ui/Forms'
-import Loading from 'components/ui/Loading'
+import { Loading } from 'components/ui/Loading'
 import { invalidateSchemasQuery } from 'data/database/schemas-query'
 import { useFDWUpdateMutation } from 'data/fdw/fdw-update-mutation'
 import { useFDWsQuery } from 'data/fdw/fdws-query'
-import { useCheckPermissions, useImmutableValue, useStore } from 'hooks'
-import { VaultSecret } from 'types'
+import { getDecryptedValue } from 'data/vault/vault-secret-decrypted-value-query'
+import { useVaultSecretsQuery } from 'data/vault/vault-secrets-query'
+import { useCheckPermissions, useImmutableValue } from 'hooks'
 import {
   Button,
   Form,
@@ -40,16 +41,21 @@ import {
   makeValidateRequired,
 } from './Wrappers.utils'
 import WrapperTableEditor from './WrapperTableEditor'
+import { ArrowLeft, ExternalLink } from 'lucide-react'
 
 const EditWrapper = () => {
   const formId = 'edit-wrapper-form'
   const router = useRouter()
   const queryClient = useQueryClient()
-  const { ui, vault } = useStore()
   const { ref, id } = useParams()
   const { project } = useProjectContext()
 
   const { data, isLoading } = useFDWsQuery({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
+
+  const { data: secrets, isLoading: isSecretsLoading } = useVaultSecretsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
@@ -62,10 +68,7 @@ const EditWrapper = () => {
 
   const { mutate: updateFDW, isLoading: isSaving } = useFDWUpdateMutation({
     onSuccess: () => {
-      ui.setNotification({
-        category: 'success',
-        message: `Successfully updated ${wrapperMeta?.label} foreign data wrapper`,
-      })
+      toast.success(`Successfully updated ${wrapperMeta?.label} foreign data wrapper`)
       setWrapperTables([])
 
       const hasNewSchema = wrapperTables.some((table) => table.is_new_schema)
@@ -180,14 +183,16 @@ const EditWrapper = () => {
           >
             <Link href={`/project/${ref}/database/wrappers`}>
               <div className="flex items-center space-x-2">
-                <IconArrowLeft strokeWidth={1.5} size={14} />
+                <ArrowLeft strokeWidth={1.5} size={14} />
                 <p className="text-sm">Back</p>
               </div>
             </Link>
           </div>
-          <h3 className="mb-2 text-xl text-foreground">Edit wrapper: {wrapper.name}</h3>
+          <h3 className="mb-2 text-xl text-foreground">
+            Edit {wrapperMeta.label} wrapper: {wrapper.name}
+          </h3>
           <div className="flex items-center space-x-2">
-            <Button asChild type="default" icon={<IconExternalLink strokeWidth={1.5} />}>
+            <Button asChild type="default" icon={<ExternalLink strokeWidth={1.5} />}>
               <Link
                 href="https://supabase.github.io/wrappers/stripe/"
                 target="_blank"
@@ -219,14 +224,23 @@ const EditWrapper = () => {
             useEffect(() => {
               const fetchEncryptedValues = async () => {
                 setLoadingSecrets(true)
+                // If the secrets haven't loaded, escape and run the effect again when they're loaded
+                if (isSecretsLoading) {
+                  return
+                }
+
                 const res = await Promise.all(
                   encryptedOptions.map(async (option) => {
-                    const [secret] = vault.listSecrets(
-                      (secret: VaultSecret) => secret.name === `${wrapper.name}_${option.name}`
+                    const secret = secrets?.find(
+                      (secret) => secret.name === `${wrapper.name}_${option.name}`
                     )
                     if (secret !== undefined) {
-                      const value = await vault.fetchSecretValue(secret.id)
-                      return { [option.name]: value }
+                      const value = await getDecryptedValue({
+                        projectRef: project?.ref,
+                        connectionString: project?.connectionString,
+                        id: secret.id,
+                      })
+                      return { [option.name]: value[0].decrypted_secret }
                     } else {
                       return { [option.name]: '' }
                     }
@@ -245,7 +259,7 @@ const EditWrapper = () => {
               }
 
               if (encryptedOptions.length > 0) fetchEncryptedValues()
-            }, [])
+            }, [isSecretsLoading])
 
             return (
               <FormPanel
@@ -327,7 +341,8 @@ const EditWrapper = () => {
                     ) : (
                       <div className="space-y-2">
                         {wrapperTables.map((table, i) => {
-                          const label = wrapperMeta.tables[table.index].label
+                          const label = wrapperMeta.tables[table.index]?.label
+                          const target = table?.table ?? table.object
 
                           return (
                             <div
@@ -336,10 +351,13 @@ const EditWrapper = () => {
                             >
                               <div>
                                 <p className="text-sm">
-                                  {table.schema_name}.{table.table_name}
+                                  {table.schema_name}.{table.table_name}{' '}
+                                </p>
+                                <p className="text-sm text-foreground-light mt-1">
+                                  Target: {target}
                                 </p>
                                 <p className="text-sm text-foreground-light">
-                                  {label}:{' '}
+                                  Columns:{' '}
                                   {table.columns.map((column: any) => column.name).join(', ')}
                                 </p>
                               </div>
@@ -399,4 +417,4 @@ const EditWrapper = () => {
   )
 }
 
-export default observer(EditWrapper)
+export default EditWrapper
