@@ -2530,7 +2530,7 @@ module.exports = [
   },
   {
     permanent: true,
-    source: '/docs/guides/auth/server-side/email-based-auth-with-pkce-flow-for-ssr',
+    source: '/docs/guides/auth/server-side/oauth-with-pkce-flow-for-ssr',
     destination: '/docs/guides/auth/server-side',
   },
 ]
