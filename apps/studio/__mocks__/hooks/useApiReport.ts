@@ -17,6 +17,11 @@ export const useApiReport = jest.fn().mockReturnValue({
       sql: '',
     },
   },
+  error: {
+    totalRequests: null,
+    topRoutes: null,
+    topErrorRoutes: null,
+  },
   filters: [],
   isLoading: false,
   mergeParams: jest.fn(),
