@@ -260,6 +260,7 @@ const InstanceConfigurationUI = () => {
                   setNewReplicaRegion(region)
                   setShowNewReplicaPanel(true)
                 }}
+                onSelectRestartReplica={setSelectedReplicaToRestart}
                 onSelectDropReplica={setSelectedReplicaToDrop}
               />
             )}
