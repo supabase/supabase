@@ -16,6 +16,7 @@ import 'styles/ui.scss'
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
 
+import * as Sentry from '@sentry/nextjs'
 import { loader } from '@monaco-editor/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
@@ -29,7 +30,8 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
 import Head from 'next/head'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { ErrorInfo, useEffect, useMemo, useRef, useState } from 'react'
+import { ErrorBoundary } from 'react-error-boundary'
 import toast from 'react-hot-toast'
 import { PortalToast, Toaster } from 'ui'
 import { ConsentToast } from 'ui-patterns/ConsentToast'
@@ -43,6 +45,7 @@ import {
 import { AppBannerContextProvider } from 'components/interfaces/App/AppBannerWrapperContext'
 import { FeaturePreviewContextProvider } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import FeaturePreviewModal from 'components/interfaces/App/FeaturePreview/FeaturePreviewModal'
+import { ErrorBoundaryState } from 'components/ui/ErrorBoundaryState'
 import FlagProvider from 'components/ui/Flag/FlagProvider'
 import PageTelemetry from 'components/ui/PageTelemetry'
 import { useRootQueryClient } from 'data/query-client'
@@ -107,6 +110,11 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
     [supabase]
   )
 
+  const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
+    console.error(error.stack)
+    Sentry.captureMessage('Full page crash caught by error boundary')
+  }
+
   useEffect(() => {
     // Check for telemetry consent
     if (typeof window !== 'undefined') {
@@ -140,44 +148,46 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
   const isTestEnv = process.env.NEXT_PUBLIC_NODE_ENV === 'test'
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Hydrate state={pageProps.dehydratedState}>
-        <AuthContainer>
-          <ProfileProvider>
-            <FlagProvider>
-              <Head>
-                <title>Supabase</title>
-                <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-              </Head>
-              <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
-              <PageTelemetry>
-                <TooltipProvider>
-                  <RouteValidationWrapper>
-                    <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
-                      <AppBannerContextProvider>
-                        <CommandMenuWrapper>
-                          <AppBannerWrapper>
-                            <FeaturePreviewContextProvider>
-                              {getLayout(<Component {...pageProps} />)}
-                              <FeaturePreviewModal />
-                            </FeaturePreviewContextProvider>
-                          </AppBannerWrapper>
-                        </CommandMenuWrapper>
-                      </AppBannerContextProvider>
-                    </ThemeProvider>
-                  </RouteValidationWrapper>
-                </TooltipProvider>
-              </PageTelemetry>
+    <ErrorBoundary FallbackComponent={ErrorBoundaryState} onError={errorBoundaryHandler}>
+      <QueryClientProvider client={queryClient}>
+        <Hydrate state={pageProps.dehydratedState}>
+          <AuthContainer>
+            <ProfileProvider>
+              <FlagProvider>
+                <Head>
+                  <title>Supabase</title>
+                  <meta name="viewport" content="initial-scale=1.0, width=device-width" />
+                </Head>
+                <MetaFaviconsPagesRouter applicationName="Supabase Studio" />
+                <PageTelemetry>
+                  <TooltipProvider>
+                    <RouteValidationWrapper>
+                      <ThemeProvider defaultTheme="system" enableSystem disableTransitionOnChange>
+                        <AppBannerContextProvider>
+                          <CommandMenuWrapper>
+                            <AppBannerWrapper>
+                              <FeaturePreviewContextProvider>
+                                {getLayout(<Component {...pageProps} />)}
+                                <FeaturePreviewModal />
+                              </FeaturePreviewContextProvider>
+                            </AppBannerWrapper>
+                          </CommandMenuWrapper>
+                        </AppBannerContextProvider>
+                      </ThemeProvider>
+                    </RouteValidationWrapper>
+                  </TooltipProvider>
+                </PageTelemetry>
 
-              <HCaptchaLoadedStore />
-              <Toaster />
-              <PortalToast />
-              {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
-            </FlagProvider>
-          </ProfileProvider>
-        </AuthContainer>
-      </Hydrate>
-    </QueryClientProvider>
+                <HCaptchaLoadedStore />
+                <Toaster />
+                <PortalToast />
+                {!isTestEnv && <ReactQueryDevtools initialIsOpen={false} position="bottom-right" />}
+              </FlagProvider>
+            </ProfileProvider>
+          </AuthContainer>
+        </Hydrate>
+      </QueryClientProvider>
+    </ErrorBoundary>
   )
 }
 
