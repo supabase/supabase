@@ -13,6 +13,7 @@ export const useApiReport = () => {
   const { project } = useProjectContext()
   const { ref: projectRef } = useParams()
   const state = useDatabaseSelectorStateSnapshot()
+
   const identifier = project?.is_read_replicas_enabled ? state.selectedDatabaseId : project?.ref
 
   const [filters, setFilters] = useState<ReportFilterItem[]>([])

@@ -4,6 +4,7 @@ import SVG from 'react-inlinesvg'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import DatabaseSelector from 'components/ui/DatabaseSelector'
+import { useLoadBalancersQuery } from 'data/read-replicas/load-balancers-query'
 import { Auth, Realtime, Storage } from 'icons'
 import { BASE_PATH } from 'lib/constants'
 import {
@@ -86,6 +87,8 @@ const ReportFilterBar = ({
 }: ReportFilterBarProps) => {
   const { project } = useProjectContext()
   const showReadReplicasUI = project?.is_read_replicas_enabled
+
+  const { data: loadBalancers } = useLoadBalancersQuery({ projectRef: project?.ref })
 
   const filterKeys = [
     'request.path',
@@ -303,7 +306,15 @@ const ReportFilterBar = ({
           </Button>
         </Popover>
       </div>
-      {showReadReplicasUI && <DatabaseSelector />}
+      {showReadReplicasUI && (
+        <DatabaseSelector
+          additionalOptions={
+            (loadBalancers ?? []).length > 0
+              ? [{ id: `${project.ref}-all`, name: 'API Load Balancer' }]
+              : []
+          }
+        />
+      )}
     </div>
   )
 }
