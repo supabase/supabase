@@ -97,7 +97,7 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
         Yes! Creating a Supabase client is lightweight.
 
         - On the server, it basically configures a `fetch` call. You need to reconfigure the fetch call anew for every request to your server, because you need the cookies from the request.
-        - On the client, `createBrowserClient` already uses a singleton pattern, so you only ever create one instance, no matter how many times you call your `createClient` function.
+        - On the client, `createBrowserClient` already uses a singleton pattern, so you only ever create one instance, no matter how many times you call your `createClientComponentClient ` function.
 
     </Accordion.Item>
 
@@ -113,7 +113,7 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
 ```ts utils/supabase/client.ts
 import { createBrowserClient } from '@supabase/ssr'
 
-export function createClient() {
+export function createClientComponentClient() {
   return createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -125,7 +125,7 @@ export function createClient() {
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { cookies } from 'next/headers'
 
-export function createClient() {
+export function createServerComponentClient() {
   const cookieStore = cookies()
 
   return createServerClient(
@@ -338,10 +338,10 @@ export default function LoginPage() {
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 
-import { createClient } from '@/utils/supabase/server'
+import { createServerComponentClient } from '@/utils/supabase/server'
 
 export async function login(formData: FormData) {
-  const supabase = createClient()
+  const supabase = createServerComponentClient()
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
@@ -361,7 +361,7 @@ export async function login(formData: FormData) {
 }
 
 export async function signup(formData: FormData) {
-  const supabase = createClient()
+  const supabase = createServerComponentClient()
 
   // type-casting here for convenience
   // in practice, you should validate your inputs
@@ -423,7 +423,7 @@ Since this is a Router Handler, use the Supabase client from `@/utils/supabase/s
 import { type EmailOtpType } from '@supabase/supabase-js'
 import { type NextRequest, NextResponse } from 'next/server'
 
-import { createClient } from '@/utils/supabase/server'
+import { createServerComponentClient } from '@/utils/supabase/server'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -437,7 +437,7 @@ export async function GET(request: NextRequest) {
   redirectTo.searchParams.delete('type')
 
   if (token_hash && type) {
-    const supabase = createClient()
+    const supabase = createServerComponentClient()
 
     const { error } = await supabase.auth.verifyOtp({
       type,
@@ -488,10 +488,10 @@ It's safe to trust `getUser()` because it sends a request to the Supabase Auth s
 ```ts app/private/page.tsx
 import { redirect } from 'next/navigation'
 
-import { createClient } from '@/utils/supabase/server'
+import { createServerComponentClient } from '@/utils/supabase/server'
 
 export default async function PrivatePage() {
-  const supabase = createClient()
+  const supabase = createServerComponentClient()
 
   const { data, error } = await supabase.auth.getUser()
   if (error || !data?.user) {
@@ -629,7 +629,7 @@ Create a `utils/supabase` folder with a file for each type of client. Then copy 
 import { createServerClient, type CookieOptions, serialize } from '@supabase/ssr'
 import { type GetServerSidePropsContext } from 'next'
 
-export function createClient(context: GetServerSidePropsContext) {
+export function createServerPropsClient(context: GetServerSidePropsContext) {
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -653,10 +653,10 @@ export function createClient(context: GetServerSidePropsContext) {
 ```
 
 ```ts utils/supabase/static-props.ts
-import { createClient as createClientPrimitive } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 
-export function createClient() {
-  const supabase = createClientPrimitive(
+export function createStaticPropsClient() {
+  const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   )
@@ -668,7 +668,7 @@ export function createClient() {
 ```ts utils/supabase/component.ts
 import { createBrowserClient } from '@supabase/ssr'
 
-export function createClient() {
+export function createClientComponentClient() {
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -682,7 +682,7 @@ export function createClient() {
 import { createServerClient, type CookieOptions, serialize } from '@supabase/ssr'
 import { type NextApiRequest, type NextApiResponse } from 'next'
 
-export default function createClient(req: NextApiRequest, res: NextApiResponse) {
+export default function createApiClient(req: NextApiRequest, res: NextApiResponse) {
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -729,11 +729,11 @@ Since Supabase is being called from a component, use the client defined in `@/ut
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 
-import { createClient } from '@/utils/supabase/component'
+import { createClientComponentClient } from '@/utils/supabase/component'
 
 export default function LoginPage() {
   const router = useRouter()
-  const supabase = createClient()
+  const supabase = createClientComponentClient()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -816,7 +816,7 @@ Since this is an API route, use the Supabase client from `@/utils/supabase/api.t
 import { type EmailOtpType } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import createClient from '@/utils/supabase/api'
+import createApiClient from '@/utils/supabase/api'
 
 function stringOrFirstString(item: string | string[] | undefined) {
   return Array.isArray(item) ? item[0] : item
@@ -835,7 +835,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   let next = '/error'
 
   if (token_hash && type) {
-    const supabase = createClient(req, res)
+    const supabase = createApiClient(req, res)
     const { error } = await supabase.auth.verifyOtp({
       type: type as EmailOtpType,
       token_hash,
@@ -891,14 +891,14 @@ It's safe to trust `getUser()` because it sends a request to the Supabase Auth s
 import type { User } from '@supabase/supabase-js'
 import type { GetServerSidePropsContext } from 'next'
 
-import { createClient } from '@/utils/supabase/server-props'
+import { createServerPropsClient } from '@/utils/supabase/server-props'
 
 export default function PrivatePage({ user }: { user: User }) {
   return <h1>Hello, {user.email || 'user'}!</h1>
 }
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const supabase = createClient(context)
+  const supabase = createServerPropsClient(context)
 
   const { data, error } = await supabase.auth.getUser()
 
@@ -938,14 +938,14 @@ Then fetch the countries data using `getStaticProps` with the client from `@/uti
 <StepHikeCompact.Code>
 
 ```ts pages/public.tsx
-import { createClient } from '@/utils/supabase/static-props'
+import { createStaticPropsClient } from '@/utils/supabase/static-props'
 
 export default function PublicPage({ data }: { data?: any[] }) {
   return <pre>{data && JSON.stringify(data, null, 2)}</pre>
 }
 
 export async function getStaticProps() {
-  const supabase = createClient()
+  const supabase = createStaticPropsClient()
 
   const { data, error } = await supabase.from('countries').select()
 
@@ -982,14 +982,14 @@ You can use both the App and Pages Routers together.
 
 Follow the instructions for both the App and Pages Routers. Whenever you need to connect to Supabase, import the `createClient` utility that you need:
 
-| Router       | Code location                                     | Which `createClient` to use |
-| ------------ | ------------------------------------------------- | --------------------------- |
-| App Router   | Server Component, Server Action, or Route Handler | `server.ts`                 |
-|              | Client Component                                  | `client.ts`                 |
-| Pages Router | `getServerSideProps`                              | `server-props.ts`           |
-|              | `getStaticProps`                                  | `static-props.ts`           |
-|              | Component                                         | `component.ts`              |
-|              | API route                                         | `api.ts`                    |
+| Router       | Code location                                     | `createClient` name          | file |
+| ------------ | ------------------------------------------------- | ---------------------------- | --------------------------- |
+| App Router   | Server Component, Server Action, or Route Handler | createServerComponentClient  | `server.ts`                 |
+|              | Client Component                                  | createClientComponentClient  | `client.ts`                 |
+| Pages Router | `getServerSideProps`                              | createServerPropsClient      | `server-props.ts`           |
+|              | `getStaticProps`                                  | createStaticPropsClient      | `static-props.ts`           |
+|              | Component                                         | createServerComponentClient  | `component.ts`              |
+|              | API route                                         | createApiClient              | `api.ts`                    |
 
 Remember to create the `middleware.ts` file for the App Router so the session refreshes for App Router pages.
 
