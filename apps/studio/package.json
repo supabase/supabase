@@ -81,6 +81,7 @@
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
+    "react-error-boundary": "^4.0.13",
     "react-grid-layout": "^1.4.2",
     "react-hot-toast": "^2.4.1",
     "react-inlinesvg": "^4.0.4",
@@ -136,6 +137,7 @@
     "@types/sqlstring": "^2.3.0",
     "@types/uuid": "^8.3.4",
     "@types/zxcvbn": "^4.4.1",
+    "api-types": "*",
     "autoprefixer": "^10.4.14",
     "common": "*",
     "config": "*",
@@ -147,7 +149,6 @@
     "prettier": "^4.0.0-alpha.8",
     "storybook-dark-mode": "^3.0.1",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5.4.3",
-    "api-types": "*"
+    "typescript": "^5.4.3"
   }
 }

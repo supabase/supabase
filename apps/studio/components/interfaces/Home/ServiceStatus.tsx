@@ -1,18 +1,12 @@
 import { useParams } from 'common'
-import { AlertTriangle, CheckCircle2 } from 'lucide-react'
+import { AlertTriangle, CheckCircle2, Loader2 } from 'lucide-react'
 import { useState } from 'react'
-import {
-  Button,
-  IconLoader,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
-  Popover_Shadcn_,
-} from 'ui'
+import { Button, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_, Popover_Shadcn_ } from 'ui'
 
+import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
 import { usePostgresServiceStatusQuery } from 'data/service-status/postgres-service-status-query'
 import { useProjectServiceStatusQuery } from 'data/service-status/service-status-query'
 import { useIsFeatureEnabled, useSelectedProject } from 'hooks'
-import { useEdgeFunctionServiceStatusQuery } from 'data/service-status/edge-functions-status-query'
 
 const ServiceStatus = () => {
   const { ref } = useParams()
@@ -125,7 +119,7 @@ const ServiceStatus = () => {
           type="default"
           icon={
             isLoadingChecks ? (
-              <IconLoader className="animate-spin" />
+              <Loader2 className="animate-spin" />
             ) : (
               <div
                 className={`w-2 h-2 rounded-full ${
@@ -155,7 +149,7 @@ const ServiceStatus = () => {
               </p>
             </div>
             {service.isLoading ? (
-              <IconLoader className="animate-spin" size="tiny" />
+              <Loader2 className="animate-spin text-foreground-light" size={18} />
             ) : service.isSuccess ? (
               <CheckCircle2 className="text-brand" size={18} strokeWidth={1.5} />
             ) : (
