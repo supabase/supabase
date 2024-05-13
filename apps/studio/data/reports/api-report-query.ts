@@ -66,7 +66,7 @@ export const useApiReport = () => {
   const formattedFilters: ReportFilterItem[] = [
     ...filters,
     ...(identifier !== undefined && identifier !== project?.ref
-      ? [{ key: 'identifier', value: identifier, compare: 'is' } as ReportFilterItem]
+      ? [{ key: 'identifier', value: `'${identifier}'`, compare: 'is' } as ReportFilterItem]
       : []),
   ]
 
@@ -128,6 +128,15 @@ export const useApiReport = () => {
       topErrorRoutes: topErrorRoutes.params,
       topSlowRoutes: topSlowRoutes.params,
       networkTraffic: networkTraffic.params,
+    },
+    error: {
+      totalRequest: totalRequests.error,
+      errorCounts: errorCounts.error,
+      responseSpeed: responseSpeed.error,
+      topRoutes: topRoutes.error,
+      topErrorRoute: topErrorRoutes.error,
+      topSlowRoutes: topSlowRoutes.error,
+      networkTraffic: networkTraffic.error,
     },
     mergeParams: handleSetParams,
     filters,
