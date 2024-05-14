@@ -28,11 +28,33 @@ import {
 } from 'ui'
 import { useProjectContext } from '../ProjectLayout/ProjectContext'
 import { useProjectLintsQuery } from 'data/lint/lint-query'
+import { Lint } from '../../../data/lint/lint-query'
 
 export interface EntityListItemProps {
   id: number
   projectRef: string
   isLocked: boolean
+}
+
+const checkEntityForLints = (
+  entity: Entity,
+  lintName: string,
+  lintLevels: ('ERROR' | 'WARN')[],
+  lints: Lint[],
+  snap: any
+): { hasLint: boolean; count: number } => {
+  const matchingLints = lints?.filter(
+    (lint) =>
+      lint?.metadata?.name === entity.name &&
+      lint?.metadata?.schema === snap.selectedSchemaName &&
+      lint?.name === lintName &&
+      lintLevels.includes(lint?.level as 'ERROR' | 'WARN')
+  )
+
+  return {
+    hasLint: matchingLints.length > 0,
+    count: matchingLints.length,
+  }
 }
 
 const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
@@ -47,28 +69,33 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
   const isActive = Number(id) === entity.id
 
   // need project lints to get security status for views
-  const { data: lints } = useProjectLintsQuery({
+  const { data: lints = [] } = useProjectLintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  const viewIsSecurityDefiner =
-    entity?.type === ENTITY_TYPE.VIEW &&
-    lints?.some(
-      (lint) =>
-        lint?.metadata?.name === entity.name &&
-        lint?.name === 'security_definer_view' &&
-        (lint?.level === 'ERROR' || lint?.level === 'WARN')
-    )
+  const tableHasLints = checkEntityForLints(
+    entity,
+    'rls_disabled_in_public',
+    ['ERROR'],
+    lints,
+    snap
+  )
 
-  const materializedViewMaybeAccessible =
-    entity?.type === ENTITY_TYPE.MATERIALIZED_VIEW &&
-    lints?.some(
-      (lint) =>
-        lint?.metadata?.name === entity.name &&
-        lint?.name === 'materialized_view_in_api' &&
-        (lint?.level === 'ERROR' || lint?.level === 'WARN')
-    )
+  const viewHasLints = checkEntityForLints(
+    entity,
+    'security_definer_view',
+    ['ERROR', 'WARN'],
+    lints,
+    snap
+  )
+  const materializedViewHasLints = checkEntityForLints(
+    entity,
+    'materialized_view_in_api',
+    ['ERROR', 'WARN'],
+    lints,
+    snap
+  )
 
   const formatTooltipText = (entityType: string) => {
     return Object.entries(ENTITY_TYPE)
@@ -135,17 +162,17 @@ const EntityListItem: ItemRenderer<Entity, EntityListItemProps> = ({
 
     switch (entity.type) {
       case ENTITY_TYPE.TABLE:
-        if (!entity.rls_enabled) {
+        if (tableHasLints.hasLint) {
           tooltipContent = 'RLS Disabled'
         }
         break
       case ENTITY_TYPE.VIEW:
-        if (viewIsSecurityDefiner) {
+        if (viewHasLints.hasLint) {
           tooltipContent = 'View is public'
         }
         break
       case ENTITY_TYPE.MATERIALIZED_VIEW:
-        if (materializedViewMaybeAccessible) {
+        if (materializedViewHasLints.hasLint) {
           tooltipContent = 'Materialized View is public'
         }
 
