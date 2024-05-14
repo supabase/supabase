@@ -13,7 +13,6 @@ import { invalidateProjectsQuery } from 'data/projects/projects-query'
 import { useSelectedProject } from 'hooks'
 import { getWithTimeout } from 'lib/common/fetch'
 import { API_URL, PROJECT_STATUS } from 'lib/constants'
-import Connect from 'components/interfaces/Home/Connect/Connect'
 
 const BuildingState = () => {
   const { ref } = useParams()
@@ -67,8 +66,8 @@ const BuildingState = () => {
           </div>
           <div>
             <p className="text-sm text-foreground-light">
-              {' '}
-              We are provisioning your database and API endpoints
+              <Button onClick={() => console.log(boom)}>Click</Button> We are provisioning your
+              database and API endpoints
             </p>
             <p className="text-sm text-foreground-light"> This may take a few minutes</p>
           </div>
