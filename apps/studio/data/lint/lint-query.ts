@@ -887,7 +887,7 @@ const getProjectLints = async (
   signal?: AbortSignal
 ) => {
   const exposedSchemasPrepend = `set local pgrst.db_schemas='${exposedSchemas}';`
-  console.log({ exposedSchemasPrepend })
+
   const { result } = await executeSql(
     {
       projectRef,
