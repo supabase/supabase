@@ -130,9 +130,8 @@ const MapView = ({ onSelectDeployNewReplica, onSelectDropReplica }: MapViewProps
           {AVAILABLE_REPLICA_REGIONS.map((region) => {
             const dbs =
               databases.filter((database) => database.region.includes(region.region)) ?? []
-            const coordinates = AVAILABLE_REPLICA_REGIONS.find(
-              (r) => r.region === region.region
-            )?.coordinates
+            const coordinates = AVAILABLE_REPLICA_REGIONS.find((r) => r.region === region.region)
+              ?.coordinates
 
             const hasNoDatabases = dbs.length === 0
             const hasPrimary = dbs.some((database) => database.identifier === ref)
@@ -281,6 +280,13 @@ const MapView = ({ onSelectDeployNewReplica, onSelectDropReplica }: MapViewProps
                                 href={`/project/${ref}/settings/database?connectionString=${database.identifier}`}
                               >
                                 View connection string
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem className="gap-x-2">
+                              <Link
+                                href={`/project/${ref}/reports/database?db=${database.identifier}&chart=replication-lag`}
+                              >
+                                View replication lag
                               </Link>
                             </DropdownMenuItem>
                             <div className="border-t" />
