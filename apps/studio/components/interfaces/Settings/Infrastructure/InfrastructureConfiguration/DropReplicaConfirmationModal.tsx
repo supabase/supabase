@@ -1,17 +1,10 @@
-import { useParams } from 'common'
 import toast from 'react-hot-toast'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  IconAlertTriangle,
-  Modal,
-} from 'ui'
 
-import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { useParams } from 'common'
 import { useReadReplicaRemoveMutation } from 'data/read-replicas/replica-remove-mutation'
 import type { Database } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID } from 'data/read-replicas/replicas.utils'
+import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 interface DropReplicaConfirmationModalProps {
   selectedReplica?: Database

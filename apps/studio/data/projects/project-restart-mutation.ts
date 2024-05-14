@@ -3,14 +3,22 @@ import { toast } from 'react-hot-toast'
 
 import { post } from 'data/fetchers'
 import type { ResponseError } from 'types'
+import type { components } from 'api-types'
 
 export type ProjectRestartVariables = {
   ref: string
+  identifier?: string
 }
 
-export async function restartProject({ ref }: ProjectRestartVariables) {
+type RestartProjectBody = components['schemas']['RestartProjectInfo']
+
+export async function restartProject({ ref, identifier }: ProjectRestartVariables) {
+  const payload: RestartProjectBody = {}
+  if (identifier !== undefined) payload.database_identifier = identifier
+
   const { data, error } = await post('/platform/projects/{ref}/restart', {
     params: { path: { ref } },
+    body: payload,
   })
   if (error) throw error
   return data
