@@ -26,6 +26,29 @@ import {
   Input_Shadcn_,
 } from 'ui'
 
+const DELETE_REQUEST_KEY = 'accountDeletionRequest'
+
+const setDeletionRequestFlag = () => {
+  const expiryDate = new Date()
+  expiryDate.setDate(expiryDate.getDate() + 30)
+  localStorage.setItem(DELETE_REQUEST_KEY, expiryDate.toString())
+}
+
+const hasActiveDeletionRequest = () => {
+  const expiryDateStr = localStorage.getItem(DELETE_REQUEST_KEY)
+  if (!expiryDateStr) return false
+
+  const expiryDate = new Date(expiryDateStr)
+  const now = new Date()
+
+  if (now > expiryDate) {
+    localStorage.removeItem(DELETE_REQUEST_KEY)
+    return false
+  }
+
+  return true
+}
+
 export const DeleteAccountButton = () => {
   const { profile } = useProfile()
   const [isOpen, setIsOpen] = useState(false)
@@ -44,6 +67,7 @@ export const DeleteAccountButton = () => {
   const { mutate: submitSupportTicket, isLoading } = useSendSupportTicketMutation({
     onSuccess: () => {
       setIsOpen(false)
+      setDeletionRequestFlag()
       toast.success(
         'Successfully submitted account deletion request - we will reach out to you via email once the request is completed!',
         { duration: 8000 }
@@ -56,6 +80,10 @@ export const DeleteAccountButton = () => {
 
   const onConfirmDelete = async () => {
     if (!accountEmail) return console.error('Account information is required')
+
+    if (hasActiveDeletionRequest()) {
+      return toast.error('You have already submitted a deletion request within the last 30 days.')
+    }
 
     const payload = {
       subject: 'Account Deletion Request',
