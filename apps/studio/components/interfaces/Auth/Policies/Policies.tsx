@@ -21,6 +21,7 @@ interface PoliciesProps {
   tables: PostgresTable[]
   hasTables: boolean
   isLocked: boolean
+  onSelectCreatePolicy: (table: string) => void
   onSelectEditPolicy: (policy: PostgresPolicy) => void
 }
 
@@ -29,6 +30,7 @@ const Policies = ({
   tables,
   hasTables,
   isLocked,
+  onSelectCreatePolicy,
   onSelectEditPolicy: onSelectEditPolicyAI,
 }: PoliciesProps) => {
   const router = useRouter()
@@ -139,12 +141,13 @@ const Policies = ({
       <div className="flex flex-col gap-y-4 pb-4">
         {isLocked && <ProtectedSchemaWarning schema={schema} entity="policies" />}
         {tables.length > 0 ? (
-          tables.map((table: any) => (
+          tables.map((table) => (
             <section key={table.id}>
               <PolicyTableRow
                 table={table}
                 isLocked={isLocked}
                 onSelectToggleRLS={onSelectToggleRLS}
+                onSelectCreatePolicy={() => onSelectCreatePolicy(table.name)}
                 onSelectEditPolicy={onSelectEditPolicy}
                 onSelectDeletePolicy={onSelectDeletePolicy}
               />

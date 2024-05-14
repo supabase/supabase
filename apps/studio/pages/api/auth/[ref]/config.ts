@@ -41,7 +41,8 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     JWT_DEFAULT_GROUP_NAME: '',
     URI_ALLOW_LIST: '',
     MAILER_AUTOCONFIRM: mailer_autoconfirm ?? false,
-    MAILER_OTP_EXP: 86400,
+    MAILER_OTP_EXP: 3600,
+    MAILER_OTP_LENGTH: 6,
     MAILER_URLPATHS_INVITE: '',
     MAILER_URLPATHS_CONFIRMATION: '',
     MAILER_URLPATHS_RECOVERY: '',
@@ -119,6 +120,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     MAILER_SUBJECTS_RECOVERY: 'Reset Your Password',
     MAILER_SUBJECTS_EMAIL_CHANGE: 'Confirm Email Change',
     MAILER_SUBJECTS_MAGIC_LINK: 'Your Magic Link',
+    MAILER_SUBJECTS_REAUTHENTICATION: 'Confirm Reauthentication',
     MAILER_TEMPLATES_INVITE: null,
     MAILER_TEMPLATES_INVITE_CONTENT:
       '<h2>You have been invited</h2>\n\n<p>You have been invited to create a user on {{ .SiteURL }}. Follow this link to accept the invite:</p>\n<p><a href="{{ .ConfirmationURL }}">Accept the invite</a></p>',
@@ -165,6 +167,9 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
     SMS_VONAGE_FROM: null,
     SMS_TEXTLOCAL_API_KEY: null,
     SMS_TEXTLOCAL_SENDER: null,
+    MAILER_TEMPLATES_REAUTHENTICATION: null,
+    MAILER_TEMPLATES_REAUTHENTICATION_CONTENT:
+      '<h2>Confirm reauthentication</h2> <p>Enter the code: {{ .Token }}</p>',
   })
 }
 

@@ -2,25 +2,31 @@ import * as Tooltip from '@radix-ui/react-tooltip'
 import type { PostgresTable } from '@supabase/postgres-meta'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { noop } from 'lodash'
+import { Lock } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 
+import { useIsRLSAIAssistantEnabled } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useCheckPermissions } from 'hooks'
-import { Badge, Button, IconLock } from 'ui'
+import { Badge, Button } from 'ui'
 
 interface PolicyTableRowHeaderProps {
   table: PostgresTable
   isLocked: boolean
   onSelectToggleRLS: (table: PostgresTable) => void
+  onSelectCreatePolicy: () => void
 }
 
 const PolicyTableRowHeader = ({
   table,
   isLocked,
   onSelectToggleRLS = noop,
+  onSelectCreatePolicy,
 }: PolicyTableRowHeaderProps) => {
   const router = useRouter()
   const { ref } = router.query
+
+  const isAiAssistantEnabled = useIsRLSAIAssistantEnabled()
   const canToggleRLS = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_WRITE, 'tables')
 
   return (
@@ -33,7 +39,7 @@ const PolicyTableRowHeader = ({
           {isLocked && (
             <Badge>
               <span className="flex gap-2 items-center text-xs uppercase text-foreground-lighter">
-                <IconLock width={12} /> Locked
+                <Lock size={12} /> Locked
               </span>
             </Badge>
           )}
@@ -73,6 +79,15 @@ const PolicyTableRowHeader = ({
                 </Tooltip.Portal>
               )}
             </Tooltip.Root>
+            {!isAiAssistantEnabled && (
+              <Button
+                type="default"
+                disabled={!canToggleRLS}
+                onClick={() => onSelectCreatePolicy()}
+              >
+                Create policy
+              </Button>
+            )}
           </div>
         </div>
       )}

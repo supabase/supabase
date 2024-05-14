@@ -1,7 +1,3 @@
-'use client'
-
-import * as React from 'react'
-
 // Markdown components
 
 export * from './src/lib/Markdown'
@@ -32,7 +28,7 @@ export * from './src/components/NavMenu'
 
 export * from './src/components/Modal'
 export * from './src/components/SidePanel'
-export * from './src/components/ContextMenu'
+// export * from './src/components/ContextMenu'
 export * from './src/components/PromoToast'
 export * from './src/components/Popover'
 export * from './src/layout/PortalToast'
@@ -82,6 +78,7 @@ export * from './src/components/shadcn/ui/toast'
 export * from './src/components/shadcn/ui/toaster'
 
 export * from './src/components/shadcn/ui/separator'
+export * from './src/components/shadcn/ui/context-menu'
 export * from './src/components/shadcn/ui/sheet'
 export * from './src/components/shadcn/ui/badge'
 export * from './src/components/shadcn/ui/input-otp'
@@ -115,6 +112,7 @@ export {
   FormDescription as FormDescription_Shadcn_,
   FormMessage as FormMessage_Shadcn_,
   FormField as FormField_Shadcn_,
+  useWatch as useWatch_Shadcn_,
 } from './src/components/shadcn/ui/form'
 
 export {
@@ -122,6 +120,7 @@ export {
   PopoverTrigger as PopoverTrigger_Shadcn_,
   PopoverContent as PopoverContent_Shadcn_,
   PopoverAnchor as PopoverAnchor_Shadcn_,
+  PopoverSeparator as PopoverSeparator_Shadcn_,
 } from './src/components/shadcn/ui/popover'
 
 export {

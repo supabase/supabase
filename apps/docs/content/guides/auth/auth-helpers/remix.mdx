@@ -36,7 +36,11 @@ This submodule provides convenience helpers for implementing user authentication
   ></iframe>
 </div>
 
-> For a complete implementation example, check out [this free egghead course](https://egghead.io/courses/build-a-realtime-chat-app-with-remix-and-supabase-d36e2618) or [this GitHub repo](https://github.com/supabase/auth-helpers/tree/main/examples/remix).
+<Admonition type="tip">
+
+For a complete implementation example, check out [this free egghead course](https://egghead.io/courses/build-a-realtime-chat-app-with-remix-and-supabase-d36e2618) or [this GitHub repo](https://github.com/supabase/auth-helpers/tree/main/examples/remix).
+
+</Admonition>
 
 ## Install the Remix helper library
 
@@ -179,7 +183,11 @@ export const loader = async ({ request }) => {
 }
 ```
 
-> Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Loader` function.
+<Admonition type="tip">
+
+Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Loader` function.
+
+</Admonition>
 
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
@@ -209,7 +217,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 }
 ```
 
-> Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Loader` function.
+<Admonition type="tip">
+
+Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Loader` function.
+
+</Admonition>
 
 </TabPanel>
 </Tabs>
@@ -251,7 +263,11 @@ export const action = async ({ request }) => {
 }
 ```
 
-> Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Action` function.
+<Admonition type="tip">
+
+Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Action` function.
+
+</Admonition>
 
 </TabPanel>
 <TabPanel id="ts" label="TypeScript">
@@ -282,7 +298,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 }
 ```
 
-> Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Action` function.
+<Admonition type="tip">
+
+Supabase will set cookie headers to manage the user's auth session, therefore, the `response.headers` must be returned from the `Action` function.
+
+</Admonition>
 
 </TabPanel>
 </Tabs>
@@ -341,7 +361,11 @@ export const loader = () => {
 }
 ```
 
-> These may not be stored in `process.env` for environments other than Node.
+<Admonition type="tip">
+
+These may not be stored in `process.env` for environments other than Node.
+
+</Admonition>
 
 Next, we call the `useLoaderData` hook in our component to get the `env` object.
 
@@ -375,7 +399,11 @@ export const loader = ({}: LoaderFunctionArgs) => {
 }
 ```
 
-> These may not be stored in `process.env` for environments other than Node.
+<Admonition type="tip">
+
+These may not be stored in `process.env` for environments other than Node.
+
+</Admonition>
 
 Next, we call the `useLoaderData` hook in our component to get the `env` object.
 
@@ -558,7 +586,11 @@ useEffect(() => {
 
 </Tabs>
 
-> Check out [this repo](https://github.com/supabase/auth-helpers/tree/main/examples/remix) for full implementation example
+<Admonition type="tip">
+
+Check out [this repo](https://github.com/supabase/auth-helpers/tree/main/examples/remix) for full implementation example
+
+</Admonition>
 
 ### Authentication
 
@@ -771,7 +803,11 @@ export default function Index() {
 
 </Tabs>
 
-> Ensure you have [enabled replication](https://supabase.com/dashboard/project/_/database/publications) on the table you are subscribing to.
+<Admonition type="tip">
+
+Ensure you have [enabled replication](https://supabase.com/dashboard/project/_/database/publications) on the table you are subscribing to.
+
+</Admonition>
 
 ## Migration guide
 

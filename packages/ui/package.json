@@ -71,10 +71,12 @@
     "react-feather": "^2.0.10",
     "react-hook-form": "^7.45.0",
     "react-hot-toast": "^2.4.1",
+    "react-intersection-observer": "^9.8.2",
     "react-markdown": "^8.0.3",
     "react-resizable-panels": "^2.0.11",
     "react-syntax-highlighter": "^15.5.0",
     "react-tooltip": "^4.2.17",
+    "react-use": "^17.5.0",
     "reactflow": "^11.10.1",
     "remark-gfm": "^3.0.1",
     "sse.js": "^2.2.0",
@@ -83,7 +85,8 @@
     "tailwindcss-animate": "^1.0.6",
     "tailwindcss-radix": "^2.0.0",
     "yup": "^1.4.0",
-    "zod": "^3.22.3"
+    "zod": "^3.22.3",
+    "react-accessible-treeview": "^2.8.3"
   },
   "devDependencies": {
     "@babel/plugin-syntax-flow": "^7.21.4",

@@ -80,10 +80,10 @@ const PITR = () => {
             <UpgradeToPro
               organizationSlug={organization!.slug}
               projectRef={ref}
-              primaryText="Point in time recovery is a Pro plan add-on."
+              primaryText="Point in Time Recovery is a Pro plan add-on."
               secondaryText={
                 plan === 'free'
-                  ? 'Upgrade to the Pro plan with the PITR add-on selected to enable point in time recovery for your project.'
+                  ? 'With PITR, you can roll back to a specific time (to the second!). PITR starts from $100/mo and is available for Pro plan customers. Note that the Pro plan already includes daily backups for no extra charge—PITR is an optional upgrade.'
                   : 'Please enable the add-on to enable point in time recovery for your project.'
               }
               addon="pitr"

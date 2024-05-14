@@ -178,5 +178,43 @@ const RECOVERY: FormSchema = {
             [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
   },
 }
+const REAUTHENTICATION: FormSchema = {
+  $schema: JSON_SCHEMA_VERSION,
+  id: 'REAUTHENTICATION',
+  type: 'object',
+  title: 'Reauthentication',
+  properties: {
+    MAILER_SUBJECTS_REAUTHENTICATION: {
+      title: 'Subject heading',
+      type: 'string',
+    },
+    MAILER_TEMPLATES_REAUTHENTICATION_CONTENT: {
+      title: 'Message body',
+      descriptionOptional: 'HTML body of your email',
+      type: 'code',
+      description: `
+- \`{{ .Token }}\` : The 6-digit numeric email OTP
+- \`{{ .SiteURL }}\` : The URL of the site
+- \`{{ .Email }}\` : The user's email address
+- \`{{ .Data }}\` : The user's \`user_metadata\`
+`,
+    },
+  },
+  validationSchema: object().shape({
+    MAILER_SUBJECTS_REAUTHENTICATION: string().required('"Subject heading is required.'),
+  }),
+  misc: {
+    iconKey: 'email-icon2',
+    helper: `To complete setup, add this authorisation callback URL to your app's configuration in the Apple Developer Console.
+            [Learn more](https://supabase.com/docs/guides/auth/social-login/auth-apple#configure-your-services-id)`,
+  },
+}
 
-export const TEMPLATES_SCHEMAS = [CONFIRMATION, INVITE, MAGIC_LINK, EMAIL_CHANGE, RECOVERY]
+export const TEMPLATES_SCHEMAS = [
+  CONFIRMATION,
+  INVITE,
+  MAGIC_LINK,
+  EMAIL_CHANGE,
+  RECOVERY,
+  REAUTHENTICATION,
+]

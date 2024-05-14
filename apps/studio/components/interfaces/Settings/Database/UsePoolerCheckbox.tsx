@@ -74,7 +74,7 @@ export const UsePoolerCheckbox = ({
             <div className="flex items-center gap-x-4">
               <div className="flex items-center gap-x-2">
                 <label htmlFor={`use-pooler-${id}`} className="text-sm cursor-pointer">
-                  Use connection pooling
+                  Display connection pooler
                 </label>
                 {checked && (
                   <>

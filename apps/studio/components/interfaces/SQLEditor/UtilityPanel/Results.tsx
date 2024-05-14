@@ -55,23 +55,35 @@ const Results = ({ id, rows }: { id: string; rows: readonly any[] }) => {
     return <div className="flex h-full items-center justify-center font-mono text-xs">{name}</div>
   }
 
-  const columns: CalculatedColumn<any>[] = Object.keys(rows?.[0] ?? []).map((key, idx) => ({
-    idx,
-    key,
-    name: key,
-    resizable: true,
-    parent: undefined,
-    level: 0,
-    width: 120,
-    minWidth: 120,
-    maxWidth: undefined,
-    draggable: false,
-    frozen: false,
-    sortable: false,
-    isLastFrozenColumn: false,
-    renderCell: ({ row }: any) => formatter(key, row),
-    renderHeaderCell: () => columnRender(key),
-  }))
+  const EST_CHAR_WIDTH = 8.25
+  const MIN_COLUMN_WIDTH = 100
+  const MAX_COLUMN_WIDTH = 500
+
+  const columns: CalculatedColumn<any>[] = Object.keys(rows?.[0] ?? []).map((key, idx) => {
+    const maxColumnValueLength = Math.max(...rows.map((row) => String(row[key]).length))
+    const columnWidth = Math.max(
+      Math.min(maxColumnValueLength * EST_CHAR_WIDTH, MAX_COLUMN_WIDTH),
+      MIN_COLUMN_WIDTH
+    )
+
+    return {
+      idx,
+      key,
+      name: key,
+      resizable: true,
+      parent: undefined,
+      level: 0,
+      width: columnWidth,
+      minWidth: MIN_COLUMN_WIDTH,
+      maxWidth: undefined,
+      draggable: false,
+      frozen: false,
+      sortable: false,
+      isLastFrozenColumn: false,
+      renderCell: ({ row }: any) => formatter(key, row),
+      renderHeaderCell: () => columnRender(key),
+    }
+  })
 
   function onSelectedCellChange(position: any) {
     setCellPosition(position)

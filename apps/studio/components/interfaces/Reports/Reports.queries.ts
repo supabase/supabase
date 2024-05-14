@@ -1,3 +1,4 @@
+import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { PRESET_CONFIG } from './Reports.constants'
 import { Presets } from './Reports.types'
 import useDbQuery from 'hooks/analytics/useDbQuery'
@@ -37,9 +38,14 @@ export const useQueryPerformanceQuery = ({
     searchQuery.length > 0 ? `statements.query ~ '${searchQuery}'` : '',
   ]
     .filter((x) => x.length > 0)
-    .join(' OR ')
+    .join(' AND ')
 
   const orderBySql = orderBy && `ORDER BY ${orderBy.column} ${orderBy.order}`
   const sql = baseSQL.sql([], whereSql.length > 0 ? `WHERE ${whereSql}` : undefined, orderBySql)
-  return useDbQuery(sql, undefined, whereSql, orderBySql)
+  return useDbQuery({
+    sql,
+    params: undefined,
+    where: whereSql,
+    orderBy: orderBySql,
+  })
 }

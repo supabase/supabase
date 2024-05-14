@@ -67,7 +67,10 @@ where
 
 function retrieve({ id }: { id: number }): { sql: string; zod: typeof pgRoleOptionalZod }
 function retrieve({ name }: { name: string }): { sql: string; zod: typeof pgRoleOptionalZod }
-function retrieve({ id, name }: { id?: number; name?: string }): { sql: string; zod: typeof pgRoleOptionalZod } {
+function retrieve({ id, name }: { id?: number; name?: string }): {
+  sql: string
+  zod: typeof pgRoleOptionalZod
+} {
   if (id) {
     const sql = `${ROLES_SQL} where r.oid = ${literal(id)};`
     return {
@@ -84,21 +87,21 @@ function retrieve({ id, name }: { id?: number; name?: string }): { sql: string; 
 }
 
 type RoleCreateParams = {
-  name: string,
-  isSuperuser?: boolean,
-  canCreateDb?: boolean,
-  canCreateRole?: boolean,
-  inheritRole?: boolean,
-  canLogin?: boolean,
-  isReplicationRole?: boolean,
-  canBypassRls?: boolean,
-  connectionLimit?: number,
-  password?: string,
-  validUntil?: string,
-  memberOf?: string[],
-  members?: string[],
-  admins?: string[],
-  config?: Record<string, string>,
+  name: string
+  isSuperuser?: boolean
+  canCreateDb?: boolean
+  canCreateRole?: boolean
+  inheritRole?: boolean
+  canLogin?: boolean
+  isReplicationRole?: boolean
+  canBypassRls?: boolean
+  connectionLimit?: number
+  password?: string
+  validUntil?: string
+  memberOf?: string[]
+  members?: string[]
+  admins?: string[]
+  config?: Record<string, string>
 }
 function create({
   name,
@@ -133,23 +136,25 @@ create role ${ident(name)}
   ${members.length === 0 ? '' : `role ${members.map(ident).join(',')}`}
   ${admins.length === 0 ? '' : `admin ${admins.map(ident).join(',')}`}
   ;
-${Object.entries(config).map(([param, value]) => `alter role ${ident(name)} set ${ident(param)} = ${literal(value)};`).join('\n')}
+${Object.entries(config)
+  .map(([param, value]) => `alter role ${ident(name)} set ${ident(param)} = ${literal(value)};`)
+  .join('\n')}
 `
   return { sql }
 }
 
 type RoleUpdateParams = {
-  name?: string,
-  isSuperuser?: boolean,
-  canCreateDb?: boolean,
-  canCreateRole?: boolean,
-  inheritRole?: boolean,
-  canLogin?: boolean,
-  isReplicationRole?: boolean,
-  canBypassRls?: boolean,
-  connectionLimit?: number,
-  password?: string,
-  validUntil?: string,
+  name?: string
+  isSuperuser?: boolean
+  canCreateDb?: boolean
+  canCreateRole?: boolean
+  inheritRole?: boolean
+  canLogin?: boolean
+  isReplicationRole?: boolean
+  canBypassRls?: boolean
+  connectionLimit?: number
+  password?: string
+  validUntil?: string
 }
 function update({ id }: { id: number }, params: RoleUpdateParams): { sql: string }
 function update({ name }: { name: string }, params: RoleUpdateParams): { sql: string }
@@ -173,7 +178,8 @@ function update(
     connectionLimit,
     password,
     validUntil,
-  }: RoleUpdateParams): { sql: string } {
+  }: RoleUpdateParams
+): { sql: string } {
   const sql = `
 do $$
 declare
@@ -198,12 +204,16 @@ begin
     ${validUntil === undefined ? '' : `valid until ${literal(validUntil)}`}
   ', old.rolname));
 
-  ${newName === undefined ? '' : `
+  ${
+    newName === undefined
+      ? ''
+      : `
   -- Using the same name in the rename clause gives an error, so only do it if the new name is different.
   if new_name != old.nspname then
     execute(format('alter role %I rename to ${ident(newName)};', old.nspname));
   end if;
-  `}
+  `
+  }
 end
 $$;
 `

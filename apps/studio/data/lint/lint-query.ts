@@ -2,6 +2,7 @@ import { UseQueryOptions, useQuery } from '@tanstack/react-query'
 
 import { executeSql } from '../sql/execute-sql-query'
 import { lintKeys } from './keys'
+import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
 
 export const LINT_SQL = /* SQL */ `set local search_path = '';
 
@@ -39,6 +40,7 @@ index_ as (
 )
 select
     'unindexed_foreign_keys' as name,
+    'Unindexed foreign keys' as title,
     'INFO' as level,
     'EXTERNAL' as facing,
     array['PERFORMANCE'] as categories,
@@ -69,7 +71,7 @@ from
 where
     idx.index_ is null
     and fk.schema_name not in (
-        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and dep.objid is null -- exclude tables owned by extensions
 order by
@@ -80,32 +82,33 @@ union all
 (
 select
     'auth_users_exposed' as name,
-    'WARN' as level,
+    'Exposed Auth Users' as title,
+    'ERROR' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
-    'Detects if auth.users is exposed to anon or authenticated roles via a view or materialized view in the public schema, potentially compromising user data security.' as description,
+    'Detects if auth.users is exposed to anon or authenticated roles via a view or materialized view in schemas exposed to PostgREST, potentially compromising user data security.' as description,
     format(
         'View/Materialized View "%s" in the public schema may expose \`auth.users\` data to anon or authenticated roles.',
         c.relname
     ) as detail,
     'https://supabase.com/docs/guides/database/database-linter?lint=0002_auth_users_exposed' as remediation,
     jsonb_build_object(
-        'schema', 'public',
+        'schema', n.nspname,
         'name', c.relname,
         'type', 'view',
         'exposed_to', array_remove(array_agg(DISTINCT case when pg_catalog.has_table_privilege('anon', c.oid, 'SELECT') then 'anon' when pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT') then 'authenticated' end), null)
     ) as metadata,
-    format('auth_users_exposed_%s_%s', 'public', c.relname) as cache_key
+    format('auth_users_exposed_%s_%s', n.nspname, c.relname) as cache_key
 from
     -- Identify the oid for auth.users
-	pg_catalog.pg_class auth_users_pg_class
+    pg_catalog.pg_class auth_users_pg_class
     join pg_catalog.pg_namespace auth_users_pg_namespace
-		on auth_users_pg_class.relnamespace = auth_users_pg_namespace.oid
-		and auth_users_pg_class.relname = 'users'
-		and auth_users_pg_namespace.nspname = 'auth'
-	-- Depends on auth.users
+        on auth_users_pg_class.relnamespace = auth_users_pg_namespace.oid
+        and auth_users_pg_class.relname = 'users'
+        and auth_users_pg_namespace.nspname = 'auth'
+    -- Depends on auth.users
     join pg_catalog.pg_depend d
-    	on d.refobjid = auth_users_pg_class.oid
+        on d.refobjid = auth_users_pg_class.oid
     join pg_catalog.pg_rewrite r
         on r.oid = d.objid
     join pg_catalog.pg_class c
@@ -116,11 +119,11 @@ from
         on d.refobjid = pg_class_auth_users.oid
 where
     d.deptype = 'n'
-    and n.nspname = 'public'
     and (
       pg_catalog.has_table_privilege('anon', c.oid, 'SELECT')
       or pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT')
     )
+    and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
     -- Exclude self
     and c.relname <> '0002_auth_users_exposed'
     -- There are 3 insecure configurations
@@ -132,7 +135,7 @@ where
         -- Standard View, accessible to anon or authenticated that is security_definer
         (
             c.relkind = 'v' -- v for view
-            -- Exclude security invoker views 
+            -- Exclude security invoker views
             and not (
                 lower(coalesce(c.reloptions::text,'{}'))::text[]
                 && array[
@@ -147,7 +150,7 @@ where
         -- Standard View, security invoker, but no RLS enabled on auth.users
         (
             c.relkind in ('v') -- v for view
-            -- is security invoker 
+            -- is security invoker
             and (
                 lower(coalesce(c.reloptions::text,'{}'))::text[]
                 && array[
@@ -157,11 +160,13 @@ where
                     'security_invoker=on'
                 ]
             )
-            and not pg_class_auth_users.relrowsecurity 
+            and not pg_class_auth_users.relrowsecurity
         )
     )
 group by
-    c.relname, c.oid)
+    n.nspname,
+    c.relname,
+    c.oid)
 union all
 (
 with policies as (
@@ -194,6 +199,7 @@ with policies as (
 )
 select
     'auth_rls_initplan' as name,
+    'Auth RLS Initialization Plan' as title,
     'WARN' as level,
     'EXTERNAL' as facing,
     array['PERFORMANCE'] as categories,
@@ -216,27 +222,48 @@ from
 where
     is_rls_active
     and schema_name not in (
-        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and (
+        -- Example: auth.uid()
         (
-            -- Example: auth.uid()
-            qual  ~ '(auth)\.(uid|jwt|role|email)\(\)'
-            -- Example: select auth.uid()
-            and lower(qual) !~ 'select\s+(auth)\.(uid|jwt|role|email)\(\)'
+            qual like '%auth.uid()%'
+            and lower(qual) not like '%select auth.uid()%'
         )
-        or
-        (
-            -- Example: auth.uid()
-            with_check  ~ '(auth)\.(uid|jwt|role|email)\(\)'
-            -- Example: select auth.uid()
-            and lower(with_check) !~ 'select\s+(auth)\.(uid|jwt|role|email)\(\)'
+        or (
+            qual like '%auth.jwt()%'
+            and lower(qual) not like '%select auth.jwt()%'
+        )
+        or (
+            qual like '%auth.role()%'
+            and lower(qual) not like '%select auth.role()%'
+        )
+        or (
+            qual like '%auth.email()%'
+            and lower(qual) not like '%select auth.email()%'
+        )
+        or (
+            with_check like '%auth.uid()%'
+            and lower(with_check) not like '%select auth.uid()%'
+        )
+        or (
+            with_check like '%auth.jwt()%'
+            and lower(with_check) not like '%select auth.jwt()%'
+        )
+        or (
+            with_check like '%auth.role()%'
+            and lower(with_check) not like '%select auth.role()%'
+        )
+        or (
+            with_check like '%auth.email()%'
+            and lower(with_check) not like '%select auth.email()%'
         )
     ))
 union all
 (
 select
     'no_primary_key' as name,
+    'No Primary Key' as title,
     'INFO' as level,
     'EXTERNAL' as facing,
     array['PERFORMANCE'] as categories,
@@ -269,7 +296,7 @@ from
 where
     pgc.relkind = 'r' -- regular tables
     and pgns.nspname not in (
-        'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgsodium', 'pgsodium_masks', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'storage', 'supabase_functions', 'supabase_migrations', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and dep.objid is null -- exclude tables owned by extensions
 group by
@@ -282,6 +309,7 @@ union all
 (
 select
     'unused_index' as name,
+    'Unused Index' as title,
     'INFO' as level,
     'EXTERNAL' as facing,
     array['PERFORMANCE'] as categories,
@@ -318,12 +346,13 @@ where
     and not pi.indisprimary
     and dep.objid is null -- exclude tables owned by extensions
     and psui.schemaname not in (
-        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     ))
 union all
 (
 select
     'multiple_permissive_policies' as name,
+    'Multiple Permissive Policies' as title,
     'WARN' as level,
     'EXTERNAL' as facing,
     array['PERFORMANCE'] as categories,
@@ -377,8 +406,9 @@ from
     ) act(cmd)
 where
     c.relkind = 'r' -- regular tables
+    and p.polpermissive -- policy is permissive
     and n.nspname not in (
-        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and r.rolname not like 'pg_%'
     and r.rolname not like 'supabase%admin'
@@ -395,7 +425,8 @@ union all
 (
 select
     'policy_exists_rls_disabled' as name,
-    'INFO' as level,
+    'Policy Exists RLS Disabled' as title,
+    'ERROR' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
     'Detects cases where row level security (RLS) policies have been created, but RLS has not been enabled for the underlying table.' as description,
@@ -428,7 +459,7 @@ from
 where
     c.relkind = 'r' -- regular tables
     and n.nspname not in (
-        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     -- RLS is disabled
     and not c.relrowsecurity
@@ -440,6 +471,7 @@ union all
 (
 select
     'rls_enabled_no_policy' as name,
+    'RLS Enabled No Policy' as title,
     'INFO' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
@@ -472,7 +504,7 @@ from
 where
     c.relkind = 'r' -- regular tables
     and n.nspname not in (
-        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     -- RLS is enabled
     and c.relrowsecurity
@@ -485,6 +517,7 @@ union all
 (
 select
     'duplicate_index' as name,
+    'Duplicate Index' as title,
     'WARN' as level,
     'EXTERNAL' as facing,
     array['PERFORMANCE'] as categories,
@@ -525,7 +558,7 @@ from
 where
     c.relkind in ('r', 'm') -- tables and materialized views
     and n.nspname not in (
-        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and dep.objid is null -- exclude tables owned by extensions
 group by
@@ -539,12 +572,13 @@ union all
 (
 select
     'security_definer_view' as name,
-    'WARN' as level,
+    'Security Definer View' as title,
+    'ERROR' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
-    'Detects views that are SECURITY DEFINER meaning that they ignore row level security (RLS) policies.' as description,
+    'Detects views defined with the SECURITY DEFINER property. These views enforce Postgres permissions and row level security policies (RLS) of the view creator, rather than that of the querying user' as description,
     format(
-        'View \`%s.%s\` is SECURITY DEFINER',
+        'View \`%s.%s\` is defined with the SECURITY DEFINER property',
         n.nspname,
         c.relname
     ) as detail,
@@ -568,21 +602,29 @@ from
         and dep.deptype = 'e'
 where
     c.relkind = 'v'
-    and n.nspname = 'public'
+    and (
+        pg_catalog.has_table_privilege('anon', c.oid, 'SELECT')
+        or pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT')
+    )
+    and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
+    and n.nspname not in (
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+    )
     and dep.objid is null -- exclude views owned by extensions
-	and not (
-		lower(coalesce(c.reloptions::text,'{}'))::text[]
-		&& array[
-			'security_invoker=1',
-			'security_invoker=true',
-			'security_invoker=yes',
-			'security_invoker=on'
-		]
-	))
+    and not (
+        lower(coalesce(c.reloptions::text,'{}'))::text[]
+        && array[
+            'security_invoker=1',
+            'security_invoker=true',
+            'security_invoker=yes',
+            'security_invoker=on'
+        ]
+    ))
 union all
 (
 select
     'function_search_path_mutable' as name,
+    'Function Search Path Mutable' as title,
     'WARN' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
@@ -613,7 +655,7 @@ from
         and dep.deptype = 'e'
 where
     n.nspname not in (
-        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and dep.objid is null -- exclude functions owned by extensions
     -- Search path not set to ''
@@ -622,10 +664,11 @@ union all
 (
 select
     'rls_disabled_in_public' as name,
+    'RLS Disabled in Public' as title,
     'ERROR' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
-    'Detects cases where row level security (RLS) has not been enabled on a table in the \`public\` schema.' as description,
+    'Detects cases where row level security (RLS) has not been enabled on tables in schemas exposed to PostgREST' as description,
     format(
         'Table \`%s.%s\` is public, but RLS has not been enabled.',
         n.nspname,
@@ -648,13 +691,21 @@ from
         on c.relnamespace = n.oid
 where
     c.relkind = 'r' -- regular tables
-    and n.nspname = 'public'
     -- RLS is disabled
-    and not c.relrowsecurity)
+    and not c.relrowsecurity
+    and (
+        pg_catalog.has_table_privilege('anon', c.oid, 'SELECT')
+        or pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT')
+    )
+    and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
+    and n.nspname not in (
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+    ))
 union all
 (
-select 
+select
     'extension_in_public' as name,
+    'Extension in Public' as title,
     'WARN' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
@@ -679,6 +730,10 @@ where
     -- plpgsql is installed by default in public and outside user control
     -- confirmed safe
     pe.extname not in ('plpgsql')
+    -- Scoping this to public is not optimal. Ideally we would use the postgres
+    -- search path. That currently isn't available via SQL. In other lints
+    -- we have used has_schema_privilege('anon', 'extensions', 'USAGE') but that
+    -- is not appropriate here as it would evaluate true for the extensions schema
     and pe.extnamespace::regnamespace::text = 'public')
 union all
 (
@@ -702,6 +757,7 @@ with policies as (
 )
 select
     'rls_references_user_metadata' as name,
+    'RLS references user metadata' as title,
     'ERROR' as level,
     'EXTERNAL' as facing,
     array['SECURITY'] as categories,
@@ -723,17 +779,60 @@ from
     policies
 where
     schema_name not in (
-        '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
     )
     and (
-            -- Example: auth.jwt() -> 'user_metadata'
-			-- False positives are possible, but it isn't practical to string match
-			-- If false positive rate is too high, this expression can iterate
-            qual like '%auth.jwt()%user_metadata%'
-			or qual like '%current_setting(%request.jwt.claims%)%user_metadata%'
-			or with_check like '%auth.jwt()%user_metadata%'
-			or with_check like '%current_setting(%request.jwt.claims%)%user_metadata%'
-    ))`.trim()
+        -- Example: auth.jwt() -> 'user_metadata'
+        -- False positives are possible, but it isn't practical to string match
+        -- If false positive rate is too high, this expression can iterate
+        qual like '%auth.jwt()%user_metadata%'
+        or qual like '%current_setting(%request.jwt.claims%)%user_metadata%'
+        or with_check like '%auth.jwt()%user_metadata%'
+        or with_check like '%current_setting(%request.jwt.claims%)%user_metadata%'
+    ))
+union all
+(
+select
+    'materialized_view_in_api' as name,
+    'Materialized View in API' as title,
+    'WARN' as level,
+    'EXTERNAL' as facing,
+    array['SECURITY'] as categories,
+    'Detects materialized views that are potentially accessible over the Data APIs.' as description,
+    format(
+        'Materialized view \`%s.%s\` is selectable by anon or authenticated roles',
+        n.nspname,
+        c.relname
+    ) as detail,
+    'https://supabase.com/docs/guides/database/database-linter?lint=0016_materialized_view_in_api' as remediation,
+    jsonb_build_object(
+        'schema', n.nspname,
+        'name', c.relname,
+        'type', 'materialized view'
+    ) as metadata,
+    format(
+        'materialized_view_in_api_%s_%s',
+        n.nspname,
+        c.relname
+    ) as cache_key
+from
+    pg_catalog.pg_class c
+    join pg_catalog.pg_namespace n
+        on n.oid = c.relnamespace
+    left join pg_catalog.pg_depend dep
+        on c.oid = dep.objid
+        and dep.deptype = 'e'
+where
+    c.relkind = 'm'
+    and (
+        pg_catalog.has_table_privilege('anon', c.oid, 'SELECT')
+        or pg_catalog.has_table_privilege('authenticated', c.oid, 'SELECT')
+    )
+    and n.nspname = any(array(select trim(unnest(string_to_array(current_setting('pgrst.db_schemas', 't'), ',')))))
+    and n.nspname not in (
+        '_timescaledb_cache', '_timescaledb_catalog', '_timescaledb_config', '_timescaledb_internal', 'auth', 'cron', 'extensions', 'graphql', 'graphql_public', 'information_schema', 'net', 'pgroonga', 'pgsodium', 'pgsodium_masks', 'pgtle', 'pgbouncer', 'pg_catalog', 'pgtle', 'realtime', 'repack', 'storage', 'supabase_functions', 'supabase_migrations', 'tiger', 'topology', 'vault'
+    )
+    and dep.objid is null)`.trim()
 
 // Array of all lint rules we handle right now.
 export const LINT_TYPES = [
@@ -779,17 +878,20 @@ export type Lint = {
 export type ProjectLintsVariables = {
   projectRef?: string
   connectionString?: string
+  exposedSchemas?: string
 }
 
 const getProjectLints = async (
-  { projectRef, connectionString }: ProjectLintsVariables,
+  { projectRef, connectionString, exposedSchemas }: ProjectLintsVariables,
   signal?: AbortSignal
 ) => {
+  const exposedSchemasPrepend = `set local pgrst.db_schemas='${exposedSchemas}';`
+
   const { result } = await executeSql(
     {
       projectRef,
       connectionString,
-      sql: LINT_SQL,
+      sql: exposedSchemasPrepend?.concat(LINT_SQL),
       queryKey: lintKeys.lint(projectRef),
     },
     signal
@@ -802,14 +904,20 @@ export type ProjectLintsData = Lint[]
 export type ProjectLintsError = unknown
 
 export const useProjectLintsQuery = <TData = ProjectLintsData>(
-  { projectRef, connectionString }: ProjectLintsVariables,
-  { enabled, ...options }: UseQueryOptions<ProjectLintsData, ProjectLintsError, TData> = {}
-) =>
-  useQuery<ProjectLintsData, ProjectLintsError, TData>(
+  { projectRef, connectionString }: Omit<ProjectLintsVariables, 'exposedSchemas'>,
+  { enabled = true, ...options }: UseQueryOptions<ProjectLintsData, ProjectLintsError, TData> = {}
+) => {
+  const { data, isSuccess } = useProjectPostgrestConfigQuery({ projectRef })
+
+  const exposedSchemas = data?.db_schema
+
+  return useQuery<ProjectLintsData, ProjectLintsError, TData>(
     lintKeys.lint(projectRef),
-    ({ signal }) => getProjectLints({ projectRef, connectionString }, signal),
+    ({ signal }) =>
+      getProjectLints({ projectRef, connectionString, exposedSchemas: exposedSchemas! }, signal),
     {
-      enabled: enabled && typeof projectRef !== 'undefined',
+      enabled: enabled && isSuccess && typeof projectRef !== 'undefined',
       ...options,
     }
   )
+}

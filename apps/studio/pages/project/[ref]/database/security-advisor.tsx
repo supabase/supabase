@@ -146,7 +146,12 @@ const ProjectLints: NextPageWithLayout = () => {
         setSelectedLint={setSelectedLint}
         isLoading={isLoading}
       />
-      <LinterPageFooter isLoading={isLoading} isRefetching={isRefetching} refetch={refetch} />
+      <LinterPageFooter
+        hideDbInspectCTA
+        isLoading={isLoading}
+        isRefetching={isRefetching}
+        refetch={refetch}
+      />
     </div>
   )
 }

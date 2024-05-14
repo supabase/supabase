@@ -28,7 +28,7 @@ export const QueryPerformanceFilterBar = ({
 }) => {
   const router = useRouter()
   const { project } = useProjectContext()
-  const [showBottomSection, setShowBottomSection] = useLocalStorageQuery(
+  const [showBottomSection] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.QUERY_PERF_SHOW_BOTTOM_SECTION,
     true
   )

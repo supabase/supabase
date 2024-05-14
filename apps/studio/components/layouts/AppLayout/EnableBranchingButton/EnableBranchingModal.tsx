@@ -23,7 +23,6 @@ import { useBranchCreateMutation } from 'data/branches/branch-create-mutation'
 import { useProjectUpgradeEligibilityQuery } from 'data/config/project-upgrade-eligibility-query'
 import { useCheckGithubBranchValidity } from 'data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from 'data/integrations/github-connections-query'
-import { useGitHubRepositoriesQuery } from 'data/integrations/github-repositories-query'
 import { useOrgSubscriptionQuery } from 'data/subscriptions/org-subscription-query'
 import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
 import { useSelectedOrganization } from 'hooks'
@@ -42,14 +41,6 @@ const EnableBranchingModal = () => {
   // but calling form.formState.isValid somehow removes the onBlur check,
   // and makes the validation run onChange instead. This is a workaround
   const [isValid, setIsValid] = useState(false)
-
-  const {
-    data: repositories,
-    error: repositoriesError,
-    isLoading: isLoadingRepositories,
-    isSuccess: isSuccessRepositories,
-    isError: isErrorRepositories,
-  } = useGitHubRepositoriesQuery()
 
   const {
     data: connections,
@@ -123,9 +114,9 @@ const EnableBranchingModal = () => {
     defaultValues: { branchName: '' },
   })
 
-  const isLoading = isLoadingRepositories
-  const isError = isErrorRepositories || isErrorUpgradeEligibility
-  const isSuccess = isSuccessRepositories && isSuccessUpgradeEligibility
+  const isLoading = isLoadingConnections || isLoadingUpgradeEligibility
+  const isError = isErrorConnections || isErrorUpgradeEligibility
+  const isSuccess = isSuccessConnections && isSuccessUpgradeEligibility
 
   const canSubmit = form.getValues('branchName').length > 0 && !isChecking && isValid
   const onSubmit = (data: z.infer<typeof FormSchema>) => {
@@ -187,11 +178,8 @@ const EnableBranchingModal = () => {
               <>
                 <Modal.Separator />
                 <Modal.Content className="px-7 py-6">
-                  {isErrorRepositories ? (
-                    <AlertError
-                      error={repositoriesError}
-                      subject="Failed to retrieve repositories"
-                    />
+                  {isErrorConnections ? (
+                    <AlertError error={connectionsError} subject="Failed to retrieve connections" />
                   ) : isErrorUpgradeEligibility ? (
                     <AlertError
                       error={upgradeEligibilityError}
