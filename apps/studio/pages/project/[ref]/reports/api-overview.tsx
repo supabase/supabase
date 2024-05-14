@@ -59,6 +59,7 @@ export const ApiReport: NextPageWithLayout = () => {
         params={report.params.totalRequests}
         title="Total Requests"
         data={report.data.totalRequests || []}
+        error={report.error.totalRequest}
         renderer={TotalRequestsChartRenderer}
         append={TopApiRoutesRenderer}
         appendProps={{ data: report.data.topRoutes || [], params: report.params.topRoutes }}
@@ -69,6 +70,7 @@ export const ApiReport: NextPageWithLayout = () => {
         title="Response Errors"
         tooltip="Error responses with 4XX or 5XX status codes"
         data={report.data.errorCounts || []}
+        error={report.error.errorCounts}
         renderer={ErrorCountsChartRenderer}
         appendProps={{
           data: report.data.topErrorRoutes || [],
@@ -82,6 +84,7 @@ export const ApiReport: NextPageWithLayout = () => {
         title="Response Speed"
         tooltip="Average response speed (in miliseconds) of a request"
         data={report.data.responseSpeed || []}
+        error={report.error.responseSpeed}
         renderer={ResponseSpeedChartRenderer}
         appendProps={{ data: report.data.topSlowRoutes || [], params: report.params.topSlowRoutes }}
         append={TopApiRoutesRenderer}
@@ -90,6 +93,7 @@ export const ApiReport: NextPageWithLayout = () => {
       <ReportWidget
         isLoading={report.isLoading}
         params={report.params.networkTraffic}
+        error={report.error.networkTraffic}
         title="Network Traffic"
         tooltip="Ingress and egress of requests and responses respectively"
         data={report.data.networkTraffic || []}
