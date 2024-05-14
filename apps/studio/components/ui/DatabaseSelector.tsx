@@ -1,5 +1,6 @@
 import { useParams } from 'common'
 import { noop } from 'lodash'
+import { Check } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -23,12 +24,11 @@ import {
   cn,
 } from 'ui'
 
+import { Markdown } from 'components/interfaces/Markdown'
+import { REPLICA_STATUS } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
 import { formatDatabaseID, formatDatabaseRegion } from 'data/read-replicas/replicas.utils'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
-import { Check } from 'lucide-react'
-import { REPLICA_STATUS } from 'components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
-import { Markdown } from 'components/interfaces/Markdown'
 
 interface DatabaseSelectorProps {
   variant?: 'regular' | 'connected-on-right' | 'connected-on-left' | 'connected-on-both'

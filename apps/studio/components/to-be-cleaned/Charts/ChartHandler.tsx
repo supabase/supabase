@@ -44,7 +44,6 @@ interface ChartHandlerProps {
  * Provided data must be in the expected chart format.
  */
 const ChartHandler = ({
-  id,
   label,
   attribute,
   provider,
@@ -150,7 +149,7 @@ const ChartHandler = ({
   }
 
   return (
-    <div id={id} className="h-full w-full">
+    <div className="h-full w-full">
       <div className="absolute right-6 z-50 flex justify-between">
         {!hideChartType && (
           <Tooltip_Shadcn_>

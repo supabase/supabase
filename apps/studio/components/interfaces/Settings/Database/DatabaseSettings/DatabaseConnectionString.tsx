@@ -169,7 +169,7 @@ export const DatabaseConnectionString = ({ appearance }: DatabaseConnectionStrin
     <div id="connection-string" className="w-full">
       <Panel
         className={cn(
-          '!m-0 [&>div:nth-child(1)]:!border-0 [&>div:nth-child(1)>div]:!p-0',
+          '!m-0 [&>div:nth-child(1)]:!border-0 [&>div:nth-child(1)]:!p-0',
           appearance === 'minimal' && 'border-0 shadow-none'
         )}
         bodyClassName={cn(appearance === 'minimal' && 'bg-transparent')}

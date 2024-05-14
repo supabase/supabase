@@ -273,7 +273,9 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               disabled={status !== PROJECT_STATUS.ACTIVE_HEALTHY}
               className="gap-x-2"
             >
-              <Link href={`/project/${ref}/reports/database?db=${id}`}>View replication lag</Link>
+              <Link href={`/project/${ref}/reports/database?db=${id}&chart=replication-lag`}>
+                View replication lag
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectRestartReplica()}>
