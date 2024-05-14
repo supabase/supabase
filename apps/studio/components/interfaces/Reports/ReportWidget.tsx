@@ -14,11 +14,13 @@ import {
 } from 'ui'
 import { LogsEndpointParams } from '../Settings/Logs'
 import type { BaseReportParams, ReportQueryType } from './Reports.types'
+import AlertError from 'components/ui/AlertError'
 
 export interface ReportWidgetProps<T = any> {
   data: T[]
   title: string
   description?: string
+  error?: string | Object | null
   tooltip?: string
   className?: string
   renderer: (props: ReportWidgetRendererProps) => ReactNode
