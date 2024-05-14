@@ -287,7 +287,16 @@ const MapView = ({
                                 View connection string
                               </Link>
                             </DropdownMenuItem>
+                            <DropdownMenuItem className="gap-x-2">
+                              <Link
+                                href={`/project/${ref}/reports/database?db=${database.identifier}&chart=replication-lag`}
+                              >
+                                View replication lag
+                              </Link>
+                            </DropdownMenuItem>
+
                             <DropdownMenuSeparator />
+
                             <DropdownMenuItem
                               className="gap-x-2"
                               onClick={() => onSelectRestartReplica(database)}
