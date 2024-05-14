@@ -74,13 +74,29 @@ const ApiOperationSection = (props) => {
         {operation.parameters &&
           operation.parameters.filter((parameter) => parameter.in === 'header').length > 0 && (
             <div className="not-prose mt-12">
-              <h5 className="mb-3 text-base text-foreground">Query Parameters</h5>
+              <h5 className="mb-3 text-base text-foreground">Header Parameters</h5>
               <ul className="mt-4">
                 {operation.parameters &&
                   operation.parameters
                     .filter((parameter: any) => parameter.in === 'header')
                     .map((parameter: any, index) => (
                       <Param key={index} {...parameter} isOptional={!parameter.required}></Param>
+                    ))}
+              </ul>
+            </div>
+          )}
+
+        {/* Body Parameters */}
+        {operation.requestBody && (
+            <div className="not-prose mt-12">
+              <h5 className="mb-3 text-base text-foreground">Body Parameters</h5>
+              <ul className="mt-4">
+                {operation.requestBody &&
+                  Object.entries(operation?.requestBody?.content['application/json']?.schema?.properties ?? {})
+                    .map(([key, value]) => (
+                      <Param key={key} name={key} {...(value as  object)}
+                             isOptional={!operation.requestBody?.content['application/json']?.schema?.required?.includes(key)}>
+                      </Param>
                     ))}
               </ul>
             </div>
