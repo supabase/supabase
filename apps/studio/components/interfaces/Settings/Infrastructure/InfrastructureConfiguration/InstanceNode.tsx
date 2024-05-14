@@ -240,7 +240,7 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               ) : status === REPLICA_STATUS.GOING_DOWN ? (
                 <Badge>Going down</Badge>
               ) : status === REPLICA_STATUS.RESTORING ? (
-                <Badge>Restoring</Badge>
+                <Badge>Restarting</Badge>
               ) : (
                 <Badge variant="warning">Unhealthy</Badge>
               )}
@@ -278,9 +278,9 @@ export const ReplicaNode = ({ data }: NodeProps<ReplicaNodeData>) => {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectRestartReplica()}>
-                Restart replica
-              </DropdownMenuItem> */}
+            <DropdownMenuItem className="gap-x-2" onClick={() => onSelectRestartReplica()}>
+              Restart replica
+            </DropdownMenuItem>
             {/* <DropdownMenuItem className="gap-x-2" onClick={() => onSelectResizeReplica()}>
                 Resize replica
               </DropdownMenuItem> */}
