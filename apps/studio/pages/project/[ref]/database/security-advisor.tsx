@@ -38,7 +38,6 @@ const ProjectLints: NextPageWithLayout = () => {
     refetch: refetchLintsQuery,
   } = useProjectLintsQuery({
     projectRef: project?.ref,
-    connectionString: project?.connectionString,
   })
 
   const {
