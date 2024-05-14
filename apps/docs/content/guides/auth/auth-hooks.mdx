@@ -95,15 +95,19 @@ Read more about `security definer` tag [in our database guide](/docs/guides/data
 
 </TabPanel>
 <TabPanel id="https-hook-security-model" label="HTTP">
-Each Hook has a dedicated `HOOK_SECRET` used to sign the payload. Ensure that you create an entry in your `.env.local` file for each Hook that you have. In this case, let’s assume we’re adding a  `SEND_SMS` Hook
+Each Hook has a dedicated `HOOK_SECRET` used to sign the payload. Ensure that you create an entry in your `.env.local` file for each Hook that you have. In this case, let’s assume we’re adding a  `SEND_SMS` Hook and we want to register the corresponding secret:
 
 ```bash
-SEND_SMS_HOOK_SECRET="v1,whsec_<base-64-secret>"
+SEND_SMS_HOOK_SECRET="v1,whsec_<standard-base-64-secret>"
 ```
 
-`v1` denotes the version of the hook while `whsec_` signifies that we’re using a symmetric secret. The secret is encoded via standard Base64 and can contain the characters `+`, `/` and `=`
+Let's break down the secret content:
 
-Use the secret in conjunction with the Standard Webhooks package to verify the Payload at the start of every function:
+- `v1` denotes the version of the hook
+- `whsec_` signifies that we’re using a symmetric secret
+- `<base-64-secret>` implies a Standard Base64 encoded secret which can contain the characters `+`, `/` and `=`
+
+We will use the secret in conjunction with the Standard Webhooks package to verify the payload before processing it:
 
 ```jsx
 
@@ -131,7 +135,7 @@ Runtime errors could happen when:
 
 - The user does not have appropriate permissions
 - The event payload received does not have required claims.
-- The user has performed an action which violates a business rule.
+- The user has performed an action which violates a business rule.a
 
 <Tabs
   scrollable
@@ -158,20 +162,20 @@ Here's an example:
 }
 ```
 
-When an error is returned, the error is propagated from the hook to Supabase Auth and translated into a HTTP error which is returned to your application. Supabase Auth will only take into account the error and disregard the rest of the payload.
+Errors returned from a Postgres Hook are not retryable. When an error is returned, the error is propagated from the hook to Supabase Auth and translated into a HTTP error which is returned to your application. Supabase Auth will only take into account the error and disregard the rest of the payload.
 
 </TabPanel>
 
 <TabPanel id="https-hook-errors" label="HTTP">
-HTTP Hooks support a limited set of status codes:
+For HTTP Hooks, errors are responses which contain status codes 400 and above. Here's a breakdown of the status codes:
 
 | HTTP Status Code | Description                                                   | Example Usage                                  |
 | ---------------- | ------------------------------------------------------------- | ---------------------------------------------- |
 | 200, 202, 204    | Valid response, proceed                                       | Successful processing of the request           |
 | 429, 503         | Retryable errors with Retry-after header supported            | Temporary server overload or maintenance       |
-| 403, 400         | Treated as internal Server Errors and return a 500 Error Code | Malformed requests or insufficient permissions |
+| 403, 400         | Treated as Internal Server Errors and return a 500 Error Code | Malformed requests or insufficient permissions |
 
-There are both retryable and non-retryable errors. On a retryable error, HTTP Hooks will attempt up to three retries with a backoff of two seconds while a Postgres Hook will fail on error. Here’s an overview of a HTTP retry schedule:
+Errors with `429` and `503` Status codes are retryable. On a retryable error, HTTP Hooks will attempt up to three retries with a backoff of two seconds. Here’s an overview of a HTTP retry schedule:
 
 | Time Since Start (HH:MM:SS) | Event                   | Notes                                             |
 | --------------------------- | ----------------------- | ------------------------------------------------- |
@@ -328,7 +332,7 @@ Note that payloads are sent uncompressed (Encoding: `identity`) in order to accu
 
 ### Debugging Your Hook
 
-Test the Postgres Function in isolation before enabling the hook by connecting to your database with `psql` and running `select <your_function_name>`. Where necessary, use [`RAISE` statements](https://www.postgresql.org/docs/current/plpgsql-errors-and-messages.html) to print information to the terminal.
+Test the Postgres Function in isolation before enabling the hook by connecting to your database with `psql` and running `select <your_function_name>`. Where necessary, use [`RAISE` statements](https://www.postgresql.org/docs/current/plpgsql-errors-and-messages.html) to print information to the terminal. For more details on debugging, visit our [Postgres Functions debugging guide](https://supabase.com/docs/guides/database/functions#debugging-functions)
 
 ## Deploying a Hook
 
@@ -354,6 +358,14 @@ Supabase Auth will supply the following fields to your hook:
 
 Example payload:
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  queryGroup="language"
+>
+<TabPanel id="mfa-verification-attempt-json" label="JSON">
+
 ```json
 {
   "factor_id": "6eab6a69-7766-48bf-95d8-bd8f606894db",
@@ -361,6 +373,30 @@ Example payload:
   "valid": true
 }
 ```
+
+</TabPanel>
+<TabPanel id="mfa-verification-attempt-json-schema" label="JSON Schema">
+```
+{
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "x-faker": "random.uuid"
+    },
+    "valid": {
+      "type": "boolean",
+      "x-faker": "random.boolean"
+    }
+  },
+  "required": [
+    "user_id",
+    "valid"
+  ]
+}
+```
+</TabPanel>
+</Tabs>
 
 **Outputs**
 
@@ -489,12 +525,44 @@ Check if a password is valid prior to taking any additional action to ensure the
 - `user_id` Unique identifier for the user attempting to sign in. Correlate this to the `auth.users` table.
 - `valid` Whether the password verification attempt was valid.
 
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  queryGroup="language"
+>
+<TabPanel id="password-verification-attempt-json" label="JSON">
+
 ```json
 {
   "user_id": "3919cb6e-4215-4478-a960-6d3454326cec",
   "valid": true
 }
 ```
+
+</TabPanel>
+<TabPanel id="password-verification-attempt-json-schema" label="JSON Schema">
+```
+{
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "x-faker": "random.uuid"
+    },
+    "valid": {
+      "type": "boolean",
+      "x-faker": "random.boolean"
+    }
+  },
+  "required": [
+    "user_id",
+    "valid"
+  ]
+}
+```
+</TabPanel>
+</Tabs>
 
 **Outputs**
 
@@ -739,6 +807,182 @@ Optional Claims: `jti`, `iss`, `nbf`, `app_metadata`, `user_metadata`, `amr`
 - `claims` Claims which are attached to the access token.
 - `authentication_method` the authentication method used to request the access token. Possible values include:
   `oauth`, `password`, `otp`, `totp`, `recovery`, `invite`, `sso/saml`, `magiclink`, `email/signup`, `email_change`, `token_refresh`.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  queryGroup="language"
+>
+<TabPanel id="custom-access-token-json" label="JSON">
+```json
+{
+  "user_id": "8ccaa7af-909f-44e7-84cb-67cdccb56be6",
+  "claims": {
+    "aud": "authenticated",
+    "exp": 1715690221,
+    "iat": 1715686621,
+    "sub": "8ccaa7af-909f-44e7-84cb-67cdccb56be6",
+    "email": "",
+    "phone": "",
+    "app_metadata": {},
+    "user_metadata": {},
+    "role": "authenticated",
+    "aal": "aal1",
+    "amr": [ { method: "anonymous", timestamp: 1715686621 } ],
+    "session_id": "4b938a09-5372-4177-a314-cfa292099ea2",
+    "is_anonymous": true
+  },
+  "authentication_method": "anonymous"
+}
+```
+</TabPanel>
+<TabPanel id="custom-access-token-json-schema" label="JSON Schema">
+```
+{
+  "type": "object",
+  "properties": {
+    "user_id": {
+      "type": "string",
+      "x-faker": "random.uuid"
+    },
+    "claims": {
+      "type": "object",
+      "properties": {
+        "aud": {
+          "type": "string",
+          "x-faker": "random.word"
+        },
+        "exp": {
+          "type": "integer",
+          "x-faker": "date.future"
+        },
+        "iat": {
+          "type": "integer",
+          "x-faker": "date.past"
+        },
+        "sub": {
+          "type": "string",
+          "x-faker": "random.uuid"
+        },
+        "email": {
+          "type": "string",
+          "x-faker": "internet.email"
+        },
+        "phone": {
+          "type": "string",
+          "x-faker": {
+            "fake": "{{phone.phoneNumber('+1##########')}}"
+          }
+        },
+        "app_metadata": {
+          "type": "object",
+          "x-faker": "random.objectElement"
+        },
+        "user_metadata": {
+          "type": "object",
+          "x-faker": "random.objectElement"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "anon",
+            "authenticated"
+          ]
+        },
+        "aal": {
+          "type": "string",
+          "enum": [
+            "aal1",
+            "aal2",
+            "aal3"
+          ]
+        },
+        "amr": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "method": {
+                "type": "string",
+                "enum": [
+                  "oauth",
+                  "password",
+                  "otp",
+                  "totp",
+                  "recovery",
+                  "invite",
+                  "sso/saml",
+                  "magiclink",
+                  "email/signup",
+                  "email_change",
+                  "token_refresh",
+                  "anonymous"
+                ]
+              },
+              "timestamp": {
+                "type": "integer",
+                "x-faker": "date.past"
+              }
+            },
+            "required": [
+              "method",
+              "timestamp"
+            ]
+          }
+        },
+        "session_id": {
+          "type": "string",
+          "x-faker": "random.uuid"
+        },
+        "is_anonymous": {
+          "type": "boolean",
+          "x-faker": "random.boolean"
+        }
+      },
+      "required": [
+        "aud",
+        "exp",
+        "iat",
+        "sub",
+        "email",
+        "phone",
+        "app_metadata",
+        "user_metadata",
+        "role",
+        "aal",
+        "amr",
+        "session_id",
+        "is_anonymous"
+      ]
+    },
+    "authentication_method": {
+      "type": "string",
+      "enum": [
+        "oauth",
+        "password",
+        "otp",
+        "totp",
+        "recovery",
+        "invite",
+        "sso/saml",
+        "magiclink",
+        "email/signup",
+        "email_change",
+        "token_refresh",
+        "anonymous"
+      ]
+    }
+  },
+  "required": [
+    "user_id",
+    "claims",
+    "authentication_method"
+  ]
+}
+```
+</TabPanel>
+</Tabs>
 
 **Outputs**
 
