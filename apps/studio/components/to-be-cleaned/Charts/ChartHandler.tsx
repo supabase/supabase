@@ -1,10 +1,10 @@
-import { isUndefined } from 'lodash'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useState } from 'react'
-import { Button } from 'ui'
+import { Button, TooltipContent_Shadcn_, TooltipTrigger_Shadcn_, Tooltip_Shadcn_ } from 'ui'
 
 import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
 import AreaChart from 'components/ui/Charts/AreaChart'
+import BarChart from 'components/ui/Charts/BarChart'
 import { AnalyticsInterval } from 'data/analytics/constants'
 import {
   InfraMonitoringAttribute,
@@ -15,9 +15,9 @@ import { Activity, BarChartIcon, Loader2 } from 'lucide-react'
 import { useDatabaseSelectorStateSnapshot } from 'state/database-selector'
 import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 import type { ChartData } from './ChartHandler.types'
-import { BarChart } from './ChartRenderer'
 
 interface ChartHandlerProps {
+  id?: string
   label: string
   attribute: string
   provider: 'infra-monitoring' | 'daily-stats'
@@ -139,7 +139,7 @@ const ChartHandler = ({
     )
   }
 
-  if (isUndefined(chartData)) {
+  if (chartData === undefined) {
     return (
       <div className="flex h-52 w-full flex-col items-center justify-center gap-y-2">
         <WarningIcon />
@@ -152,30 +152,31 @@ const ChartHandler = ({
     <div className="h-full w-full">
       <div className="absolute right-6 z-50 flex justify-between">
         {!hideChartType && (
-          <div>
-            <div className="flex w-full space-x-3">
+          <Tooltip_Shadcn_>
+            <TooltipTrigger_Shadcn_ asChild>
               <Button
                 type="default"
                 className="px-1.5"
                 icon={chartStyle === 'bar' ? <Activity /> : <BarChartIcon />}
                 onClick={() => setChartStyle(chartStyle === 'bar' ? 'line' : 'bar')}
               />
-            </div>
-          </div>
+            </TooltipTrigger_Shadcn_>
+            <TooltipContent_Shadcn_ side="left" align="center">
+              View as {chartStyle === 'bar' ? 'line chart' : 'bar chart'}
+            </TooltipContent_Shadcn_>
+          </Tooltip_Shadcn_>
         )}
         {children}
       </div>
-
       {chartStyle === 'bar' ? (
         <BarChart
-          data={chartData?.data ?? []}
-          attribute={attribute}
-          yAxisLimit={chartData?.yAxisLimit}
+          data={(chartData?.data ?? []) as any}
           format={format || chartData?.format}
+          xAxisKey={'period_start'}
+          yAxisKey={attribute}
           highlightedValue={_highlightedValue}
-          label={label}
+          title={label}
           customDateFormat={customDateFormat}
-          onBarClick={onBarClick}
         />
       ) : (
         <AreaChart
