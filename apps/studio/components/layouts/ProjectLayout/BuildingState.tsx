@@ -66,13 +66,7 @@ const BuildingState = () => {
           </div>
           <div>
             <p className="text-sm text-foreground-light">
-              <Button
-                onClick={() => {
-                  throw new Error('Boom')
-                }}
-              >
-                Click
-              </Button>{' '}
+              {' '}
               We are provisioning your database and API endpoints
             </p>
             <p className="text-sm text-foreground-light"> This may take a few minutes</p>
