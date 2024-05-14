@@ -16,9 +16,9 @@ import 'styles/ui.scss'
 import 'ui/build/css/themes/dark.css'
 import 'ui/build/css/themes/light.css'
 
-import * as Sentry from '@sentry/nextjs'
 import { loader } from '@monaco-editor/react'
 import { TooltipProvider } from '@radix-ui/react-tooltip'
+import * as Sentry from '@sentry/nextjs'
 import { SessionContextProvider } from '@supabase/auth-helpers-react'
 import { createClient } from '@supabase/supabase-js'
 import { Hydrate, QueryClientProvider } from '@tanstack/react-query'
@@ -112,7 +112,7 @@ function CustomApp({ Component, pageProps }: AppPropsWithLayout) {
 
   const errorBoundaryHandler = (error: Error, info: ErrorInfo) => {
     console.error(error.stack)
-    Sentry.captureMessage('Full page crash caught by error boundary')
+    Sentry.captureMessage(`Full page crash: ${error.message || 'Unknown error message'}`)
   }
 
   useEffect(() => {

@@ -29,6 +29,8 @@ import { REPLICA_STATUS } from './InstanceConfiguration.constants'
 import { addRegionNodes, generateNodes, getDagreGraphLayout } from './InstanceConfiguration.utils'
 import { LoadBalancerNode, PrimaryNode, RegionNode, ReplicaNode } from './InstanceNode'
 import MapView from './MapView'
+import { RestartReplicaConfirmationModal } from './RestartReplicaConfirmationModal'
+import { SmoothstepEdge } from './Edge'
 
 // [Joshen] Just FYI, UI assumes single provider for primary + replicas
 // [Joshen] Idea to visualize grouping based on region: https://reactflow.dev/examples/layout/sub-flows
@@ -141,6 +143,10 @@ const InstanceConfigurationUI = () => {
                 type: 'smoothstep',
                 animated: true,
                 className: '!cursor-default',
+                data: {
+                  identifier: database.identifier,
+                  connectionString: database.connectionString,
+                },
               }
             }),
           ]
@@ -157,6 +163,10 @@ const InstanceConfigurationUI = () => {
     }),
     []
   )
+
+  const edgeTypes = {
+    smoothstep: SmoothstepEdge,
+  }
 
   const setReactFlow = async () => {
     const graph = getDagreGraphLayout(nodes, edges)
@@ -249,6 +259,7 @@ const InstanceConfigurationUI = () => {
                 defaultNodes={[]}
                 defaultEdges={[]}
                 nodeTypes={nodeTypes}
+                edgeTypes={edgeTypes}
                 proOptions={{ hideAttribution: true }}
               >
                 <Background color={backgroundPatternColor} />
@@ -259,6 +270,7 @@ const InstanceConfigurationUI = () => {
                   setNewReplicaRegion(region)
                   setShowNewReplicaPanel(true)
                 }}
+                onSelectRestartReplica={setSelectedReplicaToRestart}
                 onSelectDropReplica={setSelectedReplicaToDrop}
               />
             )}
@@ -288,28 +300,13 @@ const InstanceConfigurationUI = () => {
         onCancel={() => setShowDeleteAllModal(false)}
       />
 
-      <ComputeInstanceSidePanel />
-
-      {/* <ConfirmationModal
-        size="medium"
-        visible={selectedReplicaToRestart !== undefined}
-        title="Confirm to restart selected replica?"
-        confirmLabel="Restart replica"
-        confirmLabelLoading="Restarting replica"
+      <RestartReplicaConfirmationModal
+        selectedReplica={selectedReplicaToRestart}
+        onSuccess={() => setRefetchInterval(5000)}
         onCancel={() => setSelectedReplicaToRestart(undefined)}
-        onConfirm={() => onConfirmRestartReplica()}
-      >
-        <p className="text-sm">Before restarting the replica, consider:</p>
-        <ul className="text-sm text-foreground-light py-1 list-disc mx-4 space-y-1">
-          <li>
-            Network traffic from this region may slow down while the replica is restarting,
-            especially if you have no other replicas in this region
-          </li>
-        </ul>
-        <p className="text-sm mt-2">
-          Are you sure you want to restart this replica (ID: {selectedReplicaToRestart?.id}) now?{' '}
-        </p>
-      </ConfirmationModal> */}
+      />
+
+      <ComputeInstanceSidePanel />
     </>
   )
 }
