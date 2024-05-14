@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 1.165.0
+  version: 1.167.4
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -256,6 +256,14 @@ commands:
         description: enable experimental features
         required: true
         default_value: 'false'
+      - id: linked
+        name: --linked
+        description: Connects to Storage API of the linked project.
+        default_value: 'true'
+      - id: local
+        name: --local
+        description: Connects to Storage API of the local database.
+        default_value: 'false'
   - id: supabase-storage-mv
     title: supabase storage mv
     summary: Move objects from src to dst path
@@ -273,6 +281,14 @@ commands:
         description: enable experimental features
         required: true
         default_value: 'false'
+      - id: linked
+        name: --linked
+        description: Connects to Storage API of the linked project.
+        default_value: 'true'
+      - id: local
+        name: --local
+        description: Connects to Storage API of the local database.
+        default_value: 'false'
   - id: supabase-storage-ls
     title: supabase storage ls
     summary: List objects by path prefix
@@ -289,6 +305,14 @@ commands:
         name: --experimental
         description: enable experimental features
         required: true
+        default_value: 'false'
+      - id: linked
+        name: --linked
+        description: Connects to Storage API of the linked project.
+        default_value: 'true'
+      - id: local
+        name: --local
+        description: Connects to Storage API of the local database.
         default_value: 'false'
   - id: supabase-storage-cp
     title: supabase storage cp
@@ -318,6 +342,14 @@ commands:
         name: --experimental
         description: enable experimental features
         required: true
+        default_value: 'false'
+      - id: linked
+        name: --linked
+        description: Connects to Storage API of the linked project.
+        default_value: 'true'
+      - id: local
+        name: --local
+        description: Connects to Storage API of the local database.
         default_value: 'false'
   - id: supabase-stop
     title: supabase stop
