@@ -2,6 +2,7 @@ import { defineConfig } from 'vitest/config'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import { fileURLToPath } from 'url'
 import { resolve } from 'path'
+import path from 'path'
 import react from '@vitejs/plugin-react'
 
 // Some tools like Vitest VSCode extensions, have trouble with resolving relative paths,
@@ -16,12 +17,18 @@ export default defineConfig({
       projects: ['.'],
     }),
   ],
+  resolve: {
+    alias: {
+      '@ui': path.resolve(__dirname, './../../packages/ui/src'),
+    },
+  },
   test: {
     globals: true,
     environment: 'jsdom', // TODO(kamil): This should be set per test via header in .tsx files only
     include: [resolve(dirname, './tests/**/*.test.{ts,tsx}')],
     restoreMocks: true,
     setupFiles: [
+      resolve(dirname, './tests/vitestSetup.ts'),
       resolve(dirname, './tests/setup/testing-library-matchers.js'),
       resolve(dirname, './tests/setup/polyfills.js'),
       resolve(dirname, './tests/setup/radix.js'),

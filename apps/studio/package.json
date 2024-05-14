@@ -10,6 +10,7 @@
     "lint": "next lint",
     "test": "vitest --run",
     "test:watch": "vitest --watch",
+    "test:ui": "vitest --ui",
     "test:update": "vitest --run --update",
     "test:update:watch": "vitest --watch --update",
     "deploy:staging": "VERCEL_ORG_ID=team_E6KJ1W561hMTjon1QSwOh0WO VERCEL_PROJECT_ID=QmcmhbiAtCMFTAHCuGgQscNbke4TzgWULECctNcKmxWCoT vercel --prod -A .vercel/staging.json",

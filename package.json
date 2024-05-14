@@ -5,7 +5,13 @@
   "author": "Supabase, Inc.",
   "license": "Apache-2.0",
   "private": true,
-  "workspaces": ["apps/*", "apps/docs/spec/parser", "tests", "playwright-tests", "packages/*"],
+  "workspaces": [
+    "apps/*",
+    "apps/docs/spec/parser",
+    "tests",
+    "playwright-tests",
+    "packages/*"
+  ],
   "scripts": {
     "build": "turbo run build",
     "build:studio": "turbo run build --filter=studio",
@@ -31,8 +37,10 @@
     "generate:types": "supabase gen types typescript --local > ./supabase/functions/common/database-types.ts"
   },
   "devDependencies": {
+    "@vitest/ui": "^1.6.0",
     "eslint": "^8.57.0",
     "eslint-config-custom": "*",
+    "next-router-mock": "^0.9.13",
     "prettier": "^4.0.0-alpha.8",
     "prettier-plugin-sql-cst": "^0.11.0",
     "sass": "^1.72.0",
@@ -47,8 +55,18 @@
     "npm": ">=9.0.0",
     "node": ">=20.0.0"
   },
-  "keywords": ["postgres", "firebase", "storage", "functions", "database", "auth"],
+  "keywords": [
+    "postgres",
+    "firebase",
+    "storage",
+    "functions",
+    "database",
+    "auth"
+  ],
   "volta": {
     "node": "20.11.1"
+  },
+  "dependencies": {
+    "msw": "^2.3.0"
   }
 }
