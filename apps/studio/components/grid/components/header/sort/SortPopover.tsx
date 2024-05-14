@@ -1,12 +1,19 @@
 import { useUrlState } from 'hooks'
 import update from 'immutability-helper'
 import { isEqual } from 'lodash'
+import { ChevronDown, List } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
-import { Button, IconChevronDown, IconList, Popover } from 'ui'
 
-import { DropdownControl } from 'components/grid/components/common'
 import { formatSortURLParams } from 'components/grid/SupabaseGrid.utils'
+import { DropdownControl } from 'components/grid/components/common'
 import type { Sort, SupaTable } from 'components/grid/types'
+import {
+  Button,
+  PopoverContent_Shadcn_,
+  PopoverSeparator_Shadcn_,
+  PopoverTrigger_Shadcn_,
+  Popover_Shadcn_,
+} from 'ui'
 import SortRow from './SortRow'
 
 export interface SortPopoverProps {
@@ -16,38 +23,48 @@ export interface SortPopoverProps {
 }
 
 const SortPopover = ({ table, sorts, setParams }: SortPopoverProps) => {
+  const [open, setOpen] = useState(false)
+
   const btnText =
     (sorts || []).length > 0
       ? `Sorted by ${sorts.length} rule${sorts.length > 1 ? 's' : ''}`
       : 'Sort'
 
+  const onApplySorts = (appliedSorts: Sort[]) => {
+    setParams((prevParams) => {
+      return {
+        ...prevParams,
+        sort: appliedSorts.map((sort) => `${sort.column}:${sort.ascending ? 'asc' : 'desc'}`),
+      }
+    })
+  }
+
   return (
-    <Popover
-      size="large"
-      align="start"
-      className="sb-grid-sort-popover"
-      overlay={<SortOverlay table={table} sorts={sorts} setParams={setParams} />}
-    >
-      <Button
-        asChild
-        type={(sorts || []).length > 0 ? 'link' : 'text'}
-        icon={
-          <div className="text-foreground-light">
-            <IconList strokeWidth={1.5} />
-          </div>
-        }
-      >
-        <span>{btnText}</span>
-      </Button>
-    </Popover>
+    <Popover_Shadcn_ modal={false} open={open} onOpenChange={setOpen}>
+      <PopoverTrigger_Shadcn_ asChild>
+        <Button
+          type={(sorts || []).length > 0 ? 'link' : 'text'}
+          icon={<List strokeWidth={1.5} className="text-foreground-light" />}
+        >
+          {btnText}
+        </Button>
+      </PopoverTrigger_Shadcn_>
+      <PopoverContent_Shadcn_ className="p-0 w-96" side="bottom" align="start">
+        <SortOverlay table={table} sorts={sorts} onApplySorts={onApplySorts} />
+      </PopoverContent_Shadcn_>
+    </Popover_Shadcn_>
   )
 }
 
 export default SortPopover
 
-export interface SortOverlayProps extends SortPopoverProps {}
+export interface SortOverlayProps {
+  table: SupaTable
+  sorts: string[]
+  onApplySorts: (sorts: Sort[]) => void
+}
 
-const SortOverlay = ({ table, sorts: sortsFromUrl, setParams }: SortOverlayProps) => {
+const SortOverlay = ({ table, sorts: sortsFromUrl, onApplySorts }: SortOverlayProps) => {
   const initialSorts = useMemo(
     () => formatSortURLParams((sortsFromUrl as string[]) ?? []),
     [sortsFromUrl]
@@ -66,15 +83,6 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, setParams }: SortOverlayProps
 
   function onAddSort(columnName: string | number) {
     setSorts([...sorts, { column: columnName as string, ascending: true }])
-  }
-
-  function onApplySort() {
-    setParams((prevParams) => {
-      return {
-        ...prevParams,
-        sort: sorts.map((sort) => `${sort.column}:${sort.ascending ? 'asc' : 'desc'}`),
-      }
-    })
   }
 
   const onDeleteSort = useCallback((column: string) => {
@@ -125,7 +133,7 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, setParams }: SortOverlayProps
         </div>
       )}
 
-      <Popover.Separator />
+      <PopoverSeparator_Shadcn_ />
       <div className="px-3 flex flex-row justify-between">
         {columns && columns.length > 0 ? (
           <DropdownControl
@@ -135,19 +143,22 @@ const SortOverlay = ({ table, sorts: sortsFromUrl, setParams }: SortOverlayProps
             align="start"
           >
             <Button
-              asChild
               type="text"
-              iconRight={<IconChevronDown />}
+              iconRight={<ChevronDown />}
               className="sb-grid-dropdown__item-trigger"
             >
-              <span>{`Pick ${sorts.length > 1 ? 'another' : 'a'} column to sort by`}</span>
+              Pick {sorts.length > 1 ? 'another' : 'a'} column to sort by
             </Button>
           </DropdownControl>
         ) : (
           <p className="text-sm text-foreground-light">All columns have been added</p>
         )}
         <div className="flex items-center">
-          <Button disabled={isEqual(sorts, initialSorts)} type="default" onClick={onApplySort}>
+          <Button
+            disabled={isEqual(sorts, initialSorts)}
+            type="default"
+            onClick={() => onApplySorts(sorts)}
+          >
             Apply sorting
           </Button>
         </div>

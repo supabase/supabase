@@ -7,6 +7,7 @@ import {
   Button,
   IconAlertCircle,
 } from 'ui'
+import { WarningIcon } from 'ui-patterns/Icons/StatusIcons'
 
 export interface AlertErrorProps {
   ref?: string
@@ -25,13 +26,13 @@ const AlertError = ({ ref, subject, error, className }: AlertErrorProps) => {
   if (subjectString) href += `&subject=${subjectString}`
   if (error) href += `&message=Error:%20${error.message}`
 
-  const formattedErrorMessage = error?.message.includes('503')
+  const formattedErrorMessage = error?.message?.includes('503')
     ? '503 Service Temporarily Unavailable'
     : error?.message
 
   return (
     <Alert_Shadcn_ className={className} variant="warning" title={subject}>
-      <IconAlertCircle className="h-4 w-4" strokeWidth={2} />
+      <WarningIcon className="h-4 w-4" strokeWidth={2} />
       <AlertTitle_Shadcn_>{subject}</AlertTitle_Shadcn_>
       <AlertDescription_Shadcn_ className="flex flex-col gap-3 break-words">
         <div>

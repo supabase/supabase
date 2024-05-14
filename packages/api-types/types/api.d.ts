@@ -136,16 +136,6 @@ export interface paths {
     /** Enables Database Webhooks on the project */
     post: operations['HooksController_enableHooks']
   }
-  '/platform/database/{ref}/owner-reassign': {
-    /** Gets the status of owner reassignment */
-    get: operations['OwnerController_getOwnerReassignStatus']
-    /** Reassigns object owner from supabase_admin to temp */
-    post: operations['OwnerController_applyOwnerReassign']
-    /** Rollback object owner from temp to supabase_admin */
-    delete: operations['OwnerController_rollbackOwnerReassign']
-    /** Reassigns object owner from temp to postgres */
-    patch: operations['OwnerController_finaliseOwnerReassign']
-  }
   '/platform/organizations': {
     /** Gets user's organizations */
     get: operations['OrganizationsController_getOrganizations']
@@ -555,6 +545,10 @@ export interface paths {
     /** Restarts project */
     post: operations['RestartController_restartProject']
   }
+  '/platform/projects/{ref}/run-lints': {
+    /** Run project lints */
+    get: operations['ProjectRunLintsController_runProjectLints']
+  }
   '/platform/projects/{ref}': {
     /** Gets a specific project that belongs to the authenticated user */
     get: operations['ProjectsRefController_getProject']
@@ -927,16 +921,6 @@ export interface paths {
   '/system/auth/{ref}/templates/{template}': {
     /** Gets GoTrue template */
     get: operations['SystemAuthTemplateController_getTemplate']
-  }
-  '/system/database/{ref}/owner/owner-reassign': {
-    /** Gets the status of owner reassignment */
-    get: operations['DatabaseOwnerController_getOwnerReassignStatus']
-    /** Reassigns object owner from supabase_admin to temp */
-    post: operations['DatabaseOwnerController_applyOwnerReassign']
-    /** Rollback object owner from temp to supabase_admin */
-    delete: operations['DatabaseOwnerController_rollbackOwnerReassign']
-    /** Reassigns object owner from temp to postgres */
-    patch: operations['DatabaseOwnerController_finaliseOwnerReassign']
   }
   '/system/database/{ref}/password': {
     /** Updates the database password */
@@ -2489,16 +2473,6 @@ export interface components {
     PointInTimeRestoreBody: {
       recovery_time_target_unix: number
     }
-    OwnerResponse: {
-      project_ref: string
-      /** @enum {string} */
-      current: 'unmigrated' | 'temp_role' | 'migrated'
-      /** @enum {string} */
-      desired: 'unmigrated' | 'temp_role' | 'migrated'
-      created_at: string
-      modified_at: string
-      migrated_at: string | null
-    }
     OrganizationResponse: {
       /** @enum {string|null} */
       restriction_status: 'grace_period' | 'grace_period_over' | 'restricted' | null
@@ -3742,10 +3716,13 @@ export interface components {
       id: string
       inserted_at: string
       updated_at: string
-      type: Record<string, never>
-      visibility: Record<string, never>
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
       name: string
       description?: string
+      content: Record<string, never>
       project_id: number
       owner_id: number
       last_updated_by?: number
@@ -3758,10 +3735,13 @@ export interface components {
       id: string
       inserted_at: string
       updated_at: string
-      type: Record<string, never>
-      visibility: Record<string, never>
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
       name: string
       description?: string
+      content: Record<string, never>
       project_id: number
       owner_id: number
       last_updated_by?: number
@@ -3781,10 +3761,13 @@ export interface components {
       id: string
       inserted_at: string
       updated_at: string
-      type: Record<string, never>
-      visibility: Record<string, never>
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
       name: string
       description?: string
+      content: Record<string, never>
       project_id: number
       owner_id: number
       last_updated_by?: number
@@ -3805,10 +3788,13 @@ export interface components {
       id: string
       inserted_at: string
       updated_at: string
-      type: Record<string, never>
-      visibility: Record<string, never>
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
       name: string
       description?: string
+      content: Record<string, never>
       project_id: number
       owner_id: number
       last_updated_by?: number
@@ -3864,8 +3850,10 @@ export interface components {
       id: string
       inserted_at: string
       updated_at: string
-      type: Record<string, never>
-      visibility: Record<string, never>
+      /** @enum {string} */
+      type: 'sql' | 'report' | 'log_sql'
+      /** @enum {string} */
+      visibility: 'user' | 'project' | 'org' | 'public'
       name: string
       description?: string
       project_id: number
@@ -3953,6 +3941,47 @@ export interface components {
     ResizeBody: {
       volume_size_gb: number
     }
+    RestartProjectInfo: {
+      database_identifier?: string
+    }
+    ProjectLintMetadata: {
+      /** @enum {string} */
+      type?: 'table' | 'view' | 'auth' | 'function' | 'extension'
+      schema?: string
+      name?: string
+      entity?: string
+      fkey_name?: string
+      fkey_columns?: number[]
+    }
+    ProjectLintResponse: {
+      /** @enum {string} */
+      name:
+        | 'unindexed_foreign_keys'
+        | 'auth_users_exposed'
+        | 'auth_rls_initplan'
+        | 'no_primary_key'
+        | 'unused_index'
+        | 'multiple_permissive_policies'
+        | 'policy_exists_rls_disabled'
+        | 'rls_enabled_no_policy'
+        | 'duplicate_index'
+        | 'security_definer_view'
+        | 'function_search_path_mutable'
+        | 'rls_disabled_in_public'
+        | 'extension_in_public'
+        | 'auth_otp_long_expiry'
+        | 'auth_otp_short_length'
+        | 'rls_references_user_metadata'
+      /** @enum {string} */
+      level: 'ERROR' | 'WARN' | 'INFO'
+      categories: ('PERFORMANCE' | 'SECURITY')[]
+      facing: string
+      description: string
+      detail: string
+      remediation: Record<string, never>
+      metadata: components['schemas']['ProjectLintMetadata'] | null
+      cache_key: string
+    }
     ServiceVersions: {
       gotrue: string
       postgrest: string
@@ -4037,6 +4066,7 @@ export interface components {
       )[]
       source_notification_id?: string
       region: string
+      database_identifier?: string
     }
     RestartServicesBody: {
       restartRequest: components['schemas']['RestartServiceRequest']
@@ -4133,6 +4163,13 @@ export interface components {
       token: string
       id: number
       name: string
+    }
+    LFAccessToken: {
+      token: string
+      id: number
+      inserted_at: string
+      scopes: string
+      description: string | null
     }
     LFEndpoint: {
       token: string
@@ -4921,9 +4958,18 @@ export interface components {
       restriction_data?: components['schemas']['RestrictionData']
       message?: string
     }
+    AwsPartnerBillingBody: {
+      aws_customer_id: string
+      aws_customer_account_id: string
+      aws_product_code: string
+      aws_private_offer_id: string
+      aws_subscription_start: string
+      aws_subscription_end: string
+    }
     CreateAwsPartnerOrganizationBody: {
       primary_email: string
       name: string
+      partner_billing: components['schemas']['AwsPartnerBillingBody']
     }
     AwsPartnerOrganizationResponse: {
       id: number
@@ -6702,104 +6748,6 @@ export interface operations {
         content: never
       }
       /** @description Failed to enable Database Webhooks on the project */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets the status of owner reassignment */
-  OwnerController_getOwnerReassignStatus: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      /** @description Failed to get status of owner reassignment */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Reassigns object owner from supabase_admin to temp */
-  OwnerController_applyOwnerReassign: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to reassign owner on the project */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Rollback object owner from temp to supabase_admin */
-  OwnerController_rollbackOwnerReassign: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to rollback owner on the project */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Reassigns object owner from temp to postgres */
-  OwnerController_finaliseOwnerReassign: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to reassign owner on the project */
       500: {
         content: never
       }
@@ -9920,6 +9868,7 @@ export interface operations {
           | 'disk_io_consumption'
           | 'ram_usage'
           | 'swap_usage'
+          | 'physical_replication_lag_physical_replica_lag_seconds'
         startDate: string
         endDate: string
         interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
@@ -9991,6 +9940,11 @@ export interface operations {
         ref: string
       }
     }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['RestartProjectInfo']
+      }
+    }
     responses: {
       201: {
         content: never
@@ -10000,6 +9954,25 @@ export interface operations {
       }
       /** @description Failed to restart project */
       500: {
+        content: never
+      }
+    }
+  }
+  /** Run project lints */
+  ProjectRunLintsController_runProjectLints: {
+    parameters: {
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+    }
+    responses: {
+      200: {
+        content: {
+          'application/json': components['schemas']['ProjectLintResponse'][]
+        }
+      }
+      403: {
         content: never
       }
     }
@@ -10507,7 +10480,7 @@ export interface operations {
     responses: {
       200: {
         content: {
-          'application/json': components['schemas']['LFSource'][]
+          'application/json': components['schemas']['LFAccessToken'][]
         }
       }
       403: {
@@ -10524,7 +10497,7 @@ export interface operations {
     responses: {
       201: {
         content: {
-          'application/json': components['schemas']['LFSource']
+          'application/json': components['schemas']['LFAccessToken']
         }
       }
       403: {
@@ -10540,9 +10513,7 @@ export interface operations {
   AccessTokenController_deleteAccessToken: {
     responses: {
       200: {
-        content: {
-          'application/json': components['schemas']['LFSource']
-        }
+        content: never
       }
       403: {
         content: never
@@ -12236,104 +12207,6 @@ export interface operations {
         }
       }
       /** @description Failed to retrieve GoTrue template */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Gets the status of owner reassignment */
-  DatabaseOwnerController_getOwnerReassignStatus: {
-    parameters: {
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      /** @description Failed to get status of owner reassignment */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Reassigns object owner from supabase_admin to temp */
-  DatabaseOwnerController_applyOwnerReassign: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      201: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to reassign owner on the project */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Rollback object owner from temp to supabase_admin */
-  DatabaseOwnerController_rollbackOwnerReassign: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to rollback owner on the project */
-      500: {
-        content: never
-      }
-    }
-  }
-  /** Reassigns object owner from temp to postgres */
-  DatabaseOwnerController_finaliseOwnerReassign: {
-    parameters: {
-      header: {
-        'x-connection-encrypted': string
-      }
-      path: {
-        /** @description Project ref */
-        ref: string
-      }
-    }
-    responses: {
-      200: {
-        content: {
-          'application/json': components['schemas']['OwnerResponse']
-        }
-      }
-      403: {
-        content: never
-      }
-      /** @description Failed to reassign owner on the project */
       500: {
         content: never
       }
