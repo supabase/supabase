@@ -4,6 +4,9 @@ import { HttpResponse, http } from 'msw'
 const PROJECT_REF = 'default'
 
 export const APIMock = [
+  http.get(`${API_URL}/msw/test`, () => {
+    return HttpResponse.json({ message: 'Hello from MSW!' })
+  }),
   http.get(`${API_URL}/platform/projects/${PROJECT_REF}/analytics/endpoints/logs.all`, () => {
     return HttpResponse.json({
       totalRequests: [
