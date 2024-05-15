@@ -9,7 +9,9 @@ const Param = ({ name, isOptional, type, description, children, isPrimitive }: I
   return (
     <div className="border-t border-b py-5 flex flex-col gap-3 debugger">
       <div className="flex gap-3 items-center">
-        {!isPrimitive && <span className="text-sm text-foreground font-mono font-medium">{name ?? 'no-name'}</span>}
+        {!isPrimitive && (
+          <span className="text-sm text-foreground font-mono font-medium">{name ?? 'no-name'}</span>
+        )}
         <span>
           {isOptional ? (
             <div className="text-[10px] px-3 tracking-wide font-mono text-foreground-lighter">

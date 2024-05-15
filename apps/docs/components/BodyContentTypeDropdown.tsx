@@ -10,7 +10,7 @@ import { useState } from 'react'
 type IParamProps = any
 
 const BodyContentTypeDropdown = ({ types, onSelect }: IParamProps) => {
-  const [selectedType, setSelectedType] = useState(types[0] || '');
+  const [selectedType, setSelectedType] = useState(types[0] || '')
   const myOnSelectType = (type: string) => {
     setSelectedType(type)
     if (onSelect) onSelect(type)
@@ -49,9 +49,7 @@ const BodyContentTypeDropdown = ({ types, onSelect }: IParamProps) => {
             onClick={() => myOnSelectType(type)}
             className="justify-between flex"
           >
-            <span className={`${selectedType === type ? 'font-bold' : ''}`}>
-              {type}
-            </span>
+            <span className={`${selectedType === type ? 'font-bold' : ''}`}>{type}</span>
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
