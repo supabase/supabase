@@ -1481,4 +1481,42 @@ describe('select', () => {
     expect(method).toBe('GET')
     expect(fullPath).toBe('/profiles?select=region,count()')
   })
+
+  test('primary relation prefix stripped', async () => {
+    const sql = stripIndents`
+      select
+        profiles.name
+      from
+        profiles
+      where
+        profiles.name = 'Bob'
+      order by
+        profiles.name
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/profiles?select=name&name=eq.Bob&order=name')
+  })
+
+  test('primary relation alias prefix stripped', async () => {
+    const sql = stripIndents`
+      select
+        p.name
+      from
+        profiles p
+      where
+        p.name = 'Bob'
+      order by
+        p.name
+    `
+
+    const statement = await processSql(sql)
+    const { method, fullPath } = await renderHttp(statement)
+
+    expect(method).toBe('GET')
+    expect(fullPath).toBe('/profiles?select=name&name=eq.Bob&order=name')
+  })
 })

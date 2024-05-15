@@ -191,6 +191,8 @@ export type Sort = {
   nulls?: 'first' | 'last'
 }
 
+export const supportedAggregateFunctions = ['avg', 'count', 'max', 'min', 'sum']
+
 /**
  * Coverts SQL into a PostgREST-compatible `Statement`.
  *
@@ -288,10 +290,10 @@ function processSelectStmt(stmt: SelectStmt): Select {
   validateGroupClause(stmt.SelectStmt.groupClause ?? [], targets, alias ?? from)
 
   const filter = stmt.SelectStmt.whereClause
-    ? processWhereClause(stmt.SelectStmt.whereClause)
+    ? processWhereClause(stmt.SelectStmt.whereClause, alias ?? from)
     : undefined
 
-  const sorts = processSortClause(stmt.SelectStmt.sortClause ?? [])
+  const sorts = processSortClause(stmt.SelectStmt.sortClause ?? [], alias ?? from)
 
   const limit = processLimit(stmt)
 
@@ -470,6 +472,7 @@ function processTargetList(
   from: string,
   embeddedTargets: EmbeddedTarget[]
 ): Target[] {
+  // First pass: map each SQL target column to a PostgREST target 1-to-1
   const flattenedColumnTargets: (ColumnTarget | AggregateTarget)[] = targetList.map((resTarget) => {
     const target = processQueryTarget(resTarget.ResTarget.val)
     target.alias = resTarget.ResTarget.name
@@ -477,7 +480,7 @@ function processTargetList(
     return target
   })
 
-  // Transfer resource embedding columns to `embeddedTargets`
+  // Second pass: transfer joined columns to `embeddedTargets`
   const columnTargets = flattenedColumnTargets.filter((target) => {
     // Account for the special case when the aggregate doesn't have a column attached
     // ie. `count()`: should always be applied to the top level relation
@@ -491,10 +494,16 @@ function processTargetList(
     const [relationName] = qualifiedName.slice(-2, -1)
     const [columnName] = qualifiedName.slice(-1)
 
-    if (relationName === from) {
+    // If the column was prefixed with the primary table name
+    if (!relationName || relationName === from) {
+      // Strip the table name from the column
+      target.column = columnName
+
+      // Keep this column at the top level
       return true
     }
 
+    // If this column is part of a joined relation
     if (relationName) {
       const embeddedTarget = embeddedTargets.find(
         (t) => (!t.alias && t.relation === relationName) || t.alias === relationName
@@ -510,14 +519,17 @@ function processTargetList(
       // Strip relation from column name
       target.column = columnName
 
+      // Nest the column in the embedded target
       embeddedTarget.targets.push(target)
+
+      // Remove this column from the top level
       return false
     }
 
     return true
   })
 
-  // Nest embedded targets within each other based on the relations in their join qualifiers
+  // Third pass: nest embedded targets within each other based on the relations in their join qualifiers
   const nestedEmbeddedTargets = embeddedTargets.reduce<EmbeddedTarget[]>(
     (output, embeddedTarget) => {
       // If the embedded target was joined with the primary relation, return it
@@ -591,7 +603,6 @@ function processQueryTarget(
     }
   } else if ('FuncCall' in queryTarget) {
     const functionName = renderFields(queryTarget.FuncCall.funcname)
-    const supportedAggregateFunctions = ['avg', 'count', 'max', 'min', 'sum']
 
     if (!supportedAggregateFunctions.includes(functionName)) {
       throw new UnsupportedError(
@@ -638,7 +649,7 @@ function processQueryTarget(
   }
 }
 
-function processWhereClause(expression: WhereExpression): Filter {
+function processWhereClause(expression: WhereExpression, from: string): Filter {
   if ('A_Expr' in expression) {
     if ('TypeCast' in expression.A_Expr.lexpr) {
       throw new UnsupportedError('Casting is not supported in the WHERE clause')
@@ -670,7 +681,20 @@ function processWhereClause(expression: WhereExpression): Filter {
       }
 
       const stringFields = fields.filter((field): field is PgString => 'String' in field)
-      column = stringFields.map((field) => field.String.sval).join('.')
+      const qualifiedName = stringFields.map((field) => field.String.sval)
+
+      // Relation and column names are last two parts of the qualified name
+      const [relationName] = qualifiedName.slice(-2, -1)
+      const [columnName] = qualifiedName.slice(-1)
+
+      // If the column is prefixed with the primary table name, strip the prefix
+      if (!relationName || relationName === from) {
+        column = columnName
+      }
+      // Otherwise this is a foreign column, so keep the relation prefix
+      else {
+        column = [relationName, columnName].join('.')
+      }
     } else {
       throw new UnsupportedError(`Left side of WHERE clause must be a column`)
     }
@@ -783,7 +807,7 @@ function processWhereClause(expression: WhereExpression): Filter {
       throw new UnsupportedError(`Unknown boolop '${expression.BoolExpr.boolop}'`)
     }
 
-    const values = expression.BoolExpr.args.map((arg) => processWhereClause(arg))
+    const values = expression.BoolExpr.args.map((arg) => processWhereClause(arg, from))
 
     // The 'not' operator is special - instead of wrapping its child,
     // we just return the child directly and set negate=true on it.
@@ -809,7 +833,7 @@ function processWhereClause(expression: WhereExpression): Filter {
   }
 }
 
-function processSortClause(sorts: SortBy[]): Sort[] {
+function processSortClause(sorts: SortBy[], from: string): Sort[] {
   return sorts.map((sortBy) => {
     if ('TypeCast' in sortBy.SortBy.node) {
       throw new UnsupportedError('Casting is not supported in the ORDER BY clause')
@@ -831,7 +855,23 @@ function processSortClause(sorts: SortBy[]): Sort[] {
     }
 
     const stringFields = fields.filter((field): field is PgString => 'String' in field)
-    const column = stringFields.map((field) => field.String.sval).join('.')
+    const qualifiedName = stringFields.map((field) => field.String.sval)
+
+    // Relation and column names are last two parts of the qualified name
+    const [relationName] = qualifiedName.slice(-2, -1)
+    const [columnName] = qualifiedName.slice(-1)
+
+    let column: string
+
+    // If the column is prefixed with the primary table name, strip the prefix
+    if (!relationName || relationName === from) {
+      column = columnName
+    }
+    // Otherwise this is a foreign column, so keep the relation prefix
+    else {
+      column = [relationName, columnName].join('.')
+    }
+
     const direction = mapSortByDirection(sortBy.SortBy.sortby_dir)
     const nulls = mapSortByNulls(sortBy.SortBy.sortby_nulls)
 
