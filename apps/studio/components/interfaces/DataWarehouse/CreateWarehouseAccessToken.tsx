@@ -55,9 +55,7 @@ const CreateWarehouseAccessToken = (props: Props) => {
                 placeholder="Description"
                 name="description"
                 id="description"
-                onChange={(e) => {
-                  setDescription(e.target.value)
-                }}
+                onChange={(e) => setDescription(e.target.value)}
                 value={description}
               />
             </FormItemLayout>
