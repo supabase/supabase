@@ -162,6 +162,54 @@
   },
   {
     "type": "category",
+    "title": "Database Branching",
+    "items": [
+      {
+        "id": "list-all-database-branches",
+        "title": "List all branches",
+        "slug": "list-all-database-branches",
+        "type": "operation"
+      },
+      {
+        "id": "get-database-branch-config",
+        "title": "Get a branch config",
+        "slug": "get-database-branch-config",
+        "type": "operation"
+      },
+      {
+        "id": "create-a-database-branch",
+        "title": "Create a branch",
+        "slug": "create-a-database-branch",
+        "type": "operation"
+      },
+      {
+        "id": "resets-a-database-branch",
+        "title": "Reset a branch",
+        "slug": "resets-a-database-branch",
+        "type": "operation"
+      },
+      {
+        "id": "update-database-branch-config",
+        "title": "Update a branch config",
+        "slug": "update-database-branch-config",
+        "type": "operation"
+      },
+      {
+        "id": "delete-a-database-branch",
+        "title": "Delete a branch",
+        "slug": "delete-a-database-branch",
+        "type": "operation"
+      },
+      {
+        "id": "disables-preview-branching",
+        "title": "Disable preview branching",
+        "slug": "disables-preview-branching",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
     "title": "Secrets",
     "items": [
       {
@@ -414,6 +462,24 @@
         "id": "removes-a-sso-provider-by-its-uuid",
         "title": "Delete a sso provider",
         "slug": "removes-a-sso-provider-by-its-uuid",
+        "type": "operation"
+      }
+    ]
+  },
+  {
+    "type": "category",
+    "title": "Oauth",
+    "items": [
+      {
+        "id": "authorize-user-through-oauth",
+        "title": "Authorize user",
+        "slug": "authorize-user-through-oauth",
+        "type": "operation"
+      },
+      {
+        "id": "exchange-auth-code-for-users-access-and-refresh-token",
+        "title": "Exchange oauth token",
+        "slug": "exchange-auth-code-for-users-access-and-refresh-token",
         "type": "operation"
       }
     ]
