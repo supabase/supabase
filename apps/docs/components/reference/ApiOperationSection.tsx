@@ -86,7 +86,11 @@ const ApiOperationSection = (props) => {
                       <Param
                         key={index}
                         {...parameter}
-                        type={parameter.schema.type === 'array' ? `${parameter.schema.type} ${parameter.schema.items?.type}` :parameter.schema.type}
+                        type={
+                          parameter.schema.type === 'array'
+                            ? `${parameter.schema.type} ${parameter.schema.items?.type}`
+                            : parameter.schema.type
+                        }
                         isOptional={!parameter.required}
                       >
                         {parameter.schema.enum && (
