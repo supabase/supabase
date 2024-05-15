@@ -59,7 +59,7 @@ const Option: FC<IOption> = (props) => {
         <span className="text-sm text-foreground font-mono font-medium">
           {props.name ?? 'no-name'}
         </span>
-        <span>
+        {!props.isEnum && <span>
           {props.isOptional ? (
             <div className="text-[10px] px-3 tracking-wide font-mono text-foreground-lighter">
               Optional
@@ -69,8 +69,8 @@ const Option: FC<IOption> = (props) => {
               REQUIRED
             </div>
           )}
-        </span>
-        <span className="text-foreground-muted text-xs">{props.type ?? 'no type'}</span>
+        </span>}
+        {!props.isEnum && <span className="text-foreground-muted text-xs">{props.type ?? 'no type'}</span>}
       </div>
 
       {props.description && (
