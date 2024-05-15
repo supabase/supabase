@@ -279,7 +279,7 @@ const GridHeaderActions = ({ table }: GridHeaderActionsProps) => {
           <Popover_Shadcn_ open={open} onOpenChange={() => setOpen(!open)} modal={false}>
             <PopoverTrigger_Shadcn_ asChild>
               <Button type="warning" icon={<Unlock strokeWidth={1.5} />}>
-                View is public
+                View is defined with the Security Definer property
               </Button>
             </PopoverTrigger_Shadcn_>
             <PopoverContent_Shadcn_ className="min-w-[395px] text-sm" align="end">
