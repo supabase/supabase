@@ -6,6 +6,7 @@ import { ReactMarkdown } from 'react-markdown/lib/react-markdown'
 import BodyContentTypeDropdown from '~/components/BodyContentTypeDropdown'
 import { useState } from 'react'
 import Options from '~/components/Options'
+import ApiBodyParam from '~/components/ApiBodyParam'
 
 const ApiOperationSection = (props) => {
   const operation = props.spec.operations.find((x: any) => x.operationId === props.funcData.id)
@@ -88,7 +89,7 @@ const ApiOperationSection = (props) => {
                         {...parameter}
                         type={
                           parameter.schema.type === 'array'
-                            ? `${parameter.schema.type} ${parameter.schema.items?.type}`
+                            ? `${parameter.schema.items?.type} array`
                             : parameter.schema.type
                         }
                         isOptional={!parameter.required}
@@ -149,6 +150,7 @@ const ApiOperationSection = (props) => {
                 <div className="space-y-4">
                   <span>array of:</span>
                   <div className="ml-10">
+                    {/*object array*/}
                     {hasBodyArrayObject &&
                       operation?.requestBody?.content[selectedContentType]?.schema?.items
                         ?.properties &&
@@ -156,18 +158,19 @@ const ApiOperationSection = (props) => {
                         operation?.requestBody?.content[selectedContentType]?.schema?.items
                           ?.properties
                       ).map(([key, value]) => (
-                        <Param
+                        <ApiBodyParam
                           key={key}
                           name={key}
-                          {...(value as object)}
+                          value={value}
                           isOptional={
                             !operation.requestBody?.content[
                               selectedContentType
                             ]?.schema?.items?.required?.includes(key)
                           }
-                        ></Param>
+                        />
                       ))}
 
+                    {/*primitive type array*/}
                     {!hasBodyArrayObject &&
                       operation?.requestBody?.content[selectedContentType]?.schema?.items?.type && (
                         <Param
@@ -185,24 +188,16 @@ const ApiOperationSection = (props) => {
                 Object.entries(
                   operation?.requestBody?.content[selectedContentType]?.schema?.properties
                 ).map(([key, value]) => (
-                  <Param
+                  <ApiBodyParam
                     key={key}
                     name={key}
-                    {...(value as object)}
+                    value={value}
                     isOptional={
                       !operation.requestBody?.content[
                         selectedContentType
-                      ]?.schema?.required?.includes(key)
+                      ]?.schema?.items?.required?.includes(key)
                     }
-                  >
-                    {(value as any).enum && (
-                      <Options>
-                        {(value as any).enum.map((value) => {
-                          return <Options.Option key={value} name={value} isEnum={true} />
-                        })}
-                      </Options>
-                    )}
-                  </Param>
+                  />
                 ))
               )}
             </ul>
